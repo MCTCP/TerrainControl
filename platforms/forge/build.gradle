@@ -18,21 +18,20 @@ buildscript
     }
     dependencies
     {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'signing'
 
 // Project properties
 archivesBaseName = "openterraingenerator-forge"
 description = "OpenTerrainGenerator for Minecraft Forge"
-//ext.forgeVersion = "1.11.2-13.20.0.2315"
-ext.forgeVersion = "1.11.2-13.20.1.2386"
+ext.forgeVersion = "1.12.2-14.23.0.2489"
 minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
-//minecraft.mappings = "snapshot_20170430"
-minecraft.mappings = "snapshot_20170612"
+minecraft.mappings = "snapshot_20170919"
 
 repositories
 {
@@ -43,7 +42,6 @@ repositories
 dependencies
 {
     compile project(':common')
-    compile 'com.google.guava:guava:17.0'
 }
 
 // Replace text in mcmod.info
@@ -69,7 +67,7 @@ processResources
     }
 }
 
-// Include all Open Terrain Generator files in the jar
+// Include all OpenTerrainGenerator files in the jar
 jar
 {
     destinationDir = new File(project.buildDir, "distributions")
@@ -78,8 +76,78 @@ jar
     {
         project(":common").sourceSets.main.output.files
     }
-    manifest
-    {
-        attributes 'FMLAT': 'openterraingenerator_at.cfg'
+}
+
+// Package OTG-ASM jar inside the OTG-Forge jar.
+
+reobf {
+    asmJar {}
+    rootJar {}
+}
+
+task asmJar(type: Jar, dependsOn: 'compileJava') {
+    from (sourceSets.main.output) {
+        // Include all of your coremod files here
+        // Example line >> include "testmod/asm/**"
+		include "com/pg85/otg/forge/asm/**"
+    }
+    archiveName = "OTG-ASM.jar" // You can change this to anything you wish, remember to change it below also
+    manifest {
+        // Your previous manifest attributes go here
+        // Example line >> attributes 'FMLCorePlugin': 'testmod.asm.TweakPlugin'
+		attributes 'FMLCorePlugin': 'com.pg85.otg.forge.asm.launch.OTGASMPlugin'
+		attributes 'FMLCorePluginContainsMod': 'true'
     }
 }
+
+task rootJar(type: Jar, dependsOn: ['compileJava', asmJar]) {
+
+	manifest
+    {
+		attributes 'ContainedDeps': 'OTG-ASM.jar'
+        attributes 'FMLAT': 'openterraingenerator_at.cfg'
+	}
+
+    from (sourceSets.main.output) {
+        // Exclude all of your coremod files here
+        // Example line >> exclude "testmod/asm/**"
+		exclude "com/pg85/otg/forge/asm/**"
+    }
+    from ("build/libs") {
+        include "OTG-ASM.jar" // If you changed the name above, change it here also.
+    }
+	
+	destinationDir = new File(project.buildDir, "distributions")
+
+    // Leave the following line commented out to overwrite the default jar,
+    //    otherwise <basename>-root.jar will be created, containing the embedded coremod jar
+    // classifier = 'root'
+}
+
+task signAsmJar(type: SignJar, dependsOn: reobfAsmJar) {
+    onlyIf { // Skip the task if our secret data isn't available
+        project.hasProperty('keyStore')
+    }
+    keyStore = project.keyStore // This needs to be a path to the keystore file
+    alias = project.keyStoreAlias
+    storePass = project.keyStorePass
+    keyPass = project.keyStoreKeyPass
+    inputFile = jar.archivePath // TODO: Sign a jar inside a jar? Find a better solution?
+    outputFile = jar.archivePath // TODO: Sign a jar inside a jar? Find a better solution?
+}
+
+task signJar(type: SignJar, dependsOn: reobfJar) {
+    onlyIf { // Skip the task if our secret data isn't available
+        project.hasProperty('keyStore')
+    }
+    keyStore = project.keyStore // This needs to be a path to the keystore file
+    alias = project.keyStoreAlias
+    storePass = project.keyStorePass
+    keyPass = project.keyStoreKeyPass
+    inputFile = jar.archivePath
+    outputFile = jar.archivePath
+}
+
+build.dependsOn rootJar
+build.dependsOn signJar
+//build.dependsOn signAsmJar // TODO: Figure out a way to sign the asm jar

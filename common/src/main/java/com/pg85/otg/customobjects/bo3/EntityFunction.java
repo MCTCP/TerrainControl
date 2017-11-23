@@ -1,7 +1,9 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.Rotation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,13 +20,13 @@ public class EntityFunction extends BO3Function
 	public int x;
     public int y;
     public int z;
-    
+
     public String mobName = "";
     public int groupSize = 1;
     public String nameTagOrNBTFileName = "";
     public String originalNameTagOrNBTFileName = "";
     public String nameTag = "";
-    
+
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
@@ -36,12 +38,12 @@ public class EntityFunction extends BO3Function
         z = readInt(args.get(2), -100, 100);
         mobName = args.get(3);
         groupSize = readInt(args.get(4), 0, Integer.MAX_VALUE);
-        
+
         if(args.size() > 5)
         {
     		originalNameTagOrNBTFileName = args.get(5);
         }
-        
+
         if(originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
         {
         	nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + originalNameTagOrNBTFileName;
@@ -65,10 +67,28 @@ public class EntityFunction extends BO3Function
         rotatedBlock.groupSize = groupSize;
         rotatedBlock.originalNameTagOrNBTFileName = originalNameTagOrNBTFileName;
         rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;
-    	
+
         return rotatedBlock;
     }
-    
+
+    public EntityFunction rotate(Rotation rotation)
+    {
+    	EntityFunction rotatedBlock = new EntityFunction();
+
+        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+
+        rotatedBlock.x = rotatedCoords.getX();
+        rotatedBlock.y = rotatedCoords.getY();
+        rotatedBlock.z = rotatedCoords.getZ();
+
+        rotatedBlock.mobName = mobName;
+        rotatedBlock.groupSize = groupSize;
+        rotatedBlock.originalNameTagOrNBTFileName = originalNameTagOrNBTFileName;
+        rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;
+
+        return rotatedBlock;
+    }
+
     private String metaDataTag;
     public String getMetaData()
     {
@@ -82,7 +102,7 @@ public class EntityFunction extends BO3Function
     				BufferedReader reader = new BufferedReader(new FileReader(metaDataFile));
     				try {
     					String line = reader.readLine();
-    	
+
     				    while (line != null) {
     				    	stringbuilder.append(line);
     				        //sb.append(System.lineSeparator());
@@ -90,19 +110,19 @@ public class EntityFunction extends BO3Function
     				    }
     				} finally {
     					reader.close();
-    				}				
+    				}
     			} catch (FileNotFoundException e1) {
     				e1.printStackTrace();
     			}
     			catch (IOException e1) {
     				e1.printStackTrace();
     			}
-    	    }    		
-    		
-            metaDataTag = stringbuilder.toString();            
+    	    }
+
+            metaDataTag = stringbuilder.toString();
     	}
     	return metaDataTag;
-    }    
+    }
 
     @Override
     public boolean isAnalogousTo(CustomObjectConfigFunction<BO3Config> other)

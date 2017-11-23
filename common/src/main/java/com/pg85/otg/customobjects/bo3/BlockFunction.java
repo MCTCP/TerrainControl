@@ -3,8 +3,10 @@ package com.pg85.otg.customobjects.bo3;
 import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.Rotation;
 
 import java.util.List;
 import java.util.Random;
@@ -23,15 +25,17 @@ public class BlockFunction extends BO3Function
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
-    {       
+    {
         assureSize(4, args);
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
 		x = readInt(args.get(0), -100, 100);
 		y = readInt(args.get(1), -1000, 1000);
 		z = readInt(args.get(2), -100, 100);
-        material = readMaterial(args.get(3));
-               
+
+		String materialName = args.get(3);
+        material = readMaterial(materialName);
+
         if (args.size() == 5)
         {
             metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().getFile());
@@ -41,7 +45,7 @@ public class BlockFunction extends BO3Function
             }
         }
     }
-    
+
     @Override
     public String makeString()
     {
@@ -61,7 +65,43 @@ public class BlockFunction extends BO3Function
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.material = material.rotate();
-        rotatedBlock.material = material;
+        rotatedBlock.metaDataTag = metaDataTag;
+        rotatedBlock.metaDataName = metaDataName;
+
+        return rotatedBlock;
+    }
+
+    public BlockFunction rotate(Rotation rotation)
+    {
+        BlockFunction rotatedBlock = new BlockFunction();
+
+        rotatedBlock.material = material; // TODO: Make sure this won't cause problems
+
+        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+
+        rotatedBlock.x = rotatedCoords.getX();
+        rotatedBlock.y = rotatedCoords.getY();
+        rotatedBlock.z = rotatedCoords.getZ();
+
+    	// TODO: This makes no sense, why is rotation inverted??? Should be: NORTH:0,WEST:1,SOUTH:2,EAST:3
+
+        // Apply rotation
+    	if(rotation.getRotationId() == 3)
+    	{
+    		rotatedBlock.material = rotatedBlock.material.rotate();
+    	}
+    	if(rotation.getRotationId() == 2)
+    	{
+    		rotatedBlock.material = rotatedBlock.material.rotate();
+    		rotatedBlock.material = rotatedBlock.material.rotate();
+    	}
+    	if(rotation.getRotationId() == 1)
+    	{
+    		rotatedBlock.material = rotatedBlock.material.rotate();
+    		rotatedBlock.material = rotatedBlock.material.rotate();
+    		rotatedBlock.material = rotatedBlock.material.rotate();
+    	}
+
         rotatedBlock.metaDataTag = metaDataTag;
         rotatedBlock.metaDataName = metaDataName;
 

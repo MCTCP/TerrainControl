@@ -28,7 +28,7 @@ public class PlayerTracker
 {
     @SubscribeEvent
     public void onConnectionCreated(FMLNetworkEvent.ServerConnectionFromClientEvent event)
-    {   	
+    {
 		ByteBuf nettyBuffer = createWorldAndBiomeConfigsPacket();
 		if(nettyBuffer != null)
 		{
@@ -52,34 +52,35 @@ public class PlayerTracker
 	    	}
 		}
     }
-    
+
     private static ByteBuf createWorldAndBiomeConfigsPacket()
     {
         // Make sure worlds are sent in the correct order.
-        
+
 		OTGDimensionInfo otgDimData = OTGDimensionManager.GetOrderedDimensionData();
-		
+
         // Serialize it
         ByteBuf nettyBuffer = Unpooled.buffer();
         //PacketBuffer mojangBuffer = new PacketBuffer(nettyBuffer);
         DataOutput stream = new ByteBufOutputStream(nettyBuffer);
-        
+
         try
         {
         	stream.writeInt(PluginStandardValues.ProtocolVersion);
         	stream.writeInt(0); // 0 == Normal packet
         	stream.writeInt(otgDimData.orderedDimensions.size() + 1); // Number of worlds in this packet
-        	   		
+
     		// Send worldconfig and biomeconfigs for each world.
-        	
+
 			LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 
 			if(localWorld == null)
 			{
 				// This is not an OTG world.
+				((ByteBufOutputStream)stream).close();
 				return null;
 			}
-			
+
 			// Overworld (dim 0)
 	        try
 	        {
@@ -90,7 +91,7 @@ public class PlayerTracker
 	        {
 	            OTG.printStackTrace(LogMarker.FATAL, e);
 	        }
-        	
+
     		for(int i = 0; i <= otgDimData.highestOrder; i++)
     		{
     			if(otgDimData.orderedDimensions.containsKey(i))
@@ -101,7 +102,7 @@ public class PlayerTracker
     				{
     					localWorld = OTG.getUnloadedWorld(dimData.dimensionName);
     				}
-    				
+
     		        try
     		        {
     		        	stream.writeInt(dimData.dimensionId);
@@ -118,7 +119,7 @@ public class PlayerTracker
         {
 			e1.printStackTrace();
 		}
-        
+
         return nettyBuffer;
     }
 }

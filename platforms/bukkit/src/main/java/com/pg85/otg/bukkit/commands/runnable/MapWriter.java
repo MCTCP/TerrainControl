@@ -7,8 +7,8 @@ import com.pg85.otg.bukkit.commands.BaseCommand;
 import com.pg85.otg.bukkit.util.WorldHelper;
 import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.logging.LogMarker;
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.World;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.World;
 import org.bukkit.command.CommandSender;
 
 import java.awt.Color;

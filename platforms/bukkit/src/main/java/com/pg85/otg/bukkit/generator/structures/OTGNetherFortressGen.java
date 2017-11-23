@@ -4,9 +4,9 @@ import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.util.WorldHelper;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_11_R1.*;
-import net.minecraft.server.v1_11_R1.BiomeBase.BiomeMeta;
-import net.minecraft.server.v1_11_R1.WorldGenNether.WorldGenNetherStart;
+import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.BiomeBase.BiomeMeta;
+import net.minecraft.server.v1_12_R1.WorldGenNether.WorldGenNetherStart;
 
 import java.util.ArrayList;
 import java.util.List;

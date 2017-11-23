@@ -13,7 +13,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_11_R1.WorldGenFactory;
+import net.minecraft.server.v1_12_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.Command;

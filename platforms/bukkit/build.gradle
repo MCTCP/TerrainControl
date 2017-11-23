@@ -5,7 +5,7 @@ apply plugin: 'java'
 // Project properties
 archivesBaseName = "openterraingenerator-bukkit"
 description = "Open Terrain Generator for Bukkit"
-ext.bukkitVersion = "1.11-R0.1-SNAPSHOT"
+ext.bukkitVersion = "1.12.2-R0.1-SNAPSHOT"
 
 repositories
 {
@@ -17,7 +17,7 @@ repositories
     }
     maven
     {   // For Bukkit API, updated by Spigot
-        url = "https://hub.spigotmc.org/nexus/content/groups/public/" 
+		url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
     }
 }
 

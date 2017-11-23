@@ -1,11 +1,9 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.LocalWorld;
-import com.pg85.otg.OTG;
 import com.pg85.otg.customobjects.Branch;
 import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.Rotation;
 
 import java.util.ArrayList;
@@ -14,57 +12,66 @@ import java.util.Random;
 import java.util.TreeSet;
 
 public class WeightedBranchFunction extends BranchFunction implements Branch
-{    	
+{
 	public double cumulativeChance = 0;
 
-    boolean isOTGPlus;
     protected double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
-    {   
+    {
         double cumulativeChance = 0;
         isOTGPlus = this.getHolder().isOTGPlus;
     	if(isOTGPlus)
     	{
-    		// assureSize only returns false if size() < size 
-    		assureSize(8, args);			    	
-    		
+    		// assureSize only returns false if size() < size
+    		assureSize(8, args);
+
 	        x = readInt(args.get(0), -32, 32);
 	        y = readInt(args.get(1), -255, 255);
-	        z = readInt(args.get(2), -32, 32);        
+	        z = readInt(args.get(2), -32, 32);
 	        isRequiredBranch = readBoolean(args.get(3));
 
-	        if(isRequiredBranch)
-	        {
-    			String branchString = "";
-    			for(String arg : args)
-    			{
-    				branchString += ",";	
-    			}
-    			
-	    		if(OTG.getPluginConfig().SpawnLog)
-	    		{
-	    			OTG.log(LogMarker.WARN, "isRequired:true branches cannot have multiple BO3's with a rarity, only one BO3 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. WeightedBranch() can only be used with isRequired:false. Branch: WeightedBranch(" + branchString.substring(0, branchString.length()  - 1) + ")");    		
-	    		}
-	    		throw new InvalidConfigException("isRequired:true branches cannot have multiple BO3's with a rarity, only one BO3 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. WeightedBranch() can only be used with isRequired:false. Branch: WeightedBranch(" + branchString.substring(0, branchString.length()  - 1) + ")");
-	        }
-	        
 	        int i;
 	        // This for loop allows multiple branches to be defined in a single Branch(x,x,x,x,etc) line in a BO3 file.
 	        for (i = 4; i < args.size() - 3; i += 4)
 	        {
 	            double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
-	            branchesOTGPlus.add(new BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i)));
+	            branchesOTGPlus.add(new BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, true, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
 	        }
+
 	        if (i < args.size())
 	        {
-	        	totalChanceSet = true;
-	            totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
+	        	String totalChanceOrBranchGroup = args.get(i);
+	        	if(totalChanceOrBranchGroup != null && totalChanceOrBranchGroup.length() > 0)
+	        	{
+	        		try
+	        		{
+	        			Double.parseDouble(totalChanceOrBranchGroup);
+			        	totalChanceSet = true;
+			            totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
+			            i++;
+	        		}
+	        		catch(NumberFormatException ex) { }
+	        	}
+	        }
+
+	        if (i < args.size())
+	        {
+	        	String totalChanceOrBranchGroup = args.get(i);
+	        	if(totalChanceOrBranchGroup != null && totalChanceOrBranchGroup.length() > 0)
+	        	{
+	        		branchGroup = args.get(i);
+
+	        		for(BranchNode branch : branchesOTGPlus)
+	        		{
+	        			branch.branchGroup = branchGroup;
+	        		}
+	        	}
 	        }
     	} else {
-    		return super.readArgs(args, accumulateChances);    		
+    		return super.readArgs(args, accumulateChances);
     	}
     	return cumulativeChance;
     }
-	
+
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
@@ -82,14 +89,14 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
 	    	for (BranchNode branch : branchesOTGPlus)
 	    	{
 	    		cumulativeChance += branch.getChance();
-	    	}    	
+	    	}
 	    	if(cumulativeChance > totalChance)
 	    	{
 	    		totalChance = cumulativeChance;
 	    	}
-	    	
+
 	        double randomChance = random.nextDouble() * totalChance;
-	             
+
 	        for(BranchNode branch : branchesOTGPlus)
 	        {
 	        	double branchRarity = branch.getChance();
@@ -97,9 +104,9 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
 	            {
 	            	if(this.getHolder().isOTGPlus)
 	            	{
-		                CustomObjectCoordinate rotatedCoords = RotateCoords(this.x, this.y, this.z, rotation);               
+		                CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
 		                Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-		                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), true, branch.branchDepth, false);
+		                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), true, branch.branchDepth, branch.isRequiredBranch, true, branch.branchGroup);
 	            	} else {
 	            		return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, y + this.y, z + this.z);
 	            	}
@@ -122,58 +129,10 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
 				{
 					return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, y + this.y, z + this.z);
 				}
-			}   		
+			}
     	}
         return null;
     }
-    
-    //TODO: The exact same method exists in multiple classes, merge into one method?
-    private CustomObjectCoordinate RotateCoords(int x, int y, int z, Rotation newRotation)
-    {
-        // Assuming initial rotation is always north
-    	
-    	int newX = 0;
-    	int newY = 0;
-    	int newZ = 0;
-    	int rotations = 0;
-    	// How many counter-clockwise rotations have to be applied?
-		if(newRotation == Rotation.WEST)
-		{
-			rotations = 1;
-		}
-		else if(newRotation == Rotation.SOUTH)
-		{
-			rotations = 2;    			
-		}
-		else if(newRotation == Rotation.EAST)
-		{
-			rotations = 3;    			
-		}
-    
-    	if(rotations == 0)
-    	{
-    		newX = x;
-    		newZ = z;
-    	}
-    	if(rotations == 1)
-    	{
-    		newX = z;
-    		newZ = -x;    		
-    	}
-    	if(rotations == 2)
-    	{
-    		newX = -x; 
-    		newZ = -z;
-    	}
-    	if(rotations == 3)
-    	{
-    		newX = -z;
-    		newZ = x;
-    	}    	
-    	newY = y;
-    	
-    	return new CustomObjectCoordinate(null, null, null, newRotation, newX, newY, newZ, false, 0, false);
-    }      
 
     @Override
     protected String getConfigName()
@@ -181,4 +140,58 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
         return "WeightedBranch";
     }
 
+    @Override
+    public WeightedBranchFunction rotate(Rotation rotation)
+    {
+    	if(!isOTGPlus)
+    	{
+    		throw new RuntimeException();
+    	}
+
+    	WeightedBranchFunction rotatedBranch = new WeightedBranchFunction();
+
+    	rotatedBranch.isOTGPlus = isOTGPlus;
+
+    	rotatedBranch.x = x;
+    	rotatedBranch.y = y;
+    	rotatedBranch.z = z;
+
+        rotatedBranch.totalChance = totalChance;
+        rotatedBranch.totalChanceSet = totalChanceSet;
+
+        rotatedBranch.branchGroup = branchGroup;
+        rotatedBranch.isRequiredBranch = isRequiredBranch;
+        rotatedBranch.cumulativeChance = cumulativeChance;
+        rotatedBranch.isOTGPlus = isOTGPlus;
+
+        rotatedBranch.holder = holder;
+        rotatedBranch.valid = valid;
+        rotatedBranch.inputName = inputName;
+        rotatedBranch.inputArgs = inputArgs;
+        rotatedBranch.error = error;
+
+        rotatedBranch.branchesOTGPlus = this.branchesOTGPlus; // TODO: Make sure this won't cause problems
+
+        int newX = rotatedBranch.x;
+        int newZ = rotatedBranch.z;
+
+    	for(int i = 0; i < rotation.getRotationId(); i++)
+    	{
+            newX = rotatedBranch.z;
+            newZ = -rotatedBranch.x;
+
+    		rotatedBranch.x = newX;
+            rotatedBranch.y = rotatedBranch.y;
+            rotatedBranch.z = newZ;
+
+            ArrayList<BranchNode> rotatedBranchBranches = new ArrayList<BranchNode>();
+            for (BranchNode holder : rotatedBranch.branchesOTGPlus)
+            {
+            	rotatedBranchBranches.add(new BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, null), holder.customObjectName, holder.branchGroup));
+            }
+            rotatedBranch.branchesOTGPlus = rotatedBranchBranches;
+    	}
+
+        return rotatedBranch;
+    }
 }

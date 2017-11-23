@@ -5,13 +5,13 @@ import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.configuration.ConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.StructureGenerator;
-import net.minecraft.server.v1_11_R1.StructureStart;
-import net.minecraft.server.v1_11_R1.World;
-import net.minecraft.server.v1_11_R1.WorldGenMonument.WorldGenMonumentStart;
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.StructureGenerator;
+import net.minecraft.server.v1_12_R1.StructureStart;
+import net.minecraft.server.v1_12_R1.World;
+import net.minecraft.server.v1_12_R1.WorldGenMonument.WorldGenMonumentStart;
+import net.minecraft.server.v1_12_R1.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;

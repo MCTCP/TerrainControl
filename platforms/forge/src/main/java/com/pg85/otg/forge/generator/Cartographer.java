@@ -39,7 +39,6 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.OTGWorldType;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.NamedBinaryTag.Type;
@@ -49,23 +48,23 @@ import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 
 public class Cartographer
-{ 
+{
 	// TODO: Use instance instead of static methods
 
 	public static int CartographerDimension = 0;
-	
+
 	static long lastUpdateTime = System.currentTimeMillis();
 	public static void UpdateWorldMap()
-	{	
+	{
 		WorldServer worldServer = DimensionManager.getWorld(0);
-		if(((ForgeEngine)OTG.getEngine()).getCartographerEnabled() && worldServer.getWorldInfo().getTerrainType() instanceof OTGWorldType)
-		{		
+		if(((ForgeEngine)OTG.getEngine()).getCartographerEnabled() && worldServer.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+		{
 			if(System.currentTimeMillis() - lastUpdateTime > 1000) // Once per second
 			{
 				destinationCoordinateCache = null;
-				
+
 				ForgeWorld world = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(worldServer);
-				ForgeWorld cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");			
+				ForgeWorld cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");
 	    		if(cartographerWorld == null)
 	    		{
 	    			DimensionManager.initDimension(Cartographer.CartographerDimension);
@@ -75,42 +74,42 @@ public class Cartographer
 	    		{
 	    			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 	    		}
-				
+
 				if(world == null || cartographerWorld == null || cartographerWorld == world)
 				{
 					return; // May be unloading / shutting down
 				}
-				
+
 				lastUpdateTime = System.currentTimeMillis();
-				
+
 		    	Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = getPortals();
 				for(Teleporter.PortalPosition portalPos : destinationCoordinateCache.values())
-				{	
-					// Prevent the portal from being unloaded from the list of portals. 
+				{
+					// Prevent the portal from being unloaded from the list of portals.
 					// TODO: Make sure this doesn't cause problems, portal locations will never be unloaded
 					// TODO: Save TC portals seperately from normal portals so they don't get unloaded and aren't seen as nether portals by MC.
-					portalPos.lastUpdateTime = worldServer.getTotalWorldTime(); 
+					portalPos.lastUpdateTime = worldServer.getTotalWorldTime();
 				}
-				
+
 				BlockPos spawnPoint = world.getSpawnPoint();
 		    	BlockPos cartographerSpawnPoint = cartographerWorld.getSpawnPoint();
 		    	ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
-				
+
 		    	HashMap<ChunkCoordinate,ArrayList<Entity>> entitiesPerBlock = new HashMap<ChunkCoordinate, ArrayList<Entity>>();
 		    	for(Entity entity : cartographerWorld.getWorld().getEntities(Entity.class, EntitySelectors.NOT_SPECTATING))
-		    	{		    		
+		    	{
 		    		if(
 	    				//entity.dimension == 0 &&
 	    				!(entity instanceof EntityEnderPearl) &&
 	    				(
-							entity instanceof EntityAreaEffectCloud || 
-		    				entity instanceof EntityItem || 
-		    				entity instanceof EntityLiving || 
-		    				entity instanceof EntityArrow || 
-		    				entity instanceof EntityFireball || 
-		    				entity instanceof EntityBoat || 
-		    				entity instanceof EntityMinecart || 
-		    				entity instanceof EntityFireworkRocket || 
+							entity instanceof EntityAreaEffectCloud ||
+		    				entity instanceof EntityItem ||
+		    				entity instanceof EntityLiving ||
+		    				entity instanceof EntityArrow ||
+		    				entity instanceof EntityFireball ||
+		    				entity instanceof EntityBoat ||
+		    				entity instanceof EntityMinecart ||
+		    				entity instanceof EntityFireworkRocket ||
 		    				entity instanceof EntityThrowable ||
 		    				entity instanceof EntityTNTPrimed ||
 		    				entity instanceof EntityShulkerBullet ||
@@ -119,7 +118,7 @@ public class Cartographer
 					)
 		    		{
 			    		ChunkCoordinate chunkCoord1 = ChunkCoordinate.fromChunkCoords(entity.getPosition().getX() - cartographerSpawnPoint.getX(), entity.getPosition().getZ() - cartographerSpawnPoint.getZ());
-			    		
+
 			    		if(entitiesPerBlock.containsKey(chunkCoord1))
 			    		{
 			    			entitiesPerBlock.get(chunkCoord1).add(entity);
@@ -130,9 +129,9 @@ public class Cartographer
 			    		}
 		    		}
 		    	}
-		    	
+
 				ArrayList<ChunkCoordinate> chunksDone = new ArrayList<ChunkCoordinate>();
-		    	
+
 				// Check all chunks around spawn for items to teleport
 		        int minDist = world.getWorld().getMinecraftServer().getPlayerList().getViewDistance();
 				for(int x = -minDist; x < minDist; x++)
@@ -151,13 +150,13 @@ public class Cartographer
 						}
 					}
 				}
-		    	
+
 				// Check all chunks around portals for items to teleport
-				minDist = 2; // Radius around portals can be tp'd to even when no player is near 						
+				minDist = 2; // Radius around portals can be tp'd to even when no player is near
 				for(Teleporter.PortalPosition portalPos : destinationCoordinateCache.values())
 				{
 					ChunkCoordinate portalChunk = ChunkCoordinate.fromBlockCoords(portalPos.getX() - spawnPoint.getX(), portalPos.getZ() - spawnPoint.getZ());
-	
+
 					for(int x = portalChunk.getChunkX() - minDist; x < portalChunk.getChunkX() + minDist; x++)
 					{
 						for(int z = portalChunk.getChunkZ() - minDist; z < portalChunk.getChunkZ() + minDist; z++)
@@ -185,7 +184,7 @@ public class Cartographer
 		    		if(player.dimension == 0)
 		    		{
 		    			ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)Math.floor(player.posX) - spawnPoint.getX(), (int)Math.floor(player.posZ) - spawnPoint.getZ());
-	
+
 						for(int x = playerChunk.getChunkX() - viewDist; x < playerChunk.getChunkX() + viewDist; x++)
 						{
 							for(int z = playerChunk.getChunkZ() - viewDist; z < playerChunk.getChunkZ() + viewDist; z++)
@@ -220,12 +219,12 @@ public class Cartographer
 			}
 		}
 	}
-	
+
 	public static boolean TeleportPlayerFromMap(EntityPlayer player)
 	{
 		ArrayList<Entity> entities = new ArrayList<Entity>();
 		entities.add(player);
-		
+
 		ForgeWorld cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");
 		if(cartographerWorld == null)
 		{
@@ -236,10 +235,10 @@ public class Cartographer
 		{
 			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 		}
-		
+
 		return TeleportEntityFromMap(cartographerWorld, entities, false);
 	}
-	
+
 	static Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = null;
 	private static Long2ObjectMap<Teleporter.PortalPosition> getPortals()
 	{
@@ -272,33 +271,33 @@ public class Cartographer
 		}
 		return destinationCoordinateCache;
 	}
-	
+
 	private static boolean TeleportEntityFromMap(ForgeWorld cartographerworld, ArrayList<Entity> entities, boolean excludePlayers)
-	{		
+	{
 		Entity entity = entities.get(0);
 		// Check existing portals, players and spawn
 
 		WorldServer overWorldServer = DimensionManager.getWorld(0);
-		if(!(overWorldServer.getWorldInfo().getTerrainType() instanceof OTGWorldType))
+		if(!(overWorldServer.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator")))
 		{
 			return false;
 		}
 		ForgeWorld overWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(overWorldServer);
-		
+
 		BlockPos spawnPoint = overWorld.getSpawnPoint();
 		ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
 		BlockPos cartographerSpawnPoint = cartographerworld.getSpawnPoint();
-				
+
 		ChunkCoordinate destinationChunk = ChunkCoordinate.fromChunkCoords((int)Math.floor(entity.posX) - cartographerSpawnPoint.getX() + spawnChunk.getChunkX(), (int)Math.floor(entity.posZ) - cartographerSpawnPoint.getZ() + spawnChunk.getChunkZ());
     	int newX = destinationChunk.getBlockXCenter();
     	int newZ = destinationChunk.getBlockZCenter();
-		
+
         // Check if destination is close enough to overworld spawn point to be able to teleport
 		int minDistSq = overWorld.getWorld().getMinecraftServer().getPlayerList().getViewDistance() * overWorld.getWorld().getMinecraftServer().getPlayerList().getViewDistance();
         int xDiff = (int) (destinationChunk.getChunkX() - spawnChunk.getChunkX());
         int zDiff = (int) (destinationChunk.getChunkZ() - spawnChunk.getChunkZ());
         float distInChunksSq = (xDiff * xDiff + zDiff * zDiff);
-		
+
         if(distInChunksSq <= minDistSq)
         {
     		for(Entity entityToTeleport : entities)
@@ -317,22 +316,22 @@ public class Cartographer
     		}
 			return true;
         }
-        
+
         // Check if destination is close enough to a portal to be able to teleport
 		boolean portalInRange = false;
 		boolean portalInChunk = false;
 
 		Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = getPortals();
-						
-		minDistSq = 2 * 2; // Radius around portals can be tp'd to even when no player is near 
+
+		minDistSq = 2 * 2; // Radius around portals can be tp'd to even when no player is near
 		for(Teleporter.PortalPosition portalPos : destinationCoordinateCache.values())
-		{				
+		{
 			ChunkCoordinate portalChunk = ChunkCoordinate.fromBlockCoords(portalPos.getX(), portalPos.getZ());
-			
+
             xDiff = destinationChunk.getChunkX() - portalChunk.getChunkX();
             zDiff = destinationChunk.getChunkZ() - portalChunk.getChunkZ();
             distInChunksSq = (xDiff * xDiff + zDiff * zDiff);
-    		           
+
             if(portalInRange || distInChunksSq <= minDistSq)
             {
             	portalInRange = true;
@@ -345,9 +344,9 @@ public class Cartographer
     			break;
     		}
 		}
-		
+
 		if(portalInRange || portalInChunk)
-		{    	
+		{
 	    	int newY = overWorld.getHighestBlockYAt(newX, newZ);
 			entity.setPositionAndUpdate(newX, newY, newZ);
 			if(entity instanceof EntityPlayerMP)
@@ -358,18 +357,18 @@ public class Cartographer
 			}
 			return true;
 		}
-		
+
     	minDistSq = overWorld.getWorld().getMinecraftServer().getPlayerList().getViewDistance() * overWorld.getWorld().getMinecraftServer().getPlayerList().getViewDistance();
     	boolean playerInRange = false;
     	ArrayList<EntityPlayer> playersInChunk = new ArrayList<EntityPlayer>();
     	for(EntityPlayer player : overWorld.getWorld().playerEntities)
     	{
     		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)player.posX, (int)player.posZ);
-    		
+
             xDiff = destinationChunk.getChunkX() - playerChunk.getChunkX();
             zDiff = destinationChunk.getChunkZ() - playerChunk.getChunkZ();
-            distInChunksSq = (xDiff * xDiff + zDiff * zDiff);    		                
-            
+            distInChunksSq = (xDiff * xDiff + zDiff * zDiff);
+
             if(playerInRange || distInChunksSq <= minDistSq)
             {
             	playerInRange = true;
@@ -382,9 +381,9 @@ public class Cartographer
     	    	break;
     		}
     	}
-		
+
 		if(portalInRange || portalInChunk)
-		{    	
+		{
 	    	int newY = overWorld.getHighestBlockYAt(newX, newZ);
 			entity.setPositionAndUpdate(newX, newY, newZ);
 			if(entity instanceof EntityPlayerMP)
@@ -397,19 +396,19 @@ public class Cartographer
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Spawns a miniature of the known world at 1/16 scale (so one block per chunk) at spawn, made of 
-	 * colored clay, wool and glass. Work in progress, will add more features for spawning location, 
+	 * Spawns a miniature of the known world at 1/16 scale (so one block per chunk) at spawn, made of
+	 * colored clay, wool and glass. Work in progress, will add more features for spawning location,
 	 * updating blocks, console commands etc.
 	 */
     public static void CreateBlockWorldMapAtSpawn(ChunkCoordinate chunkCoord, boolean unloading)
     {
 		WorldServer worldServer = DimensionManager.getWorld(0);
-		if(worldServer.getWorldInfo().getTerrainType() instanceof OTGWorldType)
-		{		
+		if(worldServer.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+		{
 			ForgeWorld world = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(worldServer);
-    	  	
+
 			ForgeWorld cartographerWorld = (ForgeWorld) OTG.getWorld("DIM-Cartographer");
     		if(cartographerWorld == null)
     		{
@@ -420,35 +419,35 @@ public class Cartographer
     		{
     			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
     		}
-    	  	
+
 	    	if(world == null || cartographerWorld == null || world == cartographerWorld)
 	    	{
 	    		return; // May be unloading / shutting down ?? TODO: Is this really acceptable? Load worlds?
 	    	}
-	    	    	    	
+
 	    	// NOTE: Don't use Glowstone, it's laggy!
-	    	 
+
 	    	DefaultMaterial replaceByMaterial = DefaultMaterial.STAINED_CLAY; // Glass = 95, Clay = 159, Wool = 35
-	    	
+
 	    	// One chunk in the overworld is one block in the Cartographer dimension, calculate x and z.
 	    	BlockPos spawnPoint =  world.getSpawnPoint();
 	    	ChunkCoordinate spawnChunk = ChunkCoordinate.fromBlockCoords(spawnPoint.getX(), spawnPoint.getZ());
 	    	BlockPos spawnPointCartographer =  cartographerWorld.getSpawnPoint();
-	   	
+
 	    	int newX = spawnPointCartographer.getX() + (chunkCoord.getChunkX() - spawnChunk.getChunkX());
 	    	int newZ = spawnPointCartographer.getZ() + (chunkCoord.getChunkZ() - spawnChunk.getChunkZ());
-	    	
+
 	    	// Draw a map of the world at spawn using blocks
 	    	int highestBlockY = world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
 	    	LocalMaterialData material = null;
 	    	LocalMaterialData topMaterial = null;
-	
+
 	    	// Apply 1/16 to height and get Y, take into account height of spawn location
 	    	int baseHeight = spawnPoint.getY();
-	
+
 	    	int minY = (baseHeight - (int) Math.floor(spawnPoint.getY() / 16d));
 	    	int maxY = (baseHeight + (int) Math.floor((255 - spawnPoint.getY()) / 16d));
-	
+
 	    	// Find the appropriate blocks to place on the map for the given material.
 	    	// If a block cannot be found (because the material is unknown or has no replace-to block)
 	    	// try lower blocks until a block is found or the world depth is reached.
@@ -457,16 +456,16 @@ public class Cartographer
 	    		//if(highestBlockY < minY || highestBlockY > maxY) // Don't count the Cartographer itself
 	    		{
 		    		LocalMaterialData materialToReplace = world.getMaterial(chunkCoord.getBlockXCenter(), highestBlockY, chunkCoord.getBlockZCenter(), true);
-		    		
+
 		    		// For trees/water/lava/ice/fire/wood the top block is wool or glass, for everything else it's clay
 		        	DefaultMaterial replaceByMaterialTop = replaceByMaterial;
 		        	if(materialToReplace != null)
 		        	{
 		    	    	DefaultMaterial defaultMaterialToReplace = materialToReplace.toDefaultMaterial();
 		    	    	if(
-		    				defaultMaterialToReplace.equals(DefaultMaterial.WATER) || 
+		    				defaultMaterialToReplace.equals(DefaultMaterial.WATER) ||
 		    				defaultMaterialToReplace.equals(DefaultMaterial.STATIONARY_WATER) ||
-		    				defaultMaterialToReplace.equals(DefaultMaterial.LAVA) || 
+		    				defaultMaterialToReplace.equals(DefaultMaterial.LAVA) ||
 		    				defaultMaterialToReplace.equals(DefaultMaterial.STATIONARY_LAVA) ||
 		    				defaultMaterialToReplace.equals(DefaultMaterial.MAGMA) ||
 		    				defaultMaterialToReplace.equals(DefaultMaterial.ICE) ||
@@ -491,9 +490,9 @@ public class Cartographer
 		    			)
 		    	    	{
 		    	    		replaceByMaterialTop = DefaultMaterial.WOOL;
-		    	    	}    	    	
-		        	}	        	
-		    		
+		    	    	}
+		        	}
+
 		    		topMaterial = GetReplaceByMaterial(materialToReplace, replaceByMaterialTop);
 		    		material = GetReplaceByMaterial(materialToReplace, replaceByMaterial);
 		    		if(material != null)
@@ -501,56 +500,56 @@ public class Cartographer
 			    		if(topMaterial == null)
 			    		{
 			    			topMaterial = GetReplaceByMaterial(materialToReplace, replaceByMaterialTop);
-			    		}		    		
+			    		}
 			    		break;
 		    		}
 	    		}
 	    		highestBlockY--;
 	    	}
-	    	    	
+
 	    	// Couldn't find a block, use black.
 	    	if(highestBlockY < 0)
 	    	{
 	    		highestBlockY = world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter()) - 1;
 	    		material = OTG.toLocalMaterialData(replaceByMaterial, 15);
 	    	}
-	    	
+
 	    	int heightDiff = (int) Math.floor(((highestBlockY + 1) - spawnPoint.getY()) / 16d);
 
-	    	
+
 	    	int viewDistSq = world.getWorld().getMinecraftServer().getPlayerList().getViewDistance() * world.getWorld().getMinecraftServer().getPlayerList().getViewDistance();
-	    	
+
 	        int xDiff = spawnChunk.getChunkX() - chunkCoord.getChunkX();
 	        int zDiff = spawnChunk.getChunkZ() - chunkCoord.getChunkZ();
 	        float distInChunksSq = (xDiff * xDiff + zDiff * zDiff);
-		    	
+
 			boolean spawnInRange = distInChunksSq <= viewDistSq;
 			boolean portalInRange = false;
 			boolean portalInChunk = false;
-			
+
 	    	Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = getPortals();
-					
-			int minDistSq = 2 * 2; // Radius around portals can be tp'd to even when no player is near 
+
+			int minDistSq = 2 * 2; // Radius around portals can be tp'd to even when no player is near
 			for(Teleporter.PortalPosition portalPos : destinationCoordinateCache.values())
-			{	
+			{
 				ChunkCoordinate portalChunk = ChunkCoordinate.fromBlockCoords(portalPos.getX(), portalPos.getZ());
-				
+
 	            xDiff = portalChunk.getChunkX() - chunkCoord.getChunkX();
 	            zDiff = portalChunk.getChunkZ() - chunkCoord.getChunkZ();
 	            distInChunksSq = (xDiff * xDiff + zDiff * zDiff);
-	    		           
+
 	            if(portalInRange || distInChunksSq <= minDistSq)
 	            {
 	            	portalInRange = true;
 	            }
-	
+
 	    		if(portalChunk.equals(chunkCoord))
 	    		{
 	    			portalInChunk = true;
 	    			break;
 	    		}
 			}
-			
+
 	    	boolean playerInRange = false;
 	    	ArrayList<EntityPlayer> playersInChunk = new ArrayList<EntityPlayer>();
 	    	for(EntityPlayer player : world.getWorld().playerEntities)
@@ -558,27 +557,27 @@ public class Cartographer
 	    		if(player.dimension == 0)
 	    		{
 		    		ChunkCoordinate playerChunk = ChunkCoordinate.fromChunkCoords(player.chunkCoordX, player.chunkCoordZ);
-		    		
+
 		            xDiff = playerChunk.getChunkX() - chunkCoord.getChunkX();
 		            zDiff = playerChunk.getChunkZ() - chunkCoord.getChunkZ();
 		            distInChunksSq = (xDiff * xDiff + zDiff * zDiff);
-		    		           
+
 		            if(playerInRange || distInChunksSq <= viewDistSq)
 		            {
 		            	playerInRange = true;
 		            }
-		
+
 		    		if(playerChunk.equals(chunkCoord))
 		    		{
 		    	    	playersInChunk.add(player);
 		    		}
 	    		}
-	    	}	    	
-	    	
+	    	}
+
 	    	// Set top block
 	    	int newY = baseHeight + heightDiff - minY;
 	    	cartographerWorld.setBlock(newX, newY, newZ, topMaterial, null, true);
-	   		
+
 	    	// Set blocks above
 	    	while(newY < maxY - minY)
 	    	{
@@ -591,15 +590,15 @@ public class Cartographer
 		    		}
 	    		}
 	    	}
-	    	
+
 	    	newY = baseHeight + heightDiff - minY;
 	    	// Set lower blocks
 	    	while(newY > 0)
 	    	{
 	    		newY--;
 	   			cartographerWorld.setBlock(newX, newY, newZ, material, null, true);
-	    	}	   		    	       
-	    	
+	    	}
+
 	    	// Banner colors
 	    	// 0 = Black
 	    	// 1 = Brown
@@ -629,20 +628,20 @@ public class Cartographer
 	   		else if(portalInChunk)
 			{
 	   			NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_Int, "Base", 13) });
-	    		cartographerWorld.setBlock(newX, newY, newZ, OTG.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, 0), tag, true);	            
+	    		cartographerWorld.setBlock(newX, newY, newZ, OTG.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, 0), tag, true);
 	    		//cartographerWorld.setBlock(destPosX, newY - 1, destPosZ, OTG.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0));
 			}
 	    	// Animals TODO: Animal textures on custom player head cause lots of lag, find a solution
 	    	/*
 	   		else if(!unloading && playerInRange && playersInChunk.size() == 0)
 	   		{
-		    	ArrayList<EntityLiving> mobsInChunk = new ArrayList<EntityLiving>();	        	
+		    	ArrayList<EntityLiving> mobsInChunk = new ArrayList<EntityLiving>();
 		    	for(EntityLiving mob : world.getWorld().getEntities(EntityLiving.class, EntitySelectors.IS_ALIVE))
 		    	{
 		    		if(mob.dimension == 0 && (mob instanceof EntityAnimal || mob instanceof EntityVillager || mob instanceof EntityWaterMob))
 		    		{
 		        		ChunkCoordinate entityChunk = ChunkCoordinate.fromChunkCoords(mob.chunkCoordX, mob.chunkCoordZ);
-		
+
 		        		if(entityChunk.equals(chunkCoord))
 		        		{
 		        			mobsInChunk.add(mob);
@@ -653,18 +652,18 @@ public class Cartographer
 		    	if(mobsInChunk.size() > 0)
 		    	{
 			    	int playerSignHeightOffset = 1;
-			    	
+
 		    		LocalMaterialData playerHead = OTG.toLocalMaterialData(DefaultMaterial.SKULL, 3);
 		    		//String playerHeadName = mobsInChunk.get(0).getName();
-		    		
+
 		    		//NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_String, "ExtraType", playerHeadName), new NamedBinaryTag(Type.TAG_String, "SkullOwner", ""), new NamedBinaryTag(Type.TAG_Byte, "SkullType", (byte)3) });
-		    			    							
+
 					BlockPos pos = new BlockPos(destPosX, baseHeight + heightDiff + playerSignHeightOffset - minY, spawnChunk.getBlockZCenter() + chunkCoord.getChunkZ());
-		
+
 					cartographerWorld.setBlock(pos.getX(), pos.getY(), pos.getZ(), playerHead);
 					//world.attachMetadata(pos.getX(), pos.getY(), pos.getZ(), tag);
 					world.getWorld().setBlockState(pos, Blocks.SKULL.getDefaultState().withProperty(BlockSkull.FACING, EnumFacing.UP), 11);
-					
+
 		            int rotation = (MathHelper.floor_double((double)((mobsInChunk.get(0).rotationYaw - 180) * 16.0F / 360.0F) + 0.5D) & 15);
 		            TileEntity tileentity = world.getWorld().getTileEntity(pos);
 		            TileEntitySkull tileentityskull = (TileEntitySkull)tileentity;
@@ -677,55 +676,55 @@ public class Cartographer
 	    	{
 	    		cartographerWorld.setBlock(newX, newY, newZ, OTG.toLocalMaterialData(DefaultMaterial.STAINED_GLASS, 15), null, true);
 	    	}
-	    	    	
+
 	    	// Place player heads
 	   		if(!unloading && playersInChunk.size() > 0)
-	    	{	    		
+	    	{
 		    	int playerSignHeightOffset = 0;
-		    	
+
 		    	for(EntityPlayer player : playersInChunk)
 		    	{
 		    		playerSignHeightOffset++;
-		    		
+
 		    		newY = baseHeight + heightDiff + playerSignHeightOffset - minY;
 		    		if(newY + 2 < maxY - minY && newY >= 0)
-		    		{		    		
+		    		{
 			    		LocalMaterialData playerHead = OTG.toLocalMaterialData(DefaultMaterial.SKULL, 3);
 			    		String playerHeadName = "MHF_Blaze";//player.getName();
-			    		
-			    		NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_String, "SkullOwner", playerHeadName), new NamedBinaryTag(Type.TAG_String, "ExtraType", ""), new NamedBinaryTag(Type.TAG_Byte, "SkullType", (byte)3) });	    		
-			    			    					
+
+			    		NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_String, "SkullOwner", playerHeadName), new NamedBinaryTag(Type.TAG_String, "ExtraType", ""), new NamedBinaryTag(Type.TAG_Byte, "SkullType", (byte)3) });
+
 						BlockPos pos = new BlockPos(newX, newY, newZ);
-		
+
 						cartographerWorld.setBlock(pos.getX(), pos.getY(), pos.getZ(), playerHead, tag, true);
 						cartographerWorld.getWorld().setBlockState(pos, Blocks.SKULL.getDefaultState().withProperty(BlockSkull.FACING, EnumFacing.UP), 11);
-						
+
 		                int rotation = (MathHelper.floor((double)((player.rotationYaw - 180) * 16.0F / 360.0F) + 0.5D) & 15);
 		                TileEntity tileentity = cartographerWorld.getWorld().getTileEntity(pos);
 		                TileEntitySkull tileentityskull = (TileEntitySkull)tileentity;
 		                tileentityskull.setSkullRotation(rotation);
 		    		}
 		    	}
-	
+
 		    	// Put banner on top of player heads
-		    	
+
 	            int rotation = (MathHelper.floor((double)(playersInChunk.get(0).rotationYaw * 16.0F / 360.0F) + 0.5D) & 15);
 	            NamedBinaryTag tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_Int, "Base", chunkCoord.equals(spawnChunk) ? 15 : portalInChunk ? 13 : 10) });
 		    	cartographerWorld.setBlock(newX, baseHeight + heightDiff + playerSignHeightOffset + 1 - minY, newZ, OTG.toLocalMaterialData(DefaultMaterial.STANDING_BANNER, rotation), tag, true);
-		    	
+
 	    		//playerSignHeightOffset = 2;
-	    		
+
 		    	//for(int i = 0; i < playersInChunk.size(); i += 4)
 		    	//{
 					//LocalMaterialData playerSign = OTG.toLocalMaterialData(DefaultMaterial.SIGN_POST, 0);
-	
+
 					//String playerName1 = playersInChunk.get(i).getName();
 					//String playerName2 = playersInChunk.size() > i + 1 ? playersInChunk.get(i + 1).getName() : "";
 					//String playerName3 = playersInChunk.size() > i + 2 ? playersInChunk.get(i + 2).getName() : "";
 					//String playerName4 = playersInChunk.size() > i + 3 ? playersInChunk.get(i + 3).getName() : "";
-	
+
 					//tag = new NamedBinaryTag(Type.TAG_List, "BlockEntityTag", new NamedBinaryTag[] { new NamedBinaryTag(Type.TAG_String, "id", "Sign"), new NamedBinaryTag(Type.TAG_String, "Text1", playerName1), new NamedBinaryTag(Type.TAG_String, "Text2", playerName2), new NamedBinaryTag(Type.TAG_String, "Text3", playerName3), new NamedBinaryTag(Type.TAG_String, "Text4", playerName4) });
-	
+
 					//cartographerWorld.setBlock(destPosX, baseHeight + heightDiff + playerSignHeightOffset - minY, destPosZ, playerSign);
 					//cartographerWorld.attachMetadata(destPosX, baseHeight + heightDiff + playerSignHeightOffset - minY, destPosZ, tag);
 		    		//playerSignHeightOffset++;
@@ -733,13 +732,13 @@ public class Cartographer
 	    	}
 		}
     }
-    
+
     /**
      * Gets the block to place on the map based on the given material.
      */
     private static LocalMaterialData GetReplaceByMaterial(LocalMaterialData materialToReplace, DefaultMaterial replaceByMaterial)
-    {        	
-		DefaultMaterial[] TransparentBlocks = { 
+    {
+		DefaultMaterial[] TransparentBlocks = {
 		};
 
 		DefaultMaterial[] WhiteBlocks = {
@@ -748,7 +747,7 @@ public class Cartographer
     	    DefaultMaterial.QUARTZ_BLOCK,
     	    DefaultMaterial.QUARTZ_STAIRS,
 		};
-		
+
 		DefaultMaterial[] OrangeBlocks = {
 			DefaultMaterial.FIRE,
     		DefaultMaterial.SAND,
@@ -756,7 +755,7 @@ public class Cartographer
     	    DefaultMaterial.HARD_CLAY,
     	    DefaultMaterial.RED_SANDSTONE_STAIRS
 		};
-		
+
 	    DefaultMaterial[] MagentaBlocks = {
     	    DefaultMaterial.PURPUR_BLOCK,
     	    DefaultMaterial.PURPUR_PILLAR,
@@ -764,27 +763,27 @@ public class Cartographer
     	    DefaultMaterial.PURPUR_DOUBLE_SLAB,
     	    DefaultMaterial.PURPUR_SLAB
 	    };
-		
+
 	    DefaultMaterial[] LightBlueBlocks = {
 	    		DefaultMaterial.PACKED_ICE
 	    };
-		
+
 		DefaultMaterial[] YellowBlocks = {
     		DefaultMaterial.SAND,
     		DefaultMaterial.SANDSTONE,
     		DefaultMaterial.SANDSTONE_STAIRS
 		};
-		
+
 		DefaultMaterial[] LimeBlocks = {
 			DefaultMaterial.LEAVES,
 			DefaultMaterial.LEAVES_2
 		};
-		
+
 		DefaultMaterial[] PinkBlocks = {
     		DefaultMaterial.NETHERRACK,
     		DefaultMaterial.MYCEL
 		};
-		
+
 		DefaultMaterial[] GrayBlocks = {
     		DefaultMaterial.COBBLESTONE,
     		DefaultMaterial.COBBLESTONE_STAIRS,
@@ -798,7 +797,7 @@ public class Cartographer
     		DefaultMaterial.SMOOTH_BRICK,
     	    DefaultMaterial.SMOOTH_STAIRS,
 		};
-		
+
 		DefaultMaterial[] LightGrayBlocks = {
     		DefaultMaterial.STONE,
     		DefaultMaterial.GRAVEL,
@@ -818,24 +817,24 @@ public class Cartographer
     	    DefaultMaterial.GOLD_BLOCK,
     	    DefaultMaterial.IRON_BLOCK,
     	    DefaultMaterial.REDSTONE_BLOCK,
-    	    DefaultMaterial.QUARTZ_ORE,    	    
+    	    DefaultMaterial.QUARTZ_ORE,
 		};
-		
+
 		DefaultMaterial[] CyanBlocks = {
     		DefaultMaterial.FROSTED_ICE,
     		DefaultMaterial.ICE
 		};
-		
+
 		DefaultMaterial[] PurpleBlocks = {
     	    DefaultMaterial.NETHER_BRICK,
     	    DefaultMaterial.NETHER_BRICK_STAIRS
 		};
-		
-	    DefaultMaterial[] BlueBlocks = {    		
+
+	    DefaultMaterial[] BlueBlocks = {
     	    DefaultMaterial.WATER,
     	    DefaultMaterial.STATIONARY_WATER
 	    };
-	    
+
 	    DefaultMaterial[] BrownBlocks = {
     		DefaultMaterial.DIRT,
     		DefaultMaterial.WOOD,
@@ -851,29 +850,29 @@ public class Cartographer
     		DefaultMaterial.SOIL,
     		DefaultMaterial.SOUL_SAND,
     	    DefaultMaterial.HUGE_MUSHROOM_1,
-    	    DefaultMaterial.HUGE_MUSHROOM_2    	    
+    	    DefaultMaterial.HUGE_MUSHROOM_2
 	    };
-	    
+
 	    DefaultMaterial[] GreenBlocks = {
     		DefaultMaterial.GRASS,
     		DefaultMaterial.GRASS_PATH,
 	    };
-		
+
 		DefaultMaterial[] RedBlocks = {
     	    DefaultMaterial.LAVA,
     	    DefaultMaterial.STATIONARY_LAVA,
     	    DefaultMaterial.MAGMA
 		};
-	    
+
 	    DefaultMaterial[] BlackBlocks = {
     		DefaultMaterial.BEDROCK,
     		DefaultMaterial.OBSIDIAN
 	    };
-		
+
 		DefaultMaterial[] ColoredBlocks = {
     	    DefaultMaterial.STAINED_CLAY
 		};
-		
+
 	    // Ignored
 	    /*
 		DefaultMaterial.GLASS
@@ -900,13 +899,13 @@ public class Cartographer
 		DefaultMaterial.RED_MUSHROOM
 	    DefaultMaterial.TNT
 	    DefaultMaterial.BOOKSHELF
-	    DefaultMaterial.TORCH	    
+	    DefaultMaterial.TORCH
 	    DefaultMaterial.MOB_SPAWNER
 	    DefaultMaterial.WOOD_STAIRS
 	    DefaultMaterial.CHEST
 	    DefaultMaterial.REDSTONE_WIRE
 	    DefaultMaterial.WORKBENCH
-	    DefaultMaterial.CROPS        	    
+	    DefaultMaterial.CROPS
 	    DefaultMaterial.FURNACE
 	    DefaultMaterial.BURNING_FURNACE
 	    DefaultMaterial.SIGN_POST
@@ -921,7 +920,7 @@ public class Cartographer
 	    DefaultMaterial.REDSTONE_TORCH_OFF
 	    DefaultMaterial.REDSTONE_TORCH_ON
 	    DefaultMaterial.STONE_BUTTON
-	    DefaultMaterial.CACTUS       	    
+	    DefaultMaterial.CACTUS
 	    DefaultMaterial.SUGAR_CANE_BLOCK
 	    DefaultMaterial.JUKEBOX
 	    DefaultMaterial.FENCE
@@ -979,7 +978,7 @@ public class Cartographer
 	    DefaultMaterial.STAINED_GLASS_PANE
 	    DefaultMaterial.SLIME_BLOCK
 	    DefaultMaterial.BARRIER
-	    DefaultMaterial.IRON_TRAPDOOR       	    
+	    DefaultMaterial.IRON_TRAPDOOR
 	    DefaultMaterial.PRISMARINE
 	    DefaultMaterial.SEA_LANTERN
 	    DefaultMaterial.HAY_BLOCK(170),
@@ -1005,9 +1004,9 @@ public class Cartographer
 	    DefaultMaterial.DARK_OAK_DOOR
 	    DefaultMaterial.END_ROD
 	    DefaultMaterial.CHORUS_PLANT
-	    DefaultMaterial.CHORUS_FLOWER        	    
-	    DefaultMaterial.END_BRICKS        	    
-	    DefaultMaterial.BEETROOT_BLOCK        	    
+	    DefaultMaterial.CHORUS_FLOWER
+	    DefaultMaterial.END_BRICKS
+	    DefaultMaterial.BEETROOT_BLOCK
 	    DefaultMaterial.END_GATEWAY
 	    DefaultMaterial.COMMAND_REPEATING
 	    DefaultMaterial.COMMAND_CHAIN
@@ -1016,8 +1015,8 @@ public class Cartographer
 	    DefaultMaterial.BONE_BLOCK
 	    DefaultMaterial.STRUCTURE_VOID
 	    DefaultMaterial.STRUCTURE_BLOCK
-	    */    
-		
+	    */
+
     	for(DefaultMaterial replacematerial : TransparentBlocks)
     	{
     		if(replacematerial.equals(materialToReplace.toDefaultMaterial()))
@@ -1039,7 +1038,7 @@ public class Cartographer
     			if(replacematerial.equals(DefaultMaterial.SAND))
     			{
     				if(materialToReplace.getBlockData() != 1) { continue; }
-    			}    
+    			}
     			return OTG.toLocalMaterialData(replaceByMaterial, 1);
     		}
     	}
@@ -1072,7 +1071,7 @@ public class Cartographer
     			{
     				continue;
     			}
-    			
+
     			return OTG.toLocalMaterialData(replaceByMaterial, 5);
     		}
     	}
@@ -1156,7 +1155,7 @@ public class Cartographer
     			return OTG.toLocalMaterialData(replaceByMaterial, materialToReplace.getBlockData());
     		}
     	}
-    	
+
     	return null;
     }
 
@@ -1167,7 +1166,7 @@ public class Cartographer
     		CartographerDimension = OTGDimensionManager.createDimension("DIM-Cartographer", false, true, false);
 
     		ForgeWorld world = (ForgeWorld) OTG.getWorld("DIM-Cartographer");
-    		
+
 			world.getWorld().getGameRules().setOrCreateGameRule("doEntityDrops", "false");
 			world.getWorld().getGameRules().setOrCreateGameRule("doFireTick", "false");
 			world.getWorld().getGameRules().setOrCreateGameRule("doMobSpawning", "false");
@@ -1176,7 +1175,7 @@ public class Cartographer
 			world.getWorld().getGameRules().setOrCreateGameRule("randomTickSpeed", "0");
 			world.getWorld().getGameRules().setOrCreateGameRule("spawnRadius", "0");
 			world.getWorld().getGameRules().setOrCreateGameRule("doWeatherCycle", "false");
-			world.getWorld().getGameRules().setOrCreateGameRule("falldamage", "false");			
+			world.getWorld().getGameRules().setOrCreateGameRule("falldamage", "false");
     	}
 	}
 }

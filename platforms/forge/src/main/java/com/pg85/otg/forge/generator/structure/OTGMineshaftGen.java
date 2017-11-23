@@ -22,13 +22,13 @@ public class OTGMineshaftGen extends MapGenStructure
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
         if (this.rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
-        {        	        	
+        {
             LocalWorld world = ((ForgeEngine)OTG.getEngine()).getWorld(this.world);
             if(world == null)
             {
             	world = ((ForgeEngine)OTG.getEngine()).getWorld(this.world);
             	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-            }            
+            }
             LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
             BiomeConfig biomeConfig = biome.getBiomeConfig();
             if (biomeConfig.mineshaftType == MineshaftType.disabled)
@@ -65,7 +65,7 @@ public class OTGMineshaftGen extends MapGenStructure
     {
         return StructureNames.MINESHAFT;
     }
-    
+
 	@Override
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {

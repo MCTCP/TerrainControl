@@ -12,7 +12,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.border.WorldBorder;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -36,16 +36,18 @@ public class WorldProviderOTG extends WorldProvider
 	
 	public WorldProviderOTG() { }
 	
+	// TODO: This method is no longer used. Seems like a nice feature for dimensions though?
     // A message to display to the user when they transfer to this dimension.
-	@Override
+	//@Override
     public String getWelcomeMessage()
     {
 		WorldConfig worldConfig = GetWorldConfig();
 		return worldConfig != null ? worldConfig.welcomeMessage : WorldStandardValues.welcomeMessage.getDefaultValue();
     }
-	
+
+	// TODO: This method is no longer used. Seems like a nice feature for dimensions though?
 	// A Message to display to the user when they transfer out of this dismension.
-	@Override
+	//@Override
     public String getDepartMessage()
     {
 		WorldConfig worldConfig = GetWorldConfig();
@@ -86,9 +88,9 @@ public class WorldProviderOTG extends WorldProvider
     }
     
     @Override
-    public IChunkGenerator createChunkGenerator()
+    public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()
     {
-    	return OTGPlugin.txWorldType.getChunkGenerator(world, world.getWorldInfo().getGeneratorOptions());
+    	return OTGPlugin.txWorldType.getChunkGenerator(world, world.getWorldInfo() instanceof DerivedWorldInfo ? ((DerivedWorldInfo)world.getWorldInfo()).delegate.getGeneratorOptions() : world.getWorldInfo().getGeneratorOptions());
     }
 
     // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions.

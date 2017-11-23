@@ -7,12 +7,12 @@ import com.pg85.otg.bukkit.BukkitWorld;
 import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.EnumCreatureType;
-import net.minecraft.server.v1_11_R1.World;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.EnumCreatureType;
+import net.minecraft.server.v1_12_R1.World;
 
-import org.bukkit.craftbukkit.v1_11_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
 import org.bukkit.generator.ChunkGenerator;
 
 public class OTGInternalChunkGenerator extends CustomChunkGenerator

@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class CustomObjectConfigFunction<T>
 {
 
-	
+
     /**
      * Convenience method for creating a config function. Used to create
      * the
@@ -58,23 +58,23 @@ public abstract class CustomObjectConfigFunction<T>
         return configFunction;
     }
 
-    
+
     /**
      * Has a value when valid == false, otherwise null.
      */
-    public String error;
+    protected String error;
 
     /**
      * Only has a value when {@link #invalidate(String, List, String)} is
      * called.
      */
-    private List<String> inputArgs;
+    protected List<String> inputArgs;
     /**
      * Only has a value when {@link #invalidate(String, List, String)} is
      * called.
      */
-    private String inputName;
-    private boolean valid = true;
+    protected String inputName;
+    protected boolean valid = true;
 
     /**
      * Checks the size of the given list.
@@ -126,8 +126,8 @@ public abstract class CustomObjectConfigFunction<T>
      */
     public abstract Class<T> getHolderType();
 
-    private T holder;
-   
+    protected T holder;
+
     /**
      * Initializes the function: the holder is set and the arguments are read.
      * @param holder The holder to set. Must be of the type returned by
@@ -158,7 +158,7 @@ public abstract class CustomObjectConfigFunction<T>
     /**
      * Returns whether or not the two resources are similar to each other AND
      * not equal. This should return true if two resources are of the same class
-     * and if critical element are the same. For example source blocks. This 
+     * and if critical element are the same. For example source blocks. This
      * will be used to test if a resource should be overridden via inheritance.
      * @return
      */
@@ -184,7 +184,7 @@ public abstract class CustomObjectConfigFunction<T>
      * @throws InvalidConfigException If the syntax is invalid.
      */
     protected abstract void load(List<String> args) throws InvalidConfigException;
-    
+
     /**
      * Formats the material list as a string list.
      * @param materials The set of materials to be converted
@@ -194,7 +194,7 @@ public abstract class CustomObjectConfigFunction<T>
     {
         return "," + materials.toString();
     }
-    
+
     /**
      * Gets a String representation, like Tree(10,BigTree,50,Tree,100)
      * @return A String representation, like Tree(10,BigTree,50,Tree,100)
@@ -231,7 +231,7 @@ public abstract class CustomObjectConfigFunction<T>
     {
         return StringHelper.readInt(string, minValue, maxValue);
     }
-    
+
     /**
      * Parses the string and returns the boolean or false if no value could be found.
      */

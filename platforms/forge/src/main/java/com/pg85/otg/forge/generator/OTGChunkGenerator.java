@@ -14,7 +14,6 @@ import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigProvider;
 import com.pg85.otg.configuration.WorldConfig;
-import com.pg85.otg.configuration.WorldConfig.TerrainMode;
 import com.pg85.otg.customobjects.bo3.BlockFunction;
 import com.pg85.otg.customobjects.bo3.ModDataFunction;
 import com.pg85.otg.forge.ForgeMaterialData;
@@ -36,25 +35,22 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkGenerator;
+import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGChunkGenerator implements IChunkGenerator
 {
-	// OTG+ 
-	
+	// OTG+
+
 	public ArrayList<Object[]> PopulatedChunks;
-	
+
     int lastx2 = 0;
     int lastz2 = 0;
     int chunkCacheSize = 256;
-    //int chunkCacheSizeDuringPreGeneration = 1024;   
     LinkedHashMap<ChunkCoordinate, Object[]> chunkCache = new LinkedHashMap<ChunkCoordinate, Object[]>();
-    //LinkedHashMap<ChunkCoordinate, BlockFunction[]> BlockColumnCache = new LinkedHashMap<ChunkCoordinate, BlockFunction[]>();
-    long lastCacheClearedTime = System.currentTimeMillis();
-    
-	//	
-	
+
+	//
+
     private ForgeWorld world;
     private World worldHandle;
     private boolean TestMode = false;
@@ -62,14 +58,14 @@ public class OTGChunkGenerator implements IChunkGenerator
     private ChunkProviderOTG generator;
     public ObjectSpawner spawner;
 
-    /** 
+    /**
      * Used in {@link #fillBiomeArray(Chunk)}, to avoid creating
      * new int arrays.
      */
     private int[] biomeIntArray;
 
     public OTGChunkGenerator(ForgeWorld _world)
-    {   	   	
+    {
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
@@ -77,17 +73,14 @@ public class OTGChunkGenerator implements IChunkGenerator
 
         this.generator = new ChunkProviderOTG(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
-        
+
         // OTG +
         this.PopulatedChunks = new ArrayList<Object[]>();
     }
 
-    private ForgeChunkBuffer chunkBuffer;
     @Override
     public Chunk generateChunk(int chunkX, int chunkZ)
     {
-    	//OTG.log(LogMarker.INFO, "provideChunk X" + chunkX + " Z" + chunkZ);
-    	
     	ChunkCoordinate chunkCoords = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
     	boolean bFound = false;
     	synchronized(PopulatedChunks)
@@ -104,19 +97,19 @@ public class OTGChunkGenerator implements IChunkGenerator
 				PopulatedChunks.add(new Object[] { chunkX, chunkZ });
 			}
     	}
-		
+
 		if(bFound)
 		{
 			Chunk chunk = world.getChunk(chunkCoords.getBlockX(), chunkCoords.getBlockZ(), true);
 			if(chunk == null)
-			{				
+			{
 				if(world.IsInsideWorldBorder(chunkCoords, false))
-				{					
+				{
 					// Can happen when chunkExists() in this.world.getChunk() mistakenly returns false
 					// This could potentially cause an infinite loop but than't can't be disallowed looping because of async calls
 					// to ProvideChunk() by updateBlocks() on server tick.
-					chunk = this.world.getWorld().getChunkFromChunkCoords(chunkX, chunkZ);    						
-					
+					chunk = this.world.getWorld().getChunkFromChunkCoords(chunkX, chunkZ);
+
 					if(chunk == null)
 					{
 						throw new RuntimeException();
@@ -132,23 +125,9 @@ public class OTGChunkGenerator implements IChunkGenerator
 				OTG.log(LogMarker.INFO, "Double population could not be prevented for chunk X" + chunkX + " Z" + chunkZ);
 			}
 		}
-		
+
 		Chunk chunk = getBlocks(chunkX, chunkZ, true);
 		return chunk;
-    }
-    
-    public int getHighestBlockInCurrentlyGeneratingChunk(int blockX, int blockZ)
-    {
-    	for(int y = 255; y > 0; y--)
-    	{
-    		ForgeMaterialData material = (ForgeMaterialData)chunkBuffer.getBlock(blockX, y, blockZ);
-    		if(!material.isAir())
-    		{
-    			return y;
-    		}
-    	}
-    	
-    	return 0;
     }
 
     /**
@@ -165,31 +144,27 @@ public class OTGChunkGenerator implements IChunkGenerator
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
             int generationId = this.biomeIntArray[i];
-               
+
             // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
             LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(generationId) : configProvider.getBiomeByIdOrNull(generationId);
-        	
+
         	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
         }
     }
-    
+
     @Override
     public void populate(int chunkX, int chunkZ)
-    {   
+    {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
     	if(this.TestMode || !world.IsInsideWorldBorder(chunkCoord, false))
         {
     		world.ClearChunkCache();
             return;
-        }         		
-   	
-    	//OTG.log(LogMarker.INFO, "Populate X" + x + " Z" + z);
-    	
-        //if(1 == 1) { return; }
-    	
+        }
+
         BlockSand.fallInstantly = true;
         BlockGravel.fallInstantly = true;
-    	
+
         if(!this.spawner.processing)
         {
 	        this.spawner.populatingX = chunkX;
@@ -213,27 +188,27 @@ public class OTGChunkGenerator implements IChunkGenerator
 
 			// This can also happen when the server decides to provide and/or
 			// populate a chunk that has already been provided/populated before,
-			// which seems like a bug.	        	
+			// which seems like a bug.
         	//throw new RuntimeException();
         }
-    
+
         fixSpawnChunk();
-    
+
         this.spawner.populate(chunkCoord);
-        
+
         BlockSand.fallInstantly = false;
         BlockGravel.fallInstantly = false;
 
     	//ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(x, z);
         //this.world.generateSkylightMap(chunkCoord.getBlockX(),chunkCoord.getBlockZ());
-    	
+
         HashMap<String,ArrayList<ModDataFunction>> MessagesPerMod = world.GetWorldSession().GetModDataForChunk(chunkCoord);
         if(MessagesPerMod == null && world.getConfigs().getWorldConfig().IsOTGPlus)
         {
     		if(!world.getStructureCache().structureCache.containsKey(chunkCoord))
-    		{    			
+    		{
     			if(!world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-    			{	    				
+    			{
     				throw new RuntimeException();
     			}
     		}
@@ -241,16 +216,16 @@ public class OTGChunkGenerator implements IChunkGenerator
         	throw new RuntimeException();
         }
         if(MessagesPerMod != null && MessagesPerMod.entrySet().size() > 0)
-        {        	
+        {
         	for(Entry<String, ArrayList<ModDataFunction>> modNameAndData : MessagesPerMod.entrySet())
         	{
         		String messageString = "";
 				if(modNameAndData.getKey().equals("OTG"))
-				{        	    		
+				{
 	    			for(ModDataFunction modData : modNameAndData.getValue())
-	    			{    	   	    				    	    				
+	    			{
 						String[] paramString2 = modData.modData.split("\\/");
-						
+
 						if(paramString2.length > 1)
 						{
 							if(paramString2[0].equals("mob"))
@@ -258,14 +233,14 @@ public class OTGChunkGenerator implements IChunkGenerator
 								boolean autoSpawn = paramString2.length > 4 ? Boolean.parseBoolean(paramString2[4]) : false;
 	    	    				if(autoSpawn)
 	    	    				{
-	    	    					messageString += "[" + modData.x + "," + modData.y + "," + modData.z + "," + modData.modData + "]";	
-	    	    				} 
-							}    							
-						}       					
+	    	    					messageString += "[" + modData.x + "," + modData.y + "," + modData.z + "," + modData.modData + "]";
+	    	    				}
+							}
+						}
 	    			}
 				} else {
 	    			for(ModDataFunction modData : modNameAndData.getValue())
-	    			{    				
+	    			{
     					messageString += "[" + modData.x + "," + modData.y + "," + modData.z + "," + modData.modData + "]";
 	    			}
 				}
@@ -276,28 +251,20 @@ public class OTGChunkGenerator implements IChunkGenerator
     			}
         	}
         }
-        
+
         Runtime runtime = Runtime.getRuntime();
 		long maxMemory = runtime.maxMemory();
 		long allocatedMemory = runtime.totalMemory();
-		long freeMemory = runtime.freeMemory();        
-		    		
-        if((!world.GetWorldSession().getPreGeneratorIsRunning() && chunkCache.entrySet().size() > chunkCacheSize) || (freeMemory + (maxMemory - allocatedMemory) <= (maxMemory * 0.25)))        	
-        {        	
-        	// Don't clear cache more than once every ten seconds
-        	// ServerTick.cs onTick() will reboot the server if memory is running out
-    		//if((System.currentTimeMillis() - lastCacheClearedTime) / 1000 >= 10)
-        	{
+		long freeMemory = runtime.freeMemory();
+
+        if((!world.GetWorldSession().getPreGeneratorIsRunning() && chunkCache.entrySet().size() > chunkCacheSize) || (freeMemory + (maxMemory - allocatedMemory) <= (maxMemory * 0.25)))
+        {
 	        	OTG.log(LogMarker.DEBUG, "Clearing ChunkProvider cache");
 	        	chunkCache.clear();
-	        	//System.gc(); // TODO: Check if this is necessary for the pre-generator
-	        	////chunkCache.remove(chunkCache.keySet().iterator().next());
-	        	lastCacheClearedTime = System.currentTimeMillis();
-        	}
         }
-        
+
 		world.ClearChunkCache();
-    }    
+    }
 
     @Override
     public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
@@ -328,7 +295,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
         // recreateStructures
         WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
-           
+
         if (worldConfig.mineshaftsEnabled)
         {
             this.world.mineshaftGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
@@ -363,8 +330,51 @@ public class OTGChunkGenerator implements IChunkGenerator
     public boolean generateStructures(Chunk chunkIn, int x, int z)
     {
         return false;
-    } 	
-    
+    }
+
+
+	@Override
+    public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos)
+    {
+        //if (!this.mapFeaturesEnabled)
+        {
+            //return false;
+        }
+        //else
+        if (("Stronghold".equals(structureName)) && (this.world.strongholdGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.world.strongholdGen.isInsideStructure(pos);
+        }
+        else if (("Mansion".equals(structureName)) && (this.world.woodLandMansionGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.world.woodLandMansionGen.isInsideStructure(pos);
+        }
+        else if (("Monument".equals(structureName)) && (this.world.oceanMonumentGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.world.oceanMonumentGen.isInsideStructure(pos);
+        }
+        else if (("Village".equals(structureName)) && (this.world.villageGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.world.villageGen.isInsideStructure(pos);
+        }
+        else if (("Mineshaft".equals(structureName)) && (this.world.mineshaftGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.world.mineshaftGen.isInsideStructure(pos);
+        }
+        else if (("Temple".equals(structureName)) && (this.world.rareBuildingGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return "Temple".equals(structureName) && this.world.rareBuildingGen.isInsideStructure(pos);
+        }
+
+    	return false;
+    }
+
     @Override
     public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos blockPos, boolean p_180513_4_)
     {
@@ -396,25 +406,23 @@ public class OTGChunkGenerator implements IChunkGenerator
 	            return this.world.rareBuildingGen.getNearestStructurePos(worldIn, blockPos, p_180513_4_);
 	        }
     	}
-    	
+
         return null;
     }
-    
-    // OTG+   
-           
+
+    // OTG+
+
     public BlockFunction[] getBlockColumnInUnloadedChunk(int x, int z)
     {
-    	//OTG.log(LogMarker.INFO, "getBlockColumnInUnloadedChunk X" + x + " Z" + z);
-    	
     	lastx2 = x;
     	lastz2 = z;
-    	
+
     	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
     	int chunkX = chunkCoord.getChunkX();
     	int chunkZ = chunkCoord.getChunkZ();
-    	
+
     	Object[] chunkCacheEntry = chunkCache.get(chunkCoord);
-    	
+
     	Chunk chunk = null;
     	LinkedHashMap<ChunkCoordinate, BlockFunction[]> blockColumnCache = null;
     	BlockFunction[] cachedColumn = null;
@@ -428,27 +436,27 @@ public class OTGChunkGenerator implements IChunkGenerator
     	{
     		return cachedColumn;
     	}
-    	    	   	           	   	    	
+
     	if(chunk == null)
     	{
         	chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
-            
+
         	if(world.IsInsideWorldBorder(chunkCoord, true))
             {
 	    		ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
 	    		this.generator.generate(chunkBuffer);
-	    		 
-	    		chunk = chunkBuffer.toChunk(this.worldHandle);        		
+
+	    		chunk = chunkBuffer.toChunk(this.worldHandle);
             }
         	blockColumnCache = new LinkedHashMap<ChunkCoordinate, BlockFunction[]>();
         	chunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ), new Object[] { chunk, blockColumnCache });
     	}
-    	
-		// Get internal coordinates for block in chunk       
+
+		// Get internal coordinates for block in chunk
     	int blockX = x &= 0xF;
     	int blockZ = z &= 0xF;
-    	
-        BlockFunction[] blocksInColumn = new BlockFunction[256];        
+
+        BlockFunction[] blocksInColumn = new BlockFunction[256];
         for(int y = 0; y < 256; y++)
         {
         	BlockFunction block = new BlockFunction();
@@ -463,24 +471,24 @@ public class OTGChunkGenerator implements IChunkGenerator
         	} else {
         		break;
         	}
-        }       
+        }
         blockColumnCache.put(ChunkCoordinate.fromChunkCoords(lastx2,lastz2), blocksInColumn);
-        
+
         return blocksInColumn;
     }
-    
+
     public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
-    {    	    	   	   	    	
-    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);    	
+    {
+    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
         return blockColumn[y].material;
     }
-    
-    public int getHighestBlockYInUnloadedChunk(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)    
-    {		    	   	
+
+    public int getHighestBlockYInUnloadedChunk(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+    {
     	int height = -1;
-    	
+
     	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
-    	
+
         for(int y = 255; y > -1; y--)
         {
         	ForgeMaterialData material = (ForgeMaterialData) blockColumn[y].material;
@@ -489,7 +497,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         	if(!(isLiquid && ignoreLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))
-        		{           		
+        		{
             		return y;
         		}
             	if((findSolid && isLiquid) || (findLiquid && isSolid))
@@ -498,20 +506,23 @@ public class OTGChunkGenerator implements IChunkGenerator
             	}
         	}
         }
-    	return height;    	
+    	return height;
     }
-    
+
     boolean firstRun = true; // The first run is used by MC to check for suitable locations for the spawn location. For some reason the spawn location must be on grass.
     ArrayList<LocalMaterialData> originalBlocks = new ArrayList<LocalMaterialData>(); // Don't need to store coords, will place the blocks back in the same order we got them so coords can be inferred
     ChunkCoordinate spawnChunk;
     boolean spawnChunkFixed = false;
-    
+
     public void fixSpawnChunk()
     {
     	if(!spawnChunkFixed && !firstRun)
-    	{    		
+    	{
+    		// TODO: This shouldn't be necessary, the first chunk spawned should be in the are being populated?
+    		world.setAllowSpawningOutsideBounds(true);
+
     		spawnChunkFixed = true;
-			int i = 0;			
+			int i = 0;
 			for(int x = 0; x < 15; x++)
 			{
 				for(int z = 0; z < 15; z++)
@@ -520,7 +531,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 					{
 						world.setBlock(spawnChunk.getBlockX() + x, 63, spawnChunk.getBlockZ() + z, originalBlocks.get(i), null, true);
 						world.setBlock(spawnChunk.getBlockX() + x, 64, spawnChunk.getBlockZ() + z, originalBlocks.get(i + 1), null, true);
-					} else {					
+					} else {
 						for(int h = 62; h > 0; h++)
 						{
 							if(!world.getMaterial(spawnChunk.getBlockX() + x, h, spawnChunk.getBlockZ() + z, true).toDefaultMaterial().equals(DefaultMaterial.AIR))
@@ -534,30 +545,31 @@ public class OTGChunkGenerator implements IChunkGenerator
 					i += 2;
 				}
 			}
+
+			world.setAllowSpawningOutsideBounds(false);
     	}
-    }    
-    
+    }
+
+    ForgeChunkBuffer chunkBuffer;
     public Chunk getBlocks(int chunkX, int chunkZ, boolean provideChunk)
-    {      	
-    	//OTG.log(LogMarker.INFO, "getBlocks X" + chunkX + " Z" + chunkZ + " " + provideChunk);
-    	
+    {
     	Object[] chunkCacheEntry = chunkCache.get(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
     	Chunk chunk = null;
     	if(chunkCacheEntry != null)
     	{
     		chunk = (Chunk)chunkCacheEntry[0];
     	}
-    	
+
     	if(chunk == null)
     	{
-    		chunk = new Chunk(this.worldHandle, chunkX, chunkZ);           	
-    		
+    		chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
+
 	    	if(world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
 	        {
 	    		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-	    		ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
+	    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
 	    		this.generator.generate(chunkBuffer);
-	    		
+
 	    		// Before starting terrain generation MC tries to find a suitable spawn point. For some reason it looks for a grass block with an air block above it.
 	    		// To prevent MC from looking in many chunks (if there is no grass block nearby) and causing them to be populated place grass in the first requested chunk
 	    		// cache the original blocks so that they can be placed back when proper world generation starts.
@@ -568,36 +580,49 @@ public class OTGChunkGenerator implements IChunkGenerator
 	    			for(int x = 0; x < 15; x++)
 	    			{
 	    				for(int z = 0; z < 15; z++)
-	    				{	    					
+	    				{
 	    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
-	    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));    					
-	    					
+	    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));
+
 	    					chunkBuffer.setBlock(x, 63, z, OTG.toLocalMaterialData(DefaultMaterial.GRASS, 0));
 	    					chunkBuffer.setBlock(x, 64, z, OTG.toLocalMaterialData(DefaultMaterial.AIR, 0));
 	    				}
 	    			}
 	    		}
 	    		chunk = chunkBuffer.toChunk(this.worldHandle);
-	
+
 		        fillBiomeArray(chunk);
-		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest) 
+		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
 		        {
 		        	chunk.generateSkylightMap(); // Normally chunks lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
 		        }
-		        chunkBuffer = null; // Not sure what this is for, hoping to have it GC'd asap?
+		        chunkBuffer = null;
 	        }
     	} else {
         	if(world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
-	        {	
+	        {
 		        fillBiomeArray(chunk);
-		        if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
+		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
 		        {
 		        	chunk.generateSkylightMap(); // Normally chunks lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
 		        }
 	        }
         	chunkCache.remove(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
     	}
-    	
+
     	return chunk;
-    }           
+    }
+
+    public int getHighestBlockInCurrentlyPopulatingChunk(int x, int z)
+    {
+    	for(int i = OTG.WORLD_HEIGHT - 1; i > OTG.WORLD_DEPTH; i--)
+    	{
+    		if(!chunkBuffer.getBlock(x, i, z).isAir())
+			{
+    			return i;
+			};
+    	}
+
+    	return 0;
+    }
 }

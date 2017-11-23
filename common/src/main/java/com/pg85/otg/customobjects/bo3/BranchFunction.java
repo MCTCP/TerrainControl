@@ -42,24 +42,85 @@ public class BranchFunction extends BO3Function implements Branch
      */
     public double totalChance = 100;
     public boolean totalChanceSet = false;
-    
+
+    public String branchGroup = "";
+
     public boolean isRequiredBranch = false;
-            
+
     @Override
     public BranchFunction rotate()
     {
+    	if(isOTGPlus)
+    	{
+    		throw new RuntimeException();
+    	}
+
         BranchFunction rotatedBranch = new BranchFunction();
         rotatedBranch.x = z;
         rotatedBranch.y = y;
         rotatedBranch.z = -x;
         rotatedBranch.branches = new TreeSet<BranchNode>();
+        rotatedBranch.totalChance = totalChance;
+        rotatedBranch.totalChanceSet = totalChanceSet;
         for (BranchNode holder : this.branches)
         {
             rotatedBranch.branches.add(new BranchNode(holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, null), holder.customObjectName));
         }
         return rotatedBranch;
     }
-    
+
+    public BranchFunction rotate(Rotation rotation)
+    {
+    	if(!isOTGPlus)
+    	{
+    		throw new RuntimeException();
+    	}
+
+    	BranchFunction rotatedBranch = new BranchFunction();
+
+    	rotatedBranch.isOTGPlus = isOTGPlus;
+
+    	rotatedBranch.x = x;
+    	rotatedBranch.y = y;
+    	rotatedBranch.z = z;
+
+        rotatedBranch.totalChance = totalChance;
+        rotatedBranch.totalChanceSet = totalChanceSet;
+
+        rotatedBranch.branchGroup = branchGroup;
+        rotatedBranch.isRequiredBranch = isRequiredBranch;
+
+        rotatedBranch.branchesOTGPlus = branchesOTGPlus; // TODO: Make sure this won't cause problems
+
+        rotatedBranch.holder = holder;
+        rotatedBranch.valid = valid;
+        rotatedBranch.inputName = inputName;
+        rotatedBranch.inputArgs = inputArgs;
+        rotatedBranch.error = error;
+
+        int newX = rotatedBranch.x;
+        int newZ = rotatedBranch.z;
+
+    	for(int i = 0; i < rotation.getRotationId(); i++)
+    	{
+            newX = rotatedBranch.z;
+            newZ = -rotatedBranch.x;
+
+            rotatedBranch.x = newX;
+            rotatedBranch.y = rotatedBranch.y;
+            rotatedBranch.z = newZ;
+
+            ArrayList<BranchNode> rotatedBranchBranches = new ArrayList<BranchNode>();
+            for (BranchNode holder : rotatedBranch.branchesOTGPlus)
+            {
+            	rotatedBranchBranches.add(new BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, null), holder.customObjectName, holder.branchGroup));
+            }
+            rotatedBranch.branchesOTGPlus = rotatedBranchBranches;
+    	}
+
+        return rotatedBranch;
+    }
+
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
@@ -76,15 +137,15 @@ public class BranchFunction extends BO3Function implements Branch
             .append(x).append(',')
             .append(y).append(',')
             .append(z).append(',');
-        
+
         if(isOTGPlus)
         {
         	output.append(isRequiredBranch);
             for (Iterator<BranchNode> it = branchesOTGPlus.iterator(); it.hasNext();)
             {
                 output.append(it.next().toBranchString());
-            } 
-        } else {        
+            }
+        } else {
 	        for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
 	        {
 	            output.append(it.next().toBranchString());
@@ -96,7 +157,7 @@ public class BranchFunction extends BO3Function implements Branch
         }
         return output.append(')').toString();
     }
-   
+
     /**
      * This method iterates all the possible branches in this branchFunction object
      * and uses a random number and the branch's spawn chance to check if the branch
@@ -104,26 +165,27 @@ public class BranchFunction extends BO3Function implements Branch
      */
     @Override
     public CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
-    {   	
+    {
     	if(world.getConfigs().getWorldConfig().IsOTGPlus)
     	{
 	        for (Iterator<BranchNode> it = branchesOTGPlus.iterator(); it.hasNext();)
 	        {
 	            BranchNode branch = it.next();
+
 	            double randomChance = random.nextDouble() * totalChance;
 	            if (randomChance <= branch.getChance())
-	            {               
-	                CustomObjectCoordinate rotatedCoords = RotateCoords(this.x, this.y, this.z, rotation);
+	            {
+	                CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
 	                Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-	                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), true, branch.branchDepth, branch.isRequiredBranch);
+	                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), true, branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
 	            }
 	        }
     	} else {
             for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
-            {            	
+            {
                 BranchNode branch = it.next();
-                                
-                double randomChance = random.nextDouble() * totalChance;                
+
+                double randomChance = random.nextDouble() * totalChance;
                 if (randomChance < branch.getChance())
                 {
                     return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, y + this.y, z + this.z);
@@ -131,55 +193,7 @@ public class BranchFunction extends BO3Function implements Branch
             }
     	}
         return null;
-    }    
-
-    //TODO: The exact same method exists in multiple classes, merge into one method?
-    private CustomObjectCoordinate RotateCoords(int x, int y, int z, Rotation newRotation)
-    {
-        // Assuming initial rotation is always north
-    	
-    	int newX = 0;
-    	int newY = 0;
-    	int newZ = 0;
-    	int rotations = 0;
-    	// How many counter-clockwise rotations have to be applied?
-		if(newRotation == Rotation.WEST)
-		{
-			rotations = 1;
-		}
-		else if(newRotation == Rotation.SOUTH)
-		{
-			rotations = 2;    			
-		}
-		else if(newRotation == Rotation.EAST)
-		{
-			rotations = 3;    			
-		}
-    
-    	if(rotations == 0)
-    	{
-    		newX = x;
-    		newZ = z;
-    	}
-    	if(rotations == 1)
-    	{
-    		newX = z;
-    		newZ = -x;    		
-    	}
-    	if(rotations == 2)
-    	{
-    		newX = -x; 
-    		newZ = -z;
-    	}
-    	if(rotations == 3)
-    	{
-    		newX = -z;
-    		newZ = x;
-    	}    	
-    	newY = y;
-    	
-    	return new CustomObjectCoordinate(null, null, null, newRotation, newX, newY, newZ, false, 0, false);
-    }    
+    }
 
     /**
      * Returns the name of the function used in the config file;
@@ -189,54 +203,77 @@ public class BranchFunction extends BO3Function implements Branch
     protected String getConfigName()
     {
         return "Branch";
-    }    
-    
+    }
+
     boolean isOTGPlus;
     protected double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
-    {   
+    {
         double cumulativeChance = 0;
         isOTGPlus = this.getHolder().isOTGPlus;
     	if(isOTGPlus)
     	{
-    		// assureSize only returns false if size() < size 
-    		assureSize(8, args);			    	
-    		
+    		// assureSize only returns false if size() < size
+    		assureSize(8, args);
+
 	        x = readInt(args.get(0), -32, 32);
 	        y = readInt(args.get(1), -255, 255);
-	        z = readInt(args.get(2), -32, 32);        
+	        z = readInt(args.get(2), -32, 32);
 	        isRequiredBranch = readBoolean(args.get(3));
-	        
+
 	        int i;
 	        // This for loop allows multiple branches to be defined in a single Branch(x,x,x,x,etc) line in a BO3 file.
 	        for (i = 4; i < args.size() - 3; i += 4)
 	        {
 	            double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
-	        	if(isRequiredBranch && args.size() > 8)
+	        	if(isRequiredBranch && args.size() > 9)
 	        	{
 	        		if(OTG.getPluginConfig().SpawnLog)
 	        		{
 	        			String branchString = "";
 	        			for(String arg : args)
 	        			{
-	        				branchString += ",";	
+	        				branchString += ", " + arg;
 	        			}
 	        			OTG.log(LogMarker.WARN, "isRequired:true branches cannot have multiple BO3's with a rarity, only one BO3 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. Using only the first BO3 for branch: Branch(" + branchString.substring(0, branchString.length()  - 1) + ")");
 	        		}
-	        		branchesOTGPlus.add(new BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, Rotation.getRotation(args.get(i + 1)), 100.0, null, args.get(i)));	        		
+	        		branchesOTGPlus.add(new BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), 100.0, null, args.get(i), null));
 	        		break;
 	        	} else {
-		            branchesOTGPlus.add(new BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i)));
+		            branchesOTGPlus.add(new BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
 	        	}
 	        }
 	        if(!isRequiredBranch)
 	        {
 		        if (i < args.size())
 		        {
-		        	totalChanceSet = true;
-		            totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
+		        	String totalChanceOrBranchGroup = args.get(i);
+		        	if(totalChanceOrBranchGroup != null && totalChanceOrBranchGroup.length() > 0)
+		        	{
+		        		try
+		        		{
+		        			Double.parseDouble(totalChanceOrBranchGroup);
+				        	totalChanceSet = true;
+				            totalChance = readDouble(args.get(i), 0, Double.MAX_VALUE);
+				            i++;
+		        		}
+		        		catch(NumberFormatException ex) { }
+		        	}
 		        }
 	        }
-    	} else {  
+	        if (i < args.size())
+	        {
+	        	String totalChanceOrBranchGroup = args.get(i);
+	        	if(totalChanceOrBranchGroup != null && totalChanceOrBranchGroup.length() > 0)
+	        	{
+	        		branchGroup = args.get(i);
+
+	        		for(BranchNode branch : branchesOTGPlus)
+	        		{
+	        			branch.branchGroup = branchGroup;
+	        		}
+	        	}
+	        }
+    	} else {
 	        assureSize(6, args);
 	        x = readInt(args.get(0), -32, 32);
 	        y = readInt(args.get(1), -64, 64);
@@ -249,9 +286,9 @@ public class BranchFunction extends BO3Function implements Branch
 	            {
 	                cumulativeChance += branchChance;
 	                // CustomObjects are inserted into the Set in ascending chance order with Chance being cumulative.
-	                branches.add(new BranchNode(0, isRequiredBranch, Rotation.getRotation(args.get(i + 1)), cumulativeChance, null, args.get(i)));
+	                branches.add(new BranchNode(0, isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), cumulativeChance, null, args.get(i), null));
 	            } else {
-	                branches.add(new BranchNode(0, isRequiredBranch, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i)));
+	                branches.add(new BranchNode(0, isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
 	            }
 	        }
 	        if (i < args.size())

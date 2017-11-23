@@ -48,7 +48,7 @@ public class OTGDimensionManager
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				DimensionType dimensionType = DimensionManager.getProviderType(i);
-				
+
 				if(dimensionType.getSuffix() != null && dimensionType.getSuffix().equals("OTG") && dimensionType.getName().equals(dimensionName))
 				{
     				return true;
@@ -57,19 +57,19 @@ public class OTGDimensionManager
 		}
 		return false;
 	}
-	
+
 	static HashMap<Integer,Integer> dimensionsOrder;
-	
+
 	public static int createDimension(String dimensionName, boolean keepLoaded, boolean initDimension, boolean saveDimensionData)
 	{
 		int newDimId = DimensionManager.getNextFreeDimId();
-        
-		DimensionManager.registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, WorldProviderOTG.class, keepLoaded));	        			        		
+
+		DimensionManager.registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, WorldProviderOTG.class, keepLoaded));
 		if(initDimension)
 		{
 			initDimension(newDimId, dimensionName);
-		}		
-		
+		}
+
 		int maxOrder = -1;
 		for(Integer dimOrder : dimensionsOrder.values())
 		{
@@ -77,17 +77,17 @@ public class OTGDimensionManager
 			{
 				maxOrder = dimOrder;
 			}
-		}		
+		}
 		dimensionsOrder.put(newDimId, maxOrder + 1);
-		
+
 		if(saveDimensionData)
 		{
 			SaveDimensionData();
 		}
-		
+
 		return newDimId;
 	}
-	
+
 	public static void DeleteDimension(int dimToRemove, ForgeWorld world, MinecraftServer server, boolean saveDimensionData)
 	{
 		if(DimensionManager.getWorld(dimToRemove) != null) // Can be null on the client if the world was unloaded(?)
@@ -98,15 +98,15 @@ public class OTGDimensionManager
 		{
 			DimensionManager.unregisterDimension(dimToRemove);
 		}
-		
+
 		world.unRegisterBiomes();
-			
+
 		((ForgeEngine)OTG.getEngine()).getWorldLoader().RemoveUnloadedWorld(world.getName());
 
 		OTGDimensionManager.UnloadCustomDimensionData(dimToRemove);
 
 		world.DeleteWorldSessionData();
-		
+
 		BitSet dimensionMap = null;
 		try {
 			Field[] fields = DimensionManager.class.getDeclaredFields();
@@ -127,9 +127,9 @@ public class OTGDimensionManager
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
 		}
-		
+
 		dimensionMap.clear(dimToRemove);
-		
+
 		if(saveDimensionData)
 		{
 			// This biome was unregistered via a console command, delete its world data
@@ -138,17 +138,17 @@ public class OTGDimensionManager
 			{
 				OTG.log(LogMarker.INFO, "Deleting world save data for dimension " + dimToRemove);
 				try {
-					FileUtils.deleteDirectory(dimensionSaveDir);								
+					FileUtils.deleteDirectory(dimensionSaveDir);
 				} catch (IOException e) {
 					OTG.log(LogMarker.ERROR, "Could not delete directory: " + e.toString());
 					e.printStackTrace();
 				}
 			}
-		
+
 			SaveDimensionData();
 		}
 	}
-		
+
     private static void initDimension(int dim, String dimensionName)
     {
         WorldServer overworld = DimensionManager.getWorld(0);
@@ -156,7 +156,7 @@ public class OTGDimensionManager
         {
             throw new RuntimeException("Cannot Hotload Dim: Overworld is not Loaded!");
         }
-        
+
         try
         {
             DimensionManager.getProviderType(dim);
@@ -170,30 +170,32 @@ public class OTGDimensionManager
         ISaveHandler savehandler = overworld.getSaveHandler();
 
         // TODO: Allow for different settings for each dimension.
-        // TODO: Changing seed here does work, but seed is forgotten after restart and overworld seed is used, fix this! <-- TODO: Is this still true?       
-        
+        // TODO: Changing seed here does work, but seed is forgotten after restart and overworld seed is used, fix this! <-- TODO: Is this still true?
+
 		long seedIn = (long) Math.floor((Math.random() * Long.MAX_VALUE));
 		GameType gameType = mcServer.getGameType();
 		boolean enableMapFeatures = overworld.getWorldInfo().isMapFeaturesEnabled(); // Whether the map features (e.g. strongholds) generation is enabled or disabled.
 		boolean hardcoreMode = overworld.getWorldInfo().isHardcoreModeEnabled();
 		WorldType worldTypeIn = overworld.getWorldType();
-		
+
 		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, worldTypeIn);
-		WorldInfo worldInfo = new WorldInfo(settings, overworld.getWorldInfo().getWorldName());        
+		settings.setGeneratorOptions("OpenTerrainGenerator");
+		WorldInfo worldInfo = new WorldInfo(settings, overworld.getWorldInfo().getWorldName());
+
         WorldServer world = (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler, worldInfo).init());
-                
+
         ForgeWorld forgeWorld = (ForgeWorld) OTG.getWorld(dimensionName);
 		if(forgeWorld == null)
 		{
 			forgeWorld = (ForgeWorld) OTG.getUnloadedWorld(dimensionName);
 		}
         if(forgeWorld != null) // forgeWorld can be null for a dimension with a vanilla world
-        {        	
+        {
 	        ((ServerConfigProvider)forgeWorld.getConfigs()).getWorldConfig().worldSeed = "" + seedIn;
 	        ((ServerConfigProvider)forgeWorld.getConfigs()).saveWorldConfig();
-	        
+
         	WorldConfig worldConfig = ((ServerConfigProvider)forgeWorld.getConfigs()).getWorldConfig();
-        	
+
 	        world.getGameRules().setOrCreateGameRule("commandBlockOutput", worldConfig.commandBlockOutput); // Whether command blocks should notify admins when they perform commands
     		world.getGameRules().setOrCreateGameRule("disableElytraMovementCheck", worldConfig.disableElytraMovementCheck); // Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).
     		world.getGameRules().setOrCreateGameRule("doDaylightCycle", worldConfig.doDaylightCycle); // Whether the day-night cycle and moon phases progress
@@ -211,12 +213,12 @@ public class OTGDimensionManager
 			world.getGameRules().setOrCreateGameRule("maxEntityCramming", worldConfig.maxEntityCramming); // The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.
 	        world.getGameRules().setOrCreateGameRule("mobGriefing", worldConfig.mobGriefing); // Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items
     		world.getGameRules().setOrCreateGameRule("naturalRegeneration", worldConfig.naturalRegeneration); // Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)
-    		world.getGameRules().setOrCreateGameRule("randomTickSpeed", worldConfig.randomTickSpeed); // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks 
+    		world.getGameRules().setOrCreateGameRule("randomTickSpeed", worldConfig.randomTickSpeed); // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks
 	        world.getGameRules().setOrCreateGameRule("reducedDebugInfo", worldConfig.reducedDebugInfo); // Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.
     		world.getGameRules().setOrCreateGameRule("sendCommandFeedback", worldConfig.sendCommandFeedback); // Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text
 			world.getGameRules().setOrCreateGameRule("showDeathMessages", worldConfig.showDeathMessages); // Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.
 			world.getGameRules().setOrCreateGameRule("spawnRadius", worldConfig.spawnRadius); // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
-	        world.getGameRules().setOrCreateGameRule("spectatorsGenerateChunks", worldConfig.spectatorsGenerateChunks); // Whether players in spectator mode can generate chunks        	        	        
+	        world.getGameRules().setOrCreateGameRule("spectatorsGenerateChunks", worldConfig.spectatorsGenerateChunks); // Whether players in spectator mode can generate chunks
 
 	        // Set difficulty, creative/survival/hardcore
 	        /*
@@ -233,25 +235,25 @@ public class OTGDimensionManager
                 worldserver.getWorldInfo().setDifficulty(difficulty);
                 worldserver.setAllowedSpawnTypes(this.allowSpawnMonsters(), this.canSpawnAnimals);
             }
-	        */	        
+	        */
         }
-        
+
         world.addEventListener(new ServerWorldEventHandler(mcServer, world));
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
     }
-    
+
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
-    
+
 	public static void SaveDimensionData()
-	{	
+	{
 		World world = DimensionManager.getWorld(0);
 		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/Dimensions.txt");
 		if(dimensionDataFile.exists())
 		{
 			dimensionDataFile.delete();
 		}
-		
+
 		StringBuilder stringbuilder = new StringBuilder();
 
 		for(int i = 2; i < Long.SIZE << 4; i++)
@@ -270,15 +272,15 @@ public class OTGDimensionManager
 					{
 						return; // If another mod added a dimension
 					}
-					
+
 					if(forgeWorld != null)
 					{
 						stringbuilder.append((stringbuilder.length() == 0 ? "" : ",") + i + "," + dimType.getName() + "," + dimType.shouldLoadSpawn() + "," + forgeWorld.getSeed() + "," + dimensionsOrder.get(i));
 					}
 				}
 			}
-		}		
-		
+		}
+
 		BufferedWriter writer = null;
         try
         {
@@ -293,18 +295,18 @@ public class OTGDimensionManager
             e.printStackTrace();
         }
         finally
-        {   
+        {
             try
-            {           	
+            {
                 writer.close();
             } catch (Exception e) { }
         }
 	}
-	
+
 	public static void UnloadAllCustomDimensionData()
 	{
 		dimensionsOrder = new HashMap<Integer,Integer>();
-		
+
 		BitSet dimensionMap = null;
 		try
 		{
@@ -336,9 +338,9 @@ public class OTGDimensionManager
 		for(int i = 2; i < Long.SIZE << 4; i++)
 		{
 			if(DimensionManager.isDimensionRegistered(i))
-			{				
+			{
 				DimensionType dimType = DimensionManager.getProviderType(i);
-				
+
 				if(dimType != null && dimType.getSuffix() != null && dimType.getSuffix().equals("OTG"))
 				{
 					DimensionManager.unregisterDimension(i);
@@ -347,11 +349,11 @@ public class OTGDimensionManager
 			}
 		}
 	}
-	
+
 	public static void UnloadCustomDimensionData(int dimId)
 	{
 		dimensionsOrder.remove(dimId);
-		
+
 		BitSet dimensionMap = null;
 		try
 		{
@@ -381,9 +383,9 @@ public class OTGDimensionManager
 		}
 
 		if(DimensionManager.isDimensionRegistered(dimId))
-		{				
+		{
 			DimensionType dimType = DimensionManager.getProviderType(dimId);
-			
+
 			if(dimType != null && dimType.getSuffix() != null && dimType.getSuffix().equals("OTG"))
 			{
 				DimensionManager.unregisterDimension(dimId);
@@ -391,11 +393,11 @@ public class OTGDimensionManager
 			}
 		}
 	}
-	
+
 	public static OTGDimensionInfo GetOrderedDimensionData()
 	{
 		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/Dimensions.txt");				
+		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/Dimensions.txt");
 		String[] dimensionDataFileValues = {};
 		if(dimensionDataFile.exists())
 		{
@@ -404,12 +406,12 @@ public class OTGDimensionManager
 				BufferedReader reader = new BufferedReader(new FileReader(dimensionDataFile));
 				try {
 					String line = reader.readLine();
-	
+
 				    while (line != null)
 				    {
 				    	stringbuilder.append(line);
 				        line = reader.readLine();
-				    }				    
+				    }
 				    if(stringbuilder.length() > 0)
 				    {
 				    	dimensionDataFileValues = stringbuilder.toString().split(",");
@@ -418,7 +420,7 @@ public class OTGDimensionManager
 				} finally {
 					reader.close();
 				}
-				
+
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			}
@@ -426,7 +428,7 @@ public class OTGDimensionManager
 				e1.printStackTrace();
 			}
 		}
-		
+
 		ArrayList<DimensionData> dimensionData = new ArrayList<DimensionData>();
 		if(dimensionDataFileValues.length > 0)
 		{
@@ -441,7 +443,7 @@ public class OTGDimensionManager
 				dimensionData.add(dimData);
 			}
 		}
-		
+
 		// Store the order in which dimensions were added
 		dimensionsOrder = new HashMap<Integer, Integer>();
 		HashMap<Integer, DimensionData> orderedDimensions = new HashMap<Integer, DimensionData>();
@@ -455,23 +457,23 @@ public class OTGDimensionManager
 				highestOrder = dimData.dimensionOrder;
 			}
 		}
-		
+
 		return new OTGDimensionInfo(highestOrder, orderedDimensions);
 	}
-	
+
 	public static void LoadCustomDimensionData()
 	{
 		OTGDimensionInfo otgDimData = GetOrderedDimensionData();
-		
-		// Recreate dimensions in the correct order						
+
+		// Recreate dimensions in the correct order
 		for(int i = 0; i <= otgDimData.highestOrder; i++)
 		{
 			if(otgDimData.orderedDimensions.containsKey(i))
 			{
 				DimensionData dimData = otgDimData.orderedDimensions.get(i);
-				
+
 				if(!DimensionManager.isDimensionRegistered(dimData.dimensionId))
-				{	
+				{
 					DimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, WorldProviderOTG.class, dimData.keepLoaded));
 					if(dimData.dimensionName.equals("DIM-Cartographer"))
 					{
@@ -481,13 +483,13 @@ public class OTGDimensionManager
 				}
 			}
 		}
-	}	
-	
+	}
+
 	private static Hashtable<Integer, Object> oldDims;
 	public static void RemoveTCDims()
-	{	
-    	Hashtable dimensions = null;  	
-   	
+	{
+    	Hashtable dimensions = null;
+
 		try
 		{
 			Field[] fields = DimensionManager.class.getDeclaredFields();
@@ -500,9 +502,9 @@ public class OTGDimensionManager
 					Hashtable fieldAsHashTable = (Hashtable) field.get(new DimensionManager());
 					if(fieldAsHashTable.values().size() > 0)
 					{
-						Object value = fieldAsHashTable.values().toArray()[0];																
+						Object value = fieldAsHashTable.values().toArray()[0];
 						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
-						{							
+						{
 							dimensions = fieldAsHashTable;
 					        break;
 						}
@@ -522,7 +524,7 @@ public class OTGDimensionManager
 		{
 			e.printStackTrace();
 		}
-		    	
+
 		oldDims = new Hashtable<Integer, Object>();
 		for(int i = 2; i < Long.SIZE << 4; i++)
 		{
@@ -535,13 +537,13 @@ public class OTGDimensionManager
 					dimensions.remove(i);
 				}
 			}
-		}	
+		}
 	}
-	
+
 	public static HashMap<Integer, String> GetAllOTGDimensions()
-	{	
+	{
 		HashMap<Integer, String> otgDims = new HashMap<Integer, String>();
-		
+
 		for(int i = 2; i < Long.SIZE << 4; i++)
 		{
 			if(DimensionManager.isDimensionRegistered(i))
@@ -553,14 +555,14 @@ public class OTGDimensionManager
 				}
 			}
 		}
-		
+
 		return otgDims;
 	}
-	
+
 	public static void ReAddTCDims()
 	{
-    	Hashtable dimensions = null;  	
-       	
+    	Hashtable dimensions = null;
+
 		try
 		{
 			Field[] fields = DimensionManager.class.getDeclaredFields();
@@ -573,9 +575,9 @@ public class OTGDimensionManager
 					Hashtable fieldAsHashTable = (Hashtable) field.get(new DimensionManager());
 					if(fieldAsHashTable.values().size() > 0)
 					{
-						Object value = fieldAsHashTable.values().toArray()[0];																
+						Object value = fieldAsHashTable.values().toArray()[0];
 						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
-						{							
+						{
 							dimensions = fieldAsHashTable;
 					        break;
 						}
@@ -595,7 +597,7 @@ public class OTGDimensionManager
 		{
 			e.printStackTrace();
 		}
-    	
+
 		for(Entry<Integer, Object> oldDim : oldDims.entrySet())
 		{
 			dimensions.put(oldDim.getKey(), oldDim.getValue());

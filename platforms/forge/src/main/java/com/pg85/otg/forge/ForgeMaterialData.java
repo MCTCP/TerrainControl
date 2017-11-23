@@ -14,47 +14,47 @@ import net.minecraft.init.Blocks;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
- * 
+ *
  */
 public class ForgeMaterialData implements LocalMaterialData
-{	
+{
 	// OTG+
-	
+
     @Override
     public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
-    {    	
-    	return 
+    {
+    	return
 			getName().toLowerCase().equals("ice") ||
 			getName().toLowerCase().equals("packed_ice") ||
-			(isSolid() || (!ignoreWater && isLiquid())) && 
+			(isSolid() || (!ignoreWater && isLiquid())) &&
 			(allowWood || !getName().toLowerCase().startsWith("log")) &&
-			!getName().toLowerCase().contains("lily");    	
+			!getName().toLowerCase().contains("lily");
     }
-	
-	//	
-	
+
+	//
+
     public static ForgeMaterialData ofString(String input) throws InvalidConfigException
     {
         // Try parsing as an internal Minecraft name
         // This is so that things like "minecraft:stone" aren't parsed
         // as the block "minecraft" with data "stone", but instead as the
         // block "minecraft:stone" with no block data.
-    	
+
     	// Used in BO3's as placeholder/detector block.
     	if(input.toLowerCase().equals("blank"))
     	{
-    		return ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.UNKNOWN_BLOCK, 0);
+    		return new ForgeMaterialData(null);
     	}
-    	
+
     	String newInput = input;
-   	
+
         net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(newInput);
         if (block != null)
         {
         	// Some old apps exported schematics/bo3's exported "STAIRS" without metadata (for instance "STAIRS:0").
         	// However, the default rotation has changed so fix this by adding the correct metadata.
-        	
-        	if(    			
+
+        	if(
     			block == Blocks.PORTAL ||
 				block == Blocks.DISPENSER ||
     			block == Blocks.ACACIA_STAIRS ||
@@ -73,8 +73,8 @@ public class ForgeMaterialData implements LocalMaterialData
         		block == Blocks.STONE_STAIRS
     		)
         	{
-        		newInput = input + ":0"; // TODO: Shouldn't this be 3? This appears to fix the problem for the dungeon dimension but I still see it in BB, double check? 
-        	} else {        	
+        		newInput = input + ":0"; // TODO: Shouldn't this be 3? This appears to fix the problem for the dungeon dimension but I still see it in BB, double check?
+        	} else {
 	            return ForgeMaterialData.ofMinecraftBlock(block);
         	}
         }
@@ -114,11 +114,11 @@ public class ForgeMaterialData implements LocalMaterialData
             if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
             {
                 block = Block.getBlockById(defaultMaterial.id);
-                
+
             	// Some old apps exported schematics/bo3's exported "STAIRS" without metadata (for instance "STAIRS:0").
             	// However, the default rotation has changed so fix this by adding the correct metadata.
-            	
-            	if( 
+
+            	if(
         			blockData == -1 &&
         			(
     					block == Blocks.PORTAL ||
@@ -159,7 +159,7 @@ public class ForgeMaterialData implements LocalMaterialData
                     return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData));
                 }
                 catch (IllegalArgumentException e)
-                {   
+                {
                 	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
                 }
             }
@@ -201,7 +201,7 @@ public class ForgeMaterialData implements LocalMaterialData
      * @return The {@code BukkitMateialData} instance.
      */
     static ForgeMaterialData ofMinecraftBlock(Block block)
-    {   	    	
+    {
         return ofMinecraftBlockState(block.getDefaultState());
     }
 
@@ -250,18 +250,23 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public byte getBlockData()
     {
-        return (byte) this.blockData.getBlock().getMetaFromState(this.blockData);
+        return this.blockData == null ? 0 : (byte) this.blockData.getBlock().getMetaFromState(this.blockData);
     }
 
     @Override
     public int getBlockId()
     {
-        return Block.getIdFromBlock(this.blockData.getBlock());
+        return this.blockData == null ? 0 : Block.getIdFromBlock(this.blockData.getBlock());
     }
 
     @Override
     public String getName()
     {
+    	if(this.blockData == null)
+    	{
+    		return "Unknown";
+    	}
+
         Block block = this.blockData.getBlock();
         DefaultMaterial defaultMaterial = toDefaultMaterial();
 
@@ -306,7 +311,7 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isLiquid()
     {
-        return this.blockData.getMaterial().isLiquid();
+        return this.blockData == null ? false : this.blockData.getMaterial().isLiquid();
     }
 
     @Override
@@ -325,12 +330,16 @@ public class ForgeMaterialData implements LocalMaterialData
             return defaultMaterial.isSolid();
         }
 
-        return this.blockData.getMaterial().isSolid();
+        return this.blockData == null ? false : this.blockData.getMaterial().isSolid();
     }
 
     @Override
     public DefaultMaterial toDefaultMaterial()
     {
+    	if(this.blockData == null)
+    	{
+    		return DefaultMaterial.UNKNOWN_BLOCK;
+    	}
         return DefaultMaterial.getMaterial(getBlockId());
     }
 
@@ -344,6 +353,10 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public LocalMaterialData withBlockData(int i)
     {
+    	if(this.blockData == null)
+    	{
+    		return this;
+    	}
         if (i == getBlockData())
         {
             return this;
@@ -356,6 +369,10 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public LocalMaterialData withDefaultBlockData()
     {
+    	if(this.blockData == null)
+    	{
+    		return this;
+    	}
         Block block = this.blockData.getBlock();
         return this.withBlockData(block.getMetaFromState(block.getDefaultState()));
     }
@@ -389,13 +406,13 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isAir()
     {
-        return this.blockData.getMaterial() == Material.AIR;
+        return this.blockData == null ? true : this.blockData.getMaterial() == Material.AIR;
     }
 
     @Override
     public boolean canFall()
     {
-        return this.blockData.getBlock() instanceof BlockFalling;
+        return this.blockData == null ? false : this.blockData.getBlock() instanceof BlockFalling;
     }
 
 }

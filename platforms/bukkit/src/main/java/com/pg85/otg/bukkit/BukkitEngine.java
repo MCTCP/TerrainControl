@@ -9,7 +9,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
-import net.minecraft.server.v1_11_R1.Block;
+import net.minecraft.server.v1_12_R1.Block;
 
 import java.io.File;
 import java.util.ArrayList;

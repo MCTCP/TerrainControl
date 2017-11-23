@@ -2,7 +2,9 @@ package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.Rotation;
 
 import java.util.List;
 import java.util.Random;
@@ -23,12 +25,12 @@ public class ModDataFunction extends BO3Function
     {
         assureSize(5, args);
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
-        // correctly based on what chunks can be accessed            
+        // correctly based on what chunks can be accessed
 		x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
         modId = args.get(3);
-        modData = args.get(4);			
+        modData = args.get(4);
     }
 
     @Override
@@ -50,6 +52,22 @@ public class ModDataFunction extends BO3Function
         return rotatedBlock;
     }
 
+    public ModDataFunction rotate(Rotation rotation)
+    {
+    	ModDataFunction rotatedBlock = new ModDataFunction();
+
+        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+
+        rotatedBlock.x = rotatedCoords.getX();
+        rotatedBlock.y = rotatedCoords.getY();
+        rotatedBlock.z = rotatedCoords.getZ();
+
+        rotatedBlock.modId = modId;
+        rotatedBlock.modData = modData;
+
+        return rotatedBlock;
+    }
+
     /**
      * Spawns this block at the position. The saved x, y and z in this block are
      * ignored.
@@ -65,7 +83,7 @@ public class ModDataFunction extends BO3Function
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean markBlockForUpdate)
     {
-    	throw new RuntimeException(); 
+    	throw new RuntimeException();
     }
 
     @Override

@@ -5,7 +5,7 @@ defaultTasks 'clean', 'build', 'createReleaseJar', 'install'
 
 allprojects
 {
-    version = "1.11.2 - v8"
+    version = "1.12.2 - v2"
     group = "com.pg85.otg"
 
     // Version of the shadow plugin
@@ -19,9 +19,8 @@ subprojects
 
     task.plugins.withType(org.gradle.api.plugins.JavaBasePlugin)
     {
-        // We're still on Java 6
-        sourceCompatibility = '1.6'
-        targetCompatibility = '1.6'
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
 
         // Generate Eclipse config files when using "gradle eclipse"
         task.apply plugin: 'eclipse'

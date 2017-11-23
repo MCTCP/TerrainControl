@@ -23,9 +23,11 @@ import java.util.Random;
 public interface LocalWorld
 {
 	// OTG+
-	
+
+	public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn);
+
     public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow);
-	
+
 	public ObjectSpawner getObjectSpawner();
 
 	boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk, boolean includeBorder);
@@ -33,19 +35,19 @@ public interface LocalWorld
 	boolean IsInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources);
 
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
-		
+
 	public WorldSession GetWorldSession();
 
 	public void DeleteWorldSessionData();
-	
+
 	public String getWorldSettingsName();
-	
+
 	public File getWorldSaveDir();
-	
+
 	public int getDimensionId();
-	
+
 	//
-	
+
 
     // Biome init
     /**
@@ -83,7 +85,7 @@ public interface LocalWorld
     public int getFreeBiomeId();
 
     public ArrayList<LocalBiome> getAllBiomes();
-    
+
     public LocalBiome getBiomeById(int id) throws BiomeNotFoundException;
 
     public LocalBiome getBiomeByIdOrNull(int id);
@@ -115,7 +117,7 @@ public interface LocalWorld
 
     /**
      * Gets the (stored) biome at the given coordinates.
-     * 
+     *
      * @param x The block x.
      * @param z The block z.
      * @return The biome at the given coordinates.
@@ -197,9 +199,9 @@ public interface LocalWorld
 
     // Blocks
     public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea);
-    
+
     public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea);
-    
+
     public NamedBinaryTag getMetadata(int x, int y, int z);
 
     public int getLiquidHeight(int x, int z);
@@ -213,7 +215,7 @@ public interface LocalWorld
      * @return The y location of the block above the highest block.
      */
     public int getHighestBlockYAt(int x, int z);
-    
+
     public int getLightLevel(int x, int y, int z);
 
     public boolean isLoaded(int x, int y, int z);
@@ -235,7 +237,7 @@ public interface LocalWorld
     /**
      * Gets the height the base terrain of the world is capped at. Resources
      * ignore this limit.
-     * 
+     *
      * @return The height the base terrain of the world is capped at.
      */
     public int getHeightCap();
@@ -244,11 +246,11 @@ public interface LocalWorld
      * Returns the vertical scale of the world. 128 blocks is the normal
      * scale, 256 doubles the scale, 64 halves the scale, etc. Only powers of
      * two will be returned.
-     * 
+     *
      * @return The vertical scale of the world.
      */
     public int getHeightScale();
-    
+
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub);
 
 	void SpawnEntity(EntityFunction entityData);

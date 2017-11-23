@@ -2,7 +2,9 @@ package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.Rotation;
 
 import java.util.List;
 import java.util.Random;
@@ -11,26 +13,26 @@ import java.util.Random;
  * Represents a block in a BO3.
  */
 public class ParticleFunction extends BO3Function
-{	
+{
     public int x;
     public int y;
     public int z;
-    
+
 	public Boolean firstSpawn = true;
-    
+
     public String particleName = "";
-    
+
     public double interval = 1;
     public double intervalOffset = 0;
-    
+
     public double velocityX = 0;
     public double velocityY = 0;
     public double velocityZ = 0;
-    
+
     public boolean velocityXSet = false;
     public boolean velocityYSet = false;
     public boolean velocityZSet = false;
-    
+
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
@@ -41,9 +43,9 @@ public class ParticleFunction extends BO3Function
 		y = readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
         particleName = args.get(3);
-        
+
         interval = readDouble(args.get(4), 0, Integer.MAX_VALUE);
-        
+
         if(args.size() > 5)
         {
         	velocityX = readDouble(args.get(5), Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -58,9 +60,9 @@ public class ParticleFunction extends BO3Function
         {
         	velocityZ = readDouble(args.get(7), Integer.MIN_VALUE, Integer.MAX_VALUE);
         	velocityZSet = true;
-        }			
+        }
     }
-    
+
     @Override
     public String makeString()
     {
@@ -71,7 +73,7 @@ public class ParticleFunction extends BO3Function
     {
     	return "Particle(" + x + ',' + y + ',' + z + ',' + particleName + ',' + interval + ',' + velocityX + ',' + velocityY + ',' + velocityZ + ',' + velocityXSet + ',' + velocityYSet + ',' + velocityZSet + ')';
     }
-    
+
     @Override
     public ParticleFunction rotate()
     {
@@ -80,16 +82,63 @@ public class ParticleFunction extends BO3Function
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.particleName = particleName;
-        
+
         rotatedBlock.interval = interval;
-        
+
         rotatedBlock.velocityX = velocityZ;
         rotatedBlock.velocityY = velocityY;
         rotatedBlock.velocityZ = -velocityX;
 
         rotatedBlock.velocityXSet = velocityZSet;
         rotatedBlock.velocityYSet = velocityYSet;
-        rotatedBlock.velocityZSet = velocityXSet; 
+        rotatedBlock.velocityZSet = velocityXSet;
+
+        return rotatedBlock;
+    }
+
+    public ParticleFunction rotate(Rotation rotation)
+    {
+    	ParticleFunction rotatedBlock = new ParticleFunction();
+
+        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+
+        rotatedBlock.x = rotatedCoords.getX();
+        rotatedBlock.y = rotatedCoords.getY();
+        rotatedBlock.z = rotatedCoords.getZ();
+
+        rotatedBlock.velocityX = velocityX;
+        rotatedBlock.velocityY = velocityY;
+        rotatedBlock.velocityZ = velocityZ;
+
+        rotatedBlock.velocityXSet = velocityXSet;
+        rotatedBlock.velocityYSet = velocityYSet;
+        rotatedBlock.velocityZSet = velocityZSet;
+
+        double newVelocityX = rotatedBlock.velocityX;
+        double newVelocityZ = rotatedBlock.velocityZ;
+
+        boolean newVelocityXSet = rotatedBlock.velocityXSet;
+        boolean newVelocityZSet = rotatedBlock.velocityZSet;
+
+    	for(int i = 0; i < rotation.getRotationId(); i++)
+    	{
+            newVelocityX = rotatedBlock.velocityZ;
+            newVelocityZ = -rotatedBlock.velocityX;
+
+            rotatedBlock.velocityX = newVelocityX;
+            rotatedBlock.velocityY = rotatedBlock.velocityY;
+            rotatedBlock.velocityZ = newVelocityZ;
+
+            newVelocityXSet = rotatedBlock.velocityZSet;
+            newVelocityZSet = rotatedBlock.velocityXSet;
+
+            rotatedBlock.velocityXSet = newVelocityXSet;
+            rotatedBlock.velocityYSet = rotatedBlock.velocityYSet;
+            rotatedBlock.velocityZSet = newVelocityZSet;
+    	}
+
+    	rotatedBlock.particleName = particleName;
+    	rotatedBlock.interval = interval;
 
         return rotatedBlock;
     }
@@ -109,7 +158,7 @@ public class ParticleFunction extends BO3Function
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean markBlockForUpdate)
     {
-    	throw new RuntimeException(); 
+    	throw new RuntimeException();
     }
 
     @Override

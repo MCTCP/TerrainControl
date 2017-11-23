@@ -13,9 +13,9 @@ import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 
 import net.minecraft.world.World;
+import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.chunk.IChunkGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -36,7 +36,7 @@ public class OTGWorldType extends WorldType
     {
     	return true;
     }
-    
+
     @Override
     public BiomeProvider getBiomeProvider(World mcWorld)
     {
@@ -56,19 +56,27 @@ public class OTGWorldType extends WorldType
             if (!worldDirectory.mkdirs())
                 System.out.println("OpenTerrainGenerator: cant create folder " + worldDirectory.getAbsolutePath());
         }
-        
+
         File worldObjectsDir = new File(OTG.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
         worldObjectsDir.mkdirs();
-        
+
         File worldBiomesDir = new File(OTG.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
         worldBiomesDir.mkdirs();
-        
+
+        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), mcWorld.getWorldInfo().getTerrainType());
+        worldSettings.setGeneratorOptions("OpenTerrainGenerator");
+        if(mcWorld.getWorldInfo().areCommandsAllowed())
+        {
+        	worldSettings.enableCommands();
+        }
+        mcWorld.getWorldInfo().populateFromWorldSettings(worldSettings);
+
         ForgeWorld world = this.worldLoader.getOrCreateForgeWorld(mcWorld);
         if (world == null)
         {
             return super.getBiomeProvider(mcWorld);
         }
-                
+
         Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeGenerator = OTG.getBiomeModeManager().createCached(biomeGenClass, world);
         BiomeProvider biomeProvider = this.createBiomeProvider(world, biomeGenerator);
@@ -80,7 +88,7 @@ public class OTGWorldType extends WorldType
      * Gets the appropriate BiomeProvider. For the vanilla biome generator we
      * have to use BiomeProvider, for other biome modes TCBiomeProvider is
      * the right option.
-     * 
+     *
      * @param world ForgeWorld instance, needed to instantiate the
      *            BiomeProvider.
      * @param biomeGenerator Biome generator.
@@ -103,10 +111,10 @@ public class OTGWorldType extends WorldType
         }
 
         return biomeProvider;
-    }   
+    }
 
     @Override
-    public IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
+    public net.minecraft.world.gen.IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
     {
         ForgeWorld world = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
         if (world != null && world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
@@ -118,7 +126,7 @@ public class OTGWorldType extends WorldType
 
     @Override
     public int getMinimumSpawnHeight(World mcWorld)
-    {    	
+    {
         LocalWorld world = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
         if (world == null)
         {

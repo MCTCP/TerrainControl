@@ -4,9 +4,9 @@ import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
 import com.pg85.otg.util.helpers.BlockHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
-import net.minecraft.server.v1_11_R1.Block;
-import net.minecraft.server.v1_11_R1.BlockFalling;
-import net.minecraft.server.v1_11_R1.IBlockData;
+import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.BlockFalling;
+import net.minecraft.server.v1_12_R1.IBlockData;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.

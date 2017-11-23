@@ -18,14 +18,14 @@ public class DimensionSyncPacket implements IMessage
 {
 	ByteBuf data = Unpooled.buffer();
 	DataInputStream wrappedStream;
-	
+
 	public DimensionSyncPacket() { }
 
 	public DimensionSyncPacket(ByteBuf data)
 	{
 		this.data = data;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf data)
 	{
@@ -39,13 +39,13 @@ public class DimensionSyncPacket implements IMessage
         	throw new RuntimeException("Client is using a different version of OTG than server!");
         }
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf data)
 	{
 		data.writeBytes(this.data);
 	}
-	
+
 	public static class Handler extends AbstractClientMessageHandler<DimensionSyncPacket>
 	{
 		@Override

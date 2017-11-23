@@ -15,17 +15,17 @@ import com.pg85.otg.configuration.ServerConfigProvider;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.NBTTagCompound;
-import net.minecraft.server.v1_11_R1.StructureGenerator;
-import net.minecraft.server.v1_11_R1.StructurePiece;
-import net.minecraft.server.v1_11_R1.StructureStart;
-import net.minecraft.server.v1_11_R1.World;
-import net.minecraft.server.v1_11_R1.WorldGenVillagePieces;
-import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
-import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
-import net.minecraft.server.v1_11_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.NBTTagCompound;
+import net.minecraft.server.v1_12_R1.StructureGenerator;
+import net.minecraft.server.v1_12_R1.StructurePiece;
+import net.minecraft.server.v1_12_R1.StructureStart;
+import net.minecraft.server.v1_12_R1.World;
+import net.minecraft.server.v1_12_R1.WorldGenVillagePieces;
+import net.minecraft.server.v1_12_R1.WorldGenVillagePieces.WorldGenVillagePieceWeight;
+import net.minecraft.server.v1_12_R1.WorldGenVillagePieces.WorldGenVillageRoadPiece;
+import net.minecraft.server.v1_12_R1.WorldGenVillagePieces.WorldGenVillageStartPiece;
 
 public class OTGVillageGen extends StructureGenerator
 {
@@ -60,8 +60,8 @@ public class OTGVillageGen extends StructureGenerator
             }
         }
     }
-    
-    
+
+
     public BlockPosition getNearestGeneratedFeature(World world, BlockPosition blockposition, boolean flag)
     {
         this.g = world;
@@ -140,7 +140,7 @@ public class OTGVillageGen extends StructureGenerator
                 // Desert village = 1
                 // Savanna village = 2
             	// Taiga village = 3
-            	
+
             	changeVillageType(startPiece, biome.getBiomeConfig().villageType == VillageType.wood ? 0 : biome.getBiomeConfig().villageType == VillageType.sandstone ? 1 : biome.getBiomeConfig().villageType == VillageType.savanna ? 2 : biome.getBiomeConfig().villageType == VillageType.taiga ? 3 : 0);
             }
 
@@ -199,8 +199,8 @@ public class OTGVillageGen extends StructureGenerator
          *            village.
          */
         private void changeVillageType(WorldGenVillageStartPiece subject, int villageType)
-        {                       
-            Class villageClass = WorldGenVillageStartPiece.class.getSuperclass().getSuperclass();            
+        {
+            Class villageClass = WorldGenVillageStartPiece.class.getSuperclass().getSuperclass();
         	for (Field field : villageClass.getDeclaredFields())
         	{
             	String fieldName = field.getName();

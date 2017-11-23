@@ -53,7 +53,7 @@ task createReleaseJar <<
     File bukkitFile = getJarFile(project(":platforms:bukkit"))
     File ourFile = getJarFile(project)
 
-    if (forgeFile.exists() && bukkitFile.exists())
+	if (forgeFile.exists() && bukkitFile.exists())
     {
         ourFile.getParentFile().mkdirs()
         ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
@@ -63,8 +63,7 @@ task createReleaseJar <<
         addToZip(bukkitFile, outputStream, alreadyAddedFiles)
 
         outputStream.close()
-    } else
-    {
+    } else {
         println(" Skipping the release jar, as the Bukkit or Forge file failed")
 		println(" Forge exists: " + forgeFile.exists())
 		println(" Bukkit exists: " + bukkitFile.exists())

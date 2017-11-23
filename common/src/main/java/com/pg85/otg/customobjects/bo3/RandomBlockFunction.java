@@ -3,15 +3,17 @@ package com.pg85.otg.customobjects.bo3;
 import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.Rotation;
 
 import java.util.List;
 import java.util.Random;
 
 public class RandomBlockFunction extends BlockFunction
 {
-    LocalMaterialData[] blocks;
+    public LocalMaterialData[] blocks;
     byte[] blockChances;
     String[] metaDataNames;
     NamedBinaryTag[] metaDataTags;
@@ -21,9 +23,10 @@ public class RandomBlockFunction extends BlockFunction
     public RandomBlockFunction()
     {
     	super();
-	}    
-    
-    public RandomBlockFunction(BO3Config config, List<String> args) throws InvalidConfigException
+	}
+
+    @Override
+    public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
@@ -34,7 +37,7 @@ public class RandomBlockFunction extends BlockFunction
         int i = 3;
         int size = args.size();
 
-        // The arrays are a little bit too large, just to be sure
+        // The arrays are a little bit too large, just to be sure <-- TODO: Why do this? Remove this?
         blocks = new LocalMaterialData[size / 2 + 1];
         blockChances = new byte[size / 2 + 1];
         metaDataNames = new String[size / 2 + 1];
@@ -81,7 +84,7 @@ public class RandomBlockFunction extends BlockFunction
     }
 
     @Override
-    public String toString()
+    public String makeString()
     {
         String text = "RandomBlock(" + x + "," + y + "," + z;
         for (int i = 0; i < blockCount; i++)
@@ -117,6 +120,58 @@ public class RandomBlockFunction extends BlockFunction
         return rotatedBlock;
     }
 
+    public BlockFunction rotate(Rotation rotation)
+    {
+    	RandomBlockFunction rotatedBlock = new RandomBlockFunction();
+
+        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+
+        rotatedBlock.x = rotatedCoords.getX();
+        rotatedBlock.y = rotatedCoords.getY();
+        rotatedBlock.z = rotatedCoords.getZ();
+
+        rotatedBlock.blocks = blocks;
+
+        if(material != null)
+        {
+        	throw new RuntimeException();
+        }
+
+    	// TODO: This makes no sense, why is rotation inverted??? Should be: NORTH:0,WEST:1,SOUTH:2,EAST:3
+        LocalMaterialData[] rotatedBlockBlocks = new LocalMaterialData[blockCount];
+        for (int a = 0; a < blockCount; a++)
+        {
+        	rotatedBlockBlocks[a] = rotatedBlock.blocks[a];
+
+		    // Apply rotation
+			if(rotation.getRotationId() == 3)
+			{
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
+			}
+			if(rotation.getRotationId() == 2)
+			{
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
+			}
+			if(rotation.getRotationId() == 1)
+			{
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
+			}
+        }
+        rotatedBlock.blocks = rotatedBlockBlocks;
+
+    	rotatedBlock.blockCount = blockCount;
+    	rotatedBlock.blockChances = blockChances;
+        rotatedBlock.metaDataTag = metaDataTag;
+        rotatedBlock.metaDataTags = metaDataTags;
+        rotatedBlock.metaDataName = metaDataName;
+        rotatedBlock.metaDataNames = metaDataNames;
+
+        return rotatedBlock;
+    }
+
     @Override
     public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean allowOutsidePopulatingArea)
     {
@@ -139,5 +194,5 @@ public class RandomBlockFunction extends BlockFunction
         }
         RandomBlockFunction block = (RandomBlockFunction) other;
         return block.x == x && block.y == y && block.z == z;
-    }    
+    }
 }

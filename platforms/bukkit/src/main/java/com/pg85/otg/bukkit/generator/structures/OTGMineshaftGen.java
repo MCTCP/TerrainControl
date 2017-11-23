@@ -7,7 +7,7 @@ import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.BiomeConfig.MineshaftType;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_12_R1.*;
 
 import java.util.Random;
 

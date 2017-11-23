@@ -47,12 +47,12 @@ import net.minecraft.client.gui.GuiListExtended;;
 public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEntry
 {
 	// Taken from net.minecraft.client.gui.GuiListWorldSelectionEntry. Only added getSelectedWorldName().
-	
+
 	public String getSelectedWorldName()
 	{
 		return this.worldSummary != null ? this.worldSummary.getFileName() : null;
 	}
-	
+
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat();
     private static final ResourceLocation ICON_MISSING = new ResourceLocation("textures/misc/unknown_server.png");
@@ -66,14 +66,14 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     private DynamicTexture icon;
     private long lastClickTime;
 
-    public OTGGuiListWorldSelectionEntry(OTGGuiListWorldSelection listWorldSelIn, WorldSummary p_i46591_2_, ISaveFormat p_i46591_3_)
+    public OTGGuiListWorldSelectionEntry(OTGGuiListWorldSelection listWorldSelIn, WorldSummary worldSummaryIn, ISaveFormat saveFormat)
     {
         this.containingListSel = listWorldSelIn;
         this.worldSelScreen = listWorldSelIn.getGuiWorldSelection();
-        this.worldSummary = p_i46591_2_;
+        this.worldSummary = worldSummaryIn;
         this.client = Minecraft.getMinecraft();
-        this.iconLocation = new ResourceLocation("worlds/" + p_i46591_2_.getFileName() + "/icon");
-        this.iconFile = p_i46591_3_.getFile(p_i46591_2_.getFileName(), "icon.png");
+        this.iconLocation = new ResourceLocation("worlds/" + worldSummaryIn.getFileName() + "/icon");
+        this.iconFile = saveFormat.getFile(worldSummaryIn.getFileName(), "icon.png");
 
         if (!this.iconFile.isFile())
         {
@@ -83,7 +83,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         this.loadServerIcon();
     }
 
-    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected)
+    public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
         String s = this.worldSummary.getDisplayName();
         String s1 = this.worldSummary.getFileName() + " (" + DATE_FORMAT.format(new Date(this.worldSummary.getLastTimePlayed())) + ")";
@@ -91,25 +91,25 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
         if (StringUtils.isEmpty(s))
         {
-            s = I18n.format("selectWorld.world", new Object[0]) + " " + (slotIndex + 1);
+            s = I18n.format("selectWorld.world") + " " + (slotIndex + 1);
         }
 
         if (this.worldSummary.requiresConversion())
         {
-            s2 = I18n.format("selectWorld.conversion", new Object[0]) + " " + s2;
+            s2 = I18n.format("selectWorld.conversion") + " " + s2;
         }
         else
         {
-            s2 = I18n.format("gameMode." + this.worldSummary.getEnumGameType().getName(), new Object[0]);
+            s2 = I18n.format("gameMode." + this.worldSummary.getEnumGameType().getName());
 
             if (this.worldSummary.isHardcoreModeEnabled())
             {
-                s2 = TextFormatting.DARK_RED + I18n.format("gameMode.hardcore", new Object[0]) + TextFormatting.RESET;
+                s2 = TextFormatting.DARK_RED + I18n.format("gameMode.hardcore") + TextFormatting.RESET;
             }
 
             if (this.worldSummary.getCheatsEnabled())
             {
-                s2 = s2 + ", " + I18n.format("selectWorld.cheats", new Object[0]);
+                s2 = s2 + ", " + I18n.format("selectWorld.cheats");
             }
 
             String s3 = this.worldSummary.getVersionName();
@@ -118,16 +118,16 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
             {
                 if (this.worldSummary.askToOpenWorld())
                 {
-                    s2 = s2 + ", " + I18n.format("selectWorld.version", new Object[0]) + " " + TextFormatting.RED + s3 + TextFormatting.RESET;
+                    s2 = s2 + ", " + I18n.format("selectWorld.version") + " " + TextFormatting.RED + s3 + TextFormatting.RESET;
                 }
                 else
                 {
-                    s2 = s2 + ", " + I18n.format("selectWorld.version", new Object[0]) + " " + TextFormatting.ITALIC + s3 + TextFormatting.RESET;
+                    s2 = s2 + ", " + I18n.format("selectWorld.version") + " " + TextFormatting.ITALIC + s3 + TextFormatting.RESET;
                 }
             }
             else
             {
-                s2 = s2 + ", " + I18n.format("selectWorld.version", new Object[0]) + " " + s3;
+                s2 = s2 + ", " + I18n.format("selectWorld.version") + " " + s3;
             }
         }
 
@@ -158,7 +158,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
                     if (j < 32)
                     {
-                        this.worldSelScreen.setVersionTooltip(TextFormatting.RED + I18n.format("selectWorld.tooltip.fromNewerVersion1", new Object[0]) + "\n" + TextFormatting.RED + I18n.format("selectWorld.tooltip.fromNewerVersion2", new Object[0]));
+                        this.worldSelScreen.setVersionTooltip(TextFormatting.RED + I18n.format("selectWorld.tooltip.fromNewerVersion1") + "\n" + TextFormatting.RED + I18n.format("selectWorld.tooltip.fromNewerVersion2"));
                     }
                 }
                 else
@@ -167,7 +167,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
                     if (j < 32)
                     {
-                        this.worldSelScreen.setVersionTooltip(TextFormatting.GOLD + I18n.format("selectWorld.tooltip.snapshot1", new Object[0]) + "\n" + TextFormatting.GOLD + I18n.format("selectWorld.tooltip.snapshot2", new Object[0]));
+                        this.worldSelScreen.setVersionTooltip(TextFormatting.GOLD + I18n.format("selectWorld.tooltip.snapshot1") + "\n" + TextFormatting.GOLD + I18n.format("selectWorld.tooltip.snapshot2"));
                     }
                 }
             }
@@ -213,14 +213,14 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
                 {
                     if (result)
                     {
-                        OTGGuiListWorldSelectionEntry.this.loadWorld();
+                    	OTGGuiListWorldSelectionEntry.this.loadWorld();
                     }
                     else
                     {
                     	OTGGuiListWorldSelectionEntry.this.client.displayGuiScreen(OTGGuiListWorldSelectionEntry.this.worldSelScreen);
                     }
                 }
-            }, I18n.format("selectWorld.versionQuestion", new Object[0]), I18n.format("selectWorld.versionWarning", new Object[] {this.worldSummary.getVersionName()}), I18n.format("selectWorld.versionJoinButton", new Object[0]), I18n.format("gui.cancel", new Object[0]), 0));
+            }, I18n.format("selectWorld.versionQuestion"), I18n.format("selectWorld.versionWarning", this.worldSummary.getVersionName()), I18n.format("selectWorld.versionJoinButton"), I18n.format("gui.cancel"), 0));
         }
         else
         {
@@ -245,7 +245,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
                 OTGGuiListWorldSelectionEntry.this.client.displayGuiScreen(OTGGuiListWorldSelectionEntry.this.worldSelScreen);
             }
-        }, I18n.format("selectWorld.deleteQuestion", new Object[0]), "\'" + this.worldSummary.getDisplayName() + "\' " + I18n.format("selectWorld.deleteWarning", new Object[0]), I18n.format("selectWorld.deleteButton", new Object[0]), I18n.format("gui.cancel", new Object[0]), 0));
+        }, I18n.format("selectWorld.deleteQuestion"), "'" + this.worldSummary.getDisplayName() + "' " + I18n.format("selectWorld.deleteWarning"), I18n.format("selectWorld.deleteButton"), I18n.format("gui.cancel"), 0));
     }
 
     public void editWorld()
@@ -260,8 +260,12 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         ISaveHandler isavehandler = this.client.getSaveLoader().getSaveLoader(this.worldSummary.getFileName(), false);
         WorldInfo worldinfo = isavehandler.loadWorldInfo();
         isavehandler.flush();
-        guicreateworld.recreateFromExistingWorld(worldinfo);
-        this.client.displayGuiScreen(guicreateworld);
+
+        if (worldinfo != null)
+        {
+            guicreateworld.recreateFromExistingWorld(worldinfo);
+            this.client.displayGuiScreen(guicreateworld);
+        }
     }
 
     private void loadWorld()
@@ -274,7 +278,6 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         }
     }
 
-    // net.minecraftforge.fml.client.FMLClientHandler.tryLoadExistingWorld
     public void tryLoadExistingWorld(FMLClientHandler clientHandler, OTGGuiWorldSelection selectWorldGUI, WorldSummary comparator)
     {
         File dir = new File(clientHandler.getSavesDir(), comparator.getFileName());
@@ -291,7 +294,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
             }
             catch (Exception e1)
             {
-                FMLLog.warning("There appears to be a problem loading the save %s, both level files are unreadable.", comparator.getFileName());
+                FMLLog.log.warn("There appears to be a problem loading the save {}, both level files are unreadable.", comparator.getFileName());
                 return;
             }
         }
@@ -304,7 +307,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         {
             try
             {
-            	clientHandler.getClient().launchIntegratedServer(comparator.getFileName(), comparator.getDisplayName(), null);
+                client.launchIntegratedServer(comparator.getFileName(), comparator.getDisplayName(), null);
             }
             catch (StartupQuery.AbortedException e)
             {
@@ -312,7 +315,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
             }
         }
     }
-    
+
     private void loadServerIcon()
     {
         boolean flag = this.iconFile != null && this.iconFile.isFile();
@@ -324,12 +327,12 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
             try
             {
                 bufferedimage = ImageIO.read(this.iconFile);
-                Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide", new Object[0]);
-                Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high", new Object[0]);
+                Validate.validState(bufferedimage.getWidth() == 64, "Must be 64 pixels wide");
+                Validate.validState(bufferedimage.getHeight() == 64, "Must be 64 pixels high");
             }
             catch (Throwable throwable)
             {
-                LOGGER.error("Invalid icon for world {}", new Object[] {this.worldSummary.getFileName(), throwable});
+                LOGGER.error("Invalid icon for world {}", this.worldSummary.getFileName(), throwable);
                 this.iconFile = null;
                 return;
             }
@@ -357,7 +360,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     {
     }
 
-    public void setSelected(int p_178011_1_, int p_178011_2_, int p_178011_3_)
+    public void updatePosition(int slotIndex, int x, int y, float partialTicks)
     {
     }
 }

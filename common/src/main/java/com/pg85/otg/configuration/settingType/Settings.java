@@ -6,6 +6,7 @@ import com.pg85.otg.configuration.ReplacedBlocksMatrix;
 import com.pg85.otg.configuration.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.List;
@@ -21,14 +22,14 @@ import java.util.List;
 public abstract class Settings
 {
 	// OTG+
-	
+
     protected static final Setting<List<ReplaceBlocks>> replaceBlocksListSetting(String name)
     {
         return new ReplaceBlocksListSetting(name);
-    }    
-	
-	//	
-	
+    }
+
+	//
+
     /**
      * Creates a setting that can be {@code true} or {@code false}.
      * @param name         Name of the setting.
@@ -99,6 +100,11 @@ public abstract class Settings
     protected static final Setting<Integer> intSetting(String name, int defaultValue, int min, int max)
     {
         return new IntSetting(name, defaultValue, min, max);
+    }
+
+    protected static final Setting<Rotation> rotationSetting(String name, Rotation defaultValue)
+    {
+        return new RotationSetting(name, defaultValue);
     }
 
     /**

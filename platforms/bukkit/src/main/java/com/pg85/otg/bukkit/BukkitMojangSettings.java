@@ -4,14 +4,15 @@ import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
 import com.pg85.otg.configuration.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.MojangSettings;
-import net.minecraft.server.v1_11_R1.BiomeBase;
+
+import net.minecraft.server.v1_12_R1.BiomeBase;
 
 import java.util.List;
 
 /**
  * Gets some default settings from the BiomeBase instance. The settings in the
  * BiomeBase instance are provided by Mojang.
- * 
+ *
  * @see MojangSettings
  */
 public final class BukkitMojangSettings implements MojangSettings
@@ -21,7 +22,7 @@ public final class BukkitMojangSettings implements MojangSettings
     /**
      * Creates an instance that provides access to the default settings of the
      * vanilla biome with the given id.
-     * 
+     *
      * @param biomeId The id of the biome.
      * @return The settings.
      */
@@ -33,7 +34,7 @@ public final class BukkitMojangSettings implements MojangSettings
     /**
      * Creates an instance that provides access to the default settings of the
      * vanilla biome.
-     * 
+     *
      * @param biomeBase The biome.
      * @return The settings.
      */
@@ -74,13 +75,13 @@ public final class BukkitMojangSettings implements MojangSettings
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.r);
+        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.q);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.s);
+        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.r);
     }
 
     @Override

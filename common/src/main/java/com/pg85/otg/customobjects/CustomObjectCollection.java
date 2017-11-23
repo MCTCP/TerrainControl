@@ -1,7 +1,6 @@
 package com.pg85.otg.customobjects;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.io.BracketSettingsReaderOTGPlus;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
@@ -18,16 +17,16 @@ public class CustomObjectCollection
     private ArrayList<CustomObject> objectsGlobalObjects = new ArrayList<CustomObject>();
     private HashMap<String, CustomObject> objectsByNameGlobalObjects = new HashMap<String, CustomObject>();
     private ArrayList<String> objectsNotFoundGlobalObjects = new ArrayList<String>();
-    
+
     private HashMap<String, ArrayList<CustomObject>> objectsPerWorld = new HashMap<String, ArrayList<CustomObject>>();
     private HashMap<String, HashMap<String, CustomObject>> objectsByNamePerWorld = new HashMap<String, HashMap<String, CustomObject>>();
     private HashMap<String, ArrayList<String>> objectsNotFoundPerWorld = new HashMap<String, ArrayList<String>>();
-    
+
     HashMap<String, File> CustomObjectFilesGlobalObjects = null;
     HashMap<String, HashMap<String, File>> CustomObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
-    
+
     public CustomObject loadObject(File file, String worldName)
-    {    
+    {
     	CustomObject object = null;
     	// Try to load single file
     	if(file.isFile())
@@ -47,7 +46,7 @@ public class CustomObjectCollection
                 if (loader != null)
                 {
                 	object = loader.loadFromFile(objectName, file);
-                	
+
                 	if(worldName != null)
                 	{
                 		ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
@@ -58,8 +57,8 @@ public class CustomObjectCollection
                 		}
             			worldObjects.add(object);
                 	} else {
-                    	objectsGlobalObjects.add(object);	
-                	}                
+                    	objectsGlobalObjects.add(object);
+                	}
                     object.onEnable(null);
                 }
             }
@@ -79,39 +78,39 @@ public class CustomObjectCollection
     {
         String lowerCaseName = object.getName().toLowerCase();
         if (!objectsByNameGlobalObjects.containsKey(lowerCaseName))
-        {        	
+        {
         	objectsByNameGlobalObjects.put(lowerCaseName, object);
         	objectsGlobalObjects.add(object);
         }
     }
-    
+
     public void ReloadCustomObjectFiles()
-    {        
+    {
         objectsGlobalObjects.clear();
         objectsByNameGlobalObjects.clear();
         objectsNotFoundGlobalObjects.clear();
-        
+
         objectsPerWorld.clear();
         objectsByNamePerWorld.clear();
         objectsNotFoundPerWorld.clear();
-        
+
         CustomObjectFilesGlobalObjects = null;
-        CustomObjectFilesPerWorld.clear();    	
-    }    
-    
+        CustomObjectFilesPerWorld.clear();
+    }
+
     /**
      * Gets the object with the given name.
      * @param name Name of the object.
      * @return The object, or null if not found.
      */
     public CustomObject getObjectByName(String name, String worldName)
-    {   	
-    	//OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ? worldName : "");   	
-    	    	
+    {
+    	//OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ? worldName : "");
+
     	CustomObject object = null;
-    	
+
     	// Check if the object has been cached
-    	
+
     	if(worldName != null)
     	{
     		HashMap<String, CustomObject> worldObjectsByName = objectsByNamePerWorld.get(worldName);
@@ -120,29 +119,29 @@ public class CustomObjectCollection
 	    		object = worldObjectsByName.get(name.toLowerCase());
 	    	}
     	}
-    	
+
     	boolean bSearchedWorldObjects = false;
-    	
+
     	if(object == null && worldName != null)
-    	{        	
+    	{
 	    	ArrayList<String> worldObjectsNotFoundByName = objectsNotFoundPerWorld.get(worldName);
 	    	if(worldObjectsNotFoundByName != null && worldObjectsNotFoundByName.contains(name.toLowerCase()))
 	    	{
 	    		bSearchedWorldObjects = true;
 	    	}
     	}
-    	
+
     	// Only check the GlobalObjects if the WorldObjects directory has already been searched
     	if(object == null && (worldName == null || bSearchedWorldObjects))
     	{
     		object = objectsByNameGlobalObjects.get(name.toLowerCase());
     	}
-    	
+
     	if(object != null)
     	{
     		return object;
     	}
-    	
+
     	if(name.equalsIgnoreCase("UseWorld") || name.equalsIgnoreCase("UseWorldAll"))
     	{
     		//OTG.log(LogMarker.INFO, "UseWorld is not used by OTG, skipping it.");
@@ -153,38 +152,38 @@ public class CustomObjectCollection
     		//OTG.log(LogMarker.INFO, "UseBiome is not used by OTG, skipping it.");
     		return null;
     	}
-    	
-    	// Check if the object has been queried before but could not be found    	
-    	    	
+
+    	// Check if the object has been queried before but could not be found
+
     	boolean bSearchedGlobalObjects = false;
-    	    	
+
     	if(objectsNotFoundGlobalObjects != null && objectsNotFoundGlobalObjects.contains(name.toLowerCase()))
     	{
     		bSearchedGlobalObjects = true;
     	}
-    	
+
     	if(bSearchedGlobalObjects && (worldName == null || bSearchedWorldObjects))
     	{
     		return null;
     	}
-    	
+
     	// Index GlobalObjects and WorldObjects directories
-    	
+
     	if(CustomObjectFilesGlobalObjects == null)
-    	{   		
+    	{
     		CustomObjectFilesGlobalObjects = new HashMap<String, File>();
     		if(new File(OTG.getEngine().getTCDataFolder() + File.separator + "GlobalObjects").exists())
     		{
     			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getTCDataFolder() + File.separator + "GlobalObjects"), CustomObjectFilesGlobalObjects);
     		}
-    		
+
 	        // Add vanilla custom objects
 	        for (TreeType type : TreeType.values())
 	        {
 	        	addLoadedGlobalObject(new TreeObject(type));
 	        }
     	}
-    	
+
     	if(!CustomObjectFilesPerWorld.containsKey(worldName))
     	{
     		HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
@@ -193,10 +192,10 @@ public class CustomObjectCollection
 			{
 				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getTCDataFolder() + File.separator + "worlds" + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
 			}
-    	}    
-    	
+    	}
+
     	// Search WorldObjects
-    	    	        	    	    		        		        		        		
+
 		if(worldName != null && !bSearchedWorldObjects)
 		{
 			HashMap<String, File> worldCustomObjectFiles = CustomObjectFilesPerWorld.get(worldName);
@@ -206,7 +205,7 @@ public class CustomObjectCollection
     			if(searchForFile != null)
     			{
     				object = loadObject(searchForFile, worldName);
-    				
+
     				if(object != null)
     				{
     			    	HashMap<String, CustomObject> worldObjectsByName = objectsByNamePerWorld.get(worldName);
@@ -223,7 +222,7 @@ public class CustomObjectCollection
     				}
     			}
     		}
-    		
+
     		// Not found
 	    	ArrayList<String> worldObjectsNotFound = objectsNotFoundPerWorld.get(worldName);
 	    	if(worldObjectsNotFound == null)
@@ -233,43 +232,43 @@ public class CustomObjectCollection
 	    	}
 	    	worldObjectsNotFound.add(name.toLowerCase());
 		}
-		
+
 		// Search GlobalObjects
-		
+
 		if(!bSearchedGlobalObjects)
 		{
     		object = objectsByNameGlobalObjects.get(name.toLowerCase());
-			
+
     		if(object != null)
     		{
     			return object;
     		}
-    		
+
 			File searchForFile = CustomObjectFilesGlobalObjects.get(name.toLowerCase());
-			
+
 			if(searchForFile != null)
 	    	{
-	        	object = loadObject(searchForFile, worldName);		        	
-	        	
+	        	object = loadObject(searchForFile, worldName);
+
 	        	if(object != null)
 	        	{
 	        		objectsByNameGlobalObjects.put(name.toLowerCase(), object);
-	    	    	return object;        		
+	    	    	return object;
 	        	} else {
 	        		OTG.log(LogMarker.ERROR, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
 	        		return null;
 	        	}
 	    	}
-			
+
 			// Not Found
 			objectsNotFoundGlobalObjects.add(name.toLowerCase());
-		}		
-		
+		}
+
     	OTG.log(LogMarker.ERROR, "Could not find BO2/BO3 " + name + " in GlobalObjects " + (worldName != null ? "and WorldObjects" : "") + " directory " + (worldName != null ? "for world " + worldName : "") + ".");
-    	
-        return null;    	
+
+        return null;
     }
-    
+
     private void indexAllCustomObjectFilesInDir(File searchDir, HashMap<String, File> customObjectFiles)
     {
     	if(searchDir.exists())
@@ -311,43 +310,5 @@ public class CustomObjectCollection
     			}
     		}
     	}
-    }  
-
-    // TODO: Can this be removed?
-    /**
-     * Parses a string in the format <code>name(setting1=foo,setting2=bar)
-     * </code>. The object is retrieved using {@link #getObjectByName(String)}.
-     * If the object doesn't exist this method will return null. Otherwise, it
-     * will apply the given parameters (if any) to a copy of the object, and
-     * it will return this modified copy.
-     *
-     * @param string The string to parse.
-     * @param config The config to search in
-     * @return A CustomObject, or null if no one was found.
-     */
-    /*
-    public CustomObject parseCustomObject(String string, String worldName)
-    {
-        String objectName = string;
-        String objectExtraSettings = "";
-
-        int start = string.indexOf('(');
-        int end = string.lastIndexOf(')');
-        if (start != -1 && end != -1)
-        {
-            objectName = string.substring(0, start);
-            objectExtraSettings = string.substring(start + 1, end);
-        }
-
-        CustomObject object = getObjectByName(objectName, worldName);
-
-        if (object != null && objectExtraSettings.length() != 0)
-        {
-        	// TODO: Test if this works properly
-            object = object.applySettings(new BracketSettingsReaderOTGPlus(object.getName(), objectExtraSettings));
-        }
-
-        return object;
     }
-    */
 }

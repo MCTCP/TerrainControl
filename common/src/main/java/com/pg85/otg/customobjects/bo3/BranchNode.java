@@ -13,18 +13,17 @@ import com.pg85.otg.util.Rotation;
  */
 public class BranchNode implements Comparable<BranchNode>
 {
-	// TODO: implement proper get / set? 
-	
+	// TODO: implement proper get / set?
+
 	/**
 	 * The max branch depth of the branch given to it by its parent
 	 * Used to make certain branches longer than others
 	 */
 	int branchDepth;
-	
-	/**
-	 * Whether this branch should only spawn at the end of the branch that added it.
-	 */	
+
 	boolean isRequiredBranch;
+
+	boolean isWeightedBranch;
 
     /**
      * The rotation of a branch
@@ -40,28 +39,32 @@ public class BranchNode implements Comparable<BranchNode>
     private CustomObject customObject;
     public String customObjectName;
 
+    public String branchGroup;
+
     /**
      * Creates an instance of BranchNode with given rotation, chance, and branch
      * fields
      * <p/>
-     * 
-     * @param branchDepth The max branch depth of the branch. Only the max branch depth of the first branch part is used when spawning a branch structure! 
+     *
+     * @param branchDepth The max branch depth of the branch. Only the max branch depth of the first branch part is used when spawning a branch structure!
      * @param rotation The rotation of the branch
      * @param chance The spawn chance of the branch
      * @param branch The branch
      */
-    public BranchNode(int branchDepth, boolean isRequiredBranch, Rotation rotation, double chance, CustomObject customObject, String customObjectName)
+    public BranchNode(int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, Rotation rotation, double chance, CustomObject customObject, String customObjectName, String branchGroup)
     {
     	this.branchDepth = branchDepth;
         this.rotation = rotation;
         this.chance = chance;
-        
+
         this.customObjectName = customObject != null ? customObject.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
         this.customObject = customObject;
-        
+
         this.isRequiredBranch = isRequiredBranch;
+        this.isWeightedBranch = isWeightedBranch;
+        this.branchGroup = branchGroup;
     }
-    
+
     // Non-OTG+
     public BranchNode(Rotation rotation, double chance, CustomObject branch, String customObjectName)
     {
@@ -86,8 +89,8 @@ public class BranchNode implements Comparable<BranchNode>
     public Rotation getRotation()
     {
         return rotation;
-    } 
-        
+    }
+
     /**
      * @return the branch CustomObject
      */
@@ -97,10 +100,10 @@ public class BranchNode implements Comparable<BranchNode>
     	{
     		return customObject;
     	}
-    	
+
     	customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(customObjectName, world.getName());
     	customObjectName = customObject != null ? customObject.getName() : null;
-    	
+
 		return customObject;
     }
 

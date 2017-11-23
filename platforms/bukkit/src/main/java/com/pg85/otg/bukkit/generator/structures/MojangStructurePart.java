@@ -5,7 +5,7 @@ import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.BukkitWorld;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.util.Rotation;
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_12_R1.*;
 
 import java.util.Random;
 

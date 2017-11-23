@@ -17,7 +17,7 @@ public class ForgeBiome implements LocalBiome
     private final BiomeConfig biomeConfig;
 
     public ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
-    {    	
+    {
         this.biomeBase = biome;
         this.biomeIds = biomeIds;
         this.biomeConfig = biomeConfig;
@@ -39,7 +39,7 @@ public class ForgeBiome implements LocalBiome
     @Override
     public String getName()
     {
-        return this.biomeBase.getBiomeName();
+        return this.biomeBase.biomeName;
     }
 
     public Biome getHandle()

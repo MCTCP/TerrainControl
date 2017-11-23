@@ -1,6 +1,8 @@
 package com.pg85.otg.forge.generator;
 
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.OTG;
+import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 
@@ -34,9 +36,21 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
     {
         this.BiomeArray = this.worldChunkManager.getBiomesForGeneration(this.BiomeArray, x, z, x_size, z_size);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
+        {
             biomeArray = new int[x_size * z_size];
+        }
+        int biomeId = -1;
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = Biome.getIdForBiome(this.BiomeArray[i]);
+        {
+        	// TODO: This may cause a problem if the biome id is not registered because it is a virtual biome?
+        	biomeId = -1;
+        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(this.BiomeArray[i]); 
+        	if(biomeId == -1)
+        	{
+        		throw new RuntimeException();
+        	}
+            biomeArray[i] = biomeId;
+        }
         return biomeArray;
     }
 
@@ -45,16 +59,33 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
     {
         this.BiomeArray = this.worldChunkManager.getBiomes(this.BiomeArray, x, z, x_size, z_size, true);
         if (biomeArray == null || biomeArray.length < x_size * z_size)
+        {
             biomeArray = new int[x_size * z_size];
+        }
+        int biomeId = -1;
         for (int i = 0; i < x_size * z_size; i++)
-            biomeArray[i] = Biome.getIdForBiome(this.BiomeArray[i]);
+        {
+        	// TODO: This may cause a problem if the biome id is not registered because it is a virtual biome?
+        	biomeId = -1;
+        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(this.BiomeArray[i]);
+        	if(biomeId == -1)
+        	{
+        		throw new RuntimeException();
+        	}
+            biomeArray[i] = biomeId;
+        }
         return biomeArray;
     }
 
     @Override
     public int getBiome(int x, int z)
     {
-        return Biome.getIdForBiome(this.worldChunkManager.getBiome(new BlockPos(x, 0, z)));
+    	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(this.worldChunkManager.getBiome(new BlockPos(x, 0, z)));
+    	if(biomeId == -1)
+    	{
+    		throw new RuntimeException();
+    	}
+        return biomeId; 
     }
 
     @Override

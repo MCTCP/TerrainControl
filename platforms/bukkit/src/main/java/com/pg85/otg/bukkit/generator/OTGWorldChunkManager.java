@@ -4,10 +4,10 @@ import com.pg85.otg.bukkit.BukkitWorld;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.BlockPosition;
-import net.minecraft.server.v1_11_R1.WorldChunkManager;
-import net.minecraft.server.v1_11_R1.WorldGenVillage;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.BlockPosition;
+import net.minecraft.server.v1_12_R1.WorldChunkManager;
+import net.minecraft.server.v1_12_R1.WorldGenVillage;
 
 import java.util.List;
 import java.util.Random;

@@ -83,7 +83,7 @@ public abstract class CustomObjectConfigFile
         if (configMode == ConfigMode.WriteDisable)
         {
             throw new IOException("ConfigMode is " + ConfigMode.WriteDisable);
-        }        
+        }
         writer.setConfigMode(configMode);
         try
         {
@@ -235,5 +235,5 @@ public abstract class CustomObjectConfigFile
     {
     	return file;
         //return reader.getFile();
-    }   
+    }
 }

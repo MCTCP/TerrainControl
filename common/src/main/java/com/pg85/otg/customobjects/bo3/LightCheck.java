@@ -1,7 +1,9 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.Rotation;
 
 import java.util.List;
 
@@ -41,7 +43,7 @@ public class LightCheck extends BO3Check
         y = readInt(args.get(1), -100, 100);
         z = readInt(args.get(2), -100, 100);
         minLightLevel = readInt(args.get(3), 0, 16);
-        maxLightLevel = readInt(args.get(4), minLightLevel, 16);			
+        maxLightLevel = readInt(args.get(4), minLightLevel, 16);
     }
 
     @Override
@@ -63,4 +65,20 @@ public class LightCheck extends BO3Check
         return rotatedCheck;
     }
 
+    @Override
+    public LightCheck rotate(Rotation rotation)
+    {
+    	LightCheck rotatedBlock = new LightCheck();
+
+        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+
+        rotatedBlock.x = rotatedCoords.getX();
+        rotatedBlock.y = rotatedCoords.getY();
+        rotatedBlock.z = rotatedCoords.getZ();
+
+    	rotatedBlock.minLightLevel = minLightLevel;
+    	rotatedBlock.maxLightLevel = maxLightLevel;
+
+        return rotatedBlock;
+    }
 }

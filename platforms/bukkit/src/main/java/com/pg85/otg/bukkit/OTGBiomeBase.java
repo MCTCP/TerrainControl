@@ -11,8 +11,8 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StringHelper;
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.MinecraftKey;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.MinecraftKey;
 import org.bukkit.block.Biome;
 
 import java.util.List;
@@ -167,14 +167,14 @@ public class OTGBiomeBase extends BiomeBase
             throw new AssertionError("Biome temperature mismatch");
         }
 
-        this.r = ((BukkitMaterialData) biomeConfig.surfaceBlock).internalBlock();
-        this.s = ((BukkitMaterialData) biomeConfig.groundBlock).internalBlock();
+        this.q = ((BukkitMaterialData) biomeConfig.surfaceBlock).internalBlock();
+        this.r = ((BukkitMaterialData) biomeConfig.groundBlock).internalBlock();
 
         // Mob spawning
-        addMobs(this.u, biomeConfig.spawnMonsters);
-        addMobs(this.v, biomeConfig.spawnCreatures);
-        addMobs(this.w, biomeConfig.spawnWaterCreatures);
-        addMobs(this.x, biomeConfig.spawnAmbientCreatures);
+        addMobs(this.t, biomeConfig.spawnMonsters);
+        addMobs(this.u, biomeConfig.spawnCreatures);
+        addMobs(this.v, biomeConfig.spawnWaterCreatures);
+        addMobs(this.w, biomeConfig.spawnAmbientCreatures);
     }
 
     // Adds the mobs to the internal list.

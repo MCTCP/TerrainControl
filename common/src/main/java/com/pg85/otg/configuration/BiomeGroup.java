@@ -96,7 +96,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
 
         	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
             //LocalBiome localBiome = OTG.isForge ? OTG.getBiomeAllWorlds(biomeName) : world.getBiomeByNameOrNull(biomeName);
-            
+
             LocalBiome localBiome = world.getBiomeByNameOrNull(biomeName);
             entry.setValue(localBiome);
 
@@ -218,6 +218,21 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
             return group.name.equalsIgnoreCase(this.name);
         }
         return false;
+    }
+
+    public SortedMap<Integer, LocalBiome> getDepthMapOrHigher(int depth)
+    {
+        int cumulativeBiomeRarity = 0;
+        TreeMap<Integer, LocalBiome> map = new TreeMap<Integer, LocalBiome>();
+        for (Entry<String, LocalBiome> biome : this.biomes.entrySet())
+        {                                                           //>>	When depth given is negative, include all biomes in group
+            if (biome.getValue().getBiomeConfig().biomeSize >= depth || depth < 0)
+            {
+                cumulativeBiomeRarity += biome.getValue().getBiomeConfig().biomeRarity;
+                map.put(cumulativeBiomeRarity, biome.getValue());
+            }
+        }
+        return map;
     }
 
     public SortedMap<Integer, LocalBiome> getDepthMap(int depth)

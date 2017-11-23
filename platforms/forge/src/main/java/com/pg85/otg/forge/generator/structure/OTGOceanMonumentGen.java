@@ -11,12 +11,10 @@ import com.pg85.otg.forge.ForgeBiome;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.entity.monster.EntityGuardian;
-import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
-import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
@@ -25,7 +23,7 @@ public class OTGOceanMonumentGen extends MapGenStructure
 {
     private int spacing = 32;
     private int separation = 5;
-    
+
     private int gridSize;
     private int randomOffset;
     private final List<Biome> monumentSpawnBiomes;
@@ -75,12 +73,6 @@ public class OTGOceanMonumentGen extends MapGenStructure
 
         if (k == i1 && l == j1)
         {
-            BiomeProvider biomeProvider = this.world.getBiomeProvider();
-            if (biomeProvider.getBiome(new BlockPos(k * 16 + 8, 64, l * 16 + 8), (Biome) null) != Biomes.DEEP_OCEAN)
-            {
-                return false;
-            }
-
             boolean flag = this.world.getBiomeProvider().areBiomesViable(k * 16 + 8, l * 16 + 8, 16,this.monumentSpawnBiomes);
 
             if (flag)
@@ -109,7 +101,7 @@ public class OTGOceanMonumentGen extends MapGenStructure
         return this.mobList;
 
     }
-    
+
     @Override
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean findUnexplored)
     {

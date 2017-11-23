@@ -4,7 +4,7 @@ import com.pg85.otg.LocalBiome;
 import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.configuration.ServerConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_12_R1.*;
 
 import java.util.ArrayList;
 import java.util.List;

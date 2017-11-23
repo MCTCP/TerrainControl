@@ -11,11 +11,11 @@ package com.pg85.otg;
 public class BiomeIds
 {
     private final int generationId;
-    private final int savedId;
+    private int savedId;
 
     /**
      * Creates a new, non-virtual biome id.
-     * 
+     *
      * @param id The id of the biome.
      */
     public BiomeIds(int id)
@@ -26,7 +26,7 @@ public class BiomeIds
 
     /**
      * Creates a new virtual biome id.
-     * 
+     *
      * @param generationId The id used during terrain generation.
      * @param savedId The id used in the world save files (the .mca files in
      *            the region directory).
@@ -41,17 +41,17 @@ public class BiomeIds
      * Gets whether this biome is virtual. A biome is virtual if the id used
      * during terrain generation isn't the same as the id used in the world
      * save files.
-     * 
+     *
      * @return True if the biome is virtual, false otherwise.
      */
     public boolean isVirtual()
     {
-        return savedId != generationId;
+        return savedId != generationId && generationId > 255;
     }
 
     /**
      * Gets the id that is saved to the world save files.
-     * 
+     *
      * @return The id.
      */
     public int getSavedId()
@@ -61,12 +61,17 @@ public class BiomeIds
 
     /**
      * Gets the id used during terrain generation.
-     * 
+     *
      * @return The id.
      */
     public int getGenerationId()
     {
         return generationId;
+    }
+
+    public void setSavedId(int value)
+    {
+    	savedId = value;
     }
 
     @Override

@@ -11,7 +11,6 @@ import com.pg85.otg.configuration.ConfigProvider;
 import com.pg85.otg.forge.ForgeBiome;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
@@ -34,16 +33,16 @@ public class OTGWoodLandMansionGen extends MapGenStructure
 	{
 		MapGenStructureIO.registerStructure(Start.class, "MansionOTG");
 	}
-	
+
     private int spacing = 80;
     private int separation = 20;
-	
+
     private final List<Biome> woodLandMansionSpawnBiomes;
-	
+
     public OTGWoodLandMansionGen(ConfigProvider settings)
     {
         this.woodLandMansionSpawnBiomes = new ArrayList<Biome>();
-        
+
         for (LocalBiome biome : settings.getBiomeArray())
         {
             if (biome == null || !biome.getBiomeConfig().woodLandMansionsEnabled)
@@ -54,7 +53,7 @@ public class OTGWoodLandMansionGen extends MapGenStructure
             this.woodLandMansionSpawnBiomes.add(((ForgeBiome) biome).getHandle());
         }
     }
-    
+
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
         int i = chunkX;
@@ -90,32 +89,32 @@ public class OTGWoodLandMansionGen extends MapGenStructure
         }
 
         return false;
-    }    
-    
+    }
+
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean findUnexplored)
     {
         this.world = worldIn;
-        BiomeProvider biomeprovider = worldIn.getBiomeProvider();              
-        return biomeprovider.isFixedBiome() && !woodLandMansionSpawnBiomes.contains(biomeprovider.getFixedBiome()) ? null : findNearestStructurePosBySpacing(worldIn, this, pos, this.spacing, this.separation, 10387319, true, 100, findUnexplored);        	
+        BiomeProvider biomeprovider = worldIn.getBiomeProvider();
+        return biomeprovider.isFixedBiome() && !woodLandMansionSpawnBiomes.contains(biomeprovider.getFixedBiome()) ? null : findNearestStructurePosBySpacing(worldIn, this, pos, this.spacing, this.separation, 10387319, true, 100, findUnexplored);
         //return biomeprovider.isFixedBiome() && biomeprovider.getFixedBiome() != Biomes.ROOFED_FOREST ? null : findNearestStructurePosBySpacing(worldIn, this, pos, this.spacing, this.separation, 10387319, true, 100, findUnexplored);
     }
-	
+
     @Override
     public String getStructureName()
     {
         return StructureNames.WOODLAND_MANSION;
     }
-    
+
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
     	//if(this.world.getChunkProvider() instanceof ChunkProviderOverworld)
     	{
     		// TODO: This only allows WoodlandMansion in the overworld
-    		return new Start(this.world, this.rand, chunkX, chunkZ); 
+    		return new Start(this.world, this.rand, chunkX, chunkZ);
     	}
     	//return null;
     }
-    
+
     public static class Start extends StructureStart
     {
         private boolean isValid;
@@ -124,24 +123,18 @@ public class OTGWoodLandMansionGen extends MapGenStructure
         {
         }
 
-        //public Start(World p_i47235_1_, ChunkProviderOverworld p_i47235_2_, Random p_i47235_3_, int p_i47235_4_, int p_i47235_5_)
         public Start(World p_i47235_1_, Random p_i47235_3_, int p_i47235_4_, int p_i47235_5_)
         {
             super(p_i47235_4_, p_i47235_5_);
-            //this.create(p_i47235_1_, p_i47235_2_, p_i47235_3_, p_i47235_4_, p_i47235_5_);
             this.create(p_i47235_1_, p_i47235_3_, p_i47235_4_, p_i47235_5_);
         }
 
-        
-        //private void create(World p_191092_1_, ChunkProviderOverworld p_191092_2_, Random p_191092_3_, int p_191092_4_, int p_191092_5_)
-        private void create(World world, Random p_191092_3_, int p_191092_4_, int p_191092_5_)
-        {       	
+        private void create(World world, Random p_191092_3_, int chunkX, int chunkZ)
+        {
             Rotation rotation = Rotation.values()[p_191092_3_.nextInt(Rotation.values().length)];
 
-            OTGChunkGenerator chunkProvider = ((ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world)).getChunkGenerator();
-                      
             // TODO: The vanilla spawn requirements for Mansions are checked a bit differently, make sure this implementation is adequate.
-            
+
             int i = 5;
             int j = 5;
 
@@ -159,18 +152,17 @@ public class OTGWoodLandMansionGen extends MapGenStructure
                 j = -5;
             }
 
-            // Checking for ground at x/z 2 and 13?
-            int k = chunkProvider.getHighestBlockInCurrentlyGeneratingChunk(7, 7);
-            int l = chunkProvider.getHighestBlockInCurrentlyGeneratingChunk(7, 7 + j);
-            int i1 = chunkProvider.getHighestBlockInCurrentlyGeneratingChunk(7 + i, 7);
-            int j1 = chunkProvider.getHighestBlockInCurrentlyGeneratingChunk(7 + i, 7 + j);
-            int k1 = Math.min(Math.min(k, l), Math.min(i1, j1));            
-  
+            int k = ((ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world)).getChunkGenerator().getHighestBlockInCurrentlyPopulatingChunk(7, 7);
+            int l = ((ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world)).getChunkGenerator().getHighestBlockInCurrentlyPopulatingChunk(7, 7 + j);
+            int i1 = ((ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world)).getChunkGenerator().getHighestBlockInCurrentlyPopulatingChunk(7 + i, 7);
+            int j1 = ((ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world)).getChunkGenerator().getHighestBlockInCurrentlyPopulatingChunk(7 + i, 7 + j);
+            int k1 = Math.min(Math.min(k, l), Math.min(i1, j1));
+
             if (k1 <= 0 || k1 > 255)
             {
                 this.isValid = false;
             } else {
-                BlockPos blockpos = new BlockPos(p_191092_4_ * 16 + 8, k1 + 1, p_191092_5_ * 16 + 8);
+                BlockPos blockpos = new BlockPos(chunkX * 16 + 8, k1 + 1, chunkZ * 16 + 8);
                 List<WoodlandMansionPieces.MansionTemplate> list = Lists.<WoodlandMansionPieces.MansionTemplate>newLinkedList();
                 WoodlandMansionPieces.generateMansion(world.getSaveHandler().getStructureTemplateManager(), blockpos, rotation, list, p_191092_3_);
                 this.components.addAll(list);
@@ -178,7 +170,7 @@ public class OTGWoodLandMansionGen extends MapGenStructure
                 this.isValid = true;
             }
         }
-        
+
         /**
          * Keeps iterating Structure Pieces and spawning them until the checks tell it to stop
          */

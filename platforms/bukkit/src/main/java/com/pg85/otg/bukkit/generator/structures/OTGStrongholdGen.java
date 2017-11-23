@@ -6,8 +6,8 @@ import com.pg85.otg.LocalBiome;
 import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.configuration.ServerConfigProvider;
 import com.pg85.otg.util.helpers.ReflectionHelper;
-import net.minecraft.server.v1_11_R1.BiomeBase;
-import net.minecraft.server.v1_11_R1.WorldGenStronghold;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.WorldGenStronghold;
 
 import java.util.List;
 

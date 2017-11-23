@@ -9,11 +9,11 @@ import com.pg85.otg.configuration.BiomeConfig.RareBuildingType;
 import com.pg85.otg.configuration.ServerConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
-import net.minecraft.server.v1_11_R1.*;
-import net.minecraft.server.v1_11_R1.WorldGenRegistration.WorldGenJungleTemple;
-import net.minecraft.server.v1_11_R1.WorldGenRegistration.WorldGenPyramidPiece;
-import net.minecraft.server.v1_11_R1.WorldGenRegistration.WorldGenWitchHut;
-import net.minecraft.server.v1_11_R1.WorldGenRegistration.b;
+import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.WorldGenRegistration.WorldGenJungleTemple;
+import net.minecraft.server.v1_12_R1.WorldGenRegistration.WorldGenPyramidPiece;
+import net.minecraft.server.v1_12_R1.WorldGenRegistration.WorldGenWitchHut;
+import net.minecraft.server.v1_12_R1.WorldGenRegistration.b;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +24,7 @@ public class OTGRareBuildingGen extends StructureGenerator
 {
     private List<BiomeBase> biomeList;
     private List<BiomeBase.BiomeMeta> mobList = Arrays.asList(new BiomeBase.BiomeMeta(EntityWitch.class, 1, 1, 1));
-    
+
     /**
      * the maximum distance between scattered features
      */
@@ -70,14 +70,14 @@ public class OTGRareBuildingGen extends StructureGenerator
     public List<BiomeBase.BiomeMeta> getWitchHutMobs()
     {
         return this.mobList;
-    }    
-    
+    }
+
     public BlockPosition getNearestGeneratedFeature(World world, BlockPosition blockposition, boolean flag)
     {
         this.g = world;
         return a(world, this, blockposition, this.maxDistanceBetweenScatteredFeatures, this.minDistanceBetweenScatteredFeatures - 1, 14357617, false, 100, flag);
     }
-    
+
     @Override
     // canSpawnStructureAtChunkCoords
     protected boolean a(int chunkX, int chunkZ)

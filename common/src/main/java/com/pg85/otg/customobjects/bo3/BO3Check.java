@@ -3,6 +3,7 @@ package com.pg85.otg.customobjects.bo3;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.util.Rotation;
 
 /**
  * Represents a check - something that can prevent the BO3 from spawning if this
@@ -10,15 +11,15 @@ import com.pg85.otg.configuration.CustomObjectConfigFunction;
  */
 public abstract class BO3Check extends BO3Function
 {
-    /** 
+    /**
      * X position relative to the object origin.
      */
     public int x;
-    /** 
+    /**
      * Y position relative to the object origin.
      */
     public int y;
-    /** 
+    /**
      * Z position relative to the object origin.
      */
     public int z;
@@ -54,4 +55,6 @@ public abstract class BO3Check extends BO3Function
 
     @Override
     public abstract BO3Check rotate();
+
+    public abstract BO3Check rotate(Rotation rotation);
 }

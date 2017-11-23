@@ -27,14 +27,14 @@ public class EntityTravelToDimensionListener
 {
 	@SubscribeEvent
 	public void entityTravelToDimension(EntityTravelToDimensionEvent e)
-	{			
+	{
 		boolean cartographerEnabled = ((ForgeEngine)OTG.getEngine()).getCartographerEnabled();
 
 		if(e.getDimension() == -1)
-		{							
+		{
 			// If going to the nether
 			//if(e.getEntity() instanceof EntityPlayer)
-			{					
+			{
 				// Make sure the player is above a portal block so we can check if this is a Quartz portal
 				if(!ForgeMaterialData.ofMinecraftBlockState(e.getEntity().getEntityWorld().getBlockState(e.getEntity().getPosition())).toDefaultMaterial().equals(DefaultMaterial.PORTAL))
 				{
@@ -58,15 +58,15 @@ public class EntityTravelToDimensionListener
 				ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
 				int destinationDim = 0;
 				boolean bPortalMaterialFound = false;
-				
+
 				ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockState);
-									
+
 				for(LocalWorld localWorld : forgeWorlds)
 				{
 					ForgeWorld forgeWorld = (ForgeWorld)localWorld;
 					ArrayList<LocalMaterialData> portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
-				
-					boolean bIsPortalMaterial = false;	
+
+					boolean bIsPortalMaterial = false;
 					for(LocalMaterialData portalMaterial : portalMaterials)
 					{
 						if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
@@ -88,7 +88,7 @@ public class EntityTravelToDimensionListener
 						}
 					}
 				}
-				
+
 				if(!bPortalMaterialFound && !material.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
 				{
 					// No custom dimensions exist, destroy the portal
@@ -117,17 +117,17 @@ public class EntityTravelToDimensionListener
 						e.getEntity().getEntityWorld().setBlockToAir(e.getEntity().getPosition());
 						return;
 					}
-									
+
 					// Register the portal to the world's portals list
 			    	OTGBlockPortal.placeInExistingPortal(originDimension, playerPos);
-			    		
+
     				if(e.getEntity() instanceof EntityPlayerMP)
     				{
     					OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e.getEntity());
 					} else {
 						OTGTeleporter.changeDimension(newDimension, e.getEntity());
     				}
-					
+
 			    	// If coming from main world then update Cartographer map at last player position (should remove head+banner from Cartographer map)
 					if(originDimension == 0 && cartographerEnabled)
 					{
@@ -140,5 +140,5 @@ public class EntityTravelToDimensionListener
 				}
 			}
 		}
-	}	
+	}
 }

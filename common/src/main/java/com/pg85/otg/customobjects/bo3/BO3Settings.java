@@ -8,6 +8,7 @@ import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.customobjects.StructurePartSpawnHeight;
 import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.List;
@@ -16,7 +17,7 @@ public class BO3Settings extends Settings
 {
     public static final Setting<Boolean>
             TREE = booleanSetting("Tree", true),
-            ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false),            
+            ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false),
             // OTG+
             REMOVEAIR = booleanSetting("RemoveAir", true),
     		CANOVERRIDE = booleanSetting("CanOverride", false),
@@ -27,14 +28,16 @@ public class BO3Settings extends Settings
 			SPAWNATWATERLEVEL = booleanSetting("SpawnAtWaterLevel", false),
 			REPLACEWITHBIOMEBLOCKS = booleanSetting("ReplaceWithBiomeBlocks", true),
 			OVERRIDECHILDSETTINGS = booleanSetting("OverrideChildSettings", true),
-			OVERRIDEPARENTHEIGHT = booleanSetting("OverrideParentHeight", false),					
+			OVERRIDEPARENTHEIGHT = booleanSetting("OverrideParentHeight", false),
 			ISSPAWNPOINT = booleanSetting("IsSpawnPoint",false),
 			SMOOTHSTARTTOP = booleanSetting("SmoothStartTop",false),
-			SMOOTHSTARTWOOD = booleanSetting("SmoothStartWood",false), 
+			SMOOTHSTARTWOOD = booleanSetting("SmoothStartWood",false),
 			IS_OTG_PLUS = booleanSetting("IsOTGPlus",false)
             ;
 
     public static final Setting<Double> RARITY = doubleSetting("Rarity", 100, 0.000001, 100);
+
+    public static final Setting<Rotation> INHERITBO3ROTATION = rotationSetting("InheritBO3Rotation", Rotation.NORTH);
 
     public static final Setting<Integer>
             FREQUENCY = intSetting("Frequency", 0, 0, 9999),
@@ -53,7 +56,7 @@ public class BO3Settings extends Settings
 			SPAWNPOINTX =  intSetting("SpawnPointX", 8, -9999, 9999),
 			SPAWNPOINTY =  intSetting("SpawnPointY", -1, -1, 9999),
 			SPAWNPOINTZ =  intSetting("SpawnPointZ", 7, -9999, 9999)
-            ;    	
+            ;
 
     public static final Setting<String>
             AUTHOR = stringSetting("Author", "Unknown"),
@@ -71,7 +74,7 @@ public class BO3Settings extends Settings
 			SMOOTHINGGROUNDBLOCK = stringSetting("SmoothingGroundBlock", ""),
 			MUSTBEINSIDE = stringSetting("MustBeInside", ""),
 			CANNOTBEINSIDE = stringSetting("CannotBeInside", ""),
-			REPLACESBO3 = stringSetting("ReplacesBO3", "")            
+			REPLACESBO3 = stringSetting("ReplacesBO3", "")
             ;
 
     public static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");

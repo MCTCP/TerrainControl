@@ -3,7 +3,7 @@ package com.pg85.otg.bukkit.util;
 import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.NamedBinaryTag;
-import net.minecraft.server.v1_11_R1.*;
+import net.minecraft.server.v1_12_R1.*;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -109,13 +109,13 @@ public class NBTHelper
             switch (listType)
             {
                 case TAG_Int_Array:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.c(i)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.d(i)));
                     break;
                 case TAG_Float:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.e(i)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.g(i)));
                     break;
                 case TAG_Double:
-                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.d(i)));
+                    listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.f(i)));
                     break;
                 case TAG_String:
                     listTag.addTag(new NamedBinaryTag(listType, null, nmsListTag.getString(i)));
@@ -136,7 +136,7 @@ public class NBTHelper
     /**
      * Gets the value from a nms tag (since that object doesn't have a simple
      * value field)
-     * 
+     *
      * @param nmsTag
      * @return
      */
@@ -181,7 +181,7 @@ public class NBTHelper
     /**
      * Converts a net.minecraftwiki.wiki.NBTClass NBT compound tag into an
      * net.minecraft.server NBT compound tag.
-     * 
+     *
      * @param compoundTag Our tag.
      * @return The Minecraft tag.
      */
@@ -222,7 +222,7 @@ public class NBTHelper
     /**
      * Converts a net.minecraftwiki.wiki.NBTClass NBT list tag into an
      * net.minecraft.server NBT list tag.
-     * 
+     *
      * @param listTag
      * @return
      */
@@ -263,7 +263,7 @@ public class NBTHelper
     /**
      * Creates a net.minecraft.server.NBTBase tag. Doesn't work for ends,
      * lists and compounds.
-     * 
+     *
      * @param type
      * @param value
      * @return

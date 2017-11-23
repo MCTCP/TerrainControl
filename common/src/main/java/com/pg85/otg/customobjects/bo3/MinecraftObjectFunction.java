@@ -21,8 +21,8 @@ public class MinecraftObjectFunction extends BlockFunction
     public MinecraftObjectFunction()
     {
     	super();
-    } 
-    
+    }
+
     public MinecraftObjectFunction(BO3Config config, List<String> args) throws InvalidConfigException
     {
         assureSize(4, args);
@@ -35,7 +35,7 @@ public class MinecraftObjectFunction extends BlockFunction
     }
 
     @Override
-    public String toString()
+    public String makeString()
     {
         return "MinecraftObject(" + x + ',' + y + ',' + z + ',' + structurePart + ')';
     }

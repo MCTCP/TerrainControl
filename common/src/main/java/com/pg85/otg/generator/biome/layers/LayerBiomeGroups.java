@@ -27,23 +27,25 @@ public class LayerBiomeGroups extends Layer
     {
         int[] childInts = this.child.getInts(arraysCache, x, z, x_size, z_size);
         int[] thisInts = arraysCache.getArray(x_size * z_size);
-        
+
         for (int i = 0; i < z_size; i++)
         {
             for (int j = 0; j < x_size; j++)
             {
                 initGroupSeed(j + x, i + z);
-                int currentPiece = childInts[(j + i * x_size)];               
+                int currentPiece = childInts[(j + i * x_size)];
 
                 if ((currentPiece & LandBit) != 0 && (currentPiece & BiomeGroupBits) == 0)    // land without biome group
                 {
+                	// TODO: even with rarity 1 this always spawns the biome
+
                     SortedMap<Integer, BiomeGroup> possibleGroups = biomeGroupManager.getGroupDepthMap(depth);
                     int newGroupRarity = nextGroupInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleGroups)*entropy);
                         //>>	Spawn the biome based on the rarity spectrum
                         for (Entry<Integer, BiomeGroup> group : possibleGroups.entrySet())
                         {
                             if (newGroupRarity/entropy < group.getKey())
-                            {   
+                            {
                                 if (group.getValue() != null){
                                     currentPiece |= (group.getValue().getGroupId() << BiomeGroupShift) |
                                                     //>>	If the average temp of the group is cold
