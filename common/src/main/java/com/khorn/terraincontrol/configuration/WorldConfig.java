@@ -144,6 +144,7 @@ public class WorldConfig extends ConfigFile
     // Other structures
     public boolean mineshaftsEnabled;
     public boolean netherFortressesEnabled;
+    public boolean templesEnabled = true;
 
     // Terrain
     public boolean oldTerrainGenerator;
@@ -447,6 +448,7 @@ public class WorldConfig extends ConfigFile
         this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS);
         this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED);
         this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED);
+        this.templesEnabled = reader.getSetting(WorldStandardValues.TEMPLES_ENABLED);
 
         // Caves
         this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY);

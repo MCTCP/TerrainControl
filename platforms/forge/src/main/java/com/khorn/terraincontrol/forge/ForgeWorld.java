@@ -69,6 +69,7 @@ public class ForgeWorld implements LocalWorld
     public TXRareBuildingGen rareBuildingGen;
     public TXNetherFortressGen netherFortressGen;
     public TXOceanMonumentGen oceanMonumentGen;
+    public TXTempleGen templeGen;
 
     private WorldGenDungeons dungeonGen;
     private WorldGenFossils fossilGen;
@@ -191,6 +192,8 @@ public class ForgeWorld implements LocalWorld
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
     {
         WorldConfig worldConfig = this.settings.getWorldConfig();
+        if (worldConfig.templesEnabled)
+            this.templeGen.generate(this.world, chunkX, chunkZ, null);
         if (worldConfig.strongholdsEnabled)
             this.strongholdGen.generate(this.world, chunkX, chunkZ, null);
         if (worldConfig.mineshaftsEnabled)
@@ -278,6 +281,8 @@ public class ForgeWorld implements LocalWorld
         WorldConfig worldConfig = this.settings.getWorldConfig();
 
         boolean isVillagePlaced = false;
+        if (worldConfig.templesEnabled)
+            this.templeGen.generateStructure(this.world, rand, chunkCoordIntPair);
         if (worldConfig.strongholdsEnabled)
             this.strongholdGen.generateStructure(this.world, rand, chunkCoordIntPair);
         if (worldConfig.mineshaftsEnabled)
@@ -700,12 +705,19 @@ public class ForgeWorld implements LocalWorld
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
         this.strongholdGen = new TXStrongholdGen(configs);
+        this.templeGen = new TXTempleGen();
         this.mansionGen = new TXMansionGen(configs);
         this.villageGen = new TXVillageGen(configs);
         this.mineshaftGen = new TXMineshaftGen();
         this.rareBuildingGen = new TXRareBuildingGen(configs);
         this.netherFortressGen = new TXNetherFortressGen();
         this.oceanMonumentGen = new TXOceanMonumentGen(configs);
+
+        this.templeGen = (TXTempleGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.templeGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.SCATTERED_FEATURE);
+        this.strongholdGen = (TXStrongholdGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.strongholdGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
+        this.villageGen = (TXVillageGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.villageGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
+        this.mineshaftGen = (TXMineshaftGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.mineshaftGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);
+        this.oceanMonumentGen = (TXOceanMonumentGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.oceanMonumentGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.OCEAN_MONUMENT);
 
         IBlockState jungleLog = Blocks.LOG.getDefaultState()
                 .withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.JUNGLE);
