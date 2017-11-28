@@ -4,42 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.google.common.collect.Iterables;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
-import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.Biome.SpawnListEntry;
+
 import net.minecraft.world.gen.structure.*;
 
-public class TXRareBuildingGen extends MapGenStructure
+public class TXRareBuildingGen extends MapGenScatteredFeature
 {
-    public List<Biome> biomeList;
+    private List<Biome> biomeList;
 
-    /**
-     * contains possible spawns for scattered features
-     */
-    private List<SpawnListEntry> scatteredFeatureSpawnList;
+    public TXRareBuildingGen(ServerConfigProvider configs) {
 
-    /**
-     * the maximum distance between scattered features
-     */
-    private int maxDistanceBetweenScatteredFeatures;
-
-    /**
-     * the minimum distance between scattered features
-     */
-    private int minDistanceBetweenScatteredFeatures;
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public TXRareBuildingGen(ServerConfigProvider configs)
-    {
         this.biomeList = new ArrayList<Biome>();
 
         for (LocalBiome biome : configs.getBiomeArray())
@@ -52,11 +34,9 @@ public class TXRareBuildingGen extends MapGenStructure
             }
         }
 
-        this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = configs.getWorldConfig().maximumDistanceBetweenRareBuildings;
         // Minecraft's internal minimum distance is one lower than TC's value
         this.minDistanceBetweenScatteredFeatures = configs.getWorldConfig().minimumDistanceBetweenRareBuildings - 1;
-        this.scatteredFeatureSpawnList.add(new SpawnListEntry(EntityWitch.class, 1, 1, 1));
     }
 
     @Override
@@ -101,29 +81,6 @@ public class TXRareBuildingGen extends MapGenStructure
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
         return new TXRareBuildingStart(this.world, this.rand, chunkX, chunkZ);
-    }
-
-    /**
-     * Returns possible spawn mobs for scattered features
-     * @return The possible mobs.
-     */
-    public List<SpawnListEntry> getMonsterSpawnList()
-    {
-        return this.scatteredFeatureSpawnList;
-    }
-
-    public boolean isSwampHutAtLocation(BlockPos blockPos)
-    {
-        StructureStart structurestart = this.getStructureAt(blockPos);
-
-        if (structurestart != null && structurestart instanceof MapGenScatteredFeature.Start && !structurestart.getComponents().isEmpty())
-        {
-            StructureComponent structurecomponent = Iterables.getFirst(structurestart.getComponents(), null);
-            return structurecomponent instanceof ComponentScatteredFeaturePieces.SwampHut;
-        } else
-        {
-            return false;
-        }
     }
 
     @Override

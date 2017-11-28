@@ -707,6 +707,12 @@ public class ForgeWorld implements LocalWorld
         this.netherFortressGen = new TXNetherFortressGen();
         this.oceanMonumentGen = new TXOceanMonumentGen(configs);
 
+        this.rareBuildingGen = (TXRareBuildingGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.rareBuildingGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.SCATTERED_FEATURE);
+        this.strongholdGen = (TXStrongholdGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.strongholdGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
+        this.villageGen = (TXVillageGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.villageGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
+        this.mineshaftGen = (TXMineshaftGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.mineshaftGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);
+        this.oceanMonumentGen = (TXOceanMonumentGen)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.oceanMonumentGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.OCEAN_MONUMENT);
+
         IBlockState jungleLog = Blocks.LOG.getDefaultState()
                 .withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.JUNGLE);
         IBlockState jungleLeaves = Blocks.LEAVES.getDefaultState()
