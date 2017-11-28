@@ -28,7 +28,6 @@ public class TXChunkGenerator implements IChunkGenerator
     private ForgeWorld world;
     private World worldHandle;
     private boolean TestMode = false;
-
     private ChunkProviderTC generator;
     private ObjectSpawner spawner;
 
@@ -125,6 +124,32 @@ public class TXChunkGenerator implements IChunkGenerator
         {
             return this.world.strongholdGen.getNearestStructurePos(worldIn, position, flag);
         }
+
+        if (("Mansion".equals(structureName)) && (this.world.mansionGen != null))
+        {
+            return this.world.mansionGen.getNearestStructurePos(worldIn, position, flag);
+        }
+
+        if (("Monument".equals(structureName)) && (this.world.oceanMonumentGen != null))
+        {
+            return this.world.oceanMonumentGen.getNearestStructurePos(worldIn, position, flag);
+        }
+
+        if (("Village".equals(structureName)) && (this.world.villageGen != null))
+        {
+            return this.world.villageGen.getNearestStructurePos(worldIn, position, flag);
+        }
+
+        if (("Mineshaft".equals(structureName)) && (this.world.mineshaftGen != null))
+        {
+            return this.world.mineshaftGen.getNearestStructurePos(worldIn, position, flag);
+        }
+
+        if (("Temple".equals(structureName)) && (this.world.templeGen != null))
+        {
+            return this.world.templeGen.getNearestStructurePos(worldIn, position, flag);
+        }
+
         return null;
     }
 
@@ -133,6 +158,10 @@ public class TXChunkGenerator implements IChunkGenerator
     {
         // recreateStructures
         WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
+        if (worldConfig.templesEnabled)
+        {
+            this.world.templeGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
+        }
         if (worldConfig.mineshaftsEnabled)
         {
             this.world.mineshaftGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
@@ -157,6 +186,10 @@ public class TXChunkGenerator implements IChunkGenerator
         {
             this.world.oceanMonumentGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
         }
+        if (worldConfig.mansionsEnabled)
+        {
+            this.world.mansionGen.generate(this.world.getWorld(), chunkX, chunkZ, null);
+        }
     }
 
     @Override
@@ -168,6 +201,11 @@ public class TXChunkGenerator implements IChunkGenerator
     public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos)
     {
         WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
+
+        if (worldConfig.templesEnabled)
+        {
+            return this.world.templeGen.isInsideStructure(pos);
+        }
         if (worldConfig.mineshaftsEnabled)
         {
             return this.world.mineshaftGen.isInsideStructure(pos);
@@ -191,6 +229,10 @@ public class TXChunkGenerator implements IChunkGenerator
         if (worldConfig.oceanMonumentsEnabled)
         {
             return this.world.oceanMonumentGen.isInsideStructure(pos);
+        }
+        if (worldConfig.mansionsEnabled)
+        {
+            return this.world.mansionGen.isInsideStructure(pos);
         }
         return false;
     }
