@@ -34,6 +34,7 @@ public class BO3Loader implements CustomObjectLoader
         registry.registerConfigFunction("BlockCheck", BlockCheck.class);
         registry.registerConfigFunction("BlockCheckNot", BlockCheckNot.class);
         registry.registerConfigFunction("LightCheck", LightCheck.class);
+        registry.registerConfigFunction("Entity", EntityFunction.class);
     }
 
     @Override

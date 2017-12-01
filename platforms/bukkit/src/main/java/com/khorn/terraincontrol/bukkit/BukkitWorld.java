@@ -10,6 +10,7 @@ import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
+import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
@@ -908,4 +909,8 @@ public class BukkitWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
 
+    @Override
+	public void SpawnEntity(EntityFunction entityData) {
+    // TODO Auto-generated method stub
+    }
 }
