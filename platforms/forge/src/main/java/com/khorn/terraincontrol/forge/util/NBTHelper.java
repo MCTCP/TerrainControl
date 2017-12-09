@@ -32,7 +32,7 @@ public class NBTHelper
         Map<String, NBTBase> nmsChildTags = null;
         try
         {
-            mapField = NBTTagCompound.class.getDeclaredField("map");
+            mapField = NBTTagCompound.class.getDeclaredField("field_74784_a"); //tagMap
             mapField.setAccessible(true);
             nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
         } catch (Exception e)
