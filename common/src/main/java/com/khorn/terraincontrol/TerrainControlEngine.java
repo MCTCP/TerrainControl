@@ -14,6 +14,7 @@ import com.khorn.terraincontrol.generator.biome.BiomeModeManager;
 import com.khorn.terraincontrol.generator.resource.Resource;
 import com.khorn.terraincontrol.logging.Logger;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
 import java.io.File;
@@ -307,5 +308,17 @@ public abstract class TerrainControlEngine
      * @return The materialData.
      */
     public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);
+
+    /**
+     * Creates a {@link NamedBinaryTag} by parsing the given input string. The
+     * string is "Mojangson"-formatted string, which looks something like JSON
+     * with optional quotes: <code>{Name:Bob,Id:3}</code>.
+     *
+     * @param mojangson The Mojangson.
+     * @return The tag.
+     * @throws InvalidConfigException If the provided Mojangson could not be
+     * parsed.
+     */
+    public abstract NamedBinaryTag toNamedBinaryTag(String mojangson) throws InvalidConfigException;
 
 }

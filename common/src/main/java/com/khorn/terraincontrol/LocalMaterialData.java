@@ -13,10 +13,9 @@ public interface LocalMaterialData
 {
 
     /**
-     * Gets the name of this material. If a {@link #toDefaultMaterial()
-     * DefaultMaterial is available,} that name is used, otherwise it's up to
-     * the mod that provided this block to name it. Block data is appended to
-     * the name, separated with a colon, like "WOOL:2".
+     * Gets the name of this material. This will be the name given by Mojang.
+     * Block data is appended to the name, separated with a colon, like
+     * "minecraft:wool:2".
      * 
      * @return The name of this material.
      */

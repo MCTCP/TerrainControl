@@ -4,12 +4,12 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.BiomeLoadInstruction;
 import com.khorn.terraincontrol.configuration.ConfigProvider;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
+import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 
 import java.util.Collection;
@@ -171,7 +171,7 @@ public interface LocalWorld
 
     public void setBlock(int x, int y, int z, LocalMaterialData material);
 
-    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag);
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaOrNull);
 
     @SuppressWarnings("UnusedDeclaration")
     public NamedBinaryTag getMetadata(int x, int y, int z);
@@ -229,5 +229,15 @@ public interface LocalWorld
      */
     public int getHeightScale();
 
-    void SpawnEntity(EntityFunction entityDate);
+    /**
+     * Spawns an entity in the world.
+     * @param id Name of the entity, like "cow". All names in {@link MobNames} (including aliases) are guaranteed to
+     *             be valid, but other (mod-provided) entity names may also be valid.
+     * @param x Block x.
+     * @param y Block y of the feet of the entity.
+     * @param z Block z.
+     * @param amount Amount of mobs to spawn.
+     * @param metaOrNull Extra meta information for the entity. Position, rotation and id will be ignored.
+     */
+    void spawnEntity(String id, float x, float y, float z, int amount, NamedBinaryTag metaOrNull);
 }

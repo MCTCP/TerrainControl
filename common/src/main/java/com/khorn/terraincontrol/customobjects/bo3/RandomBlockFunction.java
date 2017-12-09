@@ -131,11 +131,7 @@ public class RandomBlockFunction extends BO3PlaceableFunction
         {
             if (random.nextInt(100) < blockChances[i])
             {
-                world.setBlock(x, y, z, blocks[i]);
-                if (metaDataTags[i] != null)
-                {
-                    world.attachMetadata(x, y, z, metaDataTags[i]);
-                }
+                world.setBlock(x, y, z, blocks[i], metaDataTags[i]);
                 break;
             }
         }

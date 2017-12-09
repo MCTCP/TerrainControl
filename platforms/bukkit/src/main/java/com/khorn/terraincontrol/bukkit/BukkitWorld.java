@@ -10,7 +10,6 @@ import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.generator.SpawnableObject;
 import com.khorn.terraincontrol.generator.biome.BiomeGenerator;
@@ -19,10 +18,12 @@ import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.helpers.ReflectionHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.server.v1_12_R1.*;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 import java.util.*;
 
@@ -846,11 +847,16 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag tag)
     {
+        setBlock(x, y, z, material);
+        if (tag == null)
+            return;
+
         // Convert NamedBinaryTag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-        // Add the x, y and z position to it
+        // Add the id and position to it
+        nmsTag.setString("id", material.withDefaultBlockData().getName());
         nmsTag.setInt("x", x);
         nmsTag.setInt("y", y);
         nmsTag.setInt("z", z);
@@ -861,7 +867,7 @@ public class BukkitWorld implements LocalWorld
         TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
         if (tileEntity != null)
         {
-            tileEntity.load(nmsTag); // tileEntity.a
+            tileEntity.load(nmsTag);
         } else
         {
             TerrainControl.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}",
@@ -909,8 +915,46 @@ public class BukkitWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
 
+    private Entity createEntity(MinecraftKey entityResource, NBTTagCompound optionalMeta)
+    {
+        // Note that the entity position is not set by this method
+        Class<? extends Entity> entityClass = EntityTypes.b.get(entityResource);
+        if (entityClass == null)
+        {
+            TerrainControl.log(LogMarker.WARN, "Unknown entity name: {}", entityResource);
+            return null;
+        }
+
+        NBTTagCompound copy = optionalMeta == null ? new NBTTagCompound() : (NBTTagCompound) optionalMeta.clone();
+        copy.setString("id", entityResource.toString());
+        Entity entity = EntityTypes.a(copy, world);
+        if (entity instanceof EntityInsentient)
+        {
+            ((EntityInsentient) entity).persistent = true;
+        }
+        return entity;
+    }
+
     @Override
-	public void SpawnEntity(EntityFunction entityData) {
-    // TODO Auto-generated method stub
+    public void spawnEntity(String id, float x, float y, float z, int amount, NamedBinaryTag metaOrNull)
+    {
+        String mobTypeName = MobNames.toInternalName(id);
+        MinecraftKey entityResourceLocation = new MinecraftKey(mobTypeName);
+        NBTTagCompound nbttagcompound = null;
+        if (metaOrNull != null)
+        {
+            nbttagcompound = NBTHelper.getNMSFromNBTTagCompound(metaOrNull);
+        }
+
+        for (int i = 0; i < amount; i++)
+        {
+            Entity entity = createEntity(entityResourceLocation, nbttagcompound);
+            if (entity == null)
+            {
+                return;
+            }
+            entity.setLocation(x, y, z, world.random.nextFloat() * 360.0F, 0.0F);
+            world.addEntity(entity, SpawnReason.CHUNK_GEN);
+        }
     }
 }

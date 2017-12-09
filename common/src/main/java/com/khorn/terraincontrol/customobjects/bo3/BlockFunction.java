@@ -72,11 +72,7 @@ public class BlockFunction extends BO3PlaceableFunction
     @Override
     public void spawn(LocalWorld world, Random random, int x, int y, int z)
     {
-        world.setBlock(x, y, z, material);
-        if (metaDataTag != null)
-        {
-            world.attachMetadata(x, y, z, metaDataTag);
-        }
+        world.setBlock(x, y, z, material, metaDataTag);
     }
 
     @Override

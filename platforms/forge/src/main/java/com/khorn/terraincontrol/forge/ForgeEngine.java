@@ -1,20 +1,23 @@
 package com.khorn.terraincontrol.forge;
 
-import java.io.File;
-import java.lang.reflect.Field;
-import java.util.BitSet;
-
 import com.google.common.collect.BiMap;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControlEngine;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.forge.util.NBTHelper;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
-
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.util.BitSet;
 
 public class ForgeEngine extends TerrainControlEngine
 {
@@ -82,6 +85,18 @@ public class ForgeEngine extends TerrainControlEngine
     public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
+    }
+
+    @Override
+    public NamedBinaryTag toNamedBinaryTag(String mojangson) throws InvalidConfigException
+    {
+        try
+        {
+            return NBTHelper.getNBTFromNMSTagCompound("", JsonToNBT.getTagFromJson(mojangson));
+        } catch (NBTException e)
+        {
+            throw new InvalidConfigException("Error parsing NBT data \n" + mojangson + "\n" + e.getLocalizedMessage());
+        }
     }
 
     public BiMap<ResourceLocation, Biome> getBiomeMap() {

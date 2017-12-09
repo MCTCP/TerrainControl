@@ -3,10 +3,14 @@ package com.khorn.terraincontrol.bukkit;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.TerrainControlEngine;
+import com.khorn.terraincontrol.bukkit.util.NBTHelper;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.MojangsonParseException;
+import net.minecraft.server.v1_12_R1.MojangsonParser;
 
 import java.io.File;
 
@@ -120,6 +124,18 @@ public class BukkitEngine extends TerrainControlEngine
     public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
         return BukkitMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
+    }
+
+    @Override
+    public NamedBinaryTag toNamedBinaryTag(String mojangson) throws InvalidConfigException
+    {
+        try
+        {
+            return NBTHelper.getNBTFromNMSTagCompound("", MojangsonParser.parse(mojangson));
+        } catch (MojangsonParseException e)
+        {
+            throw new InvalidConfigException("Error parsing NBT data \n" + mojangson + "\n" + e.getLocalizedMessage());
+        }
     }
 
 }

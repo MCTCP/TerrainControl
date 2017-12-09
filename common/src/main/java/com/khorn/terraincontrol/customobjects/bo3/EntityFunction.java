@@ -1,34 +1,28 @@
 package com.khorn.terraincontrol.customobjects.bo3;
 
+import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.configuration.ConfigFunction;
 import com.khorn.terraincontrol.exception.InvalidConfigException;
+import com.khorn.terraincontrol.util.NamedBinaryTag;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
+import java.util.Random;
 
 /**
  * Represents an entity in a BO3.
  */
-public class EntityFunction extends BO3Function
+public class EntityFunction extends BO3PlaceableFunction
 {
-    public EntityFunction(BO3Config holder) {
-        super(holder);
-        // TODO Auto-generated constructor stub
-    }
-
-    public int x;
-    public int y;
-    public int z;
-
     public String mobName = "";
     public int groupSize = 1;
-    public String nameTagOrNBTFileName = "";
-    public String originalNameTagOrNBTFileName = "";
-    public String nameTag = "";
+    public String metaDataName = "";
+    public NamedBinaryTag metaDataTag = null;
+
+    private EntityFunction(BO3Config holder)
+    {
+        super(holder);
+    }
 
     public EntityFunction(BO3Config config, List<String> args) throws InvalidConfigException
     {
@@ -44,20 +38,15 @@ public class EntityFunction extends BO3Function
 
         if(args.size() > 5)
         {
-            nameTagOrNBTFileName = args.get(5);
-            originalNameTagOrNBTFileName = nameTagOrNBTFileName;
-        }
-
-        if(nameTagOrNBTFileName != null && nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
-        {
-            nameTagOrNBTFileName = getHolder().directory.getAbsolutePath() + File.separator + nameTagOrNBTFileName;
+            metaDataName = args.get(5).trim();
+            metaDataTag = BO3Loader.loadMetadata(args.get(5), getHolder().directory);
         }
     }
 
     @Override
     public String toString()
     {
-        return "Entity(" + x + ',' + y + ',' + z + ',' + mobName + ',' + groupSize + (originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.length() > 0 ? ',' + originalNameTagOrNBTFileName : "") + ')';
+        return "Entity(" + x + ',' + y + ',' + z + ',' + mobName + ',' + groupSize + (metaDataName.length() > 0 ? ',' + metaDataName : "") + ')';
     }
 
     @Override
@@ -69,47 +58,12 @@ public class EntityFunction extends BO3Function
         rotatedBlock.z = -x;
         rotatedBlock.mobName = mobName;
         rotatedBlock.groupSize = groupSize;
-        rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;
+        rotatedBlock.metaDataName = metaDataName;
+        rotatedBlock.metaDataTag = metaDataTag;
 
         return rotatedBlock;
     }
 
-    private String metaDataTag;
-    public String getMetaData()
-    {
-        if(nameTagOrNBTFileName != null && nameTagOrNBTFileName.length() > 0 && metaDataTag == null)
-        {
-            File metaDataFile = new File(nameTagOrNBTFileName);
-            StringBuilder stringbuilder = new StringBuilder();
-            if(metaDataFile.exists())
-            {
-                try {
-                    BufferedReader reader = new BufferedReader(new FileReader(metaDataFile));
-                    try {
-                        String line = reader.readLine();
-
-                        while (line != null) {
-                            stringbuilder.append(line);
-                            //sb.append(System.lineSeparator());
-                            line = reader.readLine();
-                        }
-                    } finally {
-                        reader.close();
-                    }
-                } catch (FileNotFoundException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-                catch (IOException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-
-            metaDataTag = stringbuilder.toString();
-        }
-        return metaDataTag;
-    }
 
     @Override
     public boolean isAnalogousTo(ConfigFunction<BO3Config> other)
@@ -119,6 +73,13 @@ public class EntityFunction extends BO3Function
             return false;
         }
         EntityFunction block = (EntityFunction) other;
-        return block.x == x && block.y == y && block.z == z && block.mobName.equalsIgnoreCase(mobName) && block.groupSize == groupSize && block.nameTagOrNBTFileName == nameTagOrNBTFileName;
+        return block.x == x && block.y == y && block.z == z && block.mobName.equalsIgnoreCase(
+                mobName) && block.groupSize == groupSize && Objects.equals(block.metaDataName, metaDataName);
+    }
+
+    @Override
+    public void spawn(LocalWorld world, Random random, int x, int y, int z)
+    {
+        world.spawnEntity(mobName, this.x + x, this.y + y, this.z + z, groupSize, metaDataTag);
     }
 }

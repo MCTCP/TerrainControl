@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
-import com.khorn.terraincontrol.customobjects.bo3.EntityFunction;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.generator.TXBiome;
 import com.khorn.terraincontrol.forge.generator.TXChunkGenerator;
@@ -16,6 +15,7 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultBiome;
+import com.khorn.terraincontrol.util.minecraftTypes.MobNames;
 import com.khorn.terraincontrol.util.minecraftTypes.TreeType;
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -24,11 +24,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
@@ -48,7 +44,6 @@ import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.*;
 
@@ -783,11 +778,16 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag tag)
     {
+        setBlock(x, y, z, material);
+        if (tag == null)
+            return;
+
         // Convert Tag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-        // Add the x, y and z position to it
+        // Add the id and position to it
+        nmsTag.setString("id", material.withDefaultBlockData().getName());
         nmsTag.setInteger("x", x);
         nmsTag.setInteger("y", y);
         nmsTag.setInteger("z", z);
@@ -852,7 +852,7 @@ public class ForgeWorld implements LocalWorld
     {
         ChunkProviderServer chunkProviderServer = (ChunkProviderServer) this.world.getChunkProvider();
         long i = ChunkPos.asLong(chunkX, chunkZ);
-        return (Chunk) chunkProviderServer.id2ChunkMap.get(i);
+        return chunkProviderServer.id2ChunkMap.get(i);
     }
 
     /**
@@ -872,182 +872,46 @@ public class ForgeWorld implements LocalWorld
         }
     }
 
-    @Override
-    public void SpawnEntity(EntityFunction entityData)
+    private Entity createEntity(ResourceLocation entityResource, NBTTagCompound optionalMeta)
     {
-        Random rand = new Random();
-
-        String mobTypeName = entityData.mobName;
-        int groupSize = entityData.groupSize;
-        String nameTag = entityData.nameTagOrNBTFileName;
-        ResourceLocation entityResourceLocation = null;
-
-        Class<?> entityClass = null;
-
-        for(ResourceLocation entry : EntityList.getEntityNameList())
+        // Note that the entity position is not set by this method
+        Class<? extends Entity> entityClass = EntityList.getClass(entityResource);
+        if (entityClass == null)
         {
-            if(entry.getResourcePath().toLowerCase().trim().replace("entity", "").replace("_", "").equals(mobTypeName.toLowerCase().replace("entity", "").replace("_", "")))
-            {
-                entityResourceLocation = entry;
-                entityClass = EntityList.getClass(entry);
-                break;
-            }
+            TerrainControl.log(LogMarker.WARN, "Unknown entity name: {}", entityResource);
+            return null;
         }
 
-        if(entityClass == null)
+        NBTTagCompound copy = optionalMeta == null ? new NBTTagCompound() : optionalMeta.copy();
+        copy.setString("id", entityResource.toString());
+        Entity entity = EntityList.createEntityFromNBT(copy, world);
+        if (entity instanceof EntityLiving)
         {
-            TerrainControl.log(LogMarker.INFO, "Could not find entity: " + mobTypeName);
-            return;
+            ((EntityLiving) entity).enablePersistence();
+        }
+        return entity;
+    }
+
+    @Override
+    public void spawnEntity(String id, float x, float y, float z, int amount, NamedBinaryTag metaOrNull)
+    {
+        String mobTypeName = MobNames.toInternalName(id);
+        ResourceLocation entityResourceLocation = new ResourceLocation(mobTypeName);
+        NBTTagCompound nbttagcompound = null;
+        if (metaOrNull != null)
+        {
+            nbttagcompound = NBTHelper.getNMSFromNBTTagCompound(metaOrNull);
         }
 
-        Entity entityliving = null;
-
-        if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+        for (int i = 0; i < amount; i++)
         {
-            NBTTagCompound nbttagcompound = new NBTTagCompound();
-
-            try
+            Entity entity = createEntity(entityResourceLocation, nbttagcompound);
+            if (entity == null)
             {
-                NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
-
-                if (!(nbtbase instanceof NBTTagCompound))
-                {
-                    throw new NotImplementedException(); // Not a valid tag
-                }
-
-                nbttagcompound = (NBTTagCompound)nbtbase;
-            }
-            catch (NBTException nbtexception)
-            {
-                TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
                 return;
             }
-
-            //nbttagcompound.setString("id", entityData.mobName);
-            nbttagcompound.setString("id", entityResourceLocation.getResourcePath());
-            entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
-        } else {
-            try
-            {
-                entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
-            }
-            catch (Exception exception)
-            {
-                exception.printStackTrace();
-                return;
-            }
-        }
-
-        if(entityliving != null)
-        {
-            EnumCreatureType creatureType = EnumCreatureType.MONSTER;
-            if(!entityliving.isCreatureType(creatureType, false))
-            {
-                creatureType = EnumCreatureType.CREATURE;
-                if(!entityliving.isCreatureType(creatureType, false))
-                {
-                    creatureType = EnumCreatureType.AMBIENT;
-                    if(!entityliving.isCreatureType(creatureType, false))
-                    {
-                        creatureType = EnumCreatureType.WATER_CREATURE;
-                        if(!entityliving.isCreatureType(creatureType, false))
-                        {
-                            creatureType = EnumCreatureType.CREATURE;
-                        }
-                    }
-                }
-            }
-
-            int j1 = entityData.x;
-            int k1 = entityData.y;
-            int l1 = entityData.z;
-
-            Material material = world.getBlockState(new BlockPos(j1, k1, l1)).getMaterial();
-            if (!world.isBlockNormalCube(new BlockPos(j1, k1, l1), false) && (creatureType == EnumCreatureType.WATER_CREATURE && material == Material.WATER || material == Material.AIR ))
-            {
-                float f = (float)j1 + 0.5F;
-                float f1 = (float)k1;
-                float f2 = (float)l1 + 0.5F;
-
-                entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
-
-                if(entityliving instanceof EntityLiving)
-                {
-                    for(int r = 0; r < groupSize; r++)
-                    {
-                        if(r != 0)
-                        {
-                            if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-                            {
-                                NBTTagCompound nbttagcompound = new NBTTagCompound();
-
-                                try
-                                {
-                                    NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
-
-                                    if (!(nbtbase instanceof NBTTagCompound))
-                                    {
-                                        throw new NotImplementedException(); // Not a valid tag
-                                    }
-
-                                    nbttagcompound = (NBTTagCompound)nbtbase;
-                                }
-                                catch (NBTException nbtexception)
-                                {
-                                    TerrainControl.log(LogMarker.INFO, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
-                                    return;
-                                }
-
-                                //nbttagcompound.setString("id", entityData.mobName);
-                                nbttagcompound.setString("id", entityResourceLocation.getResourcePath());
-                                entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
-                            } else {
-                                try
-                                {
-                                    entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
-                                }
-                                catch (Exception exception)
-                                {
-                                    exception.printStackTrace();
-                                    return;
-                                }
-                            }
-                            entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
-                        }
-
-                        ((EntityLiving) entityliving).setCustomNameTag(mobTypeName.replace("entity", "").substring(0, 1).toUpperCase() + mobTypeName.toLowerCase().replace("entity", "").substring(1));
-
-                        if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
-                        {
-                            if(nameTag != null && nameTag.length() > 0)
-                            {
-                                ((EntityLiving) entityliving).setCustomNameTag(nameTag);
-                            }
-                        }
-
-                        ((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
-                        world.spawnEntity(entityliving);
-                    }
-                } else {
-                    for(int r = 0; r < groupSize; r++)
-                    {
-                        if(r != 0)
-                        {
-                            try
-                            {
-                                entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
-                            }
-                            catch (Exception exception)
-                            {
-                                exception.printStackTrace();
-                                return;
-                            }
-                            entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
-                        }
-                        world.spawnEntity(entityliving);
-                    }
-                }
-            }
+            entity.setLocationAndAngles(x, y, z, world.rand.nextFloat() * 360.0F, 0.0F);
+            world.spawnEntity(entity);
         }
     }
 }

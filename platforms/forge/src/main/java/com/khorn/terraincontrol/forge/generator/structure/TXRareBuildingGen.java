@@ -1,20 +1,19 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.configuration.BiomeConfig.RareBuildingType;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
-
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.structure.MapGenScatteredFeature;
+import net.minecraft.world.gen.structure.StructureStart;
 
-import net.minecraft.world.gen.structure.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class TXRareBuildingGen extends MapGenScatteredFeature
 {
