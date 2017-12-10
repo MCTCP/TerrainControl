@@ -43,7 +43,6 @@ public class BukkitWorld implements LocalWorld
     private static int nextBiomeId = DefaultBiome.values().length;
 
     private static final int MAX_BIOMES_COUNT = 1024;
-    private static final int MAX_SAVED_BIOMES_COUNT = 256;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
     private final Map<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
@@ -104,12 +103,6 @@ public class BukkitWorld implements LocalWorld
     public int getMaxBiomesCount()
     {
         return MAX_BIOMES_COUNT;
-    }
-
-    @Override
-    public int getMaxSavedBiomesCount()
-    {
-        return MAX_SAVED_BIOMES_COUNT;
     }
 
     @Override
@@ -184,15 +177,15 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public boolean placeDungeon(Random rand, int x, int y, int z)
+    public void placeDungeon(Random rand, int x, int y, int z)
     {
-        return dungeon.generate(world, rand, new BlockPosition(x, y, z));
+        dungeon.generate(world, rand, new BlockPosition(x, y, z));
     }
 
     @Override
-    public boolean placeFossil(Random rand, ChunkCoordinate chunkCoord)
+    public void placeFossil(Random rand, ChunkCoordinate chunkCoord)
     {
-        return fossil.generate(world, rand, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+        fossil.generate(world, rand, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
     }
 
     @Override

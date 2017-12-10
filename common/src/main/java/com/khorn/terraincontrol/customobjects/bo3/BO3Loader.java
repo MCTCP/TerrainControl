@@ -62,10 +62,9 @@ public class BO3Loader implements CustomObjectLoader
             String filePath = bo3Folder + File.separator + name;
             return loadedTags.computeIfAbsent(filePath, BO3Loader::loadNBTFromFile);
         }
-
-        // Assume display name
         if (name.length() < 30)
         {
+            // Assume display name
             return getDisplayNameTag(name);
         }
 
@@ -84,7 +83,7 @@ public class BO3Loader implements CustomObjectLoader
     {
         File file = new File(filePath);
 
-        if (file.getName().endsWith(".txt") || file.getName().endsWith(".json"))
+        if (file.getName().endsWith(".txt"))
         {
             return loadNBTFromTextFile(file);
         } else
