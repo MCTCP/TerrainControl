@@ -135,7 +135,9 @@ public class BO3Loader implements CustomObjectLoader
             try (FileInputStream streamForUncompressed = new FileInputStream(path))
             {
                 // Get the tag
-                return findCorrectTag(NamedBinaryTag.readFrom(streamForUncompressed, false));
+                NamedBinaryTag found = findCorrectTag(NamedBinaryTag.readFrom(streamForUncompressed, false));
+                streamForUncompressed.close();  // Fix Stream not being closed after completely.
+                return found;
             } catch (IOException corruptFile)
             {
                 TerrainControl.log(LogMarker.FATAL, "Failed to read NBT meta file: ", e.getMessage());
