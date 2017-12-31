@@ -80,3 +80,13 @@ jar
         attributes 'FMLAT': 'terraincontrol_at.cfg'
     }
 }
+
+task deobfJar(type: Jar) {
+	manifest.from jar.manifest
+	from sourceSets.main.output
+	classifier = 'dev'
+}
+
+artifacts {
+    archives deobfJar
+}

@@ -6,7 +6,7 @@ defaultTasks 'clean', 'build', 'createReleaseJar', 'install'
 allprojects
 {
     version = "2.8.4-SNAPSHOT"
-    group = "com.khorn.terraincontrol"
+    group = "com.almuradev"
 }
 
 // Information for all subprojects
@@ -29,4 +29,42 @@ subprojects
 
     // Generate a pom.xml, upload to local Maven repository
     apply plugin: 'maven'
+
+    if(project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword')) {
+        uploadArchives {
+            repositories {
+                mavenDeployer {
+                    repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2/') {
+                        authentication(userName: sonatypeUsername, password: sonatypePassword)
+                    }
+
+                    snapshotRepository(url: 'https://oss.sonatype.org/content/repositories/snapshots/') {
+                        authentication(userName: sonatypeUsername, password: sonatypePassword)
+                    }
+
+                    pom.project {
+                        name project.name
+
+                        issueManagement {
+                            system 'GitHub Issues'
+                            url 'https://github.com/AlmuraDev/TerrainControl/issues'
+                        }
+
+                        licenses {
+                            license {
+                                name 'MIT License'
+                                url 'https://opensource.org/licenses/MIT'
+                            }
+                        }
+
+                        scm {
+                            connection 'scm:git@github.com:AlmuraDev/TerrainControl.git'
+                            developerConnection 'scm:git@github.com:AlmuraDev/TerrainControl.git'
+                            url 'https://github.com/AlmuraDev/TerrainControl/'
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
