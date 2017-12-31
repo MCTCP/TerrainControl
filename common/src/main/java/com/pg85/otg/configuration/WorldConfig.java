@@ -21,9 +21,9 @@ import java.util.Map.Entry;
 public class WorldConfig extends ConfigFile
 {
 	// OTG+
-	
+
 	public boolean IsOTGPlus;
-	
+
 	private List<ReplaceBlocks> replaceBlocksList = null;
     private HashMap<DefaultMaterial,LocalMaterialData> replaceBlocksDict = null;
     public HashMap<DefaultMaterial,LocalMaterialData> getReplaceBlocksDict()
@@ -48,10 +48,10 @@ public class WorldConfig extends ConfigFile
     		}
     	}
     	return replaceBlocksDict;
-    }	
-	
+    }
+
 	//
-	
+
     public final File settingsDir;
     private final Comparator<Entry<String, Integer>> CBV = new Comparator<Entry<String, Integer>>()
     {
@@ -72,7 +72,7 @@ public class WorldConfig extends ConfigFile
 
     // Dimensions
     public List<String> Dimensions = new ArrayList<String>();
-    
+
     // For old biome generator
     public double oldBiomeSize;
 
@@ -222,21 +222,21 @@ public class WorldConfig extends ConfigFile
 	public int PreGenerationRadius;
 	public int WorldBorderRadius;
     public String worldSeed;
-    
+
     public boolean Cartographer;
     public ArrayList<LocalMaterialData> DimensionPortalMaterials;
     public String dimensionBelow;
     public String dimensionAbove;
-    
+
     public int dimensionBelowHeight;
     public int dimensionAboveHeight;
-    
-    public String BO3AtSpawn;    
-    
+
+    public String BO3AtSpawn;
+
     public boolean teleportToSpawnOnly; // If this is set to true then portals to this dimension will always teleport players to the world's spawn point.
-    
+
 	// Game rules for worlds used as dimensions with Forge // TODO: Apply to overworld too?
-	
+
     public String commandBlockOutput; // Whether command blocks should notify admins when they perform commands
     public String disableElytraMovementCheck; // Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).
     public String doDaylightCycle; // Whether the day-night cycle and moon phases progress
@@ -254,56 +254,56 @@ public class WorldConfig extends ConfigFile
     public String maxEntityCramming; // The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.
     public String mobGriefing; // Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items
     public String naturalRegeneration; // Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)
-    public String randomTickSpeed; // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks 
+    public String randomTickSpeed; // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks
     public String reducedDebugInfo; // Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.
     public String sendCommandFeedback; // Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text
     public String showDeathMessages; // Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.
     public String spawnRadius; // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
-    public String spectatorsGenerateChunks; // Whether players in spectator mode can generate chunks	
-	
+    public String spectatorsGenerateChunks; // Whether players in spectator mode can generate chunks
+
     // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
-    
+
 	public String welcomeMessage; // A message to display to the user when they transfer to this dimension.
 	public String departMessage; // A Message to display to the user when they transfer out of this dimension.
 	//public boolean isHellWorld = false; // DoesWaterVaporize sets this
 	public boolean hasSkyLight; // A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.
-	public boolean isSurfaceWorld; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames. 
+	public boolean isSurfaceWorld; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.
 	//public boolean canCoordinateBeSpawn; // Will check if the x, z position specified is alright to be set as the map spawn point
 	public boolean canRespawnHere; // True if the player can respawn in this dimension (true = overworld, false = nether).
-	
+
 	public boolean doesWaterVaporize; // True for nether, any water that is placed vaporises.
-	
+
 	public boolean doesXZShowFog; // Returns true if the given X,Z coordinate should show environmental fog. True for Nether.
-	
+
 	public boolean useCustomFogColor = false;
 	public double fogColorRed;
 	public double fogColorGreen;
 	public double fogColorBlue;
-	
+
 	public boolean isSkyColored; // Is set to false for End (black sky?)
-	
+
 	//public int averageGroundlevel; // Affects spawn point location and village spawning. Should be equal to sea level + 1(?)
-	
+
 	//public int horizonHeight; // Returns horizon height for use in rendering the sky. Should be equal to sea level(?)
-	
+
 	public int cloudHeight;
-	
+
     public boolean canDoLightning;
-    
+
     public boolean canDoRainSnowIce;
-    
+
     //public boolean canMineBlock; // If set to false players are unable to mine blocks
-    
+
     public boolean isNightWorld; // Sky is always moon and stars but light levels are same as day, used for Cartographer
-    
+
     public double voidFogYFactor; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
-    
+
     public boolean shouldMapSpin; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
-    
+
     public boolean canDropChunk; // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
-    
+
 	//
-    
+
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
@@ -321,23 +321,29 @@ public class WorldConfig extends ConfigFile
 
         // Fix older names
         this.renameOldSettings(settingsReader);
+
+        if(world == null) // If world is null then this method was called from WorldCreationMenu and only needs pre-generator and worldborder settings. TODO: Make this prettier?
+        {
+        	this.suppressErrorLogging = true;
+        }
+
         // Set the local fields based on what was read from the file
         this.readConfigSettings(settingsReader);
         // Clamp Settings to acceptable values
         this.correctSettings();
-                
+
         ArrayList<Integer> usedIds = new ArrayList<Integer>();
-        
+
         if(world != null) // If world is null then this method was called from WorldCreationMenu and only needs pre-generator and worldborder settings. TODO: Make this prettier?
-        {        
+        {
 	        // Check biome ids, These are the names from the worldConfig file
 	        // Corrects any instances of incorrect biome id.
 	        for (Iterator<Entry<String, Integer>> it = customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
 	        {
 	            Entry<String, Integer> entry = it.next();
-	
+
 	            // Check name
-	            
+
 	            String biomeName = entry.getKey();
 	            if (DefaultBiome.Contain(biomeName))
 	            {
@@ -346,27 +352,27 @@ public class WorldConfig extends ConfigFile
 	                it.remove();
 	                continue;
 	            }
-	
+
 	            // Check id
-	            
+
 	            int biomeId = entry.getValue();
 	            if(!((biomeId > 39 && biomeId < 127) || (biomeId > 167)))
 	            {
-	                OTG.log(LogMarker.WARN, "CustomBiomes cannot use vanilla biome id's (0-39 and 127-167) . " 
+	                OTG.log(LogMarker.WARN, "CustomBiomes cannot use vanilla biome id's (0-39 and 127-167) . "
                 		+ "Removing biome " + biomeName + " from the list.");
 	                it.remove();
 	                continue;
 	            }
-	            
+
 	            if(usedIds.contains(biomeId))
 	            {
-	                OTG.log(LogMarker.WARN, "CustomBiomes contains two biomes with id " 
+	                OTG.log(LogMarker.WARN, "CustomBiomes contains two biomes with id "
                 		+ biomeId + ". Removing biome " + biomeName + " from the list.");
 	                it.remove();
 	                continue;
 	            }
 	            usedIds.add(biomeId);
-	            
+
 	            if (biomeId == -1)
 	            {
 	                entry.setValue(world.getFreeBiomeId());
@@ -482,6 +488,7 @@ public class WorldConfig extends ConfigFile
         }
     }
 
+    private boolean suppressErrorLogging;
     @Override
     protected void readConfigSettings(SettingsMap reader)
     {
@@ -489,7 +496,7 @@ public class WorldConfig extends ConfigFile
     	this.IsOTGPlus = reader.getSetting(WorldStandardValues.IS_OTG_PLUS);
     	this.replaceBlocksList = reader.getSetting(WorldStandardValues.REPLACE_BLOCKS_LIST);
     	//
-    	
+
         // Main modes
         this.SettingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
         this.ModeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE);
@@ -527,7 +534,7 @@ public class WorldConfig extends ConfigFile
         this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED);
         this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
         this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
-        
+
         // Biome Groups
         readBiomeGroups(reader);
 
@@ -554,7 +561,7 @@ public class WorldConfig extends ConfigFile
         // Fog
         this.WorldFog = reader.getSetting(WorldStandardValues.WORLD_FOG);
         this.WorldNightFog = reader.getSetting(WorldStandardValues.WORLD_NIGHT_FOG);
-        
+
         this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
         this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
         this.WorldFogB = (WorldFog & 0xFF) / 255F;
@@ -578,7 +585,7 @@ public class WorldConfig extends ConfigFile
         this.maximumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
 
         this.woodLandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED);
-        
+
         this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED);
         this.oceanMonumentRandomOffset = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
         this.oceanMonumentGridSize = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE);
@@ -646,20 +653,30 @@ public class WorldConfig extends ConfigFile
         this.BO3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
 
         this.Cartographer = reader.getSetting(WorldStandardValues.CARTOGRAPHER);
-        
+
         this.DimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
-        
+
         // Dimensions
         this.Dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
-        
+
         this.dimensionBelow = reader.getSetting(WorldStandardValues.DIMENSIONBELOW);
         this.dimensionAbove = reader.getSetting(WorldStandardValues.DIMENSIONABOVE);
-        
+
         this.dimensionBelowHeight = reader.getSetting(WorldStandardValues.DIMENSIONBELOWHEIGHT);
         this.dimensionAboveHeight = reader.getSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT);
-        
+
+        if(this.dimensionBelowHeight >= this.dimensionAboveHeight)
+        {
+        	this.dimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue();
+        	this.dimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue();
+        	if(!suppressErrorLogging)
+        	{
+        		OTG.log(LogMarker.INFO, "World " + this.getName() + " WorldConfig setting dimensionBelowHeight was higher than dimensionAboveHeight, using default values instead.");
+    		}
+        }
+
         this.teleportToSpawnOnly = reader.getSetting(WorldStandardValues.teleportToSpawnOnly);
-        
+
         this.commandBlockOutput = reader.getSetting(WorldStandardValues.commandBlockOutput).toString(); // "true"; // Whether command blocks should notify admins when they perform commands
         this.disableElytraMovementCheck = reader.getSetting(WorldStandardValues.disableElytraMovementCheck).toString(); // "false"; // Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).
         this.doDaylightCycle = reader.getSetting(WorldStandardValues.doDaylightCycle).toString(); // "true"; // Whether the day-night cycle and moon phases progress
@@ -677,53 +694,53 @@ public class WorldConfig extends ConfigFile
         this.maxEntityCramming = reader.getSetting(WorldStandardValues.maxEntityCramming).toString(); // "24"; // The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.
         this.mobGriefing = reader.getSetting(WorldStandardValues.mobGriefing).toString(); // "true"; // Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items
         this.naturalRegeneration = reader.getSetting(WorldStandardValues.naturalRegeneration).toString(); // "true"; // Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)
-        this.randomTickSpeed = reader.getSetting(WorldStandardValues.randomTickSpeed).toString(); // "3"; // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks 
+        this.randomTickSpeed = reader.getSetting(WorldStandardValues.randomTickSpeed).toString(); // "3"; // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks
         this.reducedDebugInfo = reader.getSetting(WorldStandardValues.reducedDebugInfo).toString(); // "false"; // Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.
         this.sendCommandFeedback = reader.getSetting(WorldStandardValues.sendCommandFeedback).toString(); // "true"; // Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text
         this.showDeathMessages = reader.getSetting(WorldStandardValues.showDeathMessages).toString(); // "true"; // Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.
         this.spawnRadius = reader.getSetting(WorldStandardValues.spawnRadius).toString(); // "10"; // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
-        this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.spectatorsGenerateChunks).toString(); // "true"; // Whether players in spectator mode can generate chunks	
-    	
+        this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.spectatorsGenerateChunks).toString(); // "true"; // Whether players in spectator mode can generate chunks
+
         // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
-        
+
         this.welcomeMessage = reader.getSetting(WorldStandardValues.welcomeMessage); // ""; // A message to display to the user when they transfer to this dimension.
         this.departMessage = reader.getSetting(WorldStandardValues.departMessage); // A Message to display to the user when they transfer out of this dimension.
         //public boolean isHellWorld = false; // DoesWaterVaporize sets this
         this.hasSkyLight = reader.getSetting(WorldStandardValues.hasSkyLight); // false; // A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.
-        this.isSurfaceWorld = reader.getSetting(WorldStandardValues.isSurfaceWorld); // true; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames. 
+        this.isSurfaceWorld = reader.getSetting(WorldStandardValues.isSurfaceWorld); // true; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.
         //this.canCoordinateBeSpawn = reader.getSetting(WorldStandardValues.canCoordinateBeSpawn); // false; // Will check if the x, z position specified is alright to be set as the map spawn point
         this.canRespawnHere = reader.getSetting(WorldStandardValues.canRespawnHere); // true; // True if the player can respawn in this dimension (true = overworld, false = nether).
-    	
+
         this.doesWaterVaporize = reader.getSetting(WorldStandardValues.doesWaterVaporize); // false; // True for nether, any water that is placed vaporises.
-    	
+
         this.doesXZShowFog = reader.getSetting(WorldStandardValues.doesXZShowFog); // false; // Returns true if the given X,Z coordinate should show environmental fog. True for Nether.
-    	
+
         this.useCustomFogColor = reader.getSetting(WorldStandardValues.useCustomFogColor); // false
         this.fogColorRed = reader.getSetting(WorldStandardValues.fogColorRed); // 0.20000000298023224D;
         this.fogColorGreen = reader.getSetting(WorldStandardValues.fogColorGreen); // 0.029999999329447746D;
         this.fogColorBlue = reader.getSetting(WorldStandardValues.fogColorBlue); // 0.029999999329447746D;
-    	
+
         this.isSkyColored = reader.getSetting(WorldStandardValues.isSkyColored); // true; // Is set to false for End (black sky?)
-    	
+
         //this.averageGroundlevel = reader.getSetting(WorldStandardValues.averageGroundlevel); // 0; // Affects spawn point location and village spawning. Should be equal to sea level + 1(?)
-    	
+
         //this.horizonHeight = reader.getSetting(WorldStandardValues.horizonHeight); // 0; // Returns horizon height for use in rendering the sky. Should be equal to sea level(?)
-    	
+
         this.cloudHeight = reader.getSetting(WorldStandardValues.cloudHeight); // 0;
-    	
+
         this.canDoLightning = reader.getSetting(WorldStandardValues.canDoLightning); // false;
-        
+
         this.canDoRainSnowIce = reader.getSetting(WorldStandardValues.canDoRainSnowIce); // false;
-        
+
         //this.canMineBlock = reader.getSetting(WorldStandardValues.canMineBlock); // false; // If set to false players are unable to mine blocks
-        
+
         this.isNightWorld = reader.getSetting(WorldStandardValues.isNightWorld); // false;
-        
+
         this.voidFogYFactor = reader.getSetting(WorldStandardValues.voidFogYFactor); // 0.03125D; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
-        
+
         this.shouldMapSpin = reader.getSetting(WorldStandardValues.shouldMapSpin); // false; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
-        
-        this.canDropChunk = reader.getSetting(WorldStandardValues.canDropChunk); // true; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.        
+
+        this.canDropChunk = reader.getSetting(WorldStandardValues.canDropChunk); // true; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
     }
 
     private void readBiomeGroups(SettingsMap reader)
@@ -846,7 +863,7 @@ public class WorldConfig extends ConfigFile
                 "For old maps two more modes are available:",
                 "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes",
                 "   OldGenerator - Minecraft Beta 1.7.3 biome generator");
-        
+
         // Custom biomes
         writer.bigTitle("Custom biomes");
 
@@ -1131,10 +1148,10 @@ public class WorldConfig extends ConfigFile
 
         // Woodland Mansions
         writer.smallTitle("Woodland Mansions");
-        
+
         writer.putSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, this.woodLandMansionsEnabled,
                 "Whether woodland mansions are enabled.");
-        
+
         // Ocean monuments
         writer.smallTitle("Ocean monuments");
 
@@ -1152,9 +1169,9 @@ public class WorldConfig extends ConfigFile
 
         // Custom structures
         writer.smallTitle("Custom structures and objects");
-        
+
         // OTG+
-        
+
         writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.IsOTGPlus,
                 "Set this to true to use advanced (OTG+) features for CustomStructure().",
                 "This includes collision detection, fine control over structure distribution, advanced branching mechanics for",
@@ -1164,19 +1181,19 @@ public class WorldConfig extends ConfigFile
         		"When this is disabled BO3's used with CustomStructure() should have IsOTGPlus:false set (the default value) ",
         		"or they will be ignored. Defaults to false."
 		);
-                
+
         writer.putSetting(WorldStandardValues.REPLACE_BLOCKS_LIST, this.replaceBlocksList,
         "A list of blocks that will be replaced in all BO2's/BO3's",
         "For instance: [{\"BEACON\":\"AIR\"},{\"DIAMOND_BLOCK\":\"AIR\"}]",
         "Defaults to: []"
 		);
-        
+
         //
-        
+
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
                 "Maximum radius of custom structures in chunks. Custom structures are spawned by",
                 "the CustomStructure resource in the biome configuration files. Only used when IsOTGPlus:false.");
-        
+
         // Other structures
         writer.smallTitle("Other structures");
         writer.putSetting(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
@@ -1257,30 +1274,30 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.MAX_MOISTURE, this.maxMoisture);
         writer.putSetting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
         writer.putSetting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
-        
-        writer.bigTitle("World Seed");        
+
+        writer.bigTitle("World Seed");
         writer.putSetting(WorldStandardValues.WORLD_SEED, this.worldSeed,
 	        "The seed that will be used for this world unless it is overriden in the world creation menu.",
 	        "Leave blank for a random seed."
     	);
 
-        writer.bigTitle("BO3 at spawn");        
+        writer.bigTitle("BO3 at spawn");
         writer.putSetting(WorldStandardValues.BO3_AT_SPAWN, this.BO3AtSpawn,
 	        "This BO3 will be spawned at the world's spawn point as a CustomObject."
     	);
-        
-        writer.bigTitle("Pre-generation radius");        
+
+        writer.bigTitle("Pre-generation radius");
         writer.putSetting(WorldStandardValues.PREGENERATION_RADIUS, this.PreGenerationRadius,
 	        "This is the radius in chunks around the spawn chunk within which chunks will automatically be spawned (uses a rectangle, not a circle around the spawn location!",
-			"Defaults to: 0 (disabled)"        		
+			"Defaults to: 0 (disabled)"
 		);
-        
-        writer.bigTitle("World border radius");        
+
+        writer.bigTitle("World border radius");
         writer.putSetting(WorldStandardValues.WORLD_BORDER_RADIUS, this.WorldBorderRadius,
 	        "This is the radius in chunks around the spawn chunk within which chunks will have blocks spawned (uses a rectangle, not a circle around the spawn location!)",
 			"Defaults to: 0 (disabled)"
 		);
-        
+
         // Dimensions
         writer.bigTitle("Dimension");
         writer.putSetting(WorldStandardValues.DIMENSIONS, this.Dimensions,
@@ -1292,22 +1309,22 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.DIMENSIONBELOWHEIGHT, this.dimensionBelowHeight,
                 "The Y coordinate (height) for the DimensionBelow setting.");
         writer.putSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT, this.dimensionAboveHeight,
-        		"The Y coordinate (height) for the DimensionAbove setting.");        
+        		"The Y coordinate (height) for the DimensionAbove setting.");
         writer.putSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS, this.DimensionPortalMaterials,
                 "A comma seperated list of blocks, dimension portals made of one or more of these blocks will lead to this world.",
                 "For blocks that have rotation such as stairs be sure to add all rotations (0,1,2,3,4,5,6,7), for instance: QUARTZ_STAIRS:0, QUARTZ_STAIRS:1, QUARTZ_STAIRS:2 etc.",
                 "For blocks that have rotation such as QUARTZ_STAIRS, \"QUARTZ_STAIRS\" is the same as \"QUARTZ_STAIRS:3\"."
         		);
-        
+
         writer.putSetting(WorldStandardValues.teleportToSpawnOnly, this.teleportToSpawnOnly,
-        		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");                
-        
+        		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
+
         writer.putSetting(WorldStandardValues.CARTOGRAPHER, this.Cartographer,
                 "Currently in development, the Cartographer is a miniature version of the world (1/16th scale) that can be used to view the world (including players) and teleport players and items. Setting this to true loads and updates the Cartographer world map in the Cartographer dimension. The Cartographer can be reached via a Quartz portal with a chiseled quartz base. The mods/OpenTerrainGenerator/worlds/DIM-Cartographer directory must be present (if you also have OTG-Cartographer.jar in your mods directory worlds/DIM-Cartographer should be created automatically).");
-        
+
         writer.smallTitle("Game rules (dimensions only)", "Game rules for dimensions (these do not work for the overworld at the moment). These settings are still in development and may be subject to change in upcoming releases.", "");
-        
-        writer.putSetting(WorldStandardValues.commandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput), 
+
+        writer.putSetting(WorldStandardValues.commandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput),
         		"Whether command blocks should notify admins when they perform commands");
         writer.putSetting(WorldStandardValues.disableElytraMovementCheck, Boolean.parseBoolean(this.disableElytraMovementCheck),
         		"Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).");
@@ -1340,7 +1357,7 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.naturalRegeneration, Boolean.parseBoolean(this.naturalRegeneration),
         		"Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)");
         writer.putSetting(WorldStandardValues.randomTickSpeed, Integer.parseInt(this.randomTickSpeed),
-        		"How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks"); 
+        		"How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks");
         writer.putSetting(WorldStandardValues.reducedDebugInfo, Boolean.parseBoolean(this.reducedDebugInfo),
         		"Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.");
         writer.putSetting(WorldStandardValues.sendCommandFeedback, Boolean.parseBoolean(this.sendCommandFeedback),
@@ -1350,12 +1367,12 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.spawnRadius, Integer.parseInt(this.spawnRadius),
         		"The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.");
         writer.putSetting(WorldStandardValues.spectatorsGenerateChunks, Boolean.parseBoolean(this.spectatorsGenerateChunks),
-        		"Whether players in spectator mode can generate chunks");	
-    	
+        		"Whether players in spectator mode can generate chunks");
+
         // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
         writer.smallTitle("World provider settings (dimensions only)", "World provider settings for dimensions (these do not work for the overworld at the moment). These settings are still in development and may be subject to change in upcoming releases.", "");
-        
-        writer.putSetting(WorldStandardValues.welcomeMessage, this.welcomeMessage, 
+
+        writer.putSetting(WorldStandardValues.welcomeMessage, this.welcomeMessage,
         		"A message to display to the user when they transfer to this dimension.");
         writer.putSetting(WorldStandardValues.departMessage, this.departMessage,
         		"A Message to display to the user when they transfer out of this dimension.");
@@ -1363,39 +1380,39 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.hasSkyLight, this.hasSkyLight,
         		"A boolean that tells if a world has a sky or not. Used for calculating weather and skylight. Also affects GetActualHeight(), hasSkyLight = false worlds are seen as 128 height worlds, which affects nether portal placement/detection.");
         writer.putSetting(WorldStandardValues.isSurfaceWorld, this.isSurfaceWorld,
-        		"Returns 'true' if in the \"main surface world\", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames."); 
+        		"Returns 'true' if in the \"main surface world\", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.");
         //writer.putSetting(WorldStandardValues.canCoordinateBeSpawn, this.canCoordinateBeSpawn,
         		//"Will check if the x, z position specified is alright to be set as the map spawn point.");
         writer.putSetting(WorldStandardValues.canRespawnHere, this.canRespawnHere,
-        		"True if the player can respawn in this dimension (true = overworld, false = nether).");    	
+        		"True if the player can respawn in this dimension (true = overworld, false = nether).");
         writer.putSetting(WorldStandardValues.doesWaterVaporize, this.doesWaterVaporize,
-        		"True for nether, any water that is placed vaporises.");    	
+        		"True for nether, any water that is placed vaporises.");
         writer.putSetting(WorldStandardValues.doesXZShowFog, this.doesXZShowFog,
         		"Returns true if the given X,Z coordinate should show environmental fog. True for Nether.");
-        writer.putSetting(WorldStandardValues.useCustomFogColor, this.useCustomFogColor, 
-        		"Set this to true if you want to use the fog color settings below.");        
+        writer.putSetting(WorldStandardValues.useCustomFogColor, this.useCustomFogColor,
+        		"Set this to true if you want to use the fog color settings below.");
         writer.putSetting(WorldStandardValues.fogColorRed, this.fogColorRed);
         writer.putSetting(WorldStandardValues.fogColorGreen, this.fogColorGreen);
         writer.putSetting(WorldStandardValues.fogColorBlue, this.fogColorBlue);
         writer.putSetting(WorldStandardValues.isSkyColored, this.isSkyColored,
-        		"Is set to false for End (black sky?)");    	
+        		"Is set to false for End (black sky?)");
         //writer.putSetting(WorldStandardValues.averageGroundlevel, this.averageGroundlevel,
-        		//"Affects spawn point location and village spawning. Should be equal to sea level + 1(?)");    	
+        		//"Affects spawn point location and village spawning. Should be equal to sea level + 1(?)");
         //writer.putSetting(WorldStandardValues.horizonHeight, this.horizonHeight,
-        		//"Returns horizon height for use in rendering the sky. Should be equal to sea level(?)");    	
+        		//"Returns horizon height for use in rendering the sky. Should be equal to sea level(?)");
         writer.putSetting(WorldStandardValues.cloudHeight, this.cloudHeight);
-        writer.putSetting(WorldStandardValues.canDoLightning, this.canDoLightning);        
-        writer.putSetting(WorldStandardValues.canDoRainSnowIce, this.canDoRainSnowIce);        
+        writer.putSetting(WorldStandardValues.canDoLightning, this.canDoLightning);
+        writer.putSetting(WorldStandardValues.canDoRainSnowIce, this.canDoRainSnowIce);
         //writer.putSetting(WorldStandardValues.canMineBlock, this.canMineBlock,
-        		//"If set to false players are unable to mine blocks");        
+        		//"If set to false players are unable to mine blocks");
         writer.putSetting(WorldStandardValues.isNightWorld, this.isNightWorld,
         		"If true then the sky will be locked at midnight with the moon and stars above but the world will be lit as if it were day time. Useful for space dimensions.");
-        writer.putSetting(WorldStandardValues.voidFogYFactor, this.voidFogYFactor, 
-        		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");        
-        writer.putSetting(WorldStandardValues.shouldMapSpin, this.shouldMapSpin, 
-        		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");                
-        writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk, 
-        		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");       
+        writer.putSetting(WorldStandardValues.voidFogYFactor, this.voidFogYFactor,
+        		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");
+        writer.putSetting(WorldStandardValues.shouldMapSpin, this.shouldMapSpin,
+        		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
+        writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk,
+        		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");
     }
 
     private void WriteCustomBiomes(SettingsMap writer)
@@ -1410,8 +1427,8 @@ public class WorldConfig extends ConfigFile
             Entry<String, Integer> entry = it.next();
     		if(!((entry.getValue() > 39 && entry.getValue() < 127) || (entry.getValue() > 167)))
         	{
-    			// Skip custom biomes with vanilla id's. 
-    			// Forge adds these to the custom biomes list 
+    			// Skip custom biomes with vanilla id's.
+    			// Forge adds these to the custom biomes list
     			// to make vanilla biomes fully customisable
     			// but the vanilla biome id's shouldn't actually
     			// be written to the WorldConfig.ini file

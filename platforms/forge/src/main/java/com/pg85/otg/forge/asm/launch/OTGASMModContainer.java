@@ -15,9 +15,9 @@ public class OTGASMModContainer extends DummyModContainer
 	{
 		super(new ModMetadata());
 		ModMetadata meta = getMetadata();
-		meta.modId = "otgasm";
-		meta.name = "OTG ASM";
-		meta.description = "Allows missing OTG biomes in the registry when a client connects to the server. OTG sends and registers the missing biomes on the client before the player joins the world.";
+		meta.modId = "otgcore";
+		meta.name = "OTG Core";
+		meta.description = "Allows missing OTG biomes in the registry when a client connects to the server. OTG sends and registers the missing biomes on the client before the player joins the world. Also makes sure the correct biome is returned when querying the registry by id.";
 		meta.version = "1.12";
 		List<String> authorList = new ArrayList<String>();
 		authorList.add("PG85");

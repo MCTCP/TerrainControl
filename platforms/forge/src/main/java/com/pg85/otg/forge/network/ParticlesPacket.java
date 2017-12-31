@@ -21,14 +21,14 @@ import com.pg85.otg.logging.LogMarker;
 public class ParticlesPacket implements IMessage
 {
     ByteBuf data = Unpooled.buffer();
-    DataInputStream wrappedStream;      
-	
+    DataInputStream wrappedStream;
+
 	public ParticlesPacket()
 	{
 		// Create an empty packet
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
-		
+
 		try
 		{
 		    stream.writeInt(PluginStandardValues.ProtocolVersion);
@@ -38,9 +38,9 @@ public class ParticlesPacket implements IMessage
 		{
 		    OTG.printStackTrace(LogMarker.FATAL, e);
 		}
-		
+
 		StringBuilder sb = new StringBuilder();
-		
+
 		try
 		{
 			String value = sb.toString();
@@ -52,7 +52,7 @@ public class ParticlesPacket implements IMessage
 		{
 		    OTG.printStackTrace(LogMarker.FATAL, e);
 		}
-		
+
 		try
 		{
 			stream.close();
@@ -61,15 +61,15 @@ public class ParticlesPacket implements IMessage
 		{
 			e.printStackTrace();
 		}
-		
+
 		this.data = nettyBuffer;
 	}
-	
+
 	public ParticlesPacket(ByteBuf data)
 	{
 		this.data = data;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf data)
 	{
@@ -77,47 +77,48 @@ public class ParticlesPacket implements IMessage
         int clientProtocolVersion = PluginStandardValues.ProtocolVersion;
         if (serverProtocolVersion == clientProtocolVersion)
         {
-        	wrappedStream = new DataInputStream(new ByteBufInputStream(data));        	
+        	data.retain();
+        	wrappedStream = new DataInputStream(new ByteBufInputStream(data));
         } else {
         	// Wrong version!
         	throw new RuntimeException("Client is using a different version of OTG than server!");
         }
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf data)
 	{
 		data.writeBytes(this.data);
 	}
-		
+
 	public static class Handler extends AbstractClientMessageHandler<ParticlesPacket>
 	{
 		@Override
 		public IMessage handleClientMessage(EntityPlayer player, ParticlesPacket message, MessageContext ctx)
-		{	        
+		{
 	        try
-	        {	        	
+	        {
 	        	int packetType = message.wrappedStream.readInt(); // 0 == normal packet, 1 == Particles packet
 	    		if(packetType == 1)
-	        	{	    			
-	        		ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>(); 
+	        	{
+	        		ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>();
 	        		int msgLength = message.wrappedStream.readShort();
 	                byte[] chars = new byte[msgLength];
 	                if (!(message.wrappedStream.read(chars, 0, chars.length) != chars.length))
-	        		{                   	
-	            		// Server sent particles                   	
+	        		{
+	            		// Server sent particles
 	            		String particleFunctionString = new String(chars);
 	            		if(particleFunctionString != null && particleFunctionString.length() > 0 && particleFunctionString.startsWith("Particle("))
 	            		{
 	            			//OTG.log(LogMarker.INFO, "Received Particle packet: " + particleFunctionString);
 	            			String[] particleStrings = particleFunctionString.replace(")", "").replace("Particle(", "'").split("'");
 	            			for(String particleString : particleStrings)
-	            			{	            				
+	            			{
 	            				String[] parameters = particleString.split(",");
 		            			if(parameters.length == 11)
 		            			{
 		            				//OTG.log(LogMarker.INFO, "Processing Particle packet: " + particleString);
-		            				
+
 			            			ParticleFunction particle = new ParticleFunction();
 		            				particle.x = Integer.parseInt(parameters[0]);
 		            				particle.y = Integer.parseInt(parameters[1]);
@@ -130,8 +131,8 @@ public class ParticlesPacket implements IMessage
 		            				particle.velocityXSet = Boolean.parseBoolean(parameters[8]);
 		            				particle.velocityYSet = Boolean.parseBoolean(parameters[9]);
 		            				particle.velocityZSet = Boolean.parseBoolean(parameters[10]);
-		            				particleFunctions.add(particle);	
-		            				
+		            				particleFunctions.add(particle);
+
 		            				//sendMessage(EnumChatFormatting.RED, "Received: " + particle.makeString());
 		            			}
 	            			}
@@ -158,7 +159,7 @@ public class ParticlesPacket implements IMessage
 	                				bFound = true;
 	                				if(!newParticleFunctions.contains(existingParticleFunction))
 	                				{
-	                					newParticleFunctions.add(existingParticleFunction);                    					
+	                					newParticleFunctions.add(existingParticleFunction);
 	                				}
 	                			}
 	                		}
@@ -167,7 +168,7 @@ public class ParticlesPacket implements IMessage
 	        					newParticleFunctions.add(particleFunction);
 	                		}
 	                	}
-	                	
+
 	                	ClientTickHandler.ClientParticleFunctions.addAll(newParticleFunctions);
 	                }
 	        	} else {
@@ -178,8 +179,10 @@ public class ParticlesPacket implements IMessage
 	        {
 	            OTG.log(LogMarker.FATAL, "Failed to receive packet");
 	            OTG.printStackTrace(LogMarker.FATAL, e);
-	        }
-	        
+	        } finally {
+				message.data.release();
+			}
+
 			return null;
 		}
 	}

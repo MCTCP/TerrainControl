@@ -63,9 +63,9 @@ public class OTGToForgeEventConverter extends EventHandler
         {
             // Fire population event
             Populate.EventType forgeEvent = getPopulateEventType(resource.getMaterial());
-            return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, blockX, blockZ,
-                    villageInChunk, forgeEvent);
-        } else if (resource instanceof OreGen || resource instanceof VeinGen)
+            return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, blockX, blockZ, villageInChunk, forgeEvent);
+        }
+        else if (resource instanceof OreGen || resource instanceof VeinGen)
         {
             if (!hasOreGenerationBegun(world))
             {
@@ -76,8 +76,7 @@ public class OTGToForgeEventConverter extends EventHandler
             // Fire ore generation event
             GenerateMinable.EventType forgeEvent = getOreEventType(resource.getMaterial());
             return TerrainGen.generateOre(world.getWorld(), random, null, blockPos, forgeEvent);
-        } else
-        {
+        } else {
             if (!hasDecorationBegun(world))
             {
                 // Fire decoration start event
@@ -150,8 +149,7 @@ public class OTGToForgeEventConverter extends EventHandler
             return Decorate.EventType.GRASS;
         if (block.isMaterial(DefaultMaterial.DEAD_BUSH))
             return Decorate.EventType.DEAD_BUSH;
-        if (block.isMaterial(DefaultMaterial.RED_ROSE) || block.isMaterial(
-                DefaultMaterial.YELLOW_FLOWER) || block.isMaterial(DefaultMaterial.DOUBLE_PLANT))
+        if (block.isMaterial(DefaultMaterial.RED_ROSE) || block.isMaterial(DefaultMaterial.YELLOW_FLOWER) || block.isMaterial(DefaultMaterial.DOUBLE_PLANT))
             return Decorate.EventType.FLOWERS;
         if (block.isMaterial(DefaultMaterial.PUMPKIN))
             return Decorate.EventType.PUMPKIN;
@@ -198,6 +196,12 @@ public class OTGToForgeEventConverter extends EventHandler
             return GenerateMinable.EventType.LAPIS;
         if (block.isMaterial(DefaultMaterial.REDSTONE_ORE))
             return GenerateMinable.EventType.REDSTONE;
+        if (block.isMaterial(DefaultMaterial.STONE) && block.getBlockData() == 1)
+            return GenerateMinable.EventType.GRANITE;
+        if (block.isMaterial(DefaultMaterial.STONE) && block.getBlockData() == 3)
+            return GenerateMinable.EventType.DIORITE;
+        if (block.isMaterial(DefaultMaterial.STONE) && block.getBlockData() == 5)
+            return GenerateMinable.EventType.ANDESITE;
         return GenerateMinable.EventType.CUSTOM;
     }
 

@@ -56,7 +56,7 @@ public class ForgeBiome implements LocalBiome
     @Override
     public float getTemperatureAt(int x, int y, int z)
     {
-        return this.biomeBase.getFloatTemperature(new BlockPos(x, y, z));
+        return this.biomeBase.getTemperature(new BlockPos(x, y, z));
     }
 
     @Override

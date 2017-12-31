@@ -613,7 +613,7 @@ public final class WorldLoader
     		{
 	    		if(i != 0)
 	    		{
-	    			DimensionManager.registerDimension(dimensionId, DimensionType.register(worldName, "OTG", dimensionId, WorldProviderOTG.class, false));
+	    			OTGDimensionManager.registerDimension(dimensionId, DimensionType.register(worldName, "OTG", dimensionId, WorldProviderOTG.class, false));
 	    		}
 
 	            ForgeWorld world = new ForgeWorld(worldName, dimensionId == 0);

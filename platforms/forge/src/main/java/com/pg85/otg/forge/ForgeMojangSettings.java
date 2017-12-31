@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Gets some default settings from the BiomeBase instance. The settings in the
  * BiomeBase instance are provided by Mojang.
- * 
+ *
  * @see MojangSettings
  */
 public final class ForgeMojangSettings implements MojangSettings
@@ -22,7 +22,7 @@ public final class ForgeMojangSettings implements MojangSettings
     /**
      * Creates an instance that provides access to the default settings of the
      * vanilla biome with the given id.
-     * 
+     *
      * @param biomeId The id of the biome.
      * @return The settings.
      */
@@ -32,14 +32,14 @@ public final class ForgeMojangSettings implements MojangSettings
     	if(baseBiome != null)
     	{
     		return fromBiomeBase(baseBiome);
-    	}  	
+    	}
     	return fromBiomeBase(ForgeWorld.vanillaBiomes[biomeId]);
     }
 
     /**
      * Creates an instance that provides access to the default settings of the
      * vanilla biome.
-     * 
+     *
      * @param biomeBase The biome.
      * @return The settings.
      */
@@ -56,7 +56,7 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public float getTemperature()
     {
-        return this.biomeBase.getTemperature();
+        return this.biomeBase.getDefaultTemperature();
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.asm.IOTGASMBiome;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -29,7 +30,7 @@ import org.apache.logging.log4j.core.Logger;
 /**
  * Used for all custom biomes.
  */
-public class OTGBiome extends Biome
+public class OTGBiome extends Biome implements IOTGASMBiome
 {
 
     public static final int MAX_TC_BIOME_ID = 1023;
@@ -238,6 +239,7 @@ public class OTGBiome extends Biome
         }
     }
 
+    @Override
 	public int getSavedId()
 	{
 		return savedId;

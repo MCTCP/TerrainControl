@@ -52,7 +52,7 @@ public class OTGClassTransformer implements IClassTransformer
 
 	public byte[] transform(int index, byte[] classBeingTransformed, boolean isObfuscated)
 	{
-		System.out.println("Transforming: " + classesBeingTransformed[index]);
+		//System.out.println("Transforming: " + classesBeingTransformed[index]);
 		try
 		{
 			ClassNode classNode = new ClassNode();
@@ -170,7 +170,7 @@ public class OTGClassTransformer implements IClassTransformer
 
 				InsnList toInsert = new InsnList();
 				toInsert.add(new VarInsnNode(ALOAD, 0));
-				toInsert.add(new TypeInsnNode(INSTANCEOF, "com/pg85/otg/forge/generator/OTGBiome"));
+				toInsert.add(new TypeInsnNode(INSTANCEOF, "com/pg85/otg/forge/asm/IOTGASMBiome"));
 				LabelNode l1 = new LabelNode();
 				toInsert.add(new JumpInsnNode(IFEQ, l1));
 				LabelNode l2 = new LabelNode();
@@ -197,7 +197,7 @@ public class OTGClassTransformer implements IClassTransformer
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");
 	}
 
-	// net.minecraftforge.registries.GameData.transformInjectSnapshot
+	// net.minecraftforge.registries.GameData.injectSnapshot()
 	private void transformInjectSnapshot(ClassNode gameDataNode, boolean isObfuscated)
 	{
 		String injectSnapShot = isObfuscated ? "injectSnapshot" : "injectSnapshot";

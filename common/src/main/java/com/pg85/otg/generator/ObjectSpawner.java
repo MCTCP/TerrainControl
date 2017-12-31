@@ -36,6 +36,7 @@ import com.pg85.otg.generator.resource.WellGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -154,6 +155,14 @@ public class ObjectSpawner
 			        hasVillage = world.placeDefaultStructures(rand, chunkCoord);
 		        }
 
+				// Get the random generator
+				WorldConfig worldConfig = configProvider.getWorldConfig();
+				long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
+				this.rand.setSeed(resourcesSeed);
+				long l1 = this.rand.nextLong() / 2L * 2L + 1L;
+				long l2 = this.rand.nextLong() / 2L * 2L + 1L;
+				this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
+
 				// Mark population started
 				OTG.firePopulationStartEvent(world, rand, hasVillage, chunkCoord);
 
@@ -163,14 +172,6 @@ public class ObjectSpawner
 				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
 				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
 				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
-
-				// Get the random generator
-				WorldConfig worldConfig = configProvider.getWorldConfig();
-				long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
-				this.rand.setSeed(resourcesSeed);
-				long l1 = this.rand.nextLong() / 2L * 2L + 1L;
-				long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-				this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
 
 				// Generate structures
 
@@ -309,12 +310,19 @@ public class ObjectSpawner
 				long l2 = this.rand.nextLong() / 2L * 2L + 1L;
 				this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
 
+		        // Mark population started
+		        world.startPopulation(chunkCoord);
+		        OTG.firePopulationStartEvent(world, rand, false, chunkCoord);
+
 				// Get the corner block coords
 				int x = chunkCoord.getChunkX() * 16;
 				int z = chunkCoord.getChunkZ() * 16;
 
 				// Get the biome of the other corner TODO: explain why?
 				LocalBiome biome = world.getBiome(x + 8, z + 8);
+
+				// Default structures can cause a bigger cascade but we have to spawn them to prevent holes in villages etc
+				boolean hasVillage = world.placeDefaultStructures(rand, chunkCoord);
 
 				// TODO: Reimplement this
 				//if(!worldConfig.improvedMobSpawning)
@@ -328,11 +336,34 @@ public class ObjectSpawner
 				// Replace blocks
 				//world.replaceBlocks(chunkCoord); // <-- causes nullreference exception when getChunk returns null
 
+		        // Mark population ended
+		        OTG.firePopulationEndEvent(world, rand, false, chunkCoord);
+		        world.endPopulation();
+
 				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC/OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to TRACE in mods/OpenTerrainGenerator/OTG.ini file for a stack trace.");
 				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
 			} else {
-				OTG.log(LogMarker.TRACE,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. (Update: The recently added multi-dimension features may be causing this log message occasionally, will fix a.s.a.p).");
+				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once! Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. (Update: The recently added multi-dimension features may be causing this log message occasionally, will fix a.s.a.p).");
 				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
+
+				// Get the random generator
+				WorldConfig worldConfig = configProvider.getWorldConfig();
+				long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
+				this.rand.setSeed(resourcesSeed);
+				long l1 = this.rand.nextLong() / 2L * 2L + 1L;
+				long l2 = this.rand.nextLong() / 2L * 2L + 1L;
+				this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
+
+		        // Mark population started
+		        world.startPopulation(chunkCoord);
+		        OTG.firePopulationStartEvent(world, rand, false, chunkCoord);
+
+				// Default structures can cause a bigger cascade but we have to spawn them to prevent holes in villages etc
+				boolean hasVillage = world.placeDefaultStructures(rand, chunkCoord);
+
+		        // Mark population ended
+		        OTG.firePopulationEndEvent(world, rand, false, chunkCoord);
+		        world.endPopulation();
 			}
 		}
 

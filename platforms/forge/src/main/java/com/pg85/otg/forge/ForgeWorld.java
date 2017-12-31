@@ -1225,7 +1225,7 @@ public class ForgeWorld implements LocalWorld
 
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
-        this.strongholdGen = new OTGStrongholdGen(configs);
+        this.strongholdGen = new OTGStrongholdGen(configs, world);
 
         this.villageGen = new OTGVillageGen(configs);
         this.mineshaftGen = new OTGMineshaftGen();

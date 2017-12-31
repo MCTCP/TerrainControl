@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map.Entry;
@@ -21,10 +22,14 @@ import com.pg85.otg.configuration.ServerConfigProvider;
 import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.logging.LogMarker;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
@@ -38,6 +43,7 @@ import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGDimensionManager
 {
@@ -58,13 +64,48 @@ public class OTGDimensionManager
 		return false;
 	}
 
+	public static void registerDimension(int id, DimensionType type)
+	{
+		DimensionManager.registerDimension(id, type);
+
+        NBTTagCompound compound = new NBTTagCompound();
+        compound.setInteger("dimensionID", id);
+        writeNBTStrings("types", null, compound);
+        FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "registerDimension", compound);
+	}
+
+    public static void unregisterDimension(int dimensionID)
+    {
+    	DimensionManager.unregisterDimension(dimensionID);
+
+        NBTTagCompound compound = new NBTTagCompound();
+
+        compound.setInteger("dimensionID", dimensionID);
+        writeNBTStrings("types", null, compound); // TODO: Collection<String> types, what's supposed to be in there?
+
+        FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "unregisterDimension", compound);
+    }
+
+    public static void writeNBTStrings(String id, Collection<String> strings, NBTTagCompound compound)
+    {
+        if (strings != null)
+        {
+            NBTTagList nbtTagList = new NBTTagList();
+
+            for (String s : strings)
+                nbtTagList.appendTag(new NBTTagString(s));
+
+            compound.setTag(id, nbtTagList);
+        }
+    }
+
 	static HashMap<Integer,Integer> dimensionsOrder;
 
 	public static int createDimension(String dimensionName, boolean keepLoaded, boolean initDimension, boolean saveDimensionData)
 	{
 		int newDimId = DimensionManager.getNextFreeDimId();
 
-		DimensionManager.registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, WorldProviderOTG.class, keepLoaded));
+		registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, WorldProviderOTG.class, keepLoaded));
 		if(initDimension)
 		{
 			initDimension(newDimId, dimensionName);
@@ -96,7 +137,7 @@ public class OTGDimensionManager
 		}
 		if(DimensionManager.isDimensionRegistered(dimToRemove))
 		{
-			DimensionManager.unregisterDimension(dimToRemove);
+			OTGDimensionManager.unregisterDimension(dimToRemove);
 		}
 
 		world.unRegisterBiomes();
@@ -343,7 +384,7 @@ public class OTGDimensionManager
 
 				if(dimType != null && dimType.getSuffix() != null && dimType.getSuffix().equals("OTG"))
 				{
-					DimensionManager.unregisterDimension(i);
+					OTGDimensionManager.unregisterDimension(i);
 					dimensionMap.clear(i);
 				}
 			}
@@ -388,7 +429,7 @@ public class OTGDimensionManager
 
 			if(dimType != null && dimType.getSuffix() != null && dimType.getSuffix().equals("OTG"))
 			{
-				DimensionManager.unregisterDimension(dimId);
+				OTGDimensionManager.unregisterDimension(dimId);
 				dimensionMap.clear(dimId);
 			}
 		}
@@ -474,7 +515,7 @@ public class OTGDimensionManager
 
 				if(!DimensionManager.isDimensionRegistered(dimData.dimensionId))
 				{
-					DimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, WorldProviderOTG.class, dimData.keepLoaded));
+					OTGDimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, WorldProviderOTG.class, dimData.keepLoaded));
 					if(dimData.dimensionName.equals("DIM-Cartographer"))
 					{
 						Cartographer.CartographerDimension = dimData.dimensionId;

@@ -59,7 +59,7 @@ public class WorldStandardValues extends Settings
 			BO3_AT_SPAWN = stringSetting("BO3AtSpawn", ""),
     		DIMENSIONBELOW = stringSetting("DimensionBelow", ""),
     		DIMENSIONABOVE = stringSetting("DimensionAbove", ""),
-	
+
 			welcomeMessage = stringSetting("WelcomeMessage", ""),
 			departMessage = stringSetting("DepartMessage", "")
     		;
@@ -104,16 +104,16 @@ public class WorldStandardValues extends Settings
             OCEAN_MONUMENT_GRID_SIZE = intSetting("OceanMonumentGridSize", 32, 5, 10000),
             OCEAN_MONUMENT_RANDOM_OFFSET = intSetting("OceanMonumentRandomOffset", 26, 0, 10000),
             MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
-            PREGENERATION_RADIUS = intSetting("PreGenerationRadius", 0, 0, 999999),            		
+            PREGENERATION_RADIUS = intSetting("PreGenerationRadius", 0, 0, 999999),
             WORLD_BORDER_RADIUS = intSetting("WorldBorderRadius", 0, 0, 999999),
-            
+
     		maxEntityCramming = intSetting("MaxEntityCramming", 24, 0, 999999),
 			randomTickSpeed = intSetting("RandomTickSpeed", 3, 0, 999999),
 			spawnRadius = intSetting("SpawnRadius", 10, 0, 999999),
 			cloudHeight = intSetting("CloudHeight", 128, 0, 999999),
-			
-    		DIMENSIONBELOWHEIGHT = intSetting("DimensionAboveHeight", 0, -999999, 999999),
-    		DIMENSIONABOVEHEIGHT = intSetting("DimensionBelowHeight", 256, -999999, 999999)
+
+    		DIMENSIONBELOWHEIGHT = intSetting("DimensionBelowHeight", 0, -999999, 999999),
+    		DIMENSIONABOVEHEIGHT = intSetting("DimensionAboveHeight", 256, -999999, 999999)
             ;
 
     public static final Setting<Boolean>
@@ -137,10 +137,10 @@ public class WorldStandardValues extends Settings
             MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
             RARE_BUILDINGS_ENABLED = booleanSetting("RareBuildingsEnabled", true),
             OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
-    		WOODLAND_MANSIONS_ENABLED = booleanSetting("WoodLandMansionsEnabled", true),            		
-            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),            
+    		WOODLAND_MANSIONS_ENABLED = booleanSetting("WoodLandMansionsEnabled", true),
+            POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
     		CARTOGRAPHER = booleanSetting("Cartographer", false),
-    		    	
+
 			teleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
 			commandBlockOutput = booleanSetting("CommandBlockOutput", true),
 			disableElytraMovementCheck = booleanSetting("DisableElytraMovementCheck", false),
@@ -183,10 +183,10 @@ public class WorldStandardValues extends Settings
 
     public static final Setting<ArrayList<LocalMaterialData>>
     		DIMENSION_PORTAL_MATERIALS = new MaterialListSetting("DimensionPortalMaterials", new DefaultMaterial[] { DefaultMaterial.QUARTZ_BLOCK });
-    
-    public static final Setting<List<ReplaceBlocks>> 
-			REPLACE_BLOCKS_LIST = replaceBlocksListSetting("ReplaceBlocksList");    
-    
+
+    public static final Setting<List<ReplaceBlocks>>
+			REPLACE_BLOCKS_LIST = replaceBlocksListSetting("ReplaceBlocksList");
+
     public static final Setting<List<String>>
             ISLE_BIOMES = stringListSetting("IsleBiomes", "Deep Ocean", "MushroomIsland",
                     "Ice Mountains", "DesertHills", "ForestHills", "Forest", "TaigaHills",
@@ -210,11 +210,11 @@ public class WorldStandardValues extends Settings
             FRACTURE_HORIZONTAL = doubleSetting("FractureHorizontal", 0, -500, 500),
             FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500),
             STRONGHOLD_DISTANCE = doubleSetting("StrongholdDistance", 32, 1, 1000),
-                                
+
     		fogColorRed = doubleSetting("FogColorRed", 0.20000000298023224D, Double.MIN_VALUE, Double.MAX_VALUE),
 			fogColorGreen = doubleSetting("FogColorGreen", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
 			fogColorBlue = doubleSetting("FogColorBlue", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
-			voidFogYFactor = doubleSetting("VoidFogYFactor", 0.03125D, Double.MIN_VALUE, Double.MAX_VALUE)            
+			voidFogYFactor = doubleSetting("VoidFogYFactor", 0.03125D, Double.MIN_VALUE, Double.MAX_VALUE)
             ;
 
     public static final Setting<Integer>

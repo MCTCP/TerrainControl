@@ -20,6 +20,7 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.util.CommandHelper;
 import com.pg85.otg.logging.LogMarker;
@@ -32,6 +33,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -105,7 +107,7 @@ public final class OTGCommandHandler implements ICommand
 
                 if(isOp)
                 {
-                    sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg tp <biome name or id> " + VALUE_COLOR + "Teleport to the nearest biome with the given name or id (max distance 16000 blocks)."));
+                    sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg tp <biome name or id / dimension name> " + VALUE_COLOR + "Teleport to the nearest biome with the given name or id (max distance 16000 blocks)."));
                 	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen " + VALUE_COLOR + "Shows the status of any currently active pre-generators. Same as /otg pregenerator."));
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> " + VALUE_COLOR + "Sets the pre-generation radius for the curren world to <radius> chunks. Same as /otg pregenerator <radius>."));
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> <dimension id> " + VALUE_COLOR + "Sets the pre-generation radius for dimension <dimension id> to <radius> chunks. Same as /otg pregenerator <radius> <dimension id>."));
@@ -161,7 +163,7 @@ public final class OTGCommandHandler implements ICommand
             	String biomeName = "";
             	for(int i = 1; i < argString.length; i++)
             	{
-            		biomeName += argString[i];
+            		biomeName += argString[i] + " ";
             	}
             	if(biomeName != null && biomeName.length() > 0)
             	{
@@ -171,6 +173,20 @@ public final class OTGCommandHandler implements ICommand
             			biomeId = Integer.parseInt(biomeName.replace(" ", ""));
             		}
             		catch(NumberFormatException ex) { }
+
+            		// Check dimension names
+        			for(int i = -1; i < Long.SIZE << 4; i++)
+					{
+						if(DimensionManager.isDimensionRegistered(i))
+						{
+							DimensionType dimensionType = DimensionManager.getProviderType(i);
+							if(dimensionType.getName().toLowerCase().trim().equals(biomeName.toLowerCase().trim()))
+							{
+								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), true);
+								return;
+							}
+						}
+					}
 
 					ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
 

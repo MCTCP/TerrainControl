@@ -33,6 +33,7 @@ public class DimensionSyncPacket implements IMessage
         int clientProtocolVersion = PluginStandardValues.ProtocolVersion;
         if (serverProtocolVersion == clientProtocolVersion)
         {
+        	data.retain();
         	wrappedStream = new DataInputStream(new ByteBufInputStream(data));
         } else {
         	// Wrong version!
@@ -65,7 +66,9 @@ public class DimensionSyncPacket implements IMessage
 	        {
 	            OTG.log(LogMarker.FATAL, "Failed to receive packet");
 	            OTG.printStackTrace(LogMarker.FATAL, e);
-	        }
+	        } finally {
+				message.data.release();
+			}
 			return null;
 		}
 	}
