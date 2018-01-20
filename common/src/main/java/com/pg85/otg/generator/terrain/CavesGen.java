@@ -155,7 +155,7 @@ public class CavesGen extends TerrainGenBase
                         {
                             LocalMaterialData material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
                             if (
-                        		material.isMaterial(DefaultMaterial.WATER) || 
+                        		material.isMaterial(DefaultMaterial.WATER) ||
                         		material.isMaterial(DefaultMaterial.STATIONARY_WATER)
                     		)
                             {
@@ -201,10 +201,10 @@ public class CavesGen extends TerrainGenBase
                                 {
                                     generatingChunkBuffer.setBlock(local_x, currentDepth, local_z, air);
                                     LocalMaterialData block = generatingChunkBuffer.getBlock(local_x, currentDepth - 1, local_z);
-                                    
+
                                     // If grass was just deleted, try to move it down
                                     if (
-                                		surfaceBlockFound && 
+                                		surfaceBlockFound &&
                                 		!block.isLiquid() &&
                                 		!block.isMaterial(DefaultMaterial.BEDROCK)
                             		)
@@ -225,7 +225,7 @@ public class CavesGen extends TerrainGenBase
     }
 
     protected boolean isSuitableBlock(LocalMaterialData material, LocalMaterialData materialAbove, LocalBiome biome)
-    {    	
+    {
         BiomeConfig biomeConfig = biome.getBiomeConfig();
         if (material.equals(biomeConfig.stoneBlock))
         {
@@ -262,22 +262,26 @@ public class CavesGen extends TerrainGenBase
         {
             return true;
         }
-        
+
         return false;
     }
 
     @Override
     protected void generateChunk(ChunkCoordinate chunkCoord, ChunkBuffer generatingChunkBuffer)
     {
-        int i = this.random.nextInt(this.random.nextInt(this.random.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
-        if (this.worldSettings.evenCaveDistribution)
-        {
-            i = this.worldSettings.caveFrequency;
-        }
-        if (this.random.nextInt(100) >= this.worldSettings.caveRarity)
-        {
-            i = 0;
-        }
+    	int i = 0;
+    	if(this.worldSettings.caveRarity > 0 && this.worldSettings.caveFrequency > 0)
+    	{
+	        i = this.random.nextInt(this.random.nextInt(this.random.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
+	        if (this.worldSettings.evenCaveDistribution)
+	        {
+	            i = this.worldSettings.caveFrequency;
+	        }
+	        if (this.random.nextInt(100) >= this.worldSettings.caveRarity)
+	        {
+	            i = 0;
+	        }
+    	}
 
         for (int j = 0; j < i; j++)
         {

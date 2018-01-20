@@ -23,6 +23,7 @@ import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -49,7 +50,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.File;
 
 //@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v2", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v4", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v5", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
 public class OTGPlugin
 {
 	public static final String MOD_ID = "openterraingenerator";
@@ -167,6 +168,9 @@ public class OTGPlugin
 
         // Register ChunkLoadListener for updating Cartographer map
         MinecraftForge.EVENT_BUS.register(new ChunkEventListener());
+
+        // Fix lava as light source not working when spawning lava as resource
+        Blocks.LAVA.setLightOpacity(255);
     }
 
     // TODO: Document why this is necessary <- Used to fill the biome registry when a client connects and has received the biomes packet?

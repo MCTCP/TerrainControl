@@ -139,7 +139,7 @@ public class ChunkProviderOTG
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
-        
+
         biomes = new BiomeConfig[1024];
     }
 
@@ -170,7 +170,7 @@ public class ChunkProviderOTG
         }
 
         generateTerrainNoise(chunkX * four, 0, chunkZ * four, maxYSections, usedYSections);
-       
+
         // Now that the raw terrain is generated, replace raw biome array with
         // fine-tuned one.
         if (biomeGenerator.canGenerateUnZoomed())
@@ -262,13 +262,13 @@ public class ChunkProviderOTG
                     }
                 }
             }
-        }       
+        }
     }
 
     /**
      * Adds the biome blocks like grass, dirt, sand and sandstone. Also adds
      * bedrock at the bottom of the map.
-     * 
+     *
      * @param chunkBuffer The the chunk to add the blocks to.
      * @return Whether there is a lot of water in this chunk. If yes, no
      *         villages will be placed.
@@ -307,7 +307,7 @@ public class ChunkProviderOTG
 
         return dryBlocksOnSurface > 250;
     }
-    
+
     private void generateTerrainNoise(int xOffset, int yOffset, int zOffset, int maxYSections, int usedYSections)
     {
         if (this.rawTerrain == null || this.rawTerrain.length != NOISE_MAX_X * maxYSections * NOISE_MAX_Z)
@@ -330,8 +330,8 @@ public class ChunkProviderOTG
         this.noise2 = this.noiseGen2.Noise3D(this.noise2, xOffset, yOffset, zOffset, NOISE_MAX_X, maxYSections, NOISE_MAX_Z, xzScale, yScale, xzScale);
 
         int i3D = 0;
-        int i2D = 0;       
-        
+        int i2D = 0;
+
         for (int x = 0; x < NOISE_MAX_X; x++)
         {
             for (int z = 0; z < NOISE_MAX_Z; z++)
@@ -339,7 +339,7 @@ public class ChunkProviderOTG
                 final int biomeId = this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))];
 
                 BiomeConfig biomeConfig = toBiomeConfig(biomeId);
-                            	
+
                 double noiseHeight = this.noise6[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
                 {
@@ -377,7 +377,7 @@ public class ChunkProviderOTG
                 } else {
                     this.oldBiomeFactor(x, z, i2D, usedYSections, noiseHeight);
             	}
-            
+
                 i2D++;
 
                 for (int y = 0; y < maxYSections; y++)
@@ -595,14 +595,14 @@ public class ChunkProviderOTG
 
     /**
      * Gets the BiomeConfig with the given id.
-     * 
+     *
      * @param id The generation id of the biome.
      * @return The BiomeConfig.
      */
     private BiomeConfig toBiomeConfig(int id)
     {
         BiomeConfig biomeConfig = biomes[id];
-        
+
         if(biomeConfig == null)
         {
             // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
@@ -610,7 +610,7 @@ public class ChunkProviderOTG
             biomeConfig = biome.getBiomeConfig();
             biomes[id] = biomeConfig;
         }
-        
+
         return biomeConfig;
     }
 }

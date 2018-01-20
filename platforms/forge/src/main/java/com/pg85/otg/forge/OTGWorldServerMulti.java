@@ -52,7 +52,7 @@ public class OTGWorldServerMulti extends WorldServer
             	getWorldBorder().setDamageBuffer(newSize);
             }
         };
-        this.delegate.getWorldBorder().addListener(this.borderListener);        
+        this.delegate.getWorldBorder().addListener(this.borderListener);
     }
 
     /**
@@ -68,6 +68,7 @@ public class OTGWorldServerMulti extends WorldServer
         this.mapStorage = this.delegate.getMapStorage();
         this.worldScoreboard = this.delegate.getScoreboard();
         this.lootTable = this.delegate.getLootTableManager();
+        this.advancementManager = this.delegate.getAdvancementManager();
         String s = VillageCollection.fileNameForProvider(this.provider);
         VillageCollection villagecollection = (VillageCollection)this.perWorldStorage.getOrLoadData(VillageCollection.class, s);
 

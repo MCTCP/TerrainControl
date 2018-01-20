@@ -8,7 +8,7 @@ import java.util.TreeMap;
 
 /**
  * Enum of the materials the server will at least support.
- * 
+ *
  * @see LocalMaterialData
  */
 public enum DefaultMaterial
@@ -247,7 +247,7 @@ public enum DefaultMaterial
     BROWN_SHULKER_BOX(231),
     GREEN_SHULKER_BOX(232),
     RED_SHULKER_BOX(233),
-    BLACK_SHULKER_BOX(234),    
+    BLACK_SHULKER_BOX(234),
     STRUCTURE_BLOCK(255, false),
     UNKNOWN_BLOCK(254);
     /**
@@ -262,7 +262,7 @@ public enum DefaultMaterial
 
     /**
      * Creates a new material.
-     * 
+     *
      * @param id Id of the material.
      * @param solid Whether the material is solid. If set to false, it will
      *            prevent snowfall. Note: this isn't always equal to what
@@ -276,7 +276,7 @@ public enum DefaultMaterial
 
     /**
      * Creates a new solid material where snow will fall on.
-     * 
+     *
      * @param id Id of the material.
      */
     private DefaultMaterial(int id)
@@ -287,20 +287,20 @@ public enum DefaultMaterial
 
     /**
      * Returns true only if this material is flowing or stationary Water
-     * 
+     *
      * @return boolean whether or not this material is flowing or stationary
      *         Water
      */
     public boolean isLiquid()
     {
-        return this == WATER || this == STATIONARY_WATER;
+        return this == WATER || this == STATIONARY_WATER || this == LAVA | this == STATIONARY_LAVA;
     }
 
     /**
      * Gets whether this material is solid. Materials that aren't solid are
      * nonexistant for {@link LocalWorld#getSolidHeight(int, int)}. Note: this
      * isn't always equal to what Minecraft calls solid.
-     * 
+     *
      * @return boolean Whether or not the material is considered solid
      */
     public boolean isSolid()
@@ -310,7 +310,7 @@ public enum DefaultMaterial
 
     /**
      * Gets whether snow can fall on this block.
-     * 
+     *
      * @return Whether snow can fall on this block.
      */
     public boolean canSnowFallOn()
@@ -345,7 +345,7 @@ public enum DefaultMaterial
     /**
      * Returns a DefaultMaterial object with the given material name. Name is
      * case insensitive.
-     * 
+     *
      * @param blockName the Name of the DefaultMaterial that is to be
      *            returned. May not contain block data.
      * @return A DefaultMaterial with the given name, or UNKNOWN_BLOCK if not
@@ -373,7 +373,7 @@ public enum DefaultMaterial
      * Returns true or false depending on if this DefaultMaterial has the
      * given name
      * <p/>
-     * 
+     *
      * @param name The string name to test this.Name against
      *            <p/>
      * @return Boolean whether or not this DefaultMaterial has the given name
@@ -386,7 +386,7 @@ public enum DefaultMaterial
     /**
      * Returns a DefaultMaterial object with the given material ID
      * <p/>
-     * 
+     *
      * @param id the ID of the DefaultMaterial that is to be returned
      *            <p/>
      * @return A DefaultMaterial with the given ID
@@ -404,7 +404,7 @@ public enum DefaultMaterial
      * Returns true or false depending on if this DefaultMaterial has the
      * given ID
      * <p/>
-     * 
+     *
      * @param id The integer ID to test this.id against
      *            <p/>
      * @return Boolean whether or not this DefaultMaterial has the given id

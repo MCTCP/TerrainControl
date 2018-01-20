@@ -24,6 +24,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
 import net.minecraft.block.*;
@@ -42,6 +43,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.DataFixer;
 import net.minecraft.util.datafix.DataFixesManager;
@@ -839,12 +841,6 @@ public class ForgeWorld implements LocalWorld
         	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
         }
 
-        /*
-        IBlockState oldState = this.world.getBlockState(pos);
-        int oldLight = oldState.getLightValue(this.world, pos);
-        int oldOpacity = oldState.getLightOpacity(this.world, pos);
-        */
-
         IBlockState iblockstate = setBlockState(chunk, pos, newState);
 
         if (iblockstate == null)
@@ -852,22 +848,12 @@ public class ForgeWorld implements LocalWorld
         	return; // Happens when block to place is the same as block being placed? TODO: Is that the only time this happens?
         }
 
-        /*
-        // Relight and update players
-        if (newState.getLightOpacity(this.world, pos) != oldOpacity || newState.getLightValue(this.world, pos) != oldLight)
-        {
-            this.world.profiler.startSection("checkLight");
-            this.world.checkLight(pos);
-            this.world.profiler.endSection();
-        }
-        */
-
 	    if (metaDataTag != null)
 	    {
 	    	attachMetadata(x, y, z, metaDataTag, isOTGPlus);
 	    }
 
-	    this.world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
+    	this.world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
     }
 
     public IBlockState setBlockState(Chunk _this, BlockPos pos, IBlockState state)
@@ -947,7 +933,7 @@ public class ForgeWorld implements LocalWorld
                     }
                     else if (j == i1 - 1)
                     {
-                        _this.relightBlock(i, j, k);
+                    	_this.relightBlock(i, j, k);
                     }
 
                     if (j1 != k1 && (j1 < k1 || _this.getLightFor(EnumSkyBlock.SKY, pos) > 0 || _this.getLightFor(EnumSkyBlock.BLOCK, pos) > 0))
@@ -959,7 +945,8 @@ public class ForgeWorld implements LocalWorld
                 // If capturing blocks, only run block physics for TE's. Non-TE's are handled in ForgeHooks.onPlaceItemIntoWorld
                 //if (!_this.getWorld().isRemote && block1 != block && (!_this.getWorld().captureBlockSnapshots || block.hasTileEntity(state)))
                 {
-                    //block.onBlockAdded(_this.getWorld(), pos, state);
+                	// Don't do this when spawning resources and BO2's/BO3's, they are considered to be in their intended updated state when spawned
+               		//block.onBlockAdded(_this.getWorld(), pos, state);
                 }
 
                 if (block.hasTileEntity(state))

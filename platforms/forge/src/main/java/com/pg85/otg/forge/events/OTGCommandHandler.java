@@ -107,7 +107,7 @@ public final class OTGCommandHandler implements ICommand
 
                 if(isOp)
                 {
-                    sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg tp <biome name or id / dimension name> " + VALUE_COLOR + "Teleport to the nearest biome with the given name or id (max distance 16000 blocks)."));
+                    sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg tp <biome name or id / dimension name> " + VALUE_COLOR + "Teleport to the given dimension or the nearest biome with the given name or id (max distance 16000 blocks)."));
                 	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen " + VALUE_COLOR + "Shows the status of any currently active pre-generators. Same as /otg pregenerator."));
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> " + VALUE_COLOR + "Sets the pre-generation radius for the curren world to <radius> chunks. Same as /otg pregenerator <radius>."));
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> <dimension id> " + VALUE_COLOR + "Sets the pre-generation radius for dimension <dimension id> to <radius> chunks. Same as /otg pregenerator <radius> <dimension id>."));

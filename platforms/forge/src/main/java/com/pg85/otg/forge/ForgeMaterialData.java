@@ -158,6 +158,10 @@ public class ForgeMaterialData implements LocalMaterialData
                 {
                     return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData));
                 }
+                catch(java.lang.ArrayIndexOutOfBoundsException e)
+                {
+                	throw new InvalidConfigException("Illegal meta data for the block type, cannot use " + input);
+                }
                 catch (IllegalArgumentException e)
                 {
                 	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
