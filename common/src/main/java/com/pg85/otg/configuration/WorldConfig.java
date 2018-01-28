@@ -261,15 +261,13 @@ public class WorldConfig extends ConfigFile
     public String spawnRadius; // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
     public String spectatorsGenerateChunks; // Whether players in spectator mode can generate chunks
 
-    // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
-
 	public String welcomeMessage; // A message to display to the user when they transfer to this dimension.
 	public String departMessage; // A Message to display to the user when they transfer out of this dimension.
 	//public boolean isHellWorld = false; // DoesWaterVaporize sets this
 	public boolean hasSkyLight; // A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.
 	public boolean isSurfaceWorld; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.
 	//public boolean canCoordinateBeSpawn; // Will check if the x, z position specified is alright to be set as the map spawn point
-	public boolean canRespawnHere; // True if the player can respawn in this dimension (true = overworld, false = nether).
+	public boolean canRespawnHere; // True if the player can respawn in this dimension.
 
 	public boolean doesWaterVaporize; // True for nether, any water that is placed vaporises.
 
@@ -302,6 +300,19 @@ public class WorldConfig extends ConfigFile
 
     public boolean canDropChunk; // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
 
+    public int respawnDimension; // Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.
+
+    public int movementFactor; // The dimension's movement factor. Whenever a player or entity changes dimension from world A to world B, their coordinates are multiplied by worldA.provider.getMovementFactor() / worldB.provider.getMovementFactor(). Example: Overworld factor is 1, nether factor is 8. Traveling from overworld to nether multiplies coordinates by 1/8.
+
+    public String itemsToAddOnJoinDimension; // Similar to the /give command, gives players items when they enter a dimension/world.
+    public String itemsToRemoveOnJoinDimension; // The opposite of the /give command, removes items from players inventories when they enter a dimension/world.
+    public String itemsToAddOnLeaveDimension; // Similar to the /give command, gives players items when they leave a dimension/world.
+    public String itemsToRemoveOnLeaveDimension; // The opposite of the /give command, removes items from players inventories when they leave a dimension/world.
+
+    public boolean spawnPointSet;
+    public int spawnPointX;
+    public int spawnPointY;
+    public int spawnPointZ;
 	//
 
     /**
@@ -741,6 +752,23 @@ public class WorldConfig extends ConfigFile
         this.shouldMapSpin = reader.getSetting(WorldStandardValues.shouldMapSpin); // false; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
 
         this.canDropChunk = reader.getSetting(WorldStandardValues.canDropChunk); // true; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
+
+        this.respawnDimension = reader.getSetting(WorldStandardValues.RESPAWN_DIMENSION); // 0 // Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.
+
+        this.movementFactor = reader.getSetting(WorldStandardValues.MOVEMENT_FACTOR); // The dimension's movement factor. Whenever a player or entity changes dimension from world A to world B, their coordinates are multiplied by worldA.provider.getMovementFactor() / worldB.provider.getMovementFactor(). Example: Overworld factor is 1, nether factor is 8. Traveling from overworld to nether multiplies coordinates by 1/8.
+
+        this.itemsToAddOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION); // Similar to the /give command, gives players items when they enter a dimension/world.
+
+        this.itemsToRemoveOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION); // The opposite of the /give command, removes items from players inventories when they enter a dimension/world.
+
+        this.itemsToAddOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION); // Similar to the /give command, gives players items when they leave a dimension/world.
+
+        this.itemsToRemoveOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION); // The opposite of the /give command, removes items from players inventories when they leave a dimension/world.
+
+        this.spawnPointSet = reader.getSetting(WorldStandardValues.SPAWN_POINT_SET);
+        this.spawnPointX = reader.getSetting(WorldStandardValues.SPAWN_POINT_X);
+        this.spawnPointY = reader.getSetting(WorldStandardValues.SPAWN_POINT_Y);
+        this.spawnPointZ = reader.getSetting(WorldStandardValues.SPAWN_POINT_Z);
     }
 
     private void readBiomeGroups(SettingsMap reader)
@@ -1413,6 +1441,39 @@ public class WorldConfig extends ConfigFile
         		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
         writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk,
         		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");
+        writer.putSetting(WorldStandardValues.RESPAWN_DIMENSION, this.respawnDimension,
+        		"Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.");
+        writer.putSetting(WorldStandardValues.MOVEMENT_FACTOR, this.movementFactor,
+        		"The dimension's movement factor. Whenever a player or entity changes dimension from world A to world B, their coordinates are multiplied by worldA.provider.getMovementFactor() / worldB.provider.getMovementFactor(). Example: Overworld factor is 1, nether factor is 8. Traveling from overworld to nether multiplies coordinates by 1/8.");
+
+        writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION, this.itemsToAddOnJoinDimension,
+        		"Similar to the /give command, gives players items when they enter a dimension/world.",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+        writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION, this.itemsToRemoveOnJoinDimension,
+        		"The opposite of the /give command, removes items from players inventories when they enter a dimension/world.",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+        writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION, this.itemsToAddOnLeaveDimension,
+        		"Similar to the /give command, gives players items when they leave a dimension/world.",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+        writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION, this.itemsToRemoveOnLeaveDimension,
+        		"The opposite of the /give command, removes items from players inventories when they leave a dimension/world.",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_SET, this.spawnPointSet,
+				"Set this to true to set the server spawn point to SpawnPointX, SpawnPointY, SpawnPointZ");
+
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_X, this.spawnPointX,
+				"Use this with SpawnPointSet: true to set a spawn coordinate.");
+
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_Y, this.spawnPointY,
+				"Use this with SpawnPointSet: true to set a spawn coordinate.");
+
+		writer.putSetting(WorldStandardValues.SPAWN_POINT_Z, this.spawnPointZ,
+				"Use this with SpawnPointSet: true to set a spawn coordinate.");
     }
 
     private void WriteCustomBiomes(SettingsMap writer)

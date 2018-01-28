@@ -13,7 +13,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.forge.generator.OTGBiome;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
@@ -466,7 +465,11 @@ public class ForgeEngine extends OTGEngine
 
     public LocalWorld getWorld(World world)
     {
-    	if(world.provider.getDimension() > 1)
+    	if(world.provider.getDimension() == 0)
+    	{
+    		return (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
+    	}
+    	else if(world.provider.getDimension() > 1)
     	{
 			if(world.provider.getDimensionType().getSuffix() != null && world.provider.getDimensionType().getSuffix().equals("OTG"))
 	    	{

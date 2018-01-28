@@ -53,7 +53,7 @@ public final class ServerConfigProvider implements ConfigProvider
      * The number of loaded biomes.
      */
     private int biomesCount;
-    
+
     /**
      * Loads the settings from the given directory for the given world.
      * @param settingsDir The directory to load from.
@@ -64,10 +64,10 @@ public final class ServerConfigProvider implements ConfigProvider
         this.settingsDir = settingsDir;
         this.world = world;
         this.biomes = new LocalBiome[world.getMaxBiomesCount()];
-        
+
         loadSettings();
     }
-    
+
     /**
      * Loads all settings. Expects the biomes array to be empty (filled with
      * nulls), the savedBiomes collection to be empty and the biomesCount
@@ -92,7 +92,7 @@ public final class ServerConfigProvider implements ConfigProvider
 
         return settingsMap;
     }
-    
+
     public void saveWorldConfig()
     {
     	File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
@@ -143,7 +143,7 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         return worldConfig;
     }
-    
+
     @Override
     public LocalBiome getBiomeByIdOrNull(int id)
     {
@@ -158,7 +158,7 @@ public final class ServerConfigProvider implements ConfigProvider
     public void reload()
     {
         // Clear biome collections
-        Arrays.fill(this.biomes, null);        
+        Arrays.fill(this.biomes, null);
         this.biomesCount = 0;
 
         // Load again
@@ -230,7 +230,7 @@ public final class ServerConfigProvider implements ConfigProvider
         // Now that all settings are loaded, we can index them,
         // cross-reference between biomes, etc.
         for (BiomeConfig biomeConfig : loadedBiomeList)
-        {        	
+        {
             // Statistics of the loaded biomes
             this.biomesCount++;
             loadedBiomeNames.append(biomeConfig.getName());
@@ -266,7 +266,7 @@ public final class ServerConfigProvider implements ConfigProvider
             int generationId = biome.getIds().getGenerationId();
 
             this.biomes[generationId] = biome;
-            
+
             // Update WorldConfig with actual id
             worldConfig.customBiomeGenerationIds.put(biome.getName(), generationId);
 
@@ -295,7 +295,7 @@ public final class ServerConfigProvider implements ConfigProvider
             }
         }
 
-        // Forge dimensions are seperate worlds that can share biome configs so 
+        // Forge dimensions are seperate worlds that can share biome configs so
         // use the highest maxSmoothRadius of any of the loaded worlds.
         // Worlds loaded before this one will not use biomes from this world
         // so no need to change their this.worldConfig.maxSmoothRadius
@@ -310,7 +310,7 @@ public final class ServerConfigProvider implements ConfigProvider
 	            }
 	        }
         }
-        
+
         if (this.biomesCount > 0)
         {
             // Remove last ", "
@@ -318,7 +318,7 @@ public final class ServerConfigProvider implements ConfigProvider
         }
         return loadedBiomeNames.toString();
     }
-    
+
     private void processInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
     {
         if (biomeConfigStub.biomeExtendsProcessed)
@@ -363,7 +363,7 @@ public final class ServerConfigProvider implements ConfigProvider
 
         // Done
         biomeConfigStub.biomeExtendsProcessed = true;
-    }    
+    }
 
     private void processMobInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
     {
@@ -372,9 +372,9 @@ public final class ServerConfigProvider implements ConfigProvider
             // Already processed earlier
             return;
         }
-        
+
         String stubInheritMobsBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, biomeConfigStub.getLoadInstructions().getBiomeTemplate().defaultInheritMobsBiomeName);
-        
+
         if(stubInheritMobsBiomeName != null && stubInheritMobsBiomeName.length() > 0)
         {
             String[] inheritMobsBiomeNames = stubInheritMobsBiomeName.split(",");
@@ -386,7 +386,7 @@ public final class ServerConfigProvider implements ConfigProvider
 	                biomeConfigStub.inheritMobsBiomeNameProcessed = true;
 	                return;
 	            }
-	            
+
 		        // This biome inherits mobs from another biome
 		        BiomeConfigStub inheritMobsBiomeConfig = biomeConfigStubs.get(inheritMobsBiomeName);
 		        if (inheritMobsBiomeConfig == null)
@@ -394,36 +394,36 @@ public final class ServerConfigProvider implements ConfigProvider
 		            OTG.log(LogMarker.WARN, "The biome {} tried to inherit mobs from the biome {}, but that biome doesn't exist.", new Object[] { biomeConfigStub.getFile().getName(), inheritMobsBiomeName});
 		            continue;
 		        }
-		        
+
 		        // Check for too much recursion
 		        if (currentDepth > MAX_INHERITANCE_DEPTH)
 		        {
 		            OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getFile().getName(), inheritMobsBiomeConfig.getFile().getName()});
 		        }
-		        
+
 		        // BiomeConfigStubs is unique per world so if there is a duplicate biome name it must be a TC biome with the same name as a vanilla biome
 		        if(inheritMobsBiomeConfig == biomeConfigStub)
 		        {
 		        	// Get the mobs that spawn in this vanilla biome (this will also inherit any mobs added to vanilla biomes by mods when MC started).
 		        	world.mergeVanillaBiomeMobSpawnSettings(biomeConfigStub);
-		        	
+
 			        continue;
 		        }
-		        
+
 		        if (!inheritMobsBiomeConfig.inheritMobsBiomeNameProcessed)
 		        {
 		            // This biome has not been processed yet, do that first
 		            processMobInheritance(biomeConfigStubs, inheritMobsBiomeConfig, currentDepth + 1);
 		        }
-		
+
 		        // Merge the two
 		        biomeConfigStub.mergeMobs(inheritMobsBiomeConfig);
 	        }
-	        
+
 	        // Done
 	        biomeConfigStub.inheritMobsBiomeNameProcessed = true;
         }
-    }    
+    }
 
     private String correctOldBiomeConfigFolder(File settingsDir)
     {

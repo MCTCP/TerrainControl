@@ -36,7 +36,6 @@ import com.pg85.otg.generator.resource.WellGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.Rotation;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -61,7 +61,11 @@ public class WorldStandardValues extends Settings
     		DIMENSIONABOVE = stringSetting("DimensionAbove", ""),
 
 			welcomeMessage = stringSetting("WelcomeMessage", ""),
-			departMessage = stringSetting("DepartMessage", "")
+			departMessage = stringSetting("DepartMessage", ""),
+			ITEMS_TO_ADD_ON_JOIN_DIMENSION = stringSetting("ItemsToAddOnJoinDimension", ""),
+			ITEMS_TO_REMOVE_ON_JOIN_DIMENSION = stringSetting("ItemsToRemoveOnJoinDimension", ""),
+			ITEMS_TO_ADD_ON_LEAVE_DIMENSION = stringSetting("ItemsToAddOnLeaveDimension", ""),
+			ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION = stringSetting("ItemsToRemoveOnLeaveDimension", "")
     		;
 
     public static final Setting<Integer>
@@ -113,7 +117,14 @@ public class WorldStandardValues extends Settings
 			cloudHeight = intSetting("CloudHeight", 128, 0, 999999),
 
     		DIMENSIONBELOWHEIGHT = intSetting("DimensionBelowHeight", 0, -999999, 999999),
-    		DIMENSIONABOVEHEIGHT = intSetting("DimensionAboveHeight", 256, -999999, 999999)
+    		DIMENSIONABOVEHEIGHT = intSetting("DimensionAboveHeight", 256, -999999, 999999),
+
+			RESPAWN_DIMENSION = intSetting("RespawnDimension", 0, -999999, 999999),
+			MOVEMENT_FACTOR = intSetting("MovementFactor", 1, 1, 999999),
+
+			SPAWN_POINT_X = intSetting("SpawnPointX", 0, 0, 999999),
+			SPAWN_POINT_Y = intSetting("SpawnPointY", 0, 0, 999999),
+			SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, 0, 999999)
             ;
 
     public static final Setting<Boolean>
@@ -172,7 +183,9 @@ public class WorldStandardValues extends Settings
 			shouldMapSpin = booleanSetting("ShouldMapSpin", false),
 			canDropChunk = booleanSetting("CanDropChunk", true),
 			useCustomFogColor = booleanSetting("UseCustomFogColor", false),
-			IS_OTG_PLUS = booleanSetting("IsOTGPlus", false)
+			IS_OTG_PLUS = booleanSetting("IsOTGPlus", false),
+
+	        SPAWN_POINT_SET = booleanSetting("SpawnPointSet", false)
             ;
 
     public static final Setting<LocalMaterialData>
@@ -195,8 +208,9 @@ public class WorldStandardValues extends Settings
                     "Mesa (Bryce)", "Mega Taiga Hills", "Mega Spruce Taiga Hills"),
             BORDER_BIOMES = stringListSetting("BorderBiomes",
                     "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
-            CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
-            DIMENSIONS = stringListSetting("Dimensions");
+        	CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
+    		DIMENSIONS = stringListSetting("Dimensions")
+			;
 
     public static final Setting<Double>
             OLD_BIOME_SIZE = doubleSetting("OldBiomeSize", 1.5, 0.1, 10),

@@ -392,13 +392,16 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 			}
 			this.mc.displayGuiScreen(new OTGGuiCreateWorld(new OTGGuiWorldSelection(null)));
 		}
-		else if(askModCompatContinue)
+		else if(GuiHandler.askModCompatContinue)
 		{
 			if(ok)
 			{
 				DeleteWorldFiles(GuiHandler.worldName);
+				PregeneratorUI.ResetIngameUI();
 				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
+				GuiHandler.askModCompatContinue = false;
 			} else {
+				GuiHandler.askModCompatContinue = false;
 				this.mc.displayGuiScreen(new OTGGuiCreateWorld(new OTGGuiWorldSelection(null)));
 			}
 		}
@@ -468,7 +471,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     {
     	askDeleteSettings = true;
     	selectingWorldName = false;
-    	askModCompatContinue = false;
+    	GuiHandler.askModCompatContinue = false;
 
         String s1 = "Delete the OpenTerrainGenerator world settings for '" + worldName + "'?";
         String s2 = "This will also delete any world (directory) named '" + worldName + "'";
@@ -478,12 +481,11 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         return guiyesno;
     }
 
-    boolean askModCompatContinue = false;
     public GuiYesNo askModCompatContinue(GuiYesNoCallback p_152129_0_, boolean customMobSpawnerEnabled, boolean biomesOPlentyEnabled)
     {
     	askDeleteSettings = false;
     	selectingWorldName = false;
-    	askModCompatContinue = true;
+    	GuiHandler.askModCompatContinue = true;
 
         String s1 = "Warning: " + (biomesOPlentyEnabled ? " Biomes o' plenty may cause crashes." : "") + (customMobSpawnerEnabled ? " CustomMobSpawner may break OTG mob spawning." : "");
         String s2 = "It is recommended that you disable or remove " + (customMobSpawnerEnabled && biomesOPlentyEnabled ? "these mods." : "this mod.");
@@ -699,6 +701,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 					this.mc.displayGuiScreen(guiyesno);
 				} else {
 					DeleteWorldFiles(GuiHandler.worldName);
+					PregeneratorUI.ResetIngameUI();
     				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
     			}
             }
@@ -737,7 +740,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
         	    	askDeleteSettings = false;
         	    	selectingWorldName = true;
-        	    	askModCompatContinue = false;
+        	    	GuiHandler.askModCompatContinue = false;
 
         	        FillAvailableWorlds();
         	        OTGGuiEnterWorldName guiRenameWorld = new OTGGuiEnterWorldName(this, GuiHandler.selectedWorldName);
@@ -750,7 +753,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
     	    	askDeleteSettings = false;
     	    	selectingWorldName = true;
-    	    	askModCompatContinue = false;
+    	    	GuiHandler.askModCompatContinue = false;
 
     	        FillAvailableWorlds();
     	        OTGGuiEnterWorldName guiRenameWorld = new OTGGuiEnterWorldName(this, "New World");

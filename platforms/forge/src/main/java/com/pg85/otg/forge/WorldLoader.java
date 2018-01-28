@@ -16,6 +16,7 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
@@ -145,6 +146,11 @@ public final class WorldLoader
 
     public ForgeWorld getWorld(String name)
     {
+    	if(name.equals("overworld"))
+    	{
+    		return ((ForgeEngine)OTG.getEngine()).getOverWorld();
+    	}
+
     	ForgeWorld forgeWorld = null;
         synchronized(this.worlds)
         {
@@ -368,7 +374,7 @@ public final class WorldLoader
     private void applyWorldCreationMenuSettings(ServerConfigProvider config)
     {
         // If this is a new world use the pre-generator and world border settings from world creation menu
-    	if(GuiHandler.lastGuiOpened.equals(OTGGuiCreateWorld.class))
+    	if(GuiHandler.lastGuiOpened.equals(OTGGuiCreateWorld.class) || (GuiHandler.lastGuiOpened.equals(GuiYesNo.class) && GuiHandler.askModCompatContinue)) // GUIYesNo is used for mod warnings (custommobspawner, bop etc)
     	{
 			config.getWorldConfig().PreGenerationRadius = GuiHandler.PregenerationRadius;
 			config.getWorldConfig().WorldBorderRadius = GuiHandler.WorldBorderRadius;
@@ -611,13 +617,13 @@ public final class WorldLoader
 
     		if((i == 0 && overWorld == null) || !DimensionManager.isDimensionRegistered(dimensionId))
     		{
-	    		if(i != 0)
+    			if(i != 0)
 	    		{
 	    			OTGDimensionManager.registerDimension(dimensionId, DimensionType.register(worldName, "OTG", dimensionId, WorldProviderOTG.class, false));
 	    		}
 
-	            ForgeWorld world = new ForgeWorld(worldName, dimensionId == 0);
-	            world.clientDimensionId = dimensionId;
+    			ForgeWorld world = new ForgeWorld(worldName, dimensionId == 0);
+    			world.clientDimensionId = dimensionId;
 	            ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world, isSinglePlayer);
 	            world.provideClientConfigs(configs);
 	            synchronized(this.worlds)

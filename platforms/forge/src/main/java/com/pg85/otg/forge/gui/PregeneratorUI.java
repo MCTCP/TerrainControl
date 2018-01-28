@@ -26,7 +26,7 @@ public class PregeneratorUI
 			ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
 			for(LocalWorld world : OTG.getAllWorlds())
 			{
-				ForgeWorld forgeWorld = (ForgeWorld)world;			
+				ForgeWorld forgeWorld = (ForgeWorld)world;
 				Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();
 				if(pregenerator.getPregeneratorIsRunning() && pregenerator.preGeneratorProgressStatus != "Done")
 				{
@@ -34,38 +34,38 @@ public class PregeneratorUI
 					pregenerators.add(pregenerator);
 				}
 			}
-			
+
 	    	Minecraft mc = Minecraft.getMinecraft();
 	    	mc.gameSettings.showDebugInfo = false;
-	    	
+
 	    	if(isRunningAndNotDone)
 	    	{
 		    	FontRenderer fontRenderer = mc.fontRenderer;
-		    	
+
 		        GlStateManager.pushMatrix();
-		        
-		        List<String> list = new ArrayList<String>();       
-		        
+
+		        List<String> list = new ArrayList<String>();
+
 		        for(Pregenerator pregenerator : pregenerators)
-		        {		        
-			        list.add("Generating \"" + pregenerator.pregenerationWorld + "\" " + (pregenerator.progressScreenWorldSizeInBlocks > 0 ? "(" + pregenerator.progressScreenWorldSizeInBlocks + "x" + pregenerator.progressScreenWorldSizeInBlocks  + " blocks)" : ""));        
+		        {
+			        list.add("Generating \"" + pregenerator.pregenerationWorld + "\" " + (pregenerator.progressScreenWorldSizeInBlocks > 0 ? "(" + pregenerator.progressScreenWorldSizeInBlocks + "x" + pregenerator.progressScreenWorldSizeInBlocks  + " blocks)" : ""));
 					list.add("Progress: " + pregenerator.preGeneratorProgress + "%");
 					list.add("Chunks: " + pregenerator.preGeneratorProgressStatus);
 					list.add("Elapsed: " + pregenerator.progressScreenElapsedTime);
 					list.add("Estimated: " + pregenerator.progressScreenEstimatedTime);
 					list.add("---");
 		        }
-		        
+
 		        long i = Runtime.getRuntime().maxMemory();
 		        long j = Runtime.getRuntime().totalMemory();
 		        long k = Runtime.getRuntime().freeMemory();
 		        long l = j - k;
 		        list.add("Memory: " + Long.valueOf(BytesToMb(l)) + "/" +  Long.valueOf(BytesToMb(i)) + " MB");
-		
+
 		        for (int zi = 0; zi < list.size(); ++zi)
 		        {
 		            String s = (String)list.get(zi);
-		
+
 		            if (!Strings.isNullOrEmpty(s))
 		            {
 		                int zj = fontRenderer.FONT_HEIGHT;
@@ -78,15 +78,20 @@ public class PregeneratorUI
 		        GlStateManager.popMatrix();
 	    	}
 		}
-	}	
+	}
 
     private static long BytesToMb(long bytes)
     {
         return bytes / 1024L / 1024L;
     }
-	
+
+    public static void ResetIngameUI()
+    {
+    	menuOpen = true;
+    }
+
 	public static void ToggleIngameUI()
-	{ 
+	{
 		boolean isRunningAndNotDone = false;
 		ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
 		for(LocalWorld world : OTG.getAllWorlds())
@@ -99,7 +104,7 @@ public class PregeneratorUI
 				pregenerators.add(pregenerator);
 			}
 		}
-		
+
 		if(isRunningAndNotDone || menuOpen)
 		{
 			if(menuOpen)
@@ -108,7 +113,7 @@ public class PregeneratorUI
 				menuOpen = false;
 			}
 			else if(!Minecraft.getMinecraft().gameSettings.showDebugInfo)
-			{			
+			{
 				menuOpen = true;
 			}
 		}

@@ -49,7 +49,11 @@ public class OTGDimensionManager
 {
 	public static boolean isDimensionNameRegistered(String dimensionName)
 	{
-		for(int i = 2; i < Long.SIZE << 4; i++)
+		if(dimensionName.equals("overworld"))
+		{
+			return true;
+		}
+		for(int i = -1000; i < Long.SIZE << 4; i++) // -1000 For other mods that add dimensions with id's below zero, hopefully -1000 is enough..
 		{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
@@ -74,13 +78,18 @@ public class OTGDimensionManager
         FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "registerDimension", compound);
 	}
 
-    public static void unregisterDimension(int dimensionID)
+    public static void unregisterDimension(int dimensionId)
     {
-    	DimensionManager.unregisterDimension(dimensionID);
+    	if(dimensionId == 0)
+    	{
+    		return; // Never unregister the overworld
+    	}
+
+    	DimensionManager.unregisterDimension(dimensionId);
 
         NBTTagCompound compound = new NBTTagCompound();
 
-        compound.setInteger("dimensionID", dimensionID);
+        compound.setInteger("dimensionID", dimensionId);
         writeNBTStrings("types", null, compound); // TODO: Collection<String> types, what's supposed to be in there?
 
         FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "unregisterDimension", compound);
@@ -297,8 +306,12 @@ public class OTGDimensionManager
 
 		StringBuilder stringbuilder = new StringBuilder();
 
-		for(int i = 2; i < Long.SIZE << 4; i++)
+		for(int i = 0; i < Long.SIZE << 4; i++)
 		{
+			if(i == 1)
+			{
+				continue; // Ignore dim 1 (End)
+			}
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				DimensionType dimType = DimensionManager.getProviderType(i);
@@ -347,6 +360,7 @@ public class OTGDimensionManager
 	public static void UnloadAllCustomDimensionData()
 	{
 		dimensionsOrder = new HashMap<Integer,Integer>();
+		dimensionsOrder.put(0,0);
 
 		BitSet dimensionMap = null;
 		try
@@ -376,7 +390,7 @@ public class OTGDimensionManager
 			e.printStackTrace();
 		}
 
-		for(int i = 2; i < Long.SIZE << 4; i++)
+		for(int i = 2; i < Long.SIZE << 4; i++) // Ignore dim 0 (Overworld) and 1 (End)
 		{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
@@ -393,6 +407,11 @@ public class OTGDimensionManager
 
 	public static void UnloadCustomDimensionData(int dimId)
 	{
+		if(dimId == 0) // Never unregister dim 0 (overworld) from DimensionManager.dimensions
+		{
+			return;
+		}
+
 		dimensionsOrder.remove(dimId);
 
 		BitSet dimensionMap = null;
@@ -487,6 +506,7 @@ public class OTGDimensionManager
 
 		// Store the order in which dimensions were added
 		dimensionsOrder = new HashMap<Integer, Integer>();
+		dimensionsOrder.put(0,0);
 		HashMap<Integer, DimensionData> orderedDimensions = new HashMap<Integer, DimensionData>();
 		int highestOrder = 0;
 		for(DimensionData dimData : dimensionData)
@@ -567,7 +587,7 @@ public class OTGDimensionManager
 		}
 
 		oldDims = new Hashtable<Integer, Object>();
-		for(int i = 2; i < Long.SIZE << 4; i++)
+		for(int i = 2; i < Long.SIZE << 4; i++) // Ignore dim 0 (Overworld) and 1 (End)
 		{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
@@ -585,8 +605,13 @@ public class OTGDimensionManager
 	{
 		HashMap<Integer, String> otgDims = new HashMap<Integer, String>();
 
-		for(int i = 2; i < Long.SIZE << 4; i++)
+		for(int i = 0; i < Long.SIZE << 4; i++)
 		{
+			if(i == 1)
+			{
+				continue; // Ignore dim 1 (End)
+			}
+
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				DimensionType type = DimensionManager.getProviderType(i);

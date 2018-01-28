@@ -19,9 +19,9 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GuiHandler implements IGuiHandler
-{		
+{
 	// TODO: Remove static fields, use instance fields or pass as method parameters
-	public static String newWorldName = null;	
+	public static String newWorldName = null;
 	public static String worldName;
 	public static String selectedWorldName = null;
 	public static String seed = null;
@@ -31,12 +31,13 @@ public class GuiHandler implements IGuiHandler
     public static boolean bonusChest = false;;
     public static HashMap<String,WorldConfig> worlds = new HashMap<String, WorldConfig>();
     public static int pageNumber = 0;
-    
+
     public static int WorldBorderRadius = 0;
-    public static int PregenerationRadius = 0;   
-    
+    public static int PregenerationRadius = 0;
+
     public static Class<? extends GuiScreen> lastGuiOpened = null;
-    
+    public static boolean askModCompatContinue = false;
+
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void renderGameOverLay(RenderGameOverlayEvent.Post event)
@@ -46,7 +47,7 @@ public class GuiHandler implements IGuiHandler
     		PregeneratorUI.ShowInGameUI();
     	}
     }
-    
+
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void openGui(GuiOpenEvent event)
@@ -64,11 +65,11 @@ public class GuiHandler implements IGuiHandler
         	lastGuiOpened = event.getGui().getClass();
         }
     }
-    
+
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void closeGui(GuiOpenEvent event) { }
-    
+
     public void registerKeybindings() {}
 
 	@Override

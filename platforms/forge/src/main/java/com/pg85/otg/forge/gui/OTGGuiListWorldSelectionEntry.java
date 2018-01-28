@@ -307,6 +307,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         {
             try
             {
+            	PregeneratorUI.ResetIngameUI();
                 client.launchIntegratedServer(comparator.getFileName(), comparator.getDisplayName(), null);
             }
             catch (StartupQuery.AbortedException e)

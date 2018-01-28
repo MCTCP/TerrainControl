@@ -11,6 +11,7 @@ import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.client.events.ClientNetworkEventListener;
 import com.pg85.otg.forge.client.events.ClientTickHandler;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.dimensions.WorldProviderOTG;
 import com.pg85.otg.forge.events.*;
 import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
@@ -25,6 +26,7 @@ import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
@@ -171,6 +173,9 @@ public class OTGPlugin
 
         // Fix lava as light source not working when spawning lava as resource
         Blocks.LAVA.setLightOpacity(255);
+
+        DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
+        DimensionType.OVERWORLD.suffix = "OTG";
     }
 
     // TODO: Document why this is necessary <- Used to fill the biome registry when a client connects and has received the biomes packet?

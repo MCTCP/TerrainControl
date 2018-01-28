@@ -40,6 +40,31 @@ public class PlayerTracker
 		}
     }
 
+    /*
+    @SubscribeEvent
+    public void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event)
+    {
+    	if(event.player.world.provider instanceof WorldProviderOTG && ((WorldProviderOTG)event.player.world.provider).getWelcomeMessage() != null && ((WorldProviderOTG)event.player.world.provider).getWelcomeMessage().trim().length() > 0)
+    	{
+    		event.player.sendMessage(new TextComponentString(((WorldProviderOTG)event.player.world.provider).getWelcomeMessage()));
+    	}
+    }
+
+    @SubscribeEvent
+    public void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event)
+    {
+    	ForgeWorld fromDim = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(event.fromDim);
+    	if(fromDim != null && event.player.world.provider instanceof WorldProviderOTG && ((WorldProviderOTG)event.player.world.provider).getDepartMessage() != null && ((WorldProviderOTG)event.player.world.provider).getDepartMessage().trim().length() > 0)
+    	{
+    		event.player.sendMessage(new TextComponentString(((WorldProviderOTG)fromDim.getWorld().provider).getDepartMessage()));
+    	}
+    	if(event.player.world.provider instanceof WorldProviderOTG && ((WorldProviderOTG)event.player.world.provider).getWelcomeMessage() != null && ((WorldProviderOTG)event.player.world.provider).getWelcomeMessage().trim().length() > 0)
+    	{
+    		event.player.sendMessage(new TextComponentString(((WorldProviderOTG)event.player.world.provider).getWelcomeMessage()));
+    	}
+    }
+    */
+
     // Used when creating / deleting dimensions
     public static void SendAllWorldAndBiomeConfigsToAllPlayers(MinecraftServer server)
     {
