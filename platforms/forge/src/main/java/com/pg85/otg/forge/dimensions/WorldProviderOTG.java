@@ -737,10 +737,6 @@ public class WorldProviderOTG extends WorldProvider
         {
         	amountRemoved += clearMatchingItemsEnderChest(entityplayer.getInventoryEnderChest(), item, meta, amount, nbtTagCompound);
         }
-        if(amount == -1 || amountRemoved < amount)
-        {
-
-        }
     }
 
     public int clearMatchingItems(InventoryPlayer _this, @Nullable Item itemIn, int metadataIn, int removeCount, @Nullable NBTTagCompound itemNBT)
@@ -872,6 +868,39 @@ public class WorldProviderOTG extends WorldProvider
         for (int j = 0; j < inventory.getSizeInventory(); ++j)
         {
             ItemStack itemstack = inventory.getStackInSlot(j);
+
+            if(itemstack.getItem() instanceof ItemShulkerBox)
+            {
+            	if(itemstack.getTagCompound() != null && itemstack.getTagCompound().getCompoundTag("BlockEntityTag") != null)
+            	{
+	        		NBTTagCompound BlockEntityTag = itemstack.getTagCompound().getCompoundTag("BlockEntityTag");
+	        		NBTTagList itemsTag = BlockEntityTag.getTagList("Items", 10);
+	        		if(itemsTag != null)
+	        		{
+		        		for(int l = 0; l < itemsTag.tagCount(); l++)
+		        		{
+		        			NBTTagCompound item = itemsTag.getCompoundTagAt(l);
+		        			String id = item.getString("id");
+		        			int count = itemstack.getCount();
+		        			NBTTagCompound nbtTag = item.getCompoundTag("tag");
+		        			if(
+								id.equals(itemIn.getRegistryName().toString()) &&
+								nbtTag.equals(itemNBT)
+							)
+		        			{
+		        				if(count - removeCount <= 0)
+		        				{
+		        					itemsTag.removeTag(l);
+		        					i += count;
+		        				} else {
+		        					itemstack.setCount(count - removeCount);
+		        					return removeCount;
+	        					}
+		        			}
+		        		}
+	        		}
+            	}
+            }
 
             if (!itemstack.isEmpty() && (itemIn == null || itemstack.getItem() == itemIn) && (metadataIn <= -1 || itemstack.getMetadata() == metadataIn) && (itemNBT == null || NBTUtil.areNBTEquals(itemNBT, itemstack.getTagCompound(), true)))
             {
