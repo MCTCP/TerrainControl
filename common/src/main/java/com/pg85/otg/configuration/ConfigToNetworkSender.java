@@ -1,6 +1,7 @@
 package com.pg85.otg.configuration;
 
 import com.pg85.otg.LocalBiome;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -124,6 +125,12 @@ public final class ConfigToNetworkSender
 		stream.writeInt(worldConfig.spawnPointY); // "Use this with SpawnPointSet: true to set a spawn coordinate.
 
 		stream.writeInt(worldConfig.spawnPointZ); // "Use this with SpawnPointSet: true to set a spawn coordinate.
+
+		stream.writeBoolean(worldConfig.playersCanBreakBlocks);  // When set to false players cannot break blocks in this world. Defaults to: true
+
+		stream.writeBoolean(worldConfig.explosionsCanBreakBlocks);  // When set to false explosions cannot break blocks in this world. Defaults to: true
+
+		stream.writeBoolean(worldConfig.playersCanPlaceBlocks); // When set to false players cannot place blocks in this world. Defaults to: true
 
         // Fetch all non-virtual biomes
         Collection<LocalBiome> nonVirtualBiomes = new ArrayList<LocalBiome>();

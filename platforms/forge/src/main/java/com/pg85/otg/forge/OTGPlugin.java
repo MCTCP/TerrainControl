@@ -114,6 +114,9 @@ public class OTGPlugin
         // Register player tracker, for sending configs.
         MinecraftForge.EVENT_BUS.register(new PlayerTracker());
 
+        // Register block tracker, for block protect
+        MinecraftForge.EVENT_BUS.register(new BlockTracker());
+
         // Register sapling tracker, for custom tree growth.
         SaplingListener saplingListener = new SaplingListener();
         MinecraftForge.TERRAIN_GEN_BUS.register(saplingListener);

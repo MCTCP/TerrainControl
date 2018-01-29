@@ -185,7 +185,10 @@ public class WorldStandardValues extends Settings
 			useCustomFogColor = booleanSetting("UseCustomFogColor", false),
 			IS_OTG_PLUS = booleanSetting("IsOTGPlus", false),
 
-	        SPAWN_POINT_SET = booleanSetting("SpawnPointSet", false)
+	        SPAWN_POINT_SET = booleanSetting("SpawnPointSet", false),
+	        PLAYERS_CAN_BREAK_BLOCKS = booleanSetting("PlayersCanBreakBlocks", true),
+	        EXPLOSIONS_CAN_BREAK_BLOCKS = booleanSetting("ExplosionsCanBreakBlocks", true),
+	        PLAYERS_CAN_PLACE_BLOCKS = booleanSetting("PlayersCanPlaceBlocks", true)
             ;
 
     public static final Setting<LocalMaterialData>
