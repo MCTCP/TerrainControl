@@ -91,6 +91,6 @@ public class Report extends RuntimeException
     public Report at(String name, LocalWorld world, int x, int y, int z)
     {
         String worldName = world == null ? "unknown (NULL) world" : world.getName();
-        return with("location of " + name, "(" + worldName + ") " + x + "," + y + "," + z);
+        return with("location of " + name, "(" + worldName + ") " + x + ", " + y + ", " + z);
     }
 }
