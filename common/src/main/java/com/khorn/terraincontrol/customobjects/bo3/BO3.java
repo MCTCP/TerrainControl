@@ -11,6 +11,7 @@ import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.OutsideSourceBlock
 import com.khorn.terraincontrol.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.khorn.terraincontrol.util.BoundingBox;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.Report;
 import com.khorn.terraincontrol.util.Rotation;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.helpers.RandomHelper;
@@ -175,23 +176,30 @@ public class BO3 implements CustomObject
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        BO3PlaceableFunction[] blocks = settings.blocks[rotation.getRotationId()];
-        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
-        // Spawn
-
-        for (BO3PlaceableFunction block : blocks)
+        try
         {
-            if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway || settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z)))
+            BO3PlaceableFunction[] blocks = settings.blocks[rotation.getRotationId()];
+            ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
+
+            // Spawn
+            for (BO3PlaceableFunction block : blocks)
             {
-                block.spawn(world, random, x + block.x, y + block.y, z + block.z);
+                if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway || settings.sourceBlocks.contains(
+                        world.getMaterial(x + block.x, y + block.y, z + block.z)))
+                {
+                    block.spawn(world, random, x + block.x, y + block.y, z + block.z);
+                }
+                if (block instanceof BlockFunction)
+                {
+                    oeh.addBlock((BlockFunction) block);
+                }
             }
-            if (block instanceof BlockFunction)
-            {
-                oeh.addBlock((BlockFunction) block);
-            }
+            oeh.extrude(world, random, x, y, z);
+            return true;
+        } catch (Throwable t)
+        {
+            throw Report.of(t).with("bo3", this.getName()).at("bo3 origin", world, x, y, z);
         }
-        oeh.extrude(world, random, x, y, z);
-        return true;
     }
 
     protected boolean spawn(LocalWorld world, Random random, int x, int z)
@@ -283,7 +291,7 @@ public class BO3 implements CustomObject
             int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
             return new CustomObjectCoordinate(
                     this, rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16)
-            );
+                    );
         }
         return null;
     }

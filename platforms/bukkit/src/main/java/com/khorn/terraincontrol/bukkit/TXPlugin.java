@@ -61,7 +61,6 @@ public class TXPlugin extends JavaPlugin
     @Override
     public void onEnable()
     {
-
         TerrainControl.setEngine(new BukkitEngine(this));
         if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
         {

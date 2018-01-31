@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
+import com.khorn.terraincontrol.util.Report;
 import com.khorn.terraincontrol.util.helpers.MathHelper;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
 
@@ -31,16 +32,22 @@ public class FrozenSurfaceHelper
      */
     protected void freezeChunk(ChunkCoordinate chunkCoord)
     {
-        int x = chunkCoord.getBlockXCenter();
-        int z = chunkCoord.getBlockZCenter();
-        for (int i = 0; i < ChunkCoordinate.CHUNK_X_SIZE; i++)
+        try
         {
-            for (int j = 0; j < ChunkCoordinate.CHUNK_Z_SIZE; j++)
+            int x = chunkCoord.getBlockXCenter();
+            int z = chunkCoord.getBlockZCenter();
+            for (int i = 0; i < ChunkCoordinate.CHUNK_X_SIZE; i++)
             {
-                int blockToFreezeX = x + i;
-                int blockToFreezeZ = z + j;
-                freezeColumn(blockToFreezeX, blockToFreezeZ);
+                for (int j = 0; j < ChunkCoordinate.CHUNK_Z_SIZE; j++)
+                {
+                    int blockToFreezeX = x + i;
+                    int blockToFreezeZ = z + j;
+                    freezeColumn(blockToFreezeX, blockToFreezeZ);
+                }
             }
+        } catch (Throwable t)
+        {
+            throw Report.of(t).with("freezing chunk", chunkCoord.toString());
         }
     }
 
