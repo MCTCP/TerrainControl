@@ -5,6 +5,7 @@ import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
+import com.khorn.terraincontrol.forge.feature.RandomPlantStateGenerator;
 import com.khorn.terraincontrol.forge.generator.TXBiome;
 import com.khorn.terraincontrol.forge.generator.TXChunkGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.*;
@@ -94,6 +95,7 @@ public class ForgeWorld implements LocalWorld
     private WorldGenTaiga2 taigaTree2;
 
     private Chunk[] chunkCache;
+    private Random random = new Random();
 
     public ForgeWorld(String _name)
     {
@@ -467,16 +469,14 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material)
-    {
+    public void setBlock(int x, int y, int z, LocalMaterialData material) {
         /*
          * This method usually breaks on every Minecraft update. Always check
          * whether the names are still correct. Often, you'll also need to
          * rewrite parts of this method for newer block place logic.
          */
 
-        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT)
-        {
+        if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT) {
             return;
         }
 
@@ -485,13 +485,35 @@ public class ForgeWorld implements LocalWorld
         // Get chunk from (faster) custom cache
         Chunk chunk = this.getChunk(x, y, z);
 
-        if (chunk == null)
-        {
+        if (chunk == null) {
             // Chunk is unloaded
             return;
         }
 
+
         BlockPos pos = new BlockPos(x, y, z);
+
+        // Start Almura Hack for Crop/Flower Population
+        Block block = newState.getBlock();
+
+        if (block == Blocks.TALLGRASS) {
+            if (world.getBiome(pos).getTemperature() <= 0.05) { // Snow
+                if (random.nextInt(25) + 1 == 1) {
+                    newState = RandomPlantStateGenerator.randomIceFlower(world, pos, random);
+                }
+            }
+
+            if (world.getBiome(pos).getTemperature() >= 0.5 && world.getBiome(pos).getTemperature() <= 0.95) { // Normal
+                final int chance = random.nextInt(75) + 1; // Random between 1 and 11
+
+                if (chance == 1) {
+                    newState = RandomPlantStateGenerator.randomCrop(world, pos, random);
+                } else if (chance == 2) {
+                    newState = RandomPlantStateGenerator.randomFlower(world, pos, random);
+                }
+            }
+        }
+        // End Almura Hack
 
         IBlockState oldState = this.world.getBlockState(pos);
         int oldLight = oldState.getLightValue(this.world, pos);
