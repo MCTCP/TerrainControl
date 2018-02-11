@@ -153,6 +153,9 @@ public class OTGDimensionManager
 
 		((ForgeEngine)OTG.getEngine()).getWorldLoader().RemoveUnloadedWorld(world.getName());
 
+		// Client side only
+		((ForgeEngine)OTG.getEngine()).getWorldLoader().RemoveLoadedWorld(world.getName());
+
 		OTGDimensionManager.UnloadCustomDimensionData(dimToRemove);
 
 		world.DeleteWorldSessionData();

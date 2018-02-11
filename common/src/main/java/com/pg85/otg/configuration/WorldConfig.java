@@ -308,6 +308,7 @@ public class WorldConfig extends ConfigFile
     public String itemsToRemoveOnJoinDimension; // The opposite of the /give command, removes items from players inventories when they enter a dimension/world.
     public String itemsToAddOnLeaveDimension; // Similar to the /give command, gives players items when they leave a dimension/world.
     public String itemsToRemoveOnLeaveDimension; // The opposite of the /give command, removes items from players inventories when they leave a dimension/world.
+    public String itemsToAddOnRespawn; // Similar to the /give command, gives players items when they respawn in a dimension/world.
 
     public boolean spawnPointSet;
     public int spawnPointX;
@@ -768,6 +769,8 @@ public class WorldConfig extends ConfigFile
         this.itemsToAddOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION); // Similar to the /give command, gives players items when they leave a dimension/world.
 
         this.itemsToRemoveOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION); // The opposite of the /give command, removes items from players inventories when they leave a dimension/world.
+
+        this.itemsToAddOnRespawn = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN); // Similar to the /give command, gives players items when they respawn in a dimension/world.
 
         this.spawnPointSet = reader.getSetting(WorldStandardValues.SPAWN_POINT_SET);
         this.spawnPointX = reader.getSetting(WorldStandardValues.SPAWN_POINT_X);
@@ -1457,19 +1460,28 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION, this.itemsToAddOnJoinDimension,
         		"Similar to the /give command, gives players items when they enter a dimension/world.",
         		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+        		"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION, this.itemsToRemoveOnJoinDimension,
         		"The opposite of the /give command, removes items from players inventories when they enter a dimension/world.",
         		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+        		"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION, this.itemsToAddOnLeaveDimension,
         		"Similar to the /give command, gives players items when they leave a dimension/world.",
         		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+    			"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION, this.itemsToRemoveOnLeaveDimension,
         		"The opposite of the /give command, removes items from players inventories when they leave a dimension/world.",
         		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]");
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+    			"Use -1 as amount to remove all matching items.");
+        writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN, this.itemsToAddOnRespawn,
+        		"Similar to the /give command, gives players items when they respawn in a dimension/world.",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+    			"Use -1 as amount to remove all matching items.");
 
 		writer.putSetting(WorldStandardValues.SPAWN_POINT_SET, this.spawnPointSet,
 				"Set this to true to set the server spawn point to SpawnPointX, SpawnPointY, SpawnPointZ");

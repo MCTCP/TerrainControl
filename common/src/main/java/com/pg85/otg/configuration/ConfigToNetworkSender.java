@@ -118,6 +118,8 @@ public final class ConfigToNetworkSender
 
 		ConfigFile.writeStringToStream(stream, worldConfig.itemsToRemoveOnLeaveDimension); // The opposite of the /give command, removes items from players inventories when they leave a dimension/world.
 
+		ConfigFile.writeStringToStream(stream, worldConfig.itemsToAddOnRespawn); // Similar to the /give command, gives players items when they respawn in a dimension/world.
+
 		stream.writeBoolean(worldConfig.spawnPointSet); // Set this to true to set the server spawn point to SpawnPointX, SpawnPointY, SpawnPointZ
 
 		stream.writeInt(worldConfig.spawnPointX); // Use this with SpawnPointSet: true to set a spawn coordinate.

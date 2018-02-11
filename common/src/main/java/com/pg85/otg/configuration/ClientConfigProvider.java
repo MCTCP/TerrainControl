@@ -118,6 +118,8 @@ public final class ClientConfigProvider implements ConfigProvider
 
         worldSettingsReader.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION, ConfigFile.readStringFromStream(stream)); // The opposite of the /give command, removes items from players inventories when they leave a dimension/world.
 
+        worldSettingsReader.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN, ConfigFile.readStringFromStream(stream)); // Similar to the /give command, gives players items when they respawn in a dimension/world.
+
         worldSettingsReader.putSetting(WorldStandardValues.SPAWN_POINT_SET, stream.readBoolean());
 
         worldSettingsReader.putSetting(WorldStandardValues.SPAWN_POINT_X, stream.readInt());
@@ -125,6 +127,12 @@ public final class ClientConfigProvider implements ConfigProvider
         worldSettingsReader.putSetting(WorldStandardValues.SPAWN_POINT_Y, stream.readInt());
 
         worldSettingsReader.putSetting(WorldStandardValues.SPAWN_POINT_Z, stream.readInt());
+
+        worldSettingsReader.putSetting(WorldStandardValues.PLAYERS_CAN_BREAK_BLOCKS, stream.readBoolean());
+
+        worldSettingsReader.putSetting(WorldStandardValues.EXPLOSIONS_CAN_BREAK_BLOCKS, stream.readBoolean());
+
+        worldSettingsReader.putSetting(WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS, stream.readBoolean());
 
         worldConfig = new WorldConfig(new File("."), worldSettingsReader, world);
 

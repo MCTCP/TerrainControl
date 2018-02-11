@@ -112,10 +112,27 @@ public final class WorldLoader
     	synchronized(unloadedWorlds)
     	{
     		ForgeWorld forgeWorld = unloadedWorlds.get(worldName);
-    		forgeWorld.DeleteWorldSessionData();
-    		unloadedWorlds.remove(worldName);
+    		if(forgeWorld != null)
+    		{
+	    		forgeWorld.DeleteWorldSessionData();
+	    		unloadedWorlds.remove(worldName);
+    		}
     	}
     }
+
+    public void RemoveLoadedWorld(String worldName)
+    {
+    	synchronized(worlds)
+    	{
+    		ForgeWorld forgeWorld = worlds.get(worldName);
+    		if(forgeWorld != null)
+    		{
+	    		forgeWorld.DeleteWorldSessionData();
+	    		worlds.remove(worldName);
+    		}
+    	}
+    }
+
 
     WorldLoader(File configsDir)
     {
@@ -146,6 +163,10 @@ public final class WorldLoader
 
     public ForgeWorld getWorld(String name)
     {
+    	if(name == null)
+    	{
+    		return null;
+    	}
     	if(name.equals("overworld"))
     	{
     		return ((ForgeEngine)OTG.getEngine()).getOverWorld();

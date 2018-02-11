@@ -65,7 +65,8 @@ public class WorldStandardValues extends Settings
 			ITEMS_TO_ADD_ON_JOIN_DIMENSION = stringSetting("ItemsToAddOnJoinDimension", ""),
 			ITEMS_TO_REMOVE_ON_JOIN_DIMENSION = stringSetting("ItemsToRemoveOnJoinDimension", ""),
 			ITEMS_TO_ADD_ON_LEAVE_DIMENSION = stringSetting("ItemsToAddOnLeaveDimension", ""),
-			ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION = stringSetting("ItemsToRemoveOnLeaveDimension", "")
+			ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION = stringSetting("ItemsToRemoveOnLeaveDimension", ""),
+			ITEMS_TO_ADD_ON_RESPAWN = stringSetting("ItemsToAddOnRespawn", "")
     		;
 
     public static final Setting<Integer>
