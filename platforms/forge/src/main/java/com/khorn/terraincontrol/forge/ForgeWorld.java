@@ -496,23 +496,31 @@ public class ForgeWorld implements LocalWorld
         // Start Almura Hack for Crop/Flower Population
         Block block = newState.getBlock();
 
+        IBlockState toReplaceState = null;
         if (block == Blocks.TALLGRASS) {
-            if (world.getBiome(pos).getTemperature() <= 0.05) { // Snow
+            final float temperature = this.getBiome(pos.getX(), pos.getZ()).getTemperatureAt(pos.getX(), pos.getY(), pos.getZ());
+
+            if (temperature <= 0.05) { // Snow
                 if (random.nextInt(25) + 1 == 1) {
-                    newState = RandomPlantStateGenerator.randomIceFlower(world, pos, random);
+                    toReplaceState = RandomPlantStateGenerator.randomIceFlower(world, pos, random);
                 }
             }
 
-            if (world.getBiome(pos).getTemperature() >= 0.5 && world.getBiome(pos).getTemperature() <= 0.95) { // Normal
+            if (temperature >= 0.5 && temperature <= 0.95) { // Normal
                 final int chance = random.nextInt(75) + 1; // Random between 1 and 11
 
                 if (chance == 1) {
-                    newState = RandomPlantStateGenerator.randomCrop(world, pos, random);
+                    toReplaceState = RandomPlantStateGenerator.randomCrop(world, pos, random);
                 } else if (chance == 2) {
-                    newState = RandomPlantStateGenerator.randomFlower(world, pos, random);
+                    toReplaceState = RandomPlantStateGenerator.randomFlower(world, pos, random);
                 }
             }
         }
+
+        if (toReplaceState != null) {
+            newState = toReplaceState;
+        }
+
         // End Almura Hack
 
         IBlockState oldState = this.world.getBlockState(pos);
