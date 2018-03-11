@@ -43,6 +43,7 @@ import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -60,11 +61,9 @@ public class ForgeWorld implements LocalWorld
     private BiomeGenerator biomeGenerator;
 
     private static int nextBiomeId = 0;
-
-    private static final int MAX_BIOMES_COUNT = 1024;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
-    private HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
+    public HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
     public TXMansionGen mansionGen;
     public TXStrongholdGen strongholdGen;
@@ -97,7 +96,7 @@ public class ForgeWorld implements LocalWorld
     private Chunk[] chunkCache;
     private Random random = new Random();
 
-    public ForgeWorld(String _name)
+    ForgeWorld(String _name)
     {
         this.name = _name;
         nextBiomeId = DefaultBiome.values().length;
@@ -106,34 +105,17 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        int savedId = biomeIds.getSavedId();
-        Biome biome = Biome.getBiome(savedId);
-        if (biome == null || biomeIds.isVirtual())
-        {
-            biome = TXBiome.getOrCreateBiome(biomeConfig, biomeIds);
-            int requestedGenerationId = biomeIds.getGenerationId();
-            int allocatedGenerationId = Biome.REGISTRY.underlyingIntegerMap.getId(biome);
-            if (requestedGenerationId != allocatedGenerationId && !biomeConfig.defaultSettings.isCustomBiome)
-            {
-                if (requestedGenerationId < 256 && allocatedGenerationId >= 256)
-                {
-                    throw new RuntimeException("Could not allocate the requested id " + requestedGenerationId + " for biome " + biomeConfig.getName() + ". All available id's under 256 have been allocated.\n"
-                        + "To proceed, adjust your WorldConfig or use the ReplaceToBiomeName feature to make the biome virtual.");
-                }
-                TerrainControl.log(LogMarker.INFO, "Asked to register {} with id {}, but succeeded with id {}",
-                        biomeConfig.getName(), requestedGenerationId, allocatedGenerationId);
-            }
-        }
+        final Biome biome = TXBiome.getOrCreateBiome(biomeConfig, biomeIds);
 
-        ForgeBiome forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
-        this.biomeNames.put(biome.biomeName, forgeBiome);
+        final ForgeBiome forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
+        this.biomeNames.put(forgeBiome.getName(), forgeBiome);
         return forgeBiome;
     }
 
     @Override
     public int getMaxBiomesCount()
     {
-        return MAX_BIOMES_COUNT;
+        return TerrainControl.MAX_BIOME_ID;
     }
 
     @Override
@@ -876,23 +858,6 @@ public class ForgeWorld implements LocalWorld
         ChunkProviderServer chunkProviderServer = (ChunkProviderServer) this.world.getChunkProvider();
         long i = ChunkPos.asLong(chunkX, chunkZ);
         return chunkProviderServer.id2ChunkMap.get(i);
-    }
-
-    /**
-     * "Evil" method that forces Forge to reuse the biome ids that we used. On
-     * singleplayer this is required to be able to properly load another world
-     * with custom biomes.
-     */
-    @SideOnly(Side.CLIENT)
-    public void unload() {
-        final BitSet biomeAvailabilityMap = ((ForgeEngine) TerrainControl.getEngine()).getBiomeAvailabilityMap();
-        for (LocalBiome biome : this.biomeNames.values()) {
-            final ForgeBiome forgeBiome = (ForgeBiome) biome;
-            final int savedId = forgeBiome.getIds().getSavedId();
-            if (forgeBiome.isCustom() && !forgeBiome.getIds().isVirtual()) {
-                biomeAvailabilityMap.clear(savedId);
-            }
-        }
     }
 
     private Entity createEntity(ResourceLocation entityResource, NBTTagCompound optionalMeta)

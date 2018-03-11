@@ -42,7 +42,7 @@ public class BukkitWorld implements LocalWorld
 
     private static int nextBiomeId = DefaultBiome.values().length;
 
-    private static final int MAX_BIOMES_COUNT = 1024;
+    private static final int MAX_BIOMES_COUNT = TerrainControl.MAX_BIOME_ID;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
     private final Map<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();

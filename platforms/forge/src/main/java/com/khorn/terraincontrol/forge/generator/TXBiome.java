@@ -7,6 +7,7 @@ import com.khorn.terraincontrol.configuration.WeightedMobSpawnGroup;
 import com.khorn.terraincontrol.configuration.standard.PluginStandardValues;
 import com.khorn.terraincontrol.configuration.standard.WorldStandardValues;
 import com.khorn.terraincontrol.forge.ForgeEngine;
+import com.khorn.terraincontrol.forge.asm.mixin.iface.IMixinForgeRegistry;
 import com.khorn.terraincontrol.forge.util.MobSpawnGroupHelper;
 import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.helpers.StringHelper;
@@ -14,6 +15,8 @@ import com.khorn.terraincontrol.util.helpers.StringHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
 
 import java.util.List;
 
@@ -22,17 +25,14 @@ import java.util.List;
  */
 public class TXBiome extends Biome
 {
-
-    public static final int MAX_TC_BIOME_ID = 1023;
-
     private int skyColor;
 
-    public final int generationId;
+    public final BiomeIds id;
 
     private TXBiome(BiomeConfig config, BiomeIds id)
     {
         super(new BiomePropertiesCustom(config));
-        this.generationId = id.getGenerationId();
+        this.id = id;
 
         this.skyColor = config.skyColor;
 
@@ -76,77 +76,85 @@ public class TXBiome extends Biome
 
     public static Biome getOrCreateBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        // This is a custom biome, get or register it
-        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
-        ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), biomeNameForRegistry);
+        final String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
+        final ResourceLocation registryKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), biomeNameForRegistry);
 
-        // Check if registered earlier
-        Biome alreadyRegisteredBiome = Biome.REGISTRY.registryObjects.get(registryKey);
-        if (alreadyRegisteredBiome != null)
-        {
+        final int generationBiomeId = biomeIds.getGenerationId();
+        final int savedBiomeId = biomeIds.getSavedId();
+
+        Biome alreadyRegisteredBiome = Biome.getBiome(generationBiomeId);
+        if (alreadyRegisteredBiome != null) {
+            if (!StringHelper.toComputerFriendlyName(alreadyRegisteredBiome.biomeName).equalsIgnoreCase(biomeNameForRegistry)) {
+                throw new RuntimeException("Attempt was made to register biome '" + registryKey + "' with id '" + generationBiomeId + "' but this "
+                        + "has already been registered to '" + alreadyRegisteredBiome.getRegistryName() + "'!");
+            }
+
             return alreadyRegisteredBiome;
         }
 
-        // No existing biome, create new one
-        TXBiome customBiome = new TXBiome(biomeConfig, biomeIds);
-        int savedBiomeId = biomeIds.getSavedId();
-        ForgeEngine forgeEngine = ((ForgeEngine) TerrainControl.getEngine());
+        final ForgeRegistry<Biome> registry = (ForgeRegistry<Biome>) ForgeRegistries.BIOMES;
 
-        // We need to init array size because Mojang uses a strange custom
-        // ArrayList. RegistryID arrays are not correctly (but randomly!) copied
-        // when resized which will cause the ReplaceToBiomeName feature not to
-        // work properly.
-        if (Biome.REGISTRY.underlyingIntegerMap.get(MAX_TC_BIOME_ID) == null)
+        alreadyRegisteredBiome = registry.getValue(registryKey);
+        if (alreadyRegisteredBiome != null)
         {
-            ResourceLocation maxTcBiomeKey = new ResourceLocation(PluginStandardValues.PLUGIN_NAME.toLowerCase(), "null");
-            TXBiome dummyBiome = new TXBiome(biomeConfig, new BiomeIds(MAX_TC_BIOME_ID, MAX_TC_BIOME_ID));
-            forgeEngine.registerForgeBiome(MAX_TC_BIOME_ID, maxTcBiomeKey, dummyBiome);
-            dummyBiome.setRegistryName(maxTcBiomeKey);
+            final int existingBiomeId = registry.getID(alreadyRegisteredBiome);
+            if (biomeIds.getGenerationId() != existingBiomeId) {
+                throw new RuntimeException("'" + registryKey + "' was registered with id '" + existingBiomeId + "' but an attempt has been made to "
+                        + "register it with another id of '" + generationBiomeId + "'. Biome ids must be the same across all world configs.");
+            }
+            return alreadyRegisteredBiome;
         }
+
+        alreadyRegisteredBiome = Biome.getBiome(generationBiomeId);
+        if (alreadyRegisteredBiome != null) {
+            throw new RuntimeException("Attempt was made to attempted to register biome '" + registryKey + "' with id '" + generationBiomeId + "' "
+                    + "but that has already been registered to '" + alreadyRegisteredBiome.getRegistryName() + "'!");
+        }
+
+        if (generationBiomeId > 256 && savedBiomeId > 256) {
+            throw new RuntimeException("Attempt was made to register virtual biome '" + registryKey + "' with id '" + generationBiomeId + "' but "
+                    + "the save id '" + savedBiomeId + "' is not 256 or below! Minecraft only supports up to 256 in world data (check what you "
+                    + "specified for ReplaceToBiomeName).");
+        }
+
+        final TXBiome customBiome = new TXBiome(biomeConfig, biomeIds);
+        customBiome.setRegistryName(registryKey);
+
+        final ForgeEngine forgeEngine = ((ForgeEngine) TerrainControl.getEngine());
 
         if (biomeIds.isVirtual())
         {
-            // Virtual biomes hack: register, then let original biome overwrite
-            // In this way, the id --> biome mapping returns the original biome,
-            // and the biome --> id mapping returns savedBiomeId for both the
-            // original and custom biome
+            if (generationBiomeId < 256) {
+                throw new RuntimeException("Attempt to register virtual biome '" + registryKey + "' but the virtual id '" + generationBiomeId + "' "
+                        + "is not above the biome limit! Either raise the biome id to > 256 or remove what is specified for 'ReplaceToBiomeName'");
+
+            }
             Biome existingBiome = Biome.getBiome(savedBiomeId);
             if (existingBiome == null)
             {
-                // Original biome not yet registered. This is because it's a
-                // custom biome that is loaded after this virtual biome, so it
-                // will soon be registered
-                forgeEngine.registerForgeBiome(biomeIds.getGenerationId(), registryKey, customBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
-                        biomeIds.getGenerationId());
+                throw new RuntimeException("Attempt to register virtual biome '" + registryKey + "' but the saved biome id '" + savedBiomeId + "' "
+                        + "does not exist!");
             } else
             {
-                ResourceLocation existingBiomeKey = Biome.REGISTRY.inverseObjectRegistry.get(existingBiome);
-                forgeEngine.registerForgeBiome(biomeIds.getSavedId(), registryKey, customBiome);
-                forgeEngine.registerForgeBiome(biomeIds.getSavedId(), existingBiomeKey, existingBiome);
-                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
-                        biomeIds.getGenerationId());
+                forgeEngine.registerForgeBiome(generationBiomeId, registryKey, customBiome);
+                TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", registryKey, savedBiomeId, generationBiomeId);
             }
-        } else if (savedBiomeId < 256 && !biomeIds.isVirtual())
+        } else if (savedBiomeId < 256)
         {
-            // Normal insertion
+            final Biome existingBiome = registry.getValue(savedBiomeId);
+            if (existingBiome != null) {
+                throw new RuntimeException("'" + registryKey + "' is attempting to register as id '" + savedBiomeId + "' but that is already " +
+                        "registered to '" + existingBiome.getRegistryName() + "'!");
+            }
+
             forgeEngine.registerForgeBiome(savedBiomeId, registryKey, customBiome);
-            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId,
-                    biomeIds.getGenerationId());
+            TerrainControl.log(LogMarker.DEBUG, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
         }
 
-        if (customBiome.getRegistryName() == null) {
-            customBiome.setRegistryName(registryKey);
-        }
-
-        // Temporarily register TC biome with Forge to bypass registry check
-        forgeEngine.getBiomeMap().put(customBiome.getRegistryName(), customBiome);
         if (!BiomeDictionary.hasAnyType(customBiome)) {
-            // register custom biome with Forge's BiomeDictionary
             BiomeDictionary.makeBestGuess(customBiome);
         }
-        // Remove biome from forge registry
-        forgeEngine.getBiomeMap().remove(customBiome.getRegistryName());
+
         return customBiome;
     }
 

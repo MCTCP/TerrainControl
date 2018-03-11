@@ -31,6 +31,7 @@ public class BiomeCommand extends BaseCommand
         int y = location.getBlockY();
         int z = location.getBlockZ();
 
+
         LocalWorld world = this.getWorld(sender, "");
         
         if (world == null)

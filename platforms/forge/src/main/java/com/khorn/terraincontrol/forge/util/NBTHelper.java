@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.NamedBinaryTag;
 import net.minecraft.nbt.*;
 
-import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,18 +26,7 @@ public class NBTHelper
     {
         NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name, new NamedBinaryTag[] {new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, null, null)});
 
-        // Get the child tags using some reflection magic
-        Field mapField;
-        Map<String, NBTBase> nmsChildTags = null;
-        try
-        {
-            mapField = NBTTagCompound.class.getDeclaredField("field_74784_a"); //tagMap
-            mapField.setAccessible(true);
-            nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
-        } catch (Exception e)
-        {
-            TerrainControl.printStackTrace(LogMarker.FATAL, e);
-        }
+        final Map<String, NBTBase> nmsChildTags = nmsTag.tagMap;
 
         if (nmsChildTags == null)
         {
@@ -133,7 +121,7 @@ public class NBTHelper
                     listTag.addTag(getNBTFromNMSTagCompound(null, (NBTTagCompound) nmsChildTag));
                     break;
                 default:
-                    TerrainControl.log(LogMarker.INFO, "Cannot convert list subtype {} from it's NMS value", new Object[] {listType});
+                    TerrainControl.log(LogMarker.INFO, "Cannot convert list subtype {} from it's NMS value", listType);
                     break;
             }
         }

@@ -96,6 +96,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
 
             LocalBiome localBiome = world.getBiomeByName(biomeName);
             if (localBiome == null) {
+                TerrainControl.log(LogMarker.WARN, "Biome '{}' in group '{}' is not found in world '{}'", biomeName, this.name, world.getName());
                 it.remove();
                 continue;
             }

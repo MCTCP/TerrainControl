@@ -37,76 +37,77 @@ public class TXWorldType extends WorldType
     }
 
     @Override
-    public BiomeProvider getBiomeProvider(World mcWorld)
+    public BiomeProvider getBiomeProvider(World world)
     {
         // Ignore client worlds
-        if (mcWorld.isRemote)
+        if (world.isRemote)
         {
-            return super.getBiomeProvider(mcWorld);
+            return super.getBiomeProvider(world);
         }
 
-        ForgeWorld world = this.worldLoader.getOrCreateForgeWorld(mcWorld);
-        if (world == null)
+        final ForgeWorld tcWorld = (ForgeWorld) WorldHelper.toLocalWorld(world);
+        if (tcWorld == null)
         {
-            return super.getBiomeProvider(mcWorld);
+            // Not a TerrainControl world
+            return super.getBiomeProvider(world);
         }
 
-        Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
-        BiomeGenerator biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, world);
-        BiomeProvider biomeProvider = this.createBiomeProvider(world, biomeGenerator);
-        world.setBiomeGenerator(biomeGenerator);
+        Class<? extends BiomeGenerator> biomeGenClass = tcWorld.getConfigs().getWorldConfig().biomeMode;
+        BiomeGenerator biomeGenerator = TerrainControl.getBiomeModeManager().createCached(biomeGenClass, tcWorld);
+        BiomeProvider biomeProvider = this.createBiomeProvider(tcWorld, biomeGenerator);
+        tcWorld.setBiomeGenerator(biomeGenerator);
         return biomeProvider;
     }
 
     /**
-     * Gets the appropriate BiomeProvider. For the vanilla biome generator we
-     * have to use BiomeProvider, for other biome modes TCBiomeProvider is
+     * Gets the appropriate BiomeGenerator. For the vanilla biome generator we
+     * have to use BiomeGenerator, for other biome modes TCBiomeProvider is
      * the right option.
      * 
-     * @param world ForgeWorld instance, needed to instantiate the
-     *            BiomeProvider.
+     * @param tcWorld ForgeWorld instance, needed to instantiate the
+     *            BiomeGenerator.
      * @param biomeGenerator Biome generator.
-     * @return The most appropriate BiomeProvider.
+     * @return The most appropriate BiomeGenerator.
      */
-    private BiomeProvider createBiomeProvider(ForgeWorld world, BiomeGenerator biomeGenerator)
+    private BiomeProvider createBiomeProvider(ForgeWorld tcWorld, BiomeGenerator biomeGenerator)
     {
-        World mcWorld = world.getWorld();
+        final World world = tcWorld.getWorld();
         BiomeProvider biomeProvider;
         if (biomeGenerator instanceof ForgeVanillaBiomeGenerator)
         {
-            biomeProvider = mcWorld.provider.getBiomeProvider();
+            biomeProvider = world.provider.getBiomeProvider();
             // Let our biome generator depend on Minecraft's
             ((ForgeVanillaBiomeGenerator) biomeGenerator).setBiomeProvider(biomeProvider);
         } else
         {
-            biomeProvider = new TXBiomeProvider(world, biomeGenerator);
+            biomeProvider = new TXBiomeProvider(tcWorld, biomeGenerator);
             // Let Minecraft's biome generator depend on ours
-            ReflectionHelper.setValueInFieldOfType(mcWorld.provider, BiomeProvider.class, biomeProvider);
+            ReflectionHelper.setValueInFieldOfType(world.provider, BiomeProvider.class, biomeProvider);
         }
 
         return biomeProvider;
     }
 
     @Override
-    public IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
+    public IChunkGenerator getChunkGenerator(World world, String generatorOptions)
     {
-        ForgeWorld world = this.worldLoader.getWorld(WorldHelper.getName(mcWorld));
-        if (world != null && world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
+        final ForgeWorld tcWorld = (ForgeWorld) WorldHelper.toLocalWorld(world);
+        if (tcWorld != null && tcWorld.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
         {
-            return world.getChunkGenerator();
+            return tcWorld.getChunkGenerator();
         } else
-            return super.getChunkGenerator(mcWorld, generatorOptions);
+            return super.getChunkGenerator(world, generatorOptions);
     }
 
     @Override
-    public int getMinimumSpawnHeight(World mcWorld)
+    public int getMinimumSpawnHeight(World world)
     {
-        LocalWorld world = this.worldLoader.getWorld(mcWorld);
-        if (world == null)
+        final LocalWorld tcWorld = WorldHelper.toLocalWorld(world);
+        if (tcWorld == null)
         {
             // MCPC+ has an interesting load order sometimes
             return 64;
         }
-        return world.getConfigs().getWorldConfig().waterLevelMax;
+        return tcWorld.getConfigs().getWorldConfig().waterLevelMax;
     }
 }

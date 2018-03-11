@@ -53,7 +53,7 @@ public enum DefaultBiome
     /**
      * Default ID, proper name and default settings class for a Sky biome
      */
-    SKY(9, "Sky", Sky.class),
+    SKY(9, "The End", Sky.class),
     /**
      * Default ID, proper name and default settings class for a Frozen Ocean biome
      */
@@ -141,7 +141,7 @@ public enum DefaultBiome
     ROOFED_FOREST_MOUNTAINS(157, "Roofed Forest M", RoofedForestMountains.class),
     COLD_TAIGA_MOUNTAINS(158, "Cold Taiga M", ColdTaigaMountains.class),
     MEGA_SPRUCE_TAIGA(160, "Mega Spruce Taiga", MegaSpruceTaiga.class),
-    MEGA_SPRUCE_TAIGA_HILLS(161, "Mega Spruce Taiga Hills", MegaSpruceTaigaHills.class),
+    MEGA_SPRUCE_TAIGA_HILLS(161, "Redwood Taiga Hills M", MegaSpruceTaigaHills.class),
     EXTREME_HILLS_PLUS_MOUNTAINS(162, "Extreme Hills+ M", ExtremeHillsPlusMountains.class),
     SAVANNA_MOUNTAINS(163, "Savanna M", SavannaMountains.class),
     SAVANNA_PLATEAU_MOUNTAINS(164, "Savanna Plateau M", SavannaPlateauMountains.class),

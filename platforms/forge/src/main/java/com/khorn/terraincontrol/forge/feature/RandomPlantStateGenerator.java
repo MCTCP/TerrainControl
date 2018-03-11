@@ -9,7 +9,7 @@ import java.util.Random;
 
 public class RandomPlantStateGenerator {
 
-    static boolean debug = true;
+    static boolean debug = false;
 
     public static IBlockState randomCrop(World worldIn, BlockPos blockPos, Random random) {
         String plantName = "";

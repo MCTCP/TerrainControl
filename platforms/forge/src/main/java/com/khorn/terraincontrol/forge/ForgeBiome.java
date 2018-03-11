@@ -10,24 +10,18 @@ import net.minecraft.world.biome.Biome;
 
 public class ForgeBiome implements LocalBiome
 {
-    private final Biome biomeBase;
+    private final Biome wrapped;
     private final boolean isCustom;
 
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
-    public ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
+    ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        this.biomeBase = biome;
+        this.wrapped = biome;
         this.biomeIds = biomeIds;
         this.biomeConfig = biomeConfig;
-        if (biome instanceof TXBiome)
-        {
-            this.isCustom = true;
-        } else
-        {
-            this.isCustom = false;
-        }
+        this.isCustom = biome instanceof TXBiome;
     }
 
     @Override
@@ -39,12 +33,12 @@ public class ForgeBiome implements LocalBiome
     @Override
     public String getName()
     {
-        return this.biomeBase.biomeName;
+        return this.wrapped.biomeName;
     }
 
     public Biome getHandle()
     {
-        return this.biomeBase;
+        return this.wrapped;
     }
 
     @Override
@@ -56,7 +50,7 @@ public class ForgeBiome implements LocalBiome
     @Override
     public float getTemperatureAt(int x, int y, int z)
     {
-        return this.biomeBase.getFloatTemperature(new BlockPos(x, y, z));
+        return this.wrapped.getTemperature(new BlockPos(x, y, z));
     }
 
     @Override

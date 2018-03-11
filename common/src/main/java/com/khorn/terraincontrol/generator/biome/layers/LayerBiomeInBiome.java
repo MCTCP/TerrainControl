@@ -1,6 +1,7 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class LayerBiomeInBiome extends Layer
     {
         short biomeId;
         int chance = 10;
-        boolean[] canSpawnIn = new boolean[1024];
+        boolean[] canSpawnIn = new boolean[TerrainControl.MAX_BIOME_ID];
         long scrambledWorldSeed;
         boolean inOcean = false;
     }

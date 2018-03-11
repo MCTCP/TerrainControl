@@ -8,6 +8,7 @@ import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
 import com.khorn.terraincontrol.forge.WorldLoader;
+import com.khorn.terraincontrol.forge.util.WorldHelper;
 import com.khorn.terraincontrol.generator.resource.SaplingGen;
 import com.khorn.terraincontrol.generator.resource.SaplingType;
 import com.khorn.terraincontrol.util.minecraftTypes.DefaultMaterial;
@@ -163,7 +164,7 @@ public class SaplingListener
     public void onSaplingGrow(SaplingGrowTreeEvent event)
     {
         World world = event.getWorld();
-        LocalWorld localWorld = this.worldLoader.getWorld(world);
+        LocalWorld localWorld = WorldHelper.toLocalWorld(world);
         BlockPos blockPos = event.getPos();
 
         if (localWorld == null)
@@ -243,7 +244,7 @@ public class SaplingListener
     @SubscribeEvent
     public void onBonemealUse(BonemealEvent event)
     {
-        LocalWorld localWorld = this.worldLoader.getWorld(event.getWorld());
+        LocalWorld localWorld = WorldHelper.toLocalWorld(event.getWorld());
         if (localWorld == null)
         {
             // World not managed by Terrain Control

@@ -103,7 +103,7 @@ public class TXChunkGenerator implements IChunkGenerator
         {
             if (paramaca == EnumCreatureType.MONSTER && this.world.rareBuildingGen.isSwampHut(blockPos))
             {
-                return this.world.rareBuildingGen.getScatteredFeatureSpawnList();
+                return this.world.rareBuildingGen.getMonsters();
             }
         }
         if (worldConfig.oceanMonumentsEnabled)

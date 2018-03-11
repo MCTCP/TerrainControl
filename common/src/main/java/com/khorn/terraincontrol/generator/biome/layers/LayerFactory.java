@@ -197,7 +197,7 @@ public final class LayerFactory
                         && biomeConfig.isleInBiome != null)
                 {
                     haveIsle = true;
-                    boolean[] biomeCanSpawnIn = new boolean[1024];
+                    boolean[] biomeCanSpawnIn = new boolean[TerrainControl.MAX_BIOME_ID];
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
@@ -349,7 +349,7 @@ public final class LayerFactory
                         && biomeConfig.isleInBiome != null)
                 {
                     haveIsle = true;
-                    boolean[] biomeCanSpawnIn = new boolean[1024];
+                    boolean[] biomeCanSpawnIn = new boolean[TerrainControl.MAX_BIOME_ID];
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {

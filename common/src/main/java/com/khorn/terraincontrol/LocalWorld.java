@@ -31,9 +31,7 @@ public interface LocalWorld
     LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds requestedBiomeIds);
 
     /**
-     * Gets how many different biome ids are in the world. Biome ids will start
-     * at zero, so a returned value of 1024 means that the biome ids range from
-     * 0 to 1023, inclusive.
+     * Gets how many different biome ids are in the world.
      *
      * @return How many different biome ids are in the world.
      */

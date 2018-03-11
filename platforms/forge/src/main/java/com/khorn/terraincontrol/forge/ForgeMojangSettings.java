@@ -50,7 +50,7 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public float getTemperature()
     {
-        return this.biomeBase.getTemperature();
+        return this.biomeBase.getDefaultTemperature();
     }
 
     @Override

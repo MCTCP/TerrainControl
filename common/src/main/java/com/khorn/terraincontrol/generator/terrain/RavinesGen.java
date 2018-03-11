@@ -3,6 +3,7 @@ package com.khorn.terraincontrol.generator.terrain;
 import com.khorn.terraincontrol.LocalBiome;
 import com.khorn.terraincontrol.LocalMaterialData;
 import com.khorn.terraincontrol.LocalWorld;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.BiomeConfig;
 import com.khorn.terraincontrol.configuration.WorldConfig;
 import com.khorn.terraincontrol.generator.ChunkBuffer;
@@ -15,7 +16,7 @@ import java.util.Random;
 
 public class RavinesGen extends TerrainGenBase
 {
-    private float[] a = new float[1024];
+    private float[] a = new float[TerrainControl.MAX_BIOME_ID];
     private WorldConfig worldSettings;
 
     public RavinesGen(WorldConfig wrk, LocalWorld world)
