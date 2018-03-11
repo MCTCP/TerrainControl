@@ -43,7 +43,7 @@ public class TerrainControl
      */
     public static final int WORLD_HEIGHT = 256;
 
-    public static final int MAX_BIOME_ID = 9999;
+    public static final int MAX_BIOME_ID = 16384;
     /**
      * @see TerrainControlEngine#fireCanCustomObjectSpawnEvent(CustomObject,
      * LocalWorld, int, int, int)

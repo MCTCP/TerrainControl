@@ -1,5 +1,6 @@
 package com.khorn.terraincontrol.generator.biome.layers;
 
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.generator.biome.ArraysCache;
 
 /**
@@ -101,22 +102,22 @@ public abstract class Layer
      * 7) Rivers size
      */
     // [ Biome Data ]
-    protected static final int BiomeBits = 1023;            //>>	1st-10th Bits           // 255 63
+    protected static final int BiomeBits = TerrainControl.MAX_BIOME_ID - 1; // 1st-14th Bits 16383
 
     // [ Flags ]
-    protected static final int LandBit = (1 << 10);         //>>	11th Bit, 1024          // 256 64
-    protected static final int IslandBit = (1 << 11);       //>>	12th Bit, 2048          // 4096 1024
-    protected static final int IceBit = (1 << 12);          //>>	13th Bit, 4096
+    protected static final int LandBit = (1 << 14);         // 14th Bit
+    protected static final int IslandBit = (1 << 15);       // 15th Bit
+    protected static final int IceBit = (1 << 16);          // 16th Bit
 
     // [ Biome Group Data ]
-    protected static final int BiomeGroupShift = 13;        //>>	Shift amount for biome group data
-    protected static final int BiomeGroupBits = (127 << BiomeGroupShift);   //>>	14th-20th Bits, 1040384
+    protected static final int BiomeGroupShift = 17;        // Shift amount for biome group data
+    protected static final int BiomeGroupBits = 127 >> BiomeGroupShift;   // 17th-23rd Bits
 
     // [ River Data ]
-    protected static final int RiverShift = 20;
-    protected static final int RiverBits = (3 << RiverShift);               //>>	21st-22nd Bits, 3145728  //3072 768
-    protected static final int RiverBitOne = (1 << RiverShift);             //>>	21st Bit, 1048576
-    protected static final int RiverBitTwo = (1 << (RiverShift + 1));       //>>	22nd Bit, 2097152
+    protected static final int RiverShift = 23;
+    protected static final int RiverBits = (3 << RiverShift);               // 23rd-24th Bits
+    protected static final int RiverBitOne = (1 << RiverShift);             // 23rd Bit
+    protected static final int RiverBitTwo = (1 << (RiverShift + 1));       // 24th Bit
 
     /**
      * In a single step, checks for land and when present returns biome data
