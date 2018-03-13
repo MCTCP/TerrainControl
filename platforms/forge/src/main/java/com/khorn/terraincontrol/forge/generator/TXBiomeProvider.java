@@ -13,6 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.structure.MapGenVillage;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.ForgeRegistry;
 
 /**
  * Minecraft's biome generator class is {@link BiomeProvider}, we use
@@ -134,7 +136,7 @@ public class TXBiomeProvider extends BiomeProvider
                 continue;
             int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            Biome localBiomeBase = Biome.REGISTRY.underlyingIntegerMap.get(arrayOfInt[i3]);
+            final Biome localBiomeBase = ((ForgeRegistry<Biome>) ForgeRegistries.BIOMES).getValue(arrayOfInt[i3]);
             if ((!biomes.contains(localBiomeBase)) || ((blockPos != null) && (random.nextInt(i2 + 1) != 0)))
                 continue;
             blockPos = new BlockPos(i4, 0, i5);
