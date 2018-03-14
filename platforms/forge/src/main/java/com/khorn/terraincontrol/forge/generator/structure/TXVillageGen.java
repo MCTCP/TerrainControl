@@ -22,6 +22,7 @@ public class TXVillageGen extends MapGenStructure
      * A list of all the biomes villages can spawn in.
      */
     public List<Biome> villageSpawnBiomes;
+    private int debugrun = 0;
 
     /**
      * Village size, 0 for normal, 1 for flat map
@@ -76,9 +77,15 @@ public class TXVillageGen extends MapGenStructure
         if (var3 == var5 && var4 == var6)
         {
             boolean canSpawn = this.world.getBiomeProvider().areBiomesViable(var3 * 16 + 8, var4 * 16 + 8, 0, this.villageSpawnBiomes);
-
+            if (debugrun == 0) {
+                for(int zz = 0; zz < this.villageSpawnBiomes.size(); zz++) {
+                    //System.out.println(this.villageSpawnBiomes.get(zz).biomeName);
+                }
+                debugrun++;
+            }
             if (canSpawn)
             {
+                //System.out.println("Village spawned at: x:" + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
                 return true;
             }
         }

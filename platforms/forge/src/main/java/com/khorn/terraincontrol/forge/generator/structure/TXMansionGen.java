@@ -1,8 +1,10 @@
 package com.khorn.terraincontrol.forge.generator.structure;
 
 import com.khorn.terraincontrol.LocalBiome;
+import com.khorn.terraincontrol.TerrainControl;
 import com.khorn.terraincontrol.configuration.ServerConfigProvider;
 import com.khorn.terraincontrol.forge.ForgeBiome;
+import com.khorn.terraincontrol.logging.LogMarker;
 import com.khorn.terraincontrol.util.minecraftTypes.StructureNames;
 
 import net.minecraft.init.Biomes;
@@ -23,6 +25,9 @@ public class TXMansionGen extends MapGenStructure
 {
     private final int maxDistance;
     private final int minDistance;
+    private int debugrun = 0;
+    private int startX = 0;
+    private int startZ = 0;
     /**
      * Roofed forest and mutated roofed forest
      */
@@ -85,14 +90,29 @@ public class TXMansionGen extends MapGenStructure
         Random random = this.world.setRandomSeed(k, l, 10387319);
         k *= maxDistance;
         l *= maxDistance;
-        k += (random.nextInt(maxDistance - minDistance + 1) + random.nextInt(maxDistance - minDistance + 1)) / 2;
-        l += (random.nextInt(maxDistance - minDistance + 1) + random.nextInt(maxDistance - minDistance + 1)) / 2;
+        k += (random.nextInt(maxDistance - minDistance) + random.nextInt(maxDistance - minDistance)) / 2;
+        l += (random.nextInt(maxDistance - minDistance) + random.nextInt(maxDistance - minDistance)) / 2;
         if (chunkX == k && chunkZ == l)
         {
+            //System.out.println("Checking for Mansion Placement at: " + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
+
+            if (debugrun == 0) {
+                for(int zz = 0; zz < biomeList.size(); zz++) {
+                    //System.out.println(biomeList.get(zz).biomeName);
+                }
+                debugrun++;
+            }
+
             boolean flag = this.world.getBiomeProvider().areBiomesViable(chunkX * 16 + 8, chunkZ * 16 + 8, 32, biomeList);
             if (flag)
             {
+                //System.out.println("Mansion spawned at: x:" + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
                 return true;
+            }
+            if (chunkX != startX || chunkZ != startZ) {
+                //System.out.println("Failed to spawn Mansion at: x:" + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
+                startX = chunkX;
+                startZ = chunkZ;
             }
         }
 
@@ -104,7 +124,7 @@ public class TXMansionGen extends MapGenStructure
     {
         this.world = worldIn;
         BiomeProvider biomeprovider = worldIn.getBiomeProvider();
-        return biomeprovider.isFixedBiome() && biomeprovider.getFixedBiome() != Biomes.ROOFED_FOREST ? null : findNearestStructurePosBySpacing(worldIn, this, pos, maxDistance, minDistance - 1, 10387319, true, 100, findUnexplored);
+        return biomeprovider.isFixedBiome() && biomeprovider.getFixedBiome() != Biomes.ROOFED_FOREST ? null : findNearestStructurePosBySpacing(worldIn, this, pos, maxDistance, minDistance, 10387319, true, 100, findUnexplored);
     }
 
     @Override
