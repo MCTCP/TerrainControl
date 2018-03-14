@@ -505,27 +505,7 @@ public class ForgeWorld implements LocalWorld
 
         // End Almura Hack
 
-        IBlockState oldState = this.world.getBlockState(pos);
-        int oldLight = oldState.getLightValue(this.world, pos);
-        int oldOpacity = oldState.getLightOpacity(this.world, pos);
-
         IBlockState iblockstate = chunk.setBlockState(pos, newState);
-
-        if (iblockstate == null)
-        {
-            return;
-        }
-
-        // Relight and update players
-        if (newState.getLightOpacity(this.world, pos) != oldOpacity || newState.getLightValue(this.world, pos) != oldLight)
-        {
-            this.world.profiler.startSection("checkLight");
-            this.world.checkLight(pos);
-            this.world.profiler.endSection();
-        }
-
-        // Notify world: (2 | 16) == update client, don't update observers
-        this.world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
     }
 
     @Override

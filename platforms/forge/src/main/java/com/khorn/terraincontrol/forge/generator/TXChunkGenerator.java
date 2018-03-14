@@ -13,6 +13,8 @@ import com.khorn.terraincontrol.generator.ObjectSpawner;
 import com.khorn.terraincontrol.generator.biome.OutputType;
 import com.khorn.terraincontrol.util.ChunkCoordinate;
 
+import net.minecraft.block.BlockFalling;
+import net.minecraft.block.BlockGravel;
 import net.minecraft.block.BlockSand;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
@@ -52,6 +54,7 @@ public class TXChunkGenerator implements IChunkGenerator
     @Override
     public Chunk generateChunk(int chunkX, int chunkZ)
     {
+        BlockFalling.fallInstantly = true;
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
         ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
         this.generator.generate(chunkBuffer);
@@ -59,7 +62,7 @@ public class TXChunkGenerator implements IChunkGenerator
         Chunk chunk = chunkBuffer.toChunk(this.worldHandle);
         fillBiomeArray(chunk);
         chunk.generateSkylightMap();
-
+        BlockFalling.fallInstantly = false;
         return chunk;
     }
 
@@ -88,9 +91,9 @@ public class TXChunkGenerator implements IChunkGenerator
     {
         if (this.TestMode)
             return;
-        BlockSand.fallInstantly = true;
+        BlockFalling.fallInstantly = true;
         this.spawner.populate(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
-        BlockSand.fallInstantly = false;
+        BlockFalling.fallInstantly = false;
     }
 
     @Override
