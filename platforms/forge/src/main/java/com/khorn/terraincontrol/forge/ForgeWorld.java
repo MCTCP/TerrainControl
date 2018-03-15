@@ -290,6 +290,7 @@ public class ForgeWorld implements LocalWorld
         Chunk[] cache = getChunkCache(chunkCoord);
 
         // Replace the blocks
+
         for (int i = 0; i < 4; i++)
         {
             replaceBlocks(cache[i], 0, 0, 16);
@@ -505,9 +506,41 @@ public class ForgeWorld implements LocalWorld
 
         // End Almura Hack
 
-        IBlockState iblockstate = chunk.setBlockState(pos, newState);
+        IBlockState oldState = chunk.setBlockState(pos, newState);
+       // int oldLight = oldState.getLightValue(this.world, pos);
+       // int oldOpacity = oldState.getLightOpacity(this.world, pos);
+
+        if (oldState == null) {
+            return;
+        }
+
+        // Relight and update players
+        /*
+        if (newState.getLightOpacity(this.world, pos) != oldOpacity || newState.getLightValue(this.world, pos) != oldLight)
+        {
+            this.world.profiler.startSection("checkLight");
+            this.world.checkLight(pos);
+            this.world.profiler.endSection();
+        } */
+
+        // Notify world: (2 | 16) == update client, don't update observers
+        this.world.markAndNotifyBlock(pos, chunk, oldState, newState, 2 | 16);
     }
 
+
+    @Override
+    public int getHighestBlockYAt(int x, int z)
+    {
+        Chunk chunk = this.getChunk(x, 0, z);
+        if (chunk == null)
+        {
+            return -1;
+        }
+
+        return chunk.getHeightValue(x & 0xf, z & 0xf);
+    }
+
+    /*
     @Override
     public int getHighestBlockYAt(int x, int z)
     {
@@ -533,7 +566,7 @@ public class ForgeWorld implements LocalWorld
         }
 
         return y;
-    }
+    } */
 
     @Override
     public void startPopulation(ChunkCoordinate chunkCoord)
