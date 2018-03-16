@@ -204,6 +204,12 @@ public class ForgeWorld implements LocalWorld
     public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
     {
         BlockPos blockPos = new BlockPos(x, y, z);
+        final Chunk chunk = this.getChunk(x, y, z);
+
+        if (chunk == null) {
+            return false;
+        }
+
         switch (type)
         {
             case Tree:
@@ -417,14 +423,9 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public boolean isEmpty(int x, int y, int z)
-    {
+    public boolean isEmpty(int x, int y, int z) {
         Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
-        {
-            return true;
-        }
-        return chunk.getBlockState(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
+        return chunk == null || chunk.getBlockState(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
     }
 
     @Override
