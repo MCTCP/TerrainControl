@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.pg85.otg.BiomeIds;
@@ -42,6 +43,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraftforge.common.BiomeDictionary;
@@ -160,17 +162,17 @@ public final class OTGCommandHandler implements ICommand
         	}
             else if (isOp && argString[0].equals("tp") && argString.length > 1)
             {
-            	String biomeName = "";
+            	String biomeOrDimensionName = "";
             	for(int i = 1; i < argString.length; i++)
             	{
-            		biomeName += argString[i] + " ";
+            		biomeOrDimensionName += argString[i] + " ";
             	}
-            	if(biomeName != null && biomeName.length() > 0)
+            	if(biomeOrDimensionName != null && biomeOrDimensionName.length() > 0)
             	{
             		int biomeId = -1;
             		try
             		{
-            			biomeId = Integer.parseInt(biomeName.replace(" ", ""));
+            			biomeId = Integer.parseInt(biomeOrDimensionName.replace(" ", ""));
             		}
             		catch(NumberFormatException ex) { }
 
@@ -180,9 +182,14 @@ public final class OTGCommandHandler implements ICommand
 						if(DimensionManager.isDimensionRegistered(i))
 						{
 							DimensionType dimensionType = DimensionManager.getProviderType(i);
-							if(dimensionType.getName().toLowerCase().trim().equals(biomeName.toLowerCase().trim()))
+							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase().trim()))
 							{
-								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), true);
+								if(OTGDimensionManager.GetAllOTGDimensions().containsKey(i))
+								{
+									OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), true);
+								} else {
+									sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Can only teleport to OTG dimensions and overworld."));
+								}
 								return;
 							}
 						}
@@ -210,7 +217,7 @@ public final class OTGCommandHandler implements ICommand
             								(
         	    								(
         											biomeId == -1 &&
-        											biome.getName().toLowerCase().replace(" ", "").equals(biomeName.toLowerCase().replace(" ", ""))
+        											biome.getName().toLowerCase().replace(" ", "").equals(biomeOrDimensionName.toLowerCase().replace(" ", ""))
         										) || (
         											biomeId != -1 &&
         											biome.getIds().getGenerationId() == biomeId
@@ -226,7 +233,7 @@ public final class OTGCommandHandler implements ICommand
                 			}
                 		}
             		}
-            		sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find biome \"" + biomeName + "\"."));
+            		sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find biome \"" + biomeOrDimensionName + "\"."));
             	}
             }
             else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
@@ -536,6 +543,31 @@ public final class OTGCommandHandler implements ICommand
             	((EntityPlayer)sender.getCommandSenderEntity()).setPositionAndUpdate(newX, newY, newZ);
             }
             */
+            else if (argString[0].equals("biomes") && isOp)
+            {
+            	sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "ForgeRegistries.BIOMES contains:"));
+            	sender.sendMessage(new TextComponentTranslation(""));
+            	for(Entry<ResourceLocation, Biome> entry : ForgeRegistries.BIOMES.getEntries())
+            	{
+            		sender.sendMessage(new TextComponentTranslation(VALUE_COLOR + entry.getKey().toString() + MESSAGE_COLOR + " : " + VALUE_COLOR + entry.getValue().toString()));
+            	}
+
+            	sender.sendMessage(new TextComponentTranslation(""));
+            	sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Biome.REGISTRY.registryObjects contains:"));
+            	sender.sendMessage(new TextComponentTranslation(""));
+            	for(Entry<ResourceLocation, Biome> entry : Biome.REGISTRY.registryObjects.entrySet())
+            	{
+            		sender.sendMessage(new TextComponentTranslation(VALUE_COLOR + entry.getKey().toString() + MESSAGE_COLOR + " : " + VALUE_COLOR + entry.getValue().toString()));
+            	}
+
+            	sender.sendMessage(new TextComponentTranslation(""));
+            	sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Biome.REGISTRY.inverseRegistryObjects contains:"));
+            	sender.sendMessage(new TextComponentTranslation(""));
+            	for(Entry<Biome, ResourceLocation> entry : Biome.REGISTRY.inverseObjectRegistry.entrySet())
+            	{
+            		sender.sendMessage(new TextComponentTranslation(VALUE_COLOR + entry.getKey().toString() + MESSAGE_COLOR + " : " + VALUE_COLOR + entry.getValue().toString()));
+            	}
+            }
             else if (argString[0].equals("biome"))
             {
             	if(

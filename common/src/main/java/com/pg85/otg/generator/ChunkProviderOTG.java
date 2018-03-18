@@ -488,9 +488,10 @@ public class ChunkProviderOTG
 
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
                 biomeWeight = Math.abs(biomeWeight);
-                if (nextBiomeHeight > centerBiomeConfig.biomeHeight)
+                // This causes problems with rough edges, makes it look like smoothing isn't working
+                //if (nextBiomeHeight > centerBiomeConfig.biomeHeight)
                 {
-                    biomeWeight /= 2.0F;
+                    //biomeWeight /= 2.0F;
                 }
                 volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;

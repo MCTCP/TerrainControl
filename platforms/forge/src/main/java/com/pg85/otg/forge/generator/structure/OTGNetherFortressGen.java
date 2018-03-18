@@ -21,7 +21,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import java.util.ArrayList;
 import java.util.List;
 
-public class OTGNetherFortressGen extends MapGenStructure
+public class OTGNetherFortressGen extends OTGMapGenStructure
 {
     public List<SpawnListEntry> spawnList = new ArrayList<SpawnListEntry>();
 
@@ -78,7 +78,7 @@ public class OTGNetherFortressGen extends MapGenStructure
     {
         return StructureNames.NETHER_FORTRESS;
     }
-    
+
 	@Override
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {

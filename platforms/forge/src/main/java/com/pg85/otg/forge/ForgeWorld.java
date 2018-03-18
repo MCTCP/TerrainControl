@@ -153,7 +153,7 @@ public class ForgeWorld implements LocalWorld
 	        ((ForgeEngine)OTG.getEngine()).worldLoader.unRegisterDefaultBiomes();
 	        ((ForgeEngine)OTG.getEngine()).worldLoader.unRegisterTCBiomes();
 
-	    	OTGDimensionManager.RemoveTCDims();
+	    	OTGDimensionManager.RemoveOTGDims();
         }
     }
 
@@ -1741,5 +1741,19 @@ public class ForgeWorld implements LocalWorld
 		{
 			IOHelper.deleteRecursive(worldDataDir);
 		}
+	}
+
+	@Override
+	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk)
+	{
+        WorldConfig worldConfig = this.settings.getWorldConfig();
+        ChunkPos chunkPos = new ChunkPos(new BlockPos(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter()));
+        //(worldConfig.strongholdsEnabled && this.strongholdGen.generate(this.world, chunkX, chunkZ, null)) ||
+        //(worldConfig.mineshaftsEnabled && this.mineshaftGen.chunkHasStructure(this.world, rand, chunkPos)) ||
+        return (worldConfig.villagesEnabled && this.villageGen.chunkHasStructure(this.world, rand, chunkPos)) ||
+        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen.chunkHasStructure(this.world, rand, chunkPos)) ||
+        (worldConfig.netherFortressesEnabled && this.netherFortressGen.chunkHasStructure(this.world, rand, chunkPos)) ||
+        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen.chunkHasStructure(this.world, rand, chunkPos)) ||
+        (worldConfig.woodLandMansionsEnabled && this.woodLandMansionGen.chunkHasStructure(this.world, rand, chunkPos));
 	}
 }

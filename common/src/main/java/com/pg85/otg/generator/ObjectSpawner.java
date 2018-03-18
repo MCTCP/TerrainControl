@@ -6,6 +6,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.ConfigProvider;
+import com.pg85.otg.configuration.ErroredFunction;
 import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectStructure;
@@ -97,7 +98,7 @@ public class ObjectSpawner
 		{
 			if(!StructurePlottedAtSpawn)
 			{
-				world.getStructureCache().PlotStructures(world.getSpawnChunk(), true);
+				world.getStructureCache().PlotStructures(rand, world.getSpawnChunk(), true);
 			}
 		}
 		StructurePlottedAtSpawn = true;
@@ -108,10 +109,10 @@ public class ObjectSpawner
 
 			if(world.getConfigs().getWorldConfig().IsOTGPlus)
 			{
-				world.getStructureCache().PlotStructures(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
-				world.getStructureCache().PlotStructures(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().PlotStructures(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().PlotStructures(chunkCoord, false);
+				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
+				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
+				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
+				world.getStructureCache().PlotStructures(rand, chunkCoord, false);
 
 		        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
 
@@ -297,7 +298,7 @@ public class ObjectSpawner
 				// populate a chunk that has already been provided/populated before,
 				// which seems like a bug.
 
-				world.getStructureCache().PlotStructures(chunkCoord, false);
+				world.getStructureCache().PlotStructures(rand, chunkCoord, false);
 
 				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
 
@@ -393,7 +394,15 @@ public class ObjectSpawner
 		{
 			if (!(res instanceof CustomObjectGen) && !(res instanceof CustomStructureGen))
 			{
-				miscResources.add((Resource) res);
+				if(!(res instanceof ErroredFunction))
+				{
+					miscResources.add((Resource) res);
+				} else {
+					if(OTG.getPluginConfig().SpawnLog)
+					{
+						OTG.log(LogMarker.INFO, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
+					}
+				}
 			}
 		}
 
@@ -447,14 +456,22 @@ public class ObjectSpawner
 		ArrayList<Resource> miscResources = new ArrayList<Resource>();
 		for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
 		{
-			if (res instanceof CustomObjectGen)
+			if(!(res instanceof ErroredFunction))
 			{
-				// Small (<32x32) custom objects like trees and rocks.
-				customObjects.add((Resource) res);
-			}
-			else if (!(res instanceof CustomStructureGen))
-			{
-				miscResources.add((Resource) res);
+				if (res instanceof CustomObjectGen)
+				{
+					// Small (<32x32) custom objects like trees and rocks.
+					customObjects.add((Resource) res);
+				}
+				else if (!(res instanceof CustomStructureGen))
+				{
+					miscResources.add((Resource) res);
+				}
+			} else {
+				if(OTG.getPluginConfig().SpawnLog)
+				{
+					OTG.log(LogMarker.INFO, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
+				}
 			}
 		}
 

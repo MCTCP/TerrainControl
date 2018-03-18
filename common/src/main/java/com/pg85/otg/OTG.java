@@ -25,14 +25,14 @@ public class OTG
 {
 	// TODO: This shouldn't be needed ideally
 	public static boolean isForge = false;
-	
+
     /**
      * The engine that powers Open Terrain Generator.
      */
     private static OTGEngine engine;
 
     /**
-     * The amount of different block ids that are supported. 4096 on Minecraft. 65535 with NotEnoughId's mod 
+     * The amount of different block ids that are supported. 4096 on Minecraft. 65535 with NotEnoughId's mod
      */
     public static final int SUPPORTED_BLOCK_IDS = 65535;//4096; // TODO: Test if this creates lag
 
@@ -113,8 +113,8 @@ public class OTG
     public static CustomObjectConfigFunctionsManager getCustomObjectConfigFunctionsManager()
     {
         return engine.getCustomObjectConfigFunctionsManager();
-    }    
-    
+    }
+
     /**
      * Returns the CustomObject manager, with hooks to spawn CustomObjects.
      * <p>
@@ -133,15 +133,15 @@ public class OTG
     public static OTGEngine getEngine()
     {
         return engine;
-    }   
-    
+    }
+
     static HashMap<String, LocalMaterialData> cachedMaterials = new HashMap<String, LocalMaterialData>();
-    
+
     /**
      * @see OTGEngine#readMaterial(String)
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
-    {    	
+    {
     	// TODO: Make sure it won't cause problems to return the same material object multiple times, is it not changed anywhere?
     	LocalMaterialData material = cachedMaterials.get(name);
     	if(material != null)
@@ -152,7 +152,7 @@ public class OTG
     	{
     		throw new InvalidConfigException("Cannot read block: " + name);
     	}
-    	
+
     	// Spigot interprets snow as SNOW_LAYER and that's how TC has always seen it too so keep it that way (even though minecraft:snow is actually a snow block).
     	if(name.toLowerCase().equals("snow"))
     	{
@@ -168,7 +168,7 @@ public class OTG
     	{
     		name = "FLOWING_LAVA";
     	}
-    	
+
     	try
     	{
     		material = engine.readMaterial(name);
@@ -178,9 +178,9 @@ public class OTG
     		cachedMaterials.put(name, null);
     		throw ex;
     	}
-    	
-    	cachedMaterials.put(name, material);    	
-    	
+
+    	cachedMaterials.put(name, material);
+
         return material;
     }
 
@@ -212,16 +212,38 @@ public class OTG
     {
         return engine.getWorld(name);
     }
-    
+
     public static LocalWorld getUnloadedWorld(String name)
     {
     	return engine.getUnloadedWorld(name);
     }
-       
+
+    // For bukkit plugin developers, do not remove. See: https://github.com/MCTCP/TerrainControl/wiki/Developer-page
+    /*
+	* Convienence method to quickly get the biome name at the given
+	* coordinates. Will return null if the world isn't loaded by OTG
+	* <p>
+	* @param worldName The world name.
+	* @param x         The block x in the world.
+	* @param z         The block z in the world.
+	* @return The biome name, or null if the world isn't managed by Terrain
+    *         Control.
+    */
+   public static String getBiomeName(String worldName, int x, int z)
+   {
+       LocalWorld world = getWorld(worldName);
+       if (world == null)
+       {
+           // World isn't loaded by OTG
+           return null;
+       }
+       return world.getSavedBiome(x, z).getName();
+   }
+
     public static LocalBiome getBiomeAllWorlds(int id)
     {
     	//OTG.log(LogMarker.INFO, "getBiomeAllWorlds id");
-    	
+
         ArrayList<LocalWorld> worlds = getAllWorlds();
         if(worlds != null)
         {
@@ -233,29 +255,29 @@ public class OTG
 	        		return biome;
 	        	}
 	        }
-        }    	
+        }
         return null;
     }
 
     public static LocalBiome getBiomeAllWorlds(String name)
     {
     	//OTG.log(LogMarker.INFO, "getBiomeAllWorlds name");
-    	
+
         ArrayList<LocalWorld> worlds = getAllWorlds();
         if(worlds != null)
         {
 	        for(LocalWorld world : worlds)
-	        {	        	
+	        {
 	        	LocalBiome biome = world.getBiomeByNameOrNull(name);
 	        	if(biome != null)
 	        	{
 	        		return biome;
 	        	}
 	        }
-        }    	
+        }
         return null;
     }
-    
+
     public static ArrayList<LocalWorld> getAllWorlds()
     {
         return engine.getAllWorlds();

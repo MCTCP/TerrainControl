@@ -1,9 +1,5 @@
 package com.pg85.otg.forge.dimensions;
 
-import java.util.ArrayList;
-
-import javax.annotation.Nullable;
-
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
@@ -11,27 +7,8 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.NumberInvalidException;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.inventory.InventoryEnderChest;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemShulkerBox;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.border.WorldBorder;
@@ -347,6 +324,19 @@ public class WorldProviderOTG extends WorldProvider
     public net.minecraftforge.client.IRenderHandler getSkyRenderer()
     {
     	return super.getSkyRenderer(); // TODO: Replace this with custom sky renderer?
+    }
+
+    public double getGravityFactor()
+    {
+    	WorldConfig worldConfig = GetWorldConfig();
+    	return worldConfig != null ? worldConfig.gravityFactor : WorldStandardValues.gravityFactor.getDefaultValue();
+    }
+
+    public double getFallDamageFactor(double y)
+    {
+    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+    	double gravityFactor = getGravityFactor();
+    	return (y * (gravityFactor / baseGravityFactor));
     }
 
     /**

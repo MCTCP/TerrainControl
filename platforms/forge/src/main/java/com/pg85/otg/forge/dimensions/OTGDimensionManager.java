@@ -74,7 +74,9 @@ public class OTGDimensionManager
 
         NBTTagCompound compound = new NBTTagCompound();
         compound.setInteger("dimensionID", id);
-        writeNBTStrings("types", null, compound);
+        ArrayList<String> types = new ArrayList<String>();
+        types.add("OPEN_TERRAIN_GENERATOR");
+        writeNBTStrings("types", types, compound);
         FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "registerDimension", compound);
 	}
 
@@ -88,9 +90,11 @@ public class OTGDimensionManager
     	DimensionManager.unregisterDimension(dimensionId);
 
         NBTTagCompound compound = new NBTTagCompound();
-
         compound.setInteger("dimensionID", dimensionId);
-        writeNBTStrings("types", null, compound); // TODO: Collection<String> types, what's supposed to be in there?
+
+        ArrayList<String> types = new ArrayList<String>();
+        types.add("OPEN_TERRAIN_GENERATOR");
+        writeNBTStrings("types", types, compound);
 
         FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "unregisterDimension", compound);
     }
@@ -327,7 +331,7 @@ public class OTGDimensionManager
 					}
 					if(forgeWorld == null)
 					{
-						return; // If another mod added a dimension
+						continue; // If another mod added a dimension
 					}
 
 					if(forgeWorld != null)
@@ -550,7 +554,7 @@ public class OTGDimensionManager
 	}
 
 	private static Hashtable<Integer, Object> oldDims;
-	public static void RemoveTCDims()
+	public static void RemoveOTGDims()
 	{
     	Hashtable dimensions = null;
 
@@ -628,7 +632,7 @@ public class OTGDimensionManager
 		return otgDims;
 	}
 
-	public static void ReAddTCDims()
+	public static void ReAddOTGDims()
 	{
     	Hashtable dimensions = null;
 

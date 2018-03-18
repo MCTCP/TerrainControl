@@ -102,6 +102,8 @@ public final class ConfigToNetworkSender
 
     	stream.writeDouble(worldConfig.voidFogYFactor); // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
 
+    	stream.writeDouble(worldConfig.gravityFactor); // A value above 0.0, defaults to 0.08D. Affects entities jumping and falling. 0.04D would result in half the gravity and falling damage.
+
         stream.writeBoolean(worldConfig.shouldMapSpin); // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
 
         stream.writeBoolean(worldConfig.canDropChunk); // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
@@ -140,7 +142,9 @@ public final class ConfigToNetworkSender
         for (LocalBiome biome : biomes)
         {
             if (biome == null)
+            {
                 continue;
+            }
 
             if (!biome.getIds().isVirtual())
             {

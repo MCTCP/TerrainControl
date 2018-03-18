@@ -102,6 +102,8 @@ public final class ClientConfigProvider implements ConfigProvider
 
         worldSettingsReader.putSetting(WorldStandardValues.voidFogYFactor, stream.readDouble()); // 0.03125D; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
 
+        worldSettingsReader.putSetting(WorldStandardValues.gravityFactor, stream.readDouble()); // 0.08D; Affects entities jumping and falling
+
         worldSettingsReader.putSetting(WorldStandardValues.shouldMapSpin, stream.readBoolean()); // false; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
 
         worldSettingsReader.putSetting(WorldStandardValues.canDropChunk, stream.readBoolean()); // true; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.

@@ -27,7 +27,7 @@ import net.minecraft.world.gen.structure.StructureComponent;
 import net.minecraft.world.gen.structure.StructureStart;
 import net.minecraft.world.gen.structure.WoodlandMansionPieces;
 
-public class OTGWoodLandMansionGen extends MapGenStructure
+public class OTGWoodLandMansionGen extends OTGMapGenStructure
 {
 	static
 	{

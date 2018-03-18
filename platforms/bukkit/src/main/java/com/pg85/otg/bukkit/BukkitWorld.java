@@ -1748,6 +1748,11 @@ public class BukkitWorld implements LocalWorld
 	@Override
 	public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn) {
 		// TODO Auto-generated method stub
+	}
 
+	@Override
+	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk)
+	{
+		return false;
 	}
 }

@@ -52,7 +52,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.File;
 
 //@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v2", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v5", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v6", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
 public class OTGPlugin
 {
 	public static final String MOD_ID = "openterraingenerator";
@@ -216,7 +216,7 @@ public class OTGPlugin
         {
 			if(!overWorld.isRemote) // Server side only
 			{
-	        	OTGDimensionManager.ReAddTCDims();
+	        	OTGDimensionManager.ReAddOTGDims();
 
 	        	// Load any saved dimensions.
 	        	OTGDimensionManager.LoadCustomDimensionData();

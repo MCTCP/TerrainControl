@@ -229,9 +229,6 @@ public class ForgeEngine extends OTGEngine
     }
 
     BiMap<ResourceLocation, Biome> names = null;
-    // Used to bypass Forge's API in order to properly register a virtual biome
-    // that would otherwise be blocked by Forge due to virtual biome ID's
-    // surpassing 255.
     public int registerForgeBiome(int id, ResourceLocation resourceLocation, Biome biome)
     {
     	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString());
@@ -303,6 +300,10 @@ public class ForgeEngine extends OTGEngine
         }
 
         ids.put(id, biome);
+
+		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
+		biomeRegistryAvailabiltyMap.set(id, true); // Mark the id as used
+
         return id;
     }
 

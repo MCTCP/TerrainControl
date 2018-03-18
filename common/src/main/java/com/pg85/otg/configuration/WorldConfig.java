@@ -296,6 +296,8 @@ public class WorldConfig extends ConfigFile
 
     public double voidFogYFactor; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
 
+    public double gravityFactor; // 0.08D; Affects entities jumping and falling
+
     public boolean shouldMapSpin; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
 
     public boolean canDropChunk; // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
@@ -753,6 +755,8 @@ public class WorldConfig extends ConfigFile
         this.isNightWorld = reader.getSetting(WorldStandardValues.isNightWorld); // false;
 
         this.voidFogYFactor = reader.getSetting(WorldStandardValues.voidFogYFactor); // 0.03125D; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
+
+        this.gravityFactor = reader.getSetting(WorldStandardValues.gravityFactor); // 0.08D; Affects entities jumping and falling
 
         this.shouldMapSpin = reader.getSetting(WorldStandardValues.shouldMapSpin); // false; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
 
@@ -1448,6 +1452,8 @@ public class WorldConfig extends ConfigFile
         		"If true then the sky will be locked at midnight with the moon and stars above but the world will be lit as if it were day time. Useful for space dimensions.");
         writer.putSetting(WorldStandardValues.voidFogYFactor, this.voidFogYFactor,
         		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");
+        writer.putSetting(WorldStandardValues.gravityFactor, this.gravityFactor,
+        		"A value above 0.0, defaults to 0.08. Affects entities jumping and falling. 0.04 would result in half the gravity and falling damage.");
         writer.putSetting(WorldStandardValues.shouldMapSpin, this.shouldMapSpin,
         		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
         writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk,

@@ -12,6 +12,7 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -28,6 +29,18 @@ public class OTGClassTransformer implements IClassTransformer
 	{
 		"net.minecraftforge.registries.GameData",
 		"net.minecraft.world.biome.Biome",
+		"net.minecraft.entity.EntityLivingBase",
+		"net.minecraft.entity.item.EntityMinecart",
+		"net.minecraft.entity.projectile.EntityArrow",
+		"net.minecraft.entity.item.EntityBoat",
+		"net.minecraft.entity.item.EntityFallingBlock",
+		"net.minecraft.entity.item.EntityItem",
+		"net.minecraft.entity.projectile.EntityLlamaSpit",
+		"net.minecraft.entity.projectile.EntityShulkerBullet",
+		"net.minecraft.entity.projectile.EntityThrowable",
+		"net.minecraft.entity.item.EntityTntPrimed",
+		"net.minecraft.entity.item.EntityXPOrb",
+		"net.minecraft.entity.Entity",
 		// Places to inject OTGWorldServerMulti
 		//"net.minecraftforge.common.DimensionManager",
 		//"net.minecraft.server.MinecraftServer",
@@ -72,13 +85,49 @@ public class OTGClassTransformer implements IClassTransformer
 				case 1: // net.minecraft.world.biome.Biome.getIdForBiome(biome)
 					transformGetIdForBiome(classNode, isObfuscated);
 				break;
-				case 2: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
+				case 2: // net.minecraft.entity.EntityLivingBase.travel
+					transformTravel(classNode, isObfuscated);
+				break;
+				case 3: // net.minecraft.entity.item.EntityMinecart.onUpdate
+					transformOnUpdateMineCart(classNode, isObfuscated);
+				break;
+				case 4: // net.minecraft.entity.projectile.EntityArrow.onUpdate
+					transformOnUpdateArrow(classNode, isObfuscated);
+				break;
+				case 5: // net.minecraft.entity.item.EntityBoat.onUpdate
+					transformOnUpdateBoat(classNode, isObfuscated);
+				break;
+				case 6: // net.minecraft.entity.item.EntityFallingBlock.onUpdate
+					transformOnUpdateFallingBlock(classNode, isObfuscated);
+				break;
+				case 7: // net.minecraft.entity.item.EntityItem.onUpdate
+					transformOnUpdateItem(classNode, isObfuscated);
+				break;
+				case 8: // net.minecraft.entity.projectile.EntityLlamaSpit.onUpdate
+					transformOnUpdateLlamaSpit(classNode, isObfuscated);
+				break;
+				case 9: // net.minecraft.entity.projectile.EntityShulkerBullet.onUpdate
+					transformOnUpdateShulkerBullet(classNode, isObfuscated);
+				break;
+				case 10: // net.minecraft.entity.projectile.EntityThrowable.onUpdate
+					transformOnUpdateThrowable(classNode, isObfuscated);
+				break;
+				case 11: // net.minecraft.entity.item.EntityTntPrimed.onUpdate
+					transformOnUpdateTntPrimed(classNode, isObfuscated);
+				break;
+				case 12: // net.minecraft.entity.item.EntityXPOrb.onUpdate
+					transformOnUpdateXPOrb(classNode, isObfuscated);
+				break;
+				case 13: // net.minecraft.entity.Entity.updateFallState
+					transformUpdateFallState(classNode, isObfuscated);
+				break;
+				case 14: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
 					transformInitDimension(classNode, isObfuscated);
 				break;
-				case 3: // net.minecraft.server.MinecraftServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
+				case 15: // net.minecraft.server.MinecraftServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
 					transformLoadAllWorldsMinecraftServer(classNode, isObfuscated);
 				break;
-				case 4: // net.minecraft.server.integrated.IntegratedServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
+				case 16: // net.minecraft.server.integrated.IntegratedServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
 					transformLoadAllWorldsIntegratedServer(classNode, isObfuscated);
 				break;
 			}
@@ -116,7 +165,7 @@ public class OTGClassTransformer implements IClassTransformer
 
 				if(targetNode == null)
 				{
-					break;
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
 				}
 
 				/*
@@ -214,7 +263,7 @@ public class OTGClassTransformer implements IClassTransformer
 	private void transformInjectSnapshot(ClassNode gameDataNode, boolean isObfuscated)
 	{
 		String injectSnapShot = isObfuscated ? "injectSnapshot" : "injectSnapshot";
-		String injectSnapShotDescriptor = isObfuscated ? "injectSnapshot" : "(Ljava/util/Map;ZZ)Lcom/google/common/collect/Multimap;";
+		String injectSnapShotDescriptor = isObfuscated ? "(Ljava/util/Map;ZZ)Lcom/google/common/collect/Multimap;" : "(Ljava/util/Map;ZZ)Lcom/google/common/collect/Multimap;";
 
 		for(MethodNode method : gameDataNode.methods)
 		{
@@ -256,7 +305,7 @@ public class OTGClassTransformer implements IClassTransformer
 
 				if(targetNode == null)
 				{
-					break;
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
 				}
 
 				/*
@@ -301,47 +350,538 @@ public class OTGClassTransformer implements IClassTransformer
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");
 	}
 
-	//net.minecraftforge.common.DimensionManager.initDimension(int dim)
-	private void transformInitDimension(ClassNode gameDataNode, boolean isObfuscated)
+	// Gravity settings for players
+	// net.minecraft.entity.EntityLivingBase.travel(float strafe, float vertical, float forward)
+	private void transformTravel(ClassNode gameDataNode, boolean isObfuscated)
 	{
-		String injectSnapShot = isObfuscated ? "initDimension" : "initDimension";
-		String injectSnapShotDescriptor = isObfuscated ? "initDimension" : "(I)V";
+		String injectSnapShot = isObfuscated ? "a" : "travel";
+		String injectSnapShotDescriptor = isObfuscated ? "(FFF)V" : "(FFF)V";
 
 		for(MethodNode method : gameDataNode.methods)
 		{
 			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
 			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.08D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.08D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactor", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// Gravity settings for minecarts
+	// net.minecraft.entity.item.EntityMinecart.onUpdate()
+	private void transformOnUpdateMineCart(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.03999999910593033D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.03999999910593033D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorMineCart", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// Gravity settings for arrows
+	// net.minecraft.entity.projectile.EntityArrow.onUpdate()
+	private void transformOnUpdateArrow(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.05000000074505806D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.05000000074505806D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorArrow", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.item.EntityBoat.updateMotion()
+	private void transformOnUpdateBoat(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "x" : "updateMotion";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//double d1 = this.hasNoGravity() ? 0.0D : -0.03999999910593033D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == -0.03999999910593033D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorBoat", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.item.EntityFallingBlock.onUpdate
+	private void transformOnUpdateFallingBlock(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.03999999910593033D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.03999999910593033D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorFallingBlock", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.item.EntityItem.onUpdate
+	private void transformOnUpdateItem(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.03999999910593033D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() ==  0.03999999910593033D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorItem", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.projectile.LlamaSpit.onUpdate
+	private void transformOnUpdateLlamaSpit(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.05999999865889549D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.05999999865889549D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorLlamaSpit", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.projectile.EntityShulkerBullet.onUpdate
+	private void transformOnUpdateShulkerBullet(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.05000000074505806D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.04D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorShulkerBullet", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.projectile.EntityThrowable.getGravityVelocity
+	private void transformOnUpdateThrowable(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "j" : "getGravityVelocity";
+		String injectSnapShotDescriptor = isObfuscated ? "()F" : "()F";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//return 0.03F;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Float && ((Float)((LdcInsnNode)instruction).cst).floatValue() == 0.03F)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorThrowable", "(Lnet/minecraft/entity/Entity;)F", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.item.EntityTntPrimed",
+	private void transformOnUpdateTntPrimed(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.03999999910593033D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.03999999910593033D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorTNTPrimed", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.entity.item.EntityXPOrb.onUpdate
+	private void transformOnUpdateXPOrb(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
+		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode instructionToRemove = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//this.motionY -= 0.029999999329447746D;
+
+					if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.029999999329447746D)
+					{
+						instructionToRemove = instruction;
+						InsnList toInsert = new InsnList();
+
+						toInsert.add(new VarInsnNode(ALOAD, 0));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorXPOrb", "(Lnet/minecraft/entity/Entity;)D", false));
+						method.instructions.insertBefore(instructionToRemove, toInsert);
+						break;
+					}
+				}
+				if(instructionToRemove != null)
+				{
+					method.instructions.remove(instructionToRemove);
+				} else {
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	// Gravity settings for falling damage
+	//protected void net.minecraft.entity.Entity.updateFallState(double y, boolean onGroundIn, IBlockState state, BlockPos pos)
+	private void transformUpdateFallState(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "a" : "updateFallState";
+		String injectSnapShotDescriptor = isObfuscated ? "(DZLawt;Let;)V" : "(DZLnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/math/BlockPos;)V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				boolean bFound = false;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					// this.fallDistance = (float)((double)this.fallDistance - y);
+					// should be
+					// this.fallDistance = (float)((double)this.fallDistance - (y * gravityFactor));
+					// Where gravityFactor is between 0 and 1 and determines how much falling damage should be applied based on the gravity of the world.
+
+					//mv.visitVarInsn(DLOAD, 1);
+
+					if(instruction.getOpcode() == DLOAD)
+					{
+						// Only apply to the second DLOAD
+						if(bFound)
+						{
+							// Insert new instruction
+							InsnList toInsert = new InsnList();
+							toInsert.add(new VarInsnNode(ALOAD, 0));
+							toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getFallDamageFactor", "(DLnet/minecraft/entity/Entity;)D", false));
+							method.instructions.insertBefore(instruction.getNext(), toInsert);
+							return;
+						}
+						bFound = true;
+					}
+				}
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+
+	//net.minecraftforge.common.DimensionManager.initDimension(int dim)
+	private void transformInitDimension(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "initDimension" : "initDimension";
+		String injectSnapShotDescriptor = isObfuscated ? "(I)V" : "(I)V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				boolean bFound1 = false;
+				boolean bFound2 = false;
+				boolean bFound3 = false;
+				boolean bFound4 = false;
+				//boolean bFound5 = false;
+				boolean bFound6 = false;
 				for(AbstractInsnNode instruction : method.instructions.toArray())
 				{
 					if(instruction.getOpcode() == CHECKCAST && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti"; //
+						bFound1 = true;
 					}
 					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound2 = true;
 					}
 					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti"; //
+						bFound3 = true;
 					}
 					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound4 = true;
 					}
 					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti"; //
+						bFound4 = true;
 					}
 					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
 					{
 						//((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti"; // first, twice
+						//bFound5 = true;
 					}
 					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti"; //
+						bFound6 = true;
 						//break;
 					}
+				}
+
+				if(!(bFound1 && bFound2 && bFound3 && bFound4 && bFound6))
+				{
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
 				}
 
 				/*
@@ -393,43 +933,62 @@ public class OTGClassTransformer implements IClassTransformer
 	private void transformLoadAllWorldsMinecraftServer(ClassNode gameDataNode, boolean isObfuscated)
 	{
 		String injectSnapShot = isObfuscated ? "loadAllWorlds" : "loadAllWorlds";
-		String injectSnapShotDescriptor = isObfuscated ? "loadAllWorlds" : "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V";
+		String injectSnapShotDescriptor = isObfuscated ? "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V" : "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V";
 
 		for(MethodNode method : gameDataNode.methods)
 		{
 			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
 			{
+				boolean bFound1 = false;
+				boolean bFound2 = false;
+				boolean bFound3 = false;
+				boolean bFound4 = false;
+				boolean bFound5 = false;
+				boolean bFound6 = false;
+				boolean bFound7 = false;
 				for(AbstractInsnNode instruction : method.instructions.toArray())
 				{
 					if(instruction.getOpcode() == CHECKCAST && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound1 = true;
 					}
 					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound2 = true;
 					}
 					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound3 = true;
 					}
 					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound4 = true;
 					}
 					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound5 = true;
 					}
 					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound6 = true;
 					}
 					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound7 = true;
 						break;
 					}
+				}
+
+				if(!(bFound1 && bFound2 && bFound3 && bFound4 && bFound5 && bFound6 && bFound7))
+				{
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
 				}
 
 				/*
@@ -480,43 +1039,62 @@ public class OTGClassTransformer implements IClassTransformer
 	private void transformLoadAllWorldsIntegratedServer(ClassNode gameDataNode, boolean isObfuscated)
 	{
 		String injectSnapShot = isObfuscated ? "loadAllWorlds" : "loadAllWorlds";
-		String injectSnapShotDescriptor = isObfuscated ? "loadAllWorlds" : "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V";
+		String injectSnapShotDescriptor = isObfuscated ? "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V" : "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V";
 
 		for(MethodNode method : gameDataNode.methods)
 		{
 			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
 			{
+				boolean bFound1 = false;
+				boolean bFound2 = false;
+				boolean bFound3 = false;
+				boolean bFound4 = false;
+				boolean bFound5 = false;
+				boolean bFound6 = false;
+				boolean bFound7 = false;
 				for(AbstractInsnNode instruction : method.instructions.toArray())
 				{
 					if(instruction.getOpcode() == CHECKCAST && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound1 = true;
 					}
 					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound2 = true;
 					}
 					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound3 = true;
 					}
 					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound4 = true;
 					}
 					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound5 = true;
 					}
 					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound6 = true;
 					}
 					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
 					{
 						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
+						bFound7 = true;
 						break;
 					}
+				}
+
+				if(!(bFound1 && bFound2 && bFound3 && bFound4 && bFound5 && bFound6 && bFound7))
+				{
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
 				}
 
 				/*

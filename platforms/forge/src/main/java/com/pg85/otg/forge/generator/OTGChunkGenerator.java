@@ -335,6 +335,15 @@ public class OTGChunkGenerator implements IChunkGenerator
         return false;
     }
 
+    public boolean isInsideStructure(World worldIn, BlockPos pos)
+    {
+        return this.world.strongholdGen.isInsideStructure(pos) ||
+        this.world.woodLandMansionGen.isInsideStructure(pos) ||
+        this.world.oceanMonumentGen.isInsideStructure(pos) ||
+        this.world.villageGen.isInsideStructure(pos) ||
+        this.world.mineshaftGen.isInsideStructure(pos) ||
+        this.world.rareBuildingGen.isInsideStructure(pos);
+    }
 
 	@Override
     public boolean isInsideStructure(World worldIn, String structureName, BlockPos pos)

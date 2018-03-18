@@ -19,7 +19,7 @@ import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
 
-public class OTGOceanMonumentGen extends MapGenStructure
+public class OTGOceanMonumentGen extends OTGMapGenStructure
 {
     private int spacing = 32;
     private int separation = 5;

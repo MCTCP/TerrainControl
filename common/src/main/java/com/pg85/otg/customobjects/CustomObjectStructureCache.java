@@ -112,7 +112,7 @@ public class CustomObjectStructureCache
     }
 
     public boolean processing = false;
-    public void PlotStructures(ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
+    public void PlotStructures(Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
     {
     	if(!processing)
     	{
@@ -121,17 +121,20 @@ public class CustomObjectStructureCache
 	        {
 	            LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8);
 	            BiomeConfig biomeConfig = biome.getBiomeConfig();
-
-	            // Get Bo3's for this biome
 	            ArrayList<CustomStructureGen> customStructureGens = new ArrayList<CustomStructureGen>();
-	            for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
-	            {
-	            	// TODO: Find out if not checking for error could cause problems
-	            	if(res instanceof CustomStructureGen)// && ((CustomStructureGen)res).error == null)
-	            	{
-	            		customStructureGens.add((CustomStructureGen)res);
-	            	}
-	            }
+
+	        	if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+	        	{
+		            // Get Bo3's for this biome
+		            for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
+		            {
+		            	// TODO: Find out if not checking for error could cause problems
+		            	if(res instanceof CustomStructureGen)// && ((CustomStructureGen)res).error == null)
+		            	{
+		            		customStructureGens.add((CustomStructureGen)res);
+		            	}
+		            }
+	        	}
 
 	            if(customStructureGens.size() > 0)
 	            {
@@ -333,28 +336,34 @@ public class CustomObjectStructureCache
 							        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
 							            				if(biomeStructures == null)
 							        	            	{
-							            					biome3 = world.getBiome((chunkCoord.getChunkX() + j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 8);
-							            					if(!biome3.getName().equals(biome.getName()))
-								            				{
-									        	                biomeConfig3 = biome3.getBiomeConfig();
-									        	                structuresToSpawn = new ArrayList<String>();
+						            						if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+						            						{
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() + j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 8);
+								            					// Get cached data if available
+								            					if(!biome3.getName().equals(biome.getName()))
+									            				{
+										        	                biomeConfig3 = biome3.getBiomeConfig();
+										        	                structuresToSpawn = new ArrayList<String>();
 
-									        	                // Get Bo3's for this biome
-									        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
-									        	                {
-									        	                	if(res instanceof CustomStructureGen)
-									        	                	{
-									        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-									        	                	}
-									        	                }
-									        	                biomeStructures = structuresToSpawn;
-								            				} else {
-								        	            		canSpawnHere = true;
-								        	            		biomeStructures = structuresToSpawn1;
-								        	            	}
+										        	                // Get Bo3's for this biome
+										        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
+										        	                {
+										        	                	if(res instanceof CustomStructureGen)
+										        	                	{
+										        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+										        	                	}
+										        	                }
+										        	                biomeStructures = structuresToSpawn;
+									            				} else {
+									        	            		canSpawnHere = true;
+									        	            		biomeStructures = structuresToSpawn1;
+									        	            	}
+						            						} else {
+						            							biomeStructures = new ArrayList<String>(); // Don't spawn anything here, there is a default structure.
+						            						}
 							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + j), (chunkCoord.getChunkZ() + i)),biomeStructures);
 						            					}
 							        	                for(String structureToSpawn : biomeStructures)
@@ -397,28 +406,33 @@ public class CustomObjectStructureCache
 							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - j), (chunkCoord.getChunkZ() + i)));
 							            				if(biomeStructures == null)
 							        	            	{
-							            					biome3 = world.getBiome((chunkCoord.getChunkX() - j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 8);
-							            					if(!biome3.getName().equals(biome.getName()))
-								            				{
-									        	                biomeConfig3 = biome3.getBiomeConfig();
-									        	                structuresToSpawn = new ArrayList<String>();
+							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+							            					{
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() - j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 8);
+								            					if(!biome3.getName().equals(biome.getName()))
+									            				{
+										        	                biomeConfig3 = biome3.getBiomeConfig();
+										        	                structuresToSpawn = new ArrayList<String>();
 
-									        	                // Get Bo3's for this biome
-									        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
-									        	                {
-									        	                	if(res instanceof CustomStructureGen)
-									        	                	{
-									        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-									        	                	}
-									        	                }
-									        	                biomeStructures = structuresToSpawn;
-								            				} else {
-								        	            		canSpawnHere = true;
-								        	            		biomeStructures = structuresToSpawn1;
-								        	            	}
+										        	                // Get Bo3's for this biome
+										        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
+										        	                {
+										        	                	if(res instanceof CustomStructureGen)
+										        	                	{
+										        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+										        	                	}
+										        	                }
+										        	                biomeStructures = structuresToSpawn;
+									            				} else {
+									        	            		canSpawnHere = true;
+									        	            		biomeStructures = structuresToSpawn1;
+									        	            	}
+							            					} else {
+							            						biomeStructures = new ArrayList<String>();
+							            					}
 							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - j), (chunkCoord.getChunkZ() + i)),biomeStructures);
 						            					}
 							        	                for(String structureToSpawn : biomeStructures)
@@ -461,28 +475,33 @@ public class CustomObjectStructureCache
 							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + j)));
 							            				if(biomeStructures == null)
 							        	            	{
-							            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + j) * 16 + 8);
-							            					if(!biome3.getName().equals(biome.getName()))
-								            				{
-									        	                biomeConfig3 = biome3.getBiomeConfig();
-									        	                structuresToSpawn = new ArrayList<String>();
+							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+							            					{
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + j) * 16 + 8);
+								            					if(!biome3.getName().equals(biome.getName()))
+									            				{
+										        	                biomeConfig3 = biome3.getBiomeConfig();
+										        	                structuresToSpawn = new ArrayList<String>();
 
-									        	                // Get Bo3's for this biome
-									        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
-									        	                {
-									        	                	if(res instanceof CustomStructureGen)
-									        	                	{
-									        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-									        	                	}
-									        	                }
-									        	                biomeStructures = structuresToSpawn;
-								            				} else {
-								        	            		canSpawnHere = true;
-								        	            		biomeStructures = structuresToSpawn1;
-								        	            	}
+										        	                // Get Bo3's for this biome
+										        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
+										        	                {
+										        	                	if(res instanceof CustomStructureGen)
+										        	                	{
+										        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+										        	                	}
+										        	                }
+										        	                biomeStructures = structuresToSpawn;
+									            				} else {
+									        	            		canSpawnHere = true;
+									        	            		biomeStructures = structuresToSpawn1;
+									        	            	}
+							            					} else {
+							            						biomeStructures = new ArrayList<String>();
+							            					}
 							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + j)),biomeStructures);
 						            					}
 							        	                for(String structureToSpawn : biomeStructures)
@@ -525,28 +544,33 @@ public class CustomObjectStructureCache
 							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - j)));
 							            				if(biomeStructures == null)
 							        	            	{
-							            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - j) * 16 + 8);
-							            					if(!biome3.getName().equals(biome.getName()))
-								            				{
-									        	                biomeConfig3 = biome3.getBiomeConfig();
-									        	                structuresToSpawn = new ArrayList<String>();
+							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+							            					{
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - j) * 16 + 8);
+								            					if(!biome3.getName().equals(biome.getName()))
+									            				{
+										        	                biomeConfig3 = biome3.getBiomeConfig();
+										        	                structuresToSpawn = new ArrayList<String>();
 
-									        	                // Get Bo3's for this biome
-									        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
-									        	                {
-									        	                	if(res instanceof CustomStructureGen)
-									        	                	{
-									        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-									        	                	}
-									        	                }
-									        	                biomeStructures = structuresToSpawn;
-								            				} else {
-								        	            		canSpawnHere = true;
-								        	            		biomeStructures = structuresToSpawn1;
-								        	            	}
+										        	                // Get Bo3's for this biome
+										        	                for (ConfigFunction<BiomeConfig> res : biomeConfig3.resourceSequence)
+										        	                {
+										        	                	if(res instanceof CustomStructureGen)
+										        	                	{
+										        	                		for(String bo3Name : ((CustomStructureGen)res).objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+										        	                	}
+										        	                }
+										        	                biomeStructures = structuresToSpawn;
+									            				} else {
+									        	            		canSpawnHere = true;
+									        	            		biomeStructures = structuresToSpawn1;
+									        	            	}
+							            					} else {
+							            						biomeStructures = new ArrayList<String>();
+							            					}
 							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - j)),biomeStructures);
 						            					}
 							        	                for(String structureToSpawn : biomeStructures)

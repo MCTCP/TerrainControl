@@ -16,7 +16,7 @@ import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
 
-public class OTGMineshaftGen extends MapGenStructure
+public class OTGMineshaftGen extends OTGMapGenStructure
 {
     @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)

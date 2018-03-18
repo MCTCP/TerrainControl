@@ -18,7 +18,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.*;
 
-public class OTGRareBuildingGen extends MapGenStructure
+public class OTGRareBuildingGen extends OTGMapGenStructure
 {
     public List<Biome> biomeList;
 
@@ -131,7 +131,7 @@ public class OTGRareBuildingGen extends MapGenStructure
     {
         return StructureNames.RARE_BUILDING;
     }
-    
+
 	@Override
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {

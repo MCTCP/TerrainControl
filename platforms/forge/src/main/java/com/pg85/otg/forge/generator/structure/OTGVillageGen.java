@@ -7,16 +7,19 @@ import com.pg85.otg.forge.ForgeBiome;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.StructureStart;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class OTGVillageGen extends MapGenStructure
+public class OTGVillageGen extends OTGMapGenStructure
 {
     /**
      * A list of all the biomes villages can spawn in.
@@ -97,7 +100,7 @@ public class OTGVillageGen extends MapGenStructure
     {
         return StructureNames.VILLAGE;
     }
-    
+
 	@Override
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {

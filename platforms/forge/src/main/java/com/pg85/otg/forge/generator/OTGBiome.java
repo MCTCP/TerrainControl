@@ -29,6 +29,9 @@ import org.apache.logging.log4j.core.Logger;
 
 /**
  * Used for all custom biomes.
+ * Note: This class implements some fishy stuff in equals() and hashCode().
+ * As a result, comparing any OTGBiome with biomeName "Ocean" to any other
+ * OTGBiome with biomeName "Ocean" will return true.
  */
 public class OTGBiome extends Biome implements IOTGASMBiome
 {
@@ -244,4 +247,31 @@ public class OTGBiome extends Biome implements IOTGASMBiome
 	{
 		return savedId;
 	}
+
+    @Override
+    public boolean equals(Object obj)
+    {
+		// TODO: This is a super ugly hack, make this prettier..
+		// Need to do this to make sure that any OTGBiome of Ocean registered in the biome registry
+		// can be found when querying biome names / id's using a different OTGBiome of Ocean.
+		// This is because MC and mods may cache the ocean biome at some point and use it as a default value/fallback.
+		// Since OTG replaces the biome in the registry every time a new (over)world is created this causes problems.
+    	return obj instanceof OTGBiome && ((OTGBiome)obj).biomeName.equals("Ocean") && this.biomeName.equals("Ocean") ? true : super.equals(obj);
+    }
+
+    @Override
+    public int hashCode()
+    {
+    	if(this.biomeName.equals("Ocean"))
+    	{
+    		// TODO: This is a super ugly hack, make this prettier..
+    		// Need to do this to make sure that any OTGBiome of Ocean registered in the biome registry
+    		// can be found when querying biome names / id's using a different OTGBiome of Ocean.
+    		// This is because MC and mods may cache the ocean biome at some point and use it as a default value/fallback.
+    		// Since OTG replaces the biome in the registry every time a new (over)world is created this causes problems.
+    		return 0;
+    	} else {
+    		return super.hashCode();
+    	}
+    }
 }

@@ -258,4 +258,6 @@ public interface LocalWorld
 	public ChunkCoordinate getSpawnChunk();
 
 	public BlockFunction[] getBlockColumn(int x, int z);
+
+	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk);
 }
