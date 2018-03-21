@@ -85,7 +85,7 @@ public class TXVillageGen extends MapGenStructure
             }
             if (canSpawn)
             {
-                //System.out.println("Village spawned at: x:" + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
+                System.out.println("Village spawned at: x:" + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
                 return true;
             }
         }

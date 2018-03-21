@@ -106,7 +106,7 @@ public class TXMansionGen extends MapGenStructure
             boolean flag = this.world.getBiomeProvider().areBiomesViable(chunkX * 16 + 8, chunkZ * 16 + 8, 32, biomeList);
             if (flag)
             {
-                //System.out.println("Mansion spawned at: x:" + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
+                System.out.println("Mansion spawned at: x:" + (chunkX * 16 + 8) + ", y: unknown , z: " + (chunkZ * 16 + 8));
                 return true;
             }
             if (chunkX != startX || chunkZ != startZ) {
