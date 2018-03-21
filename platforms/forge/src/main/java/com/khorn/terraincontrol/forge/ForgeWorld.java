@@ -463,6 +463,7 @@ public class ForgeWorld implements LocalWorld
         if (y < TerrainControl.WORLD_DEPTH || y >= TerrainControl.WORLD_HEIGHT) {
             return;
         }
+        BlockFalling.fallInstantly=true;
 
         IBlockState newState = ((ForgeMaterialData) material).internalBlock();
 
@@ -526,6 +527,7 @@ public class ForgeWorld implements LocalWorld
 
         // Notify world: (2 | 16) == update client, don't update observers
         this.world.markAndNotifyBlock(pos, chunk, oldState, newState, 2 | 16);
+        BlockFalling.fallInstantly=false;
     }
 
 
