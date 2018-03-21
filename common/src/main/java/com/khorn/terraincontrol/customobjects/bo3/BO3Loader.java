@@ -30,17 +30,29 @@ public class BO3Loader implements CustomObjectLoader
         // Register BO3 ConfigFunctions
         ConfigFunctionsManager registry = TerrainControl.getConfigFunctionsManager();
         registry.registerConfigFunction("Block", BlockFunction.class);
+        registry.registerConfigFunction("B", BlockFunction.class);
         registry.registerConfigFunction("Branch", BranchFunction.class);
-        registry.registerConfigFunction("WeightedBranch",
-                WeightedBranchFunction.class);
-        registry.registerConfigFunction("RandomBlock",
-                RandomBlockFunction.class);
-        registry.registerConfigFunction("MinecraftObject",
-                MinecraftObjectFunction.class);
+        registry.registerConfigFunction("BR", BranchFunction.class);
+        registry.registerConfigFunction("WeightedBranch", WeightedBranchFunction.class);
+        registry.registerConfigFunction("WBR", WeightedBranchFunction.class);
+        registry.registerConfigFunction("RandomBlock", RandomBlockFunction.class);
+        registry.registerConfigFunction("RB", RandomBlockFunction.class);
+        registry.registerConfigFunction("MinecraftObject", MinecraftObjectFunction.class);
+        registry.registerConfigFunction("MCO", MinecraftObjectFunction.class);
         registry.registerConfigFunction("BlockCheck", BlockCheck.class);
+        registry.registerConfigFunction("BC", BlockCheck.class);
         registry.registerConfigFunction("BlockCheckNot", BlockCheckNot.class);
+        registry.registerConfigFunction("BCN", BlockCheckNot.class);
         registry.registerConfigFunction("LightCheck", LightCheck.class);
+        registry.registerConfigFunction("LC", LightCheck.class);
         registry.registerConfigFunction("Entity", EntityFunction.class);
+        registry.registerConfigFunction("E", EntityFunction.class);
+        //registry.registerConfigFunction("Particle", ParticleFunction.class);
+        //registry.registerConfigFunction("P", ParticleFunction.class);
+        //registry.registerConfigFunction("Spawner", SpawnerFunction.class);
+        //registry.registerConfigFunction("S", SpawnerFunction.class);
+        //registry.registerConfigFunction("ModData", ModDataFunction.class);
+        //registry.registerConfigFunction("MD", ModDataFunction.class);
     }
 
     @Override
