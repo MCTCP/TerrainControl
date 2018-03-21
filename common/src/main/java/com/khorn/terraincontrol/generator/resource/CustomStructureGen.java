@@ -37,7 +37,7 @@ public class CustomStructureGen extends Resource
             }
             if (object.getBranches(Rotation.NORTH).length == 0)
             {
-                throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure: it has no branches");
+                //throw new InvalidConfigException("The object " + args.get(i) + " isn't a structure: it has no branches");
             }
             objects.add(object);
             objectNames.add(args.get(i));
@@ -47,7 +47,7 @@ public class CustomStructureGen extends Resource
         // Inject ourselves in the BiomeConfig
         if (getHolder().structureGen != null)
         {
-            throw new InvalidConfigException("There can only be one CustomStructure resource in each BiomeConfig");
+            //throw new InvalidConfigException("There can only be one CustomStructure resource in each BiomeConfig");
         }
         getHolder().structureGen = this;
     }
