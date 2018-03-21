@@ -37,7 +37,7 @@ public class TXVillageStart extends StructureStart
         if (config != null)
         {
             // Ignore removed custom biomes
-            changeToSandstoneVillage(startPiece, config.villageType == VillageType.sandstone);
+            changeVillageType(startPiece, config.villageType == VillageType.wood ? 0 : config.villageType == VillageType.sandstone ? 1 : config.villageType == VillageType.savanna ? 2 : config.villageType == VillageType.taiga ? 3 : 0);
         }
 
         this.components.add(startPiece);
@@ -87,20 +87,21 @@ public class TXVillageStart extends StructureStart
      * @param sandstoneVillage Whether the village should be a sandstone
      *                         village.
      */
-    private void changeToSandstoneVillage(StructureVillagePieces.Start subject, boolean sandstoneVillage)
+    private void changeVillageType(StructureVillagePieces.Start subject, int villageType)
     {
-        for (Field field : StructureVillagePieces.Start.class.getFields())
+        for (Field field : net.minecraft.world.gen.structure.StructureVillagePieces.Village.class.getDeclaredFields())
         {
-            if (field.getType().toString().equals("boolean"))
+            String fieldName = field.getName();
+            if (fieldName.equals("structureType") || fieldName.equals("field_189928_h")) // field_189928_h may have to be updated for newer versions of mc/forge (> 1.10.2), see http://export.mcpbot.bspk.rs/ for obfuscated method/field names.
             {
                 try
                 {
                     field.setAccessible(true);
-                    field.setBoolean(subject, sandstoneVillage);
+                    field.setInt(subject, villageType);
                     break;
                 } catch (Exception e)
                 {
-                    TerrainControl.log(LogMarker.FATAL, "Cannot make village a sandstone village!");
+                    TerrainControl.log(LogMarker.FATAL, "Cannot set specified village type!");
                     TerrainControl.printStackTrace(LogMarker.FATAL, e);
                 }
             }
