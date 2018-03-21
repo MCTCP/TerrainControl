@@ -118,7 +118,9 @@ public class BiomeConfig extends ConfigFile
     {
         disabled,
         wood,
-        sandstone
+        sandstone,
+        taiga,
+        savanna
     }
 
     public VillageType villageType;
