@@ -5,7 +5,6 @@ import com.khorn.terraincontrol.*;
 import com.khorn.terraincontrol.configuration.*;
 import com.khorn.terraincontrol.customobjects.CustomObjectStructureCache;
 import com.khorn.terraincontrol.exception.BiomeNotFoundException;
-import com.khorn.terraincontrol.forge.feature.RandomPlantStateGenerator;
 import com.khorn.terraincontrol.forge.generator.TXBiome;
 import com.khorn.terraincontrol.forge.generator.TXChunkGenerator;
 import com.khorn.terraincontrol.forge.generator.structure.*;
@@ -43,7 +42,6 @@ import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -63,7 +61,7 @@ public class ForgeWorld implements LocalWorld
     private static int nextBiomeId = 0;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
-    public HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
+    public HashMap<String, LocalBiome> biomeNames = new HashMap<>();
 
     public TXMansionGen mansionGen;
     public TXStrongholdGen strongholdGen;
@@ -94,7 +92,6 @@ public class ForgeWorld implements LocalWorld
     private WorldGenTaiga2 taigaTree2;
 
     private Chunk[] chunkCache;
-    private Random random = new Random();
 
     ForgeWorld(String _name)
     {
@@ -157,7 +154,7 @@ public class ForgeWorld implements LocalWorld
     {
         // Loop through all default biomes and create the default
         // settings for them
-        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
+        List<BiomeLoadInstruction> standardBiomes = new ArrayList<>();
         for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
             int id = defaultBiome.Id;
@@ -478,52 +475,11 @@ public class ForgeWorld implements LocalWorld
 
         BlockPos pos = new BlockPos(x, y, z);
 
-        // Start Almura Hack for Crop/Flower Population
-        Block block = newState.getBlock();
-
-        IBlockState toReplaceState = null;
-        if (block == Blocks.TALLGRASS) {
-            final float temperature = this.getBiome(pos.getX(), pos.getZ()).getTemperatureAt(pos.getX(), pos.getY(), pos.getZ());
-
-            if (temperature <= 0.05) { // Snow
-                if (random.nextInt(25) + 1 == 1) {
-                    toReplaceState = RandomPlantStateGenerator.randomIceFlower(world, pos, random);
-                }
-            }
-
-            if (temperature >= 0.5 && temperature <= 0.95) { // Normal
-                final int chance = random.nextInt(75) + 1; // Random between 1 and 11
-
-                if (chance == 1) {
-                    toReplaceState = RandomPlantStateGenerator.randomCrop(world, pos, random);
-                } else if (chance == 2) {
-                    toReplaceState = RandomPlantStateGenerator.randomFlower(world, pos, random);
-                }
-            }
-        }
-
-        if (toReplaceState != null) {
-            newState = toReplaceState;
-        }
-
-        // End Almura Hack
-
         IBlockState oldState = chunk.setBlockState(pos, newState);
-       // int oldLight = oldState.getLightValue(this.world, pos);
-       // int oldOpacity = oldState.getLightOpacity(this.world, pos);
 
         if (oldState == null) {
             return;
         }
-
-        // Relight and update players
-        /*
-        if (newState.getLightOpacity(this.world, pos) != oldOpacity || newState.getLightValue(this.world, pos) != oldLight)
-        {
-            this.world.profiler.startSection("checkLight");
-            this.world.checkLight(pos);
-            this.world.profiler.endSection();
-        } */
 
         // Notify world: (2 | 16) == update client, don't update observers
         this.world.markAndNotifyBlock(pos, chunk, oldState, newState, 2 | 16);
