@@ -112,7 +112,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getMaxBiomesCount()
     {
-        return TerrainControl.MAX_BIOME_ID;
+        return TerrainControl.SUPPORTED_BIOME_IDS;
     }
 
     @Override

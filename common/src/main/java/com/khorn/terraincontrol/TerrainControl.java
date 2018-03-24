@@ -32,8 +32,14 @@ public class TerrainControl
     public static final int SUPPORTED_BLOCK_IDS = 4096;
 
     /**
-     * The world depth that the engine supports. Not the actual depth the
-     * world is capped at. 0 in Minecraft.
+     * The amount of different biome ids that are supported. 256 in Minecraft,
+     * so the extra ones cannot be saved to the world files.
+     */
+    public static final int SUPPORTED_BIOME_IDS = 1024;
+
+    /**
+     * The world depth that the engine supports. Not the actual depth the world
+     * is capped at. 0 in Minecraft.
      */
     public static final int WORLD_DEPTH = 0;
 
@@ -43,7 +49,6 @@ public class TerrainControl
      */
     public static final int WORLD_HEIGHT = 256;
 
-    public static final int MAX_BIOME_ID = 9999;
     /**
      * @see TerrainControlEngine#fireCanCustomObjectSpawnEvent(CustomObject,
      * LocalWorld, int, int, int)

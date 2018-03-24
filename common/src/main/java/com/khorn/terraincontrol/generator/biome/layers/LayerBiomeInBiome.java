@@ -14,7 +14,7 @@ public class LayerBiomeInBiome extends Layer
     {
         short biomeId;
         int chance = 10;
-        boolean[] canSpawnIn = new boolean[TerrainControl.MAX_BIOME_ID];
+        boolean[] canSpawnIn = new boolean[TerrainControl.SUPPORTED_BIOME_IDS];
         long scrambledWorldSeed;
         boolean inOcean = false;
     }

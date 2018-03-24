@@ -384,7 +384,7 @@ public class Metrics
         // any code outside of this class / Java
 
         // Construct the post data
-        StringBuilder json = new StringBuilder(TerrainControl.MAX_BIOME_ID);
+        StringBuilder json = new StringBuilder(TerrainControl.SUPPORTED_BIOME_IDS);
         json.append('{');
 
         // The plugin's description file containg all of the plugin data such as

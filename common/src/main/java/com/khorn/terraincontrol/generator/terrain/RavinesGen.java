@@ -16,7 +16,7 @@ import java.util.Random;
 
 public class RavinesGen extends TerrainGenBase
 {
-    private float[] a = new float[TerrainControl.MAX_BIOME_ID];
+    private float[] a = new float[TerrainControl.SUPPORTED_BIOME_IDS];
     private WorldConfig worldSettings;
 
     public RavinesGen(WorldConfig wrk, LocalWorld world)
