@@ -85,12 +85,8 @@ public class LayerMixWithRiver extends Layer
                 else
                     cachedId = DefaultBiome.OCEAN.Id;
 
-                final LocalBiome tcBiome = this.configs.getBiomeByIdOrNull(cachedId);
-                if (tcBiome == null) {
-                    throw new RuntimeException();
-                }
                 if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0
-                        && !tcBiome.getBiomeConfig().riverBiome.isEmpty())
+                        && !this.configs.getBiomeByIdOrNull(cachedId).getBiomeConfig().riverBiome.isEmpty())
                     currentPiece = this.riverBiomes[cachedId];
                 else
                     currentPiece = cachedId;
