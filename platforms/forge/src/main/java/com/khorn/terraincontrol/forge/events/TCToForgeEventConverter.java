@@ -85,8 +85,16 @@ public class TCToForgeEventConverter extends EventHandler
                 MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world.getWorld(), random, blockPos));
                 setDecorationBegun(world, true);
             }
+
+            Decorate.EventType forgeEvent;
+
             // Fire decoration event
-            Decorate.EventType forgeEvent = getDecorateEventType(resource.getMaterial());
+            if (resource instanceof TreeGen) {
+                forgeEvent = Decorate.EventType.TREE;
+            } else {
+                forgeEvent = getDecorateEventType(resource.getMaterial());
+            }
+            
             return TerrainGen.decorate(world.getWorld(), random, blockPos, forgeEvent);
         }
     }
