@@ -1,5 +1,9 @@
 ##  TerrainControl
 
+| <h3>Project status</h3> |
+| -------------- |
+| Terrain Control is not really maintained anymore. There are still a few people left that make changes every now and then, but no proper release has been made for a long time. The forums and build server are also gone, so you need to compile the source code yourself. A possible alternative is [OpenTerrainGenerator](https://openterraingenerator.com/), which is a fork of Terrain Control. |
+
 [![CircleCI](https://circleci.com/gh/MCTCP/TerrainControl.svg?style=shield)](https://circleci.com/gh/MCTCP/TerrainControl)
 
 TerrainControl is an advanced world generator for Minecraft. Through various configuration files it gives the user control over almost every aspect of Minecraft terrain generation, with no knowledge of Java required. It can be used on Bukkit or Forge servers and on singleplayer with Forge. Terrain Control is the successor to the old <a href="http://www.minecraftforum.net/topic/313991-phoenixterrainmod/">PhoenixTerrainMod</a>, which was based on the popular <a href="http://www.minecraftforum.net/topic/71565-biomemod/">BiomeTerrainMod</a>. 
@@ -23,14 +27,7 @@ To learn more, check out <a href="https://github.com/MCTCP/TerrainControl/wiki/F
 ## Links
 * Project home at [Minecraft Forums](http://www.minecraftforum.net/forums/mapping-and-modding/minecraft-mods/2554291-terraincontrol-advanced-world-generator) / [SpigotMC](https://www.spigotmc.org/resources/terraincontrol.2214/) / [BukkitDev](http://dev.bukkit.org/bukkit-plugins/terrain-control/)
 * [Wiki](https://github.com/MCTCP/TerrainControl/wiki/)
-* [Forum](http://forum.mctcp.com/)
 * [Releases](https://github.com/MCTCP/TerrainControl/releases)
-* [Latest Dev Build](http://build.mctcp.com/job/TerrainControl%20-%20Master%20-%20Gradle/default/lastStableBuild/)
 * [Installation](https://github.com/MCTCP/TerrainControl/wiki/Installation-instructions) for Spigot and Forge
 * [Compilation](./COMPILING.md) instructions for command-line, Eclipse and IntelliJ
 * [Version history](https://github.com/MCTCP/TerrainControl/wiki/Version-history)
-
-## Maintainers
-* <a href="https://github.com/rutgerkok">Rutger Kok</a>
-* <a href="https://github.com/Timethor">Timethor</a>
-* <a href="http://dev.bukkit.org/profiles/Khoorn/">Khoorn</a> (known as <a href="https://github.com/Wickth">Wickth</a> on GitHub)
