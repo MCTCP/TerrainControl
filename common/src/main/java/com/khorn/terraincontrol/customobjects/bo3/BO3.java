@@ -79,7 +79,7 @@ public class BO3 implements CustomObject
         {
             variance = random.nextInt(variance + 1);
         }
-        return MathHelper.clamp(offset + variance, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+        return offset + variance;
     }
 
     @Override
@@ -202,7 +202,7 @@ public class BO3 implements CustomObject
         }
     }
 
-    protected boolean spawn(LocalWorld world, Random random, int x, int z)
+    public boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
@@ -222,12 +222,17 @@ public class BO3 implements CustomObject
         {
             y = world.getSolidHeight(x, z);
         }
-        // Offset by static and random settings values
-        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+
+        // Check spawn point before getting offset and variance
         if (!canSpawnAt(world, rotation, x, y, z))
         {
             return false;
         }
+
+        // Offset by static and random settings values
+        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        y =  MathHelper.clamp(y, TerrainControl.WORLD_DEPTH, TerrainControl.WORLD_HEIGHT);
+
         return spawnForced(world, random, rotation, x, y, z);
     }
 
