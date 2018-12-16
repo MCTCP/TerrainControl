@@ -20,15 +20,13 @@ public class LayerMixWithRiver extends Layer
 
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
-            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-            LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(id) : configs.getBiomeByIdOrNull(id);
+            LocalBiome biome = configs.getBiomeByIdOrNull(id);
             
             if (biome == null || biome.getBiomeConfig().riverBiome.isEmpty())
             {
                 this.riverBiomes[id] = -1;
             } else {
-            	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-            	this.riverBiomes[id] = OTG.isForge ? OTG.getBiomeAllWorlds(biome.getBiomeConfig().riverBiome).getIds().getGenerationId() : world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
+            	this.riverBiomes[id] = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome).getIds().getOTGBiomeId();
             	
                 //this.riverBiomes[id] = world.getBiomeByName(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
             }
@@ -47,28 +45,31 @@ public class LayerMixWithRiver extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
         switch (cache.outputType)
         {
             case FULL:
-                return this.getFull(cache, x, z, xSize, zSize);
+                return this.getFull(world, cache, x, z, xSize, zSize);
             case WITHOUT_RIVERS:
-                return this.getWithoutRivers(cache, x, z, xSize, zSize);
+                return this.getWithoutRivers(world, cache, x, z, xSize, zSize);
             case ONLY_RIVERS:
-                return this.getOnlyRivers(cache, x, z, xSize, zSize);
+                return this.getOnlyRivers(world, cache, x, z, xSize, zSize);
             default:
                 throw new UnsupportedOperationException("Unknown/invalid output type: " + cache.outputType);
         }
     }
 
-    private int[] getFull(ArraysCache cache, int x, int z, int xSize, int zSize)
+    private int[] getFull(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
-        int[] riverInts = this.riverLayer.getInts(cache, x, z, xSize, zSize);
+        int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
+        int[] riverInts = this.riverLayer.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.getWorldConfig();
 
+        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        
         int currentPiece;
         int currentRiver;
         int cachedId;
@@ -80,36 +81,40 @@ public class LayerMixWithRiver extends Layer
                 currentRiver = riverInts[(xi + zi * xSize)];
 
                 if ((currentPiece & LandBit) != 0)
+                {
                     cachedId = currentPiece & BiomeBits;
+                }
                 else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
-                    cachedId = DefaultBiome.FROZEN_OCEAN.Id;
-                else
-                    cachedId = DefaultBiome.OCEAN.Id;
+                {
+                    cachedId = defaultFrozenOceanId;
+                } else {
+                    cachedId = defaultOceanId;
+                }
 
-                // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(cachedId) : this.configs.getBiomeByIdOrNull(cachedId);
+                LocalBiome biome = this.configs.getBiomeByIdOrNull(cachedId);
                 
                 if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !biome.getBiomeConfig().riverBiome.isEmpty())
-                    currentPiece = this.riverBiomes[cachedId];
-                else
+                {
+                	currentPiece = this.riverBiomes[cachedId];
+                } else {
                     currentPiece = cachedId;
-
+                }
                 thisInts[(xi + zi * xSize)] = currentPiece;
             }
         }
         return thisInts;
-
     }
 
-    private int[] getWithoutRivers(ArraysCache cache, int x, int z, int xSize, int zSize)
+    private int[] getWithoutRivers(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
-        // int[] riverInts = this.riverLayer.GetBiomes(cache, x, z, xSize, zSize);
+        int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.getWorldConfig();
 
+        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        
         int currentPiece;
-        // int currentRiver;
         int cachedId;
         for (int zi = 0; zi < zSize; zi++)
         {
@@ -119,11 +124,15 @@ public class LayerMixWithRiver extends Layer
                 // currentRiver = riverInts[(j + i * x_size)];
 
                 if ((currentPiece & LandBit) != 0)
+                {
                     cachedId = currentPiece & BiomeBits;
+                }
                 else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
-                    cachedId = DefaultBiome.FROZEN_OCEAN.Id;
-                else
-                    cachedId = DefaultBiome.OCEAN.Id;
+                {
+                    cachedId = defaultFrozenOceanId;
+                } else {
+                    cachedId = defaultOceanId;
+                }
 
                 /*if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].riverBiome.isEmpty())
                     currentPiece = this.riverBiomes[cachedId];
@@ -136,13 +145,16 @@ public class LayerMixWithRiver extends Layer
         return thisInts;
     }
 
-    private int[] getOnlyRivers(ArraysCache cache, int x, int z, int xSize, int zSize)
+    private int[] getOnlyRivers(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
-        int[] riverInts = this.riverLayer.getInts(cache, x, z, xSize, zSize);
+        int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
+        int[] riverInts = this.riverLayer.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.getWorldConfig();
 
+        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        
         int currentPiece;
         int currentRiver;
         int cachedId;
@@ -154,21 +166,24 @@ public class LayerMixWithRiver extends Layer
                 currentRiver = riverInts[(xi + zi * xSize)];
 
                 if ((currentPiece & LandBit) != 0)
+                {
                     cachedId = currentPiece & BiomeBits;
+                }
                 else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
-                    cachedId = DefaultBiome.FROZEN_OCEAN.Id;
-                else
-                    cachedId = DefaultBiome.OCEAN.Id;
+                {
+                    cachedId = defaultFrozenOceanId;
+                } else {
+                    cachedId = defaultOceanId;
+                }
 
-                // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(cachedId) : this.configs.getBiomeByIdOrNull(cachedId);
+                LocalBiome biome = this.configs.getBiomeByIdOrNull(cachedId);
                 
-                if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0
-                        && !biome.getBiomeConfig().riverBiome.isEmpty())
-                    currentPiece = 1;
-                else
+                if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !biome.getBiomeConfig().riverBiome.isEmpty())
+                {
+                	currentPiece = 1;
+                } else {
                     currentPiece = 0;
-
+                }
                 thisInts[(xi + zi * xSize)] = currentPiece;
             }
         }

@@ -116,12 +116,17 @@ public class OTGDimensionManager
 
 	public static int createDimension(String dimensionName, boolean keepLoaded, boolean initDimension, boolean saveDimensionData)
 	{
+		return createDimension(-1l, dimensionName, keepLoaded, initDimension, saveDimensionData);
+	}
+	
+	public static int createDimension(long seed, String dimensionName, boolean keepLoaded, boolean initDimension, boolean saveDimensionData)
+	{
 		int newDimId = DimensionManager.getNextFreeDimId();
 
 		registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, WorldProviderOTG.class, keepLoaded));
 		if(initDimension)
 		{
-			initDimension(newDimId, dimensionName);
+			initDimension(newDimId, seed);//, dimensionName);
 		}
 
 		int maxOrder = -1;
@@ -206,7 +211,12 @@ public class OTGDimensionManager
 		}
 	}
 
-    private static void initDimension(int dim, String dimensionName)
+	public static void initDimension(int dim)
+	{
+		initDimension(dim, -1l);
+	}
+	
+    public static void initDimension(int dim, long seed) //, String dimensionName)
     {
         WorldServer overworld = DimensionManager.getWorld(0);
         if (overworld == null)
@@ -226,27 +236,37 @@ public class OTGDimensionManager
         MinecraftServer mcServer = overworld.getMinecraftServer();
         ISaveHandler savehandler = overworld.getSaveHandler();
 
-        // TODO: Allow for different settings for each dimension.
-        // TODO: Changing seed here does work, but seed is forgotten after restart and overworld seed is used, fix this! <-- TODO: Is this still true?
-
-		long seedIn = (long) Math.floor((Math.random() * Long.MAX_VALUE));
+        OTGDimensionInfo otgDimData = GetOrderedDimensionData();
+        if(seed == -1 && otgDimData != null)
+        {
+        	for(DimensionData dimData : otgDimData.orderedDimensions.values())
+        	{
+        		if(dimData.dimensionId == dim)
+        		{
+                	seed = dimData.seed;
+                	break;
+        		}
+        	}
+        }
+        
+		long seedIn = seed == -1 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : seed;
 		GameType gameType = mcServer.getGameType();
 		boolean enableMapFeatures = overworld.getWorldInfo().isMapFeaturesEnabled(); // Whether the map features (e.g. strongholds) generation is enabled or disabled.
 		boolean hardcoreMode = overworld.getWorldInfo().isHardcoreModeEnabled();
-		WorldType worldTypeIn = overworld.getWorldType();
 
-		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, worldTypeIn);
+		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, OTGPlugin.txWorldType);
 		settings.setGeneratorOptions("OpenTerrainGenerator");
 		WorldInfo worldInfo = new WorldInfo(settings, overworld.getWorldInfo().getWorldName());
 
         WorldServer world = (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler, worldInfo).init());
 
-        ForgeWorld forgeWorld = (ForgeWorld) OTG.getWorld(dimensionName);
-		if(forgeWorld == null)
-		{
-			forgeWorld = (ForgeWorld) OTG.getUnloadedWorld(dimensionName);
-		}
-        if(forgeWorld != null) // forgeWorld can be null for a dimension with a vanilla world
+        ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dim);
+        if(forgeWorld == null)
+        {
+        	forgeWorld = ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dim);
+        }
+        
+        if(forgeWorld != null) // forgeWorld can be null for a dimension with a vanilla world <-- Yeah but we should never be loading those, should we?
         {
 	        ((ServerConfigProvider)forgeWorld.getConfigs()).getWorldConfig().worldSeed = "" + seedIn;
 	        ((ServerConfigProvider)forgeWorld.getConfigs()).saveWorldConfig();
@@ -529,6 +549,58 @@ public class OTGDimensionManager
 		return new OTGDimensionInfo(highestOrder, orderedDimensions);
 	}
 
+	public static ArrayList<DimensionData> GetDimensionData(File worldSaveDir)
+	{
+		File dimensionDataFile = new File(worldSaveDir + "/OpenTerrainGenerator/Dimensions.txt");
+		String[] dimensionDataFileValues = {};
+		if(dimensionDataFile.exists())
+		{
+			try {
+				StringBuilder stringbuilder = new StringBuilder();
+				BufferedReader reader = new BufferedReader(new FileReader(dimensionDataFile));
+				try {
+					String line = reader.readLine();
+
+				    while (line != null)
+				    {
+				    	stringbuilder.append(line);
+				        line = reader.readLine();
+				    }
+				    if(stringbuilder.length() > 0)
+				    {
+				    	dimensionDataFileValues = stringbuilder.toString().split(",");
+				    }
+				    OTG.log(LogMarker.TRACE, "Custom dimension data loaded");
+				} finally {
+					reader.close();
+				}
+
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			}
+			catch (IOException e1) {
+				e1.printStackTrace();
+			}
+		}
+
+		ArrayList<DimensionData> dimensionData = new ArrayList<DimensionData>();
+		if(dimensionDataFileValues.length > 0)
+		{
+			for(int i = 0; i < dimensionDataFileValues.length; i += 5)
+			{
+				DimensionData dimData = new DimensionData();
+				dimData.dimensionId = Integer.parseInt(dimensionDataFileValues[i]);
+				dimData.dimensionName = dimensionDataFileValues[i + 1];
+				dimData.keepLoaded = Boolean.parseBoolean(dimensionDataFileValues[i + 2]);
+				dimData.seed = Long.parseLong(dimensionDataFileValues[i + 3]);
+				dimData.dimensionOrder = Integer.parseInt(dimensionDataFileValues[i + 4]);
+				dimensionData.add(dimData);
+			}
+		}
+		
+		return dimensionData;
+	}
+	
 	public static void LoadCustomDimensionData()
 	{
 		OTGDimensionInfo otgDimData = GetOrderedDimensionData();
@@ -547,7 +619,7 @@ public class OTGDimensionManager
 					{
 						Cartographer.CartographerDimension = dimData.dimensionId;
 					}
-					DimensionManager.initDimension(dimData.dimensionId);
+					OTGDimensionManager.initDimension(dimData.dimensionId);
 				}
 			}
 		}
@@ -671,9 +743,12 @@ public class OTGDimensionManager
 			e.printStackTrace();
 		}
 
-		for(Entry<Integer, Object> oldDim : oldDims.entrySet())
+		if(oldDims != null)
 		{
-			dimensions.put(oldDim.getKey(), oldDim.getValue());
+			for(Entry<Integer, Object> oldDim : oldDims.entrySet())
+			{
+				dimensions.put(oldDim.getKey(), oldDim.getValue());
+			}
 		}
 		oldDims = new Hashtable<Integer, Object>();
 	}

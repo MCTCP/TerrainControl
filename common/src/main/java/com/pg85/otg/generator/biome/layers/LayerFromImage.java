@@ -31,8 +31,7 @@ public class LayerFromImage extends Layer
         zOffset = config.imageZOffset;
         this.imageMode = config.imageMode;
         
-    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-    	this.fillBiome = OTG.isForge ? OTG.getBiomeAllWorlds(config.imageFillBiome).getIds().getGenerationId() : world.getBiomeByNameOrNull(config.imageFillBiome).getIds().getGenerationId();
+    	this.fillBiome = world.getBiomeByNameOrNull(config.imageFillBiome).getIds().getOTGBiomeId();
 
         // Read from file
         try
@@ -100,7 +99,7 @@ public class LayerFromImage extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
         int[] resultBiomes = cache.getArray(xSize * zSize);
 
@@ -144,7 +143,7 @@ public class LayerFromImage extends Layer
             case ContinueNormal:
                 int[] childBiomes = null;
                 if (this.child != null)
-                    childBiomes = this.child.getInts(cache, x, z, xSize, zSize);
+                    childBiomes = this.child.getInts(world, cache, x, z, xSize, zSize);
                 for (int zi = 0; zi < zSize; zi++)
                     for (int xi = 0; xi < xSize; xi++)
                     {

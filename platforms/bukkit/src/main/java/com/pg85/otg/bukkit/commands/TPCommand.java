@@ -79,7 +79,7 @@ public class TPCommand extends BaseCommand
 											biome.getName().toLowerCase().replace(" ", "").equals(biomeName.toLowerCase().replace(" ", ""))
 										) || (
 											biomeId != -1 &&
-											biome.getIds().getGenerationId() == biomeId
+											biome.getIds().getOTGBiomeId() == biomeId
 										)
 									)
 								)

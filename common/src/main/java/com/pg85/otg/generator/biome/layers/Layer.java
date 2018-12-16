@@ -1,5 +1,6 @@
 package com.pg85.otg.generator.biome.layers;
 
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 /**
@@ -218,7 +219,7 @@ public abstract class Layer
         return i;
     }
 
-    public abstract int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize);
+    public abstract int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize);
 
     protected int getRandomInArray(int... biomes)
     {

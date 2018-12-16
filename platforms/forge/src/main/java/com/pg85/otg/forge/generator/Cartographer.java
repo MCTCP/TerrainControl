@@ -67,7 +67,7 @@ public class Cartographer
 				ForgeWorld cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");
 	    		if(cartographerWorld == null)
 	    		{
-	    			DimensionManager.initDimension(Cartographer.CartographerDimension);
+	    			OTGDimensionManager.initDimension(Cartographer.CartographerDimension);
 	    			cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");
 	    		}
 	    		if(cartographerWorld == null)
@@ -228,7 +228,7 @@ public class Cartographer
 		ForgeWorld cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");
 		if(cartographerWorld == null)
 		{
-			DimensionManager.initDimension(Cartographer.CartographerDimension);
+			OTGDimensionManager.initDimension(Cartographer.CartographerDimension);
 			cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");
 		}
 		if(cartographerWorld == null)
@@ -412,7 +412,7 @@ public class Cartographer
 			ForgeWorld cartographerWorld = (ForgeWorld) OTG.getWorld("DIM-Cartographer");
     		if(cartographerWorld == null)
     		{
-    			DimensionManager.initDimension(Cartographer.CartographerDimension);
+    			OTGDimensionManager.initDimension(Cartographer.CartographerDimension);
     			cartographerWorld = (ForgeWorld)OTG.getWorld("DIM-Cartographer");
     		}
     		if(cartographerWorld == null)

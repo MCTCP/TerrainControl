@@ -24,17 +24,16 @@ public class LayerBiomeBorder extends Layer
 
         for (int i = 0; i < this.bordersFrom[replaceFrom].length; i++)
         {
-        	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-        	LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(i) : world.getBiomeByIdOrNull(i);            
+        	LocalBiome biome = world.getBiomeByIdOrNull(i);            
             this.bordersFrom[replaceFrom][i] = biome == null || !replaceTo.getBiomeConfig().notBorderNear.contains(biome.getName());
         }
-        this.bordersTo[replaceFrom] = replaceTo.getIds().getGenerationId();
+        this.bordersTo[replaceFrom] = replaceTo.getIds().getOTGBiomeId();
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] childInts = this.child.getInts(cache, x - 1, z - 1, xSize + 2, zSize + 2);
+        int[] childInts = this.child.getInts(world, cache, x - 1, z - 1, xSize + 2, zSize + 2);
         int[] thisInts = cache.getArray(xSize * zSize);
 
         for (int zi = 0; zi < zSize; zi++)

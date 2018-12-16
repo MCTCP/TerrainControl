@@ -80,7 +80,7 @@ public class MapWriter implements Runnable
             {
                 BiomeConfig biomeConfig = biome.getBiomeConfig();
                 int color = biomeConfig.biomeColor;
-                colors[biome.getIds().getGenerationId()] = color;
+                colors[biome.getIds().getOTGBiomeId()] = color;
             }
         }
         return colors;
@@ -211,7 +211,7 @@ public class MapWriter implements Runnable
         float temperature;
         if (world != null)
         {
-            temperature = world.getBiomeById(WorldHelper.getGenerationId(biome)).getBiomeConfig().biomeTemperature;
+            temperature = world.getBiomeByIdOrNull(WorldHelper.getGenerationId(biome)).getBiomeConfig().biomeTemperature;
         } else
         {
             temperature = biome.getTemperature();

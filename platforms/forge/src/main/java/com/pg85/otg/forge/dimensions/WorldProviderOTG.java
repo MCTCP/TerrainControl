@@ -1,5 +1,9 @@
 package com.pg85.otg.forge.dimensions;
 
+import java.util.ArrayList;
+
+import javax.annotation.Nullable;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
@@ -7,8 +11,27 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.NumberInvalidException;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.InventoryEnderChest;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemShulkerBox;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.JsonToNBT;
+import net.minecraft.nbt.NBTException;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.border.WorldBorder;
@@ -90,7 +113,7 @@ public class WorldProviderOTG extends WorldProvider
     @Override
     public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()
     {
-    	return OTGPlugin.txWorldType.getChunkGenerator(world, world.getWorldInfo() instanceof DerivedWorldInfo ? ((DerivedWorldInfo)world.getWorldInfo()).delegate.getGeneratorOptions() : world.getWorldInfo().getGeneratorOptions());
+    	return OTGPlugin.txWorldType.getChunkGenerator(world, "OpenTerrainGenerator");
     }
 
     // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions.

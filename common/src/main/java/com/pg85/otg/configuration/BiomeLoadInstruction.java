@@ -9,7 +9,6 @@ import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
 public class BiomeLoadInstruction
 {
     private final String name;
-    private final int generationId;
     private final StandardBiomeTemplate biomeTemplate;
 
     /**
@@ -19,16 +18,14 @@ public class BiomeLoadInstruction
      * @param generationId Generation id of the biome to be loaded.
      * @param biomeTemplate Default settings of the biome to be loaded.
      */
-    public BiomeLoadInstruction(String name, int generationId, StandardBiomeTemplate biomeTemplate)
+    public BiomeLoadInstruction(String name, StandardBiomeTemplate biomeTemplate)
     {
         if (name == null || biomeTemplate == null)
         {
-            throw new IllegalArgumentException("Parameters cannot be null (name: " + name + ", generationId: " + generationId
-                    + ",biomeTemplate: " + biomeTemplate + ")");
+            throw new IllegalArgumentException("Parameters cannot be null (name: " + name + ", biomeTemplate: " + biomeTemplate + ")");
         }
 
         this.name = name;
-        this.generationId = generationId;
         this.biomeTemplate = biomeTemplate;
     }
 
@@ -38,7 +35,6 @@ public class BiomeLoadInstruction
         final int prime = 31;
         int result = 1;
         result = prime * result + biomeTemplate.hashCode();
-        result = prime * result + generationId;
         result = prime * result + name.hashCode();
         return result;
     }
@@ -56,10 +52,6 @@ public class BiomeLoadInstruction
         }
         BiomeLoadInstruction other = (BiomeLoadInstruction) obj;
         if (!biomeTemplate.equals(other.biomeTemplate))
-        {
-            return false;
-        }
-        if (generationId != other.generationId)
         {
             return false;
         }
@@ -89,15 +81,4 @@ public class BiomeLoadInstruction
     {
         return biomeTemplate;
     }
-
-    /**
-     * Gets the generation id of the biome to be loaded.
-     * 
-     * @return The generation id.
-     */
-    public int getGenerationId()
-    {
-        return generationId;
-    }
-
 }

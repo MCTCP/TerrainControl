@@ -8,11 +8,13 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.asm.IOTGASMBiome;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StringHelper;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -40,15 +42,15 @@ public class OTGBiome extends Biome implements IOTGASMBiome
 
     private int skyColor;
 
-    public final int generationId;
-    public final int savedId;
+    public int otgBiomeId;
+    public int savedId;
 
-    private OTGBiome(BiomeConfig config, BiomeIds id)
+    private OTGBiome(BiomeConfig config, ResourceLocation registryKey)
     {
         super(new BiomePropertiesCustom(config));
-        this.generationId = id.getGenerationId();
-        this.savedId = id.getSavedId();
 
+        this.setRegistryName(registryKey);
+        
         this.skyColor = config.skyColor;
 
         // TODO: Is clearing really necessary here?
@@ -99,68 +101,102 @@ public class OTGBiome extends Biome implements IOTGASMBiome
         }
     }
 
-    public static Biome getOrCreateBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, boolean isMainWorld)
+    public static Biome getOrCreateBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, boolean isMainWorld, String worldName)
     {
         // If this biome should replace a vanilla biome then use the vanilla biome's resourcelocation to register the biome.
-        ResourceLocation registryKey = ForgeWorld.vanillaResouceLocations.get(biomeIds.getGenerationId());
-    	if(registryKey == null)
-    	{
-	        int generationId = biomeIds.getGenerationId();
+        //ResourceLocation registryKey = ForgeWorld.vanillaResouceLocations.get(biomeIds.getGenerationId());
+    	//if(registryKey == null)
+    	//{
+	        //int generationId = biomeIds.getGenerationId();
 
 	        // This is a custom biome, get or register it
-	        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(biomeConfig.getName());
-	        String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();
+	        String biomeNameForRegistry = worldName.toLowerCase() + "_" + StringHelper.toComputerFriendlyName(biomeConfig.getName());
+	        //String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();
+	        String resourceDomain = OTGPlugin.MOD_ID;
 	        // 0-39 and 127-167 are vanilla biomes so register them as such
 	        // so that biomes are properly recognised by non-modded clients
-	        if((generationId >= 0 && generationId <= 39) || (generationId >= 127 && generationId <= 167))
+	        //if((generationId >= 0 && generationId <= 39) || (generationId >= 127 && generationId <= 167))
 	        {
-	        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
+	        	//throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
 	        }
 
-	        registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
-    	}
+	        //registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
+	        ResourceLocation registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
+    	//} else {
+    		//throw new RuntimeException("This shouldn't happen.");
+    	//}
 
         // Check if registered earlier
     	Biome alreadyRegisteredBiome = ForgeRegistries.BIOMES.getValue(registryKey);
         if (alreadyRegisteredBiome != null)
-        {
-        	if(isMainWorld) // Override Vanilla biomes
-        	{
-        		((ForgeEngine)OTG.getEngine()).unRegisterForgeBiome(registryKey);
-        	} else {
-        		return alreadyRegisteredBiome;
-        	}
+        {        	
+        	// This can happen when an unloaded world is loaded, its biomes have already been registered
+        	return alreadyRegisteredBiome;
+        	
+        	
+        	// This happens for SP clients, where client and server share registries. TODO: Not anymore? Disabled packets for SP since client and server share data?
+        	//if(Minecraft.getMinecraft().isSingleplayer())
+        	//{
+        		//return alreadyRegisteredBiome;
+        	//}
+        	
+        	//throw new RuntimeException("This shouldn't happen");
+        	
+        	//if(isMainWorld)
+        	//{
+        		//((ForgeEngine)OTG.getEngine()).unRegisterForgeBiome(registryKey);
+        	//} else {
+        		//return alreadyRegisteredBiome;
+        	//}
         }
 
         // No existing biome, create new one
-        OTGBiome customBiome = new OTGBiome(biomeConfig, biomeIds);
+        OTGBiome customBiome = new OTGBiome(biomeConfig, registryKey);
 
-        int savedBiomeId = biomeIds.getSavedId();
         ForgeEngine forgeEngine = ((ForgeEngine) OTG.getEngine());
 
-        if (biomeIds.isVirtual())
+        //if (biomeIds.isVirtual())
+        if(biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.length() > 0) // This biome uses ReplaceToBiomeName and should use the ReplaceToBiomeName biome's id.
         {
             // Biome.REGISTRY.inverseObjectRegistry has been changed so can't use the old approach anymore
         	// Only register by resourcelocation.
         	// TODO: Make sure this is enough for Forge 1.12+ <- It looks like the server may not send the biomes to the client if they are not added to the registry. TODO: Check if only virtual biomes have this problem.
-            forgeEngine.registerForgeBiome(registryKey, customBiome);
-            OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
-        } else {
-            // Normal insertion
-        	biomeIds.setSavedId(forgeEngine.registerForgeBiome(savedBiomeId, registryKey, customBiome));
-            OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+        	forgeEngine.registerForgeBiome(registryKey, customBiome);
+        	
+        	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();
+        	customBiome.savedId = biomeIds.getSavedId();        	
         }
+        else if(biomeIds.getSavedId() > -1) 
+        {
+        	// This is a biome for an existing world, make sure it uses the same biome id as before. 
+        
+        	int newId = forgeEngine.registerForgeBiomeWithId(biomeIds.getSavedId(), registryKey, customBiome);       	
+        	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();
+        	customBiome.savedId = newId;
+        	
+        } else {
+
+            // Normal insertion, get next free id and register id+resourcelocation
+
+        	// TODO: Make this prettier?
+        	int newId = forgeEngine.registerForgeBiomeWithId(registryKey, customBiome);
+        	biomeIds.setSavedId(newId);
+        	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();
+        	customBiome.savedId = newId;       	        
+        }
+        
+    	OTG.log(LogMarker.INFO, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
 
         // Register biome, silence the logger to hide warnings against using the "minecraft" resourceDomain.
-        if(registryKey.getResourceDomain().equals("minecraft"))
-        {
-	        Level loglvl =((Logger)FMLLog.getLogger()).getLevel();
-	        ((Logger)FMLLog.getLogger()).setLevel(Level.OFF);
-	        customBiome.setRegistryName(registryKey);
-	        ((Logger)FMLLog.getLogger()).setLevel(loglvl);
-        } else {
-        	customBiome.setRegistryName(registryKey);
-        }
+        //if(registryKey.getResourceDomain().equals("minecraft"))
+        //{
+	        //Level loglvl =((Logger)FMLLog.getLogger()).getLevel();
+	        //((Logger)FMLLog.getLogger()).setLevel(Level.OFF);
+	        //customBiome.setRegistryName(registryKey);
+	        //((Logger)FMLLog.getLogger()).setLevel(loglvl);
+        //} else {
+        	//customBiome.setRegistryName(registryKey);
+        //}
 
         return customBiome;
     }
@@ -251,27 +287,12 @@ public class OTGBiome extends Biome implements IOTGASMBiome
     @Override
     public boolean equals(Object obj)
     {
+    	// TODO: Remove this?
 		// TODO: This is a super ugly hack, make this prettier..
 		// Need to do this to make sure that any OTGBiome of Ocean registered in the biome registry
 		// can be found when querying biome names / id's using a different OTGBiome of Ocean.
 		// This is because MC and mods may cache the ocean biome at some point and use it as a default value/fallback.
 		// Since OTG replaces the biome in the registry every time a new (over)world is created this causes problems.
     	return obj instanceof OTGBiome && ((OTGBiome)obj).biomeName.equals("Ocean") && this.biomeName.equals("Ocean") ? true : super.equals(obj);
-    }
-
-    @Override
-    public int hashCode()
-    {
-    	if(this.biomeName.equals("Ocean"))
-    	{
-    		// TODO: This is a super ugly hack, make this prettier..
-    		// Need to do this to make sure that any OTGBiome of Ocean registered in the biome registry
-    		// can be found when querying biome names / id's using a different OTGBiome of Ocean.
-    		// This is because MC and mods may cache the ocean biome at some point and use it as a default value/fallback.
-    		// Since OTG replaces the biome in the registry every time a new (over)world is created this causes problems.
-    		return 0;
-    	} else {
-    		return super.hashCode();
-    	}
     }
 }

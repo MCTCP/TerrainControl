@@ -145,8 +145,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         {
             int generationId = this.biomeIntArray[i];
 
-            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-            LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(generationId) : configProvider.getBiomeByIdOrNull(generationId);
+            LocalBiome biome = configProvider.getBiomeByIdOrNull(generationId);
 
         	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
         }

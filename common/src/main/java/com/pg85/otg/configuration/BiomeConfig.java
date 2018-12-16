@@ -113,22 +113,22 @@ public class BiomeConfig extends ConfigFile
     public boolean oceanMonumentsEnabled;
     public boolean woodLandMansionsEnabled;
     public boolean netherFortressesEnabled;
-           
+
     // Forge Biome Dict Id
-    
+
     public String biomeDictId;
-    
+
 	// Mob spawning and mob inheritance (also used to inherit modded mobs from vanilla biomes for Forge))
 
 	public String inheritMobsBiomeName;
 	public boolean inheritMobsBiomeNameProcessed = false;
-    
+
     // Spawn Config
     public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
     public List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
     public List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
     public List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-	
+
     public List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
     public List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
     public List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
@@ -171,29 +171,29 @@ public class BiomeConfig extends ConfigFile
 
     public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, SettingsMap settings, WorldConfig worldConfig)
     {
-        super(loadInstruction.getBiomeName());                
-        
+        super(loadInstruction.getBiomeName());
+
         // Mob inheritance
         // Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly
-        // Forge: If this is a vanilla biome then mob spawning settings have been inherited from vanilla MC biomes 
+        // Forge: If this is a vanilla biome then mob spawning settings have been inherited from vanilla MC biomes
         // This includes any mobs added to vanilla biomes by other mods when MC started.
-                
+
         if(biomeConfigStub != null)
         {
 	        spawnMonsters.addAll(biomeConfigStub.spawnMonsters);
 	        spawnCreatures.addAll(biomeConfigStub.spawnCreatures);
 	        spawnWaterCreatures.addAll(biomeConfigStub.spawnWaterCreatures);
 	        spawnAmbientCreatures.addAll(biomeConfigStub.spawnAmbientCreatures);
-	        
+
 	        spawnMonstersMerged.addAll(biomeConfigStub.spawnMonstersMerged);
 	        spawnCreaturesMerged.addAll(biomeConfigStub.spawnCreaturesMerged);
 	        spawnWaterCreaturesMerged.addAll(biomeConfigStub.spawnWaterCreaturesMerged);
 	        spawnAmbientCreaturesMerged.addAll(biomeConfigStub.spawnAmbientCreaturesMerged);
         }
-        
+
         this.worldConfig = worldConfig;
         this.defaultSettings = loadInstruction.getBiomeTemplate();
-        
+
         this.renameOldSettings(settings);
         this.readConfigSettings(settings);
 
@@ -214,8 +214,7 @@ public class BiomeConfig extends ConfigFile
             this.iceBlock = worldConfig.iceBlock;
             this.cooledLavaBlock = worldConfig.cooledLavaBlock;
             this.riverWaterLevel = worldConfig.waterLevelMax;
-        } else
-        {
+        } else {
             this.waterLevelMax = this.configWaterLevelMax;
             this.waterLevelMin = this.configWaterLevelMin;
             this.waterBlock = this.configWaterBlock;
@@ -269,7 +268,7 @@ public class BiomeConfig extends ConfigFile
     protected void readConfigSettings(SettingsMap settings)
     {
         this.biomeExtends = settings.getSetting(BiomeStandardValues.BIOME_EXTENDS);
-    	
+
         this.doResourceInheritance = settings.getSetting(BiomeStandardValues.RESOURCE_INHERITANCE);
         this.biomeSize = settings.getSetting(BiomeStandardValues.BIOME_SIZE, defaultSettings.defaultSize);
         this.biomeRarity = settings.getSetting(BiomeStandardValues.BIOME_RARITY, defaultSettings.defaultRarity);
@@ -288,12 +287,7 @@ public class BiomeConfig extends ConfigFile
         this.biomeTemperature = settings.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, defaultSettings.defaultBiomeTemperature);
         this.biomeWetness = settings.getSetting(BiomeStandardValues.BIOME_WETNESS, defaultSettings.defaultBiomeWetness);
 
-        if (this.defaultSettings.isCustomBiome)
-        {
-            this.replaceToBiomeName = settings.getSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME);
-        } else {
-            this.replaceToBiomeName = "";
-        }
+        this.replaceToBiomeName = settings.getSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME, defaultSettings.defaultReplaceToBiomeName);
 
         this.biomeHeight = settings.getSetting(BiomeStandardValues.BIOME_HEIGHT, defaultSettings.defaultBiomeSurface);
         this.biomeVolatility = settings.getSetting(BiomeStandardValues.BIOME_VOLATILITY, defaultSettings.defaultBiomeVolatility);
@@ -341,10 +335,10 @@ public class BiomeConfig extends ConfigFile
         this.mineshaftsRarity = settings.getSetting(BiomeStandardValues.MINESHAFT_RARITY);
         this.mineshaftType = settings.getSetting(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType);
         this.rareBuildingType = settings.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, defaultSettings.defaultRareBuildingType);
-        
-        this.biomeDictId = settings.getSetting(BiomeStandardValues.BIOME_DICT_ID, defaultSettings.defaultBiomeDictId);       
+
+        this.biomeDictId = settings.getSetting(BiomeStandardValues.BIOME_DICT_ID, defaultSettings.defaultBiomeDictId);
     	this.inheritMobsBiomeName = settings.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, defaultSettings.defaultInheritMobsBiomeName);
-                
+
         this.readCustomObjectSettings(settings);
         this.readResourceSettings(settings);
         this.heightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
@@ -455,14 +449,15 @@ public class BiomeConfig extends ConfigFile
                 "The hexadecimal color value of this biome. Used in the output of the /otg map command,",
                 "and used in the input of BiomeMode: FromImage.");
 
-        if (this.defaultSettings.isCustomBiome)
-        {
+        //if (this.defaultSettings.isCustomBiome)
+        //{
 
             writer.putSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME, this.replaceToBiomeName,
                     "Replace this biome to specified after the terrain is generated.",
                     "This will make the world files contain the id of the specified biome, instead of the id of this biome.",
-                    "This will cause saplings, colors and mob spawning work as in specified biome.");
-        }
+                    "This will cause saplings, colors and mob spawning work as in specified biome." +
+                    "To replace to minecraft biomes use resourcelocation notation, for instance: minecraft:plains." + "");
+        //}
 
         writer.smallTitle("Isle biomes only",
                 "To spawn a biome as an isle, you need to add it first to the",
@@ -753,7 +748,7 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, woodLandMansionsEnabled,
         		"Whether a Woodland Mansion can be placed in this biome.");
-        
+
         writer.putSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, oceanMonumentsEnabled,
                 "Whether an Ocean Monument can be placed in this biome.");
 
@@ -774,39 +769,30 @@ public class BiomeConfig extends ConfigFile
         writer.putSetting(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType,
                 "The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.");
 
-        if (defaultSettings.isCustomBiome)
-        {
-            writer.bigTitle("Mob spawning",
-                    "This is where you configure mob spawning. Mobs spawn in groups,",
-                    "see http://minecraft.gamepedia.com/Spawn#Mob_spawning",
-                    "",
-                    "A mobgroups is made of four parts. They are mob, weight, min and max.",
-                    "The mob is one of the Minecraft internal mob names.",
-                    "See http://minecraft.gamepedia.com/Chunk_format#Mobs",
-                    "The weight is used for a random selection. This is a positive integer.",
-                    "The min is the minimum amount of mobs spawning as a group. This is a positive integer.",
-                    "The max is the maximum amount of mobs spawning as a group. This is a positive integer.",
-                    "",
-                    "Mob groups are written to the config files in Json.",
-                    "Json is a tree document format: http://en.wikipedia.org/wiki/JSON",
-                    "Write a mobgroup like this: {\"mob\": \"mobname\", \"weight\": integer, \"min\": integer, \"max\": integer}",
-                    "For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}",
-                    "For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}",
-                    "A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]",
-                    "This would be an ampty list: []",
-                    "You can validate your json here: http://jsonlint.com/",
-                    "",
-                    "There are four categories of mobs: monsters, creatures, water creatures and ambient creatures.",
-                    "In custom biomes, you can add your own mobgroups in the lists below. In the vanilla biomes,",
-                    "your changes are ignored.",
-                    "");
-        } else {
-            writer.bigTitle("Mob spawning",
-                    "It's not possible to change mob spawns in vanilla biomes. These",
-                    "are the values used by vanilla for this biome. They are read-only:",
-                    "changes to this setting are ignored and overwritten.",
-                    "");
-        }
+        writer.bigTitle("Mob spawning",
+                "This is where you configure mob spawning. Mobs spawn in groups,",
+                "see http://minecraft.gamepedia.com/Spawn#Mob_spawning",
+                "",
+                "A mobgroups is made of four parts. They are mob, weight, min and max.",
+                "The mob is one of the Minecraft internal mob names.",
+                "See http://minecraft.gamepedia.com/Chunk_format#Mobs",
+                "The weight is used for a random selection. This is a positive integer.",
+                "The min is the minimum amount of mobs spawning as a group. This is a positive integer.",
+                "The max is the maximum amount of mobs spawning as a group. This is a positive integer.",
+                "",
+                "Mob groups are written to the config files in Json.",
+                "Json is a tree document format: http://en.wikipedia.org/wiki/JSON",
+                "Write a mobgroup like this: {\"mob\": \"mobname\", \"weight\": integer, \"min\": integer, \"max\": integer}",
+                "For example: {\"mob\": \"Ocelot\", \"weight\": 10, \"min\": 2, \"max\": 6}",
+                "For example: {\"mob\": \"MushroomCow\", \"weight\": 5, \"min\": 2, \"max\": 2}",
+                "A json list of mobgroups looks like this: [mobgroup, mobgroup, mobgroup...]",
+                "This would be an ampty list: []",
+                "You can validate your json here: http://jsonlint.com/",
+                "",
+                "There are four categories of mobs: monsters, creatures, water creatures and ambient creatures.",
+                "In custom biomes, you can add your own mobgroups in the lists below. In the vanilla biomes,",
+                "your changes are ignored.",
+                "");
 
         writer.putSetting(BiomeStandardValues.SPAWN_MONSTERS, this.spawnMonsters,
                 "The monsters (skeletons, zombies, etc.) that spawn in this biome",
@@ -835,9 +821,9 @@ public class BiomeConfig extends ConfigFile
                 "Use the \"/otg entities\" console command to get a list of possible mobs and mob types.",
                 "Use the \"/otg biome -m\" console command to get the list of registered mobs for a biome."
                 );
-        
+
         // PG Settings
-        
+
         writer.putSetting(BiomeStandardValues.BIOME_DICT_ID, this.biomeDictId,
 	        "Forge Biome Dictionary ID used by other mods to identify a biome and place",
 	        "modded blocks, items and mobs in it.",
@@ -851,15 +837,15 @@ public class BiomeConfig extends ConfigFile
 	        "NOTE: Only works for biomes with id's under < 255 (non-virtual biomes).",
 	        "For virtual biomes the BiomeDictId is inherited via ReplaceToBiomeName."
 		);
-        
+
         writer.putSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, inheritMobsBiomeName,
 		    "Inherit the internal mobs list of another biome. Inherited mobs can be ",
 		    "overridden using the SpawnMonsters, SpawnCreatures, SpawnWaterCreatures",
 		    "and SpawnAmbientCreatures settings. Any mob type defined using those settings",
 		    "will override inherited mob settings for the same mob.",
-		    "Use this setting to inherit modded mobs from vanilla biomes (see also: BiomeDictId)"        		
+		    "Use this setting to inherit modded mobs from vanilla biomes (see also: BiomeDictId)"
 		);
-        
+
         // /PG
     }
 
@@ -884,9 +870,9 @@ public class BiomeConfig extends ConfigFile
         this.biomeRarity = lowerThanOrEqualTo(biomeRarity, worldConfig.BiomeRarityScale);
         this.biomeRarityWhenIsle = lowerThanOrEqualTo(biomeRarityWhenIsle, worldConfig.BiomeRarityScale);
 
-        this.isleInBiome = filterBiomes(this.isleInBiome, this.worldConfig.customBiomeGenerationIds.keySet());
-        this.biomeIsBorder = filterBiomes(this.biomeIsBorder, this.worldConfig.customBiomeGenerationIds.keySet());
-        this.notBorderNear = filterBiomes(this.notBorderNear, this.worldConfig.customBiomeGenerationIds.keySet());
+        this.isleInBiome = filterBiomes(this.isleInBiome, this.worldConfig.worldBiomes);
+        this.biomeIsBorder = filterBiomes(this.biomeIsBorder, this.worldConfig.worldBiomes);
+        this.notBorderNear = filterBiomes(this.notBorderNear, this.worldConfig.worldBiomes);
 
         this.volatility1 = this.volatilityRaw1 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw1) + 1.0D) : this.volatilityRaw1 + 1.0D;
         this.volatility2 = this.volatilityRaw2 < 0.0D ? 1.0D / (Math.abs(this.volatilityRaw2) + 1.0D) : this.volatilityRaw2 + 1.0D;
@@ -896,11 +882,9 @@ public class BiomeConfig extends ConfigFile
 
         this.waterLevelMax = higherThanOrEqualTo(waterLevelMax, this.waterLevelMin);
 
-        this.replaceToBiomeName = (DefaultBiome.Contain(this.replaceToBiomeName) || this.worldConfig.customBiomeGenerationIds.keySet().contains(
-                this.replaceToBiomeName)) ? this.replaceToBiomeName : "";
+        //this.replaceToBiomeName = (DefaultBiome.Contain(this.replaceToBiomeName) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.replaceToBiomeName)) ? this.replaceToBiomeName : "";
 
-        this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.riverBiome)) ? this.riverBiome
-                : "";
+        //this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.riverBiome)) ? this.riverBiome : "";
     }
 
     @Override
@@ -979,7 +963,7 @@ public class BiomeConfig extends ConfigFile
                     if (start != -1 && end != -1)
                     {   // Found height settings
                         String[] ranges = rest.substring(start + 1, end).split("-");
-                        to = OTG.readMaterial(rest.substring(0, start));                     
+                        to = OTG.readMaterial(rest.substring(0, start));
                         minHeight = StringHelper.readInt(ranges[0], minHeight, maxHeight);
                         maxHeight = StringHelper.readInt(ranges[1], minHeight, maxHeight);
                     } else {
@@ -1061,6 +1045,7 @@ public class BiomeConfig extends ConfigFile
         stream.writeInt(this.foliageColor);
         stream.writeBoolean(this.foliageColorIsMultiplier);
 
+        writeStringToStream(stream, this.replaceToBiomeName);        
         writeStringToStream(stream, this.biomeDictId);
     }
 }

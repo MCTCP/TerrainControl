@@ -12,6 +12,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeMaterialData;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.generator.Cartographer;
+import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
@@ -39,7 +40,7 @@ public class OTGBlockPortal
     	// Only create a portal when a TC custom dimension exists
     	boolean bFound = false;
     	boolean bFoundOtherThanCartographer = false;
-		for(int i = 2; i < Long.SIZE << 4; i++)
+		for(int i = -1; i < Long.SIZE << 4; i++)
 		{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
@@ -59,10 +60,6 @@ public class OTGBlockPortal
 					}
 				}
 			}
-		}
-		if(!bFound)
-		{
-			return false;
 		}
 		
 		// If Cartographer is on and this is not a Cartographer portal and no other dimensions were found don't spawn a portal.
@@ -130,19 +127,42 @@ public class OTGBlockPortal
                 ;
             }
 
-			ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
+            // Try overworld first with default material dirt (could be a non-otg world)
+			ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
+			portalMaterials.add(OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0));
 			
+            int i = this.getDistanceUntilEdge(portalMaterials, p_i45694_2_, this.leftDir, isQuartz) - 1;
+
+            if (i >= 0)
+            {
+                this.bottomLeft = p_i45694_2_.offset(this.leftDir, i);
+                this.width = this.getDistanceUntilEdge(portalMaterials, this.bottomLeft, this.rightDir, isQuartz);
+
+                if (this.width < 2 || this.width > 21)
+                {
+                    this.bottomLeft = null;
+                    this.width = 0;
+                }
+            }
+
+            if (this.bottomLeft != null)
+            {
+                this.height = this.calculatePortalHeight(portalMaterials, isQuartz);
+            }
+            
+            if(height > 0 && width > 0)
+            {
+            	return;
+            }
+            
+            // If this isn't the overworld then try custom dimensions
+			ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
 			for(LocalWorld localWorld : forgeWorlds)
 			{
 				ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-				ArrayList<LocalMaterialData> portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
-	            
-				if(world.provider.getDimension() == forgeWorld.getWorld().provider.getDimension() && world.provider.getDimension() == 0)
-				{
-					continue; // For OverWorld don't allow portal using current dim's portal materials. (For other worlds such a portal leads to the OverWorld).
-				}
-				
-	            int i = this.getDistanceUntilEdge(portalMaterials, p_i45694_2_, this.leftDir, isQuartz) - 1;
+				portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
+	            				
+	            i = this.getDistanceUntilEdge(portalMaterials, p_i45694_2_, this.leftDir, isQuartz) - 1;
 	
 	            if (i >= 0)
 	            {

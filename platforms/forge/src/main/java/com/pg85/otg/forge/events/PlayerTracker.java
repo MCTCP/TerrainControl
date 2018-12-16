@@ -62,8 +62,6 @@ public class PlayerTracker
 			PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer), event.getManager());
 	    	// Reset particles in case the player just switched worlds.
 	    	PacketDispatcher.sendTo(new ParticlesPacket(), event.getManager());
-		} else {
-			OTG.log(LogMarker.WARN, "Could not find an OTG overworld, OTG is disabled. It is currently not possible to use OTG with a non-OTG overworld. To enable OTG make sure that level-type=OTG is configured in the server.properties file.");
 		}
     }
 

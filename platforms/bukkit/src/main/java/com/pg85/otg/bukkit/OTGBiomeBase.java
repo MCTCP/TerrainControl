@@ -103,7 +103,7 @@ public class OTGBiomeBase extends BiomeBase
                 // custom biome that is loaded after this virtual biome, so it
                 // will soon be registered
                 BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
-                OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+                OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getOTGBiomeId());
             } else
             {
                 MinecraftKey existingBiomeKey = BiomeBase.REGISTRY_ID.b(existingBiome);
@@ -114,14 +114,14 @@ public class OTGBiomeBase extends BiomeBase
                 // if(existingBiome instanceof CustomBiome) {
                 //     existingBiomeName = String.valueOf(((CustomBiome) existingBiome).generationId);
                 // }
-                OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId() /*, existingBiomeName*/ );
+                OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getOTGBiomeId() /*, existingBiomeName*/ );
             }
         } else
         {
             // Normal insertion
             BiomeBase.REGISTRY_ID.a(savedBiomeId, biomeKey, customBiome);
 
-            OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getGenerationId());
+            OTG.log(LogMarker.TRACE, ",{},{},{}", biomeConfig.getName(), savedBiomeId, biomeIds.getOTGBiomeId());
         }
 
         // Add biome to Bukkit enum if it's not there yet
@@ -159,7 +159,7 @@ public class OTGBiomeBase extends BiomeBase
     private OTGBiomeBase(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         super(new BiomeBase_a(biomeConfig.getName(), biomeConfig));
-        this.generationId = biomeIds.getGenerationId();
+        this.generationId = biomeIds.getOTGBiomeId();
 
         // Sanity check
         if (this.getHumidity() != biomeConfig.biomeWetness)

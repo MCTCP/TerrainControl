@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
@@ -25,6 +26,8 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
@@ -40,6 +43,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.pg85.otg.forge.dimensions.DimensionData;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.dimensions.WorldProviderOTG;
 
 import net.minecraft.client.gui.GuiListExtended;;
 
@@ -85,7 +92,19 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
-        String s = this.worldSummary.getDisplayName();
+    	// Check if an OTG world is the overworld, if so use the OTG world provider for the overworld.
+    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(Minecraft.getMinecraft().mcDataDir + "/saves/" + this.getSelectedWorldName()));    	
+    	boolean bFound = false;
+    	for(DimensionData dimensionData : dimensionDatas)
+    	{
+    		if(dimensionData.dimensionId == 0)
+    		{
+    			bFound = true;
+    			break;
+    		}
+    	}
+    	
+        String s = (bFound ? TextFormatting.GOLD + "OTG " + TextFormatting.RESET : "") + this.worldSummary.getDisplayName();
         String s1 = this.worldSummary.getFileName() + " (" + DATE_FORMAT.format(new Date(this.worldSummary.getLastTimePlayed())) + ")";
         String s2 = "";
 
@@ -113,7 +132,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
             }
 
             String s3 = this.worldSummary.getVersionName();
-
+            
             if (this.worldSummary.markVersionInList())
             {
                 if (this.worldSummary.askToOpenWorld())
@@ -269,7 +288,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     }
 
     private void loadWorld()
-    {
+    {        
         this.client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
         if (this.client.getSaveLoader().canLoadWorld(this.worldSummary.getFileName()))
@@ -280,6 +299,27 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
     public void tryLoadExistingWorld(FMLClientHandler clientHandler, OTGGuiWorldSelection selectWorldGUI, WorldSummary comparator)
     {
+    	// Check if an OTG world is the overworld, if so use the OTG world provider for the overworld.
+    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(clientHandler.getSavesDir());    	
+    	boolean bFound = false;
+    	for(DimensionData dimensionData : dimensionDatas)
+    	{
+    		if(dimensionData.dimensionId == 0)
+    		{
+    			bFound = true;
+    			break;
+    		}
+    	}
+    	
+    	if(bFound)
+    	{
+	        DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
+	        DimensionType.OVERWORLD.suffix = "OTG";
+    	} else {
+	        DimensionType.OVERWORLD.clazz = WorldProviderSurface.class;
+	        DimensionType.OVERWORLD.suffix = "overworld";
+    	}
+    	
         File dir = new File(clientHandler.getSavesDir(), comparator.getFileName());
         NBTTagCompound leveldat;
         try

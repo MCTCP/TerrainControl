@@ -2,6 +2,8 @@ package com.pg85.otg.forge.events;
 
 import com.google.common.base.Function;
 import com.pg85.otg.configuration.BiomeConfig;
+
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.event.terraingen.BiomeEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -19,13 +21,27 @@ public final class BiomeColorsListener
         this.getBiomeConfig = getBiomeConfig;
     }
 
+    ResourceLocation lastBiome = null;
+    BiomeConfig lastBiomeConfig;
+    
     @SubscribeEvent
     public void grassColor(BiomeEvent.GetGrassColor grassColorEvent)
     {
-        BiomeConfig biomeConfig = this.getBiomeConfig.apply(grassColorEvent.getBiome());
-        if (biomeConfig == null)
-            return;
-
+    	BiomeConfig biomeConfig = lastBiomeConfig;
+    	
+    	if(lastBiome == null || !grassColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	{
+            biomeConfig = this.getBiomeConfig.apply(grassColorEvent.getBiome());	
+    	}
+    	
+    	lastBiome = grassColorEvent.getBiome().getRegistryName();
+    	lastBiomeConfig = biomeConfig;
+        
+    	if (biomeConfig == null)
+        {
+        	return;
+        }
+        
         if (biomeConfig.grassColorIsMultiplier)
         {
             if (biomeConfig.grassColor != 0xffffff)
@@ -33,8 +49,7 @@ public final class BiomeColorsListener
                 // ^ This ignores the default grass color
                 grassColorEvent.setNewColor((grassColorEvent.getOriginalColor() + biomeConfig.grassColor) / 2);
             }
-        } else
-        {
+        } else {
             grassColorEvent.setNewColor(biomeConfig.grassColor);
         }
     }
@@ -42,17 +57,30 @@ public final class BiomeColorsListener
     @SubscribeEvent
     public void foliageColor(BiomeEvent.GetFoliageColor foliageColorEvent)
     {
-        BiomeConfig biomeConfig = this.getBiomeConfig.apply(foliageColorEvent.getBiome());
+    	BiomeConfig biomeConfig = lastBiomeConfig;
+    	
+    	if(lastBiome == null || !foliageColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	{
+            biomeConfig = this.getBiomeConfig.apply(foliageColorEvent.getBiome());	
+    	}
+    	
+    	lastBiome = foliageColorEvent.getBiome().getRegistryName();
+    	lastBiomeConfig = biomeConfig;
+    	
         if (biomeConfig == null)
-            return;
+        {
+        	return;
+        }
+        
         if (biomeConfig.foliageColor == 0xffffff)
-            return;
+        {
+        	return;
+        }
 
         if (biomeConfig.foliageColorIsMultiplier)
         {
             foliageColorEvent.setNewColor((foliageColorEvent.getOriginalColor() + biomeConfig.foliageColor) / 2);
-        } else
-        {
+        } else {
             foliageColorEvent.setNewColor(biomeConfig.foliageColor);
         }
     }
@@ -60,10 +88,21 @@ public final class BiomeColorsListener
     @SubscribeEvent
     public void waterColor(BiomeEvent.GetWaterColor waterColorEvent)
     {
-        BiomeConfig biomeConfig = this.getBiomeConfig.apply(waterColorEvent.getBiome());
+    	BiomeConfig biomeConfig = lastBiomeConfig;
+    	
+    	if(lastBiome == null || !waterColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	{
+            biomeConfig = this.getBiomeConfig.apply(waterColorEvent.getBiome());	
+    	}
+    	
+    	lastBiome = waterColorEvent.getBiome().getRegistryName();
+    	lastBiomeConfig = biomeConfig;
+    	
         if (biomeConfig == null)
-            return;
-
+        {
+        	return;
+        }
+        	
         waterColorEvent.setNewColor(biomeConfig.waterColor);
     }
 

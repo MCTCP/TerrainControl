@@ -43,7 +43,7 @@ public class BiomeCommand extends BaseCommand
         BiomeIds biomeIds = biome.getIds();
 
         sender.sendMessage(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR
-                + biomeIds.getGenerationId());
+                + biomeIds.getOTGBiomeId());
 
         if (args.contains("-f"))
         {

@@ -189,7 +189,7 @@ public final class BiomeGroupManager
      * removed.
      * @param customBiomeNames Set of all custom biomes in the world.
      */
-    public void filterBiomes(Set<String> customBiomeNames)
+    public void filterBiomes(ArrayList<String> customBiomeNames)
     {
         for (Iterator<BiomeGroup> it = idToGroup.values().iterator(); it.hasNext();)
         {

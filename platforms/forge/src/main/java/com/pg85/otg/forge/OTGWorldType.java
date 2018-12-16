@@ -63,18 +63,24 @@ public class OTGWorldType extends WorldType
         File worldBiomesDir = new File(OTG.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
         worldBiomesDir.mkdirs();
 
-        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), mcWorld.getWorldInfo().getTerrainType());
-        worldSettings.setGeneratorOptions("OpenTerrainGenerator");
-        if(mcWorld.getWorldInfo().areCommandsAllowed())
+    	// For server
+        if(!mcWorld.getMinecraftServer().isSinglePlayer())
         {
-        	worldSettings.enableCommands();
-        }
-        mcWorld.getWorldInfo().populateFromWorldSettings(worldSettings);
+	        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), OTGPlugin.txWorldType);
+	        worldSettings.setGeneratorOptions("OpenTerrainGenerator");
+	        if(mcWorld.getWorldInfo().areCommandsAllowed())
+	        {
+	        	worldSettings.enableCommands();
+	        }
+	        mcWorld.getWorldInfo().populateFromWorldSettings(worldSettings);
+    	}
+        //
 
         ForgeWorld world = this.worldLoader.getOrCreateForgeWorld(mcWorld);
-        if (world == null)
+        if (world == null) // TODO: When does this happen, if the world is not an OTG world?
         {
-            return super.getBiomeProvider(mcWorld);
+            throw new RuntimeException("This shouldn't happen");
+            //return super.getBiomeProvider(mcWorld);
         }
 
         Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
@@ -103,8 +109,7 @@ public class OTGWorldType extends WorldType
             biomeProvider = mcWorld.provider.getBiomeProvider();
             // Let our biome generator depend on Minecraft's
             ((ForgeVanillaBiomeGenerator) biomeGenerator).setBiomeProvider(biomeProvider);
-        } else
-        {
+        } else {
             biomeProvider = new OTGBiomeProvider(world, biomeGenerator);
             // Let Minecraft's biome generator depend on ours
             ReflectionHelper.setValueInFieldOfType(mcWorld.provider, BiomeProvider.class, biomeProvider);

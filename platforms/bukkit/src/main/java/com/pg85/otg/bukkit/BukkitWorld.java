@@ -121,7 +121,7 @@ public class BukkitWorld implements LocalWorld
 
     private static int nextBiomeId = DefaultBiome.values().length;
 
-    private static final int MAX_BIOMES_COUNT = 1024;
+    private static final int MAX_BIOMES_COUNT = 4096;
     private static final int MAX_SAVED_BIOMES_COUNT = 256;
     private static final int STANDARD_WORLD_HEIGHT = 128;
 
@@ -166,13 +166,13 @@ public class BukkitWorld implements LocalWorld
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         BukkitBiome biome;
-        if (biomeConfig.defaultSettings.isCustomBiome)
-        {
+        //if (biomeConfig.defaultSettings.isCustomBiome)
+        //{
             biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds);
-        } else
-        {
-            biome = BukkitBiome.forVanillaBiome(biomeConfig, BiomeBase.getBiome(biomeIds.getSavedId()));
-        }
+        //} else
+        //{
+            //biome = BukkitBiome.forVanillaBiome(biomeConfig, BiomeBase.getBiome(biomeIds.getSavedId()));
+        //}
 
         this.biomeNames.put(biome.getName(), biome);
 
@@ -206,17 +206,6 @@ public class BukkitWorld implements LocalWorld
 			biomes.add(biome);
 		}
     	return biomes;
-    }
-
-    @Override
-    public BukkitBiome getBiomeById(int id) throws BiomeNotFoundException
-    {
-        LocalBiome biome = settings.getBiomeByIdOrNull(id);
-        if (biome == null)
-        {
-            throw new BiomeNotFoundException(id, Arrays.asList(settings.getBiomeArray()));
-        }
-        return (BukkitBiome) biome;
     }
 
     @Override
@@ -916,7 +905,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public BukkitBiome getCalculatedBiome(int x, int z)
     {
-        return getBiomeById(this.biomeGenerator.getBiome(x, z));
+        return (BukkitBiome)getBiomeByIdOrNull(this.biomeGenerator.getBiome(x, z));
     }
 
     @Override
@@ -935,7 +924,7 @@ public class BukkitWorld implements LocalWorld
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
         int savedId = BiomeBase.a(world.getBiome(new BlockPosition(x, 0, z)));
-        return getBiomeById(savedId);
+        return getBiomeByIdOrNull(savedId);
     }
 
     void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
@@ -1647,7 +1636,7 @@ public class BukkitWorld implements LocalWorld
 	}
 
     @Override
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub) { }
+    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation) { }
 
     @Override
     public ChunkCoordinate getSpawnChunk()
@@ -1748,11 +1737,18 @@ public class BukkitWorld implements LocalWorld
 	@Override
 	public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn) {
 		// TODO Auto-generated method stub
+
 	}
 
 	@Override
-	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk)
-	{
+	public boolean chunkHasDefaultStructure(Random random, ChunkCoordinate chunk) {
+		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public int getRegisteredBiomeId(String resourceLocation) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

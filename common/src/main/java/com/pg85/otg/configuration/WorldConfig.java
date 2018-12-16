@@ -62,6 +62,8 @@ public class WorldConfig extends ConfigFile
         }
     };
 
+    public ArrayList<String> worldBiomes = new ArrayList<String>();
+
     public Map<String, Integer> customBiomeGenerationIds = new HashMap<String, Integer>();
 
     // Biome Groups and special biome lists
@@ -94,6 +96,10 @@ public class WorldConfig extends ConfigFile
     public boolean FrozenOcean;
     public boolean FreezeAllColdGroupBiomes;
     public double FrozenOceanTemperature;
+    
+	public String defaultOceanBiome;
+	public String defaultFrozenOceanBiome;
+	public String defaultRiverBiome;
 
     // Rivers
 
@@ -331,31 +337,44 @@ public class WorldConfig extends ConfigFile
      * @param world          The LocalWorld instance of the world.
      * @param customObjects  The customs objects of the world.
      */
-    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world)
+    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world, ArrayList<String> biomes)
     {
         super(settingsReader.getName());
 
         this.settingsDir = settingsDir;
+
+        if(biomes != null) // Can be null when loading the world config for the Forge world creation menu
+        {
+	        for(String biome : biomes)
+	        {
+	        	// TODO: Retrieve any already existing id's for the biomes
+	        	worldBiomes.add(biome);
+	        }
+        }
 
         // Fix older names
         this.renameOldSettings(settingsReader);
 
         if(world == null) // If world is null then this method was called from WorldCreationMenu and only needs pre-generator and worldborder settings. TODO: Make this prettier?
         {
-        	this.suppressErrorLogging = true;
+        	this.loadForWorldCreationMenu = true;
         }
 
         // Set the local fields based on what was read from the file
         this.readConfigSettings(settingsReader);
-        // Clamp Settings to acceptable values
-        this.correctSettings();
-
-        ArrayList<Integer> usedIds = new ArrayList<Integer>();
+        // Clamp Settings to acceptable values.
+        if(!this.loadForWorldCreationMenu)
+        {
+        	this.correctSettings();
+        }
+        
+        //ArrayList<Integer> usedIds = new ArrayList<Integer>();
 
         if(world != null) // If world is null then this method was called from WorldCreationMenu and only needs pre-generator and worldborder settings. TODO: Make this prettier?
         {
 	        // Check biome ids, These are the names from the worldConfig file
 	        // Corrects any instances of incorrect biome id.
+        	/*
 	        for (Iterator<Entry<String, Integer>> it = customBiomeGenerationIds.entrySet().iterator(); it.hasNext();)
 	        {
 	            Entry<String, Integer> entry = it.next();
@@ -373,29 +392,31 @@ public class WorldConfig extends ConfigFile
 
 	            // Check id
 
-	            int biomeId = entry.getValue();
-	            if(!((biomeId > 39 && biomeId < 127) || (biomeId > 167)))
+	            //int biomeId = entry.getValue();
+	            //if(!((biomeId > 39 && biomeId < 127) || (biomeId > 167)))
 	            {
-	                OTG.log(LogMarker.WARN, "CustomBiomes cannot use vanilla biome id's (0-39 and 127-167) . "
-                		+ "Removing biome " + biomeName + " from the list.");
-	                it.remove();
-	                continue;
+	                //OTG.log(LogMarker.WARN, "CustomBiomes cannot use vanilla biome id's (0-39 and 127-167) . "
+                		//+ "Removing biome " + biomeName + " from the list.");
+	                //it.remove();
+	                //continue;
 	            }
 
-	            if(usedIds.contains(biomeId))
+	            //if(usedIds.contains(biomeId))
 	            {
-	                OTG.log(LogMarker.WARN, "CustomBiomes contains two biomes with id "
-                		+ biomeId + ". Removing biome " + biomeName + " from the list.");
-	                it.remove();
-	                continue;
+	                //OTG.log(LogMarker.WARN, "CustomBiomes contains two biomes with id "
+                		//+ biomeId + ". Removing biome " + biomeName + " from the list.");
+	                //it.remove();
+	                //continue;
 	            }
-	            usedIds.add(biomeId);
+	            //usedIds.add(biomeId);
 
-	            if (biomeId == -1)
+	            //if (biomeId == -1)
 	            {
-	                entry.setValue(world.getFreeBiomeId());
+	            	// TODO: If necessary load previously saved biome id's from file?
+	                //entry.setValue(world.getFreeBiomeId());
 	            }
 	        }
+	        */
         }
     }
 
@@ -469,9 +490,9 @@ public class WorldConfig extends ConfigFile
         riverRarity = lowerThanOrEqualTo(riverRarity, GenerationDepth);
         riverSize = lowerThanOrEqualTo(riverSize, GenerationDepth - riverRarity);
 
-        biomeGroupManager.filterBiomes(customBiomeGenerationIds.keySet());
-        IsleBiomes = filterBiomes(IsleBiomes, customBiomeGenerationIds.keySet());
-        BorderBiomes = filterBiomes(BorderBiomes, customBiomeGenerationIds.keySet());
+        biomeGroupManager.filterBiomes(worldBiomes);
+        IsleBiomes = filterBiomes(IsleBiomes, worldBiomes);
+        BorderBiomes = filterBiomes(BorderBiomes, worldBiomes);
 
         if (biomeMode == OTG.getBiomeModeManager().FROM_IMAGE)
         {
@@ -483,7 +504,7 @@ public class WorldConfig extends ConfigFile
             }
         }
 
-        imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || customBiomeGenerationIds.keySet().contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue();
+        imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || worldBiomes.contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue();
 
         maxMoisture = higherThan(maxMoisture, minMoisture);
         maxTemperature = higherThan(maxTemperature, minTemperature);
@@ -497,16 +518,9 @@ public class WorldConfig extends ConfigFile
 
         maximumDistanceBetweenRareBuildings = higherThanOrEqualTo(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
         oceanMonumentRandomOffset = lowerThanOrEqualTo(oceanMonumentRandomOffset, oceanMonumentGridSize);
-
-        if (biomeMode == OTG.getBiomeModeManager().OLD_GENERATOR && ModeTerrain != TerrainMode.OldGenerator)
-        {
-            OTG.log(LogMarker.WARN, "Old biome generator works only with old terrain generator!");
-            biomeMode = OTG.getBiomeModeManager().NORMAL;
-
-        }
     }
 
-    private boolean suppressErrorLogging;
+    private boolean loadForWorldCreationMenu;
     @Override
     protected void readConfigSettings(SettingsMap reader)
     {
@@ -536,11 +550,15 @@ public class WorldConfig extends ConfigFile
         this.LandSize = reader.getSetting(WorldStandardValues.LAND_SIZE);
         this.LandFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY);
 
+    	this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME);
+        
         // Ice Area Settings
         this.FrozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN);
         this.FrozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
         this.FreezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED);
 
+    	this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME);
+    	
         // Freeze & Snow Settings
         this.useTemperatureForSnowHeight = reader.getSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
         this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL);
@@ -552,14 +570,19 @@ public class WorldConfig extends ConfigFile
         this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED);
         this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
         this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
-
-        // Biome Groups
-        readBiomeGroups(reader);
-
-        // Specialized Biomes
-        this.IsleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES);
-        this.BorderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
-        readCustomBiomes(reader);
+        
+    	this.defaultRiverBiome = reader.getSetting(WorldStandardValues.DEFAULT_RIVER_BIOME);
+        
+    	if(!loadForWorldCreationMenu)
+    	{
+    		// Biome Groups
+    		readBiomeGroups(reader);
+        
+	        // Specialized Biomes
+	        this.IsleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES);
+	        this.BorderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
+	        readCustomBiomes(reader);
+    	}
 
         // Images
         this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE);
@@ -568,13 +591,6 @@ public class WorldConfig extends ConfigFile
         this.imageFillBiome = reader.getSetting(WorldStandardValues.IMAGE_FILL_BIOME);
         this.imageXOffset = reader.getSetting(WorldStandardValues.IMAGE_X_OFFSET);
         this.imageZOffset = reader.getSetting(WorldStandardValues.IMAGE_Z_OFFSET);
-
-        // Old biomes
-        this.oldBiomeSize = reader.getSetting(WorldStandardValues.OLD_BIOME_SIZE);
-        this.minMoisture = reader.getSetting(WorldStandardValues.MIN_MOISTURE);
-        this.maxMoisture = reader.getSetting(WorldStandardValues.MAX_MOISTURE);
-        this.minTemperature = reader.getSetting(WorldStandardValues.MIN_TEMPERATURE);
-        this.maxTemperature = reader.getSetting(WorldStandardValues.MAX_TEMPERATURE);
 
         // Fog
         this.WorldFog = reader.getSetting(WorldStandardValues.WORLD_FOG);
@@ -687,7 +703,7 @@ public class WorldConfig extends ConfigFile
         {
         	this.dimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue();
         	this.dimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue();
-        	if(!suppressErrorLogging)
+        	if(!loadForWorldCreationMenu)
         	{
         		OTG.log(LogMarker.INFO, "World " + this.getName() + " WorldConfig setting dimensionBelowHeight was higher than dimensionAboveHeight, using default values instead.");
     		}
@@ -760,7 +776,7 @@ public class WorldConfig extends ConfigFile
 
         this.shouldMapSpin = reader.getSetting(WorldStandardValues.shouldMapSpin); // false; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
 
-        this.canDropChunk = reader.getSetting(WorldStandardValues.canDropChunk); // true; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
+        this.canDropChunk = reader.getSetting(WorldStandardValues.canDropChunk); // false; // // Determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
 
         this.respawnDimension = reader.getSetting(WorldStandardValues.RESPAWN_DIMENSION); // 0 // Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.
 
@@ -855,10 +871,9 @@ public class WorldConfig extends ConfigFile
                 }
                 if (keys.length == 2)
                 {
-                    int generationBiomeId = Integer.parseInt(keys[1]);
-                    customBiomeGenerationIds.put(keys[0], generationBiomeId);
-                } else
-                {
+                    int otgBiomeId = Integer.parseInt(keys[1]);
+                    customBiomeGenerationIds.put(keys[0], otgBiomeId);
+                } else {
                     customBiomeGenerationIds.put(keys[0], -1);
                 }
 
@@ -908,9 +923,9 @@ public class WorldConfig extends ConfigFile
                 "   OldGenerator - Minecraft Beta 1.7.3 biome generator");
 
         // Custom biomes
-        writer.bigTitle("Custom biomes");
+        //writer.bigTitle("Custom biomes");
 
-        WriteCustomBiomes(writer);
+        //WriteCustomBiomes(writer);
 
         // Settings for BiomeMode:Normal
         writer.bigTitle("Settings for BiomeMode: Normal",
@@ -948,7 +963,7 @@ public class WorldConfig extends ConfigFile
 
         // Biome lists
         writer.smallTitle("Biome lists",
-                "Don't forget to register your custom biomes first in CustomBiomes!",
+                //"Don't forget to register your custom biomes first in CustomBiomes!",
                 "");
 
         writer.putSetting(WorldStandardValues.ISLE_BIOMES, this.IsleBiomes,
@@ -969,6 +984,9 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.LAND_FUZZY, this.LandFuzzy,
                 "Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
 
+        writer.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, this.defaultOceanBiome,
+        		"The default Ocean biome.");
+        
         writer.smallTitle("Ice area settings");
 
         writer.putSetting(WorldStandardValues.FROZEN_OCEAN, this.FrozenOcean,
@@ -985,6 +1003,9 @@ public class WorldConfig extends ConfigFile
                 " - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
                 "Default: false");
 
+        writer.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, this.defaultFrozenOceanBiome,
+        		"The default frozen ocean biome.");
+        
         writer.smallTitle("Rivers");
 
         writer.putSetting(WorldStandardValues.RIVER_RARITY, this.riverRarity,
@@ -1007,6 +1028,9 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers,
                 "When set to true the rivers will no longer follow biome border most of the time.");
 
+        writer.putSetting(WorldStandardValues.DEFAULT_RIVER_BIOME, this.defaultRiverBiome,
+        		"The default river biome.");
+        
         // Settings for BiomeMode:FromImage
         writer.bigTitle("Settings for BiomeMode:FromImage");
 
@@ -1309,15 +1333,6 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
         writer.putSetting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
 
-        // Settings for BiomeMode:OldGenerator
-        writer.bigTitle("Settings for BiomeMode:OldGenerator",
-                "This generator works only with old terrain generator!");
-        writer.putSetting(WorldStandardValues.OLD_BIOME_SIZE, this.oldBiomeSize);
-        writer.putSetting(WorldStandardValues.MIN_MOISTURE, this.minMoisture);
-        writer.putSetting(WorldStandardValues.MAX_MOISTURE, this.maxMoisture);
-        writer.putSetting(WorldStandardValues.MIN_TEMPERATURE, this.minTemperature);
-        writer.putSetting(WorldStandardValues.MAX_TEMPERATURE, this.maxTemperature);
-
         writer.bigTitle("World Seed");
         writer.putSetting(WorldStandardValues.WORLD_SEED, this.worldSeed,
 	        "The seed that will be used for this world unless it is overriden in the world creation menu.",
@@ -1363,9 +1378,9 @@ public class WorldConfig extends ConfigFile
         		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
 
         writer.putSetting(WorldStandardValues.CARTOGRAPHER, this.Cartographer,
-                "Currently in development, the Cartographer is a miniature version of the world (1/16th scale) that can be used to view the world (including players) and teleport players and items. Setting this to true loads and updates the Cartographer world map in the Cartographer dimension. The Cartographer can be reached via a Quartz portal with a chiseled quartz base. The mods/OpenTerrainGenerator/worlds/DIM-Cartographer directory must be present (if you also have OTG-Cartographer.jar in your mods directory worlds/DIM-Cartographer should be created automatically).");
+                "In development, don't use this.");
 
-        writer.smallTitle("Game rules (dimensions only)", "Game rules for dimensions (these do not work for the overworld at the moment). These settings are still in development and may be subject to change in upcoming releases.", "");
+        writer.smallTitle("Game rules", "Game rules for this world. These settings are still in development, may not all work (please submit an issue on the git) and may be subject to change in upcoming releases.", "");
 
         writer.putSetting(WorldStandardValues.commandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput),
         		"Whether command blocks should notify admins when they perform commands");
@@ -1412,8 +1427,8 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.spectatorsGenerateChunks, Boolean.parseBoolean(this.spectatorsGenerateChunks),
         		"Whether players in spectator mode can generate chunks");
 
-        // World provider settings for worlds used as dimensions with Forge : TODO: Apply to overworld too?
-        writer.smallTitle("World provider settings (dimensions only)", "World provider settings for dimensions (these do not work for the overworld at the moment). These settings are still in development and may be subject to change in upcoming releases.", "");
+        // World provider settings for worlds used as dimensions with Forge
+        writer.smallTitle("World provider settings", "World provider settings for this world. These settings are still in development, may not all work (please submit an issue on the git) and may be subject to change in upcoming releases.", "");
 
         writer.putSetting(WorldStandardValues.welcomeMessage, this.welcomeMessage,
         		"A message to display to the user when they transfer to this dimension.");
@@ -1452,8 +1467,11 @@ public class WorldConfig extends ConfigFile
         		"If true then the sky will be locked at midnight with the moon and stars above but the world will be lit as if it were day time. Useful for space dimensions.");
         writer.putSetting(WorldStandardValues.voidFogYFactor, this.voidFogYFactor,
         		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");
+
         writer.putSetting(WorldStandardValues.gravityFactor, this.gravityFactor,
-        		"A value above 0.0, defaults to 0.08. Affects entities jumping and falling. 0.04 would result in half the gravity and falling damage.");
+        		"A value above 0.0, defaults to 0.08. Affects entities jumping and falling. 0.04 would result in half the gravity and falling damage.",
+        		"NOTE: Broken for Forge 1.11.2 MP atm, should work fine for SP and 1.12.2 SP & MP.");
+
         writer.putSetting(WorldStandardValues.shouldMapSpin, this.shouldMapSpin,
         		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
         writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk,
@@ -1521,35 +1539,30 @@ public class WorldConfig extends ConfigFile
         for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
         {
             Entry<String, Integer> entry = it.next();
-    		if(!((entry.getValue() > 39 && entry.getValue() < 127) || (entry.getValue() > 167)))
-        	{
-    			// Skip custom biomes with vanilla id's.
-    			// Forge adds these to the custom biomes list
-    			// to make vanilla biomes fully customisable
-    			// but the vanilla biome id's shouldn't actually
-    			// be written to the WorldConfig.ini file
-    			continue;
-        	}
             output.add(entry.getKey() + ":" + entry.getValue());
         }
         writer.putSetting(WorldStandardValues.CUSTOM_BIOMES, output,
-                "You need to register your custom biomes here. This setting will make Open Terrain Generator",
-                "generate setting files for them. However, it won't place them in the world automatically.",
-                "See the settings for your BiomeMode below on how to add them to the world.",
-                "",
-                "Syntax: CustomBiomes:BiomeName:id[,AnotherBiomeName:id[,...]]",
-                "Example: CustomBiomes:TestBiome1:30,BiomeTest2:31",
-                "This will add two biomes and generate the BiomeConfigs for them.",
-                "All changes here need a server restart.",
-                "",
-                "Due to the way Mojang's loading code works, all biome ids need to be unique",
-                "on the server. If you don't do this, the client will display the biomes just fine,",
-                "but the server can think it is another biome with the same id. This will cause saplings,",
-                "snowfall and mobs to work as in the other biome.",
-                "",
-                "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
-                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.",
-				"The Cartographer feature for Forge uses biome id 888.");
+	        "For legacy worlds or creating new biome config files. If you have an existing world made with an",
+	        "older version of OTG (pre 1.12.2-v7) you can register custom biomes with id's here. This will make sure",
+	        "that worlds with the same configs and seed generate the same as pre 1.12.2-v7. For new worlds don't use ", 
+	        "this setting, OTG will fetch all biomes from the WorldBiomes directory and assign them id's automatically.",
+	        "Please note that using CustomBiomes can cause biome id conflicts with other mods or dimensions trying to",
+	        "use the same id's.",
+	        "",
+	        "You can register your custom biomes here. This will make Open Terrain Generator generate setting files",
+	        "(biome configs) for them. However, it won't place them in the world automatically.",
+	        "See the settings for your BiomeMode below on how to add them to the world.",
+	        "",
+	        "Syntax: CustomBiomes:BiomeName:id[,AnotherBiomeName:id[,...]]",
+	        "Example: CustomBiomes:TestBiome1:30,BiomeTest2:31",
+	        "This will add two biomes and generate the BiomeConfigs for them.",
+	        "All changes here need a server restart.",
+	        "",
+	        "All biome ids must be unique.",
+	        "",
+	        "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
+	        "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome."
+        );
     }
 
     public double getFractureHorizontal()

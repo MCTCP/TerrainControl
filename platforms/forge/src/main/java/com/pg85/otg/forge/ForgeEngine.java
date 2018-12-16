@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.collect.BiMap;
@@ -11,6 +12,7 @@ import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
+import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
@@ -49,7 +51,7 @@ public class ForgeEngine extends OTGEngine
 
 	protected WorldLoader worldLoader;
 
-    protected Map<ResourceLocation, Biome> biomeMap;
+	public HashMap<String, BiomeConfig[]> otgBiomeIdsByWorld = new HashMap<String, BiomeConfig[]>();
 
     public ForgeEngine(WorldLoader worldLoader)
     {
@@ -229,10 +231,23 @@ public class ForgeEngine extends OTGEngine
     }
 
     BiMap<ResourceLocation, Biome> names = null;
-    public int registerForgeBiome(int id, ResourceLocation resourceLocation, Biome biome)
+    public int registerForgeBiomeWithId(ResourceLocation resourceLocation, Biome biome)
+    {
+    	return registerForgeBiomeWithId(-1, resourceLocation, biome);
+    }
+    
+    public int registerForgeBiomeWithId(int id, ResourceLocation resourceLocation, Biome biome)
     {
     	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString());
 
+		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
+    	
+    	// Get the next free id
+    	if(id == -1)
+    	{
+    		id = biomeRegistryAvailabiltyMap.nextClearBit(0);
+    	}
+    	
     	if(ids == null)
     	{
 			try {
@@ -285,23 +300,16 @@ public class ForgeEngine extends OTGEngine
 			}
 		}
 
-        names.put(resourceLocation, biome);
+		names.put(resourceLocation, biome);
 
-        if(ids.get(id) != null)
+        Biome biomeAtId = ids.get(id);
+        if(biomeAtId != null)
         {
-        	for(int i = 0; i < 256; i++)
-        	{
-        		if(ids.get(i) == null)
-        		{
-        			ids.put(i, biome);
-        			return i;
-        		}
-        	}
+        	throw new RuntimeException("Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds.");
         }
 
         ids.put(id, biome);
 
-		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
 		biomeRegistryAvailabiltyMap.set(id, true); // Mark the id as used
 
         return id;
@@ -464,6 +472,19 @@ public class ForgeEngine extends OTGEngine
     	return forgeWorld;
     }
 
+    public ForgeWorld getUnloadedWorldByDimId(int dimensionId)
+    {
+    	ForgeWorld forgeWorld;
+    	if(dimensionId == 0)
+    	{
+    		forgeWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
+    	} else {
+        	DimensionType dimType = DimensionManager.getProviderType(dimensionId);
+    		forgeWorld = (ForgeWorld)OTG.getUnloadedWorld(dimType.getName());
+    	}
+    	return forgeWorld;
+    }
+    
     public LocalWorld getWorld(World world)
     {
     	if(world.provider.getDimension() == 0)
@@ -513,7 +534,7 @@ public class ForgeEngine extends OTGEngine
     {
     	return this.worldLoader.getAllWorlds();
     }
-
+    
     @Override
     public File getTCDataFolder()
     {
@@ -537,4 +558,37 @@ public class ForgeEngine extends OTGEngine
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
+
+    @Override
+    public void setOTGBiomeId (String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
+    {
+    	if(!otgBiomeIdsByWorld.containsKey(worldName))
+    	{
+    		otgBiomeIdsByWorld.put(worldName, new BiomeConfig[1024]);
+    	}
+    	if(replaceExisting || otgBiomeIdsByWorld.get(worldName)[i] == null)
+    	{
+    		otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
+    	} else {
+    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName());
+    	}
+    }
+    
+    @Override
+    public BiomeConfig[] getOTGBiomeIds(String worldName)
+    {
+    	return otgBiomeIdsByWorld.containsKey(worldName) ? otgBiomeIdsByWorld.get(worldName) : new BiomeConfig[1024];
+    }
+    
+	@Override
+	public boolean isOTGBiomeIdAvailable(String worldName, int i)
+	{
+		return !otgBiomeIdsByWorld.containsKey(worldName) || otgBiomeIdsByWorld.get(worldName)[i] == null;
+	}
+
+	@Override
+	public void unregisterOTGBiomeId(String worldName, int i)
+	{
+		otgBiomeIdsByWorld.get(worldName)[i] = null;
+	}
 }

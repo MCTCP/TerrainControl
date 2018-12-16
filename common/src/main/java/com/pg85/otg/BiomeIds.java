@@ -10,19 +10,8 @@ package com.pg85.otg;
  */
 public class BiomeIds
 {
-    private final int generationId;
+    private int otgBiomeId;
     private int savedId;
-
-    /**
-     * Creates a new, non-virtual biome id.
-     *
-     * @param id The id of the biome.
-     */
-    public BiomeIds(int id)
-    {
-        this.generationId = id;
-        this.savedId = id;
-    }
 
     /**
      * Creates a new virtual biome id.
@@ -31,9 +20,9 @@ public class BiomeIds
      * @param savedId The id used in the world save files (the .mca files in
      *            the region directory).
      */
-    public BiomeIds(int generationId, int savedId)
+    public BiomeIds(int otgBiomeId, int savedId)
     {
-        this.generationId = generationId;
+        this.otgBiomeId = otgBiomeId;
         this.savedId = savedId;
     }
 
@@ -46,7 +35,8 @@ public class BiomeIds
      */
     public boolean isVirtual()
     {
-        return savedId != generationId && generationId > 255;
+    	return otgBiomeId > 255;
+        //return savedId != otgBiomeId;// && generationId > 255;
     }
 
     /**
@@ -64,9 +54,9 @@ public class BiomeIds
      *
      * @return The id.
      */
-    public int getGenerationId()
+    public int getOTGBiomeId()
     {
-        return generationId;
+        return otgBiomeId;
     }
 
     public void setSavedId(int value)
@@ -74,12 +64,17 @@ public class BiomeIds
     	savedId = value;
     }
 
+    public void setOTGBiomeId(int value)
+    {
+    	otgBiomeId = value;
+    }
+
     @Override
     public String toString()
     {
         if (isVirtual())
         {
-            return generationId + " (gen), " + savedId + " (saved)";
+            return otgBiomeId + " (otg), " + savedId + " (saved)";
         } else
         {
             return Integer.toString(savedId);
@@ -92,7 +87,7 @@ public class BiomeIds
         final int prime = 31;
         int result = 1;
         result = prime * result + savedId;
-        result = prime * result + generationId;
+        result = prime * result + otgBiomeId;
         return result;
     }
 
@@ -116,7 +111,7 @@ public class BiomeIds
         {
             return false;
         }
-        if (generationId != other.generationId)
+        if (otgBiomeId != other.otgBiomeId)
         {
             return false;
         }

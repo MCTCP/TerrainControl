@@ -61,35 +61,38 @@ public class EntityTravelToDimensionListener
 
 				ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockState);
 
-				for(LocalWorld localWorld : forgeWorlds)
+				if(!material.toDefaultMaterial().equals(DefaultMaterial.DIRT))
 				{
-					ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-					ArrayList<LocalMaterialData> portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
-
-					boolean bIsPortalMaterial = false;
-					for(LocalMaterialData portalMaterial : portalMaterials)
+					for(LocalWorld localWorld : forgeWorlds)
 					{
-						if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+						ForgeWorld forgeWorld = (ForgeWorld)localWorld;
+						ArrayList<LocalMaterialData> portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
+	
+						boolean bIsPortalMaterial = false;
+						for(LocalMaterialData portalMaterial : portalMaterials)
 						{
-							bIsPortalMaterial = true;
-							bPortalMaterialFound = true;
-							break;
+							if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+							{
+								bIsPortalMaterial = true;
+								bPortalMaterialFound = true;
+								break;
+							}
 						}
-					}
-					if(bIsPortalMaterial)
-					{
-						if(forgeWorld.getWorld().provider.getDimension() != e.getEntity().dimension)
+						if(bIsPortalMaterial)
 						{
-							destinationDim = forgeWorld.getWorld().provider.getDimension();
-							break;
-						} else {
-							// Portal material is the same as this dim's own material, default to OverWorld.
-							destinationDim = 0;
+							if(forgeWorld.getWorld().provider.getDimension() != e.getEntity().dimension)
+							{
+								destinationDim = forgeWorld.getWorld().provider.getDimension();
+								break;
+							} else {
+								// Portal material is the same as this dim's own material, default to OverWorld.
+								destinationDim = 0;
+							}
 						}
 					}
 				}
 
-				if(!bPortalMaterialFound && !material.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
+				if(!material.toDefaultMaterial().equals(DefaultMaterial.DIRT) && !bPortalMaterialFound && !material.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
 				{
 					// No custom dimensions exist, destroy the portal
 					e.getEntity().getEntityWorld().setBlockToAir(e.getEntity().getPosition());
@@ -97,7 +100,7 @@ public class EntityTravelToDimensionListener
 					return;
 				}
 
-				if(pos.getY() > 0 && bPortalMaterialFound)
+				if(pos.getY() > 0 && (bPortalMaterialFound || material.toDefaultMaterial().equals(DefaultMaterial.DIRT)))
 				{
 					e.setCanceled(true); // Don't tp to nether
 
@@ -123,7 +126,7 @@ public class EntityTravelToDimensionListener
 
     				if(e.getEntity() instanceof EntityPlayerMP)
     				{
-    					OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e.getEntity());
+    					OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e.getEntity(), true);
 					} else {
 						OTGTeleporter.changeDimension(newDimension, e.getEntity());
     				}

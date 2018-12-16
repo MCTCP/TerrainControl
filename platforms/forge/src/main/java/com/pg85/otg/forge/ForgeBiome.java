@@ -28,6 +28,11 @@ public class ForgeBiome implements LocalBiome
         {
             this.isCustom = false;
         }
+        
+        if(biomeConfig == null)
+        {
+        	throw new RuntimeException("Was machst du!?!");
+        }
     }
 
     @Override

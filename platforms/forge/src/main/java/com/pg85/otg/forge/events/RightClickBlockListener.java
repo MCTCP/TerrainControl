@@ -19,15 +19,15 @@ public class RightClickBlockListener
 	{
 		if(!event.getWorld().isRemote) // Server side only
 		{
-			DimensionType dimType = DimensionManager.getProviderType(event.getEntity().dimension);			
+			//DimensionType dimType = DimensionManager.getProviderType(event.getEntity().dimension);			
 			if(
-				(
-					event.getEntity().dimension == 0 ||
-					(
-						dimType.getSuffix() != null &&
-						dimType.getSuffix().equals("OTG")
-					)
-				) &&
+				//(
+				//	event.getEntity().dimension == 0 ||
+				//	(
+				//		dimType.getSuffix() != null &&
+				//		dimType.getSuffix().equals("OTG")
+				//	)
+				//) &&
 				event.getItemStack() != null && 
 				event.getItemStack().getItem() != null && 
 				event.getItemStack().getItem() instanceof ItemFlintAndSteel
@@ -65,7 +65,7 @@ public class RightClickBlockListener
 					// Register the portal to the world's portals list
 			    	OTGBlockPortal.placeInExistingPortal(event.getEntity().dimension, blockInFront);
 				}
-				// Make sure obsidian portals work in custom dimensions even though custom dimensions do not have dimensionType = DimensionType.OVERWORLD
+				// Make sure obsidian portals work in custom dimensions even though custom dimensions do not have dimensionType = DimensionType.OVERWORLD <- TODO: Are you sure they dont?
 				else if(event.getWorld().provider.getDimension() > 1 && event.getWorld().getWorldType() instanceof OTGWorldType)
 				{
 					if(OTGBlockPortal.trySpawnPortal(event.getWorld(), blockInFront, false))

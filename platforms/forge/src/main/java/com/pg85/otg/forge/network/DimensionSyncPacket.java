@@ -2,6 +2,7 @@ package com.pg85.otg.forge.network;
 
 import java.io.DataInputStream;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -52,6 +53,12 @@ public class DimensionSyncPacket implements IMessage
 		@Override
 		public IMessage handleClientMessage(EntityPlayer player, DimensionSyncPacket message, MessageContext ctx)
 		{
+			// For SP clients data is shared between client and server, no need to load worlds on the client.
+			if(Minecraft.getMinecraft().isSingleplayer())
+			{
+				return null;
+			}
+			
 			try
 			{
 				int packetType = message.wrappedStream.readInt();

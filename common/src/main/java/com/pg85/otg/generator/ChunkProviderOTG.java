@@ -11,7 +11,6 @@ import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigProvider;
 import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.generator.biome.BiomeGenerator;
-import com.pg85.otg.generator.biome.OldBiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.generator.noise.NoiseGeneratorNewOctaves;
 import com.pg85.otg.generator.noise.NoiseGeneratorPerlinOctaves;
@@ -139,8 +138,6 @@ public class ChunkProviderOTG
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
-
-        biomes = new BiomeConfig[1024];
     }
 
     protected void generateTerrain(ChunkBuffer chunkBuffer)
@@ -439,17 +436,9 @@ public class ChunkProviderOTG
 
     private void oldBiomeFactor(int x, int z, int i4, int ySections, double noiseHeight)
     {
-        BiomeGenerator unwrapped = localWorld.getBiomeGenerator().unwrap();
-        if (unwrapped instanceof OldBiomeGenerator)
-        {
-            OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) unwrapped;
-            int index = z * 48 + 17 + x * 3;
-            double product = oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
-            this.volatilityFactor = 1.0 - product;
-        } else {
-            final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
-            this.volatilityFactor = (1.0D - Math.min(1, biomeConfig.biomeTemperature) * biomeConfig.biomeWetness);
-        }
+        final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+        this.volatilityFactor = (1.0D - Math.min(1, biomeConfig.biomeTemperature) * biomeConfig.biomeWetness);
+
         this.volatilityFactor *= this.volatilityFactor;
         this.volatilityFactor = 1.0D - this.volatilityFactor * this.volatilityFactor;
 
@@ -606,8 +595,8 @@ public class ChunkProviderOTG
 
         if(biomeConfig == null)
         {
-            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-            LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(id) : this.configProvider.getBiomeByIdOrNull(id);
+            LocalBiome biome = this.configProvider.getBiomeByIdOrNull(id);
+            
             biomeConfig = biome.getBiomeConfig();
             biomes[id] = biomeConfig;
         }

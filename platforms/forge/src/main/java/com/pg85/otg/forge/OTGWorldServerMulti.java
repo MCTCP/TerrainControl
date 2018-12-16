@@ -140,10 +140,10 @@ public class OTGWorldServerMulti extends WorldServer
 	        }
         }
 	}
-
+    
     public OTGWorldServerMulti(MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn, WorldInfo worldInfo)
     {
-        super(server, saveHandlerIn, new DerivedWorldInfo(worldInfo), dimensionId, profilerIn);
+        super(server, saveHandlerIn, new OTGDerivedWorldInfo(worldInfo), dimensionId, profilerIn);
         this.delegate = delegate;
         this.borderListener = new IBorderListener()
         {

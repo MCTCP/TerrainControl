@@ -13,6 +13,7 @@ import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.forge.dimensions.WorldProviderOTG;
 import com.pg85.otg.forge.util.IOHelper;
 
 import net.minecraft.client.gui.GuiButton;
@@ -23,6 +24,7 @@ import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ChatAllowedCharacters;
+import net.minecraft.world.DimensionType;
 import net.minecraft.world.GameType;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
@@ -44,6 +46,8 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     GuiButton btnavailableWorld1;
     GuiButton btnavailableWorld2;
     GuiButton btnavailableWorld3;
+    GuiButton btnavailableWorld4;
+    GuiButton btnavailableWorld5;
     GuiButton btnavailableWorldPrev;
     GuiButton btnavailableWorldNext;
     GuiButton btnavailableWorldNew;
@@ -52,6 +56,8 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     GuiButton btnavailableWorldDelete1;
     GuiButton btnavailableWorldDelete2;
     GuiButton btnavailableWorldDelete3;
+    GuiButton btnavailableWorldDelete4;
+    GuiButton btnavailableWorldDelete5;
 
     GuiTextField txtPregenRadius;
     GuiTextField txtWorldBorderRadius;
@@ -100,14 +106,15 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         			{
         		        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         		        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
-        		        WorldConfig worldConfig = new WorldConfig(worldDir, settingsMap, null);
+        		        WorldConfig worldConfig = new WorldConfig(worldDir, settingsMap, null, null);
                         GuiHandler.worlds.put(worldDir.getName(), worldConfig);
         			}
         		}
         	}
     	}
 
-        int pages = (int)Math.ceil(worldNames.size() / 3d);
+        int pageSize = 6;
+        int pages = (int)Math.ceil(worldNames.size() / (float)pageSize);
         if(GuiHandler.pageNumber > pages - 1)
         {
         	GuiHandler.pageNumber = pages - 1;
@@ -121,39 +128,57 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         btnavailableWorld1.displayString = "";
         btnavailableWorld2.displayString = "";
         btnavailableWorld3.displayString = "";
+        btnavailableWorld4.displayString = "";
+        btnavailableWorld5.displayString = "";
 
         btnavailableWorldDelete1.displayString = "";
         btnavailableWorldDelete2.displayString = "";
         btnavailableWorldDelete3.displayString = "";
+        btnavailableWorldDelete4.displayString = "";
+        btnavailableWorldDelete5.displayString = "";
 
         for(String worldName : worldNames)
         {
         	i += 1;
-        	if(i == (GuiHandler.pageNumber * 3) + 1)
+        	if(i == (GuiHandler.pageNumber * pageSize) + 1)
         	{
         		btnavailableWorld1.displayString = worldName;
         		btnavailableWorldDelete1.displayString = "X";
         	}
-        	if(i == (GuiHandler.pageNumber * 3) + 2)
+        	if(i == (GuiHandler.pageNumber * pageSize) + 2)
         	{
         		btnavailableWorld2.displayString = worldName;
         		btnavailableWorldDelete2.displayString = "X";
         	}
-        	if(i == (GuiHandler.pageNumber * 3) + 3)
+        	if(i == (GuiHandler.pageNumber * pageSize) + 3)
         	{
         		btnavailableWorld3.displayString = worldName;
         		btnavailableWorldDelete3.displayString = "X";
+        	}
+        	if(i == (GuiHandler.pageNumber * pageSize) + 4)
+        	{
+        		btnavailableWorld4.displayString = worldName;
+        		btnavailableWorldDelete4.displayString = "X";
+        	}
+        	if(i == (GuiHandler.pageNumber * pageSize) + 5)
+        	{
+        		btnavailableWorld5.displayString = worldName;
+        		btnavailableWorldDelete5.displayString = "X";
         	}
         }
 
         btnavailableWorld1.enabled = !btnavailableWorld1.displayString.equals("") && !btnavailableWorld1.displayString.equals(GuiHandler.worldName);
        	btnavailableWorld2.enabled = !btnavailableWorld2.displayString.equals("") && !btnavailableWorld2.displayString.equals(GuiHandler.worldName);
     	btnavailableWorld3.enabled = !btnavailableWorld3.displayString.equals("") && !btnavailableWorld3.displayString.equals(GuiHandler.worldName);
-
+    	btnavailableWorld4.enabled = !btnavailableWorld4.displayString.equals("") && !btnavailableWorld4.displayString.equals(GuiHandler.worldName);
+    	btnavailableWorld5.enabled = !btnavailableWorld5.displayString.equals("") && !btnavailableWorld5.displayString.equals(GuiHandler.worldName);
+    	
     	btnavailableWorldDelete1.enabled = !btnavailableWorld1.displayString.equals("");
     	btnavailableWorldDelete2.enabled = !btnavailableWorld2.displayString.equals("");
     	btnavailableWorldDelete3.enabled = !btnavailableWorld3.displayString.equals("");
-
+    	btnavailableWorldDelete4.enabled = !btnavailableWorld4.displayString.equals("");
+    	btnavailableWorldDelete5.enabled = !btnavailableWorld5.displayString.equals("");
+    	
         if(worldNames.size() > 3)
         {
         	btnavailableWorldPrev.enabled = true;
@@ -197,7 +222,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
         if(GuiHandler.worldName.length() == 0)
         {
-        	worldNameHelpText = "World name cannot be empty";
+        	//worldNameHelpText = "World name cannot be empty";
         } else {
         	int i = 0;
         	while(true)
@@ -214,13 +239,6 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         	}
 
         	GuiHandler.worldName = getCorrectWorldName(this.mc.getSaveLoader(), GuiHandler.worldName);
-
-            if (this.mc.getSaveLoader().getWorldInfo(GuiHandler.worldName) != null)
-            {
-            	worldNameHelpText = "Existing world will be deleted!";
-            } else {
-            	worldNameHelpText = "New world dir will be created";
-            }
 
         	boolean usingPreset = false;
 
@@ -267,7 +285,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
             if(usingPreset)
             {
-            	worldNameHelpText2 = "Using existing settings";
+            	//worldNameHelpText2 = "Using existing settings";
 
                 txtPregenRadius.setText(GuiHandler.PregenerationRadius + "");
                 txtWorldBorderRadius.setText(GuiHandler.WorldBorderRadius + "");
@@ -276,7 +294,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             } else {
             	GuiHandler.selectedWorldName = null;
             	selectedWorldConfig = null;
-            	worldNameHelpText2 = "Using default settings";
+            	//worldNameHelpText2 = "Using default settings";
             }
 			btnavailableWorldClone.enabled = GuiHandler.selectedWorldName != null;
         }
@@ -285,8 +303,8 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         updateButtons();
     }
 
-    String worldNameHelpText;
-    String worldNameHelpText2;
+    //String worldNameHelpText;
+    //String worldNameHelpText2;
     public String getCorrectWorldName(ISaveFormat anvilSaveConverter, String worldName)
     {
     	worldName = worldName.replaceAll("[\\./\"]", "_");
@@ -396,12 +414,40 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 		{
 			if(ok)
 			{
+                ISaveFormat isaveformat = this.mc.getSaveLoader();
+                isaveformat.flushCache();
+                isaveformat.deleteWorldDirectory(GuiHandler.worldName);
+				
 				DeleteWorldFiles(GuiHandler.worldName);
 				PregeneratorUI.ResetIngameUI();
+				
+		        DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
+		        DimensionType.OVERWORLD.suffix = "OTG";
+				
 				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
 				GuiHandler.askModCompatContinue = false;
 			} else {
 				GuiHandler.askModCompatContinue = false;
+				this.mc.displayGuiScreen(new OTGGuiCreateWorld(new OTGGuiWorldSelection(null)));
+			}
+		}
+		else if (askOverWriteSettings)
+		{
+			if(ok)
+			{
+                ISaveFormat isaveformat = this.mc.getSaveLoader();
+                isaveformat.flushCache();
+                isaveformat.deleteWorldDirectory(GuiHandler.worldName);
+				
+				DeleteWorldFiles(GuiHandler.worldName);
+				PregeneratorUI.ResetIngameUI();
+				
+		        DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
+		        DimensionType.OVERWORLD.suffix = "OTG";
+				
+				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
+				GuiHandler.askModCompatContinue = false;				
+			} else {
 				this.mc.displayGuiScreen(new OTGGuiCreateWorld(new OTGGuiWorldSelection(null)));
 			}
 		}
@@ -466,9 +512,26 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 		}
     }
 
+	boolean askOverWriteSettings = false;
+    public GuiYesNo askOverWriteSettings(GuiYesNoCallback p_152129_0_, String worldName)
+    {
+    	askOverWriteSettings = true;
+    	askDeleteSettings = false;
+    	selectingWorldName = false;
+    	GuiHandler.askModCompatContinue = false;
+
+        String s1 = "A world already uses these settings. Existing world will be deleted!";
+        String s2 = "Tip: Use the \"Clone\" button to create multiple worlds with the same world preset.";
+        String s3 = "Delete";
+        String s4 = "Cancel";
+        GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, s2, s3, s4, 0);
+        return guiyesno;
+    }
+	
 	boolean askDeleteSettings = false;
     public GuiYesNo askDeleteSettings(GuiYesNoCallback p_152129_0_, String worldName)
     {
+    	askOverWriteSettings = false;
     	askDeleteSettings = true;
     	selectingWorldName = false;
     	GuiHandler.askModCompatContinue = false;
@@ -481,14 +544,15 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         return guiyesno;
     }
 
-    public GuiYesNo askModCompatContinue(GuiYesNoCallback p_152129_0_, boolean customMobSpawnerEnabled, boolean biomesOPlentyEnabled)
+    public GuiYesNo askModCompatContinue(GuiYesNoCallback p_152129_0_, boolean customMobSpawnerEnabled)
     {
+    	askOverWriteSettings = false;
     	askDeleteSettings = false;
     	selectingWorldName = false;
     	GuiHandler.askModCompatContinue = true;
 
-        String s1 = "Warning: " + (biomesOPlentyEnabled ? " Biomes o' plenty may cause crashes." : "") + (customMobSpawnerEnabled ? " CustomMobSpawner may break OTG mob spawning." : "");
-        String s2 = "It is recommended that you disable or remove " + (customMobSpawnerEnabled && biomesOPlentyEnabled ? "these mods." : "this mod.");
+        String s1 = "Warning: " + (customMobSpawnerEnabled ? " CustomMobSpawner may break OTG mob spawning." : "");
+        String s2 = "It is recommended that you disable or remove this mod.";
         String s3 = "Continue";
         String s4 = "Back";
         GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, s2, s3, s4, 0);
@@ -589,7 +653,27 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         		}
                 this.updateWorldName();
         	}
-
+        	if (button.id == 100) // Available world 4
+        	{
+        		if(btnavailableWorld4.displayString.length() > 0 && !btnavailableWorld4.displayString.equalsIgnoreCase(""))
+        		{
+        			this.txtWorldName.setText(btnavailableWorld4.displayString);
+        		} else {
+        			this.txtWorldName.setText("New World");
+        		}
+                this.updateWorldName();
+        	}
+        	if (button.id == 101) // Available world 5
+        	{
+        		if(btnavailableWorld5.displayString.length() > 0 && !btnavailableWorld5.displayString.equalsIgnoreCase(""))
+        		{
+        			this.txtWorldName.setText(btnavailableWorld5.displayString);
+        		} else {
+        			this.txtWorldName.setText("New World");
+        		}
+                this.updateWorldName();
+        	}
+        	
         	if (button.id == 8) // Available world delete 1
         	{
         		if(btnavailableWorld1.displayString.length() > 0 && !btnavailableWorld1.displayString.equalsIgnoreCase(""))
@@ -617,6 +701,24 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 					this.mc.displayGuiScreen(guiyesno);
         		}
         	}
+        	if (button.id == 110) // Available world delete 4
+        	{
+        		if(btnavailableWorld4.displayString.length() > 0 && !btnavailableWorld4.displayString.equalsIgnoreCase(""))
+        		{
+					GuiYesNo guiyesno = askDeleteSettings(this, btnavailableWorld4.displayString);
+					worldNameToDelete = btnavailableWorld4.displayString.trim();
+					this.mc.displayGuiScreen(guiyesno);
+        		}
+        	}
+        	if (button.id == 111) // Available world delete 5
+        	{
+        		if(btnavailableWorld5.displayString.length() > 0 && !btnavailableWorld5.displayString.equalsIgnoreCase(""))
+        		{
+					GuiYesNo guiyesno = askDeleteSettings(this, btnavailableWorld5.displayString);
+					worldNameToDelete = btnavailableWorld5.displayString.trim();
+					this.mc.displayGuiScreen(guiyesno);
+        		}
+        	}
 
         	if (button.id == 6) // Previous
         	{
@@ -638,6 +740,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 }
 
                 this.bBtnCreateNewWorldClicked = true;
+                
                 long i = (new Random()).nextLong();
                 String s = this.txtSeed.getText().trim();
 
@@ -658,10 +761,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                     }
                 }
 
-                ISaveFormat isaveformat = this.mc.getSaveLoader();
-                isaveformat.flushCache();
-                isaveformat.deleteWorldDirectory(GuiHandler.worldName);
-
+                // TODO: Document why this is necessary
                 WorldType.parseWorldType("OTG").onGUICreateWorldPress();
 
                 GameType gametype = GameType.getByName(GuiHandler.gameModeString);
@@ -677,31 +777,37 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
                 	worldsettings.enableCommands();
                 }
 
-                boolean biomesOPlentyEnabled = false;
     			boolean customMobSpawnerEnabled = false;
     			for (ModContainer mod : Loader.instance().getActiveModList())
     			{
-    				if(mod.getName().toLowerCase().equals("biomes o' plenty"))
-    				{
-    					biomesOPlentyEnabled = true;
-    				}
     				if(mod.getName().toLowerCase().equals("drzhark's customspawner"))
     				{
     					customMobSpawnerEnabled = true;
-    				}
-    				if(biomesOPlentyEnabled && customMobSpawnerEnabled)
-    				{
     					break;
     				}
     			}
 
-    			if(biomesOPlentyEnabled || customMobSpawnerEnabled)
+                if (this.mc.getSaveLoader().getWorldInfo(GuiHandler.worldName) != null && !askOverWriteSettings)
+                {
+					GuiYesNo guiyesno = askOverWriteSettings(this, btnavailableWorld1.displayString);
+					this.mc.displayGuiScreen(guiyesno);
+                }
+                else if(customMobSpawnerEnabled)
             	{
-					GuiYesNo guiyesno = askModCompatContinue(this, customMobSpawnerEnabled, biomesOPlentyEnabled);
+					GuiYesNo guiyesno = askModCompatContinue(this, customMobSpawnerEnabled);
 					this.mc.displayGuiScreen(guiyesno);
 				} else {
+					
+	                ISaveFormat isaveformat = this.mc.getSaveLoader();
+	                isaveformat.flushCache();
+	                isaveformat.deleteWorldDirectory(GuiHandler.worldName);
+
 					DeleteWorldFiles(GuiHandler.worldName);
 					PregeneratorUI.ResetIngameUI();
+					
+			        DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
+			        DimensionType.OVERWORLD.suffix = "OTG";
+					
     				this.mc.launchIntegratedServer(GuiHandler.worldName, this.txtWorldName.getText().trim(), worldsettings);
     			}
             }
@@ -738,6 +844,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             	{
             		cloning = true;
 
+            		askOverWriteSettings = false;
         	    	askDeleteSettings = false;
         	    	selectingWorldName = true;
         	    	GuiHandler.askModCompatContinue = false;
@@ -751,6 +858,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             {
             	cloning = false;
 
+            	askOverWriteSettings = false;
     	    	askDeleteSettings = false;
     	    	selectingWorldName = true;
     	    	GuiHandler.askModCompatContinue = false;
@@ -849,65 +957,97 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
             btnBonusChest.enabled = true;
     	}
 
-    	btnGameMode.displayString = I18n.format("selectWorld.gameMode", new Object[0]) + " " + I18n.format("selectWorld.gameMode." + GuiHandler.gameModeString, new Object[0]);
+    	btnGameMode.displayString = I18n.format("selectWorld.gameMode." + GuiHandler.gameModeString, new Object[0]);
 
-        btnBonusChest.displayString = I18n.format("selectWorld.bonusItems", new Object[0]) + " ";
+        btnBonusChest.displayString = I18n.format("Chest", new Object[0]);
 
         if (GuiHandler.bonusChest)
         {
-        	btnBonusChest.displayString = btnBonusChest.displayString + I18n.format("options.on", new Object[0]);
+        	btnBonusChest.displayString = I18n.format("Chest", new Object[0]);
         } else {
-        	btnBonusChest.displayString = btnBonusChest.displayString + I18n.format("options.off", new Object[0]);
+        	btnBonusChest.displayString = I18n.format("No chest", new Object[0]);
         }
 
-        btnAllowCheats.displayString = I18n.format("selectWorld.allowCommands", new Object[0]) + " ";
+        btnAllowCheats.displayString = I18n.format("Cheats", new Object[0]) + " ";
 
         if (GuiHandler.allowCheats)
         {
-        	btnAllowCheats.displayString = btnAllowCheats.displayString + I18n.format("options.on", new Object[0]);
+        	btnAllowCheats.displayString = I18n.format("Cheats", new Object[0]);
         } else {
-        	btnAllowCheats.displayString = btnAllowCheats.displayString + I18n.format("options.off", new Object[0]);
+        	btnAllowCheats.displayString = I18n.format("No cheats", new Object[0]);
         }
     }
 
+    int margin;
+    int uiWidth;
+    int column1Width;
+    int column2Width;
+    int marginFromTop;
+    int marginFromLeft;
+    int column1X;
+    int column2X;
+    int btnWidth;
+    int btn2Width;
+    int btnHeight;
+    int squareButtonSize;
+    
     /**
      * Adds the buttons (and other controls) to the screen in question.
      */
     public void initGui()
     {
+        margin = 4;
+        uiWidth = 400;
+        column1Width = (int)((uiWidth - (margin * 2)) / 5f) * 2;
+        column2Width = (int)((uiWidth - (margin * 2)) / 5f) * 3;
+        marginFromTop = 55;
+        marginFromLeft = Math.round((this.width - uiWidth) / 2f);
+        column1X = marginFromLeft;
+        column2X = column1X + column1Width + (margin * 2);
+        squareButtonSize = 20;
+        btnWidth = column1Width - squareButtonSize - margin;
+        btn2Width = (int)Math.floor((column1Width - (squareButtonSize + margin + squareButtonSize + margin) - margin) / 2f);
+        btnHeight = 20;
+        
         Keyboard.enableRepeatEvents(true);
-
+        
         this.buttonList.clear();
 
         // World name
-        this.txtWorldName = new GuiTextField(30, this.fontRenderer, this.width / 2 - 164, 45, 160, 20); //left, top, width, height
+        this.txtWorldName = new GuiTextField(30, this.fontRenderer, column2X, marginFromTop + 2, column2Width, btnHeight); //left, top, width, height
         this.txtWorldName.setEnabled(false);
 
         // Seed
-        this.txtSeed = new GuiTextField(31, this.fontRenderer, this.width / 2 - 164, 101, 160, 20);
+        this.txtSeed = new GuiTextField(31, this.fontRenderer, column2X, marginFromTop + 2 + 46, column2Width, btnHeight);
         this.txtSeed.setFocused(true);
         this.txtSeed.setText(GuiHandler.seed != null ? GuiHandler.seed : "");
 
-        int btnwidth = 136;
-
         // Available worlds
-        btnavailableWorld1 = new GuiButton(3, this.width / 2 + 6, 43, btnwidth, 20, "");
-        btnavailableWorld2 = new GuiButton(4, this.width / 2 + 6, 43 + 24, btnwidth, 20, "");
-        btnavailableWorld3 = new GuiButton(5, this.width / 2 + 6, 43 + 48, btnwidth, 20, "");
-        btnavailableWorldPrev = new GuiButton(6, this.width / 2 + 6, 43 + 72, 25, 20, "<");
-        btnavailableWorldNext = new GuiButton(7, this.width / 2 + 6 + 28, 43 + 72, 25, 20, ">");
-        btnavailableWorldClone = new GuiButton(14, this.width / 2 + 6 + 56, 43 + 72, 50, 20, "Clone");
+        
+        btnavailableWorld1 = new GuiButton(3, column1X, marginFromTop, btnWidth, btnHeight, "");
+        btnavailableWorld2 = new GuiButton(4, column1X, marginFromTop + btnHeight + margin, btnWidth, btnHeight, "");
+        btnavailableWorld3 = new GuiButton(5, column1X, marginFromTop + btnHeight + margin + btnHeight + margin, btnWidth, btnHeight, "");
+        btnavailableWorld4 = new GuiButton(100, column1X, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin, btnWidth, btnHeight, "");
+        btnavailableWorld5 = new GuiButton(101, column1X, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, btnWidth, btnHeight, "");
+        btnavailableWorldPrev = new GuiButton(6, column1X, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, squareButtonSize, squareButtonSize, "<");
+        btnavailableWorldNext = new GuiButton(7, column1X + squareButtonSize + margin, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, squareButtonSize, squareButtonSize, ">");
+        btnavailableWorldClone = new GuiButton(14, column1X + squareButtonSize + margin + squareButtonSize + margin, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, btn2Width, btnHeight, "Clone");
     	btnavailableWorldClone.enabled = GuiHandler.selectedWorldName != null;
-        btnavailableWorldNew = new GuiButton(15, this.width / 2 + 6 + 110, 43 + 72, 50, 20, "New");
+        btnavailableWorldNew = new GuiButton(15, column1X + squareButtonSize + margin + squareButtonSize + margin + btn2Width + margin, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, btn2Width, btnHeight, "New");
 
         // Available worlds delete btns
-        btnavailableWorldDelete1 = new GuiButton(8, this.width / 2 + 6 + btnwidth + 4, 43, 20, 20, "X");
-        btnavailableWorldDelete2 = new GuiButton(9, this.width / 2 + 6 + btnwidth + 4, 43 + 24, 20, 20, "X");
-        btnavailableWorldDelete3 = new GuiButton(10, this.width / 2 + 6 + btnwidth + 4, 43 + 48, 20, 20, "X");
-
+        
+        btnavailableWorldDelete1 = new GuiButton(8, column1X + btnWidth + margin, marginFromTop, squareButtonSize, squareButtonSize, "X");
+        btnavailableWorldDelete2 = new GuiButton(9, column1X + btnWidth + margin, marginFromTop + squareButtonSize + margin, squareButtonSize, squareButtonSize, "X");
+        btnavailableWorldDelete3 = new GuiButton(10, column1X + btnWidth + margin, marginFromTop + squareButtonSize + margin + squareButtonSize + margin, squareButtonSize, squareButtonSize, "X");
+        btnavailableWorldDelete4 = new GuiButton(110, column1X + btnWidth + margin, marginFromTop + squareButtonSize + margin + squareButtonSize + margin + squareButtonSize + margin, squareButtonSize, squareButtonSize, "X");
+        btnavailableWorldDelete5 = new GuiButton(110, column1X + btnWidth + margin, marginFromTop + squareButtonSize + margin + squareButtonSize + margin + squareButtonSize + margin + squareButtonSize + margin, squareButtonSize, squareButtonSize, "X");
+        
         this.buttonList.add(btnavailableWorld1);
         this.buttonList.add(btnavailableWorld2);
         this.buttonList.add(btnavailableWorld3);
+        this.buttonList.add(btnavailableWorld4);
+        this.buttonList.add(btnavailableWorld5);
         this.buttonList.add(btnavailableWorldPrev);
         this.buttonList.add(btnavailableWorldNext);
         this.buttonList.add(btnavailableWorldClone);
@@ -916,6 +1056,8 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.buttonList.add(btnavailableWorldDelete1);
         this.buttonList.add(btnavailableWorldDelete2);
         this.buttonList.add(btnavailableWorldDelete3);
+        this.buttonList.add(btnavailableWorldDelete4);
+        this.buttonList.add(btnavailableWorldDelete5);
 
         FillAvailableWorlds();
 
@@ -937,25 +1079,28 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 		}
 
         // Pre-generation radius
-        this.txtPregenRadius = new GuiTextField(20, this.fontRenderer, this.width / 2 - 164, 159, 50, 20);
+        this.txtPregenRadius = new GuiTextField(20, this.fontRenderer, column2X, marginFromTop + 2 + 46 + 46, 50, btnHeight);
         this.txtPregenRadius.setText(GuiHandler.PregenerationRadius + "");
 
         // World border
-        this.txtWorldBorderRadius = new GuiTextField(21, this.fontRenderer, this.width / 2 - 164 + 210, 159, 50, 20);
+        this.txtWorldBorderRadius = new GuiTextField(21, this.fontRenderer, column2X + 130, marginFromTop + 2 + 46 + 46, 50, btnHeight);
         this.txtWorldBorderRadius.setText(GuiHandler.WorldBorderRadius + "");
 
-        btnGameMode = new GuiButton(11, this.width / 2 - 166, 188, 122, 20, I18n.format("selectWorld.gameMode", new Object[0]));
-        btnAllowCheats = new GuiButton(12, this.width / 2 - 39, 188, 100, 20, I18n.format("selectWorld.allowCommands", new Object[0]));
-        btnBonusChest = new GuiButton(13, this.width / 2 + 66, 188, 100, 20, I18n.format("selectWorld.bonusItems", new Object[0]));
+    	int row3Width = 3;
+    	int row3ButtonWidth = (int) Math.floor(((column2Width + 2) - ((row3Width - 1) * margin)) / (float)row3Width) + 1;
+        
+        btnGameMode = new GuiButton(11, column2X - 2, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, row3ButtonWidth, btnHeight, I18n.format("selectWorld.gameMode", new Object[0]));
+        btnAllowCheats = new GuiButton(12, column2X - 2 + row3ButtonWidth + margin, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, row3ButtonWidth, btnHeight, I18n.format("Allow cheats", new Object[0]));
+        btnBonusChest = new GuiButton(13, column2X - 2 + row3ButtonWidth + margin + row3ButtonWidth + margin, marginFromTop + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin + btnHeight + margin, row3ButtonWidth, btnHeight, I18n.format("Bonus chest", new Object[0]));
 
         this.buttonList.add(btnGameMode);
         this.buttonList.add(btnAllowCheats);
         this.buttonList.add(btnBonusChest);
 
         // Create / Cancel
-        btnCreateWorld = new GuiButton(0, this.width / 2 - 166, 213, 164, 20, I18n.format("selectWorld.create", new Object[0]));
+        btnCreateWorld = new GuiButton(0, column1X, this.height - 30, (int)((uiWidth - margin) / 2f), 20, I18n.format("Create", new Object[0]));
         this.buttonList.add(btnCreateWorld);
-        this.buttonList.add(new GuiButton(1, this.width / 2 + 2, 213, 164, 20, I18n.format("gui.cancel", new Object[0])));
+        this.buttonList.add(new GuiButton(1, column1X + (int)((uiWidth - margin) / 2f) + margin, this.height - 30, (int)((uiWidth - margin) / 2f), 20, I18n.format("Cancel", new Object[0])));
 
     	this.txtWorldName.setText(worldName);
 
@@ -971,29 +1116,29 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.drawDefaultBackground();
 
         // Create new world title
-        this.drawCenteredString(this.fontRenderer, I18n.format("Create a new OpenTerrainGenerator world", new Object[0]), this.width / 2, 10, -1);
+        this.drawCenteredString(this.fontRenderer, I18n.format("Craft a new Open Terrain Generator world", new Object[0]), this.width / 2, marginFromTop - 38, -1);
 
         // World name
-        this.drawString(this.fontRenderer, I18n.format("selectWorld.enterName", new Object[0]), this.width / 2 - 164, 30, -6250336);
-        this.drawString(this.fontRenderer, this.worldNameHelpText, this.width / 2 - 164, 70, -6250336);
+        this.drawString(this.fontRenderer, I18n.format("selectWorld.enterName", new Object[0]), column2X, marginFromTop - 13, -6250336);
+        //this.drawString(this.fontRenderer, this.worldNameHelpText, column2X, 70, -6250336);
         this.txtWorldName.drawTextBox();
 
         // Available worlds
-        this.drawString(this.fontRenderer, I18n.format("World settings", new Object[0]), this.width / 2 + 9, 30, -6250336);
+        this.drawString(this.fontRenderer, I18n.format("World settings", new Object[0]), column1X + 3, marginFromTop - 13, -6250336);
 
         // Seed
-        this.drawString(this.fontRenderer, I18n.format("selectWorld.enterSeed", new Object[0]), this.width / 2 - 164, 88, -6250336);
-        this.drawString(this.fontRenderer, I18n.format("selectWorld.seedInfo", new Object[0]), this.width / 2 - 164, 126, -6250336);
+        this.drawString(this.fontRenderer, I18n.format("Seed", new Object[0]), column2X, marginFromTop + 33, -6250336);
+        //this.drawString(this.fontRenderer, I18n.format("selectWorld.seedInfo", new Object[0]), this.width / 2 - 164, 126, -6250336);
         this.txtSeed.drawTextBox();
 
         // Pre-generation Radius
-        this.drawString(this.fontRenderer, "Pre-generation radius", this.width / 2 - 164, 145, -6250336);
+        this.drawString(this.fontRenderer, "Pre-generation radius", column2X, marginFromTop + 2 + 46 + 46 - 15, -6250336);
 
         // World border Radius
-        this.drawString(this.fontRenderer, "World border radius", this.width / 2 - 164 + 210, 145, -6250336);
+        this.drawString(this.fontRenderer, "World border radius", column2X + 130, marginFromTop + 2 + 46 + 46 - 15, -6250336);
 
-        this.drawString(this.fontRenderer, "chunks", this.width / 2 - 164 + 60, 165, -6250336);
-        this.drawString(this.fontRenderer, "chunks", this.width / 2 - 164 + 210 + 60, 165, -6250336);
+        this.drawString(this.fontRenderer, "chunks", column2X + 59, marginFromTop + 101, -6250336);
+        this.drawString(this.fontRenderer, "chunks", column2X + 189, marginFromTop + 101, -6250336);
 
         this.txtPregenRadius.drawTextBox();
         this.txtWorldBorderRadius.drawTextBox();

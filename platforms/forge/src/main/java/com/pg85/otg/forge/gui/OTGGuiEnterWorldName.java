@@ -112,7 +112,7 @@ public class OTGGuiEnterWorldName extends GuiScreen
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, I18n.format("Name your new world", new Object[0]), this.width / 2, 20, 16777215);
+        this.drawCenteredString(this.fontRenderer, I18n.format("Name your new world settings", new Object[0]), this.width / 2, 20, 16777215);
         this.drawString(this.fontRenderer, I18n.format("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, 10526880);
         this.newWorldNameTextField.drawTextBox();
         

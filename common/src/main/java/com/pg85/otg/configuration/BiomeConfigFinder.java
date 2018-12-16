@@ -1,5 +1,6 @@
 package com.pg85.otg.configuration;
 
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.SettingsMap;
@@ -213,7 +214,7 @@ public final class BiomeConfigFinder
      *
      * @return A map of biome name --> location on disk.
      */
-    public Map<String, BiomeConfigStub> findBiomes(Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
+    public Map<String, BiomeConfigStub> findBiomes(WorldConfig worldConfig, LocalWorld world, int worldHeightScale, Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
     {
         Map<String, BiomeConfigStub> biomeConfigsStore = new HashMap<String, BiomeConfigStub>();
 
@@ -230,17 +231,16 @@ public final class BiomeConfigFinder
             // Account for the possibility that folder creation failed
             if (directory.exists())
             {
-                loadBiomesFromDirectory(biomeConfigsStore, directory, remainingBiomes);
+                loadBiomesFromDirectory(worldConfig, world, worldHeightScale, biomeConfigsStore, directory, remainingBiomes);
             }
         }
-
+        
         // Create all biomes that weren't loaded
         File preferredDirectory = directories.iterator().next();
         for (BiomeLoadInstruction localBiome : remainingBiomes.values())
         {
             File newConfigFile = new File(preferredDirectory, toFileName(localBiome));
-            boolean isNewConfig = true; // no file exists yet
-            SettingsMap settings = new SimpleSettingsMap(localBiome.getBiomeName(), isNewConfig);
+            SettingsMap settings = new SimpleSettingsMap(localBiome.getBiomeName(), true);
             BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, newConfigFile, localBiome);
             biomeConfigsStore.put(localBiome.getBiomeName(), biomeConfigStub);
         }
@@ -256,14 +256,14 @@ public final class BiomeConfigFinder
      * @param remainingBiomes   The biomes that should still be loaded. When a
      *                          biome is found, it is removed from this map.
      */
-    private void loadBiomesFromDirectory(Map<String, BiomeConfigStub> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes)
+    private void loadBiomesFromDirectory(WorldConfig worldConfig, LocalWorld world, int worldHeightScale, Map<String, BiomeConfigStub> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes)
     {
         for (File file : directory.listFiles())
         {
             // Search recursively
             if (file.isDirectory())
             {
-                loadBiomesFromDirectory(biomeConfigsStore, file, remainingBiomes);
+                loadBiomesFromDirectory(worldConfig, world, worldHeightScale, biomeConfigsStore, file, remainingBiomes);
                 continue;
             }
 
@@ -274,23 +274,65 @@ public final class BiomeConfigFinder
                 // Not a valid biome file
                 continue;
             }
-
-            // Get the correct LocalBiome
+                        
+            // Load file with standard template to get replacetobiomename setting
+            BiomeLoadInstruction preloadedBiome = new BiomeLoadInstruction(biomeName, new StandardBiomeTemplate(worldHeightScale));
+            File preloadedRenamedFile = renameBiomeFile(file, preloadedBiome);
+            SettingsMap preloadedSettings = FileSettingsReader.read(biomeName, preloadedRenamedFile);
+            BiomeConfigStub preloadedBiomeConfigStub = new BiomeConfigStub(preloadedSettings, file, preloadedBiome);
+            
+            // Get the correct LocalBiome, 
+            
+            // For legacy worlds that use the custombiomes list but don't have the vanilla biomes listed make sure the default biome templates are used. 
+            // For newly created configs the default biomes have been added to remainingBiomes so those already use the correct templates. 
             BiomeLoadInstruction biome = remainingBiomes.get(biomeName);
             if (biome == null)
             {
-                // Doesn't need to be loaded. Maybe it's in both the global
-                // and world folder, maybe it isn't
-                // registered in the WorldConfig
-                continue;
+            	// If a biome has replacetobiomename set to a vanilla biome and has the same name as the vanilla biome then it should use the vanilla biome's template. 
+            	String replaceToBiomeName = preloadedBiomeConfigStub.settings.getSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME, "");
+            	if(replaceToBiomeName != null && replaceToBiomeName.length() > 0)
+            	{
+	            	Collection<? extends BiomeLoadInstruction> defaultBiomes = world.getDefaultBiomes();
+	                for (BiomeLoadInstruction defaultBiome : defaultBiomes)
+	                {
+	                	if(biomeName.equals(defaultBiome.getBiomeName()) && replaceToBiomeName.equals(OTG.getRegistryNameForDefaultBiome(defaultBiome.getBiomeName())))
+	                	{
+	                		biome = new BiomeLoadInstruction(defaultBiome.getBiomeName(), defaultBiome.getBiomeTemplate());
+	                		break;
+	                	}
+	                }
+            	}
+            	// If this is a new world using legacy configs then update the config by adding replaceToBiomeName              	
+            	// If this biome is not listed in custombiomes, does not have replacetobiomename set and has the same name as a vanilla biome then
+            	// assume it is a legacy config
+        		else if(!worldConfig.worldBiomes.contains(biomeName)) 
+    			{
+	            	Collection<? extends BiomeLoadInstruction> defaultBiomes = world.getDefaultBiomes();
+	                for (BiomeLoadInstruction defaultBiome : defaultBiomes)
+	                {
+	                	if(biomeName.equals(defaultBiome.getBiomeName()))
+	                	{
+	                		biome = new BiomeLoadInstruction(defaultBiome.getBiomeName(), defaultBiome.getBiomeTemplate());
+	                		break;
+	                	}
+	                }
+            	}
             }
+        	if(biome == null)
+        	{
+        		biome = new BiomeLoadInstruction(biomeName, new StandardBiomeTemplate(worldHeightScale));
+        	}
 
             // Load biome and remove it from the todo list
             File renamedFile = renameBiomeFile(file, biome);
             SettingsMap settings = FileSettingsReader.read(biomeName, renamedFile);
             BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, file, biome);
             biomeConfigsStore.put(biomeName, biomeConfigStub);
-            remainingBiomes.remove(biome.getBiomeName());
+            
+            if(remainingBiomes.containsKey(biome.getBiomeName()))
+            {
+            	remainingBiomes.remove(biome.getBiomeName());
+            }
         }
     }
 

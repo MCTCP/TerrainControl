@@ -136,6 +136,10 @@ public final class ConfigToNetworkSender
 
 		stream.writeBoolean(worldConfig.playersCanPlaceBlocks); // When set to false players cannot place blocks in this world. Defaults to: true
 
+        ConfigFile.writeStringToStream(stream, worldConfig.defaultOceanBiome); // Required for the biome generator
+        ConfigFile.writeStringToStream(stream, worldConfig.defaultFrozenOceanBiome); // Required for the biome generator
+        ConfigFile.writeStringToStream(stream, worldConfig.defaultRiverBiome); // Required for the biome generator
+		
         // Fetch all non-virtual biomes
         Collection<LocalBiome> nonVirtualBiomes = new ArrayList<LocalBiome>();
         Collection<LocalBiome> nonVirtualCustomBiomes = new ArrayList<LocalBiome>();
@@ -157,12 +161,14 @@ public final class ConfigToNetworkSender
         }
 
         // Write them to the stream
+        /*
         stream.writeInt(nonVirtualCustomBiomes.size());
         for (LocalBiome biome : nonVirtualCustomBiomes)
         {
             ConfigFile.writeStringToStream(stream, biome.getName());
             stream.writeInt(biome.getIds().getSavedId());
         }
+        */
 
         // BiomeConfigs
         stream.writeInt(nonVirtualBiomes.size());
@@ -172,6 +178,7 @@ public final class ConfigToNetworkSender
             {
             	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
             }
+            stream.writeInt(biome.getIds().getOTGBiomeId());
             stream.writeInt(biome.getIds().getSavedId());
             biome.getBiomeConfig().writeToStream(stream, isSinglePlayer);
         }

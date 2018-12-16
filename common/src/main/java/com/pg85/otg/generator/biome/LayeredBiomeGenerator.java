@@ -48,7 +48,7 @@ public abstract class LayeredBiomeGenerator extends BiomeGenerator
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
-        int[] arrayOfInt = this.unZoomedLayer.getInts(cache, x, z, x_size, z_size);
+        int[] arrayOfInt = this.unZoomedLayer.getInts(world, cache, x, z, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
@@ -69,7 +69,7 @@ public abstract class LayeredBiomeGenerator extends BiomeGenerator
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
-        int[] arrayOfInt = this.biomeLayer.getInts(cache, x, z, x_size, z_size);
+        int[] arrayOfInt = this.biomeLayer.getInts(world, cache, x, z, x_size, z_size);
         ArraysCacheManager.ReleaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);

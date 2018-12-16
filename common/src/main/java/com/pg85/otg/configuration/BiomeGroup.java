@@ -94,12 +94,19 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
             Entry<String, LocalBiome> entry = it.next();
             String biomeName = entry.getKey();
 
-        	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-            //LocalBiome localBiome = OTG.isForge ? OTG.getBiomeAllWorlds(biomeName) : world.getBiomeByNameOrNull(biomeName);
-
             LocalBiome localBiome = world.getBiomeByNameOrNull(biomeName);
             entry.setValue(localBiome);
-
+            
+            if(localBiome == null)
+            {
+            	String breakPoint = "";
+            	localBiome = world.getBiomeByNameOrNull(biomeName);
+            }
+            if(localBiome.getBiomeConfig() == null)
+            {
+            	String breakPoint = "";
+            }
+            
             BiomeConfig biomeConfig = localBiome.getBiomeConfig();
             totalTemp += biomeConfig.biomeTemperature;
             this.totalGroupRarity += biomeConfig.biomeRarity;
@@ -142,7 +149,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      * unrecognized name.
      * @param customBiomeNames Set of known custom biomes.
      */
-    void filterBiomes(Set<String> customBiomeNames)
+    void filterBiomes(ArrayList<String> customBiomeNames)
     {
         for (Iterator<String> it = this.biomes.keySet().iterator(); it.hasNext();)
         {

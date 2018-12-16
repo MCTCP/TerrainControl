@@ -86,8 +86,6 @@ public interface LocalWorld
 
     public ArrayList<LocalBiome> getAllBiomes();
 
-    public LocalBiome getBiomeById(int id) throws BiomeNotFoundException;
-
     public LocalBiome getBiomeByIdOrNull(int id);
 
     public LocalBiome getBiomeByNameOrNull(String name);
@@ -219,7 +217,7 @@ public interface LocalWorld
     public int getLightLevel(int x, int y, int z);
 
     public boolean isLoaded(int x, int y, int z);
-
+    
     // Other information
 
     /**
@@ -251,7 +249,7 @@ public interface LocalWorld
      */
     public int getHeightScale();
 
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub);
+    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 
 	void SpawnEntity(EntityFunction entityData);
 
@@ -260,4 +258,6 @@ public interface LocalWorld
 	public BlockFunction[] getBlockColumn(int x, int z);
 
 	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk);
+
+	public int getRegisteredBiomeId(String resourceLocation);
 }

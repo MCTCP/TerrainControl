@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 /**
  * Class to hold all default settings of all default biomes.
- * 
+ *
  * Because most vanilla biomes just have a few changes, it isn't needed to
  * give each their own top-level class, a simple inner class is enough.
  */
@@ -23,14 +23,13 @@ public class MinecraftBiomeTemplates
     public abstract static class MinecraftBiomeTemplate extends StandardBiomeTemplate
     {
         protected final MojangSettings mojangSettings;
-        
+
         // For each biome's vanilla settings see net.minecraft.world.biome.Biome
         public MinecraftBiomeTemplate(MojangSettings mojangSettings, int worldHeight)
-        {        	
+        {
             super(worldHeight);
             this.mojangSettings = mojangSettings;
-            this.isCustomBiome = false; // We're a vanilla biome
-            
+
             // Some settings are provided by MojangSettings,
             // which gets them from Minecraft
             this.defaultBiomeSurface = this.mojangSettings.getSurfaceHeight();
@@ -39,20 +38,19 @@ public class MinecraftBiomeTemplates
             this.defaultGroundBlock = this.mojangSettings.getGroundBlock().toDefaultMaterial();
             this.defaultBiomeTemperature = this.mojangSettings.getTemperature();
             this.defaultBiomeWetness = this.mojangSettings.getWetness();
-                                   
+
             // Remove default mobs for vanilla biomes, these will be inherited
             // TODO: Check if this breaks Bukkit mob spawning
-            
+
             this.defaultCreatures = new ArrayList<WeightedMobSpawnGroup>();
             this.defaultMonsters = new ArrayList<WeightedMobSpawnGroup>();
             this.defaultWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
             this.defaultAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-            
+
             //this.defaultMonsters = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.MONSTER);
             //this.defaultCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.CREATURE);
             //this.defaultWaterCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.WATER_CREATURE);
             //this.defaultAmbientCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.AMBIENT_CREATURE);
-
         }
 
         protected void clearDefaultBorder()
@@ -64,18 +62,19 @@ public class MinecraftBiomeTemplates
     }
 
     public static class Ocean extends MinecraftBiomeTemplate
-    {    	
+    {
         public Ocean(MojangSettings mojangSettings, int worldHeight)
-        {                
+        {
             super(mojangSettings, worldHeight);
-            
+
             this.defaultColor = 0x000070;
             this.defaultStrongholds = false;
             this.defaultRiverBiome = "";
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
             this.defaultOceanMonuments = true;
-            
-            this.defaultInheritMobsBiomeName = "Ocean";
+
+            this.defaultReplaceToBiomeName = "minecraft:ocean";
+            this.defaultInheritMobsBiomeName = "minecraft:ocean";
             this.defaultBiomeDictId = "OCEAN";
         }
     }
@@ -98,8 +97,9 @@ public class MinecraftBiomeTemplates
             this.defaultDoubleGrass = 10;
             this.defaultDoubleGrassIsGrouped = true;
             this.defaultReed = 5;
-            
-            this.defaultInheritMobsBiomeName = "Plains";
+
+            this.defaultReplaceToBiomeName = "minecraft:plains";
+            this.defaultInheritMobsBiomeName = "minecraft:plains";
             this.defaultBiomeDictId = "PLAINS";
         }
     }
@@ -128,8 +128,9 @@ public class MinecraftBiomeTemplates
             this.defaultNotBorderNear.add(DefaultBiome.MESA_PLATEAU_FOREST_MOUNTAINS.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MESA_BRYCE.Name);
             this.defaultFossilRarity = 1.156; // 1/64 chance of spawning
-            
-            this.defaultInheritMobsBiomeName = "Desert";
+
+            this.defaultReplaceToBiomeName = "minecraft:desert";
+            this.defaultInheritMobsBiomeName = "minecraft:desert";
             this.defaultBiomeDictId = "HOT, DRY, SANDY";
         }
     }
@@ -146,8 +147,9 @@ public class MinecraftBiomeTemplates
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, 1.0,
                     DefaultMaterial.STONE, DefaultMaterial.STONE, 10.0};
-            
-            this.defaultInheritMobsBiomeName = "Extreme Hills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:extreme_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:extreme_hills";
             this.defaultBiomeDictId = "MOUNTAIN, HILLS";
         }
     }
@@ -167,8 +169,9 @@ public class MinecraftBiomeTemplates
             this.defaultPoppies = 4;
             this.defaultReed = 3;
             this.defaultMushroom = 1;
-            
-            this.defaultInheritMobsBiomeName = "Forest";            
+
+            this.defaultReplaceToBiomeName = "minecraft:forest";
+            this.defaultInheritMobsBiomeName = "minecraft:forest";
             this.defaultBiomeDictId = "FOREST";
         }
     }
@@ -182,7 +185,7 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 10;
             this.defaultColor = 0x0B6659;
             this.defaultTree = new Object[] {10, TreeType.Taiga1, 35, TreeType.Taiga2, 100};
-            
+
             // Place taiga on the border of Mega Taiga
             this.defaultBorder.add(DefaultBiome.MEGA_TAIGA.Name);
             this.defaultNotBorderNear.add(DefaultBiome.MEGA_SPRUCE_TAIGA.Name);
@@ -191,8 +194,9 @@ public class MinecraftBiomeTemplates
             this.defaultSizeWhenBorder = 6;
 
             this.defaultVillageType = VillageType.taiga;
-            
-            this.defaultInheritMobsBiomeName = "Taiga";            
+
+            this.defaultReplaceToBiomeName = "minecraft:taiga";
+            this.defaultInheritMobsBiomeName = "minecraft:taiga";
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST";
         }
     }
@@ -212,19 +216,20 @@ public class MinecraftBiomeTemplates
             this.defaultSwampPatches = 1;
             this.defaultDandelions = 0;
             this.defaultBlueOrchids = 2;
-            
+
             this.defaultColor = 0x07F9B2;
             this.defaultWaterColorMultiplier = 0xe0ffae;
             this.defaultGrassColor = 0x7E6E7E;
             this.defaultFoliageColor = 0x7E6E7E;
-            
+
             this.defaultGrass = 30;
             this.defaultRareBuildingType = RareBuildingType.swampHut;
             this.defaultTree = new Object[] {2, TreeType.SwampTree, 100};
             this.defaultStrongholds = false;
             this.defaultFossilRarity = 1.156; // 1/64 chance of spawning
-            
-            this.defaultInheritMobsBiomeName = "Swampland";           
+
+            this.defaultReplaceToBiomeName = "minecraft:swampland";
+            this.defaultInheritMobsBiomeName = "minecraft:swampland";
             this.defaultBiomeDictId = "WET, SWAMP";
         }
     }
@@ -241,8 +246,9 @@ public class MinecraftBiomeTemplates
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.BigTree, 1, TreeType.Tree, 9};
             this.defaultOceanMonuments = true;
-            
-            this.defaultInheritMobsBiomeName = "River";            
+
+            this.defaultReplaceToBiomeName = "minecraft:river";
+            this.defaultInheritMobsBiomeName = "minecraft:river";
             this.defaultBiomeDictId = "RIVER";
         }
     }
@@ -253,8 +259,9 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xFF0000;
-            
-            this.defaultInheritMobsBiomeName = "Hell";            
+
+            this.defaultReplaceToBiomeName = "minecraft:hell";
+            this.defaultInheritMobsBiomeName = "minecraft:hell";
             this.defaultBiomeDictId = "HOT, DRY, NETHER";
         }
     }
@@ -265,8 +272,9 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x8080FF;
-            
-            this.defaultInheritMobsBiomeName = "Sky";            
+
+            this.defaultReplaceToBiomeName = "minecraft:sky";
+            this.defaultInheritMobsBiomeName = "minecraft:sky";
             this.defaultBiomeDictId = "COLD, DRY, END";
         }
     }
@@ -278,9 +286,10 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
 
             this.defaultColor = 0x9090A0;
-            
-            this.defaultInheritMobsBiomeName = "FrozenOcean";            
-            this.defaultBiomeDictId = "COLD, OCEAN, SNOWY"; 
+
+            this.defaultReplaceToBiomeName = "minecraft:frozen_ocean";
+            this.defaultInheritMobsBiomeName = "minecraft:frozen_ocean";
+            this.defaultBiomeDictId = "COLD, OCEAN, SNOWY";
         }
     }
 
@@ -293,8 +302,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0xA0A0FF;
             this.defaultStrongholds = false;
             this.defaultOceanMonuments = true;
-            
-            this.defaultInheritMobsBiomeName = "FrozenRiver";            
+
+            this.defaultReplaceToBiomeName = "minecraft:frozen_river";
+            this.defaultInheritMobsBiomeName = "minecraft:frozen_river";
             this.defaultBiomeDictId = "COLD, RIVER, SNOWY";
         }
     }
@@ -312,8 +322,9 @@ public class MinecraftBiomeTemplates
             this.defaultGrassIsGrouped = true;
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 15};
             this.defaultRareBuildingType = RareBuildingType.igloo;
-            
-            this.defaultInheritMobsBiomeName = "Ice Plains";            
+
+            this.defaultReplaceToBiomeName = "minecraft:ice_flats";
+            this.defaultInheritMobsBiomeName = "minecraft:ice_flats";
             this.defaultBiomeDictId = "COLD, SNOWY, WASTELAND";
         }
     }
@@ -329,8 +340,9 @@ public class MinecraftBiomeTemplates
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.ICE_PLAINS.Name);
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
-            
-            this.defaultInheritMobsBiomeName = "Ice Mountains";            
+
+            this.defaultReplaceToBiomeName = "minecraft:ice_mountains";
+            this.defaultInheritMobsBiomeName = "minecraft:ice_mountains";
             this.defaultBiomeDictId = "COLD, SNOWY, MOUNTAIN";
         }
     }
@@ -354,8 +366,9 @@ public class MinecraftBiomeTemplates
             this.defaultWaterLily = 1;
             this.defaultStrongholds = false;
             this.defaultTree = new Object[] {1, TreeType.HugeMushroom, 100};
-            
-            this.defaultInheritMobsBiomeName = "MushroomIsland";            
+
+            this.defaultReplaceToBiomeName = "minecraft:mushroom_island";
+            this.defaultInheritMobsBiomeName = "minecraft:mushroom_island";
             this.defaultBiomeDictId = "MUSHROOM";
         }
     }
@@ -370,8 +383,9 @@ public class MinecraftBiomeTemplates
             this.defaultBorder.add(DefaultBiome.MUSHROOM_ISLAND.Name);
             this.defaultColor = 0xA000FF;
             this.defaultTree = null; // No mushrooms on the shore
-            
-            this.defaultInheritMobsBiomeName = "MushroomIslandShore";            
+
+            this.defaultReplaceToBiomeName = "minecraft:mushroom_island_shore";
+            this.defaultInheritMobsBiomeName = "minecraft:mushroom_island_shore";
             this.defaultBiomeDictId = "MUSHROOM, BEACH";
         }
     }
@@ -400,8 +414,9 @@ public class MinecraftBiomeTemplates
             this.defaultNotBorderNear.add(DefaultBiome.MESA.Name);
             this.defaultColor = 0xFADE55;
             this.defaultStrongholds = false;
-            
-            this.defaultInheritMobsBiomeName = "Beach";
+
+            this.defaultReplaceToBiomeName = "minecraft:beaches";
+            this.defaultInheritMobsBiomeName = "minecraft:beaches";
             this.defaultBiomeDictId = "BEACH";
         }
     }
@@ -428,8 +443,9 @@ public class MinecraftBiomeTemplates
 
             // Don't inherit border properties of the Desert biome
             this.clearDefaultBorder();
-            
-            this.defaultInheritMobsBiomeName = "DesertHills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:desert_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:desert_hills";
             this.defaultBiomeDictId = "HOT, DRY, SANDY, HILLS";
         }
     }
@@ -445,8 +461,9 @@ public class MinecraftBiomeTemplates
             this.defaultIsle.add(DefaultBiome.FOREST.Name);
             this.defaultGrass = 15;
             this.defaultColor = 0x22551C;
-            
-            this.defaultInheritMobsBiomeName = "ForestHills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:forest_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:forest_hills";
             this.defaultBiomeDictId = "FOREST, HILLS";
         }
     }
@@ -457,15 +474,16 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.clearDefaultBorder();
-           
+
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.TAIGA.Name);
             this.defaultGrass = 10;
             this.defaultColor = 0x163933;
             this.defaultRiverBiome = DefaultBiome.FROZEN_RIVER.Name;
-            
-            this.defaultInheritMobsBiomeName = "TaigaHills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:taiga_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:taiga_hills";
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST, HILLS";
         }
     }
@@ -481,8 +499,9 @@ public class MinecraftBiomeTemplates
             this.defaultNotBorderNear.add(DefaultBiome.EXTREME_HILLS_PLUS.Name);
             this.defaultColor = 0x72789A;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[0];
-            
-            this.defaultInheritMobsBiomeName = "Extreme Hills Edge";            
+
+            this.defaultReplaceToBiomeName = "minecraft:smaller_extreme_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:smaller_extreme_hills";
             this.defaultBiomeDictId = "MOUNTAIN";
         }
     }
@@ -502,8 +521,9 @@ public class MinecraftBiomeTemplates
             this.defaultTree = new Object[] {50, TreeType.BigTree, 10, TreeType.GroundBush, 50, TreeType.JungleTree, 35,
                     TreeType.CocoaTree, 100};
             this.defaultMelons = 1;
-            
-            this.defaultInheritMobsBiomeName = "Jungle";            
+
+            this.defaultReplaceToBiomeName = "minecraft:jungle";
+            this.defaultInheritMobsBiomeName = "minecraft:jungle";
             this.defaultBiomeDictId = "HOT, WET, DENSE, JUNGLE";
         }
     }
@@ -516,8 +536,9 @@ public class MinecraftBiomeTemplates
 
             this.defaultColor = 0x2C4205;
             this.defaultIsle.add(DefaultBiome.JUNGLE.Name);
-            
-            this.defaultInheritMobsBiomeName = "JungleHills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:jungle_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:jungle_hills";
             this.defaultBiomeDictId = "HOT, WET, DENSE, JUNGLE, HILLS";
         }
     }
@@ -531,7 +552,8 @@ public class MinecraftBiomeTemplates
             this.defaultSizeWhenBorder = 8;
             this.defaultBorder.add(DefaultBiome.JUNGLE.Name);
             
-            this.defaultInheritMobsBiomeName = "JungleEdge";            
+            this.defaultReplaceToBiomeName = "minecraft:jungle_edge";
+            this.defaultInheritMobsBiomeName = "minecraft:jungle_edge";
             this.defaultBiomeDictId = "HOT, WET, JUNGLE, FOREST";
         }
     }
@@ -545,8 +567,9 @@ public class MinecraftBiomeTemplates
             this.defaultIsle.add(DefaultBiome.OCEAN.Name);
             this.defaultSizeWhenIsle = 4;
             this.defaultRarityWhenIsle = 100;
-            
-            this.defaultInheritMobsBiomeName = "Deep Ocean";            
+
+            this.defaultReplaceToBiomeName = "minecraft:deep_ocean";
+            this.defaultInheritMobsBiomeName = "minecraft:deep_ocean";
             this.defaultBiomeDictId = "OCEAN";
         }
     }
@@ -557,8 +580,9 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xA2A284;
-            
-            this.defaultInheritMobsBiomeName = "Stone Beach";            
+
+            this.defaultReplaceToBiomeName = "minecraft:stone_beach";
+            this.defaultInheritMobsBiomeName = "minecraft:stone_beach";
             this.defaultBiomeDictId = "BEACH";
         }
     }
@@ -570,8 +594,9 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xFAF0C0;
             this.defaultStrongholds = false;
-            
-            this.defaultInheritMobsBiomeName = "Cold Beach";            
+
+            this.defaultReplaceToBiomeName = "minecraft:cold_beach";
+            this.defaultInheritMobsBiomeName = "minecraft:cold_beach";
             this.defaultBiomeDictId = "COLD, BEACH, SNOWY";
         }
     }
@@ -585,8 +610,9 @@ public class MinecraftBiomeTemplates
             this.defaultTree = new Object[] {10, TreeType.Birch, 80};
             // Forest spawns as an isle in Plains, BirchForest shouldn't
             this.defaultIsle.clear();
-            
-            this.defaultInheritMobsBiomeName = "Birch Forest";            
+
+            this.defaultReplaceToBiomeName = "minecraft:birch_forest";
+            this.defaultInheritMobsBiomeName = "minecraft:birch_forest";
             this.defaultBiomeDictId = "FOREST";
         }
     }
@@ -599,8 +625,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x1F5F32;
             this.defaultIsle.add(DefaultBiome.BIRCH_FOREST.Name);
             this.defaultRarityWhenIsle = 97;
-            
-            this.defaultInheritMobsBiomeName = "Birch Forest Hills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:birch_forest_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:birch_forest_hills";
             this.defaultBiomeDictId = "FOREST, HILLS";
         }
     }
@@ -615,10 +642,11 @@ public class MinecraftBiomeTemplates
             this.defaultTree = new Object[] {20, TreeType.HugeMushroom, 3, TreeType.DarkOak, 66, TreeType.Birch, 20, TreeType.Tree, 100};
             this.defaultTallFlowers = 1;
             this.defaultPoppies = 4;
-            
+
             this.defaultWoodlandMansions = true;
-            
-            this.defaultInheritMobsBiomeName = "Roofed Forest";            
+
+            this.defaultReplaceToBiomeName = "minecraft:roofed_forest";
+            this.defaultInheritMobsBiomeName = "minecraft:roofed_forest";
             this.defaultBiomeDictId = "SPOOKY, DENSE, FOREST";
         }
     }
@@ -629,12 +657,13 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.clearDefaultBorder();
-            
+
             this.defaultColor = 0x31554A;
             this.defaultRarity = 35;
             this.defaultRareBuildingType = RareBuildingType.igloo;
-            
-            this.defaultInheritMobsBiomeName = "Cold Taiga";            
+
+            this.defaultReplaceToBiomeName = "minecraft:taiga_cold";
+            this.defaultInheritMobsBiomeName = "minecraft:taiga_cold";
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST, SNOWY";
         }
     }
@@ -644,14 +673,15 @@ public class MinecraftBiomeTemplates
         public ColdTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
-            
+
             this.defaultColor = 0x243F36;
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.COLD_TAIGA.Name);
             this.defaultRareBuildingType = RareBuildingType.disabled;
-            
-            this.defaultInheritMobsBiomeName = "Cold Taiga Hills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:taiga_cold_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:taiga_cold_hills";
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST, SNOWY, HILLS";
         }
     }
@@ -670,10 +700,11 @@ public class MinecraftBiomeTemplates
             this.defaultLargeFerns = 60;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.DIRT + ":2", DefaultMaterial.DIRT, -0.95,
                     DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75};
-            
+
             this.defaultVillageType = VillageType.taiga;
-            
-            this.defaultInheritMobsBiomeName = "Mega Taiga";            
+
+            this.defaultReplaceToBiomeName = "minecraft:redwood_taiga";
+            this.defaultInheritMobsBiomeName = "minecraft:redwood_taiga";
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST";
         }
     }
@@ -687,14 +718,15 @@ public class MinecraftBiomeTemplates
             this.defaultSize = 6;
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.MEGA_TAIGA.Name);
-            
-            this.defaultInheritMobsBiomeName = "Mega Taiga Hills";            
+
+            this.defaultReplaceToBiomeName = "minecraft:redwood_taiga_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:redwood_taiga_hills";
             this.defaultBiomeDictId = "COLD, CONIFEROUS, FOREST, HILLS";
         }
     }
 
     // Actually called EXTREME_HILLS_WITH_TREES in this version of MC
-    public static class ExtremeHillsPlus extends ExtremeHills 
+    public static class ExtremeHillsPlus extends ExtremeHills
     {
         public ExtremeHillsPlus(MojangSettings mojangSettings, int worldHeight)
         {
@@ -704,8 +736,9 @@ public class MinecraftBiomeTemplates
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 66, TreeType.BigTree, 10, TreeType.Tree, 100};
             this.defaultIsle.add(DefaultBiome.EXTREME_HILLS.Name);
             this.defaultRarityWhenIsle = 97;
-            
-            this.defaultInheritMobsBiomeName = "Extreme Hills+";
+
+            this.defaultReplaceToBiomeName = "minecraft:extreme_hills_with_trees";
+            this.defaultInheritMobsBiomeName = "minecraft:extreme_hills_with_trees";
             this.defaultBiomeDictId = "MOUNTAIN, FOREST, SPARSE";
         }
     }
@@ -721,10 +754,11 @@ public class MinecraftBiomeTemplates
             this.defaultDoubleGrass = 4;
             this.defaultDandelions = 4;
             this.defaultTree = new Object[] {1, TreeType.Acacia, 80, TreeType.Tree, 100};
-            
+
             this.defaultVillageType = VillageType.savanna;
-            
-            this.defaultInheritMobsBiomeName = "Savanna";            
+
+            this.defaultReplaceToBiomeName = "minecraft:savanna";
+            this.defaultInheritMobsBiomeName = "minecraft:savanna";
             this.defaultBiomeDictId = "HOT, SAVANNA, PLAINS, SPARSE";
         }
     }
@@ -738,8 +772,9 @@ public class MinecraftBiomeTemplates
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.SAVANNA.Name);
-            
-            this.defaultInheritMobsBiomeName = "Savanna Plateau";            
+
+            this.defaultReplaceToBiomeName = "minecraft:savanna_rock";
+            this.defaultInheritMobsBiomeName = "minecraft:savanna_rock";
             this.defaultBiomeDictId = "HOT, SAVANNA, PLAINS, SPARSE";
         }
     }
@@ -757,8 +792,9 @@ public class MinecraftBiomeTemplates
             this.defaultCactus = 10;
             this.defaultGrass = 0;
             this.defaultMineshaftType = MineshaftType.mesa;
-            
-            this.defaultInheritMobsBiomeName = "Mesa";            
+
+            this.defaultReplaceToBiomeName = "minecraft:mesa";
+            this.defaultInheritMobsBiomeName = "minecraft:mesa";
             this.defaultBiomeDictId = "MESA, SANDY";
         }
     }
@@ -781,8 +817,9 @@ public class MinecraftBiomeTemplates
             // grass and dirt blocks.
             this.defaultSurfaceBlock = DefaultMaterial.GRASS;
             this.defaultGroundBlock = DefaultMaterial.DIRT;
-            
-            this.defaultInheritMobsBiomeName = "Mesa Plateau F";            
+
+            this.defaultReplaceToBiomeName = "minecraft:mesa_rock";
+            this.defaultInheritMobsBiomeName = "minecraft:mesa_rock";
             this.defaultBiomeDictId = "MESA, SPARSE, SANDY";
         }
     }
@@ -796,8 +833,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0xCA8C65;
             this.defaultIsle.add(DefaultBiome.MESA.Name);
             this.defaultRarityWhenIsle = 99;
-            
-            this.defaultInheritMobsBiomeName = "Mesa Plateau";            
+
+            this.defaultReplaceToBiomeName = "minecraft:mesa_clear_rock";
+            this.defaultInheritMobsBiomeName = "minecraft:mesa_clear_rock";
             this.defaultBiomeDictId = "MESA, SANDY";
         }
     }
@@ -811,8 +849,9 @@ public class MinecraftBiomeTemplates
             this.defaultDisableBiomeHeight = true;
             this.defaultStrongholds = false;
             Arrays.fill(this.defaultCustomHeightControl, -100);
-                        
-            this.defaultInheritMobsBiomeName = "The Void";            
+
+            this.defaultReplaceToBiomeName = "minecraft:void";
+            this.defaultInheritMobsBiomeName = "minecraft:void";
             this.defaultBiomeDictId = ""; // TODO: Should this be END?
         }
     }
@@ -825,8 +864,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0xDEFF00;
             this.defaultSunflowers = 30;
             this.defaultRarity = 10;
-            
-            this.defaultInheritMobsBiomeName = "Sunflower Plains";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_plains";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_plains";
         }
     }
 
@@ -841,8 +881,9 @@ public class MinecraftBiomeTemplates
 
             // Don't inherit border properties of the Desert biome
             this.clearDefaultBorder();
-            
-            this.defaultInheritMobsBiomeName = "Desert M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_desert";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_desert";
         }
     }
 
@@ -855,8 +896,9 @@ public class MinecraftBiomeTemplates
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0,
                     DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
             this.defaultRarity = 10;
-            
-            this.defaultInheritMobsBiomeName = "Extreme Hills M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_extreme_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_extreme_hills";
         }
     }
 
@@ -879,8 +921,9 @@ public class MinecraftBiomeTemplates
             // generates as much as the other flowers
             this.defaultTulips = flowerMultiplier * 4;
             this.defaultOxeyeDaisies = flowerMultiplier;
-            
-            this.defaultInheritMobsBiomeName = "Flower Forest";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_forest";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_forest";
         }
     }
 
@@ -893,8 +936,9 @@ public class MinecraftBiomeTemplates
 
             this.defaultColor = 0x0A5B4F;
             this.defaultRarity = 10;
-            
-            this.defaultInheritMobsBiomeName = "Taiga M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_taiga";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_taiga";
         }
     }
 
@@ -905,8 +949,9 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x28D29F;
             this.defaultRarity = 10;
-            
-            this.defaultInheritMobsBiomeName = "Swampland M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_swampland";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_swampland";
         }
     }
 
@@ -922,8 +967,9 @@ public class MinecraftBiomeTemplates
             this.defaultGrass = 0;
             this.defaultIceSpikes = true;
             this.defaultRareBuildingType = RareBuildingType.disabled;
-            
-            this.defaultInheritMobsBiomeName = "Ice Plains Spikes";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_ice_flats";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_ice_flats";
         }
     }
 
@@ -934,8 +980,9 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x4C7009;
             this.defaultRarity = 10;
-            
-            this.defaultInheritMobsBiomeName = "Jungle M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_jungle";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_jungle";
         }
     }
 
@@ -947,8 +994,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x5A8015;
             this.defaultSizeWhenBorder = 8;
             this.defaultBorder.add(DefaultBiome.JUNGLE_MOUNTAINS.Name);
-            
-            this.defaultInheritMobsBiomeName = "JungleEdge M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_jungle_edge";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_jungle_edge";
         }
     }
 
@@ -960,8 +1008,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x4E6E58;
             this.defaultRarity = 10;
             this.defaultTree = new Object[] {10, TreeType.TallBirch, 80};
-            
-            this.defaultInheritMobsBiomeName = "Birch Forest M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_birch_forest";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_birch_forest";
         }
     }
 
@@ -975,8 +1024,9 @@ public class MinecraftBiomeTemplates
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.clear();
             this.defaultIsle.add(DefaultBiome.BIRCH_FOREST_MOUNTAINS.Name);
-            
-            this.defaultInheritMobsBiomeName = "Birch Forest Hills M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_birch_forest_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_birch_forest_hills";
         }
     }
 
@@ -987,8 +1037,9 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x364416;
             this.defaultRarity = 10;
-            
-            this.defaultInheritMobsBiomeName = "Roofed Forest M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_roofed_forest";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_roofed_forest";
         }
     }
 
@@ -1000,8 +1051,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x2E5046;
             this.defaultRarity = 10;
             this.defaultRareBuildingType = RareBuildingType.disabled;
-            
-            this.defaultInheritMobsBiomeName = "Cold Taiga M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_taiga_cold";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_taiga_cold";
         }
     }
 
@@ -1013,8 +1065,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x818E79;
             this.defaultRarity = 10;
             this.defaultTree = new Object[] {10, TreeType.HugeTaiga2, 8, TreeType.HugeTaiga1, 30, TreeType.Taiga1, 33, TreeType.Taiga2, 100};
-            
-            this.defaultInheritMobsBiomeName = "Mega Spruce Taiga";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_redwood_taiga";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_redwood_taiga";
         }
     }
 
@@ -1026,8 +1079,9 @@ public class MinecraftBiomeTemplates
             this.defaultColor = 0x475141;
 
             this.defaultIsle.add(DefaultBiome.MEGA_SPRUCE_TAIGA.Name);
-            
-            this.defaultInheritMobsBiomeName = "Mega Spruce Taiga Hills";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_redwood_taiga_hills";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_redwood_taiga_hills";
         }
     }
 
@@ -1043,8 +1097,9 @@ public class MinecraftBiomeTemplates
             // Override IsleInBiome: Extreme Hills of Extreme Hills+
             this.defaultIsle.clear();
             this.defaultIsle.add(DefaultBiome.EXTREME_HILLS_MOUNTAINS.Name);
-            
-            this.defaultInheritMobsBiomeName = "Extreme Hills+ M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_extreme_hills_with_trees";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_extreme_hills_with_trees";
         }
     }
 
@@ -1059,8 +1114,9 @@ public class MinecraftBiomeTemplates
             this.defaultDoubleGrass = 0;
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, -0.5,
                     DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75, DefaultMaterial.STONE, DefaultMaterial.STONE, 10};
-            
-            this.defaultInheritMobsBiomeName = "Savanna M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_savanna";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_savanna";
         }
     }
 
@@ -1073,8 +1129,9 @@ public class MinecraftBiomeTemplates
             this.defaultSizeWhenIsle = 6;
             this.defaultRarityWhenIsle = 97;
             this.defaultIsle.add(DefaultBiome.SAVANNA_MOUNTAINS.Name);
-            
-            this.defaultInheritMobsBiomeName = "Savanna Plateau M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_savanna_rock";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_savanna_rock";
         }
     }
 
@@ -1089,8 +1146,9 @@ public class MinecraftBiomeTemplates
             this.defaultIsle.add(DefaultBiome.MESA.Name);
             this.defaultSizeWhenIsle = 5;
             this.defaultRarityWhenIsle = 90;
-            
-            this.defaultInheritMobsBiomeName = "Mesa (Bryce)";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_mesa";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_mesa";
         }
     }
 
@@ -1101,8 +1159,9 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xA68F5F;
             this.defaultRarityWhenIsle = 90;
-            
-            this.defaultInheritMobsBiomeName = "Mesa Plateau F M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_mesa_rock";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_mesa_rock";
         }
     }
 
@@ -1113,9 +1172,9 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0xB77F5C;
             this.defaultRarityWhenIsle = 90;
-            
-            this.defaultInheritMobsBiomeName = "Mesa Plateau M";
+
+            this.defaultReplaceToBiomeName = "minecraft:mutated_mesa_clear_rock";
+            this.defaultInheritMobsBiomeName = "minecraft:mutated_mesa_clear_rock";
         }
     }
-
 }

@@ -1,5 +1,6 @@
 package com.pg85.otg.generator.biome.layers;
 
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerLandRandom extends Layer
@@ -12,13 +13,13 @@ public class LayerLandRandom extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
         int x0 = x - 1;
         int z0 = z - 1;
         int xSize0 = xSize + 2;
         int zSize0 = zSize + 2;
-        int[] childInts = this.child.getInts(cache, x0, z0, xSize0, zSize0);
+        int[] childInts = this.child.getInts(world, cache, x0, z0, xSize0, zSize0);
         int[] thisInts = cache.getArray(xSize * zSize);
 
         for (int zi = 0; zi < zSize; zi++)

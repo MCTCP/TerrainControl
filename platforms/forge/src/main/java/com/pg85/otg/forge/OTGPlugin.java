@@ -52,7 +52,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.File;
 
 //@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v2", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v6", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v7", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
 public class OTGPlugin
 {
 	public static final String MOD_ID = "openterraingenerator";
@@ -62,11 +62,6 @@ public class OTGPlugin
 
 	@Instance("OTG")
     public static OTGPlugin instance;
-
-	public OTGPlugin()
-	{
-		OTG.isForge = true;
-	}
 
     private WorldLoader worldLoader;
     public static OTGWorldType txWorldType;
@@ -134,7 +129,9 @@ public class OTGPlugin
                 LocalBiome biome = null;
                 try
                 {
-                	biome = OTG.getBiomeAllWorlds(input.biomeName);
+                	// Get world name from resourcelocation
+                	// TODO: Get world name from somewhere sensical...
+                	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getResourcePath().split("_")[0]);
                 }
                 catch (BiomeNotFoundException e)
                 {
@@ -177,20 +174,29 @@ public class OTGPlugin
         // Fix lava as light source not working when spawning lava as resource
         Blocks.LAVA.setLightOpacity(255);
 
-        DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
-        DimensionType.OVERWORLD.suffix = "OTG";
+        //DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
+        //DimensionType.OVERWORLD.suffix = "OTG";
     }
 
     // TODO: Document why this is necessary <- Used to fill the biome registry when a client connects and has received the biomes packet?
+    // Client side only? Integrated server only?
+    /*
     @EventHandler
     public void serverAboutToStart(FMLServerAboutToStartEvent event)
     {
+    	Side side = event.getSide();
+    	if(side != Side.CLIENT)
+    	{
+    		throw new RuntimeException(); // This shouldnt happen?
+    	}
+    	
     	MinecraftServer server = event.getServer();
 
     	String worldFolderName = server.getFolderName();
 
     	WorldLoader.preLoadWorld(worldFolderName);
     }
+    */
 
     @EventHandler
     public void serverLoad(FMLServerStartingEvent event)
@@ -198,6 +204,7 @@ public class OTGPlugin
         event.registerServerCommand(new OTGCommandHandler());
 
         World overWorld = DimensionManager.getWorld(0);
+        /*
         if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator") && !(overWorld.getWorldInfo().getTerrainType() instanceof OTGWorldType))
         {
 	    	ISaveHandler isavehandler = overWorld.getSaveHandler();
@@ -211,8 +218,9 @@ public class OTGPlugin
 	        }
 	        throw new RuntimeException("OTG has detected that you are loading an OTG world that has been used without OTG installed. OTG has fixed and saved the world data, you can now restart the game and enter the world.");
         }
+        */
 
-        if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+        //if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
         {
 			if(!overWorld.isRemote) // Server side only
 			{
@@ -222,31 +230,34 @@ public class OTGPlugin
 	        	OTGDimensionManager.LoadCustomDimensionData();
 
 	        	// Create Cartographer dimension if it doesn't yet exist
-				Cartographer.CreateCartographerDimension();
+				//Cartographer.CreateCartographerDimension();
 
-	            // Create dimensions defined in worldconfig if they don't yet exist
-				ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(overWorld);
-				if(forgeWorld == null)
-				{
-					forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(overWorld);
-				}
-				WorldConfig worldConfig = forgeWorld.getConfigs().getWorldConfig();
-
-	            for(String dimName : worldConfig.Dimensions)
-	            {
-	    	    	if(!OTGDimensionManager.isDimensionNameRegistered(dimName))
-	    	    	{
-	    				File worldConfigFile = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds/" + dimName + "/WorldConfig.ini");
-	    				if(!worldConfigFile.exists())
-	    				{
-	    					OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimName + "\", mods/OpenTerrainGenerator/worlds/" + dimName + " could not be found or does not contain a WorldConfig.ini file.");
-	    				} else {
-	    		    		OTGDimensionManager.createDimension(dimName, false, true, false);
-	    				}
-	    	    	}
-	            }
-
-	            OTGDimensionManager.SaveDimensionData();
+	        	if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+	        	{
+		            // Create dimensions defined in worldconfig if they don't yet exist
+					ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(overWorld);
+					if(forgeWorld == null)
+					{
+						forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(overWorld);
+					}
+					WorldConfig worldConfig = forgeWorld.getConfigs().getWorldConfig();
+	
+		            for(String dimName : worldConfig.Dimensions)
+		            {
+		    	    	if(!OTGDimensionManager.isDimensionNameRegistered(dimName))
+		    	    	{
+		    				File worldConfigFile = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds/" + dimName + "/WorldConfig.ini");
+		    				if(!worldConfigFile.exists())
+		    				{
+		    					OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimName + "\", mods/OpenTerrainGenerator/worlds/" + dimName + " could not be found or does not contain a WorldConfig.ini file.");
+		    				} else {
+		    		    		OTGDimensionManager.createDimension(dimName, false, true, false);
+		    				}
+		    	    	}
+		            }
+		            
+		            OTGDimensionManager.SaveDimensionData();
+	        	}
 			}
         }
     }

@@ -83,7 +83,7 @@ public class OTGWoodLandMansionGen extends OTGMapGenStructure
 
             if (flag)
             {
-            	OTG.log(LogMarker.INFO, "SPAWNING MANSION AT " + (chunkX * 16 + 8) + " 100 " + (chunkZ * 16 + 8));
+            	//OTG.log(LogMarker.INFO, "SPAWNING MANSION AT " + (chunkX * 16 + 8) + " 100 " + (chunkZ * 16 + 8));
                 return true;
             }
         }

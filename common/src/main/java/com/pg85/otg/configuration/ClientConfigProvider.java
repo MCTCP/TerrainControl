@@ -3,6 +3,7 @@ package com.pg85.otg.configuration;
 import com.pg85.otg.BiomeIds;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
@@ -12,6 +13,7 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Holds the WorldConfig and all BiomeConfigs.
@@ -29,7 +31,7 @@ public final class ClientConfigProvider implements ConfigProvider
      * Must be simple array for fast access. Warning: some ids may contain
      * null values, always check.
      */
-    private LocalBiome[] biomes;
+    private LocalBiome[] biomes; // For the server, OTGBiomeIds are used, for the client only non-virtual biomes are known and saved Id's are used 
 
     public ClientConfigProvider(DataInputStream stream, LocalWorld world, boolean isSinglePlayer) throws IOException
     {
@@ -136,9 +138,19 @@ public final class ClientConfigProvider implements ConfigProvider
 
         worldSettingsReader.putSetting(WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS, stream.readBoolean());
 
-        worldConfig = new WorldConfig(new File("."), worldSettingsReader, world);
+        worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, ConfigFile.readStringFromStream(stream));
+        
+        worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, ConfigFile.readStringFromStream(stream));
+        
+        worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_RIVER_BIOME, ConfigFile.readStringFromStream(stream));
+        
+        //ArrayList<String> worldBiomes = new ArrayList<String>(Arrays.asList(ConfigFile.readStringFromStream(stream).split(",")));
+        ArrayList<String> worldBiomes = null;
+
+        worldConfig = new WorldConfig(new File("."), worldSettingsReader, world, worldBiomes);
 
         // Custom biomes + ids
+        /*
         int count = stream.readInt();
         while (count-- > 0)
         {
@@ -146,15 +158,17 @@ public final class ClientConfigProvider implements ConfigProvider
             int id = stream.readInt();
             worldConfig.customBiomeGenerationIds.put(biomeName, id);
         }
+        */
 
         // BiomeConfigs
         StandardBiomeTemplate defaultSettings = new StandardBiomeTemplate(worldConfig.worldHeightCap);
         biomes = new LocalBiome[world.getMaxBiomesCount()];
 
-        count = stream.readInt();
+        int count = stream.readInt();
         while (count-- > 0)
         {
-            int id = stream.readInt();
+            int otgBiomeId = stream.readInt();
+            int savedBiomeId = stream.readInt();
             String biomeName = ConfigFile.readStringFromStream(stream);
             SettingsMap biomeReader = new SimpleSettingsMap(biomeName, false);
             biomeReader.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, stream.readFloat());
@@ -166,16 +180,19 @@ public final class ClientConfigProvider implements ConfigProvider
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());
 
+            String replaceToBiomeName = ConfigFile.readStringFromStream(stream);
+        	biomeReader.putSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME, replaceToBiomeName); // <-- This might be used even in MP by client mods?
+            
             // TODO: Are these really necessary? <-- Maybe only for Forge SP? <-- In ClientNetworkEventListener for Forge SP packet is ignored so this doesn't actually do anything??
-
-        	String biomeDictId = ConfigFile.readStringFromStream(stream);
+            String biomeDictId = ConfigFile.readStringFromStream(stream);
         	biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId); // <-- This might be used even in MP by client mods?
 
-            BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, id, defaultSettings);
+            BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, defaultSettings);
             BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig);
 
-            LocalBiome biome = world.createBiomeFor(config, new BiomeIds(id), this);
-            biomes[id] = biome;
+            LocalBiome biome = world.createBiomeFor(config, new BiomeIds(otgBiomeId, savedBiomeId), this);
+            biomes[savedBiomeId] = biome;
+        	OTG.getEngine().setOTGBiomeId(world.getName(), otgBiomeId, config, true);
         }
     }
 

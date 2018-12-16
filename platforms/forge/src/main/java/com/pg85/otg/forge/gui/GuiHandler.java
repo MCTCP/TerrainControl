@@ -34,6 +34,8 @@ public class GuiHandler implements IGuiHandler
 
     public static int WorldBorderRadius = 0;
     public static int PregenerationRadius = 0;
+    
+    public static boolean useVanillaScreen = false;
 
     public static Class<? extends GuiScreen> lastGuiOpened = null;
     public static boolean askModCompatContinue = false;
@@ -54,7 +56,10 @@ public class GuiHandler implements IGuiHandler
     {
     	if (event.getGui() instanceof GuiCreateWorld && lastGuiOpened.equals(OTGGuiWorldSelection.class))
         {
-    		event.setGui(new OTGGuiCreateWorld(new OTGGuiWorldSelection(null)));
+    		if(!useVanillaScreen)
+    		{
+        		event.setGui(new OTGGuiCreateWorld(new OTGGuiWorldSelection(null)));	
+    		}
         }
         else if (event.getGui() instanceof GuiWorldSelection)
         {

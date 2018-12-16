@@ -34,7 +34,7 @@ public abstract class WorldHelper
     {
         if (biomeBase instanceof OTGBiome)
         {
-            return ((OTGBiome) biomeBase).generationId;
+            return ((OTGBiome) biomeBase).otgBiomeId;
         }
         return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biomeBase);
     }

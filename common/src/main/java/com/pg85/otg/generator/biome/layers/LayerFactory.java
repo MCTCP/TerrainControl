@@ -201,19 +201,13 @@ public final class LayerFactory
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	int islandIn = 0;                   	
-                    	
-                    	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome islandInBiome = OTG.isForge ? OTG.getBiomeAllWorlds(islandInName) : world.getBiomeByNameOrNull(islandInName);
-            			islandIn = islandInBiome.getIds().getGenerationId();
-                    	
-                        //int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn == DefaultBiome.OCEAN.Id)
+                    	LocalBiome islandInBiome = world.getBiomeByNameOrNull(islandInName);
+
+                        if (islandInBiome.getName().equals(worldConfig.defaultOceanBiome))
                         {
                         	inOcean = true;
                         } else {
-                        	biomeCanSpawnIn[islandIn] = true;
+                        	biomeCanSpawnIn[islandInBiome.getIds().getOTGBiomeId()] = true;
                         }
                     }
                     int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
@@ -227,16 +221,14 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	int replaceFrom = 0;                   	
-                    	
+                    	int replaceFrom = 0;
+
                     	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome replaceFromBiome = OTG.isForge ? OTG.getBiomeAllWorlds(replaceFromName) : world.getBiomeByNameOrNull(replaceFromName);                  	
-            			replaceFrom = replaceFromBiome.getIds().getGenerationId();
-                    	
+                    	LocalBiome replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+            			replaceFrom = replaceFromBiome.getIds().getOTGBiomeId();
+
                         //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
-
                     }
                 }
             }
@@ -358,21 +350,14 @@ public final class LayerFactory
                     boolean[] biomeCanSpawnIn = new boolean[1024];
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
-                    {            
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	                    
-                    	int islandIn = 0;
-                    	
-                    	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome islandInBiome = OTG.isForge ? OTG.getBiomeAllWorlds(islandInName) : world.getBiomeByNameOrNull(islandInName);
-            			islandIn = islandInBiome.getIds().getGenerationId();
-                    	
-                        //int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn == DefaultBiome.OCEAN.Id)
+                    {
+                    	LocalBiome islandInBiome = world.getBiomeByNameOrNull(islandInName);
+
+                        if (islandInBiome.getName().equals(worldConfig.defaultOceanBiome))
                         {
                         	inOcean = true;
                         } else {
-                        	biomeCanSpawnIn[islandIn] = true;
+                        	biomeCanSpawnIn[islandInBiome.getIds().getOTGBiomeId()] = true;
                         }
                     }
 
@@ -387,13 +372,11 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	int replaceFrom = 0;                   	
-                    	
-                    	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome replaceFromBiome = OTG.isForge ? OTG.getBiomeAllWorlds(replaceFromName) : world.getBiomeByNameOrNull(replaceFromName);
-            			replaceFrom = replaceFromBiome.getIds().getGenerationId();                    	
-                    	
+                    	int replaceFrom = 0;
+
+                    	LocalBiome replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+            			replaceFrom = replaceFromBiome.getIds().getOTGBiomeId();
+
                         //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
                     }

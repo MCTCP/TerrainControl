@@ -4,6 +4,7 @@ import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
+import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
@@ -133,11 +134,37 @@ public class BukkitEngine extends OTGEngine
     	return worlds;
     }
 
-    // Only used for Forge atm TODO: Put in Forge layer only, not common?
+    // Only used for Forge atm TODO: Put in Forge layer only, not common.
     
 	@Override
 	public LocalWorld getUnloadedWorld(String name)
 	{
 		return null;
+	}
+
+	@Override
+	public void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
+	{
+		// TODO: Implement this?
+	}
+
+	@Override
+	public boolean isOTGBiomeIdAvailable(String worldName, int i)
+	{
+		// TODO: Implement this?
+		return false;
+	}
+
+	@Override
+	public BiomeConfig[] getOTGBiomeIds(String worldName)
+	{
+		// TODO: Implement this?
+		return null;
+	}
+
+	@Override
+	public void unregisterOTGBiomeId(String worldName, int i)
+	{
+		// TODO: Implement this?
 	}
 }

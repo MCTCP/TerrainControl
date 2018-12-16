@@ -1409,8 +1409,6 @@ public class CustomObjectStructureCache
 		    HashSet<SpawnerFunction> SpawnerData = new HashSet<SpawnerFunction>();
 		    HashSet<ParticleFunction> ParticleData = new HashSet<ParticleFunction>();
 
-		    //boolean startChunkBlockChecksDone = false;
-
 		    String[] chunkCoordString = structureStringArray[0].split(",");
 		    int chunkX = Integer.parseInt(chunkCoordString[0]);
 		    int chunkZ = Integer.parseInt(chunkCoordString[1]);

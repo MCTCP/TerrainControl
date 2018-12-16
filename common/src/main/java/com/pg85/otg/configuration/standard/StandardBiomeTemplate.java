@@ -28,8 +28,6 @@ public class StandardBiomeTemplate
 {
     protected final int worldHeight;
 
-    public boolean isCustomBiome = true;
-
     public String defaultExtends = "";
     public boolean defaultWaterLakes = true;
     public Object[] defaultTree; // Parameters for tree resource
@@ -93,6 +91,7 @@ public class StandardBiomeTemplate
     public double defaultFossilRarity = 0;
     public String defaultBiomeDictId = "";
     public String defaultInheritMobsBiomeName = "";
+    public String defaultReplaceToBiomeName = "";
     
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
             new WeightedMobSpawnGroup(MobNames.SHEEP, 12, 4, 4),

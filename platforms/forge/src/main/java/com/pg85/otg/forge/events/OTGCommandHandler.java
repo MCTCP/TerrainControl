@@ -22,6 +22,7 @@ import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
+import com.pg85.otg.forge.generator.OTGBiome;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.util.CommandHelper;
 import com.pg85.otg.logging.LogMarker;
@@ -70,11 +71,10 @@ public final class OTGCommandHandler implements ICommand
         {
             ForgeWorld world = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
 
-            if (world == null && (argString.length == 0 || !((argString[0].equals("dimension") || argString[0].equals("dim")) && argString.length < 3)))
+            boolean isOTGWorld = false;
+            if (!(world == null && (argString.length == 0 || !((argString[0].equals("dimension") || argString[0].equals("dim")) && argString.length < 3))))
             {
-            	sender.sendMessage(new TextComponentString(""));
-                sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "OpenTerrainGenerator is not enabled for this world."));
-                return;
+            	isOTGWorld = true;
             }
 
             BlockPos pos = sender.getPosition();
@@ -169,75 +169,87 @@ public final class OTGCommandHandler implements ICommand
             	}
             	if(biomeOrDimensionName != null && biomeOrDimensionName.length() > 0)
             	{
-            		int biomeId = -1;
-            		try
-            		{
-            			biomeId = Integer.parseInt(biomeOrDimensionName.replace(" ", ""));
-            		}
-            		catch(NumberFormatException ex) { }
+            		//final String biomeOrDimensionName = biomeOrDimensionName2;
+            	    //new Thread(new Runnable() {
+            	        //public void run(){
+                    		int biomeId = -1;
+                    		try
+                    		{
+                    			biomeId = Integer.parseInt(biomeOrDimensionName.replace(" ", ""));
+                    		}
+                    		catch(NumberFormatException ex) { }
 
-            		// Check dimension names
-        			for(int i = -1; i < Long.SIZE << 4; i++)
-					{
-						if(DimensionManager.isDimensionRegistered(i))
-						{
-							DimensionType dimensionType = DimensionManager.getProviderType(i);
-							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase().trim()))
-							{
-								if(OTGDimensionManager.GetAllOTGDimensions().containsKey(i))
-								{
-									OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), true);
-								} else {
-									sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Can only teleport to OTG dimensions and overworld."));
-								}
-								return;
-							}
-						}
-					}
+                    		// Check dimension names
+                			for(int i = -1; i < Long.SIZE << 4; i++)
+        					{
+        						if(DimensionManager.isDimensionRegistered(i))
+        						{
+        							DimensionType dimensionType = DimensionManager.getProviderType(i);
+        							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase().trim()))
+        							{
+        								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), false);
+        								return;
+        							}
+        						}
+        					}
 
-					ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
+        					ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
 
-            		int maxRadius = 1000;
-            		for(int cycle = 1; cycle < maxRadius; cycle++)
-            		{
-                		for(int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)
-                		{
-                			for(int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
-                			{
-                				if(x1 == playerX - cycle || x1 == playerX + cycle)
-                				{
-                					if(z1 == playerZ - cycle || z1 == playerZ + cycle)
-                					{
-                						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(playerChunk.getChunkX() + (x1 - playerX), playerChunk.getChunkZ() + (z1 - playerZ));
-
-                						ForgeBiome biome = (ForgeBiome)world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
-
-                						if(
-            								biome != null &&
-            								(
-        	    								(
-        											biomeId == -1 &&
-        											biome.getName().toLowerCase().replace(" ", "").equals(biomeOrDimensionName.toLowerCase().replace(" ", ""))
-        										) || (
-        											biomeId != -1 &&
-        											biome.getIds().getGenerationId() == biomeId
-        										)
-        									)
-        								)
-                						{
-                							((Entity)sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(), world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), true, true, false, false), chunkCoord.getBlockZCenter());
-                							return;
-                						}
-                					}
-                				}
-                			}
-                		}
-            		}
-            		sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find biome \"" + biomeOrDimensionName + "\"."));
+        					if(world != null)
+        					{
+        	            		int maxRadius = 1000;
+        	            		for(int cycle = 1; cycle < maxRadius; cycle++)
+        	            		{
+        	                		for(int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)
+        	                		{
+        	                			for(int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
+        	                			{
+        	                				if(x1 == playerX - cycle || x1 == playerX + cycle)
+        	                				{
+        	                					if(z1 == playerZ - cycle || z1 == playerZ + cycle)
+        	                					{
+        	                						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(playerChunk.getChunkX() + (x1 - playerX), playerChunk.getChunkZ() + (z1 - playerZ));
+        	
+        	                						ForgeBiome biome = (ForgeBiome)world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
+        	
+        	                						if(
+        	            								biome != null &&
+        	            								(
+        	        	    								(
+        	        											biomeId == -1 &&
+        	        											biome.getName().toLowerCase().replace(" ", "").equals(biomeOrDimensionName.toLowerCase().replace(" ", ""))
+        	        										) || (
+        	        											biomeId != -1 &&
+        	        											biome.getIds().getOTGBiomeId() == biomeId
+        	        										)
+        	        									)
+        	        								)
+        	                						{
+        	                							((Entity)sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(), world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), true, true, false, false), chunkCoord.getBlockZCenter());
+        	                							return;
+        	                						}
+        	                					}
+        	                				}
+        	                			}
+        	                		}
+        	            		}
+        					}
+                    		sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find biome \"" + biomeOrDimensionName + "\"."));
+            	        //}
+            	    //}).start();
+    	    		//sender.sendMessage(new TextComponentString("Locating biome/dimension..."));
+            	    return;
             	}
             }
             else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
             {
+            	if(!isOTGWorld)
+            	{
+                	sender.sendMessage(new TextComponentString(""));
+                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "This command is only available for OpenTerrainGenerator worlds."));
+                    return;
+            	}
+            	
                 WorldConfig worldConfig = world.getConfigs().getWorldConfig();
         		sender.sendMessage(new TextComponentString(""));
                 sender.sendMessage(new TextComponentString("-- World info --"));
@@ -248,6 +260,13 @@ public final class OTGCommandHandler implements ICommand
             }
             else if (isOp && (argString[0].equals("pregenerator") || argString[0].equals("pregen")))
             {
+            	if(!isOTGWorld)
+            	{
+                	sender.sendMessage(new TextComponentString(""));
+                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "This command is only available for OpenTerrainGenerator worlds."));
+                    return;
+            	}
+            	
             	if (argString.length == 1)
             	{
         			boolean isRunningAndNotDone = false;
@@ -320,7 +339,7 @@ public final class OTGCommandHandler implements ICommand
                 		targetWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionId);
                 		if(targetWorld == null)
                 		{
-                			DimensionManager.initDimension(dimensionId);
+                			OTGDimensionManager.initDimension(dimensionId);
                 			targetWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionId);
                 		}
                 		if(targetWorld == null)
@@ -433,11 +452,21 @@ public final class OTGCommandHandler implements ICommand
         		}
             	else if(isOp && argString.length > 2)
             	{
+            		long seed = -1l;
+            		// -c, -d, -u
 	            	String dimName = argString[2];
 	            	if(argString.length > 3)
 	            	{
 		            	for(int i = 3; i < argString.length; i++)
 		            	{
+		            		if(argString[i].equals("-s"))
+		            		{
+		            			if(argString.length > i + 1)
+		            			{
+		            				seed = Long.parseLong(argString[i + 1]);
+		            			}
+		            			break;
+		            		}
 		            		dimName += " " + argString[i];
 		            	}
 	            	}
@@ -475,8 +504,16 @@ public final class OTGCommandHandler implements ICommand
 	            	{
 	            		if(existingDim > 1)
 	            		{
-	            			// First make sure world is unloaded
+	            			if(((ForgeEngine)OTG.getEngine()).getWorldLoader().getWorld(dimName) == null && ((ForgeEngine)OTG.getEngine()).getWorldLoader().getUnloadedWorld(dimName) == null)
+	            			{
+	    	    				sender.sendMessage(new TextComponentString(""));
+	    	                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Cannot delete dimension, dimension is not an OTG world."));
 
+	            				return;
+	            			}
+	            		
+	            			// First make sure world is unloaded
+	            			
 	            			if(((ForgeEngine)OTG.getEngine()).getWorldLoader().isWorldUnloaded(dimName))
 	            			{
 	            				ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getUnloadedWorld(dimName);
@@ -503,14 +540,33 @@ public final class OTGCommandHandler implements ICommand
         					sender.sendMessage(new TextComponentString(""));
 			    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Creating new dimension..."));
 
-							int newDimId = OTGDimensionManager.createDimension(dimName, false, true, true);
+							int newDimId = OTGDimensionManager.createDimension(seed, dimName, false, true, true);
 							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimName);
-							DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
-
+							if(createdWorld.getConfigs().getWorldConfig().canDropChunk)
+							{
+								DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
+							}
+							
 			    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Created dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + newDimId + MESSAGE_COLOR + "."));
 
 			    			PlayerTracker.SendAllWorldAndBiomeConfigsToAllPlayers(sender.getServer());
         				}
+	            	}
+	            	else if (CommandHelper.containsArgument(argString, "-u"))
+	            	{
+	            		if(existingDim > 1)
+	            		{
+	            			// First make sure world is loaded
+	            			ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldLoader().getWorld(dimName);
+	            			if(((ForgeEngine)OTG.getEngine()).getWorldLoader().getWorld(dimName) != null && ((ForgeEngine)OTG.getEngine()).getWorldLoader().getUnloadedWorld(dimName) == null)
+	            			{
+	            				forgeWorld.getConfigs().getWorldConfig().canDropChunk = true;
+	    	    				sender.sendMessage(new TextComponentString(""));
+	    	                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "World is marked for unloading, if no players are in the world minecraft will unload it automatically, this may take a while."));
+
+	            				return;
+	            			}
+	            		}
 	            	}
         		}
             }
@@ -545,6 +601,13 @@ public final class OTGCommandHandler implements ICommand
             */
             else if (argString[0].equals("biomes") && isOp)
             {
+            	if(!isOTGWorld)
+            	{
+                	sender.sendMessage(new TextComponentString(""));
+                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "This command is only available for OpenTerrainGenerator worlds."));
+                    return;
+            	}
+            	
             	sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "ForgeRegistries.BIOMES contains:"));
             	sender.sendMessage(new TextComponentTranslation(""));
             	for(Entry<ResourceLocation, Biome> entry : ForgeRegistries.BIOMES.getEntries())
@@ -570,6 +633,13 @@ public final class OTGCommandHandler implements ICommand
             }
             else if (argString[0].equals("biome"))
             {
+            	if(!isOTGWorld)
+            	{
+                	sender.sendMessage(new TextComponentString(""));
+                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "This command is only available for OpenTerrainGenerator worlds."));
+                    return;
+            	}
+            	
             	if(
                 	(
             			sender.getEntityWorld().getWorldInfo() instanceof DerivedWorldInfo &&
@@ -589,7 +659,7 @@ public final class OTGCommandHandler implements ICommand
                 LocalBiome biome = world.getBiome(playerX, playerZ);
                 BiomeIds biomeIds = biome.getIds();
                 sender.sendMessage(new TextComponentString(""));
-                sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getGenerationId()));
+                sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to OTG, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getOTGBiomeId()));
 
                 if (CommandHelper.containsArgument(argString, "-f"))
                 {
@@ -601,10 +671,9 @@ public final class OTGCommandHandler implements ICommand
                 {
                     try
                     {
-                        LocalBiome savedBiome = world.getSavedBiome(playerX, playerZ);
-                        BiomeIds savedIds = savedBiome.getIds();
+                    	Biome savedBiome = world.getWorld().getBiome(new BlockPos(playerX, 0, playerZ));
                         sender.sendMessage(new TextComponentString(""));
-                        sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + savedIds.getSavedId()));
+                        sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.biomeName + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biome.getIds().getSavedId()));
                     } catch (BiomeNotFoundException e)
                     {
                     	sender.sendMessage(new TextComponentString(""));
@@ -671,6 +740,13 @@ public final class OTGCommandHandler implements ICommand
             }
         	else if(argString[0].toLowerCase().trim().equals("bo3") || argString[0].toLowerCase().trim().equals("bo3info"))
         	{
+            	if(!isOTGWorld)
+            	{
+                	sender.sendMessage(new TextComponentString(""));
+                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "This command is only available for OpenTerrainGenerator worlds."));
+                    return;
+            	}
+        		
     			String structureInfo = world.GetWorldSession().GetStructureInfoAt(sender.getPosition().getX(),sender.getPosition().getZ());
 
     			if(structureInfo.length() > 0)
@@ -685,6 +761,13 @@ public final class OTGCommandHandler implements ICommand
         	}
         	else if(argString[0].equals("GetModData") && argString.length > 1)
         	{
+            	if(!isOTGWorld)
+            	{
+                	sender.sendMessage(new TextComponentString(""));
+                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "This command is only available for OpenTerrainGenerator worlds."));
+                    return;
+            	}
+        		
         		if (!(sender instanceof EntityPlayer) || isOp) // If the request was made by a player then check if the player is opped
         		{
 	        		if(argString.length == 2)

@@ -1,5 +1,6 @@
 package com.pg85.otg;
 
+import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunctionsManager;
 import com.pg85.otg.configuration.CustomObjectConfigFunctionsManager;
 import com.pg85.otg.configuration.PluginConfig;
@@ -346,5 +347,13 @@ public abstract class OTGEngine
      * @param blockData       The block data.
      * @return The materialData.
      */
-    public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);    
+    public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);
+
+	public abstract void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting);
+	
+	public abstract boolean isOTGBiomeIdAvailable(String worldName, int i);
+
+	public abstract void unregisterOTGBiomeId(String worldName, int i);
+	
+	public abstract BiomeConfig[] getOTGBiomeIds(String worldName);
 }

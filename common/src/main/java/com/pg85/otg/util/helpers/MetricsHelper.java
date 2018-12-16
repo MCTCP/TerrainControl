@@ -38,9 +38,6 @@ public abstract class MetricsHelper
                 } else if (VanillaBiomeGenerator.class.isAssignableFrom(clazz))
                 {
                     vanillaMode++;
-                } else if (clazz.equals(OldBiomeGenerator.class))
-                {
-                    oldBiomeMode++;
                 } else if (clazz.equals(BeforeGroupsBiomeGenerator.class))
                 {
                     beforeGroupsBiomeMode++;

@@ -134,7 +134,7 @@ public class OTGPlugin extends JavaPlugin
 
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
-        ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld);
+        ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld, null); // TODO: WorldSaveFolder should not be null, fix this? -> Only used for Forge, null is okay for Bukkit?
         localWorld.setSettings(configs);
 
         // Add the world to the to-do list

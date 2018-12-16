@@ -33,7 +33,8 @@ public final class ForgeMojangSettings implements MojangSettings
     	{
     		return fromBiomeBase(baseBiome);
     	}
-    	return fromBiomeBase(ForgeWorld.vanillaBiomes[biomeId]);
+    	throw new RuntimeException("This should not happen.");
+    	//return fromBiomeBase(ForgeWorld.vanillaBiomes[biomeId]);
     }
 
     /**

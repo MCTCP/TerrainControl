@@ -40,7 +40,7 @@ public class OTGClassTransformer implements IClassTransformer
 		"net.minecraft.entity.projectile.EntityThrowable",
 		"net.minecraft.entity.item.EntityTntPrimed",
 		"net.minecraft.entity.item.EntityXPOrb",
-		"net.minecraft.entity.Entity",
+		"net.minecraft.entity.Entity"
 		// Places to inject OTGWorldServerMulti
 		//"net.minecraftforge.common.DimensionManager",
 		//"net.minecraft.server.MinecraftServer",

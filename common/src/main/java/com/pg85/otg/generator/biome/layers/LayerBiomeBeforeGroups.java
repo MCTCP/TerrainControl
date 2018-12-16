@@ -2,6 +2,7 @@
 package com.pg85.otg.generator.biome.layers;
 
 import com.pg85.otg.LocalBiome;
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 /**
@@ -23,9 +24,9 @@ public class LayerBiomeBeforeGroups extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
 
         for (int i = 0; i < zSize; i++)
@@ -42,13 +43,13 @@ public class LayerBiomeBeforeGroups extends Layer
                     {
                         LocalBiome biome = this.biomes[nextInt(this.biomes.length)];
                         if (biome != null)
-                            currentPiece |= biome.getIds().getGenerationId();
+                            currentPiece |= biome.getIds().getOTGBiomeId();
                     } else if (this.ice_biomes.length > 0 && (currentPiece & IceBit) != 0) // Ice
                                                                                            // biome
                     {
                         LocalBiome biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
                         if (biome != null)
-                            currentPiece |= biome.getIds().getGenerationId();
+                            currentPiece |= biome.getIds().getOTGBiomeId();
                     }
                 }
                 thisInts[(j + i * xSize)] = currentPiece;
