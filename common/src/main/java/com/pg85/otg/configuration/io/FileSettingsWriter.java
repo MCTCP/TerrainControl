@@ -26,9 +26,9 @@ public final class FileSettingsWriter
      * @param configMode The configuration mode. If this is set to
      * WriteDisable, this method does nothing.
      */
-    public static final void writeToFile(SettingsMap config, File file, ConfigMode configMode)
+    public static final void writeToFile(SettingsMap config, File file, ConfigMode configMode, boolean forceWrite)
     {
-        if (configMode == ConfigMode.WriteDisable)
+        if (configMode == ConfigMode.WriteDisable && !forceWrite)
         {
             return;
         }

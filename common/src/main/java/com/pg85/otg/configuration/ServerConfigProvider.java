@@ -5,6 +5,7 @@ import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.WorldConfig.ConfigMode;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.io.SettingsMap;
@@ -81,15 +82,32 @@ public final class ServerConfigProvider implements ConfigProvider
      */
     private void loadSettings(File worldSaveFolder)
     {
-        SettingsMap worldConfigSettings = loadWorldConfig();
-        loadBiomes(worldConfigSettings, worldSaveFolder);
+        // If this is a previously created world then load the biome id data and register biomes to the same OTG biome id as before.
+        ArrayList<BiomeIdData> loadedBiomeIdData = LoadBiomeIdData(worldSaveFolder);
+        boolean hasWorldData = loadedBiomeIdData != null;
+        if(hasWorldData)
+        {
+        	boolean bFound = false;
+        	for(BiomeIdData biomeIdData : loadedBiomeIdData)
+        	{
+    			if(biomeIdData.biomeName.startsWith(world.getName() + "_"))
+    			{
+    				bFound = true;
+    				break;
+    			}
+        	}
+        	hasWorldData = bFound;
+        }
+    	
+        SettingsMap worldConfigSettings = loadWorldConfig(!hasWorldData);
+        loadBiomes(worldConfigSettings, worldSaveFolder, !hasWorldData);
 
         // We have to wait for the loading in order to get things like
         // temperature
         worldConfig.biomeGroupManager.processBiomeData(world);
     }
 
-    private SettingsMap loadWorldConfig()
+    private SettingsMap loadWorldConfig(boolean updatingConfigs)
     {
         File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), worldConfigFile);
@@ -100,7 +118,7 @@ public final class ServerConfigProvider implements ConfigProvider
     	AddBiomesFromDirRecursive(biomes, biomesDirectory);
     	
         this.worldConfig = new WorldConfig(settingsDir, settingsMap, world, biomes);
-        FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode);
+        FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode, updatingConfigs);
 
         return settingsMap;
     }
@@ -120,13 +138,13 @@ public final class ServerConfigProvider implements ConfigProvider
     	}
     }
 
-    public void saveWorldConfig()
+    public void saveWorldConfig(boolean updatingConfigs)
     {
     	File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-    	FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode);
+    	FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode, updatingConfigs);
     }
 
-    private void loadBiomes(SettingsMap worldConfigSettings, File worldSaveFolder)
+    private void loadBiomes(SettingsMap worldConfigSettings, File worldSaveFolder, boolean updatingConfigs)
     {
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
@@ -154,9 +172,9 @@ public final class ServerConfigProvider implements ConfigProvider
         // Load all files
         BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(worldConfig, OTG.getPluginConfig().biomeConfigExtension);
         Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(worldConfig, world, worldConfig.worldHeightScale, biomeDirs, biomesToLoad);
-
+        
         // Read all settings
-        Map<String, BiomeConfig> loadedBiomes = readAndWriteSettings(worldConfigSettings, biomeConfigStubs);
+        Map<String, BiomeConfig> loadedBiomes = readAndWriteSettings(worldConfigSettings, biomeConfigStubs, updatingConfigs);
 
         // Index all necessary settings
         String loadedBiomeNames = indexSettings(worldConfig.customBiomeGenerationIds, worldConfigSettings.isNewConfig(), loadedBiomes, worldSaveFolder);
@@ -192,7 +210,7 @@ public final class ServerConfigProvider implements ConfigProvider
         loadSettings(this.world.getWorldSaveDir());
     }
 
-    private Map<String, BiomeConfig> readAndWriteSettings(SettingsMap worldConfigSettings, Map<String, BiomeConfigStub> biomeConfigStubs)
+    private Map<String, BiomeConfig> readAndWriteSettings(SettingsMap worldConfigSettings, Map<String, BiomeConfigStub> biomeConfigStubs, boolean updatingConfigs)
     {
         Map<String, BiomeConfig> loadedBiomes = new HashMap<String, BiomeConfig>();
 
@@ -206,7 +224,7 @@ public final class ServerConfigProvider implements ConfigProvider
             //processMobInheritance(biomeConfigStubs, biomeConfigStub, 0); // TODO: Re-enable mob inheritance
 
             // Settings reading
-            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub, biomeConfigStub.getSettings(), worldConfig);
+            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub, biomeConfigStub.getSettings(), worldConfig, updatingConfigs);
             loadedBiomes.put(biomeConfigStub.getBiomeName(), biomeConfig);
 
             // Settings writing
@@ -215,7 +233,7 @@ public final class ServerConfigProvider implements ConfigProvider
             {
                 writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
             }
-            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.SettingsMode);
+            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.SettingsMode, updatingConfigs);
         }
 
         return loadedBiomes;
@@ -260,7 +278,7 @@ public final class ServerConfigProvider implements ConfigProvider
         ArrayList<BiomeConfig> virtualBiomesExisting = new ArrayList<BiomeConfig>();
         ArrayList<BiomeConfig> virtualBiomes = new ArrayList<BiomeConfig>();
         
-        // If this is a previously created world then register biomes to the same OTG biome id as before.
+        // If this is a previously created world then load the biome id data and register biomes to the same OTG biome id as before.
         ArrayList<BiomeIdData> loadedBiomeIdData = LoadBiomeIdData(worldSaveFolder);
         boolean hasWorldData = loadedBiomeIdData != null;
         if(hasWorldData)
@@ -278,6 +296,33 @@ public final class ServerConfigProvider implements ConfigProvider
         	OTG.log(LogMarker.INFO, "HasWorldData: " + hasWorldData);
         }
 
+        // Update configs for worlds with no saved biome id data
+        if(!hasWorldData)
+        {
+        	for(Entry<String, BiomeConfig> entry : loadedBiomes.entrySet())
+        	{
+	        	// Update biomes for legacy worlds, default biomes should be referred to as minecraft:<biomename>
+	        	if(
+        			entry.getValue().replaceToBiomeName != null && 
+					entry.getValue().replaceToBiomeName.trim().length() > 0	        			
+				)
+	        	{
+	        		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(entry.getValue().replaceToBiomeName);
+	        		if(defaultBiomeResourceLocation != null)
+	        		{
+	        			entry.getValue().replaceToBiomeName = defaultBiomeResourceLocation;
+	        		}
+	        	} else {
+	        		// Default biomes must replacetobiomename themselves
+	        		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(entry.getValue().getName());
+	        		if(defaultBiomeResourceLocation != null)
+	        		{
+	        			entry.getValue().replaceToBiomeName = defaultBiomeResourceLocation;
+	        		}
+	        	}
+        	}
+        }
+        
         // For backwards compatibility load custom biomes from the world config
         if(!hasWorldData && worldBiomes.size() > 0)
         {
@@ -285,6 +330,7 @@ public final class ServerConfigProvider implements ConfigProvider
 	        for(Entry<String, Integer> worldBiome : worldBiomes.entrySet())
 	        {
 	        	BiomeConfig biomeConfig = loadedBiomes.get(worldBiome.getKey());
+	        	
 	        	loadedBiomeIdData.add(
         			new BiomeIdData(
     					world.getName() + "_" + worldBiome.getKey(), 
@@ -341,7 +387,7 @@ public final class ServerConfigProvider implements ConfigProvider
         }
     	if(!hasWorldData)
     	{        	
-        	// If this is a new world or a legacy world without saved data then try to set the biome ids for the default biomes to the default biome id's.
+        	// If this is a new world or a legacy world without saved biome id data then try to set the biome ids for the default biomes to the default biome id's.
         	// Makes seeds look the same as before
         	
         	// Create default biomes        	
@@ -666,18 +712,21 @@ public final class ServerConfigProvider implements ConfigProvider
         		savedBiomeId = getRequestedSavedId(biomeConfig.replaceToBiomeName);
         	}
         	
-        	String[] replaceToBiomeNameArr = biomeConfig.replaceToBiomeName.split(",");
-        	if(savedBiomeId == -1 && replaceToBiomeNameArr.length == 1)
+        	if(savedBiomeId == -1)
         	{
-        		// This may be a legacy world that doesn't use resourcelocation notation, get the correct registry name
-        		String replaceToBiomeNameNew = OTG.getRegistryNameForDefaultBiome(biomeConfig.replaceToBiomeName);
-        		
-        		if(replaceToBiomeNameNew != null)
+            	String[] replaceToBiomeNameArr = biomeConfig.replaceToBiomeName.split(",");
+        		if(replaceToBiomeNameArr.length == 1)
         		{
-	        		savedBiomeId = getRequestedSavedId(replaceToBiomeNameNew);
-	        		if(savedBiomeId != -1)
+	        		// This may be a legacy world that doesn't use resourcelocation notation, get the correct registry name
+	        		String replaceToBiomeNameNew = OTG.getRegistryNameForDefaultBiome(biomeConfig.replaceToBiomeName);
+	        		
+	        		if(replaceToBiomeNameNew != null)
 	        		{
-	        			biomeConfig.replaceToBiomeName = replaceToBiomeNameNew;
+		        		savedBiomeId = getRequestedSavedId(replaceToBiomeNameNew);
+		        		if(savedBiomeId != -1)
+		        		{
+		        			biomeConfig.replaceToBiomeName = replaceToBiomeNameNew;
+		        		}
 	        		}
         		}
         	}
@@ -690,7 +739,7 @@ public final class ServerConfigProvider implements ConfigProvider
         			savedBiomeId = biome.getIds().getOTGBiomeId(); // TODO: Re-implement replacetobiomename:virtualbiome
         		} else {
             		savedBiomeId = getRequestedSavedId(biomeConfig.replaceToBiomeName);
-        			throw new RuntimeException("ReplaceToBiomeName: " + biomeConfig.replaceToBiomeName + " for biome " + biomeConfig.getName() + " could not be found. Please note that it is not possible to ReplaceToBiomeName to a ReplaceToBiomeName biome.");
+        			throw new RuntimeException("ReplaceToBiomeName: " + biomeConfig.replaceToBiomeName + " for biome " + biomeConfig.getName() + " could not be found. Please note that it is not possible to ReplaceToBiomeName to a ReplaceToBiomeName biome. Please update your biome configs.");
         		}
     		}
         }

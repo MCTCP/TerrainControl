@@ -91,10 +91,11 @@ public class OTGWorldServerMulti extends WorldServer
 	        ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 	        if(forgeWorld != null) // forgeWorld can be null for a dimension with a vanilla world
 	        {
+	        	// TODO: Fix this, seed should not depend on world config (since forge can have multiple dims with the same preset). What effect does this actually have atm?
 		        forgeWorld.getConfigs().getWorldConfig().worldSeed = "" + seedIn;
 		        if(forgeWorld.getConfigs() instanceof ServerConfigProvider)
 		        {
-		        	((ServerConfigProvider)forgeWorld.getConfigs()).saveWorldConfig();
+		        	((ServerConfigProvider)forgeWorld.getConfigs()).saveWorldConfig(false);
 		        }
 
 	        	WorldConfig worldConfig = forgeWorld.getConfigs().getWorldConfig();

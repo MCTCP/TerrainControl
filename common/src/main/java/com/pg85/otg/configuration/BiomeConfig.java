@@ -24,9 +24,11 @@ import com.pg85.otg.util.minecraftTypes.TreeType;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class BiomeConfig extends ConfigFile
 {
+	private boolean updatingConfig;
     public String biomeExtends;
     private boolean doResourceInheritance = true;
 
@@ -169,10 +171,12 @@ public class BiomeConfig extends ConfigFile
     public StandardBiomeTemplate defaultSettings;
     public WorldConfig worldConfig;
 
-    public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, SettingsMap settings, WorldConfig worldConfig)
+    public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, SettingsMap settings, WorldConfig worldConfig, boolean updatingConfig)
     {
         super(loadInstruction.getBiomeName());
 
+        this.updatingConfig = updatingConfig;
+        
         // Mob inheritance
         // Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly
         // Forge: If this is a vanilla biome then mob spawning settings have been inherited from vanilla MC biomes
@@ -885,6 +889,31 @@ public class BiomeConfig extends ConfigFile
         //this.replaceToBiomeName = (DefaultBiome.Contain(this.replaceToBiomeName) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.replaceToBiomeName)) ? this.replaceToBiomeName : "";
 
         //this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.riverBiome)) ? this.riverBiome : "";
+
+        // Update configs for worlds with no saved biome id data (OTG 1.12.2 v7, dynamic biome ids update)
+        if(this.updatingConfig)
+        {
+        	// Update biomes for legacy worlds, default biomes should be referred to as minecraft:<biomename>
+        	if(
+    			this.replaceToBiomeName != null && 
+				this.replaceToBiomeName.trim().length() > 0	        			
+			)
+        	{
+        		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(this.replaceToBiomeName);
+        		if(defaultBiomeResourceLocation != null)
+        		{
+        			this.replaceToBiomeName = defaultBiomeResourceLocation;
+        		}
+        	} else {
+        		// Default biomes must replacetobiomename themselves
+        		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(this.getName());
+        		if(defaultBiomeResourceLocation != null)
+        		{
+        			this.replaceToBiomeName = defaultBiomeResourceLocation;
+        		}
+        	}
+        }
+        
     }
 
     @Override

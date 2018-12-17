@@ -13,10 +13,7 @@ apply plugin: 'signing'
 // Project properties
 archivesBaseName = "openterraingenerator-forge"
 description = "OpenTerrainGenerator for Minecraft Forge"
-ext.forgeVersion = "1.12.2-14.23.1.2555"
-minecraft.version = ext.forgeVersion
 minecraft.runDir = "run"
-minecraft.mappings = "snapshot_20171218"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {

@@ -188,7 +188,7 @@ public final class ClientConfigProvider implements ConfigProvider
         	biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId); // <-- This might be used even in MP by client mods?
 
             BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, defaultSettings);
-            BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig);
+            BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig, false);
 
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(otgBiomeId, savedBiomeId), this);
             biomes[savedBiomeId] = biome;

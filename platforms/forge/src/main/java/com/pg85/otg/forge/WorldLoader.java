@@ -396,9 +396,10 @@ public final class WorldLoader
         // If this is a new world use the pre-generator and world border settings from world creation menu
     	if(GuiHandler.lastGuiOpened.equals(OTGGuiCreateWorld.class) || (GuiHandler.lastGuiOpened.equals(GuiYesNo.class) && GuiHandler.askModCompatContinue)) // GUIYesNo is used for mod warnings (custommobspawner etc)
     	{
+    		// TODO: Fix this, pregen and world border radius should not be tied to the world config (since we want to be able to make multiple worlds with the same settings, we need to be able to control these per dim). 
 			config.getWorldConfig().PreGenerationRadius = GuiHandler.PregenerationRadius;
 			config.getWorldConfig().WorldBorderRadius = GuiHandler.WorldBorderRadius;
-			config.saveWorldConfig();
+			config.saveWorldConfig(false);
     	}
     	else if(GuiHandler.lastGuiOpened.equals(OTGGuiWorldSelection.class))
     	{

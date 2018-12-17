@@ -268,8 +268,9 @@ public class OTGDimensionManager
         
         if(forgeWorld != null) // forgeWorld can be null for a dimension with a vanilla world <-- Yeah but we should never be loading those, should we?
         {
+        	// TODO: Fix this, seed should not depend on world config (since forge can have multiple dims with the same preset). What effect does this actually have atm?
 	        ((ServerConfigProvider)forgeWorld.getConfigs()).getWorldConfig().worldSeed = "" + seedIn;
-	        ((ServerConfigProvider)forgeWorld.getConfigs()).saveWorldConfig();
+	        ((ServerConfigProvider)forgeWorld.getConfigs()).saveWorldConfig(false);
 
         	WorldConfig worldConfig = ((ServerConfigProvider)forgeWorld.getConfigs()).getWorldConfig();
 

@@ -167,8 +167,9 @@ public final class OTGCommandHandler implements ICommand
             	{
             		biomeOrDimensionName += argString[i] + " ";
             	}
-            	if(biomeOrDimensionName != null && biomeOrDimensionName.length() > 0)
+            	if(biomeOrDimensionName != null && biomeOrDimensionName.trim().length() > 0)
             	{
+            		biomeOrDimensionName = biomeOrDimensionName.trim();
             		//final String biomeOrDimensionName = biomeOrDimensionName2;
             	    //new Thread(new Runnable() {
             	        //public void run(){
@@ -185,7 +186,7 @@ public final class OTGCommandHandler implements ICommand
         						if(DimensionManager.isDimensionRegistered(i))
         						{
         							DimensionType dimensionType = DimensionManager.getProviderType(i);
-        							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase().trim()))
+        							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase()))
         							{
         								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), false);
         								return;
@@ -352,7 +353,8 @@ public final class OTGCommandHandler implements ICommand
                 	targetWorld.GetWorldSession().setPregenerationRadius(radius);
 	                int newRadius = targetWorld.getConfigs().getWorldConfig().PreGenerationRadius = targetWorld.GetWorldSession().getPregenerationRadius();
 
-	                ((ServerConfigProvider)targetWorld.getConfigs()).saveWorldConfig();
+		        	// TODO: Fix this, seed should not depend on world config (since forge can have multiple dims with the same preset). What effect does this actually have atm?
+	                ((ServerConfigProvider)targetWorld.getConfigs()).saveWorldConfig(false);
 
         			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Pre-generator radius set to " + VALUE_COLOR + newRadius + MESSAGE_COLOR + "."));
         			return;

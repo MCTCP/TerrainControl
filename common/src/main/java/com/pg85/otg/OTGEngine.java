@@ -249,7 +249,7 @@ public abstract class OTGEngine
         // LogManager and PluginConfig are now decoupled, thank the lord!
         File pluginConfigFile = new File(getTCDataFolder(), PluginStandardValues.ConfigFilename);
         pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
-        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
+        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode, false);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
         File globalObjectsDir = new File(getTCDataFolder(), PluginStandardValues.BO_DirectoryName);

@@ -537,7 +537,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     	GuiHandler.askModCompatContinue = false;
 
         String s1 = "Delete the OpenTerrainGenerator world settings for '" + worldName + "'?";
-        String s2 = "This will also delete any world (directory) named '" + worldName + "'";
+        String s2 = "Warning: This will also delete any world named '" + worldName + "'";
         String s3 = "Delete";
         String s4 = "Cancel";
         GuiYesNo guiyesno = new GuiYesNo(p_152129_0_, s1, s2, s3, s4, 0);

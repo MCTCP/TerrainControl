@@ -525,7 +525,7 @@ public class OTG
 			case "Ice Plains Spikes":
 				registryName = "minecraft:mutated_ice_flats";
 			break;
-			case "ice Plains":
+			case "Ice Plains":
 				registryName = "minecraft:ice_flats";
 			break;
 			case "Jungle M":
