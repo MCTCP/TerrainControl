@@ -34,7 +34,9 @@ If you prefer to use IntelliJ, steps are a little different.
 
 "gradlew genIntellijRuns" (./gradlew genIntellijRuns if you are on Mac/Linux)
 
-Step 4: The final step is to open Eclipse and switch your workspace to /eclipse/ (if you use IDEA, it should automatically start on your project)
+Step 4: Copy META-INF.jar to your run/mods/ directory (create if necessary).
+
+Step 5: The final step is to open Eclipse and switch your workspace to /eclipse/ (if you use IDEA, it should automatically start on your project)
 
 If at any point you are missing libraries in your IDE, or you've run into problems you can run "gradlew --refresh-dependencies" to refresh the local cache. "gradlew clean" to reset everything {this does not affect your code} and then start the processs again.
 
