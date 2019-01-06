@@ -349,7 +349,6 @@ public class OTGBlockPortal
             for (int j = 0; j < this.width; ++j)
             {
             	IBlockState blockState = this.world.getBlockState(this.bottomLeft.offset(this.rightDir, j).up(this.height));
-            	Block block = blockState.getBlock();
             	
 				ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockState);
 				boolean isPortalMaterial = false;

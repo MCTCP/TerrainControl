@@ -31,11 +31,9 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.gui.OTGGuiDimensionSettingsList.SettingEntry;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
-import com.pg85.otg.logging.LogMarker;
 
 public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 {
@@ -576,20 +574,24 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 					(this.selectedDimensionIndex == 0 && ((ForgeWorld)forgeWorld).getName().equals("overworld")) || 
 					((ForgeWorld)forgeWorld).getName().equals(this.selectedDimension.PresetName)
 				)
-    			{    				
-    				Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();   				
-    				if(pregenerator.getPregeneratorIsRunning() && pregenerator.preGeneratorProgressStatus != "Done")
-	    			{
-	    				if(!this.dimensionSettingsList.showingPregeneratorStatus)
-	    				{
-	    					this.dimensionSettingsList.refreshData();
-	    				}
-	    			} else {
-	    				if(this.dimensionSettingsList.showingPregeneratorStatus)
-	    				{
-	    					this.dimensionSettingsList.refreshData();
-	    				}	    				
-	    			}
+    			{    	
+    				// ForgeWorldSession can be null for MP clients that have not received the world data for a new world yet
+    				if(forgeWorld.GetWorldSession() != null)
+    				{
+	    				Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();   				
+	    				if(pregenerator.getPregeneratorIsRunning() && pregenerator.preGeneratorProgressStatus != "Done")
+		    			{
+		    				if(!this.dimensionSettingsList.showingPregeneratorStatus)
+		    				{
+		    					this.dimensionSettingsList.refreshData();
+		    				}
+		    			} else {
+		    				if(this.dimensionSettingsList.showingPregeneratorStatus)
+		    				{
+		    					this.dimensionSettingsList.refreshData();
+		    				}	    				
+		    			}
+    				}
     			}
     		}
     	}
@@ -807,6 +809,10 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
             	} else {
             		// For MP get the loaded status from the ForgeWorld, set by a packet from the server.
 		            ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimensions.get(idx).PresetName);
+		            if(forgeWorld == null)
+		            {
+		            	forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(dimensions.get(idx).PresetName);
+		            }
 		            isBeingCreatedOnServer = idx != 0 && forgeWorld == null;
 		            isLoaded = idx == 0 || (forgeWorld != null && forgeWorld.isLoadedOnServer); // ForgeWorld can be null after sending a create world packet from the client
             	}

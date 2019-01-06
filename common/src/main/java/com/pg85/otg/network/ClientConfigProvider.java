@@ -17,7 +17,6 @@ import com.pg85.otg.util.BiomeIds;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * Holds the WorldConfig and all BiomeConfigs.

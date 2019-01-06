@@ -5,7 +5,6 @@ import com.pg85.otg.LocalBiome;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.events.EventPriority;

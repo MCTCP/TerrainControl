@@ -13,7 +13,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
@@ -86,7 +85,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 			            		OTG.log(LogMarker.ERROR, "Dimension config for world \"" + dimConfig.PresetName + "\" has value \"" + dimConfig.Seed + "\" for worldSeed which cannot be parsed as a number. Using a random seed instead.");
 			                }
 							
-							int newDimId = OTGDimensionManager.createDimension(seed, dimConfig.PresetName, false, true, true);
+							OTGDimensionManager.createDimension(seed, dimConfig.PresetName, false, true, true);
 							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimConfig.PresetName);
 							
 							if(dimConfig.Settings.CanDropChunk)

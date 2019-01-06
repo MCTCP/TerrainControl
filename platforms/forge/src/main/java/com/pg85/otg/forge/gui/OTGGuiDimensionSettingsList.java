@@ -24,7 +24,6 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
-import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -1047,15 +1046,12 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	            					{
 		            					ForgeWorld forgeWorld = null;
 	            						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);
-		                        		if(radius > 0 && forgeWorld != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
-		                        		{
-		                        			//OTGDimensionManager.initDimension(forgeWorld.getDimensionId());
-		                        		}
 		            					if(forgeWorld == null)
 		            					{
 		            						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
 		            					}
-		            					if(forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
+		            					// ForgeWorldSession can be null for MP clients that have not yet received the world data for a newly created world
+		            					if(forgeWorld.GetWorldSession() != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
 		            					{
 			            					forgeWorld.GetWorldSession().setPregenerationRadius(radius);
 			            					radius = forgeWorld.GetWorldSession().getPregenerationRadius();
@@ -1229,15 +1225,12 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
             		{
     					ForgeWorld forgeWorld = null;
     					forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);
-                		if(radius > 0 && forgeWorld != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
-                		{
-                			//OTGDimensionManager.initDimension(forgeWorld.getDimensionId());
-                		}
     					if(forgeWorld == null)
     					{
     						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
     					}
-    					if(forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
+    					// ForgeWorldSession can be null for MP clients that have not yet received the world data for a newly created world
+    					if(forgeWorld.GetWorldSession() != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
     					{
         					forgeWorld.GetWorldSession().setPregenerationRadius(radius);
         					radius = forgeWorld.GetWorldSession().getPregenerationRadius();

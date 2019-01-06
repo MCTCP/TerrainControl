@@ -275,7 +275,6 @@ public class OTGChunkGenerator implements IChunkGenerator
     public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
     {
         WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
-        Biome biomeBase = this.worldHandle.getBiomeForCoordsBody(blockPos);
         Biome biomeBaseOTG = ((ForgeBiome)this.world.getBiome(blockPos.getX(), blockPos.getZ())).biomeBase;
         
         if (worldConfig.rareBuildingsEnabled)

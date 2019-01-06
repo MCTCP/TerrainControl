@@ -40,7 +40,6 @@ public abstract class OTGPacket implements IMessage
         	data.retain();
         	wrappedStream = new DataInputStream(new ByteBufInputStream(data));
         } else {
-        	String a = "";
         	// Wrong version!
         	throw new RuntimeException("Client is using a different version of OTG than server!");
         }

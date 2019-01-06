@@ -5,7 +5,6 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObjectStructureCache;
 import com.pg85.otg.customobjects.bo3.BlockFunction;
@@ -1543,8 +1542,6 @@ public class ForgeWorld implements LocalWorld
 			{
 				IOHelper.deleteRecursive(worldDataDir);
 			}
-		} else {
-			String breakpoint = "";
 		}
 	}
 

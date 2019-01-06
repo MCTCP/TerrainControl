@@ -18,10 +18,6 @@ public class BlockTracker
     	{
     		event.setCanceled(true);
     	}
-    	if(dimConfig == null)
-    	{
-    		String breakpoint = "";
-    	}
     }
 
 	@SubscribeEvent
@@ -31,11 +27,7 @@ public class BlockTracker
 		if(dimConfig != null && !dimConfig.Settings.PlayersCanPlaceBlocks)
 		{
 			event.setCanceled(true);
-		}
-    	if(dimConfig == null)
-    	{
-    		String breakpoint = "";
-    	}		
+		}	
 	}
 
 	@SubscribeEvent
@@ -46,9 +38,5 @@ public class BlockTracker
 		{
 			event.setCanceled(true);
 		}
-    	if(dimConfig == null)
-    	{
-    		String breakpoint = "";
-    	}		
 	}
 }
