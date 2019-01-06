@@ -1,11 +1,10 @@
 package com.pg85.otg.customobjects;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
@@ -20,6 +19,7 @@ import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.helpers.RandomHelper;
@@ -2190,7 +2190,7 @@ public class CustomObjectStructure
     		{
     			if(minimumSize)
     			{
-    				OTG.log(LogMarker.INFO, "Error: Branching BO3 " + Start.BO3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
+    				OTG.log(LogMarker.TRACE, "Error: Branching BO3 " + Start.BO3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
             		throw new InvalidConfigException("");
     			}
     			return;
@@ -4878,7 +4878,7 @@ public class CustomObjectStructure
 	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = this.World.getConfigs().getWorldConfig().getReplaceBlocksDict();
 	    if(blocksToReplace != null && blocksToReplace.size() > 0)
 	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material);
+	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
 	    	if(targetBlock != null)
 	    	{
 	    		material = targetBlock;

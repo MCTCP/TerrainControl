@@ -2,7 +2,7 @@ package com.pg85.otg.bukkit.generator.structures;
 
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.bukkit.BukkitBiome;
-import com.pg85.otg.configuration.ServerConfigProvider;
+import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_12_R1.*;
 

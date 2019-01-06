@@ -1,0 +1,824 @@
+package com.pg85.otg.forge.gui;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map.Entry;
+import java.util.Random;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiYesNoCallback;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.text.TextFormatting;
+import net.minecraft.world.DimensionType;
+import net.minecraft.world.GameType;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.storage.ISaveFormat;
+import scala.Int;
+
+import org.lwjgl.input.Mouse;
+
+import com.pg85.otg.LocalWorld;
+import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.ForgeWorldSession;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.dimensions.OTGWorldProvider;
+import com.pg85.otg.forge.generator.Pregenerator;
+import com.pg85.otg.forge.gui.OTGGuiDimensionSettingsList.SettingEntry;
+import com.pg85.otg.forge.network.client.ClientPacketManager;
+import com.pg85.otg.logging.LogMarker;
+
+public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
+{
+	//
+
+	SettingEntry buttonId;
+    private OTGGuiDimensionSettingsList dimensionSettingsList;
+	
+    OTGGuiPresetList selectPresetForDimensionMenu = new OTGGuiPresetList(this);
+    boolean selectingPresetForDimension = false;
+    boolean creatingNewDimension = false;
+    
+	//	
+	
+    public OTGGuiPresetList previousMenu;
+    private OTGGuiSlotDimensionList dimensionsList;
+    public int selectedDimensionIndex = -1;
+    public String worldName;
+    public final ArrayList<DimensionConfig> dimensions;
+    public final ArrayList<DimensionConfig> originalDimensions;
+    DimensionConfig selectedDimension;
+    
+    private int listWidth = 100;
+    private int topMargin = 37;
+    private int bottomMargin = 73;
+    private int btnBottomMargin = 63;
+    private int leftMargin = 10;
+    private int rightMargin = 10;
+    private int slotHeight = 16;
+    private int margin = 20;
+    
+    GuiButton btnContinue;
+    GuiButton btnCancel;
+    GuiButton btnDelete;
+    private final int iContinueButton = 0;
+    private final int iCancelButton = 1;
+    private final int iNewButton = 2;
+    private final int iDeleteButton = 3;
+    
+    public OTGGuiDimensionList(OTGGuiPresetList previousMenu)
+    {
+        this.previousMenu = previousMenu;        
+        this.dimensions = new ArrayList<DimensionConfig>();
+        
+        // If previousMenu is null then this screen was opened in-game
+        if(previousMenu == null)
+        {
+        	// If world is null then we're ingame
+        	if(Minecraft.getMinecraft().world == null || Minecraft.getMinecraft().isSingleplayer())
+        	{
+        		// For SP values are applied immediately, don't clone.
+        		this.dimensions.add(OTG.GetDimensionsConfig().Overworld);
+            	for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+            	{
+            		this.dimensions.add(dimConfig);
+            	}
+        	} else {
+        		this.dimensions.add(OTG.GetDimensionsConfig().Overworld.clone());
+            	for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+            	{
+            		this.dimensions.add(dimConfig.clone());
+            	}
+        	}
+        } else {
+	        
+	        // If a modpack creator has added a default config, use that, otherwise use world config.
+	        DimensionsConfig defaultConfig = DimensionsConfig.getModPackConfig(previousMenu.selectedPreset.getFirst());
+	        if(defaultConfig != null)
+	        {
+	        	this.dimensions.add(defaultConfig.Overworld.clone());
+	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
+	        	{
+	        		this.dimensions.add(dimConfig.clone());	        		
+	        	}	        	
+	        } else {
+	        	// Add overworld
+		        this.dimensions.add(new DimensionConfig(previousMenu.selectedPreset.getSecond()));
+		                
+		        // Add any dimensions from the worldconfig's dimensions list if their presets are installed
+		        for(String dimName : previousMenu.selectedPreset.getSecond().Dimensions)
+		        {
+		        	for(Entry<String, DimensionConfigGui> preset : ForgeEngine.presets.entrySet())
+		        	{
+		        		if(dimName.equals(preset.getKey()))
+		        		{
+		        			this.dimensions.add(new DimensionConfig(preset.getValue()));
+		        			break;
+		        		}
+		        	}
+		        }
+	        }
+        }
+        
+        this.selectedDimension = this.dimensions.get(0);
+        this.selectedDimensionIndex = 0;
+        
+        // Store original dimensions to compare differences after entering values for settings
+        this.originalDimensions = new ArrayList<DimensionConfig>();
+        for(DimensionConfig dimConfig : this.dimensions)
+        {
+        	this.originalDimensions.add(dimConfig.clone());
+        }
+    }
+
+    boolean settingsChanged = false;
+    
+    /**
+     * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
+     * window resizes, the buttonList is cleared beforehand.
+     */
+    @Override
+    public void initGui()
+    {    
+    	if(this.selectingPresetForDimension)
+    	{
+    		this.selectingPresetForDimension = false;
+    		if(this.creatingNewDimension)
+    		{
+    			this.creatingNewDimension = false;    			
+    			if(this.selectPresetForDimensionMenu.selectedPreset != null) // If user didn't cancel
+    			{
+	    			// Creating a new dim, create config with the chosen preset
+	    	        // If a modpack creator has included a default config for the chosen preset in the overworld's preset, use that, otherwise use the preset's world config.
+    				// If world isn't null the we're ingame
+	    	        DimensionsConfig defaultConfig = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.GetDimensionsConfig().Overworld.PresetName : this.previousMenu.selectedPreset.getFirst());
+	    	        if(defaultConfig != null)
+	    	        {
+	    	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
+	    	        	{
+	    	        		if(dimConfig.PresetName.equals(this.selectPresetForDimensionMenu.selectedPreset.getFirst()))
+    	        			{
+	    	        			DimensionConfig newConfig = dimConfig.clone();
+	    	        			// If world is nnot null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
+	    	        			newConfig.isNewConfig = this.mc.world != null;
+	    	        			this.dimensions.add(newConfig);	    	        			
+	    	        			break;
+	    	        		}
+	    	        	}
+	    	        } else {
+	    	        	// Add only the overworld for the chosen preset, don't add dimensions.
+	    	        	DimensionConfig newConfig = new DimensionConfig(this.selectPresetForDimensionMenu.selectedPreset.getSecond());
+	        			// If world is nnot null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
+	        			newConfig.isNewConfig = this.mc.world != null;
+	    		        this.dimensions.add(newConfig);
+	    	        }
+	    			this.selectedDimension = this.dimensions.get(this.dimensions.size() - 1);
+	    			this.dimensionsList.selectedIndex = this.dimensions.size() - 1;
+	    			this.dimensionsList.lastClickTime = System.currentTimeMillis();
+	    			this.selectDimensionIndex(this.dimensionsList.selectedIndex);
+    	        	this.CompareSettingsToOriginal();
+    			}
+    		} else {
+	    		if(this.selectPresetForDimensionMenu.selectedPreset != null) // If user didn't cancel
+	    		{
+	    			this.selectedDimension.PresetName = this.selectPresetForDimensionMenu.selectedPreset.getFirst();
+	    		}
+    		}
+    	}
+
+        this.buttonList.add(new GuiButton(iNewButton, OTGGuiDimensionList.this.leftMargin, this.height - btnBottomMargin, listWidth, 20, "New"));
+        this.btnDelete = new GuiButton(iDeleteButton, OTGGuiDimensionList.this.leftMargin, this.height - (btnBottomMargin - 24), listWidth, 20, "Delete");
+        this.buttonList.add(btnDelete);
+        
+        boolean isNewDim = this.selectedDimension.isNewConfig; // This dimension config was created via the ingame menu, but the dimension itself hasn't been created yet (is done when pressing continue/apply)
+        boolean isLoaded = false;
+        if(!isNewDim)
+        {
+            // TODO: Don't do this each draw ><
+            // If we're ingame then find out if the dimension is loaded, getWorld only fetches loaded worlds.
+            // If world isn't null then we're ingame
+        	if(this.mc.isSingleplayer())
+        	{            		
+	            ForgeWorld forgeWorld = this.mc.world != null && this.selectedDimensionIndex != 0 ? (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(this.selectedDimension.PresetName) : null;
+	            isLoaded = this.selectedDimensionIndex == 0 || forgeWorld != null;
+        	} else {
+        		// For MP get the loaded status from the ForgeWorld, set by a packet from the server.
+	            ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.selectedDimension.PresetName);
+	            isLoaded = this.selectedDimensionIndex == 0 || (forgeWorld != null && forgeWorld.isLoadedOnServer); // ForgeWorld can be null after sending a create world packet from the client
+        	}
+        }
+		this.btnDelete.enabled = this.selectedDimensionIndex != 0 && (isNewDim || !isLoaded); // Overworld and unloaded dims can't be deleted
+                
+        int maxBtnWidth = 330; // Buttons show visual artifacts when they get too wide        
+        int btnWidth = OTGGuiDimensionList.this.width - OTGGuiDimensionList.this.listWidth - OTGGuiDimensionList.this.margin - OTGGuiDimensionList.this.rightMargin;
+        btnWidth = btnWidth > maxBtnWidth ? maxBtnWidth : btnWidth; 
+        this.btnContinue = new GuiButton(iContinueButton, OTGGuiDimensionList.this.listWidth + margin, this.height - btnBottomMargin, btnWidth, 20, "Continue"); 
+        this.buttonList.add(this.btnContinue);        
+        this.btnCancel = new GuiButton(iCancelButton, OTGGuiDimensionList.this.listWidth + margin, this.height - (btnBottomMargin - 24), btnWidth, 20, "Cancel");
+        this.buttonList.add(this.btnCancel);
+         
+        // If a world is loaded then this is in-game
+        if(this.mc.world != null)
+        {
+        	boolean bFound = false;
+        	for(DimensionConfig dimConfig : this.dimensions)
+        	{
+        		if(dimConfig.isNewConfig)
+        		{
+        			bFound = true;
+        		}
+        	}
+        	if(bFound || !this.mc.isSingleplayer())
+        	{
+	        	this.btnContinue.displayString = "Apply";
+	        	this.btnCancel.displayString = "Cancel";
+	        	this.btnContinue.enabled = this.mc.isSingleplayer() ? true : this.settingsChanged;
+        	} else {
+	        	this.btnContinue.displayString = "";
+	        	this.btnCancel.displayString = "Back";
+	        	this.btnContinue.enabled = false;
+        	}
+    		
+        	
+        }
+        
+        if(this.dimensionSettingsList == null)
+        {    	
+	    	this.dimensionSettingsList = new OTGGuiDimensionSettingsList(this, OTGGuiDimensionList.this.topMargin, OTGGuiDimensionList.this.height - OTGGuiDimensionList.this.bottomMargin, OTGGuiDimensionList.this.listWidth + margin, OTGGuiDimensionList.this.width - OTGGuiDimensionList.this.listWidth - OTGGuiDimensionList.this.margin - OTGGuiDimensionList.this.rightMargin, this.mc);
+	        this.dimensionsList = new OTGGuiSlotDimensionList(this, dimensions);       
+        } else {
+        	this.dimensionSettingsList.Resize(OTGGuiDimensionList.this.topMargin, OTGGuiDimensionList.this.height - OTGGuiDimensionList.this.bottomMargin, OTGGuiDimensionList.this.listWidth + margin, OTGGuiDimensionList.this.width - OTGGuiDimensionList.this.listWidth - OTGGuiDimensionList.this.margin - OTGGuiDimensionList.this.rightMargin);
+        	this.dimensionsList.Resize();
+        }
+        updateCache();
+    }
+    
+    public void CompareSettingsToOriginal()
+    {  
+    	// Only do this for MP server (not SP or main menu)
+    	if(this.mc.world != null && !this.mc.isSingleplayer())
+    	{
+	    	this.settingsChanged = false;
+	    	for(DimensionConfig dimConfig : this.dimensions)
+	    	{
+	    		// PresetName is null for vanilla overworlds
+	    		if(dimConfig.PresetName != null && dimConfig.isNewConfig)
+	    		{
+	    			this.settingsChanged = true;
+	    			return;
+	    		}
+	    	}
+	    	// dimensions and originalDimensions lists should be synchronised,
+	    	// so originalDimensions should have a clone of the same index in dimensions
+	    	// when that config was last applied/saved.
+	    	for(int i = 0; i < this.originalDimensions.size(); i++)
+	    	{
+	    		DimensionConfig originalDimConfig = this.originalDimensions.get(i);
+		    	DimensionConfig dimConfig = this.dimensions.get(i);
+		        this.settingsChanged = !dimConfig.ToYamlString().equals(originalDimConfig.ToYamlString());
+	    		if(this.settingsChanged)
+	    		{
+	    			return;
+	    		}
+	    	}
+    	}
+    }
+    
+    /**
+     * Called by the controls from the buttonList when activated. (Mouse pressed for buttons)
+     */
+    @Override
+    protected void actionPerformed(GuiButton button) throws IOException
+    {
+        if (button.enabled)
+        {
+        	// Make sure all settings are applied
+        	this.mouseClicked(0, 0, 0);
+        	
+            switch (button.id)
+            {            
+                case iContinueButton:
+                {                	
+                	// If world is not null then we're ingame
+                	if(this.mc.world == null)
+                	{
+                		this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, this.dimensions.get(0).PresetName));
+                	} else {
+                		        
+                		// If world is null then we're not ingame
+                        if(this.mc.world == null || this.mc.isSingleplayer())
+                        {
+	                		// Apply game rules and save
+	                		ApplyGameRules();                		
+	                		
+	                		// Create worlds for any newly created dims                			
+                			for(DimensionConfig dimConfig : this.dimensions)
+                			{
+                				if(dimConfig.isNewConfig)
+                				{
+                					dimConfig.isNewConfig = false;
+                        			OTGDimensionManager.CreateNewDimensionSP(dimConfig, this.mc.getIntegratedServer());
+                				}
+                			}
+                			this.dimensionSettingsList.refreshData();
+                			btnContinue.enabled = false;
+                        } else {
+                        	
+                        	ArrayList<DimensionConfig> applyDimSettings = (ArrayList<DimensionConfig>) this.dimensions.clone();
+	                		// Create worlds for any newly created dims                			
+                			for(int i = 0; i < applyDimSettings.size(); i++)
+                			{
+                				DimensionConfig dimConfig = applyDimSettings.get(i);
+                				if(dimConfig.isNewConfig)
+                				{
+                					dimConfig.isNewConfig = false;
+                					ClientPacketManager.SendCreateDimensionPacket(dimConfig);
+                        			this.dimensionSettingsList.refreshData(true, false, false);
+                				} else {
+                					// If the config has been edited send the changes to the server
+                					for(DimensionConfig originalDimConfig : this.originalDimensions)
+                					{
+                						if(originalDimConfig.PresetName == null || originalDimConfig.equals(dimConfig.PresetName))
+                						{
+                							if(!originalDimConfig.ToYamlString().equals(dimConfig.ToYamlString()))
+                							{
+                								// Send a packet with changes
+                								ClientPacketManager.SendUpdateDimensionSettingsPacket(dimConfig, i == 0);
+                							}
+                							break;
+                						}
+                					}
+                				}
+                			}
+                			this.settingsChanged = false;
+                        }                		
+                		btnContinue.displayString = "";
+                	}
+                    return;
+                }
+                case iCancelButton:
+                {
+                	if(this.dimensionSettingsList.advancedSettingsMenu || this.dimensionSettingsList.gameRulesMenu)
+                	{
+                		this.dimensionSettingsList.refreshData(true, false, false);
+                		this.dimensionSettingsList.scrollBy(Int.MinValue());
+                	} else {
+                		
+                		if(this.mc.world != null) // If world is not null then we're ingame
+                		{
+	                		// Apply game rules and save
+	                		ApplyGameRules();
+	                		
+	            			// Cancelling, remove any newly created dims, don't create worlds for them.
+	                		DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();                	
+	            			ArrayList<DimensionConfig> dims = new ArrayList<DimensionConfig>();
+	            			for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+	            			{
+	            				if(!dimConfig.isNewConfig)
+	            				{
+	            					dims.add(dimConfig);
+	            				}
+	            			}
+	            			dimsConfig.Dimensions = dims;
+	            			OTG.GetDimensionsConfig().Save();
+                		}
+                		this.mc.displayGuiScreen(this.previousMenu);
+                	}
+                    return;
+                }
+                case iNewButton:
+                {
+                	this.creatingNewDimension = true;
+	                this.selectingPresetForDimension = true;
+	                this.selectPresetForDimensionMenu = new OTGGuiPresetList(this, true);
+	                this.mc.displayGuiScreen(this.selectPresetForDimensionMenu);           	                	
+                    return;
+                }
+                case iDeleteButton:
+                {
+                    if(
+                		this.dimensionsList.selectedIndex == 0 || // Can't delete overworld
+                		this.dimensionsList.selectedIndex == -1
+            		)
+                    {
+                    	return;
+                    }
+        			
+            		// If world is null then we're not ingame
+                    if(this.mc.world == null || this.mc.isSingleplayer())
+                    {
+	                    boolean bSuccess = true;
+	        			// If world is not null then we're ingame
+	        			if(this.mc.world != null) 
+	        			{
+	        				bSuccess = OTGDimensionManager.DeleteDimensionServer(this.selectedDimension.PresetName, this.mc.getIntegratedServer());
+	        			}
+	        			if(bSuccess)
+	        			{
+		                	this.dimensions.remove(this.selectedDimension);
+		                    if(this.dimensionsList.selectedIndex > this.dimensionsList.getSize() - 1)
+		                    {
+		    	    			this.dimensionsList.selectedIndex = this.dimensionsList.getSize() - 1;
+		                    }
+		        			this.dimensionsList.lastClickTime = System.currentTimeMillis();
+		        			this.selectDimensionIndex(this.dimensionsList.selectedIndex);
+	        			}
+                    } else {
+                    	ClientPacketManager.SendDeleteDimensionPacket(this.selectedDimension.PresetName);
+                    }
+                    return;
+                }
+            }
+            return;
+        }
+        super.actionPerformed(button);
+    }
+    
+	private void ApplyGameRules()
+	{
+		// If world not is null then we're ingame
+		if(this.mc.world != null)
+		{
+			// Apply game rules to worlds
+			DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();                			
+			ArrayList<LocalWorld> worlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
+			for(LocalWorld world : worlds)
+			{            					
+				if(((ForgeWorld)world).getWorld() != null)
+				{
+					OTGDimensionManager.ApplyGameRulesToWorld(((ForgeWorld)world).getWorld(), dimsConfig.GetDimensionConfig(((ForgeWorld)world).getName()));
+				}
+			}
+			// TODO: Not sending this event atm, when game rules are changed via /gamerule it is sent. 
+			// /gamerule only works for the overworld though, so not sure how useful that would be anyway.
+			//net.minecraftforge.event.ForgeEventFactory.onGameRuleChange(rules, p_184898_1_, server);	
+		}
+	}
+
+	@Override
+    public void confirmClicked(boolean ok, int worldId)
+    {
+		if(ok)
+		{
+            long i = (new Random()).nextLong();
+            String s = this.dimensions.get(0).Seed;
+
+            if (s != null && s.length() > 0)
+            {
+                try
+                {
+                    long j = Long.parseLong(s);
+
+                    if (j != 0L)
+                    {
+                        i = j;
+                    }
+                }
+                catch (NumberFormatException numberformatexception)
+                {
+                    i = (long)s.hashCode();
+                }
+            }
+
+            WorldType.parseWorldType("OTG").onGUICreateWorldPress();
+
+            GameType gametype = this.dimensions.get(0).GameType.equals("Hardcore") ? GameType.SURVIVAL : GameType.getByName(this.dimensions.get(0).GameType.toLowerCase());
+            WorldSettings worldsettings = new WorldSettings(i, gametype, true, this.dimensions.get(0).GameType.equals("Hardcore"), WorldType.parseWorldType("OTG"));
+            worldsettings.setGeneratorOptions("OpenTerrainGenerator");
+
+            if(this.dimensions.get(0).BonusChest)
+            {
+            	worldsettings.enableBonusChest();
+            }
+            if(this.dimensions.get(0).AllowCheats)
+            {
+            	worldsettings.enableCommands();
+            }
+
+            /*
+			boolean customMobSpawnerEnabled = false;
+			for (ModContainer mod : Loader.instance().getActiveModList())
+			{
+				if(mod.getName().toLowerCase().equals("drzhark's customspawner"))
+				{
+					customMobSpawnerEnabled = true;
+					break;
+				}
+			}
+			*/
+
+			// Don't overwrite existing worlds, UI shouldn't allow it anyway
+            if (this.mc.getSaveLoader().getWorldInfo(worldName) == null)
+            {           	
+                //if(customMobSpawnerEnabled)
+            	//{
+    				//GuiYesNo guiyesno = askModCompatContinue(this, customMobSpawnerEnabled);
+    				//this.mc.displayGuiScreen(guiyesno);
+    			//} else {
+    				
+            		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.mcDataDir.getAbsolutePath() + "\\saves\\"), this.worldName);
+            		forgeWorldConfig.WorldName = this.worldName;
+            		forgeWorldConfig.Overworld = this.dimensions.get(0).clone();
+            		forgeWorldConfig.Dimensions = new ArrayList<DimensionConfig>();
+            		for(int j = 1; j < this.dimensions.size(); j++)
+            		{
+            			forgeWorldConfig.Dimensions.add(this.dimensions.get(j).clone());
+            		}
+            		OTG.SetDimensionsConfig(forgeWorldConfig);            		
+            	
+                    ISaveFormat isaveformat = this.mc.getSaveLoader();
+                    isaveformat.flushCache();
+                    isaveformat.deleteWorldDirectory(this.worldName);
+                    
+                    OTG.GetDimensionsConfig().Save();
+
+    				PregeneratorUI.ResetIngameUI();
+    				
+    		        DimensionType.OVERWORLD.suffix = "OTG";
+    				
+    				this.mc.launchIntegratedServer(this.worldName, this.worldName, worldsettings);
+    			//}
+            	
+            }
+		}
+		super.confirmClicked(ok, worldId);
+    }    
+
+    public int drawLine(String line, int offset, int shifty)
+    {
+        this.fontRenderer.drawString(line, offset, shifty, 0xd7edea);
+        return shifty + 10;
+    }
+    
+    long lastPregeneratorCheckTime = System.currentTimeMillis();
+    /**
+     * Draws the screen and all the components in it.
+     */
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+    	if(System.currentTimeMillis() - lastPregeneratorCheckTime > 1000l)
+    	{
+    		lastPregeneratorCheckTime = System.currentTimeMillis();
+
+    		for(LocalWorld forgeWorld : OTG.getEngine().getAllWorlds())
+    		{
+    			if(
+					(this.selectedDimensionIndex == 0 && ((ForgeWorld)forgeWorld).getName().equals("overworld")) || 
+					((ForgeWorld)forgeWorld).getName().equals(this.selectedDimension.PresetName)
+				)
+    			{    				
+    				Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();   				
+    				if(pregenerator.getPregeneratorIsRunning() && pregenerator.preGeneratorProgressStatus != "Done")
+	    			{
+	    				if(!this.dimensionSettingsList.showingPregeneratorStatus)
+	    				{
+	    					this.dimensionSettingsList.refreshData();
+	    				}
+	    			} else {
+	    				if(this.dimensionSettingsList.showingPregeneratorStatus)
+	    				{
+	    					this.dimensionSettingsList.refreshData();
+	    				}	    				
+	    			}
+    			}
+    		}
+    	}
+    	
+        this.dimensionsList.drawScreen(mouseX, mouseY, partialTicks);
+        this.dimensionSettingsList.drawScreen(mouseX, mouseY, partialTicks);            
+        
+        // If world isnt null then were ingame
+        this.drawCenteredString(this.fontRenderer, this.mc.world == null ? "Create dimensions" : "Manage dimensions", this.width / 2, 16, 0xFFFFFF);
+        
+        super.drawScreen(mouseX, mouseY, partialTicks);
+        if(this.mc.world != null && !this.mc.isSingleplayer() && this.btnContinue.enabled != this.settingsChanged)
+        {
+        	this.btnContinue.enabled = this.settingsChanged;
+        }
+    }
+
+    /**
+     * Handles mouse input.
+     */
+    @Override
+    public void handleMouseInput() throws IOException
+    {
+        int mouseX = Mouse.getEventX() * this.width / this.mc.displayWidth;
+        int mouseY = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+
+        super.handleMouseInput();
+        this.dimensionsList.handleMouseInput(mouseX, mouseY);
+        
+        this.dimensionSettingsList.handleMouseInput();
+    }
+
+    /**
+     * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
+     */
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+        if (this.buttonId != null)
+        {
+            this.buttonId = null;
+        }
+        if (mouseButton != 0 || !this.dimensionSettingsList.mouseClicked(mouseX, mouseY, mouseButton))
+        {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+        }
+    }
+
+    /**
+     * Called when a mouse button is released.
+     */
+    protected void mouseReleased(int mouseX, int mouseY, int state)
+    {
+        if (state != 0 || !this.dimensionSettingsList.mouseReleased(mouseX, mouseY, state))
+        {
+            super.mouseReleased(mouseX, mouseY, state);
+        }
+    }
+
+    /**
+     * Fired when a key is typed (except F11 which toggles full screen). This is the equivalent of
+     * KeyListener.keyTyped(KeyEvent e). Args : character (character on the key), keyCode (lwjgl Keyboard key code)
+     */
+    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    {
+    	if(keyCode == 1) // Escape
+    	{
+    		actionPerformed(btnCancel);
+    	}
+    	this.dimensionSettingsList.keyTyped(typedChar, keyCode);
+    	if(keyCode == 28 || keyCode == 83) // 28 + 83 is enter
+    	{
+    		this.dimensionSettingsList.refreshData();
+    	}
+    }    
+    
+    Minecraft getMinecraftInstance()
+    {
+        return mc;
+    }
+
+    FontRenderer getFontRenderer()
+    {
+        return fontRenderer;
+    }
+
+    public void selectDimensionIndex(int index)
+    {   	    	
+        this.selectedDimensionIndex = index;
+        this.selectedDimension = (index >= 0 && index <= dimensions.size()) ? dimensions.get(selectedDimensionIndex) : null;
+        
+        updateCache();
+        this.dimensionSettingsList.scrollBy(Int.MinValue());
+        
+        boolean isNewDim = this.selectedDimension.isNewConfig; // This dimension config was created via the ingame menu, but the dimension itself hasn't been created yet (is done when pressing continue/apply)
+        boolean isLoaded = false;
+        if(!isNewDim)
+        {
+            // TODO: Don't do this each draw ><
+            // If we're ingame then find out if the dimension is loaded, getWorld only fetches loaded worlds.
+            // If world isn't null then we're ingame
+        	if(this.mc.isSingleplayer())
+        	{            		
+	            ForgeWorld forgeWorld = this.mc.world != null && this.selectedDimensionIndex != 0 ? (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(this.selectedDimension.PresetName) : null;
+	            isLoaded = this.selectedDimensionIndex == 0 || forgeWorld != null;
+        	} else {
+        		// For MP get the loaded status from the ForgeWorld, set by a packet from the server.
+	            ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.selectedDimension.PresetName);
+	            isLoaded = this.selectedDimensionIndex == 0 || (forgeWorld != null && forgeWorld.isLoadedOnServer); // ForgeWorld can be null after sending a create world packet from the client
+        	}
+        }
+		this.btnDelete.enabled = this.selectedDimensionIndex != 0 && (isNewDim || !isLoaded); // Overworld and unloaded dims can't be deleted
+    }
+
+    public boolean dimensionIndexSelected(int index)
+    {
+        return index == selectedDimensionIndex;
+    }
+   
+    private void updateCache()
+    {
+        this.dimensionSettingsList.refreshData(true, false, false); 
+    }
+    
+    private class OTGGuiSlotDimensionList extends OTGGuiScrollingList
+    {   
+        private OTGGuiDimensionList parent;
+        private ArrayList<DimensionConfig> dimensions;
+
+        public OTGGuiSlotDimensionList(OTGGuiDimensionList parent, ArrayList<DimensionConfig> dimensions)
+        {
+            super(
+        		parent.getMinecraftInstance(), 
+        		OTGGuiDimensionList.this.listWidth, 
+        		parent.height, 
+        		OTGGuiDimensionList.this.topMargin, 
+        		OTGGuiDimensionList.this.height - OTGGuiDimensionList.this.bottomMargin,
+        		OTGGuiDimensionList.this.leftMargin, 
+        		OTGGuiDimensionList.this.slotHeight, 
+        		parent.width, 
+        		parent.height
+    		);
+            this.parent = parent;
+            this.dimensions = dimensions;
+        }
+
+        public void Resize()
+        {
+            this.listWidth = OTGGuiDimensionList.this.listWidth;
+            this.listHeight = parent.height;
+            this.top = OTGGuiDimensionList.this.topMargin;
+            this.bottom = OTGGuiDimensionList.this.height - OTGGuiDimensionList.this.bottomMargin;
+            this.slotHeight = OTGGuiDimensionList.this.slotHeight;
+            this.left = OTGGuiDimensionList.this.leftMargin;
+            this.right = OTGGuiDimensionList.this.listWidth + this.left;
+            this.screenWidth = parent.width;
+            this.screenHeight = parent.height;
+        }
+        
+        @Override
+        protected int getSize()
+        {
+            return dimensions.size();
+        }
+
+        @Override
+        protected void elementClicked(int index, boolean doubleClick)
+        {
+        	// Make sure all settings are applied
+        	this.parent.dimensionSettingsList.mouseClicked(0, 0, 0);
+            this.parent.selectDimensionIndex(index);
+        }
+
+        @Override
+        protected boolean isSelected(int index)
+        {
+            return this.parent.dimensionIndexSelected(index);
+        }
+
+        @Override
+        protected void drawBackground()
+        {
+            if (mc.world != null)
+            {
+                // No background in-game
+            } else {
+                this.parent.drawDefaultBackground();
+            }
+        }
+
+        @Override
+        protected int getContentHeight()
+        {
+            return (this.getSize()) * slotHeight + 1;
+        }
+        
+        @Override
+        protected void drawSlot(int idx, int right, int top, int height, Tessellator tess)
+        {
+        	DimensionConfig dimConfig = dimensions.get(idx);
+            String name = net.minecraft.util.StringUtils.stripControlCodes(dimConfig.PresetName != null && dimConfig.PresetName.length() > 0 ? dimConfig.PresetName : idx == 0 ? "Overworld" : "Dimension " + idx);
+            FontRenderer font = this.parent.getFontRenderer();
+
+            boolean isNewDim = dimConfig.isNewConfig; // This dimension config was created via the ingame menu, but the dimension itself hasn't been created yet (is done when pressing continue/apply)
+            boolean isLoaded = false;
+            boolean isBeingCreatedOnServer = false;
+            if(!isNewDim)
+            {
+                // TODO: Don't do this each draw ><
+                // If we're ingame then find out if the dimension is loaded, getWorld only fetches loaded worlds.
+                // If world isn't null then we're ingame
+            	if(this.parent.mc.world == null || this.parent.mc.isSingleplayer())
+            	{            		
+		            ForgeWorld forgeWorld = this.parent.mc.world != null && idx != 0 ? (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(dimensions.get(idx).PresetName) : null;
+		            isLoaded = idx == 0 || forgeWorld != null;
+            	} else {
+            		// For MP get the loaded status from the ForgeWorld, set by a packet from the server.
+		            ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimensions.get(idx).PresetName);
+		            isBeingCreatedOnServer = idx != 0 && forgeWorld == null;
+		            isLoaded = idx == 0 || (forgeWorld != null && forgeWorld.isLoadedOnServer); // ForgeWorld can be null after sending a create world packet from the client
+            	}
+            }
+            
+            font.drawString(font.trimStringToWidth(name + (isBeingCreatedOnServer ? TextFormatting.GRAY + " (creating)" + TextFormatting.RESET : (this.parent.mc.world != null ? (isLoaded ? TextFormatting.GREEN + " (loaded)" + TextFormatting.RESET : isNewDim ?  TextFormatting.GOLD + " (new)" + TextFormatting.RESET : TextFormatting.DARK_GREEN + " (unloaded)" + TextFormatting.RESET) : "")), listWidth - 10), this.left + 3 , top +  2, 0xFFFFFF);
+        }
+    }
+    
+    @Override
+    public boolean doesGuiPauseGame()
+    {
+        return false;
+    }
+}

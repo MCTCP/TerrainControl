@@ -10,7 +10,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Abstract base class for all configuration files. Configuration files read
@@ -61,7 +60,7 @@ public abstract class ConfigFile
      * Called directly after {@link #readConfigSettings(SettingsMap)} to fix
      * impossible combinations of settings.
      */
-    protected abstract void correctSettings();
+    protected abstract void correctSettings(boolean logWarnings);
 
     /**
      * Called before {@link #readConfigSettings(SettingsMap)} to rewrite
@@ -132,8 +131,9 @@ public abstract class ConfigFile
             }
 
             if (DefaultBiome.Contain(key))
+            {
                 output.add(key);
-
+            }
         }
         return output;
     }

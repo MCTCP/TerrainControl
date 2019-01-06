@@ -14,6 +14,7 @@ public class PluginStandardValues extends Settings
     // Folders
     public static final String BiomeConfigDirectoryName = "GlobalBiomes";
     public static final String BO_DirectoryName = "GlobalObjects";
+    public static final String PresetsDirectoryName = "worlds";
     
     // Network
     public static final String ChannelName = "OpenTerrainGenerator";

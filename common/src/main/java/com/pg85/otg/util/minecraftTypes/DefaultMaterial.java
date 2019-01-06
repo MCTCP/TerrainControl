@@ -1,7 +1,7 @@
 package com.pg85.otg.util.minecraftTypes;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.util.LocalMaterialData;
 
 import java.util.Map;
 import java.util.TreeMap;

@@ -1,7 +1,7 @@
 package com.pg85.otg.util.helpers;
 
 import com.pg85.otg.LocalWorld;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.*;
 
 /**

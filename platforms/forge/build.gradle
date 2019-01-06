@@ -35,7 +35,7 @@ minecraft {
 
 dependencies
 {
-    compile project(':common')
+    compile project(':common')	
 }
 
 processResources {
@@ -92,6 +92,7 @@ task asmJar(type: Jar, dependsOn: 'compileJava') {
 
 task rootJar(type: Jar, dependsOn: ['compileJava', asmJar]) {
 
+	// The common project's manifest will be added to the final OTG jar instead of this one, so OTG-Core.jar and FMLAT have to be listed there as well.
 	manifest
     {
 		attributes 'ContainedDeps': 'OTG-Core.jar'

@@ -1,7 +1,7 @@
 package com.pg85.otg.configuration.standard;
 
-import com.pg85.otg.LocalMaterialData;
-import com.pg85.otg.configuration.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.util.LocalMaterialData;
 
 import java.util.List;
 

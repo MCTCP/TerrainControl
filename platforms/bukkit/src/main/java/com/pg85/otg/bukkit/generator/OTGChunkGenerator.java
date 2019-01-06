@@ -2,7 +2,7 @@ package com.pg85.otg.bukkit.generator;
 
 import com.pg85.otg.bukkit.BukkitWorld;
 import com.pg85.otg.bukkit.OTGPlugin;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.util.ChunkCoordinate;

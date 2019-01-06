@@ -1,13 +1,13 @@
 package com.pg85.otg.generator;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 

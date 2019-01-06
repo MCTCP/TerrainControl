@@ -1,9 +1,9 @@
 package com.pg85.otg;
 
-import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunctionsManager;
-import com.pg85.otg.configuration.CustomObjectConfigFunctionsManager;
 import com.pg85.otg.configuration.PluginConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -16,6 +16,7 @@ import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.Logger;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.io.File;
@@ -179,6 +180,8 @@ public abstract class OTGEngine
      */
     public abstract File getGlobalObjectsDirectory();
 
+    public abstract File getWorldsDirectory();
+    
     /**
      * Gets the logger to which all messages should be logged.
      * @return The logger.
@@ -204,7 +207,7 @@ public abstract class OTGEngine
      * <p>
      * @return The root data folder for OTG.
      */
-    public abstract File getTCDataFolder();
+    public abstract File getOTGDataFolder();
 
     /**
      * Returns the world object with the given name.
@@ -246,27 +249,26 @@ public abstract class OTGEngine
         biomeManagers = new BiomeModeManager();
 
         // Do pluginConfig loading and then log anything that happened
-        // LogManager and PluginConfig are now decoupled, thank the lord!
-        File pluginConfigFile = new File(getTCDataFolder(), PluginStandardValues.ConfigFilename);
+        File pluginConfigFile = new File(getOTGDataFolder(), PluginStandardValues.ConfigFilename);
         pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
-        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode, false);
+        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
-        File globalObjectsDir = new File(getTCDataFolder(), PluginStandardValues.BO_DirectoryName);
+        File globalObjectsDir = new File(getOTGDataFolder(), PluginStandardValues.BO_DirectoryName);
         if(!globalObjectsDir.exists())
         {
         	globalObjectsDir.mkdirs();
         }
-        File globalBiomesDir = new File(getTCDataFolder(), PluginStandardValues.BiomeConfigDirectoryName);
+        File globalBiomesDir = new File(getOTGDataFolder(), PluginStandardValues.BiomeConfigDirectoryName);
         if(!globalBiomesDir.exists())
         {
         	globalBiomesDir.mkdirs();
-        }
-        File worldsDir = new File(getTCDataFolder(), "worlds");
+        }        
+        File worldsDir = new File(getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName);
         if(!worldsDir.exists())
         {
-        	worldsDir.mkdirs();
-        }        
+      		worldsDir.mkdirs();
+        }
         
         // Fire start event
         for (EventHandler handler : cancelableEventHandlers)
@@ -356,4 +358,6 @@ public abstract class OTGEngine
 	public abstract void unregisterOTGBiomeId(String worldName, int i);
 	
 	public abstract BiomeConfig[] getOTGBiomeIds(String worldName);
+
+	public abstract String GetPresetName(String worldName);
 }

@@ -8,10 +8,10 @@ import com.pg85.otg.bukkit.generator.OTGChunkGenerator;
 import com.pg85.otg.bukkit.generator.structures.OTGRareBuildingGen.RareBuildingStart;
 import com.pg85.otg.bukkit.generator.structures.OTGVillageGen.VillageStart;
 import com.pg85.otg.bukkit.metrics.BukkitMetricsHelper;
-import com.pg85.otg.configuration.ServerConfigProvider;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 import net.minecraft.server.v1_12_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
@@ -161,7 +161,7 @@ public class OTGPlugin extends JavaPlugin
 
     public File getWorldSettingsFolder(String worldName)
     {
-        File baseFolder = new File(this.getDataFolder(), "worlds" + File.separator + worldName);
+        File baseFolder = new File(this.getDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + worldName);
         if (!baseFolder.exists())
         {
             if (!baseFolder.mkdirs())

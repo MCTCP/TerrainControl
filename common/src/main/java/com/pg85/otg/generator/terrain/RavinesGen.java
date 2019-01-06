@@ -2,8 +2,8 @@ package com.pg85.otg.generator.terrain;
 
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;

@@ -1,7 +1,7 @@
 package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.logging.LogMarker;
 
 import java.io.BufferedWriter;
@@ -26,9 +26,9 @@ public final class FileSettingsWriter
      * @param configMode The configuration mode. If this is set to
      * WriteDisable, this method does nothing.
      */
-    public static final void writeToFile(SettingsMap config, File file, ConfigMode configMode, boolean forceWrite)
+    public static final void writeToFile(SettingsMap config, File file, ConfigMode configMode)
     {
-        if (configMode == ConfigMode.WriteDisable && !forceWrite)
+        if (configMode == ConfigMode.WriteDisable)
         {
             return;
         }

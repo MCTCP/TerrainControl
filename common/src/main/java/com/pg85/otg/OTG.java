@@ -1,8 +1,9 @@
 package com.pg85.otg;
 
 import com.pg85.otg.configuration.ConfigFunctionsManager;
-import com.pg85.otg.configuration.CustomObjectConfigFunctionsManager;
 import com.pg85.otg.configuration.PluginConfig;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.events.EventHandler;
@@ -12,6 +13,7 @@ import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.io.PrintWriter;
@@ -22,7 +24,21 @@ import java.util.List;
 import java.util.Random;
 
 public class OTG
-{
+{	/**
+	 * A config for each dimension of the currently active world
+	 */
+    private static DimensionsConfig dimensionsConfig = null;
+    
+    public static DimensionsConfig GetDimensionsConfig()
+    {    	
+    	return dimensionsConfig;
+    }
+
+    public static void SetDimensionsConfig(DimensionsConfig dimensionsConfig)
+    {
+    	OTG.dimensionsConfig = dimensionsConfig;
+    }
+    
     /**
      * The engine that powers Open Terrain Generator.
      */
@@ -145,7 +161,7 @@ public class OTG
     	{
     		return material;
     	}
-    	else if(cachedMaterials.containsKey(material))
+    	else if(cachedMaterials.containsKey(name))
     	{
     		throw new InvalidConfigException("Cannot read block: " + name);
     	}
@@ -447,6 +463,7 @@ public class OTG
     	String registryName = null;
 		switch(biomeName)
 		{
+			// TODO: Always keep this biome list up to date
 			case "Beach":
 				registryName = "minecraft:beaches";
 			break;
@@ -601,7 +618,7 @@ public class OTG
 				registryName = "minecraft:mutated_savanna_rock";
 			break;
 			case "Savanna Plateau":
-				registryName = " minecraft:savanna_rock";
+				registryName = "minecraft:savanna_rock";
 			break;
 			case "Savanna":
 				registryName = "minecraft:savanna";

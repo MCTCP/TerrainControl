@@ -1,13 +1,13 @@
 package com.pg85.otg.bukkit;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
-import com.pg85.otg.configuration.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.Block;
@@ -32,7 +32,7 @@ public class BukkitEngine extends OTGEngine
     }
 
     @Override
-    public File getTCDataFolder()
+    public File getOTGDataFolder()
     {
         return plugin.getDataFolder();
     }
@@ -40,9 +40,15 @@ public class BukkitEngine extends OTGEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName);
+        return new File(this.getOTGDataFolder(), PluginStandardValues.BO_DirectoryName);
     }
 
+    @Override
+    public File getWorldsDirectory()
+    {
+        return new File(this.getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName);
+    }
+    
     @Override
     public LocalMaterialData readMaterial(String input) throws InvalidConfigException
     {
@@ -166,5 +172,12 @@ public class BukkitEngine extends OTGEngine
 	public void unregisterOTGBiomeId(String worldName, int i)
 	{
 		// TODO: Implement this?
+	}
+
+	@Override
+	public String GetPresetName(String worldName)
+	{
+		// TODO: Implement this?
+		return worldName;
 	}
 }

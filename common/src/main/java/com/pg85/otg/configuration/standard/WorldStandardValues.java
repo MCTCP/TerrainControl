@@ -3,16 +3,16 @@ package com.pg85.otg.configuration.standard;
 import static com.pg85.otg.OTG.WORLD_DEPTH;
 import static com.pg85.otg.OTG.WORLD_HEIGHT;
 
-import com.pg85.otg.LocalMaterialData;
-import com.pg85.otg.configuration.ReplaceBlocks;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
-import com.pg85.otg.configuration.WorldConfig.ImageMode;
-import com.pg85.otg.configuration.WorldConfig.ImageOrientation;
-import com.pg85.otg.configuration.WorldConfig.TerrainMode;
+import com.pg85.otg.configuration.biome.ReplaceBlocks;
 import com.pg85.otg.configuration.settingType.MaterialListSetting;
 import com.pg85.otg.configuration.settingType.MaterialSetting;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
+import com.pg85.otg.configuration.world.WorldConfig.ImageMode;
+import com.pg85.otg.configuration.world.WorldConfig.ImageOrientation;
+import com.pg85.otg.configuration.world.WorldConfig.TerrainMode;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;
@@ -55,6 +55,7 @@ public class WorldStandardValues extends Settings
         IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
         AUTHOR = stringSetting("Author", "Unknown"),
         DESCRIPTION = stringSetting("Description", "No description given"),
+		WORLDPACKER_MODNAME = stringSetting("WorldPackerModName", ""),
 		WORLD_SEED = stringSetting("WorldSeed", ""),
 		BO3_AT_SPAWN = stringSetting("BO3AtSpawn", ""),
 		DIMENSIONBELOW = stringSetting("DimensionBelow", ""),
@@ -69,8 +70,7 @@ public class WorldStandardValues extends Settings
 		ITEMS_TO_ADD_ON_RESPAWN = stringSetting("ItemsToAddOnRespawn", ""),
 		
     	DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
-    	DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean"),
-    	DEFAULT_RIVER_BIOME = stringSetting("DefaultRiverBiome", "River")
+    	DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean")
 	;
 
     public static final Setting<Integer>
@@ -116,6 +116,7 @@ public class WorldStandardValues extends Settings
         PREGENERATION_RADIUS = intSetting("PreGenerationRadius", 0, 0, 999999),
         WORLD_BORDER_RADIUS = intSetting("WorldBorderRadius", 0, 0, 999999),
 
+		maxCommandChainLength = intSetting("MaxCommandChainLength", 65536, 0, 999999), 
 		maxEntityCramming = intSetting("MaxEntityCramming", 24, 0, 999999),
 		randomTickSpeed = intSetting("RandomTickSpeed", 3, 0, 999999),
 		spawnRadius = intSetting("SpawnRadius", 10, 0, 999999),
@@ -127,9 +128,9 @@ public class WorldStandardValues extends Settings
 		RESPAWN_DIMENSION = intSetting("RespawnDimension", 0, -999999, 999999),
 		MOVEMENT_FACTOR = intSetting("MovementFactor", 1, 1, 999999),
 
-		SPAWN_POINT_X = intSetting("SpawnPointX", 0, 0, 999999),
-		SPAWN_POINT_Y = intSetting("SpawnPointY", 0, 0, 999999),
-		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, 0, 999999)
+		SPAWN_POINT_X = intSetting("SpawnPointX", 0, -999999, 999999),
+		SPAWN_POINT_Y = intSetting("SpawnPointY", 0, -999999, 999999),
+		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, -999999, 999999)
     ;
 
     public static final Setting<Boolean>
@@ -163,12 +164,14 @@ public class WorldStandardValues extends Settings
 		doDaylightCycle = booleanSetting("DoDaylightCycle", true),
 		doEntityDrops = booleanSetting("DoEntityDrops", true),
 		doFireTick = booleanSetting("DoFireTick", true),
+		doLimitedCrafting = booleanSetting("DoLimitedCrafting", false),
 		doMobLoot = booleanSetting("DoMobLoot", true),
 		doMobSpawning = booleanSetting("DoMobSpawning", true),
 		doTileDrops = booleanSetting("DoTileDrops", true),
 		doWeatherCycle = booleanSetting("DoWeatherCycle", true),
+		gameLoopFunction = booleanSetting("GameLoopFunction", true),
 		keepInventory = booleanSetting("KeepInventory", false),
-		logAdminCommands = booleanSetting("LogAdminCommands", true),
+		logAdminCommands = booleanSetting("LogAdminCommands", true),				
 		mobGriefing = booleanSetting("MobGriefing", true),
 		naturalRegeneration = booleanSetting("NaturalRegeneration", true),
 		reducedDebugInfo = booleanSetting("ReducedDebugInfo", false),

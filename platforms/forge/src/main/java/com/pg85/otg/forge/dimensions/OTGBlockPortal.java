@@ -5,13 +5,13 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeMaterialData;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.generator.Cartographer;
+import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.Block;
@@ -33,7 +33,7 @@ import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class OTGBlockPortal
 {
-    public static boolean trySpawnPortal(World worldIn, BlockPos pos, boolean isQuartz)
+    public static boolean trySpawnPortal(World worldIn, BlockPos pos)
     {
     	boolean cartographerEnabled = ((ForgeEngine)OTG.getEngine()).getCartographerEnabled();
     	
@@ -63,6 +63,7 @@ public class OTGBlockPortal
 		}
 		
 		// If Cartographer is on and this is not a Cartographer portal and no other dimensions were found don't spawn a portal.
+		// TODO: Clean up all this cartographer crap
 		IBlockState blockState = worldIn.getBlockState(pos);
 		BlockPos firstSolidBlockPos = new BlockPos(pos);
 		while(!blockState.getMaterial().isSolid() && firstSolidBlockPos.getY() > 0)
@@ -70,20 +71,21 @@ public class OTGBlockPortal
 			firstSolidBlockPos = new BlockPos(firstSolidBlockPos.getX(), firstSolidBlockPos.getY() - 1, firstSolidBlockPos.getZ());
 			blockState = worldIn.getBlockState(firstSolidBlockPos);
 		}
+		// Cartographer looks for chiseled quartz (?)
 		boolean isCartographerPortal = blockState.getBlock() == Blocks.QUARTZ_BLOCK && (byte) blockState.getBlock().getMetaFromState(blockState) == 1;
 		if(!(!cartographerEnabled && bFound) && (cartographerEnabled && !bFoundOtherThanCartographer && !isCartographerPortal))
 		{
 			return false;
 		}
     	
-        OTGBlockPortal.Size blockportal$size = new OTGBlockPortal.Size(worldIn, pos, EnumFacing.Axis.X, isQuartz);
+        OTGBlockPortal.Size blockportal$size = new OTGBlockPortal.Size(worldIn, pos, EnumFacing.Axis.X);
 
         if (blockportal$size.isValid() && blockportal$size.portalBlockCount == 0)
         {
             blockportal$size.placePortalBlocks();
             return true;
         } else {
-            OTGBlockPortal.Size blockportal$size1 = new OTGBlockPortal.Size(worldIn, pos, EnumFacing.Axis.Z, isQuartz);
+            OTGBlockPortal.Size blockportal$size1 = new OTGBlockPortal.Size(worldIn, pos, EnumFacing.Axis.Z);
 
             if (blockportal$size1.isValid() && blockportal$size1.portalBlockCount == 0)
             {
@@ -106,7 +108,7 @@ public class OTGBlockPortal
         private int height;
         private int width;
 
-        public Size(World worldIn, BlockPos p_i45694_2_, EnumFacing.Axis p_i45694_3_, boolean isQuartz)
+        public Size(World worldIn, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
         {
             this.world = worldIn;
             this.axis = p_i45694_3_;
@@ -122,21 +124,91 @@ public class OTGBlockPortal
                 this.rightDir = EnumFacing.SOUTH;
             }
 
-            for (BlockPos blockpos = p_i45694_2_; p_i45694_2_.getY() > blockpos.getY() - 21 && p_i45694_2_.getY() > 0 && this.isEmptyBlock(worldIn.getBlockState(p_i45694_2_.down()).getBlock()); p_i45694_2_ = p_i45694_2_.down())
+            for (BlockPos blockpos = spawnPos; spawnPos.getY() > blockpos.getY() - 21 && spawnPos.getY() > 0 && this.isEmptyBlock(worldIn.getBlockState(spawnPos.down()).getBlock()); spawnPos = spawnPos.down())
             {
                 ;
             }
-
-            // Try overworld first with default material dirt (could be a non-otg world)
-			ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
-			portalMaterials.add(OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0));
+           
+            // Try portal materials for each world. Also try nether if no world uses obsidian.
+			boolean worldUsesObsidian = false;
+			ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
+			ForgeWorld overworld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
+			if(overworld == null) // This is a vanilla overworld
+			{
+				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+				for(LocalMaterialData portalMaterial : portalMaterials)
+				{
+					if(portalMaterial.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
+					{
+						worldUsesObsidian = true;
+						break;						
+					}
+				}
+			}
+			if(!worldUsesObsidian)
+			{
+				for(LocalWorld localWorld : forgeWorlds)
+				{
+					ForgeWorld forgeWorld = (ForgeWorld)localWorld;
+					ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+					for(LocalMaterialData portalMaterial : portalMaterials)
+					{
+						if(portalMaterial.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
+						{
+							worldUsesObsidian = true;
+							break;						
+						}
+					}
+					if(worldUsesObsidian)
+					{
+						break;
+					}
+				}
+			}
 			
-            int i = this.getDistanceUntilEdge(portalMaterials, p_i45694_2_, this.leftDir, isQuartz) - 1;
+			// If no world uses obsidian try nether.
+			if(!worldUsesObsidian)
+			{
+				ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
+				portalMaterials.add(OTG.toLocalMaterialData(DefaultMaterial.OBSIDIAN, 0));
+				if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
+				{
+					return;
+				}
+			}
+			
+			if(overworld == null && worldIn.provider.getDimension() != 0) // This is a vanilla overworld, player is not in overworld so may want to portal to it
+			{
+				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+				if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
+				{
+					return;
+				}
+			}
+			for(LocalWorld localWorld : forgeWorlds)
+			{
+				ForgeWorld forgeWorld = (ForgeWorld)localWorld;
+				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+	            				
+				if(forgeWorld.getDimensionId() != worldIn.provider.getDimension())
+				{
+					if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
+					{
+						return;
+					}
+				}
+			}
+        }
 
+        
+        boolean getDistanceUntilEdgeForPortalMaterials(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_i45694_2_)
+        {
+            int i = this.getDistanceUntilEdge(portalMaterials, p_i45694_2_, this.leftDir) - 1;
+    		
             if (i >= 0)
             {
                 this.bottomLeft = p_i45694_2_.offset(this.leftDir, i);
-                this.width = this.getDistanceUntilEdge(portalMaterials, this.bottomLeft, this.rightDir, isQuartz);
+                this.width = this.getDistanceUntilEdge(portalMaterials, this.bottomLeft, this.rightDir);
 
                 if (this.width < 2 || this.width > 21)
                 {
@@ -147,48 +219,18 @@ public class OTGBlockPortal
 
             if (this.bottomLeft != null)
             {
-                this.height = this.calculatePortalHeight(portalMaterials, isQuartz);
+                this.height = this.calculatePortalHeight(portalMaterials);
             }
             
             if(height > 0 && width > 0)
             {
-            	return;
+            	return true;
             }
             
-            // If this isn't the overworld then try custom dimensions
-			ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
-			for(LocalWorld localWorld : forgeWorlds)
-			{
-				ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-				portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
-	            				
-	            i = this.getDistanceUntilEdge(portalMaterials, p_i45694_2_, this.leftDir, isQuartz) - 1;
-	
-	            if (i >= 0)
-	            {
-	                this.bottomLeft = p_i45694_2_.offset(this.leftDir, i);
-	                this.width = this.getDistanceUntilEdge(portalMaterials, this.bottomLeft, this.rightDir, isQuartz);
-	
-	                if (this.width < 2 || this.width > 21)
-	                {
-	                    this.bottomLeft = null;
-	                    this.width = 0;
-	                }
-	            }
-	
-	            if (this.bottomLeft != null)
-	            {
-	                this.height = this.calculatePortalHeight(portalMaterials, isQuartz);
-	            }
-	            
-	            if(height > 0 && width > 0)
-	            {
-	            	return;
-	            }
-			}
+            return false;
         }
-
-        protected int getDistanceUntilEdge(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_180120_1_, EnumFacing p_180120_2_, boolean isQuartz)
+        
+        protected int getDistanceUntilEdge(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_180120_1_, EnumFacing p_180120_2_)
         {
             int i;
             
@@ -198,7 +240,6 @@ public class OTGBlockPortal
                 
                 Block block = this.world.getBlockState(blockpos).getBlock();
                 IBlockState blockStateDown = this.world.getBlockState(blockpos.down());
-                Block blockDown = blockStateDown.getBlock();
 
 				ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockStateDown);
 				boolean isPortalMaterial = false;
@@ -210,23 +251,13 @@ public class OTGBlockPortal
 					}
 				}
                 
-                if (
-            		!this.isEmptyBlock(block) ||
-            		(
-        				!isQuartz &&
-        				blockDown != Blocks.OBSIDIAN
-    				) ||
-            		(
-	            		isQuartz && !isPortalMaterial
-					)
-				)
-                {
-                    break;
-                }
+				if(!this.isEmptyBlock(block) || !isPortalMaterial)
+				{
+					break;
+				}
             }
 
             IBlockState blockState = this.world.getBlockState(p_180120_1_.offset(p_180120_2_, i));
-            Block block = blockState.getBlock();
             
 			ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockState);
 			boolean isPortalMaterial = false;
@@ -238,16 +269,7 @@ public class OTGBlockPortal
 				}
 			}
             
-            return 
-    		(
-    			(
-					!isQuartz &&
-					block == Blocks.OBSIDIAN
-    			) ||
-				(
-	        		isQuartz && isPortalMaterial
-				)
-			) ? i : 0;
+            return isPortalMaterial ? i : 0;
         }
 
         public int getHeight()
@@ -260,7 +282,7 @@ public class OTGBlockPortal
             return this.width;
         }
 
-        protected int calculatePortalHeight(ArrayList<LocalMaterialData> portalMaterials, boolean isQuartz)
+        protected int calculatePortalHeight(ArrayList<LocalMaterialData> portalMaterials)
         {        	
         	label24:
         	
@@ -295,18 +317,8 @@ public class OTGBlockPortal
         						isPortalMaterial = true;
         					}
         				}
-                        
-                        if (
-                    		!(
-                    			(
-                					!isQuartz &&
-                					block == Blocks.OBSIDIAN
-            					) ||
-                				(
-	                				isQuartz && isPortalMaterial
-								)
-							)
-                		)
+
+                        if (!isPortalMaterial)
                         {
                             break label24;
                         }
@@ -326,17 +338,7 @@ public class OTGBlockPortal
         					}
         				}
                         
-                        if (
-                    		!(
-                    			(
-                					!isQuartz &&
-                					block == Blocks.OBSIDIAN
-            					) ||                    			
-                				(
-	                				isQuartz && isPortalMaterial
-								)
-							)
-						)
+                        if (!isPortalMaterial)
                         {
                             break label24;
                         }
@@ -358,18 +360,8 @@ public class OTGBlockPortal
 						isPortalMaterial = true;
 					}
 				}
-            	
-                if (
-            		!(
-        				(
-    						!isQuartz &&
-    						block == Blocks.OBSIDIAN
-						) ||
-        				(
-	        				isQuartz && isPortalMaterial
-						)
-					)
-				)
+
+				if (!isPortalMaterial)
                 {
                     this.height = 0;
                     break;

@@ -4,9 +4,13 @@ import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.*;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeGroup;
+import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-
+import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ConfigProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -375,9 +379,16 @@ public final class LayerFactory
                     	int replaceFrom = 0;
 
                     	LocalBiome replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+                    	if(replaceFromBiome == null)
+                    	{
+                    		replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+                    	}
+                    	if(replaceFromBiome == null)
+                    	{
+                    		OTG.log(LogMarker.TRACE, "Could not find BorderBiome \"" + replaceFromName + "\" for biome \"" + biomeConfig.getName() + "\", ignoring.");
+                    		continue;
+                    	}
             			replaceFrom = replaceFromBiome.getIds().getOTGBiomeId();
-
-                        //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
                     }
                 }

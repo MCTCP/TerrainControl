@@ -18,13 +18,15 @@ import java.util.Map.Entry;
 import org.apache.commons.io.FileUtils;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ServerConfigProvider;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
-import com.pg85.otg.forge.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.Cartographer;
+import com.pg85.otg.forge.network.server.ServerPacketHandler;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -32,12 +34,12 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.GameType;
 import net.minecraft.world.ServerWorldEventHandler;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
@@ -123,10 +125,11 @@ public class OTGDimensionManager
 	{
 		int newDimId = DimensionManager.getNextFreeDimId();
 
-		registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, WorldProviderOTG.class, keepLoaded));
+		registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, OTGWorldProvider.class, keepLoaded));
+		
 		if(initDimension)
 		{
-			initDimension(newDimId, seed);//, dimensionName);
+			initDimension(newDimId, seed);
 		}
 
 		int maxOrder = -1;
@@ -147,7 +150,7 @@ public class OTGDimensionManager
 		return newDimId;
 	}
 
-	public static void DeleteDimension(int dimToRemove, ForgeWorld world, MinecraftServer server, boolean saveDimensionData)
+	public static void DeleteDimension(int dimToRemove, ForgeWorld world, MinecraftServer server, boolean isServerSide)
 	{
 		if(DimensionManager.getWorld(dimToRemove) != null) // Can be null on the client if the world was unloaded(?)
 		{
@@ -157,7 +160,7 @@ public class OTGDimensionManager
 		{
 			OTGDimensionManager.unregisterDimension(dimToRemove);
 		}
-
+	
 		world.unRegisterBiomes();
 
 		((ForgeEngine)OTG.getEngine()).getWorldLoader().RemoveUnloadedWorld(world.getName());
@@ -165,35 +168,34 @@ public class OTGDimensionManager
 		// Client side only
 		((ForgeEngine)OTG.getEngine()).getWorldLoader().RemoveLoadedWorld(world.getName());
 
-		OTGDimensionManager.UnloadCustomDimensionData(dimToRemove);
-
-		world.DeleteWorldSessionData();
-
-		BitSet dimensionMap = null;
-		try {
-			Field[] fields = DimensionManager.class.getDeclaredFields();
-			for(Field field : fields)
-			{
-				Class<?> fieldClass = field.getType();
-				if(fieldClass.equals(BitSet.class))
-				{
-					field.setAccessible(true);
-					dimensionMap = (BitSet) field.get(new DimensionManager());
-			        break;
-				}
-			}
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-
-		dimensionMap.clear(dimToRemove);
-
-		if(saveDimensionData)
+		// For MP the client knows nothing about dimensions
+		if(isServerSide)
 		{
+			OTGDimensionManager.UnloadCustomDimensionData(dimToRemove);
+	
+			BitSet dimensionMap = null;
+			try {
+				Field[] fields = DimensionManager.class.getDeclaredFields();
+				for(Field field : fields)
+				{
+					Class<?> fieldClass = field.getType();
+					if(fieldClass.equals(BitSet.class))
+					{
+						field.setAccessible(true);
+						dimensionMap = (BitSet) field.get(new DimensionManager());
+				        break;
+					}
+				}
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+			}
+	
+			dimensionMap.clear(dimToRemove);
+	
 			// This biome was unregistered via a console command, delete its world data
 			File dimensionSaveDir = new File(world.getWorld().getSaveHandler().getWorldDirectory() + "/DIM" + dimToRemove);
 			if(dimensionSaveDir.exists() && dimensionSaveDir.isDirectory())
@@ -208,16 +210,41 @@ public class OTGDimensionManager
 			}
 
 			SaveDimensionData();
+			
+			ArrayList<DimensionConfig> dimConfigs = new ArrayList<DimensionConfig>(OTG.GetDimensionsConfig().Dimensions);
+			for(DimensionConfig dimensionConfig : dimConfigs)
+			{
+				if(dimensionConfig.PresetName.equals(world.getName()))
+				{
+					OTG.GetDimensionsConfig().Dimensions.remove(dimensionConfig);
+					OTG.GetDimensionsConfig().Save();
+					break;
+				}
+			}
 		}
+	}
+	
+	public static boolean DeleteDimensionServer(String worldName, MinecraftServer server)
+	{	
+		// First make sure world is unloaded            			
+		if(((ForgeEngine)OTG.getEngine()).getWorldLoader().isWorldUnloaded(worldName))
+		{
+			ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getUnloadedWorld(worldName);
+			OTGDimensionManager.DeleteDimension(forgeWorld.getDimensionId(), forgeWorld, server, true);
+			ServerPacketHandler.SendDimensionSynchPacketToAllPlayers(server);
+			return true;
+		}		
+		return false;
 	}
 
 	public static void initDimension(int dim)
 	{
 		initDimension(dim, -1l);
 	}
-	
-    public static void initDimension(int dim, long seed) //, String dimensionName)
+		
+    public static void initDimension(int dim, long seed)
     {
+    	String dimensionName = DimensionManager.getProviderType(dim).getName();
         WorldServer overworld = DimensionManager.getWorld(0);
         if (overworld == null)
         {
@@ -236,88 +263,85 @@ public class OTGDimensionManager
         MinecraftServer mcServer = overworld.getMinecraftServer();
         ISaveHandler savehandler = overworld.getSaveHandler();
 
-        OTGDimensionInfo otgDimData = GetOrderedDimensionData();
-        if(seed == -1 && otgDimData != null)
+        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(dimensionName); 
+        if(seed == -1 && dimConfig != null && dimConfig.Seed != null && dimConfig.Seed.trim().length() > 0)
         {
-        	for(DimensionData dimData : otgDimData.orderedDimensions.values())
-        	{
-        		if(dimData.dimensionId == dim)
-        		{
-                	seed = dimData.seed;
-                	break;
-        		}
-        	}
+        	seed = Long.parseLong(dimConfig.Seed.trim());
         }
         
+        WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+        
 		long seedIn = seed == -1 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : seed;
-		GameType gameType = mcServer.getGameType();
-		boolean enableMapFeatures = overworld.getWorldInfo().isMapFeaturesEnabled(); // Whether the map features (e.g. strongholds) generation is enabled or disabled.
-		boolean hardcoreMode = overworld.getWorldInfo().isHardcoreModeEnabled();
+		GameType gameType = dimConfig.GameType.equals("Creative") ? GameType.CREATIVE : GameType.SURVIVAL;
+		boolean enableMapFeatures = worldConfig.strongholdsEnabled;
+		boolean hardcoreMode = dimConfig.GameType.equals("Hardcore");
 
 		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, OTGPlugin.txWorldType);
 		settings.setGeneratorOptions("OpenTerrainGenerator");
-		WorldInfo worldInfo = new WorldInfo(settings, overworld.getWorldInfo().getWorldName());
+		
+		WorldInfo worldInfo = new WorldInfo(settings, dimensionName);
+        WorldServer world = (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler, worldInfo).init());       
+        ApplyGameRulesToWorld(world, dimConfig);
+        world.addEventListener(new ServerWorldEventHandler(mcServer, world));
+        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 
-        WorldServer world = (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler, worldInfo).init());
-
+        // Save seed to world config TODO: Remove this
         ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dim);
         if(forgeWorld == null)
         {
         	forgeWorld = ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dim);
         }
         
-        if(forgeWorld != null) // forgeWorld can be null for a dimension with a vanilla world <-- Yeah but we should never be loading those, should we?
+        OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Seed = "" + seedIn;
+        OTG.GetDimensionsConfig().Save();
+        
+        // Apply difficulty and game type
+        // TODO: Independent difficulty / spawn types per world?
+        if (!mcServer.isSinglePlayer())
         {
-        	// TODO: Fix this, seed should not depend on world config (since forge can have multiple dims with the same preset). What effect does this actually have atm?
-	        ((ServerConfigProvider)forgeWorld.getConfigs()).getWorldConfig().worldSeed = "" + seedIn;
-	        ((ServerConfigProvider)forgeWorld.getConfigs()).saveWorldConfig(false);
-
-        	WorldConfig worldConfig = ((ServerConfigProvider)forgeWorld.getConfigs()).getWorldConfig();
-
-	        world.getGameRules().setOrCreateGameRule("commandBlockOutput", worldConfig.commandBlockOutput); // Whether command blocks should notify admins when they perform commands
-    		world.getGameRules().setOrCreateGameRule("disableElytraMovementCheck", worldConfig.disableElytraMovementCheck); // Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).
-    		world.getGameRules().setOrCreateGameRule("doDaylightCycle", worldConfig.doDaylightCycle); // Whether the day-night cycle and moon phases progress
-			world.getGameRules().setOrCreateGameRule("doEntityDrops", worldConfig.doEntityDrops); // Whether entities that are not mobs should have drops
-			world.getGameRules().setOrCreateGameRule("doFireTick", worldConfig.doFireTick); // Whether fire should spread and naturally extinguish
-			//world.getGameRules().setOrCreateGameRule("doLimitedCrafting", worldConfig.doLimitedCrafting); // Whether players should only be able to craft recipes that they've unlocked first // TODO: Implement for 1.12
-			world.getGameRules().setOrCreateGameRule("doMobLoot", worldConfig.doMobLoot); // Whether mobs should drop items
-			world.getGameRules().setOrCreateGameRule("doMobSpawning", worldConfig.doMobSpawning); // Whether mobs should naturally spawn. Does not affect monster spawners.
-			world.getGameRules().setOrCreateGameRule("doTileDrops", worldConfig.doTileDrops); // Whether blocks should have drops
-			world.getGameRules().setOrCreateGameRule("doWeatherCycle", worldConfig.doWeatherCycle); // Whether the weather will change
-	        //boolean gameLoopFunction = true; // The function to run every game tick // TODO: Implement for 1.12
-			world.getGameRules().setOrCreateGameRule("keepInventory", worldConfig.keepInventory); // Whether the player should keep items in their inventory after death
-			world.getGameRules().setOrCreateGameRule("logAdminCommands", worldConfig.logAdminCommands); // Whether to log admin commands to server log
-	        //int maxCommandChainLength = 65536; // Determines the number at which the chain command block acts as a "chain". // TODO: Implement for 1.12
-			world.getGameRules().setOrCreateGameRule("maxEntityCramming", worldConfig.maxEntityCramming); // The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.
-	        world.getGameRules().setOrCreateGameRule("mobGriefing", worldConfig.mobGriefing); // Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items
-    		world.getGameRules().setOrCreateGameRule("naturalRegeneration", worldConfig.naturalRegeneration); // Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)
-    		world.getGameRules().setOrCreateGameRule("randomTickSpeed", worldConfig.randomTickSpeed); // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks
-	        world.getGameRules().setOrCreateGameRule("reducedDebugInfo", worldConfig.reducedDebugInfo); // Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.
-    		world.getGameRules().setOrCreateGameRule("sendCommandFeedback", worldConfig.sendCommandFeedback); // Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text
-			world.getGameRules().setOrCreateGameRule("showDeathMessages", worldConfig.showDeathMessages); // Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.
-			world.getGameRules().setOrCreateGameRule("spawnRadius", worldConfig.spawnRadius); // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
-	        world.getGameRules().setOrCreateGameRule("spectatorsGenerateChunks", worldConfig.spectatorsGenerateChunks); // Whether players in spectator mode can generate chunks
-
-	        // Set difficulty, creative/survival/hardcore
-	        /*
-            if (worldserver.getWorldInfo().isHardcoreModeEnabled())
-            {
-                worldserver.getWorldInfo().setDifficulty(EnumDifficulty.HARD);
-                worldserver.setAllowedSpawnTypes(true, true);
-            }
-            else if (this.isSinglePlayer())
-            {
-                worldserver.getWorldInfo().setDifficulty(difficulty);
-                worldserver.setAllowedSpawnTypes(worldserver.getDifficulty() != EnumDifficulty.PEACEFUL, true);
-            } else {
-                worldserver.getWorldInfo().setDifficulty(difficulty);
-                worldserver.setAllowedSpawnTypes(this.allowSpawnMonsters(), this.canSpawnAnimals);
-            }
-	        */
+            world.getWorldInfo().setGameType(mcServer.getGameType());
         }
 
-        world.addEventListener(new ServerWorldEventHandler(mcServer, world));
-        MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
+        if (world.getWorldInfo().isHardcoreModeEnabled())
+        {
+        	world.getWorldInfo().setDifficulty(EnumDifficulty.HARD);
+        	world.setAllowedSpawnTypes(true, true);
+        }
+        else if (mcServer.isSinglePlayer())
+        {
+        	world.getWorldInfo().setDifficulty(mcServer.getDifficulty());
+            world.setAllowedSpawnTypes(world.getDifficulty() != EnumDifficulty.PEACEFUL, true);
+        } else {
+        	world.getWorldInfo().setDifficulty(mcServer.getDifficulty());
+            world.setAllowedSpawnTypes(mcServer.allowSpawnMonsters(), mcServer.getCanSpawnAnimals());
+        }
+    }
+    
+    public static void ApplyGameRulesToWorld(World world, DimensionConfig dimConfig)
+    {
+        world.getGameRules().setOrCreateGameRule("commandBlockOutput", dimConfig.GameRules.CommandBlockOutput + "");
+		world.getGameRules().setOrCreateGameRule("disableElytraMovementCheck", dimConfig.GameRules.DisableElytraMovementCheck + "");
+		world.getGameRules().setOrCreateGameRule("doDaylightCycle", dimConfig.GameRules.DoDaylightCycle + "");
+		world.getGameRules().setOrCreateGameRule("doEntityDrops", dimConfig.GameRules.DoEntityDrops + "");
+		world.getGameRules().setOrCreateGameRule("doFireTick", dimConfig.GameRules.DoFireTick + "");
+		world.getGameRules().setOrCreateGameRule("doLimitedCrafting", dimConfig.GameRules.DoLimitedCrafting + "");
+		world.getGameRules().setOrCreateGameRule("doMobLoot", dimConfig.GameRules.DoMobLoot + "");
+		world.getGameRules().setOrCreateGameRule("doMobSpawning", dimConfig.GameRules.DoMobSpawning + "");
+		world.getGameRules().setOrCreateGameRule("doTileDrops", dimConfig.GameRules.DoTileDrops + "");
+		world.getGameRules().setOrCreateGameRule("doWeatherCycle", dimConfig.GameRules.DoWeatherCycle + "");
+		world.getGameRules().setOrCreateGameRule("gameLoopFunction", dimConfig.GameRules.GameLoopFunction + "");
+		world.getGameRules().setOrCreateGameRule("keepInventory", dimConfig.GameRules.KeepInventory + "");
+		world.getGameRules().setOrCreateGameRule("logAdminCommands", dimConfig.GameRules.LogAdminCommands + "");
+		world.getGameRules().setOrCreateGameRule("maxCommandChainLength", dimConfig.GameRules.MaxCommandChainLength + "");
+		world.getGameRules().setOrCreateGameRule("maxEntityCramming", dimConfig.GameRules.MaxEntityCramming + "");
+        world.getGameRules().setOrCreateGameRule("mobGriefing", dimConfig.GameRules.MobGriefing + "");
+		world.getGameRules().setOrCreateGameRule("naturalRegeneration", dimConfig.GameRules.NaturalRegeneration + "");
+		world.getGameRules().setOrCreateGameRule("randomTickSpeed", dimConfig.GameRules.RandomTickSpeed + "");
+        world.getGameRules().setOrCreateGameRule("reducedDebugInfo", dimConfig.GameRules.ReducedDebugInfo + "");
+		world.getGameRules().setOrCreateGameRule("sendCommandFeedback", dimConfig.GameRules.SendCommandFeedback + "");
+		world.getGameRules().setOrCreateGameRule("showDeathMessages", dimConfig.GameRules.ShowDeathMessages + "");
+		world.getGameRules().setOrCreateGameRule("spawnRadius", dimConfig.GameRules.SpawnRadius + "");
+        world.getGameRules().setOrCreateGameRule("spectatorsGenerateChunks", dimConfig.GameRules.SpectatorsGenerateChunks + "");       
     }
 
     // Saving / Loading
@@ -482,7 +506,7 @@ public class OTGDimensionManager
 		}
 	}
 
-	public static OTGDimensionInfo GetOrderedDimensionData()
+	public static OTGDimensionInfo LoadOrderedDimensionData()
 	{
 		World world = DimensionManager.getWorld(0);
 		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/Dimensions.txt");
@@ -604,8 +628,10 @@ public class OTGDimensionManager
 	
 	public static void LoadCustomDimensionData()
 	{
-		OTGDimensionInfo otgDimData = GetOrderedDimensionData();
+		OTGDimensionInfo otgDimData = LoadOrderedDimensionData();
 
+		DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();
+		
 		// Recreate dimensions in the correct order
 		for(int i = 0; i <= otgDimData.highestOrder; i++)
 		{
@@ -615,7 +641,45 @@ public class OTGDimensionManager
 
 				if(!DimensionManager.isDimensionRegistered(dimData.dimensionId))
 				{
-					OTGDimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, WorldProviderOTG.class, dimData.keepLoaded));
+					if(dimData.dimensionId != 0)
+					{
+						boolean bFound = false;
+						for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+						{
+							if(dimConfig.PresetName.equals(dimData.dimensionName))
+							{
+								bFound = true;
+								break;
+							}
+						}
+						if(!bFound)
+						{
+							// No DimensionConfig exists for this dimension
+							// Must be a legacy dimension, create a config for it based on the worldconfig
+							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							if(worldConfig == null)
+							{
+								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
+							}
+							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig);
+							dimsConfig.Dimensions.add(new DimensionConfig(dimConfig));
+						}
+					} else {
+						if(dimsConfig.Overworld == null)
+						{
+							// No DimensionConfig exists for the overworld
+							// Must be a legacy world, create a config for it based on the worldconfig
+							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							if(worldConfig == null)
+							{
+								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
+							}
+							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig);
+							dimsConfig.Overworld = new DimensionConfig(dimConfig);
+						}
+					}
+					
+					OTGDimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, OTGWorldProvider.class, dimData.keepLoaded));
 					if(dimData.dimensionName.equals("DIM-Cartographer"))
 					{
 						Cartographer.CartographerDimension = dimData.dimensionId;
@@ -624,6 +688,8 @@ public class OTGDimensionManager
 				}
 			}
 		}
+		
+		dimsConfig.Save();
 	}
 
 	private static Hashtable<Integer, Object> oldDims;
@@ -705,6 +771,7 @@ public class OTGDimensionManager
 		return otgDims;
 	}
 
+	// TODO: Document this
 	public static void ReAddOTGDims()
 	{
     	Hashtable dimensions = null;
@@ -752,5 +819,36 @@ public class OTGDimensionManager
 			}
 		}
 		oldDims = new Hashtable<Integer, Object>();
+	}
+
+	public static void CreateNewDimensionSP(DimensionConfig dimensionConfig, MinecraftServer server)
+	{
+		DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();
+		dimensionConfig.isNewConfig = false;
+		dimsConfig.Dimensions.add(dimensionConfig);
+		
+		// Create new world
+		long seed = (long) Math.floor((Math.random() * Long.MAX_VALUE));   	        				
+		try
+		{
+			seed = Long.parseLong(dimensionConfig.Seed);
+		}
+		catch(NumberFormatException ex)
+		{
+			// TODO
+		}
+		
+		OTGDimensionManager.createDimension(seed, dimensionConfig.PresetName, false, true, true);
+		ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimensionConfig.PresetName);
+		if(createdWorld == null)
+		{
+			createdWorld = (ForgeWorld) OTG.getUnloadedWorld(dimensionConfig.PresetName);
+		}
+		if(dimensionConfig.Settings.CanDropChunk)
+		{
+			DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
+		}
+
+		OTG.GetDimensionsConfig().Save();
 	}
 }

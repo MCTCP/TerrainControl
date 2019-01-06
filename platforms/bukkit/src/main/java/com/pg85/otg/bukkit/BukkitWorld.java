@@ -9,8 +9,11 @@ import com.pg85.otg.bukkit.generator.OTGWorldProvider;
 import com.pg85.otg.bukkit.generator.structures.*;
 import com.pg85.otg.bukkit.util.NBTHelper;
 import com.pg85.otg.configuration.*;
-import com.pg85.otg.configuration.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObjectStructureCache;
 import com.pg85.otg.customobjects.bo3.BlockFunction;
 import com.pg85.otg.customobjects.bo3.EntityFunction;
@@ -19,7 +22,11 @@ import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.network.ServerConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
@@ -213,6 +220,11 @@ public class BukkitWorld implements LocalWorld
     {
         return settings.getBiomeByIdOrNull(id);
     }
+    
+	@Override
+	public LocalBiome getFirstBiomeOrNull() {
+		return biomeNames.size() > 0 ? (LocalBiome)biomeNames.values().toArray()[0] : null;
+	}
 
     @Override
     public LocalBiome getBiomeByNameOrNull(String name)

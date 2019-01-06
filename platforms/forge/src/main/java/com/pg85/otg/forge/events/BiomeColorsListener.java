@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.events;
 
 import com.google.common.base.Function;
-import com.pg85.otg.configuration.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;

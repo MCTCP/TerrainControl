@@ -36,10 +36,10 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.NamedBinaryTag.Type;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
@@ -422,7 +422,7 @@ public class Cartographer
 
 	    	if(world == null || cartographerWorld == null || world == cartographerWorld)
 	    	{
-	    		return; // May be unloading / shutting down ?? TODO: Is this really acceptable? Load worlds?
+	    		return; // May be unloading / shutting down ? TODO: Is this really acceptable? Load worlds?
 	    	}
 
 	    	// NOTE: Don't use Glowstone, it's laggy!

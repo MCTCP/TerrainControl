@@ -1,8 +1,8 @@
 package com.pg85.otg.configuration.io;
 
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.settingType.Setting;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 
 import java.io.File;
 import java.io.IOException;

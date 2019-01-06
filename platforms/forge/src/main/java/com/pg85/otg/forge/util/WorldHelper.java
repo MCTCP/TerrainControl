@@ -2,11 +2,10 @@ package com.pg85.otg.forge.util;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.generator.OTGBiome;
+import com.pg85.otg.forge.biomes.OTGBiome;
 
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraftforge.common.DimensionManager;
 
 public abstract class WorldHelper
@@ -14,7 +13,7 @@ public abstract class WorldHelper
     public static boolean isVanillaWorld(World world)
     {
         int dimensionId = world.provider.getDimension();
-        // If vanilla or TC, return overworld
+        // If vanilla or OTG, return overworld
         if (dimensionId == 0 || dimensionId == 1 || dimensionId == -1)
         {
             return true;
@@ -39,26 +38,21 @@ public abstract class WorldHelper
         return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biomeBase);
     }
 
-    /**
-     * Gets the name of the given world.
-     * @param world The world.
-     * @return The name.
-     */
     public static String getName(World world)
     {
     	if(
-			world.provider.getDimension() > 1 &&
-			(
-				(
-					world.getWorldInfo() instanceof DerivedWorldInfo &&
-					((DerivedWorldInfo)world.getWorldInfo()).delegate.getGeneratorOptions().equals("OpenTerrainGenerator")
-				) || (
+			//world.provider.getDimension() > 1 &&
+			//(
+				//(
+					//world.getWorldInfo() instanceof DerivedWorldInfo &&
+					//((DerivedWorldInfo)world.getWorldInfo()).delegate.getGeneratorOptions().equals("OpenTerrainGenerator")
+				//) || (
 					world.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator")
-				)
-			)
+				//)
+			//)
 		)
     	{
-        	// This dimension was created by TC, use the given dimension name
+        	// This dimension was created by OTG, use the given dimension name
         	return DimensionManager.getProviderType(world.provider.getDimension()).getName();
         }
 

@@ -27,26 +27,23 @@ public class OTGClassTransformer implements IClassTransformer
 {
 	static String[] classesBeingTransformed =
 	{
-		"net.minecraftforge.registries.GameData",
-		"net.minecraft.world.biome.Biome",
-		"net.minecraft.entity.EntityLivingBase",
-		"net.minecraft.entity.item.EntityMinecart",
-		"net.minecraft.entity.projectile.EntityArrow",
-		"net.minecraft.entity.item.EntityBoat",
-		"net.minecraft.entity.item.EntityFallingBlock",
-		"net.minecraft.entity.item.EntityItem",
-		"net.minecraft.entity.projectile.EntityLlamaSpit",
-		"net.minecraft.entity.projectile.EntityShulkerBullet",
-		"net.minecraft.entity.projectile.EntityThrowable",
-		"net.minecraft.entity.item.EntityTntPrimed",
-		"net.minecraft.entity.item.EntityXPOrb",
-		"net.minecraft.entity.Entity"
-		// Places to inject OTGWorldServerMulti
-		//"net.minecraftforge.common.DimensionManager",
-		//"net.minecraft.server.MinecraftServer",
-		//"net.minecraft.server.integrated.IntegratedServer",
+		"net.minecraftforge.registries.GameData", // Biome registry
+		"net.minecraft.world.biome.Biome", // Biome registry
+		"net.minecraft.entity.EntityLivingBase", // Gravity
+		"net.minecraft.entity.item.EntityMinecart", // Gravity
+		"net.minecraft.entity.projectile.EntityArrow", // Gravity
+		"net.minecraft.entity.item.EntityBoat", // Gravity
+		"net.minecraft.entity.item.EntityFallingBlock", // Gravity
+		"net.minecraft.entity.item.EntityItem", // Gravity
+		"net.minecraft.entity.projectile.EntityLlamaSpit", // Gravity
+		"net.minecraft.entity.projectile.EntityShulkerBullet", // Gravity
+		"net.minecraft.entity.projectile.EntityThrowable", // Gravity
+		"net.minecraft.entity.item.EntityTntPrimed", // Gravity
+		"net.minecraft.entity.item.EntityXPOrb", // Gravity
+		"net.minecraft.entity.Entity", // Gravity
+		"net.minecraftforge.common.DimensionManager" // Dimensions
 	};
-
+	
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] classBeingTransformed)
 	{
@@ -122,14 +119,17 @@ public class OTGClassTransformer implements IClassTransformer
 					transformUpdateFallState(classNode, isObfuscated);
 				break;
 				case 14: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
-					transformInitDimension(classNode, isObfuscated);
-				break;
-				case 15: // net.minecraft.server.MinecraftServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
-					transformLoadAllWorldsMinecraftServer(classNode, isObfuscated);
-				break;
-				case 16: // net.minecraft.server.integrated.IntegratedServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
-					transformLoadAllWorldsIntegratedServer(classNode, isObfuscated);
-				break;
+					transformInitDimension1(classNode, isObfuscated);
+				break;				
+				//case 15: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
+					//transformInitDimension2(classNode, isObfuscated);
+				//break;
+				//case 16: // net.minecraft.server.MinecraftServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
+					//transformLoadAllWorldsMinecraftServer(classNode, isObfuscated);
+				//break;
+				//case 17: // net.minecraft.server.integrated.IntegratedServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
+					//transformLoadAllWorldsIntegratedServer(classNode, isObfuscated);
+				//break;
 			}
 
 			ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
@@ -780,7 +780,93 @@ public class OTGClassTransformer implements IClassTransformer
 
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");
 	}
+			
+	// Make sure that OTG dimensions get initialised by OTGDimensionManager.initDimension
+	// net.minecraftforge.common.DimensionManager.initDimension(int dim)
+	private void transformInitDimension1(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "initDimension" : "initDimension";
+		String injectSnapShotDescriptor = isObfuscated ? "(I)V" : "(I)V";
 
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode targetNode = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					if(instruction instanceof LineNumberNode)
+					{
+						if(targetNode == null)
+						{
+							targetNode = instruction;
+						} else {
+							// Inserting 5 new lines before this, so add +5 to all linenumber nodes.
+							((LineNumberNode)instruction).line += 5;
+						}
+					}
+				}
+
+				if(targetNode == null)
+				{
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}				
+				
+				/*
+
+				Inserting at start of net.minecraftforge.common.DimensionManager.initDimension(int dim):
+
+				if(OTGHooks.InitOTGDimension(dim))
+				{
+					return;
+				}
+
+				mv.visitVarInsn(ILOAD, 0);
+				mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "InitOTGDimension", "(I)Z", false);
+				Label l4 = new Label();
+				mv.visitJumpInsn(IFEQ, l4);
+				Label l5 = new Label();
+				mv.visitLabel(l5);
+				mv.visitLineNumber(247, l5);
+				mv.visitInsn(RETURN);
+				mv.visitLabel(l4);
+				mv.visitLineNumber(250, l4);
+				mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+
+				Inserting 5 lines of code directly below:
+				
+				mv.visitLineNumber(245, l3);
+
+			 	*/
+				
+				InsnList toInsert = new InsnList();
+				toInsert.add(new VarInsnNode(ILOAD, 0));
+							
+				toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "InitOTGDimension",  "(I)Z", false));
+				LabelNode l4 = new LabelNode();
+				toInsert.add(new JumpInsnNode(IFEQ, l4));
+				LabelNode l5 = new LabelNode();
+				toInsert.add(l5);
+				toInsert.add(new LineNumberNode(247, l5));
+				toInsert.add(new InsnNode(RETURN));
+				toInsert.add(l4);
+				toInsert.add(new LineNumberNode(250, l5));
+				toInsert.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+				
+				method.instructions.insertBefore(targetNode, toInsert);
+
+				return;
+			}
+		}
+
+		//for(MethodNode method : gameDataNode.methods)
+		{
+			//System.out.println("Biome: " + method.name + " + " + method.desc + " + " + method.signature);
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}	
+	
 	// Gravity settings for falling damage
 	//protected void net.minecraft.entity.Entity.updateFallState(double y, boolean onGroundIn, IBlockState state, BlockPos pos)
 	private void transformUpdateFallState(ClassNode gameDataNode, boolean isObfuscated)
@@ -818,324 +904,6 @@ public class OTGClassTransformer implements IClassTransformer
 					}
 				}
 			}
-		}
-
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
-	}
-
-	//net.minecraftforge.common.DimensionManager.initDimension(int dim)
-	private void transformInitDimension(ClassNode gameDataNode, boolean isObfuscated)
-	{
-		String injectSnapShot = isObfuscated ? "initDimension" : "initDimension";
-		String injectSnapShotDescriptor = isObfuscated ? "(I)V" : "(I)V";
-
-		for(MethodNode method : gameDataNode.methods)
-		{
-			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
-			{
-				boolean bFound1 = false;
-				boolean bFound2 = false;
-				boolean bFound3 = false;
-				boolean bFound4 = false;
-				//boolean bFound5 = false;
-				boolean bFound6 = false;
-				for(AbstractInsnNode instruction : method.instructions.toArray())
-				{
-					if(instruction.getOpcode() == CHECKCAST && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti"; //
-						bFound1 = true;
-					}
-					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound2 = true;
-					}
-					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti"; //
-						bFound3 = true;
-					}
-					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound4 = true;
-					}
-					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti"; //
-						bFound4 = true;
-					}
-					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
-					{
-						//((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti"; // first, twice
-						//bFound5 = true;
-					}
-					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti"; //
-						bFound6 = true;
-						//break;
-					}
-				}
-
-				if(!(bFound1 && bFound2 && bFound3 && bFound4 && bFound6))
-				{
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
-				}
-
-				/*
-
-				Replacing:
-
-		        WorldServer world = (dim == 0 ? overworld : (WorldServer)(new WorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler).init()));
-
-				mv.visitTypeInsn(NEW, "net/minecraft/world/WorldServerMulti");
-				mv.visitInsn(DUP);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitVarInsn(ALOAD, 3);
-				mv.visitVarInsn(ILOAD, 0);
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "profiler", "Lnet/minecraft/profiler/Profiler;");
-				mv.visitMethodInsn(INVOKESPECIAL, "net/minecraft/world/WorldServerMulti", "<init>", "(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/storage/ISaveHandler;ILnet/minecraft/world/WorldServer;Lnet/minecraft/profiler/Profiler;)V", false);
-				mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServerMulti", "init", "()Lnet/minecraft/world/World;", false);
-
-				With:
-
-	        	WorldServer world = (dim == 0 ? overworld : (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler).init()));
-
-				mv.visitTypeInsn(NEW, "com/pg85/otg/forge/OTGWorldServerMulti");
-				mv.visitInsn(DUP);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitVarInsn(ALOAD, 3);
-				mv.visitVarInsn(ILOAD, 0);
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "profiler", "Lnet/minecraft/profiler/Profiler;");
-				mv.visitMethodInsn(INVOKESPECIAL, "com/pg85/otg/forge/OTGWorldServerMulti", "<init>", "(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/storage/ISaveHandler;ILnet/minecraft/world/WorldServer;Lnet/minecraft/profiler/Profiler;)V", false);
-				mv.visitMethodInsn(INVOKEVIRTUAL, "com/pg85/otg/forge/OTGWorldServerMulti", "init", "()Lnet/minecraft/world/World;", false);
-				*/
-
-				return;
-			}
-		}
-
-		//for(MethodNode method : gameDataNode.methods)
-		{
-			//System.out.println("Biome: " + method.name + " + " + method.desc + " + " + method.signature);
-		}
-
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
-	}
-
-	// net.minecraft.server.MinecraftServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
-	private void transformLoadAllWorldsMinecraftServer(ClassNode gameDataNode, boolean isObfuscated)
-	{
-		String injectSnapShot = isObfuscated ? "loadAllWorlds" : "loadAllWorlds";
-		String injectSnapShotDescriptor = isObfuscated ? "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V" : "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V";
-
-		for(MethodNode method : gameDataNode.methods)
-		{
-			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
-			{
-				boolean bFound1 = false;
-				boolean bFound2 = false;
-				boolean bFound3 = false;
-				boolean bFound4 = false;
-				boolean bFound5 = false;
-				boolean bFound6 = false;
-				boolean bFound7 = false;
-				for(AbstractInsnNode instruction : method.instructions.toArray())
-				{
-					if(instruction.getOpcode() == CHECKCAST && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound1 = true;
-					}
-					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound2 = true;
-					}
-					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound3 = true;
-					}
-					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound4 = true;
-					}
-					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound5 = true;
-					}
-					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound6 = true;
-					}
-					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound7 = true;
-						break;
-					}
-				}
-
-				if(!(bFound1 && bFound2 && bFound3 && bFound4 && bFound5 && bFound6 && bFound7))
-				{
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
-				}
-
-				/*
-				Replacing:
-
-		        WorldServer world = (dim == 0 ? overWorld : (WorldServer)new WorldServerMulti(this, isavehandler, dim, overWorld, profiler).init());
-
-				mv.visitTypeInsn(NEW, "net/minecraft/world/WorldServerMulti");
-				mv.visitInsn(DUP);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitVarInsn(ALOAD, 3);
-				mv.visitVarInsn(ILOAD, 0);
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "profiler", "Lnet/minecraft/profiler/Profiler;");
-				mv.visitMethodInsn(INVOKESPECIAL, "net/minecraft/world/WorldServerMulti", "<init>", "(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/storage/ISaveHandler;ILnet/minecraft/world/WorldServer;Lnet/minecraft/profiler/Profiler;)V", false);
-				mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServerMulti", "init", "()Lnet/minecraft/world/World;", false);
-
-				With:
-
-	        	WorldServer world = (dim == 0 ? overworld : (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler).init()));
-
-				mv.visitTypeInsn(NEW, "com/pg85/otg/forge/OTGWorldServerMulti");
-				mv.visitInsn(DUP);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitVarInsn(ALOAD, 3);
-				mv.visitVarInsn(ILOAD, 0);
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "profiler", "Lnet/minecraft/profiler/Profiler;");
-				mv.visitMethodInsn(INVOKESPECIAL, "com/pg85/otg/forge/OTGWorldServerMulti", "<init>", "(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/storage/ISaveHandler;ILnet/minecraft/world/WorldServer;Lnet/minecraft/profiler/Profiler;)V", false);
-				mv.visitMethodInsn(INVOKEVIRTUAL, "com/pg85/otg/forge/OTGWorldServerMulti", "init", "()Lnet/minecraft/world/World;", false);
-				*/
-
-				return;
-			}
-		}
-
-		//for(MethodNode method : gameDataNode.methods)
-		{
-			//System.out.println("Biome: " + method.name + " + " + method.desc + " + " + method.signature);
-		}
-
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
-	}
-
-	// net.minecraft.server.integrated.IntegratedServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
-	private void transformLoadAllWorldsIntegratedServer(ClassNode gameDataNode, boolean isObfuscated)
-	{
-		String injectSnapShot = isObfuscated ? "loadAllWorlds" : "loadAllWorlds";
-		String injectSnapShotDescriptor = isObfuscated ? "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V" : "(Ljava/lang/String;Ljava/lang/String;JLnet/minecraft/world/WorldType;Ljava/lang/String;)V";
-
-		for(MethodNode method : gameDataNode.methods)
-		{
-			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
-			{
-				boolean bFound1 = false;
-				boolean bFound2 = false;
-				boolean bFound3 = false;
-				boolean bFound4 = false;
-				boolean bFound5 = false;
-				boolean bFound6 = false;
-				boolean bFound7 = false;
-				for(AbstractInsnNode instruction : method.instructions.toArray())
-				{
-					if(instruction.getOpcode() == CHECKCAST && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound1 = true;
-					}
-					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServer"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound2 = true;
-					}
-					else if(instruction.getOpcode() == NEW && ((TypeInsnNode)instruction).desc.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((TypeInsnNode)instruction).desc = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound3 = true;
-					}
-					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound4 = true;
-					}
-					else if(instruction.getOpcode() == INVOKESPECIAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound5 = true;
-					}
-					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServer"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound6 = true;
-					}
-					else if(instruction.getOpcode() == INVOKEVIRTUAL && ((MethodInsnNode)instruction).owner.equals("net/minecraft/world/WorldServerMulti"))
-					{
-						((MethodInsnNode)instruction).owner = "com/pg85/otg/forge/OTGWorldServerMulti";
-						bFound7 = true;
-						break;
-					}
-				}
-
-				if(!(bFound1 && bFound2 && bFound3 && bFound4 && bFound5 && bFound6 && bFound7))
-				{
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
-				}
-
-				/*
-				Replacing:
-
-		        WorldServer world = (dim == 0 ? overWorld : (WorldServer)new WorldServerMulti(this, isavehandler, dim, overWorld, profiler).init());
-
-				mv.visitTypeInsn(NEW, "net/minecraft/world/WorldServerMulti");
-				mv.visitInsn(DUP);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitVarInsn(ALOAD, 3);
-				mv.visitVarInsn(ILOAD, 0);
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "profiler", "Lnet/minecraft/profiler/Profiler;");
-				mv.visitMethodInsn(INVOKESPECIAL, "net/minecraft/world/WorldServerMulti", "<init>", "(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/storage/ISaveHandler;ILnet/minecraft/world/WorldServer;Lnet/minecraft/profiler/Profiler;)V", false);
-				mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServerMulti", "init", "()Lnet/minecraft/world/World;", false);
-
-				With:
-
-	        	WorldServer world = (dim == 0 ? overworld : (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler).init()));
-
-				mv.visitTypeInsn(NEW, "com/pg85/otg/forge/OTGWorldServerMulti");
-				mv.visitInsn(DUP);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitVarInsn(ALOAD, 3);
-				mv.visitVarInsn(ILOAD, 0);
-				mv.visitVarInsn(ALOAD, 1);
-				mv.visitVarInsn(ALOAD, 2);
-				mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "profiler", "Lnet/minecraft/profiler/Profiler;");
-				mv.visitMethodInsn(INVOKESPECIAL, "com/pg85/otg/forge/OTGWorldServerMulti", "<init>", "(Lnet/minecraft/server/MinecraftServer;Lnet/minecraft/world/storage/ISaveHandler;ILnet/minecraft/world/WorldServer;Lnet/minecraft/profiler/Profiler;)V", false);
-				mv.visitMethodInsn(INVOKEVIRTUAL, "com/pg85/otg/forge/OTGWorldServerMulti", "init", "()Lnet/minecraft/world/World;", false);
-				*/
-
-				return;
-			}
-		}
-
-		//for(MethodNode method : gameDataNode.methods)
-		{
-			//System.out.println("Biome: " + method.name + " + " + method.desc + " + " + method.signature);
 		}
 
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");

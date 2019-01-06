@@ -2,7 +2,7 @@ package com.pg85.otg.generator.biome.layers;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.ArraysCache;
 import com.pg85.otg.logging.LogMarker;
 

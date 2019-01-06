@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.forge.ForgeBiome;
+import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.entity.monster.EntityGuardian;
@@ -15,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
-import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
 

@@ -7,11 +7,10 @@ import java.util.Random;
 import com.google.common.collect.Lists;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.forge.ForgeBiome;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.init.Blocks;
@@ -20,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraft.world.gen.structure.StructureBoundingBox;
 import net.minecraft.world.gen.structure.StructureComponent;
@@ -109,7 +107,6 @@ public class OTGWoodLandMansionGen extends OTGMapGenStructure
     {
     	//if(this.world.getChunkProvider() instanceof ChunkProviderOverworld)
     	{
-    		// TODO: This only allows WoodlandMansion in the overworld
     		return new Start(this.world, this.rand, chunkX, chunkZ);
     	}
     	//return null;

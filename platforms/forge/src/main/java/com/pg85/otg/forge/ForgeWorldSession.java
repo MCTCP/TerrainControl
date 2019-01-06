@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.WorldSession;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.customobjects.bo3.ParticleFunction;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.logging.LogMarker;
@@ -31,7 +31,6 @@ public class ForgeWorldSession extends WorldSession
 	{
 		super(world);
 		pregenerator = new Pregenerator(world);
-
 		LoadWorldBorderData();
 	}
 
@@ -187,9 +186,9 @@ public class ForgeWorldSession extends WorldSession
 		{			
 			worldBorderRadius = Integer.parseInt(worldBorderFileValues[0]);			
 			worldBorderCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(worldBorderFileValues[1]), Integer.parseInt(worldBorderFileValues[2]));			
-		} else {							
-			WorldConfig worldConfig = world.getConfigs().getWorldConfig();
-			worldBorderRadius = worldConfig.WorldBorderRadius;
+		} else {
+			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(world.getName());
+			worldBorderRadius = dimConfig.WorldBorderRadiusInChunks;
 			worldBorderCenterPoint = world.getSpawnChunk();
 			SaveWorldBorderData();
 		}

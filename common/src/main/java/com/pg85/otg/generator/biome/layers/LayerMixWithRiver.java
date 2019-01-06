@@ -3,10 +3,10 @@ package com.pg85.otg.generator.biome.layers;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.ArraysCache;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ConfigProvider;
 
 public class LayerMixWithRiver extends Layer
 {
@@ -27,8 +27,6 @@ public class LayerMixWithRiver extends Layer
                 this.riverBiomes[id] = -1;
             } else {
             	this.riverBiomes[id] = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome).getIds().getOTGBiomeId();
-            	
-                //this.riverBiomes[id] = world.getBiomeByName(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
             }
         }
     }
@@ -67,8 +65,30 @@ public class LayerMixWithRiver extends Layer
         int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.getWorldConfig();
 
-        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
-        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        LocalBiome defaultOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome);
+        if(defaultOceanBiome == null)
+        {
+        	defaultOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultOceanBiome == null)
+        	{
+    			throw new RuntimeException("Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+
+        LocalBiome defaultFrozenOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome);
+        if(defaultFrozenOceanBiome == null)
+        {
+        	defaultFrozenOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultFrozenOceanBiome == null)
+        	{
+        		throw new RuntimeException("Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+        
+        int defaultOceanId = defaultOceanBiome.getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = defaultFrozenOceanBiome.getIds().getOTGBiomeId();
         
         int currentPiece;
         int currentRiver;
@@ -111,8 +131,30 @@ public class LayerMixWithRiver extends Layer
         int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.getWorldConfig();
 
-        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
-        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        LocalBiome defaultOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome);
+        if(defaultOceanBiome == null)
+        {
+        	defaultOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultOceanBiome == null)
+        	{
+    			throw new RuntimeException("Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+
+        LocalBiome defaultFrozenOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome);
+        if(defaultFrozenOceanBiome == null)
+        {
+        	defaultFrozenOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultFrozenOceanBiome == null)
+        	{
+        		throw new RuntimeException("Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+        
+        int defaultOceanId = defaultOceanBiome.getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = defaultFrozenOceanBiome.getIds().getOTGBiomeId();
         
         int currentPiece;
         int cachedId;
@@ -121,6 +163,7 @@ public class LayerMixWithRiver extends Layer
             for (int xi = 0; xi < xSize; xi++)
             {
                 currentPiece = childInts[(xi + zi * xSize)];
+                // TODO: When/why was this commented out? Might be useful?
                 // currentRiver = riverInts[(j + i * x_size)];
 
                 if ((currentPiece & LandBit) != 0)
@@ -134,6 +177,7 @@ public class LayerMixWithRiver extends Layer
                     cachedId = defaultOceanId;
                 }
 
+                // TODO: When/why was this commented out? Might be useful?
                 /*if (this.worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !this.worldConfig.biomeConfigs[cachedId].riverBiome.isEmpty())
                     currentPiece = this.riverBiomes[cachedId];
                 else*/

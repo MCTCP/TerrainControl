@@ -1,8 +1,8 @@
 package com.pg85.otg.customobjects.bo2;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.LocalMaterialData;
 
 public class ObjectCoordinate
 {

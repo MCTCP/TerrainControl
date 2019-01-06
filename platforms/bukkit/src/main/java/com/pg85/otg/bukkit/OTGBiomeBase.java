@@ -1,15 +1,15 @@
 package com.pg85.otg.bukkit;
 
-import com.pg85.otg.BiomeIds;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.util.EnumHelper;
 import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
 import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.StringHelper;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
@@ -150,8 +150,7 @@ public class OTGBiomeBase extends BiomeBase
         for(int i = 168; i >= 0; --i) {
             BiomeBase biome = getBiome(i);
             if(biome != null && biome instanceof OTGBiomeBase && ((OTGBiomeBase) biome).generationId != i) {
-                throw new AssertionError("Biome ID #" + i + " returns custom biome #" +
-                        ((OTGBiomeBase) biome).generationId + " instead of its own.");
+                throw new AssertionError("Biome ID #" + i + " returns custom biome #" + ((OTGBiomeBase) biome).generationId + " instead of its own.");
             }
         }
     }

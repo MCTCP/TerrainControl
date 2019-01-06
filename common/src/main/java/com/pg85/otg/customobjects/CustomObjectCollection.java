@@ -1,6 +1,7 @@
 package com.pg85.otg.customobjects;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
@@ -105,6 +106,7 @@ public class CustomObjectCollection
      */
     public CustomObject getObjectByName(String name, String worldName)
     {
+    	worldName = OTG.getEngine().GetPresetName(worldName);
     	//OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ? worldName : "");
 
     	CustomObject object = null;
@@ -172,9 +174,9 @@ public class CustomObjectCollection
     	if(CustomObjectFilesGlobalObjects == null)
     	{
     		CustomObjectFilesGlobalObjects = new HashMap<String, File>();
-    		if(new File(OTG.getEngine().getTCDataFolder() + File.separator + "GlobalObjects").exists())
+    		if(new File(OTG.getEngine().getOTGDataFolder() + File.separator + "GlobalObjects").exists())
     		{
-    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getTCDataFolder() + File.separator + "GlobalObjects"), CustomObjectFilesGlobalObjects);
+    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGDataFolder() + File.separator + "GlobalObjects"), CustomObjectFilesGlobalObjects);
     		}
 
 	        // Add vanilla custom objects
@@ -188,9 +190,9 @@ public class CustomObjectCollection
     	{
     		HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
     		CustomObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
-			if(worldName != null && new File(OTG.getEngine().getTCDataFolder() + File.separator + "worlds" + File.separator + worldName + File.separator + "WorldObjects").exists())
+			if(worldName != null && new File(OTG.getEngine().getOTGDataFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects").exists())
 			{
-				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getTCDataFolder() + File.separator + "worlds" + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
+				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGDataFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
 			}
     	}
 

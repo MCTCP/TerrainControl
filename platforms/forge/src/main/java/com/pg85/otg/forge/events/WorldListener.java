@@ -7,6 +7,7 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.OTGWorldType;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.network.server.ServerPacketHandler;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
@@ -18,10 +19,21 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class WorldListener
 {
 	@SubscribeEvent
+	@SideOnly(Side.SERVER)
+	public void onWorldLoadServer(WorldEvent.Load event)
+	{
+    	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());
+    	if(forgeWorld != null)
+    	{
+    		ServerPacketHandler.SendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
+    	}
+	}
+	
+	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void onWorldLoad(WorldEvent.Load event)
+	public void onWorldLoadClient(WorldEvent.Load event)
 	{		
-		// For single player only one world is loaded on the client.		
+		// For single player only one world is loaded on the client, but forgeworlds exist for all dims		
 		for(LocalWorld localWorld : ((ForgeEngine)OTG.getEngine()).getAllWorlds())
 		{
 			ForgeWorld forgeWorld = (ForgeWorld)localWorld;
@@ -68,7 +80,6 @@ public class WorldListener
 		     
 		        boolean serverStopping = !mcServer.isServerRunning();
 		        
-				// TODO: TC should only unload the world and dimension when the server is closed or a dimension is deleted. 
 				int dimId = event.getWorld().provider.getDimension();
 		        		        
 				if(dimId != -1 && dimId != 1)
@@ -86,20 +97,18 @@ public class WorldListener
 		        		OTGDimensionManager.UnloadCustomDimensionData(mcWorld.provider.getDimension());
 		        		forgeWorld.unRegisterBiomes();
 		        		
-		        		if(mcWorld.provider.getDimension() == 0)
-		        		{
-		        			((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator().shutDown();
-		        			
-		        			// Unregister any currently unloaded custom dimensions	        			
-		        			for(ForgeWorld unloadedWorld : ((ForgeEngine)OTG.getEngine()).getUnloadedWorlds())
-		        			{
-		        				if(unloadedWorld.getWorld() != mcWorld)
-		        				{
-			    	        		OTGDimensionManager.UnloadCustomDimensionData(unloadedWorld.getWorld().provider.getDimension());
-			        				unloadedWorld.unRegisterBiomes();
-		        				}
-		        			}
-		        		}		        	
+        				((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator().shutDown();
+	        			
+	        			// Unregister any currently unloaded custom dimensions
+        				// Doesn't matter that this might happen multiple times on server shutdown
+	        			for(ForgeWorld unloadedWorld : ((ForgeEngine)OTG.getEngine()).getUnloadedWorlds())
+	        			{
+	        				if(unloadedWorld.getWorld() != mcWorld)
+	        				{
+		    	        		OTGDimensionManager.UnloadCustomDimensionData(unloadedWorld.getWorld().provider.getDimension());
+		        				unloadedWorld.unRegisterBiomes();
+	        				}
+	        			}
 		        	}
 		    	}
 	        }

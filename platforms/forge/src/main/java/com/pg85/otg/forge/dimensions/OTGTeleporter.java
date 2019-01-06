@@ -6,15 +6,15 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 
-import com.pg85.otg.LocalMaterialData;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeMaterialData;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.generator.Cartographer;
-import com.pg85.otg.forge.network.PacketDispatcher;
-import com.pg85.otg.forge.network.ParticlesPacket;
+import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.BlockPortal;
@@ -84,12 +84,25 @@ public class OTGTeleporter
                 boolean flag = entity.forceSpawn;
                 entity.forceSpawn = true;
 
-                LocalWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(DimensionManager.getWorld(i));
+                ForgeWorld forgeWorld = i == 0 ? (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld() : null;
                 ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
-
-                if(forgeWorld != null)
+                if(i == 0 && forgeWorld == null) // This is a vanilla overworld
                 {
-                	portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
+                    DimensionConfig dimConfig = OTG.GetDimensionsConfig().Overworld;
+                    if(dimConfig != null)
+                    {
+                    	portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
+                    } 
+                } else {                
+	                forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(DimensionManager.getWorld(i));                               
+	                if(forgeWorld != null)
+	                {
+	                    DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
+	                    if(dimConfig != null)
+	                    {
+	                    	portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
+	                    }                	
+	                }
                 }
                 
             	placeInPortal((ForgeMaterialData)portalMaterials.get(0), worldserver1, entity, entity.rotationYaw, worldserver1.getDefaultTeleporter());
@@ -127,20 +140,20 @@ public class OTGTeleporter
 		ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
 		
 		if(forgeWorld == null && ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dimensionIn) != null)
-		{
-			String seed = ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dimensionIn).getConfigs().getWorldConfig().worldSeed;
-			if(seed != null && seed.trim().length() > 0)
-			{
-				OTGDimensionManager.initDimension(dimensionIn, Long.parseLong(seed));
-			}
+		{		
+			OTGDimensionManager.initDimension(dimensionIn);
 			
-			//DimensionManager.initDimension(dimensionIn);
 			forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
 	
-			if(forgeWorld.getConfigs().getWorldConfig().teleportToSpawnOnly)
+			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(dimensionIn == 0 ? "overworld" : forgeWorld.getName());
+			
+			if(dimConfig.Settings.TeleportToSpawnOnly)
 			{
 				BlockPos forgeWorldSpawnPoint = forgeWorld.getSpawnPoint();
-				_this.setLocationAndAngles(forgeWorldSpawnPoint.getX(), 256, forgeWorldSpawnPoint.getZ(), 0, 0);
+				_this.setLocationAndAngles(forgeWorldSpawnPoint.getX(), forgeWorldSpawnPoint.getY(), forgeWorldSpawnPoint.getZ(), 0, 0);
+			} else {
+				// Find suitable spawn location
+				_this.setLocationAndAngles(_this.getPosition().getX(), forgeWorld.getHighestBlockYAt(_this.getPosition().getX(), _this.getPosition().getZ(), true, true, false, false), _this.getPosition().getZ(), 0, 0);
 			}
 		}
 
@@ -163,7 +176,7 @@ public class OTGTeleporter
         changePlayerDimension(_this, dimensionIn, _this.mcServer.getPlayerList(), createPortal);
         _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
 
-        PacketDispatcher.sendTo(new ParticlesPacket(), _this); // Clear particles
+        ServerPacketHandler.SendParticlesPacket(null, _this); // Clear particles 
 
         return _this;
     }
@@ -223,13 +236,17 @@ public class OTGTeleporter
 
                 if(!((ForgeEngine)OTG.getEngine()).getCartographerEnabled() || (entityIn.dimension != Cartographer.CartographerDimension && lastDimension != Cartographer.CartographerDimension))
                 {
-	                LocalWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(DimensionManager.getWorld(lastDimension));
+	                ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(DimensionManager.getWorld(lastDimension));
 
 	                ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
 	                portalMaterials.add(OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0));
-	                if(forgeWorld != null)
+	                if(lastDimension == 0 && (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld() == null) // This is a vanilla overworld
 	                {
-	                	portalMaterials = forgeWorld.getConfigs().getWorldConfig().DimensionPortalMaterials;
+	                	portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+	                }
+	                else if(forgeWorld != null)
+	                {
+	                	portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
 	                }
 	                
 	                if(createPortal)
@@ -561,7 +578,7 @@ public class OTGTeleporter
             	placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this);
             }
         } else {
-    		throw new RuntimeException("DOH!"); // TODO: Does this ever happen?
+    		throw new RuntimeException("This shouldn't happen. Please contact team OTG about this crash."); // TODO: Does this ever happen?
         }
     }
 

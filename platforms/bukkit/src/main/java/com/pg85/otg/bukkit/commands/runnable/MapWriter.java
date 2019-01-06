@@ -5,7 +5,7 @@ import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.commands.BaseCommand;
 import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.configuration.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.logging.LogMarker;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.World;

@@ -1,43 +1,14 @@
 package com.pg85.otg.forge.gui;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
-
-import org.apache.commons.io.FileUtils;
-import org.lwjgl.input.Keyboard;
-
-import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.WorldConfig;
-import com.pg85.otg.configuration.io.FileSettingsReader;
-import com.pg85.otg.configuration.io.SettingsMap;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
-import com.pg85.otg.forge.dimensions.WorldProviderOTG;
-import com.pg85.otg.forge.util.IOHelper;
-
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.GuiTextField;
-import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.ChatAllowedCharacters;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.GameType;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
-import net.minecraft.world.storage.ISaveFormat;
-import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.fml.common.Loader;
-import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 {
+	/*
     GuiScreen sender;
 
     GuiTextField txtWorldName;
@@ -77,9 +48,6 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.sender = sender;
     }
 
-    /**
-     * Called from the main game loop to update the screen.
-     */
     public void updateScreen()
     {
         this.txtSeed.updateCursorCounter();
@@ -94,10 +62,10 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     	GuiHandler.worlds.clear();
 
         ArrayList<String> worldNames = new ArrayList<String>();
-        File TCWorldsDirectory = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
-        if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
+        File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+        if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
         {
-        	for(File worldDir : TCWorldsDirectory.listFiles())
+        	for(File worldDir : OTGWorldsDirectory.listFiles())
         	{
         		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().trim().startsWith("dim-"))
         		{
@@ -242,10 +210,10 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
         	boolean usingPreset = false;
 
-            File TCWorldsDirectory = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
-            if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
+            File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+            if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
             {
-            	for(File worldDir : TCWorldsDirectory.listFiles())
+            	for(File worldDir : OTGWorldsDirectory.listFiles())
             	{
             		if(worldDir.isDirectory())
             		{
@@ -324,9 +292,6 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         return worldName;
     }
 
-    /**
-     * Called when the screen is unloaded. Used to disable keyboard repeat events
-     */
     public void onGuiClosed()
     {
         Keyboard.enableRepeatEvents(false);
@@ -342,10 +307,10 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 				GuiYesNo guiyesno = askDeleteSettings(this, worldNameToDelete);
 				this.mc.displayGuiScreen(guiyesno);
 
-	            File TCWorldsDirectory = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
-	            if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
+	            File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+	            if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
 	            {
-	            	for(File worldDir : TCWorldsDirectory.listFiles())
+	            	for(File worldDir : OTGWorldsDirectory.listFiles())
 	            	{
 	            		if(worldDir.isDirectory() && worldDir.getName().equals(worldNameToDelete))
 	            		{
@@ -365,9 +330,9 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 	                GuiHandler.pageNumber = 0;
                 	if(GuiHandler.worlds.size() > 0)
                 	{
-                        if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
+                        if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
                         {
-                        	for(File worldDir : TCWorldsDirectory.listFiles())
+                        	for(File worldDir : OTGWorldsDirectory.listFiles())
                         	{
                         		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().startsWith("dim-"))
                         		{
@@ -459,7 +424,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 				{
 					// Copy world settings
 
-		            File sourceDir = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds/" +  GuiHandler.selectedWorldName);
+		            File sourceDir = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" +  GuiHandler.selectedWorldName);
 		            if(sourceDir.exists() && sourceDir.isDirectory())
 		            {
 		            	for(File worldDir : sourceDir.listFiles())
@@ -475,7 +440,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 		        		return;
 		        	}
 
-					File destDir = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds/" +  GuiHandler.newWorldName);
+					File destDir = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" +  GuiHandler.newWorldName);
 					try {
 						FileUtils.copyDirectory(sourceDir, destDir);
 					} catch (IOException e) {
@@ -559,9 +524,6 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         return guiyesno;
     }
 
-    /**
-     * Fired when a key is typed. This is the equivalent of KeyListener.keyTyped(KeyEvent e).
-     */
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         if (txtSeed.isFocused())
@@ -601,10 +563,6 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         updateWorldName();
     }
 
-    /**
-     * Called when the mouse is clicked.
-     * @throws IOException
-     */
     protected void mouseClicked(int p_73864_1_, int p_73864_2_, int p_73864_3_) throws IOException
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
@@ -872,24 +830,24 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
     private void DeleteWorldFiles(String worldFolderName)
     {
-    	File TCWorldsDirectory = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
-    	DeleteWorldFiles(TCWorldsDirectory, worldFolderName);
+    	File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+    	DeleteWorldFiles(OTGWorldsDirectory, worldFolderName);
 
         ISaveFormat isaveformat = this.mc.getSaveLoader();
         isaveformat.flushCache();
         isaveformat.deleteWorldDirectory(worldFolderName);
     }
 
-    private void DeleteWorldFiles(File TCWorldsDirectory, String WorldName)
+    private void DeleteWorldFiles(File OTGWorldsDirectory, String WorldName)
     {
     	// TODO: This is for legacy worlds only, the files are stored in the world saves directory now. Remove this?
 
         // Clear existing pre-generator and structurecache data
         // Do this here in the Forge layer instead of in common since this only applies to Forge atm.
 
-        if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
+        if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
         {
-        	for(File worldDir : TCWorldsDirectory.listFiles())
+        	for(File worldDir : OTGWorldsDirectory.listFiles())
         	{
         		if(worldDir.isDirectory())
         		{
@@ -991,9 +949,6 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
     int btnHeight;
     int squareButtonSize;
     
-    /**
-     * Adds the buttons (and other controls) to the screen in question.
-     */
     public void initGui()
     {
         margin = 4;
@@ -1023,7 +978,7 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.txtSeed.setText(GuiHandler.seed != null ? GuiHandler.seed : "");
 
         // Available worlds
-        
+
         btnavailableWorld1 = new GuiButton(3, column1X, marginFromTop, btnWidth, btnHeight, "");
         btnavailableWorld2 = new GuiButton(4, column1X, marginFromTop + btnHeight + margin, btnWidth, btnHeight, "");
         btnavailableWorld3 = new GuiButton(5, column1X, marginFromTop + btnHeight + margin + btnHeight + margin, btnWidth, btnHeight, "");
@@ -1108,9 +1063,6 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
         this.updateButtons();
     }
 
-    /**
-     * Draws the screen and all the components in it.
-     */
     public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
         this.drawDefaultBackground();
@@ -1145,4 +1097,5 @@ public class OTGGuiCreateWorld extends GuiScreen implements GuiYesNoCallback
 
         super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
     }
+    */
 }

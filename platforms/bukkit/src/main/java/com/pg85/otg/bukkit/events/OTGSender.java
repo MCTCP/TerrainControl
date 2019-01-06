@@ -3,10 +3,10 @@ package com.pg85.otg.bukkit.events;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPlugin;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.configuration.ConfigToNetworkSender;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.network.ConfigToNetworkSender;
 
 import org.bukkit.World;
 import org.bukkit.entity.Player;

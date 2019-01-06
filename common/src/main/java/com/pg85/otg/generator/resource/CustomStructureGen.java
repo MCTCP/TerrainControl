@@ -2,8 +2,8 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.customobjects.CustomObjectStructure;
@@ -26,7 +26,6 @@ public class CustomStructureGen extends Resource
     	{
             for (int i = 0; i < objectNames.size(); i ++)
             {
-                //CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().parseCustomObject(objectNames.get(i), worldName);
             	CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
             	objects.add((StructuredCustomObject) object);
             }

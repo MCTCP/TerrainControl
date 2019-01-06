@@ -1,9 +1,8 @@
 package com.pg85.otg;
 
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.BiomeLoadInstruction;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.configuration.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.customobjects.CustomObjectStructureCache;
 import com.pg85.otg.customobjects.bo3.EntityFunction;
 import com.pg85.otg.exception.BiomeNotFoundException;
@@ -11,7 +10,10 @@ import com.pg85.otg.customobjects.bo3.BlockFunction;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.generator.biome.BiomeGenerator;
+import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
@@ -87,6 +89,8 @@ public interface LocalWorld
     public ArrayList<LocalBiome> getAllBiomes();
 
     public LocalBiome getBiomeByIdOrNull(int id);
+    
+    public LocalBiome getFirstBiomeOrNull();
 
     public LocalBiome getBiomeByNameOrNull(String name);
 

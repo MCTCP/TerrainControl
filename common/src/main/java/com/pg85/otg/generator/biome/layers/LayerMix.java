@@ -3,11 +3,10 @@ package com.pg85.otg.generator.biome.layers;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.ArraysCache;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.network.ConfigProvider;
 
 public class LayerMix extends Layer
 {
@@ -34,11 +33,10 @@ public class LayerMix extends Layer
             	LocalBiome riverBiome = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome);
     			if(riverBiome == null)
     			{
-    				OTG.log(LogMarker.ERROR, "RiverBiome: " + biome.getBiomeConfig().riverBiome + " could not be found for biome \"" + biome.getName() + "\"");
+    				OTG.log(LogMarker.TRACE, "RiverBiome: " + biome.getBiomeConfig().riverBiome + " could not be found for biome \"" + biome.getName() + "\", substituting self.");
+    				riverBiome = biome;
     			}
             	this.riverBiomes[id] = riverBiome.getIds().getOTGBiomeId();
-
-                //this.riverBiomes[id] = world.getBiomeByName(biome.getBiomeConfig().riverBiome).getIds().getGenerationId();
             }
         }
     }
@@ -69,8 +67,30 @@ public class LayerMix extends Layer
         int currentPiece;
         int cachedId;
         
-        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
-        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        LocalBiome defaultOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome);
+        if(defaultOceanBiome == null)
+        {
+        	defaultOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultOceanBiome == null)
+        	{
+    			throw new RuntimeException("Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+
+        LocalBiome defaultFrozenOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome);
+        if(defaultFrozenOceanBiome == null)
+        {
+        	defaultFrozenOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultFrozenOceanBiome == null)
+        	{
+        		throw new RuntimeException("Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+        
+        int defaultOceanId = defaultOceanBiome.getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = defaultFrozenOceanBiome.getIds().getOTGBiomeId();
         
         for (int zi = 0; zi < zSize; zi++)
         {
@@ -115,8 +135,30 @@ public class LayerMix extends Layer
         int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.getWorldConfig();
 
-        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
-        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        LocalBiome defaultOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome);
+        if(defaultOceanBiome == null)
+        {
+        	defaultOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultOceanBiome == null)
+        	{
+    			throw new RuntimeException("Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+
+        LocalBiome defaultFrozenOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome);
+        if(defaultFrozenOceanBiome == null)
+        {
+        	defaultFrozenOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultFrozenOceanBiome == null)
+        	{
+        		throw new RuntimeException("Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+        
+        int defaultOceanId = defaultOceanBiome.getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = defaultFrozenOceanBiome.getIds().getOTGBiomeId();
         
         int currentPiece;
         int cachedId;
@@ -156,8 +198,30 @@ public class LayerMix extends Layer
         int[] thisInts = cache.getArray(xSize * zSize);
         WorldConfig worldConfig = this.configs.getWorldConfig();
 
-        int defaultOceanId = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome).getIds().getOTGBiomeId();        
-        int defaultFrozenOceanId = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome).getIds().getOTGBiomeId();
+        LocalBiome defaultOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultOceanBiome);
+        if(defaultOceanBiome == null)
+        {
+        	defaultOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultOceanBiome == null)
+        	{
+    			throw new RuntimeException("Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+
+        LocalBiome defaultFrozenOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome);
+        if(defaultFrozenOceanBiome == null)
+        {
+        	defaultFrozenOceanBiome = world.getFirstBiomeOrNull();
+        	if(defaultFrozenOceanBiome == null)
+        	{
+        		throw new RuntimeException("Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");	
+        	}
+        	OTG.log(LogMarker.TRACE, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        }
+        
+        int defaultOceanId = defaultOceanBiome.getIds().getOTGBiomeId();        
+        int defaultFrozenOceanId = defaultFrozenOceanBiome.getIds().getOTGBiomeId();
         
         int currentPiece;
         int cachedId;

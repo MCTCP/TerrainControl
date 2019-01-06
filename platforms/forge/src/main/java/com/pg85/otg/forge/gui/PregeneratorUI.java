@@ -17,10 +17,10 @@ import com.pg85.otg.forge.generator.Pregenerator;
 
 public class PregeneratorUI
 {
-	private static boolean menuOpen = true;
+	private static boolean menuOpen = false;
 	public static void ShowInGameUI()
 	{
-		if(menuOpen)
+		//if(menuOpen)
 		{
 			boolean isRunningAndNotDone = false;
 			ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
@@ -87,7 +87,7 @@ public class PregeneratorUI
 
     public static void ResetIngameUI()
     {
-    	menuOpen = true;
+    	menuOpen = false;
     }
 
 	public static void ToggleIngameUI()

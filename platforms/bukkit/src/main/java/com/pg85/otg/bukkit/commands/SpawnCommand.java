@@ -45,7 +45,6 @@ public class SpawnCommand extends BaseCommand
 
         if (bukkitWorld != null)
         {
-            //spawnObject = OTG.getCustomObjectManager().getGlobalObjects().parseCustomObject(args.get(0), args.size() > 1 ? args.get(1) : "");
         	spawnObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(args.get(0), args.size() > 1 ? args.get(1) : "");
         }
 

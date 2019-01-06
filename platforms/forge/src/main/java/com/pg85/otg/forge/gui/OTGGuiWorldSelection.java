@@ -20,21 +20,17 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.util.IOHelper;
-import com.pg85.otg.logging.LogMarker;
 
 @SideOnly(Side.CLIENT)
 public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
-{
-	// Taken from net.minecraft.client.gui.GuiWorldSelection. Changed confirmClicked and disabled rename button
-	
+{	
     /** The screen to return to when this closes (always Main Menu). */
     protected GuiScreen prevScreen;
     protected String title = "Select world";
     /** Tooltip displayed a world whose version is different from this client's */
     private String worldVersTooltip;
-    //private GuiButton renameButton;
-    //private GuiButton copyButton;
     private OTGGuiListWorldSelection selectionList;
 	
     public OTGGuiWorldSelection(GuiScreen screenIn)
@@ -57,10 +53,10 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     	// TODO: This is for legacy worlds only, the files are stored in the world saves directory now. Remove this?
 		
 		// Check for world settings for this world
-        File TCWorldsDirectory = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds");
-        if(TCWorldsDirectory.exists() && TCWorldsDirectory.isDirectory())
+        File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+        if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
         {
-        	for(File worldDir : TCWorldsDirectory.listFiles())
+        	for(File worldDir : OTGWorldsDirectory.listFiles())
         	{
         		if(worldDir.isDirectory() && worldDir.getName().equals(worldName))
         		{
@@ -133,35 +129,25 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
             else if (button.id == 1)
             {
                 if (guilistworldselectionentry != null)
-                {
+                {                	
                     guilistworldselectionentry.joinWorld();
                 }
             }
             else if (button.id == 3)
             {
-            	GuiHandler.useVanillaScreen = false;
-                this.mc.displayGuiScreen(new GuiCreateWorld(this));
+            	this.mc.displayGuiScreen(new OTGGuiPresetList(this));
             }
             else if (button.id == 4)
             {
-            	GuiHandler.useVanillaScreen = true;
-    	        DimensionType.OVERWORLD.clazz = WorldProviderSurface.class;
+            	DimensionType.OVERWORLD.clazz = WorldProviderSurface.class;
     	        DimensionType.OVERWORLD.suffix = "overworld";
+    	        OTG.SetDimensionsConfig(null);
             	this.mc.displayGuiScreen(new GuiCreateWorld(this));
-            	
-                //if (guilistworldselectionentry != null)
-                //{
-                    //guilistworldselectionentry.editWorld();
-                //}
             }
             else if (button.id == 0)
             {
-                this.mc.displayGuiScreen(this.prevScreen);
+        		this.mc.displayGuiScreen(new GuiMainMenu());
             }
-            //else if (button.id == 5 && guilistworldselectionentry != null)
-            //{
-                //guilistworldselectionentry.recreateWorld();
-            //}
         }
     }
 
@@ -200,20 +186,15 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     	int row1LeftOver = (uiWidth - ((row1ButtonWidth * row1Width) + (margin * (row1Width - 1))));
     	int row2Width = 2;
     	int row2ButtonWidth = (int)Math.floor((uiWidth - ((row2Width - 1) * margin)) / (float)row2Width);
-    	int row2LeftOver = (uiWidth - ((row2ButtonWidth * row2Width) + (margin * (row2Width - 1))));
+    	int row2LeftOver = (uiWidth - ((row2ButtonWidth * row2Width) + (margin * (row2Width - 1))));    	
     	
         selectButton = this.addButton(new GuiButton(1, marginFromLeft, marginFromBottom, row1ButtonWidth, buttonHeight, I18n.format("selectWorld.select", new Object[0])));
-		GuiButton createButton = this.addButton(new GuiButton(4, marginFromLeft + row1ButtonWidth + margin, marginFromBottom, row1ButtonWidth, buttonHeight, I18n.format("selectWorld.create", new Object[0])));
-		GuiButton otgButton = this.addButton(new GuiButton(3, marginFromLeft + row1ButtonWidth + margin + row1ButtonWidth + margin, marginFromBottom, row1ButtonWidth + row1LeftOver, buttonHeight, "Create OTG World"));
-        //this.renameButton = this.addButton(new GuiButton(4, this.width / 2 - 154, this.height - 28, 72, 20, I18n.format("selectWorld.edit", new Object[0])));
+		this.addButton(new GuiButton(4, marginFromLeft + row1ButtonWidth + margin, marginFromBottom, row1ButtonWidth, buttonHeight, I18n.format("selectWorld.create", new Object[0])));
+		this.addButton(new GuiButton(3, marginFromLeft + row1ButtonWidth + margin + row1ButtonWidth + margin, marginFromBottom, row1ButtonWidth + row1LeftOver, buttonHeight, "Create OTG World"));
         deleteButton = this.addButton(new GuiButton(2, marginFromLeft, marginFromBottom + buttonHeight + margin, row2ButtonWidth, buttonHeight, I18n.format("selectWorld.delete", new Object[0])));
-        //this.copyButton = this.addButton(new GuiButton(5, this.width / 2 + 4, this.height - 28, 72, 20, I18n.format("selectWorld.recreate", new Object[0])));
-		//this.addButton(new GuiButton(0, this.width / 2 + 82, this.height - 28, 72, 20, I18n.format("gui.cancel", new Object[0])));
-		GuiButton cancelButton = this.addButton(new GuiButton(0, marginFromLeft + row2ButtonWidth + margin, marginFromBottom + buttonHeight + margin, row2ButtonWidth + row2LeftOver, buttonHeight, I18n.format("gui.cancel", new Object[0])));
+        this.addButton(new GuiButton(0, marginFromLeft + row2ButtonWidth + margin, marginFromBottom + buttonHeight + margin, row2ButtonWidth + row2LeftOver, buttonHeight, I18n.format("gui.cancel", new Object[0])));
         selectButton.enabled = false;
         deleteButton.enabled = false;
-        //this.renameButton.enabled = false;
-        //this.copyButton.enabled = false;
     }
 	
     /**
@@ -263,7 +244,5 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
         boolean flag = entry != null;
         this.selectButton.enabled = flag;
         this.deleteButton.enabled = flag;
-        //this.renameButton.enabled = flag;
-        //this.copyButton.enabled = flag;
     }
 }

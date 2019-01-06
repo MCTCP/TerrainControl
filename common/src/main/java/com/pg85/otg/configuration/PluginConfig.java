@@ -1,11 +1,11 @@
 package com.pg85.otg.configuration;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.logging.LogMarker;
 
 /**
@@ -14,12 +14,10 @@ import com.pg85.otg.logging.LogMarker;
  */
 public final class PluginConfig extends ConfigFile
 {
-
     public ConfigMode SettingsMode;
 
     public enum LogLevels
     {
-
         Off(LogMarker.ERROR),
         Quiet(LogMarker.WARN),
         Standard(LogMarker.INFO),
@@ -50,7 +48,7 @@ public final class PluginConfig extends ConfigFile
         this.renameOldSettings(settingsReader);
         this.readConfigSettings(settingsReader);
 
-        this.correctSettings();
+        this.correctSettings(true);
     }
 
     @Override
@@ -60,7 +58,7 @@ public final class PluginConfig extends ConfigFile
     }
 
     @Override
-    protected void correctSettings()
+    protected void correctSettings(boolean logWarnings)
     {
         if (!BiomeStandardValues.BiomeConfigExtensions.contains(this.biomeConfigExtension))
         {

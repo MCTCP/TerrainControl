@@ -1,9 +1,9 @@
 package com.pg85.otg.configuration.standard;
 
-import com.pg85.otg.configuration.WeightedMobSpawnGroup;
-import com.pg85.otg.configuration.BiomeConfig.MineshaftType;
-import com.pg85.otg.configuration.BiomeConfig.RareBuildingType;
-import com.pg85.otg.configuration.BiomeConfig.VillageType;
+import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
+import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
+import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;

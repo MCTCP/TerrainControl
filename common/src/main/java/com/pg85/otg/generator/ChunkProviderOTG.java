@@ -4,12 +4,10 @@ import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.generator.noise.NoiseGeneratorNewOctaves;
@@ -17,7 +15,9 @@ import com.pg85.otg.generator.noise.NoiseGeneratorPerlinOctaves;
 import com.pg85.otg.generator.terrain.CavesGen;
 import com.pg85.otg.generator.terrain.RavinesGen;
 import com.pg85.otg.generator.terrain.TerrainGenBase;
+import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 

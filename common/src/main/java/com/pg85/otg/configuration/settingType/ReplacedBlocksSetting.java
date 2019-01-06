@@ -1,7 +1,7 @@
 package com.pg85.otg.configuration.settingType;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ReplacedBlocksMatrix;
+import com.pg85.otg.configuration.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.exception.InvalidConfigException;
 
 /**

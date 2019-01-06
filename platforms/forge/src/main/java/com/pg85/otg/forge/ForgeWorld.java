@@ -1,28 +1,38 @@
 package com.pg85.otg.forge;
 
 import com.pg85.otg.*;
-import com.pg85.otg.configuration.*;
-import com.pg85.otg.configuration.BiomeConfigFinder.BiomeConfigStub;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObjectStructureCache;
 import com.pg85.otg.customobjects.bo3.BlockFunction;
 import com.pg85.otg.customobjects.bo3.EntityFunction;
 import com.pg85.otg.exception.BiomeNotFoundException;
+import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.biomes.OTGBiome;
+import com.pg85.otg.forge.biomes.BiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.generator.OTGBiome;
+import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
+import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.util.IOHelper;
-import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.util.NBTHelper;
+import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ClientConfigProvider;
+import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.network.ServerConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
-import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
@@ -63,9 +73,6 @@ import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.WorldInfo;
-import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -75,6 +82,9 @@ import java.util.*;
 
 public class ForgeWorld implements LocalWorld
 {
+	ForgeWorldSession WorldSession;
+	public boolean isLoadedOnServer;
+	
 	public int clientDimensionId = 0;
 
     private OTGChunkGenerator generator;
@@ -88,7 +98,7 @@ public class ForgeWorld implements LocalWorld
 
     private static final int MAX_BIOMES_COUNT = 4096;
     private static final int MAX_SAVED_BIOMES_COUNT = 255;
-    private static final int STANDARD_WORLD_HEIGHT = 128;
+    public static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
 
     public HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
@@ -122,131 +132,19 @@ public class ForgeWorld implements LocalWorld
 
     public static HashMap<Integer, ResourceLocation> vanillaResouceLocations = new HashMap<Integer, ResourceLocation>();
 
-    public boolean isMainWorld = false;
-
     public ForgeWorld(String _name)
-    {
-    	this.name = _name;
-    }
-
-    public ForgeWorld(String _name, boolean isMainWorld)
     {
 		OTG.log(LogMarker.INFO, "Creating world \"" + _name + "\"");
 
         this.name = _name;
-        this.isMainWorld = isMainWorld;
-
-        // If this is the main world (which should be the first world to be generated)
-        // clear the biome registry and dictionary
-        if(isMainWorld)
-        {
-        	// Default settings are not restored on world unload / server quit because this was causing problems
-        	// (unloading dimensions while their worlds were still ticking etc)
-        	// Unload all world and biomes here instead.
-
-        	OTGDimensionManager.UnloadAllCustomDimensionData();
-        	((ForgeEngine)OTG.getEngine()).worldLoader.unloadAllWorlds();
-	        // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
-	    	((ForgeEngine)OTG.getEngine()).worldLoader.clearBiomeDictionary(null);
-	        ((ForgeEngine)OTG.getEngine()).worldLoader.unRegisterOTGBiomes();
-
-	    	OTGDimensionManager.RemoveOTGDims();
-        }
     }
 
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
     {
-    	Biome biome = OTGBiome.getOrCreateBiome(biomeConfig, biomeIds, isMainWorld, this.getName());
-    		
-    	// Always try to register biomes and create Biome Configs. Biomes with id's > 255 are registered
-    	// only for biome -> id queries, any (saved)id -> biome query will return the ReplaceToBiomeName biome.
-
-        Biome existingBiome = Biome.getBiome(biomeIds.getSavedId());
-
-        if (biomeIds.getSavedId() >= 256 || biomeIds.getSavedId() < 0)
-        {
-            throw new RuntimeException("Could not allocate the requested id " + biomeIds.getSavedId() + " for biome " + biomeConfig.getName() + ". All available id's under 256 have been allocated\n" + ". To proceed, adjust your WorldConfig or use the ReplaceToBiomeName feature to make the biome virtual.");
-        }
-
-        ForgeBiome forgeBiome = new ForgeBiome(biome, biomeConfig, biomeIds);
-
-        registerBiomeInBiomeDictionary(biome, existingBiome, biomeConfig, configProvider);
-
-        this.biomeNames.put(biome.biomeName, forgeBiome);
-
+    	ForgeBiome forgeBiome = BiomeRegistryManager.getOrCreateBiome(biomeConfig, biomeIds, this.getName(), configProvider);
+        this.biomeNames.put(forgeBiome.getName(), forgeBiome);
         return forgeBiome;
-    }
-
-    private void registerBiomeInBiomeDictionary(Biome biome, Biome sourceBiome, BiomeConfig biomeConfig, ConfigProvider configProvider)
-    {
-        // Add inherited BiomeDictId's for replaceToBiomeName. Biome dict id's are stored twice,
-        // there is 1 list of biomedict types per biome id and one list of biomes (not id's) per biome dict type.
-
-        ArrayList<Type> types = new ArrayList<Type>();
-        if(biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.length() > 0)
-        {
-        	// Inherit from an existing biome
-        	if(sourceBiome != null) // Non-otg biome
-        	{
-        		Set<Type> existingTypes = BiomeDictionary.getTypes(sourceBiome);
-       			types = new ArrayList<Type>(existingTypes);
-        	} else {
-        		LocalBiome replaceToBiome = configProvider.getBiomeByIdOrNull(((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(sourceBiome != null ? sourceBiome : biome));
-
-	        	if(replaceToBiome == null)
-	        	{
-	        		int replaceToBiomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(sourceBiome != null ? sourceBiome : biome);
-	        		replaceToBiome = OTG.getBiome(replaceToBiomeId);
-	        	}
-	    		if(replaceToBiome != null && replaceToBiome.getBiomeConfig().biomeDictId != null)
-	    		{
-	    			types = getTypesList(replaceToBiome.getBiomeConfig().biomeDictId.split(","));
-	    		}
-        	}
-        } else {
-        	// If not replaceToBiomeName then attach BiomeDictId
-	        if(biomeConfig.biomeDictId != null && biomeConfig.biomeDictId.trim().length() > 0)
-	        {
-	        	types = getTypesList(biomeConfig.biomeDictId.split(","));
-	        }
-        }
-
-    	Type[] typeArr = new Type[types.size()];
-		types.toArray(typeArr);
-
-		if(!ForgeRegistries.BIOMES.containsValue(biome))
-		{
-			OTG.log(LogMarker.WARN, "Biome " + biome.biomeName + " could not be found in the registry. This could be because it is a virtual biome (id > 255) but does not have a ReplaceToBiomeName configured.");
-		}
-	
-    	BiomeDictionary.addTypes(biome, typeArr);
-    }
-
-    private ArrayList<Type> getTypesList(String[] typearr)
-    {
-    	ArrayList<Type> types = new ArrayList<Type>();
-		for(String typeString : typearr)
-		{
-			if(typeString != null && typeString.trim().length() > 0)
-			{
-		        Type type = null;
-				typeString = typeString.trim();
-		        try
-		        {
-		        	type = Type.getType(typeString, null);
-		        }
-		        catch(Exception ex)
-		        {
-		        	OTG.log(LogMarker.WARN, "Can't find BiomeDictId: \"" + typeString + "\".");
-		        }
-		        if(type != null)
-		        {
-		        	types.add(type);
-		        }
-			}
-		}
-		return types;
     }
 
     @Override
@@ -265,7 +163,6 @@ public class ForgeWorld implements LocalWorld
     public int getFreeBiomeId()
     {
     	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-        //return nextBiomeId++;
     }
 
     @Override
@@ -279,6 +176,11 @@ public class ForgeWorld implements LocalWorld
     	return biomes;
     }
 
+	@Override
+	public LocalBiome getFirstBiomeOrNull() {
+		return this.biomeNames.size() > 0 ? (LocalBiome) this.biomeNames.values().toArray()[0] : null;
+	}
+    
     @Override
     public ForgeBiome getBiomeByIdOrNull(int id)
     {
@@ -489,7 +391,6 @@ public class ForgeWorld implements LocalWorld
     {
         if (net.minecraftforge.event.terraingen.TerrainGen.populate(this.getChunkGenerator(), this.world, random, chunkCoord.getChunkX(), chunkCoord.getChunkZ(), false, net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ANIMALS))
         {
-	        //WorldEntitySpawner.performWorldGenSpawning(this.world, biome, i + 8, j + 8, 16, 16, this.rand);
 	        WorldEntitySpawner.performWorldGenSpawning(this.getWorld(), ((ForgeBiome) biome).getHandle(), chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), ChunkCoordinate.CHUNK_X_SIZE, ChunkCoordinate.CHUNK_Z_SIZE, random);
         }
     }
@@ -1103,26 +1004,27 @@ public class ForgeWorld implements LocalWorld
     public void provideWorldInstance(WorldServer world)
     {
         ServerConfigProvider configs = (ServerConfigProvider) this.settings;
-
+        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(world));
+        
         // Custom dimension settings
         // world is unique for this dimension however its worldinfo
         // was derived from the main world and has the same seed
         // configure the correct seed for this dimension.
 		// If the world is a TCWorldServerMulti then it was created
 		// by a console command and has already had its seed set
-        if(!isMainWorld && !(world instanceof OTGWorldServerMulti))
+        if(world.provider.getDimension() != 0 && !(world instanceof OTGWorldServerMulti))
         {
-        	// TODO: Use seed from Dimensions.txt instead <-- WHy, seeds in dims seem to be working fine?
-            long seedIn = (long) Math.floor((Math.random() * Long.MAX_VALUE));
-            if(configs.getWorldConfig().worldSeed != null && configs.getWorldConfig().worldSeed.trim().length() > 0)
+        	// TODO: Use seed from Dimensions.txt instead <-- Why, seeds in dims seem to be working fine?
+            long seedIn = (long) Math.floor((Math.random() * Long.MAX_VALUE));            
+            if(dimConfig.Seed != null && dimConfig.Seed.trim().length() > 0)
             {
                 try
                 {
-                	seedIn = configs.getWorldConfig().worldSeed == null || configs.getWorldConfig().worldSeed.trim().length() == 0 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : Long.parseLong(configs.getWorldConfig().worldSeed);
+                	seedIn = dimConfig.Seed == null || dimConfig.Seed.trim().length() == 0 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : Long.parseLong(dimConfig.Seed);
                 }
             	catch(NumberFormatException ex)
                 {
-            		OTG.log(LogMarker.ERROR, "WorldConfig for world \"" + world.getWorldInfo().getWorldName() + "\" has value \"" + configs.getWorldConfig().worldSeed + "\" for worldSeed which cannot be parsed as a number. Using a random seed instead.");
+            		OTG.log(LogMarker.ERROR, "WorldConfig for world \"" + world.getWorldInfo().getWorldName() + "\" has value \"" + dimConfig.Seed + "\" for worldSeed which cannot be parsed as a number. Using a random seed instead.");
                 }
             }
 
@@ -1163,6 +1065,7 @@ public class ForgeWorld implements LocalWorld
         //
 
         this.world = world;
+        OTGDimensionManager.ApplyGameRulesToWorld(world, dimConfig);
         this.seed = world.getWorldInfo().getSeed();
         world.setSeaLevel(configs.getWorldConfig().waterLevelMax);
 
@@ -1202,9 +1105,9 @@ public class ForgeWorld implements LocalWorld
         this.jungleTree = new WorldGenMegaJungle(false, 10, 20, jungleLog, jungleLeaves);
         this.groundBush = new WorldGenShrub(jungleLog, jungleLeaves);
 
-        this.WorldSession = new ForgeWorldSession(this);
         this.generator = new OTGChunkGenerator(this);
 
+        this.WorldSession = new ForgeWorldSession(this);
         this.structureCache = new CustomObjectStructureCache(this);
     }
 
@@ -1333,32 +1236,15 @@ public class ForgeWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
 
+    // TODO: Move this somewhere in com.pg85.otg.forge.biomes?
     /**
      * Used by mob inheritance code. Used to inherit default mob spawning settings (including those added by other mods)
      * @param biomeConfigStub
      */
+    @Override
 	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{
-    	Biome biome = null;
-
-    	String[] resourceLocationArr = biomeResourceLocation.split(":");
-    	String resourceDomain = resourceLocationArr[0];
-    	String resourceLocation = resourceLocationArr[1];
-
-    	biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(resourceDomain, resourceLocation));
-
-    	if(biome != null)
-    	{
-			// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
-    		// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
-			// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
-			biomeConfigStub.spawnMonstersMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnMonstersMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityCategory.MONSTER));
-			biomeConfigStub.spawnCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityCategory.CREATURE));
-			biomeConfigStub.spawnAmbientCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnAmbientCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityCategory.AMBIENT_CREATURE));
-			biomeConfigStub.spawnWaterCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnWaterCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityCategory.WATER_CREATURE));
-    	} else {
-    		throw new RuntimeException("Biome " + biomeResourceLocation + " not found for InheritMobsFromBiomeName in " + biomeConfigStub.getBiomeName() + ".bc");
-    	}
+    	BiomeRegistryManager.mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, biomeResourceLocation);
 	}
 
 	public void unRegisterBiomes()
@@ -1366,15 +1252,7 @@ public class ForgeWorld implements LocalWorld
 		// Unregister only the biomes registered by this world
 		for(LocalBiome localBiome : this.biomeNames.values())
 		{
-			if(((ForgeEngine)OTG.getEngine()).worldLoader.isConfigUnique(localBiome.getBiomeConfig().getName()))
-			{
-		        String biomeNameForRegistry = StringHelper.toComputerFriendlyName(localBiome.getName());
-		        String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();
-		        ResourceLocation registryKey = new ResourceLocation(resourceDomain, this.getName() + "_" + biomeNameForRegistry);
-
-		        ((ForgeEngine)OTG.getEngine()).unRegisterForgeBiome(registryKey);
-		        ((ForgeEngine)OTG.getEngine()).unregisterOTGBiomeId(getName(), localBiome.getIds().getOTGBiomeId());
-			}
+			BiomeRegistryManager.UnregisterBiome(localBiome, this.getName());
 		}
 
 		((ForgeEngine)OTG.getEngine()).worldLoader.clearBiomeDictionary(this);
@@ -1632,8 +1510,7 @@ public class ForgeWorld implements LocalWorld
 				chunk.getChunkZ() <= GetWorldSession().getWorldBorderCenterPoint().getChunkZ() + (GetWorldSession().getWorldBorderRadius() - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
 			);
 	}
-
-	ForgeWorldSession WorldSession;
+	
     @Override
 	public WorldSession GetWorldSession()
 	{
@@ -1655,11 +1532,19 @@ public class ForgeWorld implements LocalWorld
 	@Override
 	public void DeleteWorldSessionData()
 	{
-		int dimensionId = getWorld().provider.getDimension();
-		File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : ""));
-		if(worldDataDir.exists())
+		// getWorld == null can happen for MP clients when deleting dimensions that were never entered. 
+		// No files need to be deleted on the client though.
+		// TODO: Make this method Server side only (adding annotation causes bug ><).
+		if(getWorld() != null)
 		{
-			IOHelper.deleteRecursive(worldDataDir);
+			int dimensionId = getWorld().provider.getDimension();
+			File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : ""));
+			if(worldDataDir.exists())
+			{
+				IOHelper.deleteRecursive(worldDataDir);
+			}
+		} else {
+			String breakpoint = "";
 		}
 	}
 
@@ -1677,45 +1562,9 @@ public class ForgeWorld implements LocalWorld
         (worldConfig.woodLandMansionsEnabled && this.woodLandMansionGen.chunkHasStructure(this.world, rand, chunkPos));
 	}
 
-	public Biome getRegisteredBiome(String resourceLocationString)
-	{
-		if(resourceLocationString != null && !resourceLocationString.trim().isEmpty())
-		{
-			String[] resourceLocationStringArr = resourceLocationString.split(":");
-			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
-			{
-				ResourceLocation resourceLocation = new ResourceLocation(OTGPlugin.MOD_ID.toLowerCase(), this.getName() + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
-				return ForgeRegistries.BIOMES.getValue(resourceLocation);
-			}
-			if(resourceLocationStringArr.length == 2)
-			{
-				ResourceLocation resourceLocation = new ResourceLocation(resourceLocationStringArr[0],resourceLocationStringArr[1]);
-				return ForgeRegistries.BIOMES.getValue(resourceLocation);
-			}
-		}
-
-		return null;
-	}
-
 	@Override
 	public int getRegisteredBiomeId(String resourceLocationString)
 	{
-		if(resourceLocationString != null && !resourceLocationString.trim().isEmpty())
-		{
-			String[] resourceLocationStringArr = resourceLocationString.split(":");
-			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
-			{
-				ResourceLocation resourceLocation = new ResourceLocation(OTGPlugin.MOD_ID.toLowerCase(), this.getName() + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
-				Biome requestedBiome = ForgeRegistries.BIOMES.getValue(resourceLocation);
-				return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(requestedBiome);
-			}
-			if(resourceLocationStringArr.length == 2)
-			{
-				ResourceLocation resourceLocation = new ResourceLocation(resourceLocationStringArr[0],resourceLocationStringArr[1]);
-				Biome requestedBiome = ForgeRegistries.BIOMES.getValue(resourceLocation);
-				return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(requestedBiome);
-			}
-		}
-		return -1;
+		return BiomeRegistryManager.getRegisteredBiomeId(resourceLocationString, this.getName());
 	}
 }

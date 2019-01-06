@@ -1,7 +1,7 @@
 package com.pg85.otg.generator;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 
 /**
  * A chunk buffer holds all blocks of a chunk. It is not part of the world.

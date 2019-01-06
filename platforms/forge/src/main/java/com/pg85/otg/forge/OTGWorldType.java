@@ -4,11 +4,11 @@ import java.io.File;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.WorldConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.forge.biomes.OTGBiomeProvider;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
-import com.pg85.otg.forge.generator.OTGBiomeProvider;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 
@@ -46,22 +46,27 @@ public class OTGWorldType extends WorldType
             return super.getBiomeProvider(mcWorld);
         }
 
-        // Create dirs for a new world if necessary
-        File worldDirectory = new File(OTG.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName());
-
-        if (!worldDirectory.exists())
+        // Create dirs for a new world if necessary (only needed for overworld, when creating a new OTG world)
+        if(mcWorld.provider.getDimension() == 0)
         {
-            System.out.println("OpenTerrainGenerator: settings does not exist, creating defaults");
+	        File worldDirectory = new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.GetDimensionsConfig().Overworld.PresetName);
+	
+	        if (!worldDirectory.exists())
+	        {
+	            System.out.println("OpenTerrainGenerator: settings does not exist, creating defaults");
 
-            if (!worldDirectory.mkdirs())
-                System.out.println("OpenTerrainGenerator: cant create folder " + worldDirectory.getAbsolutePath());
+	            if (!worldDirectory.mkdirs())
+	            {
+	                System.out.println("OpenTerrainGenerator: cant create folder " + worldDirectory.getAbsolutePath());
+	            }
+	        }
+
+	        File worldObjectsDir = new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.GetDimensionsConfig().Overworld.PresetName + File.separator + WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
+	        worldObjectsDir.mkdirs();
+
+	        File worldBiomesDir = new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.GetDimensionsConfig().Overworld.PresetName + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
+	        worldBiomesDir.mkdirs();
         }
-
-        File worldObjectsDir = new File(OTG.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
-        worldObjectsDir.mkdirs();
-
-        File worldBiomesDir = new File(OTG.getEngine().getTCDataFolder(), "worlds" + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName() + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
-        worldBiomesDir.mkdirs();
 
     	// For server
         if(!mcWorld.getMinecraftServer().isSinglePlayer())
@@ -79,7 +84,7 @@ public class OTGWorldType extends WorldType
         ForgeWorld world = this.worldLoader.getOrCreateForgeWorld(mcWorld);
         if (world == null) // TODO: When does this happen, if the world is not an OTG world?
         {
-            throw new RuntimeException("This shouldn't happen");
+            throw new RuntimeException("This shouldn't happen, please contact team OTG about this crash.");
             //return super.getBiomeProvider(mcWorld);
         }
 
@@ -92,7 +97,7 @@ public class OTGWorldType extends WorldType
 
     /**
      * Gets the appropriate BiomeProvider. For the vanilla biome generator we
-     * have to use BiomeProvider, for other biome modes TCBiomeProvider is
+     * have to use BiomeProvider, for other biome modes OTGBiomeProvider is
      * the right option.
      *
      * @param world ForgeWorld instance, needed to instantiate the

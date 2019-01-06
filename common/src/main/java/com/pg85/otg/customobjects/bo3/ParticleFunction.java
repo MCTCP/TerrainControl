@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.LocalWorld;
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.Rotation;
