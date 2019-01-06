@@ -230,7 +230,9 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(this.controlsScreen.selectedDimension.PresetName);
 					}
 					
-					if(forgeWorld != null && forgeWorld.GetWorldSession() != null) // WorldSession can be null on clients when the ForgeWorld has been created but hasn't had a world instance provided yet
+					// WorldSession can be null on clients when the ForgeWorld has been created but hasn't had a world instance provided yet
+					// ForgeWorld can be null for the SP world creation menu
+					if(forgeWorld != null && forgeWorld.GetWorldSession() != null) 
 					{
 						Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();
 			
@@ -300,7 +302,10 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        // If world isn't null then we're ingame
 		        if(this.mc.world != null)
 		        {
-		        	listEntries.add(new OTGGuiDimensionSettingsList.CategoryEntry("* Close this menu to apply game rules *"));
+		        	if(this.mc.isSingleplayer())
+		        	{
+		        		listEntries.add(new OTGGuiDimensionSettingsList.CategoryEntry("* Close the OTG menu to apply game rules *"));
+		        	}
 		        	listEntries.add(new OTGGuiDimensionSettingsList.CategoryEntry("* Don't use /gamerule, it's overworld only *"));
 		        }
 	
@@ -675,11 +680,16 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 			lines.add("Elapsed: " + pregenerator.progressScreenElapsedTime);
 			lines.add("Estimated: " + pregenerator.progressScreenEstimatedTime);
 
-			long i = Runtime.getRuntime().maxMemory();
-	        long j = Runtime.getRuntime().totalMemory();
-	        long k = Runtime.getRuntime().freeMemory();
-	        long l = j - k;
-	        lines.add("Memory: " + Long.valueOf(BytesToMb(l)) + "/" +  Long.valueOf(BytesToMb(i)) + " MB");
+			if(Minecraft.getMinecraft().isSingleplayer())
+			{
+				long i = Runtime.getRuntime().maxMemory();
+		        long j = Runtime.getRuntime().totalMemory();
+		        long k = Runtime.getRuntime().freeMemory();
+		        long l = j - k;
+		        lines.add("Memory: " + Long.valueOf(BytesToMb(l)) + "/" +  Long.valueOf(BytesToMb(i)) + " MB");
+			} else {
+				lines.add("Memory: " + pregenerator.progressScreenServerUsedMbs + "/" +  pregenerator.progressScreenServerTotalMbs + " MB");
+			}
 
 	        int linespacing = 11;
 	        
@@ -1050,8 +1060,8 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		            					{
 		            						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
 		            					}
-		            					// ForgeWorldSession can be null for MP clients that have not yet received the world data for a newly created world
-		            					if(forgeWorld.GetWorldSession() != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
+		            					// ForgeWorld can be null in SP world creation menu.
+		            					if(Minecraft.getMinecraft().isSingleplayer() && forgeWorld != null && forgeWorld.GetWorldSession() != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
 		            					{
 			            					forgeWorld.GetWorldSession().setPregenerationRadius(radius);
 			            					radius = forgeWorld.GetWorldSession().getPregenerationRadius();
@@ -1229,8 +1239,8 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
     					{
     						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
     					}
-    					// ForgeWorldSession can be null for MP clients that have not yet received the world data for a newly created world
-    					if(forgeWorld.GetWorldSession() != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
+    					// ForgeWorld can be null for SP world creation menu
+    					if(Minecraft.getMinecraft().isSingleplayer() && forgeWorld != null && forgeWorld.GetWorldSession() != null && forgeWorld.GetWorldSession().getPregenerationRadius() != radius)
     					{
         					forgeWorld.GetWorldSession().setPregenerationRadius(radius);
         					radius = forgeWorld.GetWorldSession().getPregenerationRadius();

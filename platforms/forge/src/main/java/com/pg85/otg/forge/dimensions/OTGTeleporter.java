@@ -11,7 +11,7 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.generator.Cartographer;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
@@ -175,7 +175,7 @@ public class OTGTeleporter
         changePlayerDimension(_this, dimensionIn, _this.mcServer.getPlayerList(), createPortal);
         _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
 
-        ServerPacketHandler.SendParticlesPacket(null, _this); // Clear particles 
+        ServerPacketManager.SendParticlesPacket(null, _this); // Clear particles 
 
         return _this;
     }

@@ -22,7 +22,7 @@ import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.generator.Pregenerator;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.CommandHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
@@ -552,7 +552,7 @@ public final class OTGCommandHandler implements ICommand
 							
 			    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Created dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + newDimId + MESSAGE_COLOR + "."));
 
-			    			ServerPacketHandler.SendDimensionSynchPacketToAllPlayers(sender.getServer());
+			    			ServerPacketManager.SendDimensionSynchPacketToAllPlayers(sender.getServer());
         				}
 	            	}
 	            	else if (CommandHelper.containsArgument(argString, "-u"))

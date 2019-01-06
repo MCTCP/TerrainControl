@@ -29,7 +29,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.IThreadListener;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class ClientPacketManager
@@ -62,14 +64,14 @@ public class ClientPacketManager
 		}        
 	}
 
-	public static void SendUpdateDimensionSettingsPacket(DimensionConfig dimConfig, boolean isOverWorld)
+	public static void SendUpdateDimensionSettingsPacket(ArrayList<DimensionConfig> dimConfigs)
 	{
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
 
         try
         {
-        	UpdateDimensionSettingsPacket.WriteToStream(stream, dimConfig, isOverWorld);
+        	UpdateDimensionSettingsPacket.WriteToStream(stream, dimConfigs);
 		}
         catch (IOException e1)
         {
@@ -90,8 +92,6 @@ public class ClientPacketManager
 	
 	public static void SendDeleteDimensionPacket(String dimensionName)
 	{
-		ArrayList<LocalWorld> worlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
-		
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
 
@@ -183,7 +183,6 @@ public class ClientPacketManager
 	
 			String worldName = ConfigFile.readStringFromStream(wrappedStream);
 			
-			// TODO: For integratedServer worlds are shared between client and server? World only needs to be created for MP client, not SP client?			
 			if(dimensionId != 0 && !DimensionManager.isDimensionRegistered(dimensionId))
 			{
 				if(dimensionId != 0)
@@ -225,7 +224,17 @@ public class ClientPacketManager
 			)
 		)
 		{
-			Minecraft.getMinecraft().displayGuiScreen(new OTGGuiDimensionList(null));
+			if(Minecraft.getMinecraft().currentScreen instanceof OTGGuiDimensionList)
+			{
+				int previouslySelectedIndex = ((OTGGuiDimensionList)Minecraft.getMinecraft().currentScreen).selectedDimensionIndex;
+				boolean isMainMenu = ((OTGGuiDimensionList)Minecraft.getMinecraft().currentScreen).dimensionSettingsList.mainMenu;
+				boolean isGameRulesMenu = ((OTGGuiDimensionList)Minecraft.getMinecraft().currentScreen).dimensionSettingsList.gameRulesMenu;
+				boolean isAdvancedSettingsMenu = ((OTGGuiDimensionList)Minecraft.getMinecraft().currentScreen).dimensionSettingsList.advancedSettingsMenu;
+				float lastScrollPos = ((OTGGuiDimensionList)Minecraft.getMinecraft().currentScreen).dimensionSettingsList.getAmountScrolledFloat();
+				Minecraft.getMinecraft().displayGuiScreen(new OTGGuiDimensionList(previouslySelectedIndex, isMainMenu, isGameRulesMenu, isAdvancedSettingsMenu, lastScrollPos));
+			} else {
+				Minecraft.getMinecraft().displayGuiScreen(new OTGGuiDimensionList(null));
+			}
 		}
 	}
 }

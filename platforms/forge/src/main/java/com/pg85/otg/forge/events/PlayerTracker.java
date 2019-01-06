@@ -4,10 +4,12 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -36,9 +38,23 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 public class PlayerTracker
 {
     @SubscribeEvent
+    public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
+    {
+    	OTG.SetDimensionsConfig(null);
+    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    }
+    
+    @SubscribeEvent
+    public void onClientConnect(FMLNetworkEvent.ClientConnectedToServerEvent event)
+    {
+    	OTG.SetDimensionsConfig(null);
+    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    }
+	
+    @SubscribeEvent
     public void onConnectionCreated(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
-    	ServerPacketHandler.SendPacketsOnConnect(event);
+   		ServerPacketManager.SendPacketsOnConnect(event);
     }
 
 	@SubscribeEvent

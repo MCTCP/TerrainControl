@@ -30,6 +30,7 @@ import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.biomes.BiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.helpers.FileHelper;
@@ -38,11 +39,14 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ForgeEngine extends OTGEngine
@@ -70,11 +74,18 @@ public class ForgeEngine extends OTGEngine
     	}
     }
 
+    long lastPregeneratorStatusUpdateTime = System.currentTimeMillis();
     public void ProcessPregeneratorTick()
     {
     	for(LocalWorld world : getAllWorlds())
     	{
     		((ForgeWorldSession)world.GetWorldSession()).getPregenerator().ProcessTick();
+    	}
+    	
+    	if(System.currentTimeMillis() - lastPregeneratorStatusUpdateTime  > 1000l)
+    	{
+    		lastPregeneratorStatusUpdateTime = System.currentTimeMillis();
+        	ServerPacketManager.SendPregeneratorStatusPacketToAllPlayers(FMLCommonHandler.instance().getMinecraftServerInstance());
     	}
     }
 

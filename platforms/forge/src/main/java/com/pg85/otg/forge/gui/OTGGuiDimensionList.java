@@ -40,7 +40,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	//
 
 	SettingEntry buttonId;
-    private OTGGuiDimensionSettingsList dimensionSettingsList;
+    public OTGGuiDimensionSettingsList dimensionSettingsList;
 	
     OTGGuiPresetList selectPresetForDimensionMenu = new OTGGuiPresetList(this);
     boolean selectingPresetForDimension = false;
@@ -72,6 +72,12 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     private final int iCancelButton = 1;
     private final int iNewButton = 2;
     private final int iDeleteButton = 3;
+    
+    private boolean restoreSelection = false;
+	private boolean previouslySelectedMainMenu = false;
+	private boolean previouslySelectedGameRulesMenu = false;
+	private boolean previouslySelectedAdvancedSettingsMenu = false;
+	private float lastScrollPos = 0;
     
     public OTGGuiDimensionList(OTGGuiPresetList previousMenu)
     {
@@ -138,7 +144,42 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         }
     }
 
-    boolean settingsChanged = false;
+    // Only used for MP clients when refreshing the dimensions screen after receiving new data from the server
+    public OTGGuiDimensionList(int previouslySelectedIndex, boolean isMainMenu, boolean isGameRulesMenu, boolean isAdvancedSettingsMenu, float lastScrollPos)
+    {
+        this.previousMenu = null;        
+        this.dimensions = new ArrayList<DimensionConfig>();
+        
+        this.restoreSelection = true;
+        this.previouslySelectedMainMenu = isMainMenu;
+        this.previouslySelectedGameRulesMenu = isGameRulesMenu;
+        this.previouslySelectedAdvancedSettingsMenu = isAdvancedSettingsMenu;
+        this.lastScrollPos = lastScrollPos;
+        
+    	// If world is null then we're ingame
+		this.dimensions.add(OTG.GetDimensionsConfig().Overworld.clone());
+    	for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+    	{
+    		this.dimensions.add(dimConfig.clone());
+    	}
+        
+    	if(previouslySelectedIndex >= this.dimensions.size())
+    	{
+    		previouslySelectedIndex = this.dimensions.size() - 1;
+    	}
+    	
+        this.selectedDimension = this.dimensions.get(previouslySelectedIndex);
+        this.selectedDimensionIndex = previouslySelectedIndex;
+        
+        // Store original dimensions to compare differences after entering values for settings
+        this.originalDimensions = new ArrayList<DimensionConfig>();
+        for(DimensionConfig dimConfig : this.dimensions)
+        {
+        	this.originalDimensions.add(dimConfig.clone());
+        }
+	}
+
+	boolean settingsChanged = false;
     
     /**
      * Adds the buttons (and other controls) to the screen in question. Called when the GUI is displayed and when the
@@ -252,7 +293,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         if(this.dimensionSettingsList == null)
         {    	
 	    	this.dimensionSettingsList = new OTGGuiDimensionSettingsList(this, OTGGuiDimensionList.this.topMargin, OTGGuiDimensionList.this.height - OTGGuiDimensionList.this.bottomMargin, OTGGuiDimensionList.this.listWidth + margin, OTGGuiDimensionList.this.width - OTGGuiDimensionList.this.listWidth - OTGGuiDimensionList.this.margin - OTGGuiDimensionList.this.rightMargin, this.mc);
-	        this.dimensionsList = new OTGGuiSlotDimensionList(this, dimensions);       
+	        this.dimensionsList = new OTGGuiSlotDimensionList(this, dimensions);
         } else {
         	this.dimensionSettingsList.Resize(OTGGuiDimensionList.this.topMargin, OTGGuiDimensionList.this.height - OTGGuiDimensionList.this.bottomMargin, OTGGuiDimensionList.this.listWidth + margin, OTGGuiDimensionList.this.width - OTGGuiDimensionList.this.listWidth - OTGGuiDimensionList.this.margin - OTGGuiDimensionList.this.rightMargin);
         	this.dimensionsList.Resize();
@@ -312,12 +353,11 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 		this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, this.dimensions.get(0).PresetName));
                 	} else {
                 		        
-                		// If world is null then we're not ingame
-                        if(this.mc.world == null || this.mc.isSingleplayer())
+                        if(this.mc.isSingleplayer())
                         {
 	                		// Apply game rules and save
 	                		ApplyGameRules();                		
-	                		
+	                			                		
 	                		// Create worlds for any newly created dims                			
                 			for(DimensionConfig dimConfig : this.dimensions)
                 			{
@@ -332,7 +372,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                         } else {
                         	
                         	ArrayList<DimensionConfig> applyDimSettings = (ArrayList<DimensionConfig>) this.dimensions.clone();
-	                		// Create worlds for any newly created dims                			
+	                		// Create worlds for any newly created dims
+                        	ArrayList<DimensionConfig> dimensionConfigsToUpdate = new ArrayList<DimensionConfig>();
                 			for(int i = 0; i < applyDimSettings.size(); i++)
                 			{
                 				DimensionConfig dimConfig = applyDimSettings.get(i);
@@ -349,14 +390,19 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 						{
                 							if(!originalDimConfig.ToYamlString().equals(dimConfig.ToYamlString()))
                 							{
-                								// Send a packet with changes
-                								ClientPacketManager.SendUpdateDimensionSettingsPacket(dimConfig, i == 0);
+                								dimensionConfigsToUpdate.add(dimConfig);
                 							}
                 							break;
                 						}
                 					}
                 				}
                 			}
+                			if(dimensionConfigsToUpdate.size() > 0)
+                			{
+								// Send a packet with changes
+								ClientPacketManager.SendUpdateDimensionSettingsPacket(dimensionConfigsToUpdate);
+                			}
+                			
                 			this.settingsChanged = false;
                         }                		
                 		btnContinue.displayString = "";
@@ -423,7 +469,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	        			if(bSuccess)
 	        			{
 		                	this.dimensions.remove(this.selectedDimension);
-		                    if(this.dimensionsList.selectedIndex > this.dimensionsList.getSize() - 1)
+		                    if(this.dimensionsList.selectedIndex >= this.dimensionsList.getSize())
 		                    {
 		    	    			this.dimensionsList.selectedIndex = this.dimensionsList.getSize() - 1;
 		                    }
@@ -431,6 +477,16 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        			this.selectDimensionIndex(this.dimensionsList.selectedIndex);
 	        			}
                     } else {
+                    	if(this.selectedDimension.isNewConfig)
+                    	{
+		                	this.dimensions.remove(this.selectedDimension);
+		                    if(this.dimensionsList.selectedIndex >= this.dimensionsList.getSize())
+		                    {
+		    	    			this.dimensionsList.selectedIndex = this.dimensionsList.getSize() - 1;
+		                    }
+		        			this.dimensionsList.lastClickTime = System.currentTimeMillis();
+		        			this.selectDimensionIndex(this.dimensionsList.selectedIndex);
+                    	}
                     	ClientPacketManager.SendDeleteDimensionPacket(this.selectedDimension.PresetName);
                     }
                     return;
@@ -564,6 +620,11 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks)
     {
+    	if(this.dimensionsList == null)
+    	{
+    		return;
+    	}
+    	
     	if(System.currentTimeMillis() - lastPregeneratorCheckTime > 1000l)
     	{
     		lastPregeneratorCheckTime = System.currentTimeMillis();
@@ -679,8 +740,12 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 
     public void selectDimensionIndex(int index)
     {   	    	
+    	if(index >= dimensions.size())
+    	{
+    		return;
+    	}
         this.selectedDimensionIndex = index;
-        this.selectedDimension = (index >= 0 && index <= dimensions.size()) ? dimensions.get(selectedDimensionIndex) : null;
+        this.selectedDimension = index >= 0 ? dimensions.get(selectedDimensionIndex) : null;
         
         updateCache();
         this.dimensionSettingsList.scrollBy(Int.MinValue());
@@ -712,7 +777,16 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
    
     private void updateCache()
     {
-        this.dimensionSettingsList.refreshData(true, false, false); 
+    	// RestoreSelection happens when the MP client UI is updated with new data from the server
+    	if(this.restoreSelection)
+    	{
+    		this.restoreSelection = false;
+    		this.dimensionsList.selectedIndex = this.selectedDimensionIndex;
+    		this.dimensionSettingsList.refreshData(this.previouslySelectedMainMenu, this.previouslySelectedGameRulesMenu, this.previouslySelectedAdvancedSettingsMenu);
+    		this.dimensionSettingsList.amountScrolled = this.lastScrollPos;
+    	}	else {
+    		this.dimensionSettingsList.refreshData(true, false, false);
+    	}
     }
     
     private class OTGGuiSlotDimensionList extends OTGGuiScrollingList

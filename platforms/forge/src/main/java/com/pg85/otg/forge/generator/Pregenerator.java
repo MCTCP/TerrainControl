@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraft.world.gen.ChunkProviderServer;
@@ -62,12 +63,18 @@ public class Pregenerator
 	public String progressScreenElapsedTime = "";
 	public String progressScreenEstimatedTime = "";
 	public int progressScreenWorldSizeInBlocks;
+	public long progressScreenServerUsedMbs = 0;
+	public long progressScreenServerTotalMbs = 0;
 
 	public Pregenerator(LocalWorld world)
 	{
 		this.world = (ForgeWorld)world;
 
-		LoadPregeneratorData();
+		// Don't load pregenerator data on MP client
+		if(this.world.world != null)
+		{
+			LoadPregeneratorData();
+		}
 
 		maxSpawnPerTick = OTG.getPluginConfig().PregeneratorMaxChunksPerTick;
     	pregenerationWorld = world.getConfigs().getWorldConfig().getName();
@@ -76,6 +83,15 @@ public class Pregenerator
 	public int getPregenerationRadius()
 	{
 		return pregenerationRadius;
+	}
+	
+	/**
+	 * Only used when settings pregenerator status for MP clients (that don't actually get run)
+	 * @return
+	 */
+	public void SetPregeneratorIsRunning(boolean pregeneratorIsRunning)
+	{		
+		this.pregeneratorIsRunning = pregeneratorIsRunning;
 	}
 
 	/**
@@ -93,6 +109,7 @@ public class Pregenerator
 		} else {
 			pregenerationRadius = cycle;
 		}
+		// World can be null when creating new worlds on MP client
 		if(world != null)
 		{
 			this.SavePregeneratorData(true);
@@ -142,7 +159,7 @@ public class Pregenerator
 			Pregenerate();
 
 			processing = false;
-		}
+		}		
 	}
 
 	private void Pregenerate()
@@ -465,7 +482,11 @@ public class Pregenerator
     {
     	if(pregeneratorIsRunning)
     	{
-	    	SavePregeneratorData(false);
+    		// Don't save pregenerator data on MP client
+    		if(this.world.world != null)
+    		{
+    			SavePregeneratorData(false);
+    		}	    	
 	    	pregeneratorIsRunning = false;
     	}
     }
@@ -475,7 +496,11 @@ public class Pregenerator
 
     public void SavePregeneratorData()
     {
-    	SavePregeneratorData(false);
+    	// Don't save pregenerator data on MP client
+    	if(this.world.world != null)
+    	{
+    		SavePregeneratorData(false);
+    	}
     }
     
 	private void SavePregeneratorData(boolean forceSave)

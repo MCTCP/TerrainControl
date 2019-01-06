@@ -343,8 +343,12 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 
     public void selectPresetIndex(int index)
     {
+    	if(index >= ForgeEngine.presets.size())
+    	{
+    		return;
+    	}
         this.selected = index;
-        Entry<String, DimensionConfigGui> entry = (index >= 0 && index <= ForgeEngine.presets.size()) ? new ArrayList<Entry<String, DimensionConfigGui>>(ForgeEngine.presets.entrySet()).get(selected) : null;
+        Entry<String, DimensionConfigGui> entry = index >= 0 ? new ArrayList<Entry<String, DimensionConfigGui>>(ForgeEngine.presets.entrySet()).get(selected) : null;
         this.selectedPreset = entry != null ? new Tuple<String, DimensionConfigGui>(entry.getKey(), entry.getValue()) : null;
 
         updateCache();

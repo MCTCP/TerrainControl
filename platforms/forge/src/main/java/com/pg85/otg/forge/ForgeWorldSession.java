@@ -31,7 +31,11 @@ public class ForgeWorldSession extends WorldSession
 	{
 		super(world);
 		pregenerator = new Pregenerator(world);
-		LoadWorldBorderData();
+		// Don't load world border data on MP client
+		if(((ForgeWorld)world).world != null)
+		{
+			LoadWorldBorderData();
+		}
 	}
 
 	public Pregenerator getPregenerator()

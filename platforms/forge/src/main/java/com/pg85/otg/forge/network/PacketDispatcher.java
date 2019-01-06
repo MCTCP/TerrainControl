@@ -10,6 +10,7 @@ import com.pg85.otg.forge.network.client.packets.TeleportPlayerPacket;
 import com.pg85.otg.forge.network.server.packets.DimensionLoadUnloadPacket;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
 import com.pg85.otg.forge.network.server.packets.ParticlesPacket;
+import com.pg85.otg.forge.network.server.packets.PregeneratorStatusPacket;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -40,6 +41,7 @@ public class PacketDispatcher
 		PacketDispatcher.registerMessage(DimensionSyncPacket.Handler.class, DimensionSyncPacket.class, Side.CLIENT);
 		PacketDispatcher.registerMessage(ParticlesPacket.Handler.class, ParticlesPacket.class, Side.CLIENT);
 		PacketDispatcher.registerMessage(DimensionLoadUnloadPacket.Handler.class, DimensionLoadUnloadPacket.class, Side.CLIENT);
+		PacketDispatcher.registerMessage(PregeneratorStatusPacket.Handler.class, PregeneratorStatusPacket.class, Side.CLIENT);
 		PacketDispatcher.registerMessage(CreateDeleteDimensionPacket.Handler.class, CreateDeleteDimensionPacket.class, Side.SERVER);
 		PacketDispatcher.registerMessage(UpdateDimensionSettingsPacket.Handler.class, UpdateDimensionSettingsPacket.class, Side.SERVER);
 		PacketDispatcher.registerMessage(TeleportPlayerPacket.Handler.class, TeleportPlayerPacket.class, Side.SERVER);

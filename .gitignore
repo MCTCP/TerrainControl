@@ -30,6 +30,7 @@ dist
 out
 localexport.jardesc
 forgeInfo
+/platforms/forge/gradle/wrapper/*.jar
 
 # Minecraft, Bukkit and Forge files
 # (Eclipse uses ./plaftforms/forge/ as the root when running Forge, IntelliJ uses ./)
@@ -72,4 +73,3 @@ Thumbs.db
 .DS_Store
 *.lock
 *.launch
-*.jar

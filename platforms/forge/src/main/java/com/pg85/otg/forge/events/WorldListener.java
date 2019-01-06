@@ -7,7 +7,7 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.OTGWorldType;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
@@ -25,7 +25,7 @@ public class WorldListener
     	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());
     	if(forgeWorld != null)
     	{
-    		ServerPacketHandler.SendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
+    		ServerPacketManager.SendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
     	}
 	}
 	

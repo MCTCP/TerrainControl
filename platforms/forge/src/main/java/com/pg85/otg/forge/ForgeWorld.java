@@ -977,6 +977,7 @@ public class ForgeWorld implements LocalWorld
     public void provideClientConfigs(ClientConfigProvider config)
     {
         this.settings = config;
+        this.WorldSession = new ForgeWorldSession(this);
     }
 
     @SideOnly(Side.CLIENT)

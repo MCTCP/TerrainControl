@@ -8,6 +8,7 @@ import com.pg85.otg.forge.network.PacketDispatcher;
 import com.pg85.otg.forge.network.server.packets.DimensionLoadUnloadPacket;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
 import com.pg85.otg.forge.network.server.packets.ParticlesPacket;
+import com.pg85.otg.forge.network.server.packets.PregeneratorStatusPacket;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -16,7 +17,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerConnectionFromClientEvent;
 
-public class ServerPacketHandler
+public class ServerPacketManager
 {
 	// Server to client
 	
@@ -133,4 +134,34 @@ public class ServerPacketHandler
 	    	}
 		}
 	} 
+	
+	// Sent to the client to update the pregenerator UI
+	public static void SendPregeneratorStatusPacketToAllPlayers(MinecraftServer server)
+	{
+        ByteBuf nettyBuffer = Unpooled.buffer();
+        ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
+
+        try
+        {        	
+        	PregeneratorStatusPacket.WriteToStream(stream);
+		}
+        catch (IOException e1)
+        {
+			e1.printStackTrace();
+		} finally {
+			try {
+				stream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+		if(nettyBuffer != null)
+		{
+	    	for(EntityPlayerMP player : server.getPlayerList().getPlayers())
+	    	{
+	        	PacketDispatcher.sendTo(new PregeneratorStatusPacket(nettyBuffer), (EntityPlayerMP) player);
+	    	}
+		}
+	}
 }

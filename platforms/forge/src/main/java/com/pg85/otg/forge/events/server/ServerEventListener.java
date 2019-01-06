@@ -47,7 +47,7 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.generator.Cartographer;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
@@ -533,7 +533,7 @@ public class ServerEventListener
                 }
         		if(particleDataForOTGPerPlayer.size() > 0)
         		{
-        			ServerPacketHandler.SendParticlesPacket(particleDataForOTGPerPlayer, (EntityPlayerMP) player);
+        			ServerPacketManager.SendParticlesPacket(particleDataForOTGPerPlayer, (EntityPlayerMP) player);
         		}
         	}
         }

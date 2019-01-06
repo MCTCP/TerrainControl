@@ -343,7 +343,7 @@ public class ObjectSpawner
 				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC/OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to TRACE in mods/OpenTerrainGenerator/OTG.ini file for a stack trace.");
 				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
 			} else {
-				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. Update: Using OTG multi-dimension features may cause this log message occasionally, doesn't appear to cause any problems, still have to look into it further.");
+				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. Update: Using OTG multi-dimension features may cause this log message occasionally, still need to investigate.");
 				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
 
 				// Get the random generator

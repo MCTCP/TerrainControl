@@ -169,6 +169,11 @@ public abstract class OTGGuiSlot
     {
         return (int)this.amountScrolled;
     }
+    
+    public float getAmountScrolledFloat()
+    {
+        return this.amountScrolled;
+    }
 
     public boolean isMouseYWithinSlotBounds(int p_148141_1_)
     {

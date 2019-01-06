@@ -26,7 +26,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.generator.Cartographer;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -231,7 +231,7 @@ public class OTGDimensionManager
 		{
 			ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getUnloadedWorld(worldName);
 			OTGDimensionManager.DeleteDimension(forgeWorld.getDimensionId(), forgeWorld, server, true);
-			ServerPacketHandler.SendDimensionSynchPacketToAllPlayers(server);
+			ServerPacketManager.SendDimensionSynchPacketToAllPlayers(server);
 			return true;
 		}		
 		return false;

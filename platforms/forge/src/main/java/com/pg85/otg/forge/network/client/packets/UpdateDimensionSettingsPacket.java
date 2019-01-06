@@ -2,6 +2,7 @@ package com.pg85.otg.forge.network.client.packets;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IThreadListener;
@@ -13,9 +14,11 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
@@ -32,13 +35,17 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(DataOutput stream, DimensionConfig dimConfig, boolean isOverWorld) throws IOException
+	public static void WriteToStream(DataOutput stream, ArrayList<DimensionConfig> dimConfigs) throws IOException
 	{
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Normal packet
-    	stream.writeBoolean(isOverWorld);
     	
-    	ConfigFile.writeStringToStream(stream, dimConfig.ToYamlString());
+    	stream.writeInt(dimConfigs.size());
+    	
+    	for(DimensionConfig dimConfig : dimConfigs)
+    	{
+    		ConfigFile.writeStringToStream(stream, dimConfig.ToYamlString());
+    	}    	
 	}
 	
 	public static class Handler extends AbstractServerMessageHandler<UpdateDimensionSettingsPacket>
@@ -53,35 +60,65 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 				{
 					// Update dimension settings
 				
-					boolean isOverWorld = message.getStream().readBoolean();
-					
-					String dimensionConfigYaml = ConfigFile.readStringFromStream(message.getStream());
-					DimensionConfig dimConfig = DimensionConfig.FromYamlString(dimensionConfigYaml);
-					
+					int listSize = message.getStream().readInt();
+					ArrayList<DimensionConfig> dimConfigs = new ArrayList<DimensionConfig>();
+					for(int i = 0; i < listSize; i++)
+					{
+						dimConfigs.add(DimensionConfig.FromYamlString(ConfigFile.readStringFromStream(message.getStream())));
+					}					
+				
 					IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
 		            mainThread.addScheduledTask(new Runnable()
 		            {
 		                @Override
 		                public void run()
 	                	{
-		                	if(isOverWorld)
-		                	{
-		                		OTG.GetDimensionsConfig().Overworld = dimConfig;
-		                	} else {
-		                		// TODO: Assuming atm that only a single thread is ever 
-		                		// accessing dimensionsconfig, is that true? 
-		                		DimensionConfig dimConfigToRemove = null;
-		                		for(DimensionConfig dimConfig2 : OTG.GetDimensionsConfig().Dimensions)
-		                		{
-		                			if(dimConfig.PresetName.equals(dimConfig2.PresetName))
-		                			{
-		                				dimConfigToRemove = dimConfig2;
-		                			}
-		                		}
-		                		OTG.GetDimensionsConfig().Dimensions.remove(dimConfigToRemove);
-		                		OTG.GetDimensionsConfig().Dimensions.add(dimConfig);
-		                		ServerPacketHandler.SendDimensionSynchPacketToAllPlayers(player.getServer());
+		                	for(DimensionConfig dimConfig : dimConfigs)
+		                	{		                		
+		                		boolean isOverWorld = dimConfig.PresetName == null; 
+			                	if(isOverWorld)
+			                	{
+	            					ForgeWorld forgeWorld = null;
+	        						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
+	            					if(forgeWorld.GetWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
+	            					{
+		            					forgeWorld.GetWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
+		            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.GetWorldSession().getPregenerationRadius();
+	            					}
+			                		OTG.GetDimensionsConfig().Overworld = dimConfig;
+			                	} else {
+			                		// TODO: Assuming atm that only a single thread is ever 
+			                		// accessing dimensionsconfig, is that true? 
+			                		DimensionConfig dimConfigToRemove = null;
+			                		for(DimensionConfig dimConfig2 : OTG.GetDimensionsConfig().Dimensions)
+			                		{
+			                			if(dimConfig.PresetName.equals(dimConfig2.PresetName))
+			                			{
+			                				dimConfigToRemove = dimConfig2;
+			                			}
+			                		}
+			                		
+	            					ForgeWorld forgeWorld = null;
+	        						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(dimConfig.PresetName);
+	            					if(forgeWorld == null)
+	            					{
+	            						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimConfig.PresetName);	
+	            					}
+	            					// ForgeWorld might have been deleted, client may have sent outdated worlds list
+	            					if(forgeWorld != null)
+	            					{
+		            					if(forgeWorld.GetWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
+		            					{
+			            					forgeWorld.GetWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
+			            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.GetWorldSession().getPregenerationRadius();
+		            					}
+	
+				                		OTG.GetDimensionsConfig().Dimensions.remove(dimConfigToRemove);
+				                		OTG.GetDimensionsConfig().Dimensions.add(dimConfig);
+	            					}
+			                	}
 		                	}
+	                		ServerPacketManager.SendDimensionSynchPacketToAllPlayers(player.getServer());
 	                	}
 		            });
 		            return null;					

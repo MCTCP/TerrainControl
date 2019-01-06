@@ -5,7 +5,7 @@ import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.biomes.ForgeBiome;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
 import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
@@ -233,7 +233,7 @@ public final class WorldLoader
         	
             if(!loadedWorld.getWorld().isRemote)
             {
-            	ServerPacketHandler.SendDimensionLoadUnloadPacketToAllPlayers(false, world.getName(), loadedWorld.getWorld().getMinecraftServer());
+            	ServerPacketManager.SendDimensionLoadUnloadPacketToAllPlayers(false, world.getName(), loadedWorld.getWorld().getMinecraftServer());
             }
         }
     }

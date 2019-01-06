@@ -18,7 +18,7 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
-import com.pg85.otg.forge.network.server.ServerPacketHandler;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
@@ -73,6 +73,14 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		                @Override
 		                public void run()
 	                	{
+		                	// Check if the world doesn't already exist
+		                	for(DimensionConfig existingDimConfig : OTG.GetDimensionsConfig().Dimensions)
+		                	{
+		                		if(existingDimConfig.PresetName.equals(dimConfig.PresetName))
+		                		{
+		                			return;
+		                		}
+		                	}
 							OTG.GetDimensionsConfig().Dimensions.add(dimConfig);
 							
 							long seed = (long) Math.floor((Math.random() * Long.MAX_VALUE));
@@ -93,9 +101,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 								DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
 							}
 							
-			    			ServerPacketHandler.SendDimensionSynchPacketToAllPlayers(player.getServer());
-							
-							// TODO: Show message
+			    			ServerPacketManager.SendDimensionSynchPacketToAllPlayers(player.getServer());
 		                }
 		            });
 		            return null;
