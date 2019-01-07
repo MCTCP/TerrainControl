@@ -29,9 +29,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.IThreadListener;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
 
 public class ClientPacketManager
@@ -64,14 +62,14 @@ public class ClientPacketManager
 		}        
 	}
 
-	public static void SendUpdateDimensionSettingsPacket(ArrayList<DimensionConfig> dimConfigs)
+	public static void SendUpdateDimensionSettingsPacket(ArrayList<DimensionConfig> dimConfigs, boolean isOverWorldIncluded)
 	{
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
 
         try
         {
-        	UpdateDimensionSettingsPacket.WriteToStream(stream, dimConfigs);
+        	UpdateDimensionSettingsPacket.WriteToStream(stream, dimConfigs, isOverWorldIncluded);
 		}
         catch (IOException e1)
         {
@@ -141,10 +139,11 @@ public class ClientPacketManager
         	PacketDispatcher.sendToServer(new TeleportPlayerPacket(nettyBuffer));
 		}
 	}
-
+	
 	public static void RegisterClientWorlds(DataInputStream wrappedStream, WorldLoader worldLoader) throws IOException
-	{	
-		OTG.SetDimensionsConfig(DimensionsConfig.FromYamlString(ConfigFile.readStringFromStream(wrappedStream)));
+	{		
+		DimensionsConfig dimsConfig = DimensionsConfig.FromYamlString(ConfigFile.readStringFromStream(wrappedStream)); 
+		OTG.SetDimensionsConfig(dimsConfig);
 		
 		ForgeEngine.presets.clear();
 		int presetCount = wrappedStream.readInt();
@@ -183,7 +182,8 @@ public class ClientPacketManager
 	
 			String worldName = ConfigFile.readStringFromStream(wrappedStream);
 			
-			if(dimensionId != 0 && !DimensionManager.isDimensionRegistered(dimensionId))
+			// Overworld can be null for MP clients
+			if(!DimensionManager.isDimensionRegistered(dimensionId) || (dimensionId == 0 && ((ForgeEngine)OTG.getEngine()).getOverWorld() == null))
 			{
 				if(dimensionId != 0)
 	    		{

@@ -35,12 +35,13 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(DataOutput stream, ArrayList<DimensionConfig> dimConfigs) throws IOException
+	public static void WriteToStream(DataOutput stream, ArrayList<DimensionConfig> dimConfigs, boolean isOverWorldIncluded) throws IOException
 	{
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Normal packet
     	
     	stream.writeInt(dimConfigs.size());
+		stream.writeBoolean(isOverWorldIncluded);
     	
     	for(DimensionConfig dimConfig : dimConfigs)
     	{
@@ -61,6 +62,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 					// Update dimension settings
 				
 					int listSize = message.getStream().readInt();
+            		boolean isOverWorld = message.getStream().readBoolean();
 					ArrayList<DimensionConfig> dimConfigs = new ArrayList<DimensionConfig>();
 					for(int i = 0; i < listSize; i++)
 					{
@@ -74,8 +76,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 		                public void run()
 	                	{
 		                	for(DimensionConfig dimConfig : dimConfigs)
-		                	{		                		
-		                		boolean isOverWorld = dimConfig.PresetName == null; 
+		                	{ 
 			                	if(isOverWorld)
 			                	{
 	            					ForgeWorld forgeWorld = null;

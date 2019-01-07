@@ -39,8 +39,6 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -493,10 +491,15 @@ public class ForgeEngine extends OTGEngine
 		ArrayList<LocalWorld> allWorlds = getAllWorlds();
 		for(LocalWorld world : allWorlds)
 		{
+			// Overworld can be null for MP clients who are in a dimension, try 'overworld'
 			if(
-				((ForgeWorld)world).getWorld() != null && 
-				((ForgeWorld)world).getWorld().provider != null && 
-				((ForgeWorld)world).getWorld().provider.getDimension() == 0
+				(
+					((ForgeWorld)world).getWorld() != null && 
+					((ForgeWorld)world).getWorld().provider != null && 
+					((ForgeWorld)world).getWorld().provider.getDimension() == 0
+				) || (
+						((ForgeWorld)world).getName().equals("overworld")
+				)				
 			)
 			{
 				return (ForgeWorld)world;

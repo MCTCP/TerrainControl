@@ -40,15 +40,27 @@ public class PlayerTracker
     @SubscribeEvent
     public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
     {
-    	OTG.SetDimensionsConfig(null);
-    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	// Only do this for MP, to clear configs / registries
+    	// For SP the server shuts down after the client disconnects, so we can't unregister biome yet(?)
+    	if(!event.getManager().isLocalChannel())
+    	{
+	    	OTG.SetDimensionsConfig(null);
+	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	}
     }
     
     @SubscribeEvent
     public void onClientConnect(FMLNetworkEvent.ClientConnectedToServerEvent event)
     {
-    	OTG.SetDimensionsConfig(null);
-    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	// Only do this for MP, to clear any configs / registries that may 
+    	// still be present, although there technically shouldn't be any!
+    	if(!event.getManager().isLocalChannel())
+    	{
+	    	OTG.SetDimensionsConfig(null);
+	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	} else {
+    		String breakpoint = "";
+    	}
     }
 	
     @SubscribeEvent

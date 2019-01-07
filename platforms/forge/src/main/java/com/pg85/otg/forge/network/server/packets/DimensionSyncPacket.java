@@ -4,7 +4,6 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.HashMap;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.player.EntityPlayer;
@@ -62,15 +61,17 @@ public class DimensionSyncPacket extends OTGPacket
 			ConfigFile.writeStringToStream(stream, dimConfig.ToYamlString());
 		}
 		
-		stream.writeInt(otgDimData.orderedDimensions.size() + (localWorld == null ? 0 : 1)); // Number of worlds in this packet, add overworld if it is an OTG world.
+		//stream.writeInt(otgDimData.orderedDimensions.size() + (localWorld == null ? 0 : 1)); // Number of worlds in this packet, add overworld if it is an OTG world.
+		stream.writeInt(otgDimData.orderedDimensions.size());
 	
 		// Send worldconfig and biomeconfigs for each world.
-		
+		/*
 		if(localWorld != null)
 		{
 			// Overworld (dim 0)
 	        try
 	        {
+	        	stream.writeBoolean(true); // World is loaded, used for GUI on the client
 	        	stream.writeInt(0);
 	            ConfigToNetworkSender.writeConfigsToStream(localWorld.getConfigs(), stream, false);
 	        }
@@ -79,6 +80,7 @@ public class DimensionSyncPacket extends OTGPacket
 	            OTG.printStackTrace(LogMarker.FATAL, e);
 	        }
 		}
+		*/
 		
 		for(int i = 0; i <= otgDimData.highestOrder; i++)
 		{
@@ -106,7 +108,7 @@ public class DimensionSyncPacket extends OTGPacket
 			}
 		}
 	}
-
+	
 	public static ForgeWorld RegisterClientWorldBukkit(WorldClient mcWorld, DataInputStream wrappedStream, HashMap<String, ForgeWorld> worlds, HashMap<String, ForgeWorld> unloadedWorlds) throws IOException
 	{
 		// TODO: Test this and fix this if necessary.

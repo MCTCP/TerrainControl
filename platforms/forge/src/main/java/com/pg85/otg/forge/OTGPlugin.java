@@ -35,6 +35,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
+import net.minecraft.world.storage.ISaveHandler;
+import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
@@ -198,7 +200,6 @@ public class OTGPlugin
 
         World overWorld = DimensionManager.getWorld(0);
 
-        /*
         if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator") && !(overWorld.getWorldInfo().getTerrainType() instanceof OTGWorldType))
         {
 	    	ISaveHandler isavehandler = overWorld.getSaveHandler();
@@ -212,11 +213,10 @@ public class OTGPlugin
 	        }
 	        throw new RuntimeException("OTG has detected that you are loading an OTG world that has been used without OTG installed. OTG has fixed and saved the world data, you can now restart the game and enter the world.");
         }
-        */
 
 		if(!overWorld.isRemote) // Server side only
 		{
-			if(OTG.GetDimensionsConfig() == null) // This is a vanilla overworld
+			if(OTG.GetDimensionsConfig() == null) // This is a vanilla overworld or a new OTG world
 			{
 				// Check if there is a dimensionsConfig saved for this world
 				DimensionsConfig dimsConfig = DimensionsConfig.LoadFromFile(overWorld.getSaveHandler().getWorldDirectory());

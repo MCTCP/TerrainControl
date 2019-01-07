@@ -207,7 +207,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    	        		if(dimConfig.PresetName.equals(this.selectPresetForDimensionMenu.selectedPreset.getFirst()))
     	        			{
 	    	        			DimensionConfig newConfig = dimConfig.clone();
-	    	        			// If world is nnot null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
+	    	        			// If world is not null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
 	    	        			newConfig.isNewConfig = this.mc.world != null;
 	    	        			this.dimensions.add(newConfig);	    	        			
 	    	        			break;
@@ -374,6 +374,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                         	ArrayList<DimensionConfig> applyDimSettings = (ArrayList<DimensionConfig>) this.dimensions.clone();
 	                		// Create worlds for any newly created dims
                         	ArrayList<DimensionConfig> dimensionConfigsToUpdate = new ArrayList<DimensionConfig>();
+                        	boolean isOverWorldIncluded = false;
                 			for(int i = 0; i < applyDimSettings.size(); i++)
                 			{
                 				DimensionConfig dimConfig = applyDimSettings.get(i);
@@ -386,10 +387,14 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 					// If the config has been edited send the changes to the server
                 					for(DimensionConfig originalDimConfig : this.originalDimensions)
                 					{
-                						if(originalDimConfig.PresetName == null || originalDimConfig.equals(dimConfig.PresetName))
+                						if(originalDimConfig.PresetName == null || originalDimConfig.PresetName.equals(dimConfig.PresetName))
                 						{
                 							if(!originalDimConfig.ToYamlString().equals(dimConfig.ToYamlString()))
                 							{
+                								if(i == 0)
+                								{
+                									isOverWorldIncluded = true;
+                								}
                 								dimensionConfigsToUpdate.add(dimConfig);
                 							}
                 							break;
@@ -400,7 +405,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 			if(dimensionConfigsToUpdate.size() > 0)
                 			{
 								// Send a packet with changes
-								ClientPacketManager.SendUpdateDimensionSettingsPacket(dimensionConfigsToUpdate);
+								ClientPacketManager.SendUpdateDimensionSettingsPacket(dimensionConfigsToUpdate, isOverWorldIncluded);
                 			}
                 			
                 			this.settingsChanged = false;
@@ -462,7 +467,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                     {
 	                    boolean bSuccess = true;
 	        			// If world is not null then we're ingame
-	        			if(this.mc.world != null) 
+	        			if(!this.selectedDimension.isNewConfig && this.mc.world != null) 
 	        			{
 	        				bSuccess = OTGDimensionManager.DeleteDimensionServer(this.selectedDimension.PresetName, this.mc.getIntegratedServer());
 	        			}
@@ -486,8 +491,9 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		                    }
 		        			this.dimensionsList.lastClickTime = System.currentTimeMillis();
 		        			this.selectDimensionIndex(this.dimensionsList.selectedIndex);
+                    	} else {
+                    		ClientPacketManager.SendDeleteDimensionPacket(this.selectedDimension.PresetName);
                     	}
-                    	ClientPacketManager.SendDeleteDimensionPacket(this.selectedDimension.PresetName);
                     }
                     return;
                 }
@@ -784,7 +790,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     		this.dimensionsList.selectedIndex = this.selectedDimensionIndex;
     		this.dimensionSettingsList.refreshData(this.previouslySelectedMainMenu, this.previouslySelectedGameRulesMenu, this.previouslySelectedAdvancedSettingsMenu);
     		this.dimensionSettingsList.amountScrolled = this.lastScrollPos;
-    	}	else {
+    	} else {
     		this.dimensionSettingsList.refreshData(true, false, false);
     	}
     }

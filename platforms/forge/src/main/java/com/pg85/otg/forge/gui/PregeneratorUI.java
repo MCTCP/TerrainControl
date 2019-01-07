@@ -20,7 +20,7 @@ public class PregeneratorUI
 	private static boolean menuOpen = false;
 	public static void ShowInGameUI()
 	{
-		//if(menuOpen)
+		if(menuOpen)
 		{
 			boolean isRunningAndNotDone = false;
 			ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
