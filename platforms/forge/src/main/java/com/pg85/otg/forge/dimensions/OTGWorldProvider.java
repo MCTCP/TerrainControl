@@ -11,13 +11,13 @@ import com.pg85.otg.forge.OTGPlugin;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class OTGWorldProvider extends WorldProvider
+public class OTGWorldProvider extends WorldProviderSurface
 {
 	public DimensionConfig dimConfig = null;
 	public WorldConfig worldConfig = null;
@@ -36,7 +36,7 @@ public class OTGWorldProvider extends WorldProvider
 		return worldConfig;
 	}
 
-	long lastFetchTime = System.currentTimeMillis();
+	long lastFetchTime = System.currentTimeMillis();	
 	public DimensionConfig GetDimensionConfig()
 	{		
 		// The config may be updated during a session, refresh it once per second
@@ -60,7 +60,10 @@ public class OTGWorldProvider extends WorldProvider
 		return dimConfig;
 	}
 	
-	public OTGWorldProvider() { }
+	public OTGWorldProvider()
+	{
+		
+	}
 
     // A message to display to the user when they transfer to this dimension.
     public String getWelcomeMessage()
@@ -77,6 +80,7 @@ public class OTGWorldProvider extends WorldProvider
     }
 
 	DimensionType dimType = null;
+	@Override
     public DimensionType getDimensionType()
     {
     	if(dimType == null)
@@ -85,23 +89,24 @@ public class OTGWorldProvider extends WorldProvider
     	}
 
     	// Some mods (like Optifine) crash if the dimensionType returned is not one of the default ones.
-    	// We can't use DimensionType.OVERWORLD though or the ChunkProdivderServer.unloadQueuedChunks won't unload this dimension
+    	// We can't use DimensionType.OVERWORLD though or ChunkProdivderServer.unloadQueuedChunks won't unload this dimension
     	// This seems to be called often so may cause client lag :(.
-    	StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
-    	if(stackTrace.length > 2)
-    	{
-    		String className = stackTrace[2].getClassName().toLowerCase();
-	    	if(className.contains("customcolors"))
-	    	{
-	    		return DimensionType.OVERWORLD;
-	    	}
-    	}
+    	//StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    	//if(stackTrace.length > 2)
+    	//{
+    		//String className = stackTrace[2].getClassName().toLowerCase();
+	    	//if(className.contains("customcolors"))
+	    	///{
+//	    		return DimensionType.OVERWORLD;
+	    	//}
+    	//}
 
         return dimType;
     }
 
      // Creates a new {@link BiomeProvider} for the WorldProvider, and also sets the values of {@link #hasSkylight} and
      // {@link #hasNoSky} appropriately.
+	@Override
     protected void init()
     {
         // Creates a new world chunk manager for WorldProvider
@@ -393,4 +398,11 @@ public class OTGWorldProvider extends WorldProvider
     	DimensionConfig worldConfig = GetDimensionConfig();
     	return worldConfig != null ? !worldConfig.Settings.CanRespawnHere ? worldConfig.Settings.RespawnDimension : super.getRespawnDimension(player) : super.getRespawnDimension(player);
     }
+    
+    @Override
+    public boolean shouldClientCheckLighting()
+    {
+        return true;
+    }
+    
 }

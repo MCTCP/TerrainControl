@@ -31,6 +31,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.gui.OTGGuiDimensionSettingsList.SettingEntry;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
@@ -603,7 +604,9 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 
     				PregeneratorUI.ResetIngameUI();
     				
-    		        DimensionType.OVERWORLD.suffix = "OTG";
+    				//DimensionType.OVERWORLD.clazz = OTGWorldProvider.class;
+    		        //DimensionType.OVERWORLD.suffix = "OTG";    				
+    				
     				
     				this.mc.launchIntegratedServer(this.worldName, this.worldName, worldsettings);
     			//}
@@ -613,6 +616,11 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		super.confirmClicked(ok, worldId);
     }    
 
+	static
+	{
+		DimensionType.register("overworld", "OTG", 0, OTGWorldProvider.class, false);
+	}
+	
     public int drawLine(String line, int offset, int shifty)
     {
         this.fontRenderer.drawString(line, offset, shifty, 0xd7edea);

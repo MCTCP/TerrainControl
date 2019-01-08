@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.asm;
+package com.pg85.otg.forge.asm.excluded;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -18,6 +18,8 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import com.pg85.otg.forge.asm.OTGHooks;
 
 import org.objectweb.asm.Type;
 import static org.objectweb.asm.Opcodes.*;
@@ -120,16 +122,7 @@ public class OTGClassTransformer implements IClassTransformer
 				break;
 				case 14: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
 					transformInitDimension1(classNode, isObfuscated);
-				break;				
-				//case 15: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
-					//transformInitDimension2(classNode, isObfuscated);
-				//break;
-				//case 16: // net.minecraft.server.MinecraftServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
-					//transformLoadAllWorldsMinecraftServer(classNode, isObfuscated);
-				//break;
-				//case 17: // net.minecraft.server.integrated.IntegratedServer.loadAllWorlds(String saveName, String worldNameIn, long seed, WorldType type, String generatorOptions)
-					//transformLoadAllWorldsIntegratedServer(classNode, isObfuscated);
-				//break;
+				break; 				
 			}
 
 			ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
@@ -232,7 +225,7 @@ public class OTGClassTransformer implements IClassTransformer
 
 				InsnList toInsert = new InsnList();
 				toInsert.add(new VarInsnNode(ALOAD, 0));
-				toInsert.add(new TypeInsnNode(INSTANCEOF, "com/pg85/otg/forge/asm/IOTGASMBiome"));
+				toInsert.add(new TypeInsnNode(INSTANCEOF, "com/pg85/otg/forge/asm/excluded/IOTGASMBiome"));
 				LabelNode l1 = new LabelNode();
 				toInsert.add(new JumpInsnNode(IFEQ, l1));
 				LabelNode l2 = new LabelNode();

@@ -380,7 +380,8 @@ public class BiomeConfig extends ConfigFile
 
     private void readResourceSettings(SettingsMap settings)
     {
-        for (ConfigFunction<BiomeConfig> res : settings.getConfigFunctions(this, this.doResourceInheritance))
+    	// Disable resourceinheritance for saplings
+        for (ConfigFunction<BiomeConfig> res : settings.getConfigFunctions(this, false))
         {
             if (res != null)
             {
@@ -388,7 +389,16 @@ public class BiomeConfig extends ConfigFile
                 {
                     SaplingGen sapling = (SaplingGen) res;
                     this.saplingGrowers.put(sapling.saplingType, sapling);
-                } else {
+                }
+            }
+        }
+    	
+        for (ConfigFunction<BiomeConfig> res : settings.getConfigFunctions(this, this.doResourceInheritance))
+        {
+            if (res != null)
+            {
+                if (!(res instanceof SaplingGen))
+                {
                     this.resourceSequence.add(res);
                 }
             }
@@ -420,9 +430,9 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.RESOURCE_INHERITANCE, this.doResourceInheritance,
                 "When set to true, all resources of the parent biome (if any) will be copied",
-                "to the resources queue of this biome. If a resource in the parent biome looks",
-                "very similar to that of a child biome (for example, two ores of the same type)",
-                "it won't be copied.");
+                "to the resources queue of this biome, except for saplings. If a resource in",
+                "the parent biome looks very similar to that of a child biome (for example, ",
+                "two ores of the same type it won't be copied.");
 
         // Biome placement
         writer.bigTitle("Biome placement");

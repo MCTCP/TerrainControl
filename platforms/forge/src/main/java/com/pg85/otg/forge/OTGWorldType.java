@@ -113,10 +113,7 @@ public class OTGWorldType extends WorldType
         {
 	        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), OTGPlugin.txWorldType);
 	        worldSettings.setGeneratorOptions("OpenTerrainGenerator");
-	        if(mcWorld.getWorldInfo().areCommandsAllowed())
-	        {
-	        	worldSettings.enableCommands();
-	        }
+	        mcWorld.getWorldInfo().setAllowCommands(mcWorld.getWorldInfo().areCommandsAllowed());
 	        mcWorld.getWorldInfo().populateFromWorldSettings(worldSettings);
     	}
         //

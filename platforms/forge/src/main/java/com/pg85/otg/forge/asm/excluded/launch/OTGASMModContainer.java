@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.asm.launch;
+package com.pg85.otg.forge.asm.excluded.launch;
 
 import java.util.ArrayList;
 import java.util.List;

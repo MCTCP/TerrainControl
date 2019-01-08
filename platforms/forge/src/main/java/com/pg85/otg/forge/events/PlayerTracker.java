@@ -58,8 +58,6 @@ public class PlayerTracker
     	{
 	    	OTG.SetDimensionsConfig(null);
 	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
-    	} else {
-    		String breakpoint = "";
     	}
     }
 	

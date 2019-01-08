@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.forge.asm.excluded.IOTGASMBiome;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 
@@ -33,7 +34,11 @@ public class OTGHooks
 	
 	public static int getIDForObject(Biome biome)
 	{
-		return ((IOTGASMBiome)biome).getSavedId();
+		if(biome instanceof IOTGASMBiome)
+		{
+			return ((IOTGASMBiome)biome).getSavedId();
+		}
+		return Biome.getIdForBiome(biome);
 	}
 
 	public static double getGravityFactor(Entity entity)

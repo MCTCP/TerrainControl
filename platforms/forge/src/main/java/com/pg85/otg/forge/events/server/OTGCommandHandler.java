@@ -838,9 +838,27 @@ public final class OTGCommandHandler implements ICommand
 	}
 
 	@Override
-	public List<String> getTabCompletions(MinecraftServer server,
-			ICommandSender sender, String[] args, BlockPos targetPos) {
-		return null;
+	public List<String> getTabCompletions(MinecraftServer server,ICommandSender sender, String[] args, BlockPos targetPos) {
+
+		List<String> listComplet = new ArrayList<String>();
+
+		listComplet.add("worldinfo");
+		listComplet.add("biome");
+		listComplet.add("bo3");
+		listComplet.add("tp");
+
+		listComplet.add("pregenerator");
+		listComplet.add("pregen");
+
+		listComplet.add("dimension");
+		listComplet.add("dim");
+
+		listComplet.add("blocks");
+		listComplet.add("entities");
+		listComplet.add("unloadbo3s");
+		listComplet.add("GetModData");
+
+		return listComplet;
 	}
 
 	@Override

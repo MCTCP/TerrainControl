@@ -422,9 +422,9 @@ public class ChunkProviderOTG
                     }
                     if (this.riverFound)
                     {
-                        output += biomeConfig.riverHeightMatrix[y];
+                    	output += biomeConfig.riverHeightMatrix[Math.min(biomeConfig.riverHeightMatrix.length - 1, y)];
                     } else {
-                        output += biomeConfig.heightMatrix[y];
+                    	output += biomeConfig.heightMatrix[Math.min(biomeConfig.heightMatrix.length - 1, y)];
                     }
 
                     this.rawTerrain[i3D] = output;

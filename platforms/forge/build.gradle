@@ -85,7 +85,7 @@ task asmJar(type: Jar, dependsOn: 'compileJava') {
     manifest {
         // Your previous manifest attributes go here
         // Example line >> attributes 'FMLCorePlugin': 'testmod.asm.TweakPlugin'
-		attributes 'FMLCorePlugin': 'com.pg85.otg.forge.asm.launch.OTGCorePlugin'
+		attributes 'FMLCorePlugin': 'com.pg85.otg.forge.asm.excluded.launch.OTGCorePlugin'
 		attributes 'FMLCorePluginContainsMod': 'true'
     }
 }
