@@ -485,13 +485,17 @@ public final class OTGCommandHandler implements ICommand
 					}
 
 	            	int existingDim = 0;
+	            	for(int otgDim : OTGDimensionManager.GetOTGDimensions())
+	            	{
+	            		
+	            	}
+					OTGDimensionManager.GetAllOTGDimensions();
 					for(int i = 2; i < Long.SIZE << 4; i++)
 					{
 						if(DimensionManager.isDimensionRegistered(i))
 						{
 							DimensionType dimensionType = DimensionManager.getProviderType(i);
-
-							if(dimensionType.getSuffix() != null && dimensionType.getSuffix().equals("OTG") && dimensionType.getName().equals(dimName))
+							if(OTGDimensionManager.IsOTGDimension(i) && dimensionType.getName().equals(dimName))
 							{
 								existingDim = i;
 								if(CommandHelper.containsArgument(argString, "-c"))
@@ -499,7 +503,7 @@ public final class OTGCommandHandler implements ICommand
 				    				sender.sendMessage(new TextComponentString(""));
 				                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Dimension '" + dimName + "' already exists."));
 				    				return;
-								}
+								}								
 							}
 						}
 					}

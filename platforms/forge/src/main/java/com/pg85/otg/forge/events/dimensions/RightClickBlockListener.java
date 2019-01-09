@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.events.dimensions;
 
 import com.pg85.otg.forge.dimensions.OTGBlockPortal;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.generator.Cartographer;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,12 +19,11 @@ public class RightClickBlockListener
 	{
 		if(!event.getWorld().isRemote) // Server side only
 		{
-			DimensionType dimensionType = DimensionManager.getProviderType(event.getWorld().provider.getDimension());		
 			if(
 				(
 					// Allow portals from non-otg overworlds
 					event.getWorld().provider.getDimension() == 0 ||
-					dimensionType.getSuffix() != null && dimensionType.getSuffix().equals("OTG")
+					OTGDimensionManager.IsOTGDimension(event.getWorld().provider.getDimension())
 				) &&
 				event.getItemStack() != null && 
 				event.getItemStack().getItem() != null && 

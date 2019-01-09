@@ -542,8 +542,8 @@ public class ForgeEngine extends OTGEngine
     	}
     	else if(world.provider.getDimension() > 1)
     	{
-			if(world.provider.getDimensionType().getSuffix() != null && world.provider.getDimensionType().getSuffix().equals("OTG"))
-	    	{
+    		if(OTGDimensionManager.IsOTGDimension(world.provider.getDimension()))
+    		{
 				LocalWorld localWorld = this.worldLoader.getWorld(world.provider.getDimensionType().getName());
 				if(localWorld == null)
 				{

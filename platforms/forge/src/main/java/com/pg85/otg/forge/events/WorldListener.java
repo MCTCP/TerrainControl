@@ -32,21 +32,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldListener
 {
-
-    //private static Field field_WorldProvider_terrainType;
-    //private static Field field_WorldProvider_generatorSettings;
     private static Field field_World_provider = null;
-    private static Field field_WorldProvider_biomeProvider = null;
     private static Field field_ChunkProviderServer_chunkGenerator = null;
 
     static
     {
         try
         {
-            //field_WorldProvider_terrainType = ReflectionHelper.findField(WorldProvider.class, "field_76577_b", "terrainType");
-            //field_WorldProvider_generatorSettings = ReflectionHelper.findField(WorldProvider.class, "field_82913_c", "generatorSettings");
             field_World_provider = ReflectionHelper.findField(World.class, "field_73011_w", "provider");
-            field_WorldProvider_biomeProvider = ReflectionHelper.findField(WorldProvider.class, "field_76578_c", "biomeProvider");
             field_ChunkProviderServer_chunkGenerator = ReflectionHelper.findField(ChunkProviderServer.class, "field_186029_c", "chunkGenerator");
         }
         catch (UnableToFindFieldException e)
@@ -61,114 +54,56 @@ public class WorldListener
         World world = event.getWorld();
         int dimension = world.provider.getDimension();
 
-        OTG.log(LogMarker.INFO, "WorldEvent.Load - DIM: {}", dimension);
+        //OTG.log(LogMarker.INFO, "WorldEvent.Load - DIM: {}", dimension);
 
-        if (world.isRemote)
+        if (world.isRemote && dimension == 0)
         {
-        	//overrideWorldProviderIfApplicable(world);
+        	ForgeWorld overworld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
+        	if(overworld != null)
+        	{
+        		overrideWorldProvider(world);	
+        	}        	
         }
 	}
 	
-    public static void overrideWorldProviderIfApplicable(World world)
+    public static void overrideWorldProvider(World world)
     {
-        //JEDWorldProperties props = JEDWorldProperties.getPropertiesIfExists(world);
+        String newClassName = OTGWorldProvider.class.getName();
+        Class<? extends WorldProvider> newProviderClass = OTGWorldProvider.class;
 
-        //if (props != null && props.overrideWorldProvider())
+        if (newProviderClass != null && newProviderClass != world.provider.getClass())
         {
-            String newClassName = OTGWorldProvider.class.getName();
-            Class<? extends WorldProvider> newProviderClass = OTGWorldProvider.class;
-
-            if (newProviderClass != null && newProviderClass != world.provider.getClass())
-            {
-                final int dim = world.provider.getDimension();
-                String oldName = world.provider.getClass().getName();
-                OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Trying to override the WorldProvider of type '{}' in dimension {} with '{}'", oldName, dim, newClassName);
-
-                try
-                {
-                    Constructor <? extends WorldProvider> constructor = newProviderClass.getConstructor();
-                    WorldProvider newProvider = constructor.newInstance();
-
-                    try
-                    {
-                        field_World_provider.set(world, newProvider);
-                        world.provider.setWorld(world);
-                        world.provider.setDimension(dim);
-
-                        OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Overrode the WorldProvider in dimension {} with '{}'", dim, newClassName);
-
-                        //reCreateChunkGenerator(world, dim == 0);
-                    }
-                    catch (Exception e)
-                    {
-                        OTG.log(LogMarker.ERROR, "WorldUtils.overrideWorldProvider: Failed to override the WorldProvider of dimension {}", dim);
-                    }
-
-                    return;
-                }
-                catch (Exception e)
-                {
-                }
-            }
-
-            OTG.log(LogMarker.WARN, "WorldUtils.overrideWorldProvider: Failed to create a WorldProvider from name '{}', or it was already that type", newClassName);
-        }
-    }
-    
-    public static void reCreateChunkGenerator(World world, boolean generatorChangedForOverworld)
-    {
-        if (world instanceof WorldServer && world.getChunkProvider() instanceof ChunkProviderServer)
-        {
-            final int dimension = world.provider.getDimension();
-            WorldInfo info = world.getWorldInfo();
-            World overworld = DimensionManager.getWorld(0);
-
-            if (dimension == 0 && generatorChangedForOverworld == false)
-            {
-                OTG.log(LogMarker.INFO, "No need to re-create the ChunkProvider in dimension {}", dimension);
-                return;
-            }
-            else if (dimension != 0 && overworld != null)
-            {
-                WorldInfo infoOverworld = overworld.getWorldInfo();
-
-                if (infoOverworld.getTerrainType() == info.getTerrainType() &&
-                    infoOverworld.isMapFeaturesEnabled() == info.isMapFeaturesEnabled() &&
-                    infoOverworld.getGeneratorOptions().equals(info.getGeneratorOptions()) &&
-                    infoOverworld.getSeed() == info.getSeed())
-                {
-                	OTG.log(LogMarker.INFO, "No need to re-create the ChunkProvider in dimension {}", dimension);
-                    return;
-                }
-            }
-
-            // This sets the new WorldType, generatorOptions and creates the BiomeProvider based on the seed for the WorldProvider
-            world.provider.setWorld(world);
-
-            ChunkProviderServer chunkProviderServer = (ChunkProviderServer) world.getChunkProvider();
-            IChunkGenerator newChunkGenerator = world.provider.createChunkGenerator();
-
-            if (newChunkGenerator == null)
-            {
-            	OTG.log(LogMarker.WARN, "Failed to re-create the ChunkProvider for dimension {}", dimension);
-                return;
-            }
+            final int dim = world.provider.getDimension();
+            String oldName = world.provider.getClass().getName();
+            //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Trying to override the WorldProvider of type '{}' in dimension {} with '{}'", oldName, dim, newClassName);
 
             try
             {
-                field_ChunkProviderServer_chunkGenerator.set(chunkProviderServer, newChunkGenerator);
+                Constructor <? extends WorldProvider> constructor = newProviderClass.getConstructor();
+                WorldProvider newProvider = constructor.newInstance();
 
-                OTG.log(LogMarker.INFO, "WorldUtils.reCreateChunkProvider: Re-created/overwrote the ChunkProvider " +
-                                             "(of type '{}') in dimension {} with '{}'",
-                        chunkProviderServer.chunkGenerator.getClass().getName(), dimension, newChunkGenerator.getClass().getName());
+                try
+                {
+                    field_World_provider.set(world, newProvider);
+                    world.provider.setWorld(world);
+                    world.provider.setDimension(dim);
+
+                    //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Overrode the WorldProvider in dimension {} with '{}'", dim, newClassName);
+                }
+                catch (Exception e)
+                {
+                    OTG.log(LogMarker.ERROR, "WorldUtils.overrideWorldProvider: Failed to override the WorldProvider of dimension {}", dim);
+                }
+
+                return;
             }
             catch (Exception e)
             {
-            	OTG.log(LogMarker.WARN, "Failed to re-create the ChunkProvider for dimension {} with {}",
-                        dimension, newChunkGenerator.getClass().getName(), e);
             }
         }
-    }    
+
+        OTG.log(LogMarker.WARN, "WorldUtils.overrideWorldProvider: Failed to create a WorldProvider from name '{}', or it was already that type", newClassName);
+    }
     
 	@SubscribeEvent
 	@SideOnly(Side.SERVER)
@@ -220,7 +155,7 @@ public class WorldListener
 		        ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
 		        if(forgeWorld == null)
 		        {
-		        	// Can happen if this is dim -1 or 1 (or some other mod's dim??)
+		        	// Can happen if this is dim -1 or 1 (or some other mod's dim?)
 		        	return;
 		        }		        
 		        

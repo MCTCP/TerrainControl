@@ -19,9 +19,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import com.pg85.otg.forge.asm.OTGHooks;
-
-import org.objectweb.asm.Type;
 import static org.objectweb.asm.Opcodes.*;
 import net.minecraft.launchwrapper.IClassTransformer;
 
@@ -232,7 +229,7 @@ public class OTGClassTransformer implements IClassTransformer
 				toInsert.add(l2);
 				toInsert.add(new LineNumberNode(113, l2));
 				toInsert.add(new VarInsnNode(ALOAD, 0));
-				toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getIDForObject",  injectSnapShotDescriptor, false));
+				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getIDForObject",  injectSnapShotDescriptor, false));
 				toInsert.add(new InsnNode(IRETURN));
 				toInsert.add(l1);
 				toInsert.add(new LineNumberNode(115, l1));
@@ -327,7 +324,7 @@ public class OTGClassTransformer implements IClassTransformer
 				}
 
 				InsnList toInsert = new InsnList();
-				toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "countMissingRegistryEntries", "(Ljava/util/LinkedHashMap;)I", false));
+				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "countMissingRegistryEntries", "(Ljava/util/LinkedHashMap;)I", false));
 
 				method.instructions.insertBefore(removeNode, toInsert);
 
@@ -365,7 +362,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactor", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactor", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -405,7 +402,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorMineCart", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorMineCart", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -445,7 +442,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorArrow", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorArrow", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -484,7 +481,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorBoat", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorBoat", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -523,7 +520,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorFallingBlock", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorFallingBlock", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -561,7 +558,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorItem", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorItem", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -600,7 +597,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorLlamaSpit", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorLlamaSpit", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -639,7 +636,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorShulkerBullet", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorShulkerBullet", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -678,7 +675,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorThrowable", "(Lnet/minecraft/entity/Entity;)F", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorThrowable", "(Lnet/minecraft/entity/Entity;)F", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -717,7 +714,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorTNTPrimed", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorTNTPrimed", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -756,7 +753,7 @@ public class OTGClassTransformer implements IClassTransformer
 						InsnList toInsert = new InsnList();
 
 						toInsert.add(new VarInsnNode(ALOAD, 0));
-						toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getGravityFactorXPOrb", "(Lnet/minecraft/entity/Entity;)D", false));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorXPOrb", "(Lnet/minecraft/entity/Entity;)D", false));
 						method.instructions.insertBefore(instructionToRemove, toInsert);
 						break;
 					}
@@ -835,7 +832,7 @@ public class OTGClassTransformer implements IClassTransformer
 				InsnList toInsert = new InsnList();
 				toInsert.add(new VarInsnNode(ILOAD, 0));
 							
-				toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "InitOTGDimension",  "(I)Z", false));
+				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "InitOTGDimension",  "(I)Z", false));
 				LabelNode l4 = new LabelNode();
 				toInsert.add(new JumpInsnNode(IFEQ, l4));
 				LabelNode l5 = new LabelNode();
@@ -889,7 +886,7 @@ public class OTGClassTransformer implements IClassTransformer
 							// Insert new instruction
 							InsnList toInsert = new InsnList();
 							toInsert.add(new VarInsnNode(ALOAD, 0));
-							toInsert.add(new MethodInsnNode(INVOKESTATIC, Type.getInternalName(OTGHooks.class), "getFallDamageFactor", "(DLnet/minecraft/entity/Entity;)D", false));
+							toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getFallDamageFactor", "(DLnet/minecraft/entity/Entity;)D", false));
 							method.instructions.insertBefore(instruction.getNext(), toInsert);
 							return;
 						}

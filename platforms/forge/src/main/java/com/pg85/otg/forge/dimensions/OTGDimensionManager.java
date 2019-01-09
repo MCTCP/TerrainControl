@@ -61,7 +61,7 @@ public class OTGDimensionManager
 			{
 				DimensionType dimensionType = DimensionManager.getProviderType(i);
 
-				if(dimensionType.getSuffix() != null && dimensionType.getSuffix().equals("OTG") && dimensionType.getName().equals(dimensionName))
+				if(dimensionType.getName().equals(dimensionName))
 				{
     				return true;
 				}
@@ -114,8 +114,18 @@ public class OTGDimensionManager
         }
     }
 
-	static HashMap<Integer,Integer> dimensionsOrder;
+	static HashMap<Integer,Integer> orderedDimensions;
+	
+	public static boolean IsOTGDimension(int dimensionId)
+	{
+		return orderedDimensions.containsKey(dimensionId);
+	}
 
+	public static ArrayList<Integer> GetOTGDimensions()
+	{
+		return new ArrayList<Integer>(orderedDimensions.keySet());
+	}
+	
 	public static int createDimension(String dimensionName, boolean keepLoaded, boolean initDimension, boolean saveDimensionData)
 	{
 		return createDimension(-1l, dimensionName, keepLoaded, initDimension, saveDimensionData);
@@ -133,14 +143,14 @@ public class OTGDimensionManager
 		}
 
 		int maxOrder = -1;
-		for(Integer dimOrder : dimensionsOrder.values())
+		for(Integer dimOrder : orderedDimensions.values())
 		{
 			if(dimOrder > maxOrder)
 			{
 				maxOrder = dimOrder;
 			}
 		}
-		dimensionsOrder.put(newDimId, maxOrder + 1);
+		orderedDimensions.put(newDimId, maxOrder + 1);
 
 		if(saveDimensionData)
 		{
@@ -381,7 +391,7 @@ public class OTGDimensionManager
 
 					if(forgeWorld != null)
 					{
-						stringbuilder.append((stringbuilder.length() == 0 ? "" : ",") + i + "," + dimType.getName() + "," + dimType.shouldLoadSpawn() + "," + forgeWorld.getSeed() + "," + dimensionsOrder.get(i));
+						stringbuilder.append((stringbuilder.length() == 0 ? "" : ",") + i + "," + dimType.getName() + "," + dimType.shouldLoadSpawn() + "," + forgeWorld.getSeed() + "," + orderedDimensions.get(i));
 					}
 				}
 			}
@@ -411,8 +421,13 @@ public class OTGDimensionManager
 
 	public static void UnloadAllCustomDimensionData()
 	{
-		dimensionsOrder = new HashMap<Integer,Integer>();
-		dimensionsOrder.put(0,0);
+		HashMap<Integer,Integer> dimensionsOrderCopy = new HashMap<Integer,Integer>();
+		if(orderedDimensions != null)
+		{
+			dimensionsOrderCopy = new HashMap<Integer,Integer>(orderedDimensions);
+		}
+		orderedDimensions = new HashMap<Integer,Integer>();
+		orderedDimensions.put(0,0);
 
 		BitSet dimensionMap = null;
 		try
@@ -442,13 +457,11 @@ public class OTGDimensionManager
 			e.printStackTrace();
 		}
 
-		for(int i = 2; i < Long.SIZE << 4; i++) // Ignore dim 0 (Overworld) and 1 (End)
+		for(int i : dimensionsOrderCopy.keySet()) // Ignore dim 0 (Overworld) and 1 (End)
 		{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
-				DimensionType dimType = DimensionManager.getProviderType(i);
-
-				if(dimType != null && dimType.getSuffix() != null && dimType.getSuffix().equals("OTG"))
+				if(dimensionsOrderCopy.containsKey(i))
 				{
 					OTGDimensionManager.unregisterDimension(i);
 					dimensionMap.clear(i);
@@ -464,7 +477,8 @@ public class OTGDimensionManager
 			return;
 		}
 
-		dimensionsOrder.remove(dimId);
+		boolean isOTGDimension = orderedDimensions.containsKey(dimId);
+		orderedDimensions.remove(dimId);
 
 		BitSet dimensionMap = null;
 		try
@@ -496,9 +510,7 @@ public class OTGDimensionManager
 
 		if(DimensionManager.isDimensionRegistered(dimId))
 		{
-			DimensionType dimType = DimensionManager.getProviderType(dimId);
-
-			if(dimType != null && dimType.getSuffix() != null && dimType.getSuffix().equals("OTG"))
+			if(isOTGDimension)
 			{
 				OTGDimensionManager.unregisterDimension(dimId);
 				dimensionMap.clear(dimId);
@@ -557,21 +569,21 @@ public class OTGDimensionManager
 		}
 
 		// Store the order in which dimensions were added
-		dimensionsOrder = new HashMap<Integer, Integer>();
-		dimensionsOrder.put(0,0);
-		HashMap<Integer, DimensionData> orderedDimensions = new HashMap<Integer, DimensionData>();
+		orderedDimensions = new HashMap<Integer, Integer>();
+		orderedDimensions.put(0,0);
+		HashMap<Integer, DimensionData> orderedDimensions1 = new HashMap<Integer, DimensionData>();
 		int highestOrder = 0;
 		for(DimensionData dimData : dimensionData)
 		{
-			dimensionsOrder.put(dimData.dimensionId, dimData.dimensionOrder);
-			orderedDimensions.put(dimData.dimensionOrder, dimData);
+			orderedDimensions.put(dimData.dimensionId, dimData.dimensionOrder);
+			orderedDimensions1.put(dimData.dimensionOrder, dimData);
 			if(dimData.dimensionOrder > highestOrder)
 			{
 				highestOrder = dimData.dimensionOrder;
 			}
 		}
 
-		return new OTGDimensionInfo(highestOrder, orderedDimensions);
+		return new OTGDimensionInfo(highestOrder, orderedDimensions1);
 	}
 
 	public static ArrayList<DimensionData> GetDimensionData(File worldSaveDir)
@@ -733,12 +745,11 @@ public class OTGDimensionManager
 		}
 
 		oldDims = new Hashtable<Integer, Object>();
-		for(int i = 2; i < Long.SIZE << 4; i++) // Ignore dim 0 (Overworld) and 1 (End)
+		if(dimensions != null)
 		{
-			if(DimensionManager.isDimensionRegistered(i))
+			for(int i : orderedDimensions.keySet())
 			{
-				DimensionType type = DimensionManager.getProviderType(i);
-				if(type.getSuffix() != null && type.getSuffix().equals("OTG"))
+				if(DimensionManager.isDimensionRegistered(i))
 				{
 					oldDims.put(i, dimensions.get(i));
 					dimensions.remove(i);
@@ -751,22 +762,14 @@ public class OTGDimensionManager
 	{
 		HashMap<Integer, String> otgDims = new HashMap<Integer, String>();
 
-		for(int i = 0; i < Long.SIZE << 4; i++)
+		for(int i : orderedDimensions.keySet())
 		{
-			if(i == 1)
-			{
-				continue; // Ignore dim 1 (End)
-			}
-
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				DimensionType type = DimensionManager.getProviderType(i);
-				if(type.getSuffix() != null && type.getSuffix().equals("OTG"))
-				{
-					otgDims.put(new Integer(type.getId()), type.getName());
-				}
+				otgDims.put(new Integer(type.getId()), type.getName());				
 			}
-		}
+		}	
 
 		return otgDims;
 	}

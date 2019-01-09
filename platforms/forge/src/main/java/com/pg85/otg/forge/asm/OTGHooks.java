@@ -12,7 +12,6 @@ import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
 
@@ -22,8 +21,7 @@ public class OTGHooks
 	{
 		if(DimensionManager.isDimensionRegistered(i))
 		{
-			DimensionType type = DimensionManager.getProviderType(i);
-			if(type.getSuffix() != null && type.getSuffix().equals("OTG"))
+			if(OTGDimensionManager.IsOTGDimension(i))
 			{
 				OTGDimensionManager.initDimension(i);
 				return true;

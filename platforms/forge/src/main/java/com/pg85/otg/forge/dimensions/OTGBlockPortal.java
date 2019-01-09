@@ -24,7 +24,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -37,27 +36,23 @@ public class OTGBlockPortal
     {
     	boolean cartographerEnabled = ((ForgeEngine)OTG.getEngine()).getCartographerEnabled();
     	
-    	// Only create a portal when a TC custom dimension exists
+    	// Only create a portal when a OTG custom dimension exists
     	boolean bFound = false;
     	boolean bFoundOtherThanCartographer = false;
-		for(int i = -1; i < Long.SIZE << 4; i++)
-		{
+    	for(int i : OTGDimensionManager.GetOTGDimensions())
+    	{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
-				DimensionType dimensionType = DimensionManager.getProviderType(i);
-				if(dimensionType.getSuffix() != null && dimensionType.getSuffix().equals("OTG"))
+				bFound = true;
+				if(cartographerEnabled)
 				{
-					bFound = true;
-					if(cartographerEnabled)
+					if(i != Cartographer.CartographerDimension)
 					{
-						if(i != Cartographer.CartographerDimension)
-						{
-							bFoundOtherThanCartographer = true;
-							break;
-						}
-					} else {
+						bFoundOtherThanCartographer = true;
 						break;
 					}
+				} else {
+					break;
 				}
 			}
 		}

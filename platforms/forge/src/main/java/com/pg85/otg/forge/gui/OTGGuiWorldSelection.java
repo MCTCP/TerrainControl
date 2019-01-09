@@ -139,8 +139,6 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
             }
             else if (button.id == 4)
             {
-            	DimensionType.OVERWORLD.clazz = WorldProviderSurface.class;
-    	        DimensionType.OVERWORLD.suffix = "overworld";
     	        OTG.SetDimensionsConfig(null);
             	this.mc.displayGuiScreen(new GuiCreateWorld(this));
             }

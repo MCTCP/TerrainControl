@@ -340,20 +340,9 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
     public void tryLoadExistingWorld(FMLClientHandler clientHandler, OTGGuiWorldSelection selectWorldGUI, WorldSummary comparator)
     {
-    	// Check if an OTG world is the overworld, if so use the OTG world provider for the overworld.
-    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + "/" + this.worldSummary.getFileName()));    	
-    	boolean bFound = false;
-    	for(DimensionData dimensionData : dimensionDatas)
-    	{
-    		if(dimensionData.dimensionId == 0)
-    		{
-    			bFound = true;
-    			break;
-    		}
-    	}
-
     	// If this world has OTG overworld/dimensions then check if it has a DimensionsConfig
     	// If this is a legacy world then we'll need to create a new one.
+    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + "/" + this.worldSummary.getFileName()));
     	DimensionsConfig dimensionsConfig = DimensionsConfig.LoadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()));
     	if(dimensionsConfig == null && dimensionDatas.size() > 0)
     	{
@@ -384,16 +373,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     		dimensionsConfig.Save();
     	}
 
-		OTG.SetDimensionsConfig(dimensionsConfig);
-		
-    	if(bFound)
-    	{
-	        DimensionType.OVERWORLD.clazz = OTGWorldProvider.class;
-	        DimensionType.OVERWORLD.suffix = "OTG";
-    	} else {
-	        DimensionType.OVERWORLD.clazz = WorldProviderSurface.class;
-	        DimensionType.OVERWORLD.suffix = "overworld";
-    	}   	
+		OTG.SetDimensionsConfig(dimensionsConfig);		 	
     	
         File dir = new File(clientHandler.getSavesDir(), comparator.getFileName());
         NBTTagCompound leveldat;

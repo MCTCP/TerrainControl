@@ -602,11 +602,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                     
                     OTG.GetDimensionsConfig().Save();
 
-    				PregeneratorUI.ResetIngameUI();
-    				
-    				//DimensionType.OVERWORLD.clazz = OTGWorldProvider.class;
-    		        //DimensionType.OVERWORLD.suffix = "OTG";    				
-    				
+    				PregeneratorUI.ResetIngameUI();    				
     				
     				this.mc.launchIntegratedServer(this.worldName, this.worldName, worldsettings);
     			//}
