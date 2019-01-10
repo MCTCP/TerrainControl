@@ -187,7 +187,7 @@ public class OTGPlugin
     	// because this was causing problems (unloading dimensions while 
     	// their worlds were still ticking etc).
     	// Unload all world and biomes on server start / connect instead, 
-    	// for client where data is kept when leaving the game.
+    	// for SP client where data is kept when leaving the game.
  
     	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
     	ForgeEngine.loadPresets();

@@ -27,8 +27,6 @@ import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldProviderSurface;
 import net.minecraft.world.storage.ISaveFormat;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
@@ -53,8 +51,6 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.dimensions.OTGWorldProvider;
-
 import net.minecraft.client.gui.GuiListExtended;;
 
 @SideOnly(Side.CLIENT)

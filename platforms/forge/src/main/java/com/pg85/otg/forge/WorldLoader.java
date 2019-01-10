@@ -242,7 +242,7 @@ public final class WorldLoader
     public ForgeWorld getOrCreateForgeWorld(World mcWorld)
     {   	
     	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
-    	{
+    	{	
     		throw new RuntimeException("Error: OTG tried to load a world that is missing OTG information. Was this world created via OTG? For Forge Single Player, be sure to use the OTG world creation screen.");
     	}
 

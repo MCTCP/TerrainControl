@@ -9,8 +9,10 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.biomes.OTGBiomeProvider;
+import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
 import com.pg85.otg.generator.biome.BiomeGenerator;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 
 import net.minecraft.world.World;
@@ -47,6 +49,14 @@ public class OTGWorldType extends WorldType
             return super.getBiomeProvider(mcWorld);
         }
 
+        if(mcWorld.provider.getDimension() != 0 && !(mcWorld instanceof OTGWorldServerMulti))
+        {
+        	// If this is a dimension added by another mod then return the default overworld's biomeprovider
+        	// This can happen when using an OTG overworld, new dimensions inherit the terrain type of the overworld.
+        	//OTG.log(LogMarker.INFO, "Non-OTG dimension detected, using default world provider.");
+        	return super.getBiomeProvider(mcWorld);
+        }
+        
         // Create dirs for a new world if necessary (only needed for overworld, when creating a new OTG world)
         if(mcWorld.provider.getDimension() == 0)
         {

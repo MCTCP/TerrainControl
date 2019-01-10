@@ -2,6 +2,8 @@ package com.pg85.otg.forge.events.client;
 
 import org.lwjgl.input.Keyboard;
 
+import com.pg85.otg.OTG;
+import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.gui.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.PregeneratorUI;
 
@@ -30,7 +32,7 @@ public class KeyBoardEventListener
 		{
 			pregeneratorUIKeyBinding = new KeyBinding("OTG Pregenerator HUD toggle", Keyboard.KEY_F3, "OpenTerrainGenerator");
 			ClientRegistry.registerKeyBinding(pregeneratorUIKeyBinding);
-			otgInGameUIKeyBinding = new KeyBinding("OTG Pregenerator HUD toggle", Keyboard.KEY_O, "OpenTerrainGenerator");
+			otgInGameUIKeyBinding = new KeyBinding("OTG Menu", Keyboard.KEY_O, "OpenTerrainGenerator");
 			registered = true;
 		}
 
@@ -45,7 +47,18 @@ public class KeyBoardEventListener
 			}
 			if (otgInGameUIKeyBinding.isPressed())
 			{
-				Minecraft.getMinecraft().displayGuiScreen(new OTGGuiDimensionList(null));
+				// Only open the menu for overworld or OTG dimensions
+		    	if(
+	    			!(
+    					Minecraft.getMinecraft().world != null && 
+    					Minecraft.getMinecraft().world.provider != null && 
+    					Minecraft.getMinecraft().world.provider.getDimension() != 0 &&
+						((ForgeEngine)OTG.getEngine()).getWorld(Minecraft.getMinecraft().world) == null
+					)
+	    		)
+	        	{
+	        		Minecraft.getMinecraft().displayGuiScreen(new OTGGuiDimensionList(null));
+	        	}
 			}				
 		}
 	}
