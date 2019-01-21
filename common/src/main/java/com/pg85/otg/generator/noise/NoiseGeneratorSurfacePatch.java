@@ -2,7 +2,7 @@ package com.pg85.otg.generator.noise;
 
 import java.util.Random;
 
-public class NoiseGeneratorOld
+public class NoiseGeneratorSurfacePatch
 {
     private static int[][] grad3 = {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
 
@@ -15,7 +15,7 @@ public class NoiseGeneratorOld
     private static final double deskewFactor = (3.0D - square3) / 6.0D;
 
 
-    public NoiseGeneratorOld(Random random)
+    public NoiseGeneratorSurfacePatch(Random random)
     {
         this.noiseContributionX = (random.nextDouble() * 256.0D);
         this.noiseContributionY = (random.nextDouble() * 256.0D);

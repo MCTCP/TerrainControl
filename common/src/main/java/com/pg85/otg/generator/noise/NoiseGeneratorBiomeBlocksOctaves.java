@@ -2,17 +2,17 @@ package com.pg85.otg.generator.noise;
 
 import java.util.Random;
 
-public class NoiseGeneratorNewOctaves {
+public class NoiseGeneratorBiomeBlocksOctaves {
 
-    private NoiseGeneratorNew[] a;
+    private NoiseGeneratorBiomeBlocks[] a;
     private int b;
 
-    public NoiseGeneratorNewOctaves(Random random, int i) {
+    public NoiseGeneratorBiomeBlocksOctaves(Random random, int i) {
         this.b = i;
-        this.a = new NoiseGeneratorNew[i];
+        this.a = new NoiseGeneratorBiomeBlocks[i];
 
         for (int j = 0; j < i; ++j) {
-            this.a[j] = new NoiseGeneratorNew(random);
+            this.a[j] = new NoiseGeneratorBiomeBlocks(random);
         }
     }
 

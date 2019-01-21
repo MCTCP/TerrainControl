@@ -751,16 +751,10 @@ public class ServerEventListener
 		}
 	}
 
-    public void tryTeleportPlayer(EntityPlayer player)
+	private void tryTeleportPlayer(EntityPlayer player)
 	{
 		ForgeWorld playerWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(player.world);
-		//WorldConfig worldConfig = playerWorld.getConfigs().getWorldConfig();
 		DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(player.world));
-		
-		if(dimConfig == null)
-		{
-			String breakpoint = "";
-		}
 		
 		// DimensionBelow
 		if(playerWorld != null && dimConfig.Settings.DimensionBelow != null && dimConfig.Settings.DimensionBelow.trim().length() > 0)
@@ -816,7 +810,7 @@ public class ServerEventListener
 
 		if(e instanceof EntityPlayerMP)
 		{
-			OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e, false);
+			OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e, false, false);
 		}
 
     	// If coming from main world then update Cartographer map at last player position (should remove head+banner from Cartographer map)

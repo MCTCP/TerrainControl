@@ -169,16 +169,6 @@ public class OTGHooks
 		}
 	}
 
-	public static double getFallDamageFactor(double y, Entity entity)
-	{
-		if(entity.world.provider instanceof OTGWorldProvider)
-		{
-			return ((OTGWorldProvider)entity.world.provider).getFallDamageFactor(y);
-		} else {
-			return y;
-		}
-	}
-
 	public static int countMissingRegistryEntries(LinkedHashMap<ResourceLocation, Map<ResourceLocation, Integer>> missing)
 	{
 		// Exclude OTG Biomes.

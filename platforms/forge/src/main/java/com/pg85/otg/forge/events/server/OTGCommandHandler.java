@@ -193,7 +193,7 @@ public final class OTGCommandHandler implements ICommand
         							DimensionType dimensionType = DimensionManager.getProviderType(i);
         							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase()))
         							{
-        								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), false);
+        								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), false, true);
         								return;
         							}
         						}

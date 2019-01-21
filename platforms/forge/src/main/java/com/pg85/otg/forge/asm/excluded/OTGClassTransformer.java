@@ -39,7 +39,6 @@ public class OTGClassTransformer implements IClassTransformer
 		"net.minecraft.entity.projectile.EntityThrowable", // Gravity
 		"net.minecraft.entity.item.EntityTntPrimed", // Gravity
 		"net.minecraft.entity.item.EntityXPOrb", // Gravity
-		"net.minecraft.entity.Entity", // Gravity
 		"net.minecraftforge.common.DimensionManager" // Dimensions
 	};
 	
@@ -114,10 +113,7 @@ public class OTGClassTransformer implements IClassTransformer
 				case 12: // net.minecraft.entity.item.EntityXPOrb.onUpdate
 					transformOnUpdateXPOrb(classNode, isObfuscated);
 				break;
-				case 13: // net.minecraft.entity.Entity.updateFallState
-					transformUpdateFallState(classNode, isObfuscated);
-				break;
-				case 14: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
+				case 13: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
 					transformInitDimension1(classNode, isObfuscated);
 				break; 				
 			}
@@ -852,48 +848,6 @@ public class OTGClassTransformer implements IClassTransformer
 		//for(MethodNode method : gameDataNode.methods)
 		{
 			//System.out.println("Biome: " + method.name + " + " + method.desc + " + " + method.signature);
-		}
-
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
-	}	
-	
-	// Gravity settings for falling damage
-	//protected void net.minecraft.entity.Entity.updateFallState(double y, boolean onGroundIn, IBlockState state, BlockPos pos)
-	private void transformUpdateFallState(ClassNode gameDataNode, boolean isObfuscated)
-	{
-		String injectSnapShot = isObfuscated ? "a" : "updateFallState";
-		String injectSnapShotDescriptor = isObfuscated ? "(DZLawt;Let;)V" : "(DZLnet/minecraft/block/state/IBlockState;Lnet/minecraft/util/math/BlockPos;)V";
-
-		for(MethodNode method : gameDataNode.methods)
-		{
-			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
-			{
-				boolean bFound = false;
-				for(AbstractInsnNode instruction : method.instructions.toArray())
-				{
-					// this.fallDistance = (float)((double)this.fallDistance - y);
-					// should be
-					// this.fallDistance = (float)((double)this.fallDistance - (y * gravityFactor));
-					// Where gravityFactor is between 0 and 1 and determines how much falling damage should be applied based on the gravity of the world.
-
-					//mv.visitVarInsn(DLOAD, 1);
-
-					if(instruction.getOpcode() == DLOAD)
-					{
-						// Only apply to the second DLOAD
-						if(bFound)
-						{
-							// Insert new instruction
-							InsnList toInsert = new InsnList();
-							toInsert.add(new VarInsnNode(ALOAD, 0));
-							toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getFallDamageFactor", "(DLnet/minecraft/entity/Entity;)D", false));
-							method.instructions.insertBefore(instruction.getNext(), toInsert);
-							return;
-						}
-						bFound = true;
-					}
-				}
-			}
 		}
 
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");

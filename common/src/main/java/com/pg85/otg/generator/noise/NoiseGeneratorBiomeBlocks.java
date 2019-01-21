@@ -2,7 +2,7 @@ package com.pg85.otg.generator.noise;
 
 import java.util.Random;
 
-public class NoiseGeneratorNew {
+public class NoiseGeneratorBiomeBlocks {
 
     private static int[][] e = new int[][] { { 1, 1, 0}, { -1, 1, 0}, { 1, -1, 0}, { -1, -1, 0}, { 1, 0, 1}, { -1, 0, 1}, { 1, 0, -1}, { -1, 0, -1}, { 0, 1, 1}, { 0, -1, 1}, { 0, 1, -1}, { 0, -1, -1}};
     public static final double a = Math.sqrt(3.0D);
@@ -13,11 +13,11 @@ public class NoiseGeneratorNew {
     private static final double g = 0.5D * (a - 1.0D);
     private static final double h = (3.0D - a) / 6.0D;
 
-    public NoiseGeneratorNew() {
+    public NoiseGeneratorBiomeBlocks() {
         this(new Random());
     }
 
-    public NoiseGeneratorNew(Random random) {
+    public NoiseGeneratorBiomeBlocks(Random random) {
         this.f = new int[512];
         this.b = random.nextDouble() * 256.0D;
         this.c = random.nextDouble() * 256.0D;

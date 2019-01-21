@@ -15,7 +15,7 @@ import com.pg85.otg.forge.events.client.ClientTickHandler;
 import com.pg85.otg.forge.events.client.KeyBoardEventListener;
 import com.pg85.otg.forge.events.dimensions.BlockTracker;
 import com.pg85.otg.forge.events.dimensions.EntityTravelToDimensionListener;
-import com.pg85.otg.forge.events.dimensions.RightClickBlockListener;
+import com.pg85.otg.forge.events.dimensions.RightClickListener;
 import com.pg85.otg.forge.events.server.OTGCommandHandler;
 import com.pg85.otg.forge.events.server.SaveServerHandler;
 import com.pg85.otg.forge.events.server.ServerEventListener;
@@ -31,6 +31,7 @@ import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
@@ -39,6 +40,7 @@ import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -55,6 +57,8 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
 import java.io.File;
+
+import org.lwjgl.input.Keyboard;
 
 //@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v2", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
 @Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v7", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
@@ -168,7 +172,7 @@ public class OTGPlugin
         engine.registerEventHandler(new OTGToForgeEventConverter(), EventPriority.CANCELABLE);
 
         // Register RightClickBlockListener for detecting fire and creating portals
-        MinecraftForge.EVENT_BUS.register(new RightClickBlockListener());
+        MinecraftForge.EVENT_BUS.register(new RightClickListener());
 
     	// Register EntityTravelToDimensionListener for quartz portals that tp to other dimensions
     	MinecraftForge.EVENT_BUS.register(new EntityTravelToDimensionListener());
@@ -202,22 +206,22 @@ public class OTGPlugin
 
         if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator") && !(overWorld.getWorldInfo().getTerrainType() instanceof OTGWorldType))
         {
-	    	ISaveHandler isavehandler = overWorld.getSaveHandler();
-	        WorldInfo worldInfo = isavehandler.loadWorldInfo();
+            ISaveHandler isavehandler = overWorld.getSaveHandler();
+            WorldInfo worldInfo = isavehandler.loadWorldInfo();
 
-	        if(worldInfo != null)
-	        {
-	        	overWorld.getWorldInfo().setTerrainType(txWorldType);
-		        worldInfo.setTerrainType(txWorldType);
-	            isavehandler.saveWorldInfo(worldInfo);
-	        }
-	        throw new RuntimeException("OTG has detected that you are loading an OTG world that has been used without OTG installed. OTG has fixed and saved the world data, you can now restart the game and enter the world.");
+            if(worldInfo != null)
+            {
+            	overWorld.getWorldInfo().setTerrainType(txWorldType);
+            	worldInfo.setTerrainType(txWorldType);
+            	isavehandler.saveWorldInfo(worldInfo);
+            }
+            throw new RuntimeException("OTG has detected that you are loading an OTG world that has been used without OTG installed. OTG has fixed and saved the world data, you can now restart the game and enter the world.");
         }
 
 		if(!overWorld.isRemote) // Server side only
 		{
-			if(OTG.GetDimensionsConfig() == null) // This is a vanilla overworld or a new OTG world
-			{
+		    if(OTG.GetDimensionsConfig() == null) // This is a vanilla overworld or a new OTG world
+		    {
 				// Check if there is a dimensionsConfig saved for this world
 				DimensionsConfig dimsConfig = DimensionsConfig.LoadFromFile(overWorld.getSaveHandler().getWorldDirectory());
 				if(dimsConfig == null)
@@ -234,30 +238,30 @@ public class OTGPlugin
 				}
 				OTG.SetDimensionsConfig(dimsConfig);
 			}
-			
-        	OTGDimensionManager.ReAddOTGDims();
-
-        	// Load any saved dimensions.
-        	OTGDimensionManager.LoadCustomDimensionData();
-
-        	// Create Cartographer dimension if it doesn't yet exist
+				
+		    OTGDimensionManager.ReAddOTGDims();
+	
+		    // Load any saved dimensions.
+		    OTGDimensionManager.LoadCustomDimensionData();
+	
+		    // Create Cartographer dimension if it doesn't yet exist
 			//Cartographer.CreateCartographerDimension();
-
-            for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
-            {
-    	    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
-    	    	{
-    				File worldConfigFile = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimConfig.PresetName + "/WorldConfig.ini");
-    				if(!worldConfigFile.exists())
-    				{
-    					OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
-    				} else {
-    		    		OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);
-    				}
-    	    	}
-            }
-            
-            OTGDimensionManager.SaveDimensionData();
+	
+		    for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+		    {
+		    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
+	    		{
+		    		File worldConfigFile = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimConfig.PresetName + "/WorldConfig.ini");
+		    		if(!worldConfigFile.exists())
+		    		{
+		    			OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
+		    		} else {
+		    			OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);
+		    		}
+	    		}
+		    }
+	            
+		    OTGDimensionManager.SaveDimensionData();
 		}
     }
     

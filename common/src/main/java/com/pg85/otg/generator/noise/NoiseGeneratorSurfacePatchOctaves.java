@@ -2,17 +2,17 @@ package com.pg85.otg.generator.noise;
 
 import java.util.Random;
 
-public class NoiseGeneratorOldOctaves
+public class NoiseGeneratorSurfacePatchOctaves
 {
-    private NoiseGeneratorOld[] noiseArray;
+    private NoiseGeneratorSurfacePatch[] noiseArray;
     private int numOctaves;
 
-    public NoiseGeneratorOldOctaves(Random random, int numOctaves)
+    public NoiseGeneratorSurfacePatchOctaves(Random random, int numOctaves)
     {
         this.numOctaves = numOctaves;
-        this.noiseArray = new NoiseGeneratorOld[numOctaves];
+        this.noiseArray = new NoiseGeneratorSurfacePatch[numOctaves];
         for (int i = 0; i < numOctaves; i++)
-            this.noiseArray[i] = new NoiseGeneratorOld(random);
+            this.noiseArray[i] = new NoiseGeneratorSurfacePatch(random);
     }
 
     /**

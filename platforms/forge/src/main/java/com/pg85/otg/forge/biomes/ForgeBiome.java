@@ -9,7 +9,7 @@ import net.minecraft.world.biome.Biome;
 
 public class ForgeBiome implements LocalBiome
 {
-	public final Biome biomeBase;
+    public final Biome biomeBase;
     private final boolean isCustom;
 
     private final BiomeIds biomeIds;

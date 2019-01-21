@@ -8,6 +8,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 
@@ -31,7 +32,9 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
@@ -642,4 +645,27 @@ public class PlayerTracker
 
         return i;
     }
+    
+	@SubscribeEvent
+	public void onLivingFall(LivingFallEvent event)
+	{
+		if(event.getEntity().getEntityWorld() != null)
+		{
+			ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(event.getEntity().getEntityWorld());
+			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
+			
+			// Calculate the new distance based on gravity
+			double baseGravity = 0.08D;				
+			double gravityFactor = 1d / (baseGravity / dimConfig.Settings.GravityFactor);
+
+			// MC subtracts the default fall damage threshhold (3) from the distance
+			double baseThreshHold = 3D;
+			double newThreshold = baseThreshHold * (1d / gravityFactor);
+			double newDistance = ((event.getDistance() + 3) * gravityFactor) - newThreshold; 
+			
+			event.setDamageMultiplier((float)gravityFactor);
+			event.setDistance((float)newDistance);
+			event.setResult(Result.ALLOW);
+		}
+	}
 }

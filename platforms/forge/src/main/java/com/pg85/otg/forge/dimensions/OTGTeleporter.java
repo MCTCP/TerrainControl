@@ -134,7 +134,7 @@ public class OTGTeleporter
 
 	// Players
 
-	public static Entity changeDimension(int dimensionIn, EntityPlayerMP _this, boolean createPortal)
+	public static Entity changeDimension(int dimensionIn, EntityPlayerMP _this, boolean createPortal, boolean placeOnHighestBlock)
     {
 		ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
 		
@@ -149,11 +149,12 @@ public class OTGTeleporter
 			if(dimConfig.Settings.TeleportToSpawnOnly)
 			{
 				BlockPos forgeWorldSpawnPoint = forgeWorld.getSpawnPoint();
-				_this.setLocationAndAngles(forgeWorldSpawnPoint.getX(), forgeWorldSpawnPoint.getY(), forgeWorldSpawnPoint.getZ(), 0, 0);
-			} else {
+				_this.setLocationAndAngles(forgeWorldSpawnPoint.getX(), forgeWorld.getHighestBlockYAt(forgeWorldSpawnPoint.getX(), forgeWorldSpawnPoint.getZ()), forgeWorldSpawnPoint.getZ(), 0, 0);
+				placeOnHighestBlock = true;
+			} //else {
 				// Find suitable spawn location
-				_this.setLocationAndAngles(_this.getPosition().getX(), forgeWorld.getHighestBlockYAt(_this.getPosition().getX(), _this.getPosition().getZ(), true, true, false, false), _this.getPosition().getZ(), 0, 0);
-			}
+				//_this.setLocationAndAngles(_this.getPosition().getX(), forgeWorld.getHighestBlockYAt(_this.getPosition().getX(), _this.getPosition().getZ(), true, true, false, false), _this.getPosition().getZ(), 0, 0);
+			//}
 		}
 
 		if(dimensionIn != -1) // For some reason this always returns false for the nether
@@ -172,7 +173,7 @@ public class OTGTeleporter
 			_this.sendPlayerAbilities();
 		}
 
-        changePlayerDimension(_this, dimensionIn, _this.mcServer.getPlayerList(), createPortal);
+        changePlayerDimension(_this, dimensionIn, _this.mcServer.getPlayerList(), createPortal, placeOnHighestBlock);
         _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
 
         ServerPacketManager.SendParticlesPacket(null, _this); // Clear particles 
@@ -180,12 +181,12 @@ public class OTGTeleporter
         return _this;
     }
 
-    static void changePlayerDimension(EntityPlayerMP player, int dimensionIn, PlayerList _this, boolean createPortal)
+    static void changePlayerDimension(EntityPlayerMP player, int dimensionIn, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
     {
-        transferPlayerToDimension(player, dimensionIn, _this.getServerInstance().getWorld(dimensionIn).getDefaultTeleporter(), _this, createPortal);
+        transferPlayerToDimension(player, dimensionIn, _this.getServerInstance().getWorld(dimensionIn).getDefaultTeleporter(), _this, createPortal, placeOnHighestBlock);
     }
 
-    static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal)
+    static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
     {
         int i = player.dimension;
         WorldServer worldserver = _this.getServerInstance().getWorld(player.dimension);
@@ -195,7 +196,7 @@ public class OTGTeleporter
         _this.updatePermissionLevel(player);
         worldserver.removeEntityDangerously(player);
         player.isDead = false;
-        transferEntityToWorld(player, i, worldserver, worldserver1, teleporter, createPortal);
+        transferEntityToWorld(player, i, worldserver, worldserver1, teleporter, createPortal, placeOnHighestBlock);
         _this.preparePlayer(player, worldserver);
         player.connection.setPlayerLocation(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
         player.interactionManager.setWorld(worldserver1);
@@ -210,7 +211,7 @@ public class OTGTeleporter
         net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerChangedDimensionEvent(player, i, dimensionIn);
     }
 
-    static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal)
+    static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal, boolean placeOnHighestBlock)
     {
     	double entityPosY = entityIn.getPosition().getY();
         net.minecraft.world.WorldProvider pOld = oldWorldIn.provider;
@@ -266,7 +267,7 @@ public class OTGTeleporter
             				toWorldIn.setBlockToAir(new BlockPos(d0, 2, d1));
                 			entityIn.setLocationAndAngles(d0 + 0.5, 1, d1 + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
                 			((EntityPlayerMP)entityIn).connection.setPlayerLocation(d0 + 0.5, 1, d1 + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
-                		} else { // Using /otg tp
+                		} else { // Using /otg tp or teleport button
                 			if(toWorldIn.provider.getDimension() != -1)
                 			{
                 				boolean bFound = false;
@@ -350,6 +351,13 @@ public class OTGTeleporter
         }
 
         entityIn.setWorld(toWorldIn);
+        
+        if(placeOnHighestBlock)
+        {
+			entityIn.setLocationAndAngles(entityIn.posX, entityIn.getEntityWorld().getHeight((int)entityIn.posX, (int)entityIn.posZ), entityIn.posZ, entityIn.rotationYaw, entityIn.rotationPitch);
+			((EntityPlayerMP)entityIn).connection.setPlayerLocation(entityIn.posX, entityIn.getEntityWorld().getHeight((int)entityIn.posX, (int)entityIn.posZ), entityIn.posZ, entityIn.rotationYaw, entityIn.rotationPitch);
+			toWorldIn.updateEntityWithOptionalForce(entityIn, false);
+        }
     }
 
 	static Long2ObjectMap<Teleporter.PortalPosition> getPortals(int dimensionId)

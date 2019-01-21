@@ -284,11 +284,12 @@ public final class LayerFactory
 
         for (int depth = 0; depth <= worldConfig.GenerationDepth; depth++)
         {
-
             mainLayer = new LayerZoom(2001 + depth, mainLayer);
 
             if (worldConfig.randomRivers && riversStarted)
+            {
                 RiverLayer = new LayerZoom(2001 + depth, RiverLayer);
+            }
 
             if (worldConfig.LandSize == depth)
             {
@@ -322,16 +323,19 @@ public final class LayerFactory
                 {
                     RiverLayer = new LayerRiverInit(155, RiverLayer);
                     riversStarted = true;
-                } else
+                } else {
                     mainLayer = new LayerRiverInit(155, mainLayer);
-            }
+                }
+        	}
 
             if ((worldConfig.GenerationDepth - worldConfig.riverSize) == depth)
             {
                 if (worldConfig.randomRivers)
+                {
                     RiverLayer = new LayerRiver(5 + depth, RiverLayer);
-                else
+                } else {
                     mainLayer = new LayerRiver(5 + depth, mainLayer);
+                }
             }
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
@@ -407,9 +411,11 @@ public final class LayerFactory
         }
 
         if (worldConfig.randomRivers)
+        {
             mainLayer = new LayerMixWithRiver(1L, mainLayer, RiverLayer, configs, world);
-        else
+        } else {
             mainLayer = new LayerMix(1L, mainLayer, configs, world);
+        }
 
         mainLayer = new LayerSmooth(400L, mainLayer);
 
