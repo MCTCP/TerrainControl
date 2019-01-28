@@ -151,7 +151,7 @@ public class EntityTravelToDimensionListener
 
 				if(e.getEntity() instanceof EntityPlayerMP)
 				{
-					OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e.getEntity(), true, true);
+					OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e.getEntity(), true, false);
 				} else {
 					OTGTeleporter.changeDimension(newDimension, e.getEntity());
 				}

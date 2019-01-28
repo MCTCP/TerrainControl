@@ -651,21 +651,25 @@ public class PlayerTracker
 	{
 		if(event.getEntity().getEntityWorld() != null)
 		{
+			// ForgeWorld can be null for vanilla overworld / other mods dims
 			ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(event.getEntity().getEntityWorld());
-			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
-			
-			// Calculate the new distance based on gravity
-			double baseGravity = 0.08D;				
-			double gravityFactor = 1d / (baseGravity / dimConfig.Settings.GravityFactor);
-
-			// MC subtracts the default fall damage threshhold (3) from the distance
-			double baseThreshHold = 3D;
-			double newThreshold = baseThreshHold * (1d / gravityFactor);
-			double newDistance = ((event.getDistance() + 3) * gravityFactor) - newThreshold; 
-			
-			event.setDamageMultiplier((float)gravityFactor);
-			event.setDistance((float)newDistance);
-			event.setResult(Result.ALLOW);
+			if(forgeWorld != null)
+			{
+				DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
+				
+				// Calculate the new distance based on gravity
+				double baseGravity = 0.08D;				
+				double gravityFactor = 1d / (baseGravity / dimConfig.Settings.GravityFactor);
+	
+				// MC subtracts the default fall damage threshhold (3) from the distance
+				double baseThreshHold = 3D;
+				double newThreshold = baseThreshHold * (1d / gravityFactor);
+				double newDistance = ((event.getDistance() + 3) * gravityFactor) - newThreshold; 
+				
+				event.setDamageMultiplier((float)gravityFactor);
+				event.setDistance((float)newDistance);
+				event.setResult(Result.ALLOW);
+			}
 		}
 	}
 }

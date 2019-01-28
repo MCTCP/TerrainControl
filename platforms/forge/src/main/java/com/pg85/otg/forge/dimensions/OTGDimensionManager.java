@@ -74,6 +74,16 @@ public class OTGDimensionManager
 	{
 		DimensionManager.registerDimension(id, type);
 
+		int maxOrder = -1;
+		for(Integer dimOrder : orderedDimensions.values())
+		{
+			if(dimOrder > maxOrder)
+			{
+				maxOrder = dimOrder;
+			}
+		}
+		orderedDimensions.put(id, maxOrder + 1);
+		
         NBTTagCompound compound = new NBTTagCompound();
         compound.setInteger("dimensionID", id);
         ArrayList<String> types = new ArrayList<String>();
@@ -118,7 +128,8 @@ public class OTGDimensionManager
 	
 	public static boolean IsOTGDimension(int dimensionId)
 	{
-		return orderedDimensions.containsKey(dimensionId);
+		return dimensionId == 0 || (DimensionManager.isDimensionRegistered(dimensionId) && DimensionManager.getProviderType(dimensionId).suffix.equals("OTG")); 
+		//return orderedDimensions.containsKey(dimensionId);
 	}
 
 	public static ArrayList<Integer> GetOTGDimensions()
@@ -141,16 +152,6 @@ public class OTGDimensionManager
 		{
 			initDimension(newDimId, seed);
 		}
-
-		int maxOrder = -1;
-		for(Integer dimOrder : orderedDimensions.values())
-		{
-			if(dimOrder > maxOrder)
-			{
-				maxOrder = dimOrder;
-			}
-		}
-		orderedDimensions.put(newDimId, maxOrder + 1);
 
 		if(saveDimensionData)
 		{

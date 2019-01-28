@@ -24,6 +24,7 @@ import net.minecraft.entity.EntityList;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.play.server.SPacketChangeGameState;
 import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.network.play.server.SPacketEntityEffect;
 import net.minecraft.network.play.server.SPacketPlayerAbilities;
@@ -35,9 +36,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Teleporter;
+import net.minecraft.world.Teleporter.PortalPosition;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class OTGTeleporter
@@ -46,6 +50,7 @@ public class OTGTeleporter
 
     public static Entity changeDimension(int dimensionIn, Entity _this)
     {
+    	ITeleporter teleporter = _this.getServer().getWorld(dimensionIn).getDefaultTeleporter();
         if (!_this.world.isRemote && !_this.isDead)
         {
             if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(_this, dimensionIn)) return null;
@@ -58,11 +63,10 @@ public class OTGTeleporter
             {
             	OTGDimensionManager.initDimension(dimensionIn);
             }
-            worldserver1 = net.minecraftforge.common.DimensionManager.getWorld(dimensionIn);
-            
+            worldserver1 = net.minecraftforge.common.DimensionManager.getWorld(dimensionIn);            
             _this.dimension = dimensionIn;
-
-            if (i == 1 && dimensionIn == 1)
+            
+            if (i == 1 && dimensionIn == 1 && teleporter.isVanilla())
             {
                 worldserver1 = minecraftserver.getWorld(0);
                 _this.dimension = 0;
@@ -72,39 +76,42 @@ public class OTGTeleporter
             _this.isDead = false;
             _this.world.profiler.startSection("reposition");
 
+            BlockPos blockpos;
+
+            if (dimensionIn == 1 && teleporter.isVanilla())
+            {
+                blockpos = worldserver1.getSpawnCoordinate();
+            } else {
+                double moveFactor = worldserver.provider.getMovementFactor() / worldserver1.provider.getMovementFactor();
+                double d0 = MathHelper.clamp(_this.posX * moveFactor, worldserver1.getWorldBorder().minX() + 16.0D, worldserver1.getWorldBorder().maxX() - 16.0D);
+                double d1 = MathHelper.clamp(_this.posZ * moveFactor, worldserver1.getWorldBorder().minZ() + 16.0D, worldserver1.getWorldBorder().maxZ() - 16.0D);
+
+                d0 = (double)MathHelper.clamp((int)d0, -29999872, 29999872);
+                d1 = (double)MathHelper.clamp((int)d1, -29999872, 29999872);
+                float f = _this.rotationYaw;
+                _this.setLocationAndAngles(d0, _this.posY, d1, 90.0F, 0.0F);
+                teleporter.placeEntity(worldserver1, _this, f);
+                blockpos = new BlockPos(_this);
+            }            
+            
             worldserver.updateEntityWithOptionalForce(_this, false);
             _this.world.profiler.endStartSection("reloading");
-            Entity entity = EntityList.createEntityByIDFromName(EntityList.getKey(_this), worldserver1);
+            Entity entity = EntityList.newEntity(_this.getClass(), worldserver1);
 
             if (entity != null)
             {
                 copyDataFromOld(_this, entity);
 
+                if (i == 1 && dimensionIn == 1 && teleporter.isVanilla())
+                {
+                    BlockPos blockpos1 = worldserver1.getTopSolidOrLiquidBlock(worldserver1.getSpawnPoint());
+                    entity.moveToBlockPosAndAngles(blockpos1, entity.rotationYaw, entity.rotationPitch);
+                } else {
+                    entity.moveToBlockPosAndAngles(blockpos, entity.rotationYaw, entity.rotationPitch);
+                }                
+                
                 boolean flag = entity.forceSpawn;
                 entity.forceSpawn = true;
-
-                ForgeWorld forgeWorld = i == 0 ? (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld() : null;
-                ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
-                if(i == 0 && forgeWorld == null) // This is a vanilla overworld
-                {
-                    DimensionConfig dimConfig = OTG.GetDimensionsConfig().Overworld;
-                    if(dimConfig != null)
-                    {
-                    	portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
-                    } 
-                } else {                
-	                forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(DimensionManager.getWorld(i));                               
-	                if(forgeWorld != null)
-	                {
-	                    DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
-	                    if(dimConfig != null)
-	                    {
-	                    	portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
-	                    }                	
-	                }
-                }
-                
-            	placeInPortal((ForgeMaterialData)portalMaterials.get(0), worldserver1, entity, entity.rotationYaw, worldserver1.getDefaultTeleporter());
 
                 worldserver1.spawnEntity(entity);
 
@@ -117,7 +124,6 @@ public class OTGTeleporter
             worldserver.resetUpdateEntityTick();
             worldserver1.resetUpdateEntityTick();
             _this.world.profiler.endSection();
-
             return entity;
         } else {
             return null;
@@ -125,11 +131,14 @@ public class OTGTeleporter
     }
 
     static void copyDataFromOld(Entity entityIn, Entity _this)
-    {
+    {       
         NBTTagCompound nbttagcompound = entityIn.writeToNBT(new NBTTagCompound());
         nbttagcompound.removeTag("Dimension");
         _this.readFromNBT(nbttagcompound);
         _this.timeUntilPortal = entityIn.timeUntilPortal;
+        _this.lastPortalPos = entityIn.lastPortalPos;
+        _this.lastPortalVec = entityIn.lastPortalVec;
+        _this.teleportDirection = entityIn.teleportDirection;
     }
 
 	// Players
@@ -146,6 +155,7 @@ public class OTGTeleporter
 	
 			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(dimensionIn == 0 ? "overworld" : forgeWorld.getName());
 			
+			// TODO: Fix teleporttospawnonly when making portals
 			if(dimConfig.Settings.TeleportToSpawnOnly)
 			{
 				BlockPos forgeWorldSpawnPoint = forgeWorld.getSpawnPoint();
@@ -156,12 +166,68 @@ public class OTGTeleporter
 				//_this.setLocationAndAngles(_this.getPosition().getX(), forgeWorld.getHighestBlockYAt(_this.getPosition().getX(), _this.getPosition().getZ(), true, true, false, false), _this.getPosition().getZ(), 0, 0);
 			//}
 		}
-
-		if(dimensionIn != -1) // For some reason this always returns false for the nether
-		{
-			if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(_this, dimensionIn)) return _this;
-		}
+       
+		// Entity.setPortal has updated the entity's lastPortalVec incorrectly, 
+		// because Blocks.Portal.createPatternHelper can't detect OTG portals, 
+		// detect portals and update lastPortalVec again.
 		
+        if (!_this.world.isRemote)
+        {
+            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(_this.world, _this.lastPortalPos);
+            double d0 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
+            double d1 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? _this.posZ : _this.posX;
+            d1 = Math.abs(MathHelper.pct(d1 - (double)(blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - (double)blockpattern$patternhelper.getWidth()));
+            double d2 = MathHelper.pct(_this.posY - 1.0D, (double)blockpattern$patternhelper.getFrontTopLeft().getY(), (double)(blockpattern$patternhelper.getFrontTopLeft().getY() - blockpattern$patternhelper.getHeight()));
+            _this.lastPortalVec = new Vec3d(d1, d2, 0.0D);
+            _this.teleportDirection = blockpattern$patternhelper.getForwards();
+        }
+        
+        // We're overriding the flow from EntityPlayerMP.changeDimension from here on.
+        // We have to because the normal flow can't detect OTG portals and tp's players/entities
+        // to the wrong coordinates when going through a portal.
+		
+		Teleporter teleporter = _this.getServer().getWorld(dimensionIn).getDefaultTeleporter();
+        _this.invulnerableDimensionChange = true;
+
+        if (_this.dimension == 0 && dimensionIn == -1)
+        {
+        	_this.enteredNetherPosition = new Vec3d(_this.posX, _this.posY, _this.posZ);
+        }
+        else if (_this.dimension != -1 && dimensionIn != 0)
+        {
+        	_this.enteredNetherPosition = null;
+        }
+
+        if (_this.dimension == 1 && dimensionIn == 1 && teleporter.isVanilla())
+        {
+        	_this.world.removeEntity(_this);
+
+            if (!_this.queuedEndExit)
+            {
+            	_this.queuedEndExit = true;
+            	_this.connection.sendPacket(new SPacketChangeGameState(4, _this.seenCredits ? 0.0F : 1.0F));
+            	_this.seenCredits = true;
+            }
+            ServerPacketManager.SendParticlesPacket(null, _this); // Clear particles
+            return _this;
+        } else {
+            if (_this.dimension == 0 && dimensionIn == 1)
+            {
+                dimensionIn = 1;
+            }
+
+            //_this.mcServer.getPlayerList().transferPlayerToDimension(_this, dimensionIn, teleporter);
+            transferPlayerToDimension(_this, dimensionIn, teleporter, _this.mcServer.getPlayerList(), createPortal, false);
+            _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+            _this.lastExperience = -1;
+            _this.lastHealth = -1.0F;
+            _this.lastFoodLevel = -1;
+            ServerPacketManager.SendParticlesPacket(null, _this); // Clear particles            
+            return _this;
+        }		
+
+		/*
+		 * TODO: Re-use this for forcing gamemode / flying per dimension?
 		if(((ForgeEngine)OTG.getEngine()).getCartographerEnabled() && dimensionIn == Cartographer.CartographerDimension)
 		{
 			_this.capabilities.allowEdit = false;
@@ -172,13 +238,7 @@ public class OTGTeleporter
 			_this.capabilities.allowFlying = _this.capabilities.isCreativeMode;
 			_this.sendPlayerAbilities();
 		}
-
-        changePlayerDimension(_this, dimensionIn, _this.mcServer.getPlayerList(), createPortal, placeOnHighestBlock);
-        _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
-
-        ServerPacketManager.SendParticlesPacket(null, _this); // Clear particles 
-
-        return _this;
+	    */
     }
 
     static void changePlayerDimension(EntityPlayerMP player, int dimensionIn, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
@@ -208,23 +268,48 @@ public class OTGTeleporter
         {
             player.connection.sendPacket(new SPacketEntityEffect(player.getEntityId(), potioneffect));
         }
+        // Fix MC-88179: on non-death SPacketRespawn, also resend attributes
+        net.minecraft.entity.ai.attributes.AttributeMap attributemap = (net.minecraft.entity.ai.attributes.AttributeMap) player.getAttributeMap();
+        java.util.Collection<net.minecraft.entity.ai.attributes.IAttributeInstance> watchedAttribs = attributemap.getWatchedAttributes();
+        if (!watchedAttribs.isEmpty()) player.connection.sendPacket(new net.minecraft.network.play.server.SPacketEntityProperties(player.getEntityId(), watchedAttribs));
         net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerChangedDimensionEvent(player, i, dimensionIn);
     }
 
     static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal, boolean placeOnHighestBlock)
     {
     	double entityPosY = entityIn.getPosition().getY();
-        net.minecraft.world.WorldProvider pOld = oldWorldIn.provider;
-        net.minecraft.world.WorldProvider pNew = toWorldIn.provider;
-        double moveFactor = pOld.getMovementFactor() / pNew.getMovementFactor();
-        double d0 = entityIn.posX * moveFactor;
-        double d1 = entityIn.posZ * moveFactor;
+        double moveFactor = oldWorldIn.provider.getMovementFactor() / toWorldIn.provider.getMovementFactor();
+        double d0 = MathHelper.clamp(entityIn.posX * moveFactor, toWorldIn.getWorldBorder().minX() + 16.0D, toWorldIn.getWorldBorder().maxX() - 16.0D);
+        double d1 = MathHelper.clamp(entityIn.posZ * moveFactor, toWorldIn.getWorldBorder().minZ() + 16.0D, toWorldIn.getWorldBorder().maxZ() - 16.0D);
+        double d2 = 8.0D;
         float f = entityIn.rotationYaw;
         oldWorldIn.profiler.startSection("moving");
 
+        if (entityIn.dimension == 1 && teleporter.isVanilla())
+        {
+            BlockPos blockpos;
+
+            if (lastDimension == 1)
+            {
+                blockpos = toWorldIn.getSpawnPoint();
+            } else {
+                blockpos = toWorldIn.getSpawnCoordinate();
+            }
+
+            d0 = (double)blockpos.getX();
+            entityIn.posY = (double)blockpos.getY();
+            d1 = (double)blockpos.getZ();
+            entityIn.setLocationAndAngles(d0, entityIn.posY, d1, 90.0F, 0.0F);
+
+            if (entityIn.isEntityAlive())
+            {
+                oldWorldIn.updateEntityWithOptionalForce(entityIn, false);
+            }
+        }        
+        
         oldWorldIn.profiler.endSection();
 
-        if (lastDimension != 1)
+        if (lastDimension != 1 || !teleporter.isVanilla())
         {
             oldWorldIn.profiler.startSection("placing");
             d0 = (double)MathHelper.clamp((int)d0, -29999872, 29999872);
@@ -233,7 +318,8 @@ public class OTGTeleporter
             if (entityIn.isEntityAlive())
             {
             	entityIn.setLocationAndAngles(d0, entityIn.getPosition().getY(), d1, entityIn.rotationYaw, entityIn.rotationPitch);
-
+            	oldWorldIn.updateEntityWithOptionalForce(entityIn, false);
+            	
                 if(!((ForgeEngine)OTG.getEngine()).getCartographerEnabled() || (entityIn.dimension != Cartographer.CartographerDimension && lastDimension != Cartographer.CartographerDimension))
                 {
 	                ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(DimensionManager.getWorld(lastDimension));
@@ -391,6 +477,7 @@ public class OTGTeleporter
 
     static boolean placeInExistingPortal(WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
+    	int i = 128;
         double d0 = -1.0D;
         int j = MathHelper.floor(entityIn.posX);
         int k = MathHelper.floor(entityIn.posZ);
@@ -398,42 +485,35 @@ public class OTGTeleporter
         BlockPos blockpos = BlockPos.ORIGIN;
         long l = ChunkPos.asLong(j, k);
 
-        Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = getPortals(destinationWorld.provider.getDimension());
+        BlockPos blockpos3 = new BlockPos(entityIn);
 
-        if (destinationCoordinateCache.containsKey(l))
+        for (int i1 = -128; i1 <= 128; ++i1)
         {
-            Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition)destinationCoordinateCache.get(l);
-            d0 = 0.0D;
-            blockpos = teleporter$portalposition;
-            teleporter$portalposition.lastUpdateTime = destinationWorld.getTotalWorldTime();
-            flag = false;
-        } else {
-            BlockPos blockpos3 = new BlockPos(entityIn);
+            BlockPos blockpos2;
 
-            for (int i1 = -128; i1 <= 128; ++i1)
+            for (int j1 = -128; j1 <= 128; ++j1)
             {
-                BlockPos blockpos2;
-
-                for (int j1 = -128; j1 <= 128; ++j1)
+                for (BlockPos blockpos1 = blockpos3.add(i1, destinationWorld.getActualHeight() - 1 - blockpos3.getY(), j1); blockpos1.getY() >= 0; blockpos1 = blockpos2)
                 {
-                    for (BlockPos blockpos1 = blockpos3.add(i1, destinationWorld.getActualHeight() - 1 - blockpos3.getY(), j1); blockpos1.getY() >= 0; blockpos1 = blockpos2)
+                    blockpos2 = blockpos1.down();
+
+                    if (destinationWorld.getBlockState(blockpos1).getBlock() == Blocks.PORTAL)
                     {
-                        blockpos2 = blockpos1.down();
-
-                        if (destinationWorld.getBlockState(blockpos1).getBlock() == Blocks.PORTAL)
+                        for (blockpos2 = blockpos1.down(); destinationWorld.getBlockState(blockpos2).getBlock() == Blocks.PORTAL; blockpos2 = blockpos2.down())
                         {
-                            for (blockpos2 = blockpos1.down(); destinationWorld.getBlockState(blockpos2).getBlock() == Blocks.PORTAL; blockpos2 = blockpos2.down())
-                            {
-                                blockpos1 = blockpos2;
-                            }
+                            blockpos1 = blockpos2;
+                        }
 
-                            double d1 = blockpos1.distanceSq(blockpos3);
+                        double d1 = blockpos1.distanceSq(blockpos3);
 
-                            if (d0 < 0.0D || d1 < d0)
+                        if (d0 < 0.0D || d1 < d0)
+                        {
+                            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(entityIn.getEntityWorld(), destinationWorld, blockpos1);
+                            if(blockpattern$patternhelper.getHeight() >= 3 && blockpattern$patternhelper.getWidth() >= 2)
                             {
                                 d0 = d1;
                                 blockpos = blockpos1;
-                            }
+                            }        			                               
                         }
                     }
                 }
@@ -442,20 +522,13 @@ public class OTGTeleporter
 
         if (d0 >= 0.0D)
         {
-            if (flag)
-            {
-            	destinationCoordinateCache.put(l, _this.new PortalPosition(blockpos, destinationWorld.getTotalWorldTime()));
-            }
-
             double d5 = (double)blockpos.getX() + 0.5D;
             double d7 = (double)blockpos.getZ() + 0.5D;
-            BlockPattern.PatternHelper blockpattern$patternhelper = Blocks.PORTAL.createPatternHelper(destinationWorld, blockpos);
-            boolean flag1 = blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;
+            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(entityIn.getEntityWorld(), destinationWorld, blockpos);
+            boolean flag1 = blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;            
+                      
             double d2 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
-
-            double xCoord = entityIn.getLastPortalVec() == null ? 0.0 : entityIn.getLastPortalVec().x;
-            double yCoord = entityIn.getLastPortalVec() == null ? 2.0 : entityIn.getLastPortalVec().y;
-            double d6 = (double)(blockpattern$patternhelper.getFrontTopLeft().getY() + 1) - yCoord * (double)blockpattern$patternhelper.getHeight();
+            double d6 = (double)(blockpattern$patternhelper.getFrontTopLeft().getY() + 1) - entityIn.getLastPortalVec().y * (double)blockpattern$patternhelper.getHeight();
 
             if (flag1)
             {
@@ -464,109 +537,46 @@ public class OTGTeleporter
 
             if (blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X)
             {
-                d7 = d2 + (1.0D - xCoord) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
+                d7 = d2 + (1.0D - entityIn.getLastPortalVec().x) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
             } else {
-                d5 = d2 + (1.0D - xCoord) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
+                d5 = d2 + (1.0D - entityIn.getLastPortalVec().x) * (double)blockpattern$patternhelper.getWidth() * (double)blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
             }
 
-            entityIn.motionX = 0.0;
-            entityIn.motionZ = 0.0;
-            entityIn.rotationYaw = 0;
+            float f = 0.0F;
+            float f1 = 0.0F;
+            float f2 = 0.0F;
+            float f3 = 0.0F;
+
+            if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection())
+            {
+                f = 1.0F;
+                f1 = 1.0F;
+            }
+            else if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection().getOpposite())
+            {
+                f = -1.0F;
+                f1 = -1.0F;
+            }
+            else if (blockpattern$patternhelper.getForwards().getOpposite() == entityIn.getTeleportDirection().rotateY())
+            {
+                f2 = 1.0F;
+                f3 = -1.0F;
+            } else {
+                f2 = -1.0F;
+                f3 = 1.0F;
+            }
+
+            double d3 = entityIn.motionX;
+            double d4 = entityIn.motionZ;
+            entityIn.motionX = d3 * (double)f + d4 * (double)f3;
+            entityIn.motionZ = d3 * (double)f2 + d4 * (double)f1;
+            entityIn.rotationYaw = rotationYaw - (float)(entityIn.getTeleportDirection().getOpposite().getHorizontalIndex() * 90) + (float)(blockpattern$patternhelper.getForwards().getHorizontalIndex() * 90);
 
             if (entityIn instanceof EntityPlayerMP)
             {
-            	// Find a suitable spawn location next to the portal
-            	// Make it so that all positions near the portal are checked once but the spawn point is not always the same.
-            	// In this case the xyz scan direction is random so that should create 2x2x2 = 8 different possible scan orders.
-            	int radius = 2;
-            	boolean invertX = Math.random() > 0.5;
-            	boolean invertY = Math.random() > 0.5;
-            	boolean invertZ = Math.random() > 0.5;
-            	for(int x = -radius; x <= radius; x++)
-            	{
-            		int randomX = invertX ? -x : x;
-            		for(int y = -radius; y <= radius; y++)
-            		{
-            			int randomY = invertY ? -y : y;
-            			for(int z = -radius; z <= radius; z++)
-            			{
-            				int randomZ = invertZ ? -z : z;
-
-	            			BlockPos blockPos1 = new BlockPos(d5 + randomX, d6 + randomY, d7 + randomZ);
-	            			BlockPos blockPos2 = new BlockPos(d5 + randomX, d6 + randomY + 1, d7 + randomZ);
-	            			BlockPos blockPos3 = new BlockPos(d5 + randomX, d6 + randomY + 2, d7 + randomZ);
-	            			IBlockState blockState1 = destinationWorld.getBlockState(blockPos1);
-	            			IBlockState blockState2 = destinationWorld.getBlockState(blockPos2);
-	            			IBlockState blockState3 = destinationWorld.getBlockState(blockPos3);
-
-	            			if(
-            					blockState1.getMaterial().blocksMovement() &&
-            					!blockState2.getMaterial().blocksMovement() &&
-            					!blockState3.getMaterial().blocksMovement() &&
-            					!blockState2.getMaterial().isLiquid() &&
-            					!blockState3.getMaterial().isLiquid() &&
-            					blockState2.getBlock() != Blocks.FIRE &&
-            					blockState3.getBlock() != Blocks.FIRE &&
-            					blockState2.getBlock() != Blocks.PORTAL &&
-            					blockState3.getBlock() != Blocks.PORTAL
-        					)
-	            			{
-		            			((EntityPlayerMP)entityIn).connection.setPlayerLocation(blockPos2.getX() + 0.5, blockPos2.getY(), blockPos2.getZ() + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
-		            			return true;
-		            		}
-            			}
-            		}
-            	}
-            	// Could not find a suitable spawn location, have to spawn player inside portal so destroy portal so that the player doesn't get teleported back and forth
-            	destinationWorld.notifyNeighborsOfStateChange(new BlockPos(d5, d6 + 1, d7), destinationWorld.getBlockState(new BlockPos(d5, d6 + 1, d7)).getBlock(), true);
-                ((EntityPlayerMP)entityIn).connection.setPlayerLocation(d5, d6 + 1, d7, entityIn.rotationYaw, entityIn.rotationPitch);
+                ((EntityPlayerMP)entityIn).connection.setPlayerLocation(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
             } else {
-            	// Find a suitable spawn location next to the portal
-            	// Make it so that all positions near the portal are checked once but the spawn point is not always the same.
-            	// In this case the xyz scan direction is random so that should create 2x2x2 = 8 different possible scan orders.
-            	int radius = 2;
-            	boolean invertX = Math.random() > 0.5;
-            	boolean invertY = Math.random() > 0.5;
-            	boolean invertZ = Math.random() > 0.5;
-            	for(int x = -radius; x <= radius; x++)
-            	{
-            		int randomX = invertX ? -x : x;
-            		for(int y = -radius; y <= radius; y++)
-            		{
-            			int randomY = invertY ? -y : y;
-            			for(int z = -radius; z <= radius; z++)
-            			{
-            				int randomZ = invertZ ? -z : z;
-
-	            			BlockPos blockPos1 = new BlockPos(d5 + randomX, d6 + randomY, d7 + randomZ);
-	            			BlockPos blockPos2 = new BlockPos(d5 + randomX, d6 + randomY + 1, d7 + randomZ);
-	            			BlockPos blockPos3 = new BlockPos(d5 + randomX, d6 + randomY + 2, d7 + randomZ);
-	            			IBlockState blockState1 = destinationWorld.getBlockState(blockPos1);
-	            			IBlockState blockState2 = destinationWorld.getBlockState(blockPos2);
-	            			IBlockState blockState3 = destinationWorld.getBlockState(blockPos3);
-
-	            			if(
-            					blockState1.getMaterial().blocksMovement() &&
-            					!blockState2.getMaterial().blocksMovement() &&
-            					!blockState3.getMaterial().blocksMovement() &&
-            					!blockState2.getMaterial().isLiquid() &&
-            					!blockState3.getMaterial().isLiquid() &&
-            					blockState2.getBlock() != Blocks.FIRE &&
-            					blockState3.getBlock() != Blocks.FIRE &&
-            					blockState2.getBlock() != Blocks.PORTAL &&
-            					blockState3.getBlock() != Blocks.PORTAL
-        					)
-	            			{
-	                			entityIn.setLocationAndAngles(blockPos2.getX() + 0.5, blockPos2.getY(), blockPos2.getZ() + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
-		            			return true;
-		            		}
-	            		}
-            		}
-            	}
-
-            	// Could not find a suitable spawn location, have to spawn player inside portal so destroy portal so that the player doesn't get teleported back and forth
-            	destinationWorld.notifyNeighborsOfStateChange(new BlockPos(d5, d6 + 1, d7), destinationWorld.getBlockState(new BlockPos(d5, d6 + 1, d7)).getBlock(), true);
-            	entityIn.setLocationAndAngles(d5, d6 + 1, d7, entityIn.rotationYaw, entityIn.rotationPitch);
+                entityIn.setLocationAndAngles(d5, d6, d7, entityIn.rotationYaw, entityIn.rotationPitch);
             }
 
             return true;

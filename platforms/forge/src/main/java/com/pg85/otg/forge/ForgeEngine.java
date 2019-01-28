@@ -542,15 +542,12 @@ public class ForgeEngine extends OTGEngine
     	}
     	else if(world.provider.getDimension() > 1)
     	{
-    		if(OTGDimensionManager.IsOTGDimension(world.provider.getDimension()))
-    		{
-				LocalWorld localWorld = this.worldLoader.getWorld(world.provider.getDimensionType().getName());
-				if(localWorld == null)
-				{
-					return this.worldLoader.getUnloadedWorld(world.provider.getDimensionType().getName());
-				}
-	    		return this.worldLoader.getWorld(world.provider.getDimensionType().getName());
-	    	}
+			LocalWorld localWorld = this.worldLoader.getWorld(world.provider.getDimensionType().getName());
+			if(localWorld == null)
+			{
+				return this.worldLoader.getUnloadedWorld(world.provider.getDimensionType().getName());
+			}
+    		return this.worldLoader.getWorld(world.provider.getDimensionType().getName());
     	}
     	ForgeWorld forgeWorld = this.worldLoader.getWorld(world.getWorldInfo().getWorldName());
 		if(forgeWorld == null)

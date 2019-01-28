@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
+import com.google.common.cache.LoadingCache;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
@@ -17,7 +18,9 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.init.Blocks;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
@@ -102,24 +105,58 @@ public class OTGBlockPortal
         private BlockPos bottomLeft;
         private int height;
         private int width;
-
-        public Size(World worldIn, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
+        
+        // Used for checking for portals in the destination world
+        public Size(World sourceWorld, World destinationWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
         {
-            this.world = worldIn;
+            this.world = destinationWorld;
             this.axis = p_i45694_3_;
 
             if (p_i45694_3_ == EnumFacing.Axis.X)
             {
                 this.leftDir = EnumFacing.EAST;
                 this.rightDir = EnumFacing.WEST;
-            }
-            else
-            {
+            } else {
                 this.leftDir = EnumFacing.NORTH;
                 this.rightDir = EnumFacing.SOUTH;
             }
 
-            for (BlockPos blockpos = spawnPos; spawnPos.getY() > blockpos.getY() - 21 && spawnPos.getY() > 0 && this.isEmptyBlock(worldIn.getBlockState(spawnPos.down()).getBlock()); spawnPos = spawnPos.down())
+            for (BlockPos blockpos = spawnPos; spawnPos.getY() > blockpos.getY() - 21 && spawnPos.getY() > 0 && this.isEmptyBlock(world.getBlockState(spawnPos.down()).getBlock()); spawnPos = spawnPos.down())
+            {
+                ;
+            }
+           
+            ArrayList<LocalMaterialData> portalMaterials = null;
+            if(sourceWorld.provider.getDimension() == 0)
+            {
+            	portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+            } else {            
+	            ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(sourceWorld);            
+				portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+            }
+			
+			if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
+			{
+				return;
+			}
+        }
+        
+        // Used when creating portals in the source world
+        public Size(World sourceWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
+        {
+            this.world = sourceWorld;
+            this.axis = p_i45694_3_;
+
+            if (p_i45694_3_ == EnumFacing.Axis.X)
+            {
+                this.leftDir = EnumFacing.EAST;
+                this.rightDir = EnumFacing.WEST;
+            } else {
+                this.leftDir = EnumFacing.NORTH;
+                this.rightDir = EnumFacing.SOUTH;
+            }
+
+            for (BlockPos blockpos = spawnPos; spawnPos.getY() > blockpos.getY() - 21 && spawnPos.getY() > 0 && this.isEmptyBlock(sourceWorld.getBlockState(spawnPos.down()).getBlock()); spawnPos = spawnPos.down())
             {
                 ;
             }
@@ -163,17 +200,18 @@ public class OTGBlockPortal
 			
 			// If no world uses obsidian try nether.
 			if(!worldUsesObsidian)
-			{
+			{				
 				ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
 				portalMaterials.add(OTG.toLocalMaterialData(DefaultMaterial.OBSIDIAN, 0));
-				if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
+				// Only allow portals to nether from overworld
+				if(sourceWorld.provider.getDimension() == 0 && getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
 				{
 					return;
 				}
 			}
 			
-			if(overworld == null && worldIn.provider.getDimension() != 0) // This is a vanilla overworld, player is not in overworld so may want to portal to it
-			{
+			if(overworld == null && sourceWorld.provider.getDimension() != 0) // This is a vanilla overworld, player is not in overworld so may want to portal to it
+			{ // TODO: Does this still happen?
 				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
 				if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
 				{
@@ -184,8 +222,8 @@ public class OTGBlockPortal
 			{
 				ForgeWorld forgeWorld = (ForgeWorld)localWorld;
 				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
-	            				
-				if(forgeWorld.getDimensionId() != worldIn.provider.getDimension())
+				
+				if(forgeWorld.getDimensionId() != sourceWorld.provider.getDimension())
 				{
 					if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
 					{
@@ -194,7 +232,6 @@ public class OTGBlockPortal
 				}
 			}
         }
-
         
         boolean getDistanceUntilEdgeForPortalMaterials(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_i45694_2_)
         {
@@ -433,6 +470,113 @@ public class OTGBlockPortal
             teleporter$portalposition.lastUpdateTime = worldServerInstance.getTotalWorldTime();
         } else {
         	destinationCoordinateCache.put(l, _this.new PortalPosition(pos, worldServerInstance.getTotalWorldTime()));
+        }
+    }
+    
+    // Used to check if a portal exists in the destination world at the given coordinates,
+    // portal must be made of the source world's portal materials.
+    public static BlockPattern.PatternHelper createPatternHelper(World sourceWorld, World destinationWorld, BlockPos p_181089_2_)
+    {
+        EnumFacing.Axis enumfacing$axis = EnumFacing.Axis.Z;
+        OTGBlockPortal.Size blockportal$size = new OTGBlockPortal.Size(sourceWorld, destinationWorld, p_181089_2_, EnumFacing.Axis.X);
+        LoadingCache<BlockPos, BlockWorldState> loadingcache = BlockPattern.createLoadingCache(destinationWorld, true);
+
+        if (!blockportal$size.isValid())
+        {
+            enumfacing$axis = EnumFacing.Axis.X;
+            blockportal$size = new OTGBlockPortal.Size(sourceWorld, destinationWorld, p_181089_2_, EnumFacing.Axis.Z);
+        }
+
+        if (!blockportal$size.isValid())
+        {
+            return new BlockPattern.PatternHelper(p_181089_2_, EnumFacing.NORTH, EnumFacing.UP, loadingcache, 1, 1, 1);
+        } else {
+            int[] aint = new int[EnumFacing.AxisDirection.values().length];
+            EnumFacing enumfacing = blockportal$size.rightDir.rotateYCCW();
+            BlockPos blockpos = blockportal$size.bottomLeft.up(blockportal$size.getHeight() - 1);
+
+            for (EnumFacing.AxisDirection enumfacing$axisdirection : EnumFacing.AxisDirection.values())
+            {
+                BlockPattern.PatternHelper blockpattern$patternhelper = new BlockPattern.PatternHelper(enumfacing.getAxisDirection() == enumfacing$axisdirection ? blockpos : blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1), EnumFacing.getFacingFromAxis(enumfacing$axisdirection, enumfacing$axis), EnumFacing.UP, loadingcache, blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
+
+                for (int i = 0; i < blockportal$size.getWidth(); ++i)
+                {
+                    for (int j = 0; j < blockportal$size.getHeight(); ++j)
+                    {
+                        BlockWorldState blockworldstate = blockpattern$patternhelper.translateOffset(i, j, 1);
+
+                        if (blockworldstate.getBlockState() != null && blockworldstate.getBlockState().getMaterial() != Material.AIR)
+                        {
+                            ++aint[enumfacing$axisdirection.ordinal()];
+                        }
+                    }
+                }
+            }
+
+            EnumFacing.AxisDirection enumfacing$axisdirection1 = EnumFacing.AxisDirection.POSITIVE;
+
+            for (EnumFacing.AxisDirection enumfacing$axisdirection2 : EnumFacing.AxisDirection.values())
+            {
+                if (aint[enumfacing$axisdirection2.ordinal()] < aint[enumfacing$axisdirection1.ordinal()])
+                {
+                    enumfacing$axisdirection1 = enumfacing$axisdirection2;
+                }
+            }
+
+            return new BlockPattern.PatternHelper(enumfacing.getAxisDirection() == enumfacing$axisdirection1 ? blockpos : blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1), EnumFacing.getFacingFromAxis(enumfacing$axisdirection1, enumfacing$axis), EnumFacing.UP, loadingcache, blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
+        }
+    }    
+    
+    // Used to check if any portal exists in the given world at the given coordinates
+    public static BlockPattern.PatternHelper createPatternHelper(World worldIn, BlockPos p_181089_2_)
+    {
+        EnumFacing.Axis enumfacing$axis = EnumFacing.Axis.Z;
+        OTGBlockPortal.Size blockportal$size = new OTGBlockPortal.Size(worldIn, p_181089_2_, EnumFacing.Axis.X);
+        LoadingCache<BlockPos, BlockWorldState> loadingcache = BlockPattern.createLoadingCache(worldIn, true);
+
+        if (!blockportal$size.isValid())
+        {
+            enumfacing$axis = EnumFacing.Axis.X;
+            blockportal$size = new OTGBlockPortal.Size(worldIn, p_181089_2_, EnumFacing.Axis.Z);
+        }
+
+        if (!blockportal$size.isValid())
+        {
+            return new BlockPattern.PatternHelper(p_181089_2_, EnumFacing.NORTH, EnumFacing.UP, loadingcache, 1, 1, 1);
+        } else {
+            int[] aint = new int[EnumFacing.AxisDirection.values().length];
+            EnumFacing enumfacing = blockportal$size.rightDir.rotateYCCW();
+            BlockPos blockpos = blockportal$size.bottomLeft.up(blockportal$size.getHeight() - 1);
+
+            for (EnumFacing.AxisDirection enumfacing$axisdirection : EnumFacing.AxisDirection.values())
+            {
+                BlockPattern.PatternHelper blockpattern$patternhelper = new BlockPattern.PatternHelper(enumfacing.getAxisDirection() == enumfacing$axisdirection ? blockpos : blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1), EnumFacing.getFacingFromAxis(enumfacing$axisdirection, enumfacing$axis), EnumFacing.UP, loadingcache, blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
+
+                for (int i = 0; i < blockportal$size.getWidth(); ++i)
+                {
+                    for (int j = 0; j < blockportal$size.getHeight(); ++j)
+                    {
+                        BlockWorldState blockworldstate = blockpattern$patternhelper.translateOffset(i, j, 1);
+
+                        if (blockworldstate.getBlockState() != null && blockworldstate.getBlockState().getMaterial() != Material.AIR)
+                        {
+                            ++aint[enumfacing$axisdirection.ordinal()];
+                        }
+                    }
+                }
+            }
+
+            EnumFacing.AxisDirection enumfacing$axisdirection1 = EnumFacing.AxisDirection.POSITIVE;
+
+            for (EnumFacing.AxisDirection enumfacing$axisdirection2 : EnumFacing.AxisDirection.values())
+            {
+                if (aint[enumfacing$axisdirection2.ordinal()] < aint[enumfacing$axisdirection1.ordinal()])
+                {
+                    enumfacing$axisdirection1 = enumfacing$axisdirection2;
+                }
+            }
+
+            return new BlockPattern.PatternHelper(enumfacing.getAxisDirection() == enumfacing$axisdirection1 ? blockpos : blockpos.offset(blockportal$size.rightDir, blockportal$size.getWidth() - 1), EnumFacing.getFacingFromAxis(enumfacing$axisdirection1, enumfacing$axis), EnumFacing.UP, loadingcache, blockportal$size.getWidth(), blockportal$size.getHeight(), 1);
         }
     }
 }

@@ -69,7 +69,7 @@ public class TeleportPlayerPacket extends OTGPacket
 									DimensionType dimensionType = DimensionManager.getProviderType(i);
 									if(dimensionType.getName().toLowerCase().trim().equals(dimensionName.toLowerCase()))
 									{
-										OTGTeleporter.changeDimension(i, (EntityPlayerMP) player, false, true);								
+										OTGTeleporter.changeDimension(i, (EntityPlayerMP) player, false, true);
 										return;
 									}
 								}

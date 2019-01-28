@@ -109,9 +109,10 @@ public class PregeneratorStatusPacket extends OTGPacket
 				    	if(forgeWorld == null)
 				    	{
 				    		forgeWorld = (ForgeWorld)OTG.getEngine().getUnloadedWorld(pregenerationWorld);
-				    	}
+				    	}				    
+				    	
 				    	// WorldSession can be null if MP client has not received a world instance for the world
-				    	if(forgeWorld.GetWorldSession() != null)
+				    	if(forgeWorld != null && forgeWorld.GetWorldSession() != null)
 				    	{
 				    		Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();
 				    		pregenerator.SetPregeneratorIsRunning(pregeneratorIsRunning);

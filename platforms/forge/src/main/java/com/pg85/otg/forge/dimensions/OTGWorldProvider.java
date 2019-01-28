@@ -11,7 +11,9 @@ import com.pg85.otg.forge.OTGPlugin;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldProviderSurface;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
@@ -103,7 +105,8 @@ public class OTGWorldProvider extends WorldProviderSurface
 
         return dimType;
     }
-
+	
+	public boolean isSPServerOverworld = false;
      // Creates a new {@link BiomeProvider} for the WorldProvider, and also sets the values of {@link #hasSkylight} and
      // {@link #hasNoSky} appropriately.
 	@Override
@@ -111,8 +114,18 @@ public class OTGWorldProvider extends WorldProviderSurface
     {
         // Creates a new world chunk manager for WorldProvider
     	this.hasSkyLight = true;
-        this.biomeProvider = OTGPlugin.txWorldType.getBiomeProvider(world);
+    	if(!isSPServerOverworld)
+    	{
+    		this.biomeProvider = OTGPlugin.txWorldType.getBiomeProvider(world);
+    	}
     }
+	
+	public void init(BiomeProvider biomeProvider)
+	{
+        // Creates a new world chunk manager for WorldProvider
+    	this.hasSkyLight = true;
+        this.biomeProvider = biomeProvider;
+	}
 
     @Override
     public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()

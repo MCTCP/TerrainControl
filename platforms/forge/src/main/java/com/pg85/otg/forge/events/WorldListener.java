@@ -52,13 +52,13 @@ public class WorldListener
 
         //OTG.log(LogMarker.INFO, "WorldEvent.Load - DIM: {}", dimension);
 
-        if (world.isRemote && dimension == 0)
+        if (dimension == 0)
         {
         	ForgeWorld overworld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
         	if(overworld != null)
         	{
         		overrideWorldProvider(world);	
-        	}        	
+        	}
         }
 	}
 	
@@ -70,20 +70,28 @@ public class WorldListener
         if (newProviderClass != null && newProviderClass != world.provider.getClass())
         {
             final int dim = world.provider.getDimension();
-            String oldName = world.provider.getClass().getName();
             //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Trying to override the WorldProvider of type '{}' in dimension {} with '{}'", oldName, dim, newClassName);
 
             try
             {
                 Constructor <? extends WorldProvider> constructor = newProviderClass.getConstructor();
-                WorldProvider newProvider = constructor.newInstance();
+                WorldProvider newProvider = constructor.newInstance();               
 
                 try
-                {
+                {                	
+                    WorldProvider oldProvider = world.provider;
                     field_World_provider.set(world, newProvider);
-                    world.provider.setWorld(world);
+                    ((OTGWorldProvider)world.provider).isSPServerOverworld = !world.isRemote;
+                   	world.provider.setWorld(world);
                     world.provider.setDimension(dim);
-
+                 
+                    if(!world.isRemote)
+                    {
+                    	// TODO: Bit of a hack, need to override the worldprovider for SP server or gravity won't work properly ><.
+                    	// Creating a new biomeprovider causes problems, re-using the existing one seems to work though,
+                    	((OTGWorldProvider)world.provider).init(oldProvider.getBiomeProvider());
+                    }
+                    
                     //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Overrode the WorldProvider in dimension {} with '{}'", dim, newClassName);
                 }
                 catch (Exception e)
@@ -95,6 +103,7 @@ public class WorldListener
             }
             catch (Exception e)
             {
+            	
             }
         }
 

@@ -406,7 +406,7 @@ public final class LayerFactory
             if (haveBorder)
             {
                 layerBiomeBorder.child = mainLayer;
-                mainLayer = layerBiomeBorder;
+                mainLayer = layerBiomeBorder; // TODO: LayerBiomeBorder doesn't take mainLayer as a parameter, so setting it as mainLayer here would lose everything we just did to mainlayer except borders?
             }
         }
 

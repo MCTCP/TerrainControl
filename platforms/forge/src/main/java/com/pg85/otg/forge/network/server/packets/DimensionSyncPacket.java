@@ -61,26 +61,7 @@ public class DimensionSyncPacket extends OTGPacket
 			ConfigFile.writeStringToStream(stream, dimConfig.ToYamlString());
 		}
 		
-		//stream.writeInt(otgDimData.orderedDimensions.size() + (localWorld == null ? 0 : 1)); // Number of worlds in this packet, add overworld if it is an OTG world.
 		stream.writeInt(otgDimData.orderedDimensions.size());
-	
-		// Send worldconfig and biomeconfigs for each world.
-		/*
-		if(localWorld != null)
-		{
-			// Overworld (dim 0)
-	        try
-	        {
-	        	stream.writeBoolean(true); // World is loaded, used for GUI on the client
-	        	stream.writeInt(0);
-	            ConfigToNetworkSender.writeConfigsToStream(localWorld.getConfigs(), stream, false);
-	        }
-	        catch (IOException e)
-	        {
-	            OTG.printStackTrace(LogMarker.FATAL, e);
-	        }
-		}
-		*/
 		
 		for(int i = 0; i <= otgDimData.highestOrder; i++)
 		{

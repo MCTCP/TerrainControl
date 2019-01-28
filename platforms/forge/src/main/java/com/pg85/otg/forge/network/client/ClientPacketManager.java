@@ -159,8 +159,6 @@ public class ClientPacketManager
 		
 		for(int i = 0; i < worldCount; i++)
 		{
-			// Don't create dimensions on client, only server needs them.
-			
 			boolean worldIsLoaded = wrappedStream.readBoolean();
 			int dimensionId = wrappedStream.readInt();
 	
@@ -205,14 +203,17 @@ public class ClientPacketManager
 	
 		for(Entry<Integer, String> removedDim : dimsToRemove.entrySet())
 		{
-			// This dimension has been deleted on the server, remove it
-			ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getUnloadedWorld(removedDim.getValue());
-			if(forgeWorld == null)
+			// Overworld isn't sent by the server if it's a vanilla world, so it mistakenly ends up in removedDims.
+			if(removedDim.getKey() != 0)
 			{
-				forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(removedDim.getValue()); // This can happen because the client considers all worlds loaded when it receives them from the server.
+				// This dimension has been deleted on the server, remove it
+				ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getUnloadedWorld(removedDim.getValue());
+				if(forgeWorld == null)
+				{
+					forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(removedDim.getValue()); // This can happen because the client considers all worlds loaded when it receives them from the server.
+				}				
+				OTGDimensionManager.DeleteDimension(removedDim.getKey(), forgeWorld, Minecraft.getMinecraft().player.getServer(), false);
 			}
-	
-			OTGDimensionManager.DeleteDimension(removedDim.getKey(), forgeWorld, Minecraft.getMinecraft().player.getServer(), false);
 		}
 		
 		if(
