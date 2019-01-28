@@ -155,7 +155,7 @@ public class OTGBlockPortal
                 this.leftDir = EnumFacing.NORTH;
                 this.rightDir = EnumFacing.SOUTH;
             }
-
+            
             for (BlockPos blockpos = spawnPos; spawnPos.getY() > blockpos.getY() - 21 && spawnPos.getY() > 0 && this.isEmptyBlock(sourceWorld.getBlockState(spawnPos.down()).getBlock()); spawnPos = spawnPos.down())
             {
                 ;

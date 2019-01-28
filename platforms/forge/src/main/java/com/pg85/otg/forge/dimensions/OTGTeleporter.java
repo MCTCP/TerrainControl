@@ -173,7 +173,7 @@ public class OTGTeleporter
 		
         if (!_this.world.isRemote)
         {
-            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(_this.world, _this.lastPortalPos);
+            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(_this.world, _this.lastPortalPos != null ? _this.lastPortalPos : _this.getPosition());
             double d0 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
             double d1 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? _this.posZ : _this.posX;
             d1 = Math.abs(MathHelper.pct(d1 - (double)(blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - (double)blockpattern$patternhelper.getWidth()));
