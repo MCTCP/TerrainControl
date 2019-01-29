@@ -367,13 +367,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.EntityLivingBase.travel, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.EntityLivingBase.travel, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// Gravity settings for minecarts
@@ -407,13 +407,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityMinecart.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityMinecart.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// Gravity settings for arrows
@@ -447,13 +447,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.projectile.EntityArrow.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.projectile.EntityArrow.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.item.EntityBoat.updateMotion()
@@ -486,13 +486,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityBoat.updateMotion, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityBoat.updateMotion, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.item.EntityFallingBlock.onUpdate
@@ -525,12 +525,12 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityFallingBlock.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityFallingBlock.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.item.EntityItem.onUpdate
@@ -563,13 +563,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityItem.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityItem.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.projectile.LlamaSpit.onUpdate
@@ -602,13 +602,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.projectile.LlamaSpit.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.projectile.LlamaSpit.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.projectile.EntityShulkerBullet.onUpdate
@@ -641,13 +641,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.projectile.EntityShulkerBullet, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.projectile.EntityShulkerBullet, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.projectile.EntityThrowable.getGravityVelocity
@@ -680,13 +680,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.projectile.EntityThrowable.getGravityVelocity, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.projectile.EntityThrowable.getGravityVelocity, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.item.EntityTntPrimed",
@@ -719,13 +719,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityTntPrimed, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityTntPrimed, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 
 	// net.minecraft.entity.item.EntityXPOrb.onUpdate
@@ -758,13 +758,13 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+					System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityXPOrb.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 				}
 				return;
 			}
 		}
 
-		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+		System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityXPOrb.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
 	}
 			
 	// Make sure that OTG dimensions get initialised by OTGDimensionManager.initDimension
