@@ -17,7 +17,6 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.FileHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -347,7 +346,9 @@ public final class ServerConfigProvider implements ConfigProvider
         	}
         }
     	if(!hasWorldData)
-    	{        	
+    	{
+    		// TODO: This is causing problems with other mods that use reserved id's.
+    		/*
         	// If this is a new world or a legacy world without saved biome id data then try to set the biome ids for the default biomes to the default biome id's.
         	// Makes seeds look the same as before
     		
@@ -387,6 +388,7 @@ public final class ServerConfigProvider implements ConfigProvider
             		}
             	}
     		}
+    		*/
         }
         
         // Set OTG biome id's for biomes, make sure there is enough space to register all biomes.

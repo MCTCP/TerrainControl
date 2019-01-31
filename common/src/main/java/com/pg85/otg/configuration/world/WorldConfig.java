@@ -22,6 +22,7 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.io.File;
 import java.util.*;
+import java.util.Map.Entry;
 
 public class WorldConfig extends ConfigFile
 {
@@ -886,9 +887,9 @@ public class WorldConfig extends ConfigFile
                 "   OldGenerator - Minecraft Beta 1.7.3 biome generator");
 
         // Custom biomes
-        //writer.bigTitle("Custom biomes");
+        writer.bigTitle("Custom biomes");
 
-        //WriteCustomBiomes(writer);
+        WriteCustomBiomes(writer);
 
         // Settings for BiomeMode:Normal
         writer.bigTitle("Settings for BiomeMode: Normal",
@@ -1490,6 +1491,58 @@ public class WorldConfig extends ConfigFile
 		writer.putSetting(WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS, this.playersCanPlaceBlocks,
 				"When set to false players cannot place blocks in this world. Defaults to: true");
     }
+    
+    private final Comparator<Entry<String, Integer>> CBV = new Comparator<Entry<String, Integer>>()
+    {
+        @Override
+        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2)
+        {
+            return o1.getValue() - o2.getValue();
+        }
+    };    
+    
+    private void WriteCustomBiomes(SettingsMap writer)
+    {
+        List<String> output = new ArrayList<String>();
+        // Custom biome id
+        List<Entry<String, Integer>> cbi = new ArrayList<Entry<String, Integer>>(this.customBiomeGenerationIds.entrySet());
+        Collections.sort(cbi, CBV);
+        // Print all custom biomes
+        for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
+        {
+            Entry<String, Integer> entry = it.next();
+    		if(!((entry.getValue() > 39 && entry.getValue() < 127) || (entry.getValue() > 167)))
+        	{
+    			// Skip custom biomes with vanilla id's.
+    			// Forge adds these to the custom biomes list
+    			// to make vanilla biomes fully customisable
+    			// but the vanilla biome id's shouldn't actually
+    			// be written to the WorldConfig.ini file
+    			continue;
+        	}
+            output.add(entry.getKey() + ":" + entry.getValue());
+        }
+        writer.putSetting(WorldStandardValues.CUSTOM_BIOMES, output,
+        		"NOTE: This is a legacy setting and is only used for OTG worlds created with 1.12.2 v6 or lower.",
+        		"For 1.12.2 v6 or higher, OTG reads all biomes in the BiomeConfigs directory and assigns biome id's.",
+                "You need to register your custom biomes here. This setting will make Open Terrain Generator",
+                "generate setting files for them. However, it won't place them in the world automatically.",
+                "See the settings for your BiomeMode below on how to add them to the world.",
+                "",
+                "Syntax: CustomBiomes:BiomeName:id[,AnotherBiomeName:id[,...]]",
+                "Example: CustomBiomes:TestBiome1:30,BiomeTest2:31",
+                "This will add two biomes and generate the BiomeConfigs for them.",
+                "All changes here need a server restart.",
+                "",
+                "Due to the way Mojang's loading code works, all biome ids need to be unique",
+                "on the server. If you don't do this, the client will display the biomes just fine,",
+                "but the server can think it is another biome with the same id. This will cause saplings,",
+                "snowfall and mobs to work as in the other biome.",
+                "",
+                "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
+                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.",
+				"The Cartographer feature for Forge uses biome id 888.");
+    }    
 
     public double getFractureHorizontal()
     {

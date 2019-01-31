@@ -20,6 +20,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import static org.objectweb.asm.Opcodes.*;
+
 import net.minecraft.launchwrapper.IClassTransformer;
 
 public class OTGClassTransformer implements IClassTransformer
@@ -114,7 +115,7 @@ public class OTGClassTransformer implements IClassTransformer
 					transformOnUpdateXPOrb(classNode, isObfuscated);
 				break;
 				case 13: // net.minecraftforge.common.DimensionManager.initDimension(int dim)
-					transformInitDimension1(classNode, isObfuscated);
+					transformInitDimension(classNode, isObfuscated);
 				break; 				
 			}
 
@@ -367,7 +368,67 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					method.instructions.remove(instructionToRemove);
 				} else {
-					System.out.println("OTG-Core could not override net.minecraft.entity.EntityLivingBase.travel, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
+					// Galacticraft inserts getGravityForEntity(this)
+					boolean bFound = false;
+					for(AbstractInsnNode instruction : method.instructions.toArray())
+					{		
+						if(instruction.getOpcode() == INVOKESTATIC && ((MethodInsnNode)instruction).name.equals("getGravityForEntity"))
+						{
+							bFound = true;
+							
+							// Before:
+							// this.motionY -= getGravityForEntity(this);
+							/*
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactor", "(Lnet/minecraft/entity/Entity;)D", false);
+							*/
+							
+							// After:
+							// motionY -= isOTGWorld(entity) ? getGravityFactor1(this) : getGravityForEntity(this);
+							/*
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "isOTGWorld", "(Lnet/minecraft/entity/Entity;)Z", false);
+								Label l83 = new Label();
+								mv.visitJumpInsn(IFEQ, l83);
+								mv.visitVarInsn(ALOAD, 0);
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactor1", "(Lnet/minecraft/entity/Entity;)D", false);
+								Label l84 = new Label();
+								mv.visitJumpInsn(GOTO, l84);
+								mv.visitLabel(l83);
+								mv.visitFrame(Opcodes.F_FULL, 8, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, "net/minecraft/util/math/BlockPos$PooledMutableBlockPos", Opcodes.FLOAT, Opcodes.FLOAT}, 2, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.DOUBLE});
+								mv.visitVarInsn(ALOAD, 0);
+								
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactor", "(Lnet/minecraft/entity/Entity;)D", false);
+								
+								mv.visitLabel(l84);
+								mv.visitFrame(Opcodes.F_FULL, 8, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, "net/minecraft/util/math/BlockPos$PooledMutableBlockPos", Opcodes.FLOAT, Opcodes.FLOAT}, 3, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.DOUBLE, Opcodes.DOUBLE});
+							*/
+							
+							InsnList toInsertBefore = new InsnList();
+							toInsertBefore.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "isOTGWorld", "(Lnet/minecraft/entity/Entity;)Z", false));
+							LabelNode l201 = new LabelNode();							
+							toInsertBefore.add(new JumpInsnNode(IFEQ, l201));
+							toInsertBefore.add(new VarInsnNode(ALOAD, 0));
+							toInsertBefore.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactor", "(Lnet/minecraft/entity/Entity;)D", false));
+							LabelNode l202 = new LabelNode();
+							toInsertBefore.add(new JumpInsnNode(GOTO, l202));
+							toInsertBefore.add(l201);
+							toInsertBefore.add(new FrameNode(Opcodes.F_FULL, 8, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, "net/minecraft/util/math/BlockPos$PooledMutableBlockPos", Opcodes.FLOAT, Opcodes.FLOAT}, 2, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.DOUBLE}));
+							toInsertBefore.add(new VarInsnNode(ALOAD, 0));
+							
+							method.instructions.insertBefore(instruction, toInsertBefore);
+							
+							InsnList toInsertAfter = new InsnList();
+							toInsertAfter.add(l202);
+							toInsertAfter.add(new FrameNode(Opcodes.F_FULL, 8, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, Opcodes.FLOAT, "net/minecraft/util/math/BlockPos$PooledMutableBlockPos", Opcodes.FLOAT, Opcodes.FLOAT}, 3, new Object[] {"net/minecraft/entity/EntityLivingBase", Opcodes.DOUBLE, Opcodes.DOUBLE}));
+							
+							method.instructions.insertBefore(instruction.getNext(), toInsertAfter);
+							
+							break;
+						}
+					}
+					if(!bFound)
+					{
+						System.out.println("OTG-Core could not override net.minecraft.entity.EntityLivingBase.travel, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
+					}
 				}
 				return;
 			}
@@ -535,7 +596,7 @@ public class OTGClassTransformer implements IClassTransformer
 
 	// net.minecraft.entity.item.EntityItem.onUpdate
 	private void transformOnUpdateItem(ClassNode gameDataNode, boolean isObfuscated)
-	{
+	{	
 		String injectSnapShot = isObfuscated ? "B_" : "onUpdate";
 		String injectSnapShotDescriptor = isObfuscated ? "()V" : "()V";
 
@@ -562,8 +623,68 @@ public class OTGClassTransformer implements IClassTransformer
 				if(instructionToRemove != null)
 				{
 					method.instructions.remove(instructionToRemove);
-				} else {
-					System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityItem.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
+				}  else {
+					// Galacticraft inserts getGravityForEntity(this)
+					boolean bFound = false;
+					for(AbstractInsnNode instruction : method.instructions.toArray())
+					{		
+						if(instruction.getOpcode() == INVOKESTATIC && ((MethodInsnNode)instruction).name.equals("getItemGravity"))
+						{
+							bFound = true;
+							
+							// Before:
+							// this.motionY -= getItemGravity(this);
+							/*
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorItem", "(Lnet/minecraft/entity/Entity;)D", false);
+							*/
+							
+							// After:
+							// motionY -= isOTGWorld(entity) ? getGravityFactorItem(this) : getItemGravity(this);
+							/*
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "isOTGWorld", "(Lnet/minecraft/entity/Entity;)Z", false);
+								Label l83 = new Label();
+								mv.visitJumpInsn(IFEQ, l83);
+								mv.visitVarInsn(ALOAD, 0);
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorItem", "(Lnet/minecraft/entity/Entity;)D", false);
+								Label l84 = new Label();
+								mv.visitJumpInsn(GOTO, l84);
+								mv.visitLabel(l83);
+								mv.visitFrame(Opcodes.F_FULL, 4, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE, Opcodes.DOUBLE, Opcodes.DOUBLE}, 2, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE});
+								mv.visitVarInsn(ALOAD, 0);
+								
+								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getItemGravity", "(Lnet/minecraft/entity/Entity;)D", false);
+								
+								mv.visitLabel(l84);
+								mv.visitFrame(Opcodes.F_FULL, 4, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE, Opcodes.DOUBLE, Opcodes.DOUBLE}, 3, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE, Opcodes.DOUBLE});
+							*/
+							
+							InsnList toInsertBefore = new InsnList();
+							toInsertBefore.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "isOTGWorld", "(Lnet/minecraft/entity/Entity;)Z", false));
+							LabelNode l201 = new LabelNode();							
+							toInsertBefore.add(new JumpInsnNode(IFEQ, l201));
+							toInsertBefore.add(new VarInsnNode(ALOAD, 0));
+							toInsertBefore.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getGravityFactorItem", "(Lnet/minecraft/entity/Entity;)D", false));
+							LabelNode l202 = new LabelNode();
+							toInsertBefore.add(new JumpInsnNode(GOTO, l202));
+							toInsertBefore.add(l201);
+							toInsertBefore.add(new FrameNode(Opcodes.F_FULL, 4, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE, Opcodes.DOUBLE, Opcodes.DOUBLE}, 2, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE}));
+							toInsertBefore.add(new VarInsnNode(ALOAD, 0));
+							
+							method.instructions.insertBefore(instruction, toInsertBefore);
+							
+							InsnList toInsertAfter = new InsnList();
+							toInsertAfter.add(l202);
+							toInsertAfter.add(new FrameNode(Opcodes.F_FULL, 4, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE, Opcodes.DOUBLE, Opcodes.DOUBLE}, 3, new Object[] {"net/minecraft/entity/item/EntityItem", Opcodes.DOUBLE, Opcodes.DOUBLE}));
+							
+							method.instructions.insertBefore(instruction.getNext(), toInsertAfter);
+							
+							break;
+						}
+					}
+					if(!bFound)
+					{
+						System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityItem.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
+					}
 				}
 				return;
 			}
@@ -769,7 +890,7 @@ public class OTGClassTransformer implements IClassTransformer
 			
 	// Make sure that OTG dimensions get initialised by OTGDimensionManager.initDimension
 	// net.minecraftforge.common.DimensionManager.initDimension(int dim)
-	private void transformInitDimension1(ClassNode gameDataNode, boolean isObfuscated)
+	private void transformInitDimension(ClassNode gameDataNode, boolean isObfuscated)
 	{
 		String injectSnapShot = isObfuscated ? "initDimension" : "initDimension";
 		String injectSnapShotDescriptor = isObfuscated ? "(I)V" : "(I)V";

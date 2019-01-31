@@ -38,7 +38,7 @@ public class OTGHooks
 		}
 		return Biome.getIdForBiome(biome);
 	}
-
+	
 	public static double getGravityFactor(Entity entity)
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
@@ -47,6 +47,11 @@ public class OTGHooks
 		} else {
 			return 0.08D;
 		}
+	}
+	
+	public static boolean isOTGWorld(Entity entity)
+	{
+		return entity.getEntityWorld().provider instanceof OTGWorldProvider;
 	}
 
 	public static double getGravityFactorMineCart(Entity entity)

@@ -1,7 +1,5 @@
 package com.pg85.otg.forge.events.client;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.OTGGuiDimensionList;
