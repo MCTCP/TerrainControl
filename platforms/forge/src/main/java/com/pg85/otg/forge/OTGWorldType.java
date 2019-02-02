@@ -54,7 +54,7 @@ public class OTGWorldType extends WorldType
         	// If this is a dimension added by another mod then return the default overworld's biomeprovider
         	// This can happen when using an OTG overworld, new dimensions inherit the terrain type of the overworld.
         	// TODO: Can this still happen?
-        	OTG.log(LogMarker.INFO, "Non-OTG dimension detected, using default world provider.");
+        	OTG.log(LogMarker.INFO, "Non-OTG dimension detected, using default biome provider.");
         	return super.getBiomeProvider(mcWorld);
         }
         
@@ -117,9 +117,17 @@ public class OTGWorldType extends WorldType
 
 	        File worldBiomesDir = new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.GetDimensionsConfig().Overworld.PresetName + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
 	        worldBiomesDir.mkdirs();
+	        
+	        // For MP server
+	        if(!mcWorld.getMinecraftServer().isSinglePlayer())
+	        {
+			    // TODO: Why does MC add \\.? Removing.. 
+			    File worldSaveDir = new File(mcWorld.getSaveHandler().getWorldDirectory().getAbsolutePath().replace("\\.",  ""));
+			    OTG.isNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
+	        }
         }
 
-    	// For server
+    	// For MP server
         if(!mcWorld.getMinecraftServer().isSinglePlayer())
         {
 	        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), OTGPlugin.txWorldType);

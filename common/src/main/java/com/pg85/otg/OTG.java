@@ -24,7 +24,10 @@ import java.util.List;
 import java.util.Random;
 
 public class OTG
-{	/**
+{	
+	public static boolean isNewWorldBeingCreated = false;
+	
+	/**
 	 * A config for each dimension of the currently active world
 	 */
     private static DimensionsConfig dimensionsConfig = null;
@@ -464,6 +467,7 @@ public class OTG
 		switch(biomeName)
 		{
 			// TODO: Always keep this biome list up to date
+			// TODO: Put everything that needs to be updated per MC version in one place?
 			case "Beach":
 				registryName = "minecraft:beaches";
 			break;

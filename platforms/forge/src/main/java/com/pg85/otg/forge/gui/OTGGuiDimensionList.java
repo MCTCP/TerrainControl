@@ -365,7 +365,9 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 				if(dimConfig.isNewConfig)
                 				{
                 					dimConfig.isNewConfig = false;
+                			        OTG.isNewWorldBeingCreated = true;
                         			OTGDimensionManager.CreateNewDimensionSP(dimConfig, this.mc.getIntegratedServer());
+                        			OTG.isNewWorldBeingCreated = false;
                 				}
                 			}
                 			this.dimensionSettingsList.refreshData();
@@ -602,9 +604,11 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                     
                     OTG.GetDimensionsConfig().Save();
 
-    				PregeneratorUI.ResetIngameUI();    				
+    				PregeneratorUI.ResetIngameUI();
     				
+    				OTG.isNewWorldBeingCreated = true;
     				this.mc.launchIntegratedServer(this.worldName, this.worldName, worldsettings);
+    		        OTG.isNewWorldBeingCreated = false;
     			//}
             	
             }

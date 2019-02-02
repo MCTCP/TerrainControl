@@ -216,7 +216,8 @@ public class OTGPlugin
 
 		if(!overWorld.isRemote) // Server side only
 		{
-		    if(OTG.GetDimensionsConfig() == null) // This is a vanilla overworld or a new OTG world
+			// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
+		    if(OTG.GetDimensionsConfig() == null)
 		    {
 				// Check if there is a dimensionsConfig saved for this world
 				DimensionsConfig dimsConfig = DimensionsConfig.LoadFromFile(overWorld.getSaveHandler().getWorldDirectory());
@@ -234,7 +235,7 @@ public class OTGPlugin
 				}
 				OTG.SetDimensionsConfig(dimsConfig);
 			}
-				
+		    			
 		    OTGDimensionManager.ReAddOTGDims();
 	
 		    // Load any saved dimensions.
@@ -242,7 +243,7 @@ public class OTGPlugin
 	
 		    // Create Cartographer dimension if it doesn't yet exist
 			//Cartographer.CreateCartographerDimension();
-	
+
 		    for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
 		    {
 		    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
@@ -252,11 +253,13 @@ public class OTGPlugin
 		    		{
 		    			OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
 		    		} else {
+		    			OTG.isNewWorldBeingCreated = true;
 		    			OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);
+		    			OTG.isNewWorldBeingCreated = false;
 		    		}
 	    		}
 		    }
-	            
+
 		    OTGDimensionManager.SaveDimensionData();
 		}
     }

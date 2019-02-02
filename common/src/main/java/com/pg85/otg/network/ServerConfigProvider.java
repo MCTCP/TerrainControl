@@ -228,7 +228,7 @@ public final class ServerConfigProvider implements ConfigProvider
     	return world.getRegisteredBiomeId(resourceLocation);
     }
 
-    private String indexSettings(Map<String, Integer> worldBiomes, boolean isNewWorld, Map<String, BiomeConfig> loadedBiomes, File worldSaveFolder)
+    private String indexSettings(Map<String, Integer> worldBiomes, boolean isNewWorldConfig, Map<String, BiomeConfig> loadedBiomes, File worldSaveFolder)
     {
         StringBuilder loadedBiomeNames = new StringBuilder();
 
@@ -238,7 +238,7 @@ public final class ServerConfigProvider implements ConfigProvider
         ArrayList<BiomeConfig> nonVirtualBiomes = new ArrayList<BiomeConfig>();
         ArrayList<BiomeConfig> virtualBiomesExisting = new ArrayList<BiomeConfig>();
         ArrayList<BiomeConfig> virtualBiomes = new ArrayList<BiomeConfig>();
-        
+               
         // If this is a previously created world then load the biome id data and register biomes to the same OTG biome id as before.
         ArrayList<BiomeIdData> loadedBiomeIdData = LoadBiomeIdData(worldSaveFolder);
         boolean hasWorldData = loadedBiomeIdData != null;
@@ -284,7 +284,8 @@ public final class ServerConfigProvider implements ConfigProvider
         }
         
         // For backwards compatibility load custom biomes from the world config
-        if(!hasWorldData && worldBiomes.size() > 0)
+        // A world created with a previous version of OTG may not have worlddata
+        if(!OTG.isNewWorldBeingCreated && !hasWorldData && worldBiomes.size() > 0)
         {
         	loadedBiomeIdData = new ArrayList<BiomeIdData>();
 	        for(Entry<String, Integer> worldBiome : worldBiomes.entrySet())

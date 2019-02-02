@@ -92,8 +92,10 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 			                {
 			            		OTG.log(LogMarker.ERROR, "Dimension config for world \"" + dimConfig.PresetName + "\" has value \"" + dimConfig.Seed + "\" for worldSeed which cannot be parsed as a number. Using a random seed instead.");
 			                }
-							
+			                
+			                OTG.isNewWorldBeingCreated = true;
 							OTGDimensionManager.createDimension(seed, dimConfig.PresetName, false, true, true);
+							OTG.isNewWorldBeingCreated = false;
 							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimConfig.PresetName);
 							
 							if(dimConfig.Settings.CanDropChunk)

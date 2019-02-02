@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GuiHandler implements IGuiHandler
 {	
-    public static boolean useVanillaScreen = false;
+    public static boolean useVanillaScreen = false;    
 
     //public static boolean askModCompatContinue = false;
 

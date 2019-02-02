@@ -279,7 +279,7 @@ public class ForgeEngine extends OTGEngine
     
     public int registerForgeBiomeWithId(int id, ResourceLocation resourceLocation, Biome biome)
     {
-    	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString());
+    	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString() + " " + id);
 
 		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
     	
@@ -346,7 +346,7 @@ public class ForgeEngine extends OTGEngine
         Biome biomeAtId = ids.get(id);
         if(biomeAtId != null)
         {
-        	throw new RuntimeException("Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds.");
+        	throw new RuntimeException("Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
         }
 
         ids.put(id, biome);
@@ -682,7 +682,7 @@ public class ForgeEngine extends OTGEngine
     	{
     		otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
     	} else {
-    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName());
+    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName() + ". OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
     	}
     }
     
