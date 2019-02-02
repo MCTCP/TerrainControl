@@ -16,6 +16,7 @@ import net.minecraftforge.fml.common.registry.EntityEntry;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -123,18 +124,24 @@ public final class MobSpawnGroupHelper
         return biomeList;
     }
     
+    private static HashMap<String, Class<? extends EntityLiving>> foundEntitiesByClassName = new HashMap<String, Class<? extends EntityLiving>>();
     private static Class<? extends EntityLiving> getEntityByClassName(String mobClassName)
     {
-    	List<EntityEntry> entityClasses = net.minecraftforge.fml.common.registry.ForgeRegistries.ENTITIES.getValues();
-    	Class<? extends EntityLiving> mob = null;
-    	for(EntityEntry entityClass : entityClasses)
+    	Class<? extends EntityLiving> mob = foundEntitiesByClassName.get(mobClassName);
+    	if(mob == null)
     	{
-    		String entityName = entityClass.getEntityClass().getSimpleName();
-    		if(entityName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobClassName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","")))
-    		{
-    			mob = (Class<? extends EntityLiving>) entityClass.getEntityClass();
-    			break;
-    		}
+	    	List<EntityEntry> entityClasses = net.minecraftforge.fml.common.registry.ForgeRegistries.ENTITIES.getValues();
+	    	for(EntityEntry entityClass : entityClasses)
+	    	{
+	    		String entityName = entityClass.getEntityClass().getSimpleName();
+	    		if(entityName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobClassName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","")))
+	    		{
+	    			// TODO: This might return an non EnityLiving entity
+	    			mob = (Class<? extends EntityLiving>) entityClass.getEntityClass();
+	    			foundEntitiesByClassName.put(mobClassName, mob);
+	    			break;
+	    		}
+	    	}
     	}
     	return mob;
     }
@@ -145,18 +152,23 @@ public final class MobSpawnGroupHelper
      * @param mobName The mob name.
      * @return The entity class, or null if not found.
      */
+    private static HashMap<String, Class<? extends EntityLiving>> foundEntitiesByName = new HashMap<String, Class<? extends EntityLiving>>();
     @SuppressWarnings("unchecked")
 	public static Class<? extends EntityLiving> toMinecraftClass(String mobName)
     {
-    	Set<ResourceLocation> mobNames = EntityList.getEntityNameList();
-    	Class<? extends EntityLiving> mob = null;
-    	for(ResourceLocation mobName1 : mobNames)
+    	Class<? extends EntityLiving> mob = foundEntitiesByName.get(mobName);
+    	if(mob == null)
     	{
-    		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","")))
-    		{
-    			mob = (Class<? extends EntityLiving>) EntityList.getClass(mobName1);
-    			break;
-    		}
+	    	Set<ResourceLocation> mobNames = EntityList.getEntityNameList();
+	    	for(ResourceLocation mobName1 : mobNames)
+	    	{
+	    		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","")))
+	    		{
+	    			mob = (Class<? extends EntityLiving>) EntityList.getClass(mobName1);
+	    			foundEntitiesByName.put(mobName, mob);
+	    			break;
+	    		}
+	    	}
     	}
     	
     	if(mob == null)

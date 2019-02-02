@@ -5,6 +5,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -15,6 +17,7 @@ import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiConfirmOpenLink;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.gui.GuiYesNo;
@@ -45,6 +48,7 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.util.IOHelper;
+import com.pg85.otg.logging.LogMarker;
 
 import org.lwjgl.opengl.GL11;
 
@@ -79,6 +83,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     private boolean selectingPresetForDimension;
     public OTGGuiPresetList(GuiScreen previousMenu, boolean selectingPresetForDimension)
     {    
+    	showingOpenLinkDialogue = false;
         this.previousMenu = previousMenu;
         this.selectingPresetForDimension = selectingPresetForDimension;
     }
@@ -285,9 +290,26 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 				ForgeEngine.loadPresets();
 			}
 		}
+		
+		if(showingOpenLinkDialogue && ok)
+		{
+	        try {
+				this.openWebLink(new URI("http://openterraingen.wikia.com/wiki/In-game_tools_and_console_commands"));
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        Minecraft.getMinecraft().displayGuiScreen(this);
+			return;
+		}
+		if(showingOpenLinkDialogue && !ok)
+		{
+			Minecraft.getMinecraft().displayGuiScreen(this);
+		}
 				
 		askDeleteSettings = false;
 		selectingPresetName = false;
+		showingOpenLinkDialogue = false;
 		
 		super.confirmClicked(ok, worldId);
     }
@@ -298,6 +320,12 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         return shifty + 10;
     }
 
+    private int wikiBtnLeft;
+    private int wikiBtnTop;
+    private int wikiBtnWidth;
+    private int wikiBtnHeight;
+    private int wikiBtnRight;
+    private int wikiBtnBottom;
     /**
      * Draws the screen and all the components in it.
      */
@@ -311,9 +339,34 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         }
 
         this.drawCenteredString(this.fontRenderer, "Select a preset", this.width / 2, 16, 0xFFFFFF);
+
+        this.wikiBtnWidth = this.fontRenderer.getStringWidth("Wiki");
+        this.wikiBtnHeight = 6; // TODO: Measure string height        
+        this.wikiBtnLeft = this.width - (this.rightMargin + this.fontRenderer.getStringWidth("Wiki")) - 2;
+        this.wikiBtnRight = this.wikiBtnLeft + this.wikiBtnWidth;
+        this.wikiBtnTop = 16;
+        this.wikiBtnBottom = this.wikiBtnTop + this.wikiBtnHeight;
+        
+        this.drawString(this.fontRenderer, TextFormatting.UNDERLINE + "Wiki", wikiBtnLeft, wikiBtnTop, 0x5555FF);
+        
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
+    private void openWebLink(URI url)
+    {
+        try
+        {
+            Class<?> oclass = Class.forName("java.awt.Desktop");
+            Object object = oclass.getMethod("getDesktop").invoke((Object)null);
+            oclass.getMethod("browse", URI.class).invoke(object, url);
+        }
+        catch (Throwable throwable1)
+        {
+            Throwable throwable = throwable1.getCause();
+            OTG.log(LogMarker.ERROR, "Couldn't open link: {}", (Object)(throwable == null ? "<UNKNOWN>" : throwable.getMessage()));
+        }
+    }    
+    
     /**
      * Handles mouse input.
      */
@@ -330,6 +383,25 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         }
         this.presetsList.handleMouseInput(mouseX, mouseY);
     }
+    
+    private static boolean showingOpenLinkDialogue = false;
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+    	if(wikiLinkClicked(mouseX, mouseY))
+    	{
+	    	showingOpenLinkDialogue = true;
+			GuiConfirmOpenLink gui = new GuiConfirmOpenLink(this, "http://openterraingen.wikia.com/wiki/In-game_tools_and_console_commands", 0, true);
+			gui.disableSecurityWarning();
+			mc.displayGuiScreen(gui);
+			return;
+    	}   
+    	super.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    private boolean wikiLinkClicked(int mouseX, int mouseY)
+    {
+    	return mouseX >= this.wikiBtnLeft && mouseX <= this.wikiBtnRight && mouseY >= this.wikiBtnTop && mouseY <= this.wikiBtnBottom;
+	}
 
     Minecraft getMinecraftInstance()
     {

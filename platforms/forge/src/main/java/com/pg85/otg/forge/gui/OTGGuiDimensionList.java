@@ -2,6 +2,8 @@ package com.pg85.otg.forge.gui;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -9,6 +11,7 @@ import java.util.Random;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiConfirmOpenLink;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.renderer.Tessellator;
@@ -35,6 +38,7 @@ import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.gui.OTGGuiDimensionSettingsList.SettingEntry;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
+import com.pg85.otg.logging.LogMarker;
 
 public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 {
@@ -82,6 +86,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     
     public OTGGuiDimensionList(OTGGuiPresetList previousMenu)
     {
+    	showingOpenLinkDialogue = false;
         this.previousMenu = previousMenu;        
         this.dimensions = new ArrayList<DimensionConfig>();
         
@@ -530,7 +535,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	@Override
     public void confirmClicked(boolean ok, int worldId)
     {
-		if(ok)
+		if(!showingOpenLinkDialogue && ok)
 		{
             long i = (new Random()).nextLong();
             String s = this.dimensions.get(0).Seed;
@@ -613,6 +618,24 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
             	
             }
 		}
+		if(showingOpenLinkDialogue && ok)
+		{
+	        try {
+				this.openWebLink(new URI("http://openterraingen.wikia.com/wiki/In-game_tools_and_console_commands"));				
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        Minecraft.getMinecraft().displayGuiScreen(this);
+	        return;
+		}
+		if(showingOpenLinkDialogue && !ok)
+		{
+			Minecraft.getMinecraft().displayGuiScreen(this);
+		}
+		
+		showingOpenLinkDialogue = false;
+		
 		super.confirmClicked(ok, worldId);
     }    
 
@@ -627,7 +650,13 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         return shifty + 10;
     }
     
-    long lastPregeneratorCheckTime = System.currentTimeMillis();
+    private int wikiBtnLeft;
+    private int wikiBtnTop;
+    private int wikiBtnWidth;
+    private int wikiBtnHeight;
+    private int wikiBtnRight;
+    private int wikiBtnBottom;
+    private long lastPregeneratorCheckTime = System.currentTimeMillis();
     /**
      * Draws the screen and all the components in it.
      */
@@ -677,10 +706,34 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         // If world isnt null then were ingame
         this.drawCenteredString(this.fontRenderer, this.mc.world == null ? "Create dimensions" : "Manage dimensions", this.width / 2, 16, 0xFFFFFF);
         
+        this.wikiBtnWidth = this.fontRenderer.getStringWidth("Wiki");
+        this.wikiBtnHeight = 6; // TODO: Measure string height        
+        this.wikiBtnLeft = this.width - (this.rightMargin + this.fontRenderer.getStringWidth("Wiki")) - 2;
+        this.wikiBtnRight = this.wikiBtnLeft + this.wikiBtnWidth;
+        this.wikiBtnTop = 16;
+        this.wikiBtnBottom = this.wikiBtnTop + this.wikiBtnHeight;
+        
+        this.drawString(this.fontRenderer, TextFormatting.UNDERLINE + "Wiki", wikiBtnLeft, wikiBtnTop, 0x5555FF);
+
         super.drawScreen(mouseX, mouseY, partialTicks);
         if(this.mc.world != null && !this.mc.isSingleplayer() && this.btnContinue.enabled != this.settingsChanged)
         {
         	this.btnContinue.enabled = this.settingsChanged;
+        }
+    }
+    
+    private void openWebLink(URI url)
+    {
+        try
+        {
+            Class<?> oclass = Class.forName("java.awt.Desktop");
+            Object object = oclass.getMethod("getDesktop").invoke((Object)null);
+            oclass.getMethod("browse", URI.class).invoke(object, url);
+        }
+        catch (Throwable throwable1)
+        {
+            Throwable throwable = throwable1.getCause();
+            OTG.log(LogMarker.ERROR, "Couldn't open link: {}", (Object)(throwable == null ? "<UNKNOWN>" : throwable.getMessage()));
         }
     }
 
@@ -699,11 +752,21 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         this.dimensionSettingsList.handleMouseInput();
     }
 
+    private static boolean showingOpenLinkDialogue = false;
     /**
      * Called when the mouse is clicked. Args : mouseX, mouseY, clickedButton
      */
     protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
     {
+    	if(wikiLinkClicked(mouseX, mouseY))
+    	{
+	    	showingOpenLinkDialogue = true;
+			GuiConfirmOpenLink gui = new GuiConfirmOpenLink(this, "http://openterraingen.wikia.com/wiki/In-game_tools_and_console_commands", 0, true);
+			gui.disableSecurityWarning();
+			mc.displayGuiScreen(gui);
+			return;
+    	}
+    	
         if (this.buttonId != null)
         {
             this.buttonId = null;
@@ -714,7 +777,12 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         }
     }
 
-    /**
+    private boolean wikiLinkClicked(int mouseX, int mouseY)
+    {
+    	return mouseX >= this.wikiBtnLeft && mouseX <= this.wikiBtnRight && mouseY >= this.wikiBtnTop && mouseY <= this.wikiBtnBottom;
+	}
+
+	/**
      * Called when a mouse button is released.
      */
     protected void mouseReleased(int mouseX, int mouseY, int state)
