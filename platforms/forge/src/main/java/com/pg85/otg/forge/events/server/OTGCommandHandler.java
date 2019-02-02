@@ -691,10 +691,10 @@ public final class OTGCommandHandler implements ICommand
                 if (CommandHelper.containsArgument(argString, "-d"))
                 {
                     try
-                    {
-                        ForgeBiome savedBiome = (ForgeBiome)world.getSavedBiome(playerX, playerZ);
+                    {                       
+                        ForgeBiome forgeBiome = (ForgeBiome)world.getBiome(playerX, playerZ);
 
-            			Set<Type> types = BiomeDictionary.getTypes(savedBiome.biomeBase);
+            			Set<Type> types = BiomeDictionary.getTypes(forgeBiome.biomeBase);
             			String typesString = "";
             			for(Type type : types)
             			{
