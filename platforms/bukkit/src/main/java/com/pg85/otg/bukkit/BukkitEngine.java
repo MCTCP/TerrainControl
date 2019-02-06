@@ -14,6 +14,7 @@ import net.minecraft.server.v1_12_R1.Block;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class BukkitEngine extends OTGEngine
 {
@@ -146,38 +147,5 @@ public class BukkitEngine extends OTGEngine
 	public LocalWorld getUnloadedWorld(String name)
 	{
 		return null;
-	}
-
-	@Override
-	public void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
-	{
-		// TODO: Implement this?
-	}
-
-	@Override
-	public boolean isOTGBiomeIdAvailable(String worldName, int i)
-	{
-		// TODO: Implement this?
-		return false;
-	}
-
-	@Override
-	public BiomeConfig[] getOTGBiomeIds(String worldName)
-	{
-		// TODO: Implement this?
-		return null;
-	}
-
-	@Override
-	public void unregisterOTGBiomeId(String worldName, int i)
-	{
-		// TODO: Implement this?
-	}
-
-	@Override
-	public String GetPresetName(String worldName)
-	{
-		// TODO: Implement this?
-		return worldName;
 	}
 }

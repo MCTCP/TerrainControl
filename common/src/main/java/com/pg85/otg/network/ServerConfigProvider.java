@@ -346,51 +346,6 @@ public final class ServerConfigProvider implements ConfigProvider
         		}
         	}
         }
-    	if(!hasWorldData)
-    	{
-    		// TODO: This is causing problems with other mods that use reserved id's.
-    		/*
-        	// If this is a new world or a legacy world without saved biome id data then try to set the biome ids for the default biomes to the default biome id's.
-        	// Makes seeds look the same as before
-    		
-        	// Create default biomes        	
-            for (DefaultBiome defaultBiome :  DefaultBiome.values())
-            {
-        		for(BiomeConfig biomeConfig : loadedBiomeList)
-        		{
-                	if(defaultBiome.Name.equals(biomeConfig.getName()))
-                	{
-    	            	if(OTG.getEngine().isOTGBiomeIdAvailable(world.getName(), defaultBiome.Id))
-    	            	{
-            				OTG.getEngine().setOTGBiomeId(world.getName(), defaultBiome.Id, biomeConfig, false);        	            		
-    	            	}
-    	            	else if((world.getName() + "_" + OTG.getEngine().getOTGBiomeIds(world.getName())[defaultBiome.Id].getName()).equals(defaultBiome.Name))
-    	            	{
-    	            		OTG.getEngine().setOTGBiomeId(world.getName(), defaultBiome.Id, biomeConfig, true);
-    	            	} else {
-    	            		throw new RuntimeException("This shouldn't happen");
-    	            	}
-
-    	            	if(loadedBiomeIdData == null)
-    	            	{
-    	            		loadedBiomeIdData = new ArrayList<ServerConfigProvider.BiomeIdData>();
-    	            	}
-    	            	
-    		        	loadedBiomeIdData.add(
-		        			new BiomeIdData(
-		    					world.getName() + "_" + biomeConfig.getName(), 
-		    					defaultBiome.Id, 
-		    					-1
-							)
-		    			);
-    	            	
-    	        		virtualBiomesExisting.add(biomeConfig);
-        				break;
-            		}
-            	}
-    		}
-    		*/
-        }
         
         // Set OTG biome id's for biomes, make sure there is enough space to register all biomes.
         for (BiomeConfig biomeConfig : loadedBiomeList)

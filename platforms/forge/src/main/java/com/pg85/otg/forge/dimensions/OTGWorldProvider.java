@@ -40,6 +40,11 @@ public class OTGWorldProvider extends WorldProviderSurface
 	long lastFetchTime = System.currentTimeMillis();	
 	public DimensionConfig GetDimensionConfig()
 	{		
+		if(OTG.GetDimensionsConfig() == null)
+		{
+			return null; // Happen for Forge clients connecting to Bukkit servers
+		}
+		
 		// The config may be updated during a session, refresh it once per second
 		long currentTime = System.currentTimeMillis();
 		if(currentTime - lastFetchTime > 1000l)

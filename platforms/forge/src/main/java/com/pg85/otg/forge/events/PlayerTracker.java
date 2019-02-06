@@ -651,6 +651,12 @@ public class PlayerTracker
 	{
 		if(event.getEntity().getEntityWorld() != null)
 		{
+			if(OTG.GetDimensionsConfig() == null)
+			{
+				// Can happen for Forge clients connecting to a bukkit server
+				return;
+			}
+			
 			// ForgeWorld can be null for vanilla overworld / other mods dims
 			ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(event.getEntity().getEntityWorld());
 			if(forgeWorld != null)

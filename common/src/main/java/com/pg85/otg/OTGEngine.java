@@ -21,6 +21,7 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -351,13 +352,45 @@ public abstract class OTGEngine
      */
     public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);
 
-	public abstract void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting);
-	
-	public abstract boolean isOTGBiomeIdAvailable(String worldName, int i);
+	public HashMap<String, BiomeConfig[]> otgBiomeIdsByWorld = new HashMap<String, BiomeConfig[]>();
+	public void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
+	{
+    	if(!otgBiomeIdsByWorld.containsKey(worldName))
+    	{
+    		otgBiomeIdsByWorld.put(worldName, new BiomeConfig[1024]);
+    	}
+    	if(replaceExisting || otgBiomeIdsByWorld.get(worldName)[i] == null)
+    	{
+    		otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
+    	} else {
+    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName() + ". OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+    	}
+	}
 
-	public abstract void unregisterOTGBiomeId(String worldName, int i);
-	
-	public abstract BiomeConfig[] getOTGBiomeIds(String worldName);
+    public BiomeConfig[] getOTGBiomeIds(String worldName)
+    {
+    	return otgBiomeIdsByWorld.containsKey(worldName) ? otgBiomeIdsByWorld.get(worldName) : new BiomeConfig[1024];
+    }
+    
+	public boolean isOTGBiomeIdAvailable(String worldName, int i)
+	{
+		return !otgBiomeIdsByWorld.containsKey(worldName) || otgBiomeIdsByWorld.get(worldName)[i] == null;
+	}
 
-	public abstract String GetPresetName(String worldName);
+	public void unregisterOTGBiomeId(String worldName, int i)
+	{
+		otgBiomeIdsByWorld.get(worldName)[i] = null;
+	}
+
+	public String GetPresetName(String worldName)
+	{
+		// If this dim's name is the same as the preset worldname then this is an OTG overworld
+		if(worldName.equals("overworld") || worldName.equals(OTG.GetDimensionsConfig().WorldName))
+    	{
+    		return OTG.GetDimensionsConfig().Overworld.PresetName;	
+    	} else {
+    		// If this is an OTG dim other than the overworld then the world name will always match the preset name
+    		return worldName;
+    	}
+	}
 }

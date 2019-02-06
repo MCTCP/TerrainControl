@@ -171,15 +171,7 @@ public class BukkitWorld implements LocalWorld
 
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        BukkitBiome biome;
-        //if (biomeConfig.defaultSettings.isCustomBiome)
-        //{
-            biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds);
-        //} else
-        //{
-            //biome = BukkitBiome.forVanillaBiome(biomeConfig, BiomeBase.getBiome(biomeIds.getSavedId()));
-        //}
-
+        BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds);
         this.biomeNames.put(biome.getName(), biome);
 
         return biome;
@@ -934,7 +926,8 @@ public class BukkitWorld implements LocalWorld
     @Override
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
-        int savedId = BiomeBase.a(world.getBiome(new BlockPosition(x, 0, z)));
+    	BiomeBase biome = world.getBiome(new BlockPosition(x, 0, z));
+        int savedId = BiomeBase.a(biome);
         return getBiomeByIdOrNull(savedId);
     }
 
@@ -1638,7 +1631,7 @@ public class BukkitWorld implements LocalWorld
 		return null;
 	}
 
-    // Forge only TODO: Shouldn't really be here, clean this up.
+    // Forge only TODO: Shouldn't really be here? Clean this up.
 
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)

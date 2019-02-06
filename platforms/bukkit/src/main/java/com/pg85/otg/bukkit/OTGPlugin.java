@@ -8,6 +8,8 @@ import com.pg85.otg.bukkit.generator.OTGChunkGenerator;
 import com.pg85.otg.bukkit.generator.structures.OTGRareBuildingGen.RareBuildingStart;
 import com.pg85.otg.bukkit.generator.structures.OTGVillageGen.VillageStart;
 import com.pg85.otg.bukkit.metrics.BukkitMetricsHelper;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
@@ -60,7 +62,6 @@ public class OTGPlugin extends JavaPlugin
     @Override
     public void onEnable()
     {
-
         OTG.setEngine(new BukkitEngine(this));
         if (!Bukkit.getWorlds().isEmpty() && !cleanupOnDisable)
         {
@@ -74,8 +75,7 @@ public class OTGPlugin extends JavaPlugin
                     "or reload a plugin using it's built-in command (like /otg reload), ",
                     "or use a plugin managing plugin that can reload one plugin at a time."));
             setEnabled(false);
-        } else
-        {
+        } else {
             // Register vanilla generator
             OTG.getBiomeModeManager().register(VanillaBiomeGenerator.GENERATOR_NAME, BukkitVanillaBiomeGenerator.class);
 
@@ -86,8 +86,7 @@ public class OTGPlugin extends JavaPlugin
                 registerStructure.setAccessible(true);
                 registerStructure.invoke(null, RareBuildingStart.class, StructureNames.RARE_BUILDING);
                 registerStructure.invoke(null, VillageStart.class, StructureNames.VILLAGE);
-            } catch (Exception e)
-            {
+            } catch (Exception e) {
                 OTG.log(LogMarker.FATAL, "Failed to register structures:");
                 OTG.printStackTrace(LogMarker.FATAL, e);
             }
@@ -129,12 +128,20 @@ public class OTGPlugin extends JavaPlugin
 
         OTG.log(LogMarker.TRACE, "Starting to enable world ''{}''...", (Object) worldName);
 
+		// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
+	    if(OTG.GetDimensionsConfig() == null)
+	    {
+	    	DimensionsConfig dimsConfig = new DimensionsConfig();
+			dimsConfig.Overworld = new DimensionConfig();
+			OTG.SetDimensionsConfig(dimsConfig);
+		}
+        
         // Create BukkitWorld instance
         BukkitWorld localWorld = new BukkitWorld(worldName);
 
         // Load settings
         File baseFolder = getWorldSettingsFolder(worldName);
-        ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld, null); // TODO: WorldSaveFolder should not be null, fix this? -> Only used for Forge, null is okay for Bukkit?
+        ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld, new File(".\\" + worldName + "\\"));
         localWorld.setSettings(configs);
 
         // Add the world to the to-do list
@@ -202,5 +209,4 @@ public class OTGPlugin extends JavaPlugin
         // Show message
         OTG.log(LogMarker.INFO, "World {} is now unloaded!", (Object) world.getName());
     }
-
 }

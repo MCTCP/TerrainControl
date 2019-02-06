@@ -91,8 +91,6 @@ public class ForgeEngine extends OTGEngine
     
 	protected WorldLoader worldLoader;
 
-	public HashMap<String, BiomeConfig[]> otgBiomeIdsByWorld = new HashMap<String, BiomeConfig[]>();
-
     public ForgeEngine(WorldLoader worldLoader)
     {
         super(new ForgeLogger());
@@ -670,39 +668,6 @@ public class ForgeEngine extends OTGEngine
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
-
-    @Override
-    public void setOTGBiomeId (String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
-    {
-    	if(!otgBiomeIdsByWorld.containsKey(worldName))
-    	{
-    		otgBiomeIdsByWorld.put(worldName, new BiomeConfig[1024]);
-    	}
-    	if(replaceExisting || otgBiomeIdsByWorld.get(worldName)[i] == null)
-    	{
-    		otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
-    	} else {
-    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName() + ". OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
-    	}
-    }
-    
-    @Override
-    public BiomeConfig[] getOTGBiomeIds(String worldName)
-    {
-    	return otgBiomeIdsByWorld.containsKey(worldName) ? otgBiomeIdsByWorld.get(worldName) : new BiomeConfig[1024];
-    }
-    
-	@Override
-	public boolean isOTGBiomeIdAvailable(String worldName, int i)
-	{
-		return !otgBiomeIdsByWorld.containsKey(worldName) || otgBiomeIdsByWorld.get(worldName)[i] == null;
-	}
-
-	@Override
-	public void unregisterOTGBiomeId(String worldName, int i)
-	{
-		otgBiomeIdsByWorld.get(worldName)[i] = null;
-	}
 	
 	public void UnloadAndUnregisterAllWorlds()
 	{	
