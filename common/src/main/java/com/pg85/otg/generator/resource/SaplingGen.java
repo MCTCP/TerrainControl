@@ -27,7 +27,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     }
 
     public SaplingType saplingType;
-    public List<Integer> treeChances;
+    public List<Double> treeChances;
     public List<String> treeNames;
     public List<CustomObject> trees;
 
@@ -44,12 +44,12 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
 
         trees = new ArrayList<CustomObject>();
         treeNames = new ArrayList<String>();
-        treeChances = new ArrayList<Integer>();
+        treeChances = new ArrayList<Double>();
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
             treeNames.add(args.get(i));
-            treeChances.add(readInt(args.get(i + 1), 1, 100));
+            treeChances.add(readDouble(args.get(i + 1), 1, 100));
         }
     }
 
@@ -71,7 +71,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         for (int i = 0; i < typesAndChances.length - 1; i += 2)
         {
             String treeName = typesAndChances[i].toString();
-            int chance = ((Number) typesAndChances[i + 1]).intValue();
+            double chance = ((Number) typesAndChances[i + 1]).doubleValue();
             
             treeNames.add(treeName);
             treeChances.add(chance);
