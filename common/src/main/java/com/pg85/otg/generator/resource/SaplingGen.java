@@ -164,13 +164,13 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     @Override
     public String toString()
     {
-        String output = "Sapling(" + saplingType;
+        StringBuilder sb = new StringBuilder("Sapling(").append(saplingType);
 
         for (int i = 0; i < treeNames.size(); i++)
         {
-            output += "," + treeNames.get(i) + "," + treeChances.get(i);
+            sb.append(",").append(treeNames.get(i)).append(",").append(treeChances.get(i));
         }
-        return output + ")";
+        return sb.append(')').toString();
     }
 
 }
