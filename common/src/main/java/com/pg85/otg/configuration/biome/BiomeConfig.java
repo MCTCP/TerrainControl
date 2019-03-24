@@ -21,7 +21,6 @@ import com.pg85.otg.generator.terrain.TerrainShapeBase;
 import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
-import com.pg85.otg.util.minecraftTypes.TreeType;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -938,22 +937,6 @@ public class BiomeConfig extends ConfigFile
                                 DefaultMaterial.LAVA, 2, 3, 8,
                                 worldConfig.worldHeightCap - 8)));
             }
-        }
-
-        // CustomTreeChance
-        int customTreeChance = settings.getSetting(WorldStandardValues.CUSTOM_TREE_CHANCE, 0);
-        if (customTreeChance == 100)
-        {
-            settings.addConfigFunctions(Collections.singleton(
-                    new SaplingGen(this, SaplingType.All, "UseWorld", 100)));
-        }
-        if (customTreeChance > 0 && customTreeChance < 100)
-        {
-            settings.addConfigFunctions(Arrays.<ConfigFunction<?>> asList(
-                    new SaplingGen(this, SaplingType.Oak, "UseWorld", customTreeChance, TreeType.BigTree, 10, TreeType.Tree, 100),
-                    new SaplingGen(this, SaplingType.Redwood, "UseWorld", customTreeChance, TreeType.Taiga2, 100),
-                    new SaplingGen(this, SaplingType.Birch, "UseWorld", customTreeChance, TreeType.Birch, 100),
-                    new SaplingGen(this, SaplingType.SmallJungle, "UseWorld", customTreeChance, TreeType.CocoaTree, 100)));
         }
 
         // FrozenRivers

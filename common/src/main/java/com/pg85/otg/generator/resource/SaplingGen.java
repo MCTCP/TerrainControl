@@ -53,31 +53,6 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         }
     }
 
-    /**
-     * Creates a {@link SaplingGen} instance.
-     * @param biomeConfig     The biome config.
-     * @param saplingType     The sapling type.
-     * @param typesAndChances Pairs of two objects. The first entry in each pair
-     *                        must be, after transformation using
-     *                        {@link Object#toString()}, a valid tree name. The
-     *                        second entry in each pair must be an instance of
-     *                        {@link Number}, this is the spawn chance
-     *                        percentage.
-     */
-    public SaplingGen(BiomeConfig biomeConfig, SaplingType saplingType, Object... typesAndChances)
-    {
-        super(biomeConfig);
-        this.saplingType = saplingType;
-        for (int i = 0; i < typesAndChances.length - 1; i += 2)
-        {
-            String treeName = typesAndChances[i].toString();
-            double chance = ((Number) typesAndChances[i + 1]).doubleValue();
-            
-            treeNames.add(treeName);
-            treeChances.add(chance);
-        }
-    }
-
     @Override
     public boolean equals(Object other)
     {
