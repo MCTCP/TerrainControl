@@ -58,6 +58,11 @@ class SaplingListener
             location = lowestXZ;
         }
 
+        // Optimistically remove the saplings.
+        for (BlockState b : event.getBlocks()) {
+            b.getBlock().setType(Material.AIR);
+        }
+
         // Get generator
         SaplingGen sapling = biomeConfig.getSaplingGen(saplingType);
         if (sapling == null)
@@ -84,8 +89,11 @@ class SaplingListener
             event.getBlocks().clear();
         } else
         {
-            // Cannot grow, so leave the sapling there
+            // Cannot grow, so restore the saplings.
             event.setCancelled(true);
+            for (BlockState b : event.getBlocks()) {
+                b.update(true, false);
+            }
         }
     }
 
