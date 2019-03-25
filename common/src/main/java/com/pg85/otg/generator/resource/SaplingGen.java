@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
@@ -48,9 +49,25 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            treeNames.add(args.get(i));
+            String treeName = args.get(i);
+            trees.add(getTreeObject(treeName, biomeConfig.worldConfig.getName()));
+            treeNames.add(treeName);
             treeChances.add(readDouble(args.get(i + 1), 1, 100));
         }
+    }
+
+    private static CustomObject getTreeObject(String objectName, String worldName) throws InvalidConfigException
+    {
+        CustomObject maybeTree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectName, worldName);
+        if (maybeTree == null)
+        {
+            throw new InvalidConfigException("Unknown object " + objectName);
+        }
+        if (!maybeTree.canSpawnAsTree())
+        {
+            throw new InvalidConfigException("Cannot spawn " + objectName + " as tree");
+        }
+        return maybeTree;
     }
 
     @Override
