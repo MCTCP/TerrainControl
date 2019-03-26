@@ -141,6 +141,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
     {
+    	OTG.log(LogMarker.INFO, "createBiomeFor: " + biomeConfig.getName() + " " + biomeIds.getOTGBiomeId() + " " + biomeIds.getSavedId());
     	ForgeBiome forgeBiome = BiomeRegistryManager.getOrCreateBiome(biomeConfig, biomeIds, this.getName(), configProvider);
         this.biomeNames.put(forgeBiome.getName(), forgeBiome);
         return forgeBiome;
@@ -162,34 +163,6 @@ public class ForgeWorld implements LocalWorld
     public int getFreeBiomeId()
     {
     	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-    }
-
-    @Override
-    public ArrayList<LocalBiome> getAllBiomes()
-    {
-    	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
-		for(LocalBiome biome : this.settings.getBiomeArray())
-		{
-			biomes.add(biome);
-		}
-    	return biomes;
-    }
-
-	@Override
-	public LocalBiome getFirstBiomeOrNull() {
-		return this.biomeNames.size() > 0 ? (LocalBiome) this.biomeNames.values().toArray()[0] : null;
-	}
-    
-    @Override
-    public ForgeBiome getBiomeByIdOrNull(int id)
-    {
-        return (ForgeBiome) this.settings.getBiomeByIdOrNull(id);
-    }
-
-    @Override
-    public LocalBiome getBiomeByNameOrNull(String name)
-    {
-        return this.biomeNames.get(name);
     }
 
     @Override
@@ -1124,7 +1097,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome getCalculatedBiome(int x, int z)
     {
-    	return getBiomeByIdOrNull(this.biomeGenerator.getBiome(x, z));
+    	return getBiomeByOTGIdOrNull(this.biomeGenerator.getBiome(x, z));
     }
 
     @Override
@@ -1133,8 +1106,7 @@ public class ForgeWorld implements LocalWorld
         if (this.settings.getWorldConfig().populateUsingSavedBiomes)
         {
             return getSavedBiome(x, z);
-        } else
-        {
+        } else {
             return getCalculatedBiome(x, z);
         }
     }
@@ -1143,7 +1115,7 @@ public class ForgeWorld implements LocalWorld
     {
     	BlockPos pos = new BlockPos(x, 0, z);
     	Biome biome = this.world.getBiome(pos);
-   		return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biome); // Non-TC biomes don't have a generationId, only a saved id
+   		return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biome);
     }
 
     @Override
@@ -1151,18 +1123,37 @@ public class ForgeWorld implements LocalWorld
     {
     	BlockPos pos = new BlockPos(x, 0, z);
     	Biome biome = this.world.getBiome(pos);
-    	int biomeId;
-    	if(biome instanceof OTGBiome)
-    	{
-    		biomeId = ((OTGBiome)biome).otgBiomeId;
-    	} else {
-    		biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biome); // Non-TC biomes don't have a generationId, only a saved id
-    	}
-
-    	ForgeBiome forgeBiome = (ForgeBiome) OTG.getBiome(biomeId);
-
-        return forgeBiome;
+    	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biome); // Non-TC biomes don't have a generationId, only a saved id
+    	return this.settings.getBiomeBySavedIdOrNull(biomeId);
     }
+    
+    @Override
+    public ArrayList<LocalBiome> getAllBiomes()
+    {
+    	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
+		for(LocalBiome biome : this.settings.getBiomeArrayByOTGId())
+		{
+			biomes.add(biome);
+		}
+    	return biomes;
+    }
+
+	@Override
+	public LocalBiome getFirstBiomeOrNull() {
+		return this.biomeNames.size() > 0 ? (LocalBiome) this.biomeNames.values().toArray()[0] : null;
+	}
+    
+    @Override
+    public ForgeBiome getBiomeByOTGIdOrNull(int id)
+    {
+        return (ForgeBiome) this.settings.getBiomeByOTGIdOrNull(id);
+    }
+
+    @Override
+    public LocalBiome getBiomeByNameOrNull(String name)
+    {
+        return this.biomeNames.get(name);
+    }    
 
     void attachMetadata(int x, int y, int z, NamedBinaryTag tag, boolean allowOutsidePopulatingArea)
     {

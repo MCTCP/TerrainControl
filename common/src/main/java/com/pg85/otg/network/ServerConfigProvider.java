@@ -55,7 +55,9 @@ public final class ServerConfigProvider implements ConfigProvider
      * Must be simple array for fast access. Warning: some ids may contain
      * null values, always check.
      */
-    private LocalBiome[] biomes;
+    private LocalBiome[] biomesByOTGId;
+    
+    private LocalBiome[] biomesBySavedId;
 
     /**
      * The number of loaded biomes.
@@ -71,8 +73,9 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         this.settingsDir = settingsDir;
         this.world = world;
-        this.biomes = new LocalBiome[world.getMaxBiomesCount()];
-
+        this.biomesByOTGId = new LocalBiome[world.getMaxBiomesCount()];
+        this.biomesBySavedId = new LocalBiome[world.getMaxBiomesCount()];
+        
         loadSettings(worldSaveFolder);
     }
 
@@ -174,20 +177,31 @@ public final class ServerConfigProvider implements ConfigProvider
     }
 
     @Override
-    public LocalBiome getBiomeByIdOrNull(int id)
+    public LocalBiome getBiomeBySavedIdOrNull(int id)
     {
-        if (id < 0 || id > biomes.length)
+        if (id < 0 || id > biomesBySavedId.length)
         {
             return null;
         }
-        return biomes[id];
+        return biomesBySavedId[id];
+    }
+    
+    @Override
+    public LocalBiome getBiomeByOTGIdOrNull(int id)
+    {
+        if (id < 0 || id > biomesByOTGId.length)
+        {
+            return null;
+        }
+        return biomesByOTGId[id];
     }
 
     @Override
     public void reload()
     {
         // Clear biome collections
-        Arrays.fill(this.biomes, null);
+        Arrays.fill(this.biomesByOTGId, null);
+        Arrays.fill(this.biomesBySavedId, null);
         this.biomesCount = 0;
 
         // Load again
@@ -347,9 +361,12 @@ public final class ServerConfigProvider implements ConfigProvider
         	}
         }
         
+        OTG.log(LogMarker.INFO, "indexSettings start");
         // Set OTG biome id's for biomes, make sure there is enough space to register all biomes.
         for (BiomeConfig biomeConfig : loadedBiomeList)
-        {        	
+        {     
+        	OTG.log(LogMarker.INFO, "indexSettings0: " + biomeConfig.getName());
+        	
             // Statistics of the loaded biomes
             this.biomesCount++;
             loadedBiomeNames.append(biomeConfig.getName());
@@ -387,7 +404,7 @@ public final class ServerConfigProvider implements ConfigProvider
             }
             
             if(otgBiomeId == -1)
-            {            	
+            {          
             	// Find the next available id
 	            for(int i = (!biomeConfig.replaceToBiomeName.isEmpty() ? 256 : 0); i < otgIds2.length; i++) // Virtual (replacetobiomename) biomes can only have id's above 255
 	            {
@@ -410,6 +427,7 @@ public final class ServerConfigProvider implements ConfigProvider
 	        	{
 	        		virtualBiomes.add(biomeConfig);
 	        	}
+	        	OTG.log(LogMarker.INFO, "indexSettings1: " + biomeConfig.getName() + " " + otgBiomeId);
             }        	
         }
                 
@@ -486,7 +504,7 @@ public final class ServerConfigProvider implements ConfigProvider
 			}
         }
 
-		for(LocalBiome biome : this.biomes)
+		for(LocalBiome biome : this.biomesByOTGId)
 		{
 			if(biome != null)
 			{
@@ -615,6 +633,8 @@ public final class ServerConfigProvider implements ConfigProvider
     	{
     		throw new RuntimeException("Biome was not registered, most likely there were no id's available.");
     	}
+
+        OTG.log(LogMarker.INFO, "CreateAndRegisterBiome1: " + biomeConfig.getName() + " " + otgBiomeId + " " + savedBiomeId);
     	
         // Get correct saved id (defaults to generation id, but can be set to use the generation id of another biome)
         if (!biomeConfig.replaceToBiomeName.isEmpty())
@@ -665,10 +685,16 @@ public final class ServerConfigProvider implements ConfigProvider
     		}
         }
         
+        OTG.log(LogMarker.INFO, "CreateAndRegisterBiome2: " + biomeConfig.getName() + " " + otgBiomeId + " " + savedBiomeId);
+        
         // Create biome
         LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(otgBiomeId, savedBiomeId), this);
         
-        this.biomes[otgBiomeId] = biome;
+        this.biomesByOTGId[biome.getIds().getOTGBiomeId()] = biome;
+        if(biome.getIds().getSavedId() == biome.getIds().getOTGBiomeId() || OTG.getRegistryNameForDefaultBiome(biome.getBiomeConfig().getName()) != null) // Non-virtual and default biomes only
+        {
+        	this.biomesBySavedId[biome.getIds().getSavedId()] = biome;
+        }
 
         // Indexing ReplacedBlocks
         if (!this.worldConfig.BiomeConfigsHaveReplacement)
@@ -829,8 +855,8 @@ public final class ServerConfigProvider implements ConfigProvider
     }
 
     @Override
-    public LocalBiome[] getBiomeArray()
+    public LocalBiome[] getBiomeArrayByOTGId()
     {
-        return this.biomes;
+        return this.biomesByOTGId;
     }
 }

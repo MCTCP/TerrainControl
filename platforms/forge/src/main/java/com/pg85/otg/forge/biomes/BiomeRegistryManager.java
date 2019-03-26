@@ -34,7 +34,7 @@ public class BiomeRegistryManager
 			String[] resourceLocationStringArr = resourceLocationString.split(":");
 			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
 			{
-				ResourceLocation resourceLocation = new ResourceLocation(OTGPlugin.MOD_ID.toLowerCase(), worldName + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
+				ResourceLocation resourceLocation = new ResourceLocation(PluginStandardValues.MOD_ID.toLowerCase(), worldName + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
 				return ForgeRegistries.BIOMES.getValue(resourceLocation);
 			}
 			if(resourceLocationStringArr.length == 2)
@@ -54,7 +54,7 @@ public class BiomeRegistryManager
 			String[] resourceLocationStringArr = resourceLocationString.split(":");
 			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
 			{
-				ResourceLocation resourceLocation = new ResourceLocation(OTGPlugin.MOD_ID.toLowerCase(), worldName + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
+				ResourceLocation resourceLocation = new ResourceLocation(PluginStandardValues.MOD_ID.toLowerCase(), worldName + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
 				Biome requestedBiome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 				return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(requestedBiome);
 			}
@@ -108,7 +108,7 @@ public class BiomeRegistryManager
 		Biome biome = null;
 		
 	    String biomeNameForRegistry = worldName.toLowerCase() + "_" + StringHelper.toComputerFriendlyName(biomeConfig.getName());
-	    String resourceDomain = OTGPlugin.MOD_ID;
+	    String resourceDomain = PluginStandardValues.MOD_ID;
 	    ResourceLocation registryKey = new ResourceLocation(resourceDomain, biomeNameForRegistry);
 	
 	    // Check if registered earlier
@@ -152,7 +152,7 @@ public class BiomeRegistryManager
 	        	customBiome.savedId = newId;       	        
 	        }
 	        
-	    	OTG.log(LogMarker.TRACE, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
+	    	OTG.log(LogMarker.INFO, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
 	
 	        biome = customBiome;
 	    }
@@ -188,12 +188,12 @@ public class BiomeRegistryManager
 	    		Set<Type> existingTypes = BiomeDictionary.getTypes(sourceBiome);
 	   			types = new ArrayList<Type>(existingTypes);
 	    	} else {
-	    		LocalBiome replaceToBiome = configProvider.getBiomeByIdOrNull(((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(sourceBiome != null ? sourceBiome : biome));
+	    		LocalBiome replaceToBiome = configProvider.getBiomeByOTGIdOrNull(((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(sourceBiome != null ? sourceBiome : biome));
 	
 	        	if(replaceToBiome == null)
 	        	{
 	        		int replaceToBiomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(sourceBiome != null ? sourceBiome : biome);
-	        		replaceToBiome = OTG.getBiome(replaceToBiomeId);
+	        		replaceToBiome = OTG.getBiomeByOTGId(replaceToBiomeId);
 	        	}
 	    		if(replaceToBiome != null && replaceToBiome.getBiomeConfig().biomeDictId != null)
 	    		{

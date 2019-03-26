@@ -88,7 +88,7 @@ public interface LocalWorld
 
     public ArrayList<LocalBiome> getAllBiomes();
 
-    public LocalBiome getBiomeByIdOrNull(int id);
+    public LocalBiome getBiomeByOTGIdOrNull(int id);
     
     public LocalBiome getFirstBiomeOrNull();
 

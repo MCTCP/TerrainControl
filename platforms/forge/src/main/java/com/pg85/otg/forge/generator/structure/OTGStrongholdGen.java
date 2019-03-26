@@ -34,7 +34,7 @@ public class OTGStrongholdGen extends MapGenStronghold
     	this.structureCoords = new ChunkPos[128];
         allowedBiomes = new ArrayList<Biome>();
 
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

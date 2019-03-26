@@ -8,6 +8,7 @@ import com.pg85.otg.bukkit.generator.OTGWorldChunkManager;
 import com.pg85.otg.bukkit.generator.OTGWorldProvider;
 import com.pg85.otg.bukkit.generator.structures.*;
 import com.pg85.otg.bukkit.util.NBTHelper;
+import com.pg85.otg.bukkit.util.WorldHelper;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
@@ -171,7 +172,8 @@ public class BukkitWorld implements LocalWorld
 
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds);
+    	OTG.log(LogMarker.INFO, "createBiomeFor: " + this.getName() + " " + biomeConfig.getName() + " " + biomeIds.getOTGBiomeId() + " " + biomeIds.getSavedId());
+        BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds, this.getName());
         this.biomeNames.put(biome.getName(), biome);
 
         return biome;
@@ -199,7 +201,7 @@ public class BukkitWorld implements LocalWorld
     public ArrayList<LocalBiome> getAllBiomes()
     {
     	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
-		for(LocalBiome biome : this.settings.getBiomeArray())
+		for(LocalBiome biome : this.settings.getBiomeArrayByOTGId())
 		{
 			biomes.add(biome);
 		}
@@ -207,9 +209,9 @@ public class BukkitWorld implements LocalWorld
     }
 
     @Override
-    public LocalBiome getBiomeByIdOrNull(int id)
+    public LocalBiome getBiomeByOTGIdOrNull(int id)
     {
-        return settings.getBiomeByIdOrNull(id);
+        return settings.getBiomeByOTGIdOrNull(id);
     }
     
 	@Override
@@ -908,7 +910,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public BukkitBiome getCalculatedBiome(int x, int z)
     {
-        return (BukkitBiome)getBiomeByIdOrNull(this.biomeGenerator.getBiome(x, z));
+        return (BukkitBiome)getBiomeByOTGIdOrNull(this.biomeGenerator.getBiome(x, z));
     }
 
     @Override
@@ -925,10 +927,10 @@ public class BukkitWorld implements LocalWorld
 
     @Override
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
-    {
-    	BiomeBase biome = world.getBiome(new BlockPosition(x, 0, z));
-        int savedId = BiomeBase.a(biome);
-        return getBiomeByIdOrNull(savedId);
+    {    	
+    	BiomeBase biome = world.getBiome(new BlockPosition(x, 0, z));        		
+    	int biomeId = BiomeBase.a(biome);
+    	return this.settings.getBiomeBySavedIdOrNull(biomeId);
     }
 
     void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
@@ -1631,13 +1633,13 @@ public class BukkitWorld implements LocalWorld
 		return null;
 	}
 
-    // Forge only TODO: Shouldn't really be here? Clean this up.
-
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
     {
     	return createBiomeFor(biomeConfig, biomeIds);
 	}
+	
+    // Forge only TODO: Shouldn't really be here? Clean this up.
 
     @Override
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation) { }
@@ -1751,8 +1753,24 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	@Override
-	public int getRegisteredBiomeId(String resourceLocation) {
-		// TODO Auto-generated method stub
-		return 0;
+	public int getRegisteredBiomeId(String resourceLocationString)
+	{
+		if(resourceLocationString != null && !resourceLocationString.trim().isEmpty())
+		{
+			String[] resourceLocationStringArr = resourceLocationString.split(":");
+			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
+			{
+				MinecraftKey resourceLocation = new MinecraftKey(PluginStandardValues.MOD_ID.toLowerCase(), this.getName() + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
+				BiomeBase biome = BiomeBase.REGISTRY_ID.get(resourceLocation);
+				return WorldHelper.getSavedId(biome);
+			}
+			if(resourceLocationStringArr.length == 2)
+			{
+				MinecraftKey resourceLocation = new MinecraftKey(resourceLocationStringArr[0],resourceLocationStringArr[1]);
+				BiomeBase biome = BiomeBase.REGISTRY_ID.get(resourceLocation);
+				return WorldHelper.getSavedId(biome);
+			}
+		}
+		return -1;
 	}
 }

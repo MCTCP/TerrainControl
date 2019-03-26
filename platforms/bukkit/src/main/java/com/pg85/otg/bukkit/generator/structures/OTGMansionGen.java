@@ -24,7 +24,7 @@ public class OTGMansionGen extends StructureGenerator
     {
         biomeList = new ArrayList<BiomeBase>();
 
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

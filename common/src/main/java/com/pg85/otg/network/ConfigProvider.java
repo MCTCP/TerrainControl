@@ -26,14 +26,16 @@ public interface ConfigProvider
      * @param id The id of the biome.
      * @return The biome, or null if not found.
      */
-    LocalBiome getBiomeByIdOrNull(int id);
+    LocalBiome getBiomeByOTGIdOrNull(int id);
 
+    LocalBiome getBiomeBySavedIdOrNull(int id);
+    
     /**
      * Gets an array with all biomes indexed by the (generation) biome id.
      * Modifying the array is not allowed and may lead to undefined behavior.
      * @return The array.
      */
-    LocalBiome[] getBiomeArray();
+    LocalBiome[] getBiomeArrayByOTGId();
 
     /**
      * Reloads all settings. If this implementation doesn't support reloading

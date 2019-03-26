@@ -32,7 +32,7 @@ public class OTGWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeBase getBiome(BlockPosition blockPos)
     {
-        return ((BukkitBiome)localWorld.getBiomeByIdOrNull(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ()))).getHandle();
+        return ((BukkitBiome)localWorld.getBiomeByOTGIdOrNull(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ()))).getHandle();
     }
 
     @Override
@@ -48,7 +48,7 @@ public class OTGWorldChunkManager extends WorldChunkManager
         // Replaces ids with BiomeBases
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = ((BukkitBiome)localWorld.getBiomeByIdOrNull(arrayOfInt[i])).getHandle();
+            paramArrayOfBiomeBase[i] = ((BukkitBiome)localWorld.getBiomeByOTGIdOrNull(arrayOfInt[i])).getHandle();
         }
 
         return paramArrayOfBiomeBase;
@@ -67,7 +67,7 @@ public class OTGWorldChunkManager extends WorldChunkManager
         // Replace ids with BiomeBases
         for (int i = 0; i < paramInt3 * paramInt4; i++)
         {
-            paramArrayOfBiomeBase[i] = ((BukkitBiome)localWorld.getBiomeByIdOrNull(localObject[i])).getHandle();
+            paramArrayOfBiomeBase[i] = ((BukkitBiome)localWorld.getBiomeByOTGIdOrNull(localObject[i])).getHandle();
         }
 
         return paramArrayOfBiomeBase;

@@ -36,7 +36,7 @@ public class OTGVillageGen extends OTGMapGenStructure
 
         // Add all village biomes to the list
         this.villageSpawnBiomes = new ArrayList<Biome>();
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

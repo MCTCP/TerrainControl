@@ -21,6 +21,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
@@ -89,7 +90,7 @@ public class OTGDimensionManager
         ArrayList<String> types = new ArrayList<String>();
         types.add("OPEN_TERRAIN_GENERATOR");
         writeNBTStrings("types", types, compound);
-        FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "registerDimension", compound);
+        FMLInterModComms.sendMessage(PluginStandardValues.MOD_ID, "registerDimension", compound);
 	}
 
     public static void unregisterDimension(int dimensionId)
@@ -108,7 +109,7 @@ public class OTGDimensionManager
         types.add("OPEN_TERRAIN_GENERATOR");
         writeNBTStrings("types", types, compound);
 
-        FMLInterModComms.sendMessage(OTGPlugin.MOD_ID, "unregisterDimension", compound);
+        FMLInterModComms.sendMessage(PluginStandardValues.MOD_ID, "unregisterDimension", compound);
     }
 
     public static void writeNBTStrings(String id, Collection<String> strings, NBTTagCompound compound)

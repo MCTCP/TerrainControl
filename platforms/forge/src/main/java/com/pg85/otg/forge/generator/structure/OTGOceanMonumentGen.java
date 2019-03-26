@@ -35,7 +35,7 @@ public class OTGOceanMonumentGen extends OTGMapGenStructure
         this.monumentSpawnBiomes = new ArrayList<Biome>();
         this.mobList = Arrays.asList(new SpawnListEntry(EntityGuardian.class, 1, 2, 4));
 
-        for (LocalBiome biome : settings.getBiomeArray())
+        for (LocalBiome biome : settings.getBiomeArrayByOTGId())
         {
             if (biome == null || !biome.getBiomeConfig().oceanMonumentsEnabled)
             {

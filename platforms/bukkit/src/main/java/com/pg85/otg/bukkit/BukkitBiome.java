@@ -21,34 +21,22 @@ public class BukkitBiome implements LocalBiome
     private final BiomeConfig biomeConfig;
 
     /**
-     * Wraps the vanilla biome into a LocalBiome instance.
-     *
-     * @param biomeConfig Configuration file of the biome.
-     * @param biome       The vanilla biome to wrap.
-     * @return The wrapped biome.
-     */
-    public static BukkitBiome forVanillaBiome(BiomeConfig biomeConfig, BiomeBase biome)
-    {
-        return new BukkitBiome(biomeConfig, biome);
-    }
-
-    /**
      * Creates and registers a new custom biome with the config and ids.
      *
      * @param biomeConfig Config of the custom biome.
      * @param biomeIds    Ids of the custom biome.
      * @return The custom biome.
      */
-    public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
     {
-        return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds));
+        return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds, worldName));
     }
 
     protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
     {
         this.biomeBase = biome;
         int savedBiomeId =  BiomeBase.a(biomeBase);
-        this.biomeIds = new BiomeIds(WorldHelper.getGenerationId(biomeBase), savedBiomeId);
+        this.biomeIds = new BiomeIds(WorldHelper.getOTGBiomeId(biomeBase), savedBiomeId);
         this.biomeConfig = biomeConfig;
         this.isCustom = biome instanceof OTGBiomeBase;
     }

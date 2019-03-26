@@ -60,8 +60,6 @@ import java.io.File;
 @Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v7", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
 public class OTGPlugin
 {	
-	public static final String MOD_ID = "openterraingenerator";
-
 	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
 	public static CommonProxy proxy;
 

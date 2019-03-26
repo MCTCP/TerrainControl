@@ -36,5 +36,7 @@ public class PluginStandardValues extends Settings
     
     public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
     
-    public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 1, 1, Integer.MAX_VALUE);   
+    public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 1, 1, Integer.MAX_VALUE);
+
+	public static final String MOD_ID = "openterraingenerator";   
 }

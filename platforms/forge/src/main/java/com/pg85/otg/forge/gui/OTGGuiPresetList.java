@@ -467,13 +467,13 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         
         if(presetWorldPackerMod == null) // Default to OTG for mod image
         {
-        	modId = OTGPlugin.MOD_ID;
+        	modId = PluginStandardValues.MOD_ID;
         	presetWorldPackerMod = Loader.instance().activeModContainer();
         }
         
     	if(presetWorldPackerMod != null && presetWorldPackerMod.getMetadata() != null)
     	{
-    		if(modId != OTGPlugin.MOD_ID)
+    		if(modId != PluginStandardValues.MOD_ID)
     		{
 	    		description = presetWorldPackerMod.getMetadata().description;
 	    		version = presetWorldPackerMod.getMetadata().version;

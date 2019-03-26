@@ -23,7 +23,7 @@ public class LayerBiomeBorder extends Layer
 
         for (int i = 0; i < this.bordersFrom[replaceFrom].length; i++)
         {
-        	LocalBiome biome = world.getBiomeByIdOrNull(i);            
+        	LocalBiome biome = world.getBiomeByOTGIdOrNull(i);            
             this.bordersFrom[replaceFrom][i] = biome == null || !replaceTo.getBiomeConfig().notBorderNear.contains(biome.getName());
         }
         this.bordersTo[replaceFrom] = replaceTo.getIds().getOTGBiomeId();

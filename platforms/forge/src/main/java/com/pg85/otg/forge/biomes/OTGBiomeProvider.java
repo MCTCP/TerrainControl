@@ -34,13 +34,13 @@ public class OTGBiomeProvider extends BiomeProvider
     @Override
     public Biome getBiome(BlockPos blockPos)
     {
-        return this.localWorld.getBiomeByIdOrNull(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
+        return this.localWorld.getBiomeByOTGIdOrNull(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     @Override
     public Biome getBiome(BlockPos pos, Biome defaultOption)
     {
-        ForgeBiome biome = this.localWorld.getBiomeByIdOrNull(this.biomeGenerator.getBiome(pos.getX(), pos.getZ()));
+        ForgeBiome biome = this.localWorld.getBiomeByOTGIdOrNull(this.biomeGenerator.getBiome(pos.getX(), pos.getZ()));
         if (biome != null)
         {
             return biome.getHandle();
@@ -62,7 +62,7 @@ public class OTGBiomeProvider extends BiomeProvider
         // Replaces ids with BiomeBases
         for (int i = 0; i < width * height; i++)
         {
-            paramArrayOfBiomeBase[i] = this.localWorld.getBiomeByIdOrNull(arrayOfInt[i]).getHandle();
+            paramArrayOfBiomeBase[i] = this.localWorld.getBiomeByOTGIdOrNull(arrayOfInt[i]).getHandle();
         }
 
         return paramArrayOfBiomeBase;
@@ -81,7 +81,7 @@ public class OTGBiomeProvider extends BiomeProvider
         // Replace ids with BiomeBases
         for (int i = 0; i < width * length; i++)
         {
-            listToReuse[i] = this.localWorld.getBiomeByIdOrNull(arrayOfInt[i]).getHandle();
+            listToReuse[i] = this.localWorld.getBiomeByOTGIdOrNull(arrayOfInt[i]).getHandle();
         }
 
         return listToReuse;

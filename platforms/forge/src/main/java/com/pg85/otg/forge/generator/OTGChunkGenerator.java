@@ -147,7 +147,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         {
             int generationId = this.biomeIntArray[i];
 
-            LocalBiome biome = configProvider.getBiomeByIdOrNull(generationId);
+            LocalBiome biome = configProvider.getBiomeByOTGIdOrNull(generationId);
 
         	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
         }

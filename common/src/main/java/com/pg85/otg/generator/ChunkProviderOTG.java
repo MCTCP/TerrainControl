@@ -525,10 +525,6 @@ public class ChunkProviderOTG
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
 
                 biomeWeight = Math.abs(biomeWeight);
-                if (nextBiomeHeight > biomeConfig.biomeHeight)
-                {
-                    biomeWeight /= 2.0F;
-                }
                 volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 WeightSum += biomeWeight;
@@ -590,7 +586,7 @@ public class ChunkProviderOTG
 
         if(biomeConfig == null)
         {
-            LocalBiome biome = this.configProvider.getBiomeByIdOrNull(id);
+            LocalBiome biome = this.configProvider.getBiomeByOTGIdOrNull(id);
             
             biomeConfig = biome.getBiomeConfig();
             biomes[id] = biomeConfig;

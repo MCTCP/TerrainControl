@@ -3,6 +3,7 @@ package com.pg85.otg.forge.network;
 import java.lang.reflect.Field;
 import java.util.EnumMap;
 
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.network.client.packets.CreateDeleteDimensionPacket;
 import com.pg85.otg.forge.network.client.packets.UpdateDimensionSettingsPacket;
@@ -31,7 +32,7 @@ public class PacketDispatcher
 	/**
 	* The SimpleNetworkWrapper instance is used both to register and send packets.
 	*/
-	private static final SimpleNetworkWrapper dispatcher = NetworkRegistry.INSTANCE.newSimpleChannel(OTGPlugin.MOD_ID);
+	private static final SimpleNetworkWrapper dispatcher = NetworkRegistry.INSTANCE.newSimpleChannel(PluginStandardValues.MOD_ID);
 	
 	/**
 	* Call this during pre-init or loading and register all of your packets (messages) here

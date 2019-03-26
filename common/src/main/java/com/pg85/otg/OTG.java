@@ -256,7 +256,7 @@ public class OTG
        return world.getSavedBiome(x, z).getName();
    }
 
-   	public static LocalBiome getBiome(int id)
+   	public static LocalBiome getBiomeByOTGId(int id)
    	{
 	   //OTG.log(LogMarker.INFO, "getBiomeAllWorlds id");
 	
@@ -265,7 +265,7 @@ public class OTG
 	   {
 		   for(LocalWorld world : worlds)
 		   {
-			   LocalBiome biome = world.getBiomeByIdOrNull(id);
+			   LocalBiome biome = world.getBiomeByOTGIdOrNull(id);
 			   if(biome != null)
 			   {
 				   return biome;
@@ -274,7 +274,7 @@ public class OTG
 	   }
 	   return null;
    	}
-
+   	
     public static LocalBiome getBiome(String name, String worldName)
     {
     	//OTG.log(LogMarker.INFO, "getBiomeAllWorlds name");

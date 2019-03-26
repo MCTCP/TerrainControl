@@ -42,7 +42,7 @@ public class OTGRareBuildingGen extends OTGMapGenStructure
     {
         this.biomeList = new ArrayList<Biome>();
 
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

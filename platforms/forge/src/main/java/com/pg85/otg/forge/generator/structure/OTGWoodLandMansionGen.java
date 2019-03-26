@@ -41,7 +41,7 @@ public class OTGWoodLandMansionGen extends OTGMapGenStructure
     {
         this.woodLandMansionSpawnBiomes = new ArrayList<Biome>();
 
-        for (LocalBiome biome : settings.getBiomeArray())
+        for (LocalBiome biome : settings.getBiomeArrayByOTGId())
         {
             if (biome == null || !biome.getBiomeConfig().woodLandMansionsEnabled)
             {

@@ -103,7 +103,7 @@ public final class LayerFactory
         {
             List<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
             List<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
-            for (LocalBiome biome : configs.getBiomeArray())
+            for (LocalBiome biome : configs.getBiomeArrayByOTGId())
             {
                 if (biome == null)
                     continue;
@@ -188,7 +188,7 @@ public final class LayerFactory
             LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed());
             boolean haveBorder = false;
             boolean haveIsle = false;
-            for (LocalBiome biome : configs.getBiomeArray())
+            for (LocalBiome biome : configs.getBiomeArrayByOTGId())
             {
                 if (biome == null)
                     continue;
@@ -342,7 +342,7 @@ public final class LayerFactory
             LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed());
             boolean haveBorder = false;
             boolean haveIsle = false;
-            for (LocalBiome biome : configs.getBiomeArray())
+            for (LocalBiome biome : configs.getBiomeArrayByOTGId())
             {
                 if (biome == null)
                     continue;

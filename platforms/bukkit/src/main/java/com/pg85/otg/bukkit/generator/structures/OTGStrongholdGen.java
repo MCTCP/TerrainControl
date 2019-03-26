@@ -24,7 +24,7 @@ public class OTGStrongholdGen extends WorldGenStronghold
         // Modify in which biomes the stronghold is allowed to spawn
         List<BiomeBase> allowedBiomes = Lists.newArrayList();
 
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

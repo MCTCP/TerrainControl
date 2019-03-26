@@ -678,9 +678,9 @@ public final class OTGCommandHandler implements ICommand
                 {
                     try
                     {
-                    	Biome savedBiome = world.getWorld().getBiome(new BlockPos(playerX, 0, playerZ));
+                    	LocalBiome savedBiome = world.getSavedBiome(playerX, playerZ);
                         sender.sendMessage(new TextComponentString(""));
-                        sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.biomeName + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biome.getIds().getSavedId()));
+                        sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getBiomeConfig().getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biome.getIds().getSavedId()));
                     } catch (BiomeNotFoundException e)
                     {
                     	sender.sendMessage(new TextComponentString(""));

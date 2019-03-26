@@ -30,7 +30,7 @@ public final class ConfigToNetworkSender
     public static void writeConfigsToStream(ConfigProvider configProvider, DataOutput stream, boolean isSinglePlayer) throws IOException
     {
         WorldConfig worldConfig = configProvider.getWorldConfig();
-        LocalBiome[] biomes = configProvider.getBiomeArray();
+        LocalBiome[] biomes = configProvider.getBiomeArrayByOTGId();
        
         // General information
         ConfigFile.writeStringToStream(stream, worldConfig.getName());

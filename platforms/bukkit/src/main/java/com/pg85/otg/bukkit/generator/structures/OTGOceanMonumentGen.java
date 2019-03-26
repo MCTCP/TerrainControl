@@ -43,7 +43,7 @@ public class OTGOceanMonumentGen extends StructureGenerator
         this.randomOffset = settings.getWorldConfig().oceanMonumentRandomOffset;
         this.monumentSpawnBiomes = new ArrayList<BiomeBase>();
 
-        for (LocalBiome biome : settings.getBiomeArray())
+        for (LocalBiome biome : settings.getBiomeArrayByOTGId())
         {
             if (biome == null || !biome.getBiomeConfig().oceanMonumentsEnabled)
             {

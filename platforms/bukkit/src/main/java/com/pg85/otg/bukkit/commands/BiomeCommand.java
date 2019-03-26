@@ -56,10 +56,9 @@ public class BiomeCommand extends BaseCommand
             try
             {
                 LocalBiome savedBiome = world.getSavedBiome(x, z);
-                BiomeIds savedIds = savedBiome.getIds();
                 sender.sendMessage(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR
-                        + savedBiome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR
-                        + savedIds.getSavedId());
+                        + savedBiome.getBiomeConfig().getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR
+                        + savedBiome.getIds().getSavedId());
             } catch (BiomeNotFoundException e)
             {
                 sender.sendMessage(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here.");

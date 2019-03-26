@@ -34,7 +34,8 @@ public final class ClientConfigProvider implements ConfigProvider
      * Must be simple array for fast access. Warning: some ids may contain
      * null values, always check.
      */
-    private LocalBiome[] biomes; // For the server, OTGBiomeIds are used, for the client only non-virtual biomes are known and saved Id's are used 
+    private LocalBiome[] biomesByOTGId; // For the server, OTGBiomeIds are used, for the client only non-virtual biomes are known and saved Id's are used
+    private LocalBiome[] biomesBySavedId; // For the server, OTGBiomeIds are used, for the client only non-virtual biomes are known and saved Id's are used    
 
     public ClientConfigProvider(DataInputStream stream, LocalWorld world, boolean isSinglePlayer) throws IOException
     {
@@ -49,7 +50,8 @@ public final class ClientConfigProvider implements ConfigProvider
 
         // BiomeConfigs
         StandardBiomeTemplate defaultSettings = new StandardBiomeTemplate(worldConfig.worldHeightCap);
-        biomes = new LocalBiome[world.getMaxBiomesCount()];
+        biomesByOTGId = new LocalBiome[world.getMaxBiomesCount()];
+        biomesBySavedId = new LocalBiome[world.getMaxBiomesCount()];
 
         int count = stream.readInt();
         while (count-- > 0)
@@ -78,7 +80,12 @@ public final class ClientConfigProvider implements ConfigProvider
             BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig);
 
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(otgBiomeId, savedBiomeId), this);
-            biomes[savedBiomeId] = biome;
+            biomesByOTGId[otgBiomeId] = biome;
+            if(savedBiomeId == otgBiomeId || OTG.getRegistryNameForDefaultBiome(biomeName) != null) // Non-virtual and default biomes only
+            {
+            	biomesBySavedId[savedBiomeId] = biome;
+            }
+            
         	OTG.getEngine().setOTGBiomeId(world.getName(), otgBiomeId, config, true);
         }
     }
@@ -90,13 +97,23 @@ public final class ClientConfigProvider implements ConfigProvider
     }
 
     @Override
-    public LocalBiome getBiomeByIdOrNull(int id)
+    public LocalBiome getBiomeByOTGIdOrNull(int id)
     {
-        if (id < 0 || id > biomes.length)
+        if (id < 0 || id > biomesByOTGId.length)
         {
             return null;
         }
-        return biomes[id];
+        return biomesByOTGId[id];
+    }
+    
+    @Override
+    public LocalBiome getBiomeBySavedIdOrNull(int id)
+    {
+        if (id < 0 || id > biomesBySavedId.length)
+        {
+            return null;
+        }
+        return biomesBySavedId[id];
     }
 
     @Override
@@ -106,8 +123,8 @@ public final class ClientConfigProvider implements ConfigProvider
     }
 
     @Override
-    public LocalBiome[] getBiomeArray()
+    public LocalBiome[] getBiomeArrayByOTGId()
     {
-        return this.biomes;
+        return this.biomesByOTGId;
     }
 }
