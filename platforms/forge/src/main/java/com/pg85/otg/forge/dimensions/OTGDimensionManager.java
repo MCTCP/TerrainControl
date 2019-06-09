@@ -466,7 +466,10 @@ public class OTGDimensionManager
 				if(dimensionsOrderCopy.containsKey(i))
 				{
 					OTGDimensionManager.unregisterDimension(i);
-					dimensionMap.clear(i);
+					if(dimensionMap != null) // Happens when shutting down the MP server.
+					{
+						dimensionMap.clear(i);
+					}					
 				}
 			}
 		}
@@ -515,7 +518,10 @@ public class OTGDimensionManager
 			if(isOTGDimension)
 			{
 				OTGDimensionManager.unregisterDimension(dimId);
-				dimensionMap.clear(dimId);
+				if(dimensionMap != null) // Happens when shutting down the MP server
+				{
+					dimensionMap.clear(dimId);
+				}
 			}
 		}
 	}

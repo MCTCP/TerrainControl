@@ -46,7 +46,7 @@ public class ServerPacketManager
 		{
 	    	for(EntityPlayerMP player : server.getPlayerList().getPlayers())
 	    	{
-	        	PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer), (EntityPlayerMP) player);
+	        	PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer.copy()), (EntityPlayerMP) player);
 	    	}
 		}
     }
@@ -74,7 +74,7 @@ public class ServerPacketManager
 		if(nettyBuffer != null)
 		{
 			PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer), event.getManager());
-	    	// Reset particles in case the player just switched worlds.
+	    	// Reset particles in case the player just switched worlds. This also happens when players log on.
 	    	PacketDispatcher.sendTo(ParticlesPacket.CreateEmptyPacket(), event.getManager());
 		}
 	}	
@@ -130,7 +130,7 @@ public class ServerPacketManager
 		{
 	    	for(EntityPlayerMP player : server.getPlayerList().getPlayers())
 	    	{
-	        	PacketDispatcher.sendTo(new DimensionLoadUnloadPacket(nettyBuffer), (EntityPlayerMP) player);
+	        	PacketDispatcher.sendTo(new DimensionLoadUnloadPacket(nettyBuffer.copy()), (EntityPlayerMP) player);
 	    	}
 		}
 	} 
@@ -160,7 +160,7 @@ public class ServerPacketManager
 		{
 	    	for(EntityPlayerMP player : server.getPlayerList().getPlayers())
 	    	{
-	        	PacketDispatcher.sendTo(new PregeneratorStatusPacket(nettyBuffer), (EntityPlayerMP) player);
+    			PacketDispatcher.sendTo(new PregeneratorStatusPacket(nettyBuffer.copy()), (EntityPlayerMP) player);
 	    	}
 		}
 	}

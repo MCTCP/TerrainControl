@@ -11,7 +11,6 @@ import com.pg85.otg.customobjects.bo3.BlockFunction;
 import com.pg85.otg.customobjects.bo3.EntityFunction;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.biomes.ForgeBiome;
-import com.pg85.otg.forge.biomes.OTGBiome;
 import com.pg85.otg.forge.biomes.BiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
@@ -19,6 +18,7 @@ import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.util.IOHelper;
+import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.generator.ObjectSpawner;
@@ -1262,25 +1262,15 @@ public class ForgeWorld implements LocalWorld
 		String mobTypeName = entityData.mobName;
 		int groupSize = entityData.groupSize;
 		String nameTag = entityData.nameTagOrNBTFileName;
-		ResourceLocation entityResourceLocation = null;
-
-        Class<?> entityClass = null;
-
-        for(ResourceLocation entry : EntityList.getEntityNameList())
-        {
-        	if(entry.getResourcePath().toLowerCase().trim().replace("entity", "").replace("_", "").equals(mobTypeName.toLowerCase().replace("entity", "").replace("_", "")))
-        	{
-        		entityResourceLocation = entry;
-            	entityClass = EntityList.getClass(entry);
-        		break;
-        	}
-        }
-
+        Class<? extends Entity> entityClass = MobSpawnGroupHelper.toMinecraftClass(mobTypeName);
+    	
         if(entityClass == null)
         {
         	OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
         	return;
         }
+        
+		ResourceLocation entityResourceLocation = MobSpawnGroupHelper.resourceLocationFromMinecraftClass(entityClass);
 
         Entity entityliving = null;
 
@@ -1306,7 +1296,7 @@ public class ForgeWorld implements LocalWorld
 	        	return;
 	        }
 
-	        nbttagcompound.setString("id", entityResourceLocation.getResourcePath());
+	        nbttagcompound.setString("id", entityResourceLocation.toString());
 	        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
         } else {
 	        try
@@ -1383,7 +1373,7 @@ public class ForgeWorld implements LocalWorld
 	            		        	return;
 	            		        }
 
-	            		        nbttagcompound.setString("id", entityResourceLocation.getResourcePath());
+	            		        nbttagcompound.setString("id", entityResourceLocation.toString());
 	            		        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
 	            	        } else {
 	            		        try

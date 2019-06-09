@@ -101,12 +101,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
             
             if(localBiome == null)
             {
-            	String breakPoint = "";
             	localBiome = world.getBiomeByNameOrNull(biomeName);
-            }
-            if(localBiome.getBiomeConfig() == null)
-            {
-            	String breakPoint = "";
             }
             
             BiomeConfig biomeConfig = localBiome.getBiomeConfig();

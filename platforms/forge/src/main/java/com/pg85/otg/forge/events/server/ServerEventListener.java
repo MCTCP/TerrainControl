@@ -20,6 +20,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -228,21 +229,23 @@ public class ServerEventListener
 					}
 					spawnerData.firstSpawn = false;
 
-                    Class entityClass = MobSpawnGroupHelper.toMinecraftClass(mobTypeName);
+                    Class<? extends Entity> entityClass = MobSpawnGroupHelper.toMinecraftClass(mobTypeName);                    
                     if(entityClass == null)
                     {
                     	OTG.log(LogMarker.INFO, "Could not find entity: " + mobTypeName);
                     	continue;
                     }
 
-                    Entity entityliving = null;
+                    ResourceLocation resourceLocation = MobSpawnGroupHelper.resourceLocationFromMinecraftClass(entityClass);
+                    
+                    Entity entity = null;
                     NBTTagCompound nbttagcompound = null;
 
                     if(spawnerData.getMetaData() == null)
                     {
                         try
                         {
-                            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { worldServer });
+                            entity = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { worldServer });
                         }
                         catch (Exception exception)
                         {
@@ -269,11 +272,11 @@ public class ServerEventListener
                         	continue;
                         }
 
-                        nbttagcompound.setString("id", spawnerData.mobName);
-                        entityliving = EntityList.createEntityFromNBT(nbttagcompound, worldServer);
+                        nbttagcompound.setString("id", resourceLocation.toString());
+                        entity = EntityList.createEntityFromNBT(nbttagcompound, worldServer);
                     }
 
-                    if(entityliving == null)
+                    if(entity == null)
                     {
                     	throw new RuntimeException();
                     }
@@ -282,16 +285,16 @@ public class ServerEventListener
 			        int mobCountRadius = 32;
 			        for (int x = 0; x < worldServer.loadedEntityList.size(); x++)
 			        {
-			        	Entity entity = ((Entity)worldServer.loadedEntityList.get(x));
-			            if (entity.getClass() == entityClass && entity.getEntityData().hasKey("OTG"))
+			        	Entity entity1 = ((Entity)worldServer.loadedEntityList.get(x));
+			            if (entity1.getClass() == entityClass && entity1.getEntityData().hasKey("OTG"))
 			            {
 			            	if(
-		            			entity.posX >= spawnerData.x - mobCountRadius &&
-		            			entity.posX <= spawnerData.x + mobCountRadius &&
-            					entity.posY >= spawnerData.y - mobCountRadius &&
-								entity.posY <= spawnerData.y + mobCountRadius &&
-		            			entity.posZ >= spawnerData.z - mobCountRadius &&
-		            			entity.posZ <= spawnerData.z + mobCountRadius
+		            			entity1.posX >= spawnerData.x - mobCountRadius &&
+		            			entity1.posX <= spawnerData.x + mobCountRadius &&
+            					entity1.posY >= spawnerData.y - mobCountRadius &&
+								entity1.posY <= spawnerData.y + mobCountRadius &&
+		            			entity1.posZ >= spawnerData.z - mobCountRadius &&
+		            			entity1.posZ <= spawnerData.z + mobCountRadius
 	            			)
 			            	{
 				            	worldMobCount++;
@@ -315,37 +318,37 @@ public class ServerEventListener
 					float yaw = spawnerData.yaw;
 					float pitch = spawnerData.pitch;
 
-					entityliving.getEntityData().setBoolean("OTG", true);
+					entity.getEntityData().setBoolean("OTG", true);
 
                     if(despawnTime > 0)
                     {
-                    	entityliving.getEntityData().setInteger("OTGDT", despawnTime - 1); // OTG Despawn time
+                    	entity.getEntityData().setInteger("OTGDT", despawnTime - 1); // OTG Despawn time
                     }
 
-                    if(entityliving instanceof EntityLiving)
+                    if(entity instanceof EntityLiving)
                     {
 						double velocityY = spawnerData.velocityYSet ? spawnerData.velocityY : 0;
 						double velocityX = spawnerData.velocityXSet ? spawnerData.velocityX : Math.random() * 0.2 - 0.1;
 						double velocityZ = spawnerData.velocityZSet ? spawnerData.velocityZ : Math.random() * 0.2 - 0.1;
 
-                        entityliving.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
-                        entityliving.addVelocity(velocityX, velocityY, velocityZ);
+                        entity.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
+                        entity.addVelocity(velocityX, velocityY, velocityZ);
 
-                        Result canSpawn = ForgeEventFactory.canEntitySpawn((EntityLiving) entityliving, worldServer, x, y, z);
+                        Result canSpawn = ForgeEventFactory.canEntitySpawn((EntityLiving) entity, worldServer, x, y, z);
 
                         boolean entityCanSpawnHere = false;
 
                         if(canSpawn == Result.DEFAULT)
                         {
-                            int ia = MathHelper.floor(entityliving.posX);
-                            int ja = MathHelper.floor(entityliving.getEntityBoundingBox().minY);
-                            int ka = MathHelper.floor(entityliving.posZ);
+                            int ia = MathHelper.floor(entity.posX);
+                            int ja = MathHelper.floor(entity.getEntityBoundingBox().minY);
+                            int ka = MathHelper.floor(entity.posZ);
 
-                        	boolean b1 = entityliving.world.checkNoEntityCollision(entityliving.getEntityBoundingBox());
-                        	boolean b2 = entityliving.world.getCollisionBoxes(entityliving, entityliving.getEntityBoundingBox()).isEmpty();
-                        	boolean b3 = !entityliving.world.containsAnyLiquid(entityliving.getEntityBoundingBox());
+                        	boolean b1 = entity.world.checkNoEntityCollision(entity.getEntityBoundingBox());
+                        	boolean b2 = entity.world.getCollisionBoxes(entity, entity.getEntityBoundingBox()).isEmpty();
+                        	boolean b3 = !entity.world.containsAnyLiquid(entity.getEntityBoundingBox());
 
-                        	boolean b5 = entityliving instanceof EntityCreature ? ((EntityCreature)entityliving).getBlockPathWeight(new BlockPos(ia, ja, ka)) >= 0.0F : true;
+                        	boolean b5 = entity instanceof EntityCreature ? ((EntityCreature)entity).getBlockPathWeight(new BlockPos(ia, ja, ka)) >= 0.0F : true;
 
                         	entityCanSpawnHere = b1 && b2 && b3 && b5;
                         }
@@ -371,7 +374,7 @@ public class ServerEventListener
                         			{
                                         try
                                         {
-                                        	entityliving = (EntityLiving) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { worldServer });
+                                        	entity = (EntityLiving) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { worldServer });
                                         }
                                         catch (Exception exception)
                                         {
@@ -379,41 +382,41 @@ public class ServerEventListener
                                             break;
                                         }
                         			} else {
-                                    	entityliving = EntityList.createEntityFromNBT(nbttagcompound, worldServer);
+                                    	entity = EntityList.createEntityFromNBT(nbttagcompound, worldServer);
                                     }
 
                                     velocityY = spawnerData.velocityYSet ? spawnerData.velocityY : 0;
 	        						velocityX = spawnerData.velocityXSet ? spawnerData.velocityX : Math.random() * 0.2 - 0.1;
 	        						velocityZ = spawnerData.velocityZSet ? spawnerData.velocityZ : Math.random() * 0.2 - 0.1;
 
-                                    entityliving.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
-                                    entityliving.addVelocity(velocityX, velocityY, velocityZ);
-                                    entityliving.getEntityData().setBoolean("OTG", true);
-                                    entityliving.getEntityData().setInteger("OTGDT", despawnTime); // OTG Despawn time
+                                    entity.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
+                                    entity.addVelocity(velocityX, velocityY, velocityZ);
+                                    entity.getEntityData().setBoolean("OTG", true);
+                                    entity.getEntityData().setInteger("OTGDT", despawnTime); // OTG Despawn time
                         		}
 
                                 if (spawnerData.getMetaData() == null)
                                 {
-                                	((EntityLiving) entityliving).onInitialSpawn(worldServer.getDifficultyForLocation(new BlockPos(x, y, z)),(IEntityLivingData)null);
+                                	((EntityLiving) entity).onInitialSpawn(worldServer.getDifficultyForLocation(new BlockPos(x, y, z)),(IEntityLivingData)null);
                                 }
-                                worldServer.spawnEntity(entityliving);
+                                worldServer.spawnEntity(entity);
 
                                 if (nbttagcompound != null)
                                 {
-                                    Entity entity2 = entityliving;
+                                    Entity entity2 = entity;
 
                                     for (NBTTagCompound nbttagcompound1 = nbttagcompound; entity2 != null && nbttagcompound1.hasKey("Riding", 10); nbttagcompound1 = nbttagcompound1.getCompoundTag("Riding"))
                                     {
-                                        Entity entity = EntityList.createEntityFromNBT(nbttagcompound1.getCompoundTag("Riding"), worldServer);
+                                        Entity entity1 = EntityList.createEntityFromNBT(nbttagcompound1.getCompoundTag("Riding"), worldServer);
 
-                                        if (entity != null)
+                                        if (entity1 != null)
                                         {
-                                            entity.setLocationAndAngles(x, y, z, entity.rotationYaw, entity.rotationPitch);
-                                            worldServer.spawnEntity(entity);
-                                            entity2.startRiding(entity);
+                                            entity1.setLocationAndAngles(x, y, z, entity1.rotationYaw, entity1.rotationPitch);
+                                            worldServer.spawnEntity(entity1);
+                                            entity2.startRiding(entity1);
                                         }
 
-                                        entity2 = entity;
+                                        entity2 = entity1;
                                     }
                                 }
 
@@ -426,23 +429,23 @@ public class ServerEventListener
 						double velocityX = spawnerData.velocityXSet ? spawnerData.velocityX : Math.random() * 0.2 - 0.1;
 						double velocityZ = spawnerData.velocityZSet ? spawnerData.velocityZ : Math.random() * 0.2 - 0.1;
 
-                        entityliving.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
-                        if(!(entityliving instanceof EntityHanging))
+                        entity.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
+                        if(!(entity instanceof EntityHanging))
                         {
-                        	entityliving.addVelocity(velocityX, velocityY, velocityZ);
+                        	entity.addVelocity(velocityX, velocityY, velocityZ);
                         }
 
                         boolean entityCanSpawnHere = false;
 
-                        int ia = MathHelper.floor(((Entity)entityliving).posX);
-                        int ja = MathHelper.floor(((Entity)entityliving).getEntityBoundingBox().minY);
-                        int ka = MathHelper.floor(((Entity)entityliving).posZ);
+                        int ia = MathHelper.floor(((Entity)entity).posX);
+                        int ja = MathHelper.floor(((Entity)entity).getEntityBoundingBox().minY);
+                        int ka = MathHelper.floor(((Entity)entity).posZ);
 
-                    	boolean b1 = entityliving.world.checkNoEntityCollision(entityliving.getEntityBoundingBox());
-                    	boolean b2 = entityliving.world.getCollisionBoxes(entityliving, entityliving.getEntityBoundingBox()).isEmpty();
-                    	boolean b3 = !entityliving.world.containsAnyLiquid(entityliving.getEntityBoundingBox());
+                    	boolean b1 = entity.world.checkNoEntityCollision(entity.getEntityBoundingBox());
+                    	boolean b2 = entity.world.getCollisionBoxes(entity, entity.getEntityBoundingBox()).isEmpty();
+                    	boolean b3 = !entity.world.containsAnyLiquid(entity.getEntityBoundingBox());
 
-                    	boolean b5 = entityliving instanceof EntityLiving ? ((EntityCreature)entityliving).getBlockPathWeight(new BlockPos(ia, ja, ka)) >= 0.0F : true;
+                    	boolean b5 = entity instanceof EntityLiving ? ((EntityCreature)entity).getBlockPathWeight(new BlockPos(ia, ja, ka)) >= 0.0F : true;
 
                     	entityCanSpawnHere = b1 && b2 && b3 && b5;
 
@@ -467,7 +470,7 @@ public class ServerEventListener
                         			{
                                         try
                                         {
-                                        	entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { worldServer });
+                                        	entity = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { worldServer });
                                         }
                                         catch (Exception exception)
                                         {
@@ -475,20 +478,20 @@ public class ServerEventListener
                                             break;
                                         }
                         			} else {
-                                    	entityliving = EntityList.createEntityFromNBT(nbttagcompound, worldServer);
+                                    	entity = EntityList.createEntityFromNBT(nbttagcompound, worldServer);
                                     }
 
 	        						velocityX = spawnerData.velocityXSet ? spawnerData.velocityX : Math.random() * 0.2 - 0.1;
 	        						velocityY = spawnerData.velocityYSet ? spawnerData.velocityY : 0.1;
 	        						velocityZ = spawnerData.velocityZSet ? spawnerData.velocityZ : Math.random() * 0.2 - 0.1;
 
-                                    entityliving.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
-                                    entityliving.addVelocity(velocityX, velocityY, velocityZ);
-                                    entityliving.getEntityData().setBoolean("OTG", true);
-                                    entityliving.getEntityData().setInteger("OTGDT", despawnTime); // OTG Despawn time
+                                    entity.setLocationAndAngles((double)x, (double)y, (double)z, yaw, pitch);
+                                    entity.addVelocity(velocityX, velocityY, velocityZ);
+                                    entity.getEntityData().setBoolean("OTG", true);
+                                    entity.getEntityData().setInteger("OTGDT", despawnTime); // OTG Despawn time
                         		}
 
-                                worldServer.spawnEntity(entityliving);
+                                worldServer.spawnEntity(entity);
 
 								worldMobCount++;
                         	}

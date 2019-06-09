@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -710,9 +709,16 @@ public class ForgeEngine extends OTGEngine
 	    	{
 	    		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().trim().startsWith("dim-"))
 	    		{
-	    			worldNames.add(worldDir.getName());
-	    			WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(worldDir);
-			        presets.put(worldDir.getName(), new DimensionConfigGui(worldDir.getName(), worldConfig));
+	    			for(File file : worldDir.listFiles())
+	    			{
+	    				if(file.getName().equals("WorldConfig.ini"))
+	    				{
+			    			worldNames.add(worldDir.getName());
+			    			WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(worldDir);
+					        presets.put(worldDir.getName(), new DimensionConfigGui(worldDir.getName(), worldConfig));
+					        break;
+	    				}
+	    			}
 	    		}
 	    	}
 		}

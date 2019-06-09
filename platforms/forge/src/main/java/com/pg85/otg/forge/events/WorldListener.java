@@ -28,22 +28,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldListener
 {
-    private static Field field_World_provider = null;
-    private static Field field_ChunkProviderServer_chunkGenerator = null;
-
-    static
-    {
-        try
-        {
-            field_World_provider = ReflectionHelper.findField(World.class, "field_73011_w", "provider");
-            field_ChunkProviderServer_chunkGenerator = ReflectionHelper.findField(ChunkProviderServer.class, "field_186029_c", "chunkGenerator");
-        }
-        catch (UnableToFindFieldException e)
-        {
-            OTG.log(LogMarker.ERROR, "WorldUtils: Reflection failed!!", e);
-        }
-    }
-	
     @SubscribeEvent(priority = EventPriority.HIGH)
 	public void onWorldLoad(WorldEvent.Load event)
 	{
@@ -80,7 +64,7 @@ public class WorldListener
                 try
                 {                	
                     WorldProvider oldProvider = world.provider;
-                    field_World_provider.set(world, newProvider);
+                    world.provider = newProvider;
                     ((OTGWorldProvider)world.provider).isSPServerOverworld = !world.isRemote;
                    	world.provider.setWorld(world);
                     world.provider.setDimension(dim);

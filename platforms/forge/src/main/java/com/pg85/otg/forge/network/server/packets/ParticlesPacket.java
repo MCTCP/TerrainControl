@@ -57,7 +57,7 @@ public class ParticlesPacket extends OTGPacket
 		// Create an empty packet
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
-
+       
         ParticlesPacket packet = new ParticlesPacket(nettyBuffer);
         
         try {

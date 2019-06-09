@@ -280,7 +280,7 @@ public class OTGTeleporter
         double moveFactor = oldWorldIn.provider.getMovementFactor() / toWorldIn.provider.getMovementFactor();
         double d0 = MathHelper.clamp(entityIn.posX * moveFactor, toWorldIn.getWorldBorder().minX() + 16.0D, toWorldIn.getWorldBorder().maxX() - 16.0D);
         double d1 = MathHelper.clamp(entityIn.posZ * moveFactor, toWorldIn.getWorldBorder().minZ() + 16.0D, toWorldIn.getWorldBorder().maxZ() - 16.0D);
-        double d2 = 8.0D;
+        //double d2 = 8.0D;
         float f = entityIn.rotationYaw;
         oldWorldIn.profiler.startSection("moving");
 
@@ -476,13 +476,13 @@ public class OTGTeleporter
 
     static boolean placeInExistingPortal(WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
-    	int i = 128;
+    	//int i = 128;
         double d0 = -1.0D;
-        int j = MathHelper.floor(entityIn.posX);
-        int k = MathHelper.floor(entityIn.posZ);
-        boolean flag = true;
+        //int j = MathHelper.floor(entityIn.posX);
+        //int k = MathHelper.floor(entityIn.posZ);
+        //boolean flag = true;
         BlockPos blockpos = BlockPos.ORIGIN;
-        long l = ChunkPos.asLong(j, k);
+        //long l = ChunkPos.asLong(j, k);
 
         BlockPos blockpos3 = new BlockPos(entityIn);
 

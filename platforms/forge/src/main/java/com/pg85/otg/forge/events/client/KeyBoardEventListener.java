@@ -1,6 +1,5 @@
 package com.pg85.otg.forge.events.client;
 
-import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.PregeneratorUI;
@@ -34,6 +33,7 @@ public class KeyBoardEventListener
 			{
 				// Only open the menu for overworld or OTG dimensions
 		    	if(
+    				Minecraft.getMinecraft().player.canUseCommand(2, "") &&
 					Minecraft.getMinecraft().world != null && 
 					Minecraft.getMinecraft().world.provider != null && 
 					(

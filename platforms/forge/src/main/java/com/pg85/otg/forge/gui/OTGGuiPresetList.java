@@ -43,7 +43,6 @@ import org.lwjgl.input.Mouse;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.standard.PluginStandardValues;

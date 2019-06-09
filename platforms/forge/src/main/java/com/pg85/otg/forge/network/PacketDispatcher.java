@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.util.EnumMap;
 
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.network.client.packets.CreateDeleteDimensionPacket;
 import com.pg85.otg.forge.network.client.packets.UpdateDimensionSettingsPacket;
 import com.pg85.otg.forge.network.client.packets.TeleportPlayerPacket;

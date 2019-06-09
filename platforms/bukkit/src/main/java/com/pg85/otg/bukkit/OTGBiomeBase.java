@@ -9,13 +9,10 @@ import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.StringHelper;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
-import net.minecraft.server.v1_12_R1.RegistryMaterials;
-
 import org.bukkit.block.Biome;
 
 import java.util.List;

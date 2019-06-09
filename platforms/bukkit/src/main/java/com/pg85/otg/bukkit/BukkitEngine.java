@@ -3,7 +3,6 @@ package com.pg85.otg.bukkit;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
@@ -14,7 +13,6 @@ import net.minecraft.server.v1_12_R1.Block;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class BukkitEngine extends OTGEngine
 {

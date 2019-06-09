@@ -1,9 +1,11 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.Rotation;
 
 import java.io.BufferedReader;
@@ -179,10 +181,12 @@ public class SpawnerFunction extends BO3Function
     }
 
     private String metaDataTag;
+    private boolean metaDataProcessed = false;
     public String getMetaData()
     {
-    	if(nbtFileName != null && nbtFileName.length() > 0 && metaDataTag == null)
+    	if(nbtFileName != null && nbtFileName.length() > 0 && metaDataTag == null && !metaDataProcessed)
     	{
+    		metaDataProcessed = true;
     		File metaDataFile = new File(nbtFileName);
     		StringBuilder stringbuilder = new StringBuilder();
     	    if(metaDataFile.exists())
@@ -207,10 +211,17 @@ public class SpawnerFunction extends BO3Function
     				// TODO Auto-generated catch block
     				e1.printStackTrace();
     			}
+    	    } else {
+    	    	if(OTG.getPluginConfig().SpawnLog)
+    	    	{
+    	    		OTG.log(LogMarker.WARN, "Could not find file \"" + nbtFileName  + "\" for Spawner: " + this.makeString());
+    	    	}
     	    }
 
-            metaDataTag = stringbuilder.toString();
+            metaDataTag = stringbuilder.length() > 0 ? stringbuilder.toString() : null;
     	}
+    	
+    	metaDataProcessed = true;    	
     	return metaDataTag;
     }
 
