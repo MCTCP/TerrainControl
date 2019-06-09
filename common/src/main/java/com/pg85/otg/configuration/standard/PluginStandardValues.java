@@ -18,7 +18,7 @@ public class PluginStandardValues extends Settings
     
     // Network
     public static final String ChannelName = "OpenTerrainGenerator";
-    public static final int ProtocolVersion = 5;
+    public static final int ProtocolVersion = 6;
     
     // Plugin Defaults
     public static final Setting<LogLevels> LogLevel = enumSetting("LogLevel", LogLevels.Standard);
