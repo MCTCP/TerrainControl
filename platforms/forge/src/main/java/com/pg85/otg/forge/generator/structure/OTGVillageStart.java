@@ -3,8 +3,8 @@ package com.pg85.otg.forge.generator.structure;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.BiomeConfig.VillageType;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.forge.ForgeEngine;
 

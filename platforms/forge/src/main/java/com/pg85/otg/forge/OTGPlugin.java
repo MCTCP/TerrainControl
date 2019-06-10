@@ -3,30 +3,35 @@ package com.pg85.otg.forge;
 import com.google.common.base.Function;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.events.EventPriority;
 import com.pg85.otg.exception.BiomeNotFoundException;
-import com.pg85.otg.forge.client.events.ClientNetworkEventListener;
-import com.pg85.otg.forge.client.events.ClientTickHandler;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.dimensions.WorldProviderOTG;
 import com.pg85.otg.forge.events.*;
-import com.pg85.otg.forge.generator.Cartographer;
+import com.pg85.otg.forge.events.client.ClientTickHandler;
+import com.pg85.otg.forge.events.client.KeyBoardEventListener;
+import com.pg85.otg.forge.events.dimensions.BlockTracker;
+import com.pg85.otg.forge.events.dimensions.EntityTravelToDimensionListener;
+import com.pg85.otg.forge.events.dimensions.RightClickListener;
+import com.pg85.otg.forge.events.server.OTGCommandHandler;
+import com.pg85.otg.forge.events.server.SaveServerHandler;
+import com.pg85.otg.forge.events.server.ServerEventListener;
+import com.pg85.otg.forge.events.server.UnloadServerHandler;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
 import com.pg85.otg.forge.generator.structure.OTGRareBuildingStart;
 import com.pg85.otg.forge.generator.structure.OTGVillageStart;
 import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.network.CommonProxy;
 import com.pg85.otg.forge.network.PacketDispatcher;
+import com.pg85.otg.forge.network.client.BukkitClientNetworkEventListener;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.init.Blocks;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
@@ -52,25 +57,18 @@ import net.minecraftforge.fml.relauncher.Side;
 import java.io.File;
 
 //@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v2", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v6", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v7", certificateFingerprint = "e9f7847a78c5342af5b0a9e04e5abc0b554d69e0")
 public class OTGPlugin
-{
-	public static final String MOD_ID = "openterraingenerator";
-
-	@SidedProxy(clientSide="com.pg85.otg.forge.network.ClientProxy", serverSide="com.pg85.otg.forge.network.CommonProxy")
+{	
+	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
 	public static CommonProxy proxy;
 
 	@Instance("OTG")
     public static OTGPlugin instance;
 
-	public OTGPlugin()
-	{
-		OTG.isForge = true;
-	}
-
     private WorldLoader worldLoader;
     public static OTGWorldType txWorldType;
-
+    
     // TODO: Is this handler really necessary to make signing work?
     @Mod.EventHandler
     public void onFingerprintViolation(FMLFingerprintViolationEvent event) {
@@ -103,7 +101,7 @@ public class OTGPlugin
         // Register listening channel for listening to received configs. <- Spigot only?
         if (event.getSide() == Side.CLIENT)
         {
-            ClientNetworkEventListener networkHandler = new ClientNetworkEventListener(this.worldLoader);
+            BukkitClientNetworkEventListener networkHandler = new BukkitClientNetworkEventListener(this.worldLoader);
             FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName);
             eventDrivenChannel.register(networkHandler);
             MinecraftForge.EVENT_BUS.register(networkHandler);
@@ -134,7 +132,9 @@ public class OTGPlugin
                 LocalBiome biome = null;
                 try
                 {
-                	biome = OTG.getBiomeAllWorlds(input.biomeName);
+                	// Get world name from resourcelocation
+                	// TODO: Get world name from somewhere sensical...
+                	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getResourcePath().split("_")[0]);
                 }
                 catch (BiomeNotFoundException e)
                 {
@@ -166,7 +166,7 @@ public class OTGPlugin
         engine.registerEventHandler(new OTGToForgeEventConverter(), EventPriority.CANCELABLE);
 
         // Register RightClickBlockListener for detecting fire and creating portals
-        MinecraftForge.EVENT_BUS.register(new RightClickBlockListener());
+        MinecraftForge.EVENT_BUS.register(new RightClickListener());
 
     	// Register EntityTravelToDimensionListener for quartz portals that tp to other dimensions
     	MinecraftForge.EVENT_BUS.register(new EntityTravelToDimensionListener());
@@ -176,20 +176,19 @@ public class OTGPlugin
 
         // Fix lava as light source not working when spawning lava as resource
         Blocks.LAVA.setLightOpacity(255);
-
-        DimensionType.OVERWORLD.clazz = WorldProviderOTG.class;
-        DimensionType.OVERWORLD.suffix = "OTG";
     }
 
-    // TODO: Document why this is necessary <- Used to fill the biome registry when a client connects and has received the biomes packet?
     @EventHandler
     public void serverAboutToStart(FMLServerAboutToStartEvent event)
     {
-    	MinecraftServer server = event.getServer();
-
-    	String worldFolderName = server.getFolderName();
-
-    	WorldLoader.preLoadWorld(worldFolderName);
+    	// Default settings are not restored on world unload / server quit 
+    	// because this was causing problems (unloading dimensions while 
+    	// their worlds were still ticking etc).
+    	// Unload all world and biomes on server start / connect instead, 
+    	// for SP client where data is kept when leaving the game.
+ 
+    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	ForgeEngine.loadPresets();
     }
 
     @EventHandler
@@ -198,59 +197,71 @@ public class OTGPlugin
         event.registerServerCommand(new OTGCommandHandler());
 
         World overWorld = DimensionManager.getWorld(0);
+
         if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator") && !(overWorld.getWorldInfo().getTerrainType() instanceof OTGWorldType))
         {
-	    	ISaveHandler isavehandler = overWorld.getSaveHandler();
-	        WorldInfo worldInfo = isavehandler.loadWorldInfo();
+            ISaveHandler isavehandler = overWorld.getSaveHandler();
+            WorldInfo worldInfo = isavehandler.loadWorldInfo();
 
-	        if(worldInfo != null)
-	        {
-	        	overWorld.getWorldInfo().setTerrainType(txWorldType);
-		        worldInfo.setTerrainType(txWorldType);
-	            isavehandler.saveWorldInfo(worldInfo);
-	        }
-	        throw new RuntimeException("OTG has detected that you are loading an OTG world that has been used without OTG installed. OTG has fixed and saved the world data, you can now restart the game and enter the world.");
+            if(worldInfo != null)
+            {
+            	overWorld.getWorldInfo().setTerrainType(txWorldType);
+            	worldInfo.setTerrainType(txWorldType);
+            	isavehandler.saveWorldInfo(worldInfo);
+            }
+            throw new RuntimeException("OTG has detected that you are loading an OTG world that has been used without OTG installed. OTG has fixed and saved the world data, you can now restart the game and enter the world.");
         }
 
-        if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
-        {
-			if(!overWorld.isRemote) // Server side only
-			{
-	        	OTGDimensionManager.ReAddOTGDims();
-
-	        	// Load any saved dimensions.
-	        	OTGDimensionManager.LoadCustomDimensionData();
-
-	        	// Create Cartographer dimension if it doesn't yet exist
-				Cartographer.CreateCartographerDimension();
-
-	            // Create dimensions defined in worldconfig if they don't yet exist
-				ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(overWorld);
-				if(forgeWorld == null)
+		if(!overWorld.isRemote) // Server side only
+		{
+			// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
+		    if(OTG.GetDimensionsConfig() == null)
+		    {
+				// Check if there is a dimensionsConfig saved for this world
+				DimensionsConfig dimsConfig = DimensionsConfig.LoadFromFile(overWorld.getSaveHandler().getWorldDirectory());
+				if(dimsConfig == null)
 				{
-					forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(overWorld);
+					// If there is no DimensionsConfig saved for this world, create one
+					// LoadCustomDimensionData will add dimensions
+					dimsConfig = new DimensionsConfig(overWorld.getSaveHandler().getWorldDirectory());
+					// If this is a vanilla overworld then create a dummy overworld config
+					if(!overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+					{
+						dimsConfig.Overworld = new DimensionConfig();
+					}
+					dimsConfig.Save();
 				}
-				WorldConfig worldConfig = forgeWorld.getConfigs().getWorldConfig();
-
-	            for(String dimName : worldConfig.Dimensions)
-	            {
-	    	    	if(!OTGDimensionManager.isDimensionNameRegistered(dimName))
-	    	    	{
-	    				File worldConfigFile = new File(OTG.getEngine().getTCDataFolder().getAbsolutePath() + "/worlds/" + dimName + "/WorldConfig.ini");
-	    				if(!worldConfigFile.exists())
-	    				{
-	    					OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimName + "\", mods/OpenTerrainGenerator/worlds/" + dimName + " could not be found or does not contain a WorldConfig.ini file.");
-	    				} else {
-	    		    		OTGDimensionManager.createDimension(dimName, false, true, false);
-	    				}
-	    	    	}
-	            }
-
-	            OTGDimensionManager.SaveDimensionData();
+				OTG.SetDimensionsConfig(dimsConfig);
 			}
-        }
-    }
+		    			
+		    OTGDimensionManager.ReAddOTGDims();
+	
+		    // Load any saved dimensions.
+		    OTGDimensionManager.LoadCustomDimensionData();
+	
+		    // Create Cartographer dimension if it doesn't yet exist
+			//Cartographer.CreateCartographerDimension();
 
+		    for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+		    {
+		    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
+	    		{
+		    		File worldConfigFile = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimConfig.PresetName + "/WorldConfig.ini");
+		    		if(!worldConfigFile.exists())
+		    		{
+		    			OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
+		    		} else {
+		    			OTG.isNewWorldBeingCreated = true;
+		    			OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);
+		    			OTG.isNewWorldBeingCreated = false;
+		    		}
+	    		}
+		    }
+
+		    OTGDimensionManager.SaveDimensionData();
+		}
+    }
+    
     @EventHandler
     public void preInit(FMLPreInitializationEvent e)
     {

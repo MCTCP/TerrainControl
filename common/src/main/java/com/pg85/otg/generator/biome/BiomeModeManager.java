@@ -19,7 +19,6 @@ public class BiomeModeManager
 
     public final Class<NormalBiomeGenerator> NORMAL = register("Normal", NormalBiomeGenerator.class);
     public final Class<FromImageBiomeGenerator> FROM_IMAGE = register("FromImage", FromImageBiomeGenerator.class);
-    public final Class<OldBiomeGenerator> OLD_GENERATOR = register("OldGenerator", OldBiomeGenerator.class);
     public final Class<BeforeGroupsBiomeGenerator> BEFORE_GROUPS = register("BeforeGroups", BeforeGroupsBiomeGenerator.class);
 
     /**
@@ -71,7 +70,8 @@ public class BiomeModeManager
         try
         {
             return clazz.getConstructor(LocalWorld.class).newInstance(world);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             OTG.log(LogMarker.FATAL, "Cannot properly reflect biome manager, falling back on BiomeMode:Normal");
             OTG.printStackTrace(LogMarker.FATAL, e);

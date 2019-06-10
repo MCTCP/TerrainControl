@@ -4,21 +4,20 @@ import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.BiomeGenerator;
-import com.pg85.otg.generator.biome.OldBiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
-import com.pg85.otg.generator.noise.NoiseGeneratorNewOctaves;
+import com.pg85.otg.generator.noise.NoiseGeneratorBiomeBlocksOctaves;
 import com.pg85.otg.generator.noise.NoiseGeneratorPerlinOctaves;
 import com.pg85.otg.generator.terrain.CavesGen;
 import com.pg85.otg.generator.terrain.RavinesGen;
 import com.pg85.otg.generator.terrain.TerrainGenBase;
+import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
@@ -36,20 +35,20 @@ public class ChunkProviderOTG
     private final LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
 
     private final Random random;
-    private final NoiseGeneratorPerlinOctaves noiseGen1;
-    private final NoiseGeneratorPerlinOctaves noiseGen2;
-    private final NoiseGeneratorPerlinOctaves noiseGen3;
-    private final NoiseGeneratorNewOctaves noiseGen4;
-    private final NoiseGeneratorPerlinOctaves noiseGen5;
-    private final NoiseGeneratorPerlinOctaves noiseGen6;
+    private final NoiseGeneratorPerlinOctaves vol1NoiseGen;
+    private final NoiseGeneratorPerlinOctaves vol2NoiseGen;
+    private final NoiseGeneratorPerlinOctaves volNoiseGen;
+    private final NoiseGeneratorBiomeBlocksOctaves biomeBlocksNoiseGen;
+    private final NoiseGeneratorPerlinOctaves oldTerrainGeneratorNoiseGen;
+    private final NoiseGeneratorPerlinOctaves noiseHeightNoiseGen;
     private double[] rawTerrain;
-    private double[] noise4 = new double[CHUNK_X_SIZE * CHUNK_Z_SIZE];
+    private double[] biomeBlocksNoise = new double[CHUNK_X_SIZE * CHUNK_Z_SIZE];
 
-    private double[] noise3;
-    private double[] noise1;
-    private double[] noise2;
-    private double[] noise5;
-    private double[] noise6;
+    private double[] volNoise;
+    private double[] vol1Noise;
+    private double[] vol2Noise;
+    private double[] oldTerrainGeneratorNoise;
+    private double[] noiseHeightNoise;
     private float[] nearBiomeWeightArray;
 
     private double riverVol;
@@ -88,12 +87,12 @@ public class ChunkProviderOTG
 
         this.random = new Random(world.getSeed());
 
-        this.noiseGen1 = new NoiseGeneratorPerlinOctaves(this.random, 16);
-        this.noiseGen2 = new NoiseGeneratorPerlinOctaves(this.random, 16);
-        this.noiseGen3 = new NoiseGeneratorPerlinOctaves(this.random, 8);
-        this.noiseGen4 = new NoiseGeneratorNewOctaves(this.random, 4);
-        this.noiseGen5 = new NoiseGeneratorPerlinOctaves(this.random, 10);
-        this.noiseGen6 = new NoiseGeneratorPerlinOctaves(this.random, 16);
+        this.vol1NoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
+        this.vol2NoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
+        this.volNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 8);
+        this.biomeBlocksNoiseGen = new NoiseGeneratorBiomeBlocksOctaves(this.random, 4);
+        this.oldTerrainGeneratorNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 10);
+        this.noiseHeightNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
 
         this.caveGen = new CavesGen(configs.getWorldConfig(), this.localWorld);
         this.canyonGen = new RavinesGen(configs.getWorldConfig(), this.localWorld);
@@ -139,8 +138,6 @@ public class ChunkProviderOTG
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
-
-        biomes = new BiomeConfig[1024];
     }
 
     protected void generateTerrain(ChunkBuffer chunkBuffer)
@@ -280,9 +277,9 @@ public class ChunkProviderOTG
         int dryBlocksOnSurface = 256;
 
         final double d1 = 0.03125D;
-        this.noise4 = this.noiseGen4.a(this.noise4, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
+        this.biomeBlocksNoise = this.biomeBlocksNoiseGen.a(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
 
-        GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, noise4, heightCap);
+        GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, biomeBlocksNoise, heightCap);
 
         for (int x = 0; x < CHUNK_X_SIZE; x++)
         {
@@ -321,13 +318,13 @@ public class ChunkProviderOTG
 
         if (worldConfig.oldTerrainGenerator)
         {
-            this.noise5 = this.noiseGen5.Noise2D(this.noise5, xOffset, zOffset, NOISE_MAX_X, NOISE_MAX_Z, 1.121D, 1.121D);
+            this.oldTerrainGeneratorNoise = this.oldTerrainGeneratorNoiseGen.Noise2D(this.oldTerrainGeneratorNoise, xOffset, zOffset, NOISE_MAX_X, NOISE_MAX_Z, 1.121D, 1.121D);
         }
-        this.noise6 = this.noiseGen6.Noise2D(this.noise6, xOffset, zOffset, NOISE_MAX_X, NOISE_MAX_Z, 200.0D, 200.0D);
+        this.noiseHeightNoise = this.noiseHeightNoiseGen.Noise2D(this.noiseHeightNoise, xOffset, zOffset, NOISE_MAX_X, NOISE_MAX_Z, 200.0D, 200.0D);
 
-        this.noise3 = this.noiseGen3.Noise3D(this.noise3, xOffset, yOffset, zOffset, NOISE_MAX_X, maxYSections, NOISE_MAX_Z, xzScale / 80.0D, yScale / 160.0D, xzScale / 80.0D);
-        this.noise1 = this.noiseGen1.Noise3D(this.noise1, xOffset, yOffset, zOffset, NOISE_MAX_X, maxYSections, NOISE_MAX_Z, xzScale, yScale, xzScale);
-        this.noise2 = this.noiseGen2.Noise3D(this.noise2, xOffset, yOffset, zOffset, NOISE_MAX_X, maxYSections, NOISE_MAX_Z, xzScale, yScale, xzScale);
+        this.volNoise = this.volNoiseGen.Noise3D(this.volNoise, xOffset, yOffset, zOffset, NOISE_MAX_X, maxYSections, NOISE_MAX_Z, xzScale / 80.0D, yScale / 160.0D, xzScale / 80.0D);
+        this.vol1Noise = this.vol1NoiseGen.Noise3D(this.vol1Noise, xOffset, yOffset, zOffset, NOISE_MAX_X, maxYSections, NOISE_MAX_Z, xzScale, yScale, xzScale);
+        this.vol2Noise = this.vol2NoiseGen.Noise3D(this.vol2Noise, xOffset, yOffset, zOffset, NOISE_MAX_X, maxYSections, NOISE_MAX_Z, xzScale, yScale, xzScale);
 
         int i3D = 0;
         int i2D = 0;
@@ -340,7 +337,7 @@ public class ChunkProviderOTG
 
                 BiomeConfig biomeConfig = toBiomeConfig(biomeId);
 
-                double noiseHeight = this.noise6[i2D] / 8000.0D;
+                double noiseHeight = this.noiseHeightNoise[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
                 {
                     noiseHeight = -noiseHeight * 0.3D;
@@ -397,10 +394,10 @@ public class ChunkProviderOTG
                         d8 *= 4.0D;
                     }
 
-                    final double vol1 = this.noise1[i3D] / 512.0D * biomeConfig.volatility1;
-                    final double vol2 = this.noise2[i3D] / 512.0D * biomeConfig.volatility2;
+                    final double vol1 = this.vol1Noise[i3D] / 512.0D * biomeConfig.volatility1;
+                    final double vol2 = this.vol2Noise[i3D] / 512.0D * biomeConfig.volatility2;
 
-                    final double noise = (this.noise3[i3D] / 10.0D + 1.0D) / 2.0D;
+                    final double noise = (this.volNoise[i3D] / 10.0D + 1.0D) / 2.0D;
                     if (noise < biomeConfig.volatilityWeight1)
                     {
                         output = vol1;
@@ -425,9 +422,9 @@ public class ChunkProviderOTG
                     }
                     if (this.riverFound)
                     {
-                        output += biomeConfig.riverHeightMatrix[y];
+                    	output += biomeConfig.riverHeightMatrix[Math.min(biomeConfig.riverHeightMatrix.length - 1, y)];
                     } else {
-                        output += biomeConfig.heightMatrix[y];
+                    	output += biomeConfig.heightMatrix[Math.min(biomeConfig.heightMatrix.length - 1, y)];
                     }
 
                     this.rawTerrain[i3D] = output;
@@ -439,21 +436,13 @@ public class ChunkProviderOTG
 
     private void oldBiomeFactor(int x, int z, int i4, int ySections, double noiseHeight)
     {
-        BiomeGenerator unwrapped = localWorld.getBiomeGenerator().unwrap();
-        if (unwrapped instanceof OldBiomeGenerator)
-        {
-            OldBiomeGenerator oldBiomeGenerator = (OldBiomeGenerator) unwrapped;
-            int index = z * 48 + 17 + x * 3;
-            double product = oldBiomeGenerator.oldTemperature1[index] * oldBiomeGenerator.oldWetness[index];
-            this.volatilityFactor = 1.0 - product;
-        } else {
-            final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
-            this.volatilityFactor = (1.0D - Math.min(1, biomeConfig.biomeTemperature) * biomeConfig.biomeWetness);
-        }
+        final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+        this.volatilityFactor = (1.0D - Math.min(1, biomeConfig.biomeTemperature) * biomeConfig.biomeWetness);
+
         this.volatilityFactor *= this.volatilityFactor;
         this.volatilityFactor = 1.0D - this.volatilityFactor * this.volatilityFactor;
 
-        this.volatilityFactor = (this.noise3[i4] + 256.0D) / 512.0D * this.volatilityFactor;
+        this.volatilityFactor = (this.volNoise[i4] + 256.0D) / 512.0D * this.volatilityFactor;
         if (this.volatilityFactor > 1.0D)
         {
             this.volatilityFactor = 1.0D;
@@ -488,11 +477,6 @@ public class ChunkProviderOTG
 
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
                 biomeWeight = Math.abs(biomeWeight);
-                // This causes problems with rough edges, makes it look like smoothing isn't working
-                //if (nextBiomeHeight > centerBiomeConfig.biomeHeight)
-                {
-                    //biomeWeight /= 2.0F;
-                }
                 volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 biomeWeightSum += biomeWeight;
@@ -541,10 +525,6 @@ public class ChunkProviderOTG
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
 
                 biomeWeight = Math.abs(biomeWeight);
-                if (nextBiomeHeight > biomeConfig.biomeHeight)
-                {
-                    biomeWeight /= 2.0F;
-                }
                 volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 WeightSum += biomeWeight;
@@ -606,8 +586,8 @@ public class ChunkProviderOTG
 
         if(biomeConfig == null)
         {
-            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-            LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(id) : this.configProvider.getBiomeByIdOrNull(id);
+            LocalBiome biome = this.configProvider.getBiomeByOTGIdOrNull(id);
+            
             biomeConfig = biome.getBiomeConfig();
             biomes[id] = biomeConfig;
         }

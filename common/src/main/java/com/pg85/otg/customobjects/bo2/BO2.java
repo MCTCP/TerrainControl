@@ -1,15 +1,15 @@
 package com.pg85.otg.customobjects.bo2;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.CustomObjectConfigFile;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.Rotation;
@@ -36,7 +36,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
 	    if(blocksToReplace != null && blocksToReplace.size() > 0)
 	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material);
+	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
 	    	if(targetBlock != null)
 	    	{
 	    		material = targetBlock;	    		

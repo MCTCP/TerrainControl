@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.configuration.ServerConfigProvider;
-import com.pg85.otg.forge.ForgeBiome;
+import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.network.ServerConfigProvider;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -34,7 +34,7 @@ public class OTGStrongholdGen extends MapGenStronghold
     	this.structureCoords = new ChunkPos[128];
         allowedBiomes = new ArrayList<Biome>();
 
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

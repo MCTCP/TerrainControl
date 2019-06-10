@@ -4,9 +4,9 @@ import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.BiomeConfig.RareBuildingType;
-import com.pg85.otg.configuration.ServerConfigProvider;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
+import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.server.v1_12_R1.*;
@@ -39,7 +39,7 @@ public class OTGRareBuildingGen extends StructureGenerator
     {
         biomeList = new ArrayList<BiomeBase>();
 
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

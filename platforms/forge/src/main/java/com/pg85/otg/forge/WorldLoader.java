@@ -3,31 +3,21 @@ package com.pg85.otg.forge;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ClientConfigProvider;
-import com.pg85.otg.configuration.ConfigFile;
-import com.pg85.otg.configuration.ServerConfigProvider;
-import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.dimensions.WorldProviderOTG;
-import com.pg85.otg.forge.gui.GuiHandler;
-import com.pg85.otg.forge.gui.OTGGuiCreateWorld;
-import com.pg85.otg.forge.gui.OTGGuiWorldSelection;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
 import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.network.ServerConfigProvider;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.init.Biomes;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
@@ -38,7 +28,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -52,8 +41,8 @@ import javax.annotation.Nullable;
  *
  */
 public final class WorldLoader
-{
-    private final File configsDir;
+{	
+	private final File configsDir;
     private final HashMap<String, ForgeWorld> worlds = new HashMap<String, ForgeWorld>();
     private final HashMap<String, ForgeWorld> unloadedWorlds = new HashMap<String, ForgeWorld>();
 
@@ -93,18 +82,16 @@ public final class WorldLoader
 
     public boolean isWorldUnloaded(String worldName)
     {
-    	boolean isLoaded = false;
     	boolean isUnloaded = false;
     	synchronized(worlds)
     	{
     		synchronized(unloadedWorlds)
     		{
-    			isLoaded = worlds.containsKey(worldName);
     			isUnloaded = unloadedWorlds.containsKey(worldName);
     		}
     	}
 
-    	return !isLoaded && isUnloaded;
+    	return isUnloaded;
     }
 
     public void RemoveUnloadedWorld(String worldName)
@@ -127,7 +114,7 @@ public final class WorldLoader
     		ForgeWorld forgeWorld = worlds.get(worldName);
     		if(forgeWorld != null)
     		{
-	    		forgeWorld.DeleteWorldSessionData();
+   				forgeWorld.DeleteWorldSessionData();
 	    		worlds.remove(worldName);
     		}
     	}
@@ -179,43 +166,7 @@ public final class WorldLoader
         }
         return forgeWorld;
     }
-
-    public boolean isConfigUnique(String name)
-    {
-		boolean bFound = false;
-		synchronized(this.worlds)
-		{
-			synchronized(this.unloadedWorlds)
-			{
-		    	for(ForgeWorld world : this.worlds.values())
-		    	{
-		    		LocalBiome bc = world.getBiomeByNameOrNull(name);
-		    		if(bc != null)
-		    		{
-		    			if(bFound)
-		    			{
-		    				return false;
-		    			}
-		    			bFound = true;
-		    		}
-		    	}
-		    	for(ForgeWorld world : this.unloadedWorlds.values())
-		    	{
-		    		LocalBiome bc = world.getBiomeByNameOrNull(name);
-		    		if(bc != null)
-		    		{
-		    			if(bFound)
-		    			{
-		    				return false;
-		    			}
-		    			bFound = true;
-		    		}
-		    	}
-			}
-		}
-    	return true;
-    }
-
+    
     public File getConfigsFolder()
     {
         return this.configsDir;
@@ -223,7 +174,7 @@ public final class WorldLoader
 
     protected File getWorldDir(String worldName)
     {
-        return new File(this.configsDir, "worlds/" + worldName);
+        return new File(this.configsDir, PluginStandardValues.PresetsDirectoryName + "/" + worldName);
     }
 
     public void onServerStopped()
@@ -252,10 +203,7 @@ public final class WorldLoader
 		            this.worlds.remove(worldToRemove.getName());
 		        }
 
-		        synchronized(this.unloadedWorlds)
-		        {
-		        	this.unloadedWorlds.clear();
-		        }
+	        	this.unloadedWorlds.clear();
     		}
     	}
     }
@@ -282,130 +230,56 @@ public final class WorldLoader
             		this.worlds.remove(world.getName());
         		}
         	}
-        }
-    }
-
-    public static void preLoadWorld(String worldName)
-    {
-    	boolean isMainWorld = true;
-
-        File dataFolder;
-        try
-        {
-            Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
-            minecraftDir.setAccessible(true);
-            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + "OpenTerrainGenerator");
-        } catch (Throwable e)
-        {
-            dataFolder = new File("mods" + File.separator + "OpenTerrainGenerator");
-            System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
-            OTG.printStackTrace(LogMarker.FATAL, e);
-        }
-
-    	File worldConfigsFolder = new File(dataFolder, "worlds/" + worldName);
-        if (!worldConfigsFolder.exists())
-        {
-            // OpenTerrainGenerator is probably not enabled for this world
-            return;
-        }
-
-        ForgeWorld world = null;
-        if (world == null)
-        {
-            world = new ForgeWorld(worldName, isMainWorld);
-            ServerConfigProvider config = null;
-            if (config == null)
+        	
+            if(!loadedWorld.getWorld().isRemote)
             {
-                OTG.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
-
-                config = new ServerConfigProvider(worldConfigsFolder, world);
+            	ServerPacketManager.SendDimensionLoadUnloadPacketToAllPlayers(false, world.getName(), loadedWorld.getWorld().getMinecraftServer());
             }
-            world.provideConfigs(config);
         }
     }
 
     @Nullable
     public ForgeWorld getOrCreateForgeWorld(World mcWorld)
-    {
-    	if(
-			(
-				mcWorld.getWorldInfo() instanceof DerivedWorldInfo &&
-				!((DerivedWorldInfo)mcWorld.getWorldInfo()).delegate.getGeneratorOptions().equals("OpenTerrainGenerator")
-			) || (
-				!(mcWorld.getWorldInfo() instanceof DerivedWorldInfo) &&
-				!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator")
-			)
-		)
-    	{
-    		throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
+    {   	
+    	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+    	{	
+    		throw new RuntimeException("Error: OTG tried to load a world that is missing OTG information. Was this world created via OTG? For Forge Single Player, be sure to use the OTG world creation screen.");
     	}
 
     	String worldName = WorldHelper.getName(mcWorld);
-    	boolean isMainWorld = mcWorld.provider.getDimension() == 0;
-
-    	File worldConfigsFolder = this.getWorldDir(worldName);
-        if (!worldConfigsFolder.exists())
+    	File worldConfigsFolder = null;
+    	
+    	worldConfigsFolder = this.getWorldDir(OTG.GetDimensionsConfig().GetDimensionConfig(worldName).PresetName);    	    	
+        if (worldConfigsFolder == null || !worldConfigsFolder.exists())
         {
-            // OpenTerrainGenerator is probably not enabled for this world
+            // OpenTerrainGenerator is not enabled for this world
             return null;
         }
 
         ForgeWorld world = this.getWorld(worldName);
         if (world == null)
-        {
-            world = new ForgeWorld(worldName, isMainWorld);
-            ServerConfigProvider config = null;//this.configMap.get(worldName);
-            if (config == null)
-            {
-                OTG.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
+        {           	
+            world = new ForgeWorld(worldName);
+            OTG.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
 
-                config = new ServerConfigProvider(worldConfigsFolder, world);
-
-                if(isMainWorld)
-                {
-                	// Apply world creation menu settings
-                	// Client side only
-	                try
-	                {
-	                	applyWorldCreationMenuSettings(config);
-	                } catch(NoSuchMethodError ex) { }
-                }
-            }
+            ServerConfigProvider config = new ServerConfigProvider(worldConfigsFolder, world, mcWorld.getSaveHandler().getWorldDirectory());            
             world.provideConfigs(config);
-
-            if (world != null && world.getWorld() == null)
-            {
-            	world.provideWorldInstance((WorldServer) mcWorld);
-            }
-
-            synchronized(this.worlds)
-            {
-            	synchronized(this.unloadedWorlds)
-            	{
-            		this.worlds.put(worldName, world);
-            		this.unloadedWorlds.remove(worldName);
-            	}
-            }
         }
-
+        if (world != null && world.getWorld() == null)
+        {
+        	world.provideWorldInstance((WorldServer) mcWorld);
+        }
+        
+        synchronized(this.worlds)
+        {
+        	synchronized(this.unloadedWorlds)
+        	{
+        		this.worlds.put(worldName, world);
+        		this.unloadedWorlds.remove(worldName);
+        	}
+        }
+        
         return world;
-    }
-
-    @SideOnly(Side.CLIENT)
-    private void applyWorldCreationMenuSettings(ServerConfigProvider config)
-    {
-        // If this is a new world use the pre-generator and world border settings from world creation menu
-    	if(GuiHandler.lastGuiOpened.equals(OTGGuiCreateWorld.class) || (GuiHandler.lastGuiOpened.equals(GuiYesNo.class) && GuiHandler.askModCompatContinue)) // GUIYesNo is used for mod warnings (custommobspawner, bop etc)
-    	{
-			config.getWorldConfig().PreGenerationRadius = GuiHandler.PregenerationRadius;
-			config.getWorldConfig().WorldBorderRadius = GuiHandler.WorldBorderRadius;
-			config.saveWorldConfig();
-    	}
-    	else if(GuiHandler.lastGuiOpened.equals(OTGGuiWorldSelection.class))
-    	{
-    		GuiHandler.PregenerationRadius = config.getWorldConfig().PreGenerationRadius;
-    		GuiHandler.WorldBorderRadius = config.getWorldConfig().WorldBorderRadius;
-    	}
     }
 
     public void clearBiomeDictionary(ForgeWorld world)
@@ -414,20 +288,17 @@ public final class WorldLoader
     	// ForgeBiomes are created. We won't be re-registering them to the BiomeDict when the biomes
     	// are created so restore their BiomeDictionary info here after clearing the BiomeDictionary.
 
-    	Set<Type> hellTypesSet = BiomeDictionary.getTypes(Biomes.HELL);
-    	Set<Type> skyTypesSet = BiomeDictionary.getTypes(Biomes.SKY);
-
-    	Type[] hellTypes = hellTypesSet.toArray(new Type[hellTypesSet.size()]);
-    	Type[] skyTypes = skyTypesSet.toArray(new Type[skyTypesSet.size()]);
-
     	HashMap<Biome, Set<Type>> typesToRestore = new HashMap<Biome, Set<Type>>();
 
-    	// Don't remove any biomedict info for biomes added by other mods
+    	// Don't remove any biomedict info for vanilla biomes or biomes added by other mods
     	for(Entry<ResourceLocation, Biome> biome : ForgeRegistries.BIOMES.getEntries())
     	{
     		String resourceDomain = biome.getKey().getResourceDomain();
 
-    		if(!(resourceDomain.startsWith("minecraft") && !resourceDomain.startsWith("openterraingenerator")))
+    		if(
+				!resourceDomain.equals("openterraingenerator") &&
+				!resourceDomain.equals("terraincontrol")
+			)
     		{
 				if(!typesToRestore.containsKey(biome.getValue()))
 				{
@@ -515,163 +386,36 @@ public final class WorldLoader
 			e.printStackTrace();
 		}
 
-		BiomeDictionary.addTypes(Biomes.HELL, hellTypes);
-		BiomeDictionary.addTypes(Biomes.SKY, skyTypes);
 		for(Entry<Biome, Set<Type>> biomeToRestore : typesToRestore.entrySet())
 		{
 			BiomeDictionary.addTypes(biomeToRestore.getKey(), biomeToRestore.getValue().toArray(new Type[biomeToRestore.getValue().size()]));
 		}
     }
 
-    public void unRegisterDefaultBiomes()
-	{
-		// Unregister default biomes so they can be replaced by TC biomes (this allows us to fully customise the biomes)
-		for(DefaultBiome defaultBiome : DefaultBiome.values())
-		{
-			// Make an exception for the hell and sky biomes.
-			// The hell and end chunk providers refer specifically to
-			// Biomes.HELL and Biomes.SKY and query the biome registry
-			// for them. Other biomes are not referred to in this way.
-			if(defaultBiome.Name.equals("The Void") || defaultBiome.Name.equals("Hell") || defaultBiome.Name.equals("Sky")) { continue; }
-
-	        ResourceLocation registryKey = ForgeWorld.vanillaResouceLocations.get(defaultBiome.Id);
-			((ForgeEngine)OTG.getEngine()).unRegisterForgeBiome(registryKey);
-		}
-	}
-
-    public void unRegisterTCBiomes()
-	{
-		BitSet biomeRegistryAvailabiltyMap = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryAvailabiltyMap();
-		// Unregister default biomes so they can be replaced by TC biomes (this allows us to fully customise the biomes)
-		for(Entry<ResourceLocation, Biome> biome : ForgeRegistries.BIOMES.getEntries())
-		{
-			if(!(biome.getKey().getResourceDomain().toLowerCase().equals("openterraingenerator") || biome.getKey().getResourceDomain().equals("minecraft")))
-			{
-				continue;
-			}
-
-			// Make an exception for the hell and sky biomes.
-			// The hell and end chunk providers refer specifically to
-			// Biomes.HELL and Biomes.SKY and query the biome registry
-			// for them. Other biomes are not referred to in this way.
-
-			if(
-				biome.getKey().getResourcePath().equals("void") ||
-				biome.getKey().getResourcePath().equals("hell") ||
-				biome.getKey().getResourcePath().equals("sky")
-			)
-			{
-				continue;
-			}
-
-			OTG.log(LogMarker.TRACE, "Unregistering " + biome.getValue().biomeName);
-
-			int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biome.getValue());
-			// If this biome uses replaceToBiomeName and has an id > 255 then it is not actually registered in the biome id
-			// registry and biomeId will be 0. Check if biomeId is actually registered to this biome.
-			if(biomeId > -1 && biome == Biome.getBiome(biomeId))
-			{
-				biomeRegistryAvailabiltyMap.set(biomeId, false); // This should be enough to make Forge re-use the biome id
-			}
-		}
-	}
-
     @SideOnly(Side.CLIENT)
     public void registerClientWorldBukkit(WorldClient mcWorld, DataInputStream wrappedStream) throws IOException
     {
-        ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream), mcWorld.provider.getDimension() == 0);
-        ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world, Minecraft.getMinecraft().isSingleplayer());
-        world.provideClientConfigsBukkit(mcWorld, configs);
-
-        synchronized(this.worlds)
+    	ForgeWorld world = DimensionSyncPacket.RegisterClientWorldBukkit(mcWorld, wrappedStream, this.worlds, this.unloadedWorlds);
+        synchronized(worlds)
         {
-        	synchronized(this.unloadedWorlds)
+        	synchronized(unloadedWorlds)
         	{
-        		this.worlds.put(world.getName(), world);
-        		this.unloadedWorlds.remove(world.getName());
+        		worlds.put(world.getName(), world);
+        		unloadedWorlds.remove(world.getName());
         	}
         }
     }
 
-	// Called once when the client connects to the server, at that point dimensions and OTG worlds are loaded
-	// but MC worlds have not yet been sent.
-	// Called a second time when a player logs in, at that point the forge worlds that were created earlier have their
-	// MC worlds attached.
-    @SideOnly(Side.CLIENT)
-    public void registerClientWorld(DataInputStream wrappedStream) throws IOException
-    {
-        // Dimension info
-    	int worldCount = wrappedStream.readInt();
-    	HashMap<Integer, String> dimsToRemove = OTGDimensionManager.GetAllOTGDimensions(); // TODO: use String[] instead?
-    	boolean isSinglePlayer = Minecraft.getMinecraft().isSingleplayer();
-
-    	for(int i = 0; i < worldCount; i++)
-    	{
-    		int dimensionId = wrappedStream.readInt(); // TODO: Create dimensions on client? Is that even necessary, creating worlds should be enough?
-
-    		Integer integerToRemove = 0;
-    		boolean bFound = false;
-    		for(Entry<Integer, String> dimToRemove : dimsToRemove.entrySet())
-    		{
-    			if(dimToRemove.getKey().intValue() == dimensionId) // TODO: Is this really necessary?
-    			{
-    				bFound = true;
-    				integerToRemove = dimToRemove.getKey();
-    			}
-    		}
-    		if(bFound)
-    		{
-    			dimsToRemove.remove(integerToRemove);
-    		}
-
-			String worldName = ConfigFile.readStringFromStream(wrappedStream);
-
-			ForgeWorld overWorld = null;
-			if(i == 0)
-			{
-				overWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(worldName);
-				if(overWorld == null)
-				{
-					overWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(worldName);
-				}
-			}
-
-    		if((i == 0 && overWorld == null) || !DimensionManager.isDimensionRegistered(dimensionId))
-    		{
-    			if(i != 0)
-	    		{
-	    			OTGDimensionManager.registerDimension(dimensionId, DimensionType.register(worldName, "OTG", dimensionId, WorldProviderOTG.class, false));
-	    		}
-
-    			ForgeWorld world = new ForgeWorld(worldName, dimensionId == 0);
-    			world.clientDimensionId = dimensionId;
-	            ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world, isSinglePlayer);
-	            world.provideClientConfigs(configs);
-	            synchronized(this.worlds)
-	            {
-	            	synchronized(this.unloadedWorlds)
-	            	{
-	            		this.worlds.put(world.getName(), world);
-	            		this.unloadedWorlds.remove(world.getName());
-	            	}
-	            }
-    		} else {
-
-    			// World already exists, read the data from the stream but don't create a world.
-    			new ClientConfigProvider(wrappedStream, new ForgeWorld(), isSinglePlayer);
-    		}
-    	}
-
-    	for(Entry<Integer, String> removedDim : dimsToRemove.entrySet())
-    	{
-    		// This dimension has been deleted on the server, remove it
-    		ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getUnloadedWorld(removedDim.getValue());
-    		if(forgeWorld == null)
-    		{
-    			forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(removedDim.getValue()); // This can happen because the client considers all worlds loaded when it receives them from the server.
-    		}
-
-    		OTGDimensionManager.DeleteDimension(removedDim.getKey(), forgeWorld, Minecraft.getMinecraft().player.getServer(), false);
-    	}
-    }
+    // Only used when registering client worlds from a packet, don't use this separately.
+	public void LoadClientWorldFromPacket(ForgeWorld world)
+	{
+        synchronized(worlds)
+        {
+        	synchronized(unloadedWorlds)
+        	{
+        		worlds.put(world.getName(), world);
+        		unloadedWorlds.remove(world.getName());
+        	}
+        }		
+	}
 }

@@ -35,7 +35,6 @@ public class OTGCommandExecutor implements CommandExecutor
             arg.remove(0);
         }
 
-
         if (!commandSender.hasPermission(cmd.perm))
         {
             commandSender.sendMessage(ChatColor.RED.toString() + "You don't have permission to " + cmd.getHelp() + "!");

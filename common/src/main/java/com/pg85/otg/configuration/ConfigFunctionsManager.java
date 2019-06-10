@@ -1,5 +1,7 @@
 package com.pg85.otg.configuration;
 
+import com.pg85.otg.configuration.biome.BiomeGroup;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.*;
 

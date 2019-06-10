@@ -4,27 +4,61 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.BiMap;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.io.FileSettingsReader;
+import com.pg85.otg.configuration.io.FileSettingsWriter;
+import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.forge.biomes.BiomeRegistryManager;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.LocalMaterialData;
+import com.pg85.otg.util.helpers.FileHelper;
+import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.forge.util.ForgeLogger;
+import com.pg85.otg.forge.util.ForgeMaterialData;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ForgeEngine extends OTGEngine
-{
+{	
+	public WorldConfig LoadWorldConfigFromDisk(File worldDir)
+	{
+        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+        if(!worldConfigFile.exists())
+        {
+        	return null;
+        }
+        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
+        return new WorldConfig(worldDir, settingsMap, null, null);
+	}
+	
 	// OTG+
 
     public void onSave(World world)
@@ -37,19 +71,24 @@ public class ForgeEngine extends OTGEngine
     	}
     }
 
+    long lastPregeneratorStatusUpdateTime = System.currentTimeMillis();
     public void ProcessPregeneratorTick()
     {
     	for(LocalWorld world : getAllWorlds())
     	{
     		((ForgeWorldSession)world.GetWorldSession()).getPregenerator().ProcessTick();
     	}
+    	
+    	if(System.currentTimeMillis() - lastPregeneratorStatusUpdateTime  > 1000l)
+    	{
+    		lastPregeneratorStatusUpdateTime = System.currentTimeMillis();
+        	ServerPacketManager.SendPregeneratorStatusPacketToAllPlayers(FMLCommonHandler.instance().getMinecraftServerInstance());
+    	}
     }
 
 	//
-
+    
 	protected WorldLoader worldLoader;
-
-    protected Map<ResourceLocation, Biome> biomeMap;
 
     public ForgeEngine(WorldLoader worldLoader)
     {
@@ -229,10 +268,24 @@ public class ForgeEngine extends OTGEngine
     }
 
     BiMap<ResourceLocation, Biome> names = null;
-    public int registerForgeBiome(int id, ResourceLocation resourceLocation, Biome biome)
-    {
-    	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString());
 
+    public int registerForgeBiomeWithId(ResourceLocation resourceLocation, Biome biome)
+    {
+    	return registerForgeBiomeWithId(-1, resourceLocation, biome);
+    }
+    
+    public int registerForgeBiomeWithId(int id, ResourceLocation resourceLocation, Biome biome)
+    {
+    	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString() + " " + id);
+
+		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
+    	
+    	// Get the next free id
+    	if(id == -1)
+    	{
+    		id = biomeRegistryAvailabiltyMap.nextClearBit(0);
+    	}
+    	
     	if(ids == null)
     	{
 			try {
@@ -285,23 +338,16 @@ public class ForgeEngine extends OTGEngine
 			}
 		}
 
-        names.put(resourceLocation, biome);
+		names.put(resourceLocation, biome);
 
-        if(ids.get(id) != null)
+        Biome biomeAtId = ids.get(id);
+        if(biomeAtId != null)
         {
-        	for(int i = 0; i < 256; i++)
-        	{
-        		if(ids.get(i) == null)
-        		{
-        			ids.put(i, biome);
-        			return i;
-        		}
-        	}
+        	throw new RuntimeException("Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
         }
 
         ids.put(id, biome);
 
-		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
 		biomeRegistryAvailabiltyMap.set(id, true); // Mark the id as used
 
         return id;
@@ -333,8 +379,7 @@ public class ForgeEngine extends OTGEngine
 			// This can happen when a world was deleted and recreated and the index was set as "can be re-used" but when re-registering the biomes
 			// it wasn't set back to "used" because it looked like the biome registry already had the biome properly registered.
 
-			OTG.log(LogMarker.ERROR, "Could not unregister " + biome.biomeName);
-			throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
+			throw new RuntimeException("Could not unregister " + biome.biomeName + ", aborting.");
 
 			//biomeRegistryAvailabiltyMap.set(localBiome.getIds().getSavedId(), false); // This should be enough to make Forge re-use the biome id
 		}
@@ -443,7 +488,16 @@ public class ForgeEngine extends OTGEngine
 		ArrayList<LocalWorld> allWorlds = getAllWorlds();
 		for(LocalWorld world : allWorlds)
 		{
-			if(((ForgeWorld)world).getWorld() != null && ((ForgeWorld)world).getWorld().provider != null && ((ForgeWorld)world).getWorld().provider.getDimension() == 0)
+			// Overworld can be null for MP clients who are in a dimension, try 'overworld'
+			if(
+				(
+					((ForgeWorld)world).getWorld() != null && 
+					((ForgeWorld)world).getWorld().provider != null && 
+					((ForgeWorld)world).getWorld().provider.getDimension() == 0
+				) || (
+						((ForgeWorld)world).getName().equals("overworld")
+				)				
+			)
 			{
 				return (ForgeWorld)world;
 			}
@@ -464,7 +518,20 @@ public class ForgeEngine extends OTGEngine
     	return forgeWorld;
     }
 
-    public LocalWorld getWorld(World world)
+    public ForgeWorld getUnloadedWorldByDimId(int dimensionId)
+    {
+    	ForgeWorld forgeWorld;
+    	if(dimensionId == 0)
+    	{
+    		forgeWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
+    	} else {
+        	DimensionType dimType = DimensionManager.getProviderType(dimensionId);
+    		forgeWorld = (ForgeWorld)OTG.getUnloadedWorld(dimType.getName());
+    	}
+    	return forgeWorld;
+    }
+    
+    public ForgeWorld getWorld(World world)
     {
     	if(world.provider.getDimension() == 0)
     	{
@@ -472,23 +539,20 @@ public class ForgeEngine extends OTGEngine
     	}
     	else if(world.provider.getDimension() > 1)
     	{
-			if(world.provider.getDimensionType().getSuffix() != null && world.provider.getDimensionType().getSuffix().equals("OTG"))
-	    	{
-				LocalWorld localWorld = this.worldLoader.getWorld(world.provider.getDimensionType().getName());
-				if(localWorld == null)
-				{
-					return this.worldLoader.getUnloadedWorld(world.provider.getDimensionType().getName());
-				}
-	    		return this.worldLoader.getWorld(world.provider.getDimensionType().getName());
-	    	}
+			LocalWorld localWorld = this.worldLoader.getWorld(world.provider.getDimensionType().getName());
+			if(localWorld == null)
+			{
+				return this.worldLoader.getUnloadedWorld(world.provider.getDimensionType().getName());
+			}
+    		return this.worldLoader.getWorld(world.provider.getDimensionType().getName());
     	}
-    	LocalWorld localWorld = this.worldLoader.getWorld(world.getWorldInfo().getWorldName());
-		if(localWorld == null)
+    	ForgeWorld forgeWorld = this.worldLoader.getWorld(world.getWorldInfo().getWorldName());
+		if(forgeWorld == null)
 		{
 			return this.worldLoader.getUnloadedWorld(world.getWorldInfo().getWorldName());
 		}
 
-        return localWorld;
+        return forgeWorld;
     }
 
     @Override
@@ -513,9 +577,9 @@ public class ForgeEngine extends OTGEngine
     {
     	return this.worldLoader.getAllWorlds();
     }
-
+    
     @Override
-    public File getTCDataFolder()
+    public File getOTGDataFolder()
     {
         return this.worldLoader.getConfigsFolder();
     }
@@ -523,9 +587,75 @@ public class ForgeEngine extends OTGEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getTCDataFolder(), PluginStandardValues.BO_DirectoryName);
+        return new File(this.getOTGDataFolder(), PluginStandardValues.BO_DirectoryName);
     }
 
+    @Override
+    public File getWorldsDirectory()
+    {
+        return new File(this.getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName);
+    }
+    
+    public void CreateDefaultOTGWorld(String worldName)
+    {
+		// Create default OTG world
+
+    	File worldDir = new File(OTG.getEngine().getWorldsDirectory() + "/" + worldName);
+        List<File> worldDirs = new ArrayList<File>(2);
+        worldDirs.add(new File(worldDir, WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME));
+        worldDirs.add(new File(worldDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME));
+        FileHelper.makeFolders(worldDirs);		
+		
+		// World config
+		DefaulWorldData defaultWorldData = WorldConfig.CreateDefaultOTGWorldConfig(worldDir, worldName);
+		SettingsMap settingsMap = defaultWorldData.settingsMap;
+		WorldConfig defaultWorldConfig = defaultWorldData.worldConfig;			
+    	FileSettingsWriter.writeToFile(settingsMap, new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME), WorldConfig.ConfigMode.WriteAll);
+    	
+    	// Biome configs
+        // Build a set of all biomes to load
+        Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();
+
+        // Loop through all default biomes and create the default
+        // settings for them
+        List<BiomeLoadInstruction> defaultBiomes = new ArrayList<BiomeLoadInstruction>();
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
+        {
+            int id = defaultBiome.Id;
+            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), ForgeWorld.STANDARD_WORLD_HEIGHT);
+            defaultBiomes.add(instruction);
+        }
+        
+        // If we're creating a new world with new configs then add the default biomes
+        for (BiomeLoadInstruction defaultBiome : defaultBiomes)
+        {
+    		biomesToLoad.add(new BiomeLoadInstruction(defaultBiome.getBiomeName(), defaultBiome.getBiomeTemplate()));
+        }
+        
+        List<File> biomeDirs = new ArrayList<File>(1);
+        biomeDirs.add(new File(worldDir, WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME));
+        
+        // Load all files
+        BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(OTG.getPluginConfig().biomeConfigExtension);
+        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(defaultWorldConfig, null, defaultWorldConfig.worldHeightScale, biomeDirs, biomesToLoad);
+        
+        // Write all biomes
+
+        for (BiomeConfigStub biomeConfigStub : biomeConfigStubs.values())
+        {
+            // Settings reading
+            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub, biomeConfigStub.getSettings(), defaultWorldConfig);
+
+            // Settings writing
+            File writeFile = biomeConfigStub.getFile();
+            if (!biomeConfig.biomeExtends.isEmpty())
+            {
+                writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
+            }
+            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, defaultWorldConfig.SettingsMode);
+        }
+    }
+    
     @Override
     public LocalMaterialData readMaterial(String input) throws InvalidConfigException
     {
@@ -537,4 +667,60 @@ public class ForgeEngine extends OTGEngine
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
     }
+	
+	public void UnloadAndUnregisterAllWorlds()
+	{	
+    	// Default settings are not restored on world unload / server quit because this was causing problems
+    	// (unloading dimensions while their worlds were still ticking etc)
+    	// Unload all world and biomes on server start / connect instead, for client where data is kept when leaving the game.
+
+    	OTGDimensionManager.UnloadAllCustomDimensionData();
+    	this.worldLoader.unloadAllWorlds();
+        // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
+    	this.worldLoader.clearBiomeDictionary(null);
+    	BiomeRegistryManager.ClearOTGBiomeIds();
+
+    	OTGDimensionManager.RemoveOTGDims();
+	}
+
+	@Override
+	public String GetPresetName(String worldName)
+	{
+		// If this dim's name is the same as the preset worldname then this is an OTG overworld
+		if(worldName.equals("overworld") || worldName.equals(OTG.GetDimensionsConfig().WorldName))
+    	{
+    		return OTG.GetDimensionsConfig().Overworld.PresetName;	
+    	} else {
+    		// If this is an OTG dim other than the overworld then the world name will always match the preset name
+    		return worldName;
+    	}
+	}
+
+	public static LinkedHashMap<String, DimensionConfigGui> presets = new LinkedHashMap<String, DimensionConfigGui>();
+	public static void loadPresets()
+	{
+		presets.clear();
+		
+	    ArrayList<String> worldNames = new ArrayList<String>();
+	    File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+	    if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
+	    {
+	    	for(File worldDir : OTGWorldsDirectory.listFiles())
+	    	{
+	    		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().trim().startsWith("dim-"))
+	    		{
+	    			for(File file : worldDir.listFiles())
+	    			{
+	    				if(file.getName().equals("WorldConfig.ini"))
+	    				{
+			    			worldNames.add(worldDir.getName());
+			    			WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(worldDir);
+					        presets.put(worldDir.getName(), new DimensionConfigGui(worldDir.getName(), worldConfig));
+					        break;
+	    				}
+	    			}
+	    		}
+	    	}
+		}
+	}
 }

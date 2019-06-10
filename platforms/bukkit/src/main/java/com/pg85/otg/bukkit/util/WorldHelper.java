@@ -38,11 +38,11 @@ public abstract class WorldHelper
      * @param biomeBase The biome to check.
      * @return The generation id.
      */
-    public static int getGenerationId(BiomeBase biomeBase)
+    public static int getOTGBiomeId(BiomeBase biomeBase)
     {
         if (biomeBase instanceof OTGBiomeBase)
         {
-            return ((OTGBiomeBase) biomeBase).generationId;
+            return ((OTGBiomeBase) biomeBase).otgBiomeId;
         }
         return BiomeBase.a(biomeBase);
     }

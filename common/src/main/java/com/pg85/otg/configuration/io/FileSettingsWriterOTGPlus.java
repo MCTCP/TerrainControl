@@ -2,10 +2,10 @@ package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFile;
-import com.pg85.otg.configuration.CustomObjectConfigFile;
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.settingType.Setting;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.logging.LogMarker;
 
 import java.io.BufferedWriter;

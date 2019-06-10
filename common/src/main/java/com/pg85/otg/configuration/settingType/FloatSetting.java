@@ -34,4 +34,13 @@ class FloatSetting extends Setting<Float>
         return (float) StringHelper.readDouble(string, minValue, maxValue);
     }
 
+    public Float getMinValue()
+    {
+    	return minValue;
+    }
+    
+    public Float getMaxValue()
+    {
+    	return maxValue;
+    }      
 }

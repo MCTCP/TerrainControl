@@ -2,11 +2,11 @@ package com.pg85.otg.configuration.standard;
 
 import static com.pg85.otg.configuration.standard.BiomeStandardValues.*;
 
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.BiomeConfig.MineshaftType;
-import com.pg85.otg.configuration.BiomeConfig.RareBuildingType;
-import com.pg85.otg.configuration.BiomeConfig.VillageType;
-import com.pg85.otg.configuration.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
+import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
+import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.resource.IceSpikeGen.SpikeType;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
@@ -27,8 +27,6 @@ import java.util.List;
 public class StandardBiomeTemplate
 {
     protected final int worldHeight;
-
-    public boolean isCustomBiome = true;
 
     public String defaultExtends = "";
     public boolean defaultWaterLakes = true;
@@ -93,6 +91,7 @@ public class StandardBiomeTemplate
     public double defaultFossilRarity = 0;
     public String defaultBiomeDictId = "";
     public String defaultInheritMobsBiomeName = "";
+    public String defaultReplaceToBiomeName = "";
     
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
             new WeightedMobSpawnGroup(MobNames.SHEEP, 12, 4, 4),

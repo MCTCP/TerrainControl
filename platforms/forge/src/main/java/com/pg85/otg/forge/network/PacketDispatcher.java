@@ -3,7 +3,14 @@ package com.pg85.otg.forge.network;
 import java.lang.reflect.Field;
 import java.util.EnumMap;
 
-import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.forge.network.client.packets.CreateDeleteDimensionPacket;
+import com.pg85.otg.forge.network.client.packets.UpdateDimensionSettingsPacket;
+import com.pg85.otg.forge.network.client.packets.TeleportPlayerPacket;
+import com.pg85.otg.forge.network.server.packets.DimensionLoadUnloadPacket;
+import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
+import com.pg85.otg.forge.network.server.packets.ParticlesPacket;
+import com.pg85.otg.forge.network.server.packets.PregeneratorStatusPacket;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -23,10 +30,8 @@ public class PacketDispatcher
 	 
 	/**
 	* The SimpleNetworkWrapper instance is used both to register and send packets.
-	* Since I will be adding wrapper methods, this field is private, but you should
-	* make it public if you plan on using it directly.
 	*/
-	private static final SimpleNetworkWrapper dispatcher = NetworkRegistry.INSTANCE.newSimpleChannel(OTGPlugin.MOD_ID);
+	private static final SimpleNetworkWrapper dispatcher = NetworkRegistry.INSTANCE.newSimpleChannel(PluginStandardValues.MOD_ID);
 	
 	/**
 	* Call this during pre-init or loading and register all of your packets (messages) here
@@ -35,6 +40,11 @@ public class PacketDispatcher
 	{
 		PacketDispatcher.registerMessage(DimensionSyncPacket.Handler.class, DimensionSyncPacket.class, Side.CLIENT);
 		PacketDispatcher.registerMessage(ParticlesPacket.Handler.class, ParticlesPacket.class, Side.CLIENT);
+		PacketDispatcher.registerMessage(DimensionLoadUnloadPacket.Handler.class, DimensionLoadUnloadPacket.class, Side.CLIENT);
+		PacketDispatcher.registerMessage(PregeneratorStatusPacket.Handler.class, PregeneratorStatusPacket.class, Side.CLIENT);
+		PacketDispatcher.registerMessage(CreateDeleteDimensionPacket.Handler.class, CreateDeleteDimensionPacket.class, Side.SERVER);
+		PacketDispatcher.registerMessage(UpdateDimensionSettingsPacket.Handler.class, UpdateDimensionSettingsPacket.class, Side.SERVER);
+		PacketDispatcher.registerMessage(TeleportPlayerPacket.Handler.class, TeleportPlayerPacket.class, Side.SERVER);
 	}
 	
 	private static final void registerMessage(Class handlerClass, Class messageClass, Side side)

@@ -1,8 +1,8 @@
 package com.pg85.otg.util.minecraftTypes;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeLoadInstruction;
 import com.pg85.otg.configuration.standard.MinecraftBiomeTemplates.*;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.standard.MojangSettings;
 import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
 import com.pg85.otg.logging.LogMarker;
@@ -164,7 +164,7 @@ public enum DefaultBiome
     /**
      * A DefaultBiome lookup table with the biome ID being the array index
      */
-    private static DefaultBiome[] lookupID;
+    //private static DefaultBiome[] lookupID;
 
     private DefaultBiome(int i, String name, Class<? extends MinecraftBiomeTemplate> defaultSettings)
     {
@@ -173,6 +173,7 @@ public enum DefaultBiome
         this.defaultSettingsClass = defaultSettings;
     }
 
+    /*
     static
     {
         // Declares and Defines the DefaultBiome lookup table
@@ -183,13 +184,15 @@ public enum DefaultBiome
             lookupID[biome.Id] = biome;
         }
     }
+    */
 
     /**
      * Returns a DefaultBiome object with the given biome ID
-     * 
+     *
      * @param id the ID of the DeafultBiome that is to be returned
      * @return A DefaultBiome with the given ID
      */
+    /*
     public static DefaultBiome getBiome(int id)
     {
         if (id < lookupID.length)
@@ -200,26 +203,27 @@ public enum DefaultBiome
             return null;
         }
     }
+    */
 
     public BiomeLoadInstruction getLoadInstructions(MojangSettings mojangSettings, int maxWorldHeight)
     {
         try
         {
             StandardBiomeTemplate template = (StandardBiomeTemplate) defaultSettingsClass.getConstructors()[0].newInstance(mojangSettings, maxWorldHeight);
-            return new BiomeLoadInstruction(Name, Id, template);
+            return new BiomeLoadInstruction(Name, template);
         } catch (Exception e)
         {
             OTG.log(LogMarker.FATAL, "Failed to create default biome");
             OTG.printStackTrace(LogMarker.FATAL, e);
 
             // Use the standard settings for custom biomes
-            return new BiomeLoadInstruction(Name, Id, new StandardBiomeTemplate(maxWorldHeight));
+            return new BiomeLoadInstruction(Name, new StandardBiomeTemplate(maxWorldHeight));
         }
     }
 
     /**
      * Returns true or false depending on if this DefaultBiome has the given name
-     * 
+     *
      * @param name The string to test this.Name against
      * @return Boolean whether or not this DefaultBiome has the given name
      */
@@ -234,7 +238,7 @@ public enum DefaultBiome
         }
         return false;
     }
-    
+
     /**
      * Returns the biome id depending on if this DefaultBiome has the
      * given name
@@ -243,6 +247,7 @@ public enum DefaultBiome
      * <p/>
      * @return int the Id of the biome with String name
      */
+    /*
     public static Integer getId(String name)
     {
         for (DefaultBiome biome : DefaultBiome.values())
@@ -254,5 +259,5 @@ public enum DefaultBiome
         }
         return null;
     }
-    
+    */
 }

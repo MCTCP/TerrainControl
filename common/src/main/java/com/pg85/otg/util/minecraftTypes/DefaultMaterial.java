@@ -1,7 +1,7 @@
 package com.pg85.otg.util.minecraftTypes;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.util.LocalMaterialData;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -248,6 +248,8 @@ public enum DefaultMaterial
     GREEN_SHULKER_BOX(232),
     RED_SHULKER_BOX(233),
     BLACK_SHULKER_BOX(234),
+    CONCRETE(251),
+    CONCRETE_POWDER(252),
     STRUCTURE_BLOCK(255, false),
     UNKNOWN_BLOCK(254);
     /**

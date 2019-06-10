@@ -1,9 +1,9 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
-import com.pg85.otg.configuration.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.MaterialSet;
 
 import java.util.List;

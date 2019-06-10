@@ -6,9 +6,9 @@ import java.util.Random;
 
 import com.google.common.collect.Iterables;
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.configuration.BiomeConfig.RareBuildingType;
-import com.pg85.otg.configuration.ServerConfigProvider;
-import com.pg85.otg.forge.ForgeBiome;
+import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
+import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.entity.monster.EntityWitch;
@@ -42,7 +42,7 @@ public class OTGRareBuildingGen extends OTGMapGenStructure
     {
         this.biomeList = new ArrayList<Biome>();
 
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

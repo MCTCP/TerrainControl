@@ -14,46 +14,46 @@ import net.minecraft.world.gen.ChunkProviderServer;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 
 public class Pregenerator
 {
-	ForgeWorld world;
+	private ForgeWorld world;
 
-	boolean processing = false;
+	private boolean processing = false;
 
-	ChunkCoordinate preGeneratorCenterPoint;
+	private ChunkCoordinate preGeneratorCenterPoint;
 
-    int currentX;
-    int currentZ;
+	private int currentX;
+    private int currentZ;
 
-    long startTime = System.currentTimeMillis();
+    private long startTime = System.currentTimeMillis();
 
-	int pregenerationRadius;
+    private int pregenerationRadius;
 
-	int cycle = 0;
+	private int cycle = 0;
 
-	int left = 0;
-	int right = 0;
-	int top = 0;
-	int bottom = 0;
+	private int left = 0;
+	private int right = 0;
+	private int top = 0;
+	private int bottom = 0;
 
-	int iLeft = Integer.MIN_VALUE;
-	int iRight = Integer.MIN_VALUE;
-	int iTop = Integer.MIN_VALUE;
-	int iBottom = Integer.MIN_VALUE;
+	private int iLeft = Integer.MIN_VALUE;
+	private int iRight = Integer.MIN_VALUE;
+	private int iTop = Integer.MIN_VALUE;
+	private int iBottom = Integer.MIN_VALUE;
 
-	int spawned = 1;
-	double total;
+	private int spawned = 1;
+	private double total;
 
-	int spawnedThisTick = 0;
+	private int spawnedThisTick = 0;
 
-	boolean pregeneratorIsRunning;
+	private boolean pregeneratorIsRunning;
 
-	int maxSpawnPerTick;
+	private int maxSpawnPerTick;
 
 	// In-game UI
 	public String pregenerationWorld = "";
@@ -62,12 +62,18 @@ public class Pregenerator
 	public String progressScreenElapsedTime = "";
 	public String progressScreenEstimatedTime = "";
 	public int progressScreenWorldSizeInBlocks;
+	public long progressScreenServerUsedMbs = 0;
+	public long progressScreenServerTotalMbs = 0;
 
 	public Pregenerator(LocalWorld world)
 	{
 		this.world = (ForgeWorld)world;
 
-		LoadPregeneratorData();
+		// Don't load pregenerator data on MP client
+		if(this.world.world != null)
+		{
+			LoadPregeneratorData();
+		}
 
 		maxSpawnPerTick = OTG.getPluginConfig().PregeneratorMaxChunksPerTick;
     	pregenerationWorld = world.getConfigs().getWorldConfig().getName();
@@ -76,6 +82,15 @@ public class Pregenerator
 	public int getPregenerationRadius()
 	{
 		return pregenerationRadius;
+	}
+	
+	/**
+	 * Only used when settings pregenerator status for MP clients (that don't actually get run)
+	 * @return
+	 */
+	public void SetPregeneratorIsRunning(boolean pregeneratorIsRunning)
+	{		
+		this.pregeneratorIsRunning = pregeneratorIsRunning;
 	}
 
 	/**
@@ -93,9 +108,10 @@ public class Pregenerator
 		} else {
 			pregenerationRadius = cycle;
 		}
+		// World can be null when creating new worlds on MP client
 		if(world != null)
 		{
-			this.SavePregeneratorData();
+			this.SavePregeneratorData(true);
 		}
 
     	total = (pregenerationRadius * 2 + 1) * (pregenerationRadius * 2 + 1);
@@ -142,14 +158,25 @@ public class Pregenerator
 			Pregenerate();
 
 			processing = false;
-		}
+		}		
 	}
 
-	void Pregenerate()
+	private void Pregenerate()
 	{
     	// Check if there are chunks that need to be pre-generated
         if(spawned < total && pregenerationRadius > 0)
         {
+    		ChunkProviderServer chunkProvider = (ChunkProviderServer) world.getWorld().getChunkProvider();
+    		if(chunkProvider == null)
+    		{
+    			// When loading/unloading/reloading dimensions 
+    			// the chunkprovider can be null, this will correct
+    			// itself automatically when worlds are properly loaded
+    			// unloaded(?)
+    			pregeneratorIsRunning = false;
+    			return;
+    		}
+        	
     		pregeneratorIsRunning = true;
 
 	        currentX = -pregenerationRadius;
@@ -337,12 +364,12 @@ public class Pregenerator
     			iTop = Integer.MIN_VALUE;
 			}
 
-			SavePregeneratorData();
+			SavePregeneratorData(false);
         }
         pregeneratorIsRunning = false;
 	}
 
-	void Pause()
+	private void Pause()
 	{
 		if(spawned == total) // Done spawning
 		{
@@ -352,7 +379,7 @@ public class Pregenerator
 			iRight = Integer.MIN_VALUE;
 			iTop = Integer.MIN_VALUE;
 
-			SavePregeneratorData();
+			SavePregeneratorData(false);
 		} else {
 			// Pre-generation cycle cannot be completed.
 			// Save progress so we can continue and retry on the next server tick.
@@ -361,12 +388,12 @@ public class Pregenerator
 		}
 	}
 
-	void PreGenerateChunk(int currentX, int currentZ)
+	private void PreGenerateChunk(int currentX, int currentZ)
 	{
 		UpdateProgressMessage(true);
 
 		ChunkProviderServer chunkProvider = (ChunkProviderServer) world.getWorld().getChunkProvider();
-
+		
         if (
         	!(
 	    		(
@@ -385,8 +412,8 @@ public class Pregenerator
 		}
 	}
 
-	long lastMessage = System.currentTimeMillis();
-	void UpdateProgressMessage (boolean loggingCanBeIgnored)
+	private long lastMessage = System.currentTimeMillis();
+	private void UpdateProgressMessage (boolean loggingCanBeIgnored)
 	{
 		if(spawned < total)
 		{
@@ -454,7 +481,11 @@ public class Pregenerator
     {
     	if(pregeneratorIsRunning)
     	{
-	    	SavePregeneratorData();
+    		// Don't save pregenerator data on MP client
+    		if(this.world.world != null)
+    		{
+    			SavePregeneratorData(false);
+    		}	    	
 	    	pregeneratorIsRunning = false;
     	}
     }
@@ -462,9 +493,18 @@ public class Pregenerator
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
 
-	public void SavePregeneratorData()
+    public void SavePregeneratorData()
+    {
+    	// Don't save pregenerator data on MP client
+    	if(this.world.world != null)
+    	{
+    		SavePregeneratorData(false);
+    	}
+    }
+    
+	private void SavePregeneratorData(boolean forceSave)
 	{
-		if(pregeneratorIsRunning)
+		if(pregeneratorIsRunning || forceSave)
 		{
 			int dimensionId = world.getDimensionId();
 			File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "PregeneratedChunks.txt");
@@ -500,7 +540,7 @@ public class Pregenerator
 		}
 	}
 
-	void LoadPregeneratorData()
+	private void LoadPregeneratorData()
 	{
 		int dimensionId = world.getDimensionId();
 		File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "PregeneratedChunks.txt");
@@ -581,10 +621,10 @@ public class Pregenerator
 
 			preGeneratorCenterPoint = world.getSpawnChunk();
 
-			WorldConfig worldConfig = world.getConfigs().getWorldConfig();
-			this.setPregenerationRadius(worldConfig.PreGenerationRadius);
+			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(world.getName());
+			this.setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
 
-			SavePregeneratorData();
+			SavePregeneratorData(false);
 		}
 	}
 }

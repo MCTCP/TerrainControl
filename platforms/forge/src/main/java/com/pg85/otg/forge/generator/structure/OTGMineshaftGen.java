@@ -3,8 +3,8 @@ package com.pg85.otg.forge.generator.structure;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.BiomeConfig.MineshaftType;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
@@ -12,7 +12,6 @@ import com.pg85.otg.util.minecraftTypes.StructureNames;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.structure.MapGenMineshaft;
-import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
 

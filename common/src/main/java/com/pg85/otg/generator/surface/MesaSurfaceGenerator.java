@@ -1,13 +1,13 @@
 package com.pg85.otg.generator.surface;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
-import com.pg85.otg.generator.noise.NoiseGeneratorNewOctaves;
+import com.pg85.otg.generator.noise.NoiseGeneratorBiomeBlocksOctaves;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
@@ -49,9 +49,9 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private LocalMaterialData[] blockDataValuesArray;
     private boolean isForestMesa;
     private boolean isBryceMesa;
-    private NoiseGeneratorNewOctaves noiseGenBryce1;
-    private NoiseGeneratorNewOctaves noiseGenBryce2;
-    private NoiseGeneratorNewOctaves noiseGenBlockData;
+    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce1;
+    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce2;
+    private NoiseGeneratorBiomeBlocksOctaves noiseGenBlockData;
 
     private final LocalMaterialData hardenedClay;
     private final LocalMaterialData redSand;
@@ -91,7 +91,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         this.blockDataValuesArray = new LocalMaterialData[64];
         Arrays.fill(this.blockDataValuesArray, this.hardenedClay);
 
-        this.noiseGenBlockData = new NoiseGeneratorNewOctaves(random, 1);
+        this.noiseGenBlockData = new NoiseGeneratorBiomeBlocksOctaves(random, 1);
 
         int j;
 
@@ -382,8 +382,8 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 	            {
 	                Random newRandom = new Random(generatingChunk.getSeed());
 
-	                this.noiseGenBryce1 = new NoiseGeneratorNewOctaves(newRandom, 4);
-	                this.noiseGenBryce2 = new NoiseGeneratorNewOctaves(newRandom, 1);
+	                this.noiseGenBryce1 = new NoiseGeneratorBiomeBlocksOctaves(newRandom, 4);
+	                this.noiseGenBryce2 = new NoiseGeneratorBiomeBlocksOctaves(newRandom, 1);
 	            }
 
 	            int k = (xInWorld & -16) + (zInWorld & 15);

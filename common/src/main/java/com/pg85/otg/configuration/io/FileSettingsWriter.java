@@ -1,7 +1,7 @@
 package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.logging.LogMarker;
 
 import java.io.BufferedWriter;

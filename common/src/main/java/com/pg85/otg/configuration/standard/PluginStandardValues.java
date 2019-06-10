@@ -14,10 +14,11 @@ public class PluginStandardValues extends Settings
     // Folders
     public static final String BiomeConfigDirectoryName = "GlobalBiomes";
     public static final String BO_DirectoryName = "GlobalObjects";
+    public static final String PresetsDirectoryName = "worlds";
     
     // Network
     public static final String ChannelName = "OpenTerrainGenerator";
-    public static final int ProtocolVersion = 5;
+    public static final int ProtocolVersion = 6;
     
     // Plugin Defaults
     public static final Setting<LogLevels> LogLevel = enumSetting("LogLevel", LogLevels.Standard);
@@ -35,5 +36,7 @@ public class PluginStandardValues extends Settings
     
     public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
     
-    public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 1, 1, Integer.MAX_VALUE);   
+    public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 1, 1, Integer.MAX_VALUE);
+
+	public static final String MOD_ID = "openterraingenerator";   
 }

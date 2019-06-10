@@ -1,6 +1,6 @@
 package com.pg85.otg.configuration.io;
 
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.util.helpers.InheritanceHelper;
 

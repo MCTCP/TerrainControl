@@ -2,8 +2,8 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo2.BO2;
 import com.pg85.otg.customobjects.bo3.BO3;
@@ -25,8 +25,7 @@ public class TreeGen extends Resource
     	if(trees.size() == 0 && treeNames.size() > 0)
     	{
 	        for (int i = 0; i < treeNames.size(); i++)
-	        {	        	
-	        	//trees.add(OTG.getCustomObjectManager().getGlobalObjects().parseCustomObject(treeNames.get(i), worldName));
+	        {
 	        	trees.add(OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeNames.get(i), worldName));
 	        }
     	}

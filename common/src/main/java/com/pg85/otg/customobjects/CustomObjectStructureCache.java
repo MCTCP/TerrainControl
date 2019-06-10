@@ -3,8 +3,8 @@ package com.pg85.otg.customobjects;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.ModDataFunction;
 import com.pg85.otg.customobjects.bo3.ParticleFunction;
@@ -1408,8 +1408,6 @@ public class CustomObjectStructureCache
 		    HashSet<ModDataFunction> ModData = new HashSet<ModDataFunction>();
 		    HashSet<SpawnerFunction> SpawnerData = new HashSet<SpawnerFunction>();
 		    HashSet<ParticleFunction> ParticleData = new HashSet<ParticleFunction>();
-
-		    //boolean startChunkBlockChecksDone = false;
 
 		    String[] chunkCoordString = structureStringArray[0].split(",");
 		    int chunkX = Integer.parseInt(chunkCoordString[0]);

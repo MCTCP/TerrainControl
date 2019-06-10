@@ -1,8 +1,9 @@
 package com.pg85.otg;
 
 import com.pg85.otg.configuration.ConfigFunctionsManager;
-import com.pg85.otg.configuration.CustomObjectConfigFunctionsManager;
 import com.pg85.otg.configuration.PluginConfig;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.events.EventHandler;
@@ -12,6 +13,7 @@ import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.io.PrintWriter;
@@ -22,10 +24,24 @@ import java.util.List;
 import java.util.Random;
 
 public class OTG
-{
-	// TODO: This shouldn't be needed ideally
-	public static boolean isForge = false;
+{	
+	public static boolean isNewWorldBeingCreated = false;
+	
+	/**
+	 * A config for each dimension of the currently active world
+	 */
+    private static DimensionsConfig dimensionsConfig = null;
+    
+    public static DimensionsConfig GetDimensionsConfig()
+    {    	
+    	return dimensionsConfig;
+    }
 
+    public static void SetDimensionsConfig(DimensionsConfig dimensionsConfig)
+    {
+    	OTG.dimensionsConfig = dimensionsConfig;
+    }
+    
     /**
      * The engine that powers Open Terrain Generator.
      */
@@ -148,7 +164,7 @@ public class OTG
     	{
     		return material;
     	}
-    	else if(cachedMaterials.containsKey(material))
+    	else if(cachedMaterials.containsKey(name))
     	{
     		throw new InvalidConfigException("Cannot read block: " + name);
     	}
@@ -240,26 +256,26 @@ public class OTG
        return world.getSavedBiome(x, z).getName();
    }
 
-    public static LocalBiome getBiomeAllWorlds(int id)
-    {
-    	//OTG.log(LogMarker.INFO, "getBiomeAllWorlds id");
-
-        ArrayList<LocalWorld> worlds = getAllWorlds();
-        if(worlds != null)
-        {
-	        for(LocalWorld world : worlds)
-	        {
-	        	LocalBiome biome = world.getBiomeByIdOrNull(id);
-	        	if(biome != null)
-	        	{
-	        		return biome;
-	        	}
-	        }
-        }
-        return null;
-    }
-
-    public static LocalBiome getBiomeAllWorlds(String name)
+   	public static LocalBiome getBiomeByOTGId(int id)
+   	{
+	   //OTG.log(LogMarker.INFO, "getBiomeAllWorlds id");
+	
+	   ArrayList<LocalWorld> worlds = getAllWorlds();
+	   if(worlds != null)
+	   {
+		   for(LocalWorld world : worlds)
+		   {
+			   LocalBiome biome = world.getBiomeByOTGIdOrNull(id);
+			   if(biome != null)
+			   {
+				   return biome;
+			   }
+		   }
+	   }
+	   return null;
+   	}
+   	
+    public static LocalBiome getBiome(String name, String worldName)
     {
     	//OTG.log(LogMarker.INFO, "getBiomeAllWorlds name");
 
@@ -268,10 +284,13 @@ public class OTG
         {
 	        for(LocalWorld world : worlds)
 	        {
-	        	LocalBiome biome = world.getBiomeByNameOrNull(name);
-	        	if(biome != null)
+	        	if(world.getName().toLowerCase().equals(worldName.toLowerCase()))
 	        	{
-	        		return biome;
+		        	LocalBiome biome = world.getBiomeByNameOrNull(name);
+		        	if(biome != null)
+		        	{
+		        		return biome;
+		        	}
 	        	}
 	        }
         }
@@ -442,6 +461,203 @@ public class OTG
         engine = null;
     }
 
+    public static String getRegistryNameForDefaultBiome(String biomeName)
+    {
+    	String registryName = null;
+		switch(biomeName)
+		{
+			// TODO: Always keep this biome list up to date
+			// TODO: Put everything that needs to be updated per MC version in one place?
+			case "Beach":
+				registryName = "minecraft:beaches";
+			break;
+			case "Birch Forest Hills M":
+				registryName = "minecraft:mutated_birch_forest_hills";
+			break;
+			case "Birch Forest Hills":
+				registryName = "minecraft:birch_forest_hills";
+			break;
+			case "Birch Forest M":
+				registryName = "minecraft:mutated_birch_forest";
+			break;
+			case "Birch Forest":
+				registryName = "minecraft:birch_forest";
+			break;
+			case "Cold Beach":
+				registryName = "minecraft:cold_beach";
+			break;
+			case "Cold Taiga Hills":
+				registryName = "minecraft:taiga_cold_hills";
+			break;
+			case "Cold Taiga M":
+				registryName = "minecraft:mutated_taiga_cold";
+			break;
+			case "Cold Taiga":
+				registryName = "minecraft:taiga_cold";
+			break;
+			case "Deep Ocean":
+				registryName = "minecraft:deep_ocean";
+			break;
+			case "Desert M":
+				registryName = "minecraft:mutated_desert";
+			break;
+			case "Desert":
+				registryName = "minecraft:desert";
+			break;
+			case "DesertHills":
+				registryName = "minecraft:desert_hills";
+			break;
+			case "Extreme Hills Edge":
+				registryName = "minecraft:smaller_extreme_hills";
+			break;
+			case "Extreme Hills M":
+				registryName = "minecraft:mutated_extreme_hills";
+			break;
+			case "Extreme Hills":
+				registryName = "minecraft:extreme_hills";
+			break;
+			case "Extreme Hills+ M":
+				registryName = "minecraft:mutated_extreme_hills_with_trees";
+			break;
+			case "Extreme Hills+":
+				registryName = "minecraft:extreme_hills_with_trees";
+			break;
+			case "Flower Forest":
+				registryName = "minecraft:mutated_forest";
+			break;
+			case "Forest":
+				registryName = "minecraft:forest";
+			break;
+			case "ForestHills":
+				registryName = "minecraft:forest_hills";
+			break;
+			case "FrozenOcean":
+				registryName = "minecraft:frozen_ocean";
+			break;
+			case "FrozenRiver":
+				registryName = "minecraft:frozen_river";
+			break;
+			case "Hell":
+				registryName = "minecraft:hell";
+			break;
+			case "Ice Mountains":
+				registryName = "minecraft:ice_mountains";
+			break;
+			case "Ice Plains Spikes":
+				registryName = "minecraft:mutated_ice_flats";
+			break;
+			case "Ice Plains":
+				registryName = "minecraft:ice_flats";
+			break;
+			case "Jungle M":
+				registryName = "minecraft:mutated_jungle";
+			break;
+			case "Jungle":
+				registryName = "minecraft:jungle";
+			break;
+			case "JungleEdge M":
+				registryName = "minecraft:mutated_jungle_edge";
+			break;
+			case "JungleEdge":
+				registryName = "minecraft:jungle_edge";
+			break;
+			case "JungleHills":
+				registryName = "minecraft:jungle_hills";
+			break;
+			case "Mega Spruce Taiga Hills":
+				registryName = "minecraft:mutated_redwood_taiga_hills";
+			break;
+			case "Mega Spruce Taiga":
+				registryName = "minecraft:mutated_redwood_taiga";
+			break;
+			case "Mega Taiga Hills":
+				registryName = "minecraft:redwood_taiga_hills";
+			break;
+			case "Mega Taiga":
+				registryName = "minecraft:redwood_taiga";
+			break;
+			case "Mesa (Bryce)":
+				registryName = "minecraft:mutated_mesa";
+			break;
+			case "Mesa Plateau F M":
+				registryName = "minecraft:mutated_mesa_rock";
+			break;
+			case "Mesa Plateau F":
+				registryName = "minecraft:mesa_rock";
+			break;
+			case "Mesa Plateau M":
+				registryName = "minecraft:mutated_mesa_clear_rock";
+			break;
+			case "Mesa Plateau":
+				registryName = "minecraft:mesa_clear_rock";
+			break;
+			case "Mesa":
+				registryName = "minecraft:mesa";
+			break;
+			case "MushroomIsland":
+				registryName = "minecraft:mushroom_island";
+			break;
+			case "MushroomIslandShore":
+				registryName = "minecraft:mushroom_island_shore";
+			break;
+			case "Ocean":
+				registryName = "minecraft:ocean";
+			break;
+			case "Plains":
+				registryName = "minecraft:plains";
+			break;
+			case "River":
+				registryName = "minecraft:river";
+			break;
+			case "Roofed Forest M":
+				registryName = "minecraft:mutated_roofed_forest";
+			break;
+			case "Roofed Forest":
+				registryName = "minecraft:roofed_forest";
+			break;
+			case "Savanna M":
+				registryName = "minecraft:mutated_savanna";
+			break;
+			case "Savanna Plateau M":
+				registryName = "minecraft:mutated_savanna_rock";
+			break;
+			case "Savanna Plateau":
+				registryName = "minecraft:savanna_rock";
+			break;
+			case "Savanna":
+				registryName = "minecraft:savanna";
+			break;
+			case "Sky":
+				registryName = "minecraft:sky";
+			break;
+			case "Stone Beach":
+				registryName = "minecraft:stone_beach";
+			break;
+			case "Sunflower Plains":
+				registryName = "minecraft:mutated_plains";
+			break;
+			case "Swampland M":
+				registryName = "minecraft:mutated_swampland";
+			break;
+			case "Swampland":
+				registryName = "minecraft:swampland";
+			break;
+			case "Taiga M":
+				registryName = "minecraft:mutated_taiga";
+			break;
+			case "Taiga":
+				registryName = "minecraft:taiga";
+			break;
+			case "TaigaHills":
+				registryName = "minecraft:taiga_hills";
+			break;
+			case "The Void":
+				registryName = "minecraft:void";
+			break;
+		}
+		return registryName;
+    }
+    
     private OTG()
     {
         // Forbidden to instantiate.

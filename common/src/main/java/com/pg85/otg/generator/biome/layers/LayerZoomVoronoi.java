@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.biome.layers;
 
 
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerZoomVoronoi extends Layer
@@ -13,7 +14,7 @@ public class LayerZoomVoronoi extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
         x -= 2;
         z -= 2;
@@ -23,7 +24,7 @@ public class LayerZoomVoronoi extends Layer
         int m = z >> i;
         int n = (xSize >> i) + 3;
         int i1 = (zSize >> i) + 3;
-        int[] childInts = this.child.getInts(cache, k, m, n, i1);
+        int[] childInts = this.child.getInts(world, cache, k, m, n, i1);
 
         int i2 = n << i;
         int i3 = i1 << i;

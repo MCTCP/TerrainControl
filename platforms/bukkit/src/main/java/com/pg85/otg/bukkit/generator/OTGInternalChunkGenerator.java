@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import com.pg85.otg.bukkit.BukkitWorld;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;

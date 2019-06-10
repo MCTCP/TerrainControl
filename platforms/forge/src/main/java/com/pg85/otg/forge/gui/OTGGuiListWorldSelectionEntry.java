@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.imageio.ImageIO;
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiCreateWorld;
+import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.gui.GuiScreenWorking;
 import net.minecraft.client.gui.GuiWorldEdit;
 import net.minecraft.client.gui.GuiYesNo;
@@ -41,6 +43,14 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.dimensions.DimensionData;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import net.minecraft.client.gui.GuiListExtended;;
 
 @SideOnly(Side.CLIENT)
@@ -72,7 +82,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         this.worldSelScreen = listWorldSelIn.getGuiWorldSelection();
         this.worldSummary = worldSummaryIn;
         this.client = Minecraft.getMinecraft();
-        this.iconLocation = new ResourceLocation("worlds/" + worldSummaryIn.getFileName() + "/icon");
+        this.iconLocation = new ResourceLocation(PluginStandardValues.PresetsDirectoryName + "/" + worldSummaryIn.getFileName() + "/icon");
         this.iconFile = saveFormat.getFile(worldSummaryIn.getFileName(), "icon.png");
 
         if (!this.iconFile.isFile())
@@ -85,8 +95,12 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
-        String s = this.worldSummary.getDisplayName();
-        String s1 = this.worldSummary.getFileName() + " (" + DATE_FORMAT.format(new Date(this.worldSummary.getLastTimePlayed())) + ")";
+    	// Check if an OTG dim is present
+    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(Minecraft.getMinecraft().mcDataDir + "/saves/" + this.getSelectedWorldName()));    	
+    	boolean bFound = dimensionDatas != null && dimensionDatas.size() > 0;
+
+        String s = (bFound ? TextFormatting.GOLD + "OTG " + TextFormatting.RESET : "") + this.worldSummary.getDisplayName();
+        String s1 = this.worldSummary.getFileName() + " (" + DATE_FORMAT.format(new Date(this.worldSummary.getLastTimePlayed())) + ")";       
         String s2 = "";
 
         if (StringUtils.isEmpty(s))
@@ -113,7 +127,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
             }
 
             String s3 = this.worldSummary.getVersionName();
-
+            
             if (this.worldSummary.markVersionInList())
             {
                 if (this.worldSummary.askToOpenWorld())
@@ -205,6 +219,48 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
     public void joinWorld()
     {
+    	// For MP the server sends the presets
+		// If world is null then we're not ingame
+    	if(this.client.world == null || Minecraft.getMinecraft().isSingleplayer())
+    	{
+    		ForgeEngine.loadPresets(); // Load all WorldConfigs for the ingame UI
+    	}
+    	
+        DimensionsConfig dimsConfig = DimensionsConfig.LoadFromFile(new File(Minecraft.getMinecraft().mcDataDir + "/saves/" + this.getSelectedWorldName()));
+        if(dimsConfig != null)
+        {
+        	ArrayList<String> missingPresets = new ArrayList<String>();
+        	if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
+        	{
+        		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
+        		if(worldConfig == null)
+        		{
+        			missingPresets.add(dimsConfig.Overworld.PresetName);
+        		}
+        	}
+        	if(dimsConfig.Dimensions != null && dimsConfig.Dimensions.size() > 0)
+        	{
+        		for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+        		{
+            		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+            		if(worldConfig == null)
+            		{
+            			missingPresets.add(dimConfig.PresetName);
+            		}
+        		}
+        	}
+        	if(missingPresets.size() > 0)        		
+        	{
+        		String sMissingPresets = "";
+        		for(int i = 0; i < missingPresets.size(); i++)
+        		{
+        			sMissingPresets += missingPresets.get(i) + (i < missingPresets.size() - 1 ? ", " : "");
+        		}
+        		this.client.displayGuiScreen(new GuiErrorScreen("Cannot load world. The following OTG presets are not installed:", sMissingPresets));
+        		return;
+        	}
+        }        
+        
         if (this.worldSummary.askToOpenWorld())
         {
             this.client.displayGuiScreen(new GuiYesNo(new GuiYesNoCallback()
@@ -269,7 +325,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     }
 
     private void loadWorld()
-    {
+    {        
         this.client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 
         if (this.client.getSaveLoader().canLoadWorld(this.worldSummary.getFileName()))
@@ -280,6 +336,41 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
     public void tryLoadExistingWorld(FMLClientHandler clientHandler, OTGGuiWorldSelection selectWorldGUI, WorldSummary comparator)
     {
+    	// If this world has OTG overworld/dimensions then check if it has a DimensionsConfig
+    	// If this is a legacy world then we'll need to create a new one.
+    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + "/" + this.worldSummary.getFileName()));
+    	DimensionsConfig dimensionsConfig = DimensionsConfig.LoadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+    	if(dimensionsConfig == null && dimensionDatas.size() > 0)
+    	{
+    		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+    		for(DimensionData dimensionData : dimensionDatas)
+    		{
+    			if(dimensionData.dimensionId == 0)
+    			{
+    				// If this is a legacy overworld then the world name must be the same as the preset name
+    				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), comparator.getFileName());
+    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(worldConfigLocation);
+    				DimensionConfig overWorld = new DimensionConfig(comparator.getFileName(), worldConfig);
+    				dimensionsConfig.Overworld = overWorld;
+    			} else {
+    				// If this is a legacy dim then the dim name must be the same as the preset name
+    				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), dimensionData.dimensionName);
+    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(worldConfigLocation);
+    				DimensionConfig dimension = new DimensionConfig(dimensionData.dimensionName, worldConfig);
+    				dimensionsConfig.Dimensions.add(dimension);
+    			}
+    		}
+    		dimensionsConfig.Save();
+    	}
+    	else if(dimensionsConfig == null && dimensionDatas.size() == 0)
+    	{
+    		// This is a vanilla world without dims, save a config without overworld / dims
+    		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+    		dimensionsConfig.Save();
+    	}
+
+		OTG.SetDimensionsConfig(dimensionsConfig);		 	
+    	
         File dir = new File(clientHandler.getSavesDir(), comparator.getFileName());
         NBTTagCompound leveldat;
         try

@@ -1,8 +1,8 @@
 package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
-import com.pg85.otg.configuration.CustomObjectConfigFunctionsManager;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
@@ -256,22 +256,11 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
                     this.settingsCache.put(splitSettings[0].trim().toLowerCase(), new StringOnLine(splitSettings[1].trim(), lineNumber));
                 }
             }
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             OTG.printStackTrace(LogMarker.FATAL, e);
-
-            if (settingsReader != null)
-            {
-                try
-                {
-                    settingsReader.close();
-                } catch (IOException localIOException1)
-                {
-                    OTG.printStackTrace(LogMarker.FATAL, localIOException1);
-                }
-            }
-        } finally
-        {
+        } finally {
             if (settingsReader != null)
             {
                 try

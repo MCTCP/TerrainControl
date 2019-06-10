@@ -1,9 +1,10 @@
 package com.pg85.otg.bukkit.generator;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.bukkit.BukkitMaterialData;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
+
 import org.bukkit.generator.ChunkGenerator.ChunkData;
 
 final class BukkitChunkBuffer implements ChunkBuffer

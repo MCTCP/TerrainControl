@@ -1,9 +1,9 @@
 package com.pg85.otg.bukkit;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
-import com.pg85.otg.configuration.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.MojangSettings;
+import com.pg85.otg.util.LocalMaterialData;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
 

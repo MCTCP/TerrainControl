@@ -1,14 +1,13 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.customobjects.*;
 import com.pg85.otg.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
@@ -17,6 +16,7 @@ import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;

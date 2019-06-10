@@ -1,5 +1,8 @@
 package com.pg85.otg.forge.events;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
@@ -7,21 +10,106 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.OTGWorldType;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.dimensions.OTGWorldProvider;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldProvider;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper.UnableToFindFieldException;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldListener
 {
+    @SubscribeEvent(priority = EventPriority.HIGH)
+	public void onWorldLoad(WorldEvent.Load event)
+	{
+        World world = event.getWorld();
+        int dimension = world.provider.getDimension();
+
+        //OTG.log(LogMarker.INFO, "WorldEvent.Load - DIM: {}", dimension);
+
+        if (dimension == 0)
+        {
+        	ForgeWorld overworld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
+        	if(overworld != null)
+        	{
+        		overrideWorldProvider(world);	
+        	}
+        }
+	}
+	
+    public static void overrideWorldProvider(World world)
+    {
+        String newClassName = OTGWorldProvider.class.getName();
+        Class<? extends WorldProvider> newProviderClass = OTGWorldProvider.class;
+
+        if (newProviderClass != null && newProviderClass != world.provider.getClass())
+        {
+            final int dim = world.provider.getDimension();
+            //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Trying to override the WorldProvider of type '{}' in dimension {} with '{}'", oldName, dim, newClassName);
+
+            try
+            {
+                Constructor <? extends WorldProvider> constructor = newProviderClass.getConstructor();
+                WorldProvider newProvider = constructor.newInstance();               
+
+                try
+                {                	
+                    WorldProvider oldProvider = world.provider;
+                    world.provider = newProvider;
+                    ((OTGWorldProvider)world.provider).isSPServerOverworld = !world.isRemote;
+                   	world.provider.setWorld(world);
+                    world.provider.setDimension(dim);
+                 
+                    if(!world.isRemote)
+                    {
+                    	// TODO: Bit of a hack, need to override the worldprovider for SP server or gravity won't work properly ><.
+                    	// Creating a new biomeprovider causes problems, re-using the existing one seems to work though,
+                    	((OTGWorldProvider)world.provider).init(oldProvider.getBiomeProvider());
+                    }
+                    
+                    //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Overrode the WorldProvider in dimension {} with '{}'", dim, newClassName);
+                }
+                catch (Exception e)
+                {
+                    OTG.log(LogMarker.ERROR, "WorldUtils.overrideWorldProvider: Failed to override the WorldProvider of dimension {}", dim);
+                }
+
+                return;
+            }
+            catch (Exception e)
+            {
+            	
+            }
+        }
+
+        OTG.log(LogMarker.WARN, "WorldUtils.overrideWorldProvider: Failed to create a WorldProvider from name '{}', or it was already that type", newClassName);
+    }
+    
+	@SubscribeEvent
+	@SideOnly(Side.SERVER)
+	public void onWorldLoadServer(WorldEvent.Load event)
+	{
+    	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());
+    	if(forgeWorld != null)
+    	{
+    		ServerPacketManager.SendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
+    	}
+	}
+	
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
-	public void onWorldLoad(WorldEvent.Load event)
+	public void onWorldLoadClient(WorldEvent.Load event)
 	{		
-		// For single player only one world is loaded on the client.		
+		// For single player only one world is loaded on the client, but forgeworlds exist for all dims		
 		for(LocalWorld localWorld : ((ForgeEngine)OTG.getEngine()).getAllWorlds())
 		{
 			ForgeWorld forgeWorld = (ForgeWorld)localWorld;
@@ -56,7 +144,7 @@ public class WorldListener
 		        ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
 		        if(forgeWorld == null)
 		        {
-		        	// Can happen if this is dim -1 or 1 (or some other mod's dim??)
+		        	// Can happen if this is dim -1 or 1 (or some other mod's dim?)
 		        	return;
 		        }		        
 		        
@@ -68,7 +156,6 @@ public class WorldListener
 		     
 		        boolean serverStopping = !mcServer.isServerRunning();
 		        
-				// TODO: TC should only unload the world and dimension when the server is closed or a dimension is deleted. 
 				int dimId = event.getWorld().provider.getDimension();
 		        		        
 				if(dimId != -1 && dimId != 1)
@@ -86,20 +173,18 @@ public class WorldListener
 		        		OTGDimensionManager.UnloadCustomDimensionData(mcWorld.provider.getDimension());
 		        		forgeWorld.unRegisterBiomes();
 		        		
-		        		if(mcWorld.provider.getDimension() == 0)
-		        		{
-		        			((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator().shutDown();
-		        			
-		        			// Unregister any currently unloaded custom dimensions	        			
-		        			for(ForgeWorld unloadedWorld : ((ForgeEngine)OTG.getEngine()).getUnloadedWorlds())
-		        			{
-		        				if(unloadedWorld.getWorld() != mcWorld)
-		        				{
-			    	        		OTGDimensionManager.UnloadCustomDimensionData(unloadedWorld.getWorld().provider.getDimension());
-			        				unloadedWorld.unRegisterBiomes();
-		        				}
-		        			}
-		        		}		        	
+        				((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator().shutDown();
+	        			
+	        			// Unregister any currently unloaded custom dimensions
+        				// Doesn't matter that this might happen multiple times on server shutdown
+	        			for(ForgeWorld unloadedWorld : ((ForgeEngine)OTG.getEngine()).getUnloadedWorlds())
+	        			{
+	        				if(unloadedWorld.getWorld() != mcWorld)
+	        				{
+		    	        		OTGDimensionManager.UnloadCustomDimensionData(unloadedWorld.getWorld().provider.getDimension());
+		        				unloadedWorld.unRegisterBiomes();
+	        				}
+	        			}
 		        	}
 		    	}
 	        }

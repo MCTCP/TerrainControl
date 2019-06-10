@@ -1,6 +1,6 @@
 package com.pg85.otg.customobjects.bo3;
 
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 
 /**
  * Represents a BO3 function - a ConfigFunction with a BO3 as holder. It can be

@@ -1,13 +1,13 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
 import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.generator.noise.NoiseGeneratorOldOctaves;
+import com.pg85.otg.generator.noise.NoiseGeneratorSurfacePatchOctaves;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.MaterialSet;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public class SurfacePatchGen extends Resource
     /**
      * To get nice patches, we need our own noise generator here
      */
-    private final NoiseGeneratorOldOctaves noiseGen;
+    private final NoiseGeneratorSurfacePatchOctaves noiseGen;
     private final Random random;
     private final MaterialSet sourceBlocks;
 
@@ -36,7 +36,7 @@ public class SurfacePatchGen extends Resource
         maxAltitude = readInt(args.get(3), minAltitude, OTG.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 4);
         random = new Random(2345L);
-        noiseGen = new NoiseGeneratorOldOctaves(random, 1);
+        noiseGen = new NoiseGeneratorSurfacePatchOctaves(random, 1);
     }
 
     @Override

@@ -3,10 +3,13 @@ package com.pg85.otg.generator.biome.layers;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.*;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeGroup;
+import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-
+import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ConfigProvider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -100,7 +103,7 @@ public final class LayerFactory
         {
             List<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
             List<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
-            for (LocalBiome biome : configs.getBiomeArray())
+            for (LocalBiome biome : configs.getBiomeArrayByOTGId())
             {
                 if (biome == null)
                     continue;
@@ -185,7 +188,7 @@ public final class LayerFactory
             LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed());
             boolean haveBorder = false;
             boolean haveIsle = false;
-            for (LocalBiome biome : configs.getBiomeArray())
+            for (LocalBiome biome : configs.getBiomeArrayByOTGId())
             {
                 if (biome == null)
                     continue;
@@ -201,19 +204,13 @@ public final class LayerFactory
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	int islandIn = 0;                   	
-                    	
-                    	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome islandInBiome = OTG.isForge ? OTG.getBiomeAllWorlds(islandInName) : world.getBiomeByNameOrNull(islandInName);
-            			islandIn = islandInBiome.getIds().getGenerationId();
-                    	
-                        //int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn == DefaultBiome.OCEAN.Id)
+                    	LocalBiome islandInBiome = world.getBiomeByNameOrNull(islandInName);
+
+                        if (islandInBiome.getName().equals(worldConfig.defaultOceanBiome))
                         {
                         	inOcean = true;
                         } else {
-                        	biomeCanSpawnIn[islandIn] = true;
+                        	biomeCanSpawnIn[islandInBiome.getIds().getOTGBiomeId()] = true;
                         }
                     }
                     int chance = (worldConfig.BiomeRarityScale + 1) - biomeConfig.biomeRarity;
@@ -227,16 +224,14 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	int replaceFrom = 0;                   	
-                    	
+                    	int replaceFrom = 0;
+
                     	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome replaceFromBiome = OTG.isForge ? OTG.getBiomeAllWorlds(replaceFromName) : world.getBiomeByNameOrNull(replaceFromName);                  	
-            			replaceFrom = replaceFromBiome.getIds().getGenerationId();
-                    	
+                    	LocalBiome replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+            			replaceFrom = replaceFromBiome.getIds().getOTGBiomeId();
+
                         //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
-
                     }
                 }
             }
@@ -289,11 +284,12 @@ public final class LayerFactory
 
         for (int depth = 0; depth <= worldConfig.GenerationDepth; depth++)
         {
-
             mainLayer = new LayerZoom(2001 + depth, mainLayer);
 
             if (worldConfig.randomRivers && riversStarted)
+            {
                 RiverLayer = new LayerZoom(2001 + depth, RiverLayer);
+            }
 
             if (worldConfig.LandSize == depth)
             {
@@ -327,23 +323,26 @@ public final class LayerFactory
                 {
                     RiverLayer = new LayerRiverInit(155, RiverLayer);
                     riversStarted = true;
-                } else
+                } else {
                     mainLayer = new LayerRiverInit(155, mainLayer);
-            }
+                }
+        	}
 
             if ((worldConfig.GenerationDepth - worldConfig.riverSize) == depth)
             {
                 if (worldConfig.randomRivers)
+                {
                     RiverLayer = new LayerRiver(5 + depth, RiverLayer);
-                else
+                } else {
                     mainLayer = new LayerRiver(5 + depth, mainLayer);
+                }
             }
 
             LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world);
             LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed());
             boolean haveBorder = false;
             boolean haveIsle = false;
-            for (LocalBiome biome : configs.getBiomeArray())
+            for (LocalBiome biome : configs.getBiomeArrayByOTGId())
             {
                 if (biome == null)
                     continue;
@@ -358,21 +357,14 @@ public final class LayerFactory
                     boolean[] biomeCanSpawnIn = new boolean[1024];
                     boolean inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
-                    {            
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	                    
-                    	int islandIn = 0;
-                    	
-                    	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome islandInBiome = OTG.isForge ? OTG.getBiomeAllWorlds(islandInName) : world.getBiomeByNameOrNull(islandInName);
-            			islandIn = islandInBiome.getIds().getGenerationId();
-                    	
-                        //int islandIn = world.getBiomeByName(islandInName).getIds().getGenerationId();
-                        if (islandIn == DefaultBiome.OCEAN.Id)
+                    {
+                    	LocalBiome islandInBiome = world.getBiomeByNameOrNull(islandInName);
+
+                        if (islandInBiome.getName().equals(worldConfig.defaultOceanBiome))
                         {
                         	inOcean = true;
                         } else {
-                        	biomeCanSpawnIn[islandIn] = true;
+                        	biomeCanSpawnIn[islandInBiome.getIds().getOTGBiomeId()] = true;
                         }
                     }
 
@@ -387,14 +379,19 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                    	// For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-                    	int replaceFrom = 0;                   	
-                    	
-                    	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome replaceFromBiome = OTG.isForge ? OTG.getBiomeAllWorlds(replaceFromName) : world.getBiomeByNameOrNull(replaceFromName);
-            			replaceFrom = replaceFromBiome.getIds().getGenerationId();                    	
-                    	
-                        //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
+                    	int replaceFrom = 0;
+
+                    	LocalBiome replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+                    	if(replaceFromBiome == null)
+                    	{
+                    		replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+                    	}
+                    	if(replaceFromBiome == null)
+                    	{
+                    		OTG.log(LogMarker.TRACE, "Could not find BorderBiome \"" + replaceFromName + "\" for biome \"" + biomeConfig.getName() + "\", ignoring.");
+                    		continue;
+                    	}
+            			replaceFrom = replaceFromBiome.getIds().getOTGBiomeId();
                         layerBiomeBorder.addBiome(biome, replaceFrom, world);
                     }
                 }
@@ -409,14 +406,16 @@ public final class LayerFactory
             if (haveBorder)
             {
                 layerBiomeBorder.child = mainLayer;
-                mainLayer = layerBiomeBorder;
+                mainLayer = layerBiomeBorder; // TODO: LayerBiomeBorder doesn't take mainLayer as a parameter, so setting it as mainLayer here would lose everything we just did to mainlayer except borders?
             }
         }
 
         if (worldConfig.randomRivers)
+        {
             mainLayer = new LayerMixWithRiver(1L, mainLayer, RiverLayer, configs, world);
-        else
+        } else {
             mainLayer = new LayerMix(1L, mainLayer, configs, world);
+        }
 
         mainLayer = new LayerSmooth(400L, mainLayer);
 

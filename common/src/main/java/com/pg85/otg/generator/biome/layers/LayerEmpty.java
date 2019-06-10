@@ -1,5 +1,6 @@
 package com.pg85.otg.generator.biome.layers;
 
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerEmpty extends Layer
@@ -11,7 +12,7 @@ public class LayerEmpty extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
         int[] thisInts = cache.getArray(xSize * zSize);
         for (int i = 0; i < thisInts.length; i++)

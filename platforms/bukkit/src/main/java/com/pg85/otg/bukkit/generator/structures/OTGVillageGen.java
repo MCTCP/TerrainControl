@@ -10,9 +10,9 @@ import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.configuration.BiomeConfig.VillageType;
-import com.pg85.otg.configuration.ServerConfigProvider;
+import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
@@ -50,7 +50,7 @@ public class OTGVillageGen extends StructureGenerator
 
         // Add all village biomes to the list
         villageSpawnBiomes = new ArrayList<BiomeBase>();
-        for (LocalBiome biome : configs.getBiomeArray())
+        for (LocalBiome biome : configs.getBiomeArrayByOTGId())
         {
             if (biome == null)
                 continue;

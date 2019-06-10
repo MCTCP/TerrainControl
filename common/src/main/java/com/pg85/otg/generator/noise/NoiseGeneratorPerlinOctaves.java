@@ -60,8 +60,6 @@ public class NoiseGeneratorPerlinOctaves
 
     public double[] Noise2D(double[] doubleArray, int xOffset, int zOffset, int xSize, int zSize, double xScale, double zScale)
     {
-       // return this.Noise3D(doubleArray, xOffset, 10, zOffset, xSize, 1, zSize, xScale, 1.0D, zScale);
-
         if (doubleArray == null)
         {
             doubleArray = new double[xSize * zSize];

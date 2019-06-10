@@ -2,7 +2,7 @@ package com.pg85.otg.forge.generator.structure;
 
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.forge.ForgeEngine;
 
 import net.minecraft.world.World;

@@ -1,7 +1,7 @@
 package com.pg85.otg.util.helpers;
 
 import com.pg85.otg.LocalWorld;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.*;
 
 /**
@@ -38,9 +38,6 @@ public abstract class MetricsHelper
                 } else if (VanillaBiomeGenerator.class.isAssignableFrom(clazz))
                 {
                     vanillaMode++;
-                } else if (clazz.equals(OldBiomeGenerator.class))
-                {
-                    oldBiomeMode++;
                 } else if (clazz.equals(BeforeGroupsBiomeGenerator.class))
                 {
                     beforeGroupsBiomeMode++;

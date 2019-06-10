@@ -1,10 +1,10 @@
 package com.pg85.otg.generator.surface;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.LocalWorld;
-import com.pg85.otg.configuration.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
+import com.pg85.otg.util.LocalMaterialData;
 
 /**
  * Minecraft 1.7 added block data support to the initial terrain generation.

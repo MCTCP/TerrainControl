@@ -1,36 +1,22 @@
 package com.pg85.otg.forge.events;
 
-import java.io.DataOutput;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigToNetworkSender;
-import com.pg85.otg.configuration.WorldConfig;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.dimensions.DimensionData;
-import com.pg85.otg.forge.dimensions.OTGDimensionInfo;
-import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.dimensions.WorldProviderOTG;
-import com.pg85.otg.forge.network.DimensionSyncPacket;
-import com.pg85.otg.forge.network.PacketDispatcher;
-import com.pg85.otg.forge.network.ParticlesPacket;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.dimensions.OTGWorldProvider;
+import com.pg85.otg.forge.network.server.ServerPacketManager;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.buffer.Unpooled;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.NumberInvalidException;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.inventory.InventoryEnderChest;
@@ -42,132 +28,66 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 
 public class PlayerTracker
 {
     @SubscribeEvent
+    public void onClientDisconnect(FMLNetworkEvent.ClientDisconnectionFromServerEvent event)
+    {
+    	// Only do this for MP, to clear configs / registries
+    	// For SP the server shuts down after the client disconnects, so we can't unregister biome yet(?)
+    	if(!event.getManager().isLocalChannel())
+    	{
+	    	OTG.SetDimensionsConfig(null);
+	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	}
+    }
+    
+    @SubscribeEvent
+    public void onClientConnect(FMLNetworkEvent.ClientConnectedToServerEvent event)
+    {
+    	// Only do this for MP, to clear any configs / registries that may 
+    	// still be present, although there technically shouldn't be any!
+    	if(!event.getManager().isLocalChannel())
+    	{
+	    	OTG.SetDimensionsConfig(null);
+	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	}
+    }
+	
+    @SubscribeEvent
     public void onConnectionCreated(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
-		ByteBuf nettyBuffer = createWorldAndBiomeConfigsPacket();
-		if(nettyBuffer != null)
-		{
-			PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer), event.getManager());
-	    	// Reset particles in case the player just switched worlds.
-	    	PacketDispatcher.sendTo(new ParticlesPacket(), event.getManager());
-		} else {
-			OTG.log(LogMarker.WARN, "Could not find an OTG overworld, OTG is disabled. It is currently not possible to use OTG with a non-OTG overworld. To enable OTG make sure that level-type=OTG is configured in the server.properties file.");
-		}
-    }
-
-    // Used when creating / deleting dimensions
-    public static void SendAllWorldAndBiomeConfigsToAllPlayers(MinecraftServer server)
-    {
-		ByteBuf nettyBuffer = createWorldAndBiomeConfigsPacket();
-		if(nettyBuffer != null)
-		{
-	    	for(EntityPlayerMP player : server.getPlayerList().getPlayers())
-	    	{
-	        	PacketDispatcher.sendTo(new DimensionSyncPacket(nettyBuffer), (EntityPlayerMP) player);
-	    	}
-		}
-    }
-
-    private static ByteBuf createWorldAndBiomeConfigsPacket()
-    {
-        // Make sure worlds are sent in the correct order.
-
-		OTGDimensionInfo otgDimData = OTGDimensionManager.GetOrderedDimensionData();
-
-        // Serialize it
-        ByteBuf nettyBuffer = Unpooled.buffer();
-        //PacketBuffer mojangBuffer = new PacketBuffer(nettyBuffer);
-        DataOutput stream = new ByteBufOutputStream(nettyBuffer);
-
-        try
-        {
-        	stream.writeInt(PluginStandardValues.ProtocolVersion);
-        	stream.writeInt(0); // 0 == Normal packet
-        	stream.writeInt(otgDimData.orderedDimensions.size() + 1); // Number of worlds in this packet
-
-    		// Send worldconfig and biomeconfigs for each world.
-
-			LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
-
-			if(localWorld == null)
-			{
-				// This is not an OTG world.
-				((ByteBufOutputStream)stream).close();
-				return null;
-			}
-
-			// Overworld (dim 0)
-	        try
-	        {
-	        	stream.writeInt(0);
-	            ConfigToNetworkSender.writeConfigsToStream(localWorld.getConfigs(), stream, false);
-	        }
-	        catch (IOException e)
-	        {
-	            OTG.printStackTrace(LogMarker.FATAL, e);
-	        }
-
-    		for(int i = 0; i <= otgDimData.highestOrder; i++)
-    		{
-    			if(otgDimData.orderedDimensions.containsKey(i))
-    			{
-    				DimensionData dimData = otgDimData.orderedDimensions.get(i);
-    				localWorld = OTG.getWorld(dimData.dimensionName);
-    				if(localWorld == null)
-    				{
-    					localWorld = OTG.getUnloadedWorld(dimData.dimensionName);
-    				}
-
-    		        try
-    		        {
-    		        	stream.writeInt(dimData.dimensionId);
-    		            ConfigToNetworkSender.writeConfigsToStream(localWorld.getConfigs(), stream, false); // TODO: localWorld is null after /otg dim -c
-    		        }
-    		        catch (IOException e)
-    		        {
-    		            OTG.printStackTrace(LogMarker.FATAL, e);
-    		        }
-    			}
-    		}
-		}
-        catch (IOException e1)
-        {
-			e1.printStackTrace();
-		}
-
-        return nettyBuffer;
+   		ServerPacketManager.SendPacketsOnConnect(event);
     }
 
 	@SubscribeEvent
 	public void playerLoggedIn(PlayerEvent.PlayerLoggedInEvent event)
 	{
-		if(event.player.world.provider instanceof WorldProviderOTG)
+		if(event.player.world.provider instanceof OTGWorldProvider)
 		{
-	    	if(((WorldProviderOTG)event.player.world.provider).getWelcomeMessage() != null && ((WorldProviderOTG)event.player.world.provider).getWelcomeMessage().trim().length() > 0)
+	    	if(((OTGWorldProvider)event.player.world.provider).getWelcomeMessage() != null && ((OTGWorldProvider)event.player.world.provider).getWelcomeMessage().trim().length() > 0)
 	    	{
-	    		event.player.sendMessage(new TextComponentString(((WorldProviderOTG)event.player.world.provider).getWelcomeMessage()));
+	    		event.player.sendMessage(new TextComponentString(((OTGWorldProvider)event.player.world.provider).getWelcomeMessage()));
 	    	}
 
 	    	// TODO: Add feature for giving players items via world config + nbt file
 
-			WorldConfig worldConfig = ((WorldProviderOTG)event.player.world.provider).GetWorldConfig();
+	    	DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).GetDimensionConfig();
 
-			String itemsToRemoveString = worldConfig != null ? worldConfig.itemsToRemoveOnJoinDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue();
+			String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnJoinDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue();
 			boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
 
-			String itemsToAddString = worldConfig != null ? worldConfig.itemsToAddOnJoinDimension : WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();
+			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnJoinDimension : WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();
 			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsRemoved)
@@ -184,19 +104,19 @@ public class PlayerTracker
 	@SubscribeEvent
 	public void playerLoggedOut(PlayerEvent.PlayerLoggedOutEvent event)
 	{
-		if(event.player.world.provider instanceof WorldProviderOTG)
+		if(event.player.world.provider instanceof OTGWorldProvider)
 		{
-	    	if(((WorldProviderOTG)event.player.world.provider).getDepartMessage() != null && ((WorldProviderOTG)event.player.world.provider).getDepartMessage().trim().length() > 0)
+	    	if(((OTGWorldProvider)event.player.world.provider).getDepartMessage() != null && ((OTGWorldProvider)event.player.world.provider).getDepartMessage().trim().length() > 0)
 	    	{
-	    		event.player.sendMessage(new TextComponentString(((WorldProviderOTG)event.player.world.provider).getDepartMessage()));
+	    		event.player.sendMessage(new TextComponentString(((OTGWorldProvider)event.player.world.provider).getDepartMessage()));
 	    	}
 
-			WorldConfig worldConfig = ((WorldProviderOTG)event.player.world.provider).GetWorldConfig();
+			DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).GetDimensionConfig();
 
-			String itemsToRemoveString = worldConfig != null ? worldConfig.itemsToRemoveOnLeaveDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue();
+			String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnLeaveDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue();
 			boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
 
-			String itemsToAddString = worldConfig != null ? worldConfig.itemsToAddOnLeaveDimension : WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue();
+			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnLeaveDimension : WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue();
 			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsRemoved)
@@ -213,13 +133,13 @@ public class PlayerTracker
 	@SubscribeEvent
 	public void playerRespawned(PlayerEvent.PlayerRespawnEvent event)
 	{
-		if(event.player.world.provider instanceof WorldProviderOTG)
+		if(event.player.world.provider instanceof OTGWorldProvider)
 		{
 	    	// TODO: Add feature for giving players items via world config + nbt file
 
-			WorldConfig worldConfig = ((WorldProviderOTG)event.player.world.provider).GetWorldConfig();
+			DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).GetDimensionConfig();
 
-			String itemsToAddString = worldConfig != null ? worldConfig.itemsToAddOnRespawn : WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN.getDefaultValue();
+			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnRespawn : WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN.getDefaultValue();
 			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsAdded)
@@ -236,19 +156,19 @@ public class PlayerTracker
 
 		if(fromWorld != null)
 		{
-			if(fromWorld.provider instanceof WorldProviderOTG)
+			if(fromWorld.provider instanceof OTGWorldProvider)
 			{
-		    	if(((WorldProviderOTG)fromWorld.provider).getDepartMessage() != null && ((WorldProviderOTG)fromWorld.provider).getDepartMessage().trim().length() > 0)
+		    	if(((OTGWorldProvider)fromWorld.provider).getDepartMessage() != null && ((OTGWorldProvider)fromWorld.provider).getDepartMessage().trim().length() > 0)
 		    	{
-		    		event.player.sendMessage(new TextComponentString(((WorldProviderOTG)fromWorld.provider).getDepartMessage()));
+		    		event.player.sendMessage(new TextComponentString(((OTGWorldProvider)fromWorld.provider).getDepartMessage()));
 		    	}
 
-				WorldConfig worldConfig = ((WorldProviderOTG)fromWorld.provider).GetWorldConfig();
+		    	DimensionConfig dimConfig = ((OTGWorldProvider)fromWorld.provider).GetDimensionConfig();
 
-				String itemsToRemoveString = worldConfig != null ? worldConfig.itemsToRemoveOnLeaveDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue();
+				String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnLeaveDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue();
 				boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
 
-				String itemsToAddString = worldConfig != null ? worldConfig.itemsToAddOnLeaveDimension : WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue();
+				String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnLeaveDimension : WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue();
 				boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
 
 		    	if(itemsRemoved)
@@ -263,21 +183,21 @@ public class PlayerTracker
 		}
 
 		WorldServer toWorld = DimensionManager.getWorld(event.toDim);
-		if(toWorld.provider instanceof WorldProviderOTG)
+		if(toWorld.provider instanceof OTGWorldProvider)
 		{
-	    	if(((WorldProviderOTG)toWorld.provider).getWelcomeMessage() != null && ((WorldProviderOTG)toWorld.provider).getWelcomeMessage().trim().length() > 0)
+	    	if(((OTGWorldProvider)toWorld.provider).getWelcomeMessage() != null && ((OTGWorldProvider)toWorld.provider).getWelcomeMessage().trim().length() > 0)
 	    	{
-	    		event.player.sendMessage(new TextComponentString(((WorldProviderOTG)toWorld.provider).getWelcomeMessage()));
+	    		event.player.sendMessage(new TextComponentString(((OTGWorldProvider)toWorld.provider).getWelcomeMessage()));
 	    	}
 
 	    	// TODO: Add feature for giving players items via world config + nbt file
 
-			WorldConfig worldConfig = ((WorldProviderOTG)toWorld.provider).GetWorldConfig();
+	    	DimensionConfig dimConfig = ((OTGWorldProvider)toWorld.provider).GetDimensionConfig();
 
-			String itemsToRemoveString = worldConfig != null ? worldConfig.itemsToRemoveOnJoinDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue();
+			String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnJoinDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue();
 			boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
 
-			String itemsToAddString = worldConfig != null ? worldConfig.itemsToAddOnJoinDimension : WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();
+			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnJoinDimension : WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();
 			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsRemoved)
@@ -725,4 +645,37 @@ public class PlayerTracker
 
         return i;
     }
+    
+	@SubscribeEvent
+	public void onLivingFall(LivingFallEvent event)
+	{
+		if(event.getEntity().getEntityWorld() != null)
+		{
+			if(OTG.GetDimensionsConfig() == null)
+			{
+				// Can happen for Forge clients connecting to a bukkit server
+				return;
+			}
+			
+			// ForgeWorld can be null for vanilla overworld / other mods dims
+			ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(event.getEntity().getEntityWorld());
+			if(forgeWorld != null)
+			{
+				DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
+				
+				// Calculate the new distance based on gravity
+				double baseGravity = 0.08D;				
+				double gravityFactor = 1d / (baseGravity / dimConfig.Settings.GravityFactor);
+	
+				// MC subtracts the default fall damage threshhold (3) from the distance
+				double baseThreshHold = 3D;
+				double newThreshold = baseThreshHold * (1d / gravityFactor);
+				double newDistance = ((event.getDistance() + 3) * gravityFactor) - newThreshold; 
+				
+				event.setDamageMultiplier((float)gravityFactor);
+				event.setDistance((float)newDistance);
+				event.setResult(Result.ALLOW);
+			}
+		}
+	}
 }

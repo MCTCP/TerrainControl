@@ -1,13 +1,13 @@
 package com.pg85.otg.customobjects.bo3;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.CustomObjectConfigFile;
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
-import com.pg85.otg.configuration.WorldConfig.ConfigMode;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.customobjects.bo3.BO3Settings.OutsideSourceBlock;
@@ -16,6 +16,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
@@ -278,7 +279,7 @@ public class BO3Config extends CustomObjectConfigFile
     	{
     		File currentFile = this.file.getParentFile();
     		worldName = currentFile.getName();
-    		while(currentFile.getParentFile() != null && !currentFile.getName().toLowerCase().equals("worlds"))
+    		while(currentFile.getParentFile() != null && !currentFile.getName().toLowerCase().equals(PluginStandardValues.PresetsDirectoryName))
     		{
     			worldName = currentFile.getName();
     			currentFile = currentFile.getParentFile();

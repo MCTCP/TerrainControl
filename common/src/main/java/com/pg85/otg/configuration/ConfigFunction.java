@@ -1,9 +1,9 @@
 package com.pg85.otg.configuration;
 
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.ReedGen;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.helpers.StringHelper;
 

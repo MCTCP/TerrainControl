@@ -1,7 +1,8 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.configuration.BiomeGroup;
-import com.pg85.otg.configuration.BiomeGroupManager;
+import com.pg85.otg.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeGroup;
+import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 import java.util.Map.Entry;
@@ -23,9 +24,9 @@ public class LayerBiomeGroups extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache arraysCache, int x, int z, int x_size, int z_size)
+    public int[] getInts(LocalWorld world, ArraysCache arraysCache, int x, int z, int x_size, int z_size)
     {
-        int[] childInts = this.child.getInts(arraysCache, x, z, x_size, z_size);
+        int[] childInts = this.child.getInts(world, arraysCache, x, z, x_size, z_size);
         int[] thisInts = arraysCache.getArray(x_size * z_size);
 
         for (int i = 0; i < z_size; i++)

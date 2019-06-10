@@ -10,20 +10,22 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalMaterialData;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigProvider;
-import com.pg85.otg.configuration.WorldConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.bo3.BlockFunction;
 import com.pg85.otg.customobjects.bo3.ModDataFunction;
-import com.pg85.otg.forge.ForgeMaterialData;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.BlockGravel;
@@ -145,8 +147,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         {
             int generationId = this.biomeIntArray[i];
 
-            // For forge make sure all dimensions are queried since the biome we're looking for may be owned by another dimension
-            LocalBiome biome = OTG.isForge ? OTG.getBiomeAllWorlds(generationId) : configProvider.getBiomeByIdOrNull(generationId);
+            LocalBiome biome = configProvider.getBiomeByOTGIdOrNull(generationId);
 
         	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
         }
@@ -194,10 +195,11 @@ public class OTGChunkGenerator implements IChunkGenerator
 
         fixSpawnChunk();
 
-        if(world.getConfigs().getWorldConfig().spawnPointSet)
+        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(world.getName());
+        if(dimConfig.Settings.SpawnPointSet)
         {
-    		world.getWorld().provider.setSpawnPoint(new BlockPos(world.getConfigs().getWorldConfig().spawnPointX, world.getConfigs().getWorldConfig().spawnPointY, world.getConfigs().getWorldConfig().spawnPointZ));
-    		world.getConfigs().getWorldConfig().spawnPointSet = false; // This will reset when the world is reloaded, so if users manually reconfigure the spawn point it will be reverted. They will have to set spawnPointSet: false to prevent this.
+    		world.getWorld().provider.setSpawnPoint(new BlockPos(dimConfig.Settings.SpawnPointX, dimConfig.Settings.SpawnPointY, dimConfig.Settings.SpawnPointZ));
+    		dimConfig.Settings.SpawnPointSet = false; // This will reset when the world is reloaded, so if users manually reconfigure the spawn point it will be reverted. They will have to set spawnPointSet: false to prevent this.
         }
 
         this.spawner.populate(chunkCoord);
@@ -273,8 +275,8 @@ public class OTGChunkGenerator implements IChunkGenerator
     public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
     {
         WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
-        Biome biomeBase = this.worldHandle.getBiomeForCoordsBody(blockPos);
-
+        Biome biomeBaseOTG = ((ForgeBiome)this.world.getBiome(blockPos.getX(), blockPos.getZ())).biomeBase;
+        
         if (worldConfig.rareBuildingsEnabled)
         {
             if (paramaca == EnumCreatureType.MONSTER && this.world.rareBuildingGen.isSwampHutAtLocation(blockPos))
@@ -290,7 +292,7 @@ public class OTGChunkGenerator implements IChunkGenerator
             }
         }
 
-        return biomeBase.getSpawnableList(paramaca);
+        return biomeBaseOTG.getSpawnableList(paramaca);
     }
 
     @Override
@@ -630,7 +632,8 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
     	for(int i = OTG.WORLD_HEIGHT - 1; i > OTG.WORLD_DEPTH; i--)
     	{
-    		if(!chunkBuffer.getBlock(x, i, z).isAir())
+    		LocalMaterialData material = chunkBuffer.getBlock(x, i, z);
+    		if(material != null && !material.isAir())
 			{
     			return i;
 			};

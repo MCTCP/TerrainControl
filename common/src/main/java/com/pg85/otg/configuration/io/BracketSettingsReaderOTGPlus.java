@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;

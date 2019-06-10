@@ -1,5 +1,6 @@
 package com.pg85.otg.generator.biome.layers;
 
+import com.pg85.otg.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerRiverInit extends Layer
@@ -12,9 +13,9 @@ public class LayerRiverInit extends Layer
     }
 
     @Override
-    public int[] getInts(ArraysCache cache, int x, int z, int xSize, int zSize)
+    public int[] getInts(LocalWorld world, ArraysCache cache, int x, int z, int xSize, int zSize)
     {
-        int[] childInts = this.child.getInts(cache, x, z, xSize, zSize);
+        int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
 
         for (int zi = 0; zi < zSize; zi++)

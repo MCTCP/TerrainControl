@@ -8,7 +8,7 @@ import com.pg85.otg.util.helpers.StringHelper;
  *
  * <p>Numbers are limited to the given min and max values.
  */
-class DoubleSetting extends Setting<Double>
+public class DoubleSetting extends Setting<Double>
 {
     private final double defaultValue;
     private final double minValue;
@@ -34,4 +34,13 @@ class DoubleSetting extends Setting<Double>
         return StringHelper.readDouble(string, minValue, maxValue);
     }
 
+    public Double getMinValue()
+    {
+    	return minValue;
+    }
+    
+    public Double getMaxValue()
+    {
+    	return maxValue;
+    }    
 }
