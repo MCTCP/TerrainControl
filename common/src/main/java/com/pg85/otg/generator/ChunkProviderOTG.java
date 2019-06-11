@@ -127,9 +127,13 @@ public class ChunkProviderOTG
         this.random.setSeed(x * 341873128712L + z * 132897987541L);
 
         generateTerrain(chunkBuffer);
-
-        boolean dry = addBiomeBlocksAndCheckWater(chunkBuffer);
-
+        
+        boolean dry = false;
+        if(OTG.getEngine().fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld))
+		{
+        	dry = addBiomeBlocksAndCheckWater(chunkBuffer);
+		}
+        
         this.caveGen.generate(chunkBuffer);
         this.canyonGen.generate(chunkBuffer);
 
@@ -475,6 +479,7 @@ public class ChunkProviderOTG
 
                 nextBiomeHeight = nextBiomeConfig.biomeHeight;
 
+                // TODO: Potential divide by zero, not sure what the outcome or the proper solution would be. Uses floats so won't necessarily cause exceptions.
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
                 biomeWeight = Math.abs(biomeWeight);
                 volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
@@ -539,6 +544,7 @@ public class ChunkProviderOTG
                 }
 
                 nextRiverHeight = (isRiver) ? nextBiomeConfig.riverHeight : nextBiomeHeight;
+                // TODO: Potential divide by zero, not sure what the outcome or the proper solution would be. Uses floats so won't necessarily cause exceptions.
                 riverWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextRiverHeight + 2.0F);
 
                 riverWeight = Math.abs(riverWeight);

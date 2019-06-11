@@ -263,6 +263,7 @@ public class MinecraftBiomeTemplates
             this.defaultReplaceToBiomeName = "minecraft:hell";
             this.defaultInheritMobsBiomeName = "minecraft:hell";
             this.defaultBiomeDictId = "HOT, DRY, NETHER";
+            this.defaultNetherFortressEnabled = true;
         }
     }
 

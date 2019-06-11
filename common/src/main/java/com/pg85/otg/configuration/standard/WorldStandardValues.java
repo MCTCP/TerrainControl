@@ -218,7 +218,7 @@ public class WorldStandardValues extends Settings
                 "Mesa Plateau", "Mesa Plateau F", "Mesa Plateau M", "Mesa Plateau F M",
                 "Mesa (Bryce)", "Mega Taiga Hills", "Mega Spruce Taiga Hills"),
         BORDER_BIOMES = stringListSetting("BorderBiomes",
-                "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
+                "JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
     	CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
 		WORLD_BIOMES = stringListSetting("WorldBiomes"),
 		DIMENSIONS = stringListSetting("Dimensions")

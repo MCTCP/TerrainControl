@@ -12,6 +12,8 @@ import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.events.EventPriority;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.generator.ChunkBuffer;
+import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.Logger;
@@ -48,7 +50,13 @@ public abstract class OTGEngine
     public OTGEngine(Logger logger)
     {
         this.logger = logger;
-    }
+    }    
+
+	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer,
+			LocalWorld localWorld)
+	{
+        return true;
+	}
 
     /**
      * Fires the canCustomObjectSpawn event.
@@ -112,7 +120,7 @@ public abstract class OTGEngine
      */
     public boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
             int chunkZ)
-    {
+    {    	
         boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
         {

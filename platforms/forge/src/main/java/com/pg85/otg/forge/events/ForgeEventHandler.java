@@ -6,6 +6,8 @@ import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.generator.ChunkBuffer;
+import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
@@ -26,7 +28,7 @@ import java.util.Random;
 /**
  * Translates OpenTerrainGenerator events into MinecraftForge terrain events.
  */
-public class OTGToForgeEventConverter extends EventHandler
+public class ForgeEventHandler extends EventHandler
 {
     /*
      * Forge uses the *block* x and z, Open Terrain Generator and Forge Modloader use

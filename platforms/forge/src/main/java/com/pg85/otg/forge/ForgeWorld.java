@@ -987,6 +987,9 @@ public class ForgeWorld implements LocalWorld
 		// by a console command and has already had its seed set
         if(world.provider.getDimension() != 0 && !(world instanceof OTGWorldServerMulti))
         {
+            //TODO: This code is never used? Test..
+        	if(1 == 1) { throw new RuntimeException("Please report this crash to the OpenTerrainGenerator github issue tracker. Thank you!"); }
+        	
         	// TODO: Use seed from Dimensions.txt instead <-- Why, seeds in dims seem to be working fine?
             long seedIn = (long) Math.floor((Math.random() * Long.MAX_VALUE));            
             if(dimConfig.Seed != null && dimConfig.Seed.trim().length() > 0)
@@ -1010,8 +1013,8 @@ public class ForgeWorld implements LocalWorld
     		boolean enableCommands = world.getWorldInfo().areCommandsAllowed();
 
     		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, worldTypeIn);
-    		settings.setGeneratorOptions(generatorOptions);
-    		if(enableCommands) { settings.enableCommands(); }
+    		settings.setGeneratorOptions(generatorOptions);    	    
+   			if(enableCommands) { settings.enableCommands(); }
 
     		WorldInfo worldInfo = new WorldInfo(settings, world.getWorldInfo().getWorldName());
 

@@ -26,9 +26,11 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
+import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.biomes.BiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.generator.ForgeChunkBuffer;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.LocalMaterialData;
@@ -37,12 +39,15 @@ import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.generator.ChunkBuffer;
+import com.pg85.otg.generator.ChunkProviderOTG;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
@@ -722,5 +727,12 @@ public class ForgeEngine extends OTGEngine
 	    		}
 	    	}
 		}
+	}
+	
+	@Override
+	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer,
+			LocalWorld localWorld)
+	{
+        return ForgeEventFactory.onReplaceBiomeBlocks(((ForgeWorld)localWorld).getChunkGenerator(), x, z, ((ForgeChunkBuffer)chunkBuffer).getChunkPrimer(), ((ForgeWorld)localWorld).getWorld());
 	}
 }

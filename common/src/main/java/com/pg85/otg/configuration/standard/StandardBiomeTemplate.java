@@ -78,6 +78,7 @@ public class StandardBiomeTemplate
     public boolean defaultStrongholds = true;
     public boolean defaultOceanMonuments = false;
     public boolean defaultWoodlandMansions = false;
+    public boolean defaultNetherFortressEnabled = false;
     public VillageType defaultVillageType = VillageType.disabled;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
     public MineshaftType defaultMineshaftType = MineshaftType.normal;

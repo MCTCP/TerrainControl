@@ -332,7 +332,7 @@ public class BiomeConfig extends ConfigFile
         this.strongholdsEnabled = settings.getSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, defaultSettings.defaultStrongholds);
         this.oceanMonumentsEnabled = settings.getSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, defaultSettings.defaultOceanMonuments);
         this.woodLandMansionsEnabled = settings.getSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, defaultSettings.defaultWoodlandMansions);
-        this.netherFortressesEnabled = settings.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, true);
+        this.netherFortressesEnabled = settings.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, defaultSettings.defaultNetherFortressEnabled);
         this.villageType = settings.getSetting(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType);
         this.mineshaftsRarity = settings.getSetting(BiomeStandardValues.MINESHAFT_RARITY);
         this.mineshaftType = settings.getSetting(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType);

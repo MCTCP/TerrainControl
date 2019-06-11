@@ -16,7 +16,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
  * blocks internally, just like Minecraft does for chunk generation.
  *
  */
-class ForgeChunkBuffer implements ChunkBuffer
+public class ForgeChunkBuffer implements ChunkBuffer
 {
 
     private final ChunkCoordinate chunkCoord;
@@ -28,6 +28,11 @@ class ForgeChunkBuffer implements ChunkBuffer
         this.chunkPrimer = new ChunkPrimer();
     }
 
+    public ChunkPrimer getChunkPrimer()
+    {
+    	return chunkPrimer;
+    }
+    
     @Override
     public ChunkCoordinate getChunkCoordinate()
     {

@@ -77,7 +77,7 @@ public class OTGPlugin
 
     @EventHandler
     public void load(FMLInitializationEvent event)
-    {
+    {    	
         File configsDir = new File(Loader.instance().getConfigDir(), "OpenTerrainGenerator");
         this.worldLoader = new WorldLoader(configsDir);
         // Register World listener for tracking world unloads and loads.
@@ -163,7 +163,7 @@ public class OTGPlugin
         MinecraftForge.EVENT_BUS.register(new KeyBoardEventListener());
 
         // Register to our own events, so that they can be fired again as Forge events.
-        engine.registerEventHandler(new OTGToForgeEventConverter(), EventPriority.CANCELABLE);
+        engine.registerEventHandler(new ForgeEventHandler(), EventPriority.CANCELABLE);
 
         // Register RightClickBlockListener for detecting fire and creating portals
         MinecraftForge.EVENT_BUS.register(new RightClickListener());

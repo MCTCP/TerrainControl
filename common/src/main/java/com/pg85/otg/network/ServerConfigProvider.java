@@ -112,16 +112,19 @@ public final class ServerConfigProvider implements ConfigProvider
     
     void AddBiomesFromDirRecursive(ArrayList<String> biomes, File biomesDirectory)
     {
-    	for(File biomeConfig : biomesDirectory.listFiles())
+    	if(biomesDirectory.exists())
     	{
-    		if(biomeConfig.isFile() && biomeConfig.getName().endsWith(BiomeStandardValues.BIOME_CONFIG_EXTENSION.getDefaultValue()))
-    		{
-    			biomes.add(biomeConfig.getName().replace(BiomeStandardValues.BIOME_CONFIG_EXTENSION.getDefaultValue(), ""));
-    		}
-    		else if(biomeConfig.isDirectory())
-    		{
-    			AddBiomesFromDirRecursive(biomes, biomeConfig);
-    		}
+	    	for(File biomeConfig : biomesDirectory.listFiles())
+	    	{
+	    		if(biomeConfig.isFile() && biomeConfig.getName().endsWith(BiomeStandardValues.BIOME_CONFIG_EXTENSION.getDefaultValue()))
+	    		{
+	    			biomes.add(biomeConfig.getName().replace(BiomeStandardValues.BIOME_CONFIG_EXTENSION.getDefaultValue(), ""));
+	    		}
+	    		else if(biomeConfig.isDirectory())
+	    		{
+	    			AddBiomesFromDirRecursive(biomes, biomeConfig);
+	    		}
+	    	}
     	}
     }
 
