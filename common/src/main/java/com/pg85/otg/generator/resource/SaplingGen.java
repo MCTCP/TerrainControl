@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
@@ -27,7 +28,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     }
 
     public SaplingType saplingType;
-    public List<Integer> treeChances;
+    public List<Double> treeChances;
     public List<String> treeNames;
     public List<CustomObject> trees;
 
@@ -44,38 +45,29 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
 
         trees = new ArrayList<CustomObject>();
         treeNames = new ArrayList<String>();
-        treeChances = new ArrayList<Integer>();
+        treeChances = new ArrayList<Double>();
 
         for (int i = 1; i < args.size() - 1; i += 2)
         {
-            treeNames.add(args.get(i));
-            treeChances.add(readInt(args.get(i + 1), 1, 100));
+            String treeName = args.get(i);
+            trees.add(getTreeObject(treeName, biomeConfig.worldConfig.getName()));
+            treeNames.add(treeName);
+            treeChances.add(readDouble(args.get(i + 1), 1, 100));
         }
     }
 
-    /**
-     * Creates a {@link SaplingGen} instance.
-     * @param biomeConfig     The biome config.
-     * @param saplingType     The sapling type.
-     * @param typesAndChances Pairs of two objects. The first entry in each pair
-     *                        must be, after transformation using
-     *                        {@link Object#toString()}, a valid tree name. The
-     *                        second entry in each pair must be an instance of
-     *                        {@link Number}, this is the spawn chance
-     *                        percentage.
-     */
-    public SaplingGen(BiomeConfig biomeConfig, SaplingType saplingType, Object... typesAndChances)
+    private static CustomObject getTreeObject(String objectName, String worldName) throws InvalidConfigException
     {
-        super(biomeConfig);
-        this.saplingType = saplingType;
-        for (int i = 0; i < typesAndChances.length - 1; i += 2)
+        CustomObject maybeTree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectName, worldName);
+        if (maybeTree == null)
         {
-            String treeName = typesAndChances[i].toString();
-            int chance = ((Number) typesAndChances[i + 1]).intValue();
-            
-            treeNames.add(treeName);
-            treeChances.add(chance);
+            throw new InvalidConfigException("Unknown object " + objectName);
         }
+        if (!maybeTree.canSpawnAsTree())
+        {
+            throw new InvalidConfigException("Cannot spawn " + objectName + " as tree");
+        }
+        return maybeTree;
     }
 
     @Override
@@ -164,13 +156,13 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     @Override
     public String toString()
     {
-        String output = "Sapling(" + saplingType;
+        StringBuilder sb = new StringBuilder("Sapling(").append(saplingType);
 
         for (int i = 0; i < treeNames.size(); i++)
         {
-            output += "," + treeNames.get(i) + "," + treeChances.get(i);
+            sb.append(",").append(treeNames.get(i)).append(",").append(treeChances.get(i));
         }
-        return output + ")";
+        return sb.append(')').toString();
     }
 
 }

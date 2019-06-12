@@ -5,6 +5,7 @@ import java.util.Random;
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
@@ -282,13 +283,36 @@ public class SaplingListener
     // Can return null
     private SaplingGen getSaplingGen(LocalWorld world, SaplingType type, BlockPos blockPos)
     {
+        // Query the OTG biome, if no sapling of the specified type is found 
+        // and the biome has a replaceToBiome, query the parent biome.
+    	
+    	LocalBiome biome = null;
+    	BiomeConfig biomeConfig = null;
+    	SaplingGen gen = null;
         try
         {
-            LocalBiome biome = world.getSavedBiome(blockPos.getX(), blockPos.getZ());
-            return biome.getBiomeConfig().getSaplingGen(type);
-        } catch (BiomeNotFoundException e)
+        	// Get the biome by OTG id
+        	biome = world.getBiome(blockPos.getX(), blockPos.getZ());
+        	biomeConfig = biome.getBiomeConfig();
+            gen = biomeConfig.getSaplingGen(type);
+        }
+        catch (BiomeNotFoundException e)
         {
             return null;
         }
+        if(gen == null && biomeConfig.inheritSaplingResource && biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.trim().length() > 0)
+        {
+            try
+            {
+            	// Get the biome by saved id (parent biome)
+            	biome = world.getSavedBiome(blockPos.getX(), blockPos.getZ());
+                gen = biome.getBiomeConfig().getSaplingGen(type);
+            }
+            catch (BiomeNotFoundException e)
+            {
+                return null;
+            }
+        }
+        return gen;
     }
 }
