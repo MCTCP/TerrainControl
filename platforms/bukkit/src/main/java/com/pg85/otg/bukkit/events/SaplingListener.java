@@ -28,20 +28,41 @@ class SaplingListener
 
         Location location = event.getLocation();
 
+        // Query the OTG biome, if no sapling of the specified type is found 
+        // and the biome has a replaceToBiome, query the parent biome.
+        
         LocalBiome biome;
         try
         {
-            biome = world.getSavedBiome(location.getBlockX(), location.getBlockZ());
-        } catch (BiomeNotFoundException e)
+        	// Get the biome by OTG id
+            biome = world.getBiome(location.getBlockX(), location.getBlockZ());
+        }
+        catch (BiomeNotFoundException e)
         {
             return;
         }
 
         BiomeConfig biomeConfig = biome.getBiomeConfig();
-
+        
         // Get sapling type
         SaplingType saplingType = toSaplingType(event.getSpecies());
-        if (saplingType == null)
+        
+        if (saplingType == null && biomeConfig.inheritSaplingResource && biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.trim().length() > 0)
+        {
+        	biome = null;
+            try
+            {
+            	// Get the biome by saved id (parent biome)
+                biome = world.getSavedBiome(location.getBlockX(), location.getBlockZ());
+            } catch (BiomeNotFoundException e)
+            {
+                return;
+            }
+            biomeConfig = biome.getBiomeConfig();
+            saplingType = toSaplingType(event.getSpecies());
+        }
+                  
+        if(saplingType == null)
         {
             return;
         }

@@ -90,6 +90,7 @@ public class BiomeConfig extends ConfigFile
 
     public List<ConfigFunction<BiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<BiomeConfig>>();
 
+    public boolean inheritSaplingResource;
     private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
 
     public ArrayList<CustomObject> biomeObjects;
@@ -340,8 +341,9 @@ public class BiomeConfig extends ConfigFile
         this.biomeDictId = settings.getSetting(BiomeStandardValues.BIOME_DICT_ID, defaultSettings.defaultBiomeDictId);
     	this.inheritMobsBiomeName = settings.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, defaultSettings.defaultInheritMobsBiomeName);
 
-        this.readCustomObjectSettings(settings);
+        this.readCustomObjectSettings(settings);        
         this.readResourceSettings(settings);
+        this.inheritSaplingResource = settings.getSetting(BiomeStandardValues.INHERIT_SAPLING_RESOURCE, defaultSettings.inheritSaplingResource);
         this.heightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
         this.readHeightSettings(settings, this.heightMatrix, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl);
         this.riverHeightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
@@ -665,7 +667,7 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR, this.foliageColor,
                 "Biome foliage color.");
-
+             
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, this.foliageColorIsMultiplier,
                 "Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
 
@@ -740,9 +742,14 @@ public class BiomeConfig extends ConfigFile
                 "Sapling types: " + StringHelper.join(SaplingType.values(), ", "),
                 "All - will make the tree spawn from all saplings, but not from mushrooms.",
                 "BigJungle - for when 4 jungle saplings grow at once.",
-                "RedMushroom/BrownMushroom - will only grow when bonemeal is used.");
-
+                "RedMushroom/BrownMushroom - will only grow when bonemeal is used.");        
+        
         writer.addConfigFunctions(this.saplingGrowers.values());
+        
+        writer.putSetting(BiomeStandardValues.INHERIT_SAPLING_RESOURCE, this.inheritSaplingResource,
+                "For virtual (replaceToBiomeName) biomes: Inherit all Sapling() resources from the",
+                "replaceToBiomeName biome. If a Sapling() with the same SaplingType is defined ",
+                "in this config and the parent config, the one from this config is used.");
 
         writer.bigTitle("Custom objects");
 

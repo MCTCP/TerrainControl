@@ -93,6 +93,7 @@ public class StandardBiomeTemplate
     public String defaultBiomeDictId = "";
     public String defaultInheritMobsBiomeName = "";
     public String defaultReplaceToBiomeName = "";
+    public boolean inheritSaplingResource = false;
     
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
             new WeightedMobSpawnGroup(MobNames.SHEEP, 12, 4, 4),
