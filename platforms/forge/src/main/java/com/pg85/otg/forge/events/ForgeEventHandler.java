@@ -6,8 +6,6 @@ import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 import com.pg85.otg.LocalWorld;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.generator.ChunkBuffer;
-import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;

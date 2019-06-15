@@ -13,7 +13,6 @@ import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.BiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
 import com.pg85.otg.forge.util.ForgeMaterialData;
@@ -33,6 +32,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
 import net.minecraft.block.*;
@@ -57,34 +57,21 @@ import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.EnumSkyBlock;
-import net.minecraft.world.GameType;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.feature.*;
-import net.minecraft.world.gen.structure.MapGenMineshaft;
-import net.minecraft.world.gen.structure.MapGenScatteredFeature;
-import net.minecraft.world.gen.structure.MapGenStronghold;
 import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.MapGenVillage;
-import net.minecraft.world.gen.structure.StructureOceanMonument;
-import net.minecraft.world.gen.structure.WoodlandMansion;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
-import net.minecraft.world.storage.DerivedWorldInfo;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class ForgeWorld implements LocalWorld
@@ -860,8 +847,9 @@ public class ForgeWorld implements LocalWorld
         {
     		ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(x, i, z));
         	if(material == null) throw new RuntimeException();
+        	DefaultMaterial defaultMaterial = material.toDefaultMaterial();
         	boolean isLiquid = material.isLiquid();
-        	boolean isSolid = (material.isSolid() && !material.equals(Material.LEAVES)) || (!ignoreSnow && material.equals(Material.SNOW));
+        	boolean isSolid = (material.isSolid() && !defaultMaterial.equals(DefaultMaterial.LEAVES) && !defaultMaterial.equals(DefaultMaterial.LEAVES_2)) || (!ignoreSnow && defaultMaterial.equals(DefaultMaterial.SNOW));
         	if(!(isLiquid && ignoreLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))

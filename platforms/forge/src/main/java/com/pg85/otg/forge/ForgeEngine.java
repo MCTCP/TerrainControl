@@ -26,7 +26,6 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
-import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.biomes.BiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
@@ -40,8 +39,6 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.generator.ChunkBuffer;
-import com.pg85.otg.generator.ChunkProviderOTG;
-
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.World;
@@ -360,7 +357,7 @@ public class ForgeEngine extends OTGEngine
 
     public void unRegisterForgeBiome(ResourceLocation resourceLocation)
     {
-		OTG.log(LogMarker.TRACE, "Unregistering biome " + resourceLocation.toString());
+		OTG.log(LogMarker.INFO, "Unregistering biome " + resourceLocation.toString());
 
 		Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 

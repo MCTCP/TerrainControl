@@ -54,7 +54,19 @@ public class DimensionsConfig
 			for(File f : configDir.listFiles())
 			{
 				DimensionsConfig forgeWorldConfig2 = DimensionsConfig.defaultConfigfromFile(f);
-				if(forgeWorldConfig2 != null && forgeWorldConfig2.Overworld.PresetName.equals(presetName))
+				if(
+					forgeWorldConfig2 != null &&
+					(
+						(
+							// PresetName is null for vanilla overworlds
+							forgeWorldConfig2.Overworld.PresetName == null && 
+							presetName == null								
+						) || (
+							forgeWorldConfig2.Overworld.PresetName != null && 
+							forgeWorldConfig2.Overworld.PresetName.equals(presetName)
+						)
+					)
+				)
 				{
 					defaultConfigs.put(presetName, forgeWorldConfig2);
 					return forgeWorldConfig2;

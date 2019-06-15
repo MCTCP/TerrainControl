@@ -180,16 +180,17 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
         
         LocalMaterialData checkBlock = !spawnWater || !spawnLava ? world.getMaterial(x, y + 2, z, false) : null;
+        DefaultMaterial checkBlockDefaultMaterial = checkBlock.toDefaultMaterial();
         if (!spawnWater)
         {
-            if (checkBlock.equals(DefaultMaterial.WATER) || checkBlock.equals(DefaultMaterial.STATIONARY_WATER))
+            if (checkBlockDefaultMaterial.equals(DefaultMaterial.WATER) || checkBlockDefaultMaterial.equals(DefaultMaterial.STATIONARY_WATER))
             {
                 return false;
             }
         }
         if (!spawnLava)
         {
-            if (checkBlock.equals(DefaultMaterial.LAVA) || checkBlock.equals(DefaultMaterial.STATIONARY_LAVA))
+            if (checkBlockDefaultMaterial.equals(DefaultMaterial.LAVA) || checkBlockDefaultMaterial.equals(DefaultMaterial.STATIONARY_LAVA))
             {
                 return false;
             }

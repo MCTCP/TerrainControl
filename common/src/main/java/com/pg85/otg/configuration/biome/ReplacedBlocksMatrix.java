@@ -44,7 +44,7 @@ public class ReplacedBlocksMatrix
                 throw new InvalidConfigException("Replace parts must be in the format (from,to) or (from,to,minHeight,maxHeight)");
             }
 
-            from = OTG.readMaterial(values[0]).withDefaultBlockData();
+           	from = OTG.readMaterial(values[0]);
             to = OTG.readMaterial(values[1]);
 
             if (values.length == 4)

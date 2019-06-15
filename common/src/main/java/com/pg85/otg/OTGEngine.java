@@ -13,7 +13,6 @@ import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.events.EventPriority;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.ChunkBuffer;
-import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.Logger;

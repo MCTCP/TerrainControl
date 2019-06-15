@@ -222,12 +222,21 @@ public class OTGPlugin
 				if(dimsConfig == null)
 				{
 					// If there is no DimensionsConfig saved for this world, create one
-					// LoadCustomDimensionData will add dimensions
+					// LoadCustomDimensionData will add dimensions if any were saved
 					dimsConfig = new DimensionsConfig(overWorld.getSaveHandler().getWorldDirectory());
-					// If this is a vanilla overworld then create a dummy overworld config
+					// If this is a vanilla overworld then we can be sure no dimensions were saved,
 					if(!overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
 					{
+						// Create a dummy overworld config
 						dimsConfig.Overworld = new DimensionConfig();
+						// Check if there is a modpack config for vanilla worlds, 
+						// since we didn't get a chance to check via the OTG world creation UI
+						DimensionsConfig modPackConfig = DimensionsConfig.getModPackConfig(null);
+						if(modPackConfig != null)
+						{
+							dimsConfig.Overworld = modPackConfig.Overworld;
+							dimsConfig.Dimensions = modPackConfig.Dimensions;
+						}
 					}
 					dimsConfig.Save();
 				}

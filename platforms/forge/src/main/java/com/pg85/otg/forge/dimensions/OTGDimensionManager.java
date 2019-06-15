@@ -172,7 +172,6 @@ public class OTGDimensionManager
 		BitSet dimensionMap = null;
 		try {
 			Field[] fields = DimensionManager.class.getDeclaredFields();
-			int i = 0;
 			for(Field field : fields)
 			{
 				Class<?> fieldClass = field.getType();
@@ -230,7 +229,6 @@ public class OTGDimensionManager
 		// Set DimensionManager.lastUsedId = 1;
 		try {
 			Field[] fields = DimensionManager.class.getDeclaredFields();
-			int i = 0;
 			for(Field field : fields)
 			{
 			    if (field.getType() == int.class) {

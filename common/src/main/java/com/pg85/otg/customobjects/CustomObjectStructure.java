@@ -4736,6 +4736,7 @@ public class CustomObjectStructure
 						if(y >= 255){ continue;}
 
 						sourceBlockMaterial = World.getMaterial(blockToSpawn.x, y, blockToSpawn.z, IsOTGPlus);
+						DefaultMaterial sourceBlockDefaultMaterial = sourceBlockMaterial.toDefaultMaterial();
 
                     	materialToSet = replaceAboveMaterial;
                     	blockDataToSet = replaceAboveMaterialBlockData;
@@ -4790,7 +4791,7 @@ public class CustomObjectStructure
 		                    		blockDataToSet = replaceAboveMaterialBlockData;
 	                    		} else {
 	                    			// After removing layers of blocks replace the heighest block left with the surfaceBlockMaterial
-	                    			if(!sourceBlockMaterial.isLiquid() && !sourceBlockMaterial.equals(DefaultMaterial.AIR))
+	                    			if(!sourceBlockMaterial.isLiquid() && !sourceBlockDefaultMaterial.equals(DefaultMaterial.AIR))
 	                    			{
 	        	                		sourceBlockMaterialAbove = World.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, IsOTGPlus).toDefaultMaterial();
 	        	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
