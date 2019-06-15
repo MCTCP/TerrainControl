@@ -119,16 +119,6 @@ public abstract class Layer
     protected static final int RiverBitOne = (1 << RiverShift);             //>>	21st Bit, 1048576
     protected static final int RiverBitTwo = (1 << (RiverShift + 1));       //>>	22nd Bit, 2097152
 
-    /**
-     * In a single step, checks for land and when present returns biome data
-     * @param selection The location to be checked
-     * @return Biome Data or 0 when not on land
-     */
-    protected static int getBiomeFromLayer(int selection)
-    {
-        return (selection & LandBit) != 0 ? (selection & BiomeBits) : 0;
-    }
-
     private static long getScrambledBaseSeed(long baseSeed)
     {
         long scrambledBaseSeed = baseSeed;

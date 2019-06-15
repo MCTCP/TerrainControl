@@ -8,14 +8,15 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Map.Entry;
+import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
@@ -30,6 +31,7 @@ import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.logging.LogMarker;
 
+import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTTagString;
@@ -119,7 +121,9 @@ public class OTGDimensionManager
             NBTTagList nbtTagList = new NBTTagList();
 
             for (String s : strings)
+            {
                 nbtTagList.appendTag(new NBTTagString(s));
+            }
 
             compound.setTag(id, nbtTagList);
         }
@@ -162,6 +166,88 @@ public class OTGDimensionManager
 		return newDimId;
 	}
 
+	private static void removeFromUsedIds(int dimensionId)
+	{
+		// Forge 1.12.2-14.23.5.2768 uses BitSet dimensionMap
+		BitSet dimensionMap = null;
+		try {
+			Field[] fields = DimensionManager.class.getDeclaredFields();
+			int i = 0;
+			for(Field field : fields)
+			{
+				Class<?> fieldClass = field.getType();
+				if(fieldClass.equals(BitSet.class))
+				{
+					field.setAccessible(true);
+					dimensionMap = (BitSet) field.get(new DimensionManager());
+			        break;
+				}
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		if(dimensionMap != null) // null happens when shutting down the MP server
+		{
+			dimensionMap.clear(dimensionId);
+		}
+		
+		// Forge 1.12.2-14.23.5.2838 uses IntSet usedIds
+		IntSet usedIds = null;
+		try {
+			Field[] fields = DimensionManager.class.getDeclaredFields();
+			int i = 0;
+			for(Field field : fields)
+			{
+				Class<?> fieldClass = field.getType();
+				if(fieldClass.equals(IntSet.class))
+				{
+					i++;
+					if(i == 3)
+					{
+						field.setAccessible(true);
+						usedIds = (IntSet) field.get(new DimensionManager());
+				        break;
+					}
+				}
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		if(usedIds != null) // null happens when shutting down the MP server
+		{
+			usedIds.rem(dimensionId);
+		}
+		
+		// Forge 1.12.2-14.23.5.2838 uses lastUsedId
+		// Set DimensionManager.lastUsedId = 1;
+		try {
+			Field[] fields = DimensionManager.class.getDeclaredFields();
+			int i = 0;
+			for(Field field : fields)
+			{
+			    if (field.getType() == int.class) {
+			    	field.setAccessible(true);
+			    	field.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+			    	field.set(null, 1);
+			    }
+			}
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public static void DeleteDimension(int dimToRemove, ForgeWorld world, MinecraftServer server, boolean isServerSide)
 	{
 		if(DimensionManager.getWorld(dimToRemove) != null) // Can be null on the client if the world was unloaded(?)
@@ -170,7 +256,7 @@ public class OTGDimensionManager
 		}
 		if(DimensionManager.isDimensionRegistered(dimToRemove))
 		{
-			OTGDimensionManager.unregisterDimension(dimToRemove);
+			unregisterDimension(dimToRemove);
 		}
 	
 		world.unRegisterBiomes();
@@ -185,28 +271,7 @@ public class OTGDimensionManager
 		{
 			OTGDimensionManager.UnloadCustomDimensionData(dimToRemove);
 	
-			BitSet dimensionMap = null;
-			try {
-				Field[] fields = DimensionManager.class.getDeclaredFields();
-				for(Field field : fields)
-				{
-					Class<?> fieldClass = field.getType();
-					if(fieldClass.equals(BitSet.class))
-					{
-						field.setAccessible(true);
-						dimensionMap = (BitSet) field.get(new DimensionManager());
-				        break;
-					}
-				}
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-	
-			dimensionMap.clear(dimToRemove);
+			removeFromUsedIds(dimToRemove);	
 	
 			// This biome was unregistered via a console command, delete its world data
 			File dimensionSaveDir = new File(world.getWorld().getSaveHandler().getWorldDirectory() + "/DIM" + dimToRemove);
@@ -278,7 +343,24 @@ public class OTGDimensionManager
         DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(dimensionName); 
         if(seed == -1 && dimConfig != null && dimConfig.Seed != null && dimConfig.Seed.trim().length() > 0)
         {
-        	seed = Long.parseLong(dimConfig.Seed.trim());
+            seed = (new Random()).nextLong();
+
+            if (!StringUtils.isEmpty(dimConfig.Seed))
+            {
+                try
+                {
+                    long j = Long.parseLong(dimConfig.Seed);
+
+                    if (j != 0L)
+                    {
+                    	seed = j;
+                    }
+                }
+                catch (NumberFormatException var7)
+                {
+                	seed = (long)dimConfig.Seed.hashCode();
+                }
+            }        	
         }
         
         WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
@@ -431,45 +513,14 @@ public class OTGDimensionManager
 		orderedDimensions = new HashMap<Integer,Integer>();
 		orderedDimensions.put(0,0);
 
-		BitSet dimensionMap = null;
-		try
-		{
-			Field[] fields = DimensionManager.class.getDeclaredFields();
-			for(Field field : fields)
-			{
-				Class<?> fieldClass = field.getType();
-				if(fieldClass.equals(BitSet.class))
-				{
-					field.setAccessible(true);
-					dimensionMap = (BitSet) field.get(new DimensionManager());
-			        break;
-				}
-			}
-		}
-		catch (SecurityException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-
 		for(int i : dimensionsOrderCopy.keySet()) // Ignore dim 0 (Overworld) and 1 (End)
 		{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
-				if(dimensionsOrderCopy.containsKey(i))
+				if(i != 0 && dimensionsOrderCopy.containsKey(i))
 				{
-					OTGDimensionManager.unregisterDimension(i);
-					if(dimensionMap != null) // Happens when shutting down the MP server.
-					{
-						dimensionMap.clear(i);
-					}					
+					unregisterDimension(i);
+					removeFromUsedIds(i);				
 				}
 			}
 		}
@@ -485,43 +536,12 @@ public class OTGDimensionManager
 		boolean isOTGDimension = orderedDimensions.containsKey(dimId);
 		orderedDimensions.remove(dimId);
 
-		BitSet dimensionMap = null;
-		try
-		{
-			Field[] fields = DimensionManager.class.getDeclaredFields();
-			for(Field field : fields)
-			{
-				Class<?> fieldClass = field.getType();
-				if(fieldClass.equals(BitSet.class))
-				{
-					field.setAccessible(true);
-					dimensionMap = (BitSet) field.get(new DimensionManager());
-			        break;
-				}
-			}
-		}
-		catch (SecurityException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-
 		if(DimensionManager.isDimensionRegistered(dimId))
 		{
 			if(isOTGDimension)
 			{
-				OTGDimensionManager.unregisterDimension(dimId);
-				if(dimensionMap != null) // Happens when shutting down the MP server
-				{
-					dimensionMap.clear(dimId);
-				}
+				unregisterDimension(dimId);
+				removeFromUsedIds(dimId);
 			}
 		}
 	}
@@ -711,61 +731,7 @@ public class OTGDimensionManager
 		
 		dimsConfig.Save();
 	}
-
-	private static Hashtable<Integer, Object> oldDims;
-	public static void RemoveOTGDims()
-	{
-    	Hashtable dimensions = null;
-
-		try
-		{
-			Field[] fields = DimensionManager.class.getDeclaredFields();
-			for(Field field : fields)
-			{
-				Class<?> fieldClass = field.getType();
-				if(fieldClass.equals(Hashtable.class))
-				{
-					field.setAccessible(true);
-					Hashtable fieldAsHashTable = (Hashtable) field.get(new DimensionManager());
-					if(fieldAsHashTable.values().size() > 0)
-					{
-						Object value = fieldAsHashTable.values().toArray()[0];
-						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
-						{
-							dimensions = fieldAsHashTable;
-					        break;
-						}
-					}
-				}
-			}
-		}
-		catch (SecurityException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-
-		oldDims = new Hashtable<Integer, Object>();
-		if(dimensions != null)
-		{
-			for(int i : orderedDimensions.keySet())
-			{
-				if(DimensionManager.isDimensionRegistered(i))
-				{
-					oldDims.put(i, dimensions.get(i));
-					dimensions.remove(i);
-				}
-			}
-		}
-	}
-
+	
 	public static HashMap<Integer, String> GetAllOTGDimensions()
 	{
 		HashMap<Integer, String> otgDims = new HashMap<Integer, String>();
@@ -780,56 +746,6 @@ public class OTGDimensionManager
 		}	
 
 		return otgDims;
-	}
-
-	// TODO: Document this
-	public static void ReAddOTGDims()
-	{
-    	Hashtable dimensions = null;
-
-		try
-		{
-			Field[] fields = DimensionManager.class.getDeclaredFields();
-			for(Field field : fields)
-			{
-				Class<?> fieldClass = field.getType();
-				if(fieldClass.equals(Hashtable.class))
-				{
-					field.setAccessible(true);
-					Hashtable fieldAsHashTable = (Hashtable) field.get(new DimensionManager());
-					if(fieldAsHashTable.values().size() > 0)
-					{
-						Object value = fieldAsHashTable.values().toArray()[0];
-						if(value instanceof DimensionType || !(value instanceof WorldServer)) // Forge 1.11.2 - 13.20.0.2228 uses DimensionType, Forge 1.11.2 - 13.20.0.2315 uses Dimension
-						{
-							dimensions = fieldAsHashTable;
-					        break;
-						}
-					}
-				}
-			}
-		}
-		catch (SecurityException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalArgumentException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-
-		if(oldDims != null)
-		{
-			for(Entry<Integer, Object> oldDim : oldDims.entrySet())
-			{
-				dimensions.put(oldDim.getKey(), oldDim.getValue());
-			}
-		}
-		oldDims = new Hashtable<Integer, Object>();
 	}
 
 	public static void CreateNewDimensionSP(DimensionConfig dimensionConfig, MinecraftServer server)

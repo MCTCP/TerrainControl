@@ -103,6 +103,8 @@ public final class OTGCommandHandler implements ICommand
         		sender.sendMessage(new TextComponentString(""));
                 sender.sendMessage(new TextComponentString("-- OpenTerrainGenerator --"));
                 sender.sendMessage(new TextComponentString(""));
+                sender.sendMessage(new TextComponentString("Press \"O\" to open the world settings menu."));
+                sender.sendMessage(new TextComponentString(""));
                 sender.sendMessage(new TextComponentString("Commands:"));
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg world " + VALUE_COLOR + "Show author and description information for this world."));
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg biome <-f, -s, -d, -m> " + VALUE_COLOR + "Show biome information for the biome at the player's coordinates."));

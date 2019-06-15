@@ -490,9 +490,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 	                if (pack != null)
 	                {
 	                    logo = pack.getPackImage();
-	                }
-	                else
-	                {
+	                } else {
 	                    InputStream logoResource = getClass().getResourceAsStream(presetWorldPackerMod.getMetadata().logoFile);
 	                    if (logoResource != null)
 	                        logo = ImageIO.read(logoResource);
@@ -739,7 +737,10 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         	{
 	        	for(DimensionConfig dimConfig : ((OTGGuiDimensionList)this.parent.previousMenu).dimensions)
 	        	{
-	        		if(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(index)))
+	        		if(
+        				(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(index))) ||
+        				(dimConfig.PresetName == null && OTG.GetDimensionsConfig().WorldName.equals(presets.get(index)))
+    				)
 	        		{
 	        			return;
 	        		}
@@ -782,7 +783,10 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         	{
 	        	for(DimensionConfig dimConfig : ((OTGGuiDimensionList)this.parent.previousMenu).dimensions)
 	        	{
-	        		if(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(idx)))
+	        		if(
+        				(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(idx))) ||
+        				(dimConfig.PresetName == null && OTG.GetDimensionsConfig().WorldName.equals(presets.get(idx)))
+    				)
 	        		{
 	        			bFound = true;
 	        			break;

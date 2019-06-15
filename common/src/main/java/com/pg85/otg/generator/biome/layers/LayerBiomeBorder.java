@@ -2,17 +2,21 @@ package com.pg85.otg.generator.biome.layers;
 
 import com.pg85.otg.LocalBiome;
 import com.pg85.otg.LocalWorld;
+import com.pg85.otg.OTG;
 import com.pg85.otg.generator.biome.ArraysCache;
+import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ConfigProvider;
 
 public class LayerBiomeBorder extends Layer
 {
-
     private boolean[][] bordersFrom;
     private int[] bordersTo;
+    private int defaultOceanId;
 
-    public LayerBiomeBorder(long seed, LocalWorld world)
+    public LayerBiomeBorder(long seed, LocalWorld world, int defaultOceanId)
     {
         super(seed);
+        this.defaultOceanId = defaultOceanId;
         this.bordersFrom = new boolean[world.getMaxBiomesCount()][];
         this.bordersTo = new int[world.getMaxBiomesCount()];
     }
@@ -34,7 +38,7 @@ public class LayerBiomeBorder extends Layer
     {
         int[] childInts = this.child.getInts(world, cache, x - 1, z - 1, xSize + 2, zSize + 2);
         int[] thisInts = cache.getArray(xSize * zSize);
-
+        
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
@@ -63,5 +67,14 @@ public class LayerBiomeBorder extends Layer
 
         return thisInts;
     }
-
+    
+    /**
+     * In a single step, checks for land and when present returns biome data
+     * @param selection The location to be checked
+     * @return Biome Data or 0 when not on land
+     */
+    protected int getBiomeFromLayer(int selection)
+    {
+        return (selection & LandBit) != 0 ? (selection & BiomeBits) : this.defaultOceanId;
+    }
 }

@@ -97,7 +97,7 @@ public class OTGPlugin
         // Register village and rare building starts
         MapGenStructureIO.registerStructure(OTGRareBuildingStart.class, StructureNames.RARE_BUILDING);
         MapGenStructureIO.registerStructure(OTGVillageStart.class, StructureNames.VILLAGE);
-
+       
         // Register listening channel for listening to received configs. <- Spigot only?
         if (event.getSide() == Side.CLIENT)
         {
@@ -233,8 +233,6 @@ public class OTGPlugin
 				}
 				OTG.SetDimensionsConfig(dimsConfig);
 			}
-		    			
-		    OTGDimensionManager.ReAddOTGDims();
 	
 		    // Load any saved dimensions.
 		    OTGDimensionManager.LoadCustomDimensionData();

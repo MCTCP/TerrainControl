@@ -14,6 +14,12 @@ import java.util.Random;
 
 public class OTGRareBuildingStart extends StructureStart
 {
+    // Required by Minecraft's structure loading code
+    public OTGRareBuildingStart()
+    {
+    	super();
+    }
+	
     public OTGRareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getWorld(world);
@@ -52,10 +58,5 @@ public class OTGRareBuildingStart extends StructureStart
         }
 
         this.updateBoundingBox();
-    }
-
-    public OTGRareBuildingStart()
-    {
-        // Required by Minecraft's structure loading code
     }
 }

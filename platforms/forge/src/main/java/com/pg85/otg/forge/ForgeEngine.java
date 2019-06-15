@@ -684,8 +684,6 @@ public class ForgeEngine extends OTGEngine
         // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
     	this.worldLoader.clearBiomeDictionary(null);
     	BiomeRegistryManager.ClearOTGBiomeIds();
-
-    	OTGDimensionManager.RemoveOTGDims();
 	}
 
 	@Override

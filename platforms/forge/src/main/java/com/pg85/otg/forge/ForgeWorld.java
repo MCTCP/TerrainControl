@@ -67,7 +67,15 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.structure.MapGenMineshaft;
+import net.minecraft.world.gen.structure.MapGenScatteredFeature;
+import net.minecraft.world.gen.structure.MapGenStronghold;
+import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.MapGenVillage;
+import net.minecraft.world.gen.structure.StructureOceanMonument;
+import net.minecraft.world.gen.structure.WoodlandMansion;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraft.world.storage.DerivedWorldInfo;
@@ -101,13 +109,13 @@ public class ForgeWorld implements LocalWorld
 
     public HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
-    public OTGStrongholdGen strongholdGen;
-    public OTGVillageGen villageGen;
-    public OTGMineshaftGen mineshaftGen;
-    public OTGRareBuildingGen rareBuildingGen;
+    public MapGenStructure strongholdGen;
+    public MapGenStructure villageGen;
+    public MapGenStructure mineshaftGen;
+    public MapGenStructure rareBuildingGen;
     public OTGNetherFortressGen netherFortressGen;
-    public OTGOceanMonumentGen oceanMonumentGen;
-    public OTGWoodLandMansionGen woodLandMansionGen;
+    public MapGenStructure oceanMonumentGen;
+    public MapGenStructure woodLandMansionGen;
 
     private WorldGenDungeons dungeonGen;
     private WorldGenFossils fossilGen;
@@ -977,68 +985,7 @@ public class ForgeWorld implements LocalWorld
     public void provideWorldInstance(WorldServer world)
     {
         ServerConfigProvider configs = (ServerConfigProvider) this.settings;
-        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(world));
-        
-        // Custom dimension settings
-        // world is unique for this dimension however its worldinfo
-        // was derived from the main world and has the same seed
-        // configure the correct seed for this dimension.
-		// If the world is a TCWorldServerMulti then it was created
-		// by a console command and has already had its seed set
-        if(world.provider.getDimension() != 0 && !(world instanceof OTGWorldServerMulti))
-        {
-            //TODO: This code is never used? Test..
-        	if(1 == 1) { throw new RuntimeException("Please report this crash to the OpenTerrainGenerator github issue tracker. Thank you!"); }
-        	
-        	// TODO: Use seed from Dimensions.txt instead <-- Why, seeds in dims seem to be working fine?
-            long seedIn = (long) Math.floor((Math.random() * Long.MAX_VALUE));            
-            if(dimConfig.Seed != null && dimConfig.Seed.trim().length() > 0)
-            {
-                try
-                {
-                	seedIn = dimConfig.Seed == null || dimConfig.Seed.trim().length() == 0 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : Long.parseLong(dimConfig.Seed);
-                }
-            	catch(NumberFormatException ex)
-                {
-            		OTG.log(LogMarker.ERROR, "WorldConfig for world \"" + world.getWorldInfo().getWorldName() + "\" has value \"" + dimConfig.Seed + "\" for worldSeed which cannot be parsed as a number. Using a random seed instead.");
-                }
-            }
-
-    		GameType gameType = world.getWorldInfo().getGameType();
-    		boolean enableMapFeatures = world.getWorldInfo().isMapFeaturesEnabled(); // Whether the map features (e.g. strongholds) generation is enabled or disabled.
-    		boolean hardcoreMode = world.getWorldInfo().isHardcoreModeEnabled();
-    		WorldType worldTypeIn = world.getWorldType();
-
-    		String generatorOptions = world.getWorldInfo() instanceof DerivedWorldInfo ? ((DerivedWorldInfo)world.getWorldInfo()).delegate.getGeneratorOptions() : world.getWorldInfo().getGeneratorOptions();
-    		boolean enableCommands = world.getWorldInfo().areCommandsAllowed();
-
-    		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, worldTypeIn);
-    		settings.setGeneratorOptions(generatorOptions);    	    
-   			if(enableCommands) { settings.enableCommands(); }
-
-    		WorldInfo worldInfo = new WorldInfo(settings, world.getWorldInfo().getWorldName());
-
-    		try {
-    			Field[] fields = World.class.getDeclaredFields();
-    			for(Field field : fields)
-    			{
-    				Class<?> fieldClass = field.getType();
-    				if(fieldClass.equals(net.minecraft.world.storage.WorldInfo.class))
-    				{
-    			        field.setAccessible(true);
-    			        field.set(world, worldInfo);
-    			        break;
-    				}
-    			}
-    		} catch (SecurityException e) {
-    			e.printStackTrace();
-    		} catch (IllegalArgumentException e) {
-    			e.printStackTrace();
-    		} catch (IllegalAccessException e) {
-    			e.printStackTrace();
-    		}
-        }
-        //
+        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(world));        
 
         this.world = world;
         OTGDimensionManager.ApplyGameRulesToWorld(world, dimConfig);
@@ -1049,15 +996,14 @@ public class ForgeWorld implements LocalWorld
 
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
-        this.strongholdGen = new OTGStrongholdGen(configs, world);
-
-        this.villageGen = new OTGVillageGen(configs);
-        this.mineshaftGen = new OTGMineshaftGen();
-        this.rareBuildingGen = new OTGRareBuildingGen(configs);
         this.netherFortressGen = new OTGNetherFortressGen();
-        this.oceanMonumentGen = new OTGOceanMonumentGen(configs);
-        this.woodLandMansionGen = new OTGWoodLandMansionGen(configs);
-
+        this.strongholdGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGStrongholdGen(configs, world), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
+        this.villageGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGVillageGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
+        this.mineshaftGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGMineshaftGen(), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);        
+        this.rareBuildingGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGRareBuildingGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.SCATTERED_FEATURE);
+        this.oceanMonumentGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGOceanMonumentGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.OCEAN_MONUMENT);
+        this.woodLandMansionGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGWoodLandMansionGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.WOODLAND_MANSION);
+        
         IBlockState jungleLog = Blocks.LOG.getDefaultState()
                 .withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.JUNGLE);
         IBlockState jungleLeaves = Blocks.LEAVES.getDefaultState()
@@ -1530,18 +1476,25 @@ public class ForgeWorld implements LocalWorld
 		}
 	}
 
+	// Used to make sure OTG+ structures don't spawn on top of default structures
 	@Override
 	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk)
 	{
         WorldConfig worldConfig = this.settings.getWorldConfig();
         ChunkPos chunkPos = new ChunkPos(new BlockPos(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter()));
-        //(worldConfig.strongholdsEnabled && this.strongholdGen.generate(this.world, chunkX, chunkZ, null)) || // TODO: Why is this commented out?
-        //(worldConfig.mineshaftsEnabled && this.mineshaftGen.chunkHasStructure(this.world, rand, chunkPos)) || // TODO: Why is this commented out?
-        return (worldConfig.villagesEnabled && this.villageGen.chunkHasStructure(this.world, rand, chunkPos)) ||
-        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen.chunkHasStructure(this.world, rand, chunkPos)) ||
+        //(worldConfig.strongholdsEnabled && this.strongholdGen.generate(this.world, chunkX, chunkZ, null)) || // Allow OTG structures to spawn on top of strongholds
+        //(worldConfig.mineshaftsEnabled && this.mineshaftGen.chunkHasStructure(this.world, rand, chunkPos)) || // Allow OTG structures to spawn on top of mine shafts
+        return 
+		(worldConfig.villagesEnabled && this.villageGen instanceof OTGVillageGen && ((OTGVillageGen)this.villageGen).chunkHasStructure(this.world, rand, chunkPos)) ||
+		(worldConfig.villagesEnabled && !(this.villageGen instanceof OTGVillageGen) && this.villageGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7))) ||
+        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen instanceof OTGRareBuildingGen && ((OTGRareBuildingGen)this.rareBuildingGen).chunkHasStructure(this.world, rand, chunkPos)) ||
+        (worldConfig.rareBuildingsEnabled && !(this.rareBuildingGen instanceof OTGRareBuildingGen) && this.rareBuildingGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7))) ||
         (worldConfig.netherFortressesEnabled && this.netherFortressGen.chunkHasStructure(this.world, rand, chunkPos)) ||
-        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen.chunkHasStructure(this.world, rand, chunkPos)) ||
-        (worldConfig.woodLandMansionsEnabled && this.woodLandMansionGen.chunkHasStructure(this.world, rand, chunkPos));
+        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen instanceof OTGOceanMonumentGen && ((OTGOceanMonumentGen)this.oceanMonumentGen).chunkHasStructure(this.world, rand, chunkPos)) ||
+        (worldConfig.oceanMonumentsEnabled && !(this.oceanMonumentGen instanceof OTGOceanMonumentGen) && this.oceanMonumentGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7))) ||
+        (worldConfig.woodLandMansionsEnabled && this.woodLandMansionGen instanceof OTGWoodLandMansionGen && ((OTGWoodLandMansionGen)this.woodLandMansionGen).chunkHasStructure(this.world, rand, chunkPos)) ||
+        (worldConfig.woodLandMansionsEnabled && !(this.woodLandMansionGen instanceof OTGWoodLandMansionGen) && this.woodLandMansionGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7)))
+        ;
 	}
 
 	@Override

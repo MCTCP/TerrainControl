@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.google.common.collect.Lists;
 import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.generator.structure.OTGVillageGen;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
@@ -91,11 +92,10 @@ public class OTGBiomeProvider extends BiomeProvider
     public boolean areBiomesViable(int x, int z, int radius, List<Biome> allowed)
     {
         // Hack for villages in other biomes
-        // (The alternative would be to completely override the village spawn
-        // code)
-        if (allowed == MapGenVillage.VILLAGE_SPAWN_BIOMES && this.localWorld.villageGen != null)
+        // (The alternative would be to completely override the village spawn code)
+        if (allowed == MapGenVillage.VILLAGE_SPAWN_BIOMES && this.localWorld.villageGen instanceof OTGVillageGen && this.localWorld.villageGen != null)
         {
-            allowed = this.localWorld.villageGen.villageSpawnBiomes;
+            allowed = ((OTGVillageGen)this.localWorld.villageGen).villageSpawnBiomes;
         }
 
         int i = x - radius >> 2;

@@ -47,6 +47,7 @@ public class DimensionsConfig
 			return forgeWorldConfig;
 		}
 		
+		// TODO: Doesn't Forge provide a better way of getting the config dir?
 		File configDir = new File(OTG.getEngine().getOTGDataFolder().getParentFile().getParentFile() + "//config//OpenTerrainGenerator//");
 		if(configDir.exists())
 		{
@@ -181,7 +182,7 @@ public class DimensionsConfig
 				read.close();
 				
 				FileWriter writer = new FileWriter(forgeWorldConfigFile);
-				String headerComments = "#Herp dee derpdy derp.";
+				String headerComments = "#TODO: Provide instructions for modpack devs.";
 				writer.append(headerComments);
 	
 				for (int i = 0; i < list.size(); i++){

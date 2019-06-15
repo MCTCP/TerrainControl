@@ -240,7 +240,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     		}
     	}
 
-        this.buttonList.add(new GuiButton(iNewButton, OTGGuiDimensionList.this.leftMargin, this.height - btnBottomMargin, listWidth, 20, "New"));
+        this.buttonList.add(new GuiButton(iNewButton, OTGGuiDimensionList.this.leftMargin, this.height - btnBottomMargin, listWidth, 20, "Add"));
         this.btnDelete = new GuiButton(iDeleteButton, OTGGuiDimensionList.this.leftMargin, this.height - (btnBottomMargin - 24), listWidth, 20, "Delete");
         this.buttonList.add(btnDelete);
         
