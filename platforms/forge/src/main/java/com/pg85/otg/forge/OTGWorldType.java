@@ -54,7 +54,7 @@ public class OTGWorldType extends WorldType
         	// If this is a dimension added by another mod then return the default overworld's biomeprovider
         	// This can happen when using an OTG overworld, new dimensions inherit the terrain type of the overworld.
         	// TODO: Can this still happen?
-        	OTG.log(LogMarker.INFO, "Non-OTG dimension detected, using default biome provider.");
+        	OTG.log(LogMarker.WARN, "Non-OTG dimension detected, using default biome provider.");
         	return super.getBiomeProvider(mcWorld);
         }
         

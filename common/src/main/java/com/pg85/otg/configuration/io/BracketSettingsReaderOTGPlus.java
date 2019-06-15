@@ -90,10 +90,10 @@ public class BracketSettingsReaderOTGPlus implements SettingsReaderOTGPlus
             try
             {
                 return setting.read(stringValue);
-            } catch (InvalidConfigException e)
+            }
+            catch (InvalidConfigException e)
             {
-                OTG.log(LogMarker.ERROR, "The value \"{}\" is not valid for the setting {} in {}: {}",
-                        stringValue, setting, name, e.getMessage());
+                OTG.log(LogMarker.WARN, "The value \"{}\" is not valid for the setting {} in {}: {}", stringValue, setting, name, e.getMessage());
             }
         }
 

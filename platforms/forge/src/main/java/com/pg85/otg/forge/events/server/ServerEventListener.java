@@ -232,7 +232,10 @@ public class ServerEventListener
                     Class<? extends Entity> entityClass = MobSpawnGroupHelper.toMinecraftClass(mobTypeName);                    
                     if(entityClass == null)
                     {
-                    	OTG.log(LogMarker.INFO, "Could not find entity: " + mobTypeName);
+                    	if(OTG.getPluginConfig().SpawnLog)
+                    	{
+                    		OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
+                    	}
                     	continue;
                     }
 
@@ -268,7 +271,10 @@ public class ServerEventListener
                         }
                         catch (NBTException nbtexception)
                         {
-                        	OTG.log(LogMarker.INFO, "Invalid NBT tag for mob in SpawnerFunction: " + spawnerData.getMetaData() + ". Skipping mob.");
+                        	if(OTG.getPluginConfig().SpawnLog)
+                        	{
+                        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in SpawnerFunction: " + spawnerData.getMetaData() + ". Skipping mob.");
+                        	}
                         	continue;
                         }
 
@@ -609,7 +615,7 @@ public class ServerEventListener
 			                    	chunkZ = Integer.parseInt(paramString[2]);
 		                    	} catch(NumberFormatException ex)
 		                    	{
-		                    		OTG.log(LogMarker.INFO, "The mod " + imcMessage.getSender() + " has sent the following message: " + imcMessage.key + ", however the parameters were invalid: " + imcMessage.getStringValue() + ". Should be: MyWorldName,MyChunkX,MyChunkZ");
+		                    		OTG.log(LogMarker.WARN, "The mod " + imcMessage.getSender() + " has sent the following message: " + imcMessage.key + ", however the parameters were invalid: " + imcMessage.getStringValue() + ". Should be: MyWorldName,MyChunkX,MyChunkZ");
 		                    		return;
 		                    	}
 
@@ -633,7 +639,7 @@ public class ServerEventListener
 		                    		FMLInterModComms.sendRuntimeMessage(OTGPlugin.instance, imcMessage.getSender(), "ModData", "[" + "[" + worldName + "," + chunkX + "," + chunkZ + "]]");
 		                    	}
 	                    	} else {
-	            	        	OTG.log(LogMarker.INFO, "The mod " + imcMessage.getSender() + " has sent the following message: " + imcMessage.key + ", however the parameters were invalid: " + imcMessage.getStringValue() + ". Should be: MyWorldName,MyChunkX,MyChunkZ");
+	            	        	OTG.log(LogMarker.WARN, "The mod " + imcMessage.getSender() + " has sent the following message: " + imcMessage.key + ", however the parameters were invalid: " + imcMessage.getStringValue() + ". Should be: MyWorldName,MyChunkX,MyChunkZ");
 	                    	}
 	                    }
 	                }
@@ -665,18 +671,18 @@ public class ServerEventListener
 
 		    						if(world == null)
 		    						{
-		    							OTG.log(LogMarker.INFO, "Error: Failed to load LocalWorld for world \"" + worldName + "\"");
-		    							throw new RuntimeException();
+		    							OTG.log(LogMarker.FATAL, "Error: Failed to load LocalWorld for world \"" + worldName + "\"");
+		    							throw new RuntimeException("Error: Failed to load LocalWorld for world \"" + worldName + "\"");
 		    						}
 		    						if(world.getConfigs() == null)
 		    						{
-		    							OTG.log(LogMarker.INFO, "Error: Failed to load world settings for world \"" + worldName + "\"");
-		    							throw new RuntimeException();
+		    							OTG.log(LogMarker.FATAL, "Error: Failed to load world settings for world \"" + worldName + "\"");
+		    							throw new RuntimeException("Error: Failed to load world settings for world \"" + worldName + "\"");
 		    						}
 		    						if(world.getConfigs().getWorldConfig() == null)
 		    						{
-		    							OTG.log(LogMarker.INFO, "Error: Failed to load worldConfig for world \"" + worldName + "\"");
-		    							throw new RuntimeException();
+		    							OTG.log(LogMarker.FATAL, "Error: Failed to load worldConfig for world \"" + worldName + "\"");
+		    							throw new RuntimeException("Error: Failed to load worldConfig for world \"" + worldName + "\"");
 		    						}
 
 		    						String[] paramString2 = modDataText.split("\\/");
@@ -701,7 +707,10 @@ public class ServerEventListener
 		    								}
 		    								catch(NumberFormatException ex)
 		    								{
-		    									OTG.log(LogMarker.INFO, "Error in ModData: " + modDataText + " parameter count was not a number");
+		    									if(OTG.getPluginConfig().SpawnLog)
+		    									{
+		    										OTG.log(LogMarker.WARN, "Error in ModData: " + modDataText + " parameter count was not a number");
+		    									}
 		    								}
 		    							}
 		    							else if(paramString2[0].equals("block"))
@@ -712,8 +721,11 @@ public class ServerEventListener
 											}
 		    								catch (InvalidConfigException e)
 		    								{
-												e.printStackTrace();
-												OTG.log(LogMarker.INFO, "Error in ModData: " + modDataText + " parameter material was not a valid material");
+		    									if(OTG.getPluginConfig().SpawnLog)
+		    									{
+													OTG.log(LogMarker.WARN, "Error in ModData: " + modDataText + " parameter material was not a valid material");
+													e.printStackTrace();
+		    									}
 											}
 		    							}
 		    						}

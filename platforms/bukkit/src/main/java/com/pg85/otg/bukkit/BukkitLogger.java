@@ -41,10 +41,10 @@ final class BukkitLogger extends Logger
                 logger.info(logPrefix + message, params);
                 break;
             case DEBUG:
-                logger.info(logPrefix + "[Debug] " + message, params);
+                logger.debug(logPrefix + message, params);
                 break;
             case TRACE:
-                logger.trace(logPrefix + "[Trace] " + message, params);
+                logger.trace(logPrefix + message, params);
                 break;
             default:
                 // Unknown log level, should never happen

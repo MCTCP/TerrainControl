@@ -359,7 +359,7 @@ public final class BiomeConfigFinder
         {
             return newFile;
         } else {
-            OTG.log(LogMarker.WARN, "Failed to rename biome file {} to {}",
+            OTG.log(LogMarker.ERROR, "Failed to rename biome file {} to {}",
                     new Object[] {toRename.getAbsolutePath(), newFile.getAbsolutePath()});
             return toRename;
         }

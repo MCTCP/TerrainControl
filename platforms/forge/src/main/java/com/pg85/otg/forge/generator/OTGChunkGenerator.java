@@ -121,15 +121,15 @@ public class OTGChunkGenerator implements IChunkGenerator
 					{
 						throw new RuntimeException();
 					}
-					OTG.log(LogMarker.INFO, "Double population prevented");
+					OTG.log(LogMarker.WARN, "Double population prevented");
 				}
 			}
 			if(chunk != null)
 			{
-				OTG.log(LogMarker.INFO, "Double population prevented");
+				OTG.log(LogMarker.WARN, "Double population prevented");
 				return chunk;
 			} else {
-				OTG.log(LogMarker.INFO, "Double population could not be prevented for chunk X" + chunkX + " Z" + chunkZ);
+				OTG.log(LogMarker.WARN, "Double population could not be prevented for chunk X" + chunkX + " Z" + chunkZ);
 			}
 		}
 
@@ -219,11 +219,12 @@ public class OTGChunkGenerator implements IChunkGenerator
     		{
     			if(!world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
     			{
-    				throw new RuntimeException();
+    				OTG.log(LogMarker.FATAL, "This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 1");
+    				throw new RuntimeException("This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 1");
     			}
     		}
-    		OTG.log(LogMarker.INFO, "This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me!");
-        	throw new RuntimeException();
+    		OTG.log(LogMarker.FATAL, "This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 2");
+        	throw new RuntimeException("This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 2");
         }
         if(MessagesPerMod != null && MessagesPerMod.entrySet().size() > 0)
         {

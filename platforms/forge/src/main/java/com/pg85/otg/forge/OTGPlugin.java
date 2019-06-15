@@ -256,7 +256,7 @@ public class OTGPlugin
 		    		File worldConfigFile = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimConfig.PresetName + "/WorldConfig.ini");
 		    		if(!worldConfigFile.exists())
 		    		{
-		    			OTG.log(LogMarker.ERROR, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
+		    			OTG.log(LogMarker.WARN, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
 		    		} else {
 		    			OTG.isNewWorldBeingCreated = true;
 		    			OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);

@@ -485,7 +485,7 @@ public class OTGDimensionManager
         	dimensionDataFile.getParentFile().mkdirs();
         	writer = new BufferedWriter(new FileWriter(dimensionDataFile));
             writer.write(stringbuilder.toString());
-            OTG.log(LogMarker.TRACE, "Custom dimension data saved");
+            OTG.log(LogMarker.DEBUG, "Custom dimension data saved");
         }
         catch (IOException e)
         {
@@ -566,7 +566,7 @@ public class OTGDimensionManager
 				    {
 				    	dimensionDataFileValues = stringbuilder.toString().split(",");
 				    }
-				    OTG.log(LogMarker.TRACE, "Custom dimension data loaded");
+				    OTG.log(LogMarker.DEBUG, "Custom dimension data loaded");
 				} finally {
 					reader.close();
 				}
@@ -633,7 +633,7 @@ public class OTGDimensionManager
 				    {
 				    	dimensionDataFileValues = stringbuilder.toString().split(",");
 				    }
-				    OTG.log(LogMarker.TRACE, "Custom dimension data loaded");
+				    OTG.log(LogMarker.DEBUG, "Custom dimension data loaded");
 				} finally {
 					reader.close();
 				}

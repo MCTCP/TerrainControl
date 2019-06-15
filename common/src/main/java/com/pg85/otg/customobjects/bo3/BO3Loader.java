@@ -84,7 +84,10 @@ public class BO3Loader implements CustomObjectLoader
         } catch (FileNotFoundException e)
         {
             // File not found
-            OTG.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
+        	if(OTG.getPluginConfig().SpawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
+        	}
             return null;
         } catch (IOException e)
         {
@@ -101,14 +104,20 @@ public class BO3Loader implements CustomObjectLoader
             }             
             catch (java.lang.ArrayIndexOutOfBoundsException corruptFile)
             {
-                OTG.log(LogMarker.FATAL, "Failed to read NBT meta file: ", e.getMessage());
-                OTG.printStackTrace(LogMarker.FATAL, corruptFile);
+            	if(OTG.getPluginConfig().SpawnLog)
+            	{
+	                OTG.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
+	                OTG.printStackTrace(LogMarker.ERROR, corruptFile);
+            	}
                 return null;
             }
             catch (IOException corruptFile)
             {
-                OTG.log(LogMarker.FATAL, "Failed to read NBT meta file: ", e.getMessage());
-                OTG.printStackTrace(LogMarker.FATAL, corruptFile);
+            	if(OTG.getPluginConfig().SpawnLog)
+            	{
+	                OTG.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
+	                OTG.printStackTrace(LogMarker.ERROR, corruptFile);
+            	}
                 return null;
             } finally
             {

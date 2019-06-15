@@ -440,7 +440,10 @@ public class BO3Config extends CustomObjectConfigFile
 			}
 	    	if(!inheritedBO3Loaded)
 	    	{
-	    		OTG.log(LogMarker.INFO, "could not load BO3 parent for InheritBO3: " + this.inheritBO3 + " in BO3 " + this.getName());
+	    		if(OTG.getPluginConfig().SpawnLog)
+	    		{
+	    			OTG.log(LogMarker.WARN, "could not load BO3 parent for InheritBO3: " + this.inheritBO3 + " in BO3 " + this.getName());
+	    		}
 	    	}
     	}
     }

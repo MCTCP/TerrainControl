@@ -61,7 +61,7 @@ public class MapWriter implements Runnable
      */
     private int[] getColors(World world)
     {
-        OTG.log(LogMarker.TRACE, "BukkitWorld::UUID:: {}", world.getDataManager().getUUID());
+        OTG.log(LogMarker.DEBUG, "BukkitWorld::UUID:: {}", world.getDataManager().getUUID());
         LocalWorld bukkitWorld = WorldHelper.toLocalWorld(world);
         if (bukkitWorld == null)
         {
@@ -72,7 +72,7 @@ public class MapWriter implements Runnable
 
         LocalBiome[] biomes = bukkitWorld.getConfigs().getBiomeArrayByOTGId();
         int[] colors = new int[biomes.length];
-        OTG.log(LogMarker.TRACE, "BukkitWorld settings biomes.length::{}", biomes.length);
+        OTG.log(LogMarker.DEBUG, "BukkitWorld settings biomes.length::{}", biomes.length);
 
         for (LocalBiome biome : biomes)
         {
@@ -166,9 +166,10 @@ public class MapWriter implements Runnable
                             // Temperature
                             Color temperatureColor = getBiomeTemperatureColor(biomeBuffer[arrayPosition], localWorld);
                             temperatureImage.setRGB(imageX, imageY, temperatureColor.getRGB());
-                        } catch (ArrayIndexOutOfBoundsException ex)
+                        }
+                        catch (ArrayIndexOutOfBoundsException ex)
                         {
-                            OTG.log(LogMarker.TRACE, "BiomeBuff Idx::{}<{}x/{}z>, Len::{}, ID::{} | Colors Len::{}",
+                            OTG.log(LogMarker.DEBUG, "BiomeBuff Idx::{}<{}x/{}z>, Len::{}, ID::{} | Colors Len::{}",
                                     new Object[] {arrayPosition, x1, z1, biomeBuffer.length, WorldHelper.getOTGBiomeId(biomeBuffer[arrayPosition]), colors.length});
                         }
                     }
@@ -187,7 +188,8 @@ public class MapWriter implements Runnable
             ImageIO.write(temperatureImage, "png", new File(label + world.worldData.getName() + "_temperature.png"));
 
             sender.sendMessage(BaseCommand.MESSAGE_COLOR + "Done");
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
             sender.sendMessage(BaseCommand.ERROR_COLOR + "Exception while writing images: " + e.getLocalizedMessage());
             OTG.log(LogMarker.ERROR, "Failed to write image.");

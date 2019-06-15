@@ -4,7 +4,11 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.Map.Entry;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Set;
 
 import com.pg85.otg.LocalBiome;
@@ -93,7 +97,7 @@ public final class OTGCommandHandler implements ICommand
 				if(radius > 50)
 				{
 					radius = 50;
-					OTG.log(LogMarker.INFO, "Error in summon call: Parameter radius can be no higher than 50. Radius was set to 50.");
+					OTG.log(LogMarker.WARN, "Error in summon call: Parameter radius can be no higher than 50. Radius was set to 50.");
 				}
     			argString = new String[] { "GetModData", "OTG", radius + "" };
 			}
@@ -471,7 +475,25 @@ public final class OTGCommandHandler implements ICommand
 		            		{
 		            			if(argString.length > i + 1)
 		            			{
-		            				seed = Long.parseLong(argString[i + 1]);
+		            				seed = (new Random()).nextLong();		            				
+		            	            String sSeed = argString[i + 1];
+		            	            if (!StringUtils.isEmpty(sSeed))
+		            	            {
+		            	                try
+		            	                {
+		            	                    long j = Long.parseLong(sSeed);
+
+		            	                    if (j != 0L)
+		            	                    {
+		            	                    	seed = j;
+		            	                    }
+		            	                }
+		            	                catch (NumberFormatException var7)
+		            	                {
+		            	                	seed = (long)sSeed.hashCode();
+		            	                }
+		            	            }
+		            				
 		            			}
 		            			break;
 		            		}
@@ -791,7 +813,7 @@ public final class OTGCommandHandler implements ICommand
 	        				if(radius > 50)
 	        				{
 	        					radius = 50;
-	        					OTG.log(LogMarker.INFO, "Error in GetModData call: Parameter radius can be no higher than 50. Radius was set to 50.");
+	        					OTG.log(LogMarker.WARN, "Error in GetModData call: Parameter radius can be no higher than 50. Radius was set to 50.");
 	        				}
 	        				for(int x = -radius; x <= radius; x++)
 	        				{
@@ -804,7 +826,7 @@ public final class OTGCommandHandler implements ICommand
 	        			}
 	        			catch(NumberFormatException ex)
 	        			{
-	        				OTG.log(LogMarker.INFO, "Error in GetModData call: value \"" + argString[2] + "\" was expected to be a number");
+	        				OTG.log(LogMarker.WARN, "Error in GetModData call: value \"" + argString[2] + "\" was expected to be a number");
 	        			}
 	        		}
         		}

@@ -90,7 +90,7 @@ public class BiomeRegistryManager
 				continue;
 			}
 	
-			OTG.log(LogMarker.TRACE, "Unregistering " + biome.getValue().biomeName);
+			OTG.log(LogMarker.DEBUG, "Unregistering " + biome.getValue().biomeName);
 	
 			int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biome.getValue());
 			// If this biome uses replaceToBiomeName and has an id > 255 then it is not actually registered in the biome id
@@ -151,7 +151,7 @@ public class BiomeRegistryManager
 	        	customBiome.savedId = newId;       	        
 	        }
 	        
-	    	OTG.log(LogMarker.INFO, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
+	    	OTG.log(LogMarker.DEBUG, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
 	
 	        biome = customBiome;
 	    }

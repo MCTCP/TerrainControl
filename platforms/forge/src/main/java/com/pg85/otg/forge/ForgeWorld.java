@@ -136,7 +136,6 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
     {
-    	OTG.log(LogMarker.INFO, "createBiomeFor: " + biomeConfig.getName() + " " + biomeIds.getOTGBiomeId() + " " + biomeIds.getSavedId());
     	ForgeBiome forgeBiome = BiomeRegistryManager.getOrCreateBiome(biomeConfig, biomeIds, this.getName(), configProvider);
         this.biomeNames.put(forgeBiome.getName(), forgeBiome);
         return forgeBiome;
@@ -456,8 +455,8 @@ public class ForgeWorld implements LocalWorld
 		        Chunk spawnedChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
 		        if(spawnedChunk == null)
 		        {
-		        	OTG.log(LogMarker.INFO, "Chunk request failed X" + chunkX + " Z" + chunkZ);
-		        	throw new RuntimeException();
+		        	OTG.log(LogMarker.FATAL, "Chunk request failed X" + chunkX + " Z" + chunkZ);
+		        	throw new RuntimeException("Chunk request failed X" + chunkX + " Z" + chunkZ);
 		        }
 
 		        chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
@@ -496,8 +495,8 @@ public class ForgeWorld implements LocalWorld
         Chunk spawnedChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
         if(spawnedChunk == null)
         {
-        	OTG.log(LogMarker.INFO, "Chunk request failed X" + chunkX + " Z" + chunkZ);
-        	throw new RuntimeException();
+        	OTG.log(LogMarker.FATAL, "Chunk request failed X" + chunkX + " Z" + chunkZ);
+        	throw new RuntimeException("Chunk request failed X" + chunkX + " Z" + chunkZ);
         }
 
         chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
@@ -1112,7 +1111,10 @@ public class ForgeWorld implements LocalWorld
         {
             tileEntity.readFromNBT(nmsTag);
         } else {
-            OTG.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, allowOutsidePopulatingArea));
+        	if(OTG.getPluginConfig().SpawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, allowOutsidePopulatingArea));
+        	}
         }
     }
 
@@ -1203,7 +1205,10 @@ public class ForgeWorld implements LocalWorld
     	
         if(entityClass == null)
         {
-        	OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
+        	if(OTG.getPluginConfig().SpawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
+        	}
         	return;
         }
         
@@ -1221,7 +1226,10 @@ public class ForgeWorld implements LocalWorld
 
 	            if (!(nbtbase instanceof NBTTagCompound))
 	            {
-		        	OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            	if(OTG.getPluginConfig().SpawnLog)
+	            	{
+	            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            	}
 		        	return;
 	            }
 
@@ -1229,7 +1237,10 @@ public class ForgeWorld implements LocalWorld
 	        }
 	        catch (NBTException nbtexception)
 	        {
-	        	OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	        	if(OTG.getPluginConfig().SpawnLog)
+	        	{
+	        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	        	}
 	        	return;
 	        }
 
@@ -1298,7 +1309,10 @@ public class ForgeWorld implements LocalWorld
 
 	            		            if (!(nbtbase instanceof NBTTagCompound))
 	            		            {
-		            		        	OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		            	if(OTG.getPluginConfig().SpawnLog)
+	            		            	{
+	            		            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		            	}
 		            		        	return;
 	            		            }
 
@@ -1306,7 +1320,10 @@ public class ForgeWorld implements LocalWorld
 	            		        }
 	            		        catch (NBTException nbtexception)
 	            		        {
-	            		        	OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		        	if(OTG.getPluginConfig().SpawnLog)
+	            		        	{
+	            		        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		        	}
 	            		        	return;
 	            		        }
 

@@ -96,10 +96,7 @@ public final class SimpleSettingsMap implements SettingsMap
             {
             	if(OTG.getPluginConfig().SpawnLog)
             	{
-	                OTG.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}",
-	                        functionName, this.name,
-	                        configFunctionLine.getLineNumber(),
-	                        ((ErroredFunction<?>) function).error);
+	                OTG.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
             	}
             }
         }
@@ -142,10 +139,10 @@ public final class SimpleSettingsMap implements SettingsMap
             try
             {
                 return setting.read(stringValue);
-            } catch (InvalidConfigException e)
+            }
+            catch (InvalidConfigException e)
             {
-                OTG.log(LogMarker.ERROR, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}",
-                        stringValue, setting, name, stringWithLineNumber.getLineNumber(), e.getMessage());
+                OTG.log(LogMarker.WARN, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}", stringValue, setting, name, stringWithLineNumber.getLineNumber(), e.getMessage());
             }
         }
 

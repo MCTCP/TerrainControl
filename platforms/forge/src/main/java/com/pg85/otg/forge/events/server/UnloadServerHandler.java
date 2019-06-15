@@ -17,9 +17,9 @@ public class UnloadServerHandler
 			((ForgeEngine)OTG.getEngine()).onSave(event.getWorld());
 			if(OTG.getPluginConfig().DeveloperMode)
 			{
-	    		OTG.log(LogMarker.INFO, "Unloading BO2's/BO3's");
+	    		OTG.log(LogMarker.DEBUG, "Unloading BO2's/BO3's");
 	    		OTG.getEngine().ReloadCustomObjectFiles();
-	    		OTG.log(LogMarker.INFO, "BO2's/BO3's unloaded");
+	    		OTG.log(LogMarker.DEBUG, "BO2's/BO3's unloaded");
 			}
 		}
 	}

@@ -126,10 +126,10 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
         {
             writer.flush();
             writer.close();
-        } catch (IOException e)
+        }
+        catch (IOException e)
         {
-            OTG.log(LogMarker.WARN, "Failed to close file {} ({})",
-                    file.getAbsolutePath(), e.getMessage());
+            OTG.log(LogMarker.WARN, "Failed to close file {} ({})", file.getAbsolutePath(), e.getMessage());
         }
         writer = null;
     }

@@ -169,8 +169,8 @@ public final class ServerConfigProvider implements ConfigProvider
         // Index all necessary settings
         String loadedBiomeNames = indexSettings(worldConfig.customBiomeGenerationIds, worldConfigSettings.isNewConfig(), loadedBiomes, worldSaveFolder);
 
-        OTG.log(LogMarker.INFO, "{} biomes Loaded", biomesCount);
-        OTG.log(LogMarker.TRACE, "{}", loadedBiomeNames);
+        OTG.log(LogMarker.DEBUG, "{} biomes Loaded", biomesCount);
+        OTG.log(LogMarker.DEBUG, "{}", loadedBiomeNames);
     }
 
     @Override
@@ -364,12 +364,9 @@ public final class ServerConfigProvider implements ConfigProvider
         	}
         }
         
-        OTG.log(LogMarker.INFO, "indexSettings start");
         // Set OTG biome id's for biomes, make sure there is enough space to register all biomes.
         for (BiomeConfig biomeConfig : loadedBiomeList)
-        {     
-        	OTG.log(LogMarker.INFO, "indexSettings0: " + biomeConfig.getName());
-        	
+        {            	
             // Statistics of the loaded biomes
             this.biomesCount++;
             loadedBiomeNames.append(biomeConfig.getName());
@@ -413,6 +410,7 @@ public final class ServerConfigProvider implements ConfigProvider
 	            {
 	            	if((biomeConfig.replaceToBiomeName.isEmpty() && i > 255) || (biomeConfig.replaceToBiomeName.isEmpty() && i >= OTG.getEngine().getOTGBiomeIds(world.getName()).length))
 	            	{
+	            		OTG.log(LogMarker.FATAL, "Biome could not be registered, no free biome id's!");
 	            		throw new RuntimeException("Biome could not be registered, no free biome id's!");
 	            	}
 	            	if(OTG.getEngine().isOTGBiomeIdAvailable(world.getName(), i))
@@ -430,7 +428,6 @@ public final class ServerConfigProvider implements ConfigProvider
 	        	{
 	        		virtualBiomes.add(biomeConfig);
 	        	}
-	        	OTG.log(LogMarker.INFO, "indexSettings1: " + biomeConfig.getName() + " " + otgBiomeId);
             }        	
         }
                 
@@ -521,7 +518,7 @@ public final class ServerConfigProvider implements ConfigProvider
         	biomeIdDataFile.getParentFile().mkdirs();
         	writer = new BufferedWriter(new FileWriter(biomeIdDataFile));
             writer.write(stringbuilder.toString());
-            OTG.log(LogMarker.TRACE, "Custom dimension data saved");
+            OTG.log(LogMarker.DEBUG, "Custom dimension data saved");
         }
         catch (IOException e)
         {
@@ -574,15 +571,18 @@ public final class ServerConfigProvider implements ConfigProvider
 				    {
 				    	biomeIdDataFileValues = stringbuilder.toString().split(",");
 				    }
-				    OTG.log(LogMarker.TRACE, "Biome Id data loaded");
+				    OTG.log(LogMarker.DEBUG, "Biome Id data loaded");
 				} finally {
 					reader.close();
 				}
 
-			} catch (FileNotFoundException e1) {
+			}
+			catch (FileNotFoundException e1)
+			{
 				e1.printStackTrace();
 			}
-			catch (IOException e1) {
+			catch (IOException e1)
+			{
 				e1.printStackTrace();
 			}
 		}
@@ -634,11 +634,10 @@ public final class ServerConfigProvider implements ConfigProvider
     	}
     	if(otgBiomeId == -1)
     	{
+    		OTG.log(LogMarker.FATAL, "Biome was not registered, most likely there were no id's available.");
     		throw new RuntimeException("Biome was not registered, most likely there were no id's available.");
     	}
-
-        OTG.log(LogMarker.INFO, "CreateAndRegisterBiome1: " + biomeConfig.getName() + " " + otgBiomeId + " " + savedBiomeId);
-    	
+  	
         // Get correct saved id (defaults to generation id, but can be set to use the generation id of another biome)
         if (!biomeConfig.replaceToBiomeName.isEmpty())
         {
@@ -683,13 +682,12 @@ public final class ServerConfigProvider implements ConfigProvider
         			savedBiomeId = biome.getIds().getOTGBiomeId(); // TODO: Re-implement replacetobiomename:virtualbiome
         		} else {
             		savedBiomeId = getRequestedSavedId(biomeConfig.replaceToBiomeName);
+            		OTG.log(LogMarker.FATAL, "ReplaceToBiomeName: " + biomeConfig.replaceToBiomeName + " for biome " + biomeConfig.getName() + " could not be found. Please note that it is not possible to ReplaceToBiomeName to a ReplaceToBiomeName biome. Please update your biome configs.");
         			throw new RuntimeException("ReplaceToBiomeName: " + biomeConfig.replaceToBiomeName + " for biome " + biomeConfig.getName() + " could not be found. Please note that it is not possible to ReplaceToBiomeName to a ReplaceToBiomeName biome. Please update your biome configs.");
         		}
     		}
         }
-        
-        OTG.log(LogMarker.INFO, "CreateAndRegisterBiome2: " + biomeConfig.getName() + " " + otgBiomeId + " " + savedBiomeId);
-        
+               
         // Create biome
         LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(otgBiomeId, savedBiomeId), this);
         
@@ -744,8 +742,7 @@ public final class ServerConfigProvider implements ConfigProvider
         BiomeConfigStub extendedBiomeConfig = biomeConfigStubs.get(extendedBiomeName);
         if (extendedBiomeConfig == null)
         {
-            OTG.log(LogMarker.WARN, "The biome {} tried to extend the biome {}, but that biome doesn't exist.",
-                    biomeConfigStub.getBiomeName(), extendedBiomeName);
+            OTG.log(LogMarker.WARN, "The biome {} tried to extend the biome {}, but that biome doesn't exist.", biomeConfigStub.getBiomeName(), extendedBiomeName);
             return;
         }
 
@@ -804,7 +801,7 @@ public final class ServerConfigProvider implements ConfigProvider
 		        	}
 		        	else if(inheritMobsBiomeConfig == biomeConfigStub)
 		        	{
-			            OTG.log(LogMarker.TRACE, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
+			            OTG.log(LogMarker.WARN, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
 			            continue;
 		        	}
 		        }

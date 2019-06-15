@@ -2,6 +2,9 @@ package com.pg85.otg.forge.network.client.packets;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.Random;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IThreadListener;
@@ -83,15 +86,24 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		                	}
 							OTG.GetDimensionsConfig().Dimensions.add(dimConfig);
 							
-							long seed = (long) Math.floor((Math.random() * Long.MAX_VALUE));
-			                try
-			                {
-			                	seed = dimConfig.Seed == null || dimConfig.Seed.trim().length() == 0 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : Long.parseLong(dimConfig.Seed);
-			                }
-			            	catch(NumberFormatException ex)
-			                {
-			            		OTG.log(LogMarker.ERROR, "Dimension config for world \"" + dimConfig.PresetName + "\" has value \"" + dimConfig.Seed + "\" for worldSeed which cannot be parsed as a number. Using a random seed instead.");
-			                }
+            				long seed = (new Random()).nextLong();		            				
+            	            String sSeed = dimConfig.Seed;
+            	            if (sSeed != null && !StringUtils.isEmpty(sSeed))
+            	            {
+            	                try
+            	                {
+            	                    long j = Long.parseLong(sSeed);
+
+            	                    if (j != 0L)
+            	                    {
+            	                    	seed = j;
+            	                    }
+            	                }
+            	                catch (NumberFormatException var7)
+            	                {
+            	                	seed = (long)sSeed.hashCode();
+            	                }
+            	            }						
 			                
 			                OTG.isNewWorldBeingCreated = true;
 							OTGDimensionManager.createDimension(seed, dimConfig.PresetName, false, true, true);

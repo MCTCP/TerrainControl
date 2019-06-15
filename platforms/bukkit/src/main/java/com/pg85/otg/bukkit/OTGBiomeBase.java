@@ -257,7 +257,7 @@ vs Forge
             BiomeBase.REGISTRY_ID.a(customBiome.savedId, biomeKey, customBiome);
         }
         
-    	OTG.log(LogMarker.INFO, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), biomeKey.toString());
+    	OTG.log(LogMarker.DEBUG, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), biomeKey.toString());
 
         // Add biome to Bukkit enum if it's not there yet
         try {

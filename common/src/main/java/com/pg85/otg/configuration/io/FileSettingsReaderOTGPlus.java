@@ -171,8 +171,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
             }
             catch (InvalidConfigException e)
             {
-                OTG.log(LogMarker.ERROR, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}",
-                        stringValue, setting, name, stringWithLineNumber.line, e.getMessage());
+                OTG.log(LogMarker.WARN, "The value \"{}\" is not valid for the setting {} in {} on line {}: {}", stringValue, setting, name, stringWithLineNumber.line, e.getMessage());
             }
         }
 

@@ -64,8 +64,8 @@ public class CustomObjectCollection
                 }
             }
     	} else {
-    		OTG.log(LogMarker.INFO, "Given path does not exist: " + file.getAbsolutePath());
-    		throw new RuntimeException();
+   			OTG.log(LogMarker.FATAL, "Given path does not exist: " + file.getAbsolutePath());
+    		throw new RuntimeException("Given path does not exist: " + file.getAbsolutePath());
     	}
     	return object;
     }
@@ -219,7 +219,10 @@ public class CustomObjectCollection
     			    	worldObjectsByName.put(name.toLowerCase(), object);
 	        	    	return object;
     				} else {
-    	        		OTG.log(LogMarker.ERROR, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
+    					if(OTG.getPluginConfig().SpawnLog)
+    					{
+    						OTG.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
+    					}
     	        		return null;
     				}
     			}
@@ -257,7 +260,10 @@ public class CustomObjectCollection
 	        		objectsByNameGlobalObjects.put(name.toLowerCase(), object);
 	    	    	return object;
 	        	} else {
-	        		OTG.log(LogMarker.ERROR, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
+	        		if(OTG.getPluginConfig().SpawnLog)
+	        		{
+	        			OTG.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
+	        		}
 	        		return null;
 	        	}
 	    	}
@@ -266,7 +272,10 @@ public class CustomObjectCollection
 			objectsNotFoundGlobalObjects.add(name.toLowerCase());
 		}
 
-    	OTG.log(LogMarker.ERROR, "Could not find BO2/BO3 " + name + " in GlobalObjects " + (worldName != null ? "and WorldObjects" : "") + " directory " + (worldName != null ? "for world " + worldName : "") + ".");
+		if(OTG.getPluginConfig().SpawnLog)
+		{
+			OTG.log(LogMarker.WARN, "Could not find BO2/BO3 " + name + " in GlobalObjects " + (worldName != null ? "and WorldObjects" : "") + " directory " + (worldName != null ? "for world " + worldName : "") + ".");
+		}
 
         return null;
     }

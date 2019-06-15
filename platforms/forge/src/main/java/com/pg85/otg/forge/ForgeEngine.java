@@ -235,7 +235,7 @@ public class ForgeEngine extends OTGEngine
 
     public void registerForgeBiome(ResourceLocation resourceLocation, Biome biome)
     {
-    	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString());
+    	OTG.log(LogMarker.DEBUG, "Registering biome " + resourceLocation.toString());
 
 		if(names == null)
 		{
@@ -278,7 +278,7 @@ public class ForgeEngine extends OTGEngine
     
     public int registerForgeBiomeWithId(int id, ResourceLocation resourceLocation, Biome biome)
     {
-    	OTG.log(LogMarker.TRACE, "Registering biome " + resourceLocation.toString() + " " + id);
+    	OTG.log(LogMarker.DEBUG, "Registering biome " + resourceLocation.toString() + " " + id);
 
 		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
     	
@@ -357,7 +357,7 @@ public class ForgeEngine extends OTGEngine
 
     public void unRegisterForgeBiome(ResourceLocation resourceLocation)
     {
-		OTG.log(LogMarker.INFO, "Unregistering biome " + resourceLocation.toString());
+		OTG.log(LogMarker.DEBUG, "Unregistering biome " + resourceLocation.toString());
 
 		Biome biome = ForgeRegistries.BIOMES.getValue(resourceLocation);
 
@@ -381,6 +381,7 @@ public class ForgeEngine extends OTGEngine
 			// This can happen when a world was deleted and recreated and the index was set as "can be re-used" but when re-registering the biomes
 			// it wasn't set back to "used" because it looked like the biome registry already had the biome properly registered.
 
+			OTG.log(LogMarker.FATAL, "Could not unregister " + biome.biomeName + ", aborting.");
 			throw new RuntimeException("Could not unregister " + biome.biomeName + ", aborting.");
 
 			//biomeRegistryAvailabiltyMap.set(localBiome.getIds().getSavedId(), false); // This should be enough to make Forge re-use the biome id

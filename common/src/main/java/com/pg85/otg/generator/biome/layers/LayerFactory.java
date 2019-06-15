@@ -86,7 +86,7 @@ public final class LayerFactory
         	{
     			throw new RuntimeException("Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");	
         	}
-        	OTG.log(LogMarker.TRACE, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        	OTG.log(LogMarker.WARN, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
         }
 
         LocalBiome defaultFrozenOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome);
@@ -97,7 +97,7 @@ public final class LayerFactory
         	{
         		throw new RuntimeException("Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");	
         	}
-        	OTG.log(LogMarker.TRACE, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        	OTG.log(LogMarker.WARN, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
         }
         
         int defaultOceanId = defaultOceanBiome.getIds().getOTGBiomeId();        
@@ -337,9 +337,10 @@ public final class LayerFactory
         	defaultOceanBiome = world.getFirstBiomeOrNull();
         	if(defaultOceanBiome == null)
         	{
+        		OTG.log(LogMarker.FATAL, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");
     			throw new RuntimeException("Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", aborting.");	
         	}
-        	OTG.log(LogMarker.TRACE, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        	OTG.log(LogMarker.WARN, "Could not find DefaultOceanBiome \"" + worldConfig.defaultOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
         }
 
         LocalBiome defaultFrozenOceanBiome = world.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome);
@@ -348,9 +349,10 @@ public final class LayerFactory
         	defaultFrozenOceanBiome = world.getFirstBiomeOrNull();
         	if(defaultFrozenOceanBiome == null)
         	{
+        		OTG.log(LogMarker.FATAL, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");
         		throw new RuntimeException("Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", aborting.");	
         	}
-        	OTG.log(LogMarker.TRACE, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
+        	OTG.log(LogMarker.WARN, "Could not find DefaultFrozenOceanBiome \"" + worldConfig.defaultFrozenOceanBiome + "\", substituting \"" + defaultOceanBiome.getName() + "\".");
         }
         
         int defaultOceanId = defaultOceanBiome.getIds().getOTGBiomeId();        
@@ -469,7 +471,7 @@ public final class LayerFactory
                     	}
                     	if(replaceFromBiome == null)
                     	{
-                    		OTG.log(LogMarker.TRACE, "Could not find BorderBiome \"" + replaceFromName + "\" for biome \"" + biomeConfig.getName() + "\", ignoring.");
+                    		OTG.log(LogMarker.WARN, "Could not find BorderBiome \"" + replaceFromName + "\" for biome \"" + biomeConfig.getName() + "\", ignoring.");
                     		continue;
                     	}
             			replaceFrom = replaceFromBiome.getIds().getOTGBiomeId();

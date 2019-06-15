@@ -102,7 +102,8 @@ public class TreeGen extends Resource
             {
                 TreeGen otherO = (TreeGen) other;
                 return otherO.treeNames.size() == this.treeNames.size() && otherO.treeNames.containsAll(this.treeNames);
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 OTG.log(LogMarker.WARN, ex.getMessage());
             }

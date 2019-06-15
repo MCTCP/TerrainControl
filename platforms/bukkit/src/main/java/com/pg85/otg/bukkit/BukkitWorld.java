@@ -172,7 +172,6 @@ public class BukkitWorld implements LocalWorld
 
     public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-    	OTG.log(LogMarker.INFO, "createBiomeFor: " + this.getName() + " " + biomeConfig.getName() + " " + biomeIds.getOTGBiomeId() + " " + biomeIds.getSavedId());
         BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds, this.getName());
         this.biomeNames.put(biome.getName(), biome);
 
@@ -950,7 +949,10 @@ public class BukkitWorld implements LocalWorld
         {
             tileEntity.load(nmsTag);
         } else {
-            OTG.log(LogMarker.DEBUG, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
+        	if(OTG.getPluginConfig().SpawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
+        	}
         }
     }
 
@@ -1033,7 +1035,10 @@ public class BukkitWorld implements LocalWorld
 
 		if(entityType == null)
 		{
-			OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
+			if(OTG.getPluginConfig().SpawnLog)
+			{
+				OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
+			}
 			return;
 		}
 
@@ -1160,7 +1165,10 @@ public class BukkitWorld implements LocalWorld
 
             if (!(nbtbase instanceof NBTTagCompound))
             {
-            	OTG.log(LogMarker.DEBUG, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+            	if(OTG.getPluginConfig().SpawnLog)
+            	{
+            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+            	}
             	return;
             }
 
@@ -1168,7 +1176,10 @@ public class BukkitWorld implements LocalWorld
         }
         catch (NBTException nbtexception)
         {
-        	OTG.log(LogMarker.DEBUG, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+        	if(OTG.getPluginConfig().SpawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+        	}
         	return;
         }
 

@@ -267,7 +267,7 @@ public class CustomObjectStructure
 			{
 				CalculateBranches(false);
 			} catch (InvalidConfigException ex) {
-				OTG.log(LogMarker.ERROR, "An unknown error occurred while calculating branches for BO3 " + Start.BO3Name + ". This is probably an error in the BO3's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
+				OTG.log(LogMarker.FATAL, "An unknown error occurred while calculating branches for BO3 " + Start.BO3Name + ". This is probably an error in the BO3's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
 				throw new RuntimeException();
 			}
 
@@ -1945,7 +1945,7 @@ public class CustomObjectStructure
     		    		{
     		    			if(OTG.getPluginConfig().SpawnLog)
     		    			{
-    		    				OTG.log(LogMarker.INFO, "canOverride optional branches cannot be in a branch group, ignoring branch: " + childBO3.getName() + " in BO3: " + Branch.BO3Name);
+    		    				OTG.log(LogMarker.WARN, "canOverride optional branches cannot be in a branch group, ignoring branch: " + childBO3.getName() + " in BO3: " + Branch.BO3Name);
     		    			}
     		    			continue;
     		    		}
@@ -2190,8 +2190,11 @@ public class CustomObjectStructure
     		{
     			if(minimumSize)
     			{
-    				OTG.log(LogMarker.TRACE, "Error: Branching BO3 " + Start.BO3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
-            		throw new InvalidConfigException("");
+    				if(OTG.getPluginConfig().SpawnLog)
+    				{
+    					OTG.log(LogMarker.WARN, "Error: Branching BO3 " + Start.BO3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
+    				}
+            		throw new InvalidConfigException("Error: Branching BO3 " + Start.BO3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
     			}
     			return;
     		}
@@ -2326,7 +2329,10 @@ public class CustomObjectStructure
 		        		childBranchDataItem.CannotSpawn = true;
 		        		if(bo3 == null)
 		        		{
-		        			OTG.log(LogMarker.ERROR, "Error: Could not find BO3 file: " + childBranchDataItem.Branch.BO3Name + ".BO3 which is a branch of " + branchDataItem.Branch.BO3Name + ".BO3");
+		        			if(OTG.getPluginConfig().SpawnLog)
+		        			{
+		        				OTG.log(LogMarker.WARN, "Error: Could not find BO3 file: " + childBranchDataItem.Branch.BO3Name + ".BO3 which is a branch of " + branchDataItem.Branch.BO3Name + ".BO3");
+		        			}
 		        		}
         			}
 
@@ -3977,7 +3983,7 @@ public class CustomObjectStructure
                 if (!coordObject.spawnWithChecks(chunkCoordinate, World, Random, config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceAbove : objectConfig.replaceAbove, config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceBelow : objectConfig.replaceBelow, config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceWithBiomeBlocks : objectConfig.replaceWithBiomeBlocks, config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceWithSurfaceBlock : objectConfig.replaceWithSurfaceBlock, config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceWithGroundBlock : objectConfig.replaceWithGroundBlock, config.SpawnUnderWater,  !config.SpawnUnderWater ? -1 : (biomeConfig.useWorldWaterLevel ? World.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax), false, true))
                 {
                 	OTG.log(LogMarker.FATAL, "Could not spawn chunk " + coordObject.BO3Name + " for structure " + Start.getObject().getName());
-                	throw new RuntimeException();
+                	throw new RuntimeException("Could not spawn chunk " + coordObject.BO3Name + " for structure " + Start.getObject().getName());
                 }
             }
 
@@ -4005,7 +4011,7 @@ public class CustomObjectStructure
                 //if(1 == 0)
                 {
                 	OTG.log(LogMarker.FATAL, "Could not spawn chunk " + coordObject.BO3Name + " for structure " + Start.getObject().getName());
-                	throw new RuntimeException();
+                	throw new RuntimeException("Could not spawn chunk " + coordObject.BO3Name + " for structure " + Start.getObject().getName());
                 } else {
 
                 	ModDataFunction[] blockDataInObject = objectConfig.getModData();

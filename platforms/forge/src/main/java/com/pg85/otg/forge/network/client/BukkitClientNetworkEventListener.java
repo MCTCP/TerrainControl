@@ -75,7 +75,7 @@ public class BukkitClientNetworkEventListener
                     this.worldLoader.registerClientWorldBukkit(worldMC, wrappedStream);
                 }
            	
-                OTG.log(LogMarker.TRACE, "Config received from server");
+                OTG.log(LogMarker.DEBUG, "Config received from server");
             } else {
                 // Server or client is outdated
                 if (serverProtocolVersion > PluginStandardValues.ProtocolVersion)

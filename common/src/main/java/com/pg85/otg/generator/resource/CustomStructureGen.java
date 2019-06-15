@@ -135,7 +135,9 @@ public class CustomStructureGen extends Resource
             try {
                 CustomStructureGen otherO = (CustomStructureGen) other;
                 return otherO.objectNames.size() == this.objectNames.size() && otherO.objectNames.containsAll(this.objectNames);
-            } catch (Exception ex){
+            }
+            catch (Exception ex)
+            {
                 OTG.log(LogMarker.WARN, ex.getMessage());
             }
         }

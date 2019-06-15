@@ -211,7 +211,8 @@ public class OTGVillageGen extends StructureGenerator
                         field.setAccessible(true);
                         field.setInt(subject, villageType);
                         break;
-                    } catch (Exception e)
+                    }
+                    catch (Exception e)
                     {
                         OTG.log(LogMarker.FATAL, "Cannot make village a sandstone village!");
                         OTG.printStackTrace(LogMarker.FATAL, e);

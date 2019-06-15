@@ -130,7 +130,7 @@ public class ForgeWorldSession extends WorldSession
         	worldBorderFile.getParentFile().mkdirs();
         	writer = new BufferedWriter(new FileWriter(worldBorderFile));
             writer.write(stringbuilder.toString());
-            OTG.log(LogMarker.TRACE, "World border data saved");
+            OTG.log(LogMarker.DEBUG, "World border data saved");
         }
         catch (IOException e)
         {
@@ -170,7 +170,7 @@ public class ForgeWorldSession extends WorldSession
 				    {
 				    	worldBorderFileValues = stringbuilder.toString().split(",");
 				    }
-				    OTG.log(LogMarker.TRACE, "Pre-generator data loaded");
+				    OTG.log(LogMarker.DEBUG, "Pre-generator data loaded");
 				} finally {
 					reader.close();
 				}

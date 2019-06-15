@@ -839,8 +839,8 @@ public class CustomObjectStructureCache
 
     		structuresPerChunk.put(chunkCoord, new ArrayList<String>());
     	} else {
-    		OTG.log(LogMarker.ERROR, "Illegal double spawn detected, aborting...");
-    		throw new RuntimeException();
+    		OTG.log(LogMarker.FATAL, "Illegal double spawn detected, aborting...");
+    		throw new RuntimeException("Illegal double spawn detected, aborting...");
     	}
     }
 
@@ -945,7 +945,7 @@ public class CustomObjectStructureCache
 
     public void CompressCache()
     {
-    	OTG.log(LogMarker.INFO, "Compressing structure-cache and pre-generator data");
+    	OTG.log(LogMarker.DEBUG, "Compressing structure-cache and pre-generator data");
 
     	// If a chunk in the structurecache is inside the outermost ring of
     	// chunks in the pre-generated area then it can be safely removed
@@ -967,8 +967,8 @@ public class CustomObjectStructureCache
 				// Null means fully populated, plotted and spawned
 				if(cachedChunk.getValue() != null)
 				{
-					OTG.log(LogMarker.INFO, "Running " + world.GetWorldSession().getPreGeneratorIsRunning() +  " L" + world.GetWorldSession().getPregeneratedBorderLeft() + " R" + world.GetWorldSession().getPregeneratedBorderRight() + " T" + world.GetWorldSession().getPregeneratedBorderTop() + " B" + world.GetWorldSession().getPregeneratedBorderBottom());
-					OTG.log(LogMarker.INFO, "Error at Chunk X" + cachedChunk.getKey().getChunkX() + " Z" + cachedChunk.getKey().getChunkZ() + ". " + (!this.structureCache.containsKey(cachedChunk.getKey()) ? (world.IsInsidePregeneratedRegion(cachedChunk.getKey(), true) ? "Inside pregenned region" : "Not plotted") : this.structureCache.get(cachedChunk.getKey()) == null ? "Plotted and spawned" : this.structureCache.get(cachedChunk.getKey()).Start != null ? this.structureCache.get(cachedChunk.getKey()).Start.BO3Name : "Trees"));
+					OTG.log(LogMarker.FATAL, "Running " + world.GetWorldSession().getPreGeneratorIsRunning() +  " L" + world.GetWorldSession().getPregeneratedBorderLeft() + " R" + world.GetWorldSession().getPregeneratedBorderRight() + " T" + world.GetWorldSession().getPregeneratedBorderTop() + " B" + world.GetWorldSession().getPregeneratedBorderBottom());
+					OTG.log(LogMarker.FATAL, "Error at Chunk X" + cachedChunk.getKey().getChunkX() + " Z" + cachedChunk.getKey().getChunkZ() + ". " + (!this.structureCache.containsKey(cachedChunk.getKey()) ? (world.IsInsidePregeneratedRegion(cachedChunk.getKey(), true) ? "Inside pregenned region" : "Not plotted") : this.structureCache.get(cachedChunk.getKey()) == null ? "Plotted and spawned" : this.structureCache.get(cachedChunk.getKey()).Start != null ? this.structureCache.get(cachedChunk.getKey()).Start.BO3Name : "Trees"));
 
 					throw new RuntimeException();
 				}
@@ -977,12 +977,12 @@ public class CustomObjectStructureCache
 
     	structureCache = newStructureCache;
 
-    	OTG.log(LogMarker.INFO, "Removed " + structuresRemoved + " cached chunks");
+    	OTG.log(LogMarker.DEBUG, "Removed " + structuresRemoved + " cached chunks");
     }
 
     public void SaveToDisk()
     {
-    	OTG.log(LogMarker.INFO, "Saving structure data");
+    	OTG.log(LogMarker.DEBUG, "Saving structure data");
     	int i = 0;
     	long starTime = System.currentTimeMillis();
 		while(true)
@@ -997,14 +997,14 @@ public class CustomObjectStructureCache
 			}
 			if(i == 0 || i == 100)
 			{
-				OTG.log(LogMarker.INFO, "SaveToDisk waiting on Populate. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
+				OTG.log(LogMarker.WARN, "SaveToDisk waiting on Populate. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
 				i = 0;
 			}
 			i += 1;
 			if(System.currentTimeMillis() - starTime > (300 * 1000))
 			{
-				OTG.log(LogMarker.INFO, "SaveToDisk waited on populate longer than 300 seconds, something went wrong!");
-				throw new RuntimeException();
+				OTG.log(LogMarker.FATAL, "SaveToDisk waited on populate longer than 300 seconds, something went wrong!");
+				throw new RuntimeException("SaveToDisk waited on populate longer than 300 seconds, something went wrong!");
 			}
 		}
 
@@ -1023,7 +1023,7 @@ public class CustomObjectStructureCache
 
     private void SaveStructureCache()
     {
-    	OTG.log(LogMarker.INFO, "Saving structures and pre-generator data");
+    	OTG.log(LogMarker.DEBUG, "Saving structures and pre-generator data");
 
 	    Map<ChunkCoordinate, CustomObjectStructure> worldInfoChunksToSave = new HashMap<ChunkCoordinate, CustomObjectStructure>();
 
@@ -1066,7 +1066,7 @@ public class CustomObjectStructureCache
 	    	SaveChunksMapFile(spawnedStructures, "SpawnedStructures.txt");
 	    }
 
-		OTG.log(LogMarker.INFO, "Saving done");
+		OTG.log(LogMarker.DEBUG, "Saving done");
     }
 
 	private void SaveStructuresFile(Map<ChunkCoordinate, CustomObjectStructure> structures)
@@ -1252,7 +1252,7 @@ public class CustomObjectStructureCache
 
 	private void LoadStructureCache()
 	{
-		OTG.log(LogMarker.INFO, "Loading structures and pre-generator data");
+		OTG.log(LogMarker.DEBUG, "Loading structures and pre-generator data");
 
     	int structuresLoaded = 0;
 
@@ -1319,7 +1319,7 @@ public class CustomObjectStructureCache
 			}
 		}
 
-		OTG.log(LogMarker.INFO, "Loaded " + structuresLoaded + " structure chunks");
+		OTG.log(LogMarker.DEBUG, "Loaded " + structuresLoaded + " structure chunks");
 
 		if(world.getConfigs().getWorldConfig().IsOTGPlus)
 		{
@@ -1334,9 +1334,9 @@ public class CustomObjectStructureCache
 
 					// This should only happen when a world is loaded that was generated with a PregenerationRadius of 0 and then had its PregenerationRadius increased
 
-					OTG.log(LogMarker.INFO, "Running " + world.GetWorldSession().getPreGeneratorIsRunning() +  " L" + world.GetWorldSession().getPregeneratedBorderLeft() + " R" + world.GetWorldSession().getPregeneratedBorderRight() + " T" + world.GetWorldSession().getPregeneratedBorderTop() + " B" + world.GetWorldSession().getPregeneratedBorderBottom());
-					OTG.log(LogMarker.INFO, "Error at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
-					throw new RuntimeException();
+					OTG.log(LogMarker.FATAL, "Running " + world.GetWorldSession().getPreGeneratorIsRunning() +  " L" + world.GetWorldSession().getPregeneratedBorderLeft() + " R" + world.GetWorldSession().getPregeneratedBorderRight() + " T" + world.GetWorldSession().getPregeneratedBorderTop() + " B" + world.GetWorldSession().getPregeneratedBorderBottom());
+					OTG.log(LogMarker.FATAL, "Error at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
+					throw new RuntimeException("Error at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
 				}
 			}
 
@@ -1353,7 +1353,7 @@ public class CustomObjectStructureCache
 			}
 		}
 
-		OTG.log(LogMarker.INFO, "Loading done");
+		OTG.log(LogMarker.DEBUG, "Loading done");
 	}
 
 	private Map<ChunkCoordinate, CustomObjectStructure> LoadStructuresFile()

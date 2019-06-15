@@ -211,7 +211,10 @@ public final class MobSpawnGroupHelper
     		return mobName.getResourcePath();
     	}
 
-		OTG.log(LogMarker.DEBUG, "No EntityRegistry entry found for class: " + entityClass);
+    	if(OTG.getPluginConfig().SpawnLog)
+    	{
+    		OTG.log(LogMarker.DEBUG, "No EntityRegistry entry found for class: " + entityClass);
+    	}
         return null;
     }
     
@@ -228,7 +231,10 @@ public final class MobSpawnGroupHelper
     		return mobName;
     	}
 
-		OTG.log(LogMarker.DEBUG, "No EntityRegistry entry found for class: " + entityClass);
+    	if(OTG.getPluginConfig().SpawnLog)
+    	{
+    		OTG.log(LogMarker.WARN, "No EntityRegistry entry found for class: " + entityClass);
+    	}
         return null;
     }
 }

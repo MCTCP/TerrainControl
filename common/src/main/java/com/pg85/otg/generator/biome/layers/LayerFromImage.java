@@ -92,7 +92,8 @@ public class LayerFromImage extends Layer
                 else
                     this.biomeMap[nColor] = fillBiome;
             }
-        } catch (IOException ioexception)
+        }
+        catch (IOException ioexception)
         {
             OTG.log(LogMarker.FATAL, ioexception.getStackTrace().toString());
         }

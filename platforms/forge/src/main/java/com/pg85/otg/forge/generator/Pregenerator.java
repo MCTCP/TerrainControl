@@ -523,7 +523,7 @@ public class Pregenerator
 	        	pregeneratedChunksFile.getParentFile().mkdirs();
 	        	writer = new BufferedWriter(new FileWriter(pregeneratedChunksFile));
 	            writer.write(stringbuilder.toString());
-	            OTG.log(LogMarker.TRACE, "Pre-generator data saved");
+	            OTG.log(LogMarker.DEBUG, "Pre-generator data saved");
 	        }
 	        catch (IOException e)
 	        {
@@ -565,7 +565,7 @@ public class Pregenerator
 				    {
 				    	pregeneratedChunksFileValues = stringbuilder.toString().split(",");
 				    }
-				    OTG.log(LogMarker.TRACE, "Pre-generator data loaded");
+				    OTG.log(LogMarker.DEBUG, "Pre-generator data loaded");
 				} finally {
 					reader.close();
 				}

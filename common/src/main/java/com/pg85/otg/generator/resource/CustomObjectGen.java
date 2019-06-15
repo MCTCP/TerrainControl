@@ -84,7 +84,9 @@ public class CustomObjectGen extends Resource
             try {
                 CustomObjectGen otherO = (CustomObjectGen) other;
                 return otherO.objectNames.size() == this.objectNames.size() && otherO.objectNames.containsAll(this.objectNames);
-            } catch (Exception ex){
+            }
+            catch (Exception ex)
+            {
                 OTG.log(LogMarker.WARN, ex.getMessage());
             }
         }

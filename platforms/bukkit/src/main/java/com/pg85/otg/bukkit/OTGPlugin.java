@@ -96,7 +96,7 @@ public class OTGPlugin extends JavaPlugin
             this.listener = new OTGListener(this);
             Bukkit.getMessenger().registerOutgoingPluginChannel(this, PluginStandardValues.ChannelName);
 
-            OTG.log(LogMarker.INFO, "Global objects loaded, waiting for worlds to load");
+            OTG.log(LogMarker.DEBUG, "Global objects loaded, waiting for worlds to load");
 
             // Start metrics
             new BukkitMetricsHelper(this);
@@ -114,7 +114,7 @@ public class OTGPlugin extends JavaPlugin
     {
         if (worldName.isEmpty())
         {
-            OTG.log(LogMarker.TRACE, "Ignoring empty world name. Is some generator plugin checking if \"OpenTerrainGenerator\" is a valid world name?");
+            OTG.log(LogMarker.WARN, "Ignoring empty world name. Is some generator plugin checking if \"OpenTerrainGenerator\" is a valid world name?");
             return new OTGChunkGenerator(this);
         }
 
@@ -122,11 +122,11 @@ public class OTGPlugin extends JavaPlugin
         BukkitWorld world = worlds.get(worldName);
         if (world != null)
         {
-            OTG.log(LogMarker.TRACE, "Already enabled for ''{}''", (Object) worldName);
+            OTG.log(LogMarker.DEBUG, "Already enabled for ''{}''", (Object) worldName);
             return world.getChunkGenerator();
         }
 
-        OTG.log(LogMarker.TRACE, "Starting to enable world ''{}''...", (Object) worldName);
+        OTG.log(LogMarker.DEBUG, "Starting to enable world ''{}''...", (Object) worldName);
 
 		// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
 	    if(OTG.GetDimensionsConfig() == null)
@@ -179,7 +179,9 @@ public class OTGPlugin extends JavaPlugin
         if (!baseFolder.exists())
         {
             if (!baseFolder.mkdirs())
+            {
                 OTG.log(LogMarker.FATAL, "Can't create folder ", baseFolder.getName());
+            }
         }
         return baseFolder;
     }

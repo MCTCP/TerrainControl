@@ -340,10 +340,10 @@ public class ObjectSpawner
 		        OTG.firePopulationEndEvent(world, rand, false, chunkCoord);
 		        world.endPopulation();
 
-				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC/OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to TRACE in mods/OpenTerrainGenerator/OTG.ini file for a stack trace.");
+				OTG.log(LogMarker.WARN,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC/OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to TRACE in mods/OpenTerrainGenerator/OTG.ini file for a stack trace.");
 				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
 			} else {
-				OTG.log(LogMarker.INFO,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. Update: Using OTG multi-dimension features may cause this log message occasionally, still need to investigate.");
+				OTG.log(LogMarker.WARN,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. Update: Using OTG multi-dimension features may cause this log message occasionally, still need to investigate.");
 				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
 
 				// Get the random generator
@@ -383,7 +383,7 @@ public class ObjectSpawner
 
 		if (biome == null)
 		{
-			OTG.log(LogMarker.DEBUG, "Unknown biome at {},{}  (chunk {}). Population failed.", chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8, chunkCoord);
+			OTG.log(LogMarker.FATAL, "Unknown biome at {},{}  (chunk {}). Population failed.", chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8, chunkCoord);
 			throw new RuntimeException();
 		}
 
@@ -400,7 +400,7 @@ public class ObjectSpawner
 				} else {
 					if(OTG.getPluginConfig().SpawnLog)
 					{
-						OTG.log(LogMarker.INFO, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
+						OTG.log(LogMarker.WARN, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
 					}
 				}
 			}
@@ -441,7 +441,7 @@ public class ObjectSpawner
 
 		if (biome == null)
 		{
-			OTG.log(LogMarker.DEBUG, "Unknown biome at {},{}  (chunk {}). Population failed.", chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8, chunkCoord);
+			OTG.log(LogMarker.FATAL, "Unknown biome at {},{}  (chunk {}). Population failed.", chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8, chunkCoord);
 			throw new RuntimeException();
 		}
 
@@ -470,7 +470,7 @@ public class ObjectSpawner
 			} else {
 				if(OTG.getPluginConfig().SpawnLog)
 				{
-					OTG.log(LogMarker.INFO, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
+					OTG.log(LogMarker.WARN, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
 				}
 			}
 		}
@@ -528,7 +528,10 @@ public class ObjectSpawner
 		// Null check
 		if (biome == null)
 		{
-			OTG.log(LogMarker.DEBUG, "Unknown biome at {},{}  (chunk {}). Population failed.", x + 15, z + 15, chunkCoord);
+			if(OTG.getPluginConfig().SpawnLog)
+			{
+				OTG.log(LogMarker.ERROR, "Unknown biome at {},{}  (chunk {}). Population failed.", x + 15, z + 15, chunkCoord);
+			}
 			return;
 		}
 

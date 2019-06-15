@@ -49,7 +49,7 @@ public final class FileHelper
     {
         if (!folder.exists() && !folder.mkdirs())
         {
-            OTG.log(LogMarker.WARN, "Error creating directory \"{}\".", folder.getAbsolutePath());
+            OTG.log(LogMarker.ERROR, "Error creating directory \"{}\".", folder.getAbsolutePath());
             return false;
         }
         return true;

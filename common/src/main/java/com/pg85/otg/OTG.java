@@ -169,6 +169,8 @@ public class OTG
     		throw new InvalidConfigException("Cannot read block: " + name);
     	}
 
+    	String originalName = name;
+    	
     	// Spigot interprets snow as SNOW_LAYER and that's how TC has always seen it too so keep it that way (even though minecraft:snow is actually a snow block).
     	if(name.toLowerCase().equals("snow"))
     	{
@@ -191,11 +193,11 @@ public class OTG
     	}
     	catch(InvalidConfigException ex)
     	{
-    		cachedMaterials.put(name, null);
+    		cachedMaterials.put(originalName, null);
     		throw ex;
     	}
 
-    	cachedMaterials.put(name, material);
+    	cachedMaterials.put(originalName, material);
 
         return material;
     }
@@ -258,8 +260,6 @@ public class OTG
 
    	public static LocalBiome getBiomeByOTGId(int id)
    	{
-	   //OTG.log(LogMarker.INFO, "getBiomeAllWorlds id");
-	
 	   ArrayList<LocalWorld> worlds = getAllWorlds();
 	   if(worlds != null)
 	   {
@@ -276,9 +276,7 @@ public class OTG
    	}
    	
     public static LocalBiome getBiome(String name, String worldName)
-    {
-    	//OTG.log(LogMarker.INFO, "getBiomeAllWorlds name");
-
+    {    	
         ArrayList<LocalWorld> worlds = getAllWorlds();
         if(worlds != null)
         {

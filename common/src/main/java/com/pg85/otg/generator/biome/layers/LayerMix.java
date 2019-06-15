@@ -37,7 +37,7 @@ public class LayerMix extends Layer
             	LocalBiome riverBiome = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome);
     			if(riverBiome == null)
     			{
-    				OTG.log(LogMarker.TRACE, "RiverBiome: " + biome.getBiomeConfig().riverBiome + " could not be found for biome \"" + biome.getName() + "\", substituting self.");
+    				OTG.log(LogMarker.WARN, "RiverBiome: " + biome.getBiomeConfig().riverBiome + " could not be found for biome \"" + biome.getName() + "\", substituting self.");
     				riverBiome = biome;
     			}
             	this.riverBiomes[id] = riverBiome.getIds().getOTGBiomeId();

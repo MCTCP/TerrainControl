@@ -211,7 +211,8 @@ public enum DefaultBiome
         {
             StandardBiomeTemplate template = (StandardBiomeTemplate) defaultSettingsClass.getConstructors()[0].newInstance(mojangSettings, maxWorldHeight);
             return new BiomeLoadInstruction(Name, template);
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             OTG.log(LogMarker.FATAL, "Failed to create default biome");
             OTG.printStackTrace(LogMarker.FATAL, e);

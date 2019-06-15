@@ -407,7 +407,10 @@ public class BO3 implements StructuredCustomObject
 
             if(Math.abs(minX - maxX) > 31 || Math.abs(minZ - maxZ) > 31)
             {
-            	OTG.log(LogMarker.INFO, "BO3 was too large to spawn (> 32x32) " + this.getName() + " XSize " + (Math.abs(minX - maxX) + 1) + " ZSize " + (Math.abs(minZ - maxZ) + 1) + ". Convert it to a branching BO3 and add it using CustomStructure()");
+            	if(OTG.getPluginConfig().SpawnLog)
+            	{
+            		OTG.log(LogMarker.WARN, "BO3 was too large to spawn (> 32x32) " + this.getName() + " XSize " + (Math.abs(minX - maxX) + 1) + " ZSize " + (Math.abs(minZ - maxZ) + 1) + ". Convert it to a branching BO3 and add it using CustomStructure()");
+            	}
             	return false;
             }
             if(Math.abs(minX - maxX) > 15 || Math.abs(minZ - maxZ) > 15)
@@ -436,34 +439,46 @@ public class BO3 implements StructuredCustomObject
 
 		if(settings == null)
 		{
-			OTG.log(LogMarker.INFO, "Settings was null for BO3 " + this.getName() + ". This should not be happening, please contact the developer.");
-			throw new RuntimeException();
+			OTG.log(LogMarker.FATAL, "Settings was null for BO3 " + this.getName() + ". This should not be happening, please contact the developer.");
+			throw new RuntimeException("Settings was null for BO3 " + this.getName() + ". This should not be happening, please contact the developer.");
 		}
 
     	try {
     		bo3SurfaceBlock = replaceWithSurfaceBlock != null && replaceWithSurfaceBlock.length() > 0 ? OTG.readMaterial(replaceWithSurfaceBlock) : OTG.readMaterial("GRASS");
 		} catch (InvalidConfigException e1) {
 			bo3SurfaceBlock = OTG.toLocalMaterialData(DefaultMaterial.GRASS, 0);
-			OTG.log(LogMarker.INFO, "Value " + replaceWithSurfaceBlock + " for replaceWithSurfaceBlock in BO3 " + this.getName() + " was not recognised. Using GRASS instead.");
+			if(OTG.getPluginConfig().SpawnLog)
+			{
+				OTG.log(LogMarker.WARN, "Value " + replaceWithSurfaceBlock + " for replaceWithSurfaceBlock in BO3 " + this.getName() + " was not recognised. Using GRASS instead.");
+			}
 		}
     	try {
     		bo3GroundBlock = replaceWithGroundBlock != null && replaceWithGroundBlock.length() > 0 ? OTG.readMaterial(replaceWithGroundBlock) : OTG.readMaterial("DIRT");
 		} catch (InvalidConfigException e1) {
 			bo3GroundBlock = OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0);
-			OTG.log(LogMarker.INFO, "Value " + replaceWithGroundBlock + " for replaceWithGroundBlock in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
+			if(OTG.getPluginConfig().SpawnLog)
+			{
+				OTG.log(LogMarker.WARN, "Value " + replaceWithGroundBlock + " for replaceWithGroundBlock in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
+			}
 		}
 
     	try {
 			replaceBelowMaterial = settings.replaceBelow != null && settings.replaceBelow.toLowerCase().equals("none") ? null : replaceBelow != null && replaceBelow.length() > 0 ? OTG.readMaterial(replaceBelow) : null;
 		} catch (InvalidConfigException e1) {
 			replaceBelowMaterial = OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0);
-			OTG.log(LogMarker.INFO, "Value " + settings.replaceBelow + " for replaceBelow in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
+			if(OTG.getPluginConfig().SpawnLog)
+			{
+				OTG.log(LogMarker.INFO, "Value " + settings.replaceBelow + " for replaceBelow in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
+			}
 		}
     	try {
 			replaceAboveMaterial = settings.replaceAbove != null && settings.replaceAbove.toLowerCase().equals("none") ? null : replaceAbove != null && replaceAbove.length() > 0 ? OTG.readMaterial(replaceAbove) : null;
 		} catch (InvalidConfigException e1) {
 			replaceAboveMaterial = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
-			OTG.log(LogMarker.INFO, "Value " + settings.replaceAbove + " for replaceAbove in BO3 " + this.getName() + " was not recognised. Using AIR instead.");
+			if(OTG.getPluginConfig().SpawnLog)
+			{
+				OTG.log(LogMarker.INFO, "Value " + settings.replaceAbove + " for replaceAbove in BO3 " + this.getName() + " was not recognised. Using AIR instead.");
+			}
 		}
 
     	boolean isOnBiomeBorder = false;
@@ -1070,7 +1085,10 @@ public class BO3 implements StructuredCustomObject
         }
         if(outOfBounds)
         {
-        	OTG.log(LogMarker.WARN, "BO3 " + this.getName() + " tried to spawn blocks outside of the chunk being populated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO3's used as CustomStructures() should be designed, BO3 creators have to design their BO3's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO3 creator to do it.");
+        	if(OTG.getPluginConfig().SpawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "BO3 " + this.getName() + " tried to spawn blocks outside of the chunk being populated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO3's used as CustomStructures() should be designed, BO3 creators have to design their BO3's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO3 creator to do it.");
+        	}
         }
 
         if(OTG.getPluginConfig().SpawnLog && (System.currentTimeMillis() - startTime) > 50)

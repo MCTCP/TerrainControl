@@ -133,7 +133,7 @@ public class NBTHelper
                     listTag.addTag(getNBTFromNMSTagCompound(null, (NBTTagCompound) nmsChildTag));
                     break;
                 default:
-                    OTG.log(LogMarker.INFO, "Cannot convert list subtype {} from it's NMS value", new Object[] {listType});
+                    OTG.log(LogMarker.DEBUG, "Cannot convert list subtype {} from it's NMS value", new Object[] {listType});
                     break;
             }
         }

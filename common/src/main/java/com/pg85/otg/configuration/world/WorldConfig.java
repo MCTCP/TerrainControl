@@ -667,7 +667,7 @@ public class WorldConfig extends ConfigFile
         {
         	this.dimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue();
         	this.dimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue();
-    		OTG.log(LogMarker.INFO, "World " + this.getName() + " WorldConfig setting dimensionBelowHeight was higher than dimensionAboveHeight, using default values instead.");
+    		OTG.log(LogMarker.WARN, "World " + this.getName() + " WorldConfig setting dimensionBelowHeight was higher than dimensionAboveHeight, using default values instead.");
         }
 
         this.teleportToSpawnOnly = reader.getSetting(WorldStandardValues.teleportToSpawnOnly);
