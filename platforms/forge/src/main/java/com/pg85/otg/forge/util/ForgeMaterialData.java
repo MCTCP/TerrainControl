@@ -23,12 +23,27 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
     {
+    	DefaultMaterial defaultMaterial = this.toDefaultMaterial();
     	return
-			getName().toLowerCase().equals("ice") ||
-			getName().toLowerCase().equals("packed_ice") ||
-			(isSolid() || (!ignoreWater && isLiquid())) &&
-			(allowWood || !getName().toLowerCase().startsWith("log")) &&
-			!getName().toLowerCase().contains("lily");
+    		(
+				defaultMaterial.equals(DefaultMaterial.ICE) ||
+				defaultMaterial.equals(DefaultMaterial.PACKED_ICE) ||
+				defaultMaterial.equals(DefaultMaterial.FROSTED_ICE) ||
+				(
+					isSolid() || 
+					(
+						!ignoreWater && isLiquid()
+					)
+				)
+			) &&
+			(
+				allowWood || 
+				!(
+					defaultMaterial.equals(DefaultMaterial.LOG) || 
+					defaultMaterial.equals(DefaultMaterial.LOG_2)
+				)
+			) &&
+			!defaultMaterial.equals(DefaultMaterial.WATER_LILY);
     }
 
 	//
@@ -344,7 +359,7 @@ public class ForgeMaterialData implements LocalMaterialData
     	{
     		return DefaultMaterial.UNKNOWN_BLOCK;
     	}
-        return DefaultMaterial.getMaterial(getBlockId());
+    	return DefaultMaterial.getMaterial(getBlockId());
     }
 
     @Override

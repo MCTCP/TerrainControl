@@ -260,10 +260,12 @@ public final class WorldLoader
         if (world == null)
         {           	
             world = new ForgeWorld(worldName);
-            OTG.log(LogMarker.INFO, "Loading configs for world \"{}\"..", world.getName());
+            OTG.log(LogMarker.DEBUG, "Loading configs for world \"{}\"..", world.getName());
 
             ServerConfigProvider config = new ServerConfigProvider(worldConfigsFolder, world, mcWorld.getSaveHandler().getWorldDirectory());            
             world.provideConfigs(config);
+            
+            OTG.log(LogMarker.DEBUG, "Completed loading configs for world \"{}\"..", world.getName());
         }
         if (world != null && world.getWorld() == null)
         {

@@ -178,80 +178,73 @@ public final class OTGCommandHandler implements ICommand
             	if(biomeOrDimensionName != null && biomeOrDimensionName.trim().length() > 0)
             	{
             		biomeOrDimensionName = biomeOrDimensionName.trim();
-            		//final String biomeOrDimensionName = biomeOrDimensionName2;
-            	    //new Thread(new Runnable() {
-            	        //public void run(){
-            		
-            				sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Searching for destination biome or dimension \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
-            		
-                    		int biomeId = -1;
-                    		try
-                    		{
-                    			biomeId = Integer.parseInt(biomeOrDimensionName.replace(" ", ""));
-                    		}
-                    		catch(NumberFormatException ex) { }
+    				sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Searching for destination biome or dimension \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
+    		
+            		int biomeId = -1;
+            		try
+            		{
+            			biomeId = Integer.parseInt(biomeOrDimensionName.replace(" ", ""));
+            		}
+            		catch(NumberFormatException ex) { }
 
-                    		// Check dimension names
-                			for(int i = -1; i < Long.SIZE << 4; i++)
-        					{
-        						if(DimensionManager.isDimensionRegistered(i))
-        						{
-        							DimensionType dimensionType = DimensionManager.getProviderType(i);
-        							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase()))
-        							{
-        								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), false, true);
-        								return;
-        							}
-        						}
-        					}
+            		// Check dimension names
+        			for(int i = -1; i < Long.SIZE << 4; i++)
+					{
+						if(DimensionManager.isDimensionRegistered(i))
+						{
+							DimensionType dimensionType = DimensionManager.getProviderType(i);
+							if(dimensionType.getName().toLowerCase().trim().equals(biomeOrDimensionName.toLowerCase()))
+							{
+								OTGTeleporter.changeDimension(i, (EntityPlayerMP) sender.getCommandSenderEntity(), false, true);
+								return;
+							}
+						}
+					}
 
-        					ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);       					
-        					if(world != null)
-        					{
-        	            		int maxRadius = 1000;
+					ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);       					
+					if(world != null)
+					{
+	            		int maxRadius = 1000;
 
-        	            		ForgeBiome targetBiome = (ForgeBiome)world.getBiomeByNameOrNull(biomeOrDimensionName);
-        	            		if(targetBiome != null)
-        	            		{
-        	            			biomeId = targetBiome.getIds().getOTGBiomeId();
-        	            		}
-        	            		
-        	            		if(biomeId != -1)
-        	            		{
-	        	            		for(int cycle = 1; cycle < maxRadius; cycle++)
-	        	            		{
-	        	                		for(int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)
-	        	                		{
-        	                				if(x1 == playerX - cycle || x1 == playerX + cycle)
-        	                				{
-		        	                			for(int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
-		        	                			{
-	        	                					if(z1 == playerZ - cycle || z1 == playerZ + cycle)
-	        	                					{
-	        	                						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(playerChunk.getChunkX() + (x1 - playerX), playerChunk.getChunkZ() + (z1 - playerZ));	        	
-	        	                						
-	        	                						ForgeBiome biome = (ForgeBiome)world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
-	        	
-	        	                						if(
-	        	            								biome != null &&
-		        											biome.getIds().getOTGBiomeId() == biomeId        	        	    										
-	        	        								)
-	        	                						{
-	        	                							sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
-	        	                							((Entity)sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(), world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), true, true, false, false), chunkCoord.getBlockZCenter());	        	                							
-	        	                							return;
-	        	                						}
-	        	                					}
-		        	                			}
-        	                				}
-	        	                		}
-	        	            		}
-        	            		}
-        					}
-                    		sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find biome \"" + biomeOrDimensionName + "\"."));
-            	        //}
-            	    //}).start();
-    	    		//sender.sendMessage(new TextComponentString("Locating biome/dimension..."));
+	            		ForgeBiome targetBiome = (ForgeBiome)world.getBiomeByNameOrNull(biomeOrDimensionName);
+	            		if(targetBiome != null)
+	            		{
+	            			biomeId = targetBiome.getIds().getOTGBiomeId();
+	            		}
+	            		
+	            		if(biomeId != -1)
+	            		{
+    	            		for(int cycle = 1; cycle < maxRadius; cycle++)
+    	            		{
+    	                		for(int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)
+    	                		{
+	                				if(x1 == playerX - cycle || x1 == playerX + cycle)
+	                				{
+        	                			for(int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
+        	                			{
+    	                					if(z1 == playerZ - cycle || z1 == playerZ + cycle)
+    	                					{
+    	                						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(playerChunk.getChunkX() + (x1 - playerX), playerChunk.getChunkZ() + (z1 - playerZ));	        	
+    	                						
+    	                						ForgeBiome biome = (ForgeBiome)world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
+    	
+    	                						if(
+    	            								biome != null &&
+        											biome.getIds().getOTGBiomeId() == biomeId        	        	    										
+    	        								)
+    	                						{
+    	                							sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
+    	                							((Entity)sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(), world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), true, true, false, false), chunkCoord.getBlockZCenter());	        	                							
+    	                							return;
+    	                						}
+    	                					}
+        	                			}
+	                				}
+    	                		}
+    	            		}
+	            		}
+					}
+            		sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find biome \"" + biomeOrDimensionName + "\"."));
             	    return;
             	}
             }
