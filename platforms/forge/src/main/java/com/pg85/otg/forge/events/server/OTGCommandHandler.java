@@ -134,7 +134,7 @@ public final class OTGCommandHandler implements ICommand
 				{
 					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg blocks " + VALUE_COLOR + "Show a list of block names that can be spawned inside BO3's with the Block() tag and used in biome- and world-configs."));
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg entities " + VALUE_COLOR + "Show a list of entities that can be spawned inside BO3's using the Entity() tag."));
-					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg unloadbo3s " + VALUE_COLOR + "Unloads all loaded BO2/BO3 files, use this to refresh BO2's/BO3's after editing them."));
+					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg flushcache " + VALUE_COLOR + "Unloads all loaded BO2/BO3 files, use this to refresh BO2's/BO3's after editing them. Also flushes chunk generator cache to free up memory."));
 					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg GetModData <ModName> <Radius> " + VALUE_COLOR + "Sends any ModData() tags in BO3's within the specified <Radius> in chunks to the specified <ModName>. Some OTG mob spawning commands can be used this way. Be sure to set up ModData() tags in your BO3 to make this work."));
 					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg summon <Radius> " + VALUE_COLOR + "Shorthand for /mcw GetModData OTG <Radius>. Used to summon mobs and entities that are configured to spawn inside BO3's."));
 				}
@@ -161,12 +161,16 @@ public final class OTGCommandHandler implements ICommand
 
 	    		OTG.log(LogMarker.INFO, "----");
         	}
-        	else if(argString[0].equals("unloadbo3s") && isOp)
+        	else if(argString[0].toLowerCase().equals("flushcache") && isOp)
         	{
+        		OTG.log(LogMarker.INFO, "Clearing caches");
 	    		OTG.log(LogMarker.INFO, "Unloading BO3's");
 	    		OTG.getEngine().ReloadCustomObjectFiles();
 	    		OTG.log(LogMarker.INFO, "BO3's unloaded");
 	    		sender.sendMessage(new TextComponentString("BO3's unloaded"));
+	    		OTG.log(LogMarker.INFO, "Clearing chunkgenerator cache");
+	    		world.getChunkGenerator().clearChunkCache();
+	    		OTG.log(LogMarker.INFO, "Caches cleared");
         	}
             else if (isOp && argString[0].equals("tp") && argString.length > 1)
             {
@@ -247,7 +251,7 @@ public final class OTGCommandHandler implements ICommand
             		sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find biome \"" + biomeOrDimensionName + "\"."));
             	    return;
             	}
-            }
+            }         
             else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
             {
             	if(!isOTGWorld)
@@ -874,7 +878,7 @@ public final class OTGCommandHandler implements ICommand
 
 		listComplet.add("blocks");
 		listComplet.add("entities");
-		listComplet.add("unloadbo3s");
+		listComplet.add("flushcache");
 		listComplet.add("GetModData");
 
 		return listComplet;

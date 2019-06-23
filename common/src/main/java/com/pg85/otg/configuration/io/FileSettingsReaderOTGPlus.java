@@ -27,7 +27,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
     private final File file;
 
     private final String name;
-
+   
     private static final class StringOnLine
     {
         private final String string;
@@ -79,6 +79,12 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
      */
     private final Map<String, StringOnLine> settingsCache;
 
+    public void flushCache()
+    {
+    	this.settingsCache.clear();
+    	this.configFunctions.clear();
+    }
+    
     /**
      * Creates a new settings reader.
      * @param name Name of the config file, like "WorldConfig" or "Taiga".
@@ -211,7 +217,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
         this.settingsCache.put(setting.getName().toLowerCase(), new StringOnLine(setting.write(value), -1));
     }
 
-    private void readSettings()
+    public void readSettings()
     {
         BufferedReader settingsReader = null;
 

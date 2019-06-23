@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Each world has a cache of unfinished structures. This class is the cache.
+ * Each world has a CustomObjectStructureCache with data for spawned and unfinished structures
  *
  */
 public class CustomObjectStructureCache
@@ -98,7 +98,8 @@ public class CustomObjectStructureCache
 	                structureStart = new CustomObjectStructure(worldRandom, world, customObject);
 	                structureCache.put(coord, structureStart);
 	                return structureStart;
-	            }	        }
+	            }	        
+            }
 
 	        return null;
     	}
@@ -108,7 +109,7 @@ public class CustomObjectStructureCache
 
     public void CompressCache()
     {
-    	OTG.log(LogMarker.DEBUG, "Compressing structure-cache and pre-generator data");
+    	OTG.log(LogMarker.INFO, "Compressing structure-cache and pre-generator data");
 
     	// If a chunk in the structurecache is inside the outermost ring of
     	// chunks in the pre-generated area then it can be safely removed

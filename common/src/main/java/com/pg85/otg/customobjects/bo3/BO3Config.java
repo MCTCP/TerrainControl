@@ -4,6 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -38,7 +39,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 public class BO3Config extends CustomObjectConfigFile
 {
@@ -127,9 +127,6 @@ public class BO3Config extends CustomObjectConfigFile
     public boolean SpawnOnWaterOnly = false;
     public boolean SpawnUnderWater = false;
     public boolean SpawnAtWaterLevel = false;
-
-    public Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> CachedObjectsToSpawn = null;
-    public Map<ChunkCoordinate, ArrayList<Object[]>> CachedSmoothingAreasToSpawn = null;
 
     private String worldName;
 
@@ -254,7 +251,13 @@ public class BO3Config extends CustomObjectConfigFile
 
     public BlockFunction[] getBlocks()
     {
-    	return blocksOTGPlus;
+    	//return blocksOTGPlus;
+    	readBlocks();
+    	
+    	BlockFunction[] a = blocksOTGPlus.clone();
+    	blocksOTGPlus = null;
+    	
+    	return a;
     }
 
     public BranchFunction[] getbranches()
@@ -287,9 +290,9 @@ public class BO3Config extends CustomObjectConfigFile
     	return entityDataOTGPlus;
     }
 
-    private void loadInheritedBO3()
+    private void loadInheritedBO3(boolean blocksOnly)
     {
-    	if(this.inheritBO3 != null && this.inheritBO3.trim().length() > 0 && !inheritedBO3Loaded)
+    	if(this.inheritBO3 != null && this.inheritBO3.trim().length() > 0 && (!inheritedBO3Loaded || blocksOnly))
     	{
     		File currentFile = this.file.getParentFile();
     		worldName = currentFile.getName();
@@ -309,148 +312,157 @@ public class BO3Config extends CustomObjectConfigFile
 			{
 		    	inheritedBO3Loaded = true;
 
-    			inheritedBO3s.addAll(((BO3)parentBO3).getSettings().getInheritedBO3s());
-
-				removeAir = ((BO3)parentBO3).getSettings().removeAir;
-				replaceAbove = replaceAbove == null || replaceAbove.length() == 0 ? ((BO3)parentBO3).getSettings().replaceAbove : replaceAbove;
-				replaceBelow = replaceBelow == null || replaceBelow.length() == 0 ? ((BO3)parentBO3).getSettings().replaceBelow : replaceBelow;
-
-				CustomObjectCoordinate rotatedParentMaxCoords = CustomObjectCoordinate.getRotatedBO3Coords(((BO3)parentBO3).getSettings().maxX, ((BO3)parentBO3).getSettings().maxY, ((BO3)parentBO3).getSettings().maxZ, inheritBO3Rotation);
-				CustomObjectCoordinate rotatedParentMinCoords = CustomObjectCoordinate.getRotatedBO3Coords(((BO3)parentBO3).getSettings().minX, ((BO3)parentBO3).getSettings().minY, ((BO3)parentBO3).getSettings().minZ, inheritBO3Rotation);
-
-				int parentMaxX = rotatedParentMaxCoords.getX() > rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
-				int parentMinX = rotatedParentMaxCoords.getX() < rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
-
-				int parentMaxY = rotatedParentMaxCoords.getY() > rotatedParentMinCoords.getY() ? rotatedParentMaxCoords.getY() : rotatedParentMinCoords.getY();
-				int parentMinY = rotatedParentMaxCoords.getY() < rotatedParentMinCoords.getY() ? rotatedParentMaxCoords.getY() : rotatedParentMinCoords.getY();
-
-				int parentMaxZ = rotatedParentMaxCoords.getZ() > rotatedParentMinCoords.getZ() ? rotatedParentMaxCoords.getZ() : rotatedParentMinCoords.getZ();
-				int parentMinZ = rotatedParentMaxCoords.getZ() < rotatedParentMinCoords.getZ() ? rotatedParentMaxCoords.getZ() : rotatedParentMinCoords.getZ();
-
-				if(parentMaxX > this.maxX)
-				{
-					this.maxX = parentMaxX;
-				}
-				if(parentMinX < this.minX)
-				{
-					this.minX = parentMinX;
-				}
-				if(parentMaxY > this.maxY)
-				{
-					this.maxY = parentMaxY;
-				}
-				if(parentMinY < this.minY)
-				{
-					this.minY = parentMinY;
-				}
-				if(parentMaxZ > this.maxZ)
-				{
-					this.maxZ = parentMaxZ;
-				}
-				if(parentMinZ < this.minZ)
-				{
-					this.minZ = parentMinZ;
-				}
-
-				ArrayList<BlockFunction> newBlocks = new ArrayList<BlockFunction>();
-				if(this.blocksOTGPlus != null)
-				{
-					for(BlockFunction block : this.blocksOTGPlus)
+		    	if(!blocksOnly)
+		    	{
+	    			inheritedBO3s.addAll(((BO3)parentBO3).getSettings().getInheritedBO3s());
+	
+					removeAir = ((BO3)parentBO3).getSettings().removeAir;
+					replaceAbove = replaceAbove == null || replaceAbove.length() == 0 ? ((BO3)parentBO3).getSettings().replaceAbove : replaceAbove;
+					replaceBelow = replaceBelow == null || replaceBelow.length() == 0 ? ((BO3)parentBO3).getSettings().replaceBelow : replaceBelow;
+	
+					CustomObjectCoordinate rotatedParentMaxCoords = CustomObjectCoordinate.getRotatedBO3Coords(((BO3)parentBO3).getSettings().maxX, ((BO3)parentBO3).getSettings().maxY, ((BO3)parentBO3).getSettings().maxZ, inheritBO3Rotation);
+					CustomObjectCoordinate rotatedParentMinCoords = CustomObjectCoordinate.getRotatedBO3Coords(((BO3)parentBO3).getSettings().minX, ((BO3)parentBO3).getSettings().minY, ((BO3)parentBO3).getSettings().minZ, inheritBO3Rotation);
+	
+					int parentMaxX = rotatedParentMaxCoords.getX() > rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
+					int parentMinX = rotatedParentMaxCoords.getX() < rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
+	
+					int parentMaxY = rotatedParentMaxCoords.getY() > rotatedParentMinCoords.getY() ? rotatedParentMaxCoords.getY() : rotatedParentMinCoords.getY();
+					int parentMinY = rotatedParentMaxCoords.getY() < rotatedParentMinCoords.getY() ? rotatedParentMaxCoords.getY() : rotatedParentMinCoords.getY();
+	
+					int parentMaxZ = rotatedParentMaxCoords.getZ() > rotatedParentMinCoords.getZ() ? rotatedParentMaxCoords.getZ() : rotatedParentMinCoords.getZ();
+					int parentMinZ = rotatedParentMaxCoords.getZ() < rotatedParentMinCoords.getZ() ? rotatedParentMaxCoords.getZ() : rotatedParentMinCoords.getZ();
+	
+					if(parentMaxX > this.maxX)
 					{
-						newBlocks.add(block);
+						this.maxX = parentMaxX;
 					}
-				}
-				for(BlockFunction block : ((BO3)parentBO3).getSettings().blocksOTGPlus.clone())
-				{
-					newBlocks.add(block.rotate(inheritBO3Rotation));
-				}
-				this.blocksOTGPlus = newBlocks.toArray(new BlockFunction[newBlocks.size()]);
-
-				ArrayList<BranchFunction> newBranches = new ArrayList<BranchFunction>();
-				if(this.branchesOTGPlus != null)
-				{
-					for(BranchFunction branch : this.branchesOTGPlus)
+					if(parentMinX < this.minX)
 					{
-						newBranches.add(branch);
+						this.minX = parentMinX;
 					}
-				}
-				for(BranchFunction branch : ((BO3)parentBO3).getSettings().branchesOTGPlus.clone())
-				{
-					newBranches.add(branch.rotate(inheritBO3Rotation));
-				}
-				this.branchesOTGPlus = newBranches.toArray(new BranchFunction[newBranches.size()]);
-
-				ArrayList<ModDataFunction> newModData = new ArrayList<ModDataFunction>();
-				if(this.modDataOTGPlus != null)
-				{
-					for(ModDataFunction modData : this.modDataOTGPlus)
+					if(parentMaxY > this.maxY)
 					{
-						newModData.add(modData);
+						this.maxY = parentMaxY;
 					}
-				}
-				for(ModDataFunction modData : ((BO3)parentBO3).getSettings().modDataOTGPlus.clone())
-				{
-					newModData.add(modData.rotate(inheritBO3Rotation));
-				}
-				this.modDataOTGPlus = newModData.toArray(new ModDataFunction[newModData.size()]);
-
-				ArrayList<SpawnerFunction> newSpawnerData = new ArrayList<SpawnerFunction>();
-				if(this.spawnerDataOTGPlus != null)
-				{
-					for(SpawnerFunction spawnerData : this.spawnerDataOTGPlus)
+					if(parentMinY < this.minY)
 					{
-						newSpawnerData.add(spawnerData);
+						this.minY = parentMinY;
 					}
-				}
-				for(SpawnerFunction spawnerData : ((BO3)parentBO3).getSettings().spawnerDataOTGPlus.clone())
-				{
-					newSpawnerData.add(spawnerData.rotate(inheritBO3Rotation));
-				}
-				this.spawnerDataOTGPlus = newSpawnerData.toArray(new SpawnerFunction[newSpawnerData.size()]);
-
-				ArrayList<ParticleFunction> newParticleData = new ArrayList<ParticleFunction>();
-				if(this.particleDataOTGPlus != null)
-				{
-					for(ParticleFunction particleData : this.particleDataOTGPlus)
+					if(parentMaxZ > this.maxZ)
 					{
-						newParticleData.add(particleData);
+						this.maxZ = parentMaxZ;
 					}
-				}
-				for(ParticleFunction particleData : ((BO3)parentBO3).getSettings().particleDataOTGPlus.clone())
-				{
-					newParticleData.add(particleData.rotate(inheritBO3Rotation));
-				}
-				this.particleDataOTGPlus = newParticleData.toArray(new ParticleFunction[newParticleData.size()]);
-
-				ArrayList<EntityFunction> newEntityData = new ArrayList<EntityFunction>();
-				if(this.entityDataOTGPlus != null)
-				{
-					for(EntityFunction entityData : this.entityDataOTGPlus)
+					if(parentMinZ < this.minZ)
 					{
-						newEntityData.add(entityData);
+						this.minZ = parentMinZ;
 					}
-				}
-				for(EntityFunction entityData : ((BO3)parentBO3).getSettings().entityDataOTGPlus.clone())
-				{
-					newEntityData.add(entityData.rotate(inheritBO3Rotation));
-				}
-				this.entityDataOTGPlus = newEntityData.toArray(new EntityFunction[newEntityData.size()]);
+		    	}
 
-				ArrayList<BO3Check> newBO3Check = new ArrayList<BO3Check>();
-				if(this.bo3ChecksOTGPlus != null)
+				if(blocksOnly)
 				{
-					for(BO3Check bo3Check : this.bo3ChecksOTGPlus)
+					ArrayList<BlockFunction> newBlocks = new ArrayList<BlockFunction>();
+					if(this.blocksOTGPlus != null)
 					{
-						newBO3Check.add(bo3Check);
+						for(BlockFunction block : this.blocksOTGPlus)
+						{
+							newBlocks.add(block);
+						}
 					}
+					for(BlockFunction block : ((BO3)parentBO3).getSettings().getBlocks().clone())
+					{
+						newBlocks.add(block.rotate(inheritBO3Rotation));
+					}
+					this.blocksOTGPlus = newBlocks.toArray(new BlockFunction[newBlocks.size()]);
 				}
-				for(BO3Check bo3Check : ((BO3)parentBO3).getSettings().bo3ChecksOTGPlus.clone())
-				{
-					newBO3Check.add(bo3Check.rotate(inheritBO3Rotation));
-				}
-				this.bo3ChecksOTGPlus = newBO3Check.toArray(new BO3Check[newBO3Check.size()]);
 
-				inheritedBO3s.addAll(((BO3)parentBO3).getSettings().getInheritedBO3s());
+				if(!blocksOnly)
+				{
+					ArrayList<BranchFunction> newBranches = new ArrayList<BranchFunction>();
+					if(this.branchesOTGPlus != null)
+					{
+						for(BranchFunction branch : this.branchesOTGPlus)
+						{
+							newBranches.add(branch);
+						}
+					}
+					for(BranchFunction branch : ((BO3)parentBO3).getSettings().branchesOTGPlus.clone())
+					{
+						newBranches.add(branch.rotate(inheritBO3Rotation));
+					}
+					this.branchesOTGPlus = newBranches.toArray(new BranchFunction[newBranches.size()]);
+	
+					ArrayList<ModDataFunction> newModData = new ArrayList<ModDataFunction>();
+					if(this.modDataOTGPlus != null)
+					{
+						for(ModDataFunction modData : this.modDataOTGPlus)
+						{
+							newModData.add(modData);
+						}
+					}
+					for(ModDataFunction modData : ((BO3)parentBO3).getSettings().modDataOTGPlus.clone())
+					{
+						newModData.add(modData.rotate(inheritBO3Rotation));
+					}
+					this.modDataOTGPlus = newModData.toArray(new ModDataFunction[newModData.size()]);
+	
+					ArrayList<SpawnerFunction> newSpawnerData = new ArrayList<SpawnerFunction>();
+					if(this.spawnerDataOTGPlus != null)
+					{
+						for(SpawnerFunction spawnerData : this.spawnerDataOTGPlus)
+						{
+							newSpawnerData.add(spawnerData);
+						}
+					}
+					for(SpawnerFunction spawnerData : ((BO3)parentBO3).getSettings().spawnerDataOTGPlus.clone())
+					{
+						newSpawnerData.add(spawnerData.rotate(inheritBO3Rotation));
+					}
+					this.spawnerDataOTGPlus = newSpawnerData.toArray(new SpawnerFunction[newSpawnerData.size()]);
+	
+					ArrayList<ParticleFunction> newParticleData = new ArrayList<ParticleFunction>();
+					if(this.particleDataOTGPlus != null)
+					{
+						for(ParticleFunction particleData : this.particleDataOTGPlus)
+						{
+							newParticleData.add(particleData);
+						}
+					}
+					for(ParticleFunction particleData : ((BO3)parentBO3).getSettings().particleDataOTGPlus.clone())
+					{
+						newParticleData.add(particleData.rotate(inheritBO3Rotation));
+					}
+					this.particleDataOTGPlus = newParticleData.toArray(new ParticleFunction[newParticleData.size()]);
+	
+					ArrayList<EntityFunction> newEntityData = new ArrayList<EntityFunction>();
+					if(this.entityDataOTGPlus != null)
+					{
+						for(EntityFunction entityData : this.entityDataOTGPlus)
+						{
+							newEntityData.add(entityData);
+						}
+					}
+					for(EntityFunction entityData : ((BO3)parentBO3).getSettings().entityDataOTGPlus.clone())
+					{
+						newEntityData.add(entityData.rotate(inheritBO3Rotation));
+					}
+					this.entityDataOTGPlus = newEntityData.toArray(new EntityFunction[newEntityData.size()]);
+	
+					ArrayList<BO3Check> newBO3Check = new ArrayList<BO3Check>();
+					if(this.bo3ChecksOTGPlus != null)
+					{
+						for(BO3Check bo3Check : this.bo3ChecksOTGPlus)
+						{
+							newBO3Check.add(bo3Check);
+						}
+					}
+					for(BO3Check bo3Check : ((BO3)parentBO3).getSettings().bo3ChecksOTGPlus.clone())
+					{
+						newBO3Check.add(bo3Check.rotate(inheritBO3Rotation));
+					}
+					this.bo3ChecksOTGPlus = newBO3Check.toArray(new BO3Check[newBO3Check.size()]);
+	
+					inheritedBO3s.addAll(((BO3)parentBO3).getSettings().getInheritedBO3s());
+				}
 			}
 	    	if(!inheritedBO3Loaded)
 	    	{
@@ -462,7 +474,7 @@ public class BO3Config extends CustomObjectConfigFile
     	}
     }
 
-    private void readResources() throws InvalidConfigException
+    private void readResources(boolean blocksOnly) throws InvalidConfigException
     {
         List<BlockFunction> tempBlocksList = new ArrayList<BlockFunction>();
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
@@ -509,253 +521,267 @@ public class BO3Config extends CustomObjectConfigFile
 	            			}
 	            		}
 
-	                	// Get the real size of this BO3
-	                	if(((BlockFunction)res).x < minX)
-	                	{
-	                		minX = ((BlockFunction)res).x;
-	                	}
-	                	if(((BlockFunction)res).x > maxX)
-	                	{
-	                		maxX = ((BlockFunction)res).x;
-	                	}
-	                	if(((BlockFunction)res).y < minY)
-	                	{
-	                		minY = ((BlockFunction)res).y;
-	                	}
-	                	if(((BlockFunction)res).y > maxY)
-	                	{
-	                		maxY = ((BlockFunction)res).y;
-	                	}
-	                	if(((BlockFunction)res).z < minZ)
-	                	{
-	                		minZ = ((BlockFunction)res).z;
-	                	}
-	                	if(((BlockFunction)res).z > maxZ)
-	                	{
-	                		maxZ = ((BlockFunction)res).z;
-	                	}
+	            		if(!blocksOnly)
+	            		{
+		                	// Get the real size of this BO3
+		                	if(((BlockFunction)res).x < minX)
+		                	{
+		                		minX = ((BlockFunction)res).x;
+		                	}
+		                	if(((BlockFunction)res).x > maxX)
+		                	{
+		                		maxX = ((BlockFunction)res).x;
+		                	}
+		                	if(((BlockFunction)res).y < minY)
+		                	{
+		                		minY = ((BlockFunction)res).y;
+		                	}
+		                	if(((BlockFunction)res).y > maxY)
+		                	{
+		                		maxY = ((BlockFunction)res).y;
+		                	}
+		                	if(((BlockFunction)res).z < minZ)
+		                	{
+		                		minZ = ((BlockFunction)res).z;
+		                	}
+		                	if(((BlockFunction)res).z > maxZ)
+		                	{
+		                		maxZ = ((BlockFunction)res).z;
+		                	}
+	            		}
 	                }
-	                else if (res instanceof BO3Check)
+	                else if(!blocksOnly)
 	                {
-	                    tempChecksList.add((BO3Check) res);
-	                }
-	                else if (res instanceof WeightedBranchFunction)
-	                {
-	                    tempBranchesList.add((WeightedBranchFunction) res);
-	                }
-	                else if (res instanceof BranchFunction)
-	                {
-	                	tempBranchesList.add((BranchFunction) res);
-	                }
-	                else if (res instanceof ModDataFunction)
-	                {
-	                    tempModDataList.add((ModDataFunction) res);
-	                }
-	                else if (res instanceof SpawnerFunction)
-	                {
-	                	tempSpawnerList.add((SpawnerFunction) res);
-	                }
-	                else if (res instanceof ParticleFunction)
-	                {
-	                	tempParticlesList.add((ParticleFunction) res);
-	                }
-	                else if (res instanceof EntityFunction)
-	                {
-	                	tempEntitiesList.add((EntityFunction) res);
+		                if ( res instanceof BO3Check)
+		                {
+		                    tempChecksList.add((BO3Check) res);
+		                }
+		                else if (res instanceof WeightedBranchFunction)
+		                {
+		                    tempBranchesList.add((WeightedBranchFunction) res);
+		                }
+		                else if (res instanceof BranchFunction)
+		                {
+		                	tempBranchesList.add((BranchFunction) res);
+		                }
+		                else if (res instanceof ModDataFunction)
+		                {
+		                    tempModDataList.add((ModDataFunction) res);
+		                }
+		                else if (res instanceof SpawnerFunction)
+		                {
+		                	tempSpawnerList.add((SpawnerFunction) res);
+		                }
+		                else if (res instanceof ParticleFunction)
+		                {
+		                	tempParticlesList.add((ParticleFunction) res);
+		                }
+		                else if (res instanceof EntityFunction)
+		                {
+		                	tempEntitiesList.add((EntityFunction) res);
+		                }
 	                }
 	            }
 	        }
 
-	        if(minX == Integer.MAX_VALUE)
+	        if(!blocksOnly)
 	        {
-	        	minX = -8;
-	        }
-	        if(maxX == Integer.MIN_VALUE)
-	        {
-	        	maxX = -8;
-	        }
-	        if(minY == Integer.MAX_VALUE)
-	        {
-	        	minY = 0;
-	        }
-	        if(maxY == Integer.MIN_VALUE)
-	        {
-	        	maxY = 0;
-	        }
-	        if(minZ == Integer.MAX_VALUE)
-	        {
-	        	minZ = -7;
-	        }
-	        if(maxZ == Integer.MIN_VALUE)
-	        {
-	        	maxZ = -7;
+		        if(minX == Integer.MAX_VALUE)
+		        {
+		        	minX = -8;
+		        }
+		        if(maxX == Integer.MIN_VALUE)
+		        {
+		        	maxX = -8;
+		        }
+		        if(minY == Integer.MAX_VALUE)
+		        {
+		        	minY = 0;
+		        }
+		        if(maxY == Integer.MIN_VALUE)
+		        {
+		        	maxY = 0;
+		        }
+		        if(minZ == Integer.MAX_VALUE)
+		        {
+		        	minZ = -7;
+		        }
+		        if(maxZ == Integer.MIN_VALUE)
+		        {
+		        	maxZ = -7;
+		        }
 	        }
 
 	        // TODO: OTG+ Doesn't do CustomObject BO3's, only check for 16x16, not 32x32?
-
 	        boolean illegalBlock = false;
-	        for(BlockFunction block : tempBlocksList)
+	        if(blocksOnly)
 	        {
-	    		block.x += this.getXOffset();
-	    		block.z += this.getZOffset();
-
-        		if(block.x > 15 || block.z > 15)
-        		{
-        			illegalBlock = true;
-        		}
-
-	    		if(block.x < 0 || block.z < 0)
-	    		{
-	    			illegalBlock = true;
-	    		}
+		        for(BlockFunction block : tempBlocksList)
+		        {
+		    		block.x += this.getXOffset();
+		    		block.z += this.getZOffset();
+	
+	        		if(block.x > 15 || block.z > 15)
+	        		{
+	        			illegalBlock = true;
+	        		}
+	
+		    		if(block.x < 0 || block.z < 0)
+		    		{
+		    			illegalBlock = true;
+		    		}
+		        }
+		        blocksOTGPlus = tempBlocksList.toArray(new BlockFunction[tempBlocksList.size()]);
 	        }
-	        blocksOTGPlus = tempBlocksList.toArray(new BlockFunction[tempBlocksList.size()]);
 
-			boolean illegalBlockCheck = false;
-	    	for(BO3Check bo3Check : tempChecksList)
+	        if(!blocksOnly)
 	        {
-	        	// This is done when reading blocks so should also be done for blockchecks and moddata!
-
-	    		bo3Check.x += this.getXOffset();
-	    		bo3Check.z += this.getZOffset();
-
-        		if(bo3Check.x > 15 || bo3Check.z > 15)
-        		{
-        			illegalBlockCheck = true;
-        		}
-
-	    		if(bo3Check.x < 0 || bo3Check.z < 0)
-	    		{
-	    			illegalBlockCheck = true;
-	    		}
+				boolean illegalBlockCheck = false;
+		    	for(BO3Check bo3Check : tempChecksList)
+		        {
+		        	// This is done when reading blocks so should also be done for blockchecks and moddata!
+	
+		    		bo3Check.x += this.getXOffset();
+		    		bo3Check.z += this.getZOffset();
+	
+	        		if(bo3Check.x > 15 || bo3Check.z > 15)
+	        		{
+	        			illegalBlockCheck = true;
+	        		}
+	
+		    		if(bo3Check.x < 0 || bo3Check.z < 0)
+		    		{
+		    			illegalBlockCheck = true;
+		    		}
+		        }
+		        bo3ChecksOTGPlus = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
+	
+				boolean illegalModData = false;
+		        for(ModDataFunction modData : tempModDataList)
+		        {
+		        	// This is done when reading blocks so should also be done for blockchecks and moddata!
+	
+					modData.x += this.getXOffset();
+					modData.z += this.getZOffset();
+	
+	        		if(modData.x > 15 || modData.z > 15)
+	        		{
+	        			illegalModData = true;
+	        		}
+	
+		    		if(modData.x < 0 || modData.z < 0)
+		    		{
+		    			illegalModData = true;
+		    		}
+		        }
+		        modDataOTGPlus = tempModDataList.toArray(new ModDataFunction[tempModDataList.size()]);
+	
+				boolean illegalSpawnerData = false;
+		        for(SpawnerFunction spawnerData : tempSpawnerList)
+		        {
+		        	// This is done when reading blocks so should also be done for blockchecks and moddata!
+	
+		        	spawnerData.x += this.getXOffset();
+		        	spawnerData.z += this.getZOffset();
+	
+	        		if(spawnerData.x > 15 || spawnerData.z > 15)
+	        		{
+	        			illegalSpawnerData = true;
+	        		}
+	
+		    		if(spawnerData.x < 0 || spawnerData.z < 0)
+		    		{
+		    			illegalSpawnerData = true;
+		    		}
+		        }
+		        spawnerDataOTGPlus = tempSpawnerList.toArray(new SpawnerFunction[tempSpawnerList.size()]);
+	
+				boolean illegalParticleData = false;
+		        for(ParticleFunction particleData : tempParticlesList)
+		        {
+		        	// This is done when reading blocks so should also be done for blockchecks and moddata!
+	
+		        	particleData.x += this.getXOffset();
+		        	particleData.z += this.getZOffset();
+	
+	        		if(particleData.x > 15 || particleData.z > 15)
+	        		{
+	        			illegalParticleData = true;
+	        		}
+	
+		    		if(particleData.x < 0 || particleData.z < 0)
+		    		{
+		    			illegalParticleData = true;
+		    		}
+		        }
+		        particleDataOTGPlus = tempParticlesList.toArray(new ParticleFunction[tempParticlesList.size()]);
+	
+				boolean illegalEntityData = false;
+		        for(EntityFunction entityData : tempEntitiesList)
+		        {
+		        	// This is done when reading blocks so should also be done for blockchecks and moddata!
+	
+		        	entityData.x += this.getXOffset();
+		        	entityData.z += this.getZOffset();
+	
+	        		if(entityData.x > 15 || entityData.z > 15)
+	        		{
+	        			illegalEntityData = true;
+	        		}
+	
+		    		if(entityData.x < 0 || entityData.z < 0)
+		    		{
+		    			illegalEntityData = true;
+		    		}
+		        }
+		        entityDataOTGPlus = tempEntitiesList.toArray(new EntityFunction[tempEntitiesList.size()]);
+	
+				if(OTG.getPluginConfig().SpawnLog)
+				{
+					if(illegalBlock)
+					{
+						OTG.log(LogMarker.WARN, "Warning: BO3 contains Blocks or RandomBlocks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+					}
+					if(illegalBlockCheck)
+					{
+						OTG.log(LogMarker.WARN, "Warning: BO3 contains BlockChecks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+					}
+					if(illegalModData)
+					{
+						OTG.log(LogMarker.WARN, "Warning: BO3 contains ModData that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+					}
+					if(illegalSpawnerData)
+					{
+						OTG.log(LogMarker.WARN, "Warning: BO3 contains a Spawner() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+					}
+					if(illegalParticleData)
+					{
+						OTG.log(LogMarker.WARN, "Warning: BO3 contains a Particle() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+					}
+					if(illegalEntityData)
+					{
+						OTG.log(LogMarker.WARN, "Warning: BO3 contains an Entity() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+					}
+				}
+	
+		        // Store the blocks
+		        branchesOTGPlus = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
+	
+		    	if(branchesOTGPlus.length > 0) // If this BO3 has branches then it must be max 16x16
+		    	{
+		    		if(Math.abs(minX - maxX) > 15 || Math.abs(minZ - maxZ) > 15)
+		    		{
+		    			OTG.log(LogMarker.INFO, "BO3 " + this.name + " was too large, branching BO3's can be max 16x16 blocks.");
+		    			throw new InvalidConfigException("BO3 " + this.name + " was too large, branching BO3's can be max 16x16 blocks.");
+		    		}
+		    	} else {
+		    		if(Math.abs(minX - maxX) > 15 || Math.abs(minZ - maxZ) > 15) // If this BO3 is larger than 16x16 then it can only be used as a customObject
+		    		{
+		    			OTG.log(LogMarker.INFO, "BO3 " + this.name + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
+		    			throw new InvalidConfigException("BO3 " + this.name + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
+		    		}
+		    	}
 	        }
-	        bo3ChecksOTGPlus = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
-
-			boolean illegalModData = false;
-	        for(ModDataFunction modData : tempModDataList)
-	        {
-	        	// This is done when reading blocks so should also be done for blockchecks and moddata!
-
-				modData.x += this.getXOffset();
-				modData.z += this.getZOffset();
-
-        		if(modData.x > 15 || modData.z > 15)
-        		{
-        			illegalModData = true;
-        		}
-
-	    		if(modData.x < 0 || modData.z < 0)
-	    		{
-	    			illegalModData = true;
-	    		}
-	        }
-	        modDataOTGPlus = tempModDataList.toArray(new ModDataFunction[tempModDataList.size()]);
-
-			boolean illegalSpawnerData = false;
-	        for(SpawnerFunction spawnerData : tempSpawnerList)
-	        {
-	        	// This is done when reading blocks so should also be done for blockchecks and moddata!
-
-	        	spawnerData.x += this.getXOffset();
-	        	spawnerData.z += this.getZOffset();
-
-        		if(spawnerData.x > 15 || spawnerData.z > 15)
-        		{
-        			illegalSpawnerData = true;
-        		}
-
-	    		if(spawnerData.x < 0 || spawnerData.z < 0)
-	    		{
-	    			illegalSpawnerData = true;
-	    		}
-	        }
-	        spawnerDataOTGPlus = tempSpawnerList.toArray(new SpawnerFunction[tempSpawnerList.size()]);
-
-			boolean illegalParticleData = false;
-	        for(ParticleFunction particleData : tempParticlesList)
-	        {
-	        	// This is done when reading blocks so should also be done for blockchecks and moddata!
-
-	        	particleData.x += this.getXOffset();
-	        	particleData.z += this.getZOffset();
-
-        		if(particleData.x > 15 || particleData.z > 15)
-        		{
-        			illegalParticleData = true;
-        		}
-
-	    		if(particleData.x < 0 || particleData.z < 0)
-	    		{
-	    			illegalParticleData = true;
-	    		}
-	        }
-	        particleDataOTGPlus = tempParticlesList.toArray(new ParticleFunction[tempParticlesList.size()]);
-
-			boolean illegalEntityData = false;
-	        for(EntityFunction entityData : tempEntitiesList)
-	        {
-	        	// This is done when reading blocks so should also be done for blockchecks and moddata!
-
-	        	entityData.x += this.getXOffset();
-	        	entityData.z += this.getZOffset();
-
-        		if(entityData.x > 15 || entityData.z > 15)
-        		{
-        			illegalEntityData = true;
-        		}
-
-	    		if(entityData.x < 0 || entityData.z < 0)
-	    		{
-	    			illegalEntityData = true;
-	    		}
-	        }
-	        entityDataOTGPlus = tempEntitiesList.toArray(new EntityFunction[tempEntitiesList.size()]);
-
-			if(OTG.getPluginConfig().SpawnLog)
-			{
-				if(illegalBlock)
-				{
-					OTG.log(LogMarker.WARN, "Warning: BO3 contains Blocks or RandomBlocks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
-				}
-				if(illegalBlockCheck)
-				{
-					OTG.log(LogMarker.WARN, "Warning: BO3 contains BlockChecks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
-				}
-				if(illegalModData)
-				{
-					OTG.log(LogMarker.WARN, "Warning: BO3 contains ModData that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
-				}
-				if(illegalSpawnerData)
-				{
-					OTG.log(LogMarker.WARN, "Warning: BO3 contains a Spawner() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
-				}
-				if(illegalParticleData)
-				{
-					OTG.log(LogMarker.WARN, "Warning: BO3 contains a Particle() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
-				}
-				if(illegalEntityData)
-				{
-					OTG.log(LogMarker.WARN, "Warning: BO3 contains an Entity() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
-				}
-			}
-
-	        // Store the blocks
-	        branchesOTGPlus = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
-
-	    	if(branchesOTGPlus.length > 0) // If this BO3 has branches then it must be max 16x16
-	    	{
-	    		if(Math.abs(minX - maxX) > 15 || Math.abs(minZ - maxZ) > 15)
-	    		{
-	    			OTG.log(LogMarker.INFO, "BO3 " + this.name + " was too large, branching BO3's can be max 16x16 blocks.");
-	    			throw new InvalidConfigException("BO3 " + this.name + " was too large, branching BO3's can be max 16x16 blocks.");
-	    		}
-	    	} else {
-	    		if(Math.abs(minX - maxX) > 15 || Math.abs(minZ - maxZ) > 15) // If this BO3 is larger than 16x16 then it can only be used as a customObject
-	    		{
-	    			OTG.log(LogMarker.INFO, "BO3 " + this.name + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
-	    			throw new InvalidConfigException("BO3 " + this.name + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
-	    		}
-	    	}
     	}// else {
 
     		// These lists are primarily used by non-OTG+ BO3's. For OTG+ BO3's these lists are used only when writing to the bo3, after that they are discarded.
@@ -777,39 +803,52 @@ public class BO3Config extends CustomObjectConfigFile
                 	BlockFunction block = (BlockFunction) res;
                     box.expandToFit(block.x, block.y, block.z);
                     tempBlocksList.add(block);
-                } else if (res instanceof BO3Check)
+                }
+                else if(!blocksOnly)
                 {
-                    tempChecksList.add((BO3Check) res);
-                } else if (res instanceof WeightedBranchFunction)
-                {
-                    tempBranchesList.add((WeightedBranchFunction) res);
-                } else if (res instanceof BranchFunction)
-                {
-                    tempBranchesList.add((BranchFunction) res);
-                } else if (res instanceof EntityFunction)
-                {
-                    tempEntitiesList.add((EntityFunction) res);
-                } else if (res instanceof ParticleFunction)
-                {
-                	tempParticlesList.add((ParticleFunction) res);
-                } else if (res instanceof ModDataFunction)
-                {
-                	tempModDataList.add((ModDataFunction) res);
-                } else if (res instanceof SpawnerFunction)
-                {
-                	tempSpawnerList.add((SpawnerFunction) res);
+	                if (res instanceof BO3Check)
+	                {
+	                    tempChecksList.add((BO3Check) res);
+	                }
+	                else if (res instanceof WeightedBranchFunction)
+	                {
+	                    tempBranchesList.add((WeightedBranchFunction) res);
+	                }
+	                else if (res instanceof BranchFunction)
+	                {
+	                    tempBranchesList.add((BranchFunction) res);
+	                }
+	                else if (res instanceof EntityFunction)
+	                {
+	                    tempEntitiesList.add((EntityFunction) res);
+	                }
+	                else if (res instanceof ParticleFunction)
+	                {
+	                	tempParticlesList.add((ParticleFunction) res);
+	                }
+	                else if (res instanceof ModDataFunction)
+	                {
+	                	tempModDataList.add((ModDataFunction) res);
+	                }
+	                else if (res instanceof SpawnerFunction)
+	                {
+	                	tempSpawnerList.add((SpawnerFunction) res);
+	                }
                 }
             }
 
             // Store the blocks
             blocks[0] = tempBlocksList.toArray(new BlockFunction[tempBlocksList.size()]);
-            bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
-            branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
-            boundingBoxes[0] = box;
-            entityFunctions[0] = tempEntitiesList.toArray(new EntityFunction[tempEntitiesList.size()]);
-            particleFunctions[0] = tempParticlesList.toArray(new ParticleFunction[tempParticlesList.size()]);
-            modDataFunctions[0] = tempModDataList.toArray(new ModDataFunction[tempModDataList.size()]);
-            spawnerFunctions[0] = tempSpawnerList.toArray(new SpawnerFunction[tempSpawnerList.size()]);
+            if(!blocksOnly)
+            {
+	            bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
+	            branches[0] = tempBranchesList.toArray(new BranchFunction[tempBranchesList.size()]);
+	            boundingBoxes[0] = box;
+	            entityFunctions[0] = tempEntitiesList.toArray(new EntityFunction[tempEntitiesList.size()]);
+	            particleFunctions[0] = tempParticlesList.toArray(new ParticleFunction[tempParticlesList.size()]);
+	            modDataFunctions[0] = tempModDataList.toArray(new ModDataFunction[tempModDataList.size()]);
+	            spawnerFunctions[0] = tempSpawnerList.toArray(new SpawnerFunction[tempSpawnerList.size()]);
+            }
     	//}
     }
 
@@ -1243,15 +1282,46 @@ public class BO3Config extends CustomObjectConfigFile
         outsideSourceBlock = readSettings(BO3Settings.OUTSIDE_SOURCE_BLOCK);
 
         // Read the resources
-        readResources();
+        readResources(false);
 
-        this.reader = null;
+        this.reader.flushCache();
 
     	// Merge inherited resources
         if(isOTGPlus)
         {
-        	loadInheritedBO3();
+        	loadInheritedBO3(false);
         }
+    }
+    
+    protected void readBlocks()
+    {    	
+    	((FileSettingsReaderOTGPlus) this.reader).readSettings();
+    	
+    	 this.blocks = new BlockFunction[4][];
+    	
+        // Read the resources
+        try {
+			readResources(true);
+		} catch (InvalidConfigException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return;
+		}
+        
+        this.reader.flushCache();
+        
+    	// Merge inherited resources
+        if(isOTGPlus)
+        {
+        	loadInheritedBO3(true);
+        }
+        
+        //if(!isOTGPlus)
+        {
+        	//rotateBlocksAndChecks();
+        }
+        
+        this.blocks = null;
     }
 
     void writeResources(SettingsWriterOTGPlus writer) throws IOException

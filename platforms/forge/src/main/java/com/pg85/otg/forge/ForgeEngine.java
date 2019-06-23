@@ -678,7 +678,7 @@ public class ForgeEngine extends OTGEngine
     	// Unload all world and biomes on server start / connect instead, for client where data is kept when leaving the game.
 
     	OTGDimensionManager.UnloadAllCustomDimensionData();
-    	this.worldLoader.unloadAllWorlds();
+    	this.worldLoader.removeAllWorlds();
         // Clear the BiomeDictionary (it will be refilled when biomes are loaded in createBiomeFor)
     	this.worldLoader.clearBiomeDictionary(null);
     	BiomeRegistryManager.ClearOTGBiomeIds();

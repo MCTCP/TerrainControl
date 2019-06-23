@@ -26,6 +26,7 @@ import java.util.Map;
 public class BO3Loader implements CustomObjectLoader
 {
 
+	// TOOD: Update this
     /** A list of already loaded meta Tags. The path is the key, a NBT Tag is
      * the value.
      */

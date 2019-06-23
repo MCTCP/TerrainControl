@@ -1320,8 +1320,11 @@ public class BO3 implements StructuredCustomObject
     @Override
     public CustomObject applySettings(SettingsReaderOTGPlus extraSettings)
     {
+    	throw new RuntimeException(); // TODO: Remove after testing
+    	/*
         extraSettings.setFallbackReader(this.settings.reader);
         return new BO3(this, extraSettings);
+        */
     }
 
     @Override

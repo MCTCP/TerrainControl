@@ -28,6 +28,7 @@ import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 
@@ -53,9 +54,13 @@ public class OTGChunkGenerator implements IChunkGenerator
 
     int lastx2 = 0;
     int lastz2 = 0;
-    int chunkCacheSize = 256;
-    LinkedHashMap<ChunkCoordinate, Object[]> chunkCache = new LinkedHashMap<ChunkCoordinate, Object[]>();
+    FifoMap<ChunkCoordinate, Object[]> chunkCache = new FifoMap<ChunkCoordinate, Object[]>(128);
 
+    public void clearChunkCache()
+    {
+    	chunkCache.clear();
+    }
+    
 	//
 
     private ForgeWorld world;
@@ -261,17 +266,6 @@ public class OTGChunkGenerator implements IChunkGenerator
     				FMLInterModComms.sendRuntimeMessage(OTGPlugin.instance, modNameAndData.getKey(), "ModData", "[" + "[" + world.getName() + "," + chunkX + "," + chunkZ + "]" + messageString + "]");
     			}
         	}
-        }
-
-        Runtime runtime = Runtime.getRuntime();
-		long maxMemory = runtime.maxMemory();
-		long allocatedMemory = runtime.totalMemory();
-		long freeMemory = runtime.freeMemory();
-
-        if((!world.GetWorldSession().getPreGeneratorIsRunning() && chunkCache.entrySet().size() > chunkCacheSize) || (freeMemory + (maxMemory - allocatedMemory) <= (maxMemory * 0.25)))
-        {
-	        	OTG.log(LogMarker.DEBUG, "Clearing ChunkProvider cache");
-	        	chunkCache.clear();
         }
 
 		world.ClearChunkCache();

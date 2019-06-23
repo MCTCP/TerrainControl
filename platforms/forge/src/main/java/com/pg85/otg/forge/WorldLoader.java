@@ -179,10 +179,10 @@ public final class WorldLoader
 
     public void onServerStopped()
     {
-        unloadAllWorlds();
+        removeAllWorlds();
     }
 
-    public void unloadAllWorlds()
+    public void removeAllWorlds()
     {
     	ArrayList<ForgeWorld> worldsToRemove = new ArrayList<ForgeWorld>();
     	synchronized(this.worlds)

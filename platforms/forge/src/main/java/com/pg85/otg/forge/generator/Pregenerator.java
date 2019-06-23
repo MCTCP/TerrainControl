@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 
 import com.pg85.otg.OTG;
@@ -366,6 +367,8 @@ public class Pregenerator
     			iTop = Integer.MIN_VALUE;
 			}
 			
+			OTG.getEngine().ReloadCustomObjectFiles();
+			this.world.getChunkGenerator().clearChunkCache();
 			SavePregeneratorData(false);
         }
         pregeneratorIsRunning = false;
@@ -393,8 +396,15 @@ public class Pregenerator
 	private void PreGenerateChunk(int currentX, int currentZ)
 	{
 		UpdateProgressMessage(true);
+		
+		// Make sure the 3 surrounding chunks are loaded, or this chunk won't get populated.
+        world.getWorld().getChunkProvider().provideChunk(currentX + 1, currentZ);
+        world.getWorld().getChunkProvider().provideChunk(currentX, currentZ + 1);
+        world.getWorld().getChunkProvider().provideChunk(currentX + 1, currentZ + 1);
 
-		world.getWorld().getChunkProvider().provideChunk(currentX, currentZ);
+        // Provide and populate this chunk
+        world.getWorld().getChunkProvider().provideChunk(currentX, currentZ);
+
 		spawnedThisTick++;
 	}
 
@@ -454,7 +464,7 @@ public class Pregenerator
 			progressScreenElapsedTime = "";
 			progressScreenEstimatedTime = "";
 			progressScreenWorldSizeInBlocks = 0;
-			OTG.log(LogMarker.INFO, "Pre-generating chunks done for world " + pregenerationWorld + ", " + ((int)spawned) + " chunks spawned in " + sElapsedTime);
+			OTG.log(LogMarker.INFO, "Pre-generating chunks done for world " + pregenerationWorld + ", " + ((int)spawned) + " chunks spawned in " + sElapsedTime);		
 		}
 	}
 
