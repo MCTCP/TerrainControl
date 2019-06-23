@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.generator;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.biomes.OTGBiomeProvider;
 import com.pg85.otg.generator.biome.OutputType;

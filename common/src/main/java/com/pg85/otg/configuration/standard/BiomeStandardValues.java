@@ -3,17 +3,17 @@ package com.pg85.otg.configuration.standard;
 import static com.pg85.otg.OTG.WORLD_DEPTH;
 import static com.pg85.otg.OTG.WORLD_HEIGHT;
 
-import com.pg85.otg.configuration.biome.ReplacedBlocksMatrix;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
+import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.settingType.DoubleArraySetting;
 import com.pg85.otg.configuration.settingType.MaterialSetting;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.Arrays;

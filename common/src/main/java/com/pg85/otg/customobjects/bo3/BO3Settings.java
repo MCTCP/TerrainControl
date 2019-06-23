@@ -6,7 +6,6 @@ import static com.pg85.otg.OTG.WORLD_HEIGHT;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
-import com.pg85.otg.customobjects.StructurePartSpawnHeight;
 import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;

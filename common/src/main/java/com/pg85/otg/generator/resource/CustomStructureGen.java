@@ -1,13 +1,13 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.CustomObjectCoordinate;
-import com.pg85.otg.customobjects.CustomObjectStructure;
-import com.pg85.otg.customobjects.StructuredCustomObject;
+import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
+import com.pg85.otg.customobjects.customstructure.CustomObjectStructure;
+import com.pg85.otg.customobjects.customstructure.StructuredCustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -66,7 +66,7 @@ public class CustomStructureGen extends Resource
     {
     	if(world.getConfigs().getWorldConfig().IsOTGPlus)
     	{
-    		throw new RuntimeException();
+    		throw new RuntimeException(); // TODO: Remove after testing
     	} else {
 	        // Find all structures that reach this chunk, and spawn them
 	        int searchRadius = world.getConfigs().getWorldConfig().maximumCustomStructureRadius;
@@ -77,7 +77,7 @@ public class CustomStructureGen extends Resource
 	        {
 	            for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
 	            {
-	                CustomObjectStructure structureStart = world.getStructureCache().getStructureStart(searchChunkX, searchChunkZ);
+	                CustomObjectStructure structureStart = world.getStructureCache().getStructureStart(random, searchChunkX, searchChunkZ);
 	                if (structureStart != null)
 	                {
 	                    structureStart.spawnForChunk(chunkCoord);

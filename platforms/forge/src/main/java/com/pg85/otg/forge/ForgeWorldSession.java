@@ -9,11 +9,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.WorldSession;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.customobjects.bo3.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;

@@ -14,7 +14,7 @@ import io.netty.buffer.Unpooled;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.customobjects.bo3.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
 import com.pg85.otg.forge.events.client.ClientTickHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;

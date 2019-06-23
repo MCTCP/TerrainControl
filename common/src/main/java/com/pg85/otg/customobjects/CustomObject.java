@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.util.BoundingBox;

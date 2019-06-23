@@ -1,16 +1,16 @@
 package com.pg85.otg.generator;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.ErroredFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.CustomObjectStructure;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.pg85.otg.customobjects.customstructure.CustomObjectStructure;
 import com.pg85.otg.generator.resource.AboveWaterGen;
 import com.pg85.otg.generator.resource.BoulderGen;
 import com.pg85.otg.generator.resource.CactusGen;
@@ -543,7 +543,7 @@ public class ObjectSpawner
 			structureStart.SpawnForChunk(chunkCoord);
 
 			// All done spawning structures for this chunk, clean up cache
-			if(!world.IsInsidePregeneratedRegion(chunkCoord, true))
+			if(!world.IsInsidePregeneratedRegion(chunkCoord))
 			{
 				world.getStructureCache().structureCache.put(chunkCoord, null);
 			} else {
@@ -556,7 +556,7 @@ public class ObjectSpawner
 			// Complex surface blocks
 			//placeComplexSurfaceBlocks(chunkCoord);
 
-			if(!world.IsInsidePregeneratedRegion(chunkCoord, true))
+			if(!world.IsInsidePregeneratedRegion(chunkCoord))
 			{
 				world.getStructureCache().structureCache.put(chunkCoord, null);
 			} else {

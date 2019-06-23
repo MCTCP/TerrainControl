@@ -9,14 +9,18 @@ import com.pg85.otg.bukkit.generator.OTGWorldProvider;
 import com.pg85.otg.bukkit.generator.structures.*;
 import com.pg85.otg.bukkit.util.NBTHelper;
 import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.customobjects.CustomObjectStructureCache;
-import com.pg85.otg.customobjects.bo3.BlockFunction;
-import com.pg85.otg.customobjects.bo3.EntityFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
+import com.pg85.otg.customobjects.customstructure.CustomObjectStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.SpawnableObject;
@@ -26,7 +30,6 @@ import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
@@ -1679,7 +1682,7 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	@Override
-	public boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk, boolean includeBorder)
+	public boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk)
 	{
 		// TODO Implement this
 		return false;

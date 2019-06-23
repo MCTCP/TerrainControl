@@ -1,6 +1,6 @@
 package com.pg85.otg.generator;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.Rotation;
 
 import java.util.Random;

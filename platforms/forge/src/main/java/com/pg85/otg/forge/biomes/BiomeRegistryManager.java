@@ -5,8 +5,8 @@ import java.util.BitSet;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.pg85.otg.LocalBiome;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;

@@ -3,7 +3,7 @@ package com.pg85.otg.forge.network.server;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.pg85.otg.customobjects.bo3.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
 import com.pg85.otg.forge.network.PacketDispatcher;
 import com.pg85.otg.forge.network.server.packets.DimensionLoadUnloadPacket;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;

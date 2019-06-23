@@ -4,6 +4,18 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectLoader;
+import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BranchFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.MinecraftObjectFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.RandomBlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.WeightedBranchFunction;
+import com.pg85.otg.customobjects.bo3.checks.BlockCheck;
+import com.pg85.otg.customobjects.bo3.checks.BlockCheckNot;
+import com.pg85.otg.customobjects.bo3.checks.LightCheck;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.NamedBinaryTag;
 

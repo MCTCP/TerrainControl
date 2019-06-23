@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.LocalBiome;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.minecraftTypes.StructureNames;

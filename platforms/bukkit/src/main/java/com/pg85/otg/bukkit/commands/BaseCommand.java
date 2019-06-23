@@ -1,9 +1,10 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPlugin;
 import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.common.LocalWorld;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

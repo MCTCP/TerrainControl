@@ -9,12 +9,13 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import com.pg85.otg.LocalBiome;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.customobjects.bo3.BlockFunction;
-import com.pg85.otg.customobjects.bo3.ModDataFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.biomes.ForgeBiome;
@@ -27,7 +28,6 @@ import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
 

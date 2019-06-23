@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.util;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.logging.LogMarker;
 

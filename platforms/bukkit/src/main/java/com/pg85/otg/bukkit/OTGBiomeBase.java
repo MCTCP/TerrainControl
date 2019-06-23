@@ -5,7 +5,7 @@ import com.pg85.otg.bukkit.util.EnumHelper;
 import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
 import com.pg85.otg.bukkit.util.WorldHelper;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;

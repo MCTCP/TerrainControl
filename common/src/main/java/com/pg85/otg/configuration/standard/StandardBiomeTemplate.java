@@ -3,10 +3,10 @@ package com.pg85.otg.configuration.standard;
 import static com.pg85.otg.configuration.standard.BiomeStandardValues.*;
 
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.resource.IceSpikeGen.SpikeType;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;

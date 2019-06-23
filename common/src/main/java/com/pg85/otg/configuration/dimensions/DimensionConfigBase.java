@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.util.LocalMaterialData;
 
 @JsonIgnoreProperties(value = { "isNewConfig" })
 public abstract class DimensionConfigBase

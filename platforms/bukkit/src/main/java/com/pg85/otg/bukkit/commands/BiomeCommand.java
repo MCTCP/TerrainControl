@@ -1,9 +1,9 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.util.BiomeIds;
 

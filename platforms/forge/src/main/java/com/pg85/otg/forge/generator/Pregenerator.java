@@ -8,12 +8,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraft.world.gen.ChunkProviderServer;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
@@ -201,8 +199,12 @@ public class Pregenerator
 			// Progress within a cycle is tracked using iTop, iBottom, iLeft, iRight
 			while(!(leftEdgeFound && rightEdgeFound && topEdgeFound && bottomEdgeFound))
 			{
-	    		// TODO: Since the first cycle is cycle 1, the centermost chunk (at the spawnpoint) wont be pregenerated.
-	    		// Probably doesnt matter though since MC shouldve populates the chunk automatically on server start
+	    		// Since the first cycle is cycle 1, the centermost chunk (at the spawnpoint) wont be pregenerated.
+				if(cycle == 0)
+				{
+					PreGenerateChunk(spawnChunkX, spawnChunkZ);
+				}
+
 				cycle += 1;
 
 	    		// Check Right
@@ -363,7 +365,7 @@ public class Pregenerator
     			iRight = Integer.MIN_VALUE;
     			iTop = Integer.MIN_VALUE;
 			}
-
+			
 			SavePregeneratorData(false);
         }
         pregeneratorIsRunning = false;
@@ -385,31 +387,15 @@ public class Pregenerator
 			// Save progress so we can continue and retry on the next server tick.
 			cycle -= 1;
 			processing = false;
-		}
+		}		
 	}
 
 	private void PreGenerateChunk(int currentX, int currentZ)
 	{
 		UpdateProgressMessage(true);
 
-		ChunkProviderServer chunkProvider = (ChunkProviderServer) world.getWorld().getChunkProvider();
-		
-        if (
-        	!(
-	    		(
-    				chunkProvider.chunkExists(currentX, currentZ) ||
-					RegionFileCache.createOrLoadRegionFile(((WorldServer)world.getWorld()).getChunkSaveLocation(), currentX, currentZ).chunkExists(currentX & 0x1F, currentZ & 0x1F)
-				) &&
-				chunkProvider.provideChunk(currentX, currentZ).isPopulated()
-			)
-		)
-		{
-			spawnedThisTick++;
-        	chunkProvider.provideChunk(currentX, currentZ).needsSaving(true);
-        	chunkProvider.provideChunk(currentX, currentZ + 1).needsSaving(true);
-        	chunkProvider.provideChunk(currentX + 1, currentZ).needsSaving(true);
-        	chunkProvider.provideChunk(currentX + 1, currentZ + 1).needsSaving(true);
-		}
+		world.getWorld().getChunkProvider().provideChunk(currentX, currentZ);
+		spawnedThisTick++;
 	}
 
 	private long lastMessage = System.currentTimeMillis();
@@ -453,7 +439,7 @@ public class Pregenerator
 			progressScreenEstimatedTime = estimatedTime;
 			if(!dontLog)
 			{
-				OTG.log(LogMarker.INFO, "Pre-generating world \"" + pregenerationWorld + "\" chunk X" + currentX + " Z" + currentZ + ". Radius: " + pregenerationRadius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
+				OTG.log(LogMarker.INFO, "Pre-generating world \"" + pregenerationWorld + "\". Radius: " + pregenerationRadius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
 			}
 		} else {
 

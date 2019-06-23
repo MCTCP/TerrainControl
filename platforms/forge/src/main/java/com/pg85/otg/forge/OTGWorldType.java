@@ -1,8 +1,9 @@
 package com.pg85.otg.forge;
 
 import java.io.File;
-import com.pg85.otg.LocalWorld;
+
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;

@@ -2,8 +2,9 @@ package com.pg85.otg.forge.events.dimensions;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
@@ -12,7 +13,6 @@ import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.state.IBlockState;

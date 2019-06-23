@@ -1,6 +1,7 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
@@ -9,14 +10,22 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.CustomObjectCoordinate;
 import com.pg85.otg.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BranchFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.RandomBlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.WeightedBranchFunction;
+import com.pg85.otg.customobjects.bo3.checks.BO3Check;
+import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
@@ -38,8 +47,9 @@ public class BO3Config extends CustomObjectConfigFile
 	public boolean isOTGPlus = false;
 
     public int branchFrequency;
-    // Define a group that this BO3 belongs to and a range in chunks that members of this group should have to each other
+    // Define groups that this BO3 belongs to with a range in chunks that members of each group should have to each other
     public String branchFrequencyGroup = "";
+    public HashMap<String, Integer> branchFrequencyGroups = new HashMap<String, Integer>();
 
     private int minX = Integer.MAX_VALUE;
     private int maxX = Integer.MIN_VALUE;
@@ -84,6 +94,7 @@ public class BO3Config extends CustomObjectConfigFile
     public String replaceWithSurfaceBlock = "GRASS";
     // Define a group that this BO3 belongs to and a range in chunks that members of this group should have to each other
     public String bo3Group = "";
+    public HashMap<String, Integer> bo3Groups = new HashMap<String, Integer>();
     // If this is set to true then this BO3 can spawn on top of or inside other BO3's
     public boolean canOverride = false;
 
@@ -105,8 +116,11 @@ public class BO3Config extends CustomObjectConfigFile
     public boolean mustBeBelowOther = false;
 
     public String replacesBO3 = "";
+    public ArrayList<String> replacesBO3Branches = new ArrayList<String>();
     public String mustBeInside = "";
+    public ArrayList<String> mustBeInsideBranches = new ArrayList<String>();
     public String cannotBeInside = "";
+    public ArrayList<String> cannotBeInsideBranches = new ArrayList<String>();
 
     public int smoothHeightOffset = 0;
     public boolean CanSpawnOnWater = true;
@@ -1071,8 +1085,25 @@ public class BO3Config extends CustomObjectConfigFile
     	if(isOTGPlus)
     	{
 	        branchFrequency = readSettings(BO3Settings.BRANCH_FREQUENCY);
+	        
 	        branchFrequencyGroup = readSettings(BO3Settings.BRANCH_FREQUENCY_GROUP);
-
+	        branchFrequencyGroups = new HashMap<String, Integer>();
+	        if(branchFrequencyGroup != null && branchFrequencyGroup.trim().length() > 0)
+	        {
+		        String[] groupStrings = branchFrequencyGroup.split(",");
+		        if(groupStrings != null && groupStrings.length > 0)
+		        {
+		        	for(int i = 0; i < groupStrings.length; i++)
+		        	{
+		            	String[] groupString = groupStrings[i].trim().length() > 0 ? groupStrings[i].split(":") : null;
+		            	if(groupString != null && groupString.length == 2)
+		            	{
+		            		branchFrequencyGroups.put(groupString[0].trim(), Integer.parseInt(groupString[1].trim()));
+		            	}
+		        	}
+		        }
+	        }
+	        
 	        heightOffset = readSettings(BO3Settings.HEIGHT_OFFSET);
 	        inheritBO3Rotation = readSettings(BO3Settings.INHERITBO3ROTATION);
 
@@ -1083,12 +1114,81 @@ public class BO3Config extends CustomObjectConfigFile
 	        replaceWithBiomeBlocks = readSettings(BO3Settings.REPLACEWITHBIOMEBLOCKS);
 	        replaceWithGroundBlock = readSettings(BO3Settings.REPLACEWITHGROUNDBLOCK);
 	        replaceWithSurfaceBlock = readSettings(BO3Settings.REPLACEWITHSURFACEBLOCK);
+	        
 	        bo3Group = readSettings(BO3Settings.BO3GROUP);
+	        bo3Groups = new HashMap<String, Integer>();
+	        if(bo3Group != null && bo3Group.trim().length() > 0)
+	        {
+		        String[] groupStrings = bo3Group.split(",");
+		        if(groupStrings != null && groupStrings.length > 0)
+		        {
+		        	for(int i = 0; i < groupStrings.length; i++)
+		        	{
+		            	String[] groupString = groupStrings[i].trim().length() > 0 ? groupStrings[i].split(":") : null;
+		            	if(groupString != null && groupString.length == 2)
+		            	{
+		            		bo3Groups.put(groupString[0].trim(), Integer.parseInt(groupString[1].trim()));
+		            	}
+		        	}
+		        }
+	        }
+	        
 	        canOverride = readSettings(BO3Settings.CANOVERRIDE);
 	        mustBeBelowOther = readSettings(BO3Settings.MUSTBEBELOWOTHER);
-	        mustBeInside =  readSettings(BO3Settings.MUSTBEINSIDE);
+	        
+	        mustBeInside = readSettings(BO3Settings.MUSTBEINSIDE);
+	        mustBeInsideBranches = new ArrayList<String>();
+	        if(mustBeInside != null && mustBeInside.trim().length() > 0)
+	        {
+		        String[] mustBeInsideStrings = mustBeInside.split(",");
+		        if(mustBeInsideStrings != null && mustBeInsideStrings.length > 0)
+		        {
+		        	for(int i = 0; i < mustBeInsideStrings.length; i++)
+		        	{
+		            	String mustBeInsideString = mustBeInsideStrings[i].trim();
+		            	if(mustBeInsideString.length() > 0)
+		            	{
+	            			mustBeInsideBranches.add(mustBeInsideString);
+		            	}
+		        	}
+		        }
+	        }
+	        
 	        cannotBeInside =  readSettings(BO3Settings.CANNOTBEINSIDE);
+	        cannotBeInsideBranches = new ArrayList<String>();
+	        if(cannotBeInside != null && cannotBeInside.trim().length() > 0)
+	        {
+		        String[] cannotBeInsideStrings = cannotBeInside.split(",");
+		        if(cannotBeInsideStrings != null && cannotBeInsideStrings.length > 0)
+		        {
+		        	for(int i = 0; i < cannotBeInsideStrings.length; i++)
+		        	{
+		            	String cannotBeInsideString = cannotBeInsideStrings[i].trim();
+		            	if(cannotBeInsideString.length() > 0)
+		            	{
+		            		cannotBeInsideBranches.add(cannotBeInsideString);
+		            	}
+		        	}
+		        }
+	        }
+	        
 	        replacesBO3 = readSettings(BO3Settings.REPLACESBO3);
+	        replacesBO3Branches = new ArrayList<String>();
+	        if(replacesBO3 != null && replacesBO3.trim().length() > 0)
+	        {
+		        String[] replacesBO3Strings = replacesBO3.split(",");
+		        if(replacesBO3Strings != null && replacesBO3Strings.length > 0)
+		        {
+		        	for(int i = 0; i < replacesBO3Strings.length; i++)
+		        	{
+		            	String replacesBO3String = replacesBO3Strings[i].trim();
+		            	if(replacesBO3String.length() > 0)
+		            	{
+		            		replacesBO3Branches.add(replacesBO3String);
+		            	}
+		        	}
+		        }
+	        }
 
 	        //smoothHeightOffset = readSettings(BO3Settings.SMOOTH_HEIGHT_OFFSET).equals("HeightOffset") ? heightOffset : Integer.parseInt(readSettings(BO3Settings.SMOOTH_HEIGHT_OFFSET));
 	        smoothHeightOffset = readSettings(BO3Settings.SMOOTH_HEIGHT_OFFSET);

@@ -1,6 +1,6 @@
 package com.pg85.otg.network;
 
-import com.pg85.otg.LocalBiome;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.world.WorldConfig;
 
 /**

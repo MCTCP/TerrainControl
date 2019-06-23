@@ -9,8 +9,8 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 
 import com.google.common.base.Strings;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.generator.Pregenerator;

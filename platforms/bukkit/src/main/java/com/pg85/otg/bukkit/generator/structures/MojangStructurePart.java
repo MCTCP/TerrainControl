@@ -1,8 +1,8 @@
 package com.pg85.otg.bukkit.generator.structures;
 
 import com.google.common.base.Preconditions;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.BukkitWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.util.Rotation;
 import net.minecraft.server.v1_12_R1.*;

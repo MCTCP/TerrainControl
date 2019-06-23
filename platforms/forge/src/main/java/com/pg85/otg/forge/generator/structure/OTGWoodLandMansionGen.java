@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
-import com.pg85.otg.LocalBiome;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.biomes.ForgeBiome;

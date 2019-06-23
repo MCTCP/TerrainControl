@@ -11,9 +11,10 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Set;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
@@ -31,7 +32,6 @@ import com.pg85.otg.forge.util.CommandHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.MobNames;
 
 import net.minecraft.command.ICommand;

@@ -1,7 +1,7 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeGroup;
 import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.generator.biome.ArraysCache;

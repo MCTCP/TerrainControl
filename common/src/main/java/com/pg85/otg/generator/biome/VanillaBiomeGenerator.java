@@ -1,6 +1,6 @@
 package com.pg85.otg.generator.biome;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 
 /**
  * Represents the vanilla Minecraft generator.

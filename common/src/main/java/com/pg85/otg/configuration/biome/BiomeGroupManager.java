@@ -1,8 +1,8 @@
 package com.pg85.otg.configuration.biome;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.logging.LogMarker;
 
 import java.util.*;

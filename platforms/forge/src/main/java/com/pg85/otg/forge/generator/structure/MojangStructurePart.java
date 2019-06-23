@@ -3,7 +3,7 @@ package com.pg85.otg.forge.generator.structure;
 import java.util.Random;
 
 import com.google.common.base.Preconditions;
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.util.Rotation;

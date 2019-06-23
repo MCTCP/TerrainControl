@@ -1,10 +1,13 @@
 package com.pg85.otg.configuration.biome;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
-import com.pg85.otg.configuration.biome.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
+import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
@@ -18,7 +21,6 @@ import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
@@ -89,7 +91,8 @@ public class BiomeConfig extends ConfigFile
     public boolean foliageColorIsMultiplier;
 
     public List<ConfigFunction<BiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<BiomeConfig>>();
-
+    private List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
+    
     public boolean inheritSaplingResource;
     private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
 
@@ -135,7 +138,7 @@ public class BiomeConfig extends ConfigFile
     public List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
     public List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
     public List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-
+    
     public enum VillageType
     {
         disabled,
@@ -205,6 +208,13 @@ public class BiomeConfig extends ConfigFile
         if (settings.isNewConfig())
         {
             this.resourceSequence.addAll(defaultSettings.createDefaultResources(this));
+            for (ConfigFunction<BiomeConfig> res : this.resourceSequence)
+            {
+            	if(res instanceof CustomStructureGen)
+            	{
+            		this.customStructures.add((CustomStructureGen)res);
+            	}
+            }
         }
 
         // Set water level
@@ -226,6 +236,11 @@ public class BiomeConfig extends ConfigFile
         }
     }
 
+    public List<CustomStructureGen> getCustomStructures()
+    {
+    	return this.customStructures;
+    }
+    
     /**
      * This is a pretty weak map from -0.5 to ~-0.8 (min vanilla temperature)
      *
@@ -403,6 +418,14 @@ public class BiomeConfig extends ConfigFile
                     this.resourceSequence.add(res);
                 }
             }
+        }
+        
+        for (ConfigFunction<BiomeConfig> res : this.resourceSequence)
+        {
+        	if(res instanceof CustomStructureGen)
+        	{
+        		this.customStructures.add((CustomStructureGen)res);
+        	}
         }
     }
 

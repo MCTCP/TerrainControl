@@ -1,8 +1,9 @@
 package com.pg85.otg.forge.events;
 
 import java.lang.reflect.Constructor;
-import com.pg85.otg.LocalWorld;
+
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.ForgeWorldSession;

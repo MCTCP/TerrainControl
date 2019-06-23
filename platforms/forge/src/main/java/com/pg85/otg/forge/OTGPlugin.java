@@ -1,8 +1,8 @@
 package com.pg85.otg.forge;
 
 import com.google.common.base.Function;
-import com.pg85.otg.LocalBiome;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;

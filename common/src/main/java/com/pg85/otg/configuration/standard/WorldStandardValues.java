@@ -3,7 +3,8 @@ package com.pg85.otg.configuration.standard;
 import static com.pg85.otg.OTG.WORLD_DEPTH;
 import static com.pg85.otg.OTG.WORLD_HEIGHT;
 
-import com.pg85.otg.configuration.biome.ReplaceBlocks;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.settingType.MaterialListSetting;
 import com.pg85.otg.configuration.settingType.MaterialSetting;
 import com.pg85.otg.configuration.settingType.Setting;
@@ -12,7 +13,6 @@ import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.configuration.world.WorldConfig.ImageMode;
 import com.pg85.otg.configuration.world.WorldConfig.ImageOrientation;
 import com.pg85.otg.configuration.world.WorldConfig.TerrainMode;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.ArrayList;

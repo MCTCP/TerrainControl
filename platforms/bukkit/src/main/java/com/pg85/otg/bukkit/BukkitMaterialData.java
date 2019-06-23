@@ -1,7 +1,7 @@
 package com.pg85.otg.bukkit;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.util.LocalMaterialData;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.util.helpers.BlockHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.server.v1_12_R1.Block;

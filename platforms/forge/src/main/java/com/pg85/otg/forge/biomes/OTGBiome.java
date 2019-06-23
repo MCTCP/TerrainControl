@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.biomes;
 
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.asm.excluded.IOTGASMBiome;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;

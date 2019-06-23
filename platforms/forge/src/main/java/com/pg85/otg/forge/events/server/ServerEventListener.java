@@ -35,13 +35,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.customobjects.bo3.EntityFunction;
-import com.pg85.otg.customobjects.bo3.ModDataFunction;
-import com.pg85.otg.customobjects.bo3.ParticleFunction;
-import com.pg85.otg.customobjects.bo3.SpawnerFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
@@ -53,7 +54,6 @@ import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 
 public class ServerEventListener
 {	

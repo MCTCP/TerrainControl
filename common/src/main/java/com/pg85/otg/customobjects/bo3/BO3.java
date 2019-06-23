@@ -1,8 +1,9 @@
 package com.pg85.otg.customobjects.bo3;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
@@ -11,12 +12,22 @@ import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.customobjects.*;
 import com.pg85.otg.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.RandomBlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
+import com.pg85.otg.customobjects.bo3.checks.BO3Check;
+import com.pg85.otg.customobjects.customstructure.Branch;
+import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
+import com.pg85.otg.customobjects.customstructure.CustomObjectStructure;
+import com.pg85.otg.customobjects.customstructure.StructuredCustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.NamedBinaryTag;
 import com.pg85.otg.util.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
@@ -287,36 +298,36 @@ public class BO3 implements StructuredCustomObject
 
 		if(structure != null)
 		{
-			structure.modData.addAll(newModDataInObject);
-			structure.particleData.addAll(newParticleDataInObject);
-			structure.spawnerData.addAll(newSpawnerDataInObject);
+			structure.modDataManager.modData.addAll(newModDataInObject);
+			structure.particlesManager.particleData.addAll(newParticleDataInObject);
+			structure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
 
    			for(ChunkCoordinate structureCoord : chunks)
     		{
 				if(world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
 				{
 					CustomObjectStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
-					structure.modData.addAll(existingObject.modData);
-					structure.particleData.addAll(existingObject.particleData);
-					structure.spawnerData.addAll(existingObject.spawnerData);
+					structure.modDataManager.modData.addAll(existingObject.modDataManager.modData);
+					structure.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
+					structure.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
 				}
 				world.getStructureCache().worldInfoChunks.put(structureCoord, structure);
     		}
 		} else {
 
 			CustomObjectStructure placeHolderStructure = new CustomObjectStructure(new CustomObjectCoordinate(world, this, this.getName(), Rotation.NORTH, x, 0, z));
-			placeHolderStructure.modData.addAll(newModDataInObject);
-			placeHolderStructure.particleData.addAll(newParticleDataInObject);
-			placeHolderStructure.spawnerData.addAll(newSpawnerDataInObject);
+			placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
+			placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);
+			placeHolderStructure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
 
    			for(ChunkCoordinate structureCoord : chunksCustomObject)
     		{
 				if(world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
 				{
 					CustomObjectStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
-					existingObject.modData.addAll(placeHolderStructure.modData);
-					existingObject.particleData.addAll(placeHolderStructure.particleData);
-					existingObject.spawnerData.addAll(placeHolderStructure.spawnerData);
+					existingObject.modDataManager.modData.addAll(placeHolderStructure.modDataManager.modData);
+					existingObject.particlesManager.particleData.addAll(placeHolderStructure.particlesManager.particleData);
+					existingObject.spawnerManager.spawnerData.addAll(placeHolderStructure.spawnerManager.spawnerData);
 				} else {
 					world.getStructureCache().worldInfoChunks.put(structureCoord, placeHolderStructure);
 				}
@@ -421,6 +432,7 @@ public class BO3 implements StructuredCustomObject
     	return true;
     }
 
+    // Original top blocks are cached to figure out the surface block material to replace to when spawning structures and smoothing areas
     public static HashMap<ChunkCoordinate, LocalMaterialData> originalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
     public boolean spawnForcedOTGPlus(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
     {
@@ -545,13 +557,14 @@ public class BO3 implements StructuredCustomObject
         {
         	if(block instanceof RandomBlockFunction)
         	{
-                for (int i = 0; i < ((RandomBlockFunction)block).blockCount; i++)
+        		RandomBlockFunction randomBlockFunction = ((RandomBlockFunction)block);
+                for (int i = 0; i < randomBlockFunction.blockCount; i++)
                 {
-                    if (random.nextInt(100) < ((RandomBlockFunction)block).blockChances[i])
+                    if (random.nextInt(100) < randomBlockFunction.blockChances[i])
                     {
-                    	block.metaDataName = ((RandomBlockFunction)block).metaDataNames[i];
-                    	block.metaDataTag = ((RandomBlockFunction)block).metaDataTags[i];
-                    	block.material = ((RandomBlockFunction)block).blocks[i];
+                    	block.metaDataName = randomBlockFunction.metaDataNames[i];
+                    	block.metaDataTag = randomBlockFunction.metaDataTags[i];
+                    	block.material = randomBlockFunction.blocks[i];
                     	break;
                     }
                 }

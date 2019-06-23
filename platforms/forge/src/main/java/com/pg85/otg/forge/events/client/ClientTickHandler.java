@@ -2,13 +2,13 @@ package com.pg85.otg.forge.events.client;
 
 import java.util.ArrayList;
 
+import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-
-import com.pg85.otg.customobjects.bo3.ParticleFunction;
 
 public class ClientTickHandler
 {

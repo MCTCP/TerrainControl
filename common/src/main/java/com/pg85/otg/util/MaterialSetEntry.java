@@ -1,5 +1,7 @@
 package com.pg85.otg.util;
 
+import com.pg85.otg.common.LocalMaterialData;
+
 public class MaterialSetEntry
 {
     private final LocalMaterialData material;

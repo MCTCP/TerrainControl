@@ -3,11 +3,11 @@ package com.pg85.otg.forge.events;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.generator.resource.*;
-import com.pg85.otg.util.LocalMaterialData;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.MinecraftForge;
