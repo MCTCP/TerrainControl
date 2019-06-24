@@ -249,7 +249,7 @@ public final class WorldLoader
     	String worldName = WorldHelper.getName(mcWorld);
     	File worldConfigsFolder = null;
     	
-    	worldConfigsFolder = this.getWorldDir(OTG.GetDimensionsConfig().GetDimensionConfig(worldName).PresetName);    	    	
+    	worldConfigsFolder = this.getWorldDir(OTG.getDimensionsConfig().getDimensionConfig(worldName).PresetName);    	    	
         if (worldConfigsFolder == null || !worldConfigsFolder.exists())
         {
             // OpenTerrainGenerator is not enabled for this world

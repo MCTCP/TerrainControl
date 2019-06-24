@@ -294,7 +294,7 @@ public class BO3Config extends CustomObjectConfigFile
     {
     	if(this.inheritBO3 != null && this.inheritBO3.trim().length() > 0 && (!inheritedBO3Loaded || blocksOnly))
     	{
-    		File currentFile = this.file.getParentFile();
+    		File currentFile = this.getFile().getParentFile();
     		worldName = currentFile.getName();
     		while(currentFile.getParentFile() != null && !currentFile.getName().toLowerCase().equals(PluginStandardValues.PresetsDirectoryName))
     		{
@@ -771,14 +771,14 @@ public class BO3Config extends CustomObjectConfigFile
 		    	{
 		    		if(Math.abs(minX - maxX) > 15 || Math.abs(minZ - maxZ) > 15)
 		    		{
-		    			OTG.log(LogMarker.INFO, "BO3 " + this.name + " was too large, branching BO3's can be max 16x16 blocks.");
-		    			throw new InvalidConfigException("BO3 " + this.name + " was too large, branching BO3's can be max 16x16 blocks.");
+		    			OTG.log(LogMarker.INFO, "BO3 " + this.getName() + " was too large, branching BO3's can be max 16x16 blocks.");
+		    			throw new InvalidConfigException("BO3 " + this.getName() + " was too large, branching BO3's can be max 16x16 blocks.");
 		    		}
 		    	} else {
 		    		if(Math.abs(minX - maxX) > 15 || Math.abs(minZ - maxZ) > 15) // If this BO3 is larger than 16x16 then it can only be used as a customObject
 		    		{
-		    			OTG.log(LogMarker.INFO, "BO3 " + this.name + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
-		    			throw new InvalidConfigException("BO3 " + this.name + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
+		    			OTG.log(LogMarker.INFO, "BO3 " + this.getName() + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
+		    			throw new InvalidConfigException("BO3 " + this.getName() + " was too large, IsOTGPlus BO3's used as CustomStructure() can be max 16x16 blocks.");
 		    		}
 		    	}
 	        }
@@ -859,7 +859,7 @@ public class BO3Config extends CustomObjectConfigFile
      */
     public File getFile()
     {
-    	return file;
+    	return this.reader.getFile();
     }
 
 	//
@@ -1293,6 +1293,7 @@ public class BO3Config extends CustomObjectConfigFile
         }
     }
     
+    // Only used for OTG+
     protected void readBlocks()
     {    	
     	((FileSettingsReaderOTGPlus) this.reader).readSettings();

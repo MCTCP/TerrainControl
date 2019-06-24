@@ -19,6 +19,7 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.util.IOHelper;
 
 @SideOnly(Side.CLIENT)
@@ -51,7 +52,7 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     	// TODO: This is for legacy worlds only, the files are stored in the world saves directory now. Remove this?
 		
 		// Check for world settings for this world
-        File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+        File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
         if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
         {
         	for(File worldDir : OTGWorldsDirectory.listFiles())
@@ -65,37 +66,37 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
                     	IOHelper.deleteRecursive(StructureDataDirectory);
                     }
 
-                    File dimensionsDataFile = new File(worldDir.getAbsolutePath() + "/Dimensions.txt");
+                    File dimensionsDataFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.DimensionsDataFileName);
                     if (dimensionsDataFile.exists())
                     {
                     	IOHelper.deleteRecursive(dimensionsDataFile);
                     }
                     
-                    File structureDataFile = new File(worldDir.getAbsolutePath() + "/StructureData.txt");
+                    File structureDataFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.StructureDataFileName);
                     if (structureDataFile.exists())
                     {
                     	IOHelper.deleteRecursive(structureDataFile);
                     }
                     
-                    File nullChunksFile = new File(worldDir.getAbsolutePath() + "/NullChunks.txt");
+                    File nullChunksFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.NullChunksFileName);
                     if (nullChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(nullChunksFile);
                     }
                     
-                    File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + "/SpawnedStructures.txt");
+                    File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.SpawnedStructuresFileName);
                     if (spawnedStructuresFile.exists())
                     {
                     	IOHelper.deleteRecursive(spawnedStructuresFile);
                     }
 
-                    File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + "/ChunkProviderPopulatedChunks.txt");
+                    File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.ChunkProviderPopulatedChunksFileName);
                     if (chunkProviderPopulatedChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(chunkProviderPopulatedChunksFile);
                     }
 
-                    File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + "/PregeneratedChunks.txt");
+                    File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.PregeneratedChunksFileName);
                     if (pregeneratedChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(pregeneratedChunksFile);
@@ -137,7 +138,7 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
             }
             else if (button.id == 4)
             {
-    	        OTG.SetDimensionsConfig(null);
+    	        OTG.setDimensionsConfig(null);
             	this.mc.displayGuiScreen(new GuiCreateWorld(this));
             }
             else if (button.id == 0)

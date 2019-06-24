@@ -8,12 +8,12 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -367,7 +367,6 @@ public class Pregenerator
     			iTop = Integer.MIN_VALUE;
 			}
 			
-			OTG.getEngine().ReloadCustomObjectFiles();
 			this.world.getChunkGenerator().clearChunkCache();
 			SavePregeneratorData(false);
         }
@@ -503,7 +502,7 @@ public class Pregenerator
 		if(pregeneratorIsRunning || forceSave)
 		{
 			int dimensionId = world.getDimensionId();
-			File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "PregeneratedChunks.txt");
+			File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + WorldStandardValues.PregeneratedChunksFileName);
 
 			if(pregeneratedChunksFile.exists())
 			{
@@ -539,7 +538,7 @@ public class Pregenerator
 	private void LoadPregeneratorData()
 	{
 		int dimensionId = world.getDimensionId();
-		File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "PregeneratedChunks.txt");
+		File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + WorldStandardValues.PregeneratedChunksFileName);
 
 		String[] pregeneratedChunksFileValues = {};
 		if(pregeneratedChunksFile.exists())
@@ -617,7 +616,7 @@ public class Pregenerator
 
 			preGeneratorCenterPoint = world.getSpawnChunk();
 
-			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(world.getName());
+			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
 			this.setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
 
 			SavePregeneratorData(false);

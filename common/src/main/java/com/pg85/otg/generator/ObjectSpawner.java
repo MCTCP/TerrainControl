@@ -94,7 +94,7 @@ public class ObjectSpawner
 			saveRequired = true;
 		}
 
-		if(world.getConfigs().getWorldConfig().IsOTGPlus)
+		if(world.getConfigs().getWorldConfig().isOTGPlus)
 		{
 			if(!StructurePlottedAtSpawn)
 			{
@@ -107,7 +107,7 @@ public class ObjectSpawner
 		{
 			processing = true;
 
-			if(world.getConfigs().getWorldConfig().IsOTGPlus)
+			if(world.getConfigs().getWorldConfig().isOTGPlus)
 			{
 				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
 				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
@@ -118,9 +118,9 @@ public class ObjectSpawner
 
 		        boolean hasVillage = false;
 
-		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().BO3AtSpawn != null && this.world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0)
+		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
 		        {
-		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().BO3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
+		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
 		        	if(customObject != null)
 		        	{
 		        		if(customObject instanceof BO3)
@@ -210,9 +210,9 @@ public class ObjectSpawner
 
 		        boolean hasVillage = false;
 
-		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().BO3AtSpawn != null && this.world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0)
+		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
 		        {
-		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().BO3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
+		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
 		        	if(customObject != null)
 		        	{
 		        		if(customObject instanceof BO3)
@@ -276,7 +276,7 @@ public class ObjectSpawner
 
 			processing = false;
 		} else {
-			if(world.getConfigs().getWorldConfig().IsOTGPlus)
+			if(world.getConfigs().getWorldConfig().isOTGPlus)
 			{
 				// This happens when:
 				// This chunk was populated because of a block being spawned on the
@@ -543,7 +543,7 @@ public class ObjectSpawner
 			structureStart.SpawnForChunk(chunkCoord);
 
 			// All done spawning structures for this chunk, clean up cache
-			if(!world.IsInsidePregeneratedRegion(chunkCoord))
+			if(!world.isInsidePregeneratedRegion(chunkCoord))
 			{
 				world.getStructureCache().structureCache.put(chunkCoord, null);
 			} else {
@@ -556,7 +556,7 @@ public class ObjectSpawner
 			// Complex surface blocks
 			//placeComplexSurfaceBlocks(chunkCoord);
 
-			if(!world.IsInsidePregeneratedRegion(chunkCoord))
+			if(!world.isInsidePregeneratedRegion(chunkCoord))
 			{
 				world.getStructureCache().structureCache.put(chunkCoord, null);
 			} else {

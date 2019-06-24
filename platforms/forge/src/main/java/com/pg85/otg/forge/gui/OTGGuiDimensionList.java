@@ -97,14 +97,14 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         	if(Minecraft.getMinecraft().world == null || Minecraft.getMinecraft().isSingleplayer())
         	{
         		// For SP values are applied immediately, don't clone.
-        		this.dimensions.add(OTG.GetDimensionsConfig().Overworld);
-            	for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+        		this.dimensions.add(OTG.getDimensionsConfig().Overworld);
+            	for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
             	{
             		this.dimensions.add(dimConfig);
             	}
         	} else {
-        		this.dimensions.add(OTG.GetDimensionsConfig().Overworld.clone());
-            	for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+        		this.dimensions.add(OTG.getDimensionsConfig().Overworld.clone());
+            	for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
             	{
             		this.dimensions.add(dimConfig.clone());
             	}
@@ -125,7 +125,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        this.dimensions.add(new DimensionConfig(previousMenu.selectedPreset.getSecond()));
 		                
 		        // Add any dimensions from the worldconfig's dimensions list if their presets are installed
-		        for(String dimName : previousMenu.selectedPreset.getSecond().Dimensions)
+		        for(String dimName : previousMenu.selectedPreset.getSecond().dimensions)
 		        {
 		        	for(Entry<String, DimensionConfigGui> preset : ForgeEngine.presets.entrySet())
 		        	{
@@ -163,8 +163,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         this.lastScrollPos = lastScrollPos;
         
     	// If world is null then we're ingame
-		this.dimensions.add(OTG.GetDimensionsConfig().Overworld.clone());
-    	for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+		this.dimensions.add(OTG.getDimensionsConfig().Overworld.clone());
+    	for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
     	{
     		this.dimensions.add(dimConfig.clone());
     	}
@@ -205,7 +205,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    			// Creating a new dim, create config with the chosen preset
 	    	        // If a modpack creator has included a default config for the chosen preset in the overworld's preset, use that, otherwise use the preset's world config.
     				// If world isn't null the we're ingame
-	    	        DimensionsConfig defaultConfig = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.GetDimensionsConfig().Overworld.PresetName : this.previousMenu.selectedPreset.getFirst());
+	    	        DimensionsConfig defaultConfig = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.previousMenu.selectedPreset.getFirst());
 	    	        if(defaultConfig != null)
 	    	        {
 	    	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
@@ -329,7 +329,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    	{
 	    		DimensionConfig originalDimConfig = this.originalDimensions.get(i);
 		    	DimensionConfig dimConfig = this.dimensions.get(i);
-		        this.settingsChanged = !dimConfig.ToYamlString().equals(originalDimConfig.ToYamlString());
+		        this.settingsChanged = !dimConfig.toYamlString().equals(originalDimConfig.toYamlString());
 	    		if(this.settingsChanged)
 	    		{
 	    			return;
@@ -397,7 +397,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 					{
                 						if(originalDimConfig.PresetName == null || originalDimConfig.PresetName.equals(dimConfig.PresetName))
                 						{
-                							if(!originalDimConfig.ToYamlString().equals(dimConfig.ToYamlString()))
+                							if(!originalDimConfig.toYamlString().equals(dimConfig.toYamlString()))
                 							{
                 								if(i == 0)
                 								{
@@ -436,7 +436,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	                		ApplyGameRules();
 	                		
 	            			// Cancelling, remove any newly created dims, don't create worlds for them.
-	                		DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();                	
+	                		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();                	
 	            			ArrayList<DimensionConfig> dims = new ArrayList<DimensionConfig>();
 	            			for(DimensionConfig dimConfig : dimsConfig.Dimensions)
 	            			{
@@ -446,7 +446,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	            				}
 	            			}
 	            			dimsConfig.Dimensions = dims;
-	            			OTG.GetDimensionsConfig().Save();
+	            			OTG.getDimensionsConfig().save();
                 		}
                 		this.mc.displayGuiScreen(this.previousMenu);
                 	}
@@ -517,13 +517,13 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		if(this.mc.world != null)
 		{
 			// Apply game rules to worlds
-			DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();                			
+			DimensionsConfig dimsConfig = OTG.getDimensionsConfig();                			
 			ArrayList<LocalWorld> worlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
 			for(LocalWorld world : worlds)
 			{            					
 				if(((ForgeWorld)world).getWorld() != null)
 				{
-					OTGDimensionManager.ApplyGameRulesToWorld(((ForgeWorld)world).getWorld(), dimsConfig.GetDimensionConfig(((ForgeWorld)world).getName()));
+					OTGDimensionManager.ApplyGameRulesToWorld(((ForgeWorld)world).getWorld(), dimsConfig.getDimensionConfig(((ForgeWorld)world).getName()));
 				}
 			}
 			// TODO: Not sending this event atm, when game rules are changed via /gamerule it is sent. 
@@ -601,13 +601,13 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
             		{
             			forgeWorldConfig.Dimensions.add(this.dimensions.get(j).clone());
             		}
-            		OTG.SetDimensionsConfig(forgeWorldConfig);            		
+            		OTG.setDimensionsConfig(forgeWorldConfig);            		
             	
                     ISaveFormat isaveformat = this.mc.getSaveLoader();
                     isaveformat.flushCache();
                     isaveformat.deleteWorldDirectory(this.worldName);
                     
-                    OTG.GetDimensionsConfig().Save();
+                    OTG.getDimensionsConfig().save();
 
     				PregeneratorUI.ResetIngameUI();
     				

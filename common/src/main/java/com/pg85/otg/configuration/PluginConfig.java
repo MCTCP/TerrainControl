@@ -14,8 +14,26 @@ import com.pg85.otg.logging.LogMarker;
  */
 public final class PluginConfig extends ConfigFile
 {
+    private LogLevels LogLevel = LogLevels.Standard;
+    public String biomeConfigExtension;	
     public ConfigMode SettingsMode;
+    
+	/**
+	 * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
+	 */
+	public boolean SpawnLog = false;    
 
+	/**
+	 * Having developermode enabled means BO3's are reloaded when rejoining an SP world. 
+	 */
+    public boolean DeveloperMode = false;
+	
+	/**
+	 * Forge only: This is the number of chunks the pre-generator generates each server tick.
+	 * Higher values make pre-generation faster but can cause lag and increased memory usage.
+	 */
+	public int PregeneratorMaxChunksPerTick = 1;
+    
     public enum LogLevels
     {
         Off(LogMarker.ERROR),
@@ -36,9 +54,6 @@ public final class PluginConfig extends ConfigFile
         }
 
     }
-
-    private LogLevels LogLevel = LogLevels.Standard;
-    public String biomeConfigExtension;
 
     public PluginConfig(SettingsMap settingsReader)
     {
@@ -78,7 +93,6 @@ public final class PluginConfig extends ConfigFile
         this.SpawnLog = reader.getSetting(PluginStandardValues.SPAWN_LOG);
         this.PregeneratorMaxChunksPerTick = reader.getSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK);
         
-        this.ReplaceUnknownBlockWithMaterial = reader.getSetting(PluginStandardValues.REPLACE_UNKNOWN_BLOCK_WITH_MATERIAL);        
         this.DeveloperMode = reader.getSetting(PluginStandardValues.DEVELOPER_MODE);
     }
 
@@ -136,36 +150,10 @@ public final class PluginConfig extends ConfigFile
         writer.putSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK, this.PregeneratorMaxChunksPerTick,
 		        "The number of chunks the pre-generator is allowed to generate for each server tick.",
 		        "Higher numbers make pre-generation faster but increase memory usage and will cause lag.");
-                
-        // TODO: Implement this?
-        /*
-        writer.smallTitle("Replace unknown blocks with material:");
-        
-        writer.putSetting(PluginStandardValues.REPLACE_UNKNOWN_BLOCK_WITH_MATERIAL, this.ReplaceUnknownBlockWithMaterial,
-        		"If a block with an unrecognised block name/id tries to spawn it is replaced with this material.",
-        		"Defaults to: LOG"
-		);
-		*/
     }
 
     public LogLevels getLogLevel()
     {
         return LogLevel;
-    }
-
-    public String ReplaceUnknownBlockWithMaterial = null;
-    
-	/**
-	 * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
-	 */
-	public boolean SpawnLog = false;    
-
-    public boolean DeveloperMode = false;
-	
-	/**
-	 * Forge only: This is the number of chunks the pre-generator generates each server tick.
-	 * Higher values make pre-generation faster but can cause lag and increased memory usage.
-	 */
-	public int PregeneratorMaxChunksPerTick = 1;
-	
+    }	
 }

@@ -40,7 +40,7 @@ public class OTGWorldProvider extends WorldProviderSurface
 	long lastFetchTime = System.currentTimeMillis();	
 	public DimensionConfig GetDimensionConfig()
 	{		
-		if(OTG.GetDimensionsConfig() == null)
+		if(OTG.getDimensionsConfig() == null)
 		{
 			return null; // Happen for Forge clients connecting to Bukkit servers
 		}
@@ -60,7 +60,7 @@ public class OTGWorldProvider extends WorldProviderSurface
 			}
 			if(worldName != null)
 			{
-				dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(worldName);				
+				dimConfig = OTG.getDimensionsConfig().getDimensionConfig(worldName);				
 			}
 		}
 		return dimConfig;
@@ -75,14 +75,14 @@ public class OTGWorldProvider extends WorldProviderSurface
     public String getWelcomeMessage()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-		return dimConfig != null ? dimConfig.Settings.WelcomeMessage : WorldStandardValues.welcomeMessage.getDefaultValue();
+		return dimConfig != null ? dimConfig.Settings.WelcomeMessage : WorldStandardValues.WelcomeMessage.getDefaultValue();
     }
 
 	// A Message to display to the user when they transfer out of this dismension.
     public String getDepartMessage()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-		return dimConfig != null ? dimConfig.Settings.DepartMessage : WorldStandardValues.departMessage.getDefaultValue();
+		return dimConfig != null ? dimConfig.Settings.DepartMessage : WorldStandardValues.DepartMessage.getDefaultValue();
     }
 
 	DimensionType dimType = null;
@@ -142,7 +142,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     public boolean isSurfaceWorld()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.IsSurfaceWorld : WorldStandardValues.isSurfaceWorld.getDefaultValue();
+        return dimConfig != null ? dimConfig.Settings.IsSurfaceWorld : WorldStandardValues.IsSurfaceWorld.getDefaultValue();
     }
 
     // Will check if the x, z position specified is alright to be set as the map spawn point
@@ -163,7 +163,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     public boolean canRespawnHere()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.CanRespawnHere : WorldStandardValues.canRespawnHere.getDefaultValue();
+        return dimConfig != null ? dimConfig.Settings.CanRespawnHere : WorldStandardValues.CanRespawnHere.getDefaultValue();
     }
 
     // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
@@ -213,7 +213,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     public boolean doesXZShowFog(int x, int z)
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.DoesXZShowFog : WorldStandardValues.doesXZShowFog.getDefaultValue();
+        return dimConfig != null ? dimConfig.Settings.DoesXZShowFog : WorldStandardValues.DoesXZShowFog.getDefaultValue();
     }
 
     /**
@@ -226,7 +226,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     public double getVoidFogYFactor()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.VoidFogYFactor : WorldStandardValues.voidFogYFactor.getDefaultValue();
+    	return dimConfig != null ? dimConfig.Settings.VoidFogYFactor : WorldStandardValues.VoidFogYFactor.getDefaultValue();
     }
 
     // TODO: Is this really needed to make sky colors work?
@@ -235,7 +235,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     public boolean isSkyColored()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.IsSkyColored : WorldStandardValues.isSkyColored.getDefaultValue();
+        return dimConfig != null ? dimConfig.Settings.IsSkyColored : WorldStandardValues.IsSkyColored.getDefaultValue();
     }
 
     @SideOnly(Side.CLIENT)
@@ -258,7 +258,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     public float getCloudHeight()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.CloudHeight : WorldStandardValues.cloudHeight.getDefaultValue();
+    	return dimConfig != null ? dimConfig.Settings.CloudHeight : WorldStandardValues.CloudHeight.getDefaultValue();
     }
 
     @Override
@@ -276,7 +276,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     	if(this.getDimension() != 0) // Never unload Overworld
     	{
     		DimensionConfig dimConfig = GetDimensionConfig();
-	        return dimConfig != null ? dimConfig.Settings.CanDropChunk : WorldStandardValues.canDropChunk.getDefaultValue();
+	        return dimConfig != null ? dimConfig.Settings.CanDropChunk : WorldStandardValues.CanDropChunk.getDefaultValue();
     	} else {
     		return !this.world.isSpawnChunk(x, z) || !this.world.provider.getDimensionType().shouldLoadSpawn();
     	}
@@ -331,14 +331,14 @@ public class OTGWorldProvider extends WorldProviderSurface
     public boolean canDoLightning(net.minecraft.world.chunk.Chunk chunk)
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.CanDoLightning : WorldStandardValues.canDoLightning.getDefaultValue();
+        return dimConfig != null ? dimConfig.Settings.CanDoLightning : WorldStandardValues.CanDoLightning.getDefaultValue();
     }
 
     @Override
     public boolean canDoRainSnowIce(net.minecraft.world.chunk.Chunk chunk)
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.CanDoRainSnowIce : WorldStandardValues.canDoRainSnowIce.getDefaultValue();
+    	return dimConfig != null ? dimConfig.Settings.CanDoRainSnowIce : WorldStandardValues.CanDoRainSnowIce.getDefaultValue();
     }
 
     // This only affects lillies, glass bottles and a few other unimportant things?
@@ -353,14 +353,14 @@ public class OTGWorldProvider extends WorldProviderSurface
     public boolean doesWaterVaporize()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.DoesWaterVaporize : WorldStandardValues.doesWaterVaporize.getDefaultValue();
+    	return dimConfig != null ? dimConfig.Settings.DoesWaterVaporize : WorldStandardValues.DoesWaterVaporize.getDefaultValue();
     }
 
     @Override
     public boolean hasSkyLight()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.HasSkyLight : WorldStandardValues.hasSkyLight.getDefaultValue();
+    	return dimConfig != null ? dimConfig.Settings.HasSkyLight : WorldStandardValues.HasSkyLight.getDefaultValue();
     }
 
     @Override
@@ -379,12 +379,12 @@ public class OTGWorldProvider extends WorldProviderSurface
     public double getGravityFactor()
     {
     	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.GravityFactor : WorldStandardValues.gravityFactor.getDefaultValue();
+    	return dimConfig != null ? dimConfig.Settings.GravityFactor : WorldStandardValues.GravityFactor.getDefaultValue();
     }
 
     public double getFallDamageFactor(double y)
     {
-    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
     	double gravityFactor = getGravityFactor();
     	return (y * (gravityFactor / baseGravityFactor));
     }

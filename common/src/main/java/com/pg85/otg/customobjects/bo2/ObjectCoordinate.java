@@ -14,7 +14,6 @@ public class ObjectCoordinate
     public int BranchDirection;
     public int BranchOdds;
 
-
     public ObjectCoordinate(int _x, int _y, int _z)
     {
         this.x = _x;
@@ -25,7 +24,6 @@ public class ObjectCoordinate
 
         hash = x + z << 8 + y << 16;
     }
-
 
     @Override
     public boolean equals(Object obj)
@@ -44,7 +42,7 @@ public class ObjectCoordinate
         return hash;
     }
 
-    public ObjectCoordinate Rotate()
+    public ObjectCoordinate rotate()
     {
         ObjectCoordinate newCoordinate = new ObjectCoordinate(this.z, this.y, (this.x * -1));
         newCoordinate.material = material.rotate();

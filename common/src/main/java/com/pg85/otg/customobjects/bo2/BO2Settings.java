@@ -1,10 +1,8 @@
 package com.pg85.otg.customobjects.bo2;
 
-import static com.pg85.otg.OTG.WORLD_DEPTH;
-import static com.pg85.otg.OTG.WORLD_HEIGHT;
-
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
@@ -31,8 +29,8 @@ public class BO2Settings extends Settings
 
     public static final Setting<Integer>
             RARITY = intSetting("rarity", 100, 1, 1000000),
-            SPAWN_ELEVATION_MIN = intSetting("spawnElevationMin", 0, WORLD_DEPTH, WORLD_HEIGHT),
-            SPAWN_ELEVATION_MAX = intSetting("spawnElevationMax", 128, WORLD_DEPTH, WORLD_HEIGHT),
+            SPAWN_ELEVATION_MIN = intSetting("spawnElevationMin", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+            SPAWN_ELEVATION_MAX = intSetting("spawnElevationMax", 128, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
             GROUP_FREQUENCY_MIN = intSetting("groupFrequencyMin", 1, 1, 100),
             GROUP_FREQUENCY_MAX = intSetting("groupFrequencyMax", 5, 1, 100),
             GROUP_SEPERATION_MIN = intSetting("groupSeparationMin", 0, 0, 100),

@@ -165,7 +165,7 @@ public final class OTGCommandHandler implements ICommand
         	{
         		OTG.log(LogMarker.INFO, "Clearing caches");
 	    		OTG.log(LogMarker.INFO, "Unloading BO3's");
-	    		OTG.getEngine().ReloadCustomObjectFiles();
+	    		OTG.getEngine().getCustomObjectManager().ReloadCustomObjectFiles();
 	    		OTG.log(LogMarker.INFO, "BO3's unloaded");
 	    		sender.sendMessage(new TextComponentString("BO3's unloaded"));
 	    		OTG.log(LogMarker.INFO, "Clearing chunkgenerator cache");
@@ -262,7 +262,7 @@ public final class OTGCommandHandler implements ICommand
             	}
             	
                 WorldConfig worldConfig = world.getConfigs().getWorldConfig();
-                DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(world.getName());
+                DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
         		sender.sendMessage(new TextComponentString(""));
                 sender.sendMessage(new TextComponentString("-- World info --"));
                 sender.sendMessage(new TextComponentString(""));
@@ -361,10 +361,10 @@ public final class OTGCommandHandler implements ICommand
                 		}
                 	}
 
-                	DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(targetWorld.getName());                	
+                	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(targetWorld.getName());                	
                 	targetWorld.GetWorldSession().setPregenerationRadius(radius);
 	                int newRadius = dimConfig.PregeneratorRadiusInChunks = targetWorld.GetWorldSession().getPregenerationRadius();
-	                OTG.GetDimensionsConfig().Save();
+	                OTG.getDimensionsConfig().save();
 
         			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Pre-generator radius set to " + VALUE_COLOR + newRadius + MESSAGE_COLOR + "."));
         			return;
@@ -437,7 +437,7 @@ public final class OTGCommandHandler implements ICommand
 							String materials = "";
 							if(forgeWorld != null)
 							{
-								DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());								
+								DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());								
 								if(
 									dimConfig.Settings.DimensionPortalMaterials != null &&
 									dimConfig.Settings.DimensionPortalMaterials.length > 0
@@ -551,7 +551,7 @@ public final class OTGCommandHandler implements ICommand
 	            	}
 	            	else if(CommandHelper.containsArgument(argString, "-c"))
 	            	{
-        				File worldConfigFile = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimName + "/WorldConfig.ini");
+        				File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimName + "/WorldConfig.ini");
         				if(!worldConfigFile.exists())
         				{
 		    				sender.sendMessage(new TextComponentString(""));
@@ -564,7 +564,7 @@ public final class OTGCommandHandler implements ICommand
 							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimName));
 							
 			    			DimensionConfig dimConfig = new DimensionConfig(dimName, worldConfig);
-							OTG.GetDimensionsConfig().Dimensions.add(dimConfig);
+							OTG.getDimensionsConfig().Dimensions.add(dimConfig);
 							
 							int newDimId = OTGDimensionManager.createDimension(seed, dimName, false, true, true);
 							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimName);
@@ -585,7 +585,7 @@ public final class OTGCommandHandler implements ICommand
 	            			// First make sure world is loaded
 	            			if(((ForgeEngine)OTG.getEngine()).getWorldLoader().getWorld(dimName) != null && ((ForgeEngine)OTG.getEngine()).getWorldLoader().getUnloadedWorld(dimName) == null)
 	            			{
-	            				DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(dimName);
+	            				DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(dimName);
 	            				dimConfig.Settings.CanDropChunk = true;
 	    	    				sender.sendMessage(new TextComponentString(""));
 	    	                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "World is marked for unloading, if no players are in the world minecraft will unload it automatically, this may take a while."));

@@ -1,11 +1,11 @@
 package com.pg85.otg.customobjects;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -25,6 +25,54 @@ import java.util.Random;
  */
 public class TreeObject implements CustomObject
 {
+    private TreeType type;
+    private int minHeight = PluginStandardValues.WORLD_DEPTH;
+    private int maxHeight = PluginStandardValues.WORLD_HEIGHT;
+    
+    private static class TreeSettings extends Settings
+    {
+        static final Setting<Integer> MIN_HEIGHT = intSetting("MinHeight",
+                PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
+        static final Setting<Integer> MAX_HEIGHT = intSetting("MaxHeight",
+                PluginStandardValues.WORLD_HEIGHT, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
+    }
+
+    public TreeObject(TreeType type)
+    {
+        this.type = type;
+    }
+
+    public TreeObject(TreeType type, SettingsReaderOTGPlus settings)
+    {
+        this.type = type;
+        this.minHeight = settings.getSetting(TreeSettings.MIN_HEIGHT, TreeSettings.MIN_HEIGHT.getDefaultValue());
+        this.maxHeight = settings.getSetting(TreeSettings.MAX_HEIGHT, TreeSettings.MAX_HEIGHT.getDefaultValue());
+    }
+    
+    @Override
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    {
+        // Stub method
+    }
+
+    @Override
+    public String getName()
+    {
+        return type.name();
+    }
+
+    @Override
+    public boolean canSpawnAsTree()
+    {
+        return true;
+    }
+
+    @Override
+    public boolean canSpawnAsObject()
+    {
+        return false;
+    }
+
     // Non-OTG+
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
@@ -48,55 +96,7 @@ public class TreeObject implements CustomObject
         return trySpawnAt(world, random, Rotation.NORTH, x, y, z);
     }
     //
-	
-    private static class TreeSettings extends Settings
-    {
-        static final Setting<Integer> MIN_HEIGHT = intSetting("MinHeight",
-                OTG.WORLD_DEPTH, OTG.WORLD_DEPTH, OTG.WORLD_HEIGHT);
-        static final Setting<Integer> MAX_HEIGHT = intSetting("MaxHeight",
-                OTG.WORLD_HEIGHT, OTG.WORLD_DEPTH, OTG.WORLD_HEIGHT);
-    }
-
-    private TreeType type;
-    private int minHeight = OTG.WORLD_DEPTH;
-    private int maxHeight = OTG.WORLD_HEIGHT;
-
-    public TreeObject(TreeType type)
-    {
-        this.type = type;
-    }
-
-    @Override
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
-    {
-        // Stub method
-    }
-
-    public TreeObject(TreeType type, SettingsReaderOTGPlus settings)
-    {
-        this.type = type;
-        this.minHeight = settings.getSetting(TreeSettings.MIN_HEIGHT, TreeSettings.MIN_HEIGHT.getDefaultValue());
-        this.maxHeight = settings.getSetting(TreeSettings.MAX_HEIGHT, TreeSettings.MAX_HEIGHT.getDefaultValue());
-    }
-
-    @Override
-    public String getName()
-    {
-        return type.name();
-    }
-
-    @Override
-    public boolean canSpawnAsTree()
-    {
-        return true;
-    }
-
-    @Override
-    public boolean canSpawnAsObject()
-    {
-        return false;
-    }
-
+    
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
@@ -141,4 +141,5 @@ public class TreeObject implements CustomObject
 	{
 		return BoundingBox.newEmptyBox();
 	}
+
 }

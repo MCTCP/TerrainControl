@@ -9,6 +9,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
@@ -290,7 +291,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
-        if (!this.settings.getWorldConfig().BiomeConfigsHaveReplacement)
+        if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
         {
             // Don't waste time here, ReplacedBlocks is empty everywhere
             return;
@@ -472,7 +473,7 @@ public class ForgeWorld implements LocalWorld
 		}
 
         boolean outsideBorder = false;
-    	if(!IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), true))
+    	if(!isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), true))
     	{
     		// This can happen when net.minecraft.server.MinecraftServer.updateTimeLightAndEntities() is called
     		//OTG.log(LogMarker.INFO, "Requested chunk outside world border X" + chunkX + " Z" + chunkZ);
@@ -576,7 +577,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean isNullOrAir(int x, int y, int z, boolean isOTGPlus)
     {
-    	if (y >= OTG.WORLD_HEIGHT || y < OTG.WORLD_DEPTH)
+    	if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
     	{
     		return true;
     	}
@@ -601,7 +602,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public LocalMaterialData getMaterial(int x, int y, int z, boolean IsOTGPlus)
     {
-        if (y >= OTG.WORLD_HEIGHT || y < OTG.WORLD_DEPTH)
+        if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
         {
         	return ForgeMaterialData.ofMinecraftBlock(Blocks.AIR);
         	//throw new RuntimeException();
@@ -640,7 +641,7 @@ public class ForgeWorld implements LocalWorld
 	     * rewrite parts of this method for newer block place logic.
 	     */
 
-        if (y < OTG.WORLD_DEPTH || y >= OTG.WORLD_HEIGHT)
+        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
         {
             return;
         }
@@ -975,7 +976,7 @@ public class ForgeWorld implements LocalWorld
     public void provideWorldInstance(WorldServer world)
     {
         ServerConfigProvider configs = (ServerConfigProvider) this.settings;
-        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(world));        
+        DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(world));        
 
         this.world = world;
         OTGDimensionManager.ApplyGameRulesToWorld(world, dimConfig);
@@ -1406,7 +1407,7 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-	public boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk)
+	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
 	{
 		return
 			!(
@@ -1434,7 +1435,7 @@ public class ForgeWorld implements LocalWorld
 	}
 
     @Override
-	public boolean IsInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
+	public boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
 	{
 		return
 			GetWorldSession().getWorldBorderRadius() == 0 ||

@@ -1,8 +1,5 @@
 package com.pg85.otg.configuration.standard;
 
-import static com.pg85.otg.OTG.WORLD_DEPTH;
-import static com.pg85.otg.OTG.WORLD_HEIGHT;
-
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
@@ -53,7 +50,7 @@ public class BiomeStandardValues extends Settings
             BIOME_RARITY = intSetting("BiomeRarity", 100, 0, Integer.MAX_VALUE),
             BIOME_RARITY_WHEN_ISLE = intSetting("BiomeRarityWhenIsle", 100, 0, Integer.MAX_VALUE),
             SMOOTH_RADIUS = intSetting("SmoothRadius", 2, 0, 32),
-            RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, WORLD_DEPTH, WORLD_HEIGHT),
+            RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
             WATER_LEVEL_MAX = WorldStandardValues.WATER_LEVEL_MAX,
             WATER_LEVEL_MIN = WorldStandardValues.WATER_LEVEL_MIN;
 
@@ -286,6 +283,4 @@ public class BiomeStandardValues extends Settings
 
     public static final int iceSpikeDepositMinHeight = 60;
     public static final int iceSpikeDepositMaxHeight = 128;
-    // End resource settings
-
 }

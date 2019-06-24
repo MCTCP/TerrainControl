@@ -23,35 +23,55 @@ import java.util.Random;
 
 public interface LocalWorld
 {
-	// OTG+
+    public String getName();
 
-	public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn);
+    public String getWorldSettingsName();
+    
+	public int getDimensionId();
 
-    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow);
-
-	public ObjectSpawner getObjectSpawner();
-
-	boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk);
-
-	boolean IsInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources);
-
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
-
-	public WorldSession GetWorldSession();
-
-	public void DeleteWorldSessionData();
-
-	public String getWorldSettingsName();
+    public long getSeed();
 
 	public File getWorldSaveDir();
 
-	public int getDimensionId();
+    public ConfigProvider getConfigs();
+    
+	public ObjectSpawner getObjectSpawner();
+	
+    public CustomObjectStructureCache getStructureCache();
+    	
+	public WorldSession GetWorldSession();
 
-	//
-
-
-    // Biome init
+	public void DeleteWorldSessionData();
+	
+    public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn);
+    
     /**
+     * Gets the height the base terrain of the world is capped at. Resources
+     * ignore this limit.
+     *
+     * @return The height the base terrain of the world is capped at.
+     */
+    public int getHeightCap();
+
+    /**
+     * Returns the vertical scale of the world. 128 blocks is the normal
+     * scale, 256 doubles the scale, 64 halves the scale, etc. Only powers of
+     * two will be returned.
+     *
+     * @return The vertical scale of the world.
+     */
+    public int getHeightScale();
+    
+	
+	// Biomes
+
+    /**
+     * Gets the biome generator.
+     * @return The biome generator.
+     */
+    public BiomeGenerator getBiomeGenerator();
+    
+	/**
      * Creates a LocalBiome instance for the given biome.
      * @param biomeConfig The settings for the biome, which are saved in
      * the LocalBiome instance.
@@ -95,12 +115,6 @@ public interface LocalWorld
 
     public Collection<? extends BiomeLoadInstruction> getDefaultBiomes();
 
-    // Biome manager
-    /**
-     * Gets the biome generator.
-     * @return The biome generator.
-     */
-    public BiomeGenerator getBiomeGenerator();
 
     /**
      * Calculates the biome at the given coordinates. This is usually taken
@@ -134,7 +148,10 @@ public interface LocalWorld
      */
     public LocalBiome getCalculatedBiome(int x, int z);
 
+	public int getRegisteredBiomeId(String resourceLocation);
+    
     // Default generators
+    
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry);
 
     public boolean placeDungeon(Random rand, int x, int y, int z);
@@ -152,6 +169,70 @@ public interface LocalWorld
      */
     SpawnableObject getMojangStructurePart(String name);
 
+	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk);
+    
+    // Mobs / entities
+    
+    /**
+     * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the
+     * terrain generation. Calling this method will place the mobs.
+     * @param biome      Biome to place the mobs of.
+     * @param random     Random number generator.
+     * @param chunkCoord The chunk to spawn the mobs in.
+     */
+    public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord);
+
+    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
+
+	void SpawnEntity(EntityFunction entityData);
+    
+    // Population start and end
+    
+    /**
+     * Marks the given chunks as being populated. No new chunks may be created. Implementations may cache the chunk.
+     * @param chunkCoord The chunk being populated.
+     * @throws IllegalStateException If another chunks is being populated. Call {@link #endPopulation()} first.
+     * @see #endPopulation()
+     */
+    public void startPopulation(ChunkCoordinate chunkCoord);
+
+    /**
+     * Stops the population step. New chunks may be created again. Implementations may cache the chunk.
+     * @throws IllegalStateException If no chunk was being populated.
+     * @see #startPopulation(ChunkCoordinate)
+     */
+    public void endPopulation();
+
+    // Blocks
+    
+    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea);
+
+    public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea);
+
+    public NamedBinaryTag getMetadata(int x, int y, int z);
+
+    public int getLiquidHeight(int x, int z);
+
+    /**
+     * @return The y location of the block above the highest solid block.
+     */
+    public int getSolidHeight(int x, int z);
+
+    /**
+     * @return The y location of the block above the highest block.
+     */
+    public int getHighestBlockYAt(int x, int z);
+
+    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow);
+    
+    public int getLightLevel(int x, int y, int z);
+
+    public boolean isLoaded(int x, int y, int z);   
+
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
+
+	public BlockFunction[] getBlockColumn(int x, int z);
+	
     /**
      * Executes ReplacedBlocks.
      *
@@ -172,95 +253,12 @@ public interface LocalWorld
      * @param chunkCoord The top left chunk for ReplacedBlocks.
      */
     public void replaceBlocks(ChunkCoordinate chunkCoord);
+	
+	// Chunks
+	
+	boolean isInsidePregeneratedRegion(ChunkCoordinate chunk);
 
-    /**
-     * Since Minecraft Beta 1.8, friendly mobs are mainly spawned during the
-     * terrain generation. Calling this method will place the mobs.
-     * @param biome      Biome to place the mobs of.
-     * @param random     Random number generator.
-     * @param chunkCoord The chunk to spawn the mobs in.
-     */
-    public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord);
+	boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources);
 
-    // Population start and end
-    /**
-     * Marks the given chunks as being populated. No new chunks may be created. Implementations may cache the chunk.
-     * @param chunkCoord The chunk being populated.
-     * @throws IllegalStateException If another chunks is being populated. Call {@link #endPopulation()} first.
-     * @see #endPopulation()
-     */
-    public void startPopulation(ChunkCoordinate chunkCoord);
-
-    /**
-     * Stops the population step. New chunks may be created again. Implementations may cache the chunk.
-     * @throws IllegalStateException If no chunk was being populated.
-     * @see #startPopulation(ChunkCoordinate)
-     */
-    public void endPopulation();
-
-    // Blocks
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea);
-
-    public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea);
-
-    public NamedBinaryTag getMetadata(int x, int y, int z);
-
-    public int getLiquidHeight(int x, int z);
-
-    /**
-     * @return The y location of the block above the highest solid block.
-     */
-    public int getSolidHeight(int x, int z);
-
-    /**
-     * @return The y location of the block above the highest block.
-     */
-    public int getHighestBlockYAt(int x, int z);
-
-    public int getLightLevel(int x, int y, int z);
-
-    public boolean isLoaded(int x, int y, int z);
-    
-    // Other information
-
-    /**
-     * Gets the configuration objects of this world.
-     * @return The configuration objects.
-     */
-    public ConfigProvider getConfigs();
-
-    public CustomObjectStructureCache getStructureCache();
-
-    public String getName();
-
-    public long getSeed();
-
-    /**
-     * Gets the height the base terrain of the world is capped at. Resources
-     * ignore this limit.
-     *
-     * @return The height the base terrain of the world is capped at.
-     */
-    public int getHeightCap();
-
-    /**
-     * Returns the vertical scale of the world. 128 blocks is the normal
-     * scale, 256 doubles the scale, 64 halves the scale, etc. Only powers of
-     * two will be returned.
-     *
-     * @return The vertical scale of the world.
-     */
-    public int getHeightScale();
-
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
-
-	void SpawnEntity(EntityFunction entityData);
-
-	public ChunkCoordinate getSpawnChunk();
-
-	public BlockFunction[] getBlockColumn(int x, int z);
-
-	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk);
-
-	public int getRegisteredBiomeId(String resourceLocation);
+	public ChunkCoordinate getSpawnChunk();	
 }

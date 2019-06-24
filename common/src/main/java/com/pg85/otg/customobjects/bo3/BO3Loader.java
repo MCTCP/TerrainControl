@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
+import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectLoader;
 import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
@@ -35,7 +35,7 @@ public class BO3Loader implements CustomObjectLoader
     public BO3Loader()
     {
         // Register BO3 ConfigFunctions
-        CustomObjectConfigFunctionsManager registry = OTG.getCustomObjectConfigFunctionsManager();
+        CustomObjectResourcesManager registry = OTG.getCustomObjectResourcesManager();
         registry.registerConfigFunction("Block", BlockFunction.class);
         registry.registerConfigFunction("B", BlockFunction.class);
         registry.registerConfigFunction("Branch", BranchFunction.class);

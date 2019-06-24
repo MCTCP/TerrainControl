@@ -58,7 +58,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.03999999910593033D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -70,7 +70,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.05000000074505806D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -82,7 +82,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return -0.03999999910593033D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -94,7 +94,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.03999999910593033D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -106,7 +106,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.03999999910593033D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -118,7 +118,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.05999999865889549D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -130,7 +130,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.04D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -142,7 +142,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return (float)(0.03F * (double)(gravityFactor / baseGravityFactor));
 		} else {
@@ -154,7 +154,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.03999999910593033D * (double)(gravityFactor / baseGravityFactor);
 		} else {
@@ -166,7 +166,7 @@ public class OTGHooks
 	{
 		if(entity.world.provider instanceof OTGWorldProvider)
 		{
-	    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
 	    	return 0.029999999329447746D * (double)(gravityFactor / baseGravityFactor);
 		} else {

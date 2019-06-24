@@ -13,6 +13,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
@@ -81,7 +82,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         this.world = _world;
         this.worldHandle = _world.getWorld();
 
-        this.TestMode = this.world.getConfigs().getWorldConfig().ModeTerrain == WorldConfig.TerrainMode.TerrainTest;
+        this.TestMode = this.world.getConfigs().getWorldConfig().modeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
         this.generator = new ChunkProviderOTG(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
@@ -115,7 +116,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 			Chunk chunk = world.getChunk(chunkCoords.getBlockX(), chunkCoords.getBlockZ(), true);
 			if(chunk == null)
 			{
-				if(world.IsInsideWorldBorder(chunkCoords, false))
+				if(world.isInsideWorldBorder(chunkCoords, false))
 				{
 					// Can happen when chunkExists() in this.world.getChunk() mistakenly returns false
 					// This could potentially cause an infinite loop but than't can't be disallowed looping because of async calls
@@ -167,7 +168,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     public void populate(int chunkX, int chunkZ)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-    	if(this.TestMode || !world.IsInsideWorldBorder(chunkCoord, false))
+    	if(this.TestMode || !world.isInsideWorldBorder(chunkCoord, false))
         {
     		world.ClearChunkCache();
             return;
@@ -205,7 +206,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
         fixSpawnChunk();
 
-        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(world.getName());
+        DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
         if(dimConfig.Settings.SpawnPointSet)
         {
     		world.getWorld().provider.setSpawnPoint(new BlockPos(dimConfig.Settings.SpawnPointX, dimConfig.Settings.SpawnPointY, dimConfig.Settings.SpawnPointZ));
@@ -218,7 +219,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         BlockGravel.fallInstantly = false;
 
         HashMap<String,ArrayList<ModDataFunction>> MessagesPerMod = world.GetWorldSession().GetModDataForChunk(chunkCoord);
-        if(MessagesPerMod == null && world.getConfigs().getWorldConfig().IsOTGPlus)
+        if(MessagesPerMod == null && world.getConfigs().getWorldConfig().isOTGPlus)
         {
     		if(!world.getStructureCache().structureCache.containsKey(chunkCoord))
     		{
@@ -467,7 +468,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     	{
         	chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
 
-        	if(world.IsInsideWorldBorder(chunkCoord, true))
+        	if(world.isInsideWorldBorder(chunkCoord, true))
             {
 	    		ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
 	    		this.generator.generate(chunkBuffer);
@@ -545,7 +546,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     	if(!firstRun)
     	{
     		// Only required for OTG+ isStructureAtSpawn setting for BO3's.
-    		if(!spawnChunkFixed && world.getConfigs().getWorldConfig().IsOTGPlus)
+    		if(!spawnChunkFixed && world.getConfigs().getWorldConfig().isOTGPlus)
 			{
 	    		// TODO: This shouldn't be necessary, the first chunk spawned should be in the are being populated?
 	    		world.setAllowSpawningOutsideBounds(true);
@@ -593,7 +594,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     	{
     		chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
 
-	    	if(world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
+	    	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
 	        {
 	    		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
 	    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
@@ -603,7 +604,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 	    		// To prevent MC from looking in many chunks (if there is no grass block nearby) and causing them to be populated place grass in the first requested chunk
 	    		// cache the original blocks so that they can be placed back when proper world generation starts.
 	    		// Only needed for OTG+ isStructureAtSpawn setting for BO3's.
-	    		if(firstRun && world.getConfigs().getWorldConfig().IsOTGPlus)
+	    		if(firstRun && world.getConfigs().getWorldConfig().isOTGPlus)
 	    		{
 	    			spawnChunk = chunkCoord;
 	    			for(int x = 0; x < 15; x++)
@@ -630,7 +631,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 		        chunkBuffer = null;
 	        }
     	} else {
-        	if(world.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
+        	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
 	        {
 		        fillBiomeArray(chunk);
 		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
@@ -646,7 +647,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
     public int getHighestBlockInCurrentlyPopulatingChunk(int x, int z)
     {
-    	for(int i = OTG.WORLD_HEIGHT - 1; i > OTG.WORLD_DEPTH; i--)
+    	for(int i = PluginStandardValues.WORLD_HEIGHT - 1; i > PluginStandardValues.WORLD_DEPTH; i--)
     	{
     		LocalMaterialData material = chunkBuffer.getBlock(x, i, z);
     		if(material != null && !material.isAir())

@@ -1,8 +1,8 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.MaterialSet;
@@ -36,10 +36,10 @@ public class VeinGen extends Resource
         oreSize = readInt(args.get(4), 1, 64);
         oreFrequency = readInt(args.get(5), 1, 100);
         oreRarity = readInt(args.get(6), 1, 100);
-        minAltitude = readInt(args.get(7), OTG.WORLD_DEPTH,
-                OTG.WORLD_HEIGHT - 1);
+        minAltitude = readInt(args.get(7), PluginStandardValues.WORLD_DEPTH,
+                PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(8), minAltitude,
-                OTG.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 9);
     }
 

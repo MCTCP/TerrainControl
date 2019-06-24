@@ -36,7 +36,7 @@ public class KeyBoardEventListener
 					// The GUI screen requires the dimensions configuration to be available, so it shouldn't be opened
 					// with an unset configuration.
                     // This is the case when connecting to servers without the mod installed, for example.
-					OTG.GetDimensionsConfig() != null &&
+					OTG.getDimensionsConfig() != null &&
 					
 					// Only open the menu if players are opped
     				Minecraft.getMinecraft().player.canUseCommand(2, "") &&

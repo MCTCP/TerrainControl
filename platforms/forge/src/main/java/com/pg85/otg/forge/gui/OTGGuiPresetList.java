@@ -252,7 +252,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 					GuiYesNo guiyesno = askDeleteSettings(this, presetNameToDelete);
 					this.mc.displayGuiScreen(guiyesno);
 	
-		            File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+		            File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
 		            if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
 		            {
 		            	for(File worldDir : OTGWorldsDirectory.listFiles())
@@ -512,16 +512,16 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         {
         	lines.add("URL: " + url);
         }
-        if(this.selectedPreset.getSecond().Dimensions.size() > 0)
+        if(this.selectedPreset.getSecond().dimensions.size() > 0)
         {
         	String dimsString = "";
-        	for(int i = 0; i < this.selectedPreset.getSecond().Dimensions.size(); i++)
+        	for(int i = 0; i < this.selectedPreset.getSecond().dimensions.size(); i++)
         	{
-        		String dimName = this.selectedPreset.getSecond().Dimensions.get(i);
+        		String dimName = this.selectedPreset.getSecond().dimensions.get(i);
         		boolean bFound = ForgeEngine.presets.containsKey(dimName);
         		if(bFound)
         		{
-        			dimsString += dimName + (i == this.selectedPreset.getSecond().Dimensions.size() - 1 ? "" : ", ");
+        			dimsString += dimName + (i == this.selectedPreset.getSecond().dimensions.size() - 1 ? "" : ", ");
         		} else {
         			dimsString += TextFormatting.GRAY + dimName + " (Not installed)" + TextFormatting.RESET + ", ";
         		}
@@ -739,7 +739,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 	        	{
 	        		if(
         				(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(index))) ||
-        				(dimConfig.PresetName == null && OTG.GetDimensionsConfig().WorldName.equals(presets.get(index)))
+        				(dimConfig.PresetName == null && OTG.getDimensionsConfig().WorldName.equals(presets.get(index)))
     				)
 	        		{
 	        			return;
@@ -785,7 +785,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 	        	{
 	        		if(
         				(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(idx))) ||
-        				(dimConfig.PresetName == null && OTG.GetDimensionsConfig().WorldName.equals(presets.get(idx)))
+        				(dimConfig.PresetName == null && OTG.getDimensionsConfig().WorldName.equals(presets.get(idx)))
     				)
 	        		{
 	        			bFound = true;

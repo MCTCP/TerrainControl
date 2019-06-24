@@ -215,10 +215,10 @@ public class OTGPlugin
 		if(!overWorld.isRemote) // Server side only
 		{
 			// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
-		    if(OTG.GetDimensionsConfig() == null)
+		    if(OTG.getDimensionsConfig() == null)
 		    {
 				// Check if there is a dimensionsConfig saved for this world
-				DimensionsConfig dimsConfig = DimensionsConfig.LoadFromFile(overWorld.getSaveHandler().getWorldDirectory());
+				DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(overWorld.getSaveHandler().getWorldDirectory());
 				if(dimsConfig == null)
 				{
 					// If there is no DimensionsConfig saved for this world, create one
@@ -238,9 +238,9 @@ public class OTGPlugin
 							dimsConfig.Dimensions = modPackConfig.Dimensions;
 						}
 					}
-					dimsConfig.Save();
+					dimsConfig.save();
 				}
-				OTG.SetDimensionsConfig(dimsConfig);
+				OTG.setDimensionsConfig(dimsConfig);
 			}
 	
 		    // Load any saved dimensions.
@@ -249,11 +249,11 @@ public class OTGPlugin
 		    // Create Cartographer dimension if it doesn't yet exist
 			//Cartographer.CreateCartographerDimension();
 
-		    for(DimensionConfig dimConfig : OTG.GetDimensionsConfig().Dimensions)
+		    for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
 		    {
 		    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
 	    		{
-		    		File worldConfigFile = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimConfig.PresetName + "/WorldConfig.ini");
+		    		File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimConfig.PresetName + "/WorldConfig.ini");
 		    		if(!worldConfigFile.exists())
 		    		{
 		    			OTG.log(LogMarker.WARN, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");

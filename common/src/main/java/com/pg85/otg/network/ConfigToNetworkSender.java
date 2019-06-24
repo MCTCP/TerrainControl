@@ -35,8 +35,8 @@ public final class ConfigToNetworkSender
         // General information
         ConfigFile.writeStringToStream(stream, worldConfig.getName());
 
-        stream.writeInt(worldConfig.WorldFog);
-        stream.writeInt(worldConfig.WorldNightFog);
+        stream.writeInt(worldConfig.worldFog);
+        stream.writeInt(worldConfig.worldNightFog);
 
         stream.writeInt(worldConfig.waterLevelMax);       
 

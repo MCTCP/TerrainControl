@@ -63,7 +63,7 @@ public abstract class WorldSession
     {
     	HashMap<String,ArrayList<ModDataFunction>> result = new HashMap<String,ArrayList<ModDataFunction>>();
     	boolean bFound = false;
-    	if(world.IsInsideWorldBorder(chunkCoord, true))
+    	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
     		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
     		{
@@ -87,7 +87,7 @@ public abstract class WorldSession
 	    	}
 	    	if(!bFound)
 	    	{
-	    		if(!world.IsInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().IsOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
+	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
 	    		{
 	    			result = null;
 	    		}
@@ -100,7 +100,7 @@ public abstract class WorldSession
     {
     	ArrayList<SpawnerFunction> result = new ArrayList<SpawnerFunction>();
     	boolean bFound = false;
-    	if(world.IsInsideWorldBorder(chunkCoord, true))
+    	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
     		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
     		{
@@ -120,7 +120,7 @@ public abstract class WorldSession
 			}
 	    	if(!bFound)
 	    	{
-	    		if(!world.IsInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().IsOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
+	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
 	    		{
 	    			result = null;
 	    		}
@@ -133,7 +133,7 @@ public abstract class WorldSession
     {
     	ArrayList<ParticleFunction> result = new ArrayList<ParticleFunction>();
     	boolean bFound = false;
-    	if(world.IsInsideWorldBorder(chunkCoord, true))
+    	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
     		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
     		{
@@ -153,7 +153,7 @@ public abstract class WorldSession
 	    	}
 	    	if(!bFound)
 	    	{
-	    		if(!world.IsInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().IsOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
+	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
 	    		{
 	    			result = null;
 	    		}
@@ -164,7 +164,7 @@ public abstract class WorldSession
 
     public void RemoveParticles(ChunkCoordinate chunkCoord, ParticleFunction particle)
     {
-    	if(world.IsInsideWorldBorder(chunkCoord, true))
+    	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
     		CustomObjectStructure customObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
     		if(customObject != null && customObject.particlesManager.particleData.contains(particle))

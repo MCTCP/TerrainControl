@@ -15,6 +15,7 @@ import java.util.Stack;
 import java.util.Map.Entry;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
@@ -28,7 +29,7 @@ public class CustomObjectStructureFileManager
 	    Map<ChunkCoordinate, CustomObjectStructure> structuresFile = new HashMap<ChunkCoordinate, CustomObjectStructure>();
 
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "StructureData.txt");
+		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + WorldStandardValues.StructureDataFileName);
 
 		StringBuilder stringbuilder = new StringBuilder();
 	    if(occupiedChunksFile.exists())
@@ -246,7 +247,7 @@ public class CustomObjectStructureFileManager
 		    }
 
 		    CustomObjectStructure structure;
-		    if(world.getConfigs().getWorldConfig().IsOTGPlus)
+		    if(world.getConfigs().getWorldConfig().isOTGPlus)
 		    {
 		    	structure = new CustomObjectStructure(world, structureStart, ObjectsToSpawn, SmoothingAreasToSpawn, minY);
 		    } else {
@@ -524,7 +525,7 @@ public class CustomObjectStructureFileManager
 		// So don't worry about saving structure files for structures that have already been spawned, they won't be added to the structure cache when loading
 
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "StructureData.txt");
+		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + WorldStandardValues.StructureDataFileName);
     	if(occupiedChunksFile.exists())
     	{
     		occupiedChunksFile.delete();

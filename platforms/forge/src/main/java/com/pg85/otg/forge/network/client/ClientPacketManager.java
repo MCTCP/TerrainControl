@@ -141,14 +141,14 @@ public class ClientPacketManager
 	
 	public static void RegisterClientWorlds(DataInputStream wrappedStream, WorldLoader worldLoader) throws IOException
 	{		
-		DimensionsConfig dimsConfig = DimensionsConfig.FromYamlString(ConfigFile.readStringFromStream(wrappedStream)); 
-		OTG.SetDimensionsConfig(dimsConfig);
+		DimensionsConfig dimsConfig = DimensionsConfig.fromYamlString(ConfigFile.readStringFromStream(wrappedStream)); 
+		OTG.setDimensionsConfig(dimsConfig);
 		
 		ForgeEngine.presets.clear();
 		int presetCount = wrappedStream.readInt();
 		for(int i = 0; i < presetCount; i++)
 		{
-			DimensionConfigGui dimConfig = DimensionConfigGui.FromYamlString(ConfigFile.readStringFromStream(wrappedStream));
+			DimensionConfigGui dimConfig = DimensionConfigGui.fromYamlString(ConfigFile.readStringFromStream(wrappedStream));
 			ForgeEngine.presets.put(dimConfig.PresetName, dimConfig);
 		}
 		

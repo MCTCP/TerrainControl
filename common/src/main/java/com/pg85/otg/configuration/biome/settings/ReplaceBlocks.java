@@ -79,13 +79,8 @@ public class ReplaceBlocks
             {
             	throw new InvalidConfigException("Invalid JSON structure near " + option);
             }
-            //String[] optionParts = option.split(":");
-            //if (optionParts.length != 2)
-            //{
-                //throw new InvalidConfigException("Invalid JSON structure near " + option);
-            //}
-            sourceBlock = optionParts[1];//.trim();//.replace("\"", "");
-            targetBlock = optionParts[3];//.trim();//.replace("\"", "");
+            sourceBlock = optionParts[1];
+            targetBlock = optionParts[3];
         }
 
         // Check if data is complete and valid

@@ -4,6 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.BO3Config;
@@ -140,7 +141,7 @@ public class CustomObjectStructure
 
 			startY += ((BO3)Start.getObject()).getSettings().heightOffset;
 
-			if(startY < OTG.WORLD_DEPTH || startY >= OTG.WORLD_HEIGHT)
+			if(startY < PluginStandardValues.WORLD_DEPTH || startY >= PluginStandardValues.WORLD_HEIGHT)
 			{
 				return false;
 			}
@@ -229,7 +230,7 @@ public class CustomObjectStructure
 				//if(!DoStartChunkBlockChecks()){ return; }
 				int highestBlocky = world.getHighestBlockYAt(Start.getX() + 8, Start.getZ() + 7, true, true, false, true);;
 				//if(Start.y - 1 > OTG.WORLD_DEPTH && Start.y - 1 < OTG.WORLD_HEIGHT && world.getMaterial(Start.getX() + 8, Start.y - 1, Start.getZ() + 7).isLiquid())
-				if(Start.y - 1 > OTG.WORLD_DEPTH && Start.y - 1 < OTG.WORLD_HEIGHT && world.getMaterial(Start.getX() + 8, highestBlocky, Start.getZ() + 7, IsOTGPlus).isLiquid())
+				if(Start.y - 1 > PluginStandardValues.WORLD_DEPTH && Start.y - 1 < PluginStandardValues.WORLD_HEIGHT && world.getMaterial(Start.getX() + 8, highestBlocky, Start.getZ() + 7, IsOTGPlus).isLiquid())
 				{
 					return;
 				}
@@ -774,7 +775,7 @@ public class CustomObjectStructure
         				(
     						(
 								smoothRadius == 0 &&
-								!World.IsInsideWorldBorder(ChunkCoordinate.fromChunkCoords(childBranchDataItem.Branch.getChunkX(), childBranchDataItem.Branch.getChunkZ()), true)
+								!World.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(childBranchDataItem.Branch.getChunkX(), childBranchDataItem.Branch.getChunkZ()), true)
 							)
     						||
     						(
@@ -1937,7 +1938,7 @@ public class CustomObjectStructure
     	if(!minimumSize)
     	{
 		    // Check if any other structures in world are in this chunk
-		    if(!bFound && (World.IsInsidePregeneratedRegion(branchData.ChunkCoordinate) || World.getStructureCache().structureCache.containsKey(branchData.ChunkCoordinate)))
+		    if(!bFound && (World.isInsidePregeneratedRegion(branchData.ChunkCoordinate) || World.getStructureCache().structureCache.containsKey(branchData.ChunkCoordinate)))
 		    {
 		    	collidingObjects.add(null);
 		    	bFound = true;
@@ -1996,7 +1997,7 @@ public class CustomObjectStructure
 	            		if(distanceBetweenStructures <= radiusInChunks)
 	            		{
 	            		    // Check if any other structures in world are in this chunk
-	            			if(World.IsInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(x,z)) || World.getStructureCache().structureCache.containsKey(ChunkCoordinate.fromChunkCoords(x,z)))
+	            			if(World.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(x,z)) || World.getStructureCache().structureCache.containsKey(ChunkCoordinate.fromChunkCoords(x,z)))
 	            		    {
 	            		        // Structures' bounding boxes are overlapping, don't add this branch.
 	            		    	collidingObjects.add(null);

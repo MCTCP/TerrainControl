@@ -8,12 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CustomObjectConfigFunctionsManager
+public class CustomObjectResourcesManager
 {
-
     private Map<String, Class<? extends CustomObjectConfigFunction<?>>> configFunctions;
 
-    public CustomObjectConfigFunctionsManager()
+    public CustomObjectResourcesManager()
     {
         // Also store in this class
         this.configFunctions = new HashMap<String, Class<? extends CustomObjectConfigFunction<?>>>();

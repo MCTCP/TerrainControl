@@ -2,6 +2,7 @@ package com.pg85.otg.customobjects.customstructure;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -50,7 +51,7 @@ public class CustomObjectCoordinate
         this.rotation = rotation != null ? rotation : Rotation.NORTH;
         this.x = x;
         this.y = y;
-        if(y >= OTG.WORLD_HEIGHT)
+        if(y >= PluginStandardValues.WORLD_HEIGHT)
         {
         	throw new RuntimeException(); // TODO: Remove this after testing
         }

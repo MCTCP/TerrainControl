@@ -83,7 +83,7 @@ public class LayerMixWithRiver extends Layer
                 {
                     cachedId = currentPiece & BiomeBits;
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {
@@ -125,7 +125,7 @@ public class LayerMixWithRiver extends Layer
                 {
                     cachedId = currentPiece & BiomeBits;
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {
@@ -165,7 +165,7 @@ public class LayerMixWithRiver extends Layer
                 {
                     cachedId = currentPiece & BiomeBits;
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {

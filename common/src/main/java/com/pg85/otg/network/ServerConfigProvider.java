@@ -10,6 +10,7 @@ import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.io.SettingsMap;
+import com.pg85.otg.configuration.standard.BiomeRegistryNames;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
@@ -105,7 +106,7 @@ public final class ServerConfigProvider implements ConfigProvider
     	AddBiomesFromDirRecursive(biomes, biomesDirectory);
     	
         this.worldConfig = new WorldConfig(settingsDir, settingsMap, world, biomes);
-        FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode);
+        FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.settingsMode);
 
         return settingsMap;
     }
@@ -131,7 +132,7 @@ public final class ServerConfigProvider implements ConfigProvider
     public void saveWorldConfig()
     {
     	File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-    	FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.SettingsMode);
+    	FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.settingsMode);
     }
 
     private void loadBiomes(SettingsMap worldConfigSettings, File worldSaveFolder)
@@ -141,7 +142,7 @@ public final class ServerConfigProvider implements ConfigProvider
         // OpenTerrainGenerator/Presets/<WorldName>/<WorldBiomes/
         biomeDirs.add(new File(settingsDir, correctOldBiomeConfigFolder(settingsDir)));
         // OpenTerrainGenerator/GlobalBiomes/
-        biomeDirs.add(new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.BiomeConfigDirectoryName));
+        biomeDirs.add(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.BiomeConfigDirectoryName));
 
         FileHelper.makeFolders(biomeDirs);
 
@@ -234,7 +235,7 @@ public final class ServerConfigProvider implements ConfigProvider
             {
                 writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
             }
-            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.SettingsMode);
+            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.settingsMode);
         }
 
         return loadedBiomes;
@@ -284,14 +285,14 @@ public final class ServerConfigProvider implements ConfigProvider
 					entry.getValue().replaceToBiomeName.trim().length() > 0	        			
 				)
 	        	{
-	        		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(entry.getValue().replaceToBiomeName);
+	        		String defaultBiomeResourceLocation = BiomeRegistryNames.getRegistryNameForDefaultBiome(entry.getValue().replaceToBiomeName);
 	        		if(defaultBiomeResourceLocation != null)
 	        		{
 	        			entry.getValue().replaceToBiomeName = defaultBiomeResourceLocation;
 	        		}
 	        	} else {
 	        		// Default biomes must replacetobiomename themselves
-	        		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(entry.getValue().getName());
+	        		String defaultBiomeResourceLocation = BiomeRegistryNames.getRegistryNameForDefaultBiome(entry.getValue().getName());
 	        		if(defaultBiomeResourceLocation != null)
 	        		{
 	        			entry.getValue().replaceToBiomeName = defaultBiomeResourceLocation;
@@ -661,7 +662,7 @@ public final class ServerConfigProvider implements ConfigProvider
         		if(replaceToBiomeNameArr.length == 1)
         		{
 	        		// This may be a legacy world that doesn't use resourcelocation notation, get the correct registry name
-	        		String replaceToBiomeNameNew = OTG.getRegistryNameForDefaultBiome(biomeConfig.replaceToBiomeName);
+	        		String replaceToBiomeNameNew = BiomeRegistryNames.getRegistryNameForDefaultBiome(biomeConfig.replaceToBiomeName);
 	        		
 	        		if(replaceToBiomeNameNew != null)
 	        		{
@@ -692,15 +693,15 @@ public final class ServerConfigProvider implements ConfigProvider
         LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(otgBiomeId, savedBiomeId), this);
         
         this.biomesByOTGId[biome.getIds().getOTGBiomeId()] = biome;
-        if(biome.getIds().getSavedId() == biome.getIds().getOTGBiomeId() || OTG.getRegistryNameForDefaultBiome(biome.getBiomeConfig().getName()) != null) // Non-virtual and default biomes only
+        if(biome.getIds().getSavedId() == biome.getIds().getOTGBiomeId() || BiomeRegistryNames.getRegistryNameForDefaultBiome(biome.getBiomeConfig().getName()) != null) // Non-virtual and default biomes only
         {
         	this.biomesBySavedId[biome.getIds().getSavedId()] = biome;
         }
 
         // Indexing ReplacedBlocks
-        if (!this.worldConfig.BiomeConfigsHaveReplacement)
+        if (!this.worldConfig.biomeConfigsHaveReplacement)
         {
-            this.worldConfig.BiomeConfigsHaveReplacement = biomeConfig.replacedBlocks.hasReplaceSettings();
+            this.worldConfig.biomeConfigsHaveReplacement = biomeConfig.replacedBlocks.hasReplaceSettings();
         }
 
         // Indexing MaxSmoothRadius
@@ -793,7 +794,7 @@ public final class ServerConfigProvider implements ConfigProvider
 
 		        if (inheritMobsBiomeConfig == null || inheritMobsBiomeConfig == biomeConfigStub) // Most likely a legacy config that is not using resourcelocation yet, for instance: Plains instead of minecraft:plains. Try to convert.
 		        {
-		        	String vanillaBiomeName = OTG.getRegistryNameForDefaultBiome(inheritMobsBiomeName);
+		        	String vanillaBiomeName = BiomeRegistryNames.getRegistryNameForDefaultBiome(inheritMobsBiomeName);
 		        	if(vanillaBiomeName != null)
 		        	{
 		        		inheritMobsBiomeConfig = null;

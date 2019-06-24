@@ -2,7 +2,7 @@ package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
+import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
@@ -21,13 +21,7 @@ import java.util.Map.Entry;
  *
  */
 public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
-{
-    private final List<StringOnLine> configFunctions;
-    private SettingsReaderOTGPlus fallback;
-    private final File file;
-
-    private final String name;
-   
+{  
     private static final class StringOnLine
     {
         private final String string;
@@ -68,9 +62,13 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
         {
             throw new UnsupportedOperationException();
         }
-
     }
-
+    
+    private final List<StringOnLine> configFunctions;
+    private SettingsReaderOTGPlus fallback;
+    private final File file;
+    private final String name;
+    
     /**
      * Stores all the settings. Settings like Name:Value or Name=Value are
      * stored as name. Because this is a linked hashmap,
@@ -78,12 +76,6 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
      * over this map.
      */
     private final Map<String, StringOnLine> settingsCache;
-
-    public void flushCache()
-    {
-    	this.settingsCache.clear();
-    	this.configFunctions.clear();
-    }
     
     /**
      * Creates a new settings reader.
@@ -101,6 +93,12 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
         readSettings();
     }
 
+    public void flushCache()
+    {
+    	this.settingsCache.clear();
+    	this.configFunctions.clear();
+    }
+
     @Override
     public <T> void addConfigFunction(CustomObjectConfigFunction<T> function)
     {
@@ -111,7 +109,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
     public <T> List<CustomObjectConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback)
     {
         List<CustomObjectConfigFunction<T>> result = new ArrayList<CustomObjectConfigFunction<T>>(configFunctions.size());
-        CustomObjectConfigFunctionsManager manager = OTG.getCustomObjectConfigFunctionsManager();
+        CustomObjectResourcesManager manager = OTG.getCustomObjectResourcesManager();
         for (StringOnLine configFunctionLine : configFunctions)
         {
             String configFunctionString = configFunctionLine.string;

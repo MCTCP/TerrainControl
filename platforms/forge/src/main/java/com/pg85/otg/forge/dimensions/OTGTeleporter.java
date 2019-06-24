@@ -151,7 +151,7 @@ public class OTGTeleporter
 			
 			forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
 	
-			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(dimensionIn == 0 ? "overworld" : forgeWorld.getName());
+			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(dimensionIn == 0 ? "overworld" : forgeWorld.getName());
 			
 			// TODO: Fix teleporttospawnonly when making portals
 			if(dimConfig.Settings.TeleportToSpawnOnly)
@@ -326,11 +326,11 @@ public class OTGTeleporter
 	                portalMaterials.add(OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0));
 	                if(lastDimension == 0 && (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld() == null) // This is a vanilla overworld
 	                {
-	                	portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+	                	portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
 	                }
 	                else if(forgeWorld != null)
 	                {
-	                	portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+	                	portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
 	                }
 	                
 	                if(createPortal)

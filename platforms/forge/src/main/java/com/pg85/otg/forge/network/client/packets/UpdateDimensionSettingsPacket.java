@@ -45,7 +45,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
     	
     	for(DimensionConfig dimConfig : dimConfigs)
     	{
-    		ConfigFile.writeStringToStream(stream, dimConfig.ToYamlString());
+    		ConfigFile.writeStringToStream(stream, dimConfig.toYamlString());
     	}    	
 	}
 	
@@ -66,7 +66,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 					ArrayList<DimensionConfig> dimConfigs = new ArrayList<DimensionConfig>();
 					for(int i = 0; i < listSize; i++)
 					{
-						dimConfigs.add(DimensionConfig.FromYamlString(ConfigFile.readStringFromStream(message.getStream())));
+						dimConfigs.add(DimensionConfig.fromYamlString(ConfigFile.readStringFromStream(message.getStream())));
 					}					
 				
 					IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
@@ -86,12 +86,12 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 		            					forgeWorld.GetWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
 		            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.GetWorldSession().getPregenerationRadius();
 	            					}
-			                		OTG.GetDimensionsConfig().Overworld = dimConfig;
+			                		OTG.getDimensionsConfig().Overworld = dimConfig;
 			                	} else {
 			                		// TODO: Assuming atm that only a single thread is ever 
 			                		// accessing dimensionsconfig, is that true? 
 			                		DimensionConfig dimConfigToRemove = null;
-			                		for(DimensionConfig dimConfig2 : OTG.GetDimensionsConfig().Dimensions)
+			                		for(DimensionConfig dimConfig2 : OTG.getDimensionsConfig().Dimensions)
 			                		{
 			                			if(dimConfig.PresetName.equals(dimConfig2.PresetName))
 			                			{
@@ -114,8 +114,8 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 			            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.GetWorldSession().getPregenerationRadius();
 		            					}
 	
-				                		OTG.GetDimensionsConfig().Dimensions.remove(dimConfigToRemove);
-				                		OTG.GetDimensionsConfig().Dimensions.add(dimConfig);
+				                		OTG.getDimensionsConfig().Dimensions.remove(dimConfigToRemove);
+				                		OTG.getDimensionsConfig().Dimensions.add(dimConfig);
 	            					}
 			                	}
 		                	}

@@ -12,7 +12,7 @@ import com.pg85.otg.configuration.world.WorldConfig;
 
 public class DimensionConfigGui extends DimensionConfigBase
 {
-	public List<String> Dimensions = new ArrayList<String>();
+	public List<String> dimensions = new ArrayList<String>();
 	public String author = null;
 	public String description = null;
 	public String worldPackerModName = null;
@@ -31,7 +31,7 @@ public class DimensionConfigGui extends DimensionConfigBase
 	{	
 		super(presetName, worldConfig);
 		
-		this.Dimensions = worldConfig.Dimensions;
+		this.dimensions = worldConfig.dimensions;
 		this.author = worldConfig.author;
 		this.description = worldConfig.description;
 		this.worldPackerModName = worldConfig.worldPackerModName;
@@ -42,7 +42,7 @@ public class DimensionConfigGui extends DimensionConfigBase
 	{	
 		DimensionConfigGui clone = new DimensionConfigGui();
 		
-		clone.Dimensions = this.Dimensions;
+		clone.dimensions = this.dimensions;
 		clone.author = this.author;
 		clone.description = this.description;
 		clone.worldPackerModName = this.worldPackerModName;
@@ -58,7 +58,7 @@ public class DimensionConfigGui extends DimensionConfigBase
 		return clone;
 	}
 	
-	public static DimensionConfigGui FromBaseConfig(DimensionConfig dimConfigBase)
+	public static DimensionConfigGui fromBaseConfig(DimensionConfig dimConfigBase)
 	{
 		DimensionConfigGui dimConfig = new DimensionConfigGui();
 		
@@ -73,7 +73,7 @@ public class DimensionConfigGui extends DimensionConfigBase
 		return dimConfig;
 	}
 	
-	public static DimensionConfigGui FromYamlString(String readStringFromStream)
+	public static DimensionConfigGui fromYamlString(String readStringFromStream)
 	{
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         DimensionConfigGui dimConfig = null;

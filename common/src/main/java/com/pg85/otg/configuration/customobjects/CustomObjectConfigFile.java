@@ -20,11 +20,6 @@ import java.util.Set;
 public abstract class CustomObjectConfigFile
 {
     public SettingsReaderOTGPlus reader;
-    /**
-     * Use {@link #getName()}.
-     */
-    public String name;
-    public File file;
 
     /**
      * True if the file does not exist yet on disk, false otherwise. Used to
@@ -43,9 +38,6 @@ public abstract class CustomObjectConfigFile
     {
         this.reader = reader;
         this.isNewConfig = reader.isNewConfig();
-
-        this.file = reader.getFile();
-        this.name = reader.getName();
     }
 
     /**
@@ -108,7 +100,7 @@ public abstract class CustomObjectConfigFile
 
     public void logIOError(IOException e)
     {
-        OTG.log(LogMarker.ERROR, "Failed to write to file {}", file);
+        OTG.log(LogMarker.ERROR, "Failed to write to file {}", reader.getFile());
         OTG.printStackTrace(LogMarker.ERROR, e);
     }
 
@@ -223,8 +215,7 @@ public abstract class CustomObjectConfigFile
      */
     public String getName()
     {
-        return name;
-        //return reader.getName();
+        return reader.getName();
     }
 
     /**
@@ -234,7 +225,6 @@ public abstract class CustomObjectConfigFile
      */
     public File getFile()
     {
-    	return file;
-        //return reader.getFile();
+        return reader.getFile();
     }
 }

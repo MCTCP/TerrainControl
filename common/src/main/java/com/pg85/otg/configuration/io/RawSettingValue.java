@@ -13,6 +13,30 @@ import java.util.List;
 public final class RawSettingValue
 {
     /**
+     * The type of a setting value.
+     */
+    public enum ValueType
+    {
+        PLAIN_SETTING,
+        FUNCTION,
+        BIG_TITLE,
+        SMALL_TITLE
+    }
+
+    private final List<String> comments;
+    private final int line;
+    private final String value;
+    private final ValueType valueType;
+    
+    private RawSettingValue(String value, ValueType valueType, int line, List<String> comments)
+    {
+        this.value = value;
+        this.valueType = valueType;
+        this.line = line;
+        this.comments = comments;
+    }
+	
+    /**
      * Creates a new setting value object.
      * @param valueType    The type of the setting.
      * @param settingValue The raw value of the setting, like "Foo: Bar" or
@@ -48,30 +72,6 @@ public final class RawSettingValue
     public static <S> RawSettingValue ofPlainSetting(String settingName, String value)
     {
         return create(ValueType.PLAIN_SETTING, settingName + ": " + value);
-    }
-
-    private final List<String> comments;
-    private final int line;
-    private final String value;
-    private final ValueType valueType;
-
-    /**
-     * The type of a setting value.
-     */
-    public enum ValueType
-    {
-        PLAIN_SETTING,
-        FUNCTION,
-        BIG_TITLE,
-        SMALL_TITLE
-    }
-
-    private RawSettingValue(String value, ValueType valueType, int line, List<String> comments)
-    {
-        this.value = value;
-        this.valueType = valueType;
-        this.line = line;
-        this.comments = comments;
     }
 
     /**

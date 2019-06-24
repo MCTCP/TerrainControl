@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.bo3.checks;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.MaterialSet;
@@ -16,7 +16,7 @@ public class BlockCheck extends BO3Check
     @Override
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)
     {
-        return y > OTG.WORLD_DEPTH && y < OTG.WORLD_HEIGHT && !toCheck.contains(world.getMaterial(x, y, z, false));
+        return y > PluginStandardValues.WORLD_DEPTH && y < PluginStandardValues.WORLD_HEIGHT && !toCheck.contains(world.getMaterial(x, y, z, false));
     }
 
     @Override

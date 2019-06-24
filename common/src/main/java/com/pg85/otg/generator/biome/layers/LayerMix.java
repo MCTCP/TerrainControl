@@ -87,7 +87,7 @@ public class LayerMix extends Layer
                     	cachedId = this.defaultOceanId;
                     }                    
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {
@@ -133,7 +133,7 @@ public class LayerMix extends Layer
                     	cachedId = this.defaultOceanId;
                     }                      
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {
@@ -172,7 +172,7 @@ public class LayerMix extends Layer
                     	cachedId = this.defaultOceanId;
                     }                      
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {

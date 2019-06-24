@@ -46,7 +46,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Create dimension packet
     	
-    	ConfigFile.writeStringToStream(stream, dimensionConfig.ToYamlString());
+    	ConfigFile.writeStringToStream(stream, dimensionConfig.toYamlString());
 	}
 	
 	public static void WriteDeletePacketToStream(String dimensionName, DataOutput stream) throws IOException
@@ -68,7 +68,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 				if(packetType == 0) // Create dimension
 				{
 					String dimConfigYaml = ConfigFile.readStringFromStream(message.getStream());
-					DimensionConfig dimConfig = DimensionConfig.FromYamlString(dimConfigYaml);       			
+					DimensionConfig dimConfig = DimensionConfig.fromYamlString(dimConfigYaml);       			
 					
 		            IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
 		            mainThread.addScheduledTask(new Runnable()
@@ -77,14 +77,14 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		                public void run()
 	                	{
 		                	// Check if the world doesn't already exist
-		                	for(DimensionConfig existingDimConfig : OTG.GetDimensionsConfig().Dimensions)
+		                	for(DimensionConfig existingDimConfig : OTG.getDimensionsConfig().Dimensions)
 		                	{
 		                		if(existingDimConfig.PresetName.equals(dimConfig.PresetName))
 		                		{
 		                			return;
 		                		}
 		                	}
-							OTG.GetDimensionsConfig().Dimensions.add(dimConfig);
+							OTG.getDimensionsConfig().Dimensions.add(dimConfig);
 							
             				long seed = (new Random()).nextLong();		            				
             	            String sSeed = dimConfig.Seed;

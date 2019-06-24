@@ -63,13 +63,13 @@ public class OTGWorldType extends WorldType
         if(mcWorld.provider.getDimension() == 0)
         {
         	// Happens when the MP server is started
-        	if(OTG.GetDimensionsConfig() == null)
+        	if(OTG.getDimensionsConfig() == null)
         	{
         		// Check if a dimsconfig is saved for the world
-        		DimensionsConfig savedConfig = DimensionsConfig.LoadFromFile(mcWorld.getSaveHandler().getWorldDirectory());
+        		DimensionsConfig savedConfig = DimensionsConfig.loadFromFile(mcWorld.getSaveHandler().getWorldDirectory());
         		if(savedConfig != null)
         		{
-        			OTG.SetDimensionsConfig(savedConfig);
+        			OTG.setDimensionsConfig(savedConfig);
         		} else {
             		// This is a new world, create a DimensionsConfig for it based on modpack config or worldconfig.
         			DimensionsConfig modPackConfig = DimensionsConfig.getModPackConfig(mcWorld.getSaveHandler().getWorldDirectory().getName());
@@ -78,30 +78,30 @@ public class OTGWorldType extends WorldType
         	        	DimensionsConfig dimsConfig = new DimensionsConfig(mcWorld.getSaveHandler().getWorldDirectory());
         	        	dimsConfig.Overworld = modPackConfig.Overworld;
         	        	dimsConfig.Dimensions = modPackConfig.Dimensions;
-        	        	OTG.SetDimensionsConfig(dimsConfig);
-        	        	OTG.GetDimensionsConfig().Save();
+        	        	OTG.setDimensionsConfig(dimsConfig);
+        	        	OTG.getDimensionsConfig().save();
         	        } else {
         	        	// Create config from worldconfig, only works if worldname is the same as preset name
-        	        	WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
+        	        	WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
         	        	if(worldConfig != null)
         	        	{
         	        		DimensionsConfig dimsConfig = new DimensionsConfig(mcWorld.getSaveHandler().getWorldDirectory());
         	        		dimsConfig.Overworld = new DimensionConfig(mcWorld.getSaveHandler().getWorldDirectory().getName(), worldConfig);
-        	        		for(String dimToAdd : worldConfig.Dimensions)
+        	        		for(String dimToAdd : worldConfig.dimensions)
         	        		{
-        	        			WorldConfig dimWorldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimToAdd));
+        	        			WorldConfig dimWorldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimToAdd));
         	        			if(dimWorldConfig != null)
         	        			{
         	        				dimsConfig.Dimensions.add(new DimensionConfig(dimToAdd, dimWorldConfig));
         	        			}
         	        		}
-        	        		OTG.SetDimensionsConfig(dimsConfig);
-        	        		OTG.GetDimensionsConfig().Save();
+        	        		OTG.setDimensionsConfig(dimsConfig);
+        	        		OTG.getDimensionsConfig().save();
         	        	}
         	        }
         		}
         	}
-	        File worldDirectory = new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.GetDimensionsConfig().Overworld.PresetName);
+	        File worldDirectory = new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.getDimensionsConfig().Overworld.PresetName);
 	
 	        if (!worldDirectory.exists())
 	        {
@@ -113,10 +113,10 @@ public class OTGWorldType extends WorldType
 	            }
 	        }
 
-	        File worldObjectsDir = new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.GetDimensionsConfig().Overworld.PresetName + File.separator + WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
+	        File worldObjectsDir = new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.getDimensionsConfig().Overworld.PresetName + File.separator + WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME);
 	        worldObjectsDir.mkdirs();
 
-	        File worldBiomesDir = new File(OTG.getEngine().getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.GetDimensionsConfig().Overworld.PresetName + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
+	        File worldBiomesDir = new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + OTG.getDimensionsConfig().Overworld.PresetName + File.separator + WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
 	        worldBiomesDir.mkdirs();
 	        
 	        // For MP server
@@ -184,7 +184,7 @@ public class OTGWorldType extends WorldType
     public net.minecraft.world.gen.IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
     {
         ForgeWorld world = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
-        if (world != null && world.getConfigs().getWorldConfig().ModeTerrain != WorldConfig.TerrainMode.Default)
+        if (world != null && world.getConfigs().getWorldConfig().modeTerrain != WorldConfig.TerrainMode.Default)
         {
             return world.getChunkGenerator();
         } else

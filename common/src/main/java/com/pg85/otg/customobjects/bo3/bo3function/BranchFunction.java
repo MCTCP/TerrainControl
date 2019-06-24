@@ -167,7 +167,7 @@ public class BranchFunction extends BO3Function implements Branch
     @Override
     public CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
     {
-    	if(world.getConfigs().getWorldConfig().IsOTGPlus)
+    	if(world.getConfigs().getWorldConfig().isOTGPlus)
     	{
 	        for (Iterator<BranchNode> it = branchesOTGPlus.iterator(); it.hasNext();)
 	        {

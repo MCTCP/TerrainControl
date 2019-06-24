@@ -483,7 +483,7 @@ public class ForgeEngine extends OTGEngine
     public boolean getCartographerEnabled()
     {
     	ForgeWorld world = getOverWorld(); // If overworld is null then the overworld is not an OTG world
-    	return world == null ? false : world.getConfigs().getWorldConfig().Cartographer;
+    	return world == null ? false : world.getConfigs().getWorldConfig().cartographer;
     }
 
     public ForgeWorld getOverWorld()
@@ -582,7 +582,7 @@ public class ForgeEngine extends OTGEngine
     }
     
     @Override
-    public File getOTGDataFolder()
+    public File getOTGRootFolder()
     {
         return this.worldLoader.getConfigsFolder();
     }
@@ -590,13 +590,13 @@ public class ForgeEngine extends OTGEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getOTGDataFolder(), PluginStandardValues.BO_DirectoryName);
+        return new File(this.getOTGRootFolder(), PluginStandardValues.BO_DirectoryName);
     }
 
     @Override
     public File getWorldsDirectory()
     {
-        return new File(this.getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName);
+        return new File(this.getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName);
     }
     
     public void CreateDefaultOTGWorld(String worldName)
@@ -610,7 +610,7 @@ public class ForgeEngine extends OTGEngine
         FileHelper.makeFolders(worldDirs);		
 		
 		// World config
-		DefaulWorldData defaultWorldData = WorldConfig.CreateDefaultOTGWorldConfig(worldDir, worldName);
+		DefaulWorldData defaultWorldData = WorldConfig.createDefaultOTGWorldConfig(worldDir, worldName);
 		SettingsMap settingsMap = defaultWorldData.settingsMap;
 		WorldConfig defaultWorldConfig = defaultWorldData.worldConfig;			
     	FileSettingsWriter.writeToFile(settingsMap, new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME), WorldConfig.ConfigMode.WriteAll);
@@ -655,7 +655,7 @@ public class ForgeEngine extends OTGEngine
             {
                 writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
             }
-            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, defaultWorldConfig.SettingsMode);
+            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, defaultWorldConfig.settingsMode);
         }
     }
     
@@ -688,9 +688,9 @@ public class ForgeEngine extends OTGEngine
 	public String GetPresetName(String worldName)
 	{
 		// If this dim's name is the same as the preset worldname then this is an OTG overworld
-		if(worldName.equals("overworld") || worldName.equals(OTG.GetDimensionsConfig().WorldName))
+		if(worldName.equals("overworld") || worldName.equals(OTG.getDimensionsConfig().WorldName))
     	{
-    		return OTG.GetDimensionsConfig().Overworld.PresetName;	
+    		return OTG.getDimensionsConfig().Overworld.PresetName;	
     	} else {
     		// If this is an OTG dim other than the overworld then the world name will always match the preset name
     		return worldName;
@@ -703,7 +703,7 @@ public class ForgeEngine extends OTGEngine
 		presets.clear();
 		
 	    ArrayList<String> worldNames = new ArrayList<String>();
-	    File OTGWorldsDirectory = new File(OTG.getEngine().getOTGDataFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+	    File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
 	    if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
 	    {
 	    	for(File worldDir : OTGWorldsDirectory.listFiles())

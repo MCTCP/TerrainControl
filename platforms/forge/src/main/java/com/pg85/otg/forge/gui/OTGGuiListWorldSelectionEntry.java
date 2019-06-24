@@ -226,7 +226,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     		ForgeEngine.loadPresets(); // Load all WorldConfigs for the ingame UI
     	}
     	
-        DimensionsConfig dimsConfig = DimensionsConfig.LoadFromFile(new File(Minecraft.getMinecraft().mcDataDir + "/saves/" + this.getSelectedWorldName()));
+        DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(new File(Minecraft.getMinecraft().mcDataDir + "/saves/" + this.getSelectedWorldName()));
         if(dimsConfig != null)
         {
         	ArrayList<String> missingPresets = new ArrayList<String>();
@@ -339,7 +339,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     	// If this world has OTG overworld/dimensions then check if it has a DimensionsConfig
     	// If this is a legacy world then we'll need to create a new one.
     	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + "/" + this.worldSummary.getFileName()));
-    	DimensionsConfig dimensionsConfig = DimensionsConfig.LoadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+    	DimensionsConfig dimensionsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()));
     	if(dimensionsConfig == null && dimensionDatas.size() > 0)
     	{
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
@@ -360,16 +360,16 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     				dimensionsConfig.Dimensions.add(dimension);
     			}
     		}
-    		dimensionsConfig.Save();
+    		dimensionsConfig.save();
     	}
     	else if(dimensionsConfig == null && dimensionDatas.size() == 0)
     	{
     		// This is a vanilla world without dims, save a config without overworld / dims
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
-    		dimensionsConfig.Save();
+    		dimensionsConfig.save();
     	}
 
-		OTG.SetDimensionsConfig(dimensionsConfig);		 	
+		OTG.setDimensionsConfig(dimensionsConfig);		 	
     	
         File dir = new File(clientHandler.getSavesDir(), comparator.getFileName());
         NBTTagCompound leveldat;

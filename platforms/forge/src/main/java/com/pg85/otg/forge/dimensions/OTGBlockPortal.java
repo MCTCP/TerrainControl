@@ -129,10 +129,10 @@ public class OTGBlockPortal
             ArrayList<LocalMaterialData> portalMaterials = null;
             if(sourceWorld.provider.getDimension() == 0)
             {
-            	portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+            	portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
             } else {            
 	            ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(sourceWorld);            
-				portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+				portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
             }
 			
 			if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
@@ -167,7 +167,7 @@ public class OTGBlockPortal
 			ForgeWorld overworld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 			if(overworld == null) // This is a vanilla overworld
 			{
-				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+				ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
 				for(LocalMaterialData portalMaterial : portalMaterials)
 				{
 					if(portalMaterial.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
@@ -182,7 +182,7 @@ public class OTGBlockPortal
 				for(LocalWorld localWorld : forgeWorlds)
 				{
 					ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-					ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+					ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
 					for(LocalMaterialData portalMaterial : portalMaterials)
 					{
 						if(portalMaterial.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
@@ -212,7 +212,7 @@ public class OTGBlockPortal
 			
 			if(overworld == null && sourceWorld.provider.getDimension() != 0) // This is a vanilla overworld, player is not in overworld so may want to portal to it
 			{ // TODO: Does this still happen?
-				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+				ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
 				if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
 				{
 					return;
@@ -221,7 +221,7 @@ public class OTGBlockPortal
 			for(LocalWorld localWorld : forgeWorlds)
 			{
 				ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-				ArrayList<LocalMaterialData> portalMaterials = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+				ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
 				
 				if(forgeWorld.getDimensionId() != sourceWorld.provider.getDimension())
 				{

@@ -7,6 +7,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -28,51 +29,7 @@ import java.util.Random;
  * The good old BO2.
  */
 public class BO2 extends CustomObjectConfigFile implements CustomObject
-{
-	// OTG+
-		   
-    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
-    {
-	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
-	    if(blocksToReplace != null && blocksToReplace.size() > 0)
-	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
-	    	if(targetBlock != null)
-	    	{
-	    		material = targetBlock;	    		
-	    	}
-	    }
-	    world.setBlock(x, y, z, material, metaDataTag, false);
-    }
-    
-    public BO2(SettingsReaderOTGPlus reader)
-    {
-        super(reader);
-    }    
-
-    @Override
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
-    {
-        enable();
-    }
-
-    private void enable()
-    {
-        readConfigSettings();
-        correctSettings();
-    }
-    
-    @Override
-    public CustomObject applySettings(SettingsReaderOTGPlus extraSettings)
-    {
-        extraSettings.setFallbackReader(this.reader);
-        BO2 bo2WithSettings = new BO2(extraSettings);
-        bo2WithSettings.enable();
-        return bo2WithSettings;
-    }
-    
-	//
-	
+{	
     public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
     public BO2[] groupObjects = null;
@@ -111,6 +68,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
     public int branchLimit;
 
+    public BO2(SettingsReaderOTGPlus reader)
+    {
+        super(reader);
+    }
+    
     @Override
     public boolean canSpawnAsTree()
     {
@@ -159,7 +121,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {    	
         // Basic checks
     	
-        if (y < OTG.WORLD_DEPTH || y >= OTG.WORLD_HEIGHT)  // Isn't this already done before this method is called?
+        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)  // Isn't this already done before this method is called?
         {
             return false;
         }
@@ -218,7 +180,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         ChunkCoordinate chunkCoord;        
         for (ObjectCoordinate point : objData)
         {
-            if (y + point.y < OTG.WORLD_DEPTH || y + point.y >= OTG.WORLD_HEIGHT)
+            if (y + point.y < PluginStandardValues.WORLD_DEPTH || y + point.y >= PluginStandardValues.WORLD_HEIGHT)
             {
                 return false;
             }
@@ -440,11 +402,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             ObjectCoordinate coordinate = coordinates.get(i);
 
             data[0][i] = coordinate;
-            coordinate = coordinate.Rotate();
+            coordinate = coordinate.rotate();
             data[1][i] = coordinate;
-            coordinate = coordinate.Rotate();
+            coordinate = coordinate.rotate();
             data[2][i] = coordinate;
-            coordinate = coordinate.Rotate();
+            coordinate = coordinate.rotate();
             data[3][i] = coordinate;
         }
 
@@ -468,4 +430,43 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
         return 0;
     }
+    
+	// OTG+
+	   
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
+    {
+	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+	    if(blocksToReplace != null && blocksToReplace.size() > 0)
+	    {
+	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+	    	if(targetBlock != null)
+	    	{
+	    		material = targetBlock;	    		
+	    	}
+	    }
+	    world.setBlock(x, y, z, material, metaDataTag, false);
+    }       
+
+    @Override
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    {
+        enable();
+    }
+
+    private void enable()
+    {
+        readConfigSettings();
+        correctSettings();
+    }
+    
+    @Override
+    public CustomObject applySettings(SettingsReaderOTGPlus extraSettings)
+    {
+        extraSettings.setFallbackReader(this.reader);
+        BO2 bo2WithSettings = new BO2(extraSettings);
+        bo2WithSettings.enable();
+        return bo2WithSettings;
+    }
+    
+	//
 }

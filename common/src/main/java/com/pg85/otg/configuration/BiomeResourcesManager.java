@@ -11,12 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ConfigFunctionsManager
+public class BiomeResourcesManager
 {
-
     private Map<String, Class<? extends ConfigFunction<?>>> configFunctions;
 
-    public ConfigFunctionsManager()
+    public BiomeResourcesManager()
     {
         // Also store in this class
         this.configFunctions = new HashMap<String, Class<? extends ConfigFunction<?>>>();

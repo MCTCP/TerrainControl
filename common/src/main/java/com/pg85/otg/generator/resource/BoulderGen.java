@@ -1,9 +1,9 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.MaterialSet;
 
@@ -24,10 +24,10 @@ public class BoulderGen extends Resource
         material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 5000);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), OTG.WORLD_DEPTH,
-                OTG.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(3), PluginStandardValues.WORLD_DEPTH,
+                PluginStandardValues.WORLD_HEIGHT);
         maxAltitude = readInt(args.get(4), minAltitude,
-                OTG.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 5);
     }
 

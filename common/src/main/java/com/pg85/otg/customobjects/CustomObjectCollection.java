@@ -174,9 +174,9 @@ public class CustomObjectCollection
     	if(CustomObjectFilesGlobalObjects == null)
     	{
     		CustomObjectFilesGlobalObjects = new HashMap<String, File>();
-    		if(new File(OTG.getEngine().getOTGDataFolder() + File.separator + "GlobalObjects").exists())
+    		if(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects").exists())
     		{
-    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGDataFolder() + File.separator + "GlobalObjects"), CustomObjectFilesGlobalObjects);
+    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects"), CustomObjectFilesGlobalObjects);
     		}
 
 	        // Add vanilla custom objects
@@ -190,9 +190,9 @@ public class CustomObjectCollection
     	{
     		HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
     		CustomObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
-			if(worldName != null && new File(OTG.getEngine().getOTGDataFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects").exists())
+			if(worldName != null && new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects").exists())
 			{
-				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGDataFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
+				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
 			}
     	}
 

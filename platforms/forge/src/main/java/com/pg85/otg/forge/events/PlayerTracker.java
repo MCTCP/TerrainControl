@@ -47,7 +47,7 @@ public class PlayerTracker
     	// For SP the server shuts down after the client disconnects, so we can't unregister biome yet(?)
     	if(!event.getManager().isLocalChannel())
     	{
-	    	OTG.SetDimensionsConfig(null);
+	    	OTG.setDimensionsConfig(null);
 	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
     	}
     }
@@ -59,7 +59,7 @@ public class PlayerTracker
     	// still be present, although there technically shouldn't be any!
     	if(!event.getManager().isLocalChannel())
     	{
-	    	OTG.SetDimensionsConfig(null);
+	    	OTG.setDimensionsConfig(null);
 	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
     	}
     }
@@ -651,7 +651,7 @@ public class PlayerTracker
 	{
 		if(event.getEntity().getEntityWorld() != null)
 		{
-			if(OTG.GetDimensionsConfig() == null)
+			if(OTG.getDimensionsConfig() == null)
 			{
 				// Can happen for Forge clients connecting to a bukkit server
 				return;
@@ -661,7 +661,7 @@ public class PlayerTracker
 			ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(event.getEntity().getEntityWorld());
 			if(forgeWorld != null)
 			{
-				DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
+				DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
 				
 				// Calculate the new distance based on gravity
 				double baseGravity = 0.08D;				

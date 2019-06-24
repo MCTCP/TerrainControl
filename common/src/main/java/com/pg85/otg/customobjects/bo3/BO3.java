@@ -8,6 +8,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.customobjects.*;
 import com.pg85.otg.customobjects.bo3.BO3Settings.OutsideSourceBlock;
@@ -104,7 +105,7 @@ public class BO3 implements StructuredCustomObject
     {
     	if(!skipChecks)
     	{
-	        if (y < OTG.WORLD_DEPTH || y >= OTG.WORLD_HEIGHT) // Isn't this already done before this method is called?
+	        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT) // Isn't this already done before this method is called?
 	        {
 	            return false;
 	        }
@@ -136,7 +137,7 @@ public class BO3 implements StructuredCustomObject
             ChunkCoordinate chunkCoord;
 	        for (BlockFunction block : blocks)
 	        {
-	            if (y + block.y < OTG.WORLD_DEPTH || y + block.y >= OTG.WORLD_HEIGHT)
+	            if (y + block.y < PluginStandardValues.WORLD_DEPTH || y + block.y >= PluginStandardValues.WORLD_HEIGHT)
 	            {
 	                return false;
 	            }
@@ -628,11 +629,11 @@ public class BO3 implements StructuredCustomObject
 	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z)))
 	        	{
 	        		int highestBlockY = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false);
-	        		if(highestBlockY <= OTG.WORLD_DEPTH)
+	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
 	        		{
 	        			highestBlockY = 1;
 	        		}
-	        		if(highestBlockY >= OTG.WORLD_HEIGHT)
+	        		if(highestBlockY >= PluginStandardValues.WORLD_HEIGHT)
 	        		{
 	        			highestBlockY = 255;
 	        		}
@@ -716,9 +717,9 @@ public class BO3 implements StructuredCustomObject
 
         				// TODO: Make override leaves and air configurable
         				// TODO: Make replaceBelow height configurable
-	        			while(blockY > OTG.WORLD_DEPTH)
+	        			while(blockY > PluginStandardValues.WORLD_DEPTH)
 	        			{
-	        				if(blockY < OTG.WORLD_HEIGHT)
+	        				if(blockY < PluginStandardValues.WORLD_HEIGHT)
 	        				{
 	                            blockToQueueForSpawn = new BlockFunction();
 	                            blockToQueueForSpawn.x = x + newBlock.x;
@@ -894,11 +895,11 @@ public class BO3 implements StructuredCustomObject
             	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
             	        	{
             	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
-            	        		if(highestBlockY <= OTG.WORLD_DEPTH)
+            	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
             	        		{
             	        			highestBlockY = 1;
             	        		}
-            	        		if(highestBlockY >= OTG.WORLD_HEIGHT)
+            	        		if(highestBlockY >= PluginStandardValues.WORLD_HEIGHT)
             	        		{
             	        			highestBlockY = 255;
             	        		}
@@ -936,9 +937,9 @@ public class BO3 implements StructuredCustomObject
 	        			coordsBelowDone.add(new Object[] { x + block.x, z + block.z });
 	        			int blockY = y + block.y - 1;
 
-	        			while(blockY > OTG.WORLD_DEPTH)
+	        			while(blockY > PluginStandardValues.WORLD_DEPTH)
 	        			{
-	        				if(blockY < OTG.WORLD_HEIGHT)
+	        				if(blockY < PluginStandardValues.WORLD_HEIGHT)
 	        				{
 	                            blockToQueueForSpawn = new BlockFunction();
 	                            blockToQueueForSpawn.x = x + block.x;
@@ -954,11 +955,11 @@ public class BO3 implements StructuredCustomObject
 	            	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
 	            	        	{
 	            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
-	            	        		if(highestBlockY <= OTG.WORLD_DEPTH)
+	            	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
 	            	        		{
 	            	        			highestBlockY = 1;
 	            	        		}
-	            	        		if(highestBlockY >= OTG.WORLD_HEIGHT)
+	            	        		if(highestBlockY >= PluginStandardValues.WORLD_HEIGHT)
 	            	        		{
 	            	        			highestBlockY = 255;
 	            	        		}
@@ -1000,7 +1001,7 @@ public class BO3 implements StructuredCustomObject
     	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
     	        	{
     	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
-    	        		if(highestBlockY > OTG.WORLD_DEPTH)
+    	        		if(highestBlockY > PluginStandardValues.WORLD_DEPTH)
     	        		{
     	        			originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, settings.isOTGPlus));
     	        		} else {
@@ -1225,7 +1226,7 @@ public class BO3 implements StructuredCustomObject
         {
             variance = random.nextInt(variance + 1);
         }
-        return MathHelper.clamp(offset + variance, OTG.WORLD_DEPTH, OTG.WORLD_HEIGHT);
+        return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
     }
 
     @Override

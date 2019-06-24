@@ -21,15 +21,6 @@ import java.util.List;
  */
 public abstract class Settings
 {
-	// OTG+
-
-    protected static final Setting<List<ReplaceBlocks>> replaceBlocksListSetting(String name)
-    {
-        return new ReplaceBlocksListSetting(name);
-    }
-
-	//
-
     /**
      * Creates a setting that can be {@code true} or {@code false}.
      * @param name         Name of the setting.
@@ -175,6 +166,16 @@ public abstract class Settings
     protected static final Setting<ReplacedBlocksMatrix> replacedBlocksSetting(String name)
     {
         return new ReplacedBlocksSetting(name);
+    }
+    
+    /**
+     * Creates a setting that represents a replaceBlocks mappings list.
+     * @param value         The setting's value as a string.
+     * @return The newly created setting.
+     */
+    protected static final Setting<List<ReplaceBlocks>> replaceBlocksListSetting(String value)
+    {
+        return new ReplaceBlocksListSetting(value);
     }
 
     /**

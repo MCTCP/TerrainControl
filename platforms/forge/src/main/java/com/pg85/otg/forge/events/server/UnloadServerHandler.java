@@ -18,7 +18,7 @@ public class UnloadServerHandler
 			if(OTG.getPluginConfig().DeveloperMode)
 			{
 	    		OTG.log(LogMarker.DEBUG, "Unloading BO2's/BO3's");
-	    		OTG.getEngine().ReloadCustomObjectFiles();
+	    		OTG.getEngine().getCustomObjectManager().ReloadCustomObjectFiles();
 	    		OTG.log(LogMarker.DEBUG, "BO2's/BO3's unloaded");
 			}
 		}

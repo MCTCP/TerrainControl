@@ -83,7 +83,7 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
     @Override
     public CustomObjectCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
     {
-    	if(world.getConfigs().getWorldConfig().IsOTGPlus)
+    	if(world.getConfigs().getWorldConfig().isOTGPlus)
     	{
 	    	int cumulativeChance = 0;
 	    	for (BranchNode branch : branchesOTGPlus)

@@ -129,11 +129,11 @@ public class OTGPlugin extends JavaPlugin
         OTG.log(LogMarker.DEBUG, "Starting to enable world ''{}''...", (Object) worldName);
 
 		// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
-	    if(OTG.GetDimensionsConfig() == null)
+	    if(OTG.getDimensionsConfig() == null)
 	    {
 	    	DimensionsConfig dimsConfig = new DimensionsConfig();
 			dimsConfig.Overworld = new DimensionConfig();
-			OTG.SetDimensionsConfig(dimsConfig);
+			OTG.setDimensionsConfig(dimsConfig);
 		}
         
         // Create BukkitWorld instance
@@ -156,7 +156,7 @@ public class OTGPlugin extends JavaPlugin
 
         // Get the right chunk generator
         OTGChunkGenerator generator = null;
-        switch (configs.getWorldConfig().ModeTerrain)
+        switch (configs.getWorldConfig().modeTerrain)
         {
             case Normal:
             case TerrainTest:

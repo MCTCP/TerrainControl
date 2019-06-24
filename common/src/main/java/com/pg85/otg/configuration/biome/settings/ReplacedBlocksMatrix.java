@@ -2,6 +2,7 @@ package com.pg85.otg.configuration.biome.settings;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
 
@@ -185,7 +186,7 @@ public class ReplacedBlocksMatrix
             return;
         }
 
-        this.compiledInstructions = new LocalMaterialData[OTG.SUPPORTED_BLOCK_IDS][];
+        this.compiledInstructions = new LocalMaterialData[PluginStandardValues.SUPPORTED_BLOCK_IDS][];
         for (ReplacedBlocksInstruction instruction : instructions)
         {
             int fromBlockId = instruction.getFrom().getBlockId();

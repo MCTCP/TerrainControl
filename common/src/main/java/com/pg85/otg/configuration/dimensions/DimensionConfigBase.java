@@ -10,12 +10,14 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 
+// Make sure isNewConfig isn't serialised
 @JsonIgnoreProperties(value = { "isNewConfig" })
 public abstract class DimensionConfigBase
 {
-	// Make sure isNewConfig isn't serialised
+	// isNewConfig isn't serialised
 	public boolean isNewConfig = false;
 	
+	// Capital letters since we'll be serialising to yaml (and we want to make it look nice)
 	public String PresetName;
 	public String Seed = WorldStandardValues.WORLD_SEED.getDefaultValue();
     public String GameType = "Survival";
@@ -37,8 +39,8 @@ public abstract class DimensionConfigBase
 	{
 		this.PresetName = presetName;
 		this.Seed = worldConfig.worldSeed;
-		this.WorldBorderRadiusInChunks = worldConfig.WorldBorderRadius;
-		this.PregeneratorRadiusInChunks = worldConfig.PreGenerationRadius;
+		this.WorldBorderRadiusInChunks = worldConfig.worldBorderRadius;
+		this.PregeneratorRadiusInChunks = worldConfig.preGenerationRadius;
 		
 		this.Settings.CanDoLightning = worldConfig.canDoLightning;
 		this.Settings.CanDoRainSnowIce = worldConfig.canDoRainSnowIce;
@@ -50,7 +52,7 @@ public abstract class DimensionConfigBase
 		this.Settings.DimensionAboveHeight = worldConfig.dimensionAboveHeight;
 		this.Settings.DimensionBelow = worldConfig.dimensionBelow;
 		this.Settings.DimensionBelowHeight = worldConfig.dimensionBelowHeight;
-		LocalMaterialData[] portalMats = worldConfig.DimensionPortalMaterials.toArray(new LocalMaterialData[0]);
+		LocalMaterialData[] portalMats = worldConfig.dimensionPortalMaterials.toArray(new LocalMaterialData[0]);
 		ArrayList<String> portalMaterials = new ArrayList<String>();
 		for(LocalMaterialData mat : portalMats)
 		{
@@ -112,7 +114,8 @@ public abstract class DimensionConfigBase
 		this.GameRules.SpectatorsGenerateChunks = Boolean.parseBoolean(worldConfig.spectatorsGenerateChunks);
 	}	
 
-	public String ToYamlString() {
+	public String toYamlString()
+	{
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		try {
 			return mapper.writeValueAsString(this);

@@ -3,6 +3,7 @@ package com.pg85.otg.customobjects.customstructure;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
@@ -69,7 +70,7 @@ public class CustomObjectStructureCache
 
     public CustomObjectStructure getStructureStart(Random worldRandom, int chunkX, int chunkZ)
     {
-    	if(world.getConfigs().getWorldConfig().IsOTGPlus)
+    	if(world.getConfigs().getWorldConfig().isOTGPlus)
     	{
     		throw new RuntimeException();
     	} else {
@@ -109,7 +110,7 @@ public class CustomObjectStructureCache
 
     public void CompressCache()
     {
-    	OTG.log(LogMarker.INFO, "Compressing structure-cache and pre-generator data");
+    	OTG.log(LogMarker.DEBUG, "Compressing structure-cache and pre-generator data");
 
     	// If a chunk in the structurecache is inside the outermost ring of
     	// chunks in the pre-generated area then it can be safely removed
@@ -122,7 +123,7 @@ public class CustomObjectStructureCache
     	for (Map.Entry<ChunkCoordinate, CustomObjectStructure> cachedChunk : structureCache.entrySet())
     	{
 			// If this structure is not done spawning or on/outside the border of the pre-generated area then keep it
-			if(!world.IsInsidePregeneratedRegion(cachedChunk.getKey()))
+			if(!world.isInsidePregeneratedRegion(cachedChunk.getKey()))
 			{
 				newStructureCache.put(cachedChunk.getKey(), cachedChunk.getValue());
 			} else {
@@ -134,7 +135,7 @@ public class CustomObjectStructureCache
 				{
 					a++;
 					OTG.log(LogMarker.FATAL, "Running " + world.GetWorldSession().getPreGeneratorIsRunning() +  " L" + world.GetWorldSession().getPregeneratedBorderLeft() + " R" + world.GetWorldSession().getPregeneratedBorderRight() + " T" + world.GetWorldSession().getPregeneratedBorderTop() + " B" + world.GetWorldSession().getPregeneratedBorderBottom());
-					OTG.log(LogMarker.FATAL, "Error at Chunk X" + cachedChunk.getKey().getChunkX() + " Z" + cachedChunk.getKey().getChunkZ() + ". " + (!this.structureCache.containsKey(cachedChunk.getKey()) ? (world.IsInsidePregeneratedRegion(cachedChunk.getKey()) ? "Inside pregenned region" : "Not plotted") : this.structureCache.get(cachedChunk.getKey()) == null ? "Plotted and spawned" : this.structureCache.get(cachedChunk.getKey()).Start != null ? this.structureCache.get(cachedChunk.getKey()).Start.BO3Name : "Trees"));
+					OTG.log(LogMarker.FATAL, "Error at Chunk X" + cachedChunk.getKey().getChunkX() + " Z" + cachedChunk.getKey().getChunkZ() + ". " + (!this.structureCache.containsKey(cachedChunk.getKey()) ? (world.isInsidePregeneratedRegion(cachedChunk.getKey()) ? "Inside pregenned region" : "Not plotted") : this.structureCache.get(cachedChunk.getKey()) == null ? "Plotted and spawned" : this.structureCache.get(cachedChunk.getKey()).Start != null ? this.structureCache.get(cachedChunk.getKey()).Start.BO3Name : "Trees"));
 
 					//throw new RuntimeException();
 				}
@@ -178,7 +179,7 @@ public class CustomObjectStructureCache
 			}
 		}
 
-		if(world.getConfigs().getWorldConfig().IsOTGPlus)
+		if(world.getConfigs().getWorldConfig().isOTGPlus)
 		{
 			CompressCache();
 		}
@@ -217,21 +218,21 @@ public class CustomObjectStructureCache
 	    	}
 	    }
 
-	    if(world.getConfigs().getWorldConfig().IsOTGPlus)
+	    if(world.getConfigs().getWorldConfig().isOTGPlus)
 	    {
 		    ArrayList<ChunkCoordinate> nullChunks = new ArrayList<ChunkCoordinate>();
 	    	for (Map.Entry<ChunkCoordinate, CustomObjectStructure> cachedChunk : structureCache.entrySet()) // Save null chunks from structurecache so that when loading we can reconstitute it based on worldInfoChunks, null chunks and the pregenerator border
 	    	{
 	    		if(cachedChunk.getValue() == null)
 	    		{
-	    			if(!world.IsInsidePregeneratedRegion(cachedChunk.getKey()))
+	    			if(!world.isInsidePregeneratedRegion(cachedChunk.getKey()))
 	    			{
 	    				nullChunks.add(cachedChunk.getKey());
 					}
 	    		}
 	    	}
 
-	    	CustomObjectStructureFileManager.SaveChunksFile(nullChunks, "NullChunks.txt", this.world);
+	    	CustomObjectStructureFileManager.SaveChunksFile(nullChunks, WorldStandardValues.NullChunksFileName, this.world);
 
 	    	this.plotter.saveSpawnedStructures(this.world);
 	    }
@@ -258,9 +259,9 @@ public class CustomObjectStructureCache
 
 			worldInfoChunks.put(loadedStructure.getKey(), loadedStructure.getValue());
 
-			if(world.getConfigs().getWorldConfig().IsOTGPlus)
+			if(world.getConfigs().getWorldConfig().isOTGPlus)
 			{
-				if(!world.IsInsidePregeneratedRegion(loadedStructure.getKey()) && !structureCache.containsKey(loadedStructure.getKey())) // Dont override any loaded structures that have been added to the structure cache
+				if(!world.isInsidePregeneratedRegion(loadedStructure.getKey()) && !structureCache.containsKey(loadedStructure.getKey())) // Dont override any loaded structures that have been added to the structure cache
 				{
 					// This chunk is either
 					// A. outside the border and has no objects to spawn (empty chunk) but has not yet been populated
@@ -274,7 +275,7 @@ public class CustomObjectStructureCache
 
 				for(ChunkCoordinate chunkCoord : loadedStructure.getValue().ObjectsToSpawn.keySet())
 				{
-					if(!world.IsInsidePregeneratedRegion(chunkCoord))
+					if(!world.isInsidePregeneratedRegion(chunkCoord))
 					{
 						structureCache.put(chunkCoord, loadedStructure.getValue()); // This structure has BO3 blocks that need to be spawned
 					} else {
@@ -283,7 +284,7 @@ public class CustomObjectStructureCache
 				}
 				for(ChunkCoordinate chunkCoord : loadedStructure.getValue().SmoothingAreasToSpawn.keySet())
 				{
-					if(!world.IsInsidePregeneratedRegion(chunkCoord))
+					if(!world.isInsidePregeneratedRegion(chunkCoord))
 					{
 						structureCache.put(chunkCoord, loadedStructure.getValue()); // This structure has smoothing area blocks that need to be spawned
 					} else {
@@ -310,13 +311,13 @@ public class CustomObjectStructureCache
 
 		OTG.log(LogMarker.DEBUG, "Loaded " + structuresLoaded + " structure chunks");
 
-		if(world.getConfigs().getWorldConfig().IsOTGPlus)
+		if(world.getConfigs().getWorldConfig().isOTGPlus)
 		{
-			ArrayList<ChunkCoordinate> nullChunks = CustomObjectStructureFileManager.LoadChunksFile("NullChunks.txt", this.world);
+			ArrayList<ChunkCoordinate> nullChunks = CustomObjectStructureFileManager.LoadChunksFile(WorldStandardValues.NullChunksFileName, this.world);
 			for(ChunkCoordinate chunkCoord : nullChunks)
 			{
 				structureCache.remove(chunkCoord);
-				if(!world.IsInsidePregeneratedRegion(chunkCoord))
+				if(!world.isInsidePregeneratedRegion(chunkCoord))
 				{
 					structureCache.put(chunkCoord, null); // This chunk has been completely populated and spawned
 				} else {

@@ -11,6 +11,7 @@ import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.RandomBlockFunction;
@@ -1621,7 +1622,7 @@ public class SmoothingAreaGenerator
             	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z)))
             	{
         			int highestBlockY = World.getHighestBlockYAt(blockToSpawn.x, blockToSpawn.z, true, true, false, false);
-        			if(highestBlockY > OTG.WORLD_DEPTH)
+        			if(highestBlockY > PluginStandardValues.WORLD_DEPTH)
         			{
         				originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z), World.getMaterial(blockToSpawn.x, highestBlockY, blockToSpawn.z, true));
         			} else {

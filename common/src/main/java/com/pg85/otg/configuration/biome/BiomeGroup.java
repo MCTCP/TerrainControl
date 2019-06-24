@@ -23,7 +23,6 @@ import java.util.Map.Entry;
  */
 public final class BiomeGroup extends ConfigFunction<WorldConfig>
 {
-
     private int groupId;
     private String name;
     private int groupRarity;
@@ -53,7 +52,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         // Must have at least a GroupName and a Biome that belongs to it
         assureSize(4, args);
         this.name = args.get(0);
-        this.generationDepth = readInt(args.get(1), 0, config.GenerationDepth);
+        this.generationDepth = readInt(args.get(1), 0, config.generationDepth);
         this.groupRarity = readInt(args.get(2), 1, Integer.MAX_VALUE);
         for (String biome : readBiomes(args, 3))
         {
@@ -276,5 +275,4 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     {
         return biomes.isEmpty();
     }
-
 }

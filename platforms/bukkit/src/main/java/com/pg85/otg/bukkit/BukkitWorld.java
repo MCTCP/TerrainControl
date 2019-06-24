@@ -356,7 +356,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
-        if (!this.settings.getWorldConfig().BiomeConfigsHaveReplacement)
+        if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
         {
             // Don't waste time here, ReplacedBlocks is empty everywhere
             return;
@@ -424,7 +424,7 @@ public class BukkitWorld implements LocalWorld
 
     private Chunk getChunk(int x, int y, int z)
     {
-        if (y < OTG.WORLD_DEPTH || y >= OTG.WORLD_HEIGHT)
+        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
             return null;
 
         int chunkX = x >> 4;
@@ -495,7 +495,7 @@ public class BukkitWorld implements LocalWorld
     public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
     {
         Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null || y < OTG.WORLD_DEPTH || y >= OTG.WORLD_HEIGHT)
+        if (chunk == null || y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
         {
             return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
         }
@@ -514,7 +514,7 @@ public class BukkitWorld implements LocalWorld
 
         try
         {
-            if (y < OTG.WORLD_DEPTH || y >= OTG.WORLD_HEIGHT)
+            if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
             {
                 return;
             }
@@ -805,7 +805,7 @@ public class BukkitWorld implements LocalWorld
             this.structureCache = new CustomObjectStructureCache(this);
             this.dataConverter = DataConverterRegistry.a();
 
-            switch (this.settings.getWorldConfig().ModeTerrain)
+            switch (this.settings.getWorldConfig().modeTerrain)
             {
                 case Normal:
                 case OldGenerator:
@@ -1682,14 +1682,14 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	@Override
-	public boolean IsInsidePregeneratedRegion(ChunkCoordinate chunk)
+	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
 	{
 		// TODO Implement this
 		return false;
 	}
 
 	@Override
-	public boolean IsInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
+	public boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
 	{
 		// TODO Implement this
 		return true;
@@ -1740,7 +1740,7 @@ public class BukkitWorld implements LocalWorld
 	@Override
 	public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea)
 	{
-    	if (y >= OTG.WORLD_HEIGHT || y < OTG.WORLD_DEPTH)
+    	if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
     	{
         	return true;
     	}

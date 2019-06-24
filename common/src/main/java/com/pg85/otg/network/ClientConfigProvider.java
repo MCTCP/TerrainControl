@@ -8,6 +8,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
+import com.pg85.otg.configuration.standard.BiomeRegistryNames;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
 import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
@@ -81,7 +82,7 @@ public final class ClientConfigProvider implements ConfigProvider
 
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(otgBiomeId, savedBiomeId), this);
             biomesByOTGId[otgBiomeId] = biome;
-            if(savedBiomeId == otgBiomeId || OTG.getRegistryNameForDefaultBiome(biomeName) != null) // Non-virtual and default biomes only
+            if(savedBiomeId == otgBiomeId || BiomeRegistryNames.getRegistryNameForDefaultBiome(biomeName) != null) // Non-virtual and default biomes only
             {
             	biomesBySavedId[savedBiomeId] = biome;
             }

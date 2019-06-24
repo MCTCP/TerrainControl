@@ -2,10 +2,11 @@ package com.pg85.otg;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.ConfigFunctionsManager;
+import com.pg85.otg.configuration.BiomeResourcesManager;
 import com.pg85.otg.configuration.PluginConfig;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
+import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -29,35 +30,118 @@ import java.util.Random;
 
 public abstract class OTGEngine
 {
-	// OTG+
-	
-    public void ReloadCustomObjectFiles()
-    {
-    	this.customObjectManager.ReloadCustomObjectFiles();
-    }
-		    
-    //      	
-
+	private HashMap<String, BiomeConfig[]> otgBiomeIdsByWorld = new HashMap<String, BiomeConfig[]>();
     private BiomeModeManager biomeManagers;
     private List<EventHandler> cancelableEventHandlers = new ArrayList<EventHandler>(5);
-    private ConfigFunctionsManager configFunctionsManager;
-    private CustomObjectConfigFunctionsManager customObjectConfigFunctionsManager;
+    private BiomeResourcesManager biomeResourcesManager;
+    private CustomObjectResourcesManager customObjectResourcesManager;
     private CustomObjectManager customObjectManager;
     private List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>(5);
     private PluginConfig pluginConfig;
+    private DimensionsConfig dimensionsConfig = null;
     private Logger logger;
 
     public OTGEngine(Logger logger)
     {
         this.logger = logger;
     }    
+    
+    public void onShutdown()
+    {
+        // Shutdown all loaders
+        customObjectManager.shutdown();
 
-	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer,
-			LocalWorld localWorld)
+        // Null out values to help the garbage collector
+        customObjectManager = null;
+        biomeResourcesManager = null;
+        customObjectResourcesManager = null;
+        biomeManagers = null;
+        pluginConfig = null;
+        cancelableEventHandlers.clear();
+        monitoringEventHandlers.clear();
+        cancelableEventHandlers = null;
+        monitoringEventHandlers = null;
+    }
+
+    public void onStart()
+    {
+        // Start the engine
+        biomeResourcesManager = new BiomeResourcesManager();
+        customObjectResourcesManager = new CustomObjectResourcesManager();
+        customObjectManager = new CustomObjectManager();
+        biomeManagers = new BiomeModeManager();
+
+        // Do pluginConfig loading and then log anything that happened
+        File pluginConfigFile = new File(getOTGRootFolder(), PluginStandardValues.PluginConfigFilename);
+        pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
+        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
+        logger.setLevel(pluginConfig.getLogLevel().getLevel());
+
+        File globalObjectsDir = new File(getOTGRootFolder(), PluginStandardValues.BO_DirectoryName);
+        if(!globalObjectsDir.exists())
+        {
+        	globalObjectsDir.mkdirs();
+        }
+        File globalBiomesDir = new File(getOTGRootFolder(), PluginStandardValues.BiomeConfigDirectoryName);
+        if(!globalBiomesDir.exists())
+        {
+        	globalBiomesDir.mkdirs();
+        }        
+        File worldsDir = new File(getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName);
+        if(!worldsDir.exists())
+        {
+      		worldsDir.mkdirs();
+        }
+        
+        // Fire start event
+        for (EventHandler handler : cancelableEventHandlers)
+        {
+            handler.onStart();
+        }
+        for (EventHandler handler : monitoringEventHandlers)
+        {
+            handler.onStart();
+        }
+    }
+    
+    // Events
+    
+    /**
+     * Register your event handler here with normal priority. You can do this
+     * before OpenTerrainGenerator is started.
+     * <p/>
+     * <p>
+     * @param handler The handler that will receive the events.
+     */
+    public void registerEventHandler(EventHandler handler)
+    {
+        cancelableEventHandlers.add(handler);
+    }
+
+    /**
+     * Register you event handler here with the given priority. You can do
+     * this before OpenTerrainGenerator is started.
+     * <p/>
+     * <p>
+     * @param handler  The handler that will receive the events.
+     * @param priority The priority of the event.
+     */
+    public void registerEventHandler(EventHandler handler, EventPriority priority)
+    {
+        if (priority == EventPriority.CANCELABLE)
+        {
+            cancelableEventHandlers.add(handler);
+        } else
+        {
+            monitoringEventHandlers.add(handler);
+        }
+    }
+    
+	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer, LocalWorld localWorld)
 	{
         return true;
 	}
-
+    
     /**
      * Fires the canCustomObjectSpawn event.
      * <p>
@@ -135,6 +219,8 @@ public abstract class OTGEngine
         }
         return success;
     }
+    
+    // Managers
 
     /**
      * Returns the biome managers. Register your own biome manager here.
@@ -147,179 +233,98 @@ public abstract class OTGEngine
         return biomeManagers;
     }   
 
-    /**
-     * Returns the Resource manager.
-     * <p/>
-     * <p>
-     * @return The Resource manager.
-     */
-    public ConfigFunctionsManager getConfigFunctionsManager()
+    public BiomeResourcesManager getBiomeResourceManager()
     {
-        return configFunctionsManager;
+        return biomeResourcesManager;
     }
     
-    /**
-     * Returns the Resource manager for Custom objects.
-     * <p/>
-     * <p>
-     * @return The Resource manager for Custom objects.
-     */
-    public CustomObjectConfigFunctionsManager getCustomObjectConfigFunctionsManager()
+    public CustomObjectResourcesManager getCustomObjectResourcesManager()
     {
-        return customObjectConfigFunctionsManager;
+        return customObjectResourcesManager;
     }
     
-
-    /**
-     * Returns the CustomObject manager, with hooks to spawn CustomObjects.
-     * <p/>
-     * <p>
-     * @return The CustomObject manager.
-     */
     public CustomObjectManager getCustomObjectManager()
     {
         return customObjectManager;
     }
 
-    /**
-     * Returns the folder where the global objects are stored in.
-     * <p/>
-     * <p>
-     * @return Folder where the global objects are stored.
-     */
+    // Plugin dirs
+ 
+    public abstract File getOTGRootFolder();
+    
     public abstract File getGlobalObjectsDirectory();
 
     public abstract File getWorldsDirectory();
     
-    /**
-     * Gets the logger to which all messages should be logged.
-     * @return The logger.
-     */
-    public Logger getLogger()
-    {
-        return logger;
-    }
-
-    /**
-     * Returns the global config file.
-     * <p>
-     * @return The global config file.
-     */
+    // Plugin configs
+    
     public PluginConfig getPluginConfig()
     {
         return pluginConfig;
+    }   
+    
+    public DimensionsConfig getDimensionsConfig()
+    {    	
+    	return this.dimensionsConfig;
     }
 
-    /**
-     * Returns the root data folder for OTG.
-     * <p/>
-     * <p>
-     * @return The root data folder for OTG.
-     */
-    public abstract File getOTGDataFolder();
+    public void setDimensionsConfig(DimensionsConfig dimensionsConfig)
+    {
+    	this.dimensionsConfig = dimensionsConfig;
+    }
+    
+	public String GetPresetName(String worldName)
+	{
+		// If this dim's name is the same as the preset worldname then this is an OTG overworld
+		if(worldName.equals("overworld") || worldName.equals(OTG.getDimensionsConfig().WorldName))
+    	{
+    		return OTG.getDimensionsConfig().Overworld.PresetName;	
+    	} else {
+    		// If this is an OTG dim other than the overworld then the world name will always match the preset name
+    		return worldName;
+    	}
+	}
 
-    /**
-     * Returns the world object with the given name.
-     * <p/>
-     * <p>
-     * @param name The name of the world.
-     * <p/>
-     * @return The world object.
-     */
+	// Worlds
+	
     public abstract LocalWorld getWorld(String name);
 
     public abstract LocalWorld getUnloadedWorld(String name);
     
     public abstract ArrayList<LocalWorld> getAllWorlds();
 
-    public void onShutdown()
+    // Biomes
+    
+	public void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
+	{
+    	if(!otgBiomeIdsByWorld.containsKey(worldName))
+    	{
+    		otgBiomeIdsByWorld.put(worldName, new BiomeConfig[1024]);
+    	}
+    	if(replaceExisting || otgBiomeIdsByWorld.get(worldName)[i] == null)
+    	{
+    		otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
+    	} else {
+    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName() + ". OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+    	}
+	}
+
+    public BiomeConfig[] getOTGBiomeIds(String worldName)
     {
-        // Shutdown all loaders
-        customObjectManager.shutdown();
-
-        // Null out values to help the garbage collector
-        customObjectManager = null;
-        configFunctionsManager = null;
-        customObjectConfigFunctionsManager = null;
-        biomeManagers = null;
-        pluginConfig = null;
-        cancelableEventHandlers.clear();
-        monitoringEventHandlers.clear();
-        cancelableEventHandlers = null;
-        monitoringEventHandlers = null;
+    	return otgBiomeIdsByWorld.containsKey(worldName) ? otgBiomeIdsByWorld.get(worldName) : new BiomeConfig[1024];
     }
+    
+	public boolean isOTGBiomeIdAvailable(String worldName, int i)
+	{
+		return !otgBiomeIdsByWorld.containsKey(worldName) || otgBiomeIdsByWorld.get(worldName)[i] == null;
+	}
 
-    public void onStart()
-    {
-        // Start the engine
-        configFunctionsManager = new ConfigFunctionsManager();
-        customObjectConfigFunctionsManager = new CustomObjectConfigFunctionsManager();
-        customObjectManager = new CustomObjectManager();
-        biomeManagers = new BiomeModeManager();
-
-        // Do pluginConfig loading and then log anything that happened
-        File pluginConfigFile = new File(getOTGDataFolder(), PluginStandardValues.ConfigFilename);
-        pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
-        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
-        logger.setLevel(pluginConfig.getLogLevel().getLevel());
-
-        File globalObjectsDir = new File(getOTGDataFolder(), PluginStandardValues.BO_DirectoryName);
-        if(!globalObjectsDir.exists())
-        {
-        	globalObjectsDir.mkdirs();
-        }
-        File globalBiomesDir = new File(getOTGDataFolder(), PluginStandardValues.BiomeConfigDirectoryName);
-        if(!globalBiomesDir.exists())
-        {
-        	globalBiomesDir.mkdirs();
-        }        
-        File worldsDir = new File(getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName);
-        if(!worldsDir.exists())
-        {
-      		worldsDir.mkdirs();
-        }
-        
-        // Fire start event
-        for (EventHandler handler : cancelableEventHandlers)
-        {
-            handler.onStart();
-        }
-        for (EventHandler handler : monitoringEventHandlers)
-        {
-            handler.onStart();
-        }
-    }
-
-    /**
-     * Register your event handler here with normal priority. You can do this
-     * before OpenTerrainGenerator is started.
-     * <p/>
-     * <p>
-     * @param handler The handler that will receive the events.
-     */
-    public void registerEventHandler(EventHandler handler)
-    {
-        cancelableEventHandlers.add(handler);
-    }
-
-    /**
-     * Register you event handler here with the given priority. You can do
-     * this before OpenTerrainGenerator is started.
-     * <p/>
-     * <p>
-     * @param handler  The handler that will receive the events.
-     * @param priority The priority of the event.
-     */
-    public void registerEventHandler(EventHandler handler, EventPriority priority)
-    {
-        if (priority == EventPriority.CANCELABLE)
-        {
-            cancelableEventHandlers.add(handler);
-        } else
-        {
-            monitoringEventHandlers.add(handler);
-        }
-    }
+	public void unregisterOTGBiomeId(String worldName, int i)
+	{
+		otgBiomeIdsByWorld.get(worldName)[i] = null;
+	}    
+    
+    // Materials
 
     /**
      * Gets the material with the given name. The name can be one of
@@ -350,55 +355,13 @@ public abstract class OTGEngine
      */
     public abstract LocalMaterialData readMaterial(String name) throws InvalidConfigException;
 
-    /**
-     * Creates a {@link LocalMaterialData} based on the given
-     * {@link DefaultMaterial} and block data.
-     * <p>
-     * @param defaultMaterial The block type.
-     * @param blockData       The block data.
-     * @return The materialData.
-     */
     public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);
-
-	public HashMap<String, BiomeConfig[]> otgBiomeIdsByWorld = new HashMap<String, BiomeConfig[]>();
-	public void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
-	{
-    	if(!otgBiomeIdsByWorld.containsKey(worldName))
-    	{
-    		otgBiomeIdsByWorld.put(worldName, new BiomeConfig[1024]);
-    	}
-    	if(replaceExisting || otgBiomeIdsByWorld.get(worldName)[i] == null)
-    	{
-    		otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
-    	} else {
-    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName() + ". OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
-    	}
-	}
-
-    public BiomeConfig[] getOTGBiomeIds(String worldName)
+	
+	// Logging
+	
+    public Logger getLogger()
     {
-    	return otgBiomeIdsByWorld.containsKey(worldName) ? otgBiomeIdsByWorld.get(worldName) : new BiomeConfig[1024];
+        return logger;
     }
-    
-	public boolean isOTGBiomeIdAvailable(String worldName, int i)
-	{
-		return !otgBiomeIdsByWorld.containsKey(worldName) || otgBiomeIdsByWorld.get(worldName)[i] == null;
-	}
 
-	public void unregisterOTGBiomeId(String worldName, int i)
-	{
-		otgBiomeIdsByWorld.get(worldName)[i] = null;
-	}
-
-	public String GetPresetName(String worldName)
-	{
-		// If this dim's name is the same as the preset worldname then this is an OTG overworld
-		if(worldName.equals("overworld") || worldName.equals(OTG.GetDimensionsConfig().WorldName))
-    	{
-    		return OTG.GetDimensionsConfig().Overworld.PresetName;	
-    	} else {
-    		// If this is an OTG dim other than the overworld then the world name will always match the preset name
-    		return worldName;
-    	}
-	}
 }

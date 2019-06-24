@@ -12,17 +12,32 @@ import java.util.List;
 
 public abstract class CustomObjectConfigFunction<T>
 {
-
+    protected T holder;
+	
+    /**
+     * Has a value when valid == false, otherwise null.
+     */
+    protected String error;
 
     /**
+     * Only has a value when {@link #invalidate(String, List, String)} is
+     * called.
+     */
+    protected List<String> inputArgs;
+    /**
+     * Only has a value when {@link #invalidate(String, List, String)} is
+     * called.
+     */
+    protected String inputName;
+    protected boolean valid = true;
+	
+    /**
      * Convenience method for creating a config function. Used to create
-     * the
-     * default config functions.
+     * the default config functions.
      *
      * @param <T>
      * @param clazz
      * @param args
-     *              <p/>
      * @return
      */
     public static final <T> CustomObjectConfigFunction<T> create(T holder, Class<? extends CustomObjectConfigFunction<T>> clazz, Object... args)
@@ -57,24 +72,6 @@ public abstract class CustomObjectConfigFunction<T>
 
         return configFunction;
     }
-
-
-    /**
-     * Has a value when valid == false, otherwise null.
-     */
-    protected String error;
-
-    /**
-     * Only has a value when {@link #invalidate(String, List, String)} is
-     * called.
-     */
-    protected List<String> inputArgs;
-    /**
-     * Only has a value when {@link #invalidate(String, List, String)} is
-     * called.
-     */
-    protected String inputName;
-    protected boolean valid = true;
 
     /**
      * Checks the size of the given list.
@@ -125,8 +122,6 @@ public abstract class CustomObjectConfigFunction<T>
      * @return The class.
      */
     public abstract Class<T> getHolderType();
-
-    protected T holder;
 
     /**
      * Initializes the function: the holder is set and the arguments are read.

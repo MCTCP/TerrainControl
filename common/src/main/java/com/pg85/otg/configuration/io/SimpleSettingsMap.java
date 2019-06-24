@@ -2,7 +2,7 @@ package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFunction;
-import com.pg85.otg.configuration.ConfigFunctionsManager;
+import com.pg85.otg.configuration.BiomeResourcesManager;
 import com.pg85.otg.configuration.ErroredFunction;
 import com.pg85.otg.configuration.io.RawSettingValue.ValueType;
 import com.pg85.otg.configuration.settingType.Setting;
@@ -76,7 +76,7 @@ public final class SimpleSettingsMap implements SettingsMap
     public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback)
     {
         List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
-        ConfigFunctionsManager manager = OTG.getConfigFunctionsManager();
+        BiomeResourcesManager manager = OTG.getBiomeResourcesManager();
         for (RawSettingValue configFunctionLine : configFunctions)
         {
             String configFunctionString = configFunctionLine.getRawValue();

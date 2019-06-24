@@ -14,7 +14,6 @@ import java.util.*;
  */
 public final class BiomeGroupManager
 {
-
     public static final int MAX_BIOME_GROUP_COUNT = 127;
     private int cumulativeGroupRarity = 0;
     private Map<String, BiomeGroup> nameToGroup = new LinkedHashMap<String, BiomeGroup>(4);
@@ -201,5 +200,4 @@ public final class BiomeGroupManager
             }
         }
     }
-
 }

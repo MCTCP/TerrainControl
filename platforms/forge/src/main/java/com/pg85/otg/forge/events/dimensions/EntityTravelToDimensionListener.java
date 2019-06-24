@@ -63,7 +63,7 @@ public class EntityTravelToDimensionListener
 			boolean bFound = false;
 			if(overWorld == null) // If overworld is null then it's a vanilla overworld
 			{
-				DimensionConfig dimConfig = OTG.GetDimensionsConfig().Overworld;
+				DimensionConfig dimConfig = OTG.getDimensionsConfig().Overworld;
 				ArrayList<LocalMaterialData> portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
 
 				boolean bIsPortalMaterial = false;
@@ -93,7 +93,7 @@ public class EntityTravelToDimensionListener
 				for(LocalWorld localWorld : forgeWorlds)
 				{
 					ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-					DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
+					DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
 					ArrayList<LocalMaterialData> portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
 	
 					boolean bIsPortalMaterial = false;

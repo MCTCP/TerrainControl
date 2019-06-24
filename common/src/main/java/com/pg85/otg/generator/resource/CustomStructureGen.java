@@ -64,7 +64,7 @@ public class CustomStructureGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-    	if(world.getConfigs().getWorldConfig().IsOTGPlus)
+    	if(world.getConfigs().getWorldConfig().isOTGPlus)
     	{
     		throw new RuntimeException(); // TODO: Remove after testing
     	} else {

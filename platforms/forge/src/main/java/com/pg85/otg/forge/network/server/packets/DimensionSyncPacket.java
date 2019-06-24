@@ -50,7 +50,7 @@ public class DimensionSyncPacket extends OTGPacket
 		stream.writeInt(0); // 0 == Normal packet
 		
 	    // Send ForgeWorldConfig
-		ConfigFile.writeStringToStream(stream, OTG.GetDimensionsConfig().ToYamlString());
+		ConfigFile.writeStringToStream(stream, OTG.getDimensionsConfig().toYamlString());
 		
 		LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 		
@@ -58,7 +58,7 @@ public class DimensionSyncPacket extends OTGPacket
 		stream.writeInt(ForgeEngine.presets.size());
 		for(DimensionConfigGui dimConfig : ForgeEngine.presets.values())
 		{
-			ConfigFile.writeStringToStream(stream, dimConfig.ToYamlString());
+			ConfigFile.writeStringToStream(stream, dimConfig.toYamlString());
 		}
 		
 		stream.writeInt(otgDimData.orderedDimensions.size());

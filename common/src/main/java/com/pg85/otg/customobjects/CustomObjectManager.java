@@ -51,7 +51,6 @@ public class CustomObjectManager
         registerCustomObjectLoader("bo2", new BO2Loader());
         registerCustomObjectLoader("bo3", new BO3Loader());
 
-        //this.globalCustomObjects = new CustomObjectCollection();
         this.globalCustomObjects = new CustomObjectCollection();
         
         // Put some default CustomObjects

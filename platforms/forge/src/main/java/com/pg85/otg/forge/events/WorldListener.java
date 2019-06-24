@@ -203,7 +203,7 @@ public class WorldListener
     	LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(event.getWorld());
     	if(world != null)
     	{
-	        if(((ForgeEngine)OTG.getEngine()).getCartographerEnabled() || world.GetWorldSession().getWorldBorderRadius() > 0 || (world.getConfigs().getWorldConfig().BO3AtSpawn != null && world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0))
+	        if(((ForgeEngine)OTG.getEngine()).getCartographerEnabled() || world.GetWorldSession().getWorldBorderRadius() > 0 || (world.getConfigs().getWorldConfig().bo3AtSpawn != null && world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0))
 	        {
 	        	event.setCanceled(true);
 	        }        

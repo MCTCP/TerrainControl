@@ -129,7 +129,7 @@ public class ChunkProviderOTG
         generateTerrain(chunkBuffer);
         
         boolean dry = false;
-        if(OTG.getEngine().fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld))
+        if(OTG.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld))
 		{
         	dry = addBiomeBlocksAndCheckWater(chunkBuffer);
 		}
@@ -138,7 +138,7 @@ public class ChunkProviderOTG
         this.canyonGen.generate(chunkBuffer);
 
         WorldConfig worldConfig = configProvider.getWorldConfig();
-        if (worldConfig.ModeTerrain == WorldConfig.TerrainMode.Normal || worldConfig.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
+        if (worldConfig.modeTerrain == WorldConfig.TerrainMode.Normal || worldConfig.modeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }

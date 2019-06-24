@@ -10,6 +10,7 @@ import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.settingType.Setting;
+import com.pg85.otg.configuration.standard.BiomeRegistryNames;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
@@ -30,6 +31,9 @@ import java.util.*;
 
 public class BiomeConfig extends ConfigFile
 {
+    public StandardBiomeTemplate defaultSettings;
+    public WorldConfig worldConfig;
+	
     public String biomeExtends;
     private boolean doResourceInheritance = true;
 
@@ -170,9 +174,6 @@ public class BiomeConfig extends ConfigFile
     }
 
     public RareBuildingType rareBuildingType;
-
-    public StandardBiomeTemplate defaultSettings;
-    public WorldConfig worldConfig;
 
     public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, SettingsMap settings, WorldConfig worldConfig)
     {
@@ -905,11 +906,11 @@ public class BiomeConfig extends ConfigFile
     protected void correctSettings(boolean logWarnings)
     {
         this.biomeExtends = (this.biomeExtends == null || this.biomeExtends.equals("null")) ? "" : this.biomeExtends;
-        this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.GenerationDepth);
-        this.biomeSizeWhenIsle = lowerThanOrEqualTo(biomeSizeWhenIsle, worldConfig.GenerationDepth);
-        this.biomeSizeWhenBorder = lowerThanOrEqualTo(biomeSizeWhenBorder, worldConfig.GenerationDepth);
-        this.biomeRarity = lowerThanOrEqualTo(biomeRarity, worldConfig.BiomeRarityScale);
-        this.biomeRarityWhenIsle = lowerThanOrEqualTo(biomeRarityWhenIsle, worldConfig.BiomeRarityScale);
+        this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.generationDepth);
+        this.biomeSizeWhenIsle = lowerThanOrEqualTo(biomeSizeWhenIsle, worldConfig.generationDepth);
+        this.biomeSizeWhenBorder = lowerThanOrEqualTo(biomeSizeWhenBorder, worldConfig.generationDepth);
+        this.biomeRarity = lowerThanOrEqualTo(biomeRarity, worldConfig.biomeRarityScale);
+        this.biomeRarityWhenIsle = lowerThanOrEqualTo(biomeRarityWhenIsle, worldConfig.biomeRarityScale);
 
         this.isleInBiome = filterBiomes(this.isleInBiome, this.worldConfig.worldBiomes);
         this.biomeIsBorder = filterBiomes(this.biomeIsBorder, this.worldConfig.worldBiomes);
@@ -923,10 +924,6 @@ public class BiomeConfig extends ConfigFile
 
         this.waterLevelMax = higherThanOrEqualTo(waterLevelMax, this.waterLevelMin);
 
-        //this.replaceToBiomeName = (DefaultBiome.Contain(this.replaceToBiomeName) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.replaceToBiomeName)) ? this.replaceToBiomeName : "";
-
-        //this.riverBiome = (DefaultBiome.Contain(this.riverBiome) || this.worldConfig.customBiomeGenerationIds.keySet().contains(this.riverBiome)) ? this.riverBiome : "";
-
         // Update configs for worlds with no saved biome id data (OTG 1.12.2 v7, dynamic biome ids update)
     	// Update biomes for legacy worlds, default biomes should be referred to as minecraft:<biomename>
     	if(
@@ -934,14 +931,14 @@ public class BiomeConfig extends ConfigFile
 			this.replaceToBiomeName.trim().length() > 0	        			
 		)
     	{
-    		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(this.replaceToBiomeName);
+    		String defaultBiomeResourceLocation = BiomeRegistryNames.getRegistryNameForDefaultBiome(this.replaceToBiomeName);
     		if(defaultBiomeResourceLocation != null)
     		{
     			this.replaceToBiomeName = defaultBiomeResourceLocation;
     		}
     	} else {
     		// Default biomes must replacetobiomename themselves
-    		String defaultBiomeResourceLocation = OTG.getRegistryNameForDefaultBiome(this.getName());
+    		String defaultBiomeResourceLocation = BiomeRegistryNames.getRegistryNameForDefaultBiome(this.getName());
     		if(defaultBiomeResourceLocation != null)
     		{
     			this.replaceToBiomeName = defaultBiomeResourceLocation;

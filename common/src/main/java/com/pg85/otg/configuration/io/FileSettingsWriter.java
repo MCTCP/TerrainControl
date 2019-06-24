@@ -16,7 +16,15 @@ import java.util.Collection;
  */
 public final class FileSettingsWriter
 {
+    private final File file;
+    private final boolean writeComments;
 
+    public FileSettingsWriter(File file, boolean writeComments)
+    {
+        this.file = file;
+        this.writeComments = writeComments;
+    }
+	
     /**
      * Writes the configuration settings to the given file. If writing fails,
      * the error is logged.
@@ -48,15 +56,6 @@ public final class FileSettingsWriter
     {
         OTG.log(LogMarker.ERROR, "Failed to write to file {}", file);
         OTG.printStackTrace(LogMarker.ERROR, e);
-    }
-
-    private final File file;
-    private final boolean writeComments;
-
-    public FileSettingsWriter(File file, boolean writeComments)
-    {
-        this.file = file;
-        this.writeComments = writeComments;
     }
 
     /**
@@ -179,5 +178,4 @@ public final class FileSettingsWriter
         writer.newLine();
         writer.newLine();
     }
-
 }

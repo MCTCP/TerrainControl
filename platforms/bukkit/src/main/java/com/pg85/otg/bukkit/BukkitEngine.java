@@ -31,7 +31,7 @@ public class BukkitEngine extends OTGEngine
     }
 
     @Override
-    public File getOTGDataFolder()
+    public File getOTGRootFolder()
     {
         return plugin.getDataFolder();
     }
@@ -39,13 +39,13 @@ public class BukkitEngine extends OTGEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getOTGDataFolder(), PluginStandardValues.BO_DirectoryName);
+        return new File(this.getOTGRootFolder(), PluginStandardValues.BO_DirectoryName);
     }
 
     @Override
     public File getWorldsDirectory()
     {
-        return new File(this.getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName);
+        return new File(this.getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName);
     }
     
     @Override

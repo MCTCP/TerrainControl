@@ -191,7 +191,7 @@ public class ForgeWorldSession extends WorldSession
 			worldBorderRadius = Integer.parseInt(worldBorderFileValues[0]);			
 			worldBorderCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(worldBorderFileValues[1]), Integer.parseInt(worldBorderFileValues[2]));			
 		} else {
-			DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(world.getName());
+			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
 			worldBorderRadius = dimConfig.WorldBorderRadiusInChunks;
 			worldBorderCenterPoint = world.getSpawnChunk();
 			SaveWorldBorderData();
