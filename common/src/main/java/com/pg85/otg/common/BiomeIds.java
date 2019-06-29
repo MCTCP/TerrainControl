@@ -1,4 +1,4 @@
-package com.pg85.otg.util;
+package com.pg85.otg.common;
 
 /**
  * Immutable class to hold the biome ids of a biome.
@@ -36,7 +36,6 @@ public class BiomeIds
     public boolean isVirtual()
     {
     	return otgBiomeId > 255;
-        //return savedId != otgBiomeId;// && generationId > 255;
     }
 
     /**

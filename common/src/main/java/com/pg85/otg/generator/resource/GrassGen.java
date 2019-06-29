@@ -6,7 +6,7 @@ import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.List;

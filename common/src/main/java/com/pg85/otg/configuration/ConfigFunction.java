@@ -4,8 +4,8 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.ReedGen;
-import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 

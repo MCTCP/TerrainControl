@@ -4,7 +4,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.customstructure.Branch;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;

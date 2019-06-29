@@ -10,7 +10,7 @@ import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.resource.IceSpikeGen.SpikeType;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
-import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.util.minecraftTypes.MobNames;

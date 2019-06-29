@@ -14,28 +14,43 @@ import com.pg85.otg.util.helpers.RandomHelper;
 public class BranchDataItem
 {
 	boolean wasDeleted = false;
-
 	boolean isBeingRolledBack = false;
-
 	int branchNumber = -1;
-
 	boolean MinimumSize = false;
-
 	public CustomObjectCoordinate Branch;
 	public ChunkCoordinate ChunkCoordinate;
-
 	public BranchDataItem Parent;
 	public boolean DoneSpawning = false;
 	public boolean SpawnDelayed = false;
 	public boolean CannotSpawn = false;
-
 	int CurrentDepth = 0;
 	int MaxDepth = 0;
-
 	LocalWorld World;
 	Random Random;
-
 	private Stack<BranchDataItem> Children = new Stack<BranchDataItem>();
+	private static int branchDataItemCounter = -1;
+	
+	public BranchDataItem()
+	{
+		throw new RuntimeException();
+	}
+
+	public BranchDataItem(LocalWorld world, Random random, BranchDataItem parent, CustomObjectCoordinate branch, String startBO3Name, int currentDepth, int maxDepth, boolean minimumSize)
+	{
+		World = world;
+		Random = random;
+		Parent = parent;
+		Branch = branch;
+		Branch.StartBO3Name = startBO3Name;
+		CurrentDepth = currentDepth;
+		MaxDepth = maxDepth;
+		MinimumSize = minimumSize;
+		ChunkCoordinate = com.pg85.otg.util.ChunkCoordinate.fromBlockCoords(Branch.getX(), Branch.getZ());
+
+		BranchDataItem.branchDataItemCounter += 1; // TODO: Reset this somewhere for each new world created?
+		branchNumber = BranchDataItem.branchDataItemCounter;
+	}	
+	
 	public Stack<BranchDataItem> getChildren(boolean dontSpawn)
 	{
 		if(World == null)
@@ -177,26 +192,4 @@ public class BranchDataItem
         }
         return false;
 	}
-
-	public BranchDataItem()
-	{
-		throw new RuntimeException();
-	}
-
-	private static int branchDataItemCounter = -1;
-	public BranchDataItem(LocalWorld world, Random random, BranchDataItem parent, CustomObjectCoordinate branch, String startBO3Name, int currentDepth, int maxDepth, boolean minimumSize)
-	{
-		World = world;
-		Random = random;
-		Parent = parent;
-		Branch = branch;
-		Branch.StartBO3Name = startBO3Name;
-		CurrentDepth = currentDepth;
-		MaxDepth = maxDepth;
-		MinimumSize = minimumSize;
-		ChunkCoordinate = com.pg85.otg.util.ChunkCoordinate.fromBlockCoords(Branch.getX(), Branch.getZ());
-
-		BranchDataItem.branchDataItemCounter += 1; // TODO: Reset this somewhere for each new world created?
-		branchNumber = BranchDataItem.branchDataItemCounter;
-	}	
 }

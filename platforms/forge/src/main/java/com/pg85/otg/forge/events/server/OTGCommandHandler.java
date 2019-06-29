@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Set;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -30,7 +31,6 @@ import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.CommandHelper;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.minecraftTypes.MobNames;
 
@@ -773,7 +773,7 @@ public final class OTGCommandHandler implements ICommand
                     return;
             	}
         		
-    			String structureInfo = world.GetWorldSession().GetStructureInfoAt(sender.getPosition().getX(),sender.getPosition().getZ());
+    			String structureInfo = world.GetWorldSession().getStructureInfoAt(sender.getPosition().getX(),sender.getPosition().getZ());
 
     			if(structureInfo.length() > 0)
     			{

@@ -18,8 +18,8 @@ import com.pg85.otg.customobjects.bo3.bo3function.RandomBlockFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.NamedBinaryTag;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 public class SmoothingAreaGenerator
@@ -110,7 +110,7 @@ public class SmoothingAreaGenerator
      * and we'll be able to detect the highest solid block in the landscape that we'll need to smooth to) and the lines of blocks we've plotted are spawned, creating a nice
      * linear slope from the highest solid block in the landscape to the lowest block in the BO3 (the block we started at when drawing the line).
     */
-    public Map<ChunkCoordinate, ArrayList<Object[]>> CalculateSmoothingAreas(Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> ObjectsToSpawn, CustomObjectCoordinate Start, LocalWorld World)
+    public Map<ChunkCoordinate, ArrayList<Object[]>> calculateSmoothingAreas(Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> ObjectsToSpawn, CustomObjectCoordinate Start, LocalWorld World)
     {
         // TODO: Don't check neighbouring BO3's with SmoothRadius -1
 
@@ -497,7 +497,7 @@ public class SmoothingAreaGenerator
                                         xOffset = -1;
                                         CustomObjectCoordinate blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset1, objectInChunk.getRotation());
 
-                                        Object[] smoothDirections = RotateSmoothDirections(true, false, false, false, objectInChunk.getRotation());
+                                        Object[] smoothDirections = rotateSmoothDirections(true, false, false, false, objectInChunk.getRotation());
 
                                         smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
 
@@ -505,19 +505,19 @@ public class SmoothingAreaGenerator
                                         {
                                             zOffset = -1;
                                             blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
-                                            smoothDirections = RotateSmoothDirections(true, false, true, false, objectInChunk.getRotation());
+                                            smoothDirections = rotateSmoothDirections(true, false, true, false, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0,smoothRadius2 });
-                                            PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1,smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1,smoothRadius2 }, World);
                                         }
                                         if(!bFoundNeighbour4)
                                         {
                                             zOffset = 1;
                                             blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
-                                            smoothDirections = RotateSmoothDirections(true, false, false, true, objectInChunk.getRotation());
+                                            smoothDirections = rotateSmoothDirections(true, false, false, true, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0,smoothRadius2 });
-                                            PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1,smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1,smoothRadius2 }, World);
                                         }
                                     }
 
@@ -525,7 +525,7 @@ public class SmoothingAreaGenerator
                                     {
                                         xOffset = 1;
                                         CustomObjectCoordinate blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset1, objectInChunk.getRotation());
-                                        Object[] smoothDirections = RotateSmoothDirections(false, true, false, false, objectInChunk.getRotation());
+                                        Object[] smoothDirections = rotateSmoothDirections(false, true, false, false, objectInChunk.getRotation());
 
                                         smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
 
@@ -533,19 +533,19 @@ public class SmoothingAreaGenerator
                                         {
                                             zOffset = -1;
                                             blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
-                                            smoothDirections = RotateSmoothDirections(false, true, true, false, objectInChunk.getRotation());
+                                            smoothDirections = rotateSmoothDirections(false, true, true, false, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0, smoothRadius2 });
-                                            PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2 }, World);
                                         }
                                         if(!bFoundNeighbour4)
                                         {
                                             zOffset = 1;
                                             blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
-                                            smoothDirections = RotateSmoothDirections(false, true, false, true, objectInChunk.getRotation());
+                                            smoothDirections = rotateSmoothDirections(false, true, false, true, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0, smoothRadius2 });
-                                            PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2 }, World);
                                         }
                                     }
 
@@ -553,7 +553,7 @@ public class SmoothingAreaGenerator
                                     {
                                         zOffset = -1;
                                         CustomObjectCoordinate blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
-                                        Object[] smoothDirections = RotateSmoothDirections(false, false, true, false, objectInChunk.getRotation());
+                                        Object[] smoothDirections = rotateSmoothDirections(false, false, true, false, objectInChunk.getRotation());
 
                                         smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
                                     }
@@ -561,7 +561,7 @@ public class SmoothingAreaGenerator
                                     {
                                         zOffset = 1;
                                         CustomObjectCoordinate blockCoords = CustomObjectCoordinate.getRotatedSmoothingCoords(block.x + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
-                                        Object[] smoothDirections = RotateSmoothDirections(false, false, false, true, objectInChunk.getRotation());
+                                        Object[] smoothDirections = rotateSmoothDirections(false, false, false, true, objectInChunk.getRotation());
 
                                         smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
                                     }
@@ -581,10 +581,10 @@ public class SmoothingAreaGenerator
             }
         }
 
-        return CalculateBeginAndEndPointsPerChunk(smoothToBlocksPerChunk);
+        return calculateBeginAndEndPointsPerChunk(smoothToBlocksPerChunk);
     }
 
-    Object[] RotateSmoothDirections(Boolean smoothDirection1, Boolean smoothDirection2, Boolean smoothDirection3, Boolean smoothDirection4, Rotation rotation)
+    Object[] rotateSmoothDirections(Boolean smoothDirection1, Boolean smoothDirection2, Boolean smoothDirection3, Boolean smoothDirection4, Rotation rotation)
     {
     	// smoothDirection1 -1x WEST
     	// smoothDirection2 +1x EAST
@@ -637,7 +637,7 @@ public class SmoothingAreaGenerator
     	return false;
     }
 
-    private void PlotDiagonalLine(Map<ChunkCoordinate, ArrayList<Object[]>> smoothToBlocksPerChunk, Object[] blockCoordsAndNeighbours, LocalWorld World)
+    private void plotDiagonalLine(Map<ChunkCoordinate, ArrayList<Object[]>> smoothToBlocksPerChunk, Object[] blockCoordsAndNeighbours, LocalWorld World)
     {
         Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
 
@@ -976,7 +976,7 @@ public class SmoothingAreaGenerator
     // The lines we plot this way may traverse several chunks so divide them up into segments of one chunk and make a collection of line segments per chunk.
     // For each line-segment store the beginning and endpoints within the chunk as well as the origin coordinate of the line and the final destination coordinate of the line
     // we spawn the line-segments per chunk we can still see what the completed line looks like and how far along that line we are.
-    private Map<ChunkCoordinate, ArrayList<Object[]>> CalculateBeginAndEndPointsPerChunk(Map<ChunkCoordinate, ArrayList<Object[]>> smoothToBlocksPerChunk)
+    private Map<ChunkCoordinate, ArrayList<Object[]>> calculateBeginAndEndPointsPerChunk(Map<ChunkCoordinate, ArrayList<Object[]>> smoothToBlocksPerChunk)
     {
         Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
 
@@ -1464,7 +1464,7 @@ public class SmoothingAreaGenerator
      * and spawning has to be delayed until other chunks have spawned
      * @param chunkCoordinate
     */
-    public boolean SpawnSmoothAreas(ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn, CustomObjectCoordinate Start, LocalWorld World)
+    public boolean spawnSmoothAreas(ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn, CustomObjectCoordinate Start, LocalWorld World)
     {
         // Get all smoothing areas (lines) that should spawn in this chunk for this branching structure
         Entry<ChunkCoordinate, ArrayList<Object[]>> smoothingAreaInChunk = null;
@@ -1480,7 +1480,7 @@ public class SmoothingAreaGenerator
         if(smoothingAreaInChunk != null && smoothingAreaInChunk.getValue() != null)
         {
             // Merge all smooth areas (lines) so that in one x + z coordinate there can be a maximum of 2 smoothing area blocks, 1 going up and 1 going down (first pass and second pass)
-            ArrayList<Object[]> blocksToSpawn = MergeSmoothingAreas(chunkCoordinate, smoothingAreaInChunk.getValue(), World, Start);
+            ArrayList<Object[]> blocksToSpawn = mergeSmoothingAreas(chunkCoordinate, smoothingAreaInChunk.getValue(), World, Start);
 
             // blocksToSpawn can be null if a smoothing line's endpoint Y coordinate could not be found. This can happen if
             // the chunk that the endpoint is located in has not yet been spawned. Return false so that the calling method (SpawnForChunk()) knows
@@ -1941,7 +1941,7 @@ public class SmoothingAreaGenerator
 	    World.setBlock(x, y, z, material, metaDataTag, true);
     }
 
-    private ArrayList<Object[]> MergeSmoothingAreas(ChunkCoordinate chunkCoordinate, ArrayList<Object[]> smoothingAreas, LocalWorld World, CustomObjectCoordinate Start)
+    private ArrayList<Object[]> mergeSmoothingAreas(ChunkCoordinate chunkCoordinate, ArrayList<Object[]> smoothingAreas, LocalWorld World, CustomObjectCoordinate Start)
     {
         ArrayList<Object[]> blocksToSpawn = new ArrayList<Object[]>();
 

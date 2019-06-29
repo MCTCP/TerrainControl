@@ -5,7 +5,7 @@ import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.SpawnableObject;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.minecraftTypes.DefaultStructurePart;
 
 import java.util.List;

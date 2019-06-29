@@ -3,9 +3,9 @@ package com.pg85.otg.generator.resource;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.Random;
 

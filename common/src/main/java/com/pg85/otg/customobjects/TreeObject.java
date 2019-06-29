@@ -7,9 +7,9 @@ import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.generator.SpawnableObject;
-import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.BoundingBox;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
 import java.util.Map;
@@ -67,12 +67,6 @@ public class TreeObject implements CustomObject
         return true;
     }
 
-    @Override
-    public boolean canSpawnAsObject()
-    {
-        return false;
-    }
-
     // Non-OTG+
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
@@ -107,18 +101,6 @@ public class TreeObject implements CustomObject
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {      	
     	throw new RuntimeException(); // Fix this properly, re-do the abstraction/inheritance for BO2/BO3/TreeObject/MCObject/CustomObject
-    }
-
-    @Override
-    public CustomObject applySettings(SettingsReaderOTGPlus settings)
-    {
-        return new TreeObject(type, settings);
-    }
-
-    @Override
-    public boolean hasPreferenceToSpawnIn(LocalBiome biome)
-    {
-        return true;
     }
     
     @Override

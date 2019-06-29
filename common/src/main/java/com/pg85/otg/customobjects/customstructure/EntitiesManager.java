@@ -4,7 +4,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 public class EntitiesManager
 {

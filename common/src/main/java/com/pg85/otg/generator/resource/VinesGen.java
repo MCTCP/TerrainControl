@@ -13,7 +13,6 @@ import java.util.Random;
 
 public class VinesGen extends Resource
 {
-
     public static final int[] d =
     {
         -1, -1, 2, 0, 1, 3
@@ -22,9 +21,7 @@ public class VinesGen extends Resource
     {
         1, 0, 3, 2, 5, 4
     };
-
     private final int maxAltitude;
-
     private final int minAltitude;
 
     public VinesGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
@@ -40,6 +37,7 @@ public class VinesGen extends Resource
         maxAltitude = readInt(args.get(3), minAltitude,
                 PluginStandardValues.WORLD_HEIGHT);
     }
+    
     public boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
     {
         LocalMaterialData sourceBlock;
@@ -65,6 +63,7 @@ public class VinesGen extends Resource
         }
         return sourceBlock.isSolid();
     }
+    
     @Override
     public boolean equals(Object other)
     {

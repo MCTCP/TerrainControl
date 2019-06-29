@@ -17,7 +17,7 @@ import com.pg85.otg.customobjects.bo3.checks.BlockCheck;
 import com.pg85.otg.customobjects.bo3.checks.BlockCheckNot;
 import com.pg85.otg.customobjects.bo3.checks.LightCheck;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
 
 import java.io.*;
 import java.util.HashMap;

@@ -218,7 +218,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         BlockSand.fallInstantly = false;
         BlockGravel.fallInstantly = false;
 
-        HashMap<String,ArrayList<ModDataFunction>> MessagesPerMod = world.GetWorldSession().GetModDataForChunk(chunkCoord);
+        HashMap<String,ArrayList<ModDataFunction>> MessagesPerMod = world.GetWorldSession().getModDataForChunk(chunkCoord);
         if(MessagesPerMod == null && world.getConfigs().getWorldConfig().isOTGPlus)
         {
     		if(!world.getStructureCache().structureCache.containsKey(chunkCoord))

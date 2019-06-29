@@ -5,7 +5,7 @@ import java.util.Random;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 /**
  * Represents CustomObjects that can have other objects attached
@@ -14,13 +14,6 @@ import com.pg85.otg.util.Rotation;
  */
 public interface StructuredCustomObject extends CustomObject
 {
-    /**
-     * Returns whether this object has branches attached to it.
-     * 
-     * @return Whether this object has branches attached to it.
-     */
-    public boolean hasBranches();
-
     /**
      * Returns a list of all branches in this object. Null is not a valid
      * return value, return an empty list instead.

@@ -18,23 +18,6 @@ import java.util.Random;
 
 public class CustomStructureGen extends Resource
 {
-	// OTG+
-	
-    public List<StructuredCustomObject> getObjects(String worldName)
-    {
-    	if(objects.isEmpty() && !objectNames.isEmpty())
-    	{
-            for (int i = 0; i < objectNames.size(); i ++)
-            {
-            	CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
-            	objects.add((StructuredCustomObject) object);
-            }
-    	}
-    	return objects;
-    }
-
-	//
-	
     private List<StructuredCustomObject> objects;
     public List<Double> objectChances;
     public List<String> objectNames;
@@ -52,6 +35,19 @@ public class CustomStructureGen extends Resource
         }
 
         getHolder().structureGen = this;
+    }
+    
+    public List<StructuredCustomObject> getObjects(String worldName)
+    {
+    	if(objects.isEmpty() && !objectNames.isEmpty())
+    	{
+            for (int i = 0; i < objectNames.size(); i ++)
+            {
+            	CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
+            	objects.add((StructuredCustomObject) object);
+            }
+    	}
+    	return objects;
     }
 
     @Override
@@ -180,5 +176,4 @@ public class CustomStructureGen extends Resource
     {
         return -41;
     }
-
 }

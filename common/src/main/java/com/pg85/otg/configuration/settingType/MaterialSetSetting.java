@@ -1,8 +1,8 @@
 package com.pg85.otg.configuration.settingType;
 
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 /**

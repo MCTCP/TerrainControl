@@ -37,7 +37,7 @@ public abstract class WorldSession
 
 	public abstract boolean getPreGeneratorIsRunning();
 
-    public String GetStructureInfoAt(double x, double z)
+    public String getStructureInfoAt(double x, double z)
     {
     	String structureInfo = "";
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)x, (int)z);
@@ -59,7 +59,7 @@ public abstract class WorldSession
     	return structureInfo;
     }
 
-    public HashMap<String,ArrayList<ModDataFunction>> GetModDataForChunk(ChunkCoordinate chunkCoord)
+    public HashMap<String,ArrayList<ModDataFunction>> getModDataForChunk(ChunkCoordinate chunkCoord)
     {
     	HashMap<String,ArrayList<ModDataFunction>> result = new HashMap<String,ArrayList<ModDataFunction>>();
     	boolean bFound = false;
@@ -96,7 +96,7 @@ public abstract class WorldSession
     	return result;
     }
 
-    public ArrayList<SpawnerFunction> GetSpawnersForChunk(ChunkCoordinate chunkCoord)
+    public ArrayList<SpawnerFunction> getSpawnersForChunk(ChunkCoordinate chunkCoord)
     {
     	ArrayList<SpawnerFunction> result = new ArrayList<SpawnerFunction>();
     	boolean bFound = false;
@@ -129,7 +129,7 @@ public abstract class WorldSession
     	return result;
     }
 
-    public ArrayList<ParticleFunction> GetParticlesForChunk(ChunkCoordinate chunkCoord)
+    public ArrayList<ParticleFunction> getParticlesForChunk(ChunkCoordinate chunkCoord)
     {
     	ArrayList<ParticleFunction> result = new ArrayList<ParticleFunction>();
     	boolean bFound = false;
@@ -162,7 +162,7 @@ public abstract class WorldSession
     	return result;
     }
 
-    public void RemoveParticles(ChunkCoordinate chunkCoord, ParticleFunction particle)
+    public void removeParticles(ChunkCoordinate chunkCoord, ParticleFunction particle)
     {
     	if(world.isInsideWorldBorder(chunkCoord, true))
     	{

@@ -16,7 +16,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 public class CustomObjectStructurePlotter
 {
@@ -30,7 +30,8 @@ public class CustomObjectStructurePlotter
 			return chunkCoord.equals(otherObject.chunkCoord);
 		}
 	}
-	
+
+    public boolean processing = false;
 	private HashMap<ChunkCoordinate, ArrayList<String>> structuresPerChunk; // Used as a cache by the plotting code
 	private HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
 	private HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
@@ -49,21 +50,20 @@ public class CustomObjectStructurePlotter
 	
 	public void saveSpawnedStructures(LocalWorld world)
 	{
-		CustomObjectStructureFileManager.SaveChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, spawnedStructuresByGroup);
+		CustomObjectStructureFileManager.saveChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, spawnedStructuresByGroup);
 	}
 	
 	public void loadSpawnedStructures(LocalWorld world)
 	{		
-		CustomObjectStructureFileManager.LoadChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
+		CustomObjectStructureFileManager.loadChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
 	}
 	
-	public void AddToStructuresPerChunkCache(ChunkCoordinate chunkCoord, ArrayList<String> BO3Names)
+	public void addToStructuresPerChunkCache(ChunkCoordinate chunkCoord, ArrayList<String> BO3Names)
 	{
 		this.structuresPerChunk.put(chunkCoord, BO3Names);
 	}
 		
-    public boolean processing = false;
-    public void PlotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, CustomObjectStructure> structureCache, Map<ChunkCoordinate, CustomObjectStructure> worldInfoChunks)
+    public void plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, CustomObjectStructure> structureCache, Map<ChunkCoordinate, CustomObjectStructure> worldInfoChunks)
     {
     	if(!processing)
     	{
@@ -132,7 +132,7 @@ public class CustomObjectStructurePlotter
 				                	// Get minimum size (size if spawned with branchDepth 0)
 
 				                	try {
-										topLeftAndLowerRightChunkCoordinates = structureStart2.GetMinimumSize();
+										topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize();
 					                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
 				                		BO3sBySize.add(new Object[]{ bo3AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo3AndRarity.getValue() });
 									}
@@ -152,7 +152,7 @@ public class CustomObjectStructurePlotter
 			            		{
 			            			// TODO: avoid calling IsBO3AllowedToSpawnAt so much, cache and reuse any nearest group members found
 
-			            			if(IsBO3AllowedToSpawnAt(chunkCoord, ((BO3)bo3AndRarity.getKey())))
+			            			if(isBO3AllowedToSpawnAt(chunkCoord, ((BO3)bo3AndRarity.getKey())))
 			            			{
 					            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
 					                	structureCoord = new CustomObjectCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ(), false, 0, false, false, null);
@@ -160,7 +160,7 @@ public class CustomObjectStructurePlotter
 					                	// Get minimum size (size if spawned with branchDepth 0)
 
 					                	try {
-											topLeftAndLowerRightChunkCoordinates = structureStart2.GetMinimumSize();
+											topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize();
 						                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
 						            		int insertAtIndex = BO3sBySize.size();
 						            		int i = 0;
@@ -644,7 +644,7 @@ public class CustomObjectStructurePlotter
 						            		spawnCoordZ = chunkCoord.getChunkZ() - (top > 0 && top - (Integer)topLeftAndLowerRightChunkCoordinates[0] > (Integer)topLeftAndLowerRightChunkCoordinates[2] ?  (structureSizeZ - 1) : top) + (Integer)topLeftAndLowerRightChunkCoordinates[0]; //top + (Integer)topLeftAndLowerRightChunkCoordinates[0];
 					            		}
 
-				                		if(IsBO3AllowedToSpawnAt(ChunkCoordinate.fromChunkCoords((int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)), (int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))), (BO3)currentStructureSpawning[0]))
+				                		if(isBO3AllowedToSpawnAt(ChunkCoordinate.fromChunkCoords((int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)), (int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))), (BO3)currentStructureSpawning[0]))
 				                		{
 						                	structureCoord = new CustomObjectCoordinate(world, ((BO3)currentStructureSpawning[0]), null, Rotation.NORTH, spawnCoordX * 16, 0, spawnCoordZ * 16, false, 0, false, false, null);
 						                	structureStart2 = new CustomObjectStructure(world, structureCoord, true, spawningStructureAtSpawn);
@@ -816,7 +816,7 @@ public class CustomObjectStructurePlotter
     	}
     }
 
-    private boolean IsBO3AllowedToSpawnAt(ChunkCoordinate chunkCoord, BO3 BO3ToSpawn)
+    private boolean isBO3AllowedToSpawnAt(ChunkCoordinate chunkCoord, BO3 BO3ToSpawn)
     {
         // Check if no other structure of the same type (filename) is within the minimum radius (BO3 frequency)
 		int radius = BO3ToSpawn.getSettings().frequency;

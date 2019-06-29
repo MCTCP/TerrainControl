@@ -8,6 +8,10 @@ import java.util.Random;
  */
 public class RandomHelper
 {
+    private RandomHelper()
+    {
+    }
+	
     /**
      * Gets a Random generator with a random seed. However, the same input
      * will always produce the same output.
@@ -49,9 +53,5 @@ public class RandomHelper
     public static int numberInRange(Random random, int min, int max)
     {
         return min + random.nextInt(max - min + 1);
-    }
-
-    private RandomHelper()
-    {
     }
 }

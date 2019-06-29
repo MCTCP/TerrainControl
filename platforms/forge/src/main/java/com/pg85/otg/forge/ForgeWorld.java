@@ -1,6 +1,7 @@
 package com.pg85.otg.forge;
 
 import com.pg85.otg.*;
+import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -32,9 +33,8 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.util.minecraftTypes.TreeType;

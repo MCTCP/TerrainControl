@@ -15,24 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 public class CustomObjectGen extends Resource
-{
-	// OTG+
-	
-    public List<CustomObject> getObjects(String worldName)
-    {
-    	if(objects.isEmpty() && !objectNames.isEmpty())
-    	{
-            for (int i = 0; i < objectNames.size(); i ++)
-            {
-            	CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
-            	objects.add(object);	              	
-            }
-    	}
-    	return objects;
-    }
-	
-	//
-	
+{	
     private List<CustomObject> objects;
     private List<String> objectNames;
 
@@ -51,6 +34,19 @@ public class CustomObjectGen extends Resource
         {
             objectNames.add(arg);
         }
+    }
+    
+    public List<CustomObject> getObjects(String worldName)
+    {
+    	if(objects.isEmpty() && !objectNames.isEmpty())
+    	{
+            for (int i = 0; i < objectNames.size(); i ++)
+            {
+            	CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
+            	objects.add(object);	              	
+            }
+    	}
+    	return objects;
     }
 
     @Override
@@ -125,6 +121,5 @@ public class CustomObjectGen extends Resource
     public int getPriority()
     {
         return -40;
-    }
-
+    }    
 }

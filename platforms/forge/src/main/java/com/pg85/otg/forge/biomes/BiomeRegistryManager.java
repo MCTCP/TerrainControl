@@ -6,6 +6,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -15,7 +16,6 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
-import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.StringHelper;
 
 import net.minecraft.util.ResourceLocation;

@@ -4,8 +4,8 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 

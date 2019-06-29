@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects.bo3.checks;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.List;
 

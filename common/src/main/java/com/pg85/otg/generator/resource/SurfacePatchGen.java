@@ -8,7 +8,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.noise.NoiseGeneratorSurfacePatchOctaves;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 import java.util.Random;

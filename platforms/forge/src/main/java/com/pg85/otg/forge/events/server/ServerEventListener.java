@@ -158,7 +158,7 @@ public class ServerEventListener
             {
                 if (!this.eligibleChunksForSpawning.get(chunkcoordintpair1))
                 {
-                	ArrayList<SpawnerFunction> spawnerDataForOTG = world.GetWorldSession().GetSpawnersForChunk(ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ()));
+                	ArrayList<SpawnerFunction> spawnerDataForOTG = world.GetWorldSession().getSpawnersForChunk(ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ()));
 
                 	if(spawnerDataForOTG != null && spawnerDataForOTG.size() > 0)
                 	{
@@ -516,7 +516,7 @@ public class ServerEventListener
                     if (!this.eligibleChunksForSpawning.get(chunkcoordintpair1))
                     {
                     	ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ());
-                    	ArrayList<ParticleFunction> particleDataForOTG = world.GetWorldSession().GetParticlesForChunk(chunkCoord);
+                    	ArrayList<ParticleFunction> particleDataForOTG = world.GetWorldSession().getParticlesForChunk(chunkCoord);
 
                     	if(particleDataForOTG != null && particleDataForOTG.size() > 0)
                     	{
@@ -533,7 +533,7 @@ public class ServerEventListener
                                 	{
                                 		particleDataForOTGPerPlayer.add(particleData);
                                 	} else {
-                                		world.GetWorldSession().RemoveParticles(chunkCoord, particleData);
+                                		world.GetWorldSession().removeParticles(chunkCoord, particleData);
                                 	}
                                 }
             				}
@@ -621,7 +621,7 @@ public class ServerEventListener
 
                     			// Return modData to sender.
                         		String messageString = "";
-		                    	HashMap<String, ArrayList<ModDataFunction>> modDataInChunk = forgeWorld.GetWorldSession().GetModDataForChunk(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+		                    	HashMap<String, ArrayList<ModDataFunction>> modDataInChunk = forgeWorld.GetWorldSession().getModDataForChunk(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
 		                    	if(modDataInChunk != null)
 		                    	{
 			                    	for(Entry<String, ArrayList<ModDataFunction>> modNameAndData : modDataInChunk.entrySet())

@@ -17,7 +17,7 @@ import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.FifoMap;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.io.PrintWriter;
@@ -31,7 +31,6 @@ public class OTG
 	// Used to determine if a new world is being created or if a world save already exists
 	// TODO: Make this prettier.
 	public static boolean isNewWorldBeingCreated = false;
-    static FifoMap<String, LocalMaterialData> cachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
 	
     /**
      * The engine that powers Open Terrain Generator.
@@ -216,48 +215,7 @@ public class OTG
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
     {
-    	// TODO: Make sure it won't cause problems to return the same material object multiple times, is it not changed anywhere?
-    	LocalMaterialData material = cachedMaterials.get(name);
-    	if(material != null)
-    	{
-    		return material;
-    	}
-    	else if(cachedMaterials.containsKey(name))
-    	{
-    		throw new InvalidConfigException("Cannot read block: " + name);
-    	}
-
-    	String originalName = name;
-    	
-    	// Spigot interprets snow as SNOW_LAYER and that's how TC has always seen it too so keep it that way (even though minecraft:snow is actually a snow block).
-    	if(name.toLowerCase().equals("snow"))
-    	{
-    		name = "SNOW_LAYER";
-    	}
-    	// Spigot interprets water as FLOWING_WATER and that's how TC has always seen it too so keep it that way (even though minecraft:water is actually stationary water).
-    	if(name.toLowerCase().equals("water"))
-    	{
-    		name = "FLOWING_WATER";
-    	}
-    	// Spigot interprets lava as FLOWING_LAVA and that's how TC has always seen it too so keep it that way (even though minecraft:lava is actually stationary lava).
-    	if(name.toLowerCase().equals("lava"))
-    	{
-    		name = "FLOWING_LAVA";
-    	}
-
-    	try
-    	{
-    		material = engine.readMaterial(name);
-    	}
-    	catch(InvalidConfigException ex)
-    	{
-    		cachedMaterials.put(originalName, null);
-    		throw ex;
-    	}
-
-    	cachedMaterials.put(originalName, material);
-
-        return material;
+        return MaterialHelper.readMaterial(name);
     }
 
     /**
@@ -265,7 +223,7 @@ public class OTG
      */
     public static LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
-        return engine.toLocalMaterialData(defaultMaterial, blockData);
+        return MaterialHelper.toLocalMaterialData(defaultMaterial, blockData);
     }
 
     // Events

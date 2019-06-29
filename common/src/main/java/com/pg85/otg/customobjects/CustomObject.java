@@ -4,9 +4,9 @@ import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.generator.SpawnableObject;
-import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.BoundingBox;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.Map;
 import java.util.Random;
@@ -45,14 +45,6 @@ public interface CustomObject extends SpawnableObject
      * @return Whether this object can spawn as a tree.
      */
     public boolean canSpawnAsTree();
-
-    /**
-     * Returns whether this object can spawn from the CustomObject() resource.
-     * Vanilla trees should return false; everything else should return true.
-     *
-     * @return Whether this object can spawn as an object.
-     */
-    public boolean canSpawnAsObject();
 
     /**
      * Returns whether this object can be placed with a random rotation. If
@@ -107,26 +99,7 @@ public interface CustomObject extends SpawnableObject
      * @return Whether at least one object spawned successfully.
      */
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);
-
-    /**
-     * Creates a new object with all settings applied.
-     *
-     * @param settings The settings. The settings of the existing object will
-     * be {@link SettingsReader#setFallbackReader(SettingsReader) set as a
-     * fallback}.
-     * @return A copy of this object will all the settings applied.
-     */
-    public CustomObject applySettings(SettingsReaderOTGPlus settings);
-
-    /**
-     * Returns whether this object would like to spawn in this biome. BO2s will
-     * return whether this biome is in their spawnInBiome setting.
-     *
-     * @param biome
-     * @return
-     */
-    public boolean hasPreferenceToSpawnIn(LocalBiome biome);
-    
+   
     public int getMaxBranchDepth(); // Only needed for Non-OTG+
     
     public BoundingBox getBoundingBox(Rotation rotation); // Only needed for Non-OTG+

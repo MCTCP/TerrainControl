@@ -161,10 +161,6 @@ public enum DefaultBiome
      * {@link DefaultBiome#getLoadInstructions(MojangSettings, int)}
      */
     private final Class<? extends MinecraftBiomeTemplate> defaultSettingsClass;
-    /**
-     * A DefaultBiome lookup table with the biome ID being the array index
-     */
-    //private static DefaultBiome[] lookupID;
 
     private DefaultBiome(int i, String name, Class<? extends MinecraftBiomeTemplate> defaultSettings)
     {
@@ -172,38 +168,6 @@ public enum DefaultBiome
         this.Name = name;
         this.defaultSettingsClass = defaultSettings;
     }
-
-    /*
-    static
-    {
-        // Declares and Defines the DefaultBiome lookup table
-        lookupID = new DefaultBiome[256];
-        for (DefaultBiome biome : DefaultBiome.values())
-        {
-            // Register by id
-            lookupID[biome.Id] = biome;
-        }
-    }
-    */
-
-    /**
-     * Returns a DefaultBiome object with the given biome ID
-     *
-     * @param id the ID of the DeafultBiome that is to be returned
-     * @return A DefaultBiome with the given ID
-     */
-    /*
-    public static DefaultBiome getBiome(int id)
-    {
-        if (id < lookupID.length)
-        {
-            return lookupID[id];
-        } else
-        {
-            return null;
-        }
-    }
-    */
 
     public BiomeLoadInstruction getLoadInstructions(MojangSettings mojangSettings, int maxWorldHeight)
     {
@@ -239,26 +203,4 @@ public enum DefaultBiome
         }
         return false;
     }
-
-    /**
-     * Returns the biome id depending on if this DefaultBiome has the
-     * given name
-     * <p/>
-     * @param name The string to test this.Name against
-     * <p/>
-     * @return int the Id of the biome with String name
-     */
-    /*
-    public static Integer getId(String name)
-    {
-        for (DefaultBiome biome : DefaultBiome.values())
-        {
-            if (biome.Name.equals(name))
-            {
-                return biome.Id;
-            }
-        }
-        return null;
-    }
-    */
 }

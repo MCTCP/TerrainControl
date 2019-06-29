@@ -4,7 +4,7 @@ import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.io.BufferedReader;
 import java.io.File;

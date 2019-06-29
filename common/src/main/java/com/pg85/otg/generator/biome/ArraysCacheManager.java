@@ -12,7 +12,7 @@ public class ArraysCacheManager
 
     }
 
-    public static ArraysCache GetCache()
+    public static ArraysCache getCache()
     {
         synchronized (ARRAYS_CACHES)
         {
@@ -29,49 +29,13 @@ public class ArraysCacheManager
         return null; // Exception ??
     }
 
-    public static void ReleaseCache(ArraysCache cache)
+    public static void releaseCache(ArraysCache cache)
     {
         synchronized (ARRAYS_CACHES)
         {
             cache.release();
         }
     }
-
-    /*
-    @SuppressWarnings({"unchecked"})
-    public static int[] GetArray(int cacheId, int size)
-    {
-        if (size <= 256)
-        {
-            int[] array = SmallArrays[cacheId][SmallArraysNext[cacheId]];
-            if (array == null)
-            {
-                array = new int[256];
-                SmallArrays[cacheId][SmallArraysNext[cacheId]] = array;
-            }
-            SmallArraysNext[cacheId]++;
-
-            return array;
-        }
-        int[] array;
-        if (BigArraysNext[cacheId] == BigArrays[cacheId].size())
-        {
-            array = new int[size];
-            BigArrays[cacheId].add(array);
-        } else
-        {
-            array = (int[]) BigArrays[cacheId].get(BigArraysNext[cacheId]);
-            if (array.length < size)
-            {
-                array = new int[size];
-                BigArrays[cacheId].set(BigArraysNext[cacheId], array);
-            }
-        }
-
-        BigArraysNext[cacheId]++;
-        return array;
-    }
-    */
 
     private ArraysCacheManager()
     {

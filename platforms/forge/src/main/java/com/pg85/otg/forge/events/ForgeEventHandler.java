@@ -1,8 +1,5 @@
 package com.pg85.otg.forge.events;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
-
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.events.EventHandler;
@@ -18,6 +15,9 @@ import net.minecraftforge.event.terraingen.OreGenEvent.GenerateMinable;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate;
 import net.minecraftforge.event.terraingen.TerrainGen;
+
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import java.util.HashMap;
 import java.util.Map;

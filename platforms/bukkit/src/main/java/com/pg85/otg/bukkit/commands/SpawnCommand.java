@@ -5,7 +5,7 @@ import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;

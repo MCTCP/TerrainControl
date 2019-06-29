@@ -27,10 +27,10 @@ import com.pg85.otg.customobjects.customstructure.StructuredCustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.NamedBinaryTag;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.BoundingBox;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
@@ -44,63 +44,234 @@ import java.util.Random;
 
 public class BO3 implements StructuredCustomObject
 {
-	// OTG+
-
+    // Original top blocks are cached to figure out the surface block material to replace to when spawning structures and smoothing areas
+    public static HashMap<ChunkCoordinate, LocalMaterialData> originalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
+	
 	public boolean isInvalidConfig;
 
     boolean measured = false;
+    boolean isCollidable = false;
+    public boolean is32x32 = false;
+    
     int minX = Integer.MAX_VALUE;
     int maxX = Integer.MIN_VALUE;
     int minZ = Integer.MAX_VALUE;
     int maxZ = Integer.MIN_VALUE;
-    boolean isCollidable = false;
 
-    public boolean isCollidable()
-    {
-    	measure();
-    	return isCollidable;
-    }
-
-    public boolean is32x32 = false;
+    private BO3Config settings;
+    private final String name;
+    private final File file;
 
     /**
-     * Creates a BO3 with the specified settings. Ignores the settings in the
-     * settings file.
+     * Creates a BO3 from a file.
      *
-     * @param oldObject     The object where this object is based on
-     * @param extraSettings The settings to override
+     * @param name Name of the BO3.
+     * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
      */
-    public BO3(BO3 oldObject, SettingsReaderOTGPlus extraSettings)
+    public BO3(String name, File file)
     {
-        try
-        {
-			this.settings = new BO3Config(extraSettings, null);
-			//this.settings.inheritBO3 = oldObject.getName();
-		}
-        catch (InvalidConfigException e)
-        {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-        //this.settings.file = oldObject.file;
-
-        //FileSettingsWriter.writeToFile(this.settings, this.settings.settingsMode);
-
-		this.settings.inheritBO3 = oldObject.getName();
-
-        this.name = settings.getName();
-        this.file = settings.getFile();
+        this.name = name;
+        this.file = file;
+    }
+    
+    @Override
+    public String getName()
+    {
+        return name;
     }
 
+    public BO3Config getSettings()
+    {
+        return settings;
+    }
+    
+    @Override
+    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    {
+    	try
+    	{
+    		this.settings = new BO3Config(new FileSettingsReaderOTGPlus(name, file), otherObjectsInDirectory);
+    		if(this.settings.settingsMode != ConfigMode.WriteDisable)
+    		{
+    			FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
+    		}
+    	}
+    	catch(InvalidConfigException ex)
+    	{
+    		isInvalidConfig = true;
+    	}
+
+    	// TODO: Is this really necessary?
+    	if(this.settings != null && this.settings.isOTGPlus)
+    	{
+	    	this.settings.blocks = null;
+	    	this.settings.bo3Checks = null;
+	    	this.settings.branches = null;
+	    	this.settings.boundingBoxes = null;
+	    	this.settings.entityFunctions = null;
+	    	this.settings.particleFunctions = null;
+	    	this.settings.modDataFunctions = null;
+	    	this.settings.spawnerFunctions = null;
+    	}
+    }
+    
+    // OTG
+
+    @Override
+    public boolean canSpawnAsTree()
+    {
+        return settings.tree;
+    }
+
+    // Used for saplings
+    @Override
+    public boolean canRotateRandomly()
+    {
+        return settings.rotateRandomly;
+    }
+        
     // Used for Tree() and CustomObject
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
     	return trySpawnAt(false, null, world, random, rotation, x, y, z);
     }
+    
+    // Used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc).
+    @Override
+    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+		return trySpawnAt(true, null, world, random, rotation, x, y, z);
+    }
 
-	// This should only be used for CustomObject and OTG CustomStructure
+	// This method is only used to spawn CustomObject.
+    @Override
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    {
+        boolean atLeastOneObjectHasSpawned = false;
+
+        int chunkMiddleX = chunkCoord.getBlockXCenter();
+        int chunkMiddleZ = chunkCoord.getBlockZCenter();
+        for (int i = 0; i < settings.frequency; i++)
+        {
+            if (settings.rarity > random.nextDouble() * 100.0)
+            {
+                int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+                int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+
+                if (spawn(world, random, x, z))
+                {
+                    atLeastOneObjectHasSpawned = true;
+                }
+            }
+        }
+
+        return atLeastOneObjectHasSpawned;
+    }
+
+    @Override
+    public Branch[] getBranches(Rotation rotation)
+    {
+    	if(settings.isOTGPlus)
+    	{
+    		throw new RuntimeException();
+    	} else {
+    		return settings.branches[rotation.getRotationId()];
+    	}
+    }
+
+    @Override
+    public CustomObjectCoordinate makeCustomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
+    	if(settings.isOTGPlus)
+    	{
+    		if(OTG.getPluginConfig().SpawnLog)
+    		{
+    			OTG.log(LogMarker.WARN, "Tried to spawn a OTG+ enabled BO3 as CustomStructure in a non-OTG+ enabled world. BO3: " + settings.getName());
+    		}
+    		return null;
+    	} else {
+	        if (settings.rarity > random.nextDouble() * 100.0)
+	        {
+	            Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+	            int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
+	            return new CustomObjectCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
+	        }
+	        return null;
+    	}
+    }
+
+    @Override
+    public StructurePartSpawnHeight getStructurePartSpawnHeight()
+    {
+        return this.settings.spawnHeight.toStructurePartSpawnHeight();
+    }
+
+    // TODO: Reimplement this?
+    @Override
+    public BoundingBox getBoundingBox(Rotation rotation)
+    {
+        return this.settings.boundingBoxes[rotation.getRotationId()];
+    }
+
+    @Override
+    public int getMaxBranchDepth() // This used to be in CustomObject?
+    {
+        return settings.maxBranchDepth;
+    }
+    
+    /**
+     * Computes the offset and variance for spawning a bo3
+     *
+     * @param random   Random number generator.
+     * @param offset   Base spawn offset.
+     * @param variance Max variance from this offset.
+     *
+     * @return The sum of the offset and variance.
+     */
+    public int getOffsetAndVariance(Random random, int offset, int variance)
+    {
+        if (variance == 0)
+        {
+            return offset;
+        } else if (variance < 0)
+        {
+            variance = -random.nextInt(MathHelper.abs(variance) + 1);
+        } else
+        {
+            variance = random.nextInt(variance + 1);
+        }
+        return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
+    }
+   
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
+    {
+		return spawn(world, random, x, z);
+    }
+
+    // Used for customobject and trees
+    protected boolean spawn(LocalWorld world, Random random, int x, int z)
+    {
+        Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        int y = 0;
+        if (settings.spawnHeight == SpawnHeightEnum.randomY)
+        {
+            y = settings.minHeight == settings.maxHeight ? settings.minHeight : RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
+        }
+        if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
+        {
+            y = world.getHighestBlockYAt(x, z);
+        }
+        if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
+        {
+            y = world.getSolidHeight(x, z);
+        }
+        // Offset by static and random settings values
+        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        return trySpawnAt(world, random, rotation, x, y, z);
+    }
+    
+    // Used for saplings, trees, customobjects and customstructures
     public boolean trySpawnAt(boolean skipChecks, CustomObjectStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
     	if(!skipChecks)
@@ -353,12 +524,19 @@ public class BO3 implements StructuredCustomObject
     	}
 
         return true;
-    }
+    }    
 
-    // Used by OTG+ CustomStructure
+    
+    // OTG+
+    
+    @Override
+    public Branch[] getBranches()
+    {
+        return settings.getbranches();
+    }
+    
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
     {
-    	// This should only be used for OTG+ CustomStructure()
     	if(settings.isOTGPlus)
     	{
 			if(!measure())
@@ -432,9 +610,57 @@ public class BO3 implements StructuredCustomObject
     	}
     	return true;
     }
-
-    // Original top blocks are cached to figure out the surface block material to replace to when spawning structures and smoothing areas
-    public static HashMap<ChunkCoordinate, LocalMaterialData> originalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
+    
+    public boolean isCollidable()
+    {
+    	measure();
+    	return isCollidable;
+    }
+    
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
+    {
+	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+	    if(blocksToReplace != null && blocksToReplace.size() > 0)
+	    {
+	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+	    	if(targetBlock != null)
+	    	{
+	    		material = targetBlock;
+	    	}
+	    }
+	    if(OTG.getPluginConfig().DeveloperMode)
+	    {
+		    DefaultMaterial worldMaterial = world.getMaterial(x, y, z, false).toDefaultMaterial();
+		    if(
+	    		worldMaterial == DefaultMaterial.GOLD_BLOCK ||
+	    		worldMaterial == DefaultMaterial.IRON_BLOCK ||
+	    		worldMaterial == DefaultMaterial.REDSTONE_BLOCK ||
+	    		worldMaterial == DefaultMaterial.DIAMOND_BLOCK ||
+	    		worldMaterial == DefaultMaterial.LAPIS_BLOCK ||
+	    		worldMaterial == DefaultMaterial.COAL_BLOCK ||
+	    		worldMaterial == DefaultMaterial.QUARTZ_BLOCK ||
+	    		worldMaterial == DefaultMaterial.EMERALD_BLOCK
+    		)
+		    {
+		    	if(
+		    		material.toDefaultMaterial() == DefaultMaterial.GOLD_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.IRON_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.REDSTONE_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.DIAMOND_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.LAPIS_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.COAL_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.QUARTZ_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.EMERALD_BLOCK
+    			)
+		    	{
+		    		world.setBlock(x, y, z, OTG.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0), null, true);
+		    	}
+		    	return;
+		    }
+	    }
+	    world.setBlock(x, y, z, material, metaDataTag, true);
+    }
+   
     public boolean spawnForcedOTGPlus(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
     {
     	//OTG.log(LogMarker.INFO, "Spawning " + this.getName());
@@ -1111,299 +1337,5 @@ public class BO3 implements StructuredCustomObject
         }
 
         return true;
-    }
-
-    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
-    {
-	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
-	    if(blocksToReplace != null && blocksToReplace.size() > 0)
-	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
-	    	if(targetBlock != null)
-	    	{
-	    		material = targetBlock;
-	    	}
-	    }
-	    if(OTG.getPluginConfig().DeveloperMode)
-	    {
-		    DefaultMaterial worldMaterial = world.getMaterial(x, y, z, false).toDefaultMaterial();
-		    if(
-	    		worldMaterial == DefaultMaterial.GOLD_BLOCK ||
-	    		worldMaterial == DefaultMaterial.IRON_BLOCK ||
-	    		worldMaterial == DefaultMaterial.REDSTONE_BLOCK ||
-	    		worldMaterial == DefaultMaterial.DIAMOND_BLOCK ||
-	    		worldMaterial == DefaultMaterial.LAPIS_BLOCK ||
-	    		worldMaterial == DefaultMaterial.COAL_BLOCK ||
-	    		worldMaterial == DefaultMaterial.QUARTZ_BLOCK ||
-	    		worldMaterial == DefaultMaterial.EMERALD_BLOCK
-    		)
-		    {
-		    	if(
-		    		material.toDefaultMaterial() == DefaultMaterial.GOLD_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.IRON_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.REDSTONE_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.DIAMOND_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.LAPIS_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.COAL_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.QUARTZ_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.EMERALD_BLOCK
-    			)
-		    	{
-		    		world.setBlock(x, y, z, OTG.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0), null, true);
-		    	}
-		    	return;
-		    }
-	    }
-	    world.setBlock(x, y, z, material, metaDataTag, true);
-    }
-
-	//
-
-    private BO3Config settings;
-    private final String name;
-    private final File file;
-
-    /**
-     * Creates a BO3 from a file.
-     *
-     * @param name Name of the BO3.
-     * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
-     */
-    public BO3(String name, File file)
-    {
-        this.name = name;
-        this.file = file;
-    }
-
-    @Override
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
-    {
-    	try
-    	{
-    		this.settings = new BO3Config(new FileSettingsReaderOTGPlus(name, file), otherObjectsInDirectory);
-    		if(this.settings.settingsMode != ConfigMode.WriteDisable)
-    		{
-    			FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
-    		}
-    	}
-    	catch(InvalidConfigException ex)
-    	{
-    		isInvalidConfig = true;
-    	}
-
-    	// TODO: Is this really necessary?
-    	if(this.settings != null && this.settings.isOTGPlus)
-    	{
-	    	this.settings.blocks = null;
-	    	this.settings.bo3Checks = null;
-	    	this.settings.branches = null;
-	    	this.settings.boundingBoxes = null;
-	    	this.settings.entityFunctions = null;
-	    	this.settings.particleFunctions = null;
-	    	this.settings.modDataFunctions = null;
-	    	this.settings.spawnerFunctions = null;
-    	}
-    }
-
-    /**
-     * Computes the offset and variance for spawning a bo3
-     *
-     * @param random   Random number generator.
-     * @param offset   Base spawn offset.
-     * @param variance Max variance from this offset.
-     *
-     * @return The sum of the offset and variance.
-     */
-    public int getOffsetAndVariance(Random random, int offset, int variance)
-    {
-        if (variance == 0)
-        {
-            return offset;
-        } else if (variance < 0)
-        {
-            variance = -random.nextInt(MathHelper.abs(variance) + 1);
-        } else
-        {
-            variance = random.nextInt(variance + 1);
-        }
-        return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-    }
-
-    @Override
-    public String getName()
-    {
-        return name;
-    }
-
-    public BO3Config getSettings()
-    {
-        return settings;
-    }
-
-    @Override
-    public boolean canSpawnAsTree()
-    {
-        return settings.tree;
-    }
-
-    @Override
-    public boolean canSpawnAsObject()
-    {
-        return true;
-    }
-
-    @Override
-    public boolean canRotateRandomly()
-    {
-        return settings.rotateRandomly;
-    }
-
-    // Used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc).
-    @Override
-    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
-    {
-		return trySpawnAt(true, null, world, random, rotation, x, y, z);
-    }
-
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-		return spawn(world, random, x, z);
-    }
-
-    protected boolean spawn(LocalWorld world, Random random, int x, int z)
-    {
-        Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-        int y = 0;
-        if (settings.spawnHeight == SpawnHeightEnum.randomY)
-        {
-            y = settings.minHeight == settings.maxHeight ? settings.minHeight : RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
-        }
-        if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
-        {
-            y = world.getHighestBlockYAt(x, z);
-        }
-        if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
-        {
-            y = world.getSolidHeight(x, z);
-        }
-        // Offset by static and random settings values
-        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
-        return trySpawnAt(world, random, rotation, x, y, z);
-    }
-
-    @Override
-    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
-    {
-    	// This method is only used to spawn CustomObject.
-
-        boolean atLeastOneObjectHasSpawned = false;
-
-        int chunkMiddleX = chunkCoord.getBlockXCenter();
-        int chunkMiddleZ = chunkCoord.getBlockZCenter();
-        for (int i = 0; i < settings.frequency; i++)
-        {
-            if (settings.rarity > random.nextDouble() * 100.0)
-            {
-                int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-                int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-
-                if (spawn(world, random, x, z))
-                {
-                    atLeastOneObjectHasSpawned = true;
-                }
-            }
-        }
-
-        return atLeastOneObjectHasSpawned;
-    }
-
-    // TODO: Not used?
-    @Override
-    public CustomObject applySettings(SettingsReaderOTGPlus extraSettings)
-    {
-    	throw new RuntimeException(); // TODO: Remove after testing
-    	/*
-        extraSettings.setFallbackReader(this.settings.reader);
-        return new BO3(this, extraSettings);
-        */
-    }
-
-    @Override
-    public boolean hasPreferenceToSpawnIn(LocalBiome biome)
-    {
-        if (settings.excludedBiomes.contains("All") || settings.excludedBiomes.contains("all") || settings.excludedBiomes.contains(biome.getName()))
-        {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean hasBranches()
-    {
-    	if(settings.isOTGPlus)
-    	{
-            return settings.getbranches().length != 0;
-    	} else {
-    		return settings.branches[0].length != 0;
-    	}
-    }
-
-    @Override
-    public Branch[] getBranches(Rotation rotation)
-    {
-    	if(settings.isOTGPlus)
-    	{
-    		throw new RuntimeException();
-    	} else {
-    		return settings.branches[rotation.getRotationId()];
-    	}
-    }
-
-    @Override
-    public Branch[] getBranches()
-    {
-        return settings.getbranches();
-    }
-
-    @Override
-    public CustomObjectCoordinate makeCustomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-    	if(settings.isOTGPlus)
-    	{
-    		if(OTG.getPluginConfig().SpawnLog)
-    		{
-    			OTG.log(LogMarker.WARN, "Tried to spawn a OTG+ enabled BO3 as CustomStructure in a non-OTG+ enabled world. BO3: " + settings.getName());
-    		}
-    		return null;
-    	} else {
-	        if (settings.rarity > random.nextDouble() * 100.0)
-	        {
-	            Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-	            int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
-	            return new CustomObjectCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
-	        }
-	        return null;
-    	}
-    }
-
-    @Override
-    public StructurePartSpawnHeight getStructurePartSpawnHeight()
-    {
-        return this.settings.spawnHeight.toStructurePartSpawnHeight();
-    }
-
-    // TODO: Reimplement this?
-
-    @Override
-    public BoundingBox getBoundingBox(Rotation rotation)
-    {
-        return this.settings.boundingBoxes[rotation.getRotationId()];
-    }
-
-    @Override
-    public int getMaxBranchDepth() // This used to be in CustomObject?
-    {
-        return settings.maxBranchDepth;
     }
 }

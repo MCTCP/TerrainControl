@@ -48,7 +48,7 @@ public class CustomObjectStructureCache
         this.worldInfoChunks = new HashMap<ChunkCoordinate, CustomObjectStructure>();        
         this.plotter = new CustomObjectStructurePlotter();
         
-        LoadStructureCache();
+        loadStructureCache();
     }
     
     public CustomObjectStructurePlotter getPlotter()
@@ -56,9 +56,9 @@ public class CustomObjectStructureCache
     	return this.plotter;
     }
     
-    public void PlotStructures(Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
+    public void plotStructures(Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
     {
-    	plotter.PlotStructures(this.world, rand, chunkCoord, spawningStructureAtSpawn, this.structureCache, this.worldInfoChunks);
+    	plotter.plotStructures(this.world, rand, chunkCoord, spawningStructureAtSpawn, this.structureCache, this.worldInfoChunks);
     }
 
     public void reload(LocalWorld world)
@@ -106,9 +106,9 @@ public class CustomObjectStructureCache
     	}
     }
 
-    // persistence stuff
+    // persistence
 
-    public void CompressCache()
+    public void compressCache()
     {
     	OTG.log(LogMarker.DEBUG, "Compressing structure-cache and pre-generator data");
 
@@ -151,7 +151,7 @@ public class CustomObjectStructureCache
     	OTG.log(LogMarker.DEBUG, "Removed " + structuresRemoved + " cached chunks");
     }
 
-    public void SaveToDisk()
+    public void saveToDisk()
     {
     	OTG.log(LogMarker.DEBUG, "Saving structure data");
     	int i = 0;
@@ -181,9 +181,9 @@ public class CustomObjectStructureCache
 
 		if(world.getConfigs().getWorldConfig().isOTGPlus)
 		{
-			CompressCache();
+			compressCache();
 		}
-		SaveStructureCache();
+		saveStructureCache();
 
 		synchronized(world.getObjectSpawner().lockingObject)
 		{
@@ -192,7 +192,7 @@ public class CustomObjectStructureCache
 		}
     }
 
-    private void SaveStructureCache()
+    private void saveStructureCache()
     {
     	OTG.log(LogMarker.DEBUG, "Saving structures and pre-generator data");
 
@@ -208,7 +208,7 @@ public class CustomObjectStructureCache
 	    	}
 	    }
 
-	    CustomObjectStructureFileManager.SaveStructuresFile(worldInfoChunksToSave, this.world);
+	    CustomObjectStructureFileManager.saveStructuresFile(worldInfoChunksToSave, this.world);
 
 	    for (Map.Entry<ChunkCoordinate, CustomObjectStructure> cachedChunk : worldInfoChunks.entrySet())
 	    {
@@ -232,7 +232,7 @@ public class CustomObjectStructureCache
 	    		}
 	    	}
 
-	    	CustomObjectStructureFileManager.SaveChunksFile(nullChunks, WorldStandardValues.NullChunksFileName, this.world);
+	    	CustomObjectStructureFileManager.saveChunksFile(nullChunks, WorldStandardValues.NullChunksFileName, this.world);
 
 	    	this.plotter.saveSpawnedStructures(this.world);
 	    }
@@ -240,13 +240,13 @@ public class CustomObjectStructureCache
 		OTG.log(LogMarker.DEBUG, "Saving done");
     }
 
-	private void LoadStructureCache()
+	private void loadStructureCache()
 	{
 		OTG.log(LogMarker.DEBUG, "Loading structures and pre-generator data");
 
     	int structuresLoaded = 0;
 
-		Map<ChunkCoordinate, CustomObjectStructure> loadedStructures = CustomObjectStructureFileManager.LoadStructuresFile(this.world);
+		Map<ChunkCoordinate, CustomObjectStructure> loadedStructures = CustomObjectStructureFileManager.loadStructuresFile(this.world);
 
 		for(Map.Entry<ChunkCoordinate, CustomObjectStructure> loadedStructure : loadedStructures.entrySet())
 		{
@@ -313,7 +313,7 @@ public class CustomObjectStructureCache
 
 		if(world.getConfigs().getWorldConfig().isOTGPlus)
 		{
-			ArrayList<ChunkCoordinate> nullChunks = CustomObjectStructureFileManager.LoadChunksFile(WorldStandardValues.NullChunksFileName, this.world);
+			ArrayList<ChunkCoordinate> nullChunks = CustomObjectStructureFileManager.loadChunksFile(WorldStandardValues.NullChunksFileName, this.world);
 			for(ChunkCoordinate chunkCoord : nullChunks)
 			{
 				structureCache.remove(chunkCoord);
@@ -334,7 +334,7 @@ public class CustomObjectStructureCache
 
 			for(ChunkCoordinate chunkCoord : structureCache.keySet())
 			{
-				plotter.AddToStructuresPerChunkCache(chunkCoord, new ArrayList<String>()); // This is an optimisation so that PlotStructures knows not to plot anything in this chunk
+				plotter.addToStructuresPerChunkCache(chunkCoord, new ArrayList<String>()); // This is an optimisation so that PlotStructures knows not to plot anything in this chunk
 			}
 
 			if(loadedStructures.size() > 0 || nullChunks.size() > 0 || plotter.getStructureCount() > 0)

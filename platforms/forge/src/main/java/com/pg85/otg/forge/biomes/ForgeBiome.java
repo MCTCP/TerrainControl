@@ -1,8 +1,8 @@
 package com.pg85.otg.forge.biomes;
 
+import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.util.BiomeIds;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;

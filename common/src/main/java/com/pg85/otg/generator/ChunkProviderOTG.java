@@ -1,8 +1,5 @@
 package com.pg85.otg.generator;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
-
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
@@ -20,6 +17,9 @@ import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import java.util.Random;
 
@@ -78,6 +78,8 @@ public class ChunkProviderOTG
     private final int maxSmoothDiameter;
     private final int maxSmoothRadius;
 
+    BiomeConfig[] biomes = new BiomeConfig[1024];
+    
     public ChunkProviderOTG(ConfigProvider configs, LocalWorld world)
     {
         this.configProvider = configs;
@@ -118,7 +120,6 @@ public class ChunkProviderOTG
 
     }
 
-    BiomeConfig[] biomes = new BiomeConfig[1024];
     public void generate(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();

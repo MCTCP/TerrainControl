@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects.bo3.bo3function;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 /**
  * Simple class to hold the spawn chance and rotation of a BO3 in the Branch or

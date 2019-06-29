@@ -20,11 +20,11 @@ import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 public class CustomObjectStructureFileManager
 {
-	public static Map<ChunkCoordinate, CustomObjectStructure> LoadStructuresFile(LocalWorld world)
+	public static Map<ChunkCoordinate, CustomObjectStructure> loadStructuresFile(LocalWorld world)
 	{
 	    Map<ChunkCoordinate, CustomObjectStructure> structuresFile = new HashMap<ChunkCoordinate, CustomObjectStructure>();
 
@@ -264,7 +264,7 @@ public class CustomObjectStructureFileManager
 	    return structuresFile;
 	}
 
-	public static void SaveChunksFile(ArrayList<ChunkCoordinate> chunks, String fileName, LocalWorld world)
+	public static void saveChunksFile(ArrayList<ChunkCoordinate> chunks, String fileName, LocalWorld world)
 	{
 		int dimensionId = world.getDimensionId();
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + fileName);
@@ -309,7 +309,7 @@ public class CustomObjectStructureFileManager
 		}
 	}
 
-	public static ArrayList<ChunkCoordinate> LoadChunksFile(String fileName, LocalWorld world)
+	public static ArrayList<ChunkCoordinate> loadChunksFile(String fileName, LocalWorld world)
 	{
 		int dimensionId = world.getDimensionId();
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + fileName);
@@ -357,7 +357,7 @@ public class CustomObjectStructureFileManager
 		return chunks;
 	}
 
-	public static void SaveChunksMapFile(String fileName, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
+	public static void saveChunksMapFile(String fileName, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
 	{
 		int dimensionId = world.getDimensionId();
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + fileName);
@@ -422,7 +422,7 @@ public class CustomObjectStructureFileManager
 		}
 	}
 
-	public static void LoadChunksMapFile(String fileName, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
+	public static void loadChunksMapFile(String fileName, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
 	{
 		int dimensionId = world.getDimensionId();
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + fileName);
@@ -516,7 +516,7 @@ public class CustomObjectStructureFileManager
 	}
 	
 
-	public static void SaveStructuresFile(Map<ChunkCoordinate, CustomObjectStructure> structures, LocalWorld world)
+	public static void saveStructuresFile(Map<ChunkCoordinate, CustomObjectStructure> structures, LocalWorld world)
 	{
 		// When loading files we first load all the structure files and put them in worldInfoChunks and structurecache (if they are outside the pregenerated region),
 		// then from any structures that have ObjectsToSpawn or SmoothingAreas to spawn we create structures in the structure cache for each of those (overriding some of the structures we added earlier)

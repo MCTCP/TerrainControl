@@ -1,4 +1,4 @@
-package com.pg85.otg.util;
+package com.pg85.otg.util.materials;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;

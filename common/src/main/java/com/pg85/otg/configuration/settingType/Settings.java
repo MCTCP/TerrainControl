@@ -5,8 +5,8 @@ import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix;
 import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.util.List;

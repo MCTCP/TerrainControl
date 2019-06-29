@@ -25,10 +25,10 @@ import com.pg85.otg.customobjects.bo3.checks.BO3Check;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.BoundingBox;
+import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.util.minecraftTypes.DefaultStructurePart;
 
@@ -139,6 +139,47 @@ public class BO3Config extends CustomObjectConfigFile
     private EntityFunction[] entityDataOTGPlus = new EntityFunction[1];
 
     String directoryName = null;
+    
+    //
+    
+    // OTG
+    
+    public String author;
+    public String description;
+    public ConfigMode settingsMode;
+    public boolean tree;
+    public int frequency;
+    public double rarity;
+    public boolean rotateRandomly;
+    public SpawnHeightEnum spawnHeight;
+    // Extra spawn height settings
+    public int spawnHeightOffset;
+    public int spawnHeightVariance;
+
+    // Extrusion
+    public BO3Settings.ExtrudeMode extrudeMode;
+    public MaterialSet extrudeThroughBlocks;
+
+    public int minHeight;
+    public int maxHeight;
+    public List<String> excludedBiomes;
+    public MaterialSet sourceBlocks;
+    public int maxPercentageOutsideSourceBlock;
+    public OutsideSourceBlock outsideSourceBlock;
+    public BlockFunction[][] blocks = new BlockFunction[4][]; // four
+    // rotations
+    public BO3Check[][] bo3Checks = new BO3Check[4][];
+    public int maxBranchDepth;
+    public BranchFunction[][] branches = new BranchFunction[4][];
+
+    public BoundingBox[] boundingBoxes = new BoundingBox[4];
+
+    public ParticleFunction[][] particleFunctions = new ParticleFunction[4][];
+    public SpawnerFunction[][] spawnerFunctions = new SpawnerFunction[4][];
+    public ModDataFunction[][] modDataFunctions = new ModDataFunction[4][];
+    public EntityFunction[][] entityFunctions = new EntityFunction[4][];
+
+    //
 
 	public int getXOffset()
 	{
@@ -863,41 +904,6 @@ public class BO3Config extends CustomObjectConfigFile
     }
 
 	//
-
-    public String author;
-    public String description;
-    public ConfigMode settingsMode;
-    public boolean tree;
-    public int frequency;
-    public double rarity;
-    public boolean rotateRandomly;
-    public SpawnHeightEnum spawnHeight;
-    // Extra spawn height settings
-    public int spawnHeightOffset;
-    public int spawnHeightVariance;
-
-    // Extrusion
-    public BO3Settings.ExtrudeMode extrudeMode;
-    public MaterialSet extrudeThroughBlocks;
-
-    public int minHeight;
-    public int maxHeight;
-    public List<String> excludedBiomes;
-    public MaterialSet sourceBlocks;
-    public int maxPercentageOutsideSourceBlock;
-    public OutsideSourceBlock outsideSourceBlock;
-    public BlockFunction[][] blocks = new BlockFunction[4][]; // four
-    // rotations
-    public BO3Check[][] bo3Checks = new BO3Check[4][];
-    public int maxBranchDepth;
-    public BranchFunction[][] branches = new BranchFunction[4][];
-
-    public BoundingBox[] boundingBoxes = new BoundingBox[4];
-
-    public ParticleFunction[][] particleFunctions = new ParticleFunction[4][];
-    public SpawnerFunction[][] spawnerFunctions = new SpawnerFunction[4][];
-    public ModDataFunction[][] modDataFunctions = new ModDataFunction[4][];
-    public EntityFunction[][] entityFunctions = new EntityFunction[4][];
 
     /**
      * Creates a BO3Config from a file.

@@ -21,6 +21,46 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     public static final String NAME_FOREST = "MesaForest";
     public static final String NAME_BRYCE = "MesaBryce";
 
+    private LocalMaterialData[] blockDataValuesArray;
+    private boolean isForestMesa;
+    private boolean isBryceMesa;
+    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce1;
+    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce2;
+    private NoiseGeneratorBiomeBlocksOctaves noiseGenBlockData;
+
+    private final LocalMaterialData hardenedClay;
+    private final LocalMaterialData redSand;
+    private final LocalMaterialData whiteStainedClay;
+    private final LocalMaterialData orangeStainedClay;
+    private final LocalMaterialData yellowStainedClay;
+    private final LocalMaterialData brownStainedClay;
+    private final LocalMaterialData redStainedClay;
+    private final LocalMaterialData silverStainedClay;
+    private final LocalMaterialData coarseDirt;
+    
+    HashMap<ChunkCoordinate, Double> bryceHeightPerColumn = new HashMap<ChunkCoordinate, Double>();
+    HashMap<ChunkCoordinate, Integer> generatingChunkWaterLevelPerColumn = new HashMap<ChunkCoordinate, Integer>();
+    HashMap<ChunkCoordinate, Double> noisePerColumn = new HashMap<ChunkCoordinate, Double>();    
+    HashMap<ChunkCoordinate, Integer> noisePlusRandomFactorPerColumn = new HashMap<ChunkCoordinate, Integer>();
+    HashMap<ChunkCoordinate, Boolean> cosNoiseIsLargerThanZeroPerColumn = new HashMap<ChunkCoordinate, Boolean>();
+    HashMap<ChunkCoordinate, Integer> maxHeightPerColumn = new HashMap<ChunkCoordinate, Integer>();
+    
+    public MesaSurfaceGenerator(boolean mountainMesa, boolean forestMesa)
+    {
+        this.isBryceMesa = mountainMesa;
+        this.isForestMesa = forestMesa;
+
+        this.hardenedClay = OTG.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0);
+        this.redSand = OTG.toLocalMaterialData(DefaultMaterial.SAND, 1);
+        this.coarseDirt = OTG.toLocalMaterialData(DefaultMaterial.DIRT, 1);
+        this.whiteStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
+        this.orangeStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 1);
+        this.yellowStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 4);
+        this.brownStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 12);
+        this.redStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 14);
+        this.silverStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 8);
+    }
+
     /**
      * Returns the mesa surface generator representing the setting value. If
      * no mes surface generator represents this setting value, null is
@@ -44,41 +84,8 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             return new MesaSurfaceGenerator(true, false);
         }
         return null;
-    }
-
-    private LocalMaterialData[] blockDataValuesArray;
-    private boolean isForestMesa;
-    private boolean isBryceMesa;
-    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce1;
-    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce2;
-    private NoiseGeneratorBiomeBlocksOctaves noiseGenBlockData;
-
-    private final LocalMaterialData hardenedClay;
-    private final LocalMaterialData redSand;
-    private final LocalMaterialData whiteStainedClay;
-    private final LocalMaterialData orangeStainedClay;
-    private final LocalMaterialData yellowStainedClay;
-    private final LocalMaterialData brownStainedClay;
-    private final LocalMaterialData redStainedClay;
-    private final LocalMaterialData silverStainedClay;
-    private final LocalMaterialData coarseDirt;
-
-    public MesaSurfaceGenerator(boolean mountainMesa, boolean forestMesa)
-    {
-        this.isBryceMesa = mountainMesa;
-        this.isForestMesa = forestMesa;
-
-        this.hardenedClay = OTG.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0);
-        this.redSand = OTG.toLocalMaterialData(DefaultMaterial.SAND, 1);
-        this.coarseDirt = OTG.toLocalMaterialData(DefaultMaterial.DIRT, 1);
-        this.whiteStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
-        this.orangeStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 1);
-        this.yellowStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 4);
-        this.brownStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 12);
-        this.redStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 14);
-        this.silverStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 8);
-    }
-
+    }    
+    
     private LocalMaterialData getBlockData(int i, int j, int k)
     {
         int l = (int) Math.round(this.noiseGenBlockData.a(i * 1.0D / 512.0D, i * 1.0D / 512.0D) * 2.0D);
@@ -174,14 +181,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             }
         }
     }
-
-    HashMap<ChunkCoordinate, Double> bryceHeightPerColumn = new HashMap<ChunkCoordinate, Double>();
-    HashMap<ChunkCoordinate, Integer> generatingChunkWaterLevelPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    HashMap<ChunkCoordinate, Double> noisePerColumn = new HashMap<ChunkCoordinate, Double>();    
-    HashMap<ChunkCoordinate, Integer> noisePlusRandomFactorPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    HashMap<ChunkCoordinate, Boolean> cosNoiseIsLargerThanZeroPerColumn = new HashMap<ChunkCoordinate, Boolean>();
-    HashMap<ChunkCoordinate, Integer> maxHeightPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    
+   
     @Override
     public LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
     {   	                      

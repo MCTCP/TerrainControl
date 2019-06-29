@@ -11,9 +11,8 @@ import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
-import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
 import java.io.File;

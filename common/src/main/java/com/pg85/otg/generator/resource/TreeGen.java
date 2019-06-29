@@ -10,7 +10,7 @@ import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,22 +18,6 @@ import java.util.Random;
 
 public class TreeGen extends Resource
 {
-	// OTG+
-	
-    private List<CustomObject> getTrees(String worldName)
-    {
-    	if(trees.size() == 0 && treeNames.size() > 0)
-    	{
-	        for (int i = 0; i < treeNames.size(); i++)
-	        {
-	        	trees.add(OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeNames.get(i), worldName));
-	        }
-    	}
-    	return trees;
-    }	
-	
-	//
-	
     private final List<Integer> treeChances;
     private final List<String> treeNames;
     private final List<CustomObject> trees;
@@ -177,4 +161,16 @@ public class TreeGen extends Resource
             }
         }    		
     }
+    	
+    private List<CustomObject> getTrees(String worldName)
+    {
+    	if(trees.size() == 0 && treeNames.size() > 0)
+    	{
+	        for (int i = 0; i < treeNames.size(); i++)
+	        {
+	        	trees.add(OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeNames.get(i), worldName));
+	        }
+    	}
+    	return trees;
+    }		
 }

@@ -1,5 +1,6 @@
-package com.pg85.otg.util;
+package com.pg85.otg.util.bo3;
 
+import com.pg85.otg.util.ChunkCoordinate;
 
 /**
  * Represents a three-dimensional bounding box. Bounding boxes are initially

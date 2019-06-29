@@ -2,7 +2,7 @@ package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
-import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.ArrayList;
 import java.util.Random;

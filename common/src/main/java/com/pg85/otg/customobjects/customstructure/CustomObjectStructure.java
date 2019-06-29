@@ -14,7 +14,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.RandomHelper;
 
 import java.util.*;
@@ -29,6 +29,38 @@ import java.util.Map.Entry;
  */
 public class CustomObjectStructure
 {
+	// OTG
+	
+    protected StructurePartSpawnHeight height;
+    private Map<ChunkCoordinate, Set<CustomObjectCoordinate>> objectsToSpawn;
+    private int maxBranchDepth;
+    Random worldRandom;
+	
+    public CustomObjectStructure(CustomObjectCoordinate start)
+    {
+    	IsOTGPlus = false;
+    	Start = start;
+    }
+    
+    CustomObjectStructure(Random worldRandom, LocalWorld world, CustomObjectCoordinate start)
+    {
+    	IsOTGPlus = false;
+        StructuredCustomObject object = (StructuredCustomObject)start.getObject(); // TODO: Turned CustomObject into StructuredCustomObject, check if that doesn't cause problems. Can a non-StructuredCustomObject be passed here?
+
+        this.World = world;
+        this.worldRandom = worldRandom;
+        this.Start = start;
+        this.height = object.getStructurePartSpawnHeight();
+        this.maxBranchDepth = object.getMaxBranchDepth();
+        this.Random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), world.getSeed());
+
+        // Calculate all branches and add them to a list
+        objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomObjectCoordinate>>();
+
+        addToSpawnList(start, object); // Add the object itself
+        addBranches(start, 1);
+    }
+	
 	// OTG+
 
 	public SmoothingAreaGenerator smoothingAreaManager = new SmoothingAreaGenerator();
@@ -62,6 +94,23 @@ public class CustomObjectStructure
     // Object[] { int startpoint, int endpoint, int distance from real startpoint }
     Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
 
+    int branchesTried = 0;
+
+    public boolean startChunkBlockChecksDone = false;
+    
+    public Stack<BranchDataItem> AllBranchesBranchData = new Stack<BranchDataItem>();
+    public HashMap<ChunkCoordinate, ArrayList<BranchDataItem>> AllBranchesBranchDataByChunk = new HashMap<ChunkCoordinate, ArrayList<BranchDataItem>>();
+	private HashMap<String, ArrayList<ChunkCoordinate>> AllBranchesBranchDataByName = new HashMap<String, ArrayList<ChunkCoordinate>>(); // Used to find distance between branches and branch groups
+	private HashMap<String, HashMap<ChunkCoordinate, ArrayList<Integer>>> AllBranchesBranchDataByGroup = new HashMap<String, HashMap<ChunkCoordinate, ArrayList<Integer>>>(); // Used to find distance between branches and branch groups
+    public HashSet<Integer> AllBranchesBranchDataHash = new HashSet<Integer>();
+    private boolean SpawningCanOverrideBranches = false;
+    int Cycle = 0;
+    
+    BranchDataItem currentSpawningRequiredChildrenForOptionalBranch;
+    boolean spawningRequiredChildrenForOptionalBranch = false;
+    boolean spawnedBranchThisCycle = false;
+    boolean spawnedBranchLastCycle = false;
+    
     public CustomObjectStructure(LocalWorld world, CustomObjectCoordinate structureStart, Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn, int minY)
     {
     	this(world, structureStart, false, false);
@@ -69,9 +118,178 @@ public class CustomObjectStructure
     	SmoothingAreasToSpawn = smoothingAreasToSpawn;
     	MinY = minY;
     }
+    
+    public CustomObjectStructure(LocalWorld world, CustomObjectCoordinate start, boolean spawn, boolean isStructureAtSpawn)
+    {
+        World = world;
+        IsStructureAtSpawn = isStructureAtSpawn;
+        IsOTGPlus = true;
 
-    public boolean startChunkBlockChecksDone = false;
-    private boolean DoStartChunkBlockChecks()
+        if(start == null)
+        {
+        	return;
+        }
+        if (!(start.getObject() instanceof StructuredCustomObject))
+        {
+            throw new IllegalArgumentException("Start object must be a structure!");
+        }
+
+        Start = start;
+        Random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, world.getSeed());
+
+		if(spawn)
+		{
+			branchesTried = 0;
+
+			long startTime = System.currentTimeMillis();
+
+			// Structure at spawn can't hurt to query source blocks, structures with randomY don't need to do any block checks so don't hurt either.
+			//if(isStructureAtSpawn || ((BO3)Start.getObject(World.getName())).settings.spawnHeight == SpawnHeightEnum.randomY)
+			{
+				if(!doStartChunkBlockChecks()){ return; } // Just do the damn checks to get the height right....
+			}
+
+			// Only detect Y or material of source block if necessary to prevent chunk loading
+			// if this BO3 is being plotted in a chunk that has not yet been populated.
+
+			// Need to know the height if this structure can only spawn at a certain height
+			//if((((BO3)Start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestBlock || ((BO3)Start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock) && (World.getConfigs().getWorldConfig().disableBedrock || ((BO3)Start.getObject()).getSettings().minHeight > 1 || ((BO3)Start.getObject()).getSettings().maxHeight < 256))
+			{
+				//if(!DoStartChunkBlockChecks()){ return; }
+			}
+
+			if(!((BO3)Start.getObject()).getSettings().CanSpawnOnWater)
+			{
+				//if(!DoStartChunkBlockChecks()){ return; }
+				int highestBlocky = world.getHighestBlockYAt(Start.getX() + 8, Start.getZ() + 7, true, true, false, true);;
+				//if(Start.y - 1 > OTG.WORLD_DEPTH && Start.y - 1 < OTG.WORLD_HEIGHT && world.getMaterial(Start.getX() + 8, Start.y - 1, Start.getZ() + 7).isLiquid())
+				if(Start.y - 1 > PluginStandardValues.WORLD_DEPTH && Start.y - 1 < PluginStandardValues.WORLD_HEIGHT && world.getMaterial(Start.getX() + 8, highestBlocky, Start.getZ() + 7, IsOTGPlus).isLiquid())
+				{
+					return;
+				}
+			}
+
+			if(((BO3)Start.getObject()).getSettings().SpawnOnWaterOnly)
+			{
+				//if(!DoStartChunkBlockChecks()){ return; }
+				if(
+					!(
+						world.getMaterial(Start.getX(), Start.y - 1, Start.getZ(), IsOTGPlus).isLiquid() &&
+						world.getMaterial(Start.getX(), Start.y - 1, Start.getZ() + 15, IsOTGPlus).isLiquid() &&
+						world.getMaterial(Start.getX() + 15, Start.y - 1, Start.getZ(), IsOTGPlus).isLiquid() &&
+						world.getMaterial(Start.getX() + 15, Start.y - 1, Start.getZ() + 15, IsOTGPlus).isLiquid()
+					)
+				)
+				{
+					return;
+				}
+			}
+
+			try
+			{
+				calculateBranches(false);
+			} catch (InvalidConfigException ex) {
+				OTG.log(LogMarker.FATAL, "An unknown error occurred while calculating branches for BO3 " + Start.BO3Name + ". This is probably an error in the BO3's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
+				throw new RuntimeException();
+			}
+
+			for(Entry<ChunkCoordinate, Stack<CustomObjectCoordinate>> chunkCoordSet : ObjectsToSpawn.entrySet())
+			{
+				String structureInfo = "";
+				for(CustomObjectCoordinate customObjectCoord : chunkCoordSet.getValue())
+				{
+					structureInfo += customObjectCoord.getObject().getName() + ":" + customObjectCoord.getRotation() + ", ";
+				}
+				if(structureInfo.length() > 0)
+				{
+					structureInfo = structureInfo.substring(0,  structureInfo.length() - 2);
+					ObjectsToSpawnInfo.put(chunkCoordSet.getKey(), "Branches in chunk X" + chunkCoordSet.getKey().getChunkX() + " Z" + chunkCoordSet.getKey().getChunkZ() + " : " + structureInfo);
+				}
+			}
+
+			for(Entry<ChunkCoordinate, Stack<CustomObjectCoordinate>> chunkCoordSet : ObjectsToSpawn.entrySet())
+			{
+	        	// Don't spawn BO3's that have been overriden because of replacesBO3
+	        	for (CustomObjectCoordinate coordObject : chunkCoordSet.getValue())
+	        	{
+	        		BO3Config objectConfig = ((BO3)coordObject.getObject()).getSettings();
+	        		if(objectConfig.replacesBO3Branches.size() > 0)
+	        		{
+	        			for(String BO3ToReplace : objectConfig.replacesBO3Branches)
+	        			{
+	        				for (CustomObjectCoordinate coordObjectToReplace : chunkCoordSet.getValue())
+	        				{
+	        					if(((BO3)coordObjectToReplace.getObject()).getName().equals(BO3ToReplace))
+	        					{
+	        						if(checkCollision(coordObject, coordObjectToReplace))
+	        						{
+	        							coordObjectToReplace.isSpawned = true;
+	        						}
+	        					}
+	        				}
+	        			}
+	        		}
+	        	}
+			}
+
+			//TODO: Smoothing areas should count as must spawn/required branches! <-- Is this really a problem? Smoothing areas from different structures don't overlap?
+
+	        // Calculate smoothing areas around the entire branching structure
+	        // Smooth the terrain in all directions bordering the structure so
+	        // that there is a smooth transition in height from the surrounding
+	        // terrain to the BO3. This way BO3's won't float above the ground
+	        // or spawn inside a hole with vertical walls.
+			SmoothingAreasToSpawn = smoothingAreaManager.calculateSmoothingAreas(ObjectsToSpawn, Start, World);
+			smoothingAreaManager.CustomObjectStructureSpawn(SmoothingAreasToSpawn);			
+			
+			for(ChunkCoordinate chunkCoord : ObjectsToSpawn.keySet())
+			{
+				World.getStructureCache().structureCache.put(chunkCoord, this);
+				World.getStructureCache().getPlotter().addToStructuresPerChunkCache(chunkCoord, new ArrayList<String>());
+				// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
+				if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+				{
+					CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
+					this.modDataManager.modData.addAll(existingObject.modDataManager.modData);
+					this.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
+					this.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
+				}
+				World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
+			}
+
+			for(ChunkCoordinate chunkCoord : SmoothingAreasToSpawn.keySet())
+			{
+				World.getStructureCache().structureCache.put(chunkCoord, this);
+				World.getStructureCache().getPlotter().addToStructuresPerChunkCache(chunkCoord, new ArrayList<String>());
+				// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
+				if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+				{
+					CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
+					this.modDataManager.modData.addAll(existingObject.modDataManager.modData);
+					this.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
+					this.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
+				}
+				World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
+			}
+
+			if(ObjectsToSpawn.size() > 0)
+			{
+				IsSpawned = true;
+				if(OTG.getPluginConfig().SpawnLog)
+				{
+					int totalBO3sSpawned = 0;
+					for(ChunkCoordinate entry : ObjectsToSpawn.keySet())
+					{
+						totalBO3sSpawned += ObjectsToSpawn.get(entry).size();
+					}
+
+					OTG.log(LogMarker.INFO, Start.getObject().getName() + " " + totalBO3sSpawned + " object(s) plotted in " + (System.currentTimeMillis() - startTime) + " Ms and " + Cycle + " cycle(s), " + (branchesTried + 1) + " object(s) tried.");
+				}
+			}
+		}
+    }
+
+    private boolean doStartChunkBlockChecks()
     {
     	if(!startChunkBlockChecksDone)
     	{
@@ -183,179 +401,7 @@ public class CustomObjectStructure
     	}
     	return true;
     }
-
-    int branchesTried = 0;
-
-    public CustomObjectStructure(LocalWorld world, CustomObjectCoordinate start, boolean spawn, boolean isStructureAtSpawn)
-    {
-        World = world;
-        IsStructureAtSpawn = isStructureAtSpawn;
-        IsOTGPlus = true;
-
-        if(start == null)
-        {
-        	return;
-        }
-        if (!(start.getObject() instanceof StructuredCustomObject))
-        {
-            throw new IllegalArgumentException("Start object must be a structure!");
-        }
-
-        Start = start;
-        Random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, world.getSeed());
-
-		if(spawn)
-		{
-			branchesTried = 0;
-
-			long startTime = System.currentTimeMillis();
-
-			// Structure at spawn can't hurt to query source blocks, structures with randomY don't need to do any block checks so don't hurt either.
-			//if(isStructureAtSpawn || ((BO3)Start.getObject(World.getName())).settings.spawnHeight == SpawnHeightEnum.randomY)
-			{
-				if(!DoStartChunkBlockChecks()){ return; } // Just do the damn checks to get the height right....
-			}
-
-			// Only detect Y or material of source block if necessary to prevent chunk loading
-			// if this BO3 is being plotted in a chunk that has not yet been populated.
-
-			// Need to know the height if this structure can only spawn at a certain height
-			//if((((BO3)Start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestBlock || ((BO3)Start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock) && (World.getConfigs().getWorldConfig().disableBedrock || ((BO3)Start.getObject()).getSettings().minHeight > 1 || ((BO3)Start.getObject()).getSettings().maxHeight < 256))
-			{
-				//if(!DoStartChunkBlockChecks()){ return; }
-			}
-
-			if(!((BO3)Start.getObject()).getSettings().CanSpawnOnWater)
-			{
-				//if(!DoStartChunkBlockChecks()){ return; }
-				int highestBlocky = world.getHighestBlockYAt(Start.getX() + 8, Start.getZ() + 7, true, true, false, true);;
-				//if(Start.y - 1 > OTG.WORLD_DEPTH && Start.y - 1 < OTG.WORLD_HEIGHT && world.getMaterial(Start.getX() + 8, Start.y - 1, Start.getZ() + 7).isLiquid())
-				if(Start.y - 1 > PluginStandardValues.WORLD_DEPTH && Start.y - 1 < PluginStandardValues.WORLD_HEIGHT && world.getMaterial(Start.getX() + 8, highestBlocky, Start.getZ() + 7, IsOTGPlus).isLiquid())
-				{
-					return;
-				}
-			}
-
-			if(((BO3)Start.getObject()).getSettings().SpawnOnWaterOnly)
-			{
-				//if(!DoStartChunkBlockChecks()){ return; }
-				if(
-					!(
-						world.getMaterial(Start.getX(), Start.y - 1, Start.getZ(), IsOTGPlus).isLiquid() &&
-						world.getMaterial(Start.getX(), Start.y - 1, Start.getZ() + 15, IsOTGPlus).isLiquid() &&
-						world.getMaterial(Start.getX() + 15, Start.y - 1, Start.getZ(), IsOTGPlus).isLiquid() &&
-						world.getMaterial(Start.getX() + 15, Start.y - 1, Start.getZ() + 15, IsOTGPlus).isLiquid()
-					)
-				)
-				{
-					return;
-				}
-			}
-
-			try
-			{
-				CalculateBranches(false);
-			} catch (InvalidConfigException ex) {
-				OTG.log(LogMarker.FATAL, "An unknown error occurred while calculating branches for BO3 " + Start.BO3Name + ". This is probably an error in the BO3's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
-				throw new RuntimeException();
-			}
-
-			for(Entry<ChunkCoordinate, Stack<CustomObjectCoordinate>> chunkCoordSet : ObjectsToSpawn.entrySet())
-			{
-				String structureInfo = "";
-				for(CustomObjectCoordinate customObjectCoord : chunkCoordSet.getValue())
-				{
-					structureInfo += customObjectCoord.getObject().getName() + ":" + customObjectCoord.getRotation() + ", ";
-				}
-				if(structureInfo.length() > 0)
-				{
-					structureInfo = structureInfo.substring(0,  structureInfo.length() - 2);
-					ObjectsToSpawnInfo.put(chunkCoordSet.getKey(), "Branches in chunk X" + chunkCoordSet.getKey().getChunkX() + " Z" + chunkCoordSet.getKey().getChunkZ() + " : " + structureInfo);
-				}
-			}
-
-			for(Entry<ChunkCoordinate, Stack<CustomObjectCoordinate>> chunkCoordSet : ObjectsToSpawn.entrySet())
-			{
-	        	// Don't spawn BO3's that have been overriden because of replacesBO3
-	        	for (CustomObjectCoordinate coordObject : chunkCoordSet.getValue())
-	        	{
-	        		BO3Config objectConfig = ((BO3)coordObject.getObject()).getSettings();
-	        		if(objectConfig.replacesBO3Branches.size() > 0)
-	        		{
-	        			for(String BO3ToReplace : objectConfig.replacesBO3Branches)
-	        			{
-	        				for (CustomObjectCoordinate coordObjectToReplace : chunkCoordSet.getValue())
-	        				{
-	        					if(((BO3)coordObjectToReplace.getObject()).getName().equals(BO3ToReplace))
-	        					{
-	        						if(CheckCollision(coordObject, coordObjectToReplace))
-	        						{
-	        							coordObjectToReplace.isSpawned = true;
-	        						}
-	        					}
-	        				}
-	        			}
-	        		}
-	        	}
-			}
-
-			//TODO: Smoothing areas should count as must spawn/required branches! <-- Is this really a problem? Smoothing areas from different structures don't overlap?
-
-	        // Calculate smoothing areas around the entire branching structure
-	        // Smooth the terrain in all directions bordering the structure so
-	        // that there is a smooth transition in height from the surrounding
-	        // terrain to the BO3. This way BO3's won't float above the ground
-	        // or spawn inside a hole with vertical walls.
-			SmoothingAreasToSpawn = smoothingAreaManager.CalculateSmoothingAreas(ObjectsToSpawn, Start, World);
-			smoothingAreaManager.CustomObjectStructureSpawn(SmoothingAreasToSpawn);			
-			
-			for(ChunkCoordinate chunkCoord : ObjectsToSpawn.keySet())
-			{
-				World.getStructureCache().structureCache.put(chunkCoord, this);
-				World.getStructureCache().getPlotter().AddToStructuresPerChunkCache(chunkCoord, new ArrayList<String>());
-				// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
-				if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-				{
-					CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
-					this.modDataManager.modData.addAll(existingObject.modDataManager.modData);
-					this.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
-					this.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
-				}
-				World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
-			}
-
-			for(ChunkCoordinate chunkCoord : SmoothingAreasToSpawn.keySet())
-			{
-				World.getStructureCache().structureCache.put(chunkCoord, this);
-				World.getStructureCache().getPlotter().AddToStructuresPerChunkCache(chunkCoord, new ArrayList<String>());
-				// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
-				if(World.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-				{
-					CustomObjectStructure existingObject = World.getStructureCache().worldInfoChunks.get(chunkCoord);
-					this.modDataManager.modData.addAll(existingObject.modDataManager.modData);
-					this.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
-					this.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
-				}
-				World.getStructureCache().worldInfoChunks.put(chunkCoord, this);
-			}
-
-			if(ObjectsToSpawn.size() > 0)
-			{
-				IsSpawned = true;
-				if(OTG.getPluginConfig().SpawnLog)
-				{
-					int totalBO3sSpawned = 0;
-					for(ChunkCoordinate entry : ObjectsToSpawn.keySet())
-					{
-						totalBO3sSpawned += ObjectsToSpawn.get(entry).size();
-					}
-
-					OTG.log(LogMarker.INFO, Start.getObject().getName() + " " + totalBO3sSpawned + " object(s) plotted in " + (System.currentTimeMillis() - startTime) + " Ms and " + Cycle + " cycle(s), " + (branchesTried + 1) + " object(s) tried.");
-				}
-			}
-		}
-    }
-    
+   
     /**
      * Gets an Object[] { ChunkCoordinate, ChunkCoordinate } containing the top left and bottom right chunk
      * If this structure were spawned as small as possible (with branchDepth 0)
@@ -364,7 +410,7 @@ public class CustomObjectStructure
      * @return
      * @throws InvalidConfigException
      */
-    public Object[] GetMinimumSize() throws InvalidConfigException
+    public Object[] getMinimumSize() throws InvalidConfigException
     {
     	if(
 			((BO3)Start.getObject()).getSettings().MinimumSizeTop != -1 &&
@@ -376,7 +422,7 @@ public class CustomObjectStructure
     		return returnValue;
     	}
     	
-    	CalculateBranches(true);
+    	calculateBranches(true);
 
         // Calculate smoothing areas around the entire branching structure
         // Smooth the terrain in all directions bordering the structure so
@@ -441,21 +487,13 @@ public class CustomObjectStructure
     	return returnValue;
     }
 
-    public Stack<BranchDataItem> AllBranchesBranchData = new Stack<BranchDataItem>();
-    public HashMap<ChunkCoordinate, ArrayList<BranchDataItem>> AllBranchesBranchDataByChunk = new HashMap<ChunkCoordinate, ArrayList<BranchDataItem>>();
-	private HashMap<String, ArrayList<ChunkCoordinate>> AllBranchesBranchDataByName = new HashMap<String, ArrayList<ChunkCoordinate>>(); // Used to find distance between branches and branch groups
-	private HashMap<String, HashMap<ChunkCoordinate, ArrayList<Integer>>> AllBranchesBranchDataByGroup = new HashMap<String, HashMap<ChunkCoordinate, ArrayList<Integer>>>(); // Used to find distance between branches and branch groups
-    public HashSet<Integer> AllBranchesBranchDataHash = new HashSet<Integer>();
-    private boolean SpawningCanOverrideBranches = false;
-    int Cycle = 0;
-
     // TODO: Make sure that canOverride optional branches cannot be in the same branch group as required branches.
     // This makes sure that when the first spawn phase is complete and all required branches and non-canOverride optional branches have spawned
     // those can never be rolled back because of canOverride optional branches that are unable to spawn.
     // canOverride required branches: things that need to be spawned in the same cycle as their parent branches, for instance door/wall markers for rooms
     // canOverride optional branches: things that should be spawned after the base of the structure has spawned, for instance room interiors, adapter/modifier pieces that knock out walls/floors between rooms etc.
 
-    public void CalculateBranches(boolean minimumSize) throws InvalidConfigException
+    public void calculateBranches(boolean minimumSize) throws InvalidConfigException
     {
     	if(OTG.getPluginConfig().SpawnLog)
     	{
@@ -481,8 +519,8 @@ public class CustomObjectStructure
     	boolean processingDone = false;
     	while(!processingDone)
     	{
-    		SpawnedBranchLastCycle = SpawnedBranchThisCycle;
-    		SpawnedBranchThisCycle = false;
+    		spawnedBranchLastCycle = spawnedBranchThisCycle;
+    		spawnedBranchThisCycle = false;
 
     		Cycle += 1;
 
@@ -492,13 +530,13 @@ public class CustomObjectStructure
     			OTG.log(LogMarker.INFO, "---- Cycle " + Cycle + " ----");
     		}
 
-    		TraverseAndSpawnChildBranches(branchData, minimumSize, true);
+    		traverseAndSpawnChildBranches(branchData, minimumSize, true);
 
 			if(OTG.getPluginConfig().SpawnLog)
 			{
 				OTG.log(LogMarker.INFO, "All branch groups with required branches only have been processed for cycle " + Cycle + ", plotting branch groups with optional branches.");
 			}
-			TraverseAndSpawnChildBranches(branchData, minimumSize, false);
+			traverseAndSpawnChildBranches(branchData, minimumSize, false);
 
 			processingDone = true;
             for(BranchDataItem branchDataItem3 : AllBranchesBranchData)
@@ -573,7 +611,7 @@ public class CustomObjectStructure
         		{
         			throw new RuntimeException(); // TODO: Remove after testing
         		}
-        		AddToChunk(branchToAdd.Branch, branchToAdd.ChunkCoordinate, ObjectsToSpawn);
+        		addToChunk(branchToAdd.Branch, branchToAdd.ChunkCoordinate, ObjectsToSpawn);
         	}
         }
         
@@ -584,15 +622,11 @@ public class CustomObjectStructure
         AllBranchesBranchDataHash.clear();
     }
 
-    BranchDataItem currentSpawningRequiredChildrenForOptionalBranch;
-    boolean SpawningRequiredChildrenForOptionalBranch = false;
-    boolean SpawnedBranchThisCycle = false;
-    boolean SpawnedBranchLastCycle = false;
-    private void TraverseAndSpawnChildBranches(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly)
+    private void traverseAndSpawnChildBranches(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly)
     {
     	if(!branchData.DoneSpawning)
     	{
-    		AddBranches(branchData, minimumSize, false, spawningRequiredBranchesOnly);
+    		addBranches(branchData, minimumSize, false, spawningRequiredBranchesOnly);
     	} else {
     		if(!branchData.CannotSpawn)
     		{
@@ -602,14 +636,14 @@ public class CustomObjectStructure
     				// that tried to spawn but couldnt
     				if(!branchDataItem2.CannotSpawn && branchData.DoneSpawning)
     				{
-    					TraverseAndSpawnChildBranches(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
+    					traverseAndSpawnChildBranches(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
     				}
     			}
     		}
     	}
     }
 
-    private void AddBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly)
+    private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly)
     {
     	// CanOverride optional branches are spawned only after the main structure has spawned.
     	// This is useful for adding interiors and knocking out walls between rooms
@@ -634,7 +668,7 @@ public class CustomObjectStructure
     	}
 
     	// TODO: Remove these
-    	if(SpawningRequiredChildrenForOptionalBranch && traverseOnlySpawnedChildren)
+    	if(spawningRequiredChildrenForOptionalBranch && traverseOnlySpawnedChildren)
     	{
     		throw new RuntimeException();
     	}
@@ -794,7 +828,7 @@ public class CustomObjectStructure
 	        			isInsideWorldBorder = false;
 	        		}
 
-        			if(!DoStartChunkBlockChecks())
+        			if(!doStartChunkBlockChecks())
         			{
         				canSpawn = false;
         				startChunkBlockChecksPassed = false;
@@ -888,7 +922,7 @@ public class CustomObjectStructure
 	        			if(canSpawn)
 	        			{
 	        				// Returns collidingObject == null if if the branch cannot spawn in the given biome or if the given chunk is occupied by another structure
-	    					collidingObjects = CheckSpawnRequirementsAndCollisions(childBranchDataItem, minimumSize);
+	    					collidingObjects = checkSpawnRequirementsAndCollisions(childBranchDataItem, minimumSize);
 	        				if(collidingObjects.size() > 0)
 	        				{
 		    					canSpawn = false;
@@ -987,7 +1021,7 @@ public class CustomObjectStructure
         					}
 		        		}
 
-		        		SpawnedBranchThisCycle = true;
+		        		spawnedBranchThisCycle = true;
 
 		        		addToCaches(childBranchDataItem, bo3);		        		
 
@@ -995,7 +1029,7 @@ public class CustomObjectStructure
 		        		// If this causes a rollback the rollback will stopped at this branch and we can resume spawning
 		        		// the current branch's children as if it was unable to spawn.
 		        		if(
-	        				!SpawningRequiredChildrenForOptionalBranch &&
+	        				!spawningRequiredChildrenForOptionalBranch &&
 	        				!childBranchDataItem.Branch.isRequiredBranch
         				)
 		        		{
@@ -1004,10 +1038,10 @@ public class CustomObjectStructure
 		        				OTG.log(LogMarker.INFO, "Plotting all required child branches that are not in a branch group with optional branches.");
 		        			}
 
-		        			SpawningRequiredChildrenForOptionalBranch = true;
+		        			spawningRequiredChildrenForOptionalBranch = true;
         					currentSpawningRequiredChildrenForOptionalBranch = childBranchDataItem;
-			        		TraverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true);
-			        		SpawningRequiredChildrenForOptionalBranch = false;
+			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true);
+			        		spawningRequiredChildrenForOptionalBranch = false;
 
 			        		// Make sure the branch wasn't rolled back because the required branches couldn't spawn.
 			        		boolean bFound = false;
@@ -1034,11 +1068,11 @@ public class CustomObjectStructure
 		        		// Otherwise existing branches could have their children spawn more than once per cycle
 		        		else if(
 	        				traverseOnlySpawnedChildren &&
-	        				!SpawningRequiredChildrenForOptionalBranch &&
+	        				!spawningRequiredChildrenForOptionalBranch &&
 	        				childBranchDataItem.Branch.isRequiredBranch
         				)
 		        		{
-			        		TraverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true);
+			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true);
 		        		}
 		        	}
 
@@ -1049,7 +1083,7 @@ public class CustomObjectStructure
 		        			// WasntBelowOther branches that cannot spawn get to retry
 		        			// each cycle unless no branch spawned last cycle
 		        			// TODO: Won't this cause problems?
-		        			if(!wasntBelowOther || !SpawnedBranchLastCycle)
+		        			if(!wasntBelowOther || !spawnedBranchLastCycle)
 		        			{
 				        		childBranchDataItem.DoneSpawning = true;
 				        		childBranchDataItem.CannotSpawn = true;
@@ -1086,7 +1120,7 @@ public class CustomObjectStructure
 				        		}
 			        		}
 
-			        		if(!collidedWithParentOrSibling && (!wasntBelowOther || !SpawnedBranchLastCycle) && branchGroupFailedSpawning)
+			        		if(!collidedWithParentOrSibling && (!wasntBelowOther || !spawnedBranchLastCycle) && branchGroupFailedSpawning)
 			        		{
 			            		// Branch could not spawn
 			            		// abort this branch because it has a branch group that could not be spawned
@@ -1121,14 +1155,14 @@ public class CustomObjectStructure
 			        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.Branch.getChunkX() + " Z" + branchDataItem.Branch.getChunkZ() + " Y" + branchDataItem.Branch.getY() + " " + branchDataItem.Branch.BO3Name + ":" + branchDataItem.Branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.Branch.BO3Name + " couldn't spawn. Reason: " + reason);
 			            		}
 
-		            			RollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly);
+		            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly);
 		            			bBreak = true;
 			        		} else {
 				        		// if this child branch could not spawn then in some cases other child branches won't be able to either
 				        		// mark those child branches so they dont try to spawn and roll back the whole branch if a required branch can't spawn
 				        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false))
 				        		{
-				        			if(!wasntBelowOther || !SpawnedBranchLastCycle)
+				        			if(!wasntBelowOther || !spawnedBranchLastCycle)
 				        			{
 					        			if(
 				        					childBranchDataItem == childBranchDataItem2 ||
@@ -1218,7 +1252,7 @@ public class CustomObjectStructure
 							        	    				(!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && isInsideWorldBorder && startChunkBlockChecksPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "ChunkIsIneligible: Either the chunk is occupied by another structure or a default structure, or the BO3/smoothing area is not allowed in the Biome)" : "");
 							        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.Branch.getChunkX() + " Z" + branchDataItem.Branch.getChunkZ() + " Y" + branchDataItem.Branch.getY() + " " + branchDataItem.Branch.BO3Name + ":" + branchDataItem.Branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.Branch.BO3Name + " couldn't spawn. Reason: " + reason);
 							            		}
-						            			RollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly);
+						            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly);
 						            			bBreak = true;
 						            			break;
 					        				}
@@ -1262,11 +1296,11 @@ public class CustomObjectStructure
 							!childBranchDataItem.CannotSpawn &&
 							(
 								!childBranchDataItem.SpawnDelayed ||
-								!SpawnedBranchLastCycle
+								!spawnedBranchLastCycle
 							)
 						)
 						{
-							TraverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly);
+							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly);
 						}
 	        		}
 	        	}
@@ -1285,7 +1319,7 @@ public class CustomObjectStructure
 	        		{
 						if(childBranchDataItem.Branch.isRequiredBranch)
 						{
-							TraverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly);
+							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly);
 						}
 	        		}
 	        	}
@@ -1413,7 +1447,7 @@ public class CustomObjectStructure
 						{
 							if(branchName.equals(cantBeInsideBO3))
 							{
-   	    						if(CheckCollision(childBranchDataItem.Branch, branchDataItem3.Branch))
+   	    						if(checkCollision(childBranchDataItem.Branch, branchDataItem3.Branch))
    	    						{
    	     	        				if(OTG.getPluginConfig().SpawnLog)
    	    	        				{
@@ -1439,7 +1473,8 @@ public class CustomObjectStructure
 		return !foundSpawnBlocker;
 	}
 
-	private boolean checkMustBeInside(BranchDataItem childBranchDataItem, BO3 bo3) {
+	private boolean checkMustBeInside(BranchDataItem childBranchDataItem, BO3 bo3)
+	{
 		// Check for mustBeInside
 		// Only one branch has to be present
 		// TODO: Make AND/OR switch
@@ -1459,7 +1494,7 @@ public class CustomObjectStructure
 							{
 								if(branchName.equals(mustBeInsideBO3))
 								{
-	   	    						if(CheckCollision(childBranchDataItem.Branch, branchDataItem3.Branch))
+	   	    						if(checkCollision(childBranchDataItem.Branch, branchDataItem3.Branch))
 	   	    						{
 	   	    							bFoundPart = true;
 	   	    							break;
@@ -1492,12 +1527,12 @@ public class CustomObjectStructure
 		return foundSpawnRequirement;
 	}
 
-	private void RollBackBranch(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly)
+	private void rollBackBranch(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly)
     {
     	// When spawning an optional branch its required branches are spawned immediately as well (if there are no optional branches in the same branchGroup)
     	// This can cause a rollback if the required branches cannot spawn. Make sure that the parent branch of the optional branch isn't rolled back since it
     	// is currently still being processed and is spawning its optional branches.
-    	if(SpawningRequiredChildrenForOptionalBranch && currentSpawningRequiredChildrenForOptionalBranch.Parent == branchData)
+    	if(spawningRequiredChildrenForOptionalBranch && currentSpawningRequiredChildrenForOptionalBranch.Parent == branchData)
     	{
     		return;
     	}
@@ -1513,7 +1548,7 @@ public class CustomObjectStructure
     	branchData.wasDeleted = true;
 
     	branchData.isBeingRolledBack = true;
-    	DeleteBranchChildren(branchData,minimumSize, spawningRequiredBranchesOnly);
+    	deleteBranchChildren(branchData,minimumSize, spawningRequiredBranchesOnly);
 
     	if(AllBranchesBranchDataHash.contains(branchData.branchNumber))
     	{
@@ -1568,7 +1603,7 @@ public class CustomObjectStructure
 		    					}
 			    				if(!branchAboveFound)
 			    				{
-			    					RollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
+			    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
 			    				}
 			    			}
 		    			}
@@ -1616,7 +1651,7 @@ public class CustomObjectStructure
 								// Check if the branch can remain spawned without the branch we're rolling back
 	    	    				if(!checkMustBeInside(branchDataItem2, ((BO3)branchDataItem2.Branch.getObject())))
 	    	    				{
-	    	    					RollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
+	    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
 	    	    				}
 							}
 		    			}
@@ -1631,7 +1666,7 @@ public class CustomObjectStructure
     		if(branchData.Branch.isRequiredBranch)
     		{
     			//OTG.log(LogMarker.INFO, "RollBackBranch 4: " + branchData.Parent.Branch.BO3Name + " <> " + branchData.Branch.BO3Name);
-    			RollBackBranch(branchData.Parent, minimumSize, spawningRequiredBranchesOnly);
+    			rollBackBranch(branchData.Parent, minimumSize, spawningRequiredBranchesOnly);
     		} else {
 
     			// Mark for spawning the parent and all other branches in the same branch group that spawn after this branch (unless they have already been spawned successfully)
@@ -1670,7 +1705,7 @@ public class CustomObjectStructure
         		if(
     				!parentDoneSpawning &&
     				!(
-						SpawningRequiredChildrenForOptionalBranch &&
+						spawningRequiredChildrenForOptionalBranch &&
 						currentSpawningRequiredChildrenForOptionalBranch == branchData
 					)
 				)
@@ -1679,7 +1714,7 @@ public class CustomObjectStructure
 
 	        		// Rollbacks only happen when:
 
-        			if(!SpawningRequiredChildrenForOptionalBranch)
+        			if(!spawningRequiredChildrenForOptionalBranch)
         			{
         				if(spawningRequiredBranchesOnly)
         				{
@@ -1688,7 +1723,7 @@ public class CustomObjectStructure
             				// AddBranches should be called for the parent of the branch being rolled back and its parent if a branch group failed to spawn (and so on).
 
                 			// Since we're using SpawningRequiredBranchesOnly AddBranches can traverse all child branches without problems.
-            				AddBranches(branchData.Parent, minimumSize, false, spawningRequiredBranchesOnly);
+            				addBranches(branchData.Parent, minimumSize, false, spawningRequiredBranchesOnly);
         				} else {
         					// 2. During the second phase of a cycle branch groups with optional branches are spawned, the optional branches get a chance to spawn first, after that the
         					// required branches try to spawn, if that fails the branch is rolled back.
@@ -1696,7 +1731,7 @@ public class CustomObjectStructure
 
                 			// Since we're not using SpawningRequiredBranchesOnly AddBranches should only traverse child branches for any branches that it spawns from the branch group its re-trying.
         					// Otherwise some branches may have the same children traversed multiple times in a single phase.
-            				AddBranches(branchData.Parent, minimumSize, true, spawningRequiredBranchesOnly);
+            				addBranches(branchData.Parent, minimumSize, true, spawningRequiredBranchesOnly);
         				}
         			} else {
 
@@ -1710,10 +1745,10 @@ public class CustomObjectStructure
         					throw new RuntimeException();
         				}
 
-        				SpawningRequiredChildrenForOptionalBranch = false;
+        				spawningRequiredChildrenForOptionalBranch = false;
             			// Since we're using SpawningRequiredBranchesOnly AddBranches can traverse all child branches without problems.
-        				AddBranches(branchData.Parent, minimumSize, false, spawningRequiredBranchesOnly);
-        				SpawningRequiredChildrenForOptionalBranch = true;
+        				addBranches(branchData.Parent, minimumSize, false, spawningRequiredBranchesOnly);
+        				spawningRequiredChildrenForOptionalBranch = true;
         			}
     			}
     		}
@@ -1722,7 +1757,7 @@ public class CustomObjectStructure
     	branchData.isBeingRolledBack = false;
     }
 
-    private void DeleteBranchChildren(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly)
+    private void deleteBranchChildren(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly)
     {
     	// Remove all children of this branch from AllBranchesBranchData
     	Stack<BranchDataItem> children = branchData.getChildren(true);
@@ -1734,7 +1769,7 @@ public class CustomObjectStructure
 
         	if(branchDataItem.getChildren(true).size() > 0)
         	{
-    			DeleteBranchChildren(branchDataItem, minimumSize, spawningRequiredBranchesOnly);
+    			deleteBranchChildren(branchDataItem, minimumSize, spawningRequiredBranchesOnly);
         	}
         	if(AllBranchesBranchDataHash.contains(branchDataItem.branchNumber))
         	{
@@ -1788,7 +1823,7 @@ public class CustomObjectStructure
 		    	    					}
 			    	    				if(!branchAboveFound)
 			    	    				{
-			    	    					RollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
+			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
 			    	    				}
 			    	    			}
 			        			}
@@ -1836,7 +1871,7 @@ public class CustomObjectStructure
 										// Check if the branch can remain spawned without the branch we're rolling back
 		    	    					if(!checkMustBeInside(branchDataItem2, ((BO3)branchDataItem2.Branch.getObject())))
 			    	    				{
-			    	    					RollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
+			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly);
 			    	    				}
 									}
 			        			}
@@ -1927,7 +1962,7 @@ public class CustomObjectStructure
 		}
 	}
 
-    private Stack<BranchDataItem> CheckSpawnRequirementsAndCollisions(BranchDataItem branchData, boolean minimumSize)
+    private Stack<BranchDataItem> checkSpawnRequirementsAndCollisions(BranchDataItem branchData, boolean minimumSize)
     {
     	// collidingObjects are only used for size > 0 check and to see if this branch tried to spawn on top of its parent
     	Stack<BranchDataItem> collidingObjects = new Stack<BranchDataItem>();
@@ -2069,7 +2104,7 @@ public class CustomObjectStructure
 	        {
 	        	for (BranchDataItem cachedBranch : existingBranches)
 	        	{
-	        		if(CheckCollision(coordObject, cachedBranch.Branch))
+	        		if(checkCollision(coordObject, cachedBranch.Branch))
 	        		{
 	        			collidingObjects.add(cachedBranch);
 	        		}
@@ -2081,7 +2116,7 @@ public class CustomObjectStructure
     }
 
     // TODO: return list with colliding structures instead of bool?
-    private boolean CheckCollision(CustomObjectCoordinate branchData1Branch, CustomObjectCoordinate branchData2Branch)
+    private boolean checkCollision(CustomObjectCoordinate branchData1Branch, CustomObjectCoordinate branchData2Branch)
     {
     	if(
 			!((BO3)branchData1Branch.getObject()).isCollidable() ||
@@ -2134,7 +2169,7 @@ public class CustomObjectStructure
      * @param coordObject
      * @param chunkCoordinate
      */
-    private void AddToChunk(CustomObjectCoordinate coordObject, ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> objectList)
+    private void addToChunk(CustomObjectCoordinate coordObject, ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> objectList)
     {
     	//OTG.log(LogMarker.INFO, "AddToChunk X" + chunkCoordinate.getChunkX() + " Z" + chunkCoordinate.getChunkZ());
 
@@ -2158,7 +2193,7 @@ public class CustomObjectStructure
     *
     * @param chunkCoordinate
     */
-    public boolean SpawnForChunk(ChunkCoordinate chunkCoordinate)
+    public boolean spawnForChunkOTGPlus(ChunkCoordinate chunkCoordinate)
     {
     	//OTG.log(LogMarker.INFO, "SpawnForChunk X" + chunkCoordinate.getChunkX() + " Z" + chunkCoordinate.getChunkZ() + " " + Start.BO3Name);
 
@@ -2176,7 +2211,7 @@ public class CustomObjectStructure
 
     	saveRequired = true;
 
-    	DoStartChunkBlockChecks();
+    	doStartChunkBlockChecks();
 
         // Get all BO3's that should spawn in the given chunk, if any
         // Note: The given chunk may not necessarily be the chunkCoordinate of this.Start
@@ -2222,7 +2257,7 @@ public class CustomObjectStructure
             // Spawn smooth areas in this chunk if any exist
             // If SpawnSmoothAreas returns false then spawning has
             // been delayed and should be tried again later.
-        	if(!smoothingAreaManager.SpawnSmoothAreas(chunkCoordinate, SmoothingAreasToSpawn, Start, World))
+        	if(!smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, SmoothingAreasToSpawn, Start, World))
         	{
         		BO3.originalTopBlocks.clear(); // TODO: Make this prettier
         		return false;
@@ -2261,7 +2296,7 @@ public class CustomObjectStructure
             // Spawn smooth areas in this chunk if any exist
             // If SpawnSmoothAreas returns false then spawning has
             // been delayed and should be tried again later.
-        	if(!smoothingAreaManager.SpawnSmoothAreas(chunkCoordinate, SmoothingAreasToSpawn, Start, World))
+        	if(!smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, SmoothingAreasToSpawn, Start, World))
         	{
         		BO3.originalTopBlocks.clear(); // TODO: Make this prettier
         		return false;
@@ -2274,37 +2309,7 @@ public class CustomObjectStructure
         return true;
     }
 
-    public CustomObjectStructure(CustomObjectCoordinate start)
-    {
-    	IsOTGPlus = false;
-    	Start = start;
-    }
-
-	//
-
-    protected StructurePartSpawnHeight height;
-    private Map<ChunkCoordinate, Set<CustomObjectCoordinate>> objectsToSpawn;
-    private int maxBranchDepth;
-    Random worldRandom;
-    
-    CustomObjectStructure(Random worldRandom, LocalWorld world, CustomObjectCoordinate start)
-    {
-    	IsOTGPlus = false;
-        StructuredCustomObject object = (StructuredCustomObject)start.getObject(); // TODO: Turned CustomObject into StructuredCustomObject, check if that doesn't cause problems. Can a non-StructuredCustomObject be passed here?
-
-        this.World = world;
-        this.worldRandom = worldRandom;
-        this.Start = start;
-        this.height = object.getStructurePartSpawnHeight();
-        this.maxBranchDepth = object.getMaxBranchDepth();
-        this.Random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), world.getSeed());
-
-        // Calculate all branches and add them to a list
-        objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomObjectCoordinate>>();
-
-        addToSpawnList(start, object); // Add the object itself
-        addBranches(start, 1);
-    }
+    // OTG
 
     private void addBranches(CustomObjectCoordinate coordObject, int depth)
     {
@@ -2367,7 +2372,6 @@ public class CustomObjectStructure
         }
     }
 
-    // Only used for OTG CustomStructure
     public void spawnForChunk(ChunkCoordinate chunkCoordinate)
     {
         Set<CustomObjectCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);

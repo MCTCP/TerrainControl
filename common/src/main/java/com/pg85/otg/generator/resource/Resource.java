@@ -17,7 +17,15 @@ import java.util.Random;
  */
 public abstract class Resource extends ConfigFunction<BiomeConfig> implements Comparable<Resource>
 {
+    protected int frequency;
+    protected LocalMaterialData material;
+    protected double rarity;
 
+    public Resource(BiomeConfig biomeConfig) throws InvalidConfigException
+    {
+        super(biomeConfig);
+    }
+    
     /**
      * Convenience method for creating a resource. Used to create the default
      * resources.
@@ -43,17 +51,6 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
         {
             throw new RuntimeException(e);
         }
-    }
-
-    protected int frequency;
-    protected LocalMaterialData material;
-    protected double rarity;
-
-
-
-    public Resource(BiomeConfig biomeConfig) throws InvalidConfigException
-    {
-        super(biomeConfig);
     }
 
     @Override

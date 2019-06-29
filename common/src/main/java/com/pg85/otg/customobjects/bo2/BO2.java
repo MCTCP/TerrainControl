@@ -9,11 +9,11 @@ import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.NamedBinaryTag;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.BoundingBox;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import java.io.IOException;
@@ -77,12 +77,6 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     public boolean canSpawnAsTree()
     {
         return tree;
-    }
-
-    @Override
-    public boolean canSpawnAsObject()
-    {
-        return true;
     }
 
     @Override
@@ -413,12 +407,6 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     }
 
     @Override
-    public boolean hasPreferenceToSpawnIn(LocalBiome biome)
-    {
-        return spawnInBiome.contains(biome.getName()) || spawnInBiome.contains("All");
-    }
-
-    @Override
     public BoundingBox getBoundingBox(Rotation rotation)
     {
         // We just
@@ -458,15 +446,6 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         readConfigSettings();
         correctSettings();
     }
-    
-    @Override
-    public CustomObject applySettings(SettingsReaderOTGPlus extraSettings)
-    {
-        extraSettings.setFallbackReader(this.reader);
-        BO2 bo2WithSettings = new BO2(extraSettings);
-        bo2WithSettings.enable();
-        return bo2WithSettings;
-    }
-    
+        
 	//
 }

@@ -7,7 +7,7 @@ import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -49,6 +49,9 @@ public class SpawnerFunction extends BO3Function
     public boolean velocityYSet = false;
     public boolean velocityZSet = false;
 
+    private String metaDataTag;
+    private boolean metaDataProcessed = false;
+    
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
@@ -181,8 +184,6 @@ public class SpawnerFunction extends BO3Function
         }
     }
 
-    private String metaDataTag;
-    private boolean metaDataProcessed = false;
     public String getMetaData()
     {
     	if(nbtFileName != null && nbtFileName.length() > 0 && metaDataTag == null && !metaDataProcessed)

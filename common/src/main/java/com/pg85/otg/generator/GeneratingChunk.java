@@ -1,10 +1,10 @@
 package com.pg85.otg.generator;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
-
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.util.ChunkCoordinate;
+
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import java.util.Random;
 

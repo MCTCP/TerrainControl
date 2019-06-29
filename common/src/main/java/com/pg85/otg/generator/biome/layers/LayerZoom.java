@@ -36,8 +36,8 @@ public class LayerZoom extends Layer
                 int centerCheck = childInts[(xi + 1 + (zi + 1) * xSize0)];
 
                 thisInts[i3] = i4;
-                thisInts[(i3++ + n)] = RndParam(i4, i5);
-                thisInts[i3] = RndParam(i4, northCheck);
+                thisInts[(i3++ + n)] = rndParam(i4, i5);
+                thisInts[i3] = rndParam(i4, northCheck);
                 thisInts[(i3++ + n)] = getRandomOf4(i4, northCheck, i5, centerCheck);
 
                 i4 = northCheck;
@@ -52,7 +52,7 @@ public class LayerZoom extends Layer
         return ret;
     }
 
-    protected int RndParam(int a, int b)
+    protected int rndParam(int a, int b)
     {
         return nextInt(2) == 0 ? a : b;
     }

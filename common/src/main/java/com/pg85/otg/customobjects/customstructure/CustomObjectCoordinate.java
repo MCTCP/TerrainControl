@@ -4,9 +4,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.BoundingBox;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
@@ -19,6 +19,32 @@ import java.util.Random;
  */
 public class CustomObjectCoordinate
 {
+	// OTG
+	
+    private transient CustomObject object;
+    Rotation rotation;
+    int x;
+    int y;
+    int z;
+	
+    public CustomObjectCoordinate(LocalWorld world, CustomObject object, String customObjectName, Rotation rotation, int x, int y, int z)
+    {
+    	this.World = world;
+        this.object = object;
+
+        BO3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
+
+        if(BO3Name == null)
+        {
+        	throw new RuntimeException(); // TODO: Remove this after testing
+        }
+
+        this.rotation = rotation;
+        this.x = x;
+        this.y = y;
+        this.z = z;
+    }
+    
 	// OTG+
 
 	public boolean isSpawned;
@@ -30,10 +56,10 @@ public class CustomObjectCoordinate
 	String BO3Name;
 	String StartBO3Name; // Is filled in when its needed after the caller calls the constructor (todo, change that, ugly!)
 
+    public LocalWorld World;
+	
     public final int getChunkX(){ return (int)MathHelper.floor(x / (double)16); }
     public final int getChunkZ(){ return (int)MathHelper.floor(z / (double)16); }
-
-    public LocalWorld World;
 
     public CustomObjectCoordinate(LocalWorld world, CustomObject object, String customObjectName, Rotation rotation, int x, int y, int z, boolean isBranch, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
     {
@@ -64,7 +90,29 @@ public class CustomObjectCoordinate
         this.isWeightedBranch = isWeightedBranch;
         this.branchGroup = branchGroup;
     }
+ 
+    // Shared
+    
+    public int getX()
+    {
+        return x;
+    }
 
+    public int getY()
+    {
+        return y;
+    }
+
+    public int getZ()
+    {
+        return z;
+    }
+
+    public Rotation getRotation()
+    {
+        return rotation;
+    }
+    
     /**
      * Returns the object of this coordinate.
      *
@@ -100,22 +148,7 @@ public class CustomObjectCoordinate
 
         return object;
     }
-
-    // This should only be used for OTG+ CustomStructure
-    public boolean spawnWithChecks(ChunkCoordinate chunkCoord, LocalWorld world, Random random, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
-    {
-    	if(getObject() == null)
-    	{
-    		throw new RuntimeException(); // TODO: Remove this after testing
-    	}
-        if(getObject() instanceof BO3)
-        {
-        	return ((BO3)getObject()).trySpawnAt(world, random, rotation, chunkCoord, x, y, z, replaceAbove, replaceBelow, replaceWithBiomeBlocks, replaceWithSurfaceBlock, replaceWithGroundBlock, spawnUnderWater, waterLevel, isStructureAtSpawn, doReplaceAboveBelowOnly);
-        } else {
-        	throw new RuntimeException(); // TODO: Remove this after testing
-        }
-    }
-
+    
 	/**
 	 * Returns the object of this coordinate, casted to a
 	 * StructuredCustomObject. Will throw a ClassCastExcpetion
@@ -127,59 +160,13 @@ public class CustomObjectCoordinate
     {
     	return (StructuredCustomObject)getObject();
     }
-
-	//
-
-    private transient CustomObject object;
-    Rotation rotation;
-    int x;
-    int y;
-    int z;
-
-    public CustomObjectCoordinate(LocalWorld world, CustomObject object, String customObjectName, Rotation rotation, int x, int y, int z)
+    
+    @Override
+    public int hashCode()
     {
-    	this.World = world;
-        this.object = object;
-
-        BO3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
-
-        if(BO3Name == null)
-        {
-        	throw new RuntimeException(); // TODO: Remove this after testing
-        }
-
-        this.rotation = rotation;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+        return (x >> 13) ^ (y >> 7) ^ z ^ object.getName().hashCode() ^ rotation.toString().hashCode();
     }
-
-    public int getX()
-    {
-        return x;
-    }
-
-    public int getY()
-    {
-        return y;
-    }
-
-    public int getZ()
-    {
-        return z;
-    }
-
-    public Rotation getRotation()
-    {
-        return rotation;
-    }
-
-    // This should only be used for OTG CustomStructure
-    boolean spawnWithChecks(CustomObjectStructure structure, LocalWorld world, StructurePartSpawnHeight height, Random random)
-    {
-        return ((BO3)object).trySpawnAt(false, structure, world, random, rotation, x, height.getCorrectY(world, x, this.y, z), z);
-    }
-
+    
     @Override
     public boolean equals(Object otherObject)
     {
@@ -214,13 +201,70 @@ public class CustomObjectCoordinate
         }
         return true;
     }
-
-    @Override
-    public int hashCode()
+    
+    /**
+     * Same as getRotatedBO3Coords except it assumes that the minX=-8 maxX=7 minZ=-7 maxZ=8 coordinates have been
+     * centered and justified inside chunk (aligned to fit between 0,0 and 15,15).
+     */
+    public static CustomObjectCoordinate getRotatedBO3CoordsJustified(int x, int y, int z, Rotation newRotation)
     {
-        return (x >> 13) ^ (y >> 7) ^ z ^ object.getName().hashCode() ^ rotation.toString().hashCode();
-    }
+    	int rotations = newRotation.getRotationId();
+    	if(rotations < 0)
+    	{
+    		throw new RuntimeException(); // TODO: Remove this after testing
+    		//rotations += 4;
+    	}
 
+    	int rotatedX = x;
+    	int rotatedZ = z;
+
+    	int newX = x;
+    	int newZ = z;
+
+    	for(int i = 0; i < rotations; i++)
+    	{
+    		newX = 15 - rotatedZ;
+    		newZ = rotatedX;
+
+    		rotatedX = newX;
+    		rotatedZ = newZ;
+    	}
+
+    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
+    }
+    
+    public static CustomObjectCoordinate getRotatedCoord(int x, int y, int z, Rotation newRotation)
+    {
+    	int rotations = newRotation.getRotationId();
+    	if(rotations < 0)
+    	{
+    		throw new RuntimeException(); // TODO: Remove this after testing
+    		//rotations += 4;
+    	}
+
+    	int rotatedX = x;
+    	int rotatedZ = z;
+
+    	int newX = x;
+    	int newZ = z;
+    	for(int i = 0; i < rotations; i++)
+    	{
+    		newX = rotatedZ;
+    		newZ = -rotatedX;
+    		rotatedX = newX;
+    		rotatedZ = newZ;
+    	}
+
+    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
+    }    
+    
+    // OTG
+
+    boolean spawnWithChecks(CustomObjectStructure structure, LocalWorld world, StructurePartSpawnHeight height, Random random)
+    {
+        return ((BO3)object).trySpawnAt(false, structure, world, random, rotation, x, height.getCorrectY(world, x, this.y, z), z);
+    }
+    
     /**
      * Gets the chunk that should populate for this object.
      * @return The chunk.
@@ -245,32 +289,22 @@ public class CustomObjectCoordinate
         return ChunkCoordinate.getPopulatingChunk(centerX, centerZ);
     }
 
-    public static CustomObjectCoordinate getRotatedCoord(int x, int y, int z, Rotation newRotation)
+    // OTG+
+    
+    public boolean spawnWithChecks(ChunkCoordinate chunkCoord, LocalWorld world, Random random, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
     {
-    	int rotations = newRotation.getRotationId();
-    	if(rotations < 0)
+    	if(getObject() == null)
     	{
     		throw new RuntimeException(); // TODO: Remove this after testing
-    		//rotations += 4;
     	}
-
-    	int rotatedX = x;
-    	int rotatedZ = z;
-
-    	int newX = x;
-    	int newZ = z;
-    	for(int i = 0; i < rotations; i++)
-    	{
-    		newX = rotatedZ;
-    		newZ = -rotatedX;
-    		rotatedX = newX;
-    		rotatedZ = newZ;
-    	}
-
-    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
+        if(getObject() instanceof BO3)
+        {
+        	return ((BO3)getObject()).trySpawnAt(world, random, rotation, chunkCoord, x, y, z, replaceAbove, replaceBelow, replaceWithBiomeBlocks, replaceWithSurfaceBlock, replaceWithGroundBlock, spawnUnderWater, waterLevel, isStructureAtSpawn, doReplaceAboveBelowOnly);
+        } else {
+        	throw new RuntimeException(); // TODO: Remove this after testing
+        }
     }
-
-
+    
     /**
      * Rotates a coordinate around its center, assumes the center is at 0,0.
      * Should only be used for resouces that like Block() that spawn in BO3's and have a -1z offset.
@@ -323,38 +357,7 @@ public class CustomObjectCoordinate
 
     	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
     }
-
-    /**
-     * Same as getRotatedBO3Coords except it assumes that the minX=-8 maxX=7 minZ=-7 maxZ=8 coordinates have been
-     * centered and justified inside chunk (aligned to fit between 0,0 and 15,15).
-     */
-    public static CustomObjectCoordinate getRotatedBO3CoordsJustified(int x, int y, int z, Rotation newRotation)
-    {
-    	int rotations = newRotation.getRotationId();
-    	if(rotations < 0)
-    	{
-    		throw new RuntimeException(); // TODO: Remove this after testing
-    		//rotations += 4;
-    	}
-
-    	int rotatedX = x;
-    	int rotatedZ = z;
-
-    	int newX = x;
-    	int newZ = z;
-
-    	for(int i = 0; i < rotations; i++)
-    	{
-    		newX = 15 - rotatedZ;
-    		newZ = rotatedX;
-
-    		rotatedX = newX;
-    		rotatedZ = newZ;
-    	}
-
-    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
-    }
-
+    
     // TODO: Why is this necessary for smoothing areas?
     public static CustomObjectCoordinate getRotatedSmoothingCoords(int x, int y, int z, Rotation newRotation)
     {

@@ -5,20 +5,17 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 import java.util.Random;
 
 public class WellGen extends Resource
 {
-
     private final int maxAltitude;
     private final int minAltitude;
-
     private final LocalMaterialData slab;
     private final LocalMaterialData water;
-
     private final MaterialSet sourceBlocks;
 
     public WellGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
@@ -167,5 +164,4 @@ public class WellGen extends Resource
             world.setBlock(x + 1, y + i, z + 1, material, null, false);
         }
     }
-
 }

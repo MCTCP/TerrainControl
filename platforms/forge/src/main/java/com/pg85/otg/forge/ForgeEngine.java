@@ -69,7 +69,7 @@ public class ForgeEngine extends OTGEngine
     	ForgeWorld forgeWorld = (ForgeWorld) getWorld(world);
     	if(forgeWorld != null && forgeWorld.getObjectSpawner().saveRequired && !forgeWorld.GetWorldSession().getPreGeneratorIsRunning())
     	{
-    		forgeWorld.getStructureCache().SaveToDisk();
+    		forgeWorld.getStructureCache().saveToDisk();
     	}
     }
 

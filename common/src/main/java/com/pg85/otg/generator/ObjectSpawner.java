@@ -36,7 +36,7 @@ import com.pg85.otg.generator.resource.WellGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,23 +44,18 @@ import java.util.Random;
 
 public class ObjectSpawner
 {
-	// OTG+
-
 	public boolean populating;
-    public boolean saving;
+    public boolean processing = false;
+	public boolean saving;
 	public boolean saveRequired;
-
+    public boolean StructurePlottedAtSpawn = false;
 	public int populatingX = 0;
 	public int populatingZ = 0;
-
-	public Object lockingObject = new Object();
-
-	//
-
     private final ConfigProvider configProvider;
     private final Random rand;
     private final LocalWorld world;
-
+	public Object lockingObject = new Object();
+    
     public ObjectSpawner(ConfigProvider configProvider, LocalWorld localWorld)
     {
         this.configProvider = configProvider;
@@ -68,9 +63,6 @@ public class ObjectSpawner
         this.world = localWorld;
     }
 
-    public boolean StructurePlottedAtSpawn = false;
-
-    public boolean processing = false;
     public void populate(ChunkCoordinate chunkCoord)
     {
     	//OTG.log(LogMarker.INFO, "ObjectSpawner populate X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
@@ -98,7 +90,7 @@ public class ObjectSpawner
 		{
 			if(!StructurePlottedAtSpawn)
 			{
-				world.getStructureCache().PlotStructures(rand, world.getSpawnChunk(), true);
+				world.getStructureCache().plotStructures(rand, world.getSpawnChunk(), true);
 			}
 		}
 		StructurePlottedAtSpawn = true;
@@ -109,10 +101,10 @@ public class ObjectSpawner
 
 			if(world.getConfigs().getWorldConfig().isOTGPlus)
 			{
-				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
-				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().PlotStructures(rand, chunkCoord, false);
+				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
+				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
+				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
+				world.getStructureCache().plotStructures(rand, chunkCoord, false);
 
 		        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
 
@@ -168,10 +160,10 @@ public class ObjectSpawner
 
 				processResourcesPhase2(chunkCoord);
 
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()));
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
 
 				// Generate structures
 
@@ -298,9 +290,9 @@ public class ObjectSpawner
 				// populate a chunk that has already been provided/populated before,
 				// which seems like a bug.
 
-				world.getStructureCache().PlotStructures(rand, chunkCoord, false);
+				world.getStructureCache().plotStructures(rand, chunkCoord, false);
 
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
 
 				// Get the random generator
 				WorldConfig worldConfig = configProvider.getWorldConfig();
@@ -516,7 +508,7 @@ public class ObjectSpawner
 		world.replaceBlocks(chunkCoord);
 	}
 
-	public void SpawnBO3s(ChunkCoordinate chunkCoord)
+	public void spawnBO3s(ChunkCoordinate chunkCoord)
 	{
 		// Get the corner block coords
 		int x = chunkCoord.getChunkX() * 16;
@@ -540,7 +532,7 @@ public class ObjectSpawner
 		{
 			// SpawnForChunk will call placeComplexSurfaceBlocks for this
 			// chunk (after spawning smooth area but before spawning structure)
-			structureStart.SpawnForChunk(chunkCoord);
+			structureStart.spawnForChunkOTGPlus(chunkCoord);
 
 			// All done spawning structures for this chunk, clean up cache
 			if(!world.isInsidePregeneratedRegion(chunkCoord))

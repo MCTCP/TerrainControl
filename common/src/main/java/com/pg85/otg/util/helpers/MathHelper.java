@@ -4,6 +4,10 @@ public class MathHelper
 {
     private static float[] a = new float[65536];
 
+    private MathHelper()
+    {
+    }
+    
     public static float sqrt(float paramFloat)
     {
         return (float) Math.sqrt(paramFloat);
@@ -75,9 +79,5 @@ public class MathHelper
     public static int clamp(int check, int min, int max)
     {
         return check > max ? max : (check < min ? min : check);
-    }
-
-    private MathHelper()
-    {
     }
 }
