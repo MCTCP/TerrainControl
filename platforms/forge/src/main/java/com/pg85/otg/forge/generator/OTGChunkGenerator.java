@@ -17,12 +17,12 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.generator.structure.OTGOceanMonumentGen;
 import com.pg85.otg.forge.generator.structure.OTGRareBuildingGen;
 import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.OutputType;
@@ -49,28 +49,24 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGChunkGenerator implements IChunkGenerator
 {
-	// OTG+
-
-	public ArrayList<Object[]> PopulatedChunks;
-
     int lastx2 = 0;
     int lastz2 = 0;
-    FifoMap<ChunkCoordinate, Object[]> chunkCache = new FifoMap<ChunkCoordinate, Object[]>(128);
-
-    public void clearChunkCache()
-    {
-    	chunkCache.clear();
-    }
-    
-	//
-
+    private boolean TestMode = false;
     private ForgeWorld world;
     private World worldHandle;
-    private boolean TestMode = false;
-
     private ChunkProviderOTG generator;
     public ObjectSpawner spawner;
-
+    
+	public ArrayList<Object[]> PopulatedChunks;
+    FifoMap<ChunkCoordinate, Object[]> chunkCache = new FifoMap<ChunkCoordinate, Object[]>(128);
+    ForgeChunkBuffer chunkBuffer;
+    
+    // The first run is used by MC to check for suitable locations for the spawn location. For some reason the spawn location must be on grass.
+    boolean firstRun = true; 
+    ArrayList<LocalMaterialData> originalBlocks = new ArrayList<LocalMaterialData>(); // Don't need to store coords, will place the blocks back in the same order we got them so coords can be inferred    
+    ChunkCoordinate spawnChunk;
+    boolean spawnChunkFixed = false;
+    
     /**
      * Used in {@link #fillBiomeArray(Chunk)}, to avoid creating
      * new int arrays.
@@ -86,9 +82,12 @@ public class OTGChunkGenerator implements IChunkGenerator
 
         this.generator = new ChunkProviderOTG(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
-
-        // OTG +
         this.PopulatedChunks = new ArrayList<Object[]>();
+    }
+    
+    public void clearChunkCache()
+    {
+    	chunkCache.clear();
     }
 
     @Override
@@ -143,34 +142,13 @@ public class OTGChunkGenerator implements IChunkGenerator
 		return chunk;
     }
 
-    /**
-     * Fills the biome array of a chunk with the proper saved ids (no
-     * generation ids).
-     * @param chunk The chunk to fill the biomes of.
-     */
-    private void fillBiomeArray(Chunk chunk)
-    {
-        byte[] chunkBiomeArray = chunk.getBiomeArray();
-        ConfigProvider configProvider = this.world.getConfigs();
-        this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray, chunk.x * CHUNK_X_SIZE, chunk.z * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
-
-        for (int i = 0; i < chunkBiomeArray.length; i++)
-        {
-            int generationId = this.biomeIntArray[i];
-
-            LocalBiome biome = configProvider.getBiomeByOTGIdOrNull(generationId);
-
-        	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
-        }
-    }
-
     @Override
     public void populate(int chunkX, int chunkZ)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
     	if(this.TestMode || !world.isInsideWorldBorder(chunkCoord, false))
         {
-    		world.ClearChunkCache();
+    		world.clearChunkCache();
             return;
         }
 
@@ -218,7 +196,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         BlockSand.fallInstantly = false;
         BlockGravel.fallInstantly = false;
 
-        HashMap<String,ArrayList<ModDataFunction>> MessagesPerMod = world.GetWorldSession().getModDataForChunk(chunkCoord);
+        HashMap<String,ArrayList<ModDataFunction>> MessagesPerMod = world.getWorldSession().getModDataForChunk(chunkCoord);
         if(MessagesPerMod == null && world.getConfigs().getWorldConfig().isOTGPlus)
         {
     		if(!world.getStructureCache().structureCache.containsKey(chunkCoord))
@@ -264,49 +242,199 @@ public class OTGChunkGenerator implements IChunkGenerator
     			if(messageString.length() > 0)
     			{
     				// Send messages to any mods listening
-    				FMLInterModComms.sendRuntimeMessage(OTGPlugin.instance, modNameAndData.getKey(), "ModData", "[" + "[" + world.getName() + "," + chunkX + "," + chunkZ + "]" + messageString + "]");
+    				FMLInterModComms.sendRuntimeMessage(OTGPlugin.Instance, modNameAndData.getKey(), "ModData", "[" + "[" + world.getName() + "," + chunkX + "," + chunkZ + "]" + messageString + "]");
     			}
         	}
         }
 
-		world.ClearChunkCache();
+		world.clearChunkCache();
     }
 
-    @Override
-    public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
+    // Blocks
+    
+    public Chunk getBlocks(int chunkX, int chunkZ, boolean provideChunk)
     {
-        WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
-        Biome biomeBaseOTG = ((ForgeBiome)this.world.getBiome(blockPos.getX(), blockPos.getZ())).biomeBase;
-        
-        if (worldConfig.rareBuildingsEnabled)
-        {
-            if (
-        		paramaca == EnumCreatureType.MONSTER && 
-            	(
-	        		(
-	        			this.world.rareBuildingGen instanceof OTGRareBuildingGen && 
-	        			((OTGRareBuildingGen)this.world.rareBuildingGen).isSwampHutAtLocation(blockPos)
-	    			) ||
-	        		(
-	        			!(this.world.rareBuildingGen instanceof OTGRareBuildingGen) && 
-	        			((MapGenScatteredFeature)this.world.rareBuildingGen).isSwampHut(blockPos)	        				
-					)
-        		)
-        	)
-            {
-                return (this.world.rareBuildingGen instanceof OTGRareBuildingGen) ? ((OTGRareBuildingGen)this.world.rareBuildingGen).getMonsterSpawnList() : ((MapGenScatteredFeature)this.world.rareBuildingGen).getMonsters();
-            }
-        }
-        if (worldConfig.oceanMonumentsEnabled)
-        {
-            if (paramaca == EnumCreatureType.MONSTER && this.world.oceanMonumentGen.isPositionInStructure(this.worldHandle, blockPos))
-            {
-                return (this.world.oceanMonumentGen instanceof OTGOceanMonumentGen) ? ((OTGOceanMonumentGen)this.world.oceanMonumentGen).getMonsterSpawnList() : ((StructureOceanMonument)this.world.oceanMonumentGen).getMonsters();
-            }
-        }
+    	Object[] chunkCacheEntry = chunkCache.get(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
+    	Chunk chunk = null;
+    	if(chunkCacheEntry != null)
+    	{
+    		chunk = (Chunk)chunkCacheEntry[0];
+    	}
 
-        return biomeBaseOTG.getSpawnableList(paramaca);
+    	if(chunk == null)
+    	{
+    		chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
+
+	    	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
+	        {
+	    		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+	    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
+	    		this.generator.generate(chunkBuffer);
+
+	    		// Before starting terrain generation MC tries to find a suitable spawn point. For some reason it looks for a grass block with an air block above it.
+	    		// To prevent MC from looking in many chunks (if there is no grass block nearby) and causing them to be populated place grass in the first requested chunk
+	    		// cache the original blocks so that they can be placed back when proper world generation starts.
+	    		// Only needed for OTG+ isStructureAtSpawn setting for BO3's.
+	    		if(firstRun && world.getConfigs().getWorldConfig().isOTGPlus)
+	    		{
+	    			spawnChunk = chunkCoord;
+	    			for(int x = 0; x < 15; x++)
+	    			{
+	    				for(int z = 0; z < 15; z++)
+	    				{
+	    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
+	    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));
+
+	    					chunkBuffer.setBlock(x, 63, z, OTG.toLocalMaterialData(DefaultMaterial.GRASS, 0));
+	    					chunkBuffer.setBlock(x, 64, z, OTG.toLocalMaterialData(DefaultMaterial.AIR, 0));
+	    				}
+	    			}
+	    		}
+    			firstRun = false;
+	    		chunk = chunkBuffer.toChunk(this.worldHandle);
+
+		        fillBiomeArray(chunk);
+		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
+		        {
+		        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
+		        }
+
+		        chunkBuffer = null;
+	        }
+    	} else {
+        	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
+	        {
+		        fillBiomeArray(chunk);
+		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
+		        {
+		        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
+		        }
+	        }
+        	chunkCache.remove(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
+    	}
+
+    	return chunk;
     }
+    
+    /**
+     * Fills the biome array of a chunk with the proper saved ids (no
+     * generation ids).
+     * @param chunk The chunk to fill the biomes of.
+     */
+    private void fillBiomeArray(Chunk chunk)
+    {
+        byte[] chunkBiomeArray = chunk.getBiomeArray();
+        ConfigProvider configProvider = this.world.getConfigs();
+        this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray, chunk.x * CHUNK_X_SIZE, chunk.z * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+
+        for (int i = 0; i < chunkBiomeArray.length; i++)
+        {
+            int generationId = this.biomeIntArray[i];
+
+            LocalBiome biome = configProvider.getBiomeByOTGIdOrNull(generationId);
+
+        	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
+        }
+    }
+    
+    public BlockFunction[] getBlockColumnInUnloadedChunk(int x, int z)
+    {
+    	lastx2 = x;
+    	lastz2 = z;
+
+    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    	int chunkX = chunkCoord.getChunkX();
+    	int chunkZ = chunkCoord.getChunkZ();
+
+    	Object[] chunkCacheEntry = chunkCache.get(chunkCoord);
+
+    	Chunk chunk = null;
+    	LinkedHashMap<ChunkCoordinate, BlockFunction[]> blockColumnCache = null;
+    	BlockFunction[] cachedColumn = null;
+    	if(chunkCacheEntry != null)
+    	{
+    		chunk = (Chunk)chunkCacheEntry[0];
+    		blockColumnCache = (LinkedHashMap<ChunkCoordinate, BlockFunction[]>)chunkCacheEntry[1];
+    		cachedColumn = blockColumnCache.get(ChunkCoordinate.fromChunkCoords(x,z));
+    	}
+    	if(cachedColumn != null)
+    	{
+    		return cachedColumn;
+    	}
+
+    	if(chunk == null)
+    	{
+        	chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
+
+        	if(world.isInsideWorldBorder(chunkCoord, true))
+            {
+	    		ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
+	    		this.generator.generate(chunkBuffer);
+
+	    		chunk = chunkBuffer.toChunk(this.worldHandle);
+            }
+        	blockColumnCache = new LinkedHashMap<ChunkCoordinate, BlockFunction[]>();
+        	chunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ), new Object[] { chunk, blockColumnCache });
+    	}
+
+		// Get internal coordinates for block in chunk
+    	int blockX = x &= 0xF;
+    	int blockZ = z &= 0xF;
+
+        BlockFunction[] blocksInColumn = new BlockFunction[256];
+        for(int y = 0; y < 256; y++)
+        {
+        	BlockFunction block = new BlockFunction();
+        	block.x = x;
+        	block.y = y;
+        	block.z = z;
+        	IBlockState blockInChunk = chunk.getBlockState(new BlockPos(blockX, y, blockZ));
+        	if(blockInChunk != null)
+        	{
+        		block.material = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
+	        	blocksInColumn[y] = block;
+        	} else {
+        		break;
+        	}
+        }
+        blockColumnCache.put(ChunkCoordinate.fromChunkCoords(lastx2,lastz2), blocksInColumn);
+
+        return blocksInColumn;
+    }
+    
+    public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
+    {
+    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
+        return blockColumn[y].material;
+    }
+
+    public int getHighestBlockYInUnloadedChunk(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+    {
+    	int height = -1;
+
+    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
+
+        for(int y = 255; y > -1; y--)
+        {
+        	ForgeMaterialData material = (ForgeMaterialData) blockColumn[y].material;
+        	boolean isLiquid = material.isLiquid();
+        	boolean isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
+        	if(!(isLiquid && ignoreLiquid))
+        	{
+            	if((findSolid && isSolid) || (findLiquid && isLiquid))
+        		{
+            		return y;
+        		}
+            	if((findSolid && isLiquid) || (findLiquid && isSolid))
+            	{
+            		return -1;
+            	}
+        	}
+        }
+    	return height;
+    }
+    
+    // Structures
 
     @Override
     public void recreateStructures(Chunk chunkIn, int chunkX, int chunkZ)
@@ -435,111 +563,61 @@ public class OTGChunkGenerator implements IChunkGenerator
     	}
 
         return null;
-    }
+    }    
 
-    // OTG+
-
-    public BlockFunction[] getBlockColumnInUnloadedChunk(int x, int z)
+    public int getHighestBlockInCurrentlyPopulatingChunk(int x, int z)
     {
-    	lastx2 = x;
-    	lastz2 = z;
-
-    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-    	int chunkX = chunkCoord.getChunkX();
-    	int chunkZ = chunkCoord.getChunkZ();
-
-    	Object[] chunkCacheEntry = chunkCache.get(chunkCoord);
-
-    	Chunk chunk = null;
-    	LinkedHashMap<ChunkCoordinate, BlockFunction[]> blockColumnCache = null;
-    	BlockFunction[] cachedColumn = null;
-    	if(chunkCacheEntry != null)
+    	for(int i = PluginStandardValues.WORLD_HEIGHT - 1; i > PluginStandardValues.WORLD_DEPTH; i--)
     	{
-    		chunk = (Chunk)chunkCacheEntry[0];
-    		blockColumnCache = (LinkedHashMap<ChunkCoordinate, BlockFunction[]>)chunkCacheEntry[1];
-    		cachedColumn = blockColumnCache.get(ChunkCoordinate.fromChunkCoords(x,z));
-    	}
-    	if(cachedColumn != null)
-    	{
-    		return cachedColumn;
+    		LocalMaterialData material = chunkBuffer.getBlock(x, i, z);
+    		if(material != null && !material.isAir())
+			{
+    			return i;
+			};
     	}
 
-    	if(chunk == null)
-    	{
-        	chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
-
-        	if(world.isInsideWorldBorder(chunkCoord, true))
+    	return 0;
+    }    
+    
+    // Mob spawning
+    
+    @Override
+    public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
+    {
+        WorldConfig worldConfig = this.world.getConfigs().getWorldConfig();
+        Biome biomeBaseOTG = ((ForgeBiome)this.world.getBiome(blockPos.getX(), blockPos.getZ())).biomeBase;
+        
+        if (worldConfig.rareBuildingsEnabled)
+        {
+            if (
+        		paramaca == EnumCreatureType.MONSTER && 
+            	(
+	        		(
+	        			this.world.rareBuildingGen instanceof OTGRareBuildingGen && 
+	        			((OTGRareBuildingGen)this.world.rareBuildingGen).isSwampHutAtLocation(blockPos)
+	    			) ||
+	        		(
+	        			!(this.world.rareBuildingGen instanceof OTGRareBuildingGen) && 
+	        			((MapGenScatteredFeature)this.world.rareBuildingGen).isSwampHut(blockPos)	        				
+					)
+        		)
+        	)
             {
-	    		ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-	    		this.generator.generate(chunkBuffer);
-
-	    		chunk = chunkBuffer.toChunk(this.worldHandle);
+                return (this.world.rareBuildingGen instanceof OTGRareBuildingGen) ? ((OTGRareBuildingGen)this.world.rareBuildingGen).getMonsterSpawnList() : ((MapGenScatteredFeature)this.world.rareBuildingGen).getMonsters();
             }
-        	blockColumnCache = new LinkedHashMap<ChunkCoordinate, BlockFunction[]>();
-        	chunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ), new Object[] { chunk, blockColumnCache });
-    	}
-
-		// Get internal coordinates for block in chunk
-    	int blockX = x &= 0xF;
-    	int blockZ = z &= 0xF;
-
-        BlockFunction[] blocksInColumn = new BlockFunction[256];
-        for(int y = 0; y < 256; y++)
-        {
-        	BlockFunction block = new BlockFunction();
-        	block.x = x;
-        	block.y = y;
-        	block.z = z;
-        	IBlockState blockInChunk = chunk.getBlockState(new BlockPos(blockX, y, blockZ));
-        	if(blockInChunk != null)
-        	{
-        		block.material = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
-	        	blocksInColumn[y] = block;
-        	} else {
-        		break;
-        	}
         }
-        blockColumnCache.put(ChunkCoordinate.fromChunkCoords(lastx2,lastz2), blocksInColumn);
-
-        return blocksInColumn;
-    }
-
-    public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
-    {
-    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
-        return blockColumn[y].material;
-    }
-
-    public int getHighestBlockYInUnloadedChunk(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
-    {
-    	int height = -1;
-
-    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
-
-        for(int y = 255; y > -1; y--)
+        if (worldConfig.oceanMonumentsEnabled)
         {
-        	ForgeMaterialData material = (ForgeMaterialData) blockColumn[y].material;
-        	boolean isLiquid = material.isLiquid();
-        	boolean isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
-        	if(!(isLiquid && ignoreLiquid))
-        	{
-            	if((findSolid && isSolid) || (findLiquid && isLiquid))
-        		{
-            		return y;
-        		}
-            	if((findSolid && isLiquid) || (findLiquid && isSolid))
-            	{
-            		return -1;
-            	}
-        	}
+            if (paramaca == EnumCreatureType.MONSTER && this.world.oceanMonumentGen.isPositionInStructure(this.worldHandle, blockPos))
+            {
+                return (this.world.oceanMonumentGen instanceof OTGOceanMonumentGen) ? ((OTGOceanMonumentGen)this.world.oceanMonumentGen).getMonsterSpawnList() : ((StructureOceanMonument)this.world.oceanMonumentGen).getMonsters();
+            }
         }
-    	return height;
-    }
 
-    boolean firstRun = true; // The first run is used by MC to check for suitable locations for the spawn location. For some reason the spawn location must be on grass.
-    ArrayList<LocalMaterialData> originalBlocks = new ArrayList<LocalMaterialData>(); // Don't need to store coords, will place the blocks back in the same order we got them so coords can be inferred
-    ChunkCoordinate spawnChunk;
-    boolean spawnChunkFixed = false;
+        return biomeBaseOTG.getSpawnableList(paramaca);
+    }
+    
+    // Spawn chunk fix for OTG+    
 
     public void fixSpawnChunk()
     {
@@ -578,84 +656,5 @@ public class OTGChunkGenerator implements IChunkGenerator
 			}
     		spawnChunkFixed = true;
     	}
-    }
-
-    ForgeChunkBuffer chunkBuffer;
-    public Chunk getBlocks(int chunkX, int chunkZ, boolean provideChunk)
-    {
-    	Object[] chunkCacheEntry = chunkCache.get(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
-    	Chunk chunk = null;
-    	if(chunkCacheEntry != null)
-    	{
-    		chunk = (Chunk)chunkCacheEntry[0];
-    	}
-
-    	if(chunk == null)
-    	{
-    		chunk = new Chunk(this.worldHandle, chunkX, chunkZ);
-
-	    	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
-	        {
-	    		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-	    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-	    		this.generator.generate(chunkBuffer);
-
-	    		// Before starting terrain generation MC tries to find a suitable spawn point. For some reason it looks for a grass block with an air block above it.
-	    		// To prevent MC from looking in many chunks (if there is no grass block nearby) and causing them to be populated place grass in the first requested chunk
-	    		// cache the original blocks so that they can be placed back when proper world generation starts.
-	    		// Only needed for OTG+ isStructureAtSpawn setting for BO3's.
-	    		if(firstRun && world.getConfigs().getWorldConfig().isOTGPlus)
-	    		{
-	    			spawnChunk = chunkCoord;
-	    			for(int x = 0; x < 15; x++)
-	    			{
-	    				for(int z = 0; z < 15; z++)
-	    				{
-	    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
-	    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));
-
-	    					chunkBuffer.setBlock(x, 63, z, OTG.toLocalMaterialData(DefaultMaterial.GRASS, 0));
-	    					chunkBuffer.setBlock(x, 64, z, OTG.toLocalMaterialData(DefaultMaterial.AIR, 0));
-	    				}
-	    			}
-	    		}
-    			firstRun = false;
-	    		chunk = chunkBuffer.toChunk(this.worldHandle);
-
-		        fillBiomeArray(chunk);
-		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
-		        {
-		        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
-		        }
-
-		        chunkBuffer = null;
-	        }
-    	} else {
-        	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
-	        {
-		        fillBiomeArray(chunk);
-		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
-		        {
-		        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
-		        }
-	        }
-        	chunkCache.remove(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
-    	}
-
-    	return chunk;
-    }
-
-    public int getHighestBlockInCurrentlyPopulatingChunk(int x, int z)
-    {
-    	for(int i = PluginStandardValues.WORLD_HEIGHT - 1; i > PluginStandardValues.WORLD_DEPTH; i--)
-    	{
-    		LocalMaterialData material = chunkBuffer.getBlock(x, i, z);
-    		if(material != null && !material.isAir())
-			{
-    			return i;
-			};
-    	}
-
-    	return 0;
-    }
+    }    
 }

@@ -13,9 +13,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 
 public class DimensionLoadUnloadPacket extends OTGPacket
@@ -30,7 +30,7 @@ public class DimensionLoadUnloadPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(boolean dimensionLoaded, String worldName, ByteBufOutputStream stream) throws IOException
+	public static void writeToStream(boolean dimensionLoaded, String worldName, ByteBufOutputStream stream) throws IOException
 	{
 	    stream.writeInt(PluginStandardValues.ProtocolVersion);
 	    stream.writeInt(dimensionLoaded ? 1 : 0); // 1 == World loaded packet 0 == world unloaded packet

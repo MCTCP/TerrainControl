@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui;
+package com.pg85.otg.forge.gui.mainmenu;
 
 import com.google.common.collect.Lists;
 
@@ -22,7 +22,7 @@ import org.apache.logging.log4j.Logger;
 @SideOnly(Side.CLIENT)
 public class OTGGuiListWorldSelection extends GuiListExtended
 {
-	// Taken from net.minecraft.client.gui.GuiListWorldSelection. Only changed GuiWorldSelection to TCGuiWorldSelection and GuiListWorldSelectionEntry to TCGuiListWorldSelectionEntry
+	// Taken from net.minecraft.client.gui.GuiListWorldSelection. Only changed GuiWorldSelection to OTGGuiWorldSelection and GuiListWorldSelectionEntry to OTGGuiListWorldSelectionEntry
 	
     private static final Logger LOGGER = LogManager.getLogger();
     private final OTGGuiWorldSelection worldSelectionObj;

@@ -252,6 +252,12 @@ public enum DefaultMaterial
     CONCRETE_POWDER(252),
     STRUCTURE_BLOCK(255, false),
     UNKNOWN_BLOCK(254);
+	
+    /**
+     * A DefaultMaterial lookup table with the material ID as the index
+     */
+    private static DefaultMaterial[] LookupID;
+	
     /**
      * The ID of the material
      */
@@ -261,7 +267,7 @@ public enum DefaultMaterial
      * snowfall. Note: this isn't always equal to what Minecraft calls solid.
      */
     private final boolean solid;
-
+    
     /**
      * Creates a new material.
      *
@@ -324,22 +330,18 @@ public enum DefaultMaterial
     }
 
     /**
-     * A DefaultMaterial lookup table with the material ID as the index
-     */
-    private static DefaultMaterial[] lookupID;
-    /**
      * A DefaultMaterial lookup table with the material name as the index
      */
     private static Map<String, DefaultMaterial> lookupName;
 
     static
     {
-        lookupID = new DefaultMaterial[256];
+        LookupID = new DefaultMaterial[256];
         lookupName = new TreeMap<String, DefaultMaterial>(String.CASE_INSENSITIVE_ORDER);
 
         for (DefaultMaterial material : DefaultMaterial.values())
         {
-            lookupID[material.id] = material;
+            LookupID[material.id] = material;
             lookupName.put(material.name(), material);
         }
     }
@@ -395,9 +397,9 @@ public enum DefaultMaterial
      */
     public static DefaultMaterial getMaterial(int id)
     {
-        if (id < 256 && lookupID[id] != null)
+        if (id < 256 && LookupID[id] != null)
         {
-            return lookupID[id];
+            return LookupID[id];
         }
         return UNKNOWN_BLOCK;
     }
@@ -413,7 +415,7 @@ public enum DefaultMaterial
      */
     public static boolean contains(int id)
     {
-        return id < 256 && lookupID[id] != null;
+        return id < 256 && LookupID[id] != null;
     }
 
 }

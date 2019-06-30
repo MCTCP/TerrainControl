@@ -18,7 +18,6 @@ import net.minecraft.world.chunk.ChunkPrimer;
  */
 public class ForgeChunkBuffer implements ChunkBuffer
 {
-
     private final ChunkCoordinate chunkCoord;
     private final ChunkPrimer chunkPrimer;
 

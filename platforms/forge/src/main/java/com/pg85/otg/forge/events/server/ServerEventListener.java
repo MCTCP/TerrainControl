@@ -45,13 +45,12 @@ import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
-import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.util.WorldHelper;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 
@@ -158,7 +157,7 @@ public class ServerEventListener
             {
                 if (!this.eligibleChunksForSpawning.get(chunkcoordintpair1))
                 {
-                	ArrayList<SpawnerFunction> spawnerDataForOTG = world.GetWorldSession().getSpawnersForChunk(ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ()));
+                	ArrayList<SpawnerFunction> spawnerDataForOTG = world.getWorldSession().getSpawnersForChunk(ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ()));
 
                 	if(spawnerDataForOTG != null && spawnerDataForOTG.size() > 0)
                 	{
@@ -232,7 +231,7 @@ public class ServerEventListener
                     Class<? extends Entity> entityClass = MobSpawnGroupHelper.toMinecraftClass(mobTypeName);                    
                     if(entityClass == null)
                     {
-                    	if(OTG.getPluginConfig().SpawnLog)
+                    	if(OTG.getPluginConfig().spawnLog)
                     	{
                     		OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
                     	}
@@ -271,7 +270,7 @@ public class ServerEventListener
                         }
                         catch (NBTException nbtexception)
                         {
-                        	if(OTG.getPluginConfig().SpawnLog)
+                        	if(OTG.getPluginConfig().spawnLog)
                         	{
                         		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in SpawnerFunction: " + spawnerData.getMetaData() + ". Skipping mob.");
                         	}
@@ -516,7 +515,7 @@ public class ServerEventListener
                     if (!this.eligibleChunksForSpawning.get(chunkcoordintpair1))
                     {
                     	ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ());
-                    	ArrayList<ParticleFunction> particleDataForOTG = world.GetWorldSession().getParticlesForChunk(chunkCoord);
+                    	ArrayList<ParticleFunction> particleDataForOTG = world.getWorldSession().getParticlesForChunk(chunkCoord);
 
                     	if(particleDataForOTG != null && particleDataForOTG.size() > 0)
                     	{
@@ -533,7 +532,7 @@ public class ServerEventListener
                                 	{
                                 		particleDataForOTGPerPlayer.add(particleData);
                                 	} else {
-                                		world.GetWorldSession().removeParticles(chunkCoord, particleData);
+                                		world.getWorldSession().removeParticles(chunkCoord, particleData);
                                 	}
                                 }
             				}
@@ -542,7 +541,7 @@ public class ServerEventListener
                 }
         		if(particleDataForOTGPerPlayer.size() > 0)
         		{
-        			ServerPacketManager.SendParticlesPacket(particleDataForOTGPerPlayer, (EntityPlayerMP) player);
+        			ServerPacketManager.sendParticlesPacket(particleDataForOTGPerPlayer, (EntityPlayerMP) player);
         		}
         	}
         }
@@ -553,20 +552,10 @@ public class ServerEventListener
 	{
 		if(event.phase == Phase.END)
 		{
-			((ForgeEngine)OTG.getEngine()).ProcessPregeneratorTick();
-
-			if(((ForgeEngine)OTG.getEngine()).getOverWorld() != null) // If overworld is null then the overworld is not an OTG world
-			{
-				boolean cartographerEnabled = ((ForgeEngine)OTG.getEngine()).getCartographerEnabled();
-
-				if(cartographerEnabled)
-				{
-					Cartographer.UpdateWorldMap();
-				}
-			}
+			((ForgeEngine)OTG.getEngine()).processPregeneratorTick();
 
 			// When players are above or below the y threshold teleport them to the dimension above or below this one (configured via worldconfig)
-			TeleportPlayers();
+			teleportPlayers();
 		}
 
 		if(event.phase == Phase.END)
@@ -583,7 +572,7 @@ public class ServerEventListener
     		}
 
         	// ModData
-	        List<IMCMessage> messages = FMLInterModComms.fetchRuntimeMessages(OTGPlugin.instance);
+	        List<IMCMessage> messages = FMLInterModComms.fetchRuntimeMessages(OTGPlugin.Instance);
 	        if (messages.size() > 0)
 	        {
 	        	for(IMCMessage imcMessage : messages)
@@ -621,7 +610,7 @@ public class ServerEventListener
 
                     			// Return modData to sender.
                         		String messageString = "";
-		                    	HashMap<String, ArrayList<ModDataFunction>> modDataInChunk = forgeWorld.GetWorldSession().getModDataForChunk(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+		                    	HashMap<String, ArrayList<ModDataFunction>> modDataInChunk = forgeWorld.getWorldSession().getModDataForChunk(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
 		                    	if(modDataInChunk != null)
 		                    	{
 			                    	for(Entry<String, ArrayList<ModDataFunction>> modNameAndData : modDataInChunk.entrySet())
@@ -634,9 +623,9 @@ public class ServerEventListener
 			                    			}
 			                    		}
 			                    	}
-			                    	FMLInterModComms.sendRuntimeMessage(OTGPlugin.instance, imcMessage.getSender(), "ModData", "[" + "[" + worldName + "," + chunkX + "," + chunkZ + "]" + (messageString.length() > 0 ? messageString : "[]") + "]");
+			                    	FMLInterModComms.sendRuntimeMessage(OTGPlugin.Instance, imcMessage.getSender(), "ModData", "[" + "[" + worldName + "," + chunkX + "," + chunkZ + "]" + (messageString.length() > 0 ? messageString : "[]") + "]");
 		                    	} else {
-		                    		FMLInterModComms.sendRuntimeMessage(OTGPlugin.instance, imcMessage.getSender(), "ModData", "[" + "[" + worldName + "," + chunkX + "," + chunkZ + "]]");
+		                    		FMLInterModComms.sendRuntimeMessage(OTGPlugin.Instance, imcMessage.getSender(), "ModData", "[" + "[" + worldName + "," + chunkX + "," + chunkZ + "]]");
 		                    	}
 	                    	} else {
 	            	        	OTG.log(LogMarker.WARN, "The mod " + imcMessage.getSender() + " has sent the following message: " + imcMessage.key + ", however the parameters were invalid: " + imcMessage.getStringValue() + ". Should be: MyWorldName,MyChunkX,MyChunkZ");
@@ -703,11 +692,11 @@ public class ServerEventListener
 		    									entityFunc.nameTagOrNBTFileName = paramString2.length > 5 ? paramString2[5] : null;
 		    									entityFunc.originalNameTagOrNBTFileName = entityFunc.nameTagOrNBTFileName;
 
-		    									world.SpawnEntity(entityFunc);
+		    									world.spawnEntity(entityFunc);
 		    								}
 		    								catch(NumberFormatException ex)
 		    								{
-		    									if(OTG.getPluginConfig().SpawnLog)
+		    									if(OTG.getPluginConfig().spawnLog)
 		    									{
 		    										OTG.log(LogMarker.WARN, "Error in ModData: " + modDataText + " parameter count was not a number");
 		    									}
@@ -721,7 +710,7 @@ public class ServerEventListener
 											}
 		    								catch (InvalidConfigException e)
 		    								{
-		    									if(OTG.getPluginConfig().SpawnLog)
+		    									if(OTG.getPluginConfig().spawnLog)
 		    									{
 													OTG.log(LogMarker.WARN, "Error in ModData: " + modDataText + " parameter material was not a valid material");
 													e.printStackTrace();
@@ -741,7 +730,7 @@ public class ServerEventListener
 		}
 	}
 
-	private void TeleportPlayers()
+	private void teleportPlayers()
 	{
 		MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();
 		for(WorldServer worldServer : mcServer.worlds)
@@ -790,7 +779,7 @@ public class ServerEventListener
 						player.world.setBlockToAir(new BlockPos(player.getPosition().getX(), 255, player.getPosition().getZ()));
 						player.setPositionAndUpdate(player.getPosition().getX(), 254, player.getPosition().getZ());
 					} else {
-						TeleportPlayerToDimension(playerWorld.getWorld().provider.getDimension(), destinationWorld.getWorld().provider.getDimension(), player);
+						teleportPlayerToDimension(playerWorld.getWorld().provider.getDimension(), destinationWorld.getWorld().provider.getDimension(), player);
 						return;
 					}
 				}
@@ -812,30 +801,18 @@ public class ServerEventListener
 				{
 					if(destinationWorld != playerWorld)
 					{
-						TeleportPlayerToDimension(playerWorld.getWorld().provider.getDimension(), destinationWorld.getWorld().provider.getDimension(), player);
+						teleportPlayerToDimension(playerWorld.getWorld().provider.getDimension(), destinationWorld.getWorld().provider.getDimension(), player);
 					}
 				}
 			}
 		}
 	}
 
-    private void TeleportPlayerToDimension(int originDimension, int newDimension, EntityPlayer e)
+    private void teleportPlayerToDimension(int originDimension, int newDimension, EntityPlayer e)
     {
-    	boolean cartographerEnabled = ((ForgeEngine)OTG.getEngine()).getCartographerEnabled();
-
 		if(e instanceof EntityPlayerMP)
 		{
 			OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e, false, false);
-		}
-
-    	// If coming from main world then update Cartographer map at last player position (should remove head+banner from Cartographer map)
-		if(originDimension == 0 && cartographerEnabled)
-		{
-			//LocalWorld localWorld = OTG.getEngine().getWorld(world.getWorldInfo().getWorldName());
-			//if(localWorld != null)
-			{
-				Cartographer.CreateBlockWorldMapAtSpawn(ChunkCoordinate.fromBlockCoords(e.getPosition().getX(), e.getPosition().getZ()), true);
-			}
 		}
     }
 }

@@ -143,7 +143,7 @@ public class MinecraftBiomeTemplates
 
             this.defaultColor = 0x606060;
             this.defaultDandelions = 4;
-            this.defaultEmeraldOre = BiomeStandardValues.emeraldDepositFrequency;
+            this.defaultEmeraldOre = BiomeStandardValues.EmeraldDepositFrequency;
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, 1.0,
                     DefaultMaterial.STONE, DefaultMaterial.STONE, 10.0};

@@ -9,19 +9,19 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 public class MaterialHelper
 {
-    static FifoMap<String, LocalMaterialData> cachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
+    static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
     /**
      * @see OTGEngine#readMaterial(String)
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
     {
     	// TODO: Make sure it won't cause problems to return the same material object multiple times, is it not changed anywhere?
-    	LocalMaterialData material = cachedMaterials.get(name);
+    	LocalMaterialData material = CachedMaterials.get(name);
     	if(material != null)
     	{
     		return material;
     	}
-    	else if(cachedMaterials.containsKey(name))
+    	else if(CachedMaterials.containsKey(name))
     	{
     		throw new InvalidConfigException("Cannot read block: " + name);
     	}
@@ -50,11 +50,11 @@ public class MaterialHelper
     	}
     	catch(InvalidConfigException ex)
     	{
-    		cachedMaterials.put(originalName, null);
+    		CachedMaterials.put(originalName, null);
     		throw ex;
     	}
 
-    	cachedMaterials.put(originalName, material);
+    	CachedMaterials.put(originalName, material);
 
         return material;
     }

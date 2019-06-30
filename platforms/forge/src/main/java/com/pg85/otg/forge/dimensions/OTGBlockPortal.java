@@ -10,9 +10,8 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 import net.minecraft.block.Block;
@@ -37,41 +36,17 @@ public class OTGBlockPortal
 {
     public static boolean trySpawnPortal(World worldIn, BlockPos pos)
     {
-    	boolean cartographerEnabled = ((ForgeEngine)OTG.getEngine()).getCartographerEnabled();
-    	
     	// Only create a portal when a OTG custom dimension exists
     	boolean bFound = false;
-    	boolean bFoundOtherThanCartographer = false;
     	for(int i : OTGDimensionManager.GetOTGDimensions())
     	{
 			if(DimensionManager.isDimensionRegistered(i))
 			{
 				bFound = true;
-				if(cartographerEnabled)
-				{
-					if(i != Cartographer.CartographerDimension)
-					{
-						bFoundOtherThanCartographer = true;
-						break;
-					}
-				} else {
-					break;
-				}
+				break;
 			}
-		}
-		
-		// If Cartographer is on and this is not a Cartographer portal and no other dimensions were found don't spawn a portal.
-		// TODO: Clean up all this cartographer crap
-		IBlockState blockState = worldIn.getBlockState(pos);
-		BlockPos firstSolidBlockPos = new BlockPos(pos);
-		while(!blockState.getMaterial().isSolid() && firstSolidBlockPos.getY() > 0)
-		{
-			firstSolidBlockPos = new BlockPos(firstSolidBlockPos.getX(), firstSolidBlockPos.getY() - 1, firstSolidBlockPos.getZ());
-			blockState = worldIn.getBlockState(firstSolidBlockPos);
-		}
-		// Cartographer looks for chiseled quartz (?)
-		boolean isCartographerPortal = blockState.getBlock() == Blocks.QUARTZ_BLOCK && (byte) blockState.getBlock().getMetaFromState(blockState) == 1;
-		if(!(!cartographerEnabled && bFound) && (cartographerEnabled && !bFoundOtherThanCartographer && !isCartographerPortal))
+		}	
+		if(!bFound)
 		{
 			return false;
 		}

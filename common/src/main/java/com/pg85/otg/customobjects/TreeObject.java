@@ -1,6 +1,5 @@
 package com.pg85.otg.customobjects;
 
-import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.settingType.Setting;

@@ -8,9 +8,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -48,7 +48,7 @@ public class PlayerTracker
     	if(!event.getManager().isLocalChannel())
     	{
 	    	OTG.setDimensionsConfig(null);
-	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+	    	((ForgeEngine)OTG.getEngine()).getWorldLoader().unloadAndUnregisterAllWorlds();
     	}
     }
     
@@ -60,14 +60,14 @@ public class PlayerTracker
     	if(!event.getManager().isLocalChannel())
     	{
 	    	OTG.setDimensionsConfig(null);
-	    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+	    	((ForgeEngine)OTG.getEngine()).getWorldLoader().unloadAndUnregisterAllWorlds();
     	}
     }
 	
     @SubscribeEvent
     public void onConnectionCreated(FMLNetworkEvent.ServerConnectionFromClientEvent event)
     {
-   		ServerPacketManager.SendPacketsOnConnect(event);
+   		ServerPacketManager.sendPacketsOnConnect(event);
     }
 
 	@SubscribeEvent
@@ -82,13 +82,13 @@ public class PlayerTracker
 
 	    	// TODO: Add feature for giving players items via world config + nbt file
 
-	    	DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).GetDimensionConfig();
+	    	DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).getDimensionConfig();
 
 			String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnJoinDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue();
-			boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
+			boolean itemsRemoved = removeItemsFromPlayer(itemsToRemoveString, event.player);
 
 			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnJoinDimension : WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();
-			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
+			boolean itemsAdded = giveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsRemoved)
 	    	{
@@ -111,13 +111,13 @@ public class PlayerTracker
 	    		event.player.sendMessage(new TextComponentString(((OTGWorldProvider)event.player.world.provider).getDepartMessage()));
 	    	}
 
-			DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).GetDimensionConfig();
+			DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).getDimensionConfig();
 
 			String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnLeaveDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue();
-			boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
+			boolean itemsRemoved = removeItemsFromPlayer(itemsToRemoveString, event.player);
 
 			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnLeaveDimension : WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue();
-			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
+			boolean itemsAdded = giveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsRemoved)
 	    	{
@@ -137,10 +137,10 @@ public class PlayerTracker
 		{
 	    	// TODO: Add feature for giving players items via world config + nbt file
 
-			DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).GetDimensionConfig();
+			DimensionConfig dimConfig = ((OTGWorldProvider)event.player.world.provider).getDimensionConfig();
 
 			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnRespawn : WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN.getDefaultValue();
-			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
+			boolean itemsAdded = giveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsAdded)
 	    	{
@@ -163,13 +163,13 @@ public class PlayerTracker
 		    		event.player.sendMessage(new TextComponentString(((OTGWorldProvider)fromWorld.provider).getDepartMessage()));
 		    	}
 
-		    	DimensionConfig dimConfig = ((OTGWorldProvider)fromWorld.provider).GetDimensionConfig();
+		    	DimensionConfig dimConfig = ((OTGWorldProvider)fromWorld.provider).getDimensionConfig();
 
 				String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnLeaveDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue();
-				boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
+				boolean itemsRemoved = removeItemsFromPlayer(itemsToRemoveString, event.player);
 
 				String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnLeaveDimension : WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue();
-				boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
+				boolean itemsAdded = giveItemsToPlayer(itemsToAddString, event.player);
 
 		    	if(itemsRemoved)
 		    	{
@@ -192,13 +192,13 @@ public class PlayerTracker
 
 	    	// TODO: Add feature for giving players items via world config + nbt file
 
-	    	DimensionConfig dimConfig = ((OTGWorldProvider)toWorld.provider).GetDimensionConfig();
+	    	DimensionConfig dimConfig = ((OTGWorldProvider)toWorld.provider).getDimensionConfig();
 
 			String itemsToRemoveString = dimConfig != null ? dimConfig.Settings.ItemsToRemoveOnJoinDimension : WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue();
-			boolean itemsRemoved = RemoveItemsFromPlayer(itemsToRemoveString, event.player);
+			boolean itemsRemoved = removeItemsFromPlayer(itemsToRemoveString, event.player);
 
 			String itemsToAddString = dimConfig != null ? dimConfig.Settings.ItemsToAddOnJoinDimension : WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();
-			boolean itemsAdded = GiveItemsToPlayer(itemsToAddString, event.player);
+			boolean itemsAdded = giveItemsToPlayer(itemsToAddString, event.player);
 
 	    	if(itemsRemoved)
 	    	{
@@ -211,7 +211,7 @@ public class PlayerTracker
 		}
 	}
 
-    boolean GiveItemsToPlayer(String itemsToAddString, EntityPlayer player)
+	private boolean giveItemsToPlayer(String itemsToAddString, EntityPlayer player)
     {
     	boolean itemsAdded = false;
 		if(itemsToAddString != null)
@@ -243,7 +243,7 @@ public class PlayerTracker
 				}
 				for(int i = 0; i < params.size(); i+= 4)
 				{
-					GiveItemToPlayer(player, params.get(i + 0), params.get(i + 1), params.get(i + 2), params.get(i + 3));
+					giveItemToPlayer(player, params.get(i + 0), params.get(i + 1), params.get(i + 2), params.get(i + 3));
 	    			//GiveItemToPlayer(player, "diamond_sword", "1", "0", "{ench:[{id:16,lvl:5}]}");
 					itemsAdded = true;
 				}
@@ -252,7 +252,7 @@ public class PlayerTracker
 		return itemsAdded;
     }
 
-    void GiveItemToPlayer(EntityPlayer entityplayer, String itemName, String amountString, String metaDataString, String nbtDataString)
+    private void giveItemToPlayer(EntityPlayer entityplayer, String itemName, String amountString, String metaDataString, String nbtDataString)
     {
     	// Taken from CommandGive
 
@@ -345,7 +345,7 @@ public class PlayerTracker
         }
     }
 
-    boolean RemoveItemsFromPlayer(String itemsToRemoveString, EntityPlayer player)
+    private boolean removeItemsFromPlayer(String itemsToRemoveString, EntityPlayer player)
     {
 		boolean itemsRemoved = false;
 		if(itemsToRemoveString != null)
@@ -377,7 +377,7 @@ public class PlayerTracker
 				}
 				for(int i = 0; i < params.size(); i+= 4)
 				{
-					RemoveItemFromPlayer(player, params.get(i + 0), params.get(i + 1), params.get(i + 2), params.get(i + 3));
+					removeItemFromPlayer(player, params.get(i + 0), params.get(i + 1), params.get(i + 2), params.get(i + 3));
 	    			//RemoveItemFromPlayer(player, "diamond_sword", "1", "0", "{ench:[{id:16,lvl:5}]}");
 	                itemsRemoved = true;
 				}
@@ -386,7 +386,7 @@ public class PlayerTracker
 		return itemsRemoved;
     }
 
-    void RemoveItemFromPlayer(EntityPlayer entityplayer, String itemName, String amountString, String metaDataString, String nbtDataString)
+    private void removeItemFromPlayer(EntityPlayer entityplayer, String itemName, String amountString, String metaDataString, String nbtDataString)
     {
     	// Taken from CommandGive
 
@@ -458,7 +458,7 @@ public class PlayerTracker
         }
     }
 
-    int clearMatchingItems(InventoryPlayer _this, @Nullable Item itemIn, int metadataIn, int removeCount, @Nullable NBTTagCompound itemNBT)
+    private int clearMatchingItems(InventoryPlayer _this, @Nullable Item itemIn, int metadataIn, int removeCount, @Nullable NBTTagCompound itemNBT)
     {
         int i = 0;
 
@@ -580,7 +580,7 @@ public class PlayerTracker
      * @param itemNBT The NBT data to match, null ignores.
      * @return The number of items removed from the inventory.
      */
-    int clearMatchingItemsEnderChest(InventoryEnderChest inventory, @Nullable Item itemIn, int metadataIn, int removeCount, @Nullable NBTTagCompound itemNBT)
+    private int clearMatchingItemsEnderChest(InventoryEnderChest inventory, @Nullable Item itemIn, int metadataIn, int removeCount, @Nullable NBTTagCompound itemNBT)
     {
         int i = 0;
 

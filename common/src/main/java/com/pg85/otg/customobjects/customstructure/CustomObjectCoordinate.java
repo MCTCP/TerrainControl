@@ -131,7 +131,7 @@ public class CustomObjectCoordinate
 
     		if(object == null)
     		{
-    			if(OTG.getPluginConfig().SpawnLog)
+    			if(OTG.getPluginConfig().spawnLog)
     			{
     				OTG.log(LogMarker.WARN, "Could not find BO2/BO3 " + BO3Name + " in GlobalObjects or WorldObjects directory.");
     			}

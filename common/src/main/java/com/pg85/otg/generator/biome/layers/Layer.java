@@ -73,7 +73,7 @@ public abstract class Layer
     /**
      * This helps our random numbers be a little more random
      */
-    protected static final int entropy = 10000;
+    protected static final int Entropy = 10000;
 
     /*
      * LayerIsland - chance to big land

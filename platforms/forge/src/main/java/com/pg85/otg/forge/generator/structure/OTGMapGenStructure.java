@@ -17,7 +17,7 @@ public abstract class OTGMapGenStructure extends MapGenStructure
         int i = (chunkCoord.x << 4) + 8;
         int j = (chunkCoord.z << 4) + 8;
 
-        ObjectIterator objectiterator = this.structureMap.values().iterator();
+        ObjectIterator<?> objectiterator = this.structureMap.values().iterator();
 
         while (objectiterator.hasNext())
         {

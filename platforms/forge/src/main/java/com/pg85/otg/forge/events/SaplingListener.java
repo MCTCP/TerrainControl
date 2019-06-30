@@ -9,7 +9,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.resource.SaplingGen;
 import com.pg85.otg.generator.resource.SaplingType;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
@@ -30,7 +30,6 @@ public class SaplingListener
         private final LocalWorld world;
         private final LocalMaterialData material;
         private final SaplingType saplingType;
-
         private BlockPos blockPos;
 
         private SaplingGrower(LocalWorld world, BlockPos blockPos)

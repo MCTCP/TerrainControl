@@ -118,6 +118,12 @@ import java.util.*;
 
 public class BukkitWorld implements LocalWorld
 {
+    private static int NextBiomeId = DefaultBiome.values().length;
+
+    private static final int MAX_BIOMES_COUNT = 4096;
+    private static final int MAX_SAVED_BIOMES_COUNT = 256;
+    private static final int STANDARD_WORLD_HEIGHT = 128;
+    
     // Initially false, set to true when enabled once
     private boolean initialized;
 
@@ -128,12 +134,6 @@ public class BukkitWorld implements LocalWorld
     private String name;
     private BiomeGenerator biomeGenerator;
     private DataConverter dataConverter;
-
-    private static int nextBiomeId = DefaultBiome.values().length;
-
-    private static final int MAX_BIOMES_COUNT = 4096;
-    private static final int MAX_SAVED_BIOMES_COUNT = 256;
-    private static final int STANDARD_WORLD_HEIGHT = 128;
 
     private final Map<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
@@ -196,7 +196,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public int getFreeBiomeId()
     {
-        return nextBiomeId++;
+        return NextBiomeId++;
     }
 
     @Override
@@ -952,7 +952,7 @@ public class BukkitWorld implements LocalWorld
         {
             tileEntity.load(nmsTag);
         } else {
-        	if(OTG.getPluginConfig().SpawnLog)
+        	if(OTG.getPluginConfig().spawnLog)
         	{
         		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
         	}
@@ -1000,7 +1000,7 @@ public class BukkitWorld implements LocalWorld
     }
 
 	@Override
-	public void SpawnEntity(EntityFunction entityData)
+	public void spawnEntity(EntityFunction entityData)
 	{
     	Random rand = new Random();
 
@@ -1038,7 +1038,7 @@ public class BukkitWorld implements LocalWorld
 
 		if(entityType == null)
 		{
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
 			}
@@ -1168,7 +1168,7 @@ public class BukkitWorld implements LocalWorld
 
             if (!(nbtbase instanceof NBTTagCompound))
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
             		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
             	}
@@ -1179,7 +1179,7 @@ public class BukkitWorld implements LocalWorld
         }
         catch (NBTException nbtexception)
         {
-        	if(OTG.getPluginConfig().SpawnLog)
+        	if(OTG.getPluginConfig().spawnLog)
         	{
         		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
         	}
@@ -1704,7 +1704,7 @@ public class BukkitWorld implements LocalWorld
 
 	BukkitWorldSession WorldSession;
     @Override
-	public WorldSession GetWorldSession()
+	public WorldSession getWorldSession()
 	{
     	// TODO Implement this properly (for particles)
 		return WorldSession;
@@ -1731,7 +1731,7 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	@Override
-	public void DeleteWorldSessionData()
+	public void deleteWorldSessionData()
 	{
 		// TODO Implement this (for spawners and particles)
 		throw new RuntimeException();

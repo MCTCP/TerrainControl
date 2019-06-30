@@ -1,4 +1,4 @@
-package com.pg85.otg.forge;
+package com.pg85.otg.forge.world;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -20,12 +20,10 @@ import com.pg85.otg.util.ChunkCoordinate;
 
 public class ForgeWorldSession extends WorldSession
 {
-	ArrayList<ParticleFunction> ParticleFunctions = new ArrayList<ParticleFunction>();
-
-	Pregenerator pregenerator;
-
 	int worldBorderRadius;
 	ChunkCoordinate worldBorderCenterPoint;
+	ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>();
+	Pregenerator pregenerator;
 
 	public ForgeWorldSession(LocalWorld world)
 	{
@@ -34,7 +32,7 @@ public class ForgeWorldSession extends WorldSession
 		// Don't load world border data on MP client
 		if(((ForgeWorld)world).world != null)
 		{
-			LoadWorldBorderData();
+			loadWorldBorderData();
 		}
 	}
 
@@ -46,7 +44,7 @@ public class ForgeWorldSession extends WorldSession
 	@Override
 	public ArrayList<ParticleFunction> getParticleFunctions()
 	{
-		return ParticleFunctions;
+		return particleFunctions;
 	}
 
 	@Override
@@ -112,7 +110,7 @@ public class ForgeWorldSession extends WorldSession
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
     
-	void SaveWorldBorderData()
+	void saveWorldBorderData()
 	{			
 		int dimensionId = world.getDimensionId();
 		File worldBorderFile = new File(world.getWorldSaveDir() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "WorldBorder.txt");		
@@ -147,7 +145,7 @@ public class ForgeWorldSession extends WorldSession
         }
 	}
 
-	void LoadWorldBorderData()
+	void loadWorldBorderData()
 	{	
 		int dimensionId = world.getDimensionId();
 		File worldBorderFile = new File(world.getWorldSaveDir() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "WorldBorder.txt");				
@@ -194,7 +192,7 @@ public class ForgeWorldSession extends WorldSession
 			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
 			worldBorderRadius = dimConfig.WorldBorderRadiusInChunks;
 			worldBorderCenterPoint = world.getSpawnChunk();
-			SaveWorldBorderData();
+			saveWorldBorderData();
 		}
 	}
 }

@@ -17,11 +17,11 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
@@ -41,7 +41,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 
-	public static void WriteCreatePacketToStream(DimensionConfig dimensionConfig, DataOutput stream) throws IOException
+	public static void writeCreatePacketToStream(DimensionConfig dimensionConfig, DataOutput stream) throws IOException
 	{
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Create dimension packet
@@ -49,7 +49,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
     	ConfigFile.writeStringToStream(stream, dimensionConfig.toYamlString());
 	}
 	
-	public static void WriteDeletePacketToStream(String dimensionName, DataOutput stream) throws IOException
+	public static void writeDeletePacketToStream(String dimensionName, DataOutput stream) throws IOException
 	{
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(1); // 1 == Delete dimension packet
@@ -105,9 +105,9 @@ public class CreateDeleteDimensionPacket extends OTGPacket
             	                }
             	            }						
 			                
-			                OTG.isNewWorldBeingCreated = true;
+			                OTG.IsNewWorldBeingCreated = true;
 							OTGDimensionManager.createDimension(seed, dimConfig.PresetName, false, true, true);
-							OTG.isNewWorldBeingCreated = false;
+							OTG.IsNewWorldBeingCreated = false;
 							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimConfig.PresetName);
 							
 							if(dimConfig.Settings.CanDropChunk)
@@ -115,7 +115,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 								DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
 							}
 							
-			    			ServerPacketManager.SendDimensionSynchPacketToAllPlayers(player.getServer());
+			    			ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
 		                }
 		            });
 		            return null;

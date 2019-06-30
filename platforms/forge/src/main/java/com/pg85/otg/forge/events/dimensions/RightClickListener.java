@@ -2,9 +2,7 @@ package com.pg85.otg.forge.events.dimensions;
 
 import com.pg85.otg.forge.dimensions.OTGBlockPortal;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.generator.Cartographer;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemFlintAndSteel;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -60,11 +58,6 @@ public class RightClickListener
 					// Register the portal to the world's portals list
 			    	OTGBlockPortal.placeInExistingPortal(event.getEntity().dimension, blockInFront);
 				}
-			}
-			else if(event.getEntity().dimension > 0 && event.getEntity().dimension == Cartographer.CartographerDimension)
-			{
-	        	// TP player to the location they are standing on on the map
-	        	Cartographer.TeleportPlayerFromMap((EntityPlayer)event.getEntityPlayer());
 			}
 		}
 	}	

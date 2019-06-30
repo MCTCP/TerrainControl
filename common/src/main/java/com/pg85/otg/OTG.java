@@ -30,12 +30,12 @@ public class OTG
 {		
 	// Used to determine if a new world is being created or if a world save already exists
 	// TODO: Make this prettier.
-	public static boolean isNewWorldBeingCreated = false;
+	public static boolean IsNewWorldBeingCreated = false;
 	
     /**
      * The engine that powers Open Terrain Generator.
      */
-    private static OTGEngine engine;
+    private static OTGEngine Engine;
 	
     private OTG()
     {
@@ -51,7 +51,7 @@ public class OTG
      */
     public static OTGEngine getEngine()
     {
-        return engine;
+        return Engine;
     }
     
     /**
@@ -62,12 +62,12 @@ public class OTG
      */
     public static void setEngine(OTGEngine engine)
     {
-        if (OTG.engine != null)
+        if (OTG.Engine != null)
         {
             throw new IllegalStateException("Engine is already set.");
         }
 
-        OTG.engine = engine;
+        OTG.Engine = engine;
         engine.onStart();
     }
 
@@ -77,8 +77,8 @@ public class OTG
      */
     public static void stopEngine()
     {
-        engine.onShutdown();
-        engine = null;
+        Engine.onShutdown();
+        Engine = null;
     }
     
     // Managers
@@ -90,29 +90,29 @@ public class OTG
      */
     public static BiomeModeManager getBiomeModeManager()
     {
-        return engine.getBiomeModeManager();
+        return Engine.getBiomeModeManager();
     }
 
     public static BiomeResourcesManager getBiomeResourcesManager()
     {
-        return engine.getBiomeResourceManager();
+        return Engine.getBiomeResourceManager();
     }
 
     public static CustomObjectResourcesManager getCustomObjectResourcesManager()
     {
-        return engine.getCustomObjectResourcesManager();
+        return Engine.getCustomObjectResourcesManager();
     }
 
     public static CustomObjectManager getCustomObjectManager()
     {
-        return engine.getCustomObjectManager();
+        return Engine.getCustomObjectManager();
     }
     
     // Plugin
     
     public static PluginConfig getPluginConfig()
     {
-        return engine.getPluginConfig();
+        return Engine.getPluginConfig();
     }    
     
     // Dimensions config
@@ -122,12 +122,12 @@ public class OTG
 	 */
     public static DimensionsConfig getDimensionsConfig()
     {    	
-    	return engine.getDimensionsConfig();
+    	return Engine.getDimensionsConfig();
     }
 
     public static void setDimensionsConfig(DimensionsConfig dimensionsConfig)
     {
-    	engine.setDimensionsConfig(dimensionsConfig);
+    	Engine.setDimensionsConfig(dimensionsConfig);
     }
     
     // Biomes
@@ -195,17 +195,17 @@ public class OTG
     
     public static LocalWorld getWorld(String name)
     {
-        return engine.getWorld(name);
+        return Engine.getWorld(name);
     }
 
     public static LocalWorld getUnloadedWorld(String name)
     {
-    	return engine.getUnloadedWorld(name);
+    	return Engine.getUnloadedWorld(name);
     }
     
     public static ArrayList<LocalWorld> getAllWorlds()
     {
-        return engine.getAllWorlds();
+        return Engine.getAllWorlds();
     }
     
     // Materials
@@ -233,7 +233,7 @@ public class OTG
      */
     public static void registerEventHandler(EventHandler handler)
     {
-        engine.registerEventHandler(handler);
+        Engine.registerEventHandler(handler);
     }
 
     /**
@@ -242,12 +242,12 @@ public class OTG
      */
     public static void registerEventHandler(EventHandler handler, EventPriority priority)
     {
-        engine.registerEventHandler(handler, priority);
+        Engine.registerEventHandler(handler, priority);
     }
     
     public static boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer, LocalWorld localWorld)
     {
-    	return engine.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld);
+    	return Engine.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld);
     }
     
     /**
@@ -256,7 +256,7 @@ public class OTG
      */
     public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
-        return engine.fireCanCustomObjectSpawnEvent(object, world, x, y, z);
+        return Engine.fireCanCustomObjectSpawnEvent(object, world, x, y, z);
     }
 
     /**
@@ -265,7 +265,7 @@ public class OTG
      */
     public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        engine.firePopulationEndEvent(world, random, villageInChunk, chunkCoord);
+        Engine.firePopulationEndEvent(world, random, villageInChunk, chunkCoord);
     }
 
     /**
@@ -274,7 +274,7 @@ public class OTG
      */
     public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        engine.firePopulationStartEvent(world, random, villageInChunk, chunkCoord);
+        Engine.firePopulationStartEvent(world, random, villageInChunk, chunkCoord);
     }
 
     /**
@@ -283,7 +283,7 @@ public class OTG
      */
     public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        return engine.fireResourceProcessEvent(resource, world, random, villageInChunk, chunkX, chunkZ);
+        return Engine.fireResourceProcessEvent(resource, world, random, villageInChunk, chunkX, chunkZ);
     }    
     
     // Logging
@@ -297,7 +297,7 @@ public class OTG
      */
     public static void log(LogMarker level, List<String> messages)
     {
-        engine.getLogger().log(level, messages);
+        Engine.getLogger().log(level, messages);
     }
 
     /**
@@ -312,7 +312,7 @@ public class OTG
      */
     public static void log(LogMarker level, String message, Object... params)
     {
-        engine.getLogger().log(level, message, params);
+        Engine.getLogger().log(level, message, params);
     }
 
     /**
@@ -340,6 +340,6 @@ public class OTG
         StringWriter stringWriter = new StringWriter();
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
-        engine.getLogger().log(level, stringWriter.toString());
+        Engine.getLogger().log(level, stringWriter.toString());
     }
 }

@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.generator.structure.OTGVillageGen;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.util.minecraftTypes.DefaultBiome;
@@ -22,10 +22,12 @@ import net.minecraft.world.gen.structure.MapGenVillage;
  * allowing us to use custom biome generators.
  */
 public class OTGBiomeProvider extends BiomeProvider
-{   
+{
+    private static List<Biome> ForbiddenBiomes = Lists.newArrayList(Biomes.HELL, Biomes.SKY, Biomes.VOID);
+    
     private final BiomeGenerator biomeGenerator;
     private final ForgeWorld localWorld;
-
+    
     public OTGBiomeProvider(ForgeWorld world, BiomeGenerator biomeGenerator)
     {
         this.localWorld = world;
@@ -115,8 +117,6 @@ public class OTGBiomeProvider extends BiomeProvider
 
         return true;
     }
-
-    private static List<Biome> forbiddenBiomes = Lists.newArrayList(Biomes.HELL, Biomes.SKY, Biomes.VOID);
     
     @Override
     public BlockPos findBiomePosition(int x, int z, int range, List<Biome> biomes, Random random)
@@ -143,7 +143,7 @@ public class OTGBiomeProvider extends BiomeProvider
             int i5 = j + i3 / n << 2;
             Biome localBiomeBase = Biome.getBiome(arrayOfInt[i3]);            
             if (
-        		!forbiddenBiomes.contains(localBiomeBase) && 
+        		!ForbiddenBiomes.contains(localBiomeBase) && 
         		!(blockPos != null && random.nextInt(i2 + 1) != 0))
             {
                 blockPos = new BlockPos(i4, 0, i5);

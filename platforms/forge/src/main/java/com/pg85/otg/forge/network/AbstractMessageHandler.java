@@ -21,9 +21,9 @@ public abstract class AbstractMessageHandler<T extends IMessage> implements IMes
 	{
 		if (ctx.side.isClient())
 		{
-			return handleClientMessage(OTGPlugin.proxy.getPlayerEntity(ctx), message, ctx);
+			return handleClientMessage(OTGPlugin.Proxy.getPlayerEntity(ctx), message, ctx);
 		} else {
-			return handleServerMessage(OTGPlugin.proxy.getPlayerEntity(ctx), message, ctx);
+			return handleServerMessage(OTGPlugin.Proxy.getPlayerEntity(ctx), message, ctx);
 		}
 	}
 }

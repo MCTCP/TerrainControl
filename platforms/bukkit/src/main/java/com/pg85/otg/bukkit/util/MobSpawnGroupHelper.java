@@ -132,7 +132,7 @@ public final class MobSpawnGroupHelper
                 biomeList.add(new BiomeMeta(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
             		OTG.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
             	}

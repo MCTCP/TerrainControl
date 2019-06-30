@@ -2,7 +2,7 @@ package com.pg85.otg.forge.network.client;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.WorldLoader;
+import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;

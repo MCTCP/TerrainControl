@@ -201,7 +201,6 @@ public class WorldConfig extends ConfigFile
 	public int worldBorderRadius;
     public String worldSeed;
 
-    public boolean cartographer;
     public ArrayList<LocalMaterialData> dimensionPortalMaterials;
     public String dimensionBelow;
     public String dimensionAbove;
@@ -261,7 +260,7 @@ public class WorldConfig extends ConfigFile
 	public int cloudHeight;
     public boolean canDoLightning;
     public boolean canDoRainSnowIce;
-    public boolean isNightWorld; // Sky is always moon and stars but light levels are same as day, used for Cartographer
+    public boolean isNightWorld; // Sky is always moon and stars but light levels are same as day
     public double voidFogYFactor; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
     public double gravityFactor; // 0.08D; Affects entities jumping and falling
     public boolean shouldMapSpin; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
@@ -674,7 +673,6 @@ public class WorldConfig extends ConfigFile
 
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
         this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
-        this.cartographer = reader.getSetting(WorldStandardValues.CARTOGRAPHER);
         this.dimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
 
         // Dimensions
@@ -1336,9 +1334,6 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.TeleportToSpawnOnly, this.teleportToSpawnOnly,
         		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
 
-        //writer.putSetting(WorldStandardValues.CARTOGRAPHER, this.Cartographer,
-                //"In development, don't use this.");
-
         writer.smallTitle("Game rules", "Game rules for this world. These settings are still in development, may not all work (please submit an issue on the git) and may be subject to change in upcoming releases.", "");
 
         writer.putSetting(WorldStandardValues.CommandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput),
@@ -1533,7 +1528,7 @@ public class WorldConfig extends ConfigFile
                 "snowfall and mobs to work as in the other biome.",
                 "",
                 "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
-                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.",
-				"The Cartographer feature for Forge uses biome id 888.");
+                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome."
+				);
     }   
 }

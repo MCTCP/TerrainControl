@@ -200,7 +200,7 @@ public class OTGVillageGen extends StructureGenerator
          */
         private void changeVillageType(WorldGenVillageStartPiece subject, int villageType)
         {
-            Class villageClass = WorldGenVillageStartPiece.class.getSuperclass().getSuperclass();
+            Class<?> villageClass = WorldGenVillageStartPiece.class.getSuperclass().getSuperclass();
         	for (Field field : villageClass.getDeclaredFields())
         	{
             	String fieldName = field.getName();

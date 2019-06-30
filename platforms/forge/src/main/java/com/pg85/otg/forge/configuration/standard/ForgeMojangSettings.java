@@ -1,4 +1,4 @@
-package com.pg85.otg.forge;
+package com.pg85.otg.forge.configuration.standard;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
@@ -34,8 +34,7 @@ public final class ForgeMojangSettings implements MojangSettings
     	{
     		return fromBiomeBase(baseBiome);
     	}
-    	throw new RuntimeException("This should not happen.");
-    	//return fromBiomeBase(ForgeWorld.vanillaBiomes[biomeId]);
+    	throw new RuntimeException("This should not happen."); // TODO: Remove after testing
     }
 
     /**

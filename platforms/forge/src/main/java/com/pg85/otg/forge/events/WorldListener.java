@@ -5,12 +5,12 @@ import java.lang.reflect.Constructor;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.ForgeWorldSession;
-import com.pg85.otg.forge.OTGWorldType;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorldSession;
+import com.pg85.otg.forge.world.OTGWorldType;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.server.MinecraftServer;
@@ -97,7 +97,7 @@ public class WorldListener
     	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());
     	if(forgeWorld != null)
     	{
-    		ServerPacketManager.SendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
+    		ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
     	}
 	}
 	
@@ -122,7 +122,7 @@ public class WorldListener
 		ForgeWorld world = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());
 		if(world != null)
 		{
-			((ForgeWorldSession)world.GetWorldSession()).getPregenerator().SavePregeneratorData();
+			((ForgeWorldSession)world.getWorldSession()).getPregenerator().savePregeneratorData();
 		} else {
 			// This is not an OTG world.
 		}
@@ -169,7 +169,7 @@ public class WorldListener
 		        		OTGDimensionManager.UnloadCustomDimensionData(mcWorld.provider.getDimension());
 		        		forgeWorld.unRegisterBiomes();
 		        		
-						((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator().shutDown();
+						((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator().shutDown();
 	    			}
 		    	}
 	        }
@@ -203,7 +203,7 @@ public class WorldListener
     	LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(event.getWorld());
     	if(world != null)
     	{
-	        if(((ForgeEngine)OTG.getEngine()).getCartographerEnabled() || world.GetWorldSession().getWorldBorderRadius() > 0 || (world.getConfigs().getWorldConfig().bo3AtSpawn != null && world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0))
+	        if(world.getWorldSession().getWorldBorderRadius() > 0 || (world.getConfigs().getWorldConfig().bo3AtSpawn != null && world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0))
 	        {
 	        	event.setCanceled(true);
 	        }        

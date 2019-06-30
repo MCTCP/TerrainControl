@@ -20,10 +20,10 @@ import javax.imageio.ImageIO;
 
 public class MapWriter implements Runnable
 {
-    public static final int[] defaultColors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0,
+    public static final int[] DefaultColors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0,
             0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600};
 
-    public static boolean isWorking = false;
+    public static boolean IsWorking = false;
 
     private World world;
     private int size;
@@ -67,7 +67,7 @@ public class MapWriter implements Runnable
         {
             OTG.log(LogMarker.ERROR, "BukkitWorld is null :: Make sure you add `{}` to bukkit.yml", (Object) world.getWorld()
                     .getName());
-            return defaultColors;
+            return DefaultColors;
         }
 
         LocalBiome[] biomes = bukkitWorld.getConfigs().getBiomeArrayByOTGId();
@@ -89,13 +89,13 @@ public class MapWriter implements Runnable
     @Override
     public void run()
     {
-        if (MapWriter.isWorking)
+        if (MapWriter.IsWorking)
         {
             sender.sendMessage(BaseCommand.ERROR_COLOR + "Another instance of map writer is running");
             return;
         }
 
-        MapWriter.isWorking = true;
+        MapWriter.IsWorking = true;
         int height = size;
         int width = size;
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
@@ -196,7 +196,7 @@ public class MapWriter implements Runnable
             OTG.printStackTrace(LogMarker.ERROR, e);
         }
 
-        MapWriter.isWorking = false;
+        MapWriter.IsWorking = false;
     }
 
     /**

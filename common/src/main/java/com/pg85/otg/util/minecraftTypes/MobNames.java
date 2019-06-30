@@ -61,7 +61,7 @@ public enum MobNames
     ZOMBIE_VILLAGER("zombie_villager", "zombievillager");
    
     // Contains all aliases (alias, internalName)
-    private static Map<String, String> mobAliases = new HashMap<String, String>();
+    private static Map<String, String> MobAliases = new HashMap<String, String>();
 
     // Auto-register all aliases in the enum
     static
@@ -81,11 +81,11 @@ public enum MobNames
      */
     public static String toInternalName(String alias)
     {
-    	for(String key : mobAliases.keySet())
+    	for(String key : MobAliases.keySet())
     	{
     		if(key.toLowerCase().trim().replace("entity","").replace("_","").equals(alias.toLowerCase().trim().replace("entity","").replace("_","")))
     		{
-    			return mobAliases.get(key);
+    			return MobAliases.get(key);
     		}
     	}
     	
@@ -102,7 +102,7 @@ public enum MobNames
     {
         for (String alias : aliases)
         {
-            mobAliases.put(alias, internalMinecraftName);
+            MobAliases.put(alias, internalMinecraftName);
         }
     }
 

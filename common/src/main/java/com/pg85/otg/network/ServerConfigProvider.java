@@ -19,13 +19,7 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.FileHelper;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -308,7 +302,7 @@ public final class ServerConfigProvider implements ConfigProvider
         
         // For backwards compatibility load custom biomes from the world config
         // A world created with a previous version of OTG may not have worlddata
-        if(!OTG.isNewWorldBeingCreated && !hasWorldData && worldBiomes.size() > 0)
+        if(!OTG.IsNewWorldBeingCreated && !hasWorldData && worldBiomes.size() > 0)
         {
         	loadedBiomeIdData = new ArrayList<BiomeIdData>();
 	        for(Entry<String, Integer> worldBiome : worldBiomes.entrySet())

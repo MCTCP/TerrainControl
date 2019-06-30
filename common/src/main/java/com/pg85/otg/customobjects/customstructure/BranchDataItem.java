@@ -13,22 +13,25 @@ import com.pg85.otg.util.helpers.RandomHelper;
 
 public class BranchDataItem
 {
-	boolean wasDeleted = false;
-	boolean isBeingRolledBack = false;
-	int branchNumber = -1;
-	boolean MinimumSize = false;
+	private static int BranchDataItemCounter = -1;
+	
 	public CustomObjectCoordinate Branch;
 	public ChunkCoordinate ChunkCoordinate;
 	public BranchDataItem Parent;
 	public boolean DoneSpawning = false;
 	public boolean SpawnDelayed = false;
 	public boolean CannotSpawn = false;
+
+	boolean wasDeleted = false;
+	boolean isBeingRolledBack = false;
+	int branchNumber = -1;
 	int CurrentDepth = 0;
 	int MaxDepth = 0;
-	LocalWorld World;
-	Random Random;
+	
+	private boolean MinimumSize = false;
+	private LocalWorld World;
+	private Random Random;
 	private Stack<BranchDataItem> Children = new Stack<BranchDataItem>();
-	private static int branchDataItemCounter = -1;
 	
 	public BranchDataItem()
 	{
@@ -47,8 +50,8 @@ public class BranchDataItem
 		MinimumSize = minimumSize;
 		ChunkCoordinate = com.pg85.otg.util.ChunkCoordinate.fromBlockCoords(Branch.getX(), Branch.getZ());
 
-		BranchDataItem.branchDataItemCounter += 1; // TODO: Reset this somewhere for each new world created?
-		branchNumber = BranchDataItem.branchDataItemCounter;
+		BranchDataItem.BranchDataItemCounter += 1; // TODO: Reset this somewhere for each new world created?
+		branchNumber = BranchDataItem.BranchDataItemCounter;
 	}	
 	
 	public Stack<BranchDataItem> getChildren(boolean dontSpawn)
@@ -85,7 +88,7 @@ public class BranchDataItem
 	    				!childCoordObject.isRequiredBranch
     				)
 		    		{
-		    			if(OTG.getPluginConfig().SpawnLog)
+		    			if(OTG.getPluginConfig().spawnLog)
 		    			{
 		    				OTG.log(LogMarker.WARN, "canOverride optional branches cannot be in a branch group, ignoring branch: " + childBO3.getName() + " in BO3: " + Branch.BO3Name);
 		    			}

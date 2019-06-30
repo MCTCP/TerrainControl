@@ -23,7 +23,6 @@ import java.util.List;
  */
 public class OTGBiome extends Biome implements IOTGASMBiome
 {
-
     public static final int MAX_TC_BIOME_ID = 1023;
 
     private int skyColor;

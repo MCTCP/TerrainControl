@@ -4,16 +4,15 @@ import java.util.Random;
 
 public class NoiseGeneratorSurfacePatch
 {
-    private static int[][] grad3 = {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
-
+    public static final double Square3 = Math.sqrt(3.0D);
+    private static int[][] Grad3 = {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
+    private static final double SkewFactor = 0.5D * (Square3 - 1.0D);
+    private static final double DeskewFactor = (3.0D - Square3) / 6.0D;
+    
     private int[] permutationTable = new int[512];
-    public static final double square3 = Math.sqrt(3.0D);
     public double noiseContributionX;
     public double noiseContributionY;
     public double noiseContributionZ;
-    private static final double skewFactor = 0.5D * (square3 - 1.0D);
-    private static final double deskewFactor = (3.0D - square3) / 6.0D;
-
 
     public NoiseGeneratorSurfacePatch(Random random)
     {
@@ -53,11 +52,11 @@ public class NoiseGeneratorSurfacePatch
      */
     public double getYNoise(double x, double z)
     {
-        double var11 = 0.5D * (square3 - 1.0D);
+        double var11 = 0.5D * (Square3 - 1.0D);
         double var13 = (x + z) * var11;
         int var15 = fastFloor(x + var13);
         int var16 = fastFloor(z + var13);
-        double var17 = (3.0D - square3) / 6.0D;
+        double var17 = (3.0D - Square3) / 6.0D;
         double var19 = (double)(var15 + var16) * var17;
         double var21 = (double)var15 - var19;
         double var23 = (double)var16 - var19;
@@ -96,7 +95,7 @@ public class NoiseGeneratorSurfacePatch
         else
         {
             var44 *= var44;
-            var5 = var44 * var44 * dot(grad3[var41], var25, var27);
+            var5 = var44 * var44 * dot(Grad3[var41], var25, var27);
         }
 
         double var46 = 0.5D - var31 * var31 - var33 * var33;
@@ -109,7 +108,7 @@ public class NoiseGeneratorSurfacePatch
         else
         {
             var46 *= var46;
-            var7 = var46 * var46 * dot(grad3[var42], var31, var33);
+            var7 = var46 * var46 * dot(Grad3[var42], var31, var33);
         }
 
         double var48 = 0.5D - var35 * var35 - var37 * var37;
@@ -122,7 +121,7 @@ public class NoiseGeneratorSurfacePatch
         else
         {
             var48 *= var48;
-            var9 = var48 * var48 * dot(grad3[var43], var35, var37);
+            var9 = var48 * var48 * dot(Grad3[var43], var35, var37);
         }
 
         return 70.0D * (var5 + var7 + var9);
@@ -138,10 +137,10 @@ public class NoiseGeneratorSurfacePatch
             {
                 double d1 = (paramDouble1 + k) * paramDouble3 + this.noiseContributionX;
 
-                double d3 = (d1 + d2) * skewFactor;
+                double d3 = (d1 + d2) * SkewFactor;
                 int m = fastFloor(d1 + d3);
                 int n = fastFloor(d2 + d3);
-                double d4 = (m + n) * deskewFactor;
+                double d4 = (m + n) * DeskewFactor;
                 double d5 = m - d4;
                 double d6 = n - d4;
                 double d7 = d1 - d5;
@@ -158,10 +157,10 @@ public class NoiseGeneratorSurfacePatch
                     i2 = 1;
                 }
 
-                double d9 = d7 - i1 + deskewFactor;
-                double d10 = d8 - i2 + deskewFactor;
-                double d11 = d7 - 1.0D + 2.0D * deskewFactor;
-                double d12 = d8 - 1.0D + 2.0D * deskewFactor;
+                double d9 = d7 - i1 + DeskewFactor;
+                double d10 = d8 - i2 + DeskewFactor;
+                double d11 = d7 - 1.0D + 2.0D * DeskewFactor;
+                double d12 = d8 - 1.0D + 2.0D * DeskewFactor;
 
                 int i3 = m & 0xFF;
                 int i4 = n & 0xFF;
@@ -177,7 +176,7 @@ public class NoiseGeneratorSurfacePatch
                 } else
                 {
                     d13 *= d13;
-                    d14 = d13 * d13 * dot(grad3[i5], d7, d8);
+                    d14 = d13 * d13 * dot(Grad3[i5], d7, d8);
                 }
                 double d15 = 0.5D - d9 * d9 - d10 * d10;
                 double d16;
@@ -187,7 +186,7 @@ public class NoiseGeneratorSurfacePatch
                 } else
                 {
                     d15 *= d15;
-                    d16 = d15 * d15 * dot(grad3[i6], d9, d10);
+                    d16 = d15 * d15 * dot(Grad3[i6], d9, d10);
                 }
                 double d17 = 0.5D - d11 * d11 - d12 * d12;
                 double d18;
@@ -197,7 +196,7 @@ public class NoiseGeneratorSurfacePatch
                 } else
                 {
                     d17 *= d17;
-                    d18 = d17 * d17 * dot(grad3[i7], d11, d12);
+                    d18 = d17 * d17 * dot(Grad3[i7], d11, d12);
                 }
 
                 paramArrayOfDouble[(i++)] += 70.0D * (d14 + d16 + d18) * paramDouble5;

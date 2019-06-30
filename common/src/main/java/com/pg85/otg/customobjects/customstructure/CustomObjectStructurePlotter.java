@@ -101,7 +101,7 @@ public class CustomObjectStructurePlotter
 	        				} else {
 	        					if(structure != null && !((BO3)structure).getSettings().isOTGPlus)
 	        					{
-		        					if(OTG.getPluginConfig().SpawnLog)
+		        					if(OTG.getPluginConfig().spawnLog)
 		        					{
 		        						OTG.log(LogMarker.WARN, "Tried to spawn non-OTG+ enabled BO3 as CustomStructure in a OTG+ enabled world. BO3: " + ((BO3)structure).getSettings().getName());
 		        					}
@@ -578,12 +578,12 @@ public class CustomObjectStructurePlotter
 				            			bottom = (int) Math.floor(((Integer)topLeftAndLowerRightChunkCoordinates[0] + (Integer)topLeftAndLowerRightChunkCoordinates[2]) / 2d);
 
 				            			if(
-			            					world.GetWorldSession().getWorldBorderRadius() > 0 &&
+			            					world.getWorldSession().getWorldBorderRadius() > 0 &&
 			            					(
-		            							world.GetWorldSession().getWorldBorderRadius() < left ||
-		            							world.GetWorldSession().getWorldBorderRadius() < right ||
-		            							world.GetWorldSession().getWorldBorderRadius() < top ||
-		            							world.GetWorldSession().getWorldBorderRadius() < bottom
+		            							world.getWorldSession().getWorldBorderRadius() < left ||
+		            							world.getWorldSession().getWorldBorderRadius() < right ||
+		            							world.getWorldSession().getWorldBorderRadius() < top ||
+		            							world.getWorldSession().getWorldBorderRadius() < bottom
 			            					)
 		            					)
 				            			{
@@ -660,7 +660,7 @@ public class CustomObjectStructurePlotter
 
 						                		((BO3)structureCoord.getObject()).getSettings().timesSpawned += 1;
 							                	//biome3 = world.getBiome(spawnCoordX * 16 + 8, spawnCoordZ * 16 + 8);
-						                		if(OTG.getPluginConfig().SpawnLog)
+						                		if(OTG.getPluginConfig().spawnLog)
 						                		{
 						                			OTG.log(LogMarker.INFO, "Plotted structure " + structureCoord.getObject().getName() + " at chunk X" + spawnCoordX + " Z" + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
 						                		}

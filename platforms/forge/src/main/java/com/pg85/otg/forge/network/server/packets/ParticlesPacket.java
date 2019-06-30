@@ -32,7 +32,7 @@ public class ParticlesPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(ArrayList<ParticleFunction> particleDataForOTGPerPlayer, DataOutput stream) throws IOException
+	public static void writeToStream(ArrayList<ParticleFunction> particleDataForOTGPerPlayer, DataOutput stream) throws IOException
 	{
 	    stream.writeInt(PluginStandardValues.ProtocolVersion);
 	    stream.writeInt(0); // 0 == particles packet
@@ -52,7 +52,7 @@ public class ParticlesPacket extends OTGPacket
         stream.write(bytes);
 	}
 	
-	public static ParticlesPacket CreateEmptyPacket()
+	public static ParticlesPacket createEmptyPacket()
 	{
 		// Create an empty packet
         ByteBuf nettyBuffer = Unpooled.buffer();
@@ -61,7 +61,7 @@ public class ParticlesPacket extends OTGPacket
         ParticlesPacket packet = new ParticlesPacket(nettyBuffer);
         
         try {
-			ParticlesPacket.WriteToStream(null, stream);
+			ParticlesPacket.writeToStream(null, stream);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} finally {

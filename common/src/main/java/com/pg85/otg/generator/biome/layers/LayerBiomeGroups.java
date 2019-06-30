@@ -41,11 +41,11 @@ public class LayerBiomeGroups extends Layer
                 	// TODO: even with rarity 1 this always spawns the biome
 
                     SortedMap<Integer, BiomeGroup> possibleGroups = biomeGroupManager.getGroupDepthMap(depth);
-                    int newGroupRarity = nextGroupInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleGroups)*entropy);
+                    int newGroupRarity = nextGroupInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleGroups)*Entropy);
                         //>>	Spawn the biome based on the rarity spectrum
                         for (Entry<Integer, BiomeGroup> group : possibleGroups.entrySet())
                         {
-                            if (newGroupRarity/entropy < group.getKey())
+                            if (newGroupRarity/Entropy < group.getKey())
                             {
                                 if (group.getValue() != null){
                                     currentPiece |= (group.getValue().getGroupId() << BiomeGroupShift) |

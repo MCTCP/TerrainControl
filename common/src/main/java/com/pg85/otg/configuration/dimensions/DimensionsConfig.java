@@ -18,9 +18,10 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 
 public class DimensionsConfig
 {
-	private static HashMap<String, DimensionsConfig> defaultConfigs = new HashMap<String, DimensionsConfig>();
-	private File WorldSavesDir;
+	private static HashMap<String, DimensionsConfig> DefaultConfigs = new HashMap<String, DimensionsConfig>();
+	private File worldSavesDir;
 	
+	// Use capitals since we're serialising to yaml and we want to make it look nice
 	public String WorldName;
 	public DimensionConfig Overworld;
 	public ArrayList<DimensionConfig> Dimensions = new ArrayList<DimensionConfig>();
@@ -30,18 +31,18 @@ public class DimensionsConfig
 	public DimensionsConfig(File mcWorldSaveDir)
 	{
 		this.WorldName = mcWorldSaveDir.getName();
-       	this.WorldSavesDir = mcWorldSaveDir.getParentFile();
+       	this.worldSavesDir = mcWorldSaveDir.getParentFile();
 	}
 	
 	public DimensionsConfig(File mcWorldSavesDir, String worldDir)
 	{
-		this.WorldSavesDir = mcWorldSavesDir;
+		this.worldSavesDir = mcWorldSavesDir;
 		this.WorldName = worldDir;
 	}
 		
 	public static DimensionsConfig getModPackConfig(String presetName)
 	{
-		DimensionsConfig forgeWorldConfig = defaultConfigs.get(presetName);
+		DimensionsConfig forgeWorldConfig = DefaultConfigs.get(presetName);
 		if(forgeWorldConfig != null)
 		{
 			return forgeWorldConfig;
@@ -68,7 +69,7 @@ public class DimensionsConfig
 					)
 				)
 				{
-					defaultConfigs.put(presetName, forgeWorldConfig2);
+					DefaultConfigs.put(presetName, forgeWorldConfig2);
 					return forgeWorldConfig2;
 				}
 			}
@@ -130,7 +131,7 @@ public class DimensionsConfig
 			}
 	       	
 	       	presetsConfig.WorldName = mcWorldSaveDir.getName();
-	       	presetsConfig.WorldSavesDir = mcWorldSaveDir.getParentFile();
+	       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
 		}
        	
        	return presetsConfig;
@@ -151,9 +152,9 @@ public class DimensionsConfig
 	{
 		// Don't save default configs (loaded via defaultConfigfromFile)
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?
-		if(WorldSavesDir != null)
+		if(worldSavesDir != null)
 		{
-			File forgeWorldConfigFile = new File(WorldSavesDir.getAbsolutePath() + "//" + WorldName + "//OpenTerrainGenerator//" + WorldStandardValues.DimensionsConfigFileName);
+			File forgeWorldConfigFile = new File(worldSavesDir.getAbsolutePath() + "//" + WorldName + "//OpenTerrainGenerator//" + WorldStandardValues.DimensionsConfigFileName);
 			if(!forgeWorldConfigFile.exists())
 			{
 				forgeWorldConfigFile.getParentFile().mkdirs();

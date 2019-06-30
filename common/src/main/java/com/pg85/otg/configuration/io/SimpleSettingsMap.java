@@ -94,7 +94,7 @@ public final class SimpleSettingsMap implements SettingsMap
             result.add(function);
             if (function instanceof ErroredFunction)
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
 	                OTG.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
             	}

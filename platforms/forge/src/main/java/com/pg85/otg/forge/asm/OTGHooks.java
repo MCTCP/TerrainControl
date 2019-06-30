@@ -17,7 +17,7 @@ import net.minecraftforge.common.DimensionManager;
 
 public class OTGHooks
 {
-	public static boolean InitOTGDimension(int i)
+	public static boolean initOTGDimension(int i)
 	{
 		if(DimensionManager.isDimensionRegistered(i))
 		{

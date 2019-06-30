@@ -146,11 +146,11 @@ public class StandardBiomeTemplate
         
         // Underground lakes
         resources.add(Resource
-                .createResource(config, UndergroundLakeGen.class, undergroundLakeMinSize, undergroundLakeMaxSize, undergroundLakeFrequency,
-                        undergroundLakeRarity, undergroundLakeMinAltitude, undergroundLakeMaxAltitude));
+                .createResource(config, UndergroundLakeGen.class, UndergroundLakeMinSize, UndergroundLakeMaxSize, UndergroundLakeFrequency,
+                        UndergroundLakeRarity, UndergroundLakeMinAltitude, UndergroundLakeMaxAltitude));
 
         // Dungeon
-        resources.add(Resource.createResource(config, DungeonGen.class, dungeonFrequency, dungeonRarity, dungeonMinAltitude,
+        resources.add(Resource.createResource(config, DungeonGen.class, DungeonFrequency, DungeonRarity, DungeonMinAltitude,
                 this.worldHeight));
         
         // Fossil
@@ -160,82 +160,82 @@ public class StandardBiomeTemplate
         }
 
         // Dirt
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIRT, dirtDepositSize, dirtDepositFrequency,
-                dirtDepositRarity, dirtDepositMinAltitude, dirtDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIRT, DirtDepositSize, DirtDepositFrequency,
+                DirtDepositRarity, DirtDepositMinAltitude, DirtDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Gravel
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GRAVEL, gravelDepositSize, gravelDepositFrequency,
-                gravelDepositRarity, gravelDepositMinAltitude, gravelDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GRAVEL, GravelDepositSize, GravelDepositFrequency,
+                GravelDepositRarity, GravelDepositMinAltitude, GravelDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Granite
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.STONE + ":1", graniteDepositSize,
-                graniteDepositFrequency, graniteDepositRarity, graniteDepositMinAltitude,
-                graniteDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.STONE + ":1", GraniteDepositSize,
+                GraniteDepositFrequency, GraniteDepositRarity, GraniteDepositMinAltitude,
+                GraniteDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Diorite
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.STONE + ":3", dioriteDepositSize,
-                dioriteDepositFrequency, dioriteDepositRarity, dioriteDepositMinAltitude,
-                dioriteDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.STONE + ":3", DioriteDepositSize,
+                DioriteDepositFrequency, DioriteDepositRarity, DioriteDepositMinAltitude,
+                DioriteDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Andesite
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.STONE + ":5", andesiteDepositSize,
-                andesiteDepositFrequency, andesiteDepositRarity, andesiteDepositMinAltitude,
-                andesiteDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.STONE + ":5", AndesiteDepositSize,
+                AndesiteDepositFrequency, AndesiteDepositRarity, AndesiteDepositMinAltitude,
+                AndesiteDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Coal
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.COAL_ORE, coalDepositSize, coalDepositFrequency,
-                coalDepositRarity, coalDepositMinAltitude, coalDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.COAL_ORE, CoalDepositSize, CoalDepositFrequency,
+                CoalDepositRarity, CoalDepositMinAltitude, CoalDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Iron
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.IRON_ORE, ironDepositSize, ironDepositFrequency,
-                ironDepositRarity, ironDepositMinAltitude, ironDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.IRON_ORE, IronDepositSize, IronDepositFrequency,
+                IronDepositRarity, IronDepositMinAltitude, IronDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Gold
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GOLD_ORE, goldDepositSize, goldDepositFrequency,
-                goldDepositRarity, goldDepositMinAltitude, goldDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.GOLD_ORE, GoldDepositSize, GoldDepositFrequency,
+                GoldDepositRarity, GoldDepositMinAltitude, GoldDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Redstone
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.REDSTONE_ORE, redstoneDepositSize,
-                redstoneDepositFrequency, redstoneDepositRarity, redstoneDepositMinAltitude,
-                redstoneDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.REDSTONE_ORE, RedstoneDepositSize,
+                RedstoneDepositFrequency, RedstoneDepositRarity, RedstoneDepositMinAltitude,
+                RedstoneDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Diamond
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIAMOND_ORE, diamondDepositSize,
-                diamondDepositFrequency, diamondDepositRarity, diamondDepositMinAltitude,
-                diamondDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.DIAMOND_ORE, DiamondDepositSize,
+                DiamondDepositFrequency, DiamondDepositRarity, DiamondDepositMinAltitude,
+                DiamondDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Lapislazuli
-        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.LAPIS_ORE, lapislazuliDepositSize,
-                lapislazuliDepositFrequency, lapislazuliDepositRarity, lapislazuliDepositMinAltitude,
-                lapislazuliDepositMaxAltitude, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.LAPIS_ORE, LapislazuliDepositSize,
+                LapislazuliDepositFrequency, LapislazuliDepositRarity, LapislazuliDepositMinAltitude,
+                LapislazuliDepositMaxAltitude, DefaultMaterial.STONE));
 
         // Emerald ore
         if (defaultEmeraldOre > 0)
         {
-            resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.EMERALD_ORE, emeraldDepositSize,
+            resources.add(Resource.createResource(config, OreGen.class, DefaultMaterial.EMERALD_ORE, EmeraldDepositSize,
                     this.defaultEmeraldOre,
-                    emeraldDepositRarity, emeraldDepositMinAltitude, emeraldDepositMaxAltitude, DefaultMaterial.STONE));
+                    EmeraldDepositRarity, EmeraldDepositMinAltitude, EmeraldDepositMaxAltitude, DefaultMaterial.STONE));
         }
 
         // Under water sand
         if (defaultWaterSand > 0)
         {
-            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.SAND, waterSandDepositSize,
+            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.SAND, WaterSandDepositSize,
                     defaultWaterSand,
-                    waterSandDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
+                    WaterSandDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
         }
 
         // Under water clay
-        resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.CLAY, waterClayDepositSize,
-                waterClayDepositFrequency,
-                waterClayDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.CLAY));
+        resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.CLAY, WaterClayDepositSize,
+                WaterClayDepositFrequency,
+                WaterClayDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.CLAY));
 
         // Under water gravel
         if (defaultWaterGravel > 0)
         {
-            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.GRAVEL, waterGravelDepositSize,
+            resources.add(Resource.createResource(config, UnderWaterOreGen.class, DefaultMaterial.GRAVEL, WaterGravelDepositSize,
                     defaultWaterGravel,
-                    waterGravelDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
+                    WaterGravelDepositRarity, DefaultMaterial.DIRT, DefaultMaterial.GRASS));
         }
 
         // Custom objects
@@ -245,8 +245,8 @@ public class StandardBiomeTemplate
         if (this.defaultBoulder != 0)
         {
             resources.add(Resource.createResource(config, BoulderGen.class, DefaultMaterial.MOSSY_COBBLESTONE, defaultBoulder,
-                    boulderDepositRarity,
-                    boulderDepositMinAltitude, boulderDepositMaxAltitude, DefaultMaterial.GRASS, DefaultMaterial.DIRT,
+                    BoulderDepositRarity,
+                    BoulderDepositMinAltitude, BoulderDepositMaxAltitude, DefaultMaterial.GRASS, DefaultMaterial.DIRT,
                     DefaultMaterial.STONE));
         }
 
@@ -254,21 +254,21 @@ public class StandardBiomeTemplate
         if (this.defaultIceSpikes)
         {
             resources.add(Resource.createResource(config, IceSpikeGen.class, DefaultMaterial.PACKED_ICE, SpikeType.HugeSpike, 3, 1.66,
-                    iceSpikeDepositMinHeight,
-                    iceSpikeDepositMaxHeight, DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
+                    IceSpikeDepositMinHeight,
+                    IceSpikeDepositMaxHeight, DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
             resources.add(Resource.createResource(config, IceSpikeGen.class, DefaultMaterial.PACKED_ICE, SpikeType.SmallSpike, 3, 98.33,
-                    iceSpikeDepositMinHeight,
-                    iceSpikeDepositMaxHeight, DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
+                    IceSpikeDepositMinHeight,
+                    IceSpikeDepositMaxHeight, DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
             resources.add(Resource.createResource(config, IceSpikeGen.class, DefaultMaterial.PACKED_ICE, SpikeType.Basement, 2, 100,
-                    iceSpikeDepositMinHeight,
-                    iceSpikeDepositMaxHeight, DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
+                    IceSpikeDepositMinHeight,
+                    IceSpikeDepositMaxHeight, DefaultMaterial.ICE, DefaultMaterial.DIRT, DefaultMaterial.SNOW_BLOCK));
         }
 
         // Melons (need to be spawned before trees)
         if (this.defaultMelons > 0)
         {
             resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.MELON_BLOCK, this.defaultMelons,
-                    flowerDepositRarity, flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                    FlowerDepositRarity, FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         // Melons (need to be spawned before trees)
@@ -292,73 +292,73 @@ public class StandardBiomeTemplate
         if (this.defaultPoppies > 0)
         {
             // Poppy
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Poppy, this.defaultPoppies, roseDepositRarity,
-                    roseDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Poppy, this.defaultPoppies, RoseDepositRarity,
+                    RoseDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultBlueOrchids > 0)
         {
             // Blue orchid
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.BlueOrchid, this.defaultBlueOrchids,
-                    blueOrchidDepositRarity, blueOrchidDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                    BlueOrchidDepositRarity, BlueOrchidDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultDandelions > 0)
         {
             // Dandelion
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Dandelion, this.defaultDandelions, flowerDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Dandelion, this.defaultDandelions, FlowerDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultTallFlowers > 0)
         {
             // Lilac
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Lilac, this.defaultTallFlowers, flowerDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Lilac, this.defaultTallFlowers, FlowerDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
 
             // Rose bush
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RoseBush, this.defaultTallFlowers, flowerDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RoseBush, this.defaultTallFlowers, FlowerDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
 
             // Peony
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Peony, this.defaultTallFlowers, flowerDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Peony, this.defaultTallFlowers, FlowerDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultSunflowers > 0)
         {
             // Sunflower
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Sunflower, this.defaultSunflowers, flowerDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Sunflower, this.defaultSunflowers, FlowerDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultTulips > 0)
         {
             // Tulip
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.OrangeTulip, this.defaultTulips, tulipDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedTulip, this.defaultTulips, tulipDepositRarity,
-                    flowerDepositMinAltitude,
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.OrangeTulip, this.defaultTulips, TulipDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedTulip, this.defaultTulips, TulipDepositRarity,
+                    FlowerDepositMinAltitude,
                     this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.WhiteTulip, this.defaultTulips, tulipDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.PinkTulip, this.defaultTulips, tulipDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.WhiteTulip, this.defaultTulips, TulipDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.PinkTulip, this.defaultTulips, TulipDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultAzureBluets > 0)
         {
             // Azure bluet
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.AzureBluet, this.defaultDandelions,
-                    flowerDepositRarity, flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                    FlowerDepositRarity, FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
 
         }
 
         if (this.defaultAlliums > 0)
         {
             // Allium
-            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Allium, this.defaultDandelions, flowerDepositRarity,
-                    flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+            resources.add(Resource.createResource(config, PlantGen.class, PlantType.Allium, this.defaultDandelions, FlowerDepositRarity,
+                    FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
 
         }
 
@@ -366,18 +366,18 @@ public class StandardBiomeTemplate
         {
             // Oxeye Daisy
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.OxeyeDaisy, this.defaultDandelions,
-                    flowerDepositRarity, flowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                    FlowerDepositRarity, FlowerDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultMushroom > 0)
         {
             // Red mushroom
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.RedMushroom, this.defaultMushroom,
-                    redMushroomDepositRarity, redMushroomDepositMinAltitude, this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT));
+                    RedMushroomDepositRarity, RedMushroomDepositMinAltitude, this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT));
 
             // Brown mushroom
             resources.add(Resource.createResource(config, PlantGen.class, PlantType.BrownMushroom, this.defaultMushroom,
-                    brownMushroomDepositRarity, brownMushroomDepositMinAltitude,
+                    BrownMushroomDepositRarity, BrownMushroomDepositMinAltitude,
                     this.worldHeight, defaultSurfaceBlock, DefaultMaterial.DIRT));
         }
 
@@ -385,7 +385,7 @@ public class StandardBiomeTemplate
         {
             // Ferns
             resources.add(Resource.createResource(config, GrassGen.class, PlantType.Fern, GrassGen.GroupOption.NotGrouped,
-                    this.defaultFerns, longGrassDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                    this.defaultFerns, LongGrassDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
         }
 
         if (this.defaultDoubleGrass > 0)
@@ -394,11 +394,11 @@ public class StandardBiomeTemplate
             if (this.defaultDoubleGrassIsGrouped)
             {
                 resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.Grouped, this.defaultDoubleGrass,
-                        doubleGrassGroupedDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                        DoubleGrassGroupedDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             } else
             {
                 resources.add(Resource.createResource(config, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.NotGrouped, this.defaultDoubleGrass,
-                        doubleGrassDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                        DoubleGrassDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             }
         }
 
@@ -408,11 +408,11 @@ public class StandardBiomeTemplate
             if (this.defaultGrassIsGrouped)
             {
                 resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.Grouped,
-                        this.defaultGrass, longGrassGroupedDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                        this.defaultGrass, LongGrassGroupedDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             } else
             {
                 resources.add(Resource.createResource(config, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.NotGrouped,
-                        this.defaultGrass, longGrassDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
+                        this.defaultGrass, LongGrassDepositRarity, DefaultMaterial.GRASS, DefaultMaterial.DIRT));
             }
         }
 
@@ -426,41 +426,41 @@ public class StandardBiomeTemplate
         {
             // Dead Bush
             resources.add(Resource.createResource(config, GrassGen.class, PlantType.DeadBush, 0, this.defaultDeadBush,
-                    deadBushDepositRarity, DefaultMaterial.SAND, DefaultMaterial.HARD_CLAY,
+                    DeadBushDepositRarity, DefaultMaterial.SAND, DefaultMaterial.HARD_CLAY,
                     DefaultMaterial.STAINED_CLAY, DefaultMaterial.DIRT));
         }
 
         // Pumpkin
-        resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.PUMPKIN, pumpkinDepositFrequency,
-                pumpkinDepositRarity, pumpkinDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS));
+        resources.add(Resource.createResource(config, PlantGen.class, DefaultMaterial.PUMPKIN, PumpkinDepositFrequency,
+                PumpkinDepositRarity, PumpkinDepositMinAltitude, this.worldHeight, DefaultMaterial.GRASS));
 
         if (this.defaultReed > 0)
         {
             // Reed
             resources.add(Resource.createResource(config, ReedGen.class, DefaultMaterial.SUGAR_CANE_BLOCK, this.defaultReed,
-                    reedDepositRarity, reedDepositMinAltitude, this.worldHeight,
+                    ReedDepositRarity, ReedDepositMinAltitude, this.worldHeight,
                     DefaultMaterial.GRASS, DefaultMaterial.DIRT, DefaultMaterial.SAND));
         }
 
         if (this.defaultCactus > 0)
         {
             // Cactus
-            resources.add(Resource.createResource(config, CactusGen.class, DefaultMaterial.CACTUS, this.defaultCactus, cactusDepositRarity,
-                    cactusDepositMinAltitude, this.worldHeight, DefaultMaterial.SAND));
+            resources.add(Resource.createResource(config, CactusGen.class, DefaultMaterial.CACTUS, this.defaultCactus, CactusDepositRarity,
+                    CactusDepositMinAltitude, this.worldHeight, DefaultMaterial.SAND));
         }
         if (this.defaultHasVines)
         {
-            resources.add(Resource.createResource(config, VinesGen.class, vinesFrequency, vinesRarity, vinesMinAltitude, this.worldHeight,
+            resources.add(Resource.createResource(config, VinesGen.class, VinesFrequency, VinesRarity, VinesMinAltitude, this.worldHeight,
                     DefaultMaterial.VINE));
         }
 
         // Water source
-        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.WATER, waterSourceDepositFrequency,
-                waterSourceDepositRarity, waterSourceDepositMinAltitude, this.worldHeight, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.WATER, WaterSourceDepositFrequency,
+                WaterSourceDepositRarity, WaterSourceDepositMinAltitude, this.worldHeight, DefaultMaterial.STONE));
 
         // Lava source
-        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.LAVA, lavaSourceDepositFrequency,
-                lavaSourceDepositRarity, lavaSourceDepositMinAltitude, this.worldHeight, DefaultMaterial.STONE));
+        resources.add(Resource.createResource(config, LiquidGen.class, DefaultMaterial.LAVA, LavaSourceDepositFrequency,
+                LavaSourceDepositRarity, LavaSourceDepositMinAltitude, this.worldHeight, DefaultMaterial.STONE));
 
         // Desert wells
         if (this.defaultWell != null)

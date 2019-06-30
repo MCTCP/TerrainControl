@@ -134,7 +134,7 @@ public class CustomObjectStructureCache
 				if(cachedChunk.getValue() != null)
 				{
 					a++;
-					OTG.log(LogMarker.FATAL, "Running " + world.GetWorldSession().getPreGeneratorIsRunning() +  " L" + world.GetWorldSession().getPregeneratedBorderLeft() + " R" + world.GetWorldSession().getPregeneratedBorderRight() + " T" + world.GetWorldSession().getPregeneratedBorderTop() + " B" + world.GetWorldSession().getPregeneratedBorderBottom());
+					OTG.log(LogMarker.FATAL, "Running " + world.getWorldSession().getPreGeneratorIsRunning() +  " L" + world.getWorldSession().getPregeneratedBorderLeft() + " R" + world.getWorldSession().getPregeneratedBorderRight() + " T" + world.getWorldSession().getPregeneratedBorderTop() + " B" + world.getWorldSession().getPregeneratedBorderBottom());
 					OTG.log(LogMarker.FATAL, "Error at Chunk X" + cachedChunk.getKey().getChunkX() + " Z" + cachedChunk.getKey().getChunkZ() + ". " + (!this.structureCache.containsKey(cachedChunk.getKey()) ? (world.isInsidePregeneratedRegion(cachedChunk.getKey()) ? "Inside pregenned region" : "Not plotted") : this.structureCache.get(cachedChunk.getKey()) == null ? "Plotted and spawned" : this.structureCache.get(cachedChunk.getKey()).Start != null ? this.structureCache.get(cachedChunk.getKey()).Start.BO3Name : "Trees"));
 
 					//throw new RuntimeException();
@@ -324,7 +324,7 @@ public class CustomObjectStructureCache
 
 					// This should only happen when a world is loaded that was generated with a PregenerationRadius of 0 and then had its PregenerationRadius increased
 					// TODO: This never seems to happen?
-					OTG.log(LogMarker.FATAL, "Running " + world.GetWorldSession().getPreGeneratorIsRunning() +  " L" + world.GetWorldSession().getPregeneratedBorderLeft() + " R" + world.GetWorldSession().getPregeneratedBorderRight() + " T" + world.GetWorldSession().getPregeneratedBorderTop() + " B" + world.GetWorldSession().getPregeneratedBorderBottom());
+					OTG.log(LogMarker.FATAL, "Running " + world.getWorldSession().getPreGeneratorIsRunning() +  " L" + world.getWorldSession().getPregeneratedBorderLeft() + " R" + world.getWorldSession().getPregeneratedBorderRight() + " T" + world.getWorldSession().getPregeneratedBorderTop() + " B" + world.getWorldSession().getPregeneratedBorderBottom());
 					OTG.log(LogMarker.FATAL, "Error at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
 					throw new RuntimeException("Error at Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
 				}

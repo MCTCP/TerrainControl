@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui;
+package com.pg85.otg.forge.gui.mainmenu;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -51,17 +51,13 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+
 import net.minecraft.client.gui.GuiListExtended;;
 
 @SideOnly(Side.CLIENT)
 public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEntry
 {
 	// Taken from net.minecraft.client.gui.GuiListWorldSelectionEntry. Only added getSelectedWorldName().
-
-	public String getSelectedWorldName()
-	{
-		return this.worldSummary != null ? this.worldSummary.getFileName() : null;
-	}
 
     private static final Logger LOGGER = LogManager.getLogger();
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat();
@@ -92,6 +88,11 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 
         this.loadServerIcon();
     }
+    
+	public String getSelectedWorldName()
+	{
+		return this.worldSummary != null ? this.worldSummary.getFileName() : null;
+	}
 
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
@@ -232,7 +233,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         	ArrayList<String> missingPresets = new ArrayList<String>();
         	if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
         	{
-        		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
+        		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
         		if(worldConfig == null)
         		{
         			missingPresets.add(dimsConfig.Overworld.PresetName);
@@ -242,7 +243,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         	{
         		for(DimensionConfig dimConfig : dimsConfig.Dimensions)
         		{
-            		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+            		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
             		if(worldConfig == null)
             		{
             			missingPresets.add(dimConfig.PresetName);
@@ -349,13 +350,13 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     			{
     				// If this is a legacy overworld then the world name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), comparator.getFileName());
-    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(worldConfigLocation);
     				DimensionConfig overWorld = new DimensionConfig(comparator.getFileName(), worldConfig);
     				dimensionsConfig.Overworld = overWorld;
     			} else {
     				// If this is a legacy dim then the dim name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), dimensionData.dimensionName);
-    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(worldConfigLocation);
     				DimensionConfig dimension = new DimensionConfig(dimensionData.dimensionName, worldConfig);
     				dimensionsConfig.Dimensions.add(dimension);
     			}
@@ -398,7 +399,6 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         {
             try
             {
-            	PregeneratorUI.ResetIngameUI();
                 client.launchIntegratedServer(comparator.getFileName(), comparator.getDisplayName(), null);
             }
             catch (StartupQuery.AbortedException e)

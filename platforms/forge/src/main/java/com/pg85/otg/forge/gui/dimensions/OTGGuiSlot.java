@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui;
+package com.pg85.otg.forge.gui.dimensions;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -108,29 +108,6 @@ public abstract class OTGGuiSlot
         return this.getSize() * this.slotHeight + this.headerPadding;
     }
 
-    protected abstract void drawBackground();
-
-    protected void updateItemPos(int entryID, int insideLeft, int yPos, float partialTicks)
-    {
-    }
-
-    protected abstract void drawSlot(int slotIndex, int xPos, int yPos, int heightIn, int mouseXIn, int mouseYIn, float partialTicks);
-
-    /**
-     * Handles drawing a list's header row.
-     */
-    protected void drawListHeader(int insideLeft, int insideTop, Tessellator tessellatorIn)
-    {
-    }
-
-    protected void clickedHeader(int p_148132_1_, int p_148132_2_)
-    {
-    }
-
-    protected void renderDecorations(int mouseXIn, int mouseYIn)
-    {
-    }
-
     public int getSlotIndexFromScreenCoords(int posX, int posY)
     {
         int i = this.left + this.width / 2 - this.getListWidth() / 2;
@@ -189,25 +166,51 @@ public abstract class OTGGuiSlot
         this.bindAmountScrolled();
         this.initialClickY = -2;
     }
-
-    public void actionPerformed(GuiButton button)
+    
+    protected void updateItemPos(int entryID, int insideLeft, int yPos, float partialTicks)
     {
-        if (button.enabled)
-        {
-            if (button.id == this.scrollUpButtonID)
-            {
-                this.amountScrolled -= (float)(this.slotHeight * 2 / 3);
-                this.initialClickY = -2;
-                this.bindAmountScrolled();
-            }
-            else if (button.id == this.scrollDownButtonID)
-            {
-                this.amountScrolled += (float)(this.slotHeight * 2 / 3);
-                this.initialClickY = -2;
-                this.bindAmountScrolled();
-            }
-        }
     }
+
+    public void setEnabled(boolean enabledIn)
+    {
+        this.enabled = enabledIn;
+    }
+
+    public boolean getEnabled()
+    {
+        return this.enabled;
+    }
+
+    /**
+     * Gets the width of the list
+     */
+    public int getListWidth()
+    {
+        return this.width;
+    }
+
+    protected int getScrollBarX()
+    {    	
+    	return this.left + this.width - 6;//this.width / 2 + 124;
+    }
+    
+    /**
+     * Sets the left and right bounds of the slot. Param is the left bound, right is calculated as left + width.
+     */
+    public void setSlotXBoundsFromLeft(int leftIn)
+    {
+        this.left = leftIn;
+        this.right = leftIn + this.width;
+    }
+
+    public int getSlotHeight()
+    {
+        return this.slotHeight;
+    }
+    
+    // Drawing
+    
+    protected abstract void drawBackground();
 
     public void drawScreen(int mouseXIn, int mouseYIn, float partialTicks)
     {
@@ -324,6 +327,175 @@ public abstract class OTGGuiSlot
             //           
         }
     }
+
+    /**
+     * Draws the selection box around the selected slot element.
+     */
+    protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks)
+    {
+        int i = this.getSize();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+
+        for (int j = 0; j < i; ++j)
+        {
+            int xPos = insideTop + j * this.slotHeight + this.headerPadding;
+            int yPos = this.slotHeight - 4;
+
+            if (xPos > this.bottom || xPos + yPos < this.top)
+            {
+                this.updateItemPos(j, insideLeft, xPos, partialTicks);
+            }
+
+            if (this.showSelectionBox && this.isSelected(j))
+            {
+                int i1 = this.left + (this.width / 2 - this.getListWidth() / 2);
+                int j1 = this.left + this.width / 2 + this.getListWidth() / 2;
+                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                GlStateManager.disableTexture2D();
+                bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+                bufferbuilder.pos((double)i1, (double)(xPos + yPos + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+                bufferbuilder.pos((double)j1, (double)(xPos + yPos + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+                bufferbuilder.pos((double)j1, (double)(xPos - 2), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+                bufferbuilder.pos((double)i1, (double)(xPos - 2), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+                bufferbuilder.pos((double)(i1 + 1), (double)(xPos + yPos + 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                bufferbuilder.pos((double)(j1 - 1), (double)(xPos + yPos + 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+                bufferbuilder.pos((double)(j1 - 1), (double)(xPos - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                bufferbuilder.pos((double)(i1 + 1), (double)(xPos - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+                tessellator.draw();
+                GlStateManager.enableTexture2D();
+            }
+
+            this.drawSlot(j, insideLeft, xPos, yPos, mouseXIn, mouseYIn, partialTicks);
+        }
+    }
+
+    /**
+     * Overlays the background to hide scrolled items
+     */
+    protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha)
+    {
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferbuilder = tessellator.getBuffer();
+        
+        ScaledResolution res = new ScaledResolution(mc);
+        double scaleW = mc.displayWidth / res.getScaledWidth_double();
+        double scaleH = mc.displayHeight / res.getScaledHeight_double();
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor((int)(left      * scaleW), (int)(mc.displayHeight - (bottom * scaleH)),
+                       (int)(this.width * scaleW), (int)(this.height * scaleH));
+        
+        if (mc.world != null)
+        {
+        	GuiUtils.drawGradientRect(0, this.left, this.top, this.right, this.bottom, 0xC0101010, 0xD0101010);
+        } else {
+        	// Draw dark dirt background
+            GlStateManager.disableLighting();
+            GlStateManager.disableFog();
+            mc.renderEngine.bindTexture(Gui.OPTIONS_BACKGROUND);
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            final float scale = 32.0F;
+            bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+            bufferbuilder.pos((double)this.left, (double)endY, 0.0D
+        		).tex(0.0D, (double)((float)endY / scale)
+    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
+            bufferbuilder.pos((double)(this.left + this.width), (double)endY, 0.0D
+        		).tex((double)((float)this.width / scale), (double)((float)endY / scale)
+    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
+            bufferbuilder.pos((double)(this.left + this.width), (double)startY, 0.0D
+        		).tex((double)((float)this.width / scale), (double)((float)startY / scale)
+    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
+            bufferbuilder.pos((double)this.left, (double)startY, 0.0D
+        		).tex(0.0D, (double)((float)startY / scale)
+    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
+            tessellator.draw();
+        }
+    }
+
+    protected void drawContainerBackground(Tessellator tessellator)
+    {
+        BufferBuilder buffer = tessellator.getBuffer();
+        this.mc.getTextureManager().bindTexture(Gui.OPTIONS_BACKGROUND);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        float f = 32.0F;
+        buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+        
+        buffer.pos(
+        		(double)this.left,  
+        		(double)this.bottom, 
+        		0.0D
+    		).tex(
+				(double)((float)this.left  / f), 
+				(double)((float)(this.bottom + (int)this.amountScrolled) / f)
+			).color(32, 32, 32, 255).endVertex();
+        
+        buffer.pos(
+        		(double)this.right, 
+        		(double)this.bottom, 
+        		0.0D
+    		).tex(
+				(double)((float)this.right / f), 
+				(double)((float)(this.bottom + (int)this.amountScrolled) / f)
+			).color(32, 32, 32, 255).endVertex();
+        
+        buffer.pos(
+        		(double)this.right, 
+        		(double)this.top,    
+        		0.0D
+    		).tex(
+				(double)((float)this.right / f), 
+				(double)((float)(this.top    + (int)this.amountScrolled) / f)
+			).color(32, 32, 32, 255).endVertex();
+        
+        buffer.pos(
+        		(double)this.left,  
+        		(double)this.top,    
+        		0.0D
+    		).tex(
+				(double)((float)this.left  / f), 
+				(double)((float)(this.top    + (int)this.amountScrolled) / f)
+			).color(32, 32, 32, 255).endVertex();
+        
+        tessellator.draw();
+    }
+    
+    protected abstract void drawSlot(int slotIndex, int xPos, int yPos, int heightIn, int mouseXIn, int mouseYIn, float partialTicks);
+
+    /**
+     * Handles drawing a list's header row.
+     */
+    protected void drawListHeader(int insideLeft, int insideTop, Tessellator tessellatorIn)
+    {
+    }
+
+    protected void renderDecorations(int mouseXIn, int mouseYIn)
+    {
+    }
+    
+    // Mouse / keyboard
+    
+    protected void clickedHeader(int p_148132_1_, int p_148132_2_)
+    {
+    }
+
+    public void actionPerformed(GuiButton button)
+    {
+        if (button.enabled)
+        {
+            if (button.id == this.scrollUpButtonID)
+            {
+                this.amountScrolled -= (float)(this.slotHeight * 2 / 3);
+                this.initialClickY = -2;
+                this.bindAmountScrolled();
+            }
+            else if (button.id == this.scrollDownButtonID)
+            {
+                this.amountScrolled += (float)(this.slotHeight * 2 / 3);
+                this.initialClickY = -2;
+                this.bindAmountScrolled();
+            }
+        }
+    }
     
     public void handleMouseInput()
     {
@@ -389,23 +561,17 @@ public abstract class OTGGuiSlot
                             int l1 = (int)((float)((this.bottom - this.top) * (this.bottom - this.top)) / (float)this.getContentHeight());
                             l1 = MathHelper.clamp(l1, 32, this.bottom - this.top - 8);
                             this.scrollMultiplier /= (float)(this.bottom - this.top - l1) / (float)k1;
-                        }
-                        else
-                        {
+                        } else {
                             this.scrollMultiplier = 1.0F;
                         }
 
                         if (flag1)
                         {
                             this.initialClickY = this.mouseY;
-                        }
-                        else
-                        {
+                        } else {
                             this.initialClickY = -2;
                         }
-                    }
-                    else
-                    {
+                    } else {
                         this.initialClickY = -2;
                     }
                 }
@@ -414,9 +580,7 @@ public abstract class OTGGuiSlot
                     this.amountScrolled -= (float)(this.mouseY - this.initialClickY) * this.scrollMultiplier;
                     this.initialClickY = this.mouseY;
                 }
-            }
-            else
-            {
+            } else {
                 this.initialClickY = -1;
             }
 
@@ -436,173 +600,5 @@ public abstract class OTGGuiSlot
                 this.amountScrolled += (float)(i2 * this.slotHeight / 2);
             }
         }
-    }
-
-    public void setEnabled(boolean enabledIn)
-    {
-        this.enabled = enabledIn;
-    }
-
-    public boolean getEnabled()
-    {
-        return this.enabled;
-    }
-
-    /**
-     * Gets the width of the list
-     */
-    public int getListWidth()
-    {
-        return this.width;
-    }
-
-    /**
-     * Draws the selection box around the selected slot element.
-     */
-    protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks)
-    {
-        int i = this.getSize();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-
-        for (int j = 0; j < i; ++j)
-        {
-            int xPos = insideTop + j * this.slotHeight + this.headerPadding;
-            int yPos = this.slotHeight - 4;
-
-            if (xPos > this.bottom || xPos + yPos < this.top)
-            {
-                this.updateItemPos(j, insideLeft, xPos, partialTicks);
-            }
-
-            if (this.showSelectionBox && this.isSelected(j))
-            {
-                int i1 = this.left + (this.width / 2 - this.getListWidth() / 2);
-                int j1 = this.left + this.width / 2 + this.getListWidth() / 2;
-                GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-                GlStateManager.disableTexture2D();
-                bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-                bufferbuilder.pos((double)i1, (double)(xPos + yPos + 2), 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
-                bufferbuilder.pos((double)j1, (double)(xPos + yPos + 2), 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
-                bufferbuilder.pos((double)j1, (double)(xPos - 2), 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
-                bufferbuilder.pos((double)i1, (double)(xPos - 2), 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
-                bufferbuilder.pos((double)(i1 + 1), (double)(xPos + yPos + 1), 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
-                bufferbuilder.pos((double)(j1 - 1), (double)(xPos + yPos + 1), 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
-                bufferbuilder.pos((double)(j1 - 1), (double)(xPos - 1), 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
-                bufferbuilder.pos((double)(i1 + 1), (double)(xPos - 1), 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
-                tessellator.draw();
-                GlStateManager.enableTexture2D();
-            }
-
-            this.drawSlot(j, insideLeft, xPos, yPos, mouseXIn, mouseYIn, partialTicks);
-        }
-    }
-
-    protected int getScrollBarX()
-    {    	
-    	return this.left + this.width - 6;//this.width / 2 + 124;
-    }
-
-    /**
-     * Overlays the background to hide scrolled items
-     */
-    protected void overlayBackground(int startY, int endY, int startAlpha, int endAlpha)
-    {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
-        
-        ScaledResolution res = new ScaledResolution(mc);
-        double scaleW = mc.displayWidth / res.getScaledWidth_double();
-        double scaleH = mc.displayHeight / res.getScaledHeight_double();
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor((int)(left      * scaleW), (int)(mc.displayHeight - (bottom * scaleH)),
-                       (int)(this.width * scaleW), (int)(this.height * scaleH));
-        
-        if (mc.world != null)
-        {
-        	GuiUtils.drawGradientRect(0, this.left, this.top, this.right, this.bottom, 0xC0101010, 0xD0101010);
-        } else {
-        	// Draw dark dirt background
-            GlStateManager.disableLighting();
-            GlStateManager.disableFog();
-            mc.renderEngine.bindTexture(Gui.OPTIONS_BACKGROUND);
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-            final float scale = 32.0F;
-            bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-            bufferbuilder.pos((double)this.left, (double)endY, 0.0D
-        		).tex(0.0D, (double)((float)endY / scale)
-    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
-            bufferbuilder.pos((double)(this.left + this.width), (double)endY, 0.0D
-        		).tex((double)((float)this.width / scale), (double)((float)endY / scale)
-    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
-            bufferbuilder.pos((double)(this.left + this.width), (double)startY, 0.0D
-        		).tex((double)((float)this.width / scale), (double)((float)startY / scale)
-    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
-            bufferbuilder.pos((double)this.left, (double)startY, 0.0D
-        		).tex(0.0D, (double)((float)startY / scale)
-    			).color(0x20, 0x20, 0x20, 0xFF).endVertex();
-            tessellator.draw();
-        }
-    }
-
-    /**
-     * Sets the left and right bounds of the slot. Param is the left bound, right is calculated as left + width.
-     */
-    public void setSlotXBoundsFromLeft(int leftIn)
-    {
-        this.left = leftIn;
-        this.right = leftIn + this.width;
-    }
-
-    public int getSlotHeight()
-    {
-        return this.slotHeight;
-    }
-
-    protected void drawContainerBackground(Tessellator tessellator)
-    {
-        BufferBuilder buffer = tessellator.getBuffer();
-        this.mc.getTextureManager().bindTexture(Gui.OPTIONS_BACKGROUND);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        float f = 32.0F;
-        buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
-        
-        buffer.pos(
-        		(double)this.left,  
-        		(double)this.bottom, 
-        		0.0D
-    		).tex(
-				(double)((float)this.left  / f), 
-				(double)((float)(this.bottom + (int)this.amountScrolled) / f)
-			).color(32, 32, 32, 255).endVertex();
-        
-        buffer.pos(
-        		(double)this.right, 
-        		(double)this.bottom, 
-        		0.0D
-    		).tex(
-				(double)((float)this.right / f), 
-				(double)((float)(this.bottom + (int)this.amountScrolled) / f)
-			).color(32, 32, 32, 255).endVertex();
-        
-        buffer.pos(
-        		(double)this.right, 
-        		(double)this.top,    
-        		0.0D
-    		).tex(
-				(double)((float)this.right / f), 
-				(double)((float)(this.top    + (int)this.amountScrolled) / f)
-			).color(32, 32, 32, 255).endVertex();
-        
-        buffer.pos(
-        		(double)this.left,  
-        		(double)this.top,    
-        		0.0D
-    		).tex(
-				(double)((float)this.left  / f), 
-				(double)((float)(this.top    + (int)this.amountScrolled) / f)
-			).color(32, 32, 32, 255).endVertex();
-        
-        tessellator.draw();
     }
 }

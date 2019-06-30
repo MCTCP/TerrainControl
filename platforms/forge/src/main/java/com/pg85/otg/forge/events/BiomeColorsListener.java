@@ -15,14 +15,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public final class BiomeColorsListener
 {
     private final Function<Biome, BiomeConfig> getBiomeConfig;
-
+    ResourceLocation lastBiome = null;
+    BiomeConfig lastBiomeConfig;
+    
     public BiomeColorsListener(Function<Biome, BiomeConfig> getBiomeConfig)
     {
         this.getBiomeConfig = getBiomeConfig;
     }
-
-    ResourceLocation lastBiome = null;
-    BiomeConfig lastBiomeConfig;
     
     @SubscribeEvent
     public void grassColor(BiomeEvent.GetGrassColor grassColorEvent)

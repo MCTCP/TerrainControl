@@ -75,41 +75,14 @@ public abstract class OTGGuiScrollingList
     }
 
     protected abstract int getSize();
-
-    protected abstract void elementClicked(int index, boolean doubleClick);
-
+    
     protected abstract boolean isSelected(int index);
 
     protected int getContentHeight()
     {
         return this.getSize() * this.slotHeight + this.headerHeight;
     }
-
-    protected abstract void drawBackground();
-
-    /**
-     * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
-     * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
-     */
-    protected abstract void drawSlot(int slotIdx, int entryRight, int slotTop, int slotBuffer, Tessellator tess);
-
-    @Deprecated protected void func_27260_a(int entryRight, int relativeY, Tessellator tess) {}
-    /**
-     * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
-     * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
-     */
-    protected void drawHeader(int entryRight, int relativeY, Tessellator tess) { func_27260_a(entryRight, relativeY, tess); }
-
-    @Deprecated protected void func_27255_a(int x, int y) {}
-    protected void clickHeader(int x, int y) { func_27255_a(x, y); }
-
-    @Deprecated protected void func_27257_b(int mouseX, int mouseY) {}
-    /**
-     * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
-     * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
-     */
-    protected void drawScreen(int mouseX, int mouseY) { func_27257_b(mouseX, mouseY); }
-
+    
     @Deprecated // Unused, Remove in 1.9.3?
     public int func_27256_c(int x, int y)
     {
@@ -141,42 +114,31 @@ public abstract class OTGGuiScrollingList
             this.scrollDistance = 0.0F;
         }
     }
+    
+    // Drawing
 
-    public void actionPerformed(GuiButton button)
-    {
-        if (button.enabled)
-        {
-            if (button.id == this.scrollUpActionId)
-            {
-                this.scrollDistance -= (float)(this.slotHeight * 2 / 3);
-                this.initialMouseClickY = -2.0F;
-                this.applyScrollLimits();
-            }
-            else if (button.id == this.scrollDownActionId)
-            {
-                this.scrollDistance += (float)(this.slotHeight * 2 / 3);
-                this.initialMouseClickY = -2.0F;
-                this.applyScrollLimits();
-            }
-        }
-    }
+    protected abstract void drawBackground();
 
+    /**
+     * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
+     * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
+     */
+    protected abstract void drawSlot(int slotIdx, int entryRight, int slotTop, int slotBuffer, Tessellator tess);
 
-    public void handleMouseInput(int mouseX, int mouseY) throws IOException
-    {
-        boolean isHovering = mouseX >= this.left && mouseX <= this.left + this.listWidth &&
-                             mouseY >= this.top && mouseY <= this.bottom;
-        if (!isHovering)
-            return;
+    @Deprecated protected void func_27260_a(int entryRight, int relativeY, Tessellator tess) {}
+    /**
+     * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
+     * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
+     */
+    protected void drawHeader(int entryRight, int relativeY, Tessellator tess, float zLevel) { func_27260_a(entryRight, relativeY, tess); }
 
-        int scroll = Mouse.getEventDWheel();
-        if (scroll != 0)
-        {
-            this.scrollDistance += (float)((-1 * scroll / 120.0F) * this.slotHeight / 2);
-        }
-    }
-
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    /**
+     * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
+     * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
+     */
+    protected void drawScreen(int mouseX, int mouseY) { func_27257_b(mouseX, mouseY); }
+    
+    public void drawScreen(int mouseX, int mouseY, float partialTicks, float zLevel)
     {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
@@ -226,16 +188,12 @@ public abstract class OTGGuiScrollingList
                             var13 = viewHeight - border*2;
 
                         this.scrollFactor /= (float)(viewHeight - var13) / (float)scrollHeight;
-                    }
-                    else
-                    {
+                    } else {
                         this.scrollFactor = 1.0F;
                     }
 
                     this.initialMouseClickY = mouseY;
-                }
-                else
-                {
+                } else {
                     this.initialMouseClickY = -2.0F;
                 }
             }
@@ -244,9 +202,7 @@ public abstract class OTGGuiScrollingList
                 this.scrollDistance -= ((float)mouseY - this.initialMouseClickY) * this.scrollFactor;
                 this.initialMouseClickY = (float)mouseY;
             }
-        }
-        else
-        {
+        } else {
             this.initialMouseClickY = -1.0F;
         }
 
@@ -265,9 +221,8 @@ public abstract class OTGGuiScrollingList
         if (this.client.world != null)
         {
             this.drawGradientRect(this.left, this.top, this.right, this.bottom, 0xC0101010, 0xD0101010);
-        }
-        else // Draw dark dirt background
-        {
+        } else {
+        	// Draw dark dirt background
             GlStateManager.disableLighting();
             GlStateManager.disableFog();
             this.client.renderEngine.bindTexture(Gui.OPTIONS_BACKGROUND);
@@ -284,7 +239,7 @@ public abstract class OTGGuiScrollingList
         int baseY = this.top + border - (int)this.scrollDistance;
 
         if (this.hasHeader) {
-            this.drawHeader(entryRight, baseY, tess);
+            this.drawHeader(entryRight, baseY, tess, zLevel);
         }
 
         for (int slotIdx = 0; slotIdx < listLength; ++slotIdx)
@@ -372,5 +327,47 @@ public abstract class OTGGuiScrollingList
     protected void drawGradientRect(int left, int top, int right, int bottom, int color1, int color2)
     {
         GuiUtils.drawGradientRect(0, left, top, right, bottom, color1, color2);
+    }
+    
+    // Mouse / keyboard
+    
+    protected abstract void elementClicked(int index, boolean doubleClick);
+
+    @Deprecated protected void func_27255_a(int x, int y) {}
+    protected void clickHeader(int x, int y) { func_27255_a(x, y); }
+
+    @Deprecated protected void func_27257_b(int mouseX, int mouseY) {}
+
+    public void actionPerformed(GuiButton button)
+    {
+        if (button.enabled)
+        {
+            if (button.id == this.scrollUpActionId)
+            {
+                this.scrollDistance -= (float)(this.slotHeight * 2 / 3);
+                this.initialMouseClickY = -2.0F;
+                this.applyScrollLimits();
+            }
+            else if (button.id == this.scrollDownActionId)
+            {
+                this.scrollDistance += (float)(this.slotHeight * 2 / 3);
+                this.initialMouseClickY = -2.0F;
+                this.applyScrollLimits();
+            }
+        }
+    }
+
+    public void handleMouseInput(int mouseX, int mouseY) throws IOException
+    {
+        boolean isHovering = mouseX >= this.left && mouseX <= this.left + this.listWidth &&
+                             mouseY >= this.top && mouseY <= this.bottom;
+        if (!isHovering)
+            return;
+
+        int scroll = Mouse.getEventDWheel();
+        if (scroll != 0)
+        {
+            this.scrollDistance += (float)((-1 * scroll / 120.0F) * this.slotHeight / 2);
+        }
     }
 }

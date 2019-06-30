@@ -12,8 +12,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 
 public class ClientTickHandler
 {
-    double lastSpawnedTimeIn100Ms = 0;  
-      
+    double lastSpawnedTimeIn100Ms = 0;      
 	public static ArrayList<ParticleFunction> ClientParticleFunctions = new ArrayList<ParticleFunction>();    
     
 	@SubscribeEvent

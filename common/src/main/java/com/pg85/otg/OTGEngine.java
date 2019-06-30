@@ -74,7 +74,7 @@ public abstract class OTGEngine
         // Do pluginConfig loading and then log anything that happened
         File pluginConfigFile = new File(getOTGRootFolder(), PluginStandardValues.PluginConfigFilename);
         pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
-        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.SettingsMode);
+        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.settingsMode);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
         File globalObjectsDir = new File(getOTGRootFolder(), PluginStandardValues.BO_DirectoryName);
@@ -273,7 +273,7 @@ public abstract class OTGEngine
     	this.dimensionsConfig = dimensionsConfig;
     }
     
-	public String GetPresetName(String worldName)
+	public String getPresetName(String worldName)
 	{
 		// If this dim's name is the same as the preset worldname then this is an OTG overworld
 		if(worldName.equals("overworld") || worldName.equals(OTG.getDimensionsConfig().WorldName))

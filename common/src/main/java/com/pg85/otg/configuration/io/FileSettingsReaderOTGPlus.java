@@ -123,7 +123,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
             	function = manager.getConfigFunction(functionName, holder, args);	
             }
             result.add(function);
-            if (!function.isValid() && OTG.getPluginConfig().SpawnLog)
+            if (!function.isValid() && OTG.getPluginConfig().spawnLog)
             {
                 OTG.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.line, function.getError());
             }

@@ -106,7 +106,7 @@ public class CustomObjectCollection
      */
     public CustomObject getObjectByName(String name, String worldName)
     {
-    	worldName = OTG.getEngine().GetPresetName(worldName);
+    	worldName = OTG.getEngine().getPresetName(worldName);
     	//OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ? worldName : "");
 
     	CustomObject object = null;
@@ -219,7 +219,7 @@ public class CustomObjectCollection
     			    	worldObjectsByName.put(name.toLowerCase(), object);
 	        	    	return object;
     				} else {
-    					if(OTG.getPluginConfig().SpawnLog)
+    					if(OTG.getPluginConfig().spawnLog)
     					{
     						OTG.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
     					}
@@ -260,7 +260,7 @@ public class CustomObjectCollection
 	        		objectsByNameGlobalObjects.put(name.toLowerCase(), object);
 	    	    	return object;
 	        	} else {
-	        		if(OTG.getPluginConfig().SpawnLog)
+	        		if(OTG.getPluginConfig().spawnLog)
 	        		{
 	        			OTG.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
 	        		}
@@ -272,7 +272,7 @@ public class CustomObjectCollection
 			objectsNotFoundGlobalObjects.add(name.toLowerCase());
 		}
 
-		if(OTG.getPluginConfig().SpawnLog)
+		if(OTG.getPluginConfig().spawnLog)
 		{
 			OTG.log(LogMarker.WARN, "Could not find BO2/BO3 " + name + " in GlobalObjects " + (worldName != null ? "and WorldObjects" : "") + " directory " + (worldName != null ? "for world " + worldName : "") + ".");
 		}
@@ -298,7 +298,7 @@ public class CustomObjectCollection
 		    				{
 		    					customObjectFiles.put(fileInDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", ""), fileInDir);
 		    				} else {
-		    					if(OTG.getPluginConfig().SpawnLog)
+		    					if(OTG.getPluginConfig().spawnLog)
 		    					{
 		    						OTG.log(LogMarker.WARN, "Duplicate file found: " + fileInDir.getName() + ".");
 		    					}
@@ -313,7 +313,7 @@ public class CustomObjectCollection
 					{
 	    				customObjectFiles.put(searchDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", ""), searchDir);
 					} else {
-						if(OTG.getPluginConfig().SpawnLog)
+						if(OTG.getPluginConfig().spawnLog)
 						{
 							OTG.log(LogMarker.WARN, "Duplicate file found: " + searchDir.getName() + ".");
 						}

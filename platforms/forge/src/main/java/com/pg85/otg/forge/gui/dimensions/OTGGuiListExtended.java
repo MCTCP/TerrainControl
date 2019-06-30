@@ -1,8 +1,8 @@
-package com.pg85.otg.forge.gui;
+package com.pg85.otg.forge.gui.dimensions;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.forge.gui.OTGGuiDimensionSettingsList.KeyEntry;
+import com.pg85.otg.forge.gui.IGuiListEntry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -106,31 +106,7 @@ public abstract class OTGGuiListExtended extends OTGGuiSlot
     /**
      * Gets the IGuiListEntry object for the given index
      */
-    public abstract OTGGuiListExtended.IGuiListEntry getListEntry(int index);
+    public abstract IGuiListEntry getListEntry(int index);
     
-    public abstract ArrayList<OTGGuiListExtended.IGuiListEntry> getAllListEntries();
-
-    @SideOnly(Side.CLIENT)
-    public interface IGuiListEntry
-    {
-		String getLabelText();
-    	String getDisplayText();
-    	
-        void updatePosition(int slotIndex, int x, int y, float partialTicks);
-
-        void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks);
-
-        /**
-         * Called when the mouse is clicked within this entry. Returning true means that something within this entry was
-         * clicked and the list should not be dragged.
-         */
-        boolean mousePressed(int slotIndex, int mouseX, int mouseY, int mouseEvent, int relativeX, int relativeY);
-
-        void keyTyped(char typedChar, int keyCode);
-        
-        /**
-         * Fired when the mouse button is released. Arguments: index, x, y, mouseEvent, relativeX, relativeY
-         */
-        void mouseReleased(int slotIndex, int x, int y, int mouseEvent, int relativeX, int relativeY);
-    }
+    public abstract ArrayList<IGuiListEntry> getAllListEntries();
 }

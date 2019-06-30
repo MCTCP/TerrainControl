@@ -15,7 +15,7 @@ public class UnloadServerHandler
 		if(!event.getWorld().isRemote)
 		{
 			((ForgeEngine)OTG.getEngine()).onSave(event.getWorld());
-			if(OTG.getPluginConfig().DeveloperMode)
+			if(OTG.getPluginConfig().developerMode)
 			{
 	    		OTG.log(LogMarker.DEBUG, "Unloading BO2's/BO3's");
 	    		OTG.getEngine().getCustomObjectManager().ReloadCustomObjectFiles();

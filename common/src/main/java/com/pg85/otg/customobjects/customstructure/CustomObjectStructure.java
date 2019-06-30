@@ -275,7 +275,7 @@ public class CustomObjectStructure
 			if(ObjectsToSpawn.size() > 0)
 			{
 				IsSpawned = true;
-				if(OTG.getPluginConfig().SpawnLog)
+				if(OTG.getPluginConfig().spawnLog)
 				{
 					int totalBO3sSpawned = 0;
 					for(ChunkCoordinate entry : ObjectsToSpawn.keySet())
@@ -476,7 +476,7 @@ public class CustomObjectStructure
 
     	Object[] returnValue = { ((BO3)Start.getObject()).getSettings().MinimumSizeTop, ((BO3)Start.getObject()).getSettings().MinimumSizeRight, ((BO3)Start.getObject()).getSettings().MinimumSizeBottom, ((BO3)Start.getObject()).getSettings().MinimumSizeLeft };
 
-    	if(OTG.getPluginConfig().SpawnLog)
+    	if(OTG.getPluginConfig().spawnLog)
     	{
     		OTG.log(LogMarker.INFO, "");
         	OTG.log(LogMarker.INFO, Start.getObject().getName() + " minimum size: Width " + ((Integer)returnValue[1] + (Integer)returnValue[3] + 1) + " Length " + ((Integer)returnValue[0] + (Integer)returnValue[2] + 1) + " top " + (Integer)returnValue[0] + " right " + (Integer)returnValue[1] + " bottom " + (Integer)returnValue[2] + " left " + (Integer)returnValue[3]);
@@ -495,7 +495,7 @@ public class CustomObjectStructure
 
     public void calculateBranches(boolean minimumSize) throws InvalidConfigException
     {
-    	if(OTG.getPluginConfig().SpawnLog)
+    	if(OTG.getPluginConfig().spawnLog)
     	{
 	    	String sminimumSize = minimumSize ? " (minimumSize)" : "";
 	    	OTG.log(LogMarker.INFO, "");
@@ -504,7 +504,7 @@ public class CustomObjectStructure
 
         BranchDataItem branchData = new BranchDataItem(World, Random, null, Start, null, 0, 0, minimumSize);
 
-        if(OTG.getPluginConfig().SpawnLog)
+        if(OTG.getPluginConfig().spawnLog)
         {
         	OTG.log(LogMarker.INFO, "");
 	        OTG.log(LogMarker.INFO, "---- Cycle 0 ----");
@@ -524,7 +524,7 @@ public class CustomObjectStructure
 
     		Cycle += 1;
 
-    		if(OTG.getPluginConfig().SpawnLog)
+    		if(OTG.getPluginConfig().spawnLog)
     		{
     			OTG.log(LogMarker.INFO, "");
     			OTG.log(LogMarker.INFO, "---- Cycle " + Cycle + " ----");
@@ -532,7 +532,7 @@ public class CustomObjectStructure
 
     		traverseAndSpawnChildBranches(branchData, minimumSize, true);
 
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.INFO, "All branch groups with required branches only have been processed for cycle " + Cycle + ", plotting branch groups with optional branches.");
 			}
@@ -586,7 +586,7 @@ public class CustomObjectStructure
     		{
     			if(minimumSize)
     			{
-    				if(OTG.getPluginConfig().SpawnLog)
+    				if(OTG.getPluginConfig().spawnLog)
     				{
     					OTG.log(LogMarker.WARN, "Error: Branching BO3 " + Start.BO3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
     				}
@@ -733,7 +733,7 @@ public class CustomObjectStructure
 		        		childBranchDataItem.CannotSpawn = true;
 		        		if(bo3 == null)
 		        		{
-		        			if(OTG.getPluginConfig().SpawnLog)
+		        			if(OTG.getPluginConfig().spawnLog)
 		        			{
 		        				OTG.log(LogMarker.WARN, "Error: Could not find BO3 file: " + childBranchDataItem.Branch.BO3Name + ".BO3 which is a branch of " + branchDataItem.Branch.BO3Name + ".BO3");
 		        			}
@@ -800,12 +800,12 @@ public class CustomObjectStructure
 	        			smoothRadius = 0;
 	        		}
 
-	        		ChunkCoordinate worldBorderCenterPoint = World.GetWorldSession().getWorldBorderCenterPoint();
+	        		ChunkCoordinate worldBorderCenterPoint = World.getWorldSession().getWorldBorderCenterPoint();
 
 	        		if(
         				canSpawn &&
         				!minimumSize &&
-        				World.GetWorldSession().getWorldBorderRadius() > 0 &&
+        				World.getWorldSession().getWorldBorderRadius() > 0 &&
         				(
     						(
 								smoothRadius == 0 &&
@@ -815,10 +815,10 @@ public class CustomObjectStructure
     						(
 								smoothRadius > 0 &&
 								(
-									childBranchDataItem.Branch.getChunkX() - Math.ceil(smoothRadius / (double)16) < worldBorderCenterPoint.getChunkX() - (World.GetWorldSession().getWorldBorderRadius() - 1) ||
-									childBranchDataItem.Branch.getChunkX() + Math.ceil(smoothRadius / (double)16) > worldBorderCenterPoint.getChunkX() + (World.GetWorldSession().getWorldBorderRadius() - 1) - 1 || // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
-									childBranchDataItem.Branch.getChunkZ() - Math.ceil(smoothRadius / (double)16) < worldBorderCenterPoint.getChunkZ() - (World.GetWorldSession().getWorldBorderRadius() - 1) ||
-									childBranchDataItem.Branch.getChunkZ() + Math.ceil(smoothRadius / (double)16) > worldBorderCenterPoint.getChunkZ() + (World.GetWorldSession().getWorldBorderRadius() - 1) - 1 // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
+									childBranchDataItem.Branch.getChunkX() - Math.ceil(smoothRadius / (double)16) < worldBorderCenterPoint.getChunkX() - (World.getWorldSession().getWorldBorderRadius() - 1) ||
+									childBranchDataItem.Branch.getChunkX() + Math.ceil(smoothRadius / (double)16) > worldBorderCenterPoint.getChunkX() + (World.getWorldSession().getWorldBorderRadius() - 1) - 1 || // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
+									childBranchDataItem.Branch.getChunkZ() - Math.ceil(smoothRadius / (double)16) < worldBorderCenterPoint.getChunkZ() - (World.getWorldSession().getWorldBorderRadius() - 1) ||
+									childBranchDataItem.Branch.getChunkZ() + Math.ceil(smoothRadius / (double)16) > worldBorderCenterPoint.getChunkZ() + (World.getWorldSession().getWorldBorderRadius() - 1) - 1 // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
 								)
 							)
 						)
@@ -987,7 +987,7 @@ public class CustomObjectStructure
 
 		        	if(canSpawn)
 		        	{
-		        		if(OTG.getPluginConfig().SpawnLog)
+		        		if(OTG.getPluginConfig().spawnLog)
 		        		{
 
 			        		String allParentsString = "";
@@ -1033,7 +1033,7 @@ public class CustomObjectStructure
 	        				!childBranchDataItem.Branch.isRequiredBranch
         				)
 		        		{
-		        			if(OTG.getPluginConfig().SpawnLog)
+		        			if(OTG.getPluginConfig().spawnLog)
 		        			{
 		        				OTG.log(LogMarker.INFO, "Plotting all required child branches that are not in a branch group with optional branches.");
 		        			}
@@ -1059,7 +1059,7 @@ public class CustomObjectStructure
 			        		}
 			        		canSpawn = bFound;
 
-		        			if(OTG.getPluginConfig().SpawnLog)
+		        			if(OTG.getPluginConfig().spawnLog)
 		        			{
 		        				OTG.log(LogMarker.INFO, "Done spawning required children for optional branch X" + childBranchDataItem.ChunkCoordinate.getChunkX() + " Z" + childBranchDataItem.ChunkCoordinate.getChunkZ() + (minimumSize ? "" : " Y" + (childBranchDataItem.Branch.getY())) + " " +  childBranchDataItem.Branch.BO3Name + ":" + childBranchDataItem.Branch.getRotation());
 		        			}
@@ -1125,7 +1125,7 @@ public class CustomObjectStructure
 			            		// Branch could not spawn
 			            		// abort this branch because it has a branch group that could not be spawned
 
-			            		if(OTG.getPluginConfig().SpawnLog)
+			            		if(OTG.getPluginConfig().spawnLog)
 			            		{
 			        	    		String allParentsString = "";
 			        	    		BranchDataItem tempBranch = branchDataItem;
@@ -1211,7 +1211,7 @@ public class CustomObjectStructure
 
 					        				if(branchGroupFailedSpawning && !collidedWithParentOrSibling)
 					        				{
-							            		if(OTG.getPluginConfig().SpawnLog)
+							            		if(OTG.getPluginConfig().spawnLog)
 							            		{
 							        	    		String allParentsString = "";
 							        	    		BranchDataItem tempBranch = branchDataItem;
@@ -1449,7 +1449,7 @@ public class CustomObjectStructure
 							{
    	    						if(checkCollision(childBranchDataItem.Branch, branchDataItem3.Branch))
    	    						{
-   	     	        				if(OTG.getPluginConfig().SpawnLog)
+   	     	        				if(OTG.getPluginConfig().spawnLog)
    	    	        				{
    	     	        					OTG.log(LogMarker.INFO, "CannotBeInside branch " + childBranchDataItem.Branch.BO3Name + " was blocked by " + branchDataItem3.Branch.BO3Name);
    	    	        				}
@@ -1552,7 +1552,7 @@ public class CustomObjectStructure
 
     	if(AllBranchesBranchDataHash.contains(branchData.branchNumber))
     	{
-    		if(OTG.getPluginConfig().SpawnLog)
+    		if(OTG.getPluginConfig().spawnLog)
     		{
 	    		String allParentsString = "";
 	    		BranchDataItem tempBranch = branchData;
@@ -1773,7 +1773,7 @@ public class CustomObjectStructure
         	}
         	if(AllBranchesBranchDataHash.contains(branchDataItem.branchNumber))
         	{
-        		if(OTG.getPluginConfig().SpawnLog)
+        		if(OTG.getPluginConfig().spawnLog)
         		{
 	        		String allParentsString = "";
 	        		BranchDataItem tempBranch = branchDataItem;
@@ -2259,7 +2259,7 @@ public class CustomObjectStructure
             // been delayed and should be tried again later.
         	if(!smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, SmoothingAreasToSpawn, Start, World))
         	{
-        		BO3.originalTopBlocks.clear(); // TODO: Make this prettier
+        		BO3.OriginalTopBlocks.clear(); // TODO: Make this prettier
         		return false;
     		}
 
@@ -2298,14 +2298,14 @@ public class CustomObjectStructure
             // been delayed and should be tried again later.
         	if(!smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, SmoothingAreasToSpawn, Start, World))
         	{
-        		BO3.originalTopBlocks.clear(); // TODO: Make this prettier
+        		BO3.OriginalTopBlocks.clear(); // TODO: Make this prettier
         		return false;
     		}
         }
 
 		ObjectsToSpawn.remove(chunkCoordinate);
 		SmoothingAreasToSpawn.remove(chunkCoordinate);	
-        BO3.originalTopBlocks.clear(); // TODO: Make this prettier		
+        BO3.OriginalTopBlocks.clear(); // TODO: Make this prettier		
         return true;
     }
 
@@ -2365,7 +2365,7 @@ public class CustomObjectStructure
 	        }
 	        objectsInChunk.add(coordObject);
         } else {
-    		if(OTG.getPluginConfig().SpawnLog)
+    		if(OTG.getPluginConfig().spawnLog)
     		{
 	    		OTG.log(LogMarker.WARN, "Error reading branch in BO3 " + parent.getName()  + " Could not find BO3: " + coordObject.BO3Name);
     		}

@@ -18,35 +18,12 @@ import net.minecraft.init.Blocks;
  */
 public class ForgeMaterialData implements LocalMaterialData
 {
-	// OTG+
+    private final IBlockState blockData;
 
-    @Override
-    public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
+    private ForgeMaterialData(IBlockState blockData)
     {
-    	DefaultMaterial defaultMaterial = this.toDefaultMaterial();
-    	return
-    		(
-				defaultMaterial.equals(DefaultMaterial.ICE) ||
-				defaultMaterial.equals(DefaultMaterial.PACKED_ICE) ||
-				defaultMaterial.equals(DefaultMaterial.FROSTED_ICE) ||
-				(
-					isSolid() || 
-					(
-						!ignoreWater && isLiquid()
-					)
-				)
-			) &&
-			(
-				allowWood || 
-				!(
-					defaultMaterial.equals(DefaultMaterial.LOG) || 
-					defaultMaterial.equals(DefaultMaterial.LOG_2)
-				)
-			) &&
-			!defaultMaterial.equals(DefaultMaterial.WATER_LILY);
+        this.blockData = blockData;
     }
-
-	//
 
     public static ForgeMaterialData ofString(String input) throws InvalidConfigException
     {
@@ -187,9 +164,9 @@ public class ForgeMaterialData implements LocalMaterialData
         // Failed
         throw new InvalidConfigException("Unknown material: " + input);
     }
-
+    
     /**
-     * Gets a {@code BukkitMaterialData} of the given id and data.
+     * Gets a {@code ForgeMaterialData} of the given id and data.
      * @param id   The block id.
      * @param data The block data.
      * @return The {@code BukkitMateialData} instance.
@@ -225,7 +202,7 @@ public class ForgeMaterialData implements LocalMaterialData
     }
 
     /**
-     * Gets a {@code BukkitMaterialData} of the given Minecraft blockData.
+     * Gets a {@code ForgeMaterialData} of the given Minecraft blockData.
      * @param blockData The material an data.
      * @return The {@code BukkitMateialData} instance.
      */
@@ -233,39 +210,35 @@ public class ForgeMaterialData implements LocalMaterialData
     {
         return new ForgeMaterialData(blockData);
     }
-
-    private final IBlockState blockData;
-
-    private ForgeMaterialData(IBlockState blockData)
+    
+    @SuppressWarnings("deprecation")
+    @Override
+    public LocalMaterialData withBlockData(int i)
     {
-        this.blockData = blockData;
+    	if(this.blockData == null)
+    	{
+    		return this;
+    	}
+        if (i == getBlockData())
+        {
+            return this;
+        }
+
+        Block block = this.blockData.getBlock();
+        return ofMinecraftBlockState(block.getStateFromMeta(i));
     }
 
     @Override
-    public boolean canSnowFallOn()
+    public LocalMaterialData withDefaultBlockData()
     {
-        return toDefaultMaterial().canSnowFallOn();
+    	if(this.blockData == null)
+    	{
+    		return this;
+    	}
+        Block block = this.blockData.getBlock();
+        return this.withBlockData(block.getMetaFromState(block.getDefaultState()));
     }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-        if (this == obj)
-        {
-            return true;
-        }
-        if (!(obj instanceof ForgeMaterialData))
-        {
-            return false;
-        }
-        ForgeMaterialData other = (ForgeMaterialData) obj;
-        if (!this.blockData.equals(other.blockData))
-        {
-            return false;
-        }
-        return true;
-    }
-
+    
     @Override
     public byte getBlockData()
     {
@@ -313,30 +286,21 @@ public class ForgeMaterialData implements LocalMaterialData
         }
     }
 
-    @Override
-    public int hashCode()
+    public IBlockState internalBlock()
     {
-        // From 4096 to 69632 when there are 4096 block ids
-        return PluginStandardValues.SUPPORTED_BLOCK_IDS + getBlockId() * 16 + getBlockData();
-    }
-
-    @Override
-    public int hashCodeWithoutBlockData()
-    {
-        // From 0 to 4095 when there are 4096 block ids
-        return getBlockId();
-    }
-
-    @Override
-    public boolean isLiquid()
-    {
-        return this.blockData == null ? false : this.blockData.getMaterial().isLiquid();
+        return this.blockData;
     }
 
     @Override
     public boolean isMaterial(DefaultMaterial material)
     {
         return material.id == getBlockId();
+    }
+    
+    @Override
+    public boolean isLiquid()
+    {
+        return this.blockData == null ? false : this.blockData.getMaterial().isLiquid();
     }
 
     @Override
@@ -351,56 +315,51 @@ public class ForgeMaterialData implements LocalMaterialData
 
         return this.blockData == null ? false : this.blockData.getMaterial().isSolid();
     }
-
+    
     @Override
-    public DefaultMaterial toDefaultMaterial()
+    public boolean isAir()
     {
-    	if(this.blockData == null)
-    	{
-    		return DefaultMaterial.UNKNOWN_BLOCK;
-    	}
-    	return DefaultMaterial.getMaterial(getBlockId());
+        return this.blockData == null ? true : this.blockData.getMaterial() == Material.AIR;
     }
 
     @Override
-    public String toString()
+    public boolean canFall()
     {
-        return getName();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public LocalMaterialData withBlockData(int i)
-    {
-    	if(this.blockData == null)
-    	{
-    		return this;
-    	}
-        if (i == getBlockData())
-        {
-            return this;
-        }
-
-        Block block = this.blockData.getBlock();
-        return ofMinecraftBlockState(block.getStateFromMeta(i));
+        return this.blockData == null ? false : this.blockData.getBlock() instanceof BlockFalling;
     }
 
     @Override
-    public LocalMaterialData withDefaultBlockData()
+    public boolean canSnowFallOn()
     {
-    	if(this.blockData == null)
-    	{
-    		return this;
-    	}
-        Block block = this.blockData.getBlock();
-        return this.withBlockData(block.getMetaFromState(block.getDefaultState()));
+        return toDefaultMaterial().canSnowFallOn();
     }
-
-    public IBlockState internalBlock()
+    
+    @Override
+    public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
     {
-        return this.blockData;
+    	DefaultMaterial defaultMaterial = this.toDefaultMaterial();
+    	return
+    		(
+				defaultMaterial.equals(DefaultMaterial.ICE) ||
+				defaultMaterial.equals(DefaultMaterial.PACKED_ICE) ||
+				defaultMaterial.equals(DefaultMaterial.FROSTED_ICE) ||
+				(
+					isSolid() || 
+					(
+						!ignoreWater && isLiquid()
+					)
+				)
+			) &&
+			(
+				allowWood || 
+				!(
+					defaultMaterial.equals(DefaultMaterial.LOG) || 
+					defaultMaterial.equals(DefaultMaterial.LOG_2)
+				)
+			) &&
+			!defaultMaterial.equals(DefaultMaterial.WATER_LILY);
     }
-
+    
     @SuppressWarnings("deprecation")
     @Override
     public LocalMaterialData rotate()
@@ -421,17 +380,53 @@ public class ForgeMaterialData implements LocalMaterialData
         // No changes, return object itself
         return this;
     }
-
+        
     @Override
-    public boolean isAir()
+    public DefaultMaterial toDefaultMaterial()
     {
-        return this.blockData == null ? true : this.blockData.getMaterial() == Material.AIR;
+    	if(this.blockData == null)
+    	{
+    		return DefaultMaterial.UNKNOWN_BLOCK;
+    	}
+    	return DefaultMaterial.getMaterial(getBlockId());
+    }
+    
+    @Override
+    public int hashCode()
+    {
+        // From 4096 to 69632 when there are 4096 block ids
+        return PluginStandardValues.SUPPORTED_BLOCK_IDS + getBlockId() * 16 + getBlockData();
     }
 
     @Override
-    public boolean canFall()
+    public int hashCodeWithoutBlockData()
     {
-        return this.blockData == null ? false : this.blockData.getBlock() instanceof BlockFalling;
+        // From 0 to 4095 when there are 4096 block ids
+        return getBlockId();
     }
-
+    
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+        {
+            return true;
+        }
+        if (!(obj instanceof ForgeMaterialData))
+        {
+            return false;
+        }
+        ForgeMaterialData other = (ForgeMaterialData) obj;
+        if (!this.blockData.equals(other.blockData))
+        {
+            return false;
+        }
+        return true;
+    }
+    
+    @Override
+    public String toString()
+    {
+        return getName();
+    }
 }

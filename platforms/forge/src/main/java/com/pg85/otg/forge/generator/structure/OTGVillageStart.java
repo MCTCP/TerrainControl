@@ -23,6 +23,11 @@ public class OTGVillageStart extends StructureStart
     // well ... thats what it does
     private boolean hasMoreThanTwoComponents = false;
 
+    public OTGVillageStart()
+    {
+        // Required by Minecraft's structure loading code
+    }
+    
     public OTGVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<PieceWeight> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
@@ -129,10 +134,5 @@ public class OTGVillageStart extends StructureStart
     public boolean isSizeableStructure()
     {
         return this.hasMoreThanTwoComponents;
-    }
-
-    public OTGVillageStart()
-    {
-        // Required by Minecraft's structure loading code
     }
 }

@@ -7,7 +7,6 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
-import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.customobjects.*;
@@ -45,7 +44,7 @@ import java.util.Random;
 public class BO3 implements StructuredCustomObject
 {
     // Original top blocks are cached to figure out the surface block material to replace to when spawning structures and smoothing areas
-    public static HashMap<ChunkCoordinate, LocalMaterialData> originalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
+    public static HashMap<ChunkCoordinate, LocalMaterialData> OriginalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
 	
 	public boolean isInvalidConfig;
 
@@ -185,7 +184,7 @@ public class BO3 implements StructuredCustomObject
     {
     	if(settings.isOTGPlus)
     	{
-    		if(OTG.getPluginConfig().SpawnLog)
+    		if(OTG.getPluginConfig().spawnLog)
     		{
     			OTG.log(LogMarker.WARN, "Tried to spawn a OTG+ enabled BO3 as CustomStructure in a non-OTG+ enabled world. BO3: " + settings.getName());
     		}
@@ -520,7 +519,7 @@ public class BO3 implements StructuredCustomObject
         	newEntityData.nameTagOrNBTFileName = entity.nameTagOrNBTFileName;
         	newEntityData.originalNameTagOrNBTFileName = entity.originalNameTagOrNBTFileName;
 
-        	world.SpawnEntity(newEntityData);
+        	world.spawnEntity(newEntityData);
     	}
 
         return true;
@@ -597,7 +596,7 @@ public class BO3 implements StructuredCustomObject
 
             if(Math.abs(minX - maxX) > 31 || Math.abs(minZ - maxZ) > 31)
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
             		OTG.log(LogMarker.WARN, "BO3 was too large to spawn (> 32x32) " + this.getName() + " XSize " + (Math.abs(minX - maxX) + 1) + " ZSize " + (Math.abs(minZ - maxZ) + 1) + ". Convert it to a branching BO3 and add it using CustomStructure()");
             	}
@@ -628,7 +627,7 @@ public class BO3 implements StructuredCustomObject
 	    		material = targetBlock;
 	    	}
 	    }
-	    if(OTG.getPluginConfig().DeveloperMode)
+	    if(OTG.getPluginConfig().developerMode)
 	    {
 		    DefaultMaterial worldMaterial = world.getMaterial(x, y, z, false).toDefaultMaterial();
 		    if(
@@ -686,7 +685,7 @@ public class BO3 implements StructuredCustomObject
     		bo3SurfaceBlock = replaceWithSurfaceBlock != null && replaceWithSurfaceBlock.length() > 0 ? OTG.readMaterial(replaceWithSurfaceBlock) : OTG.readMaterial("GRASS");
 		} catch (InvalidConfigException e1) {
 			bo3SurfaceBlock = OTG.toLocalMaterialData(DefaultMaterial.GRASS, 0);
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.WARN, "Value " + replaceWithSurfaceBlock + " for replaceWithSurfaceBlock in BO3 " + this.getName() + " was not recognised. Using GRASS instead.");
 			}
@@ -695,7 +694,7 @@ public class BO3 implements StructuredCustomObject
     		bo3GroundBlock = replaceWithGroundBlock != null && replaceWithGroundBlock.length() > 0 ? OTG.readMaterial(replaceWithGroundBlock) : OTG.readMaterial("DIRT");
 		} catch (InvalidConfigException e1) {
 			bo3GroundBlock = OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0);
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.WARN, "Value " + replaceWithGroundBlock + " for replaceWithGroundBlock in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
@@ -705,7 +704,7 @@ public class BO3 implements StructuredCustomObject
 			replaceBelowMaterial = settings.replaceBelow != null && settings.replaceBelow.toLowerCase().equals("none") ? null : replaceBelow != null && replaceBelow.length() > 0 ? OTG.readMaterial(replaceBelow) : null;
 		} catch (InvalidConfigException e1) {
 			replaceBelowMaterial = OTG.toLocalMaterialData(DefaultMaterial.DIRT, 0);
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.INFO, "Value " + settings.replaceBelow + " for replaceBelow in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
@@ -714,7 +713,7 @@ public class BO3 implements StructuredCustomObject
 			replaceAboveMaterial = settings.replaceAbove != null && settings.replaceAbove.toLowerCase().equals("none") ? null : replaceAbove != null && replaceAbove.length() > 0 ? OTG.readMaterial(replaceAbove) : null;
 		} catch (InvalidConfigException e1) {
 			replaceAboveMaterial = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.INFO, "Value " + settings.replaceAbove + " for replaceAbove in BO3 " + this.getName() + " was not recognised. Using AIR instead.");
 			}
@@ -852,7 +851,7 @@ public class BO3 implements StructuredCustomObject
 	        	newBlock.metaDataName = block.metaDataName;
 	        	newBlock.metaDataTag = block.metaDataTag;
 
-	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z)))
+	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z)))
 	        	{
 	        		int highestBlockY = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false);
 	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
@@ -863,7 +862,7 @@ public class BO3 implements StructuredCustomObject
 	        		{
 	        			highestBlockY = 255;
 	        		}
-	        		originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z), world.getMaterial(x + newBlock.x, highestBlockY, z + newBlock.z, settings.isOTGPlus));
+	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z), world.getMaterial(x + newBlock.x, highestBlockY, z + newBlock.z, settings.isOTGPlus));
 	        	}
 
 	        	// TODO: See BlockFunction.Spawn for what should be done with metadata
@@ -1028,7 +1027,7 @@ public class BO3 implements StructuredCustomObject
     					{
     						blockToQueueForSpawn.material = biomeSurfaceBlock;
 
-    	        			LocalMaterialData originalSurfaceBlock = originalTopBlocks.get(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z));
+    	        			LocalMaterialData originalSurfaceBlock = OriginalTopBlocks.get(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z));
     	        			if(originalSurfaceBlock != null && originalSurfaceBlock.toDefaultMaterial() != DefaultMaterial.UNKNOWN_BLOCK && !originalSurfaceBlock.isLiquid() && !originalSurfaceBlock.isAir())
     	        			{
     	        				blockToQueueForSpawn.material = originalSurfaceBlock;
@@ -1118,7 +1117,7 @@ public class BO3 implements StructuredCustomObject
 
                             sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, settings.isOTGPlus);
 
-            	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
+            	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
             	        	{
             	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
             	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
@@ -1129,7 +1128,7 @@ public class BO3 implements StructuredCustomObject
             	        		{
             	        			highestBlockY = 255;
             	        		}
-            	        		originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, settings.isOTGPlus));
+            	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, settings.isOTGPlus));
             	        	}
 
                 			if(!sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
@@ -1178,7 +1177,7 @@ public class BO3 implements StructuredCustomObject
 
 	    						sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, settings.isOTGPlus);
 
-	            	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
+	            	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
 	            	        	{
 	            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
 	            	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
@@ -1189,7 +1188,7 @@ public class BO3 implements StructuredCustomObject
 	            	        		{
 	            	        			highestBlockY = 255;
 	            	        		}
-	            	        		originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, settings.isOTGPlus));
+	            	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, settings.isOTGPlus));
 	            	        	}
 
 	                			if(!sourceBlockMaterial.isSolid() && !sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
@@ -1224,14 +1223,14 @@ public class BO3 implements StructuredCustomObject
 
 					sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, settings.isOTGPlus);
 
-    	        	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
+    	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
     	        	{
     	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
     	        		if(highestBlockY > PluginStandardValues.WORLD_DEPTH)
     	        		{
-    	        			originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, settings.isOTGPlus));
+    	        			OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, settings.isOTGPlus));
     	        		} else {
-    	        			originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), null);
+    	        			OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), null);
     	        		}
     	        	}
 
@@ -1272,7 +1271,7 @@ public class BO3 implements StructuredCustomObject
     					{
     						blockToQueueForSpawn.material = biomeSurfaceBlock;
 
-    	        			LocalMaterialData originalSurfaceBlock = originalTopBlocks.get(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z));
+    	        			LocalMaterialData originalSurfaceBlock = OriginalTopBlocks.get(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z));
     	        			if(originalSurfaceBlock != null && originalSurfaceBlock.toDefaultMaterial() != DefaultMaterial.UNKNOWN_BLOCK && !originalSurfaceBlock.isLiquid() && !originalSurfaceBlock.isAir())
     	        			{
     	        				blockToQueueForSpawn.material = originalSurfaceBlock;
@@ -1325,13 +1324,13 @@ public class BO3 implements StructuredCustomObject
         }
         if(outOfBounds)
         {
-        	if(OTG.getPluginConfig().SpawnLog)
+        	if(OTG.getPluginConfig().spawnLog)
         	{
         		OTG.log(LogMarker.WARN, "BO3 " + this.getName() + " tried to spawn blocks outside of the chunk being populated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO3's used as CustomStructures() should be designed, BO3 creators have to design their BO3's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO3 creator to do it.");
         	}
         }
 
-        if(OTG.getPluginConfig().SpawnLog && (System.currentTimeMillis() - startTime) > 50)
+        if(OTG.getPluginConfig().spawnLog && (System.currentTimeMillis() - startTime) > 50)
         {
         	OTG.log(LogMarker.WARN, "Warning: Spawning BO3 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
         }

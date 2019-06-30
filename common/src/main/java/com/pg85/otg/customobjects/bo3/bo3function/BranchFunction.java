@@ -228,7 +228,7 @@ public class BranchFunction extends BO3Function implements Branch
 	            double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
 	        	if(isRequiredBranch && args.size() > 9)
 	        	{
-	        		if(OTG.getPluginConfig().SpawnLog)
+	        		if(OTG.getPluginConfig().spawnLog)
 	        		{
 	        			String branchString = "";
 	        			for(String arg : args)

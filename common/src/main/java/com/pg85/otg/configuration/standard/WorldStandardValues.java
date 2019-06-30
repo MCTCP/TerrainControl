@@ -12,7 +12,6 @@ import com.pg85.otg.configuration.world.WorldConfig.ImageOrientation;
 import com.pg85.otg.configuration.world.WorldConfig.TerrainMode;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -163,7 +162,6 @@ public class WorldStandardValues extends Settings
         OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
 		WOODLAND_MANSIONS_ENABLED = booleanSetting("WoodLandMansionsEnabled", true),
         POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
-		CARTOGRAPHER = booleanSetting("Cartographer", false),
 
 		TeleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
 		CommandBlockOutput = booleanSetting("CommandBlockOutput", true),

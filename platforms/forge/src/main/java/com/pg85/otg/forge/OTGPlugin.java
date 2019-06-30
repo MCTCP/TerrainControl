@@ -11,6 +11,7 @@ import com.pg85.otg.events.EventPriority;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.events.*;
+import com.pg85.otg.forge.events.client.ClientConnectionEventListener;
 import com.pg85.otg.forge.events.client.ClientTickHandler;
 import com.pg85.otg.forge.events.client.KeyBoardEventListener;
 import com.pg85.otg.forge.events.dimensions.BlockTracker;
@@ -27,6 +28,8 @@ import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.network.CommonProxy;
 import com.pg85.otg.forge.network.PacketDispatcher;
 import com.pg85.otg.forge.network.client.BukkitClientNetworkEventListener;
+import com.pg85.otg.forge.world.OTGWorldType;
+import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraftTypes.StructureNames;
@@ -61,13 +64,14 @@ import java.io.File;
 public class OTGPlugin
 {	
 	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
-	public static CommonProxy proxy;
+	public static CommonProxy Proxy;
 
 	@Instance("OTG")
-    public static OTGPlugin instance;
+    public static OTGPlugin Instance;
 
+    public static OTGWorldType OtgWorldType;
+    
     private WorldLoader worldLoader;
-    public static OTGWorldType txWorldType;
     
     // TODO: Is this handler really necessary to make signing work?
     @Mod.EventHandler
@@ -85,7 +89,7 @@ public class OTGPlugin
 
         // Create the world type. WorldType registers itself in the constructor
         // - that is Mojang code, so don't blame me
-        txWorldType = new OTGWorldType(this.worldLoader);
+        OtgWorldType = new OTGWorldType(this.worldLoader);
 
         // Start OpenTerrainGenerator engine
         final ForgeEngine engine = new ForgeEngine(this.worldLoader);
@@ -171,8 +175,8 @@ public class OTGPlugin
     	// Register EntityTravelToDimensionListener for quartz portals that tp to other dimensions
     	MinecraftForge.EVENT_BUS.register(new EntityTravelToDimensionListener());
 
-        // Register ChunkLoadListener for updating Cartographer map
-        MinecraftForge.EVENT_BUS.register(new ChunkEventListener());
+        // Register ClientConnectionEventListener for detecting disconnects on the client side 
+        MinecraftForge.EVENT_BUS.register(new ClientConnectionEventListener());
 
         // Fix lava as light source not working when spawning lava as resource
         Blocks.LAVA.setLightOpacity(255);
@@ -187,7 +191,7 @@ public class OTGPlugin
     	// Unload all world and biomes on server start / connect instead, 
     	// for SP client where data is kept when leaving the game.
  
-    	((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds();
+    	((ForgeEngine)OTG.getEngine()).getWorldLoader().unloadAndUnregisterAllWorlds();
     	ForgeEngine.loadPresets();
     }
 
@@ -205,8 +209,8 @@ public class OTGPlugin
 
             if(worldInfo != null)
             {
-            	overWorld.getWorldInfo().setTerrainType(txWorldType);
-            	worldInfo.setTerrainType(txWorldType);
+            	overWorld.getWorldInfo().setTerrainType(OtgWorldType);
+            	worldInfo.setTerrainType(OtgWorldType);
             	isavehandler.saveWorldInfo(worldInfo);
             }
             throw new RuntimeException("OTG has detected that you are loading an OTG world that has been used without OTG installed. OTG has fixed and saved the world data, you can now restart the game and enter the world.");
@@ -246,9 +250,6 @@ public class OTGPlugin
 		    // Load any saved dimensions.
 		    OTGDimensionManager.LoadCustomDimensionData();
 	
-		    // Create Cartographer dimension if it doesn't yet exist
-			//Cartographer.CreateCartographerDimension();
-
 		    for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
 		    {
 		    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
@@ -258,9 +259,9 @@ public class OTGPlugin
 		    		{
 		    			OTG.log(LogMarker.WARN, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
 		    		} else {
-		    			OTG.isNewWorldBeingCreated = true;
+		    			OTG.IsNewWorldBeingCreated = true;
 		    			OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);
-		    			OTG.isNewWorldBeingCreated = false;
+		    			OTG.IsNewWorldBeingCreated = false;
 		    		}
 	    		}
 		    }
@@ -272,18 +273,18 @@ public class OTGPlugin
     @EventHandler
     public void preInit(FMLPreInitializationEvent e)
     {
-        proxy.preInit(e);
+        Proxy.preInit(e);
     }
 
     @EventHandler
     public void init(FMLInitializationEvent e)
     {
-        proxy.init(e);
+        Proxy.init(e);
     }
 
     @EventHandler
     public void postInit(FMLPostInitializationEvent e)
     {
-        proxy.postInit(e);
+        Proxy.postInit(e);
     }
 }

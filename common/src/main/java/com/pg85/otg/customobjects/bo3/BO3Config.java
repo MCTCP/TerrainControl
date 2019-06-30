@@ -507,7 +507,7 @@ public class BO3Config extends CustomObjectConfigFile
 			}
 	    	if(!inheritedBO3Loaded)
 	    	{
-	    		if(OTG.getPluginConfig().SpawnLog)
+	    		if(OTG.getPluginConfig().spawnLog)
 	    		{
 	    			OTG.log(LogMarker.WARN, "could not load BO3 parent for InheritBO3: " + this.inheritBO3 + " in BO3 " + this.getName());
 	    		}
@@ -777,7 +777,7 @@ public class BO3Config extends CustomObjectConfigFile
 		        }
 		        entityDataOTGPlus = tempEntitiesList.toArray(new EntityFunction[tempEntitiesList.size()]);
 	
-				if(OTG.getPluginConfig().SpawnLog)
+				if(OTG.getPluginConfig().spawnLog)
 				{
 					if(illegalBlock)
 					{

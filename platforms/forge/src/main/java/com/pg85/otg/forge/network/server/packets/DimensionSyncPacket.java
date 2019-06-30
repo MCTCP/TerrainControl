@@ -16,13 +16,13 @@ import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionInfo;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigToNetworkSender;
@@ -55,8 +55,8 @@ public class DimensionSyncPacket extends OTGPacket
 		LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 		
 		// Send presets for client GUI
-		stream.writeInt(ForgeEngine.presets.size());
-		for(DimensionConfigGui dimConfig : ForgeEngine.presets.values())
+		stream.writeInt(ForgeEngine.Presets.size());
+		for(DimensionConfigGui dimConfig : ForgeEngine.Presets.values())
 		{
 			ConfigFile.writeStringToStream(stream, dimConfig.toYamlString());
 		}
@@ -90,7 +90,7 @@ public class DimensionSyncPacket extends OTGPacket
 		}
 	}
 	
-	public static ForgeWorld RegisterClientWorldBukkit(WorldClient mcWorld, DataInputStream wrappedStream, HashMap<String, ForgeWorld> worlds, HashMap<String, ForgeWorld> unloadedWorlds) throws IOException
+	public static ForgeWorld registerClientWorldBukkit(WorldClient mcWorld, DataInputStream wrappedStream, HashMap<String, ForgeWorld> worlds, HashMap<String, ForgeWorld> unloadedWorlds) throws IOException
 	{
 		// TODO: Test this and fix this if necessary.
 		//((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds(); // TODO: Is this necessary for Bukkit?
@@ -116,7 +116,7 @@ public class DimensionSyncPacket extends OTGPacket
 				int packetType = message.getStream().readInt();
 				if(packetType == 0)
 				{
-					ClientPacketManager.RegisterClientWorlds(message.getStream(), ((ForgeEngine)OTG.getEngine()).getWorldLoader());
+					ClientPacketManager.registerClientWorlds(message.getStream(), ((ForgeEngine)OTG.getEngine()).getWorldLoader());
 				} else {
 					throw new RuntimeException();
 				}

@@ -12,6 +12,9 @@ import java.util.Map.Entry;
 
 public class NBTHelper
 {
+    private NBTHelper()
+    {
+    }
 
     /**
      * Converts a net.minecraft.server compound NBT tag to a
@@ -295,9 +298,5 @@ public class NBTHelper
                 // Cannot make this into a tag
                 throw new IllegalArgumentException(type + "doesn't have a simple value!");
         }
-    }
-
-    private NBTHelper()
-    {
     }
 }

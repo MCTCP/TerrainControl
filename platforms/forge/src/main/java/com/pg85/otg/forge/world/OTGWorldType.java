@@ -1,4 +1,4 @@
-package com.pg85.otg.forge;
+package com.pg85.otg.forge.world;
 
 import java.io.File;
 
@@ -9,6 +9,8 @@ import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.biomes.OTGBiomeProvider;
 import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
@@ -82,14 +84,14 @@ public class OTGWorldType extends WorldType
         	        	OTG.getDimensionsConfig().save();
         	        } else {
         	        	// Create config from worldconfig, only works if worldname is the same as preset name
-        	        	WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
+        	        	WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
         	        	if(worldConfig != null)
         	        	{
         	        		DimensionsConfig dimsConfig = new DimensionsConfig(mcWorld.getSaveHandler().getWorldDirectory());
         	        		dimsConfig.Overworld = new DimensionConfig(mcWorld.getSaveHandler().getWorldDirectory().getName(), worldConfig);
         	        		for(String dimToAdd : worldConfig.dimensions)
         	        		{
-        	        			WorldConfig dimWorldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimToAdd));
+        	        			WorldConfig dimWorldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimToAdd));
         	        			if(dimWorldConfig != null)
         	        			{
         	        				dimsConfig.Dimensions.add(new DimensionConfig(dimToAdd, dimWorldConfig));
@@ -124,14 +126,14 @@ public class OTGWorldType extends WorldType
 	        {
 			    // TODO: Why does MC add \\.? Removing.. 
 			    File worldSaveDir = new File(mcWorld.getSaveHandler().getWorldDirectory().getAbsolutePath().replace("\\.",  ""));
-			    OTG.isNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
+			    OTG.IsNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
 	        }
         }
 
     	// For MP server
         if(!mcWorld.getMinecraftServer().isSinglePlayer())
         {
-	        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), OTGPlugin.txWorldType);
+	        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), OTGPlugin.OtgWorldType);
 	        worldSettings.setGeneratorOptions("OpenTerrainGenerator");
 	        mcWorld.getWorldInfo().setAllowCommands(mcWorld.getWorldInfo().areCommandsAllowed());
 	        mcWorld.getWorldInfo().populateFromWorldSettings(worldSettings);

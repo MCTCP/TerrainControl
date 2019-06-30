@@ -25,7 +25,7 @@ import net.minecraft.launchwrapper.IClassTransformer;
 
 public class OTGClassTransformer implements IClassTransformer
 {
-	static String[] classesBeingTransformed =
+	static String[] ClassesBeingTransformed =
 	{
 		"net.minecraftforge.registries.GameData", // Biome registry
 		"net.minecraft.world.biome.Biome", // Biome registry
@@ -50,9 +50,9 @@ public class OTGClassTransformer implements IClassTransformer
 		{
 			boolean isObfuscated = !name.equals(transformedName);
 			int index = -1;
-			for(int i = 0; i < classesBeingTransformed.length; i++)
+			for(int i = 0; i < ClassesBeingTransformed.length; i++)
 			{
-				if(classesBeingTransformed[i].equals(transformedName))
+				if(ClassesBeingTransformed[i].equals(transformedName))
 				{
 					index = i;
 					break;
@@ -964,11 +964,6 @@ public class OTGClassTransformer implements IClassTransformer
 
 				return;
 			}
-		}
-
-		//for(MethodNode method : gameDataNode.methods)
-		{
-			//System.out.println("Biome: " + method.name + " + " + method.desc + " + " + method.signature);
 		}
 
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");

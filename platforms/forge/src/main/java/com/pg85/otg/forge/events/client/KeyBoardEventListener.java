@@ -2,8 +2,7 @@ package com.pg85.otg.forge.events.client;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
-import com.pg85.otg.forge.gui.OTGGuiDimensionList;
-import com.pg85.otg.forge.gui.PregeneratorUI;
+import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.network.client.ClientProxy;
 
 import net.minecraft.client.Minecraft;
@@ -23,14 +22,7 @@ public class KeyBoardEventListener
 	{
 		if (FMLClientHandler.instance().getClient().inGameHasFocus)
 		{
-			if (ClientProxy.pregeneratorUIKeyBinding.isPressed())
-			{
-				if(Minecraft.getMinecraft().isSingleplayer())
-				{
-					PregeneratorUI.ToggleIngameUI();
-				}
-			}
-			if (ClientProxy.otgInGameUIKeyBinding.isPressed())
+			if (ClientProxy.OtgInGameUIKeyBinding.isPressed())
 			{
 		    	if(
 					// The GUI screen requires the dimensions configuration to be available, so it shouldn't be opened

@@ -30,7 +30,7 @@ public class BO3Loader implements CustomObjectLoader
     /** A list of already loaded meta Tags. The path is the key, a NBT Tag is
      * the value.
      */
-    private static Map<String, NamedBinaryTag> loadedTags = new HashMap<String, NamedBinaryTag>();
+    private static Map<String, NamedBinaryTag> LoadedTags = new HashMap<String, NamedBinaryTag>();
 
     public BO3Loader()
     {
@@ -72,10 +72,10 @@ public class BO3Loader implements CustomObjectLoader
     {
         String path = bo3Folder.getParent() + File.separator + name;
 
-        if (loadedTags.containsKey(path))
+        if (LoadedTags.containsKey(path))
         {
             // Found a cached one
-            return loadedTags.get(path);
+            return LoadedTags.get(path);
         }
 
         NamedBinaryTag tag = loadTileEntityFromNBT(path);
@@ -97,7 +97,7 @@ public class BO3Loader implements CustomObjectLoader
         } catch (FileNotFoundException e)
         {
             // File not found
-        	if(OTG.getPluginConfig().SpawnLog)
+        	if(OTG.getPluginConfig().spawnLog)
         	{
         		OTG.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
         	}
@@ -117,7 +117,7 @@ public class BO3Loader implements CustomObjectLoader
             }             
             catch (java.lang.ArrayIndexOutOfBoundsException corruptFile)
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
 	                OTG.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
 	                OTG.printStackTrace(LogMarker.ERROR, corruptFile);
@@ -126,7 +126,7 @@ public class BO3Loader implements CustomObjectLoader
             }
             catch (IOException corruptFile)
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
 	                OTG.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
 	                OTG.printStackTrace(LogMarker.ERROR, corruptFile);
@@ -178,7 +178,7 @@ public class BO3Loader implements CustomObjectLoader
     public static NamedBinaryTag registerMetadata(String pathOnDisk, NamedBinaryTag metadata)
     {
         // Add it to the cache
-        loadedTags.put(pathOnDisk, metadata);
+        LoadedTags.put(pathOnDisk, metadata);
         // Return it
         return metadata;
     }
@@ -201,7 +201,7 @@ public class BO3Loader implements CustomObjectLoader
     public void onShutdown()
     {
         // Clean up the cache
-        loadedTags.clear();
+        LoadedTags.clear();
     }
 
 }

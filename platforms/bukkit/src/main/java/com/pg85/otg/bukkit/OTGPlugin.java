@@ -144,12 +144,12 @@ public class OTGPlugin extends JavaPlugin
         
         // Check if world exists
 	    File worldSaveDir = new File(".\\" + worldName + "\\");
-	    OTG.isNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
+	    OTG.IsNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
         
         ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld, worldSaveDir);
         localWorld.setSettings(configs);
         
-        OTG.isNewWorldBeingCreated = false;
+        OTG.IsNewWorldBeingCreated = false;
 
         // Add the world to the to-do list
         this.notInitedWorlds.put(worldName, localWorld);

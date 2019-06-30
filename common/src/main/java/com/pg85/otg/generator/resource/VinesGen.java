@@ -13,7 +13,7 @@ import java.util.Random;
 
 public class VinesGen extends Resource
 {
-    public static final int[] d =
+    public static final int[] D =
     {
         -1, -1, 2, 0, 1, 3
     };
@@ -116,7 +116,7 @@ public class VinesGen extends Resource
                 for (int direction = 2; direction <= 5; direction++)
                     if (canPlace(world, _x, y, _z, direction))
                     {
-                        world.setBlock(_x, y, _z, OTG.toLocalMaterialData(DefaultMaterial.VINE, 1 << d[OPPOSITE_FACING[direction]]), null, false);
+                        world.setBlock(_x, y, _z, OTG.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, false);
                         break;
                     }
             } else

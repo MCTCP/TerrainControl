@@ -38,9 +38,9 @@ public interface LocalWorld
 	
     public CustomObjectStructureCache getStructureCache();
     	
-	public WorldSession GetWorldSession();
+	public WorldSession getWorldSession();
 
-	public void DeleteWorldSessionData();
+	public void deleteWorldSessionData();
 	
     public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn);
     
@@ -183,7 +183,7 @@ public interface LocalWorld
 
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 
-	void SpawnEntity(EntityFunction entityData);
+	void spawnEntity(EntityFunction entityData);
     
     // Population start and end
     

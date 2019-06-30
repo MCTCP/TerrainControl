@@ -10,18 +10,10 @@ import net.minecraftforge.common.DimensionManager;
 
 public abstract class WorldHelper
 {
-    public static boolean isVanillaWorld(World world)
+    private WorldHelper()
     {
-        int dimensionId = world.provider.getDimension();
-        // If vanilla or OTG, return overworld
-        if (dimensionId == 0 || dimensionId == 1 || dimensionId == -1)
-        {
-            return true;
-        }
-
-        return false;
     }
-
+	
     /**
      * Gets the generation id of the given biome. This is usually equal to the
      * id of the BiomeBase, but when using virtual biomes it may be different.
@@ -35,7 +27,7 @@ public abstract class WorldHelper
         {
             return ((OTGBiome) biomeBase).otgBiomeId;
         }
-        return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(biomeBase);
+        return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(biomeBase);
     }
 
     public static String getName(World world)
@@ -59,7 +51,7 @@ public abstract class WorldHelper
         World defaultWorld = DimensionManager.getWorld(0);
         // If vanilla or we are dealing with an implementation that supports
         // multiple save handlers, return the world name
-        if (isVanillaWorld(world) || (defaultWorld != null && world.getWorldInfo() != null && world.getSaveHandler() != defaultWorld.getSaveHandler()))
+        if (isVanillaDimension(world) || (defaultWorld != null && world.getWorldInfo() != null && world.getSaveHandler() != defaultWorld.getSaveHandler()))
         {
             return world.getWorldInfo().getWorldName();
         }
@@ -68,7 +60,15 @@ public abstract class WorldHelper
         return world.provider.getSaveFolder();
     }
 
-    private WorldHelper()
+    private static boolean isVanillaDimension(World world)
     {
-    }
+        int dimensionId = world.provider.getDimension();
+        // If vanilla or OTG, return overworld
+        if (dimensionId == 0 || dimensionId == 1 || dimensionId == -1)
+        {
+            return true;
+        }
+
+        return false;
+    }   
 }

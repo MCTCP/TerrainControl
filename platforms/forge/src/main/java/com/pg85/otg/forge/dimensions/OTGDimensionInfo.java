@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 public class OTGDimensionInfo
 {
+	// Used to recreate dimensions in the correct order
 	public int highestOrder;
 	public HashMap<Integer, DimensionData> orderedDimensions;
 	

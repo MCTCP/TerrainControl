@@ -58,13 +58,13 @@ public enum DefaultStructurePart
     IGLOO_MIDDLE("minecraft:igloo/igloo_middle"),
     IGLOO_BOTTOM("minecraft:igloo/igloo_bottom");
 
-    private static final Map<String, DefaultStructurePart> byPath = new HashMap<String, DefaultStructurePart>();
+    private static final Map<String, DefaultStructurePart> ByPath = new HashMap<String, DefaultStructurePart>();
 
     static
     {
         for (DefaultStructurePart defaultStructurePart : values())
         {
-            byPath.put(defaultStructurePart.path, defaultStructurePart);
+            ByPath.put(defaultStructurePart.path, defaultStructurePart);
         }
     }
 
@@ -85,7 +85,7 @@ public enum DefaultStructurePart
         }
         lookupName = lookupName.toLowerCase();
 
-        DefaultStructurePart result = byPath.get(lookupName);
+        DefaultStructurePart result = ByPath.get(lookupName);
         if (result == null)
         {
             throw new InvalidConfigException(PluginStandardValues.PLUGIN_NAME + " doesn't know about a structure part called " + name);

@@ -275,7 +275,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
 
     public WorldType getTerrainType()
     {
-        return OTGPlugin.txWorldType;
+        return OTGPlugin.OtgWorldType;
     }
     
     public String getGeneratorOptions()

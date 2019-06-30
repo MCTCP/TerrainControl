@@ -113,7 +113,7 @@ public class CustomStructureGen extends Resource
             	{
             		return object.makeCustomObjectCoordinate(world, random, chunkX, chunkZ);
             	} else {
-            		if(OTG.getPluginConfig().SpawnLog)
+            		if(OTG.getPluginConfig().spawnLog)
             		{
             			BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
             			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + objectNames.get(objectNumber));

@@ -17,11 +17,11 @@ import java.util.List;
  */
 public class EnumHelper
 {
-    private static Object reflectionFactory = null;
-    private static Method newConstructorAccessor = null;
-    private static Method newInstance = null;
-    private static Method newFieldAccessor = null;
-    private static Method fieldAccessorSet = null;
+    private static Object ReflectionFactory = null;
+    private static Method NewConstructorAccessor = null;
+    private static Method NewInstance = null;
+    private static Method NewFieldAccessor = null;
+    private static Method FieldAccessorSet = null;
 
     static
     {
@@ -29,11 +29,11 @@ public class EnumHelper
         try
         {
             Method getReflectionFactory = Class.forName("sun.reflect.ReflectionFactory").getDeclaredMethod("getReflectionFactory");
-            reflectionFactory = getReflectionFactory.invoke(null);
-            newConstructorAccessor = Class.forName("sun.reflect.ReflectionFactory").getDeclaredMethod("newConstructorAccessor", Constructor.class);
-            newInstance = Class.forName("sun.reflect.ConstructorAccessor").getDeclaredMethod("newInstance", Object[].class);
-            newFieldAccessor = Class.forName("sun.reflect.ReflectionFactory").getDeclaredMethod("newFieldAccessor", Field.class, boolean.class);
-            fieldAccessorSet = Class.forName("sun.reflect.FieldAccessor").getDeclaredMethod("set", Object.class, Object.class);
+            ReflectionFactory = getReflectionFactory.invoke(null);
+            NewConstructorAccessor = Class.forName("sun.reflect.ReflectionFactory").getDeclaredMethod("newConstructorAccessor", Constructor.class);
+            NewInstance = Class.forName("sun.reflect.ConstructorAccessor").getDeclaredMethod("newInstance", Object[].class);
+            NewFieldAccessor = Class.forName("sun.reflect.ReflectionFactory").getDeclaredMethod("newFieldAccessor", Field.class, boolean.class);
+            FieldAccessorSet = Class.forName("sun.reflect.FieldAccessor").getDeclaredMethod("set", Object.class, Object.class);
         } catch (Exception e)
         {
             throw new RuntimeException(e);
@@ -46,7 +46,7 @@ public class EnumHelper
         parameterTypes[0] = String.class;
         parameterTypes[1] = int.class;
         System.arraycopy(additionalParameterTypes, 0, parameterTypes, 2, additionalParameterTypes.length);
-        return newConstructorAccessor.invoke(reflectionFactory, enumClass.getDeclaredConstructor(parameterTypes));
+        return NewConstructorAccessor.invoke(ReflectionFactory, enumClass.getDeclaredConstructor(parameterTypes));
     }
 
     private static <T extends Enum<?>> T makeEnum(Class<T> enumClass, String value, int ordinal, Class<?>[] additionalTypes, Object[] additionalValues) throws Exception
@@ -55,7 +55,7 @@ public class EnumHelper
         parms[0] = value;
         parms[1] = Integer.valueOf(ordinal);
         System.arraycopy(additionalValues, 0, parms, 2, additionalValues.length);
-        return enumClass.cast(newInstance.invoke(getConstructorAccessor(enumClass, additionalTypes), new Object[]{parms}));
+        return enumClass.cast(NewInstance.invoke(getConstructorAccessor(enumClass, additionalTypes), new Object[]{parms}));
     }
 
     private static void setFailsafeFieldValue(Field field, Object target, Object value) throws Exception
@@ -64,8 +64,8 @@ public class EnumHelper
         Field modifiersField = Field.class.getDeclaredField("modifiers");
         modifiersField.setAccessible(true);
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-        Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, field, false);
-        fieldAccessorSet.invoke(fieldAccessor, target, value);
+        Object fieldAccessor = NewFieldAccessor.invoke(ReflectionFactory, field, false);
+        FieldAccessorSet.invoke(fieldAccessor, target, value);
     }
 
     private static void blankField(Class<?> enumClass, String fieldName) throws Exception

@@ -214,7 +214,7 @@ public class SpawnerFunction extends BO3Function
     				e1.printStackTrace();
     			}
     	    } else {
-    	    	if(OTG.getPluginConfig().SpawnLog)
+    	    	if(OTG.getPluginConfig().spawnLog)
     	    	{
     	    		OTG.log(LogMarker.WARN, "Could not find file \"" + nbtFileName  + "\" for Spawner: " + this.makeString());
     	    	}

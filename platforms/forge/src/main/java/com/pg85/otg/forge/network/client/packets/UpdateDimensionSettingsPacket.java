@@ -15,10 +15,10 @@ import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
@@ -35,7 +35,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(DataOutput stream, ArrayList<DimensionConfig> dimConfigs, boolean isOverWorldIncluded) throws IOException
+	public static void writeToStream(DataOutput stream, ArrayList<DimensionConfig> dimConfigs, boolean isOverWorldIncluded) throws IOException
 	{
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Normal packet
@@ -81,10 +81,10 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 			                	{
 	            					ForgeWorld forgeWorld = null;
 	        						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
-	            					if(forgeWorld.GetWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
+	            					if(forgeWorld.getWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
 	            					{
-		            					forgeWorld.GetWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
-		            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.GetWorldSession().getPregenerationRadius();
+		            					forgeWorld.getWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
+		            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.getWorldSession().getPregenerationRadius();
 	            					}
 			                		OTG.getDimensionsConfig().Overworld = dimConfig;
 			                	} else {
@@ -108,10 +108,10 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 	            					// ForgeWorld might have been deleted, client may have sent outdated worlds list
 	            					if(forgeWorld != null)
 	            					{
-		            					if(forgeWorld.GetWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
+		            					if(forgeWorld.getWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
 		            					{
-			            					forgeWorld.GetWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
-			            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.GetWorldSession().getPregenerationRadius();
+			            					forgeWorld.getWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
+			            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.getWorldSession().getPregenerationRadius();
 		            					}
 	
 				                		OTG.getDimensionsConfig().Dimensions.remove(dimConfigToRemove);
@@ -119,7 +119,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 	            					}
 			                	}
 		                	}
-	                		ServerPacketManager.SendDimensionSynchPacketToAllPlayers(player.getServer());
+	                		ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
 	                	}
 		            });
 		            return null;					

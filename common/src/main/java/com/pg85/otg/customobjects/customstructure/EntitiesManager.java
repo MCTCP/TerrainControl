@@ -62,7 +62,7 @@ public class EntitiesManager
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
 
-        		world.SpawnEntity(newEntityData);
+        		world.spawnEntity(newEntityData);
 
         		if(!ChunkCoordinate.fromBlockCoords(newEntityData.x, newEntityData.z).equals(chunkCoordinate))
         		{
@@ -79,7 +79,7 @@ public class EntitiesManager
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
 
-        		world.SpawnEntity(newEntityData);
+        		world.spawnEntity(newEntityData);
 
         		if(!ChunkCoordinate.fromBlockCoords(newEntityData.x, newEntityData.z).equals(chunkCoordinate))
         		{

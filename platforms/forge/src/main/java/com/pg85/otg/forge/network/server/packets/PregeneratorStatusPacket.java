@@ -15,11 +15,11 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.ForgeWorldSession;
 import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.logging.LogMarker;
 
 public class PregeneratorStatusPacket extends OTGPacket
@@ -34,7 +34,7 @@ public class PregeneratorStatusPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(ByteBufOutputStream stream) throws IOException
+	public static void writeToStream(ByteBufOutputStream stream) throws IOException
 	{
 	    stream.writeInt(PluginStandardValues.ProtocolVersion);
 	    stream.writeInt(0); // 0 = Normal packet
@@ -42,9 +42,9 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
 	    for(LocalWorld localWorld : ((ForgeEngine)OTG.getEngine()).getAllWorlds())
 	    {
-	    	if(localWorld.GetWorldSession() != null && ((ForgeWorldSession)localWorld.GetWorldSession()).getPregenerator() != null)
+	    	if(localWorld.getWorldSession() != null && ((ForgeWorldSession)localWorld.getWorldSession()).getPregenerator() != null)
 	    	{
-	    		pregenerators.add(((ForgeWorldSession)localWorld.GetWorldSession()).getPregenerator());
+	    		pregenerators.add(((ForgeWorldSession)localWorld.getWorldSession()).getPregenerator());
 	    	}
 	    }
 	    
@@ -65,12 +65,12 @@ public class PregeneratorStatusPacket extends OTGPacket
 	        long k = Runtime.getRuntime().freeMemory();
 	        long l = j - k;
 	    	
-	    	stream.writeLong(Long.valueOf(BytesToMb(l)));
-	    	stream.writeLong(Long.valueOf(BytesToMb(i)));
+	    	stream.writeLong(Long.valueOf(bytesToMb(l)));
+	    	stream.writeLong(Long.valueOf(bytesToMb(i)));
 	    }
 	}
 	
-    private static long BytesToMb(long bytes)
+    private static long bytesToMb(long bytes)
     {
         return bytes / 1024L / 1024L;
     }
@@ -112,10 +112,10 @@ public class PregeneratorStatusPacket extends OTGPacket
 				    	}				    
 				    	
 				    	// WorldSession can be null if MP client has not received a world instance for the world
-				    	if(forgeWorld != null && forgeWorld.GetWorldSession() != null)
+				    	if(forgeWorld != null && forgeWorld.getWorldSession() != null)
 				    	{
-				    		Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();
-				    		pregenerator.SetPregeneratorIsRunning(pregeneratorIsRunning);
+				    		Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator();
+				    		pregenerator.setPregeneratorIsRunning(pregeneratorIsRunning);
 				    		pregenerator.progressScreenWorldSizeInBlocks = progressScreenWorldSizeInBlocks;
 				    		pregenerator.preGeneratorProgress = preGeneratorProgress;
 				    		pregenerator.preGeneratorProgressStatus = preGeneratorProgressStatus;

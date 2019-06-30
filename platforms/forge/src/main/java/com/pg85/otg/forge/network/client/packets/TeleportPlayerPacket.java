@@ -33,7 +33,7 @@ public class TeleportPlayerPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(String dimensionName, DataOutput stream) throws IOException
+	public static void writeToStream(String dimensionName, DataOutput stream) throws IOException
 	{
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Teleport player packet

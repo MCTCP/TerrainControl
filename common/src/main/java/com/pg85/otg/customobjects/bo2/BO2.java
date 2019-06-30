@@ -1,7 +1,6 @@
 package com.pg85.otg.customobjects.bo2;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;

@@ -390,7 +390,7 @@ public class ObjectSpawner
 				{
 					miscResources.add((Resource) res);
 				} else {
-					if(OTG.getPluginConfig().SpawnLog)
+					if(OTG.getPluginConfig().spawnLog)
 					{
 						OTG.log(LogMarker.WARN, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
 					}
@@ -460,7 +460,7 @@ public class ObjectSpawner
 					miscResources.add((Resource) res);
 				}
 			} else {
-				if(OTG.getPluginConfig().SpawnLog)
+				if(OTG.getPluginConfig().spawnLog)
 				{
 					OTG.log(LogMarker.WARN, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
 				}
@@ -520,7 +520,7 @@ public class ObjectSpawner
 		// Null check
 		if (biome == null)
 		{
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.ERROR, "Unknown biome at {},{}  (chunk {}). Population failed.", x + 15, z + 15, chunkCoord);
 			}

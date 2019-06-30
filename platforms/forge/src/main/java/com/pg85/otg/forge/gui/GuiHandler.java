@@ -1,5 +1,7 @@
 package com.pg85.otg.forge.gui;
 
+import com.pg85.otg.forge.gui.mainmenu.OTGGuiWorldSelection;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiWorldSelection;
@@ -14,19 +16,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GuiHandler implements IGuiHandler
 {	
-    public static boolean useVanillaScreen = false;    
-
-    //public static boolean askModCompatContinue = false;
-
-    @SideOnly(Side.CLIENT)
-    @SubscribeEvent
-    public void renderGameOverLay(RenderGameOverlayEvent.Post event)
-    {
-    	if(Minecraft.getMinecraft().isIntegratedServerRunning())
-    	{
-    		PregeneratorUI.ShowInGameUI();
-    	}
-    }
+    public static boolean UseVanillaScreen = false;    
 
     @SideOnly(Side.CLIENT)
     @SubscribeEvent

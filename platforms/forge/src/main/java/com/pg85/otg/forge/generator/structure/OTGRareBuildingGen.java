@@ -54,7 +54,7 @@ public class OTGRareBuildingGen extends OTGMapGenStructure
 
         this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = configs.getWorldConfig().maximumDistanceBetweenRareBuildings;
-        // Minecraft's internal minimum distance is one lower than TC's value
+        // Minecraft's internal minimum distance is one lower than OTG's value
         this.minDistanceBetweenScatteredFeatures = configs.getWorldConfig().minimumDistanceBetweenRareBuildings - 1;
         this.scatteredFeatureSpawnList.add(new SpawnListEntry(EntityWitch.class, 1, 1, 1));
     }

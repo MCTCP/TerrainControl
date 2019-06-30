@@ -26,12 +26,12 @@ import net.minecraftforge.fml.relauncher.Side;
 public class PacketDispatcher
 {
 	// a simple counter will allow us to get rid of 'magic' numbers used during packet registration
-	private static byte packetId = 0;
+	private static byte PacketId = 0;
 	 
 	/**
 	* The SimpleNetworkWrapper instance is used both to register and send packets.
 	*/
-	private static final SimpleNetworkWrapper dispatcher = NetworkRegistry.INSTANCE.newSimpleChannel(PluginStandardValues.MOD_ID);
+	private static final SimpleNetworkWrapper Dispatcher = NetworkRegistry.INSTANCE.newSimpleChannel(PluginStandardValues.MOD_ID);
 	
 	/**
 	* Call this during pre-init or loading and register all of your packets (messages) here
@@ -49,7 +49,7 @@ public class PacketDispatcher
 	
 	private static final void registerMessage(Class handlerClass, Class messageClass, Side side)
 	{
-		PacketDispatcher.dispatcher.registerMessage(handlerClass, messageClass, packetId++, side);
+		PacketDispatcher.Dispatcher.registerMessage(handlerClass, messageClass, PacketId++, side);
 	}
 	
 	public static final void sendTo(IMessage message, NetworkManager manager)
@@ -64,7 +64,7 @@ public class PacketDispatcher
 				if(fieldClass.equals(EnumMap.class))
 				{
 			        field.setAccessible(true);			        
-			        channels = (EnumMap<Side, FMLEmbeddedChannel>) field.get(PacketDispatcher.dispatcher);
+			        channels = (EnumMap<Side, FMLEmbeddedChannel>) field.get(PacketDispatcher.Dispatcher);
 			        break;
 				}    				
 			}
@@ -88,12 +88,12 @@ public class PacketDispatcher
 	
 	public static final void sendTo(IMessage message, EntityPlayerMP player)
 	{
-		PacketDispatcher.dispatcher.sendTo(message, player);
+		PacketDispatcher.Dispatcher.sendTo(message, player);
 	}
 	
 	public static final void sendToAllAround(IMessage message, NetworkRegistry.TargetPoint point)
 	{
-		PacketDispatcher.dispatcher.sendToAllAround(message, point);
+		PacketDispatcher.Dispatcher.sendToAllAround(message, point);
 	}
 	
 	public static final void sendToAllAround(IMessage message, int dimension, double x, double y, double z, double range)
@@ -108,11 +108,11 @@ public class PacketDispatcher
 	
 	public static final void sendToDimension(IMessage message, int dimensionId)
 	{
-		PacketDispatcher.dispatcher.sendToDimension(message, dimensionId);
+		PacketDispatcher.Dispatcher.sendToDimension(message, dimensionId);
 	}
 	
 	public static final void sendToServer(IMessage message)
 	{
-		PacketDispatcher.dispatcher.sendToServer(message);
+		PacketDispatcher.Dispatcher.sendToServer(message);
 	}
 }
