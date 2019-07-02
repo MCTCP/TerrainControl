@@ -21,32 +21,32 @@ public class BranchFunction extends BO3Function implements Branch
     /**
      * The base X coordinate where this branch is expected to spawn
      */
-    public int x;
+    int x;
     /**
      * The base Y coordinate where this branch is expected to spawn
      */
-    public int y;
+    int y;
     /**
      * The base Z coordinate where this branch is expected to spawn
      */
-    public int z;
+    int z;
     /**
      * holds each CustomObject, its spawn chance and its rotation as a node
      */
-    public SortedSet<BranchNode> branches; // Warning: Using SortedSet + BranchNode's compare method causes a bug where branches with the same rarity are seen as the same branch, this means only the first branch with the same rarity tries to spawn. This is fixed for OTG+.
-    public ArrayList<BranchNode> branchesOTGPlus;
+    SortedSet<BranchNode> branches; // Warning: Using SortedSet + BranchNode's compare method causes a bug where branches with the same rarity are seen as the same branch, this means only the first branch with the same rarity tries to spawn. This is fixed for OTG+.
+    ArrayList<BranchNode> branchesOTGPlus;
     /**
      * This variable was added to allow the following format to be used
      * Branch(x,y,z,branchName,rotation,chance[,anotherBranchName,rotation,chance[,...]][,maxChanceOutOf])
      * maxChanceOutOf changes the upper limit of the random number used to
      * determine if the branch spawns
      */
-    public double totalChance = 100;
-    public boolean totalChanceSet = false;
+    double totalChance = 100;
+    boolean totalChanceSet = false;
 
-    public String branchGroup = "";
+    String branchGroup = "";
 
-    public boolean isRequiredBranch = false;
+    boolean isRequiredBranch = false;
 
     @Override
     public BranchFunction rotate()
@@ -178,7 +178,7 @@ public class BranchFunction extends BO3Function implements Branch
 	            {
 	                CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
 	                Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-	                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), true, branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
+	                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
 	            }
 	        }
     	} else {

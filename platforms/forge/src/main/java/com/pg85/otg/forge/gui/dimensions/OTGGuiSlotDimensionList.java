@@ -40,14 +40,11 @@ class OTGGuiSlotDimensionList extends OTGGuiScrollingList
     public void resize()
     {
         this.listWidth = this.otgGuiDimensionList.listWidth;
-        this.listHeight = parent.height;
         this.top = this.otgGuiDimensionList.topMargin;
         this.bottom = this.otgGuiDimensionList.height - this.otgGuiDimensionList.bottomMargin;
         this.slotHeight = this.otgGuiDimensionList.slotHeight;
         this.left = this.otgGuiDimensionList.leftMargin;
         this.right = this.otgGuiDimensionList.listWidth + this.left;
-        this.screenWidth = parent.width;
-        this.screenHeight = parent.height;
     }
     
     @Override

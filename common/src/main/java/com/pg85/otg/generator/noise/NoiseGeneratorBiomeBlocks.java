@@ -4,25 +4,23 @@ import java.util.Random;
 
 public class NoiseGeneratorBiomeBlocks
 {
-    public static final double A = Math.sqrt(3.0D);    
+    private static final double A = Math.sqrt(3.0D);    
     private static final double G = 0.5D * (A - 1.0D);
     private static final double H = (3.0D - A) / 6.0D;
     private static int[][] E = new int[][] { { 1, 1, 0}, { -1, 1, 0}, { 1, -1, 0}, { -1, -1, 0}, { 1, 0, 1}, { -1, 0, 1}, { 1, 0, -1}, { -1, 0, -1}, { 0, 1, 1}, { 0, -1, 1}, { 0, 1, -1}, { 0, -1, -1}};
     
     private int[] f;
-    public double b;
-    public double c;
-    public double d;
+    private double b;
+    private double c;
 
     public NoiseGeneratorBiomeBlocks() {
         this(new Random());
     }
 
-    public NoiseGeneratorBiomeBlocks(Random random) {
+    NoiseGeneratorBiomeBlocks(Random random) {
         this.f = new int[512];
         this.b = random.nextDouble() * 256.0D;
         this.c = random.nextDouble() * 256.0D;
-        this.d = random.nextDouble() * 256.0D;
 
         int i;
 
@@ -48,7 +46,7 @@ public class NoiseGeneratorBiomeBlocks
         return (double) aint[0] * d0 + (double) aint[1] * d1;
     }
 
-    public double a(double d0, double d1) {
+    double a(double d0, double d1) {
         double d2 = 0.5D * (A - 1.0D);
         double d3 = (d0 + d1) * d2;
         int i = a(d0 + d3);
@@ -112,7 +110,7 @@ public class NoiseGeneratorBiomeBlocks
         return 70.0D * (d15 + d17 + d19);
     }
 
-    public void a(double[] adouble, double d0, double d1, int i, int j, double d2, double d3, double d4) {
+    void a(double[] adouble, double d0, double d1, int i, int j, double d2, double d3, double d4) {
         int k = 0;
 
         for (int l = 0; l < j; ++l) {

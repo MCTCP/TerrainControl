@@ -21,7 +21,7 @@ public class MaterialSet
      * Keyword that adds all materials to the set when used in
      * {@link #parseAndAdd(String)}.
      */
-    public static final String ALL_MATERIALS = "All";
+    private static final String ALL_MATERIALS = "All";
 
     /**
      * Keyword that adds all solid materials to the set when used in
@@ -33,7 +33,7 @@ public class MaterialSet
      * Keyword that adds all non solid materials to the set when used in
      * {@link #parseAndAdd(String)}.
      */
-    public static final String NON_SOLID_MATERIALS = "NonSolid";
+    private static final String NON_SOLID_MATERIALS = "NonSolid";
 
     private boolean allMaterials = false;
     private boolean allSolidMaterials = false;
@@ -138,7 +138,7 @@ public class MaterialSet
      *
      * @param entry The entry to add, may not be null.
      */
-    public void add(MaterialSetEntry entry)
+    private void add(MaterialSetEntry entry)
     {
         // Add the appropriate hashCode
         intSetUpToDate = false;

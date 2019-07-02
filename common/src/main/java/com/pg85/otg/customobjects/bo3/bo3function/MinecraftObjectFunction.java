@@ -16,8 +16,8 @@ import java.util.Random;
  */
 public class MinecraftObjectFunction extends BlockFunction
 {
-    public DefaultStructurePart structurePart;
-    public Rotation rotation = Rotation.NORTH;
+    private DefaultStructurePart structurePart;
+    private Rotation rotation = Rotation.NORTH;
 
     public MinecraftObjectFunction()
     {

@@ -16,13 +16,13 @@ import com.pg85.otg.logging.LogMarker;
 
 public class BiomeIdData
 {
-	public String biomeName;
-	public int otgBiomeId;
-	public int savedBiomeId;
+	String biomeName;
+	int otgBiomeId;
+	int savedBiomeId;
 	
 	public BiomeIdData() {}
 	
-	public BiomeIdData(String biomeName, int otgBiomeId, int savedBiomeId)
+	BiomeIdData(String biomeName, int otgBiomeId, int savedBiomeId)
 	{
 		this.biomeName = biomeName;
 		this.otgBiomeId = otgBiomeId;
@@ -32,7 +32,7 @@ public class BiomeIdData
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
     
-	public static void saveBiomeIdData(File worldSaveDir, ServerConfigProvider serverConfigProvider, LocalWorld world)
+	static void saveBiomeIdData(File worldSaveDir, ServerConfigProvider serverConfigProvider, LocalWorld world)
 	{
         // If this is a previously created world then register biomes to the same OTG biome id as before.
         ArrayList<BiomeIdData> loadedBiomeIdData = loadBiomeIdData(worldSaveDir);
@@ -86,7 +86,7 @@ public class BiomeIdData
         }
 	}
 		
-	public static ArrayList<BiomeIdData> loadBiomeIdData(File worldSaveDir)
+	static ArrayList<BiomeIdData> loadBiomeIdData(File worldSaveDir)
 	{
 		File biomeIdDataFile = new File(worldSaveDir + "/OpenTerrainGenerator/BiomeIds.txt");
 		String[] biomeIdDataFileValues = {};

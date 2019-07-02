@@ -43,7 +43,7 @@ public final class RawSettingValue
      *                     "Foo(Bar)".
      * @return The setting.
      */
-    public static RawSettingValue create(ValueType valueType, String settingValue)
+    static RawSettingValue create(ValueType valueType, String settingValue)
     {
         if (settingValue == null || valueType == null)
         {
@@ -58,7 +58,7 @@ public final class RawSettingValue
      * @param value   The value.
      * @return The setting value object.
      */
-    public static <S> RawSettingValue ofPlainSetting(Setting<S> setting, S value)
+    static <S> RawSettingValue ofPlainSetting(Setting<S> setting, S value)
     {
         return ofPlainSetting(setting.getName(), setting.write(value));
     }
@@ -69,7 +69,7 @@ public final class RawSettingValue
      * @param value       The unparsed value.
      * @return The setting value object.
      */
-    public static <S> RawSettingValue ofPlainSetting(String settingName, String value)
+    private static <S> RawSettingValue ofPlainSetting(String settingName, String value)
     {
         return create(ValueType.PLAIN_SETTING, settingName + ": " + value);
     }
@@ -116,7 +116,7 @@ public final class RawSettingValue
      * @param comments The comments.
      * @return The new {@link RawSettingValue}.
      */
-    public RawSettingValue withComments(String... comments)
+    RawSettingValue withComments(String... comments)
     {
         if (comments.length == 0 && this.comments.isEmpty())
         {
@@ -134,7 +134,7 @@ public final class RawSettingValue
      * 1 as the line number.
      * @return This object, for chaining.
      */
-    public RawSettingValue withLineNumber(int lineNumber)
+    RawSettingValue withLineNumber(int lineNumber)
     {
         if (lineNumber <= 0)
         {

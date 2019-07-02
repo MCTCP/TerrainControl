@@ -24,10 +24,10 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 public class SmoothingAreaGenerator
 {   
-    Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerDiagonalLineDestination = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
-    Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerLineOrigin = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();    
+    private Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerDiagonalLineDestination = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+    private Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerLineOrigin = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();    
 	
-	public void CustomObjectStructureSpawn(Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn)
+	void CustomObjectStructureSpawn(Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn)
 	{
 		Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerDiagonalLineOrigin = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
 		SmoothingAreasToSpawnPerDiagonalLineDestination.clear();
@@ -110,7 +110,7 @@ public class SmoothingAreaGenerator
      * and we'll be able to detect the highest solid block in the landscape that we'll need to smooth to) and the lines of blocks we've plotted are spawned, creating a nice
      * linear slope from the highest solid block in the landscape to the lowest block in the BO3 (the block we started at when drawing the line).
     */
-    public Map<ChunkCoordinate, ArrayList<Object[]>> calculateSmoothingAreas(Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> ObjectsToSpawn, CustomObjectCoordinate Start, LocalWorld World)
+    Map<ChunkCoordinate, ArrayList<Object[]>> calculateSmoothingAreas(Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> ObjectsToSpawn, CustomObjectCoordinate Start, LocalWorld World)
     {
         // TODO: Don't check neighbouring BO3's with SmoothRadius -1
 
@@ -584,7 +584,7 @@ public class SmoothingAreaGenerator
         return calculateBeginAndEndPointsPerChunk(smoothToBlocksPerChunk);
     }
 
-    Object[] rotateSmoothDirections(Boolean smoothDirection1, Boolean smoothDirection2, Boolean smoothDirection3, Boolean smoothDirection4, Rotation rotation)
+    private Object[] rotateSmoothDirections(Boolean smoothDirection1, Boolean smoothDirection2, Boolean smoothDirection3, Boolean smoothDirection4, Rotation rotation)
     {
     	// smoothDirection1 -1x WEST
     	// smoothDirection2 +1x EAST
@@ -927,7 +927,7 @@ public class SmoothingAreaGenerator
 	                filler.y = beginPoint.y;
 
 	                smoothToBlocks = new ArrayList<Object[]>();
-	                bO3 = new CustomObjectCoordinate(World, null, null, null, 0, 0, 0, false, 0, false, false, null);
+	                bO3 = new CustomObjectCoordinate(World, null, null, null, 0, 0, 0, 0, false, false, null);
 
 	        		// While drawing a circle:
 	        		// x^2 + y^2 = r^2
@@ -1464,7 +1464,7 @@ public class SmoothingAreaGenerator
      * and spawning has to be delayed until other chunks have spawned
      * @param chunkCoordinate
     */
-    public boolean spawnSmoothAreas(ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn, CustomObjectCoordinate Start, LocalWorld World)
+    boolean spawnSmoothAreas(ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn, CustomObjectCoordinate Start, LocalWorld World)
     {
         // Get all smoothing areas (lines) that should spawn in this chunk for this branching structure
         Entry<ChunkCoordinate, ArrayList<Object[]>> smoothingAreaInChunk = null;

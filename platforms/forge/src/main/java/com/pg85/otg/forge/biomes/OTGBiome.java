@@ -23,8 +23,7 @@ import java.util.List;
 public class OTGBiome extends Biome implements IOTGASMBiome
 {
     private int skyColor;
-    public int otgBiomeId;
-    public int savedId;
+    int savedId;
 
     OTGBiome(BiomeConfig config, ResourceLocation registryKey)
     {
@@ -92,7 +91,7 @@ public class OTGBiome extends Biome implements IOTGASMBiome
     }
 
     // Adds the mobs to the internal list
-    public void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
+    private void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
     {
     	List<SpawnListEntry> newList = new ArrayList<SpawnListEntry>();
     	List<SpawnListEntry> newListParent = new ArrayList<SpawnListEntry>();

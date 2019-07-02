@@ -23,7 +23,7 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 {
     private static final Pattern INT_ARRAY_MATCHER = Pattern.compile("\\[[-+\\d|,\\s]+\\]");
 
-    public static NBTTagCompound getTagFromJson(String jsonString) throws NBTException
+    static NBTTagCompound getTagFromJson(String jsonString) throws NBTException
     {
         jsonString = jsonString.trim();
 
@@ -39,7 +39,7 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
         }
     }
 
-    static int topTagsCount(String str) throws NBTException
+    private static int topTagsCount(String str) throws NBTException
     {
         int i = 0;
         boolean flag = false;
@@ -102,12 +102,12 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
         }
     }
 
-    static JsonToNBT.Any joinStrToNBT(String... args) throws NBTException
+    private static JsonToNBT.Any joinStrToNBT(String... args) throws NBTException
     {
         return nameValueToNBT(args[0], args[1]);
     }
 
-    static JsonToNBT.Any nameValueToNBT(String key, String value) throws NBTException
+    private static JsonToNBT.Any nameValueToNBT(String key, String value) throws NBTException
     {
         value = value.trim();
 
@@ -371,7 +371,7 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 
     abstract static class Any
     {
-        protected String json;
+        String json;
 
         /**
          * Parses the JSON string contained in this object.
@@ -382,9 +382,9 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 
     static class Compound extends JsonToNBT.Any
     {
-        protected java.util.List<JsonToNBT.Any> tagList = Lists.<JsonToNBT.Any>newArrayList();
+        private java.util.List<JsonToNBT.Any> tagList = Lists.<JsonToNBT.Any>newArrayList();
 
-        public Compound(String jsonIn)
+        private Compound(String jsonIn)
         {
             this.json = jsonIn;
         }
@@ -408,9 +408,9 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 
     static class List extends JsonToNBT.Any
     {
-        protected java.util.List<JsonToNBT.Any> tagList = Lists.<JsonToNBT.Any>newArrayList();
+        private java.util.List<JsonToNBT.Any> tagList = Lists.<JsonToNBT.Any>newArrayList();
 
-        public List(String json)
+        private List(String json)
         {
             this.json = json;
         }
@@ -443,9 +443,9 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
         private static final Pattern DOUBLE_UNTYPED = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+");
         private static final Splitter SPLITTER = Splitter.on(',').omitEmptyStrings();
         /** The value to be parsed into a tag. */
-        protected String jsonValue;
+        private String jsonValue;
 
-        public Primitive(String jsonIn, String valueIn)
+        private Primitive(String jsonIn, String valueIn)
         {
             this.json = jsonIn;
             this.jsonValue = valueIn;

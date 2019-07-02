@@ -24,7 +24,7 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
         this.file = configFile.getFile();
     }
 
-    public FileSettingsWriterOTGPlus(File file)
+    private FileSettingsWriterOTGPlus(File file)
     {
         this.file = file;
     }
@@ -52,7 +52,7 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
      * @param configMode The configuration mode. If this is set to
      * WriteDisable, this method does nothing.
      */
-    public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode)
+    private static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode)
     {
         if (configMode == ConfigMode.WriteDisable)
         {

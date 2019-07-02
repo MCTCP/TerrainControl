@@ -6,7 +6,7 @@ import com.pg85.otg.generator.biome.ArraysCache;
 public class LayerLandRandom extends Layer
 {
 
-    public LayerLandRandom(long seed, Layer childLayer)
+    LayerLandRandom(long seed, Layer childLayer)
     {
         super(seed);
         this.child = childLayer;

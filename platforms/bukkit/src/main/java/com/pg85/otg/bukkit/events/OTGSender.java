@@ -19,12 +19,12 @@ public class OTGSender
 {   
     private OTGPlugin plugin;
 
-    public OTGSender(OTGPlugin plugin)
+    OTGSender(OTGPlugin plugin)
     {
         this.plugin = plugin;
     }
 
-    public void send(Player player)
+    void send(Player player)
     {
         // Send the configs
         World world = player.getWorld();

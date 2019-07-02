@@ -1,68 +1,21 @@
 package com.pg85.otg.forge.events.server;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Stack;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityHanging;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.IEntityLivingData;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.storage.DerivedWorldInfo;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms.IMCMessage;
-import net.minecraftforge.fml.common.eventhandler.Event.Result;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
-import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.dimensions.OTGTeleporter;
-import com.pg85.otg.forge.network.server.ServerPacketManager;
-import com.pg85.otg.forge.util.MobSpawnGroupHelper;
-import com.pg85.otg.forge.util.WorldHelper;
-import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.OTGWorldType;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.ChunkCoordinate;
 
 public class ServerEventListener
 {	

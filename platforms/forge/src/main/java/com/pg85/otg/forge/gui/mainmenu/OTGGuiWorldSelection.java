@@ -27,19 +27,13 @@ import com.pg85.otg.forge.util.IOHelper;
 public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
 {	
     /** The screen to return to when this closes (always Main Menu). */
-    protected GuiScreen prevScreen;
-    protected String title = "Select world";
+    private String title = "Select world";
     /** Tooltip displayed a world whose version is different from this client's */
     private String worldVersTooltip;
     private OTGGuiListWorldSelection selectionList;
     private GuiButton selectButton;
     private GuiButton deleteButton;
-    
-    public OTGGuiWorldSelection(GuiScreen screenIn)
-    {    	
-    	this.prevScreen = screenIn;
-    }
-	
+    	
     /**
      * Called back by selectionList when we call its drawScreen method, from ours.
      */
@@ -48,7 +42,7 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
         this.worldVersTooltip = p_184861_1_;
     }
 
-    public void selectWorld(@Nullable OTGGuiListWorldSelectionEntry entry)
+    void selectWorld(@Nullable OTGGuiListWorldSelectionEntry entry)
     {
         boolean flag = entry != null;
         this.selectButton.enabled = flag;
@@ -68,7 +62,7 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
         this.postInit();
     }
    
-    public void postInit()
+    private void postInit()
     {
     	int margin = 4;
     	int marginFromBottom = this.height - 54;

@@ -12,9 +12,9 @@ import java.util.HashMap;
 
 public class OTGCommandExecutor implements CommandExecutor
 {
-    protected final OTGPlugin plugin;
+    private final OTGPlugin plugin;
     protected HashMap<String, BaseCommand> commandHashMap = new HashMap<String, BaseCommand>();
-    protected HelpCommand helpCommand;
+    private HelpCommand helpCommand;
 
     public OTGCommandExecutor(OTGPlugin plugin)
     {

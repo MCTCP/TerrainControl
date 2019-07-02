@@ -67,7 +67,7 @@ public enum SaplingType
      *            The name to look up.
      * @return The sapling type.
      */
-    public static SaplingType get(String name)
+    static SaplingType get(String name)
     {
         return BY_NAME.get(name.toLowerCase());
     }

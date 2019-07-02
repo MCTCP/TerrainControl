@@ -21,7 +21,7 @@ public class PregeneratorSettingsEntry implements IGuiListEntry
 	private final OTGGuiDimensionSettingsList parent;
     private Pregenerator pregenerator = null;
     
-    public PregeneratorSettingsEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, OTGGuiDimensionSettingsList parent)
+    PregeneratorSettingsEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, OTGGuiDimensionSettingsList parent)
     {
         this.otgGuiDimensionSettingsList = otgGuiDimensionSettingsList;
 		this.parent = parent;

@@ -35,7 +35,7 @@ public class TreeObject implements CustomObject
                 PluginStandardValues.WORLD_HEIGHT, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
     }
 
-    public TreeObject(TreeType type)
+    TreeObject(TreeType type)
     {
         this.type = type;
     }

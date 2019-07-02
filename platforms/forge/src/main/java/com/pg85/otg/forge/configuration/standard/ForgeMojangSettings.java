@@ -44,7 +44,7 @@ public final class ForgeMojangSettings implements MojangSettings
      * @param biomeBase The biome.
      * @return The settings.
      */
-    public static MojangSettings fromBiomeBase(Biome biomeBase)
+    private static MojangSettings fromBiomeBase(Biome biomeBase)
     {
         return new ForgeMojangSettings(biomeBase);
     }

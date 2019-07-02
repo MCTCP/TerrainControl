@@ -14,13 +14,12 @@ import java.util.List;
 
 public class BiomeCommand extends BaseCommand
 {
-    public BiomeCommand(OTGPlugin _plugin)
+    BiomeCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "biome";
         perm = OTGPerm.CMD_BIOME.node;
         usage = "biome [-f] [-s]";
-        workOnConsole = false;
     }
 
     @Override

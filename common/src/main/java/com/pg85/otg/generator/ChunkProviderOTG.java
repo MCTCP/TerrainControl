@@ -29,9 +29,6 @@ public class ChunkProviderOTG
     private static final int NOISE_MAX_X = CHUNK_X_SIZE / 4 + 1;
     private static final int NOISE_MAX_Z = CHUNK_Z_SIZE / 4 + 1;
 
-    public static final int HEIGHT_BITS = 8;
-    public static final int HEIGHT_BITS_PLUS_FOUR = HEIGHT_BITS + 4;
-
     private final LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
 
     private final Random random;
@@ -78,7 +75,7 @@ public class ChunkProviderOTG
     private final int maxSmoothDiameter;
     private final int maxSmoothRadius;
 
-    BiomeConfig[] biomes = new BiomeConfig[1024];
+    private BiomeConfig[] biomes = new BiomeConfig[1024];
     
     public ChunkProviderOTG(ConfigProvider configs, LocalWorld world)
     {
@@ -145,7 +142,7 @@ public class ChunkProviderOTG
         }
     }
 
-    protected void generateTerrain(ChunkBuffer chunkBuffer)
+    private void generateTerrain(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
         int chunkX = chunkCoord.getChunkX();
@@ -275,7 +272,7 @@ public class ChunkProviderOTG
      * @return Whether there is a lot of water in this chunk. If yes, no
      *         villages will be placed.
      */
-    protected boolean addBiomeBlocksAndCheckWater(ChunkBuffer chunkBuffer)
+    private boolean addBiomeBlocksAndCheckWater(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
 

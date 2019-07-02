@@ -1,7 +1,6 @@
 package com.pg85.otg.configuration.biome;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.logging.LogMarker;
 
@@ -14,7 +13,7 @@ import java.util.*;
  */
 public final class BiomeGroupManager
 {
-    public static final int MAX_BIOME_GROUP_COUNT = 127;
+    static final int MAX_BIOME_GROUP_COUNT = 127;
     private int cumulativeGroupRarity = 0;
     private Map<String, BiomeGroup> nameToGroup = new LinkedHashMap<String, BiomeGroup>(4);
     private Map<Integer, BiomeGroup> idToGroup = new LinkedHashMap<Integer, BiomeGroup>(4);
@@ -112,17 +111,6 @@ public final class BiomeGroupManager
         return idToGroup.size();
     }
 
-    /**
-     * Gets whether there are no groups registered. Calling this method is
-     * equivalent to calling {@code getGroups().isEmpty()}.
-     * @return True if there are no groups registered, false if there are
-     * groups registered.
-     */
-    public boolean hasNoGroups()
-    {
-        return idToGroup.isEmpty();
-    }
-
     public SortedMap<Integer, BiomeGroup> getGroupDepthMap(int depth)
     {
         TreeMap<Integer, BiomeGroup> map = new TreeMap<Integer, BiomeGroup>();
@@ -152,11 +140,6 @@ public final class BiomeGroupManager
             }
         }
         return true;
-    }
-
-    public SortedMap<Integer, LocalBiome> getBiomeDepthMap(int groupId, int depth)
-    {
-        return getGroupById(groupId).getDepthMap(depth);
     }
 
     public boolean isBiomeDepthMapEmpty(int depth)

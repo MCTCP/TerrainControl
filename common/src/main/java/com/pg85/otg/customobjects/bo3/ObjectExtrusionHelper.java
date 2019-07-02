@@ -40,7 +40,7 @@ public class ObjectExtrusionHelper
      * @param extrudeMode          The style of extrusion to perform
      * @param extrudeThroughBlocks The types of materials to allow extrusion to act upon
      */
-    public ObjectExtrusionHelper(BO3Settings.ExtrudeMode extrudeMode, MaterialSet extrudeThroughBlocks)
+    ObjectExtrusionHelper(BO3Settings.ExtrudeMode extrudeMode, MaterialSet extrudeThroughBlocks)
     {
         this.extrudeMode = extrudeMode;
         this.extrudeThroughBlocks = extrudeThroughBlocks;
@@ -54,7 +54,7 @@ public class ObjectExtrusionHelper
      *
      * @param block The block to add.
      */
-    public void addBlock(BlockFunction block)
+    void addBlock(BlockFunction block)
     {
         if (extrudeMode != BO3Settings.ExtrudeMode.None)
         {
@@ -84,7 +84,7 @@ public class ObjectExtrusionHelper
      * @param y      The BO3 base Y spawn location
      * @param z      The BO3 base Z spawn location
      */
-    public void extrude(LocalWorld world, Random random, int x, int y, int z)
+    void extrude(LocalWorld world, Random random, int x, int y, int z)
     {
         for (BlockFunction block : blocksToExtrude)
         {

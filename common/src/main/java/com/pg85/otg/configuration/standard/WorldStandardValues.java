@@ -224,7 +224,6 @@ public class WorldStandardValues extends Settings
         BORDER_BIOMES = stringListSetting("BorderBiomes",
                 "JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
     	CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
-		WORLD_BIOMES = stringListSetting("WorldBiomes"),
 		DIMENSIONS = stringListSetting("Dimensions")
 	;
 
@@ -252,7 +251,6 @@ public class WorldStandardValues extends Settings
 
     // Deprecated settings
     public static final Setting<Boolean> FROZEN_RIVERS = booleanSetting("FrozenRivers", true);
-    public static final Setting<Integer> CUSTOM_TREE_CHANCE = intSetting("CustomTreeChance", 0, 0, 100);
     public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting("NormalBiomes", "Desert", "Forest", "Extreme Hills",
             "Swampland", "Plains", "Taiga", "Jungle", "River");
     public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");

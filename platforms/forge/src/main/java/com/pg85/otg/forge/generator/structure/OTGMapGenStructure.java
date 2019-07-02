@@ -11,6 +11,7 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 public abstract class OTGMapGenStructure extends MapGenStructure
 {
+	// TODO: This is no longer used, remove?
     public synchronized boolean chunkHasStructure(World worldIn, Random randomIn, ChunkPos chunkCoord)
     {
         this.initializeStructureData(worldIn);

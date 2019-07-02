@@ -58,21 +58,6 @@ public class DimensionConfigGui extends DimensionConfigBase
 		return clone;
 	}
 	
-	public static DimensionConfigGui fromBaseConfig(DimensionConfig dimConfigBase)
-	{
-		DimensionConfigGui dimConfig = new DimensionConfigGui();
-		
-		dimConfig.PresetName = dimConfigBase.PresetName;
-		dimConfig.Seed = dimConfigBase.Seed;
-		dimConfig.WorldBorderRadiusInChunks = dimConfigBase.WorldBorderRadiusInChunks;
-		dimConfig.PregeneratorRadiusInChunks = dimConfigBase.PregeneratorRadiusInChunks;
-		
-		dimConfig.Settings = dimConfigBase.Settings.clone();
-		dimConfig.GameRules = dimConfigBase.GameRules.clone();
-		
-		return dimConfig;
-	}
-	
 	public static DimensionConfigGui fromYamlString(String readStringFromStream)
 	{
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());

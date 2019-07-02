@@ -99,7 +99,7 @@ public class OTGBlockPortal
     
     // Used to check if a portal exists in the destination world at the given coordinates,
     // portal must be made of the source world's portal materials.
-    public static BlockPattern.PatternHelper createPatternHelper(World sourceWorld, World destinationWorld, BlockPos p_181089_2_)
+    static BlockPattern.PatternHelper createPatternHelper(World sourceWorld, World destinationWorld, BlockPos p_181089_2_)
     {
         EnumFacing.Axis enumfacing$axis = EnumFacing.Axis.Z;
         OTGBlockPortalSize blockportal$size = new OTGBlockPortalSize(sourceWorld, destinationWorld, p_181089_2_, EnumFacing.Axis.X);
@@ -152,7 +152,7 @@ public class OTGBlockPortal
     }    
     
     // Used to check if any portal exists in the given world at the given coordinates
-    public static BlockPattern.PatternHelper createPatternHelper(World worldIn, BlockPos p_181089_2_)
+    static BlockPattern.PatternHelper createPatternHelper(World worldIn, BlockPos p_181089_2_)
     {
         EnumFacing.Axis enumfacing$axis = EnumFacing.Axis.Z;
         OTGBlockPortalSize blockportal$size = new OTGBlockPortalSize(worldIn, p_181089_2_, EnumFacing.Axis.X);

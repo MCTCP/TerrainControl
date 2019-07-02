@@ -10,7 +10,7 @@ public class LayerBiomeBorder extends Layer
     private int[] bordersTo;
     private int defaultOceanId;
 
-    public LayerBiomeBorder(long seed, LocalWorld world, int defaultOceanId)
+    LayerBiomeBorder(long seed, LocalWorld world, int defaultOceanId)
     {
         super(seed);
         this.defaultOceanId = defaultOceanId;
@@ -18,7 +18,7 @@ public class LayerBiomeBorder extends Layer
         this.bordersTo = new int[world.getMaxBiomesCount()];
     }
 
-    public void addBiome(LocalBiome replaceTo, int replaceFrom, LocalWorld world)
+    void addBiome(LocalBiome replaceTo, int replaceFrom, LocalWorld world)
     {
         this.bordersFrom[replaceFrom] = new boolean[world.getMaxBiomesCount()];
 
@@ -70,7 +70,7 @@ public class LayerBiomeBorder extends Layer
      * @param selection The location to be checked
      * @return Biome Data or 0 when not on land
      */
-    protected int getBiomeFromLayer(int selection)
+    private int getBiomeFromLayer(int selection)
     {
         return (selection & LandBit) != 0 ? (selection & BiomeBits) : this.defaultOceanId;
     }

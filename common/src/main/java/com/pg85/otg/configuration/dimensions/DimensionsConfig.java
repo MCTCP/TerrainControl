@@ -94,17 +94,6 @@ public class DimensionsConfig
        	
        	return presetsConfig;
 	}
-
-	/**
-	 * 
-	 * @param mcWorldSaveDir Refers to mc/saves/
-	 * @param worldDir
-	 * @return
-	 */
-	public static DimensionsConfig loadFromFile(File mcWorldSavesDir, String worldDir)
-	{
-		return loadFromFile(new File(mcWorldSavesDir.getAbsolutePath() + "//" + worldDir));
-	}
 	
 	/**
 	 * 

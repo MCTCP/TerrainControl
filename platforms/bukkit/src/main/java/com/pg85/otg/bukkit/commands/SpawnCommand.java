@@ -19,13 +19,12 @@ import java.util.Random;
 
 public class SpawnCommand extends BaseCommand
 {
-    public SpawnCommand(OTGPlugin _plugin)
+    SpawnCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "spawn";
         perm = OTGPerm.CMD_SPAWN.node;
         usage = "spawn Name [World]";
-        workOnConsole = false;
     }
 
     @Override
@@ -71,7 +70,7 @@ public class SpawnCommand extends BaseCommand
         return true;
     }
 
-    public Block getWatchedBlock(Player me, boolean verbose)
+    private Block getWatchedBlock(Player me, boolean verbose)
     {
         if (me == null)
             return null;

@@ -23,7 +23,7 @@ public class LayerFromImage extends Layer
     private int zOffset;
     private WorldConfig.ImageMode imageMode;
 
-    public LayerFromImage(long seed, Layer childLayer, WorldConfig config, LocalWorld world)
+    LayerFromImage(long seed, Layer childLayer, WorldConfig config, LocalWorld world)
     {
         super(seed);
         this.child = childLayer;

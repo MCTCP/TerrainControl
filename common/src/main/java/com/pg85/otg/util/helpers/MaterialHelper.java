@@ -9,7 +9,7 @@ import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 
 public class MaterialHelper
 {
-    static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
+    private static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
     /**
      * @see OTGEngine#readMaterial(String)
      */

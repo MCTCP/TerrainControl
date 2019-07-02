@@ -20,7 +20,7 @@ import net.minecraft.world.gen.structure.*;
 
 public class OTGRareBuildingGen extends OTGMapGenStructure
 {
-    public List<Biome> biomeList;
+    private List<Biome> biomeList;
 
     /**
      * contains possible spawns for scattered features

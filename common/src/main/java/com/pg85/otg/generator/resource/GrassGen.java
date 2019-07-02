@@ -111,7 +111,7 @@ public class GrassGen extends Resource
         // Handled by spawnInChunk().
     }
 
-    protected void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    private void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         if (random.nextDouble() * 100.0 <= this.rarity)
         {
@@ -159,7 +159,7 @@ public class GrassGen extends Resource
         }
     }
 
-    protected void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    private void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         for (int t = 0; t < frequency; t++)
         {

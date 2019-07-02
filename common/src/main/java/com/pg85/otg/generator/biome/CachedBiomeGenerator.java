@@ -62,7 +62,7 @@ class CachedBiomeGenerator extends BiomeGenerator
      */
     private long lastCleanupTime;
 
-    private CachedBiomeGenerator(BiomeGenerator generator)
+    public CachedBiomeGenerator(BiomeGenerator generator)
     {
         super(generator.world);
         this.generator = generator;
@@ -175,7 +175,7 @@ class CachedBiomeGenerator extends BiomeGenerator
      * @param chunkCoord The chunk to get cached biomes for.
      * @return The biomes.
      */
-    public int[] getCachedBiomes(ChunkCoordinate chunkCoord)
+    private int[] getCachedBiomes(ChunkCoordinate chunkCoord)
     {
         return this.getBiomeCacheBlock(chunkCoord).biomes;
     }

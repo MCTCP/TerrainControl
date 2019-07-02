@@ -18,45 +18,44 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public abstract class OTGGuiSlot
 {
-    protected final Minecraft mc;
-    public int width;
-    public int height;
+    private final Minecraft mc;
+    int width;
+    int height;
     /** The top of the slot container. Affects the overlays and scrolling. */
-    public int top;
+    int top;
     /** The bottom of the slot container. Affects the overlays and scrolling. */
-    public int bottom;
-    public int right;
-    public int left;
+    int bottom;
+    int right;
+    int left;
     /** The height of a slot. */
-    public final int slotHeight;
+    final int slotHeight;
     /** The buttonID of the button used to scroll up */
     private int scrollUpButtonID;
     /** The buttonID of the button used to scroll down */
     private int scrollDownButtonID;
-    protected int mouseX;
-    protected int mouseY;
-    protected boolean centerListVertically = true;
+    private int mouseX;
+    private int mouseY;
     /** Where the mouse was in the window when you first clicked to scroll */
-    protected int initialClickY = -2;
+    private int initialClickY = -2;
     /**
      * What to multiply the amount you moved your mouse by (used for slowing down scrolling when over the items and not
      * on the scroll bar)
      */
-    protected float scrollMultiplier;
+    private float scrollMultiplier;
     /** How far down this slot has been scrolled */
     protected float amountScrolled;
     /** The element in the list that was selected */
-    protected int selectedElement = -1;
+    private int selectedElement = -1;
     /** The time when this button was last clicked. */
-    protected long lastClicked;
-    protected boolean visible = true;
+    private long lastClicked;
+    private boolean visible = true;
     /** Set to true if a selected element in this gui will show an outline box */
-    protected boolean showSelectionBox = true;
-    protected boolean hasListHeader;
-    public int headerPadding;
+    private boolean showSelectionBox = true;
+    private boolean hasListHeader;
+    int headerPadding;
     private boolean enabled = true;
 
-    public OTGGuiSlot(Minecraft mcIn, int left, int width, int height, int topIn, int bottomIn, int slotHeightIn)
+    OTGGuiSlot(Minecraft mcIn, int left, int width, int height, int topIn, int bottomIn, int slotHeightIn)
     {
         this.mc = mcIn;
         this.width = width;
@@ -103,12 +102,12 @@ public abstract class OTGGuiSlot
     /**
      * Return the height of the content being scrolled
      */
-    protected int getContentHeight()
+    private int getContentHeight()
     {
         return this.getSize() * this.slotHeight + this.headerPadding;
     }
 
-    public int getSlotIndexFromScreenCoords(int posX, int posY)
+    int getSlotIndexFromScreenCoords(int posX, int posY)
     {
         int i = this.left + this.width / 2 - this.getListWidth() / 2;
         int j = this.left + this.width / 2 + this.getListWidth() / 2;
@@ -129,7 +128,7 @@ public abstract class OTGGuiSlot
     /**
      * Stop the thing from scrolling out of bounds
      */
-    protected void bindAmountScrolled()
+    private void bindAmountScrolled()
     {
         this.amountScrolled = MathHelper.clamp(this.amountScrolled, 0.0F, (float)this.getMaxScroll());
     }
@@ -152,7 +151,7 @@ public abstract class OTGGuiSlot
         return this.amountScrolled;
     }
 
-    public boolean isMouseYWithinSlotBounds(int p_148141_1_)
+    boolean isMouseYWithinSlotBounds(int p_148141_1_)
     {
         return p_148141_1_ >= this.top && p_148141_1_ <= this.bottom && this.mouseX >= this.left && this.mouseX <= this.right;
     }
@@ -160,7 +159,7 @@ public abstract class OTGGuiSlot
     /**
      * Scrolls the slot by the given amount. A positive value scrolls down, and a negative value scrolls up.
      */
-    public void scrollBy(int amount)
+    void scrollBy(int amount)
     {
         this.amountScrolled += (float)amount;
         this.bindAmountScrolled();
@@ -189,7 +188,7 @@ public abstract class OTGGuiSlot
         return this.width;
     }
 
-    protected int getScrollBarX()
+    private int getScrollBarX()
     {    	
     	return this.left + this.width - 6;//this.width / 2 + 124;
     }
@@ -212,7 +211,7 @@ public abstract class OTGGuiSlot
     
     protected abstract void drawBackground();
 
-    public void drawScreen(int mouseXIn, int mouseYIn, float partialTicks)
+    void drawScreen(int mouseXIn, int mouseYIn, float partialTicks)
     {
         if (this.visible)
         {
@@ -331,7 +330,7 @@ public abstract class OTGGuiSlot
     /**
      * Draws the selection box around the selected slot element.
      */
-    protected void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks)
+    private void drawSelectionBox(int insideLeft, int insideTop, int mouseXIn, int mouseYIn, float partialTicks)
     {
         int i = this.getSize();
         Tessellator tessellator = Tessellator.getInstance();
@@ -412,7 +411,7 @@ public abstract class OTGGuiSlot
         }
     }
 
-    protected void drawContainerBackground(Tessellator tessellator)
+    private void drawContainerBackground(Tessellator tessellator)
     {
         BufferBuilder buffer = tessellator.getBuffer();
         this.mc.getTextureManager().bindTexture(Gui.OPTIONS_BACKGROUND);
@@ -464,17 +463,17 @@ public abstract class OTGGuiSlot
     /**
      * Handles drawing a list's header row.
      */
-    protected void drawListHeader(int insideLeft, int insideTop, Tessellator tessellatorIn)
+    private void drawListHeader(int insideLeft, int insideTop, Tessellator tessellatorIn)
     {
     }
 
-    protected void renderDecorations(int mouseXIn, int mouseYIn)
+    private void renderDecorations(int mouseXIn, int mouseYIn)
     {
     }
     
     // Mouse / keyboard
     
-    protected void clickedHeader(int p_148132_1_, int p_148132_2_)
+    private void clickedHeader(int p_148132_1_, int p_148132_2_)
     {
     }
 
@@ -497,7 +496,7 @@ public abstract class OTGGuiSlot
         }
     }
     
-    public void handleMouseInput()
+    void handleMouseInput()
     {
         if (this.isMouseYWithinSlotBounds(this.mouseY))
         {

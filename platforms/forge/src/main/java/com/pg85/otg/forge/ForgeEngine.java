@@ -35,7 +35,7 @@ public class ForgeEngine extends OTGEngine
 
 	private ForgeBiomeRegistryManager biomeRegistryManager;
 	private WorldLoader worldLoader;
-    long lastPregeneratorStatusUpdateTime = System.currentTimeMillis();   
+    private long lastPregeneratorStatusUpdateTime = System.currentTimeMillis();   
 	
     public ForgeEngine()
     {

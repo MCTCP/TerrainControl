@@ -11,7 +11,7 @@ import java.util.List;
 
 public class BlockCheck extends BO3Check
 {
-    public MaterialSet toCheck;
+    MaterialSet toCheck;
 
     @Override
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)

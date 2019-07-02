@@ -13,7 +13,7 @@ public class CategoryEntry implements IGuiListEntry
 	private final String labelText;
     private final int labelWidth;
 
-    public CategoryEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, String name)
+    CategoryEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, String name)
     {
         this.otgGuiDimensionSettingsList = otgGuiDimensionSettingsList;
 		this.labelText = name;

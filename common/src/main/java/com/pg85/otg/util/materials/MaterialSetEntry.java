@@ -7,7 +7,7 @@ public class MaterialSetEntry
     private final LocalMaterialData material;
     private final boolean includesBlockData;
 
-    public MaterialSetEntry(LocalMaterialData material, boolean includesBlockData)
+    MaterialSetEntry(LocalMaterialData material, boolean includesBlockData)
     {
         this.material = material;
         this.includesBlockData = includesBlockData;
@@ -63,7 +63,7 @@ public class MaterialSetEntry
      * 
      * @return The rotated check.
      */
-    public MaterialSetEntry rotate()
+    MaterialSetEntry rotate()
     {
         if (!includesBlockData)
         {

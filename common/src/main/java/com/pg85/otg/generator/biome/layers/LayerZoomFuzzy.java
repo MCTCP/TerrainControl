@@ -3,7 +3,7 @@ package com.pg85.otg.generator.biome.layers;
 public class LayerZoomFuzzy extends LayerZoom
 {
 
-    public LayerZoomFuzzy(long seed, Layer childLayer)
+    LayerZoomFuzzy(long seed, Layer childLayer)
     {
         super(seed, childLayer);
     }

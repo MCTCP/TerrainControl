@@ -64,13 +64,13 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     int slotHeight = 16;
     int margin = 20;
     
-    final int iContinueButton = 0;
-    final int iCancelButton = 1;
-    final int iNewButton = 2;
-    final int iDeleteButton = 3;
+    private final int iContinueButton = 0;
+    private final int iCancelButton = 1;
+    private final int iNewButton = 2;
+    private final int iDeleteButton = 3;
     
-	boolean askDeleteSettings = false;
-	boolean selectingPresetName = true;
+	private boolean askDeleteSettings = false;
+	private boolean selectingPresetName = true;
     public String newPresetName;
 
     private int wikiBtnLeft;
@@ -109,7 +109,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         return fontRenderer;
     }
     
-    public void selectPresetIndex(int index)
+    void selectPresetIndex(int index)
     {
     	if(index >= ForgeEngine.Presets.size())
     	{
@@ -122,7 +122,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         updateCache();
     }
 
-    public boolean presetIndexSelected(int index)
+    boolean presetIndexSelected(int index)
     {
         return index == selected;
     }
@@ -233,7 +233,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         presetInfo = new OTGGuiScrollingListInfo(this, lines, logoPath, logoDims);       
     }
     
-    public GuiYesNo askDeleteSettings(GuiYesNoCallback p_152129_0_, String worldName)
+    private GuiYesNo askDeleteSettings(GuiYesNoCallback p_152129_0_, String worldName)
     {
     	selectingPresetName = false;
     	askDeleteSettings = true;    	
@@ -391,7 +391,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
                 		this.selectingPresetForDimension = false;
                 		this.mc.displayGuiScreen(this.previousMenu);
                 	} else {
-                		this.mc.displayGuiScreen(new OTGGuiWorldSelection(this));
+                		this.mc.displayGuiScreen(new OTGGuiWorldSelection());
                 	}
                     return;
                 }

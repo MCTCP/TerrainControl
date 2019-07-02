@@ -21,7 +21,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     protected LocalMaterialData material;
     protected double rarity;
 
-    public Resource(BiomeConfig biomeConfig) throws InvalidConfigException
+    Resource(BiomeConfig biomeConfig) throws InvalidConfigException
     {
         super(biomeConfig);
     }

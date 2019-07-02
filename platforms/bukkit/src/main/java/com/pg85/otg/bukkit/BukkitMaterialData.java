@@ -41,7 +41,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * @param data     The block data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static BukkitMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
+    static BukkitMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
     {
         return ofIds(material.id, data);
     }
@@ -52,7 +52,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * @param block The material.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static BukkitMaterialData ofMinecraftBlock(Block block)
+    static BukkitMaterialData ofMinecraftBlock(Block block)
     {
         return ofIds(Block.getId(block), block.toLegacyData(block.getBlockData()));
     }
@@ -62,7 +62,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * @param blockData The material an data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
+    static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
     {
         Block block = blockData.getBlock();
         return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData));
@@ -212,8 +212,7 @@ public final class BukkitMaterialData implements LocalMaterialData
         return this.withBlockData(defaultData);
     }
 
-    @SuppressWarnings("deprecation")
-    public IBlockData internalBlock()
+    @SuppressWarnings("deprecation") IBlockData internalBlock()
     {
         return Block.getById(getBlockId()).fromLegacyData(getBlockData());
     }

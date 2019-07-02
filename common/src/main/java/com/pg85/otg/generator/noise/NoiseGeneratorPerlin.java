@@ -5,12 +5,12 @@ import java.util.Random;
 public class NoiseGeneratorPerlin
 {
     private int permutations[];
-    public double xCoord;
-    public double yCoord;
-    public double zCoord;
+    private double xCoord;
+    private double yCoord;
+    private double zCoord;
 
 
-    public NoiseGeneratorPerlin(Random random)
+    NoiseGeneratorPerlin(Random random)
     {
         permutations = new int[512];
         xCoord = random.nextDouble() * 256D;
@@ -31,12 +31,12 @@ public class NoiseGeneratorPerlin
         }
     }
 
-    public final double lerp(double d, double d1, double d2)
+    private final double lerp(double d, double d1, double d2)
     {
         return d1 + d * (d2 - d1);
     }
 
-    public final double func_4110_a(int i, double d, double d1)
+    private final double func_4110_a(int i, double d, double d1)
     {
         int j = i & 0xf;
         double d2 = (double) (1 - ((j & 8) >> 3)) * d;
@@ -44,7 +44,7 @@ public class NoiseGeneratorPerlin
         return ((j & 1) != 0 ? -d2 : d2) + ((j & 2) != 0 ? -d3 : d3);
     }
 
-    public final double grad(int i, double d, double d1, double d2)
+    private final double grad(int i, double d, double d1, double d2)
     {
         int j = i & 0xf;
         double d3 = j >= 8 ? d1 : d;
@@ -52,7 +52,7 @@ public class NoiseGeneratorPerlin
         return ((j & 1) != 0 ? -d3 : d3) + ((j & 2) != 0 ? -d4 : d4);
     }
 
-    public void populateNoiseArray3D(double NoiseArray[], double xOffset, double yOffset, double zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale, double noiseScale)
+    void populateNoiseArray3D(double NoiseArray[], double xOffset, double yOffset, double zOffset, int xSize, int ySize, int zSize, double xScale, double yScale, double zScale, double noiseScale)
     {
         int i1 = 0;
         double d7 = 1.0D / noiseScale;
@@ -117,7 +117,7 @@ public class NoiseGeneratorPerlin
         }
     }
 
-    public void populateNoiseArray2D(double NoiseArray[], double xOffset, double zOffset, int xSize, int zSize, double xScale, double zScale, double noiseScale)
+    void populateNoiseArray2D(double NoiseArray[], double xOffset, double zOffset, int xSize, int zSize, double xScale, double zScale, double noiseScale)
     {
         int j3 = 0;
         double d12 = 1.0D / noiseScale;

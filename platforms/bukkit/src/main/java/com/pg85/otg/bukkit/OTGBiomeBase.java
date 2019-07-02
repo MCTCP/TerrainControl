@@ -21,7 +21,7 @@ public class OTGBiomeBase extends BiomeBase
 {
     private static final int MAX_OTG_BIOME_ID = 4095;
     public int otgBiomeId;
-    public int savedId;
+    private int savedId;
 
     /**
      * Mojang made the methods on BiomeBase.a protected (so only accessable for
@@ -83,13 +83,13 @@ public class OTGBiomeBase extends BiomeBase
     }
 
     // Adds the mobs to the internal list.
-    protected void addMobs(List<BiomeMeta> internalList, List<WeightedMobSpawnGroup> configList)
+    private void addMobs(List<BiomeMeta> internalList, List<WeightedMobSpawnGroup> configList)
     {
         internalList.clear();
         internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
     }
     
-    public static OTGBiomeBase createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
+    static OTGBiomeBase createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
     {
         // We need to init array size because Mojang uses a strange custom
         // ArrayList. RegistryID arrays are not correctly (but randomly!) copied

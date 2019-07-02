@@ -127,7 +127,7 @@ public class OTGTeleporter
         }
     }
 
-    static void copyDataFromOld(Entity entityIn, Entity _this)
+    private static void copyDataFromOld(Entity entityIn, Entity _this)
     {       
         NBTTagCompound nbttagcompound = entityIn.writeToNBT(new NBTTagCompound());
         nbttagcompound.removeTag("Dimension");
@@ -238,12 +238,7 @@ public class OTGTeleporter
 	    */
     }
 
-    static void changePlayerDimension(EntityPlayerMP player, int dimensionIn, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
-    {
-        transferPlayerToDimension(player, dimensionIn, _this.getServerInstance().getWorld(dimensionIn).getDefaultTeleporter(), _this, createPortal, placeOnHighestBlock);
-    }
-
-    static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
+    private static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
     {
         int i = player.dimension;
         WorldServer worldserver = _this.getServerInstance().getWorld(player.dimension);
@@ -272,7 +267,7 @@ public class OTGTeleporter
         net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerChangedDimensionEvent(player, i, dimensionIn);
     }
 
-    static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal, boolean placeOnHighestBlock)
+    private static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal, boolean placeOnHighestBlock)
     {
     	double entityPosY = entityIn.getPosition().getY();
         double moveFactor = oldWorldIn.provider.getMovementFactor() / toWorldIn.provider.getMovementFactor();
@@ -469,7 +464,7 @@ public class OTGTeleporter
 		return destinationCoordinateCache;
 	}
 
-    static boolean placeInExistingPortal(WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
+    private static boolean placeInExistingPortal(WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
     	//int i = 128;
         double d0 = -1.0D;
@@ -579,7 +574,7 @@ public class OTGTeleporter
         }
     }
 
-    static void placeInPortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
+    private static void placeInPortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
         if (destinationWorld.provider.getDimensionType().getId() != 1) // If not End
         {
@@ -593,7 +588,7 @@ public class OTGTeleporter
         }
     }
 
-    static boolean makePortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, Teleporter _this)
+    private static boolean makePortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, Teleporter _this)
     {
         double d0 = -1.0D;
         int j = MathHelper.floor(entityIn.posX);

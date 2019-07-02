@@ -28,7 +28,7 @@ public class OTGVillageStart extends StructureStart
         // Required by Minecraft's structure loading code
     }
     
-    public OTGVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
+    OTGVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<PieceWeight> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);
 

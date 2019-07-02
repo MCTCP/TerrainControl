@@ -10,8 +10,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 
 public abstract class OTGPacket implements IMessage
 {
-	ByteBuf data = Unpooled.buffer();
-	DataInputStream wrappedStream;
+	private ByteBuf data = Unpooled.buffer();
+	private DataInputStream wrappedStream;
 
 	public OTGPacket() { }
 

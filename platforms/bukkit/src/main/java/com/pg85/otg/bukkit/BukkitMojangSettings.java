@@ -26,7 +26,7 @@ public final class BukkitMojangSettings implements MojangSettings
      * @param biomeId The id of the biome.
      * @return The settings.
      */
-    public static MojangSettings fromId(int biomeId)
+    static MojangSettings fromId(int biomeId)
     {
         return fromBiomeBase(BiomeBase.getBiome(biomeId));
     }
@@ -38,7 +38,7 @@ public final class BukkitMojangSettings implements MojangSettings
      * @param biomeBase The biome.
      * @return The settings.
      */
-    public static MojangSettings fromBiomeBase(BiomeBase biomeBase)
+    private static MojangSettings fromBiomeBase(BiomeBase biomeBase)
     {
         return new BukkitMojangSettings(biomeBase);
     }

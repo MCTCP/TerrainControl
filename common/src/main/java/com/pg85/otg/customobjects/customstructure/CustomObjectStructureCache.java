@@ -108,7 +108,7 @@ public class CustomObjectStructureCache
 
     // persistence
 
-    public void compressCache()
+    private void compressCache()
     {
     	OTG.log(LogMarker.DEBUG, "Compressing structure-cache and pre-generator data");
 
@@ -209,14 +209,6 @@ public class CustomObjectStructureCache
 	    }
 
 	    CustomObjectStructureFileManager.saveStructuresFile(worldInfoChunksToSave, this.world);
-
-	    for (Map.Entry<ChunkCoordinate, CustomObjectStructure> cachedChunk : worldInfoChunks.entrySet())
-	    {
-	    	if(cachedChunk.getValue() != null)
-	    	{
-	    		cachedChunk.getValue().saveRequired = false;
-	    	}
-	    }
 
 	    if(world.getConfigs().getWorldConfig().isOTGPlus)
 	    {

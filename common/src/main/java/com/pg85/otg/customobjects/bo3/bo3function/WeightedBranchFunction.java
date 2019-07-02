@@ -13,7 +13,7 @@ import java.util.TreeSet;
 
 public class WeightedBranchFunction extends BranchFunction implements Branch
 {
-	public double cumulativeChance = 0;
+	private double cumulativeChance = 0;
 
     protected double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
     {
@@ -106,7 +106,7 @@ public class WeightedBranchFunction extends BranchFunction implements Branch
 	            	{
 		                CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
 		                Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-		                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), true, branch.branchDepth, branch.isRequiredBranch, true, branch.branchGroup);
+		                return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, true, branch.branchGroup);
 	            	} else {
 	            		return new CustomObjectCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, y + this.y, z + this.z);
 	            	}

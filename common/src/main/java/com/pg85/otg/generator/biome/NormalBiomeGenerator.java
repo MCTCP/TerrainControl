@@ -10,7 +10,7 @@ import com.pg85.otg.generator.biome.layers.LayerFactory;
 public class NormalBiomeGenerator extends LayeredBiomeGenerator
 {
 
-    public NormalBiomeGenerator(LocalWorld world)
+	public NormalBiomeGenerator(LocalWorld world)
     {
         super(world);
     }

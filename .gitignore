@@ -4,6 +4,7 @@
 .settings
 .metadata
 .recommenders
+.ucdetector_reports
 
 # NetBeans
 nbproject

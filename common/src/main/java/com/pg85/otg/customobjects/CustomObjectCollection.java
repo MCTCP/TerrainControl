@@ -23,10 +23,10 @@ public class CustomObjectCollection
     private HashMap<String, HashMap<String, CustomObject>> objectsByNamePerWorld = new HashMap<String, HashMap<String, CustomObject>>();
     private HashMap<String, ArrayList<String>> objectsNotFoundPerWorld = new HashMap<String, ArrayList<String>>();
 
-    HashMap<String, File> CustomObjectFilesGlobalObjects = null;
-    HashMap<String, HashMap<String, File>> CustomObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
+    private HashMap<String, File> CustomObjectFilesGlobalObjects = null;
+    private HashMap<String, HashMap<String, File>> CustomObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
 
-    public CustomObject loadObject(File file, String worldName)
+    private CustomObject loadObject(File file, String worldName)
     {
     	CustomObject object = null;
     	// Try to load single file
@@ -75,7 +75,7 @@ public class CustomObjectCollection
      * same name (case insensitive) already exists, nothing happens.
      * @param object The object to add to the list of loaded objects.
      */
-    public void addLoadedGlobalObject(CustomObject object)
+    void addLoadedGlobalObject(CustomObject object)
     {
         String lowerCaseName = object.getName().toLowerCase();
         if (!objectsByNameGlobalObjects.containsKey(lowerCaseName))
@@ -85,7 +85,7 @@ public class CustomObjectCollection
         }
     }
 
-    public void ReloadCustomObjectFiles()
+    void ReloadCustomObjectFiles()
     {
         objectsGlobalObjects.clear();
         objectsByNameGlobalObjects.clear();

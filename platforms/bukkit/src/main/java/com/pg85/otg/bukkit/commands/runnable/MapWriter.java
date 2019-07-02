@@ -20,10 +20,10 @@ import javax.imageio.ImageIO;
 
 public class MapWriter implements Runnable
 {
-    public static final int[] DefaultColors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0,
+    private static final int[] DefaultColors = {0x3333FF, 0x999900, 0xFFCC33, 0x333300, 0x00FF00, 0x007700, 0x99cc66, 0x00CCCC, 0, 0,
             0xFFFFFF, 0x66FFFF, 0xCCCCCC, 0xCC9966, 0xFF33cc, 0xff9999, 0xFFFF00, 0x996600, 0x009900, 0x003300, 0x666600};
 
-    public static boolean IsWorking = false;
+    private static boolean IsWorking = false;
 
     private World world;
     private int size;

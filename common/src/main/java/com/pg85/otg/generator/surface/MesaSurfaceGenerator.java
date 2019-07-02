@@ -38,14 +38,14 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private final LocalMaterialData silverStainedClay;
     private final LocalMaterialData coarseDirt;
     
-    HashMap<ChunkCoordinate, Double> bryceHeightPerColumn = new HashMap<ChunkCoordinate, Double>();
-    HashMap<ChunkCoordinate, Integer> generatingChunkWaterLevelPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    HashMap<ChunkCoordinate, Double> noisePerColumn = new HashMap<ChunkCoordinate, Double>();    
-    HashMap<ChunkCoordinate, Integer> noisePlusRandomFactorPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    HashMap<ChunkCoordinate, Boolean> cosNoiseIsLargerThanZeroPerColumn = new HashMap<ChunkCoordinate, Boolean>();
-    HashMap<ChunkCoordinate, Integer> maxHeightPerColumn = new HashMap<ChunkCoordinate, Integer>();
+    private HashMap<ChunkCoordinate, Double> bryceHeightPerColumn = new HashMap<ChunkCoordinate, Double>();
+    private HashMap<ChunkCoordinate, Integer> generatingChunkWaterLevelPerColumn = new HashMap<ChunkCoordinate, Integer>();
+    private HashMap<ChunkCoordinate, Double> noisePerColumn = new HashMap<ChunkCoordinate, Double>();    
+    private HashMap<ChunkCoordinate, Integer> noisePlusRandomFactorPerColumn = new HashMap<ChunkCoordinate, Integer>();
+    private HashMap<ChunkCoordinate, Boolean> cosNoiseIsLargerThanZeroPerColumn = new HashMap<ChunkCoordinate, Boolean>();
+    private HashMap<ChunkCoordinate, Integer> maxHeightPerColumn = new HashMap<ChunkCoordinate, Integer>();
     
-    public MesaSurfaceGenerator(boolean mountainMesa, boolean forestMesa)
+    private MesaSurfaceGenerator(boolean mountainMesa, boolean forestMesa)
     {
         this.isBryceMesa = mountainMesa;
         this.isForestMesa = forestMesa;

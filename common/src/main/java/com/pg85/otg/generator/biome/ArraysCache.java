@@ -10,7 +10,7 @@ public class ArraysCache
     private final ArrayList<int[]> bigArrays = new ArrayList<int[]>();
     private int bigArraysNext = 0;
 
-    public boolean isFree = true;
+    boolean isFree = true;
 
     public OutputType outputType = OutputType.FULL;
 
@@ -19,7 +19,7 @@ public class ArraysCache
 
     }
 
-    public void release()
+    void release()
     {
         smallArraysNext = 0;
         bigArraysNext = 0;

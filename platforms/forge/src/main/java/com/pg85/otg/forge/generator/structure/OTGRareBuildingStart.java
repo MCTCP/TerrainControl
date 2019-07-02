@@ -20,7 +20,7 @@ public class OTGRareBuildingStart extends StructureStart
     	super();
     }
 	
-    public OTGRareBuildingStart(World world, Random random, int chunkX, int chunkZ)
+    OTGRareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getWorld(world);
         if(localWorld == null)

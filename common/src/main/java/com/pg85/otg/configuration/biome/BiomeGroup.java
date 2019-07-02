@@ -126,7 +126,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      * @throws InvalidConfigException If one of the elements in the list is
      *                                not a valid block id.
      */
-    protected List<String> readBiomes(List<String> strings, int start) throws InvalidConfigException
+    private List<String> readBiomes(List<String> strings, int start) throws InvalidConfigException
     {
         return new ArrayList<String>(strings.subList(start, strings.size()));
     }
@@ -241,7 +241,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         return map;
     }
 
-    public SortedMap<Integer, LocalBiome> getDepthMap(int depth)
+    SortedMap<Integer, LocalBiome> getDepthMap(int depth)
     {
         int cumulativeBiomeRarity = 0;
         TreeMap<Integer, LocalBiome> map = new TreeMap<Integer, LocalBiome>();
@@ -271,7 +271,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      * @return True if the group has no biomes and is thus empty, false
      * if the group has biomes.
      */
-    public boolean hasNoBiomes()
+    boolean hasNoBiomes()
     {
         return biomes.isEmpty();
     }

@@ -14,9 +14,9 @@ import java.util.List;
 public class WeightedMobSpawnGroup
 {
     private final String mob;
-    protected final int max;
-    protected final int weight;
-    protected final int min;
+    private final int max;
+    private final int weight;
+    private final int min;
 
     public WeightedMobSpawnGroup(String mobName, int weight, int min, int max)
     {

@@ -42,7 +42,7 @@ public abstract class Layer
      * The base seed set during layer construction, all other seeds are based
      * upon this one.
      */
-    protected long baseSeed;
+    private long baseSeed;
 
     /**
      * A general seed kept for use in world generation
@@ -114,7 +114,7 @@ public abstract class Layer
     protected static final int BiomeGroupBits = (127 << BiomeGroupShift);   //>>	14th-20th Bits, 1040384
 
     // [ River Data ]
-    protected static final int RiverShift = 20;
+    private static final int RiverShift = 20;
     protected static final int RiverBits = (3 << RiverShift);               //>>	21st-22nd Bits, 3145728  //3072 768
     protected static final int RiverBitOne = (1 << RiverShift);             //>>	21st Bit, 1048576
     protected static final int RiverBitTwo = (1 << (RiverShift + 1));       //>>	22nd Bit, 2097152

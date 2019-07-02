@@ -16,11 +16,11 @@ public class LightCheck extends BO3Check
     /**
      * The minimum Light level, inclusive
      */
-    public int minLightLevel;
+    private int minLightLevel;
     /**
      * The maximum Light level, inclusive
      */
-    public int maxLightLevel;
+    private int maxLightLevel;
 
     @Override
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)

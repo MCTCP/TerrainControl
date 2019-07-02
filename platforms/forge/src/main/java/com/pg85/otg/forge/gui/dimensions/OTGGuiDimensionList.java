@@ -53,14 +53,14 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	
     OTGGuiPresetList selectPresetForDimensionMenu = new OTGGuiPresetList(this);
     boolean selectingPresetForDimension = false;
-    boolean creatingNewDimension = false;
+    private boolean creatingNewDimension = false;
 	
-    public OTGGuiPresetList previousMenu;
+    OTGGuiPresetList previousMenu;
     private OTGGuiSlotDimensionList dimensionsList;
     public int selectedDimensionIndex = -1;
     public String worldName;
     public final ArrayList<DimensionConfig> dimensions;
-    public final ArrayList<DimensionConfig> originalDimensions;
+    private final ArrayList<DimensionConfig> originalDimensions;
     DimensionConfig selectedDimension;
     
     int listWidth = 100;
@@ -72,9 +72,9 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     int slotHeight = 16;
     private int margin = 20;
     
-    GuiButton btnContinue;
+    private GuiButton btnContinue;
     GuiButton btnCancel;
-    GuiButton btnDelete;
+    private GuiButton btnDelete;
     private final int iContinueButton = 0;
     private final int iCancelButton = 1;
     private final int iNewButton = 2;
@@ -86,7 +86,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	private boolean previouslySelectedAdvancedSettingsMenu = false;
 	private float lastScrollPos = 0;
 	
-	boolean settingsChanged = false;
+	private boolean settingsChanged = false;
     
     private int wikiBtnLeft;
     private int wikiBtnTop;
@@ -740,7 +740,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    
     // Misc    
 
-    public void compareSettingsToOriginal()
+    void compareSettingsToOriginal()
     {  
     	// Only do this for MP server (not SP or main menu)
     	if(this.mc.world != null && !this.mc.isSingleplayer())
@@ -807,7 +807,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         }
     }  
     
-    public void selectDimensionIndex(int index)
+    void selectDimensionIndex(int index)
     {   	    	
     	if(index >= dimensions.size())
     	{
@@ -839,7 +839,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		this.btnDelete.enabled = this.selectedDimensionIndex != 0 && (isNewDim || !isLoaded); // Overworld and unloaded dims can't be deleted
     }
 
-    public boolean isDimensionIndexSelected(int index)
+    boolean isDimensionIndexSelected(int index)
     {
         return index == selectedDimensionIndex;
     }

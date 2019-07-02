@@ -50,7 +50,7 @@ public class BiomeResourcesManager
         registerConfigFunction("Well", WellGen.class);
     }
 
-    public void registerConfigFunction(String name, Class<? extends ConfigFunction<?>> value)
+    private void registerConfigFunction(String name, Class<? extends ConfigFunction<?>> value)
     {
         configFunctions.put(name.toLowerCase(), value);
     }

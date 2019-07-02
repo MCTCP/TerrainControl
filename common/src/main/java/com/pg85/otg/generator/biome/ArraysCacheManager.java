@@ -12,7 +12,7 @@ public class ArraysCacheManager
 
     }
 
-    public static ArraysCache getCache()
+    static ArraysCache getCache()
     {
         synchronized (ARRAYS_CACHES)
         {
@@ -29,7 +29,7 @@ public class ArraysCacheManager
         return null; // Exception ??
     }
 
-    public static void releaseCache(ArraysCache cache)
+    static void releaseCache(ArraysCache cache)
     {
         synchronized (ARRAYS_CACHES)
         {

@@ -11,7 +11,7 @@ import java.util.List;
 
 public class BO3Settings extends Settings
 {
-    public static final Setting<Boolean>
+    static final Setting<Boolean>
             TREE = booleanSetting("Tree", true),
             ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false),
             // OTG+
@@ -31,11 +31,11 @@ public class BO3Settings extends Settings
 			IS_OTG_PLUS = booleanSetting("IsOTGPlus",false)
             ;
 
-    public static final Setting<Double> RARITY = doubleSetting("Rarity", 100, 0.000001, 100);
+    static final Setting<Double> RARITY = doubleSetting("Rarity", 100, 0.000001, 100);
 
-    public static final Setting<Rotation> INHERITBO3ROTATION = rotationSetting("InheritBO3Rotation", Rotation.NORTH);
+    static final Setting<Rotation> INHERITBO3ROTATION = rotationSetting("InheritBO3Rotation", Rotation.NORTH);
 
-    public static final Setting<Integer>
+    static final Setting<Integer>
             FREQUENCY = intSetting("Frequency", 0, 0, 9999),
             MIN_HEIGHT = intSetting("MinHeight", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
             MAX_HEIGHT = intSetting("MaxHeight", 256, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
@@ -48,13 +48,10 @@ public class BO3Settings extends Settings
     		BRANCH_FREQUENCY = intSetting("BranchFrequency", 0, 0, 9999),
 			HEIGHT_OFFSET = intSetting("HeightOffset", 0, -255, 255),
 			SMOOTH_HEIGHT_OFFSET = intSetting("SmoothHeightOffset", 0, -255, 255),
-    		SMOOTHRADIUS = intSetting("SmoothRadius", 0, -1, 9999),
-			SPAWNPOINTX =  intSetting("SpawnPointX", 8, -9999, 9999),
-			SPAWNPOINTY =  intSetting("SpawnPointY", -1, -1, 9999),
-			SPAWNPOINTZ =  intSetting("SpawnPointZ", 7, -9999, 9999)
+    		SMOOTHRADIUS = intSetting("SmoothRadius", 0, -1, 9999)
             ;
 
-    public static final Setting<String>
+    static final Setting<String>
             AUTHOR = stringSetting("Author", "Unknown"),
             DESCRIPTION = stringSetting("Description", "No description given"),
             VERSION = stringSetting("Version", "3"),
@@ -73,16 +70,16 @@ public class BO3Settings extends Settings
 			REPLACESBO3 = stringSetting("ReplacesBO3", "")
             ;
 
-    public static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");
+    static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");
 
-    public static final Setting<MaterialSet>
+    static final Setting<MaterialSet>
             SOURCE_BLOCKS = materialSetSetting("SourceBlocks", DefaultMaterial.AIR),
             EXTRUDE_THROUGH_BLOCKS = materialSetSetting("ExtrudeThroughBlocks", DefaultMaterial.AIR);
 
     // Enum settings
-    public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
-    public static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
-    public static final Setting<ExtrudeMode> EXTRUDE_MODE = enumSetting("ExtrudeMode", ExtrudeMode.None);
+    static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
+    static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
+    static final Setting<ExtrudeMode> EXTRUDE_MODE = enumSetting("ExtrudeMode", ExtrudeMode.None);
 
     // The spawn height
     public static enum SpawnHeightEnum
@@ -98,7 +95,7 @@ public class BO3Settings extends Settings
             this.height = height;
         }
 
-        public StructurePartSpawnHeight toStructurePartSpawnHeight()
+        StructurePartSpawnHeight toStructurePartSpawnHeight()
         {
             return height;
         }

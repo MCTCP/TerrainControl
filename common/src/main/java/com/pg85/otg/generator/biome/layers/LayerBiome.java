@@ -15,7 +15,7 @@ public class LayerBiome extends Layer
     private int depth;
     private double freezeTemp;
 
-    public LayerBiome(long seed, Layer childLayer, BiomeGroupManager groupManager, int depth, double freezeTemp)
+    LayerBiome(long seed, Layer childLayer, BiomeGroupManager groupManager, int depth, double freezeTemp)
     {
         super(seed);
         this.child = childLayer;

@@ -1,7 +1,5 @@
 package com.pg85.otg.util.bo3;
 
-import com.pg85.otg.util.ChunkCoordinate;
-
 /**
  * Represents a three-dimensional bounding box. Bounding boxes are initially
  * empty and can be expanded to fit a block by calling the
@@ -119,13 +117,6 @@ public final class BoundingBox implements Cloneable
         {
             maxZ = z + 1;
         }
-    }
-
-    public void expandToFitChunk(ChunkCoordinate chunk)
-    {
-        expandToFit(chunk.getBlockX(), 0, chunk.getBlockZ());
-        expandToFit(chunk.getBlockX() + ChunkCoordinate.CHUNK_X_SIZE, ChunkCoordinate.CHUNK_Y_SIZE,
-                chunk.getBlockZ() + ChunkCoordinate.CHUNK_Z_SIZE);
     }
 
     /**

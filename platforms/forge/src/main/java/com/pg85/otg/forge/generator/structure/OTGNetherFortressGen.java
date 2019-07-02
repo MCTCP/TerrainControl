@@ -22,7 +22,7 @@ import java.util.List;
 
 public class OTGNetherFortressGen extends OTGMapGenStructure
 {
-    public List<SpawnListEntry> spawnList = new ArrayList<SpawnListEntry>();
+    private List<SpawnListEntry> spawnList = new ArrayList<SpawnListEntry>();
 
     public OTGNetherFortressGen()
     {

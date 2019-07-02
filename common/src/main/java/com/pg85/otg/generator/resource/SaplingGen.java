@@ -28,9 +28,9 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     }
 
     public SaplingType saplingType;
-    public List<Double> treeChances;
-    public List<String> treeNames;
-    public List<CustomObject> trees;
+    private List<Double> treeChances;
+    private List<String> treeNames;
+    private List<CustomObject> trees;
 
     public SaplingGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {

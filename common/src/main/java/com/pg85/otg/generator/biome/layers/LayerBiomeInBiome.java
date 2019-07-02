@@ -22,7 +22,7 @@ public class LayerBiomeInBiome extends Layer
     private final long worldSeed;
     private List<Isle> isles = new ArrayList<Isle>();
 
-    public LayerBiomeInBiome(Layer childLayer, long worldSeed)
+    LayerBiomeInBiome(Layer childLayer, long worldSeed)
     {
         this.worldSeed = worldSeed;
         this.child = childLayer;
@@ -34,7 +34,7 @@ public class LayerBiomeInBiome extends Layer
      * @param chance The isle spawns when nextInt(chance) == 0.
      * @param biomeCanSpawnIn The biomes the isle can spawn in.
      */
-    public void addIsle(LocalBiome biome, int chance, boolean[] biomeCanSpawnIn, boolean inOcean)
+    void addIsle(LocalBiome biome, int chance, boolean[] biomeCanSpawnIn, boolean inOcean)
     {
         Isle isle = new Isle();
         isle.biomeId = (short) biome.getIds().getOTGBiomeId();

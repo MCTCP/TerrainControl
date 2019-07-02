@@ -17,7 +17,7 @@ public class ButtonEntry implements IGuiListEntry
     private final GuiButton btnSettingsEntry;
     private final OTGGuiDimensionSettingsList parent;
 
-    public ButtonEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, OTGGuiDimensionSettingsList parent, String name)
+    ButtonEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, OTGGuiDimensionSettingsList parent, String name)
     {
     	this.otgGuiDimensionSettingsList = otgGuiDimensionSettingsList;
 		this.parent = parent;

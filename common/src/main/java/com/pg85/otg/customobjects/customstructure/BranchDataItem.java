@@ -15,12 +15,12 @@ public class BranchDataItem
 {
 	private static int BranchDataItemCounter = -1;
 	
-	public CustomObjectCoordinate Branch;
-	public ChunkCoordinate ChunkCoordinate;
-	public BranchDataItem Parent;
-	public boolean DoneSpawning = false;
-	public boolean SpawnDelayed = false;
-	public boolean CannotSpawn = false;
+	CustomObjectCoordinate Branch;
+	ChunkCoordinate ChunkCoordinate;
+	BranchDataItem Parent;
+	boolean DoneSpawning = false;
+	boolean SpawnDelayed = false;
+	boolean CannotSpawn = false;
 
 	boolean wasDeleted = false;
 	boolean isBeingRolledBack = false;
@@ -38,7 +38,7 @@ public class BranchDataItem
 		throw new RuntimeException();
 	}
 
-	public BranchDataItem(LocalWorld world, Random random, BranchDataItem parent, CustomObjectCoordinate branch, String startBO3Name, int currentDepth, int maxDepth, boolean minimumSize)
+	BranchDataItem(LocalWorld world, Random random, BranchDataItem parent, CustomObjectCoordinate branch, String startBO3Name, int currentDepth, int maxDepth, boolean minimumSize)
 	{
 		World = world;
 		Random = random;
@@ -54,7 +54,7 @@ public class BranchDataItem
 		branchNumber = BranchDataItem.BranchDataItemCounter;
 	}	
 	
-	public Stack<BranchDataItem> getChildren(boolean dontSpawn)
+	Stack<BranchDataItem> getChildren(boolean dontSpawn)
 	{
 		if(World == null)
 		{

@@ -19,7 +19,7 @@ public class BranchNode implements Comparable<BranchNode>
 	 */
 	int branchDepth;
 
-	public boolean isRequiredBranch;
+	boolean isRequiredBranch;
 
 	boolean isWeightedBranch;
 
@@ -35,9 +35,9 @@ public class BranchNode implements Comparable<BranchNode>
      * The branch with associated rotation and chance values
      */
     private CustomObject customObject;
-    public String customObjectName;
+    String customObjectName;
 
-    public String branchGroup;
+    String branchGroup;
 
     /**
      * Creates an instance of BranchNode with given rotation, chance, and branch
@@ -49,7 +49,7 @@ public class BranchNode implements Comparable<BranchNode>
      * @param chance The spawn chance of the branch
      * @param branch The branch
      */
-    public BranchNode(int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, Rotation rotation, double chance, CustomObject customObject, String customObjectName, String branchGroup)
+    BranchNode(int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, Rotation rotation, double chance, CustomObject customObject, String customObjectName, String branchGroup)
     {
     	this.branchDepth = branchDepth;
         this.rotation = rotation;
@@ -64,7 +64,7 @@ public class BranchNode implements Comparable<BranchNode>
     }
 
     // Non-OTG+
-    public BranchNode(Rotation rotation, double chance, CustomObject branch, String customObjectName)
+    BranchNode(Rotation rotation, double chance, CustomObject branch, String customObjectName)
     {
         this.rotation = rotation;
         this.chance = chance;
@@ -92,7 +92,7 @@ public class BranchNode implements Comparable<BranchNode>
     /**
      * @return the branch CustomObject
      */
-    public CustomObject getCustomObject(boolean lazyLoad, LocalWorld world)
+    CustomObject getCustomObject(boolean lazyLoad, LocalWorld world)
     {
     	if(customObject != null || !lazyLoad)
     	{
@@ -108,7 +108,7 @@ public class BranchNode implements Comparable<BranchNode>
     /**
      * @return The string representation of this branch as seen in BO3 configs
      */
-    public String toBranchString()
+    String toBranchString()
     {
         return ',' + customObjectName + ',' + rotation.name() + ',' + chance + ',' + branchDepth;
     }

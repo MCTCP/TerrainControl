@@ -23,9 +23,9 @@ public class OTGGuiEnterWorldName extends GuiScreen
     private GuiScreen sender;
     private GuiTextField newWorldNameTextField;
     private GuiButton btnOk;
-    public String worldName;
-    boolean bExists = false;
-    boolean bIsIllegal = false;
+    private String worldName;
+    private boolean bExists = false;
+    private boolean bIsIllegal = false;
     
     public OTGGuiEnterWorldName(GuiScreen sender, String originalValue)
     {

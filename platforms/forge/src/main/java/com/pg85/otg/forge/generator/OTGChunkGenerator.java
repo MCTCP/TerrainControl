@@ -56,28 +56,28 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGChunkGenerator implements IChunkGenerator
 {
-    int lastx2 = 0;
-    int lastz2 = 0;
+    private int lastx2 = 0;
+    private int lastz2 = 0;
     private boolean TestMode = false;
     private ForgeWorld world;
     private ChunkProviderOTG generator;
     public ObjectSpawner spawner;
     
-	public ArrayList<Object[]> PopulatedChunks;
-    FifoMap<ChunkCoordinate, Object[]> chunkCache = new FifoMap<ChunkCoordinate, Object[]>(128);
-    ForgeChunkBuffer chunkBuffer;
+	private ArrayList<Object[]> PopulatedChunks;
+    private FifoMap<ChunkCoordinate, Object[]> chunkCache = new FifoMap<ChunkCoordinate, Object[]>(128);
+    private ForgeChunkBuffer chunkBuffer;
     
     // The first run is used by MC to check for suitable locations for the spawn location. For some reason the spawn location must be on grass.
-    boolean firstRun = true; 
-    ArrayList<LocalMaterialData> originalBlocks = new ArrayList<LocalMaterialData>(); // Don't need to store coords, will place the blocks back in the same order we got them so coords can be inferred    
-    ChunkCoordinate spawnChunk;
-    boolean spawnChunkFixed = false;
+    private boolean firstRun = true; 
+    private ArrayList<LocalMaterialData> originalBlocks = new ArrayList<LocalMaterialData>(); // Don't need to store coords, will place the blocks back in the same order we got them so coords can be inferred    
+    private ChunkCoordinate spawnChunk;
+    private boolean spawnChunkFixed = false;
     
-    public Map<ChunkCoordinate,Chunk> chunkCacheOTGPlus = new HashMap<ChunkCoordinate, Chunk>();
-    public Chunk lastUsedChunk;
+    private Map<ChunkCoordinate,Chunk> chunkCacheOTGPlus = new HashMap<ChunkCoordinate, Chunk>();
+    private Chunk lastUsedChunk;
     private boolean allowSpawningOutsideBounds = false;   
-    public int lastUsedChunkX;
-    public int lastUsedChunkZ;
+    private int lastUsedChunkX;
+    private int lastUsedChunkZ;
     
     /**
      * Used in {@link #fillBiomeArray(Chunk)}, to avoid creating
@@ -418,7 +418,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     
     // Spawn chunk fix for OTG+    
 
-    public void fixSpawnChunk()
+    private void fixSpawnChunk()
     {
     	if(!firstRun)
     	{
@@ -459,7 +459,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
     // Blocks
     
-    public Chunk getBlocks(int chunkX, int chunkZ, boolean provideChunk)
+    private Chunk getBlocks(int chunkX, int chunkZ, boolean provideChunk)
     {
     	Object[] chunkCacheEntry = chunkCache.get(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
     	Chunk chunk = null;
@@ -693,7 +693,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     	this.world.getWorld().markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
     }
 
-    public IBlockState setBlockState(Chunk _this, BlockPos pos, IBlockState state)
+    private IBlockState setBlockState(Chunk _this, BlockPos pos, IBlockState state)
     {
         int i = pos.getX() & 15;
         int j = pos.getY();
@@ -808,7 +808,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         }
     }   
     
-    public void attachMetadata(int x, int y, int z, NamedBinaryTag tag, boolean allowOutsidePopulatingArea)
+    private void attachMetadata(int x, int y, int z, NamedBinaryTag tag, boolean allowOutsidePopulatingArea)
     {
         // Convert Tag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);

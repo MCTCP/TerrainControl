@@ -12,7 +12,7 @@ import net.minecraft.server.v1_12_R1.WorldProviderNormal;
  */
 public class OTGWorldProvider extends WorldProviderNormal
 {
-    protected BukkitWorld localWorld;
+    private BukkitWorld localWorld;
     private final WorldProvider oldWorldProvider;
 
     public OTGWorldProvider(BukkitWorld localWorld, WorldProvider oldWorldProvider)

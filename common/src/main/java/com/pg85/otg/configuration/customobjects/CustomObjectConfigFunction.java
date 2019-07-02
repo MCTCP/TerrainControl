@@ -130,7 +130,7 @@ public abstract class CustomObjectConfigFunction<T>
      * @param args   Arguments to parse.
      * @throws InvalidConfigException If the arguments are invalid.
      */
-    public final void init(T holder, List<String> args) throws InvalidConfigException
+    final void init(T holder, List<String> args) throws InvalidConfigException
     {
         this.holder = holder;
         load(args);
@@ -142,7 +142,7 @@ public abstract class CustomObjectConfigFunction<T>
      * @param args  Arguments used in this resource, for output.
      * @param error Error message detailing what went wrong.
      */
-    public final void invalidate(String name, List<String> args, String error)
+    final void invalidate(String name, List<String> args, String error)
     {
         valid = false;
         this.inputName = name;
@@ -264,18 +264,6 @@ public abstract class CustomObjectConfigFunction<T>
         }
 
         return materials;
-    }
-
-    /**
-     * Parses the string and returns the rarity between 0.000001 and 100
-     * (inclusive)
-     * @param string The string to parse.
-     * @return The rarity.
-     * @throws InvalidConfigException If the number is invalid.
-     */
-    protected final double readRarity(String string) throws InvalidConfigException
-    {
-        return StringHelper.readDouble(string, 0.000001, 100);
     }
 
     /**

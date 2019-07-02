@@ -23,12 +23,12 @@ public class CavesGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void generateLargeCaveNode(long seed, ChunkBuffer generatingChunkBuffer, double x, double y, double z)
+    private void generateLargeCaveNode(long seed, ChunkBuffer generatingChunkBuffer, double x, double y, double z)
     {
         generateCaveNode(seed, generatingChunkBuffer, x, y, z, 1.0F + this.random.nextFloat() * 6.0F, 0.0F, 0.0F, -1, -1, 0.5D);
     }
 
-    protected void generateCaveNode(long seed, ChunkBuffer generatingChunkBuffer, double x, double y, double z, float paramFloat1, float paramFloat2, float paramFloat3, int angle, int maxAngle, double paramDouble4)
+    private void generateCaveNode(long seed, ChunkBuffer generatingChunkBuffer, double x, double y, double z, float paramFloat1, float paramFloat2, float paramFloat3, int angle, int maxAngle, double paramDouble4)
     {
         ChunkCoordinate generatingChunk = generatingChunkBuffer.getChunkCoordinate();
         double real_x = generatingChunk.getBlockXCenter();
@@ -224,7 +224,7 @@ public class CavesGen extends TerrainGenBase
         }
     }
 
-    protected boolean isSuitableBlock(LocalMaterialData material, LocalMaterialData materialAbove, LocalBiome biome)
+    private boolean isSuitableBlock(LocalMaterialData material, LocalMaterialData materialAbove, LocalBiome biome)
     {
         BiomeConfig biomeConfig = biome.getBiomeConfig();
         if (material.equals(biomeConfig.stoneBlock))

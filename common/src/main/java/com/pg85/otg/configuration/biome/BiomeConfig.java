@@ -16,7 +16,6 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
@@ -31,7 +30,7 @@ import java.util.*;
 
 public class BiomeConfig extends ConfigFile
 {
-    public StandardBiomeTemplate defaultSettings;
+    private StandardBiomeTemplate defaultSettings;
     public WorldConfig worldConfig;
 	
     public String biomeExtends;
@@ -100,9 +99,8 @@ public class BiomeConfig extends ConfigFile
     public boolean inheritSaplingResource;
     private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
 
-    public ArrayList<CustomObject> biomeObjects;
     public CustomStructureGen structureGen;
-    public ArrayList<String> biomeObjectStrings;
+    private ArrayList<String> biomeObjectStrings;
 
     public double maxAverageHeight;
     public double maxAverageDepth;
@@ -129,8 +127,7 @@ public class BiomeConfig extends ConfigFile
 
 	// Mob spawning and mob inheritance (also used to inherit modded mobs from vanilla biomes for Forge))
 
-	public String inheritMobsBiomeName;
-	public boolean inheritMobsBiomeNameProcessed = false;
+	private String inheritMobsBiomeName;
 
     // Spawn Config
     public List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();

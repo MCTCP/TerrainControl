@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class CustomObjectManager
 {
-    public final Map<String, CustomObjectLoader> loaders;
+    private final Map<String, CustomObjectLoader> loaders;
     
     private final CustomObjectCollection globalCustomObjects;
 
@@ -73,7 +73,7 @@ public class CustomObjectManager
      *                  all files with this extension.
      * @param loader    The loader.
      */
-    public void registerCustomObjectLoader(String extension, CustomObjectLoader loader)
+    private void registerCustomObjectLoader(String extension, CustomObjectLoader loader)
     {
         loaders.put(extension.toLowerCase(), loader);
     }
@@ -83,7 +83,7 @@ public class CustomObjectManager
      *
      * @param object The object to register.
      */
-    public void registerGlobalObject(CustomObject object)
+    private void registerGlobalObject(CustomObject object)
     {
     	globalCustomObjects.addLoadedGlobalObject(object);
     }

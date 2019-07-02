@@ -34,28 +34,8 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
 public class ForgeBiomeRegistryManager
 {
-    BiMap<Integer, Biome> ids = null;
-    BiMap<ResourceLocation, Biome> names = null;
-	
-	public static Biome getRegisteredBiome(String resourceLocationString, String worldName)
-	{
-		if(resourceLocationString != null && !resourceLocationString.trim().isEmpty())
-		{
-			String[] resourceLocationStringArr = resourceLocationString.split(":");
-			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
-			{
-				ResourceLocation resourceLocation = new ResourceLocation(PluginStandardValues.MOD_ID.toLowerCase(), worldName + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
-				return ForgeRegistries.BIOMES.getValue(resourceLocation);
-			}
-			if(resourceLocationStringArr.length == 2)
-			{
-				ResourceLocation resourceLocation = new ResourceLocation(resourceLocationStringArr[0],resourceLocationStringArr[1]);
-				return ForgeRegistries.BIOMES.getValue(resourceLocation);
-			}
-		}
-
-		return null;
-	}
+    private BiMap<Integer, Biome> ids = null;
+    private BiMap<ResourceLocation, Biome> names = null;
 	
 	public static int getRegisteredBiomeId(String resourceLocationString, String worldName)
 	{
@@ -78,7 +58,7 @@ public class ForgeBiomeRegistryManager
 		return -1;
 	}
 
-	public static void unregisterBiome(LocalBiome localBiome, String worldName)
+	private static void unregisterBiome(LocalBiome localBiome, String worldName)
 	{
         String biomeNameForRegistry = StringHelper.toComputerFriendlyName(localBiome.getName());
         String resourceDomain = PluginStandardValues.PLUGIN_NAME.toLowerCase();
@@ -138,14 +118,12 @@ public class ForgeBiomeRegistryManager
 	        	// TODO: Make sure this is enough for Forge 1.12+ <- It looks like the server may not send the biomes to the client if they are not added to the registry. TODO: Check if only virtual biomes have this problem.
 	        	forgeEngine.getBiomeRegistryManager().registerForgeBiome(registryKey, customBiome);
 	        	
-	        	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();
 	        	customBiome.savedId = biomeIds.getSavedId();        	
 	        }
 	        else if(biomeIds.getSavedId() > -1) 
 	        {
 	        	// This is a biome for an existing world, make sure it uses the same biome id as before.         
 	        	int newId = forgeEngine.getBiomeRegistryManager().registerForgeBiomeWithId(biomeIds.getSavedId(), registryKey, customBiome);       	
-	        	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();
 	        	customBiome.savedId = newId;
 	        	
 	        } else {
@@ -155,7 +133,6 @@ public class ForgeBiomeRegistryManager
 	        	// TODO: Make this prettier?
 	        	int newId = forgeEngine.getBiomeRegistryManager().registerForgeBiomeWithId(registryKey, customBiome);
 	        	biomeIds.setSavedId(newId);
-	        	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();
 	        	customBiome.savedId = newId;       	        
 	        }
 	        
@@ -181,7 +158,7 @@ public class ForgeBiomeRegistryManager
 	    return forgeBiome;
 	}
 
-	static void registerBiomeInBiomeDictionary(Biome biome, Biome sourceBiome, BiomeConfig biomeConfig, ConfigProvider configProvider)
+	private static void registerBiomeInBiomeDictionary(Biome biome, Biome sourceBiome, BiomeConfig biomeConfig, ConfigProvider configProvider)
 	{
 	    // Add inherited BiomeDictId's for replaceToBiomeName. Biome dict id's are stored twice,
 	    // there is 1 list of biomedict types per biome id and one list of biomes (not id's) per biome dict type.
@@ -226,7 +203,7 @@ public class ForgeBiomeRegistryManager
 		BiomeDictionary.addTypes(biome, typeArr);
 	}
 
-	static ArrayList<Type> getTypesList(String[] typearr)
+	private static ArrayList<Type> getTypesList(String[] typearr)
 	{
 		ArrayList<Type> types = new ArrayList<Type>();
 		for(String typeString : typearr)
@@ -277,7 +254,7 @@ public class ForgeBiomeRegistryManager
 		}
 	}
    
-    public Biome getRegisteredBiome(int id)
+    private Biome getRegisteredBiome(int id)
     {
     	if(ids == null)
     	{
@@ -346,70 +323,7 @@ public class ForgeBiomeRegistryManager
     	}
     }
 
-    public int getBiomeRegistryId(ResourceLocation resourceLocation)
-    {
-    	if(ids == null)
-    	{
-			try {
-				Field[] fields = ForgeRegistries.BIOMES.getClass().getDeclaredFields();
-				for(Field field : fields)
-				{
-					Class<?> fieldClass = field.getType();
-					if(fieldClass.equals(BiMap.class))
-					{
-						field.setAccessible(true);
-						ids = (BiMap<Integer, Biome>)field.get(ForgeRegistries.BIOMES);
-				        break;
-					}
-				}
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-    	}
-
-		if(names == null)
-		{
-			try {
-				Field[] fields = ForgeRegistries.BIOMES.getClass().getDeclaredFields();
-				boolean isFirst = true;
-				for(Field field : fields)
-				{
-					Class<?> fieldClass = field.getType();
-					if(fieldClass.equals(BiMap.class))
-					{
-						if(isFirst)
-						{
-							isFirst = false; // Skip the first BiMap, which should be id's. TODO: Make this prettier.
-							continue;
-						}
-						field.setAccessible(true);
-						names = (BiMap<ResourceLocation, Biome>)field.get(ForgeRegistries.BIOMES);
-				        break;
-					}
-				}
-			} catch (SecurityException e) {
-				e.printStackTrace();
-			} catch (IllegalArgumentException e) {
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-			}
-		}
-
-		Biome biome = names.get(resourceLocation);
-		if(biome != null)
-		{
-			return ids.inverse().get(biome);
-		}
-
-		throw new RuntimeException("This should not happen, please submit a bug report to the OTG git."); // TODO: Remove after testing
-    }
-
-    public void registerForgeBiome(ResourceLocation resourceLocation, Biome biome)
+    private void registerForgeBiome(ResourceLocation resourceLocation, Biome biome)
     {
     	OTG.log(LogMarker.DEBUG, "Registering biome " + resourceLocation.toString());
 
@@ -445,12 +359,12 @@ public class ForgeBiomeRegistryManager
         names.put(resourceLocation, biome);
     }
 
-    public int registerForgeBiomeWithId(ResourceLocation resourceLocation, Biome biome)
+    private int registerForgeBiomeWithId(ResourceLocation resourceLocation, Biome biome)
     {
     	return registerForgeBiomeWithId(-1, resourceLocation, biome);
     }
     
-    public int registerForgeBiomeWithId(int id, ResourceLocation resourceLocation, Biome biome)
+    private int registerForgeBiomeWithId(int id, ResourceLocation resourceLocation, Biome biome)
     {
     	OTG.log(LogMarker.DEBUG, "Registering biome " + resourceLocation.toString() + " " + id);
 
@@ -529,7 +443,7 @@ public class ForgeBiomeRegistryManager
         return id;
     }
 
-    public void unRegisterForgeBiome(ResourceLocation resourceLocation)
+    private void unRegisterForgeBiome(ResourceLocation resourceLocation)
     {
 		OTG.log(LogMarker.DEBUG, "Unregistering biome " + resourceLocation.toString());
 

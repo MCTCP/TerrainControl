@@ -41,7 +41,7 @@ public class Graph
      *
      * @param plotter the plotter to add to the graph
      */
-    public void addPlotter(final Plotter plotter)
+    void addPlotter(final Plotter plotter)
     {
         plotters.add(plotter);
     }

@@ -29,7 +29,7 @@ public class VillageStart extends StructureStart
         // Required by Minecraft's structure loading code
     }
     
-    public VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
+    VillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<WorldGenVillagePieceWeight> villagePieces = WorldGenVillagePieces.a(random, size);
 

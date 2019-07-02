@@ -31,7 +31,7 @@ public class ReplacedBlocksMatrix
          * @throws InvalidConfigException If the instruction is formatted
          *             incorrectly.
          */
-        public ReplacedBlocksInstruction(String instruction, int maxAllowedY) throws InvalidConfigException
+        private ReplacedBlocksInstruction(String instruction, int maxAllowedY) throws InvalidConfigException
         {
             String[] values = instruction.split(",");
             if (values.length == 5)
@@ -105,7 +105,7 @@ public class ReplacedBlocksMatrix
      * {@link ReplacedBlocksInstruction#getMaxHeight() maxHeight} smaller than
      * or equal to this.
      */
-    public final int maxHeight;
+    private final int maxHeight;
     private List<ReplacedBlocksInstruction> instructions;
 
     /**

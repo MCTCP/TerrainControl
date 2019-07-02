@@ -14,13 +14,12 @@ import java.util.List;
 
 public class TPCommand extends BaseCommand
 {
-    public TPCommand(OTGPlugin _plugin)
+    TPCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "tp";
         perm = OTGPerm.CMD_TP.node;
         usage = "tp <biome name or id>";
-        workOnConsole = false;
     }
 
     @Override

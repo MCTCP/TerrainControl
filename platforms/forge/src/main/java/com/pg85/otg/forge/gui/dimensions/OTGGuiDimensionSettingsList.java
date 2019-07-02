@@ -26,13 +26,13 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
     private final ArrayList<IGuiListEntry> listEntries;
     private int maxListLabelWidth;
 
-    public final OTGGuiDimensionList controlsScreen;
+    final OTGGuiDimensionList controlsScreen;
     public boolean mainMenu = true;
     public boolean gameRulesMenu = false;
     public boolean advancedSettingsMenu = false;
-	public boolean showingPregeneratorStatus;
+	boolean showingPregeneratorStatus;
     
-	public OTGGuiDimensionSettingsList(OTGGuiDimensionList controls, int top, int height, int left, int width, Minecraft mcIn)
+	OTGGuiDimensionSettingsList(OTGGuiDimensionList controls, int top, int height, int left, int width, Minecraft mcIn)
     {
         super(mcIn, left, width, height, top, height, 24);
         this.controlsScreen = controls;
@@ -42,7 +42,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         refreshData(true, false, false);
     }
     
-    public void resize(int topIn, int height, int left, int width)
+    void resize(int topIn, int height, int left, int width)
     {
         this.width = width;
         this.height = height;
@@ -52,12 +52,12 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         this.right = left + width;
     }
     
-    public void refreshData()
+    void refreshData()
     {
     	refreshData(this.mainMenu, this.gameRulesMenu, this.advancedSettingsMenu);
     }
 
-    public void refreshData(boolean mainMenu, boolean gameRulesMenu, boolean advancedSettingsMenu)
+    void refreshData(boolean mainMenu, boolean gameRulesMenu, boolean advancedSettingsMenu)
     {
     	this.showingPregeneratorStatus = false;
     	this.mainMenu = mainMenu;
@@ -294,7 +294,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         }
     }
     
-    public void applySettings()
+    void applySettings()
     {
         DimensionConfig dimConfig = this.controlsScreen.selectedDimension;
     	    	

@@ -31,7 +31,7 @@ public class OTGBlockPortalSize
     private int width;
     
     // Used for checking for portals in the destination world
-    public OTGBlockPortalSize(World sourceWorld, World destinationWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
+    OTGBlockPortalSize(World sourceWorld, World destinationWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
     {
         this.world = destinationWorld;
         this.axis = p_i45694_3_;
@@ -66,7 +66,7 @@ public class OTGBlockPortalSize
     }
     
     // Used when creating portals in the source world
-    public OTGBlockPortalSize(World sourceWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
+    OTGBlockPortalSize(World sourceWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
     {
         this.world = sourceWorld;
         this.axis = p_i45694_3_;
@@ -157,7 +157,7 @@ public class OTGBlockPortalSize
 		}
     }
     
-    boolean getDistanceUntilEdgeForPortalMaterials(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_i45694_2_)
+    private boolean getDistanceUntilEdgeForPortalMaterials(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_i45694_2_)
     {
         int i = this.getDistanceUntilEdge(portalMaterials, p_i45694_2_, this.leftDir) - 1;
 		
@@ -186,7 +186,7 @@ public class OTGBlockPortalSize
         return false;
     }
     
-    protected int getDistanceUntilEdge(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_180120_1_, EnumFacing p_180120_2_)
+    private int getDistanceUntilEdge(ArrayList<LocalMaterialData> portalMaterials, BlockPos p_180120_1_, EnumFacing p_180120_2_)
     {
         int i;
         
@@ -238,7 +238,7 @@ public class OTGBlockPortalSize
         return this.width;
     }
 
-    protected int calculatePortalHeight(ArrayList<LocalMaterialData> portalMaterials)
+    private int calculatePortalHeight(ArrayList<LocalMaterialData> portalMaterials)
     {        	
     	label24:
     	
@@ -334,7 +334,7 @@ public class OTGBlockPortalSize
         }
     }
 
-    protected boolean isEmptyBlock(Block blockIn)
+    private boolean isEmptyBlock(Block blockIn)
     {
         return blockIn.getMaterial(null) == Material.AIR || blockIn == Blocks.FIRE || blockIn == Blocks.PORTAL;
     }
@@ -344,7 +344,7 @@ public class OTGBlockPortalSize
         return this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
     }
 
-    public void placePortalBlocks()
+    void placePortalBlocks()
     {
         for (int i = 0; i < this.width; ++i)
         {

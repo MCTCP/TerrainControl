@@ -15,7 +15,7 @@ public class OTGBlockPopulator extends BlockPopulator
 {
     private ObjectSpawner spawner;
 
-    public OTGBlockPopulator(BukkitWorld world)
+    OTGBlockPopulator(BukkitWorld world)
     {
         this.spawner = new ObjectSpawner(world.getConfigs(), world);
     }

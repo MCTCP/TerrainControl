@@ -164,9 +164,9 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga2 taigaTree2;
 
     private Chunk[] chunkCache;
-	BukkitWorldSession worldSession;
+	private BukkitWorldSession worldSession;
 
-    public BukkitWorld(String _name)
+    BukkitWorld(String _name)
     {
         this.name = _name;
         this.worldSession = new BukkitWorldSession(this);
@@ -302,7 +302,7 @@ public class BukkitWorld implements LocalWorld
      *
      * @param world The world that needs to be enabled.
      */
-    public void enable(org.bukkit.World world)
+    void enable(org.bukkit.World world)
     {
         WorldServer mcWorld = ((CraftWorld) world).getHandle();
 
@@ -396,7 +396,7 @@ public class BukkitWorld implements LocalWorld
     /**
      * Cleans up references of itself in Minecraft's native code.
      */
-    public void disable()
+    void disable()
     {
         // Restore old world provider if replaced
         if (world.worldProvider instanceof OTGWorldProvider)
@@ -518,7 +518,7 @@ public class BukkitWorld implements LocalWorld
     	return this.settings.getBiomeBySavedIdOrNull(biomeId);
     }
     
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    private LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds, this.getName());
         this.biomeNames.put(biome.getName(), biome);
@@ -1744,7 +1744,7 @@ public class BukkitWorld implements LocalWorld
         }
     }    
     
-    void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
+    private void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {
         // Convert NamedBinaryTag to a native nms tag
         NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);

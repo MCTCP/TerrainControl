@@ -4,21 +4,13 @@ import java.util.Random;
 
 public class NoiseGeneratorSurfacePatch
 {
-    public static final double Square3 = Math.sqrt(3.0D);
+    private static final double Square3 = Math.sqrt(3.0D);
     private static int[][] Grad3 = {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
-    private static final double SkewFactor = 0.5D * (Square3 - 1.0D);
-    private static final double DeskewFactor = (3.0D - Square3) / 6.0D;
     
     private int[] permutationTable = new int[512];
-    public double noiseContributionX;
-    public double noiseContributionY;
-    public double noiseContributionZ;
 
-    public NoiseGeneratorSurfacePatch(Random random)
+    NoiseGeneratorSurfacePatch(Random random)
     {
-        this.noiseContributionX = (random.nextDouble() * 256.0D);
-        this.noiseContributionY = (random.nextDouble() * 256.0D);
-        this.noiseContributionZ = (random.nextDouble() * 256.0D);
         for (int i = 0; i < 256; this.permutationTable[i] = i++)
         {
             ;
@@ -50,7 +42,7 @@ public class NoiseGeneratorSurfacePatch
      * @param z The z coordinate
      * @return the noise value of y
      */
-    public double getYNoise(double x, double z)
+    double getYNoise(double x, double z)
     {
         double var11 = 0.5D * (Square3 - 1.0D);
         double var13 = (x + z) * var11;
@@ -125,82 +117,5 @@ public class NoiseGeneratorSurfacePatch
         }
 
         return 70.0D * (var5 + var7 + var9);
-    }
-
-    public void a(double[] paramArrayOfDouble, double paramDouble1, double paramDouble2, int paramInt1, int paramInt2, double paramDouble3, double paramDouble4, double paramDouble5)
-    {
-        int i = 0;
-        for (int j = 0; j < paramInt1; j++)
-        {
-            double d2 = (paramDouble2 + j) * paramDouble4 + this.noiseContributionY;
-            for (int k = 0; k < paramInt2; k++)
-            {
-                double d1 = (paramDouble1 + k) * paramDouble3 + this.noiseContributionX;
-
-                double d3 = (d1 + d2) * SkewFactor;
-                int m = fastFloor(d1 + d3);
-                int n = fastFloor(d2 + d3);
-                double d4 = (m + n) * DeskewFactor;
-                double d5 = m - d4;
-                double d6 = n - d4;
-                double d7 = d1 - d5;
-                double d8 = d2 - d6;
-                int i1;
-                int i2;
-                if (d7 > d8)
-                {
-                    i1 = 1;
-                    i2 = 0;
-                } else
-                {
-                    i1 = 0;
-                    i2 = 1;
-                }
-
-                double d9 = d7 - i1 + DeskewFactor;
-                double d10 = d8 - i2 + DeskewFactor;
-                double d11 = d7 - 1.0D + 2.0D * DeskewFactor;
-                double d12 = d8 - 1.0D + 2.0D * DeskewFactor;
-
-                int i3 = m & 0xFF;
-                int i4 = n & 0xFF;
-                int i5 = this.permutationTable[(i3 + this.permutationTable[i4])] % 12;
-                int i6 = this.permutationTable[(i3 + i1 + this.permutationTable[(i4 + i2)])] % 12;
-                int i7 = this.permutationTable[(i3 + 1 + this.permutationTable[(i4 + 1)])] % 12;
-
-                double d13 = 0.5D - d7 * d7 - d8 * d8;
-                double d14;
-                if (d13 < 0.0D)
-                {
-                    d14 = 0.0D;
-                } else
-                {
-                    d13 *= d13;
-                    d14 = d13 * d13 * dot(Grad3[i5], d7, d8);
-                }
-                double d15 = 0.5D - d9 * d9 - d10 * d10;
-                double d16;
-                if (d15 < 0.0D)
-                {
-                    d16 = 0.0D;
-                } else
-                {
-                    d15 *= d15;
-                    d16 = d15 * d15 * dot(Grad3[i6], d9, d10);
-                }
-                double d17 = 0.5D - d11 * d11 - d12 * d12;
-                double d18;
-                if (d17 < 0.0D)
-                {
-                    d18 = 0.0D;
-                } else
-                {
-                    d17 *= d17;
-                    d18 = d17 * d17 * dot(Grad3[i7], d11, d12);
-                }
-
-                paramArrayOfDouble[(i++)] += 70.0D * (d14 + d16 + d18) * paramDouble5;
-            }
-        }
     }
 }

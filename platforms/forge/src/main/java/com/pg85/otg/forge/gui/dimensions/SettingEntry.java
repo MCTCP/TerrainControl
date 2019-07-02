@@ -14,31 +14,31 @@ public class SettingEntry<T>
 		String
 	}
 	
-	public String name;
-	public ValueType valueType;
-	public T value;
-	public T defaultValue;
-	public T minValue;
-	public T maxValue;
-	public boolean newWorldOnly;
-	public boolean overWorldOnly;
+	String name;
+	ValueType valueType;
+	T value;
+	T defaultValue;
+	T minValue;
+	T maxValue;
+	boolean newWorldOnly;
+	boolean overWorldOnly;
 
-	public SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly)
+	SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly)
 	{
 		this(name, value, defaultValue, null, null, newWorldOnly, false);
 	}
 	
-	public SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly, boolean overWorldOnly)
+	SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly, boolean overWorldOnly)
 	{
 		this(name, value, defaultValue, null, null, newWorldOnly, overWorldOnly);
 	}
 	
-	public SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly)
+	SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly)
 	{
 		this(name, value, defaultValue, minValue, maxValue, newWorldOnly, false);
 	}
 	
-	public SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly, boolean overWorldOnly)
+	private SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly, boolean overWorldOnly)
 	{
 		this.name = name;
 		this.value = value;

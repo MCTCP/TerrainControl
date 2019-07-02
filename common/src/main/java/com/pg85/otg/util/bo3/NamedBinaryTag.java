@@ -248,7 +248,7 @@ public class NamedBinaryTag
      * @param tag   The tag to add.
      * @param index Index of the tag.
      */
-    public void insertTag(NamedBinaryTag tag, int index)
+    private void insertTag(NamedBinaryTag tag, int index)
     {
         if (type != Type.TAG_List && type != Type.TAG_Compound)
             throw new RuntimeException();
@@ -271,7 +271,7 @@ public class NamedBinaryTag
      * @param index Index of the tag.
      * @return the removed tag
      */
-    public NamedBinaryTag removeTag(int index)
+    private NamedBinaryTag removeTag(int index)
     {
         if (type != Type.TAG_List && type != Type.TAG_Compound)
             throw new RuntimeException();
@@ -351,7 +351,7 @@ public class NamedBinaryTag
      *
      * @return All child tags of this tag.
      */
-    public NamedBinaryTag[] values()
+    private NamedBinaryTag[] values()
     {
         if (type != Type.TAG_Compound && type != Type.TAG_List)
         {
@@ -553,14 +553,6 @@ public class NamedBinaryTag
                 break;
 
         }
-    }
-
-    /**
-     * Print the NBT structure to System.out
-     */
-    public void print()
-    {
-        print(this, 0);
     }
 
     private String getTypeString(Type type)

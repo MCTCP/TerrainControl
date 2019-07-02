@@ -24,7 +24,7 @@ public abstract class Plotter
      *
      * @param name the name of the plotter to use, which will show up on the website
      */
-    public Plotter(final String name)
+    Plotter(final String name)
     {
         this.name = name;
     }
@@ -51,7 +51,7 @@ public abstract class Plotter
     /**
      * Called after the website graphs have been updated
      */
-    public void reset()
+    void reset()
     {
     }
 

@@ -86,7 +86,7 @@ public final class WorldLoader
         return this.configsDir;
     }
 
-    protected File getWorldDir(String worldName)
+    private File getWorldDir(String worldName)
     {
         return new File(this.configsDir, PluginStandardValues.PresetsDirectoryName + "/" + worldName);
     }
@@ -250,7 +250,7 @@ public final class WorldLoader
     	unloadWorld(this.getWorld(world), unRegisterBiomes);
     }
 
-    public void unloadWorld(ForgeWorld world, boolean unRegisterBiomes)
+    private void unloadWorld(ForgeWorld world, boolean unRegisterBiomes)
     {
     	// Used when dimensions are unloaded.
 
@@ -301,7 +301,7 @@ public final class WorldLoader
     	}
     }
     
-    public void removeAllWorlds()
+    private void removeAllWorlds()
     {
     	ArrayList<ForgeWorld> worldsToRemove = new ArrayList<ForgeWorld>();
     	synchronized(this.worlds)
@@ -340,8 +340,7 @@ public final class WorldLoader
     	ForgeBiomeRegistryManager.clearOTGBiomeIds();
 	}
 
-    @Nullable
-    public ForgeWorld getOrCreateForgeWorld(World mcWorld)
+    @Nullable ForgeWorld getOrCreateForgeWorld(World mcWorld)
     {   	
     	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
     	{	

@@ -105,7 +105,7 @@ public final class MobSpawnGroupHelper
      * @param biomeMetas The BiomeMeta collection.
      * @return The WeightedMobSpawnGroup list.
      */
-    static List<WeightedMobSpawnGroup> fromMinecraftList(Collection<BiomeMeta> biomeMetas)
+    private static List<WeightedMobSpawnGroup> fromMinecraftList(Collection<BiomeMeta> biomeMetas)
     {
         List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
         for (BiomeMeta meta : biomeMetas)
@@ -147,7 +147,7 @@ public final class MobSpawnGroupHelper
      * @param mobName The mob name.
      * @return The entity class, or null if not found.
      */
-    static Class<? extends EntityInsentient> toMinecraftClass(String mobName)
+    private static Class<? extends EntityInsentient> toMinecraftClass(String mobName)
     {    	
 		Class<? extends Entity> clazz = EntityTypes.b.get(new MinecraftKey(mobName));
 		if (clazz == null)

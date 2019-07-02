@@ -19,7 +19,7 @@ public class BukkitBiome implements LocalBiome
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
-    protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
+    private BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
     {
         this.biomeBase = biome;
         int savedBiomeId =  BiomeBase.a(biomeBase);
@@ -35,7 +35,7 @@ public class BukkitBiome implements LocalBiome
      * @param biomeIds    Ids of the custom biome.
      * @return The custom biome.
      */
-    public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
+    static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
     {
         return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds, worldName));
     }

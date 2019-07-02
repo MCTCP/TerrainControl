@@ -21,7 +21,7 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 public class OTGStrongholdGen extends MapGenStronghold
 {
-    public final List<Biome> allowedBiomes;
+    private final List<Biome> allowedBiomes;
     /** is spawned false and set true once the defined BiomeGenBases were compared with the present ones */
     private boolean ranBiomeCheck;
     private ChunkPos[] structureCoords;

@@ -24,7 +24,7 @@ public class ChunkCoordinate
     private final int chunkX;
     private final int chunkZ;
 
-    protected ChunkCoordinate(int chunkX, int chunkZ)
+    private ChunkCoordinate(int chunkX, int chunkZ)
     {
         this.chunkX = chunkX;
         this.chunkZ = chunkZ;
@@ -190,22 +190,5 @@ public class ChunkCoordinate
     public boolean coordsMatch(int chunkX, int chunkZ)
     {
         return this.chunkX == chunkX && this.chunkZ == chunkZ;
-    }
-
-    /**
-     * Gets whether this chunk is responsible for populating the given block.
-     * Calling this method is equivalent to calling
-     * <code>equals(ChunkCoordinate.{@link #getPopulatingChunk(int, int) getPopulatingChunk}(blockX,blockZ))</code>, but
-     * this method saves you from creating one unnecessary object.
-     * @param blockX X position of the block.
-     * @param blockZ Z position of the block.
-     * @return True if this chunk coordinate contains that block, false
-     * otherwise.
-     */
-    public boolean populatesForBlock(int blockX, int blockZ)
-    {
-        return coordsMatch(
-                MathHelper.floor((blockX - CHUNK_POPULATION_OFFSET_X) / (double) CHUNK_X_SIZE),
-                MathHelper.floor((blockZ - CHUNK_POPULATION_OFFSET_Z) / (double) CHUNK_Z_SIZE));
     }
 }

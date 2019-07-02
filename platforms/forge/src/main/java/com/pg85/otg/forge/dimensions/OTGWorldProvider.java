@@ -20,11 +20,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class OTGWorldProvider extends WorldProviderSurface
 {
-	public DimensionConfig dimConfig = null;
-	public WorldConfig worldConfig = null;
-	public String worldName = null;
-	DimensionType dimType = null;
-	long lastFetchTime = System.currentTimeMillis();	
+	private DimensionConfig dimConfig = null;
+	private WorldConfig worldConfig = null;
+	private String worldName = null;
+	private DimensionType dimType = null;
+	private long lastFetchTime = System.currentTimeMillis();	
 	public boolean isSPServerOverworld = false;
 	
 	public OTGWorldProvider()

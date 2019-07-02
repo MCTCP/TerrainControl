@@ -31,10 +31,10 @@ public class CustomObjectStructure
 {
 	// OTG
 	
-    protected StructurePartSpawnHeight height;
+    private StructurePartSpawnHeight height;
     private Map<ChunkCoordinate, Set<CustomObjectCoordinate>> objectsToSpawn;
     private int maxBranchDepth;
-    Random worldRandom;
+    private Random worldRandom;
 	
     public CustomObjectStructure(CustomObjectCoordinate start)
     {
@@ -63,55 +63,51 @@ public class CustomObjectStructure
 	
 	// OTG+
 
-	public SmoothingAreaGenerator smoothingAreaManager = new SmoothingAreaGenerator();
-	public EntitiesManager entitiesManager = new EntitiesManager();
+	private SmoothingAreaGenerator smoothingAreaManager = new SmoothingAreaGenerator();
+	private EntitiesManager entitiesManager = new EntitiesManager();
 	public ParticlesManager particlesManager = new ParticlesManager();
 	public ModDataManager modDataManager = new ModDataManager();
 	public SpawnerManager spawnerManager = new SpawnerManager();
 	
-	public boolean saveRequired = true;
-
-    protected LocalWorld World;
-    protected Random Random;
+    private LocalWorld World;
+    private Random Random;
 
     // The origin BO3 for this branching structure
     public CustomObjectCoordinate Start;
 
     // Stores all the branches of this branching structure that should spawn along with the chunkcoordinates they should spawn in
-    public Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> ObjectsToSpawn = new HashMap<ChunkCoordinate, Stack<CustomObjectCoordinate>>();
+    Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> ObjectsToSpawn = new HashMap<ChunkCoordinate, Stack<CustomObjectCoordinate>>();
     public Map<ChunkCoordinate, String> ObjectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();
    
-    public boolean IsSpawned;
-    // If the origin structure of this branching structure has tried to spawn but could not not and never will.
-    public boolean CannotSpawn;
-    public boolean IsStructureAtSpawn = false;
+    boolean IsSpawned;
+    private boolean IsStructureAtSpawn = false;
 
-    int MinY;
+    private int MinY;
 
-    boolean IsOTGPlus = false;
+    private boolean IsOTGPlus = false;
 
     // A smoothing area is drawn around all outer blocks (or blocks neighbouring air) on the lowest layer of blocks in each BO3 of this branching structure that has a SmoothRadius set greater than 0.
     // Object[] { int startpoint, int endpoint, int distance from real startpoint }
     Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
 
-    int branchesTried = 0;
+    private int branchesTried = 0;
 
-    public boolean startChunkBlockChecksDone = false;
+    boolean startChunkBlockChecksDone = false;
     
-    public Stack<BranchDataItem> AllBranchesBranchData = new Stack<BranchDataItem>();
-    public HashMap<ChunkCoordinate, ArrayList<BranchDataItem>> AllBranchesBranchDataByChunk = new HashMap<ChunkCoordinate, ArrayList<BranchDataItem>>();
+    private Stack<BranchDataItem> AllBranchesBranchData = new Stack<BranchDataItem>();
+    private HashMap<ChunkCoordinate, ArrayList<BranchDataItem>> AllBranchesBranchDataByChunk = new HashMap<ChunkCoordinate, ArrayList<BranchDataItem>>();
 	private HashMap<String, ArrayList<ChunkCoordinate>> AllBranchesBranchDataByName = new HashMap<String, ArrayList<ChunkCoordinate>>(); // Used to find distance between branches and branch groups
 	private HashMap<String, HashMap<ChunkCoordinate, ArrayList<Integer>>> AllBranchesBranchDataByGroup = new HashMap<String, HashMap<ChunkCoordinate, ArrayList<Integer>>>(); // Used to find distance between branches and branch groups
-    public HashSet<Integer> AllBranchesBranchDataHash = new HashSet<Integer>();
+    private HashSet<Integer> AllBranchesBranchDataHash = new HashSet<Integer>();
     private boolean SpawningCanOverrideBranches = false;
-    int Cycle = 0;
+    private int Cycle = 0;
     
-    BranchDataItem currentSpawningRequiredChildrenForOptionalBranch;
-    boolean spawningRequiredChildrenForOptionalBranch = false;
-    boolean spawnedBranchThisCycle = false;
-    boolean spawnedBranchLastCycle = false;
+    private BranchDataItem currentSpawningRequiredChildrenForOptionalBranch;
+    private boolean spawningRequiredChildrenForOptionalBranch = false;
+    private boolean spawnedBranchThisCycle = false;
+    private boolean spawnedBranchLastCycle = false;
     
-    public CustomObjectStructure(LocalWorld world, CustomObjectCoordinate structureStart, Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn, int minY)
+    CustomObjectStructure(LocalWorld world, CustomObjectCoordinate structureStart, Map<ChunkCoordinate, Stack<CustomObjectCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn, int minY)
     {
     	this(world, structureStart, false, false);
     	ObjectsToSpawn = objectsToSpawn;
@@ -119,7 +115,7 @@ public class CustomObjectStructure
     	MinY = minY;
     }
     
-    public CustomObjectStructure(LocalWorld world, CustomObjectCoordinate start, boolean spawn, boolean isStructureAtSpawn)
+    CustomObjectStructure(LocalWorld world, CustomObjectCoordinate start, boolean spawn, boolean isStructureAtSpawn)
     {
         World = world;
         IsStructureAtSpawn = isStructureAtSpawn;
@@ -293,7 +289,6 @@ public class CustomObjectStructure
     {
     	if(!startChunkBlockChecksDone)
     	{
-    		saveRequired = true;
 	    	startChunkBlockChecksDone = true;
 
 	    	//OTG.log(LogMarker.INFO, "DoStartChunkBlockChecks");
@@ -493,7 +488,7 @@ public class CustomObjectStructure
     // canOverride required branches: things that need to be spawned in the same cycle as their parent branches, for instance door/wall markers for rooms
     // canOverride optional branches: things that should be spawned after the base of the structure has spawned, for instance room interiors, adapter/modifier pieces that knock out walls/floors between rooms etc.
 
-    public void calculateBranches(boolean minimumSize) throws InvalidConfigException
+    private void calculateBranches(boolean minimumSize) throws InvalidConfigException
     {
     	if(OTG.getPluginConfig().spawnLog)
     	{
@@ -2208,8 +2203,6 @@ public class CustomObjectStructure
         {
             return true;
         }
-
-    	saveRequired = true;
 
     	doStartChunkBlockChecks();
 

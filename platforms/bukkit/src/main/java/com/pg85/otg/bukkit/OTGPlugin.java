@@ -30,7 +30,7 @@ import java.util.HashMap;
 
 public class OTGPlugin extends JavaPlugin
 {
-    public OTGListener listener;
+    private OTGListener listener;
     public OTGCommandExecutor commandExecutor;
 
     /*
@@ -38,7 +38,7 @@ public class OTGPlugin extends JavaPlugin
      * itself. However, terrain generators aren't cleaned up properly by
      * Bukkit, so this won't really work until that bug is fixed.
      */
-    public boolean cleanupOnDisable = false;
+    private boolean cleanupOnDisable = false;
 
     public final HashMap<String, BukkitWorld> worlds = new HashMap<String, BukkitWorld>();
     private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
@@ -173,7 +173,7 @@ public class OTGPlugin extends JavaPlugin
         return generator;
     }
 
-    public File getWorldSettingsFolder(String worldName)
+    private File getWorldSettingsFolder(String worldName)
     {
         File baseFolder = new File(this.getDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + worldName);
         if (!baseFolder.exists())

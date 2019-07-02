@@ -79,12 +79,11 @@ import java.util.*;
 
 public class ForgeWorld implements LocalWorld
 {
-    public static HashMap<Integer, ResourceLocation> VanillaResouceLocations = new HashMap<Integer, ResourceLocation>();
     private static final int MAX_BIOMES_COUNT = 4096;
     private static final int MAX_SAVED_BIOMES_COUNT = 255;
     public static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
     
-	ForgeWorldSession worldSession;
+	private ForgeWorldSession worldSession;
 	public boolean isLoadedOnServer;	
 	public int clientDimensionId = 0;
     private OTGChunkGenerator generator;
@@ -92,16 +91,16 @@ public class ForgeWorld implements LocalWorld
     private ConfigProvider settings;
     private CustomObjectStructureCache structureCache;
     private String name;
-    public long seed;
+    private long seed;
     private BiomeGenerator biomeGenerator;
     public HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();    
-    public MapGenStructure strongholdGen;
+    private MapGenStructure strongholdGen;
     public MapGenStructure villageGen;
-    public MapGenStructure mineshaftGen;
-    public MapGenStructure rareBuildingGen;
-    public OTGNetherFortressGen netherFortressGen;
-    public MapGenStructure oceanMonumentGen;
-    public MapGenStructure woodLandMansionGen;
+    private MapGenStructure mineshaftGen;
+    private MapGenStructure rareBuildingGen;
+    private OTGNetherFortressGen netherFortressGen;
+    private MapGenStructure oceanMonumentGen;
+    private MapGenStructure woodLandMansionGen;
     private WorldGenDungeons dungeonGen;
     private WorldGenFossils fossilGen;
     private WorldGenTrees tree;
@@ -132,7 +131,7 @@ public class ForgeWorld implements LocalWorld
      * after {@link #provideConfigs(ServerConfigProvider)} has been called.
      * @param world The Minecraft world.
      */
-    public void provideWorldInstance(WorldServer world)
+    void provideWorldInstance(WorldServer world)
     {
         ServerConfigProvider configs = (ServerConfigProvider) this.settings;
         DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(world));        
@@ -207,7 +206,7 @@ public class ForgeWorld implements LocalWorld
      * Call this method when the configs are loaded.
      * @param configs The configs.
      */
-    public void provideConfigs(ServerConfigProvider configs)
+    void provideConfigs(ServerConfigProvider configs)
     {
         this.settings = configs;
     }
@@ -367,13 +366,6 @@ public class ForgeWorld implements LocalWorld
         } else {
             return getCalculatedBiome(x, z);
         }
-    }
-
-    public int getSavedBiomeId(int x, int z)
-    {
-    	BlockPos pos = new BlockPos(x, 0, z);
-    	Biome biome = this.world.getBiome(pos);
-   		return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(biome);
     }
 
     @Override
@@ -644,16 +636,6 @@ public class ForgeWorld implements LocalWorld
     	this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag, isOTGPlus);
     }
 
-    public IBlockState setBlockState(Chunk _this, BlockPos pos, IBlockState state)
-    {
-    	return this.getChunkGenerator().setBlockState(_this, pos, state);
-    }
-    
-    void attachMetadata(int x, int y, int z, NamedBinaryTag tag, boolean allowOutsidePopulatingArea)
-    {
-    	this.getChunkGenerator().attachMetadata(x, y, z, tag, allowOutsidePopulatingArea);
-    }
-
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
@@ -783,7 +765,6 @@ public class ForgeWorld implements LocalWorld
         
     public void recreateStructures(Chunk chunkIn, int chunkX, int chunkZ)
     {
-    	this.recreateStructures(chunkIn, chunkX, chunkZ);
         // recreateStructures
         WorldConfig worldConfig = this.getConfigs().getWorldConfig();
 

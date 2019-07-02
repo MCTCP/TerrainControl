@@ -36,7 +36,7 @@ public class CustomObjectGen extends Resource
         }
     }
     
-    public List<CustomObject> getObjects(String worldName)
+    private List<CustomObject> getObjects(String worldName)
     {
     	if(objects.isEmpty() && !objectNames.isEmpty())
     	{

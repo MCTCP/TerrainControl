@@ -16,7 +16,7 @@ public class LayerMix extends Layer
     private int defaultOceanId;
     private int defaultFrozenOceanId;
 
-    public LayerMix(long seed, Layer childLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
+    LayerMix(long seed, Layer childLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
     {
         super(seed);
         this.defaultOceanId = defaultOceanId;

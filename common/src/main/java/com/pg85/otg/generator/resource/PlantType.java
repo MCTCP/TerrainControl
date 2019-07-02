@@ -49,7 +49,7 @@ public class PlantType
      * @return The plant type.
      * @throws InvalidConfigException If the name is invalid.
      */
-    public static PlantType getPlant(String name) throws InvalidConfigException
+    static PlantType getPlant(String name) throws InvalidConfigException
     {
         PlantType plantType = LOOKUP_MAP.get(name);
         if (plantType == null)
@@ -78,7 +78,7 @@ public class PlantType
      * @param plantType The plant type.
      * @return The plant type provided.
      */
-    public static PlantType register(PlantType plantType)
+    private static PlantType register(PlantType plantType)
     {
         LOOKUP_MAP.put(plantType.toString(), plantType);
         return plantType;
@@ -95,7 +95,7 @@ public class PlantType
      * @param material The material of the block.
      * @param data The data value of the block.
      */
-    protected PlantType(String name, DefaultMaterial material, int data)
+    private PlantType(String name, DefaultMaterial material, int data)
     {
         this.name = name;
         this.topBlock = null;
@@ -107,7 +107,7 @@ public class PlantType
      * 
      * @param material Material of the plant.
      */
-    protected PlantType(LocalMaterialData material)
+    private PlantType(LocalMaterialData material)
     {
         this.name = material.toString();
         this.topBlock = null;
@@ -122,7 +122,7 @@ public class PlantType
      * @param bottomData Data value for the bottom.
      * @param topData Data value for the top.
      */
-    protected PlantType(String name, DefaultMaterial material, int bottomData, int topData)
+    private PlantType(String name, DefaultMaterial material, int bottomData, int topData)
     {
         this.name = name;
         this.topBlock = OTG.toLocalMaterialData(material, topData);
@@ -148,7 +148,7 @@ public class PlantType
      * @param y Y position of the lowest block of the plant.
      * @param z Z position of the plant.
      */
-    public void spawn(LocalWorld world, int x, int y, int z)
+    void spawn(LocalWorld world, int x, int y, int z)
     {
         world.setBlock(x, y, z, bottomBlock, null, false);
         if (topBlock != null)

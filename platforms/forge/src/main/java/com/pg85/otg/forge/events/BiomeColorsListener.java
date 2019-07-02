@@ -18,8 +18,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public final class BiomeColorsListener
 {
     private final Function<Biome, BiomeConfig> getBiomeConfig;
-    ResourceLocation lastBiome = null;
-    BiomeConfig lastBiomeConfig;
+    private ResourceLocation lastBiome = null;
+    private BiomeConfig lastBiomeConfig;
     
     public BiomeColorsListener()
     {

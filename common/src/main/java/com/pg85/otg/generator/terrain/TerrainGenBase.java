@@ -21,7 +21,7 @@ public abstract class TerrainGenBase
     private final long worldLong1;
     private final long worldLong2;
 
-    public TerrainGenBase(LocalWorld world)
+    TerrainGenBase(LocalWorld world)
     {
         this.world = world;
         this.random.setSeed(this.world.getSeed());

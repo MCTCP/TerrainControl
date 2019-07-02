@@ -16,8 +16,8 @@ import java.util.Random;
 public class SmallLakeGen extends Resource
 {
     private final boolean[] BooleanBuffer = new boolean[2048];
-    public int maxAltitude;
-    public int minAltitude;
+    private int maxAltitude;
+    private int minAltitude;
 
     public SmallLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {

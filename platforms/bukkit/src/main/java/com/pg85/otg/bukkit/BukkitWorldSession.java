@@ -9,9 +9,9 @@ import com.pg85.otg.util.ChunkCoordinate;
 
 public class BukkitWorldSession extends WorldSession
 {
-	ArrayList<ParticleFunction> ParticleFunctions = new ArrayList<ParticleFunction>();
+	private ArrayList<ParticleFunction> ParticleFunctions = new ArrayList<ParticleFunction>();
 
-	public BukkitWorldSession(LocalWorld world)
+	BukkitWorldSession(LocalWorld world)
 	{
 		super(world);
 	}

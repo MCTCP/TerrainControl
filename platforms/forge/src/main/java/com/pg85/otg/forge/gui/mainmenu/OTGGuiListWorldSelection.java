@@ -30,14 +30,14 @@ public class OTGGuiListWorldSelection extends GuiListExtended
     /** Index to the currently selected world */
     private int selectedIdx = -1;
 
-    public OTGGuiListWorldSelection(OTGGuiWorldSelection p_i46590_1_, Minecraft clientIn, int p_i46590_3_, int p_i46590_4_, int p_i46590_5_, int p_i46590_6_, int p_i46590_7_)
+    OTGGuiListWorldSelection(OTGGuiWorldSelection p_i46590_1_, Minecraft clientIn, int p_i46590_3_, int p_i46590_4_, int p_i46590_5_, int p_i46590_6_, int p_i46590_7_)
     {
         super(clientIn, p_i46590_3_, p_i46590_4_, p_i46590_5_, p_i46590_6_, p_i46590_7_);
         this.worldSelectionObj = p_i46590_1_;
         this.refreshList();
     }
 
-    public void refreshList()
+    void refreshList()
     {
         ISaveFormat isaveformat = this.mc.getSaveLoader();
         List<WorldSummary> list;
@@ -87,7 +87,7 @@ public class OTGGuiListWorldSelection extends GuiListExtended
         return super.getListWidth() + 50;
     }
 
-    public void selectWorld(int idx)
+    void selectWorld(int idx)
     {
         this.selectedIdx = idx;
         this.worldSelectionObj.selectWorld(this.getSelectedWorld());

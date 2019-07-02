@@ -60,9 +60,9 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 public final class OTGCommandHandler implements ICommand
 {
     private final List<String> aliases = Arrays.asList("otg");
-    public static final TextFormatting ERROR_COLOR = TextFormatting.RED;
-    public static final TextFormatting MESSAGE_COLOR = TextFormatting.GREEN;
-    public static final TextFormatting VALUE_COLOR = TextFormatting.DARK_GREEN;
+    private static final TextFormatting ERROR_COLOR = TextFormatting.RED;
+    private static final TextFormatting MESSAGE_COLOR = TextFormatting.GREEN;
+    private static final TextFormatting VALUE_COLOR = TextFormatting.DARK_GREEN;
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] argString)
@@ -868,7 +868,7 @@ public final class OTGCommandHandler implements ICommand
         return bytes / 1024L / 1024L;
     }
 	
-    public boolean containsArgument(String[] args, String arg)
+    private boolean containsArgument(String[] args, String arg)
     {
         for (String str : args)
         {

@@ -369,7 +369,7 @@ public class ObjectSpawner
 		//OTG.log(LogMarker.INFO, "ObjectSpawner DONE populating X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
     }
 
-	public void processResourcesPhase2(ChunkCoordinate chunkCoord)
+	private void processResourcesPhase2(ChunkCoordinate chunkCoord)
 	{
 		// Get the biome of the other corner TODO: explain why?
 		LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8);
@@ -415,7 +415,7 @@ public class ObjectSpawner
 		}
 	}
 
-	public void processResourcesPhase3(ChunkCoordinate chunkCoord, boolean hasGeneratedAVillage)
+	private void processResourcesPhase3(ChunkCoordinate chunkCoord, boolean hasGeneratedAVillage)
 	{
 		// Get the random generator
 		WorldConfig worldConfig = configProvider.getWorldConfig();
@@ -509,7 +509,7 @@ public class ObjectSpawner
 		world.replaceBlocks(chunkCoord);
 	}
 
-	public void spawnBO3s(ChunkCoordinate chunkCoord)
+	private void spawnBO3s(ChunkCoordinate chunkCoord)
 	{
 		// Get the corner block coords
 		int x = chunkCoord.getChunkX() * 16;

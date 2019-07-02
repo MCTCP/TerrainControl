@@ -19,7 +19,7 @@ public final class FileSettingsWriter
     private final File file;
     private final boolean writeComments;
 
-    public FileSettingsWriter(File file, boolean writeComments)
+    private FileSettingsWriter(File file, boolean writeComments)
     {
         this.file = file;
         this.writeComments = writeComments;
@@ -63,7 +63,7 @@ public final class FileSettingsWriter
      * @param settingsMap The settings map.
      * @throws IOException If an IO error occurs.
      */
-    public void write(SettingsMap settingsMap) throws IOException
+    private void write(SettingsMap settingsMap) throws IOException
     {
         BufferedWriter writer = null;
         try

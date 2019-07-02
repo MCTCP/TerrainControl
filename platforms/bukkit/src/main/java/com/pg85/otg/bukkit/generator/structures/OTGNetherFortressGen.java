@@ -15,7 +15,7 @@ import java.util.Random;
 public class OTGNetherFortressGen extends StructureGenerator
 {
 
-    public List<BiomeMeta> spawnList = new ArrayList<BiomeMeta>();
+    private List<BiomeMeta> spawnList = new ArrayList<BiomeMeta>();
 
     public OTGNetherFortressGen()
     {
@@ -25,6 +25,7 @@ public class OTGNetherFortressGen extends StructureGenerator
         this.spawnList.add(new BiomeMeta(EntityMagmaCube.class, 3, 4, 4));
     }
 
+    // TODO: Never used, remove this?
     public List<BiomeMeta> b()
     {
         return this.spawnList;

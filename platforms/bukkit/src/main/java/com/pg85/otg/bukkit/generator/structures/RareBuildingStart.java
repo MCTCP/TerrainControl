@@ -16,7 +16,7 @@ import net.minecraft.server.v1_12_R1.WorldGenRegistration.b;
 
 public class RareBuildingStart extends StructureStart
 {
-    public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
+    RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = WorldHelper.toLocalWorld(world);
         BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();

@@ -48,14 +48,14 @@ public class BO3 implements StructuredCustomObject
 	
 	public boolean isInvalidConfig;
 
-    boolean measured = false;
-    boolean isCollidable = false;
-    public boolean is32x32 = false;
+    private boolean measured = false;
+    private boolean isCollidable = false;
+    private boolean is32x32 = false;
     
-    int minX = Integer.MAX_VALUE;
-    int maxX = Integer.MIN_VALUE;
-    int minZ = Integer.MAX_VALUE;
-    int maxZ = Integer.MIN_VALUE;
+    private int minX = Integer.MAX_VALUE;
+    private int maxX = Integer.MIN_VALUE;
+    private int minZ = Integer.MAX_VALUE;
+    private int maxZ = Integer.MIN_VALUE;
 
     private BO3Config settings;
     private final String name;
@@ -67,7 +67,7 @@ public class BO3 implements StructuredCustomObject
      * @param name Name of the BO3.
      * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
      */
-    public BO3(String name, File file)
+    BO3(String name, File file)
     {
         this.name = name;
         this.file = file;
@@ -228,7 +228,7 @@ public class BO3 implements StructuredCustomObject
      *
      * @return The sum of the offset and variance.
      */
-    public int getOffsetAndVariance(Random random, int offset, int variance)
+    private int getOffsetAndVariance(Random random, int offset, int variance)
     {
         if (variance == 0)
         {
@@ -249,7 +249,7 @@ public class BO3 implements StructuredCustomObject
     }
 
     // Used for customobject and trees
-    protected boolean spawn(LocalWorld world, Random random, int x, int z)
+    private boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
@@ -660,7 +660,7 @@ public class BO3 implements StructuredCustomObject
 	    world.setBlock(x, y, z, material, metaDataTag, true);
     }
    
-    public boolean spawnForcedOTGPlus(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
+    private boolean spawnForcedOTGPlus(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
     {
     	//OTG.log(LogMarker.INFO, "Spawning " + this.getName());
 

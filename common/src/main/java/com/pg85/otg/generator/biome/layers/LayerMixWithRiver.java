@@ -11,7 +11,7 @@ public class LayerMixWithRiver extends Layer
     private int defaultOceanId;
     private int defaultFrozenOceanId;
 	
-    public LayerMixWithRiver(long seed, Layer childLayer, Layer riverLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
+    LayerMixWithRiver(long seed, Layer childLayer, Layer riverLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
     {
         super(seed);
         this.defaultOceanId = defaultOceanId;

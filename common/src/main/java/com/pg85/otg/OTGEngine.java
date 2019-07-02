@@ -46,7 +46,7 @@ public abstract class OTGEngine
         this.logger = logger;
     }    
     
-    public void onShutdown()
+    void onShutdown()
     {
         // Shutdown all loaders
         customObjectManager.shutdown();
@@ -63,7 +63,7 @@ public abstract class OTGEngine
         monitoringEventHandlers = null;
     }
 
-    public void onStart()
+    void onStart()
     {
         // Start the engine
         biomeResourcesManager = new BiomeResourcesManager();
@@ -150,7 +150,7 @@ public abstract class OTGEngine
      * @return True if the event handlers allow that the object is spawned,
      *         false otherwise.
      */
-    public boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
+    boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
         boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
@@ -172,7 +172,7 @@ public abstract class OTGEngine
      * <p>
      * @see EventHandler#onPopulateEnd(LocalWorld, Random, boolean, int, int)
      */
-    public void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (EventHandler handler : cancelableEventHandlers)
             handler.onPopulateEnd(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
@@ -186,7 +186,7 @@ public abstract class OTGEngine
      * @see EventHandler#onPopulateStart(LocalWorld, Random, boolean, int,
      * int)
      */
-    public void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (EventHandler handler : cancelableEventHandlers)
             handler.onPopulateStart(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
@@ -202,7 +202,7 @@ public abstract class OTGEngine
      * @return True if the event handlers allow that the resource is spawned,
      *         false otherwise.
      */
-    public boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
+    boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
             int chunkZ)
     {    	
         boolean success = true;

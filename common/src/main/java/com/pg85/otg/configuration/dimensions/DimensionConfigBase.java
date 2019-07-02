@@ -30,12 +30,12 @@ public abstract class DimensionConfigBase
 	
 	public DimensionConfigBase() { }
 	
-	public DimensionConfigBase(String presetName)
+	DimensionConfigBase(String presetName)
 	{
 		this.PresetName = presetName;
 	}
 	
-	public DimensionConfigBase(String presetName, WorldConfig worldConfig)
+	DimensionConfigBase(String presetName, WorldConfig worldConfig)
 	{
 		this.PresetName = presetName;
 		this.Seed = worldConfig.worldSeed;

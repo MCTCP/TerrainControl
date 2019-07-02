@@ -108,7 +108,7 @@ public class Metrics
      */
     private volatile BukkitTask task = null;
 
-    public Metrics(final Plugin plugin) throws IOException
+    Metrics(final Plugin plugin) throws IOException
     {
         if (plugin == null)
         {
@@ -145,7 +145,7 @@ public class Metrics
      * @param name The name of the graph
      * @return Graph object created. Will never return NULL under normal circumstances unless bad parameters are given
      */
-    public Graph createGraph(final String name)
+    Graph createGraph(final String name)
     {
         if (name == null)
         {
@@ -184,7 +184,7 @@ public class Metrics
      *
      * @return True if statistics measuring is running, otherwise false.
      */
-    public boolean start()
+    boolean start()
     {
         synchronized (optOutLock)
         {
@@ -555,7 +555,7 @@ public class Metrics
      * @param input String to compress.
      * @return The compressed bytes.
      */
-    public static byte[] gzip(String input)
+    private static byte[] gzip(String input)
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         GZIPOutputStream gzos = null;

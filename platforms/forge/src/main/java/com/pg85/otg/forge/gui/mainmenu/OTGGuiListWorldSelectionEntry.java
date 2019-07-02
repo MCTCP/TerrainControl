@@ -13,10 +13,8 @@ import javax.imageio.ImageIO;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiCreateWorld;
 import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.gui.GuiScreenWorking;
-import net.minecraft.client.gui.GuiWorldEdit;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.client.renderer.GlStateManager;
@@ -28,8 +26,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.storage.ISaveFormat;
-import net.minecraft.world.storage.ISaveHandler;
-import net.minecraft.world.storage.WorldInfo;
 import net.minecraft.world.storage.WorldSummary;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.GuiOldSaveLoadConfirm;
@@ -72,7 +68,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     private DynamicTexture icon;
     private long lastClickTime;
 
-    public OTGGuiListWorldSelectionEntry(OTGGuiListWorldSelection listWorldSelIn, WorldSummary worldSummaryIn, ISaveFormat saveFormat)
+    OTGGuiListWorldSelectionEntry(OTGGuiListWorldSelection listWorldSelIn, WorldSummary worldSummaryIn, ISaveFormat saveFormat)
     {
         this.containingListSel = listWorldSelIn;
         this.worldSelScreen = listWorldSelIn.getGuiWorldSelection();
@@ -218,7 +214,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         }
     }
 
-    public void joinWorld()
+    void joinWorld()
     {
     	// For MP the server sends the presets
 		// If world is null then we're not ingame
@@ -285,7 +281,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         }
     }
 
-    public void deleteWorld()
+    void deleteWorld()
     {
         this.client.displayGuiScreen(new GuiYesNo(new GuiYesNoCallback()
         {
@@ -305,26 +301,6 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         }, I18n.format("selectWorld.deleteQuestion"), "'" + this.worldSummary.getDisplayName() + "' " + I18n.format("selectWorld.deleteWarning"), I18n.format("selectWorld.deleteButton"), I18n.format("gui.cancel"), 0));
     }
 
-    public void editWorld()
-    {
-        this.client.displayGuiScreen(new GuiWorldEdit(this.worldSelScreen, this.worldSummary.getFileName()));
-    }
-
-    public void recreateWorld()
-    {
-        this.client.displayGuiScreen(new GuiScreenWorking());
-        GuiCreateWorld guicreateworld = new GuiCreateWorld(this.worldSelScreen);
-        ISaveHandler isavehandler = this.client.getSaveLoader().getSaveLoader(this.worldSummary.getFileName(), false);
-        WorldInfo worldinfo = isavehandler.loadWorldInfo();
-        isavehandler.flush();
-
-        if (worldinfo != null)
-        {
-            guicreateworld.recreateFromExistingWorld(worldinfo);
-            this.client.displayGuiScreen(guicreateworld);
-        }
-    }
-
     private void loadWorld()
     {        
         this.client.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
@@ -335,7 +311,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         }
     }
 
-    public void tryLoadExistingWorld(FMLClientHandler clientHandler, OTGGuiWorldSelection selectWorldGUI, WorldSummary comparator)
+    private void tryLoadExistingWorld(FMLClientHandler clientHandler, OTGGuiWorldSelection selectWorldGUI, WorldSummary comparator)
     {
     	// If this world has OTG overworld/dimensions then check if it has a DimensionsConfig
     	// If this is a legacy world then we'll need to create a new one.

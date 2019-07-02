@@ -141,7 +141,7 @@ public final class ServerConfigProvider implements ConfigProvider
         return settingsMap;
     }
     
-    void addBiomesFromDirRecursive(ArrayList<String> biomes, File biomesDirectory)
+    private void addBiomesFromDirRecursive(ArrayList<String> biomes, File biomesDirectory)
     {
     	if(biomesDirectory.exists())
     	{
@@ -157,12 +157,6 @@ public final class ServerConfigProvider implements ConfigProvider
 	    		}
 	    	}
     	}
-    }
-
-    public void saveWorldConfig()
-    {
-    	File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-    	FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.settingsMode);
     }
 
     private void loadBiomes(SettingsMap worldConfigSettings, File worldSaveFolder)

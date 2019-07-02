@@ -36,7 +36,7 @@ public class FileSettingsReader
      *                     read, but you'll have to close the stream yourself.
      * @throws IOException If an IO error occurs.
      */
-    public void readIntoMap(SettingsMap settings, BufferedReader fileContents) throws IOException
+    private void readIntoMap(SettingsMap settings, BufferedReader fileContents) throws IOException
     {
         int lineNumber = 0;
         String thisLine;
@@ -78,7 +78,7 @@ public class FileSettingsReader
      * @param settings The settings map.
      * @param file     The file.
      */
-    public void readIntoMap(SettingsMap settings, File file)
+    private void readIntoMap(SettingsMap settings, File file)
     {
         BufferedReader settingsReader = null;
 

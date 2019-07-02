@@ -19,9 +19,6 @@ public abstract class OTGGuiScrollingList
 {
     private final Minecraft client;
     protected int listWidth;
-    protected int listHeight;
-    protected int screenWidth;
-    protected int screenHeight;
     protected int top;
     protected int bottom;
     protected int right;
@@ -29,8 +26,6 @@ public abstract class OTGGuiScrollingList
     protected int slotHeight;
     private int scrollUpActionId;
     private int scrollDownActionId;
-    protected int mouseX;
-    protected int mouseY;
     private float initialMouseClickY = -2.0F;
     private float scrollFactor;
     private float scrollDistance;
@@ -39,7 +34,6 @@ public abstract class OTGGuiScrollingList
     private boolean highlightSelected = true;
     private boolean hasHeader;
     private int headerHeight;
-    protected boolean captureMouse = true;
 
     @Deprecated // We need to know screen size.
     public OTGGuiScrollingList(Minecraft client, int width, int height, int top, int bottom, int left, int entryHeight)
@@ -50,14 +44,11 @@ public abstract class OTGGuiScrollingList
     {
         this.client = client;
         this.listWidth = width;
-        this.listHeight = height;
         this.top = top;
         this.bottom = bottom;
         this.slotHeight = entryHeight;
         this.left = left;
         this.right = width + this.left;
-        this.screenWidth = screenWidth;
-        this.screenHeight = screenHeight;
     }
 
     @Deprecated // Unused, remove in 1.9.3?
@@ -125,7 +116,7 @@ public abstract class OTGGuiScrollingList
      */
     protected abstract void drawSlot(int slotIdx, int entryRight, int slotTop, int slotBuffer, Tessellator tess);
 
-    @Deprecated protected void func_27260_a(int entryRight, int relativeY, Tessellator tess) {}
+    @Deprecated private void func_27260_a(int entryRight, int relativeY, Tessellator tess) {}
     /**
      * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
      * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
@@ -136,12 +127,10 @@ public abstract class OTGGuiScrollingList
      * Draw anything special on the screen. GL_SCISSOR is enabled for anything that
      * is rendered outside of the view box. Do not mess with SCISSOR unless you support this.
      */
-    protected void drawScreen(int mouseX, int mouseY) { func_27257_b(mouseX, mouseY); }
+    private void drawScreen(int mouseX, int mouseY) { func_27257_b(mouseX, mouseY); }
     
     public void drawScreen(int mouseX, int mouseY, float partialTicks, float zLevel)
     {
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
         this.drawBackground();
 
         boolean isHovering = mouseX >= this.left && mouseX <= this.left + this.listWidth &&
@@ -324,7 +313,7 @@ public abstract class OTGGuiScrollingList
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
-    protected void drawGradientRect(int left, int top, int right, int bottom, int color1, int color2)
+    private void drawGradientRect(int left, int top, int right, int bottom, int color1, int color2)
     {
         GuiUtils.drawGradientRect(0, left, top, right, bottom, color1, color2);
     }
@@ -333,10 +322,10 @@ public abstract class OTGGuiScrollingList
     
     protected abstract void elementClicked(int index, boolean doubleClick);
 
-    @Deprecated protected void func_27255_a(int x, int y) {}
+    @Deprecated private void func_27255_a(int x, int y) {}
     protected void clickHeader(int x, int y) { func_27255_a(x, y); }
 
-    @Deprecated protected void func_27257_b(int mouseX, int mouseY) {}
+    @Deprecated private void func_27257_b(int mouseX, int mouseY) {}
 
     public void actionPerformed(GuiButton button)
     {

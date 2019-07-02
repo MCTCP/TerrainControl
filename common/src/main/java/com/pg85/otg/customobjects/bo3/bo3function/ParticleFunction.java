@@ -1,6 +1,5 @@
 package com.pg85.otg.customobjects.bo3.bo3function;
 
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
@@ -8,7 +7,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Represents a block in a BO3.
@@ -142,24 +140,6 @@ public class ParticleFunction extends BO3Function
     	rotatedBlock.interval = interval;
 
         return rotatedBlock;
-    }
-
-    /**
-     * Spawns this block at the position. The saved x, y and z in this block are
-     * ignored.
-     * <p/>
-     * @param world  The world to spawn in.
-     * @param random The random number generator.
-     * @param x      The absolute x to spawn. The x-position in this object is
-     *               ignored.
-     * @param y      The absolute y to spawn. The y-position in this object is
-     *               ignored.
-     * @param z      The absolute z to spawn. The z-position in this object is
-     *               ignored.
-     */
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean markBlockForUpdate)
-    {
-    	throw new RuntimeException();
     }
 
     @Override

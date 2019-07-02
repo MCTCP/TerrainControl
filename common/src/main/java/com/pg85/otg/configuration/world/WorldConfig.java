@@ -94,11 +94,13 @@ public class WorldConfig extends ConfigFile
 
     // Look settings
     public int worldFog;
+    // TODO: Implement this?
     public float worldFogR;
     public float worldFogG;
     public float worldFogB;
 
     public int worldNightFog;
+    // TODO: Implement this?
     public float worldNightFogR;
     public float worldNightFogG;
     public float worldNightFogB;
@@ -176,7 +178,6 @@ public class WorldConfig extends ConfigFile
     public boolean removeSurfaceStone;
 
     public int objectSpawnRatio;
-    public File customObjectsDirectory;
 
     public ConfigMode settingsMode;
     public TerrainMode modeTerrain;

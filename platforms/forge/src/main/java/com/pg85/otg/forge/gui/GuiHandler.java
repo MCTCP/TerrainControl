@@ -2,7 +2,6 @@ package com.pg85.otg.forge.gui;
 
 import com.pg85.otg.forge.gui.mainmenu.OTGGuiWorldSelection;
 
-import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiWorldSelection;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -13,16 +12,14 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class GuiHandler implements IGuiHandler
-{	
-    public static boolean UseVanillaScreen = false;    
-
+{
     @SideOnly(Side.CLIENT)
     @SubscribeEvent
     public void openGui(GuiOpenEvent event)
     {
         if (event.getGui() instanceof GuiWorldSelection)
         {
-            event.setGui(new OTGGuiWorldSelection(new GuiMainMenu()));
+            event.setGui(new OTGGuiWorldSelection());
         }
     }
 

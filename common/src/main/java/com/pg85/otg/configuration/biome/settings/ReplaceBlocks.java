@@ -8,10 +8,10 @@ import java.util.List;
 
 public class ReplaceBlocks
 {
-    protected final String sourceBlock;
-    protected final String targetBlock;
+    private final String sourceBlock;
+    private final String targetBlock;
 
-    public ReplaceBlocks(String sourceBlock, String targetBlock)
+    private ReplaceBlocks(String sourceBlock, String targetBlock)
     {
         this.sourceBlock = sourceBlock;
         this.targetBlock = targetBlock;

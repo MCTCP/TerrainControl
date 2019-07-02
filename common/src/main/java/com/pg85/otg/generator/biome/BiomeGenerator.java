@@ -24,7 +24,7 @@ public abstract class BiomeGenerator
 {
     protected final LocalWorld world;
 
-    public BiomeGenerator(LocalWorld world)
+    BiomeGenerator(LocalWorld world)
     {
         this.world = world;
     }

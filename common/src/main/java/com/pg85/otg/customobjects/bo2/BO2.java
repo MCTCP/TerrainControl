@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -29,45 +28,30 @@ import java.util.Random;
  */
 public class BO2 extends CustomObjectConfigFile implements CustomObject
 {	
-    public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
+    private ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
-    public BO2[] groupObjects = null;
+    private MaterialSet spawnOnBlockType;
+    private MaterialSet collisionBlockType;
 
-    public List<String> spawnInBiome;
+    private boolean spawnWater;
+    private boolean spawnLava;
+    private boolean spawnAboveGround;
+    private boolean spawnUnderGround;
 
-    public String version;
-    public MaterialSet spawnOnBlockType;
-    public MaterialSet collisionBlockType;
+    private boolean spawnSunlight;
+    private boolean spawnDarkness;
 
-    public boolean spawnWater;
-    public boolean spawnLava;
-    public boolean spawnAboveGround;
-    public boolean spawnUnderGround;
+    private boolean randomRotation;
+    private boolean dig;
+    private boolean tree;
+    private boolean branch;
+    private boolean needsFoundation;
+    private int rarity;
+    private double collisionPercentage;
+    private int spawnElevationMin;
+    private int spawnElevationMax;
 
-    public boolean spawnSunlight;
-    public boolean spawnDarkness;
-
-    public boolean underFill;
-    public boolean randomRotation;
-    public boolean dig;
-    public boolean tree;
-    public boolean branch;
-    public boolean diggingBranch;
-    public boolean needsFoundation;
-    public int rarity;
-    public double collisionPercentage;
-    public int spawnElevationMin;
-    public int spawnElevationMax;
-
-    public int groupFrequencyMin;
-    public int groupFrequencyMax;
-    public int groupSeparationMin;
-    public int groupSeparationMax;
-    public List<String> groupId;
-
-    public int branchLimit;
-
-    public BO2(SettingsReaderOTGPlus reader)
+    BO2(SettingsReaderOTGPlus reader)
     {
         super(reader);
     }
@@ -229,7 +213,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
    		return spawn(world, random, x, z);
     } 
     
-    protected boolean spawn(LocalWorld world, Random random, int x, int z)
+    private boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         int y;
         if (spawnAboveGround)
@@ -306,12 +290,8 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     @Override
     protected void readConfigSettings()
     {
-        this.version = readSettings(BO2Settings.VERSION);
-
         this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
         this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
-
-        this.spawnInBiome = readSettings(BO2Settings.SPAWN_IN_BIOME);
 
         this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
         this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
@@ -320,29 +300,15 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
         this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
 
-        this.underFill = readSettings(BO2Settings.UNDER_FILL);
-
         this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
         this.dig = readSettings(BO2Settings.DIG);
         this.tree = readSettings(BO2Settings.TREE);
         this.branch = readSettings(BO2Settings.BRANCH);
-        this.diggingBranch = readSettings(BO2Settings.DIGGING_BRANCH);
         this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
         this.rarity = readSettings(BO2Settings.RARITY);
         this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
         this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
         this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
-
-        this.groupFrequencyMin = readSettings(BO2Settings.GROUP_FREQUENCY_MIN);
-        this.groupFrequencyMax = readSettings(BO2Settings.GROUP_FREQUENCY_MAX);
-        this.groupSeparationMin = readSettings(BO2Settings.GROUP_SEPERATION_MIN);
-        this.groupSeparationMax = readSettings(BO2Settings.GROUP_SEPERATION_MAX);
-        // >> Is this not used anymore? Netbeans finds no references to it
-        // >> Nothing other than this line references BO2Settings.groupId
-        // either...
-        this.groupId = readSettings(BO2Settings.GROUP_ID);
-
-        this.branchLimit = readSettings(BO2Settings.BRANCH_LIMIT);
 
         this.readCoordinates();
     }

@@ -26,7 +26,6 @@ public class EntityFunction extends BO3Function
     public int groupSize = 1;
     public String nameTagOrNBTFileName = "";
     public String originalNameTagOrNBTFileName = "";
-    public String nameTag = "";
 
     @Override
     public void load(List<String> args) throws InvalidConfigException

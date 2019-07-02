@@ -19,15 +19,14 @@ public abstract class BaseCommand
 {
     public static final String ERROR_COLOR = ChatColor.RED.toString();
     public static final String MESSAGE_COLOR = ChatColor.GREEN.toString();
-    public static final String VALUE_COLOR = ChatColor.DARK_GREEN.toString();
+    static final String VALUE_COLOR = ChatColor.DARK_GREEN.toString();
 	
-    public String name;
-    public String perm;
-    public String usage;
-    public boolean workOnConsole;
+    String name;
+    String perm;
+    String usage;
     protected OTGPlugin plugin;
 
-    public BaseCommand(OTGPlugin _plugin)
+    BaseCommand(OTGPlugin _plugin)
     {
         this.plugin = _plugin;
     }

@@ -48,7 +48,7 @@ public class BO3Config extends CustomObjectConfigFile
 
     public int branchFrequency;
     // Define groups that this BO3 belongs to with a range in chunks that members of each group should have to each other
-    public String branchFrequencyGroup = "";
+    private String branchFrequencyGroup = "";
     public HashMap<String, Integer> branchFrequencyGroups = new HashMap<String, Integer>();
 
     private int minX = Integer.MAX_VALUE;
@@ -76,9 +76,9 @@ public class BO3Config extends CustomObjectConfigFile
     // Adjusts the height by this number before spawning. Handy when using "highestblock" for lowering BO3s that have a lot of ground under them included
     public int heightOffset;
     // OTG+ CustomStructures only
-    public Rotation inheritBO3Rotation = Rotation.NORTH;
+    private Rotation inheritBO3Rotation = Rotation.NORTH;
     // If this is set to true then any air blocks in the bo3 will not be spawned
-    public boolean removeAir = true;
+    private boolean removeAir = true;
     // Defaults to false. Set to true if this BO3 should spawn at the player spawn point. When the server starts one of the structures that has IsSpawnPoint set to true is selected randomly and is spawned, the others never get spawned.)
     public boolean isSpawnPoint = false;
 
@@ -93,13 +93,13 @@ public class BO3Config extends CustomObjectConfigFile
     // Replaces all the blocks of the given material in the BO3 with the SurfaceBlock configured for the biome it spawns in
     public String replaceWithSurfaceBlock = "GRASS";
     // Define a group that this BO3 belongs to and a range in chunks that members of this group should have to each other
-    public String bo3Group = "";
+    private String bo3Group = "";
     public HashMap<String, Integer> bo3Groups = new HashMap<String, Integer>();
     // If this is set to true then this BO3 can spawn on top of or inside other BO3's
     public boolean canOverride = false;
 
     // Copies the blocks and branches of an existing BO3 into this one
-    public String inheritBO3 = "";
+    private String inheritBO3 = "";
     // Should the smoothing area go to the top or the bottom blocks in the bo3?
     public boolean smoothStartTop = false;
     public boolean smoothStartWood = false;
@@ -115,11 +115,11 @@ public class BO3Config extends CustomObjectConfigFile
     // Used to make sure that dungeons can only spawn underneath other structures
     public boolean mustBeBelowOther = false;
 
-    public String replacesBO3 = "";
+    private String replacesBO3 = "";
     public ArrayList<String> replacesBO3Branches = new ArrayList<String>();
-    public String mustBeInside = "";
+    private String mustBeInside = "";
     public ArrayList<String> mustBeInsideBranches = new ArrayList<String>();
-    public String cannotBeInside = "";
+    private String cannotBeInside = "";
     public ArrayList<String> cannotBeInsideBranches = new ArrayList<String>();
 
     public int smoothHeightOffset = 0;
@@ -130,15 +130,13 @@ public class BO3Config extends CustomObjectConfigFile
 
     private String worldName;
 
-    BlockFunction[] blocksOTGPlus = null;
-    public BO3Check[] bo3ChecksOTGPlus = new BO3Check[1];
+    private BlockFunction[] blocksOTGPlus = null;
+    private BO3Check[] bo3ChecksOTGPlus = new BO3Check[1];
     private BranchFunction[] branchesOTGPlus = new BranchFunction[1];
     private ModDataFunction[] modDataOTGPlus = new ModDataFunction[1];
     private SpawnerFunction[] spawnerDataOTGPlus = new SpawnerFunction[1];
     private ParticleFunction[] particleDataOTGPlus = new ParticleFunction[1];
     private EntityFunction[] entityDataOTGPlus = new EntityFunction[1];
-
-    String directoryName = null;
     
     //
     
@@ -146,38 +144,38 @@ public class BO3Config extends CustomObjectConfigFile
     
     public String author;
     public String description;
-    public ConfigMode settingsMode;
-    public boolean tree;
+    ConfigMode settingsMode;
+    boolean tree;
     public int frequency;
-    public double rarity;
-    public boolean rotateRandomly;
+    double rarity;
+    boolean rotateRandomly;
     public SpawnHeightEnum spawnHeight;
     // Extra spawn height settings
     public int spawnHeightOffset;
-    public int spawnHeightVariance;
+    int spawnHeightVariance;
 
     // Extrusion
-    public BO3Settings.ExtrudeMode extrudeMode;
-    public MaterialSet extrudeThroughBlocks;
+    BO3Settings.ExtrudeMode extrudeMode;
+    MaterialSet extrudeThroughBlocks;
 
     public int minHeight;
     public int maxHeight;
-    public List<String> excludedBiomes;
-    public MaterialSet sourceBlocks;
-    public int maxPercentageOutsideSourceBlock;
-    public OutsideSourceBlock outsideSourceBlock;
-    public BlockFunction[][] blocks = new BlockFunction[4][]; // four
+    private List<String> excludedBiomes;
+    MaterialSet sourceBlocks;
+    int maxPercentageOutsideSourceBlock;
+    OutsideSourceBlock outsideSourceBlock;
+    BlockFunction[][] blocks = new BlockFunction[4][]; // four
     // rotations
-    public BO3Check[][] bo3Checks = new BO3Check[4][];
-    public int maxBranchDepth;
-    public BranchFunction[][] branches = new BranchFunction[4][];
+    BO3Check[][] bo3Checks = new BO3Check[4][];
+    int maxBranchDepth;
+    BranchFunction[][] branches = new BranchFunction[4][];
 
-    public BoundingBox[] boundingBoxes = new BoundingBox[4];
+    BoundingBox[] boundingBoxes = new BoundingBox[4];
 
-    public ParticleFunction[][] particleFunctions = new ParticleFunction[4][];
-    public SpawnerFunction[][] spawnerFunctions = new SpawnerFunction[4][];
-    public ModDataFunction[][] modDataFunctions = new ModDataFunction[4][];
-    public EntityFunction[][] entityFunctions = new EntityFunction[4][];
+    ParticleFunction[][] particleFunctions = new ParticleFunction[4][];
+    SpawnerFunction[][] spawnerFunctions = new SpawnerFunction[4][];
+    ModDataFunction[][] modDataFunctions = new ModDataFunction[4][];
+    EntityFunction[][] entityFunctions = new EntityFunction[4][];
 
     //
 
@@ -301,7 +299,7 @@ public class BO3Config extends CustomObjectConfigFile
     	return a;
     }
 
-    public BranchFunction[] getbranches()
+    BranchFunction[] getbranches()
     {
     	return branchesOTGPlus;
     }
@@ -912,7 +910,7 @@ public class BO3Config extends CustomObjectConfigFile
      * @param directory    The directory the BO3 is stored in.
      * @param otherObjects All other loaded objects by their name.
      */
-    public BO3Config(SettingsReaderOTGPlus reader, Map<String, CustomObject> otherObjectsInDirectory) throws InvalidConfigException
+    BO3Config(SettingsReaderOTGPlus reader, Map<String, CustomObject> otherObjectsInDirectory) throws InvalidConfigException
     {
         super(reader);
 
@@ -1300,7 +1298,7 @@ public class BO3Config extends CustomObjectConfigFile
     }
     
     // Only used for OTG+
-    protected void readBlocks()
+    private void readBlocks()
     {    	
     	((FileSettingsReaderOTGPlus) this.reader).readSettings();
     	
@@ -1331,7 +1329,7 @@ public class BO3Config extends CustomObjectConfigFile
         this.blocks = null;
     }
 
-    void writeResources(SettingsWriterOTGPlus writer) throws IOException
+    private void writeResources(SettingsWriterOTGPlus writer) throws IOException
     {
         writer.bigTitle("Blocks");
         writer.comment("All the blocks used in the BO3 are listed here. Possible blocks:");
@@ -1522,7 +1520,7 @@ public class BO3Config extends CustomObjectConfigFile
     /**
      * Rotates all the blocks and all the checks
      */
-    public void rotateBlocksAndChecks()
+    private void rotateBlocksAndChecks()
     {
         for (int i = 1; i < 4; i++)
         {

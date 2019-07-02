@@ -91,7 +91,7 @@ public class IceSpikeGen extends Resource
         }
     }
 
-    public void spawnBasement(LocalWorld world, Random random,int x, int z)
+    private void spawnBasement(LocalWorld world, Random random,int x, int z)
     {
         int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 
@@ -126,7 +126,7 @@ public class IceSpikeGen extends Resource
         }
     }
 
-    public void spawnSpike(LocalWorld par1World, Random random, int x, int z, boolean hugeSpike)
+    private void spawnSpike(LocalWorld par1World, Random random, int x, int z, boolean hugeSpike)
     {
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
         while (par1World.isNullOrAir(x, y, z, false) && y > 2)

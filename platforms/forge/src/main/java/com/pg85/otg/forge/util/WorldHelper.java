@@ -1,33 +1,12 @@
 package com.pg85.otg.forge.util;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.biomes.OTGBiome;
-
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
 
 public abstract class WorldHelper
 {
     private WorldHelper()
     {
-    }
-	
-    /**
-     * Gets the generation id of the given biome. This is usually equal to the
-     * id of the BiomeBase, but when using virtual biomes it may be different.
-     *
-     * @param biomeBase The biome to check.
-     * @return The generation id.
-     */
-    public static int getGenerationId(Biome biomeBase)
-    {
-        if (biomeBase instanceof OTGBiome)
-        {
-            return ((OTGBiome) biomeBase).otgBiomeId;
-        }
-        return ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(biomeBase);
     }
 
     public static String getName(World world)

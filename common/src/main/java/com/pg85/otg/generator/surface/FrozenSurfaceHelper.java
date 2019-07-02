@@ -49,7 +49,7 @@ public class FrozenSurfaceHelper
      * @param x Location X
      * @param z Location Z
      */
-    protected void freezeColumn(int x, int z)
+    private void freezeColumn(int x, int z)
     {
         // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
         LocalBiome biome = world.getBiome(x, z);

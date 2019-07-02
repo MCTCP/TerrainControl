@@ -91,12 +91,12 @@ public class PacketDispatcher
 		PacketDispatcher.Dispatcher.sendTo(message, player);
 	}
 	
-	public static final void sendToAllAround(IMessage message, NetworkRegistry.TargetPoint point)
+	private static final void sendToAllAround(IMessage message, NetworkRegistry.TargetPoint point)
 	{
 		PacketDispatcher.Dispatcher.sendToAllAround(message, point);
 	}
 	
-	public static final void sendToAllAround(IMessage message, int dimension, double x, double y, double z, double range)
+	private static final void sendToAllAround(IMessage message, int dimension, double x, double y, double z, double range)
 	{
 		PacketDispatcher.sendToAllAround(message, new NetworkRegistry.TargetPoint(dimension, x, y, z, range));
 	}

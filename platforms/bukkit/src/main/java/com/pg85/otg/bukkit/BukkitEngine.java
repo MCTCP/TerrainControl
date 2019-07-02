@@ -18,7 +18,7 @@ public class BukkitEngine extends OTGEngine
 {
     private final OTGPlugin plugin;
 
-    public BukkitEngine(OTGPlugin plugin)
+    BukkitEngine(OTGPlugin plugin)
     {
         super(new BukkitLogger(plugin.getLogger()));
         this.plugin = plugin;

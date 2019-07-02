@@ -52,7 +52,7 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGDimensionManager
 {
-	static HashMap<Integer,Integer> orderedDimensions;
+	private static HashMap<Integer,Integer> orderedDimensions;
 	
 	public static boolean isDimensionNameRegistered(String dimensionName)
 	{
@@ -97,7 +97,7 @@ public class OTGDimensionManager
         FMLInterModComms.sendMessage(PluginStandardValues.MOD_ID, "registerDimension", compound);
 	}
 
-    public static void unregisterDimension(int dimensionId)
+    private static void unregisterDimension(int dimensionId)
     {
     	if(dimensionId == 0)
     	{
@@ -116,7 +116,7 @@ public class OTGDimensionManager
         FMLInterModComms.sendMessage(PluginStandardValues.MOD_ID, "unregisterDimension", compound);
     }
 
-    public static void writeNBTStrings(String id, Collection<String> strings, NBTTagCompound compound)
+    private static void writeNBTStrings(String id, Collection<String> strings, NBTTagCompound compound)
     {
         if (strings != null)
         {
@@ -137,7 +137,7 @@ public class OTGDimensionManager
 		//return orderedDimensions.containsKey(dimensionId);
 	}
 
-	public static ArrayList<Integer> GetOTGDimensions()
+	static ArrayList<Integer> GetOTGDimensions()
 	{
 		return new ArrayList<Integer>(orderedDimensions.keySet());
 	}
@@ -317,7 +317,7 @@ public class OTGDimensionManager
 		initDimension(dim, -1l);
 	}
 		
-    public static void initDimension(int dim, long seed)
+    private static void initDimension(int dim, long seed)
     {
     	String dimensionName = DimensionManager.getProviderType(dim).getName();
         WorldServer overworld = DimensionManager.getWorld(0);

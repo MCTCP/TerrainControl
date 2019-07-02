@@ -47,21 +47,20 @@ public class CustomObjectCoordinate
     
 	// OTG+
 
-	public boolean isSpawned;
-	public boolean isBranch;
-	public int branchDepth;
-	public boolean isRequiredBranch;
-	public boolean isWeightedBranch;
-	public String branchGroup;
+	boolean isSpawned;
+	int branchDepth;
+	boolean isRequiredBranch;
+	boolean isWeightedBranch;
+	String branchGroup;
 	String BO3Name;
 	String StartBO3Name; // Is filled in when its needed after the caller calls the constructor (todo, change that, ugly!)
 
-    public LocalWorld World;
+    private LocalWorld World;
 	
     public final int getChunkX(){ return (int)MathHelper.floor(x / (double)16); }
     public final int getChunkZ(){ return (int)MathHelper.floor(z / (double)16); }
 
-    public CustomObjectCoordinate(LocalWorld world, CustomObject object, String customObjectName, Rotation rotation, int x, int y, int z, boolean isBranch, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
+    public CustomObjectCoordinate(LocalWorld world, CustomObject object, String customObjectName, Rotation rotation, int x, int y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
     {
     	World = world;
 
@@ -83,7 +82,6 @@ public class CustomObjectCoordinate
         }
 
         this.z = z;
-        this.isBranch = isBranch;
         this.branchDepth = branchDepth;
 
         this.isRequiredBranch = isRequiredBranch;
@@ -230,7 +228,7 @@ public class CustomObjectCoordinate
     		rotatedZ = newZ;
     	}
 
-    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
+    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, 0, false, false, null);
     }
     
     public static CustomObjectCoordinate getRotatedCoord(int x, int y, int z, Rotation newRotation)
@@ -255,7 +253,7 @@ public class CustomObjectCoordinate
     		rotatedZ = newZ;
     	}
 
-    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
+    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, 0, false, false, null);
     }    
     
     // OTG
@@ -291,7 +289,7 @@ public class CustomObjectCoordinate
 
     // OTG+
     
-    public boolean spawnWithChecks(ChunkCoordinate chunkCoord, LocalWorld world, Random random, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
+    boolean spawnWithChecks(ChunkCoordinate chunkCoord, LocalWorld world, Random random, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
     {
     	if(getObject() == null)
     	{
@@ -355,11 +353,11 @@ public class CustomObjectCoordinate
     		rotatedZ = newZ;
     	}
 
-    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, false, 0, false, false, null);
+    	return new CustomObjectCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, 0, false, false, null);
     }
     
     // TODO: Why is this necessary for smoothing areas?
-    public static CustomObjectCoordinate getRotatedSmoothingCoords(int x, int y, int z, Rotation newRotation)
+    static CustomObjectCoordinate getRotatedSmoothingCoords(int x, int y, int z, Rotation newRotation)
     {
         // Assuming initial rotation is always north
 
@@ -405,6 +403,6 @@ public class CustomObjectCoordinate
         }
         newY = y;
 
-        return new CustomObjectCoordinate(null, null, null, newRotation, newX, newY, newZ, false, 0, false, false, null);
+        return new CustomObjectCoordinate(null, null, null, newRotation, newX, newY, newZ, 0, false, false, null);
     }
 }

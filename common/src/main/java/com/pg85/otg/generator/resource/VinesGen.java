@@ -13,11 +13,11 @@ import java.util.Random;
 
 public class VinesGen extends Resource
 {
-    public static final int[] D =
+    private static final int[] D =
     {
         -1, -1, 2, 0, 1, 3
     };
-    public static final int[] OPPOSITE_FACING =
+    private static final int[] OPPOSITE_FACING =
     {
         1, 0, 3, 2, 5, 4
     };
@@ -38,7 +38,7 @@ public class VinesGen extends Resource
                 PluginStandardValues.WORLD_HEIGHT);
     }
     
-    public boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
+    private boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
     {
         LocalMaterialData sourceBlock;
         switch (paramInt4)

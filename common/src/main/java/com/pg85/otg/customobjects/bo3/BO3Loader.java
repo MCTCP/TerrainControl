@@ -175,7 +175,7 @@ public class BO3Loader implements CustomObjectLoader
      * @param metadata   The Tag object to be cached
      * @return the meta data that was cached
      */
-    public static NamedBinaryTag registerMetadata(String pathOnDisk, NamedBinaryTag metadata)
+    private static NamedBinaryTag registerMetadata(String pathOnDisk, NamedBinaryTag metadata)
     {
         // Add it to the cache
         LoadedTags.put(pathOnDisk, metadata);

@@ -23,7 +23,7 @@ public class RavinesGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void placeBlocks(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
+    private void placeBlocks(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
     {
         Random localRandom = new Random(paramLong);
 

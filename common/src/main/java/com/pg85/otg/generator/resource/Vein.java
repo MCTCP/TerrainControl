@@ -66,7 +66,7 @@ class Vein
         }
     }
 
-    protected void spawnOre(LocalWorld world, Random rand, int x, int y, int z, VeinGen gen)
+    private void spawnOre(LocalWorld world, Random rand, int x, int y, int z, VeinGen gen)
     {
         int maxSize = gen.oreSize;
         LocalMaterialData material = gen.material;

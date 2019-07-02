@@ -15,7 +15,7 @@ public class LayerBiomeGroups extends Layer
     private int depth;
     private boolean freezeGroups;
 
-    public LayerBiomeGroups(Layer paramGenLayer, BiomeGroupManager biomeGroups, int depth, boolean freezeGroups)
+    LayerBiomeGroups(Layer paramGenLayer, BiomeGroupManager biomeGroups, int depth, boolean freezeGroups)
     {
         this.child = paramGenLayer;
         this.biomeGroupManager = biomeGroups;

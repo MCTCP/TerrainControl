@@ -36,14 +36,11 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
     public void resize()
     {
         this.listWidth = this.otgGuiPresetList.listWidth;
-        this.listHeight = parent.height;
         this.top = this.otgGuiPresetList.topMargin;
         this.bottom = this.otgGuiPresetList.height - this.otgGuiPresetList.bottomMargin;
         this.slotHeight = this.otgGuiPresetList.slotHeight;
         this.left = this.otgGuiPresetList.leftMargin;
         this.right = this.otgGuiPresetList.listWidth + this.left;
-        this.screenWidth = parent.width;
-        this.screenHeight = parent.height;
     }        
 
 	@Override

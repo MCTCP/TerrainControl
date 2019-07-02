@@ -15,7 +15,7 @@ public class LayerBiomeBeforeGroups extends Layer
     private LocalBiome[] biomes;
     private LocalBiome[] ice_biomes;
 
-    public LayerBiomeBeforeGroups(long seed, Layer childLayer, LocalBiome[] biomes, LocalBiome[] ice_biomes)
+    LayerBiomeBeforeGroups(long seed, Layer childLayer, LocalBiome[] biomes, LocalBiome[] ice_biomes)
     {
         super(seed);
         this.child = childLayer;

@@ -20,12 +20,12 @@ import com.pg85.otg.util.ChunkCoordinate;
 
 public class ForgeWorldSession extends WorldSession
 {
-	int worldBorderRadius;
-	ChunkCoordinate worldBorderCenterPoint;
-	ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>();
-	Pregenerator pregenerator;
+	private int worldBorderRadius;
+	private ChunkCoordinate worldBorderCenterPoint;
+	private ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>();
+	private Pregenerator pregenerator;
 
-	public ForgeWorldSession(LocalWorld world)
+	ForgeWorldSession(LocalWorld world)
 	{
 		super(world);
 		pregenerator = new Pregenerator(world);
@@ -110,7 +110,7 @@ public class ForgeWorldSession extends WorldSession
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
     
-	void saveWorldBorderData()
+	private void saveWorldBorderData()
 	{			
 		int dimensionId = world.getDimensionId();
 		File worldBorderFile = new File(world.getWorldSaveDir() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "WorldBorder.txt");		
@@ -145,7 +145,7 @@ public class ForgeWorldSession extends WorldSession
         }
 	}
 
-	void loadWorldBorderData()
+	private void loadWorldBorderData()
 	{	
 		int dimensionId = world.getDimensionId();
 		File worldBorderFile = new File(world.getWorldSaveDir() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "WorldBorder.txt");				

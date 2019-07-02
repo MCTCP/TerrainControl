@@ -14,15 +14,15 @@ import java.util.Random;
 public class VeinGen extends Resource
 {
 
-    public int maxAltitude; // Maximum altitude of the vein
-    public int maxRadius; // Maximum size of the vein in blocks (inclusive)
-    public int minAltitude; // Minimum altitude of the vein
-    public int minRadius; // Minimum size of the vein in blocks (inclusive)
-    public int oreFrequency; // Frequency of the ores in the vein
-    public int oreRarity; // Rarity of the ores in the vein
-    public int oreSize; // Average size of a ore in the vein
-    public MaterialSet sourceBlocks; // Blocks for the ore to spawn in
-    public double veinRarity; // Chance for the vein to spawn in a chunk
+    int maxAltitude; // Maximum altitude of the vein
+    private int maxRadius; // Maximum size of the vein in blocks (inclusive)
+    int minAltitude; // Minimum altitude of the vein
+    private int minRadius; // Minimum size of the vein in blocks (inclusive)
+    int oreFrequency; // Frequency of the ores in the vein
+    int oreRarity; // Rarity of the ores in the vein
+    int oreSize; // Average size of a ore in the vein
+    MaterialSet sourceBlocks; // Blocks for the ore to spawn in
+    private double veinRarity; // Chance for the vein to spawn in a chunk
 
     public VeinGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -81,7 +81,7 @@ public class VeinGen extends Resource
      * @return The vein that starts in the chunk, or null if there is no
      *         starting vein.
      */
-    public Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
+    private Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
     {
         // Create a random generator that is constant for this chunk and vein
         Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, material.hashCode() * (minRadius + maxRadius + 100) + world.getSeed());

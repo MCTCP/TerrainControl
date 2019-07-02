@@ -42,7 +42,7 @@ public class WorldListener
         }
 	}
 	
-    public static void overrideWorldProvider(World world)
+    private static void overrideWorldProvider(World world)
     {
         String newClassName = OTGWorldProvider.class.getName();
         Class<? extends WorldProvider> newProviderClass = OTGWorldProvider.class;

@@ -20,18 +20,7 @@ import com.pg85.otg.util.bo3.Rotation;
 
 public class CustomObjectStructurePlotter
 {
-	public class SpawnedStructureInfo
-	{
-		ChunkCoordinate chunkCoord;
-		int frequency;
-		
-		public boolean equals(SpawnedStructureInfo otherObject)
-		{
-			return chunkCoord.equals(otherObject.chunkCoord);
-		}
-	}
-
-    public boolean processing = false;
+    private boolean processing = false;
 	private HashMap<ChunkCoordinate, ArrayList<String>> structuresPerChunk; // Used as a cache by the plotting code
 	private HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
 	private HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
@@ -48,22 +37,22 @@ public class CustomObjectStructurePlotter
 		return spawnedStructuresByName.entrySet().size();	
 	}
 	
-	public void saveSpawnedStructures(LocalWorld world)
+	void saveSpawnedStructures(LocalWorld world)
 	{
 		CustomObjectStructureFileManager.saveChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, spawnedStructuresByGroup);
 	}
 	
-	public void loadSpawnedStructures(LocalWorld world)
+	void loadSpawnedStructures(LocalWorld world)
 	{		
 		CustomObjectStructureFileManager.loadChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
 	}
 	
-	public void addToStructuresPerChunkCache(ChunkCoordinate chunkCoord, ArrayList<String> BO3Names)
+	void addToStructuresPerChunkCache(ChunkCoordinate chunkCoord, ArrayList<String> BO3Names)
 	{
 		this.structuresPerChunk.put(chunkCoord, BO3Names);
 	}
 		
-    public void plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, CustomObjectStructure> structureCache, Map<ChunkCoordinate, CustomObjectStructure> worldInfoChunks)
+    void plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, CustomObjectStructure> structureCache, Map<ChunkCoordinate, CustomObjectStructure> worldInfoChunks)
     {
     	if(!processing)
     	{
@@ -127,7 +116,7 @@ public class CustomObjectStructurePlotter
 			            		if(!((BO3)bo3AndRarity.getKey()).isInvalidConfig && ((BO3)bo3AndRarity.getKey()).getSettings().isSpawnPoint)
 			            		{
 				            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
-				                	structureCoord = new CustomObjectCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ(), false, 0, false, false, null);
+				                	structureCoord = new CustomObjectCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ(), 0, false, false, null);
 				                	structureStart2 = new CustomObjectStructure(world, structureCoord, false, false);
 				                	// Get minimum size (size if spawned with branchDepth 0)
 
@@ -155,7 +144,7 @@ public class CustomObjectStructurePlotter
 			            			if(isBO3AllowedToSpawnAt(chunkCoord, ((BO3)bo3AndRarity.getKey())))
 			            			{
 					            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
-					                	structureCoord = new CustomObjectCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ(), false, 0, false, false, null);
+					                	structureCoord = new CustomObjectCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ(), 0, false, false, null);
 					                	structureStart2 = new CustomObjectStructure(world, structureCoord, false, false);
 					                	// Get minimum size (size if spawned with branchDepth 0)
 
@@ -646,7 +635,7 @@ public class CustomObjectStructurePlotter
 
 				                		if(isBO3AllowedToSpawnAt(ChunkCoordinate.fromChunkCoords((int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)), (int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))), (BO3)currentStructureSpawning[0]))
 				                		{
-						                	structureCoord = new CustomObjectCoordinate(world, ((BO3)currentStructureSpawning[0]), null, Rotation.NORTH, spawnCoordX * 16, 0, spawnCoordZ * 16, false, 0, false, false, null);
+						                	structureCoord = new CustomObjectCoordinate(world, ((BO3)currentStructureSpawning[0]), null, Rotation.NORTH, spawnCoordX * 16, 0, spawnCoordZ * 16, 0, false, false, null);
 						                	structureStart2 = new CustomObjectStructure(world, structureCoord, true, spawningStructureAtSpawn);
 
 				            	        	if(structureStart2.IsSpawned)

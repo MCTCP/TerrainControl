@@ -65,7 +65,7 @@ public class BiomeModeManager
      * @return The biome generator.
      * @see #createCached(Class, LocalWorld)
      */
-    public <T extends BiomeGenerator> BiomeGenerator create(Class<T> clazz, LocalWorld world)
+    private <T extends BiomeGenerator> BiomeGenerator create(Class<T> clazz, LocalWorld world)
     {
         try
         {

@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class SurfacePatchGen extends Resource
 {
-    protected LocalMaterialData decorationAboveReplacements;
+    private LocalMaterialData decorationAboveReplacements;
     private final int maxAltitude;
     private final int minAltitude;
     /**

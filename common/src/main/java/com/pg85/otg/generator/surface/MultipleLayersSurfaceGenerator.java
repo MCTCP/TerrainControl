@@ -14,31 +14,6 @@ import java.util.List;
 
 public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
 {
-
-    public static class LayerChoice implements Comparable<LayerChoice>
-    {
-        public final LocalMaterialData surfaceBlock;
-        public final LocalMaterialData groundBlock;
-        public final float maxNoise;
-
-        public LayerChoice(LocalMaterialData surfaceBlock, LocalMaterialData groundBlock, float maxNoise)
-        {
-            this.surfaceBlock = surfaceBlock;
-            this.groundBlock = groundBlock;
-            this.maxNoise = maxNoise;
-        }
-
-        @Override
-        public int compareTo(LayerChoice that)
-        {
-            float delta = this.maxNoise - that.maxNoise;
-            // The number 65565 is just randomly chosen, any positive number
-            // works fine as long as it can represent the floating point delta
-            // as an integer
-            return (int) (delta * 65565);
-        }
-    }
-
     // Must be sorted based on the noise field
     private List<LayerChoice> layerChoices;
 
