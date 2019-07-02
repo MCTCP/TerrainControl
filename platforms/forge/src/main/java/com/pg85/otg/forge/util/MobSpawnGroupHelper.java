@@ -175,7 +175,7 @@ public final class MobSpawnGroupHelper
 	    	{
 		    	for(ResourceLocation mobName1 : mobNames)
 		    	{
-		    		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(entityName))
+		    		if(mobName1.getPath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(entityName))
 		    		{
 		    			entity = (Class<? extends Entity>) EntityList.getClass(mobName1);
 		    			FoundEntitiesByName.put(entityName, entity);
@@ -207,7 +207,7 @@ public final class MobSpawnGroupHelper
     	ResourceLocation mobName = EntityList.getKey(entityClass);
     	if(mobName != null)
     	{
-    		return mobName.getResourcePath();
+    		return mobName.getPath();
     	}
 
     	if(OTG.getPluginConfig().spawnLog)

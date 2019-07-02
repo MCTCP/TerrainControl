@@ -144,7 +144,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 					// Can happen when chunkExists() in this.world.getChunk() mistakenly returns false
 					// This could potentially cause an infinite loop but than't can't be disallowed looping because of async calls
 					// to ProvideChunk() by updateBlocks() on server tick.
-					chunk = this.world.getWorld().getChunkFromChunkCoords(chunkX, chunkZ);
+					chunk = this.world.getWorld().getChunk(chunkX, chunkZ);
 
 					if(chunk == null)
 					{
@@ -353,7 +353,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 			// For BO3AtSpawn we may be forced to populate a chunk outside of the chunks being populated.
 			if(this.allowSpawningOutsideBounds)
 			{
-		        Chunk spawnedChunk = this.world.getWorld().getChunkFromChunkCoords(chunkX, chunkZ);
+		        Chunk spawnedChunk = this.world.getWorld().getChunk(chunkX, chunkZ);
 		        if(spawnedChunk == null)
 		        {
 		        	OTG.log(LogMarker.FATAL, "Chunk request failed X" + chunkX + " Z" + chunkZ);
@@ -393,7 +393,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     		}
     	}
 
-        Chunk spawnedChunk = this.world.getWorld().getChunkFromChunkCoords(chunkX, chunkZ);
+        Chunk spawnedChunk = this.world.getWorld().getChunk(chunkX, chunkZ);
         if(spawnedChunk == null)
         {
         	OTG.log(LogMarker.FATAL, "Chunk request failed X" + chunkX + " Z" + chunkZ);
@@ -411,9 +411,8 @@ public class OTGChunkGenerator implements IChunkGenerator
     // TODO: This looks interesting, could use it more?
     private Chunk getLoadedChunkWithoutMarkingActive(int chunkX, int chunkZ)
     {
-        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) this.world.getWorld().getChunkProvider();
         long i = ChunkPos.asLong(chunkX, chunkZ);
-        return (Chunk) chunkProviderServer.id2ChunkMap.get(i);
+        return (Chunk) ((ChunkProviderServer) this.world.getWorld().getChunkProvider()).loadedChunks.get(i);
     }
     
     // Spawn chunk fix for OTG+    

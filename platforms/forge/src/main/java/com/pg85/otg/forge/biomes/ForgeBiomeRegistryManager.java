@@ -73,7 +73,7 @@ public class ForgeBiomeRegistryManager
 		BitSet biomeRegistryAvailabiltyMap = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryAvailabiltyMap();
 		for(Entry<ResourceLocation, Biome> biome : ForgeRegistries.BIOMES.getEntries())
 		{
-			if(!(biome.getKey().getResourceDomain().toLowerCase().equals("openterraingenerator")))
+			if(!(biome.getKey().getNamespace().toLowerCase().equals("openterraingenerator")))
 			{
 				continue;
 			}

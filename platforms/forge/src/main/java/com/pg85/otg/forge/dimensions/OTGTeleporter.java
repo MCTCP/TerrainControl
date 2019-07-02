@@ -214,7 +214,7 @@ public class OTGTeleporter
             }
 
             //_this.mcServer.getPlayerList().transferPlayerToDimension(_this, dimensionIn, teleporter);
-            transferPlayerToDimension(_this, dimensionIn, teleporter, _this.mcServer.getPlayerList(), createPortal, false);
+            transferPlayerToDimension(_this, dimensionIn, teleporter, _this.getServer().getPlayerList(), createPortal, false);
             _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
             _this.lastExperience = -1;
             _this.lastHealth = -1.0F;

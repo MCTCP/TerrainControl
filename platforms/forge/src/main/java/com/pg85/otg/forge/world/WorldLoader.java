@@ -483,7 +483,7 @@ public final class WorldLoader
     	// Don't remove any biomedict info for vanilla biomes or biomes added by other mods
     	for(Entry<ResourceLocation, Biome> biome : ForgeRegistries.BIOMES.getEntries())
     	{
-    		String resourceDomain = biome.getKey().getResourceDomain();
+    		String resourceDomain = biome.getKey().getNamespace();
 
     		if(
 				!resourceDomain.equals("openterraingenerator") &&

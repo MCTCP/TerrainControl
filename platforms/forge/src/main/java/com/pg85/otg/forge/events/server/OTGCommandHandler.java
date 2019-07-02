@@ -385,7 +385,7 @@ public final class OTGCommandHandler implements ICommand
 	        	{
     		        if(EntityList.getClass(entry) != null)
     		        {
-		    			String msg = entry.getResourceDomain() + ":" + entry.getResourcePath();
+		    			String msg = entry.getNamespace() + ":" + entry.getPath();
 		    		    for (int k3 = 0; k3 < aenumcreaturetype.length; ++k3)
 		    		    {
 		    		        EnumCreatureType enumcreaturetype = aenumcreaturetype[k3];

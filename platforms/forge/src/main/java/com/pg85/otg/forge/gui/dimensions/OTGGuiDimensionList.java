@@ -606,10 +606,10 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 }
             }
 
-            WorldType.parseWorldType("OTG").onGUICreateWorldPress();
+            WorldType.byName("OTG").onGUICreateWorldPress();
 
             GameType gametype = this.dimensions.get(0).GameType.equals("Hardcore") ? GameType.SURVIVAL : GameType.getByName(this.dimensions.get(0).GameType.toLowerCase());
-            WorldSettings worldsettings = new WorldSettings(i, gametype, true, this.dimensions.get(0).GameType.equals("Hardcore"), WorldType.parseWorldType("OTG"));
+            WorldSettings worldsettings = new WorldSettings(i, gametype, true, this.dimensions.get(0).GameType.equals("Hardcore"), WorldType.byName("OTG"));
             worldsettings.setGeneratorOptions("OpenTerrainGenerator");
 
             if(this.dimensions.get(0).BonusChest)
@@ -624,7 +624,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 			// Don't overwrite existing worlds, UI shouldn't allow it anyway
             if (this.mc.getSaveLoader().getWorldInfo(worldName) == null)
             {    				
-        		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.mcDataDir.getAbsolutePath() + "\\saves\\"), this.worldName);
+        		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.gameDir.getAbsolutePath() + "\\saves\\"), this.worldName);
         		forgeWorldConfig.WorldName = this.worldName;
         		forgeWorldConfig.Overworld = this.dimensions.get(0).clone();
         		forgeWorldConfig.Dimensions = new ArrayList<DimensionConfig>();

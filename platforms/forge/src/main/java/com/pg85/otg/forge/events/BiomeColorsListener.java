@@ -34,7 +34,7 @@ public final class BiomeColorsListener
                 {
                 	// Get world name from resourcelocation
                 	// TODO: Get world name from somewhere sensical...
-                	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getResourcePath().split("_")[0]);
+                	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getPath().split("_")[0]);
                 }
                 catch (BiomeNotFoundException e)
                 {
