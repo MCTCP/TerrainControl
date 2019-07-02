@@ -20,7 +20,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.common.ForgeHooks;
 
-class Info extends OTGGuiScrollingList
+class OTGGuiScrollingListInfo extends OTGGuiScrollingList
 {
 	private final OTGGuiPresetList otgGuiPresetList;
 	@Nullable
@@ -28,7 +28,7 @@ class Info extends OTGGuiScrollingList
     private Dimension logoDims;
     private List<ITextComponent> lines = null;
 
-    public Info(OTGGuiPresetList otgGuiPresetList, List<String> lines, @Nullable ResourceLocation logoPath, Dimension logoDims)
+    public OTGGuiScrollingListInfo(OTGGuiPresetList otgGuiPresetList, List<String> lines, @Nullable ResourceLocation logoPath, Dimension logoDims)
     {
         super(
     		  otgGuiPresetList.getMinecraftInstance(),

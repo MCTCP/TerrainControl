@@ -134,7 +134,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     	this.btnContinue.enabled = this.selectedPreset != null;
         if (this.selectedPreset == null)
         {
-        	this.presetInfo = new Info(this, null, null, null);           	
+        	this.presetInfo = new OTGGuiScrollingListInfo(this, null, null, null);           	
             return;
         }
 
@@ -230,7 +230,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         lines.add((description != null ? description : this.selectedPreset.getSecond().description));
         lines.add("");
 
-        presetInfo = new Info(this, lines, logoPath, logoDims);       
+        presetInfo = new OTGGuiScrollingListInfo(this, lines, logoPath, logoDims);       
     }
     
     public GuiYesNo askDeleteSettings(GuiYesNoCallback p_152129_0_, String worldName)
@@ -301,7 +301,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     	if(this.presetsList == null)
     	{
 	        this.presetsList = new OTGGuiSlotPresetList(this, this);    	
-	        this.presetInfo = new Info(this, null, null, null);
+	        this.presetInfo = new OTGGuiScrollingListInfo(this, null, null, null);
     	} else {
     		this.presetsList.resize();
     	}

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.gui.IGuiListEntry;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionSettingsList;
+import com.pg85.otg.forge.pregenerator.Pregenerator;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 

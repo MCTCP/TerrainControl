@@ -4,8 +4,8 @@ import java.util.Random;
 
 import com.google.common.base.Preconditions;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.forge.world.ForgeWorld;
-import com.pg85.otg.generator.SpawnableObject;
 import com.pg85.otg.util.bo3.Rotation;
 
 import net.minecraft.util.math.BlockPos;

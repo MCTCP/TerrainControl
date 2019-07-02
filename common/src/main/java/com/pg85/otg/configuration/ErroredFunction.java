@@ -10,7 +10,7 @@ public final class ErroredFunction<T> extends ConfigFunction<T>
     private final List<String> args;
     public final String error;
 
-    ErroredFunction(String name, T holder, List<String> args, String error)
+    public ErroredFunction(String name, T holder, List<String> args, String error)
     {
         super(holder);
         this.name = name;

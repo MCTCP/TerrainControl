@@ -1,4 +1,4 @@
-package com.pg85.otg.generator;
+package com.pg85.otg.generator.surface;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
@@ -29,7 +29,7 @@ public class FrozenSurfaceHelper
      * Freezes and Applied snow to an offset chunkCoordinate
      * @param chunkCoord The chunk to freeze and snow on
      */
-    protected void freezeChunk(ChunkCoordinate chunkCoord)
+    public void freezeChunk(ChunkCoordinate chunkCoord)
     {
         int x = chunkCoord.getBlockXCenter();
         int z = chunkCoord.getBlockZCenter();

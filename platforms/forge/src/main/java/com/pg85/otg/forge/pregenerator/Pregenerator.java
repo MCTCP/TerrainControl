@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.generator;
+package com.pg85.otg.forge.pregenerator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

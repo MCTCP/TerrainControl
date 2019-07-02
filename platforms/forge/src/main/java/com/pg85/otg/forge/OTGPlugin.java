@@ -12,6 +12,7 @@ import com.pg85.otg.forge.events.dimensions.EntityTravelToDimensionListener;
 import com.pg85.otg.forge.events.dimensions.RightClickListener;
 import com.pg85.otg.forge.events.server.SaveServerHandler;
 import com.pg85.otg.forge.events.server.ServerEventListener;
+import com.pg85.otg.forge.events.server.ServerTickHandler;
 import com.pg85.otg.forge.events.server.UnloadServerHandler;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
 import com.pg85.otg.forge.generator.structure.OTGRareBuildingStart;
@@ -104,7 +105,7 @@ public class OTGPlugin
         MinecraftForge.EVENT_BUS.register(new BiomeColorsListener());
 
         // Register server tick handler which is used for the pre-generator, dimAbove/dimBelow, mob/entity spawning etc.
-        MinecraftForge.EVENT_BUS.register(new ServerEventListener());
+        MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
 
         // Register client tick handler for handling particles.
         MinecraftForge.EVENT_BUS.register(new ClientTickHandler());

@@ -1,5 +1,7 @@
-package com.pg85.otg.configuration;
+package com.pg85.otg.configuration.biome.settings;
 
+import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.ErroredFunction;
 import com.pg85.otg.configuration.biome.BiomeGroup;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;

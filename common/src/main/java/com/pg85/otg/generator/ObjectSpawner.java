@@ -33,6 +33,7 @@ import com.pg85.otg.generator.resource.UndergroundLakeGen;
 import com.pg85.otg.generator.resource.VeinGen;
 import com.pg85.otg.generator.resource.VinesGen;
 import com.pg85.otg.generator.resource.WellGen;
+import com.pg85.otg.generator.surface.FrozenSurfaceHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;

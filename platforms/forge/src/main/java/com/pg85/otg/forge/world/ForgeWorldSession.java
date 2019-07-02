@@ -14,7 +14,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
-import com.pg85.otg.forge.generator.Pregenerator;
+import com.pg85.otg.forge.pregenerator.Pregenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 

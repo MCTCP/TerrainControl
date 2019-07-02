@@ -1,4 +1,4 @@
-package com.pg85.otg.generator;
+package com.pg85.otg.customobjects;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.bo3.Rotation;

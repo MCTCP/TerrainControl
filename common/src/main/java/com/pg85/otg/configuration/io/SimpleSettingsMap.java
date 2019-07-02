@@ -2,8 +2,8 @@ package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFunction;
-import com.pg85.otg.configuration.BiomeResourcesManager;
 import com.pg85.otg.configuration.ErroredFunction;
+import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.io.RawSettingValue.ValueType;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
