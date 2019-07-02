@@ -159,7 +159,7 @@ public class WorldListener
 	    			if((ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld()) != null)
 	    			{    				
 		    			//OTG.log(LogMarker.INFO, "Unloading world " + event.getWorld().getWorldInfo().getWorldName() + " at dim " + dimId);
-		    			((OTGWorldType)event.getWorld().getWorldType()).worldLoader.unloadWorld(event.getWorld(), false);
+		    			((ForgeEngine)OTG.getEngine()).getWorldLoader().unloadWorld(event.getWorld(), false);
 	    			} else {
 	    				// World has already been unloaded, only happens when shutting down server?
 	    			}

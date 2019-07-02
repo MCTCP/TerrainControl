@@ -118,8 +118,6 @@ import java.util.*;
 
 public class BukkitWorld implements LocalWorld
 {
-    private static int NextBiomeId = DefaultBiome.values().length;
-
     private static final int MAX_BIOMES_COUNT = 4096;
     private static final int MAX_SAVED_BIOMES_COUNT = 256;
     private static final int STANDARD_WORLD_HEIGHT = 128;
@@ -166,546 +164,12 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga2 taigaTree2;
 
     private Chunk[] chunkCache;
+	BukkitWorldSession worldSession;
 
     public BukkitWorld(String _name)
     {
         this.name = _name;
-        this.WorldSession = new BukkitWorldSession(this);
-    }
-
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
-    {
-        BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds, this.getName());
-        this.biomeNames.put(biome.getName(), biome);
-
-        return biome;
-    }
-
-    @Override
-    public int getMaxBiomesCount()
-    {
-        return MAX_BIOMES_COUNT;
-    }
-
-    @Override
-    public int getMaxSavedBiomesCount()
-    {
-        return MAX_SAVED_BIOMES_COUNT;
-    }
-
-    @Override
-    public int getFreeBiomeId()
-    {
-        return NextBiomeId++;
-    }
-
-    @Override
-    public ArrayList<LocalBiome> getAllBiomes()
-    {
-    	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
-		for(LocalBiome biome : this.settings.getBiomeArrayByOTGId())
-		{
-			biomes.add(biome);
-		}
-    	return biomes;
-    }
-
-    @Override
-    public LocalBiome getBiomeByOTGIdOrNull(int id)
-    {
-        return settings.getBiomeByOTGIdOrNull(id);
-    }
-    
-	@Override
-	public LocalBiome getFirstBiomeOrNull() {
-		return biomeNames.size() > 0 ? (LocalBiome)biomeNames.values().toArray()[0] : null;
-	}
-
-    @Override
-    public LocalBiome getBiomeByNameOrNull(String name)
-    {
-        return biomeNames.get(name);
-    }
-
-    @Override
-    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes()
-    {
-        // Loop through all default biomes and create the default
-        // settings for them
-        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
-        for (DefaultBiome defaultBiome : DefaultBiome.values())
-        {
-            int id = defaultBiome.Id;
-            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(BukkitMojangSettings.fromId(id), STANDARD_WORLD_HEIGHT);
-            standardBiomes.add(instruction);
-        }
-
-        return standardBiomes;
-    }
-
-    @Override
-    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
-    {
-        WorldConfig worldConfig = this.settings.getWorldConfig();
-
-        if (worldConfig.strongholdsEnabled)
-            this.strongholdGen.a(this.world, chunkX, chunkZ, null);
-        if (worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.a(this.world, chunkX, chunkZ, null);
-        if (worldConfig.villagesEnabled && dry)
-            this.villageGen.a(this.world, chunkX, chunkZ, null);
-        if (worldConfig.rareBuildingsEnabled)
-        	this.rareBuildingGen.a(this.world, chunkX, chunkZ, null);
-        if (worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.a(this.world, chunkX, chunkZ, null);
-        if (worldConfig.oceanMonumentsEnabled)
-            this.oceanMonumentGen.a(this.world, chunkX, chunkZ, null);
-        if (worldConfig.woodLandMansionsEnabled)
-        	this.mansionGen.a(this.world, chunkX, chunkZ, null);
-    }
-
-    @Override
-    public boolean placeDungeon(Random rand, int x, int y, int z)
-    {
-        return dungeon.generate(world, rand, new BlockPosition(x, y, z));
-    }
-
-    @Override
-    public boolean placeFossil(Random rand, ChunkCoordinate chunkCoord)
-    {
-        return fossil.generate(world, rand, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
-    }
-
-    @Override
-    public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
-    {
-        BlockPosition blockPos = new BlockPosition(x, y, z);
-        switch (type)
-        {
-            case Tree:
-                return tree.generate(this.world, rand, blockPos);
-            case BigTree:
-                return bigTree.generate(this.world, rand, blockPos);
-            case Forest:
-            case Birch:
-                return birchTree.generate(this.world, rand, blockPos);
-            case TallBirch:
-                return longBirchTree.generate(this.world, rand, blockPos);
-            case HugeMushroom:
-                if (rand.nextBoolean())
-                {
-                    return hugeBrownMushroom.generate(this.world, rand, blockPos);
-                } else
-                {
-                    return hugeRedMushroom.generate(this.world, rand, blockPos);
-                }
-            case HugeRedMushroom:
-                return hugeRedMushroom.generate(this.world, rand, blockPos);
-            case HugeBrownMushroom:
-                return hugeBrownMushroom.generate(this.world, rand, blockPos);
-            case SwampTree:
-                return swampTree.generate(this.world, rand, blockPos);
-            case Taiga1:
-                return taigaTree1.generate(this.world, rand, blockPos);
-            case Taiga2:
-                return taigaTree2.generate(this.world, rand, blockPos);
-            case JungleTree:
-                return jungleTree.generate(this.world, rand, blockPos);
-            case GroundBush:
-                return groundBush.generate(this.world, rand, blockPos);
-            case CocoaTree:
-                return cocoaTree.generate(this.world, rand, blockPos);
-            case Acacia:
-                return acaciaTree.generate(this.world, rand, blockPos);
-            case DarkOak:
-                return darkOakTree.generate(this.world, rand, blockPos);
-            case HugeTaiga1:
-                return hugeTaigaTree1.generate(this.world, rand, blockPos);
-            case HugeTaiga2:
-                return hugeTaigaTree2.generate(this.world, rand, blockPos);
-            default:
-                throw new RuntimeException("Failed to handle tree of type " + type.toString());
-        }
-    }
-
-    @Override
-    public boolean placeDefaultStructures(Random random, ChunkCoordinate chunkCoord)
-    {
-        ChunkCoordIntPair chunkIntPair = new ChunkCoordIntPair(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
-        WorldConfig worldConfig = this.settings.getWorldConfig();
-        boolean villageGenerated = false;
-
-        if (worldConfig.strongholdsEnabled)
-            this.strongholdGen.a(this.world, random, chunkIntPair);
-        if (worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.a(this.world, random, chunkIntPair);
-        if (worldConfig.villagesEnabled)
-            villageGenerated = this.villageGen.a(this.world, random, chunkIntPair);
-        if (worldConfig.rareBuildingsEnabled)
-            this.rareBuildingGen.a(this.world, random, chunkIntPair);
-        if (worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.a(this.world, random, chunkIntPair);
-        if (worldConfig.oceanMonumentsEnabled)
-            this.oceanMonumentGen.a(this.world, random, chunkIntPair);
-        if (worldConfig.woodLandMansionsEnabled)
-        	this.mansionGen.a(this.world, random, chunkIntPair);
-
-        return villageGenerated;
-    }
-
-    @Override
-    public void replaceBlocks(ChunkCoordinate chunkCoord)
-    {
-        if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
-        {
-            // Don't waste time here, ReplacedBlocks is empty everywhere
-            return;
-        }
-
-        // Get cache
-        Chunk[] cache = getChunkCache(chunkCoord);
-
-        // Replace the blocks
-        for(int i = 0; i < 4; i++) {
-            replaceBlocks(cache[i], 0, 0, 16);
-        }
-    }
-
-    private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk, int size)
-    {
-        int endXInChunk = startXInChunk + size;
-        int endZInChunk = startZInChunk + size;
-        int worldStartX = rawChunk.locX * 16;
-        int worldStartZ = rawChunk.locZ * 16;
-
-        ChunkSection[] sectionsArray = rawChunk.getSections();
-
-        for (ChunkSection section : sectionsArray)
-        {
-            if (section == null)
-                continue;
-
-            for (int sectionX = startXInChunk; sectionX < endXInChunk; sectionX++)
-            {
-                for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
-                {
-                    LocalBiome biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
-                    if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
-                    {
-                        LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
-                        for (int sectionY = 0; sectionY < 16; sectionY++)
-                        {
-                            IBlockData block = section.getType(sectionX, sectionY, sectionZ);
-                            int blockId = Block.getId(block.getBlock());
-                            if (replaceArray[blockId] == null)
-                                continue;
-
-                            int y = section.getYPosition() + sectionY;
-                            if (y >= replaceArray[blockId].length)
-                                break;
-
-                            BukkitMaterialData replaceTo = (BukkitMaterialData) replaceArray[blockId][y];
-                            if (replaceTo == null || replaceTo.getBlockId() == blockId)
-                                continue;
-
-                            section.setType(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    @Override
-    public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord)
-    {
-        SpawnerCreature.a(this.world, ((BukkitBiome) biome).getHandle(), chunkCoord.getChunkX() * 16 + 8, chunkCoord.getChunkZ() * 16 + 8, 16, 16, random);
-    }
-
-    private Chunk getChunk(int x, int y, int z)
-    {
-        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-            return null;
-
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
-
-        if (this.chunkCache == null)
-        {
-            // Blocks requested outside population step
-            // (Tree growing, /otg spawn, etc.)
-           return world.getChunkAt(chunkX, chunkZ);
-        }
-
-        // Restrict to chunks we are currently populating
-        Chunk topLeftCachedChunk = this.chunkCache[0];
-        int indexX = (chunkX - topLeftCachedChunk.locX);
-        int indexZ = (chunkZ - topLeftCachedChunk.locZ);
-        if ((indexX == 0 || indexX == 1) && (indexZ == 0 || indexZ == 1))
-        {
-            return this.chunkCache[indexX | (indexZ << 1)];
-        } else
-        {
-            // Outside area
-            if (this.settings.getWorldConfig().populationBoundsCheck)
-            {
-                return null;
-            }
-            if (world.getChunkProviderServer().isLoaded(chunkX, chunkZ))
-            {
-                return world.getChunkAt(chunkX, chunkZ);
-            }
-            return null;
-        }
-    }
-
-    @Override
-    public int getLiquidHeight(int x, int z)
-    {
-        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
-        {
-            LocalMaterialData material = getMaterial(x, y, z, false);
-            if (material.isLiquid())
-            {
-                return y + 1;
-            } else if (material.isSolid())
-            {
-                // Failed to find a liquid
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public int getSolidHeight(int x, int z)
-    {
-        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
-        {
-            LocalMaterialData material = getMaterial(x, y, z, false);
-            if (material.isSolid())
-            {
-                return y + 1;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
-    {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null || y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-        {
-            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
-        }
-
-        return BukkitMaterialData.ofMinecraftBlockData(chunk.a(x, y, z));
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
-    {
-        /*
-         * This method usually breaks on every Minecraft update. Always check
-         * whether the names are still correct. Often, you'll also need to
-         * rewrite parts of this method for newer block place logic.
-         */
-
-        try
-        {
-            if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-            {
-                return;
-            }
-
-            IBlockData blockData = ((BukkitMaterialData) material).internalBlock();
-
-            // Get chunk from (faster) custom cache
-            Chunk chunk = this.getChunk(x, y, z);
-
-            if (chunk == null)
-            {
-                // Chunk is unloaded
-                return;
-            }
-
-            BlockPosition blockPos = new BlockPosition(x, y, z);
-
-            // Disable nearby block physics (except for tile entities) and set block
-            boolean oldCaptureBlockStates = this.world.captureBlockStates;
-            this.world.captureBlockStates = !(blockData.getBlock() instanceof ITileEntity);
-            IBlockData oldBlockData = chunk.a(blockPos, blockData);
-            this.world.captureBlockStates = oldCaptureBlockStates;
-
-            if (oldBlockData == null)
-            {
-                return;
-            }
-
-            if (blockData.c() != oldBlockData.c() || blockData.d() != oldBlockData.d())
-            {
-                if (isSafeForLightUpdates(chunk, x, z))
-                {
-                    // Relight
-                    world.methodProfiler.a("checkLight");
-                    world.w(blockPos);
-                    world.methodProfiler.b();
-                }
-            }
-
-    	    if (metaDataTag != null)
-    	    {
-    	    	attachMetadata(x, y, z, metaDataTag);
-    	    }
-
-            // Notify world: (2 | 16) == update client, don't update observers
-            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
-        } catch (Throwable t)
-        {
-            String populatingChunkInfo = this.chunkCache == null? "(no chunk)" :
-                    this.chunkCache[0].locX + "," + this.chunkCache[0].locZ;
-            // Add location info to error
-            RuntimeException runtimeException = new RuntimeException("Error setting "
-                    + material + " block at " + x + "," + y + "," + z
-                    + " while populating chunk " + populatingChunkInfo, t);
-            runtimeException.setStackTrace(new StackTraceElement[0]);
-            throw runtimeException;
-        }
-    }
-
-    /**
-     * When a light update hits an unloaded chunk, Minecraft unfortunately
-     * attempts to generate this chunk. When this happens, two chunks will be
-     * populated at the same time, which crashes the server. We must prevent
-     * this by checking beforehand whether a light update will touch unloaded
-     * chunks. If this is the case, the light update must be skipped.
-     * @param currentChunk Current chunk (contains the following x and z)
-     * @param x Block x in the world.
-     * @param z Block z in the world.
-     * @return True if it is safe to perform a light update at this location.
-     */
-    private boolean isSafeForLightUpdates(Chunk currentChunk, int x, int z)
-    {
-        int xInChunk = x & 0xf;
-        int zInChunk = z & 0xf;
-        if (xInChunk == 0 || xInChunk == 15 || zInChunk == 0 || zInChunk == 15)
-        {
-            // We're at the edge of a chunk
-            // Ensure a larger region is loaded
-            return currentChunk.areNeighborsLoaded(2);
-        }
-        return currentChunk.areNeighborsLoaded(1);
-    }
-
-    @Override
-    public int getHighestBlockYAt(int x, int z)
-    {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-        {
-            return -1;
-        }
-
-        int y = chunk.b(x & 0xf, z & 0xf);
-
-        // Fix for incorrect light map
-        boolean incorrectHeightMap = false;
-        while (y < getHeightCap() && chunk.a(x, y, z).getMaterial().blocksLight())
-        {
-            y++;
-            incorrectHeightMap = true;
-        }
-        if (incorrectHeightMap && isSafeForLightUpdates(chunk, x, z))
-        {
-            // Let Minecraft know that it made an error
-            world.w(new BlockPosition(x, y, z)); // world.relight
-        }
-
-        return y;
-    }
-
-    @Override
-    public void startPopulation(ChunkCoordinate chunkCoord)
-    {
-        if (this.chunkCache != null && settings.getWorldConfig().populationBoundsCheck)
-        {
-            throw new IllegalStateException("Chunk is already being populated."
-                    + " This may be a bug in " + PluginStandardValues.PLUGIN_NAME + ", but it may also be"
-                    + " another mod that is poking in unloaded chunks.\nSet"
-                    + " PopulationBoundsCheck to false in the WorldConfig to"
-                    + " disable this error.");
-        }
-
-        // Initialize cache
-        this.chunkCache = loadFourChunks(chunkCoord);
-    }
-
-    private Chunk[] getChunkCache(ChunkCoordinate topLeft)
-    {
-        if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].locX, this.chunkCache[0].locZ))
-        {
-            // Cache is invalid, most likely because two chunks are being populated at once
-            if (this.settings.getWorldConfig().populationBoundsCheck)
-            {
-                // ... but this can never happen, as startPopulation() checks for this if populationBoundsCheck is set
-                // to true. So we must have a bug.
-                throw new IllegalStateException("chunkCache is null! You've got a bug!");
-            } else
-            {
-                // Use a temporary cache, best we can do
-                return this.loadFourChunks(topLeft);
-            }
-        }
-        return this.chunkCache;
-    }
-
-    private Chunk[] loadFourChunks(ChunkCoordinate topLeft)
-    {
-        Chunk[] chunkCache = new Chunk[4];
-        for (int indexX = 0; indexX <= 1; indexX++)
-        {
-            for (int indexZ = 0; indexZ <= 1; indexZ++)
-            {
-                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(
-                        topLeft.getChunkX() + indexX,
-                        topLeft.getChunkZ() + indexZ
-                );
-            }
-        }
-        return chunkCache;
-    }
-
-    @Override
-    public void endPopulation()
-    {
-        if (this.chunkCache == null && settings.getWorldConfig().populationBoundsCheck)
-        {
-            throw new IllegalStateException("Chunk is not being populated."
-                    + " This may be a bug in Open Terrain Generator, but it may also be"
-                    + " another mod that is poking in unloaded chunks. Set"
-                    + " PopulationBoundsCheck to false in the WorldConfig to"
-                    + " disable this error.");
-        }
-        this.chunkCache = null;
-    }
-
-    @Override
-    public int getLightLevel(int x, int y, int z)
-    {
-        return world.j(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
-    }
-
-    @Override
-    public boolean isLoaded(int x, int y, int z)
-    {
-        return this.getChunk(x, y, z) != null;
-    }
-
-    @Override
-    public ConfigProvider getConfigs()
-    {
-        return this.settings;
+        this.worldSession = new BukkitWorldSession(this);
     }
 
     @Override
@@ -720,26 +184,15 @@ public class BukkitWorld implements LocalWorld
         return world.getSeed();
     }
 
-    @Override
-    public int getHeightCap()
-    {
-        return settings.getWorldConfig().worldHeightCap;
-    }
-
-    @Override
-    public int getHeightScale()
-    {
-        return settings.getWorldConfig().worldHeightScale;
-    }
-
-    public OTGChunkGenerator getChunkGenerator()
-    {
-        return this.generator;
-    }
-
     public World getWorld()
     {
         return this.world;
+    }
+    
+    @Override
+    public ConfigProvider getConfigs()
+    {
+        return this.settings;
     }
 
     /**
@@ -767,6 +220,81 @@ public class BukkitWorld implements LocalWorld
         this.biomeNames.clear();
         this.settings.reload();
     }
+    
+    public OTGChunkGenerator getChunkGenerator()
+    {
+        return this.generator;
+    }
+    
+    public void setChunkGenerator(OTGChunkGenerator _generator)
+    {
+        this.generator = _generator;
+    }
+		
+    @Override
+    public CustomObjectStructureCache getStructureCache()
+    {
+        return this.structureCache;
+    }
+
+    @Override
+    public BiomeGenerator getBiomeGenerator() {
+        return biomeGenerator;
+    }
+	
+	@Override
+	public ObjectSpawner getObjectSpawner()
+	{
+		return this.generator.getObjectSpawner();
+	}
+
+    @Override
+	public WorldSession getWorldSession()
+	{
+    	// TODO Implement this properly (for particles)
+		return worldSession;
+	}
+    	
+	@Override
+	public String getWorldSettingsName()
+	{
+		// TODO: Make sure this returns the correct name
+		return this.getWorld().getWorldData().getName();
+	}
+
+	@Override
+	public File getWorldSaveDir()
+	{
+		// TODO: Make sure this returns the correct directory
+		return this.getWorld().getDataManager().getDirectory();
+	}
+
+	@Override
+	public int getDimensionId()
+	{
+		return this.getWorld().worldProvider.getDimensionManager().getDimensionID();
+	}
+	
+	@Override
+	public void deleteWorldSessionData()
+	{
+		// TODO Implement this (for spawners and particles)
+		throw new RuntimeException();
+	}
+   
+    @Override
+    public int getHeightCap()
+    {
+        return settings.getWorldConfig().worldHeightCap;
+    }
+
+    @Override
+    public int getHeightScale()
+    {
+        return settings.getWorldConfig().worldHeightScale;
+    }
+    
+    // World
 
     /**
      * Enables/reloads this BukkitWorld. If you are reloading, don't forget to
@@ -864,15 +392,29 @@ public class BukkitWorld implements LocalWorld
             this.structureCache.reload(this);
         }
     }
+    
+    /**
+     * Cleans up references of itself in Minecraft's native code.
+     */
+    public void disable()
+    {
+        // Restore old world provider if replaced
+        if (world.worldProvider instanceof OTGWorldProvider)
+        {
+            world.worldProvider = ((OTGWorldProvider) world.worldProvider).getOldWorldProvider();
+        }
 
+        // Restore vanilla chunk generator
+        this.injectInternalChunkGenerator(new CustomChunkGenerator(world, getSeed(), generator));
+    }
+    
     private void injectWorldChunkManager(BiomeGenerator biomeGenerator)
     {
         if (biomeGenerator instanceof BukkitVanillaBiomeGenerator)
         {
             // Let our biome generator depend on Minecraft's
             ((BukkitVanillaBiomeGenerator) biomeGenerator).setWorldChunkManager(this.world.worldProvider.k());
-        } else
-        {
+        } else {
             // Let Minecraft's biome generator depend on ours
             ReflectionHelper.setValueInFieldOfType(this.world.worldProvider,
                     WorldChunkManager.class, new OTGWorldChunkManager(this, biomeGenerator));
@@ -889,26 +431,67 @@ public class BukkitWorld implements LocalWorld
         }
     }
 
-    /**
-     * Cleans up references of itself in Minecraft's native code.
-     */
-    public void disable()
+    
+    @Override
+    public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        // Restore old world provider if replaced
-        if (world.worldProvider instanceof OTGWorldProvider)
+        if (this.chunkCache != null && settings.getWorldConfig().populationBoundsCheck)
         {
-            world.worldProvider = ((OTGWorldProvider) world.worldProvider).getOldWorldProvider();
+            throw new IllegalStateException("Chunk is already being populated."
+                    + " This may be a bug in " + PluginStandardValues.PLUGIN_NAME + ", but it may also be"
+                    + " another mod that is poking in unloaded chunks.\nSet"
+                    + " PopulationBoundsCheck to false in the WorldConfig to"
+                    + " disable this error.");
         }
 
-        // Restore vanilla chunk generator
-        this.injectInternalChunkGenerator(new CustomChunkGenerator(world, getSeed(), generator));
+        // Initialize cache
+        this.chunkCache = loadFourChunks(chunkCoord);
     }
 
-    public void setChunkGenerator(OTGChunkGenerator _generator)
+    @Override
+    public void endPopulation()
     {
-        this.generator = _generator;
+        if (this.chunkCache == null && settings.getWorldConfig().populationBoundsCheck)
+        {
+            throw new IllegalStateException("Chunk is not being populated."
+                    + " This may be a bug in Open Terrain Generator, but it may also be"
+                    + " another mod that is poking in unloaded chunks. Set"
+                    + " PopulationBoundsCheck to false in the WorldConfig to"
+                    + " disable this error.");
+        }
+        this.chunkCache = null;
     }
-
+    
+    // Biomes
+    
+    @Override
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
+    {
+    	return createBiomeFor(biomeConfig, biomeIds);
+	}
+    
+	@Override
+	public int getRegisteredBiomeId(String resourceLocationString)
+	{
+		if(resourceLocationString != null && !resourceLocationString.trim().isEmpty())
+		{
+			String[] resourceLocationStringArr = resourceLocationString.split(":");
+			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
+			{
+				MinecraftKey resourceLocation = new MinecraftKey(PluginStandardValues.MOD_ID.toLowerCase(), this.getName() + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
+				BiomeBase biome = BiomeBase.REGISTRY_ID.get(resourceLocation);
+				return WorldHelper.getSavedId(biome);
+			}
+			if(resourceLocationStringArr.length == 2)
+			{
+				MinecraftKey resourceLocation = new MinecraftKey(resourceLocationStringArr[0],resourceLocationStringArr[1]);
+				BiomeBase biome = BiomeBase.REGISTRY_ID.get(resourceLocation);
+				return WorldHelper.getSavedId(biome);
+			}
+		}
+		return -1;
+	}
+    
     @Override
     public BukkitBiome getCalculatedBiome(int x, int z)
     {
@@ -934,58 +517,189 @@ public class BukkitWorld implements LocalWorld
     	int biomeId = BiomeBase.a(biome);
     	return this.settings.getBiomeBySavedIdOrNull(biomeId);
     }
-
-    void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
+    
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
-        // Convert NamedBinaryTag to a native nms tag
-        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-        // Add the x, y and z position to it
-        nmsTag.setInt("x", x);
-        nmsTag.setInt("y", y);
-        nmsTag.setInt("z", z);
-        // Update to current Minecraft format (maybe we want to do this at
-        // server startup instead, and then save the result?)
-        nmsTag = this.dataConverter.a(DataConverterTypes.BLOCK_ENTITY, nmsTag, -1);
-        // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
-        if (tileEntity != null)
+        BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds, this.getName());
+        this.biomeNames.put(biome.getName(), biome);
+
+        return biome;
+    }
+
+    @Override
+    public int getMaxBiomesCount()
+    {
+        return MAX_BIOMES_COUNT;
+    }
+
+    @Override
+    public int getMaxSavedBiomesCount()
+    {
+        return MAX_SAVED_BIOMES_COUNT;
+    }
+
+    @Override
+    public ArrayList<LocalBiome> getAllBiomes()
+    {
+    	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
+		for(LocalBiome biome : this.settings.getBiomeArrayByOTGId())
+		{
+			biomes.add(biome);
+		}
+    	return biomes;
+    }
+
+    @Override
+    public LocalBiome getBiomeByOTGIdOrNull(int id)
+    {
+        return settings.getBiomeByOTGIdOrNull(id);
+    }
+    
+	@Override
+	public LocalBiome getFirstBiomeOrNull() {
+		return biomeNames.size() > 0 ? (LocalBiome)biomeNames.values().toArray()[0] : null;
+	}
+
+    @Override
+    public LocalBiome getBiomeByNameOrNull(String name)
+    {
+        return biomeNames.get(name);
+    }
+
+    @Override
+    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes()
+    {
+        // Loop through all default biomes and create the default
+        // settings for them
+        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
-            tileEntity.load(nmsTag);
-        } else {
-        	if(OTG.getPluginConfig().spawnLog)
-        	{
-        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
-        	}
+            int id = defaultBiome.Id;
+            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(BukkitMojangSettings.fromId(id), STANDARD_WORLD_HEIGHT);
+            standardBiomes.add(instruction);
+        }
+
+        return standardBiomes;
+    }
+
+    // Structures / trees
+    
+    @Override
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
+    {
+        WorldConfig worldConfig = this.settings.getWorldConfig();
+
+        if (worldConfig.strongholdsEnabled)
+            this.strongholdGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.mineshaftsEnabled)
+            this.mineshaftGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.villagesEnabled && dry)
+            this.villageGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.rareBuildingsEnabled)
+        	this.rareBuildingGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.netherFortressesEnabled)
+            this.netherFortressGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.oceanMonumentsEnabled)
+            this.oceanMonumentGen.a(this.world, chunkX, chunkZ, null);
+        if (worldConfig.woodLandMansionsEnabled)
+        	this.mansionGen.a(this.world, chunkX, chunkZ, null);
+    }
+
+    @Override
+    public boolean placeDungeon(Random rand, int x, int y, int z)
+    {
+        return dungeon.generate(world, rand, new BlockPosition(x, y, z));
+    }
+
+    @Override
+    public boolean placeFossil(Random rand, ChunkCoordinate chunkCoord)
+    {
+        return fossil.generate(world, rand, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+    }
+
+    @Override
+    public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
+    {
+        BlockPosition blockPos = new BlockPosition(x, y, z);
+        switch (type)
+        {
+            case Tree:
+                return tree.generate(this.world, rand, blockPos);
+            case BigTree:
+                return bigTree.generate(this.world, rand, blockPos);
+            case Forest:
+            case Birch:
+                return birchTree.generate(this.world, rand, blockPos);
+            case TallBirch:
+                return longBirchTree.generate(this.world, rand, blockPos);
+            case HugeMushroom:
+                if (rand.nextBoolean())
+                {
+                    return hugeBrownMushroom.generate(this.world, rand, blockPos);
+                } else
+                {
+                    return hugeRedMushroom.generate(this.world, rand, blockPos);
+                }
+            case HugeRedMushroom:
+                return hugeRedMushroom.generate(this.world, rand, blockPos);
+            case HugeBrownMushroom:
+                return hugeBrownMushroom.generate(this.world, rand, blockPos);
+            case SwampTree:
+                return swampTree.generate(this.world, rand, blockPos);
+            case Taiga1:
+                return taigaTree1.generate(this.world, rand, blockPos);
+            case Taiga2:
+                return taigaTree2.generate(this.world, rand, blockPos);
+            case JungleTree:
+                return jungleTree.generate(this.world, rand, blockPos);
+            case GroundBush:
+                return groundBush.generate(this.world, rand, blockPos);
+            case CocoaTree:
+                return cocoaTree.generate(this.world, rand, blockPos);
+            case Acacia:
+                return acaciaTree.generate(this.world, rand, blockPos);
+            case DarkOak:
+                return darkOakTree.generate(this.world, rand, blockPos);
+            case HugeTaiga1:
+                return hugeTaigaTree1.generate(this.world, rand, blockPos);
+            case HugeTaiga2:
+                return hugeTaigaTree2.generate(this.world, rand, blockPos);
+            default:
+                throw new RuntimeException("Failed to handle tree of type " + type.toString());
         }
     }
 
+	@Override
+	public boolean chunkHasDefaultStructure(Random random, ChunkCoordinate chunk) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+    
     @Override
-    public NamedBinaryTag getMetadata(int x, int y, int z)
+    public boolean placeDefaultStructures(Random random, ChunkCoordinate chunkCoord)
     {
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
-        if (tileEntity == null)
-        {
-            return null;
-        }
-        NBTTagCompound nmsTag = new NBTTagCompound();
-        tileEntity.save(nmsTag);
-        nmsTag.remove("x");
-        nmsTag.remove("y");
-        nmsTag.remove("z");
-        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
-    }
+        ChunkCoordIntPair chunkIntPair = new ChunkCoordIntPair(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+        WorldConfig worldConfig = this.settings.getWorldConfig();
+        boolean villageGenerated = false;
 
-    @Override
-    public CustomObjectStructureCache getStructureCache()
-    {
-        return this.structureCache;
-    }
+        if (worldConfig.strongholdsEnabled)
+            this.strongholdGen.a(this.world, random, chunkIntPair);
+        if (worldConfig.mineshaftsEnabled)
+            this.mineshaftGen.a(this.world, random, chunkIntPair);
+        if (worldConfig.villagesEnabled)
+            villageGenerated = this.villageGen.a(this.world, random, chunkIntPair);
+        if (worldConfig.rareBuildingsEnabled)
+            this.rareBuildingGen.a(this.world, random, chunkIntPair);
+        if (worldConfig.netherFortressesEnabled)
+            this.netherFortressGen.a(this.world, random, chunkIntPair);
+        if (worldConfig.oceanMonumentsEnabled)
+            this.oceanMonumentGen.a(this.world, random, chunkIntPair);
+        if (worldConfig.woodLandMansionsEnabled)
+        	this.mansionGen.a(this.world, random, chunkIntPair);
 
-    @Override
-    public BiomeGenerator getBiomeGenerator() {
-        return biomeGenerator;
+        return villageGenerated;
     }
-
+    
     @Override
     public SpawnableObject getMojangStructurePart(String name)
     {
@@ -998,215 +712,79 @@ public class BukkitWorld implements LocalWorld
         }
         return new MojangStructurePart(name, mojangStructurePart);
     }
+    
+    // Replace blocks
 
-	@Override
-	public void spawnEntity(EntityFunction entityData)
-	{
-    	Random rand = new Random();
-
-		String mobTypeName = entityData.mobName;
-		int groupSize = entityData.groupSize;
-		String nameTag = entityData.nameTagOrNBTFileName;
-
-		EntityType entityType = null;
-
-		for(EntityType entityType1 : EntityType.values())
-		{
-			if(entityType1.name() != null && mobTypeName.toLowerCase().replace("_", "").replace(" ", "").replace("entity","").equals(entityType1.name().toLowerCase().replace("_", "").replace(" ", "").replace("entity","")))
-			{
-				entityType = entityType1;
-				break;
-			}
-		}
-
-		// Make sure all mob names that forge accepts also work here
-
-    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("evocationillager"))
-    	{
-    		entityType = org.bukkit.entity.EntityType.EVOKER;
-    	}
-    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("vindicationillager"))
-    	{
-    		entityType = org.bukkit.entity.EntityType.VINDICATOR;
-    	}
-    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("zombiepigman"))
-    	{
-    		entityType = org.bukkit.entity.EntityType.PIG_ZOMBIE;
-    	}
-
-    	//
-
-		if(entityType == null)
-		{
-			if(OTG.getPluginConfig().spawnLog)
-			{
-				OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
-			}
-			return;
-		}
-
-		if (entityType == EntityType.PLAYER)
-		{
-			return;
-		}
-
-		Entity entityLiving = getEntity(entityType.getEntityClass());
-		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();
-
-		boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian || bukkitEntityLiving instanceof CraftElderGuardian;
-
-        if(entityLiving != null)
+    @Override
+    public void replaceBlocks(ChunkCoordinate chunkCoord)
+    {
+        if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
         {
-			EnumCreatureType creatureType = EnumCreatureType.CREATURE;
-
-			// MONSTER
-			if(
-				bukkitEntityLiving instanceof CraftComplexLivingEntity || // Dragon
-				bukkitEntityLiving instanceof CraftSlime || // Slime/Magma
-				bukkitEntityLiving instanceof CraftMonster ||
-				bukkitEntityLiving instanceof CraftFlying // Ghast
-			)
-			{
-				creatureType = EnumCreatureType.MONSTER;
-			}
-
-			// AMBIENT
-			if(
-				bukkitEntityLiving instanceof CraftAmbient // Bat
-			)
-			{
-				creatureType = EnumCreatureType.AMBIENT;
-			}
-
-			// CREATURE
-			if(
-				bukkitEntityLiving instanceof CraftAnimals || // Creature
-				bukkitEntityLiving instanceof CraftVillager ||
-				bukkitEntityLiving instanceof CraftGolem
-			)
-			{
-				creatureType = EnumCreatureType.CREATURE;
-			}
-
-			// WATERCREATURE
-			if(
-				bukkitEntityLiving instanceof CraftWaterMob
-			)
-			{
-				creatureType = EnumCreatureType.WATER_CREATURE;
-			}
-
-            int j1 = entityData.x;
-            int k1 = entityData.y;
-            int l1 = entityData.z;
-
-            int x = entityData.x;
-            int y = entityData.y;
-            int z = entityData.z;
-
-            CraftBlock block = (CraftBlock) world.getWorld().getBlockAt(new Location(world.getWorld(), x, y, z));
-            org.bukkit.Material material = block.getType();
-
-            boolean isOutsideBuildHeight = y < 0 || y >= 256;
-            boolean isOpaque = material.isTransparent() ? false : material.isSolid();
-            boolean isFullCube = material != org.bukkit.Material.STEP;
-            boolean canProvidePower = block.isBlockPowered();
-            boolean isBlockNormalCube = !isOutsideBuildHeight && isOpaque && isFullCube && !canProvidePower;
-
-            if (!isBlockNormalCube && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && (material == org.bukkit.Material.WATER || material == org.bukkit.Material.STATIONARY_WATER)) || material == org.bukkit.Material.AIR))
-            {
-	            float f = (float)j1 + 0.5F;
-	            float f1 = (float)k1;
-	            float f2 = (float)l1 + 0.5F;
-
-	            if(entityLiving instanceof EntityLiving)
-	            {
-	            	for(int r = 0; r < groupSize; r++)
-	            	{
-            			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
-
-	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-	           			{
-	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
-	           			}
-
-	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
-	            		{
-	            			if(nameTag != null && nameTag.length() > 0)
-	        				{
-	            				entity.setCustomName(nameTag);
-	        				}
-	            		}
-
-	            		if(entity instanceof CraftLivingEntity)
-	            		{
-	            			((CraftLivingEntity) entity).setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
-	            		}
-	            	}
-	            } else {
-	            	for(int r = 0; r < groupSize; r++)
-	            	{
-	            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
-
-	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-	           			{
-	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
-	           			}
-	            	}
-	            }
-            }
-		}
-	}
-
-	private void applyMetaData(CraftEntity entity, String mobName, String metaDataString)
-	{
-    	NBTTagCompound nbttagcompound = new NBTTagCompound();
-
-        try
-        {
-            NBTBase nbtbase = JsonToNBT.getTagFromJson(metaDataString);
-
-            if (!(nbtbase instanceof NBTTagCompound))
-            {
-            	if(OTG.getPluginConfig().spawnLog)
-            	{
-            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
-            	}
-            	return;
-            }
-
-            nbttagcompound = (NBTTagCompound)nbtbase;
-        }
-        catch (NBTException nbtexception)
-        {
-        	if(OTG.getPluginConfig().spawnLog)
-        	{
-        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
-        	}
-        	return;
+            // Don't waste time here, ReplacedBlocks is empty everywhere
+            return;
         }
 
-        nbttagcompound.setString("id", mobName);
+        // Get cache
+        Chunk[] cache = getChunkCache(chunkCoord);
 
-		Entity nmsEntity = ((CraftEntity)entity).getHandle();
+        // Replace the blocks
+        for(int i = 0; i < 4; i++) {
+            replaceBlocks(cache[i], 0, 0, 16);
+        }
+    }
 
-		NBTTagCompound originalTag = new NBTTagCompound();
-		nmsEntity.c(originalTag);
+    private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk, int size)
+    {
+        int endXInChunk = startXInChunk + size;
+        int endZInChunk = startZInChunk + size;
+        int worldStartX = rawChunk.locX * 16;
+        int worldStartZ = rawChunk.locZ * 16;
 
-		NBTBase originalPos = originalTag.get("Pos");
-		NBTBase originalRot = originalTag.get("Rotation");
+        ChunkSection[] sectionsArray = rawChunk.getSections();
 
-		NBTBase originalUUIDLeast = originalTag.get("UUIDLeast");
-		NBTBase originalUUIDMost = originalTag.get("UUIDMost");
+        for (ChunkSection section : sectionsArray)
+        {
+            if (section == null)
+                continue;
 
-		nbttagcompound.set("Pos", originalPos);
-		nbttagcompound.set("Rotation", originalRot);
-		nbttagcompound.set("UUIDLeast", originalUUIDLeast);
-		nbttagcompound.set("UUIDMost", originalUUIDMost);
+            for (int sectionX = startXInChunk; sectionX < endXInChunk; sectionX++)
+            {
+                for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
+                {
+                    LocalBiome biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
+                    if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
+                    {
+                        LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
+                        for (int sectionY = 0; sectionY < 16; sectionY++)
+                        {
+                            IBlockData block = section.getType(sectionX, sectionY, sectionZ);
+                            int blockId = Block.getId(block.getBlock());
+                            if (replaceArray[blockId] == null)
+                                continue;
 
-		nmsEntity.f(nbttagcompound);
-		nmsEntity.recalcPosition();
-	}
+                            int y = section.getYPosition() + sectionY;
+                            if (y >= replaceArray[blockId].length)
+                                break;
+
+                            BukkitMaterialData replaceTo = (BukkitMaterialData) replaceArray[blockId][y];
+                            if (replaceTo == null || replaceTo.getBlockId() == blockId)
+                                continue;
+
+                            section.setType(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // Mob / entity spawning
+    
+    @Override
+    public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord)
+    {
+        SpawnerCreature.a(this.world, ((BukkitBiome) biome).getHandle(), chunkCoord.getChunkX() * 16 + 8, chunkCoord.getChunkZ() * 16 + 8, 16, 16, random);
+    }
 
 	private Entity getEntity(Class<? extends org.bukkit.entity.Entity> clazz)
 	{
@@ -1646,18 +1224,293 @@ public class BukkitWorld implements LocalWorld
 
 		return null;
 	}
-
-    @Override
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
-    {
-    	return createBiomeFor(biomeConfig, biomeIds);
-	}
 	
-    // Forge only TODO: Shouldn't really be here? Clean this up.
-
     @Override
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation) { }
+    
+	@Override
+	public void spawnEntity(EntityFunction entityData)
+	{
+    	Random rand = new Random();
 
+		String mobTypeName = entityData.mobName;
+		int groupSize = entityData.groupSize;
+		String nameTag = entityData.nameTagOrNBTFileName;
+
+		EntityType entityType = null;
+
+		for(EntityType entityType1 : EntityType.values())
+		{
+			if(entityType1.name() != null && mobTypeName.toLowerCase().replace("_", "").replace(" ", "").replace("entity","").equals(entityType1.name().toLowerCase().replace("_", "").replace(" ", "").replace("entity","")))
+			{
+				entityType = entityType1;
+				break;
+			}
+		}
+
+		// Make sure all mob names that forge accepts also work here
+
+    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("evocationillager"))
+    	{
+    		entityType = org.bukkit.entity.EntityType.EVOKER;
+    	}
+    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("vindicationillager"))
+    	{
+    		entityType = org.bukkit.entity.EntityType.VINDICATOR;
+    	}
+    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("zombiepigman"))
+    	{
+    		entityType = org.bukkit.entity.EntityType.PIG_ZOMBIE;
+    	}
+
+    	//
+
+		if(entityType == null)
+		{
+			if(OTG.getPluginConfig().spawnLog)
+			{
+				OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
+			}
+			return;
+		}
+
+		if (entityType == EntityType.PLAYER)
+		{
+			return;
+		}
+
+		Entity entityLiving = getEntity(entityType.getEntityClass());
+		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();
+
+		boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian || bukkitEntityLiving instanceof CraftElderGuardian;
+
+        if(entityLiving != null)
+        {
+			EnumCreatureType creatureType = EnumCreatureType.CREATURE;
+
+			// MONSTER
+			if(
+				bukkitEntityLiving instanceof CraftComplexLivingEntity || // Dragon
+				bukkitEntityLiving instanceof CraftSlime || // Slime/Magma
+				bukkitEntityLiving instanceof CraftMonster ||
+				bukkitEntityLiving instanceof CraftFlying // Ghast
+			)
+			{
+				creatureType = EnumCreatureType.MONSTER;
+			}
+
+			// AMBIENT
+			if(
+				bukkitEntityLiving instanceof CraftAmbient // Bat
+			)
+			{
+				creatureType = EnumCreatureType.AMBIENT;
+			}
+
+			// CREATURE
+			if(
+				bukkitEntityLiving instanceof CraftAnimals || // Creature
+				bukkitEntityLiving instanceof CraftVillager ||
+				bukkitEntityLiving instanceof CraftGolem
+			)
+			{
+				creatureType = EnumCreatureType.CREATURE;
+			}
+
+			// WATERCREATURE
+			if(
+				bukkitEntityLiving instanceof CraftWaterMob
+			)
+			{
+				creatureType = EnumCreatureType.WATER_CREATURE;
+			}
+
+            int j1 = entityData.x;
+            int k1 = entityData.y;
+            int l1 = entityData.z;
+
+            int x = entityData.x;
+            int y = entityData.y;
+            int z = entityData.z;
+
+            CraftBlock block = (CraftBlock) world.getWorld().getBlockAt(new Location(world.getWorld(), x, y, z));
+            org.bukkit.Material material = block.getType();
+
+            boolean isOutsideBuildHeight = y < 0 || y >= 256;
+            boolean isOpaque = material.isTransparent() ? false : material.isSolid();
+            boolean isFullCube = material != org.bukkit.Material.STEP;
+            boolean canProvidePower = block.isBlockPowered();
+            boolean isBlockNormalCube = !isOutsideBuildHeight && isOpaque && isFullCube && !canProvidePower;
+
+            if (!isBlockNormalCube && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && (material == org.bukkit.Material.WATER || material == org.bukkit.Material.STATIONARY_WATER)) || material == org.bukkit.Material.AIR))
+            {
+	            float f = (float)j1 + 0.5F;
+	            float f1 = (float)k1;
+	            float f2 = (float)l1 + 0.5F;
+
+	            if(entityLiving instanceof EntityLiving)
+	            {
+	            	for(int r = 0; r < groupSize; r++)
+	            	{
+            			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
+
+	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+	           			{
+	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
+	           			}
+
+	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+	            		{
+	            			if(nameTag != null && nameTag.length() > 0)
+	        				{
+	            				entity.setCustomName(nameTag);
+	        				}
+	            		}
+
+	            		if(entity instanceof CraftLivingEntity)
+	            		{
+	            			((CraftLivingEntity) entity).setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
+	            		}
+	            	}
+	            } else {
+	            	for(int r = 0; r < groupSize; r++)
+	            	{
+	            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
+
+	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+	           			{
+	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
+	           			}
+	            	}
+	            }
+            }
+		}
+	}
+    
+    private void applyMetaData(CraftEntity entity, String mobName, String metaDataString)
+	{
+    	NBTTagCompound nbttagcompound = new NBTTagCompound();
+
+        try
+        {
+            NBTBase nbtbase = JsonToNBT.getTagFromJson(metaDataString);
+
+            if (!(nbtbase instanceof NBTTagCompound))
+            {
+            	if(OTG.getPluginConfig().spawnLog)
+            	{
+            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+            	}
+            	return;
+            }
+
+            nbttagcompound = (NBTTagCompound)nbtbase;
+        }
+        catch (NBTException nbtexception)
+        {
+        	if(OTG.getPluginConfig().spawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
+        	}
+        	return;
+        }
+
+        nbttagcompound.setString("id", mobName);
+
+		Entity nmsEntity = ((CraftEntity)entity).getHandle();
+
+		NBTTagCompound originalTag = new NBTTagCompound();
+		nmsEntity.c(originalTag);
+
+		NBTBase originalPos = originalTag.get("Pos");
+		NBTBase originalRot = originalTag.get("Rotation");
+
+		NBTBase originalUUIDLeast = originalTag.get("UUIDLeast");
+		NBTBase originalUUIDMost = originalTag.get("UUIDMost");
+
+		nbttagcompound.set("Pos", originalPos);
+		nbttagcompound.set("Rotation", originalRot);
+		nbttagcompound.set("UUIDLeast", originalUUIDLeast);
+		nbttagcompound.set("UUIDMost", originalUUIDMost);
+
+		nmsEntity.f(nbttagcompound);
+		nmsEntity.recalcPosition();
+	}
+	
+    // Chunks
+    
+    private Chunk getChunk(int x, int y, int z)
+    {
+        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+            return null;
+
+        int chunkX = x >> 4;
+        int chunkZ = z >> 4;
+
+        if (this.chunkCache == null)
+        {
+            // Blocks requested outside population step
+            // (Tree growing, /otg spawn, etc.)
+           return world.getChunkAt(chunkX, chunkZ);
+        }
+
+        // Restrict to chunks we are currently populating
+        Chunk topLeftCachedChunk = this.chunkCache[0];
+        int indexX = (chunkX - topLeftCachedChunk.locX);
+        int indexZ = (chunkZ - topLeftCachedChunk.locZ);
+        if ((indexX == 0 || indexX == 1) && (indexZ == 0 || indexZ == 1))
+        {
+            return this.chunkCache[indexX | (indexZ << 1)];
+        } else
+        {
+            // Outside area
+            if (this.settings.getWorldConfig().populationBoundsCheck)
+            {
+                return null;
+            }
+            if (world.getChunkProviderServer().isLoaded(chunkX, chunkZ))
+            {
+                return world.getChunkAt(chunkX, chunkZ);
+            }
+            return null;
+        }
+    }
+    
+    private Chunk[] getChunkCache(ChunkCoordinate topLeft)
+    {
+        if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].locX, this.chunkCache[0].locZ))
+        {
+            // Cache is invalid, most likely because two chunks are being populated at once
+            if (this.settings.getWorldConfig().populationBoundsCheck)
+            {
+                // ... but this can never happen, as startPopulation() checks for this if populationBoundsCheck is set
+                // to true. So we must have a bug.
+                throw new IllegalStateException("chunkCache is null! You've got a bug!");
+            } else
+            {
+                // Use a temporary cache, best we can do
+                return this.loadFourChunks(topLeft);
+            }
+        }
+        return this.chunkCache;
+    }
+
+    private Chunk[] loadFourChunks(ChunkCoordinate topLeft)
+    {
+        Chunk[] chunkCache = new Chunk[4];
+        for (int indexX = 0; indexX <= 1; indexX++)
+        {
+            for (int indexZ = 0; indexZ <= 1; indexZ++)
+            {
+                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(
+                        topLeft.getChunkX() + indexX,
+                        topLeft.getChunkZ() + indexZ
+                );
+            }
+        }
+        return chunkCache;
+    }
+    
     @Override
     public ChunkCoordinate getSpawnChunk()
     {
@@ -1665,22 +1518,7 @@ public class BukkitWorld implements LocalWorld
 
     	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
     }
-
-    // OTG+
-
-	@Override
-	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
-	{
-		// TODO Implement this
-		throw new RuntimeException();
-	}
-
-	@Override
-	public ObjectSpawner getObjectSpawner()
-	{
-		return this.generator.getObjectSpawner();
-	}
-
+	
 	@Override
 	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
 	{
@@ -1694,49 +1532,9 @@ public class BukkitWorld implements LocalWorld
 		// TODO Implement this
 		return true;
 	}
-
-	@Override
-	public BlockFunction[] getBlockColumn(int x, int z)
-	{
-		// TODO Implement this
-		throw new RuntimeException();
-	}
-
-	BukkitWorldSession WorldSession;
-    @Override
-	public WorldSession getWorldSession()
-	{
-    	// TODO Implement this properly (for particles)
-		return WorldSession;
-	}
-
-	@Override
-	public String getWorldSettingsName()
-	{
-		// TODO: Make sure this returns the correct name
-		return this.getWorld().getWorldData().getName();
-	}
-
-	@Override
-	public File getWorldSaveDir()
-	{
-		// TODO: Make sure this returns the correct directory
-		return this.getWorld().getDataManager().getDirectory();
-	}
-
-	@Override
-	public int getDimensionId()
-	{
-		return this.getWorld().worldProvider.getDimensionManager().getDimensionID();
-	}
-
-	@Override
-	public void deleteWorldSessionData()
-	{
-		// TODO Implement this (for spawners and particles)
-		throw new RuntimeException();
-	}
-
+    
+    // Blocks / materials
+    	
 	@Override
 	public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea)
 	{
@@ -1753,38 +1551,242 @@ public class BukkitWorld implements LocalWorld
 
         return chunk.a(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
 	}
+    
+    @Override
+    public int getLiquidHeight(int x, int z)
+    {
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
+        {
+            LocalMaterialData material = getMaterial(x, y, z, false);
+            if (material.isLiquid())
+            {
+                return y + 1;
+            } else if (material.isSolid())
+            {
+                // Failed to find a liquid
+                return -1;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public int getSolidHeight(int x, int z)
+    {
+        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
+        {
+            LocalMaterialData material = getMaterial(x, y, z, false);
+            if (material.isSolid())
+            {
+                return y + 1;
+            }
+        }
+        return -1;
+    }
+
+    @Override
+    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
+    {
+        Chunk chunk = this.getChunk(x, y, z);
+        if (chunk == null || y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+        {
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
+        }
+
+        return BukkitMaterialData.ofMinecraftBlockData(chunk.a(x, y, z));
+    }
 
 	@Override
-	public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public boolean chunkHasDefaultStructure(Random random, ChunkCoordinate chunk) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public int getRegisteredBiomeId(String resourceLocationString)
+	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
 	{
-		if(resourceLocationString != null && !resourceLocationString.trim().isEmpty())
-		{
-			String[] resourceLocationStringArr = resourceLocationString.split(":");
-			if(resourceLocationStringArr.length == 1) // When querying for biome name without domain search the local world's biomes 
-			{
-				MinecraftKey resourceLocation = new MinecraftKey(PluginStandardValues.MOD_ID.toLowerCase(), this.getName() + "_" + resourceLocationStringArr[0].replaceAll(" ", "_"));
-				BiomeBase biome = BiomeBase.REGISTRY_ID.get(resourceLocation);
-				return WorldHelper.getSavedId(biome);
-			}
-			if(resourceLocationStringArr.length == 2)
-			{
-				MinecraftKey resourceLocation = new MinecraftKey(resourceLocationStringArr[0],resourceLocationStringArr[1]);
-				BiomeBase biome = BiomeBase.REGISTRY_ID.get(resourceLocation);
-				return WorldHelper.getSavedId(biome);
-			}
-		}
-		return -1;
+		// TODO Implement this
+		throw new RuntimeException();
+	}
+    
+    @Override
+    public int getHighestBlockYAt(int x, int z)
+    {
+        Chunk chunk = this.getChunk(x, 0, z);
+        if (chunk == null)
+        {
+            return -1;
+        }
+
+        int y = chunk.b(x & 0xf, z & 0xf);
+
+        // Fix for incorrect light map
+        boolean incorrectHeightMap = false;
+        while (y < getHeightCap() && chunk.a(x, y, z).getMaterial().blocksLight())
+        {
+            y++;
+            incorrectHeightMap = true;
+        }
+        if (incorrectHeightMap && isSafeForLightUpdates(chunk, x, z))
+        {
+            // Let Minecraft know that it made an error
+            world.w(new BlockPosition(x, y, z)); // world.relight
+        }
+
+        return y;
+    }
+
+    /**
+     * When a light update hits an unloaded chunk, Minecraft unfortunately
+     * attempts to generate this chunk. When this happens, two chunks will be
+     * populated at the same time, which crashes the server. We must prevent
+     * this by checking beforehand whether a light update will touch unloaded
+     * chunks. If this is the case, the light update must be skipped.
+     * @param currentChunk Current chunk (contains the following x and z)
+     * @param x Block x in the world.
+     * @param z Block z in the world.
+     * @return True if it is safe to perform a light update at this location.
+     */
+    private boolean isSafeForLightUpdates(Chunk currentChunk, int x, int z)
+    {
+        int xInChunk = x & 0xf;
+        int zInChunk = z & 0xf;
+        if (xInChunk == 0 || xInChunk == 15 || zInChunk == 0 || zInChunk == 15)
+        {
+            // We're at the edge of a chunk
+            // Ensure a larger region is loaded
+            return currentChunk.areNeighborsLoaded(2);
+        }
+        return currentChunk.areNeighborsLoaded(1);
+    }
+    
+    @Override
+    public int getLightLevel(int x, int y, int z)
+    {
+        return world.j(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
+    }
+    
+    @Override
+    public boolean isLoaded(int x, int y, int z)
+    {
+        return this.getChunk(x, y, z) != null;
+    }
+    
+	@Override
+	public BlockFunction[] getBlockColumn(int x, int z)
+	{
+		// TODO Implement this
+		throw new RuntimeException();
+	}
+    
+    @Override
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
+    {
+        /*
+         * This method usually breaks on every Minecraft update. Always check
+         * whether the names are still correct. Often, you'll also need to
+         * rewrite parts of this method for newer block place logic.
+         */
+
+        try
+        {
+            if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+            {
+                return;
+            }
+
+            IBlockData blockData = ((BukkitMaterialData) material).internalBlock();
+
+            // Get chunk from (faster) custom cache
+            Chunk chunk = this.getChunk(x, y, z);
+
+            if (chunk == null)
+            {
+                // Chunk is unloaded
+                return;
+            }
+
+            BlockPosition blockPos = new BlockPosition(x, y, z);
+
+            // Disable nearby block physics (except for tile entities) and set block
+            boolean oldCaptureBlockStates = this.world.captureBlockStates;
+            this.world.captureBlockStates = !(blockData.getBlock() instanceof ITileEntity);
+            IBlockData oldBlockData = chunk.a(blockPos, blockData);
+            this.world.captureBlockStates = oldCaptureBlockStates;
+
+            if (oldBlockData == null)
+            {
+                return;
+            }
+
+            if (blockData.c() != oldBlockData.c() || blockData.d() != oldBlockData.d())
+            {
+                if (isSafeForLightUpdates(chunk, x, z))
+                {
+                    // Relight
+                    world.methodProfiler.a("checkLight");
+                    world.w(blockPos);
+                    world.methodProfiler.b();
+                }
+            }
+
+    	    if (metaDataTag != null)
+    	    {
+    	    	attachMetadata(x, y, z, metaDataTag);
+    	    }
+
+            // Notify world: (2 | 16) == update client, don't update observers
+            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
+        } catch (Throwable t)
+        {
+            String populatingChunkInfo = this.chunkCache == null? "(no chunk)" :
+                    this.chunkCache[0].locX + "," + this.chunkCache[0].locZ;
+            // Add location info to error
+            RuntimeException runtimeException = new RuntimeException("Error setting "
+                    + material + " block at " + x + "," + y + "," + z
+                    + " while populating chunk " + populatingChunkInfo, t);
+            runtimeException.setStackTrace(new StackTraceElement[0]);
+            throw runtimeException;
+        }
+    }    
+    
+    void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
+    {
+        // Convert NamedBinaryTag to a native nms tag
+        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
+        // Add the x, y and z position to it
+        nmsTag.setInt("x", x);
+        nmsTag.setInt("y", y);
+        nmsTag.setInt("z", z);
+        // Update to current Minecraft format (maybe we want to do this at
+        // server startup instead, and then save the result?)
+        nmsTag = this.dataConverter.a(DataConverterTypes.BLOCK_ENTITY, nmsTag, -1);
+        // Add that data to the current tile entity in the world
+        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
+        if (tileEntity != null)
+        {
+            tileEntity.load(nmsTag);
+        } else {
+        	if(OTG.getPluginConfig().spawnLog)
+        	{
+        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
+        	}
+        }
+    }
+
+    @Override
+    public NamedBinaryTag getMetadata(int x, int y, int z)
+    {
+        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
+        if (tileEntity == null)
+        {
+            return null;
+        }
+        NBTTagCompound nmsTag = new NBTTagCompound();
+        tileEntity.save(nmsTag);
+        nmsTag.remove("x");
+        nmsTag.remove("y");
+        nmsTag.remove("z");
+        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
+    }
+
+	@Override
+	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
+	{
+		// TODO: Implement this?
 	}
 }

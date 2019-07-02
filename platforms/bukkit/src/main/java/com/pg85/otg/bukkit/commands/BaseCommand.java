@@ -17,6 +17,10 @@ import java.util.List;
 
 public abstract class BaseCommand
 {
+    public static final String ERROR_COLOR = ChatColor.RED.toString();
+    public static final String MESSAGE_COLOR = ChatColor.GREEN.toString();
+    public static final String VALUE_COLOR = ChatColor.DARK_GREEN.toString();
+	
     public String name;
     public String perm;
     public String usage;
@@ -84,7 +88,7 @@ public abstract class BaseCommand
         return null;
     }
 
-    protected void ListMessage(CommandSender sender, List<String> lines, int page, String... headers)
+    protected void listMessage(CommandSender sender, List<String> lines, int page, String... headers)
     {
         int pageCount = (lines.size() >> 3) + 1;
         if (page > pageCount)
@@ -121,8 +125,4 @@ public abstract class BaseCommand
         }
         return ret;
     }
-
-    public static final String ERROR_COLOR = ChatColor.RED.toString();
-    public static final String MESSAGE_COLOR = ChatColor.GREEN.toString();
-    public static final String VALUE_COLOR = ChatColor.DARK_GREEN.toString();
 }

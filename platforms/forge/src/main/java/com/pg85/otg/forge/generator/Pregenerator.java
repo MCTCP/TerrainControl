@@ -359,7 +359,7 @@ public class Pregenerator
     			iTop = Integer.MIN_VALUE;
 			}
 			
-			this.world.getChunkGenerator().clearChunkCache();
+			this.world.getChunkGenerator().clearChunkCache(false);
 			savePregeneratorData(false);
         }
         pregeneratorIsRunning = false;

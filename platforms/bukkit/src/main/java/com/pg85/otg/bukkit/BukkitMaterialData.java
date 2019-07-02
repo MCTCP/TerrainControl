@@ -14,7 +14,16 @@ import net.minecraft.server.v1_12_R1.IBlockData;
  */
 public final class BukkitMaterialData implements LocalMaterialData
 {
-
+    /**
+     * Block id and data, calculated as {@code blockId << 4 | blockData}, or
+     * without binary operators: {@code blockId * 16 + blockData}.
+     *
+     * <p>Note that Minecraft's Block.getCombinedId uses another format (at
+     * least in Minecraft 1.8). However, Minecraft's ChunkSection uses the same
+     * format as this field.
+     */
+	private final int combinedBlockId;	
+	
     /**
      * Gets a {@code BukkitMaterialData} of the given id and data.
      * @param id   The block id.
@@ -58,16 +67,6 @@ public final class BukkitMaterialData implements LocalMaterialData
         Block block = blockData.getBlock();
         return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData));
     }
-
-    /**
-     * Block id and data, calculated as {@code blockId << 4 | blockData}, or
-     * without binary operators: {@code blockId * 16 + blockData}.
-     *
-     * <p>Note that Minecraft's Block.getCombinedId uses another format (at
-     * least in Minecraft 1.8). However, Minecraft's ChunkSection uses the same
-     * format as this field.
-     */
-    private final int combinedBlockId;
 
     private BukkitMaterialData(int blockId, int blockData)
     {
@@ -250,14 +249,10 @@ public final class BukkitMaterialData implements LocalMaterialData
         return Block.getById(getBlockId()) instanceof BlockFalling;
     }
 
-    // OTG+
-    
 	@Override
 	public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
 	{
 		// TODO: Implement this
 		return false;
 	}
-	
-	//
 }

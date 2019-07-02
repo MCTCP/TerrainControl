@@ -16,10 +16,18 @@ public class BukkitBiome implements LocalBiome
 {
     private final BiomeBase biomeBase;
     private final boolean isCustom;
-
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
+    protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
+    {
+        this.biomeBase = biome;
+        int savedBiomeId =  BiomeBase.a(biomeBase);
+        this.biomeIds = new BiomeIds(WorldHelper.getOTGBiomeId(biomeBase), savedBiomeId);
+        this.biomeConfig = biomeConfig;
+        this.isCustom = biome instanceof OTGBiomeBase;
+    }
+    
     /**
      * Creates and registers a new custom biome with the config and ids.
      *
@@ -30,15 +38,6 @@ public class BukkitBiome implements LocalBiome
     public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
     {
         return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds, worldName));
-    }
-
-    protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
-    {
-        this.biomeBase = biome;
-        int savedBiomeId =  BiomeBase.a(biomeBase);
-        this.biomeIds = new BiomeIds(WorldHelper.getOTGBiomeId(biomeBase), savedBiomeId);
-        this.biomeConfig = biomeConfig;
-        this.isCustom = biome instanceof OTGBiomeBase;
     }
 
     @Override

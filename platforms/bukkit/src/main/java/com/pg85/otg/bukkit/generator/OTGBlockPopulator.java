@@ -15,15 +15,15 @@ public class OTGBlockPopulator extends BlockPopulator
 {
     private ObjectSpawner spawner;
 
-    public ObjectSpawner getObjectSpawner()
-    {    	
-    	return spawner;
-    }
-    
     public OTGBlockPopulator(BukkitWorld world)
     {
         this.spawner = new ObjectSpawner(world.getConfigs(), world);
     }
+    
+    public ObjectSpawner getObjectSpawner()
+    {    	
+    	return spawner;
+    }   
 
     @Override
     public void populate(World world, Random random, Chunk chunk)

@@ -3,6 +3,8 @@ package com.pg85.otg.forge.biomes;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -12,13 +14,17 @@ import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
@@ -641,5 +647,31 @@ public class ForgeBiomeRegistryManager
 		}
 
 		return biomeRegistryAvailabiltyMap;
+	}
+
+	public static void unregisterBiomes(HashMap<String, LocalBiome> biomeNames, ForgeWorld forgeWorld)
+	{
+		// Unregister only the biomes registered by this world
+		for(LocalBiome localBiome : forgeWorld.biomeNames.values())
+		{
+			ForgeBiomeRegistryManager.unregisterBiome(localBiome, forgeWorld.getName());
+		}
+
+		((ForgeEngine)OTG.getEngine()).getWorldLoader().clearBiomeDictionary(forgeWorld);
+	}
+
+	public static List<BiomeLoadInstruction> getDefaultBiomes()
+	{
+        // Loop through all default biomes and create the default
+        // settings for them
+        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
+        {
+            int id = defaultBiome.Id;
+            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), ForgeWorld.STANDARD_WORLD_HEIGHT);
+            standardBiomes.add(instruction);
+        }
+
+        return standardBiomes;
 	}
 }

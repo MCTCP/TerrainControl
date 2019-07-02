@@ -52,6 +52,8 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGDimensionManager
 {
+	static HashMap<Integer,Integer> orderedDimensions;
+	
 	public static boolean isDimensionNameRegistered(String dimensionName)
 	{
 		if(dimensionName.equals("overworld"))
@@ -128,8 +130,6 @@ public class OTGDimensionManager
             compound.setTag(id, nbtTagList);
         }
     }
-
-	static HashMap<Integer,Integer> orderedDimensions;
 	
 	public static boolean IsOTGDimension(int dimensionId)
 	{

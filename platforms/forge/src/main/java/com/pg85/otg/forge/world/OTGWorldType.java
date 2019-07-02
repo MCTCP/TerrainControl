@@ -27,13 +27,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class OTGWorldType extends WorldType
 {
-
-    public final WorldLoader worldLoader;
-
-    public OTGWorldType(WorldLoader worldLoader)
+    public OTGWorldType()
     {
         super(PluginStandardValues.PLUGIN_NAME_SHORT);
-        this.worldLoader = worldLoader;
     }
 
     @Override
@@ -140,7 +136,7 @@ public class OTGWorldType extends WorldType
     	}
         //
 
-        ForgeWorld world = this.worldLoader.getOrCreateForgeWorld(mcWorld);
+        ForgeWorld world = ((ForgeEngine)OTG.getEngine()).getWorldLoader().getOrCreateForgeWorld(mcWorld);
         if (world == null) // TODO: When does this happen, if the world is not an OTG world?
         {
             throw new RuntimeException("This shouldn't happen, please contact team OTG about this crash.");

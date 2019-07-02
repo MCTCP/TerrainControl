@@ -19,7 +19,6 @@ import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
-import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
@@ -37,8 +36,8 @@ import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraftTypes.StructureNames;
 import com.pg85.otg.util.minecraftTypes.TreeType;
 
 import net.minecraft.block.*;
@@ -57,21 +56,19 @@ import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.datafix.DataFixer;
-import net.minecraft.util.datafix.DataFixesManager;
-import net.minecraft.util.datafix.FixTypes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldEntitySpawner;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraft.world.gen.feature.*;
+import net.minecraft.world.gen.structure.MapGenScatteredFeature;
 import net.minecraft.world.gen.structure.MapGenStructure;
+import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.relauncher.Side;
@@ -97,7 +94,6 @@ public class ForgeWorld implements LocalWorld
     private String name;
     public long seed;
     private BiomeGenerator biomeGenerator;
-    private	DataFixer dataFixer;
     public HashMap<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();    
     public MapGenStructure strongholdGen;
     public MapGenStructure villageGen;
@@ -124,11 +120,6 @@ public class ForgeWorld implements LocalWorld
     private WorldGenSwamp swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
-    boolean allowSpawningOutsideBounds = false;   
-    public Map<ChunkCoordinate,Chunk> chunkCacheOTGPlus = new HashMap<ChunkCoordinate, Chunk>();
-    public Chunk lastUsedChunk;
-    public int lastUsedChunkX;
-    public int lastUsedChunkZ;
     
     public ForgeWorld(String _name)
     {
@@ -150,8 +141,6 @@ public class ForgeWorld implements LocalWorld
         OTGDimensionManager.ApplyGameRulesToWorld(world, dimConfig);
         this.seed = world.getWorldInfo().getSeed();
         world.setSeaLevel(configs.getWorldConfig().waterLevelMax);
-
-        this.dataFixer = DataFixesManager.createFixer();
 
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
@@ -273,18 +262,7 @@ public class ForgeWorld implements LocalWorld
     {
         return this.world;
     }
-    
-    @Override
-	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
-	{
-		this.allowSpawningOutsideBounds = allowSpawningOutsideBounds;
-	}
-
-    public boolean getAllowSpawningOutsideBounds()
-	{
-		return this.allowSpawningOutsideBounds;
-	}
-    
+        
     @Override
     public int getLightLevel(int x, int y, int z)
     {
@@ -322,30 +300,29 @@ public class ForgeWorld implements LocalWorld
 	{
 		return getWorld().provider.getDimension();
 	}
-        
+            
+	@Override
+	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
+	{
+		this.getChunkGenerator().setAllowSpawningOutsideBounds(allowSpawningOutsideBounds);
+	}
+    
+    public BlockPos getSpawnPoint()
+    {
+    	BlockPos spawnPos = world.provider.getSpawnPoint();
+    	return new BlockPos(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+    }
+    
     @Override
     public void startPopulation(ChunkCoordinate chunkCoord)
     {
-
+    	// TODO: Only used for Spigot, remove?
     }
 
     @Override
     public void endPopulation()
     {
-
-    }	
-    
-    @Override
-    public ChunkCoordinate getSpawnChunk()
-    {
-    	BlockPos spawnPos = getSpawnPoint();
-    	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
-    }
-
-    public BlockPos getSpawnPoint()
-    {
-    	BlockPos spawnPos = world.provider.getSpawnPoint();
-    	return new BlockPos(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+    	// TODO: Only used for Spigot, remove?
     }
     
     // World session
@@ -452,13 +429,7 @@ public class ForgeWorld implements LocalWorld
     
 	public void unRegisterBiomes()
 	{
-		// Unregister only the biomes registered by this world
-		for(LocalBiome localBiome : this.biomeNames.values())
-		{
-			ForgeBiomeRegistryManager.unregisterBiome(localBiome, this.getName());
-		}
-
-		((ForgeEngine)OTG.getEngine()).getWorldLoader().clearBiomeDictionary(this);
+		ForgeBiomeRegistryManager.unregisterBiomes(this.biomeNames, this);
 	}
     
     @Override
@@ -474,165 +445,23 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int getFreeBiomeId()
-    {
-    	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-    }
-
-    @Override
     public Collection<BiomeLoadInstruction> getDefaultBiomes()
     {
-        // Loop through all default biomes and create the default
-        // settings for them
-        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
-        for (DefaultBiome defaultBiome : DefaultBiome.values())
-        {
-            int id = defaultBiome.Id;
-            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), STANDARD_WORLD_HEIGHT);
-            standardBiomes.add(instruction);
-        }
-
-        return standardBiomes;
+    	return ForgeBiomeRegistryManager.getDefaultBiomes();
     }
     
     // Chunks
 
-    // If allowOutsidePopulatinArea then normal OTG rules are used:
-    // returns any chunk that is inside the area being populated.
-    // returns null for chunks outside the populated area if populationBoundsCheck=true
-    // returns any loaded chunk or null if populationBoundsCheck=false and chunk is outside the populated area
-
-    // If !allowOutsidePopulatinArea then OTG+ rules are used:
-    // returns any chunk that is inside the area being populated. TODO: Or any chunk that is cached, which technically should only be chunks that are in the populated area. Cached chunks could also be from the previously populated area, fix that?
-    // returns any loaded chunk outside the populated area
-    // throws an exception if any unloaded chunk outside the populated area is requested or if a loaded chunk could not be queried.
-
+    @Override
+    public ChunkCoordinate getSpawnChunk()
+    {
+    	BlockPos spawnPos = getSpawnPoint();
+    	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
+    }
+    
     public Chunk getChunk(int x, int z, boolean isOTGPlus)
     {
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
-
-        if(lastUsedChunk != null && lastUsedChunkX == chunkX && lastUsedChunkZ == chunkZ)
-        {
-        	return lastUsedChunk;
-        }
-
-        Chunk chunk = chunkCacheOTGPlus.get(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
-        if(chunk != null)
-        {
-        	lastUsedChunk = chunk;
-        	lastUsedChunkX = chunkX;
-        	lastUsedChunkZ = chunkZ;
-        	return chunk;
-        }
-
-        boolean outsidePopulatingArea =
-			(
-				chunkX != getObjectSpawner().populatingX &&
-				chunkX != getObjectSpawner().populatingX + 1
-			)
-			||
-			(
-				chunkZ != getObjectSpawner().populatingZ &&
-				chunkZ != getObjectSpawner().populatingZ + 1
-			)
-		;
-
-		if(
-			(
-				outsidePopulatingArea &&
-				!isOTGPlus
-			) ||
-			allowSpawningOutsideBounds
-		)
-		{
-			if(!isOTGPlus)
-			{
-				if(this.getConfigs().getWorldConfig().populationBoundsCheck)
-				{
-					return null;
-				}
-
-				// TODO: Does this return only loaded chunks outside the area being populated, or also unloaded ones?
-				Chunk loadedChunk = this.getLoadedChunkWithoutMarkingActive(chunkX, chunkZ);
-				if(loadedChunk != null)
-				{
-					lastUsedChunk = loadedChunk;
-		        	lastUsedChunkX = chunkX;
-		        	lastUsedChunkZ = chunkZ;
-					chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), loadedChunk);
-				}
-
-				if(!allowSpawningOutsideBounds || loadedChunk != null)
-				{
-					return loadedChunk;
-				}
-			}
-
-			// For BO3AtSpawn we may be forced to populate a chunk outside of the chunks being populated.
-			if(allowSpawningOutsideBounds)
-			{
-		        Chunk spawnedChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
-		        if(spawnedChunk == null)
-		        {
-		        	OTG.log(LogMarker.FATAL, "Chunk request failed X" + chunkX + " Z" + chunkZ);
-		        	throw new RuntimeException("Chunk request failed X" + chunkX + " Z" + chunkZ);
-		        }
-
-		        chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
-				lastUsedChunk = spawnedChunk;
-		    	lastUsedChunkX = chunkX;
-		    	lastUsedChunkZ = chunkZ;
-
-				return spawnedChunk;
-			}
-		}
-
-        boolean outsideBorder = false;
-    	if(!isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), true))
-    	{
-    		// This can happen when net.minecraft.server.MinecraftServer.updateTimeLightAndEntities() is called
-    		//OTG.log(LogMarker.INFO, "Requested chunk outside world border X" + chunkX + " Z" + chunkZ);
-    		outsideBorder = true;
-    	}
-
-    	// This never happens when we're spawning stuff on neighbouring BO3's inside the 2x2 population area
-    	if(
-			!outsideBorder && outsidePopulatingArea
-		)
-    	{
-    		if(!((WorldServer)this.getWorld()).isBlockLoaded(new BlockPos(chunkX * 16, 1, chunkZ * 16)))
-    		//if(!((WorldServer)this.getWorld()).isChunkGeneratedAt(chunkX, chunkZ))
-    		{
-    			// Happens when part of a BO3 or smoothing area is spawned and triggers height/material checks in unpopulated chunks.
-    			// Also happens when /otg tp requests a block in an unpopulated chunk.
-    			return null;
-    		} else {
-    			// Chunk was provided by chunkprovider
-    		}
-    	}
-
-        Chunk spawnedChunk = world.getChunkFromChunkCoords(chunkX, chunkZ);
-        if(spawnedChunk == null)
-        {
-        	OTG.log(LogMarker.FATAL, "Chunk request failed X" + chunkX + " Z" + chunkZ);
-        	throw new RuntimeException("Chunk request failed X" + chunkX + " Z" + chunkZ);
-        }
-
-        chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
-		lastUsedChunk = spawnedChunk;
-    	lastUsedChunkX = chunkX;
-    	lastUsedChunkZ = chunkZ;
-
-		return spawnedChunk;
-    }
-
-    // TODO: This looks interesting, could use it more?
-    public Chunk getLoadedChunkWithoutMarkingActive(int chunkX, int chunkZ)
-    {
-        ChunkProviderServer chunkProviderServer = (ChunkProviderServer) this.world.getChunkProvider();
-        long i = ChunkPos.asLong(chunkX, chunkZ);
-        return (Chunk) chunkProviderServer.id2ChunkMap.get(i);
+    	return this.getChunkGenerator().getChunk(x, z, isOTGPlus);
     }
     
     @Override
@@ -644,52 +473,14 @@ public class ForgeWorld implements LocalWorld
     @Override
 	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
 	{
-		return
-			!(
-				// TODO: Make this prettier.
-				// Cycle 0 for the pre-generator can mean 2 things:
-				// 1. Nothing has been pre-generated.
-				// 2. Oly the spawn chunk has been generated.
-				// The pre-generator actually skips spawning the center chunk at cycle 0 (is done automatically by MC anyway).
-				getWorldSession().getPregeneratedBorderLeft() == 0 &&
-				getWorldSession().getPregeneratedBorderRight() == 0 &&
-				getWorldSession().getPregeneratedBorderTop() == 0 &&
-				getWorldSession().getPregeneratedBorderBottom() == 0
-			) &&
-			(
-				getWorldSession().getPregenerationRadius() > 0 &&
-				chunk.getChunkX() >= getWorldSession().getPreGeneratorCenterPoint().getChunkX() - getWorldSession().getPregeneratedBorderLeft()
-				&&
-				chunk.getChunkX() <= getWorldSession().getPreGeneratorCenterPoint().getChunkX() + getWorldSession().getPregeneratedBorderRight()
-				&&
-				chunk.getChunkZ() >= getWorldSession().getPreGeneratorCenterPoint().getChunkZ() - getWorldSession().getPregeneratedBorderTop()
-				&&
-				chunk.getChunkZ() <= getWorldSession().getPreGeneratorCenterPoint().getChunkZ() + getWorldSession().getPregeneratedBorderBottom()
-			)
-		;
+		return getWorldSession().isInsidePregeneratedRegion(chunk);
 	}
 
     @Override
 	public boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
 	{
-		return
-			getWorldSession().getWorldBorderRadius() == 0 ||
-			(
-				chunk.getChunkX() >= getWorldSession().getWorldBorderCenterPoint().getChunkX() - (getWorldSession().getWorldBorderRadius() - 1)
-				&&
-				chunk.getChunkX() <= getWorldSession().getWorldBorderCenterPoint().getChunkX() + (getWorldSession().getWorldBorderRadius() - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
-				&&
-				chunk.getChunkZ() >= getWorldSession().getWorldBorderCenterPoint().getChunkZ() - (getWorldSession().getWorldBorderRadius() - 1)
-				&&
-				chunk.getChunkZ() <= getWorldSession().getWorldBorderCenterPoint().getChunkZ() + (getWorldSession().getWorldBorderRadius() - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
-			);
+		return getWorldSession().isInsideWorldBorder(chunk, spawningResources);
 	}
-    
-    public void clearChunkCache()
-    {
-    	chunkCacheOTGPlus.clear();
-    	lastUsedChunk = null;
-    }
 
     // Blocks
     
@@ -755,7 +546,7 @@ public class ForgeWorld implements LocalWorld
         Chunk chunk = this.getChunk(x, z, true);
         if (chunk == null)
         {
-        	int y = generator.getHighestBlockYInUnloadedChunk(x,z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+        	int y = generator.getHighestBlockYInUnloadedChunk(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
         	return y;
         }
 
@@ -850,196 +641,17 @@ public class ForgeWorld implements LocalWorld
     @Override
     public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTGPlus)
     {
-	    /*
-	     * This method usually breaks on every Minecraft update. Always check
-	     * whether the names are still correct. Often, you'll also need to
-	     * rewrite parts of this method for newer block place logic.
-	     */
-
-        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-        {
-            return;
-        }
-
-        //DefaultMaterial defaultMaterial = material.toDefaultMaterial();
-
-        // TODO: Fix this
-        //if(defaultMaterial.equals(DefaultMaterial.DIODE_BLOCK_ON))
-        {
-        	//material = ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.DIODE_BLOCK_OFF, material.getBlockData());
-        }
-        //else if(defaultMaterial.equals(DefaultMaterial.REDSTONE_COMPARATOR_ON))
-        {
-        	//material = ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.REDSTONE_COMPARATOR_OFF, material.getBlockData());
-        }
-
-        IBlockState newState = ((ForgeMaterialData) material).internalBlock();
-
-        BlockPos pos = new BlockPos(x, y, z);
-
-        // Get chunk from (faster) custom cache
-        Chunk chunk = getChunk(x, z, isOTGPlus);
-        if (chunk == null)
-        {
-            // Chunk is unloaded
-        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-        }
-
-        IBlockState iblockstate = setBlockState(chunk, pos, newState);
-
-        if (iblockstate == null)
-        {
-        	return; // Happens when block to place is the same as block being placed? TODO: Is that the only time this happens?
-        }
-
-	    if (metaDataTag != null)
-	    {
-	    	attachMetadata(x, y, z, metaDataTag, isOTGPlus);
-	    }
-
-    	this.world.markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
+    	this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag, isOTGPlus);
     }
 
     public IBlockState setBlockState(Chunk _this, BlockPos pos, IBlockState state)
     {
-        int i = pos.getX() & 15;
-        int j = pos.getY();
-        int k = pos.getZ() & 15;
-        int l = k << 4 | i;
-
-        if (j >= _this.precipitationHeightMap[l] - 1)
-        {
-        	_this.precipitationHeightMap[l] = -999;
-        }
-
-        int i1 = _this.getHeightMap()[l];
-        IBlockState iblockstate = _this.getBlockState(pos);
-
-        if (iblockstate == state)
-        {
-            return null;
-        } else {
-            Block block = state.getBlock();
-            Block block1 = iblockstate.getBlock();
-            int k1 = iblockstate.getLightOpacity(_this.getWorld(), pos); // Relocate old light value lookup here, so that it is called before TE is removed.
-            ExtendedBlockStorage extendedblockstorage = _this.getBlockStorageArray()[j >> 4];
-            boolean flag = false;
-
-            if (extendedblockstorage == Chunk.NULL_BLOCK_STORAGE)
-            {
-                if (block == Blocks.AIR)
-                {
-                    return null;
-                }
-
-                extendedblockstorage = new ExtendedBlockStorage(j >> 4 << 4, _this.getWorld().provider.hasSkyLight());
-                _this.getBlockStorageArray()[j >> 4] = extendedblockstorage;
-                flag = j >= i1;
-            }
-
-            extendedblockstorage.set(i, j & 15, k, state);
-
-            //if (block1 != block)
-            {
-                if (!_this.getWorld().isRemote)
-                {
-                    if (block1 != block) //Only fire block breaks when the block changes.
-                    block1.breakBlock(_this.getWorld(), pos, iblockstate);
-                    TileEntity te = _this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-                    if (te != null && te.shouldRefresh(_this.getWorld(), pos, iblockstate, state)) _this.getWorld().removeTileEntity(pos);
-                }
-                else if (block1.hasTileEntity(iblockstate))
-                {
-                    TileEntity te = _this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-                    if (te != null && te.shouldRefresh(_this.getWorld(), pos, iblockstate, state))
-                    _this.getWorld().removeTileEntity(pos);
-                }
-            }
-
-            if (extendedblockstorage.get(i, j & 15, k).getBlock() != block)
-            {
-                return null;
-            } else {
-                if (flag)
-                {
-                    _this.generateSkylightMap();
-                }
-                else
-                {
-                    int j1 = state.getLightOpacity(_this.getWorld(), pos);
-
-                    if (j1 > 0)
-                    {
-                        if (j >= i1)
-                        {
-                            _this.relightBlock(i, j + 1, k);
-                        }
-                    }
-                    else if (j == i1 - 1)
-                    {
-                    	_this.relightBlock(i, j, k);
-                    }
-
-                    if (j1 != k1 && (j1 < k1 || _this.getLightFor(EnumSkyBlock.SKY, pos) > 0 || _this.getLightFor(EnumSkyBlock.BLOCK, pos) > 0))
-                    {
-                        _this.propagateSkylightOcclusion(i, k);
-                    }
-                }
-
-                // If capturing blocks, only run block physics for TE's. Non-TE's are handled in ForgeHooks.onPlaceItemIntoWorld
-                //if (!_this.getWorld().isRemote && block1 != block && (!_this.getWorld().captureBlockSnapshots || block.hasTileEntity(state)))
-                {
-                	// Don't do this when spawning resources and BO2's/BO3's, they are considered to be in their intended updated state when spawned
-               		//block.onBlockAdded(_this.getWorld(), pos, state);
-                }
-
-                if (block.hasTileEntity(state))
-                {
-                    TileEntity tileentity1 = _this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-
-                    if (tileentity1 == null)
-                    {
-                        tileentity1 = block.createTileEntity(_this.getWorld(), state);
-                        _this.getWorld().setTileEntity(pos, tileentity1);
-                    }
-
-                    if (tileentity1 != null)
-                    {
-                        tileentity1.updateContainingBlockInfo();
-                    }
-                }
-
-                _this.markDirty();
-                return iblockstate;
-            }
-        }
+    	return this.getChunkGenerator().setBlockState(_this, pos, state);
     }
     
     void attachMetadata(int x, int y, int z, NamedBinaryTag tag, boolean allowOutsidePopulatingArea)
     {
-        // Convert Tag to a native nms tag
-        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-        // Add the x, y and z position to it
-        nmsTag.setInteger("x", x);
-        nmsTag.setInteger("y", y);
-        nmsTag.setInteger("z", z);
-        // Update to current Minecraft format (maybe we want to do this at
-        // server startup instead, and then save the result?)
-        // TODO: Use datawalker instead
-        //nmsTag = this.dataFixer.process(FixTypes.BLOCK_ENTITY, nmsTag, -1);
-        nmsTag = this.dataFixer.process(FixTypes.BLOCK_ENTITY, nmsTag);
-
-        // Add that data to the current tile entity in the world
-        TileEntity tileEntity = this.world.getTileEntity(new BlockPos(x, y, z));
-        if (tileEntity != null)
-        {
-            tileEntity.readFromNBT(nmsTag);
-        } else {
-        	if(OTG.getPluginConfig().spawnLog)
-        	{
-        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, allowOutsidePopulatingArea));
-        	}
-        }
+    	this.getChunkGenerator().attachMetadata(x, y, z, tag, allowOutsidePopulatingArea);
     }
 
     @Override
@@ -1059,26 +671,6 @@ public class ForgeWorld implements LocalWorld
     }
     
     // Structures / trees
-
-    @Override
-    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
-    {
-        WorldConfig worldConfig = this.settings.getWorldConfig();
-        if (worldConfig.strongholdsEnabled)
-            this.strongholdGen.generate(this.world, chunkX, chunkZ, null);
-        if (worldConfig.mineshaftsEnabled)
-            this.mineshaftGen.generate(this.world, chunkX, chunkZ, null);
-        if (worldConfig.villagesEnabled && dry)
-            this.villageGen.generate(this.world, chunkX, chunkZ, null);
-        if (worldConfig.rareBuildingsEnabled)
-            this.rareBuildingGen.generate(this.world, chunkX, chunkZ, null);
-        if (worldConfig.netherFortressesEnabled)
-            this.netherFortressGen.generate(this.world, chunkX, chunkZ, null);
-        if (worldConfig.oceanMonumentsEnabled)
-            this.oceanMonumentGen.generate(this.world, chunkX, chunkZ, null);
-        if (worldConfig.woodLandMansionsEnabled)
-            this.woodLandMansionGen.generate(this.world, chunkX, chunkZ, null);
-    }
 
     @Override
     public boolean placeDungeon(Random rand, int x, int y, int z)
@@ -1142,6 +734,26 @@ public class ForgeWorld implements LocalWorld
             default:
                 throw new RuntimeException("Failed to handle tree of type " + type.toString());
         }
+    }    
+    
+    @Override
+    public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
+    {
+        WorldConfig worldConfig = this.settings.getWorldConfig();
+        if (worldConfig.strongholdsEnabled)
+            this.strongholdGen.generate(this.world, chunkX, chunkZ, null);
+        if (worldConfig.mineshaftsEnabled)
+            this.mineshaftGen.generate(this.world, chunkX, chunkZ, null);
+        if (worldConfig.villagesEnabled && dry)
+            this.villageGen.generate(this.world, chunkX, chunkZ, null);
+        if (worldConfig.rareBuildingsEnabled)
+            this.rareBuildingGen.generate(this.world, chunkX, chunkZ, null);
+        if (worldConfig.netherFortressesEnabled)
+            this.netherFortressGen.generate(this.world, chunkX, chunkZ, null);
+        if (worldConfig.oceanMonumentsEnabled)
+            this.oceanMonumentGen.generate(this.world, chunkX, chunkZ, null);
+        if (worldConfig.woodLandMansionsEnabled)
+            this.woodLandMansionGen.generate(this.world, chunkX, chunkZ, null);
     }
 
     @Override
@@ -1168,6 +780,42 @@ public class ForgeWorld implements LocalWorld
 
         return isVillagePlaced;
     }
+        
+    public void recreateStructures(Chunk chunkIn, int chunkX, int chunkZ)
+    {
+    	this.recreateStructures(chunkIn, chunkX, chunkZ);
+        // recreateStructures
+        WorldConfig worldConfig = this.getConfigs().getWorldConfig();
+
+        if (worldConfig.mineshaftsEnabled)
+        {
+            this.mineshaftGen.generate(this.getWorld(), chunkX, chunkZ, null);
+        }
+        if (worldConfig.villagesEnabled)
+        {
+            this.villageGen.generate(this.getWorld(), chunkX, chunkZ, null);
+        }
+        if (worldConfig.strongholdsEnabled)
+        {
+            this.strongholdGen.generate(this.getWorld(), chunkX, chunkZ, null);
+        }
+        if (worldConfig.rareBuildingsEnabled)
+        {
+            this.rareBuildingGen.generate(this.getWorld(), chunkX, chunkZ, null);
+        }
+        if (worldConfig.netherFortressesEnabled)
+        {
+            this.netherFortressGen.generate(this.getWorld(), chunkX, chunkZ, null);
+        }
+        if (worldConfig.oceanMonumentsEnabled)
+        {
+            this.oceanMonumentGen.generate(this.getWorld(), chunkX, chunkZ, null);
+        }
+        if (worldConfig.woodLandMansionsEnabled)
+        {
+            this.woodLandMansionGen.generate(this.getWorld(), chunkX, chunkZ, null);
+        }
+    }
     
     @Override
     public SpawnableObject getMojangStructurePart(String name)
@@ -1187,21 +835,96 @@ public class ForgeWorld implements LocalWorld
 	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk)
 	{
         WorldConfig worldConfig = this.settings.getWorldConfig();
-        ChunkPos chunkPos = new ChunkPos(new BlockPos(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter()));
-        //(worldConfig.strongholdsEnabled && this.strongholdGen.generate(this.world, chunkX, chunkZ, null)) || // Allow OTG structures to spawn on top of strongholds
-        //(worldConfig.mineshaftsEnabled && this.mineshaftGen.chunkHasStructure(this.world, rand, chunkPos)) || // Allow OTG structures to spawn on top of mine shafts
+        BlockPos blockPos = new BlockPos(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter());
+        // Allow OTG structures to spawn on top of strongholds
+        // Allow OTG structures to spawn on top of mine shafts
         return 
-		(worldConfig.villagesEnabled && this.villageGen instanceof OTGVillageGen && ((OTGVillageGen)this.villageGen).chunkHasStructure(this.world, rand, chunkPos)) ||
-		(worldConfig.villagesEnabled && !(this.villageGen instanceof OTGVillageGen) && this.villageGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7))) ||
-        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen instanceof OTGRareBuildingGen && ((OTGRareBuildingGen)this.rareBuildingGen).chunkHasStructure(this.world, rand, chunkPos)) ||
-        (worldConfig.rareBuildingsEnabled && !(this.rareBuildingGen instanceof OTGRareBuildingGen) && this.rareBuildingGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7))) ||
-        (worldConfig.netherFortressesEnabled && this.netherFortressGen.chunkHasStructure(this.world, rand, chunkPos)) ||
-        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen instanceof OTGOceanMonumentGen && ((OTGOceanMonumentGen)this.oceanMonumentGen).chunkHasStructure(this.world, rand, chunkPos)) ||
-        (worldConfig.oceanMonumentsEnabled && !(this.oceanMonumentGen instanceof OTGOceanMonumentGen) && this.oceanMonumentGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7))) ||
-        (worldConfig.woodLandMansionsEnabled && this.woodLandMansionGen instanceof OTGWoodLandMansionGen && ((OTGWoodLandMansionGen)this.woodLandMansionGen).chunkHasStructure(this.world, rand, chunkPos)) ||
-        (worldConfig.woodLandMansionsEnabled && !(this.woodLandMansionGen instanceof OTGWoodLandMansionGen) && this.woodLandMansionGen.isPositionInStructure(this.world, chunkPos.getBlock(7, 0, 7)))
+		(worldConfig.villagesEnabled && this.villageGen instanceof OTGVillageGen && ((OTGVillageGen)this.villageGen).isInsideStructure(blockPos)) ||
+		(worldConfig.villagesEnabled && !(this.villageGen instanceof OTGVillageGen) && this.villageGen.isInsideStructure(blockPos)) ||
+        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen instanceof OTGRareBuildingGen && ((OTGRareBuildingGen)this.rareBuildingGen).isInsideStructure(blockPos)) ||
+        (worldConfig.rareBuildingsEnabled && !(this.rareBuildingGen instanceof OTGRareBuildingGen) && this.rareBuildingGen.isInsideStructure(blockPos)) ||
+        (worldConfig.netherFortressesEnabled && this.netherFortressGen.isInsideStructure(blockPos)) ||
+        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen instanceof OTGOceanMonumentGen && ((OTGOceanMonumentGen)this.oceanMonumentGen).isInsideStructure(blockPos)) ||
+        (worldConfig.oceanMonumentsEnabled && !(this.oceanMonumentGen instanceof OTGOceanMonumentGen) && this.oceanMonumentGen.isInsideStructure(blockPos)) ||
+        (worldConfig.woodLandMansionsEnabled && this.woodLandMansionGen instanceof OTGWoodLandMansionGen && ((OTGWoodLandMansionGen)this.woodLandMansionGen).isInsideStructure(blockPos)) ||
+        (worldConfig.woodLandMansionsEnabled && !(this.woodLandMansionGen instanceof OTGWoodLandMansionGen) && this.woodLandMansionGen.isInsideStructure(blockPos))
         ;
 	}
+	
+    public boolean isInsideStructure(String structureName, BlockPos pos)
+    {
+        //if (!this.mapFeaturesEnabled)
+        {
+            //return false;
+        }
+        //else
+        if ((StructureNames.STRONGHOLD.equals(structureName)) && (this.strongholdGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.strongholdGen.isInsideStructure(pos);
+        }
+        else if ((StructureNames.WOODLAND_MANSION.equals(structureName)) && (this.woodLandMansionGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.woodLandMansionGen.isInsideStructure(pos);
+        }
+        else if ((StructureNames.OCEAN_MONUMENT.equals(structureName)) && (this.oceanMonumentGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.oceanMonumentGen.isInsideStructure(pos);
+        }
+        else if (((StructureNames.VILLAGE.equals(structureName)) || ("Village".equals(structureName))) && (this.villageGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.villageGen.isInsideStructure(pos);
+        }
+        else if ((StructureNames.MINESHAFT.equals(structureName)) && (this.mineshaftGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.mineshaftGen.isInsideStructure(pos);
+        }
+        else if (((StructureNames.RARE_BUILDING.equals(structureName))|| ("Temple".equals(structureName))) && (this.rareBuildingGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.rareBuildingGen.isInsideStructure(pos);
+        }
+
+    	return false;
+    }
+
+    public BlockPos getNearestStructurePos(String structureName, BlockPos blockPos, boolean p_180513_4_)
+    {
+    	//if(!this.mapFeaturesEnabled == null)
+    	{
+	        // Gets the nearest stronghold
+	        if ((StructureNames.STRONGHOLD.equals(structureName)) && (this.strongholdGen != null))
+	        {
+	            return this.strongholdGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
+	        }
+	        if ((StructureNames.WOODLAND_MANSION.equals(structureName)) && (this.woodLandMansionGen != null))
+	        {
+	            return this.woodLandMansionGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
+	        }
+	        if ((StructureNames.OCEAN_MONUMENT.equals(structureName)) && (this.oceanMonumentGen != null))
+	        {
+	            return this.oceanMonumentGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
+	        }
+	        if (((StructureNames.VILLAGE.equals(structureName)) || ("Village".equals(structureName))) && (this.villageGen != null))
+	        {
+	            return this.villageGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
+	        }
+	        if ((StructureNames.MINESHAFT.equals(structureName)) && (this.mineshaftGen != null))
+	        {
+	            return this.mineshaftGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
+	        }
+	        if (((StructureNames.RARE_BUILDING.equals(structureName))|| ("Temple".equals(structureName))) && (this.rareBuildingGen != null))
+	        {
+	            return this.rareBuildingGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
+	        }
+    	}
+
+        return null;
+    }	
     
     // Replace blocks
 
@@ -1284,7 +1007,6 @@ public class ForgeWorld implements LocalWorld
         }
     }
 
-    // TODO: Move this somewhere in com.pg85.otg.forge.biomes?
     /**
      * Used by mob inheritance code. Used to inherit default mob spawning settings (including those added by other mods)
      * @param biomeConfigStub
@@ -1295,6 +1017,41 @@ public class ForgeWorld implements LocalWorld
     	ForgeBiomeRegistryManager.mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, biomeResourceLocation);
 	}
 
+    public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
+    {
+        WorldConfig worldConfig = this.getConfigs().getWorldConfig();
+        Biome biomeBaseOTG = ((ForgeBiome)this.getBiome(blockPos.getX(), blockPos.getZ())).biomeBase;
+        
+        if (worldConfig.rareBuildingsEnabled)
+        {
+            if (
+        		paramaca == EnumCreatureType.MONSTER && 
+            	(
+	        		(
+	        			this.rareBuildingGen instanceof OTGRareBuildingGen && 
+	        			((OTGRareBuildingGen)this.rareBuildingGen).isSwampHutAtLocation(blockPos)
+	    			) ||
+	        		(
+	        			!(this.rareBuildingGen instanceof OTGRareBuildingGen) && 
+	        			((MapGenScatteredFeature)this.rareBuildingGen).isSwampHut(blockPos)	        				
+					)
+        		)
+        	)
+            {
+                return (this.rareBuildingGen instanceof OTGRareBuildingGen) ? ((OTGRareBuildingGen)this.rareBuildingGen).getMonsterSpawnList() : ((MapGenScatteredFeature)this.rareBuildingGen).getMonsters();
+            }
+        }
+        if (worldConfig.oceanMonumentsEnabled)
+        {
+            if (paramaca == EnumCreatureType.MONSTER && this.oceanMonumentGen.isPositionInStructure(this.getWorld(), blockPos))
+            {
+                return (this.oceanMonumentGen instanceof OTGOceanMonumentGen) ? ((OTGOceanMonumentGen)this.oceanMonumentGen).getMonsterSpawnList() : ((StructureOceanMonument)this.oceanMonumentGen).getMonsters();
+            }
+        }
+
+        return biomeBaseOTG.getSpawnableList(paramaca);
+    }    
+    
     // Entity spawning
     	
     @Override

@@ -27,6 +27,7 @@ import com.pg85.otg.generator.ChunkBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.Loader;
 
 public class ForgeEngine extends OTGEngine
 {
@@ -36,10 +37,11 @@ public class ForgeEngine extends OTGEngine
 	private WorldLoader worldLoader;
     long lastPregeneratorStatusUpdateTime = System.currentTimeMillis();   
 	
-    public ForgeEngine(WorldLoader worldLoader)
+    public ForgeEngine()
     {
         super(new ForgeLogger());
-        this.worldLoader = worldLoader;
+        
+        this.worldLoader = new WorldLoader(new File(Loader.instance().getConfigDir(), "OpenTerrainGenerator"));      
         this.biomeRegistryManager = new ForgeBiomeRegistryManager();
     }
 

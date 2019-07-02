@@ -168,7 +168,7 @@ public final class OTGCommandHandler implements ICommand
 	    		OTG.log(LogMarker.INFO, "BO3's unloaded");
 	    		sender.sendMessage(new TextComponentString("BO3's unloaded"));
 	    		OTG.log(LogMarker.INFO, "Clearing chunkgenerator cache");
-	    		world.getChunkGenerator().clearChunkCache();
+	    		world.getChunkGenerator().clearChunkCache(false);
 	    		OTG.log(LogMarker.INFO, "Caches cleared");
         	}
             else if (isOp && argString[0].equals("tp") && argString.length > 1)
@@ -209,10 +209,13 @@ public final class OTGCommandHandler implements ICommand
 					{
 	            		int maxRadius = 1000;
 
-	            		ForgeBiome targetBiome = (ForgeBiome)world.getBiomeByNameOrNull(biomeOrDimensionName);
-	            		if(targetBiome != null)
+	            		if(biomeId == -1)
 	            		{
-	            			biomeId = targetBiome.getIds().getOTGBiomeId();
+		            		ForgeBiome targetBiome = (ForgeBiome)world.getBiomeByNameOrNull(biomeOrDimensionName);
+		            		if(targetBiome != null)
+		            		{
+		            			biomeId = targetBiome.getIds().getOTGBiomeId();
+		            		}
 	            		}
 	            		
 	            		if(biomeId != -1)

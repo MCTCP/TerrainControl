@@ -1,7 +1,10 @@
 package com.pg85.otg.forge.events;
 
 import com.google.common.base.Function;
+import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.exception.BiomeNotFoundException;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
@@ -18,9 +21,34 @@ public final class BiomeColorsListener
     ResourceLocation lastBiome = null;
     BiomeConfig lastBiomeConfig;
     
-    public BiomeColorsListener(Function<Biome, BiomeConfig> getBiomeConfig)
+    public BiomeColorsListener()
     {
-        this.getBiomeConfig = getBiomeConfig;
+        // Register colorizer, for biome colors
+        this.getBiomeConfig = new Function<Biome, BiomeConfig>()
+        {
+            @Override
+            public BiomeConfig apply(Biome input)
+            {
+                LocalBiome biome = null;
+                try
+                {
+                	// Get world name from resourcelocation
+                	// TODO: Get world name from somewhere sensical...
+                	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getResourcePath().split("_")[0]);
+                }
+                catch (BiomeNotFoundException e)
+                {
+                    // Ignored, try in next world
+                }
+
+                if (biome == null)
+                {
+                    return null;
+                }
+
+                return biome.getBiomeConfig();
+            }
+        };
     }
     
     @SubscribeEvent

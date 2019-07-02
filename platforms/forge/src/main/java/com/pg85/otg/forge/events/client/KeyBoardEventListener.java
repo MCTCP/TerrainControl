@@ -14,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class KeyBoardEventListener
 {
-	// Used for pre-generator in-game UI toggle (F3) and OTG in-game menu (O)
+	// Used for OTG in-game menu (O)
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)

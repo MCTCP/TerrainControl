@@ -173,4 +173,46 @@ public abstract class WorldSession
     		}
     	}
     }
+    
+	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
+	{
+		return
+			!(
+				// TODO: Make this prettier.
+				// Cycle 0 for the pre-generator can mean 2 things:
+				// 1. Nothing has been pre-generated.
+				// 2. Oly the spawn chunk has been generated.
+				// The pre-generator actually skips spawning the center chunk at cycle 0 (is done automatically by MC anyway).
+				getPregeneratedBorderLeft() == 0 &&
+				getPregeneratedBorderRight() == 0 &&
+				getPregeneratedBorderTop() == 0 &&
+				getPregeneratedBorderBottom() == 0
+			) &&
+			(
+				getPregenerationRadius() > 0 &&
+				chunk.getChunkX() >= getPreGeneratorCenterPoint().getChunkX() - getPregeneratedBorderLeft()
+				&&
+				chunk.getChunkX() <= getPreGeneratorCenterPoint().getChunkX() + getPregeneratedBorderRight()
+				&&
+				chunk.getChunkZ() >= getPreGeneratorCenterPoint().getChunkZ() - getPregeneratedBorderTop()
+				&&
+				chunk.getChunkZ() <= getPreGeneratorCenterPoint().getChunkZ() + getPregeneratedBorderBottom()
+			)
+		;
+	}
+
+	public boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
+	{
+		return
+			getWorldBorderRadius() == 0 ||
+			(
+				chunk.getChunkX() >= getWorldBorderCenterPoint().getChunkX() - (getWorldBorderRadius() - 1)
+				&&
+				chunk.getChunkX() <= getWorldBorderCenterPoint().getChunkX() + (getWorldBorderRadius() - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
+				&&
+				chunk.getChunkZ() >= getWorldBorderCenterPoint().getChunkZ() - (getWorldBorderRadius() - 1)
+				&&
+				chunk.getChunkZ() <= getWorldBorderCenterPoint().getChunkZ() + (getWorldBorderRadius() - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
+			);
+	}
 }

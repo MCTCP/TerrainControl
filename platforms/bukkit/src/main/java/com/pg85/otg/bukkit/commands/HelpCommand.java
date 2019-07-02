@@ -39,7 +39,7 @@ public class HelpCommand extends BaseCommand
             }
         }
 
-        this.ListMessage(sender, lines, page, "Available commands");
+        this.listMessage(sender, lines, page, "Available commands");
         return true;
     }
 }

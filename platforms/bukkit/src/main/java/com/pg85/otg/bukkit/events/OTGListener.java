@@ -15,14 +15,14 @@ import org.bukkit.event.world.WorldUnloadEvent;
 
 public class OTGListener implements Listener
 {
-    private final OTGPlugin txPlugin;
-    private final OTGSender tcSender;
+    private final OTGPlugin otgPlugin;
+    private final OTGSender otgSender;
     private final SaplingListener saplingListener;
 
     public OTGListener(OTGPlugin plugin)
     {
-        this.txPlugin = plugin;
-        this.tcSender = new OTGSender(plugin);
+        this.otgPlugin = plugin;
+        this.otgSender = new OTGSender(plugin);
         this.saplingListener = new SaplingListener();
         Bukkit.getServer().getPluginManager().registerEvents(this, plugin);
     }
@@ -30,13 +30,13 @@ public class OTGListener implements Listener
     @EventHandler(priority = EventPriority.HIGH)
     public void onWorldInit(WorldInitEvent event)
     {
-        this.txPlugin.onWorldInit(event.getWorld());
+        this.otgPlugin.onWorldInit(event.getWorld());
     }
 
     @EventHandler
     public void onWorldUnload(WorldUnloadEvent event)
     {
-        this.txPlugin.onWorldUnload(event.getWorld());
+        this.otgPlugin.onWorldUnload(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.NORMAL)
@@ -45,14 +45,13 @@ public class OTGListener implements Listener
         saplingListener.onStructureGrow(event);
     }
 
-
     @EventHandler
     public void onPlayerRegisterChannel(PlayerRegisterChannelEvent event)
     {
         // Sends custom colors on join
         if (event.getChannel().equals(PluginStandardValues.ChannelName))
         {
-            tcSender.send(event.getPlayer());
+            otgSender.send(event.getPlayer());
         }
     }
 
@@ -63,8 +62,7 @@ public class OTGListener implements Listener
         Player player = event.getPlayer();
         if (player.getListeningPluginChannels().contains(PluginStandardValues.ChannelName))
         {
-            tcSender.send(player);
+            otgSender.send(player);
         }
     }
-
 }

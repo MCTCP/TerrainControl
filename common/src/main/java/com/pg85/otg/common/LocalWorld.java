@@ -41,9 +41,7 @@ public interface LocalWorld
 	public WorldSession getWorldSession();
 
 	public void deleteWorldSessionData();
-	
-    public void setAllowSpawningOutsideBounds(boolean isSpawningBO3AtSpawn);
-    
+	   
     /**
      * Gets the height the base terrain of the world is capped at. Resources
      * ignore this limit.
@@ -101,8 +99,6 @@ public interface LocalWorld
      * @return How many different biome ids are in the save files.
      */
     public int getMaxSavedBiomesCount();
-
-    public int getFreeBiomeId();
 
     public ArrayList<LocalBiome> getAllBiomes();
 
@@ -259,5 +255,7 @@ public interface LocalWorld
 
 	boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources);
 
-	public ChunkCoordinate getSpawnChunk();	
+	public ChunkCoordinate getSpawnChunk();
+
+	public void setAllowSpawningOutsideBounds(boolean b);	
 }

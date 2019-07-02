@@ -9,7 +9,6 @@ import org.bukkit.generator.ChunkGenerator.ChunkData;
 
 final class BukkitChunkBuffer implements ChunkBuffer
 {
-
     private final ChunkCoordinate chunkCoord;
     private final ChunkData chunkData;
 
