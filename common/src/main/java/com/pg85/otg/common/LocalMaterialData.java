@@ -1,7 +1,7 @@
 package com.pg85.otg.common;
 
 import com.pg85.otg.OTGEngine;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 /**
  * Represents one of Minecraft's materials. Also includes its data value.

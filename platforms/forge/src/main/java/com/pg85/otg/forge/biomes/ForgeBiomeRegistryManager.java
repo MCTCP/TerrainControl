@@ -24,7 +24,7 @@ import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;

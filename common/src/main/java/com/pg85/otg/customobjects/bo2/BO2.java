@@ -9,17 +9,15 @@ import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -370,22 +368,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
 
     }
-
-    @Override
-    public BoundingBox getBoundingBox(Rotation rotation)
-    {
-        // We just
-        return BoundingBox.newEmptyBox();
-    }
     
-    @Override
-    public int getMaxBranchDepth()
-    {
-        return 0;
-    }
-    
-	// OTG+
-	   
     private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
     {
 	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
@@ -401,9 +384,10 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     }       
 
     @Override
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    public boolean onEnable()
     {
         enable();
+        return true;
     }
 
     private void enable()
@@ -411,6 +395,4 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         readConfigSettings();
         correctSettings();
     }
-        
-	//
 }

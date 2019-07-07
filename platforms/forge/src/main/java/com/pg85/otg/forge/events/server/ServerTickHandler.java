@@ -11,10 +11,12 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3EntityFunction;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4EntityFunction;
+import com.pg85.otg.customobjects.bofunctions.EntityFunction;
+import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.SpawnerFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
@@ -125,14 +127,14 @@ public class ServerTickHandler
 
                     			// Return modData to sender.
                         		String messageString = "";
-		                    	HashMap<String, ArrayList<ModDataFunction>> modDataInChunk = forgeWorld.getWorldSession().getModDataForChunk(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+		                    	HashMap<String, ArrayList<ModDataFunction<?>>> modDataInChunk = forgeWorld.getWorldSession().getModDataForChunk(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
 		                    	if(modDataInChunk != null)
 		                    	{
-			                    	for(Entry<String, ArrayList<ModDataFunction>> modNameAndData : modDataInChunk.entrySet())
+			                    	for(Entry<String, ArrayList<ModDataFunction<?>>> modNameAndData : modDataInChunk.entrySet())
 			                    	{
 			                    		if(modNameAndData.getKey().equalsIgnoreCase(imcMessage.getSender()))
 			                    		{
-			                    			for(ModDataFunction modData : modNameAndData.getValue())
+			                    			for(ModDataFunction<?> modData : modNameAndData.getValue())
 			                    			{
 			                    				messageString += "[" + modData.x + "," + modData.y + "," + modData.z + "," + modData.modData + "]";
 			                    			}
@@ -197,7 +199,13 @@ public class ServerTickHandler
 		    							{
 		    								try
 		    								{
-		    									EntityFunction entityFunc = new EntityFunction();
+		    									EntityFunction<?> entityFunc;
+		    									if(world.getConfigs().getWorldConfig().isOTGPlus)
+		    									{
+	    											entityFunc = new BO4EntityFunction();		
+		    									} else {
+		    										entityFunc = new BO3EntityFunction();
+		    									} 
 		    									entityFunc.x = modDataBlockX;
 		    									entityFunc.y = modDataBlockY;
 		    									entityFunc.z = modDataBlockZ;
@@ -333,18 +341,18 @@ public class ServerTickHandler
             Random random = new Random();
 
             // OTG mob spawning
-    		Stack<SpawnerFunction> spawnerDataSortedByDistance = new Stack<SpawnerFunction>();
+    		Stack<SpawnerFunction<?>> spawnerDataSortedByDistance = new Stack<SpawnerFunction<?>>();
     		Stack<Object[]> spawnerDatasWithDistance = new Stack<Object[]>();
 
             for (ChunkCoordinate chunkcoordintpair1 : this.eligibleChunksForSpawning.keySet())
             {
                 if (!this.eligibleChunksForSpawning.get(chunkcoordintpair1))
                 {
-                	ArrayList<SpawnerFunction> spawnerDataForOTG = world.getWorldSession().getSpawnersForChunk(ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ()));
+                	ArrayList<SpawnerFunction<?>> spawnerDataForOTG = world.getWorldSession().getSpawnersForChunk(ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ()));
 
                 	if(spawnerDataForOTG != null && spawnerDataForOTG.size() > 0)
                 	{
-                		for(SpawnerFunction spawnerData : spawnerDataForOTG)
+                		for(SpawnerFunction<?> spawnerData : spawnerDataForOTG)
                 		{
                 			double distToClosestPlayer = maxDistToClosestPlayerSq;
 
@@ -389,10 +397,10 @@ public class ServerTickHandler
 
             for(Object[] spawnerDataWithDistance : spawnerDatasWithDistance)
             {
-            	spawnerDataSortedByDistance.add((SpawnerFunction)spawnerDataWithDistance[1]);
+            	spawnerDataSortedByDistance.add((SpawnerFunction<?>)spawnerDataWithDistance[1]);
             }
 
-    		for(SpawnerFunction spawnerData : spawnerDataSortedByDistance)
+    		for(SpawnerFunction<?> spawnerData : spawnerDataSortedByDistance)
         	{
 				String mobTypeName = spawnerData.mobName;
 				int groupSize = spawnerData.groupSize;
@@ -691,18 +699,18 @@ public class ServerTickHandler
 			for (int a = 0; a < playerCoords.size(); ++a)
             {
 				EntityPlayer player = (EntityPlayer)playerCoords.get(a)[3];
-				ArrayList<ParticleFunction> particleDataForOTGPerPlayer = new ArrayList<ParticleFunction>();
+				ArrayList<ParticleFunction<?>> particleDataForOTGPerPlayer = new ArrayList<ParticleFunction<?>>();
 
                 for (ChunkCoordinate chunkcoordintpair1 : this.eligibleChunksForSpawning.keySet())
                 {
                     if (!this.eligibleChunksForSpawning.get(chunkcoordintpair1))
                     {
                     	ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkcoordintpair1.getChunkX(), chunkcoordintpair1.getChunkZ());
-                    	ArrayList<ParticleFunction> particleDataForOTG = world.getWorldSession().getParticlesForChunk(chunkCoord);
+                    	ArrayList<ParticleFunction<?>> particleDataForOTG = world.getWorldSession().getParticlesForChunk(chunkCoord);
 
                     	if(particleDataForOTG != null && particleDataForOTG.size() > 0)
                     	{
-                    		for(ParticleFunction particleData : particleDataForOTG)
+                    		for(ParticleFunction<?> particleData : particleDataForOTG)
                     		{
                 		        float f = (float)((Double)playerCoords.get(a)[0] - particleData.x);
                 		        float f1 = (float)((Double)playerCoords.get(a)[1] - particleData.y);

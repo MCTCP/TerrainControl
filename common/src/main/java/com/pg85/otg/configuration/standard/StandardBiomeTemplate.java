@@ -11,9 +11,9 @@ import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.resource.IceSpikeGen.SpikeType;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
-import com.pg85.otg.util.minecraftTypes.MobNames;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.MobNames;
 
 import java.util.ArrayList;
 import java.util.Arrays;

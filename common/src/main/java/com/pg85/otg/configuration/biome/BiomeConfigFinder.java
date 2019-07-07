@@ -6,11 +6,11 @@ import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
-import com.pg85.otg.configuration.standard.BiomeRegistryNames;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
 import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 
 import java.io.File;
 import java.util.ArrayList;

@@ -13,9 +13,10 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
-import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
-import com.pg85.otg.customobjects.customstructure.CustomObjectStructureCache;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
+import com.pg85.otg.customobjects.bofunctions.EntityFunction;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.biomes.ForgeBiome;
@@ -35,10 +36,11 @@ import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
@@ -89,7 +91,7 @@ public class ForgeWorld implements LocalWorld
     private OTGChunkGenerator generator;
     public World world;
     private ConfigProvider settings;
-    private CustomObjectStructureCache structureCache;
+    private CustomStructureCache structureCache;
     private String name;
     private long seed;
     private BiomeGenerator biomeGenerator;
@@ -177,7 +179,7 @@ public class ForgeWorld implements LocalWorld
         this.generator = new OTGChunkGenerator(this);
 
         this.worldSession = new ForgeWorldSession(this);
-        this.structureCache = new CustomObjectStructureCache(this);
+        this.structureCache = new CustomStructureCache(this);
     }
 
     @SideOnly(Side.CLIENT)
@@ -271,7 +273,7 @@ public class ForgeWorld implements LocalWorld
 
     // OTG+ structure cache
     @Override
-    public CustomObjectStructureCache getStructureCache()
+    public CustomStructureCache getStructureCache()
     {
         return this.structureCache;
     }
@@ -451,9 +453,9 @@ public class ForgeWorld implements LocalWorld
     	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
     }
     
-    public Chunk getChunk(int x, int z, boolean isOTGPlus)
+    public Chunk getChunk(int x, int z, boolean allowOutsidePopulatingArea)
     {
-    	return this.getChunkGenerator().getChunk(x, z, isOTGPlus);
+    	return this.getChunkGenerator().getChunk(x, z, allowOutsidePopulatingArea);
     }
     
     @Override
@@ -591,7 +593,7 @@ public class ForgeWorld implements LocalWorld
     
     // TODO: This returns AIR for nothing and AIR, refactor?
     @Override
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean IsOTGPlus)
+    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
     {
         if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
         {
@@ -599,9 +601,9 @@ public class ForgeWorld implements LocalWorld
         	//throw new RuntimeException();
         }
 
-        Chunk chunk = this.getChunk(x, z, IsOTGPlus);
+        Chunk chunk = this.getChunk(x, z, allowOutsidePopulatingArea);
 
-        if(chunk == null && !IsOTGPlus)
+        if(chunk == null && !allowOutsidePopulatingArea)
         {
         	return ForgeMaterialData.ofMinecraftBlock(Blocks.AIR);
         }
@@ -624,7 +626,7 @@ public class ForgeWorld implements LocalWorld
     }
     
     @Override
-    public BlockFunction[] getBlockColumn(int x, int z)
+    public OTGBlock[] getBlockColumn(int x, int z)
     {
     	//OTG.log(LogMarker.INFO, "getBlockColumn at X" + x + " Z" + z);
     	return generator.getBlockColumnInUnloadedChunk(x,z);
@@ -1036,7 +1038,7 @@ public class ForgeWorld implements LocalWorld
     // Entity spawning
     	
     @Override
-    public void spawnEntity(EntityFunction entityData)
+    public void spawnEntity(EntityFunction<?> entityData)
     {
     	if(OTG.getPluginConfig().spawnLog)
     	{

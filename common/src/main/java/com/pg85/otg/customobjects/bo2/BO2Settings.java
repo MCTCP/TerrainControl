@@ -4,9 +4,9 @@ import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
-public class BO2Settings extends Settings
+class BO2Settings extends Settings
 {
     static final Setting<Boolean>
             SPAWN_SUNLIGHT = booleanSetting("spawnSunlight", true),

@@ -8,7 +8,7 @@ import com.pg85.otg.forge.generator.structure.OTGVillageGen;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;

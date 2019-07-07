@@ -4,14 +4,12 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Config;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3Function;
-import com.pg85.otg.util.bo3.Rotation;
 
 /**
  * Represents a check - something that can prevent the BO3 from spawning if this
  * condition is not met.
  */
-public abstract class BO3Check extends BO3Function
+public abstract class BO3Check extends CustomObjectConfigFunction<BO3Config>
 {
     /**
      * X position relative to the object origin.
@@ -55,8 +53,5 @@ public abstract class BO3Check extends BO3Function
         return check.x == x && check.y == y && check.z == z;
     }
 
-    @Override
     public abstract BO3Check rotate();
-
-    public abstract BO3Check rotate(Rotation rotation);
 }

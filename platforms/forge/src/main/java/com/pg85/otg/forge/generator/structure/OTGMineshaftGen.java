@@ -7,7 +7,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

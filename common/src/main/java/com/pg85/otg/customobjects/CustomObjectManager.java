@@ -2,7 +2,8 @@ package com.pg85.otg.customobjects;
 
 import com.pg85.otg.customobjects.bo2.BO2Loader;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.customobjects.bo4.BO4Loader;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ public class CustomObjectManager
         // Register loaders
         registerCustomObjectLoader("bo2", new BO2Loader());
         registerCustomObjectLoader("bo3", new BO3Loader());
+        registerCustomObjectLoader("bo4", new BO4Loader());
 
         this.globalCustomObjects = new CustomObjectCollection();
         
@@ -60,9 +62,9 @@ public class CustomObjectManager
         }
     }
     
-    public void ReloadCustomObjectFiles()
+    public void reloadCustomObjectFiles()
     {
-    	this.globalCustomObjects.ReloadCustomObjectFiles();
+    	this.globalCustomObjects.reloadCustomObjectFiles();
     }
 
     /**

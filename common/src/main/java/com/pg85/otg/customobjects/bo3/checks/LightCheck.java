@@ -1,10 +1,8 @@
 package com.pg85.otg.customobjects.bo3.checks;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
+import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.bo3.Rotation;
-
 import java.util.List;
 
 /**
@@ -64,21 +62,10 @@ public class LightCheck extends BO3Check
 
         return rotatedCheck;
     }
-
+    
     @Override
-    public LightCheck rotate(Rotation rotation)
+    public Class<BO3Config> getHolderType()
     {
-    	LightCheck rotatedBlock = new LightCheck();
-
-        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
-
-        rotatedBlock.x = rotatedCoords.getX();
-        rotatedBlock.y = rotatedCoords.getY();
-        rotatedBlock.z = rotatedCoords.getZ();
-
-    	rotatedBlock.minLightLevel = minLightLevel;
-    	rotatedBlock.maxLightLevel = maxLightLevel;
-
-        return rotatedBlock;
+        return BO3Config.class;
     }
 }

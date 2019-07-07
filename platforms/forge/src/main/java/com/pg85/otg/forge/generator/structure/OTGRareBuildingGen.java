@@ -9,7 +9,7 @@ import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.util.math.BlockPos;

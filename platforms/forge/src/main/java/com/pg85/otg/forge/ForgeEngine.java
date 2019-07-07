@@ -17,13 +17,14 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.generator.ForgeChunkBuffer;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.generator.ChunkBuffer;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+
 import net.minecraft.world.World;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.FMLCommonHandler;

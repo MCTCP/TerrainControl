@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import java.util.Random;
 /**
  * This class aids in the task of finding the blocks at the top or bottom of a collection of blocks
  */
-public class ObjectExtrusionHelper
+class ObjectExtrusionHelper
 {
     /**
      * The Y coordinate of the appropriate level to be extruding blocks from
@@ -32,7 +32,7 @@ public class ObjectExtrusionHelper
      * These blocks are the blocks that are found to be at the location dictated by the extrudeMode, and will be
      * extruded until hitting a material not listed in extrudeThroughBlocks
      */
-    private ArrayList<BlockFunction> blocksToExtrude = new ArrayList<BlockFunction>();
+    private ArrayList<BO3BlockFunction> blocksToExtrude = new ArrayList<BO3BlockFunction>();
 
     /**
      * Constructor
@@ -54,7 +54,7 @@ public class ObjectExtrusionHelper
      *
      * @param block The block to add.
      */
-    void addBlock(BlockFunction block)
+    void addBlock(BO3BlockFunction block)
     {
         if (extrudeMode != BO3Settings.ExtrudeMode.None)
         {
@@ -86,7 +86,7 @@ public class ObjectExtrusionHelper
      */
     void extrude(LocalWorld world, Random random, int x, int y, int z)
     {
-        for (BlockFunction block : blocksToExtrude)
+        for (BO3BlockFunction block : blocksToExtrude)
         {
             if (extrudeMode == BO3Settings.ExtrudeMode.BottomDown)
             {
@@ -107,6 +107,4 @@ public class ObjectExtrusionHelper
             }
         }
     }
-
-
 }

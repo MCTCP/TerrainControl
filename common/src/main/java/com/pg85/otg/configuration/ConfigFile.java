@@ -2,7 +2,7 @@ package com.pg85.otg.configuration;
 
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import java.io.DataInputStream;
 import java.io.DataOutput;

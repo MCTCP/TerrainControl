@@ -16,8 +16,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
+import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.util.NBTHelper;
@@ -29,8 +28,10 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
+import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockGravel;
 import net.minecraft.block.BlockSand;
@@ -223,28 +224,15 @@ public class OTGChunkGenerator implements IChunkGenerator
         BlockSand.fallInstantly = false;
         BlockGravel.fallInstantly = false;
 
-        HashMap<String,ArrayList<ModDataFunction>> MessagesPerMod = world.getWorldSession().getModDataForChunk(chunkCoord);
-        if(MessagesPerMod == null && world.getConfigs().getWorldConfig().isOTGPlus)
-        {
-    		if(!world.getStructureCache().structureCache.containsKey(chunkCoord))
-    		{
-    			if(!world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-    			{
-    				OTG.log(LogMarker.FATAL, "This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 1");
-    				throw new RuntimeException("This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 1");
-    			}
-    		}
-    		OTG.log(LogMarker.FATAL, "This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 2");
-        	throw new RuntimeException("This exception seems to be a fluke and occurs rarely. If you find a way to re-create it please tell me! 2");
-        }
+        HashMap<String,ArrayList<ModDataFunction<?>>> MessagesPerMod = world.getWorldSession().getModDataForChunk(chunkCoord);
         if(MessagesPerMod != null && MessagesPerMod.entrySet().size() > 0)
         {
-        	for(Entry<String, ArrayList<ModDataFunction>> modNameAndData : MessagesPerMod.entrySet())
+        	for(Entry<String, ArrayList<ModDataFunction<?>>> modNameAndData : MessagesPerMod.entrySet())
         	{
         		String messageString = "";
 				if(modNameAndData.getKey().equals("OTG"))
 				{
-	    			for(ModDataFunction modData : modNameAndData.getValue())
+	    			for(ModDataFunction<?> modData : modNameAndData.getValue())
 	    			{
 						String[] paramString2 = modData.modData.split("\\/");
 
@@ -261,7 +249,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 						}
 	    			}
 				} else {
-	    			for(ModDataFunction modData : modNameAndData.getValue())
+	    			for(ModDataFunction<?> modData : modNameAndData.getValue())
 	    			{
     					messageString += "[" + modData.x + "," + modData.y + "," + modData.z + "," + modData.modData + "]";
 	    			}
@@ -288,7 +276,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     // returns any loaded chunk outside the populated area
     // throws an exception if any unloaded chunk outside the populated area is requested or if a loaded chunk could not be queried.
     
-    public Chunk getChunk(int x, int z, boolean isOTGPlus)
+    public Chunk getChunk(int x, int z, boolean allowOutsidePopulatingArea)
     {
         int chunkX = x >> 4;
         int chunkZ = z >> 4;
@@ -322,12 +310,12 @@ public class OTGChunkGenerator implements IChunkGenerator
 		if(
 			(
 				outsidePopulatingArea &&
-				!isOTGPlus
+				!allowOutsidePopulatingArea
 			) ||
 			this.allowSpawningOutsideBounds
 		)
 		{
-			if(!isOTGPlus)
+			if(!allowOutsidePopulatingArea)
 			{
 				if(this.world.getConfigs().getWorldConfig().populationBoundsCheck)
 				{
@@ -543,7 +531,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         }
     }
     
-    public BlockFunction[] getBlockColumnInUnloadedChunk(int x, int z)
+    public OTGBlock[] getBlockColumnInUnloadedChunk(int x, int z)
     {
     	lastx2 = x;
     	lastz2 = z;
@@ -555,12 +543,12 @@ public class OTGChunkGenerator implements IChunkGenerator
     	Object[] chunkCacheEntry = chunkCache.get(chunkCoord);
 
     	Chunk chunk = null;
-    	LinkedHashMap<ChunkCoordinate, BlockFunction[]> blockColumnCache = null;
-    	BlockFunction[] cachedColumn = null;
+    	LinkedHashMap<ChunkCoordinate, OTGBlock[]> blockColumnCache = null;
+    	OTGBlock[] cachedColumn = null;
     	if(chunkCacheEntry != null)
     	{
     		chunk = (Chunk)chunkCacheEntry[0];
-    		blockColumnCache = (LinkedHashMap<ChunkCoordinate, BlockFunction[]>)chunkCacheEntry[1];
+    		blockColumnCache = (LinkedHashMap<ChunkCoordinate, OTGBlock[]>)chunkCacheEntry[1];
     		cachedColumn = blockColumnCache.get(ChunkCoordinate.fromChunkCoords(x,z));
     	}
     	if(cachedColumn != null)
@@ -579,7 +567,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
 	    		chunk = chunkBuffer.toChunk(this.world.getWorld());
             }
-        	blockColumnCache = new LinkedHashMap<ChunkCoordinate, BlockFunction[]>();
+        	blockColumnCache = new LinkedHashMap<ChunkCoordinate, OTGBlock[]>();
         	chunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ), new Object[] { chunk, blockColumnCache });
     	}
 
@@ -587,10 +575,10 @@ public class OTGChunkGenerator implements IChunkGenerator
     	int blockX = x &= 0xF;
     	int blockZ = z &= 0xF;
 
-        BlockFunction[] blocksInColumn = new BlockFunction[256];
+        OTGBlock[] blocksInColumn = new OTGBlock[256];
         for(int y = 0; y < 256; y++)
         {
-        	BlockFunction block = new BlockFunction();
+        	OTGBlock block = new OTGBlock();
         	block.x = x;
         	block.y = y;
         	block.z = z;
@@ -610,7 +598,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     
     public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
     {
-    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
+    	OTGBlock[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
         return blockColumn[y].material;
     }
 
@@ -618,7 +606,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
     	int height = -1;
 
-    	BlockFunction[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
+    	OTGBlock[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
 
         for(int y = 255; y > -1; y--)
         {

@@ -10,7 +10,8 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
-import com.pg85.otg.customobjects.customstructure.CustomObjectStructure;
+import com.pg85.otg.customobjects.structures.CustomStructure;
+import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.generator.resource.AboveWaterGen;
 import com.pg85.otg.generator.resource.BoulderGen;
 import com.pg85.otg.generator.resource.CactusGen;
@@ -528,19 +529,19 @@ public class ObjectSpawner
 			return;
 		}
 
-		CustomObjectStructure structureStart = world.getStructureCache().structureCache.get(chunkCoord);
-		if (structureStart != null && structureStart.Start != null)
+		BO4CustomStructure structureStart = world.getStructureCache().bo4StructureCache.get(chunkCoord);
+		if (structureStart != null && structureStart.start != null)
 		{
 			// SpawnForChunk will call placeComplexSurfaceBlocks for this
 			// chunk (after spawning smooth area but before spawning structure)
-			structureStart.spawnForChunkOTGPlus(chunkCoord);
+			structureStart.spawnForChunkOTGPlus(chunkCoord, world);
 
 			// All done spawning structures for this chunk, clean up cache
 			if(!world.isInsidePregeneratedRegion(chunkCoord))
 			{
-				world.getStructureCache().structureCache.put(chunkCoord, null);
+				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
 			} else {
-				world.getStructureCache().structureCache.remove(chunkCoord);
+				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
 			}
 		}
 		// Only trees plotted here
@@ -551,9 +552,9 @@ public class ObjectSpawner
 
 			if(!world.isInsidePregeneratedRegion(chunkCoord))
 			{
-				world.getStructureCache().structureCache.put(chunkCoord, null);
+				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
 			} else {
-				world.getStructureCache().structureCache.remove(chunkCoord);
+				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
 			}
 		}
 	}

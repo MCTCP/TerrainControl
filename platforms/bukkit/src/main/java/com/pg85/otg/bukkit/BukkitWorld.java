@@ -20,9 +20,10 @@ import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
-import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
-import com.pg85.otg.customobjects.customstructure.CustomObjectStructureCache;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
+import com.pg85.otg.customobjects.bofunctions.EntityFunction;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
@@ -30,10 +31,11 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
@@ -128,7 +130,7 @@ public class BukkitWorld implements LocalWorld
     private OTGChunkGenerator generator;
     private WorldServer world;
     private ServerConfigProvider settings;
-    private CustomObjectStructureCache structureCache;
+    private CustomStructureCache structureCache;
     private String name;
     private BiomeGenerator biomeGenerator;
     private DataConverter dataConverter;
@@ -232,7 +234,7 @@ public class BukkitWorld implements LocalWorld
     }
 		
     @Override
-    public CustomObjectStructureCache getStructureCache()
+    public CustomStructureCache getStructureCache()
     {
         return this.structureCache;
     }
@@ -330,7 +332,7 @@ public class BukkitWorld implements LocalWorld
         {
             // Things that need to be done only when enabling
             // for the first time
-            this.structureCache = new CustomObjectStructureCache(this);
+            this.structureCache = new CustomStructureCache(this);
             this.dataConverter = DataConverterRegistry.a();
 
             switch (this.settings.getWorldConfig().modeTerrain)
@@ -1229,7 +1231,7 @@ public class BukkitWorld implements LocalWorld
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation) { }
     
 	@Override
-	public void spawnEntity(EntityFunction entityData)
+	public void spawnEntity(EntityFunction<?> entityData)
 	{
     	Random rand = new Random();
 
@@ -1667,7 +1669,7 @@ public class BukkitWorld implements LocalWorld
     }
     
 	@Override
-	public BlockFunction[] getBlockColumn(int x, int z)
+	public OTGBlock[] getBlockColumn(int x, int z)
 	{
 		// TODO Implement this
 		throw new RuntimeException();

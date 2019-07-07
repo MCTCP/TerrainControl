@@ -3,7 +3,7 @@ package com.pg85.otg.forge.network.server;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.forge.network.PacketDispatcher;
 import com.pg85.otg.forge.network.server.packets.DimensionLoadUnloadPacket;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
@@ -79,7 +79,7 @@ public class ServerPacketManager
 		}
 	}	
 	
-	public static void sendParticlesPacket(ArrayList<ParticleFunction> particleDataForOTGPerPlayer, EntityPlayerMP player)
+	public static void sendParticlesPacket(ArrayList<ParticleFunction<?>> particleDataForOTGPerPlayer, EntityPlayerMP player)
 	{
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);

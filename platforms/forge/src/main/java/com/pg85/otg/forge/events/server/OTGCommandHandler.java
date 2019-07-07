@@ -31,7 +31,7 @@ import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.minecraftTypes.MobNames;
+import com.pg85.otg.util.minecraft.defaults.MobNames;
 
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
@@ -164,7 +164,7 @@ public final class OTGCommandHandler implements ICommand
         	{
         		OTG.log(LogMarker.INFO, "Clearing caches");
 	    		OTG.log(LogMarker.INFO, "Unloading BO3's");
-	    		OTG.getEngine().getCustomObjectManager().ReloadCustomObjectFiles();
+	    		OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
 	    		OTG.log(LogMarker.INFO, "BO3's unloaded");
 	    		sender.sendMessage(new TextComponentString("BO3's unloaded"));
 	    		OTG.log(LogMarker.INFO, "Clearing chunkgenerator cache");
@@ -737,7 +737,10 @@ public final class OTGCommandHandler implements ICommand
 
                 return;
             }
-        	else if(argString[0].toLowerCase().trim().equals("bo3") || argString[0].toLowerCase().trim().equals("bo3info"))
+        	else if(
+    			argString[0].toLowerCase().trim().equals("bo3") || argString[0].toLowerCase().trim().equals("bo3info") ||
+    			argString[0].toLowerCase().trim().equals("bo4") || argString[0].toLowerCase().trim().equals("bo4info")
+			)
         	{
             	if(!isOTGWorld)
             	{
@@ -836,6 +839,7 @@ public final class OTGCommandHandler implements ICommand
 		listComplet.add("worldinfo");
 		listComplet.add("biome");
 		listComplet.add("bo3");
+		listComplet.add("bo4");
 		listComplet.add("tp");
 
 		listComplet.add("pregenerator");

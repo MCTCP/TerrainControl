@@ -10,7 +10,6 @@ import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.settingType.Setting;
-import com.pg85.otg.configuration.standard.BiomeRegistryNames;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
@@ -22,7 +21,8 @@ import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.DataOutput;
 import java.io.IOException;

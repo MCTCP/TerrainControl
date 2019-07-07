@@ -2,7 +2,8 @@ package com.pg85.otg.forge.events.client;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.EnumParticleTypes;
@@ -13,7 +14,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 public class ClientTickHandler
 {
     private double lastSpawnedTimeIn100Ms = 0;      
-	public static ArrayList<ParticleFunction> ClientParticleFunctions = new ArrayList<ParticleFunction>();    
+	public static ArrayList<ParticleFunction<?>> ClientParticleFunctions = new ArrayList<ParticleFunction<?>>();    
     
 	@SubscribeEvent
 	public void onClientTick(ClientTickEvent event)
@@ -23,7 +24,7 @@ public class ClientTickHandler
 	    	double currentTimeIn100Ms = Math.ceil((double)(System.currentTimeMillis() / 100L));	    	
 	    	if(currentTimeIn100Ms != lastSpawnedTimeIn100Ms) // If the server is lagging and suddenly processes multiple ticks in a row only do 1 spawning cycle.
 	    	{	    		
-	    		ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>();
+	    		ArrayList<ParticleFunction<?>> particleFunctions = new ArrayList<ParticleFunction<?>>();
 	    		synchronized(ClientParticleFunctions)
                 {
                 	if(ClientParticleFunctions.size() > 0)
@@ -33,7 +34,7 @@ public class ClientTickHandler
                 }
 	    		
             	lastSpawnedTimeIn100Ms = currentTimeIn100Ms;
-        		for(ParticleFunction particleData : particleFunctions)
+        		for(ParticleFunction<?> particleData : particleFunctions)
             	{           			        			
                     double x = (double)particleData.x + 0.5F;
                     double y = (double)particleData.y;

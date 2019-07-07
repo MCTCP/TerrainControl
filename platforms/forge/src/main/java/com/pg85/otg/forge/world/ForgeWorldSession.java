@@ -13,7 +13,8 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -22,7 +23,7 @@ public class ForgeWorldSession extends WorldSession
 {
 	private int worldBorderRadius;
 	private ChunkCoordinate worldBorderCenterPoint;
-	private ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>();
+	private ArrayList<ParticleFunction<?>> particleFunctions = new ArrayList<ParticleFunction<?>>();
 	private Pregenerator pregenerator;
 
 	ForgeWorldSession(LocalWorld world)
@@ -42,7 +43,7 @@ public class ForgeWorldSession extends WorldSession
 	}
 
 	@Override
-	public ArrayList<ParticleFunction> getParticleFunctions()
+	public ArrayList<ParticleFunction<?>> getParticleFunctions()
 	{
 		return particleFunctions;
 	}

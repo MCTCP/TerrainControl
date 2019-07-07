@@ -23,7 +23,7 @@ import com.pg85.otg.forge.network.PacketDispatcher;
 import com.pg85.otg.forge.network.client.BukkitClientNetworkEventListener;
 import com.pg85.otg.forge.world.OTGWorldType;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.init.Blocks;
 import net.minecraft.world.gen.structure.MapGenStructureIO;

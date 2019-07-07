@@ -11,7 +11,7 @@ import com.pg85.otg.configuration.settingType.MaterialSetting;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Arrays;
 import java.util.Collection;

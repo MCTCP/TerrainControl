@@ -14,7 +14,8 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
+
 import net.minecraft.server.v1_12_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;

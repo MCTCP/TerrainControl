@@ -2,9 +2,8 @@ package com.pg85.otg.customobjects.bo3.checks;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.customobjects.customstructure.CustomObjectCoordinate;
+import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -56,25 +55,10 @@ public class BlockCheck extends BO3Check
         rotatedCheck.toCheck = this.toCheck.rotate();
         return rotatedCheck;
     }
-
+    
     @Override
-    public BO3Check rotate(Rotation rotation)
+    public Class<BO3Config> getHolderType()
     {
-    	BlockCheck rotatedBlock = new BlockCheck();
-
-        CustomObjectCoordinate rotatedCoords = CustomObjectCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
-
-        rotatedBlock.x = rotatedCoords.getX();
-        rotatedBlock.y = rotatedCoords.getY();
-        rotatedBlock.z = rotatedCoords.getZ();
-
-        rotatedBlock.toCheck = this.toCheck;
-
-    	for(int i = 0; i < rotation.getRotationId(); i++)
-    	{
-            rotatedBlock.toCheck = rotatedBlock.toCheck.rotate();
-    	}
-
-        return rotatedBlock;
+        return BO3Config.class;
     }
 }

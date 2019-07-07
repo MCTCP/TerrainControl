@@ -9,7 +9,7 @@ import com.pg85.otg.generator.GeneratingChunk;
 import com.pg85.otg.generator.noise.NoiseGeneratorBiomeBlocksOctaves;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Arrays;
 import java.util.HashMap;

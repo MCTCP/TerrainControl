@@ -4,7 +4,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.BlockHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;

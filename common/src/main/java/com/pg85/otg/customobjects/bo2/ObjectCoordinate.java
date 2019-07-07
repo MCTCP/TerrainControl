@@ -4,7 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 
-public class ObjectCoordinate
+class ObjectCoordinate
 {
     int x;
     int y;

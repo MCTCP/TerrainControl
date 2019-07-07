@@ -4,12 +4,13 @@ import java.util.ArrayList;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 
 public class BukkitWorldSession extends WorldSession
 {
-	private ArrayList<ParticleFunction> ParticleFunctions = new ArrayList<ParticleFunction>();
+	private ArrayList<ParticleFunction<?>> ParticleFunctions = new ArrayList<ParticleFunction<?>>();
 
 	BukkitWorldSession(LocalWorld world)
 	{
@@ -17,7 +18,7 @@ public class BukkitWorldSession extends WorldSession
 	}
 
 	@Override
-	public ArrayList<ParticleFunction> getParticleFunctions()
+	public ArrayList<ParticleFunction<?>> getParticleFunctions()
 	{
 		return ParticleFunctions;
 	}

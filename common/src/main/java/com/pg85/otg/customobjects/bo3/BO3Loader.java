@@ -4,15 +4,15 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectLoader;
-import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.BranchFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.MinecraftObjectFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.RandomBlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.WeightedBranchFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3EntityFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3MinecraftObjectFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ModDataFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3SpawnerFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3WeightedBranchFunction;
 import com.pg85.otg.customobjects.bo3.checks.BlockCheck;
 import com.pg85.otg.customobjects.bo3.checks.BlockCheckNot;
 import com.pg85.otg.customobjects.bo3.checks.LightCheck;
@@ -36,36 +36,36 @@ public class BO3Loader implements CustomObjectLoader
     {
         // Register BO3 ConfigFunctions
         CustomObjectResourcesManager registry = OTG.getCustomObjectResourcesManager();
-        registry.registerConfigFunction("Block", BlockFunction.class);
-        registry.registerConfigFunction("B", BlockFunction.class);
-        registry.registerConfigFunction("Branch", BranchFunction.class);
-        registry.registerConfigFunction("BR", BranchFunction.class);
-        registry.registerConfigFunction("WeightedBranch", WeightedBranchFunction.class);
-        registry.registerConfigFunction("WBR", WeightedBranchFunction.class);
-        registry.registerConfigFunction("RandomBlock", RandomBlockFunction.class);
-        registry.registerConfigFunction("RB", RandomBlockFunction.class);
-        registry.registerConfigFunction("MinecraftObject", MinecraftObjectFunction.class);
-        registry.registerConfigFunction("MCO", MinecraftObjectFunction.class);
+        registry.registerConfigFunction("Block", BO3BlockFunction.class);
+        registry.registerConfigFunction("B", BO3BlockFunction.class);
+        registry.registerConfigFunction("Branch", BO3BranchFunction.class);
+        registry.registerConfigFunction("BR", BO3BranchFunction.class);
+        registry.registerConfigFunction("WeightedBranch", BO3WeightedBranchFunction.class);
+        registry.registerConfigFunction("WBR", BO3WeightedBranchFunction.class);
+        registry.registerConfigFunction("RandomBlock", BO3RandomBlockFunction.class);
+        registry.registerConfigFunction("RB", BO3RandomBlockFunction.class);
+        registry.registerConfigFunction("MinecraftObject", BO3MinecraftObjectFunction.class);
+        registry.registerConfigFunction("MCO", BO3MinecraftObjectFunction.class);
         registry.registerConfigFunction("BlockCheck", BlockCheck.class);
         registry.registerConfigFunction("BC", BlockCheck.class);
         registry.registerConfigFunction("BlockCheckNot", BlockCheckNot.class);
         registry.registerConfigFunction("BCN", BlockCheckNot.class);
         registry.registerConfigFunction("LightCheck", LightCheck.class);
         registry.registerConfigFunction("LC", LightCheck.class);
-        registry.registerConfigFunction("Entity", EntityFunction.class);
-        registry.registerConfigFunction("E", EntityFunction.class);
-        registry.registerConfigFunction("Particle", ParticleFunction.class);
-        registry.registerConfigFunction("P", ParticleFunction.class);
-        registry.registerConfigFunction("Spawner", SpawnerFunction.class);
-        registry.registerConfigFunction("S", SpawnerFunction.class);
-        registry.registerConfigFunction("ModData", ModDataFunction.class);
-        registry.registerConfigFunction("MD", ModDataFunction.class);
+        registry.registerConfigFunction("Entity", BO3EntityFunction.class);
+        registry.registerConfigFunction("E", BO3EntityFunction.class);
+        registry.registerConfigFunction("Particle", BO3ParticleFunction.class);
+        registry.registerConfigFunction("P", BO3ParticleFunction.class);
+        registry.registerConfigFunction("Spawner", BO3SpawnerFunction.class);
+        registry.registerConfigFunction("S", BO3SpawnerFunction.class);
+        registry.registerConfigFunction("ModData", BO3ModDataFunction.class);
+        registry.registerConfigFunction("MD", BO3ModDataFunction.class);
     }
 
     @Override
     public CustomObject loadFromFile(String objectName, File file)
     {
-        return new BO3(objectName, file);
+   		return new BO3(objectName, file);
     }
 
     public static NamedBinaryTag loadMetadata(String name, File bo3Folder)

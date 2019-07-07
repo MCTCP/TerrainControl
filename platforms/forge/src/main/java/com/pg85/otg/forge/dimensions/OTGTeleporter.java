@@ -13,7 +13,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;

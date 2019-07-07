@@ -23,7 +23,7 @@ import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.helpers.FileHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.ResourceLocation;

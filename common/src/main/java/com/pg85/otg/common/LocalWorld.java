@@ -4,16 +4,19 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.customobjects.SpawnableObject;
-import com.pg85.otg.customobjects.bo3.bo3function.BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.EntityFunction;
-import com.pg85.otg.customobjects.customstructure.CustomObjectStructureCache;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
+import com.pg85.otg.customobjects.bofunctions.BlockFunction;
+import com.pg85.otg.customobjects.bofunctions.EntityFunction;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ public interface LocalWorld
     
 	public ObjectSpawner getObjectSpawner();
 	
-    public CustomObjectStructureCache getStructureCache();
+    public CustomStructureCache getStructureCache();
     	
 	public WorldSession getWorldSession();
 
@@ -179,7 +182,7 @@ public interface LocalWorld
 
     public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 
-	void spawnEntity(EntityFunction entityData);
+	void spawnEntity(EntityFunction<?> entityData);
     
     // Population start and end
     
@@ -226,7 +229,7 @@ public interface LocalWorld
 
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
 
-	public BlockFunction[] getBlockColumn(int x, int z);
+	public OTGBlock[] getBlockColumn(int x, int z);
 	
     /**
      * Executes ReplacedBlocks.

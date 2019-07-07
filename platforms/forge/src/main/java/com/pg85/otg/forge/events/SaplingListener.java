@@ -12,7 +12,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.resource.SaplingGen;
 import com.pg85.otg.generator.resource.SaplingType;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -35,7 +35,7 @@ public class SaplingListener
         private SaplingGrower(LocalWorld world, BlockPos blockPos)
         {
             this.world = world;
-            this.material = world.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ(), false);
+            this.material = world.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ(), true);
             this.blockPos = blockPos;
 
             // Check whether block is a sapling

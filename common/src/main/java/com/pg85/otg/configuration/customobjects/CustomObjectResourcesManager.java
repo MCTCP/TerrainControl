@@ -4,23 +4,30 @@ import com.pg85.otg.configuration.ErroredFunction;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class CustomObjectResourcesManager
 {
-    private Map<String, Class<? extends CustomObjectConfigFunction<?>>> configFunctions;
+    private Map<String, ArrayList<Class<? extends CustomObjectConfigFunction<?>>>> configFunctions;
 
     public CustomObjectResourcesManager()
     {
         // Also store in this class
-        this.configFunctions = new HashMap<String, Class<? extends CustomObjectConfigFunction<?>>>();
+        this.configFunctions = new HashMap<String, ArrayList<Class<? extends CustomObjectConfigFunction<?>>>>();
     }
 
     public void registerConfigFunction(String name, Class<? extends CustomObjectConfigFunction<?>> value)
     {
-        configFunctions.put(name.toLowerCase(), value);
+    	ArrayList<Class<? extends CustomObjectConfigFunction<?>>> list = configFunctions.get(name.toLowerCase());
+    	if(list == null)
+    	{
+    		list = new ArrayList<Class<? extends CustomObjectConfigFunction<?>>>();
+    		configFunctions.put(name.toLowerCase(), list);
+    	}
+    	list.add(value);
     }
 
     /**
@@ -46,36 +53,44 @@ public class CustomObjectResourcesManager
     	}
 
         // Get the class of the config function
-        Class<? extends CustomObjectConfigFunction<?>> clazz = configFunctions.get(name.toLowerCase());
-        if (clazz == null)
+        ArrayList<Class<? extends CustomObjectConfigFunction<?>>> clazzes = configFunctions.get(name.toLowerCase());
+        if (clazzes == null)
         {
             return new CustomObjectErroredFunction<T>(name, holder, args, "Resource type " + name + " not found");
         }
 
         // Get a config function
-        CustomObjectConfigFunction<T> configFunction;
-        try
+        CustomObjectConfigFunction<T> configFunction = null;
+        for(Class<? extends CustomObjectConfigFunction<?>> clazz : clazzes)
         {
-            configFunction = (CustomObjectConfigFunction<T>) clazz.newInstance();
-        } catch (Exception e)
-        {
-            throw new RuntimeException("Reflection error while loading the resources: ", e);
+	        try
+	        {
+	            configFunction = (CustomObjectConfigFunction<T>) clazz.newInstance();
+	        } catch (Exception e)
+	        {
+	            throw new RuntimeException("Reflection error while loading the resources: ", e);
+	        }
+	
+	        // Check if config function is of the right type
+	        boolean matchingTypes = holder.getClass().isAssignableFrom(configFunction.getHolderType());
+	        if (!matchingTypes)
+	        {
+	        	continue;
+	        }
+	
+	        // Initialize the function
+	        try
+	        {
+	            configFunction.init(holder, args);
+	        } catch (InvalidConfigException e)
+	        {
+	            configFunction.invalidate(name, args, e.getMessage());
+	        }
+	        break;
         }
-
-        // Check if config function is of the right type
-        boolean matchingTypes = holder.getClass().isAssignableFrom(configFunction.getHolderType());
-        if (!matchingTypes)
+        if(configFunction == null)
         {
-            return new CustomObjectErroredFunction<T>(name, holder, args, "Resource " + name + " cannot be placed in this config file");
-        }
-
-        // Initialize the function
-        try
-        {
-            configFunction.init(holder, args);
-        } catch (InvalidConfigException e)
-        {
-            configFunction.invalidate(name, args, e.getMessage());
+        	return new CustomObjectErroredFunction<T>(name, holder, args, "Resource " + name + " cannot be placed in this config file");
         }
         return configFunction;
     }

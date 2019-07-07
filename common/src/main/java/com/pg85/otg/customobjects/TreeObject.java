@@ -6,11 +6,9 @@ import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -21,7 +19,7 @@ import java.util.Random;
  * to accept {@link SpawnableObject}s instead of {@link CustomObject}s, so that
  * all the extra methods are no longer needed.
  */
-public class TreeObject implements CustomObject
+class TreeObject implements CustomObject
 {
     private TreeType type;
     private int minHeight = PluginStandardValues.WORLD_DEPTH;
@@ -48,9 +46,9 @@ public class TreeObject implements CustomObject
     }
     
     @Override
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
+    public boolean onEnable()
     {
-        // Stub method
+    	return true;
     }
 
     @Override
@@ -107,19 +105,4 @@ public class TreeObject implements CustomObject
         // Trees cannot be rotated
         return false;
     }
-    
-    // TODO: Clean up inheritance for CustomObject, these methods shouldn't be here
-    
-    @Override
-    public int getMaxBranchDepth()
-    {
-    	throw new RuntimeException();
-    }    
-    
-	@Override
-	public BoundingBox getBoundingBox(Rotation rotation)
-	{
-		return BoundingBox.newEmptyBox();
-	}
-
 }

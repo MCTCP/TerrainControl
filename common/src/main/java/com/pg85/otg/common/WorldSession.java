@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import com.pg85.otg.customobjects.bo3.BO3;
-import com.pg85.otg.customobjects.bo3.bo3function.ModDataFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.ParticleFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.SpawnerFunction;
-import com.pg85.otg.customobjects.customstructure.CustomObjectStructure;
+import com.pg85.otg.customobjects.bo4.BO4;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.SpawnerFunction;
+import com.pg85.otg.customobjects.structures.CustomStructure;
+import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.util.ChunkCoordinate;
 
 // TODO: Implement this properly for spigot (maybe one day..)
@@ -20,7 +23,7 @@ public abstract class WorldSession
 		this.world = world;
 	}
 
-	public abstract ArrayList<ParticleFunction> getParticleFunctions();
+	public abstract ArrayList<ParticleFunction<?>> getParticleFunctions();
 
 	public abstract int getWorldBorderRadius();
 	public abstract ChunkCoordinate getWorldBorderCenterPoint();
@@ -44,40 +47,45 @@ public abstract class WorldSession
 		// if the player is in range
 		if(world.getStructureCache().worldInfoChunks.containsKey(playerChunk))
 		{
-			CustomObjectStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(playerChunk);
+			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(playerChunk);
 
 			if(worldInfoChunk != null)
 			{
-    			structureInfo += "-- BO3 Info -- \r\nName: " + ((BO3)worldInfoChunk.Start.getObject()).getSettings().getName().replace("Start", "") + "\r\nAuthor: " + ((BO3)worldInfoChunk.Start.getObject()).getSettings().author + "\r\nDescription: " + ((BO3)worldInfoChunk.Start.getObject()).getSettings().description;
-    			String branchesInChunk = worldInfoChunk.ObjectsToSpawnInfo.get(playerChunk);
-    			if(branchesInChunk != null && branchesInChunk.length() > 0)
+    			if(worldInfoChunk instanceof BO4CustomStructure)
     			{
-    				structureInfo += "\r\n" + branchesInChunk;
+        			structureInfo += "-- BO4 Info -- \r\nName: " + ((BO4)worldInfoChunk.start.getObject()).getSettings().getName().replace("Start", "") + "\r\nAuthor: " + ((BO4)worldInfoChunk.start.getObject()).getSettings().author + "\r\nDescription: " + ((BO4)worldInfoChunk.start.getObject()).getSettings().description;
+	    			String branchesInChunk = ((BO4CustomStructure)worldInfoChunk).ObjectsToSpawnInfo.get(playerChunk);
+	    			if(branchesInChunk != null && branchesInChunk.length() > 0)
+	    			{
+	    				structureInfo += "\r\n" + branchesInChunk;
+	    			}
+    			} else {
+        			structureInfo += "-- BO3 Info -- \r\nName: " + ((BO3)worldInfoChunk.start.getObject()).getSettings().getName().replace("Start", "") + "\r\nAuthor: " + ((BO3)worldInfoChunk.start.getObject()).getSettings().author + "\r\nDescription: " + ((BO3)worldInfoChunk.start.getObject()).getSettings().description;
     			}
     		}
 		}
     	return structureInfo;
     }
 
-    public HashMap<String,ArrayList<ModDataFunction>> getModDataForChunk(ChunkCoordinate chunkCoord)
+    public HashMap<String,ArrayList<ModDataFunction<?>>> getModDataForChunk(ChunkCoordinate chunkCoord)
     {
-    	HashMap<String,ArrayList<ModDataFunction>> result = new HashMap<String,ArrayList<ModDataFunction>>();
+    	HashMap<String,ArrayList<ModDataFunction<?>>> result = new HashMap<String,ArrayList<ModDataFunction<?>>>();
     	boolean bFound = false;
     	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
     		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
     		{
-    			CustomObjectStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+    			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
 
 				if(worldInfoChunk != null)
 	    		{
-	    			for(ModDataFunction modData : worldInfoChunk.modDataManager.modData)
+	    			for(ModDataFunction<?> modData : worldInfoChunk.modDataManager.modData)
 	    			{
 	    				if(ChunkCoordinate.fromBlockCoords(modData.x, modData.z).equals(chunkCoord)) // modData for all branches of the structure is stored, make sure the modData is in this chunk
 	    				{
 		    				if(!result.containsKey(modData.modId))
 		    				{
-		    					result.put(modData.modId, new ArrayList<ModDataFunction>());
+		    					result.put(modData.modId, new ArrayList<ModDataFunction<?>>());
 		    				}
 	    					result.get(modData.modId).add(modData);
 	    				}
@@ -87,7 +95,7 @@ public abstract class WorldSession
 	    	}
 	    	if(!bFound)
 	    	{
-	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
+	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
 	    		{
 	    			result = null;
 	    		}
@@ -96,19 +104,19 @@ public abstract class WorldSession
     	return result;
     }
 
-    public ArrayList<SpawnerFunction> getSpawnersForChunk(ChunkCoordinate chunkCoord)
+    public ArrayList<SpawnerFunction<?>> getSpawnersForChunk(ChunkCoordinate chunkCoord)
     {
-    	ArrayList<SpawnerFunction> result = new ArrayList<SpawnerFunction>();
+    	ArrayList<SpawnerFunction<?>> result = new ArrayList<SpawnerFunction<?>>();
     	boolean bFound = false;
     	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
     		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
     		{
-    			CustomObjectStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+    			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
 
 				if(worldInfoChunk != null)
 	    		{
-	    			for(SpawnerFunction spawnerData : worldInfoChunk.spawnerManager.spawnerData)
+	    			for(SpawnerFunction<?> spawnerData : worldInfoChunk.spawnerManager.spawnerData)
 	    			{
 	    				if(ChunkCoordinate.fromBlockCoords(spawnerData.x, spawnerData.z).equals(chunkCoord)) // spawnerData for all branches of the structure is stored, make sure the modData is in this chunk
 	    				{
@@ -120,7 +128,7 @@ public abstract class WorldSession
 			}
 	    	if(!bFound)
 	    	{
-	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
+	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
 	    		{
 	    			result = null;
 	    		}
@@ -129,19 +137,19 @@ public abstract class WorldSession
     	return result;
     }
 
-    public ArrayList<ParticleFunction> getParticlesForChunk(ChunkCoordinate chunkCoord)
+    public ArrayList<ParticleFunction<?>> getParticlesForChunk(ChunkCoordinate chunkCoord)
     {
-    	ArrayList<ParticleFunction> result = new ArrayList<ParticleFunction>();
+    	ArrayList<ParticleFunction<?>> result = new ArrayList<ParticleFunction<?>>();
     	boolean bFound = false;
     	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
     		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
     		{
-    			CustomObjectStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+    			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
 
 	    		if(worldInfoChunk != null)
 	    		{
-	    			for(ParticleFunction particleData : worldInfoChunk.particlesManager.particleData)
+	    			for(ParticleFunction<?> particleData : worldInfoChunk.particlesManager.particleData)
 	    			{
 	    				if(ChunkCoordinate.fromBlockCoords(particleData.x, particleData.z).equals(chunkCoord)) // paticleData for all branches of the structure is stored, make sure the modData is in this chunk
 	    				{
@@ -153,7 +161,7 @@ public abstract class WorldSession
 	    	}
 	    	if(!bFound)
 	    	{
-	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().structureCache.containsKey(chunkCoord)))
+	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
 	    		{
 	    			result = null;
 	    		}
@@ -162,11 +170,11 @@ public abstract class WorldSession
     	return result;
     }
 
-    public void removeParticles(ChunkCoordinate chunkCoord, ParticleFunction particle)
+    public void removeParticles(ChunkCoordinate chunkCoord, ParticleFunction<?> particle)
     {
     	if(world.isInsideWorldBorder(chunkCoord, true))
     	{
-    		CustomObjectStructure customObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+    		CustomStructure customObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
     		if(customObject != null && customObject.particlesManager.particleData.contains(particle))
     		{
     			customObject.particlesManager.particleData.remove(particle);

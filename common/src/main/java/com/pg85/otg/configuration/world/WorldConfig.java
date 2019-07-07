@@ -17,8 +17,8 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.File;
 import java.util.*;
@@ -1195,16 +1195,11 @@ public class WorldConfig extends ConfigFile
         // Custom structures
         writer.smallTitle("Custom structures and objects");
 
-        // OTG+
-
         writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.isOTGPlus,
-                "Set this to true to use advanced (OTG+) features for CustomStructure().",
-                "This includes collision detection, fine control over structure distribution, advanced branching mechanics for",
+                "Set this to true to use BO4's for CustomStructure().",
+                "BO4's allow for collision detection, fine control over structure distribution, advanced branching mechanics for",
                 "procedurally generated structures, smoothing areas, extremely large structures, settings for blending structures",
-                "with surrounding terrain, etc.",
-        		"When this is enabled BO3's used with CustomStructure() must have IsOTGPlus:true set or they will be ignored.",
-        		"When this is disabled BO3's used with CustomStructure() should have IsOTGPlus:false set (the default value) ",
-        		"or they will be ignored. Defaults to false."
+                "with surrounding terrain, etc."
 		);
 
         writer.putSetting(WorldStandardValues.REPLACE_BLOCKS_LIST, this.replaceBlocksList,
@@ -1217,7 +1212,7 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
                 "Maximum radius of custom structures in chunks. Custom structures are spawned by",
-                "the CustomStructure resource in the biome configuration files. Only used when IsOTGPlus:false.");
+                "the CustomStructure resource in the biome configuration files. Not used for BO4's.");
 
         // Other structures
         writer.smallTitle("Other structures");

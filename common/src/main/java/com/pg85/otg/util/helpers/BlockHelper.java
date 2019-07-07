@@ -1,6 +1,6 @@
 package com.pg85.otg.util.helpers;
 
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class BlockHelper
 {

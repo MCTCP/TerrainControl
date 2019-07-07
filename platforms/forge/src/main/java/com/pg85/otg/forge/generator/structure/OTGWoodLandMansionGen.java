@@ -7,7 +7,7 @@ import java.util.Random;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.network.ConfigProvider;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

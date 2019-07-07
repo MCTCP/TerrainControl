@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.io.File;
 import java.util.*;
@@ -23,8 +23,8 @@ public class CustomObjectCollection
     private HashMap<String, HashMap<String, CustomObject>> objectsByNamePerWorld = new HashMap<String, HashMap<String, CustomObject>>();
     private HashMap<String, ArrayList<String>> objectsNotFoundPerWorld = new HashMap<String, ArrayList<String>>();
 
-    private HashMap<String, File> CustomObjectFilesGlobalObjects = null;
-    private HashMap<String, HashMap<String, File>> CustomObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
+    private HashMap<String, File> customObjectFilesGlobalObjects = null;
+    private HashMap<String, HashMap<String, File>> customObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
 
     private CustomObject loadObject(File file, String worldName)
     {
@@ -60,7 +60,57 @@ public class CustomObjectCollection
                 	} else {
                     	objectsGlobalObjects.add(object);
                 	}
-                    object.onEnable(null);
+                    ;
+                    if(!object.onEnable())
+                    {
+                    	// Remove the object
+                    	if(worldName != null)
+                    	{
+                    		ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+                			worldObjects.remove(object);
+                			if(worldObjects.size() == 0)
+                			{
+                    			objectsPerWorld.remove(worldName, worldObjects);
+                			}
+                    	} else {
+                        	objectsGlobalObjects.remove(object);
+                    	}
+                    	
+                    	// Try bo4
+                    	loader = OTG.getCustomObjectManager().getObjectLoaders().get("bo4");
+                        if (loader != null)
+                        {
+                        	object = loader.loadFromFile(objectName, file);
+	                    	if(worldName != null)
+	                    	{
+	                    		ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+	                    		if(worldObjects == null)
+	                    		{
+	                    			worldObjects = new ArrayList<CustomObject>();
+	                    			objectsPerWorld.put(worldName, worldObjects);
+	                    		}
+	                			worldObjects.add(object);
+	                    	} else {
+	                        	objectsGlobalObjects.add(object);
+	                    	}
+	                        ;
+	                        if(!object.onEnable())
+	                        {
+	                        	// Remove the object
+	                        	if(worldName != null)
+	                        	{
+	                        		ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+	                    			worldObjects.remove(object);
+	                    			if(worldObjects.size() == 0)
+	                    			{
+	                        			objectsPerWorld.remove(worldName, worldObjects);
+	                    			}
+	                        	} else {
+	                            	objectsGlobalObjects.remove(object);
+	                        	}
+	                        }
+                        }
+                    }                    
                 }
             }
     	} else {
@@ -85,7 +135,7 @@ public class CustomObjectCollection
         }
     }
 
-    void ReloadCustomObjectFiles()
+    void reloadCustomObjectFiles()
     {
         objectsGlobalObjects.clear();
         objectsByNameGlobalObjects.clear();
@@ -95,8 +145,8 @@ public class CustomObjectCollection
         objectsByNamePerWorld.clear();
         objectsNotFoundPerWorld.clear();
 
-        CustomObjectFilesGlobalObjects = null;
-        CustomObjectFilesPerWorld.clear();
+        customObjectFilesGlobalObjects = null;
+        customObjectFilesPerWorld.clear();
     }
 
     /**
@@ -171,12 +221,12 @@ public class CustomObjectCollection
 
     	// Index GlobalObjects and WorldObjects directories
 
-    	if(CustomObjectFilesGlobalObjects == null)
+    	if(customObjectFilesGlobalObjects == null)
     	{
-    		CustomObjectFilesGlobalObjects = new HashMap<String, File>();
+    		customObjectFilesGlobalObjects = new HashMap<String, File>();
     		if(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects").exists())
     		{
-    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects"), CustomObjectFilesGlobalObjects);
+    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects"), customObjectFilesGlobalObjects);
     		}
 
 	        // Add vanilla custom objects
@@ -186,10 +236,10 @@ public class CustomObjectCollection
 	        }
     	}
 
-    	if(!CustomObjectFilesPerWorld.containsKey(worldName))
+    	if(!customObjectFilesPerWorld.containsKey(worldName))
     	{
     		HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
-    		CustomObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
+    		customObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
 			if(worldName != null && new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects").exists())
 			{
 				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
@@ -200,7 +250,7 @@ public class CustomObjectCollection
 
 		if(worldName != null && !bSearchedWorldObjects)
 		{
-			HashMap<String, File> worldCustomObjectFiles = CustomObjectFilesPerWorld.get(worldName);
+			HashMap<String, File> worldCustomObjectFiles = customObjectFilesPerWorld.get(worldName);
     		if(worldCustomObjectFiles != null)
     		{
     			File searchForFile = worldCustomObjectFiles.get(name.toLowerCase());
@@ -249,7 +299,7 @@ public class CustomObjectCollection
     			return object;
     		}
 
-			File searchForFile = CustomObjectFilesGlobalObjects.get(name.toLowerCase());
+			File searchForFile = customObjectFilesGlobalObjects.get(name.toLowerCase());
 
 			if(searchForFile != null)
 	    	{

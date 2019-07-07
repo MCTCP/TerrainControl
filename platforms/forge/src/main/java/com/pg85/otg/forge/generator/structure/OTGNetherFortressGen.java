@@ -3,7 +3,6 @@ package com.pg85.otg.forge.generator.structure;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
 
 import net.minecraft.entity.monster.EntityBlaze;
 import net.minecraft.entity.monster.EntityMagmaCube;
@@ -16,6 +15,7 @@ import net.minecraft.world.gen.structure.MapGenNetherBridge;
 import net.minecraft.world.gen.structure.StructureStart;
 
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import java.util.ArrayList;
 import java.util.List;
