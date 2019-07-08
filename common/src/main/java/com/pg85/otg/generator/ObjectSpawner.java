@@ -10,7 +10,6 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
-import com.pg85.otg.customobjects.structures.CustomStructure;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.generator.resource.AboveWaterGen;
 import com.pg85.otg.generator.resource.BoulderGen;

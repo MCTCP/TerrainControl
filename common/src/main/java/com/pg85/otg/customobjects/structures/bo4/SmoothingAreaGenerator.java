@@ -1958,7 +1958,7 @@ class SmoothingAreaGenerator
         boolean diagonalLinegoingDown;
 
         int distanceFromStart;
-        OTGBlock beginPoint;
+        BO4BlockFunction beginPoint;
         int originPointX;
         int originPointY;
         int originPointZ;
@@ -1975,8 +1975,8 @@ class SmoothingAreaGenerator
 
         LocalMaterialData material;
         boolean dontAdd;
-        OTGBlock existingBlock;
-        OTGBlock endPoint;
+        BO4BlockFunction existingBlock;
+        BO4BlockFunction endPoint;
         int surfaceBlockHeight;
         BO4BlockFunction filler;
         ArrayList<Object[]> blocksToRemove;
@@ -1994,7 +1994,7 @@ class SmoothingAreaGenerator
         // spawn them later
         for(Object[] smoothingBeginAndEndPoints : smoothingAreas)
         {
-        	beginPoint = new OTGBlock();
+        	beginPoint = new BO4BlockFunction();
             beginPoint.x = (Integer)smoothingBeginAndEndPoints[0];
             beginPoint.y = (Integer)smoothingBeginAndEndPoints[1];
             beginPoint.z = (Integer)smoothingBeginAndEndPoints[2];
@@ -2229,7 +2229,7 @@ class SmoothingAreaGenerator
             goingDown = false;
             distanceFromStart = 0;
 
-            beginPoint = new OTGBlock();
+            beginPoint = new BO4BlockFunction();
             beginPoint.x = (Integer)smoothingBeginAndEndPoints[0];
             beginPoint.y = (Integer)smoothingBeginAndEndPoints[1];
             beginPoint.z = (Integer)smoothingBeginAndEndPoints[2];
@@ -2598,7 +2598,7 @@ class SmoothingAreaGenerator
                 }
 
                 // Get the coordinates for the last block in this chunk for this line
-                endPoint = new OTGBlock();
+                endPoint = new BO4BlockFunction();
                 endPoint.x = (Integer)smoothingBeginAndEndPoints[3];
                 endPoint.y = finalDestinationPointY;
                 endPoint.z = (Integer)smoothingBeginAndEndPoints[5];
@@ -2741,7 +2741,7 @@ class SmoothingAreaGenerator
                         dontAdd = false;
                         for(Object[] existingBlockItem : blocksToSpawn)
                         {
-                            existingBlock = (OTGBlock)existingBlockItem[0];
+                            existingBlock = (BO4BlockFunction)existingBlockItem[0];
 
                             //Don't always override higher blocks when going down, instead do a second pass going up
                             if (existingBlock.x == filler.x && existingBlock.z == filler.z)
@@ -2963,7 +2963,7 @@ class SmoothingAreaGenerator
                         blocksToRemove = new ArrayList<Object[]>();
                         for(Object[] existingBlockItem : blocksToSpawn)
                         {
-                            existingBlock = (OTGBlock)existingBlockItem[0];
+                            existingBlock = (BO4BlockFunction)existingBlockItem[0];
                             //Don't always override higher blocks when going down, instead do a second pass going up
                             if (existingBlock.x == filler.x && existingBlock.z == filler.z)
                             {
@@ -3098,7 +3098,7 @@ class SmoothingAreaGenerator
                     blocksToRemove = new ArrayList<Object[]>();
                     for(Object[] existingBlockItem : blocksToSpawn)
                     {
-                        existingBlock = (OTGBlock)existingBlockItem[0];
+                        existingBlock = (BO4BlockFunction)existingBlockItem[0];
                         //Don't always override higher blocks when going down, instead do a second pass going up
                         if (existingBlock.x == filler.x && existingBlock.z == filler.z)
                         {

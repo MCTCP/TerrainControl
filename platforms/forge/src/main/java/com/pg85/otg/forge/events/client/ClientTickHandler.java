@@ -2,7 +2,6 @@ package com.pg85.otg.forge.events.client;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
 import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 
 import net.minecraft.client.Minecraft;

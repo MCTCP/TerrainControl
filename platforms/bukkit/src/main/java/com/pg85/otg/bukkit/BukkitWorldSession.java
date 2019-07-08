@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
 import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 
