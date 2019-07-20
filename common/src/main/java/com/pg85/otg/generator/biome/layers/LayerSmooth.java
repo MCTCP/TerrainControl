@@ -23,15 +23,20 @@ public class LayerSmooth extends Layer
         int[] childInts = this.child.getInts(world, cache, x0, z0, xSize0, zSize0);
         int[] thisInts = cache.getArray(xSize * zSize);
 
+        int northCheck;
+        int southCheck;
+        int eastCheck;
+        int westCheck;
+        int centerCheck;
         for (int zi = 0; zi < zSize; ++zi)
         {
             for (int xi = 0; xi < xSize; ++xi)
             {
-                int northCheck = childInts[xi + 1 + (zi + 0) * xSize0];
-                int southCheck = childInts[xi + 1 + (zi + 2) * xSize0];
-                int eastCheck = childInts[xi + 2 + (zi + 1) * xSize0];
-                int westCheck = childInts[xi + 0 + (zi + 1) * xSize0];
-                int centerCheck = childInts[xi + 1 + (zi + 1) * xSize0];
+                northCheck = childInts[xi + 1 + (zi + 0) * xSize0];
+                southCheck = childInts[xi + 1 + (zi + 2) * xSize0];
+                eastCheck = childInts[xi + 2 + (zi + 1) * xSize0];
+                westCheck = childInts[xi + 0 + (zi + 1) * xSize0];
+                centerCheck = childInts[xi + 1 + (zi + 1) * xSize0];
 
                 if (westCheck == eastCheck && northCheck == southCheck)
                 {

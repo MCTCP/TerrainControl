@@ -1,5 +1,6 @@
 package com.pg85.otg.customobjects.bo3;
 
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
@@ -13,11 +14,15 @@ import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3EntityFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3WeightedBranchFunction;
 import com.pg85.otg.customobjects.bo3.checks.BO3Check;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.BoundingBox;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultStructurePart;
 
@@ -53,7 +58,24 @@ public class BO3Config extends CustomObjectConfigFile
     protected MaterialSet sourceBlocks;
     int maxPercentageOutsideSourceBlock;
     OutsideSourceBlock outsideSourceBlock;
-    BO3BlockFunction[][] blocks = new BO3BlockFunction[4][]; // four rotations
+       
+    // Store blocks in arrays instead of as BO3BlockFunctions,
+    // since that gives way too much overhead memory wise.
+    // We may have tens of millions of blocks, java doesn't handle lots of small classes well. 
+    private byte[][]blocksX;
+    private short[][]blocksY;
+    private byte[][]blocksZ;
+    private LocalMaterialData[][]blocksMaterial;
+    private String[]blocksMetaDataName;
+    private NamedBinaryTag[]blocksMetaDataTag;
+
+    private LocalMaterialData[][][] randomBlocksBlocks;
+    private byte[][] randomBlocksBlockChances;
+    private String[][] randomBlocksMetaDataNames;
+    private NamedBinaryTag[][] randomBlocksMetaDataTags;
+    private byte[] randomBlocksBlockCount;    
+    //
+    
     BO3Check[][] bo3Checks = new BO3Check[4][];
     int maxBranchDepth;
     BO3BranchFunction[][] branches = new BO3BranchFunction[4][];
@@ -85,7 +107,7 @@ public class BO3Config extends CustomObjectConfigFile
     	rotateBlocksAndChecks();
     }
     
-    private void readResources(boolean blocksOnly) throws InvalidConfigException
+    private void readResources() throws InvalidConfigException
     {
         List<BO3BlockFunction> tempBlocksList = new ArrayList<BO3BlockFunction>();
         List<BO3Check> tempChecksList = new ArrayList<BO3Check>();
@@ -95,71 +117,92 @@ public class BO3Config extends CustomObjectConfigFile
         List<BO3ParticleFunction> tempParticlesList = new ArrayList<BO3ParticleFunction>();
         List<BO3SpawnerFunction> tempSpawnerList = new ArrayList<BO3SpawnerFunction>();
 
-    	tempBlocksList = new ArrayList<BO3BlockFunction>();
-    	tempChecksList = new ArrayList<BO3Check>();
-    	tempBranchesList = new ArrayList<BO3BranchFunction>();
-    	tempEntitiesList = new ArrayList<BO3EntityFunction>();
-    	tempModDataList = new ArrayList<BO3ModDataFunction>();
-    	tempParticlesList = new ArrayList<BO3ParticleFunction>();
-    	tempSpawnerList = new ArrayList<BO3SpawnerFunction>();
-
         BoundingBox box = BoundingBox.newEmptyBox();
 
-        for (CustomObjectConfigFunction<BO3Config> res : reader.getConfigFunctions(this, true))
+        for (CustomObjectConfigFunction<BO3Config> res : this.reader.getConfigFunctions(this, true))
         {
-            if (res instanceof BO3BlockFunction)
+            if (res.isValid())
             {
-            	BO3BlockFunction block = (BO3BlockFunction) res;
-                box.expandToFit(block.x, block.y, block.z);
-                tempBlocksList.add(block);
-            }
-            else if(!blocksOnly)
-            {
-                if (res instanceof BO3Check)
-                {
-                    tempChecksList.add((BO3Check) res);
-                }
-                else if (res instanceof BO3WeightedBranchFunction)
-                {
-                    tempBranchesList.add((BO3WeightedBranchFunction) res);
-                }
-                else if (res instanceof BO3BranchFunction)
-                {
-                    tempBranchesList.add((BO3BranchFunction) res);
-                }
-                else if (res instanceof BO3EntityFunction)
-                {
-                    tempEntitiesList.add((BO3EntityFunction) res);
-                }
-                else if (res instanceof BO3ParticleFunction)
-                {
-                	tempParticlesList.add((BO3ParticleFunction) res);
-                }
-                else if (res instanceof BO3ModDataFunction)
-                {
-                	tempModDataList.add((BO3ModDataFunction) res);
-                }
-                else if (res instanceof BO3SpawnerFunction)
-                {
-                	tempSpawnerList.add((BO3SpawnerFunction) res);
-                }
+	            if (res instanceof BO3BlockFunction)
+	            {
+	            	BO3BlockFunction block = (BO3BlockFunction) res;
+	                box.expandToFit(block.x, block.y, block.z);
+	                tempBlocksList.add(block);
+	            } else {
+	                if (res instanceof BO3Check)
+	                {
+	                    tempChecksList.add((BO3Check) res);
+	                }
+	                else if (res instanceof BO3WeightedBranchFunction)
+	                {
+	                    tempBranchesList.add((BO3WeightedBranchFunction) res);
+	                }
+	                else if (res instanceof BO3BranchFunction)
+	                {
+	                    tempBranchesList.add((BO3BranchFunction) res);
+	                }
+	                else if (res instanceof BO3EntityFunction)
+	                {
+	                    tempEntitiesList.add((BO3EntityFunction) res);
+	                }
+	                else if (res instanceof BO3ParticleFunction)
+	                {
+	                	tempParticlesList.add((BO3ParticleFunction) res);
+	                }
+	                else if (res instanceof BO3ModDataFunction)
+	                {
+	                	tempModDataList.add((BO3ModDataFunction) res);
+	                }
+	                else if (res instanceof BO3SpawnerFunction)
+	                {
+	                	tempSpawnerList.add((BO3SpawnerFunction) res);
+	                }
+	            }
             }
         }
 
-        // Store the blocks
-        blocks[0] = tempBlocksList.toArray(new BO3BlockFunction[tempBlocksList.size()]);
-        if(!blocksOnly)
+    	this.blocksX = new byte[4][tempBlocksList.size()];
+    	this.blocksY = new short[4][tempBlocksList.size()];
+    	this.blocksZ = new byte[4][tempBlocksList.size()];
+    	this.blocksMaterial = new LocalMaterialData[4][tempBlocksList.size()];
+    	this.blocksMetaDataName = new String[tempBlocksList.size()];
+    	this.blocksMetaDataTag = new NamedBinaryTag[tempBlocksList.size()];
+    	
+        this.randomBlocksBlocks = new LocalMaterialData[4][tempBlocksList.size()][];
+        this.randomBlocksBlockChances = new byte[tempBlocksList.size()][];
+        this.randomBlocksMetaDataNames = new String[tempBlocksList.size()][];
+        this.randomBlocksMetaDataTags = new NamedBinaryTag[tempBlocksList.size()][];
+        this.randomBlocksBlockCount = new byte[tempBlocksList.size()]; 
+        
+        for(int i = 0; i < tempBlocksList.size(); i++)
         {
-            bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
-            branches[0] = tempBranchesList.toArray(new BO3BranchFunction[tempBranchesList.size()]);
-            boundingBoxes[0] = box;
-            entityFunctions[0] = tempEntitiesList.toArray(new BO3EntityFunction[tempEntitiesList.size()]);
-            particleFunctions[0] = tempParticlesList.toArray(new BO3ParticleFunction[tempParticlesList.size()]);
-            modDataFunctions[0] = tempModDataList.toArray(new BO3ModDataFunction[tempModDataList.size()]);
-            spawnerFunctions[0] = tempSpawnerList.toArray(new BO3SpawnerFunction[tempSpawnerList.size()]);
-        }
+        	BO3BlockFunction block = tempBlocksList.get(i);
+        	this.blocksX[0][i] = (byte) block.x;
+        	this.blocksY[0][i] = (short) block.y;
+        	this.blocksZ[0][i] = (byte) block.z;
+        	this.blocksMaterial[0][i] = block.material;
+        	this.blocksMetaDataName[i] = block.metaDataName;
+        	this.blocksMetaDataTag[i] = block.metaDataTag;
+        	
+        	if(block instanceof BO3RandomBlockFunction)
+        	{
+	            this.randomBlocksBlocks[0][i] = ((BO3RandomBlockFunction)block).blocks;
+	            this.randomBlocksBlockChances[i] = ((BO3RandomBlockFunction)block).blockChances;
+	            this.randomBlocksMetaDataNames[i] = ((BO3RandomBlockFunction)block).metaDataNames;
+	            this.randomBlocksMetaDataTags[i] = ((BO3RandomBlockFunction)block).metaDataTags;
+	            this.randomBlocksBlockCount[i] = ((BO3RandomBlockFunction)block).blockCount;
+        	}
+        }        
+        
+    	this.bo3Checks[0] = tempChecksList.toArray(new BO3Check[tempChecksList.size()]);
+    	this.branches[0] = tempBranchesList.toArray(new BO3BranchFunction[tempBranchesList.size()]);
+    	this.boundingBoxes[0] = box;
+    	this.entityFunctions[0] = tempEntitiesList.toArray(new BO3EntityFunction[tempEntitiesList.size()]);
+    	this.particleFunctions[0] = tempParticlesList.toArray(new BO3ParticleFunction[tempParticlesList.size()]);
+    	this.modDataFunctions[0] = tempModDataList.toArray(new BO3ModDataFunction[tempModDataList.size()]);
+    	this.spawnerFunctions[0] = tempSpawnerList.toArray(new BO3SpawnerFunction[tempSpawnerList.size()]);
     }
-
+    
     /**
      * Gets the file this config will be written to. May be null if the config
      * will never be written.
@@ -170,34 +213,66 @@ public class BO3Config extends CustomObjectConfigFile
     	return this.reader.getFile();
     }
 
+    public BO3BlockFunction[] getBlocks(int rotation)
+    {
+    	BO3BlockFunction[] blocksOTGPlus = new BO3BlockFunction[this.blocksX[rotation].length];
+    	
+    	BO3BlockFunction block;
+    	for(int i = 0; i < this.blocksX[rotation].length; i++)
+    	{
+    		if(this.randomBlocksBlocks[rotation][i] != null)
+    		{
+    			block = new BO3RandomBlockFunction(this);
+    			((BO3RandomBlockFunction)block).blocks = this.randomBlocksBlocks[rotation][i];
+    			((BO3RandomBlockFunction)block).blockChances = this.randomBlocksBlockChances[i];
+    			((BO3RandomBlockFunction)block).metaDataNames = this.randomBlocksMetaDataNames[i];
+    			((BO3RandomBlockFunction)block).metaDataTags = this.randomBlocksMetaDataTags[i];
+    			((BO3RandomBlockFunction)block).blockCount = this.randomBlocksBlockCount[i];
+    		} else {
+    			block = new BO3BlockFunction(this);
+    		}
+    		
+    		block.x = this.blocksX[rotation][i];
+    		block.y = this.blocksY[rotation][i];
+    		block.z = this.blocksZ[rotation][i];
+    		block.material = this.blocksMaterial[rotation][i];
+    		block.metaDataName = this.blocksMetaDataName[i];
+    		block.metaDataTag = this.blocksMetaDataTag[i];
+    		
+    		blocksOTGPlus[i] = block;
+    	}    
+    	
+    	return blocksOTGPlus;
+    }
+    
     protected BO3BranchFunction[] getbranches()
     {
-    	return branches[0];
+    	return this.branches[0];
     }
 
     public BO3ModDataFunction[] getModData()
     {
-    	return modDataFunctions[0];
+    	return this.modDataFunctions[0];
     }
 
     public BO3SpawnerFunction[] getSpawnerData()
     {
-    	return spawnerFunctions[0];
+    	return this.spawnerFunctions[0];
     }
 
     public BO3ParticleFunction[] getParticleData()
     {
-    	return particleFunctions[0];
+    	return this.particleFunctions[0];
     }
 
     public BO3Check[] getBO3Checks()
     {
-    	return bo3Checks[0];
+    	return this.bo3Checks[0];
     }
 
     public BO3EntityFunction[] getEntityData()
     {
-    	return entityFunctions[0];
+    	return this.entityFunctions[0];
     }
     
     @Override
@@ -210,87 +285,87 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("");
 
 		writer.comment("This is the creator of this BO3 object");
-        writer.setting(BO3Settings.AUTHOR, author);
+        writer.setting(BO3Settings.AUTHOR, this.author);
 
         writer.comment("A short description of this BO3 object");
-        writer.setting(BO3Settings.DESCRIPTION, description);
+        writer.setting(BO3Settings.DESCRIPTION, this.description);
 
         writer.comment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
         writer.setting(BO3Settings.VERSION, "3");
 
         writer.comment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");
-        writer.setting(WorldStandardValues.SETTINGS_MODE_BO3, settingsMode);
+        writer.setting(WorldStandardValues.SETTINGS_MODE_BO3, this.settingsMode);
 
         // Main settings
         writer.bigTitle("Main settings");
 
 		writer.comment("This needs to be set to true to spawn the object in the Tree and Sapling resources.");
-        writer.setting(BO3Settings.TREE, tree);
+        writer.setting(BO3Settings.TREE, this.tree);
 
         writer.comment("The frequency of the BO3 from 1 to 200. Tries this many times to spawn this BO3 when using the CustomObject(...) resource.");
 		writer.comment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
-        writer.setting(BO3Settings.FREQUENCY, frequency);
+        writer.setting(BO3Settings.FREQUENCY, this.frequency);
 
 		writer.comment("The rarity of the BO3 from 0 to 100. Each spawn attempt has rarity% chance to succeed when using the CustomObject(...) resource.");
 		writer.comment("Ignored by Tree(..), Sapling(..) and CustomStructure(..)");
-        writer.setting(BO3Settings.RARITY, rarity);
+        writer.setting(BO3Settings.RARITY, this.rarity);
 
 		writer.comment("If you set this to true, the BO3 will be placed with a random rotation.");
-        writer.setting(BO3Settings.ROTATE_RANDOMLY, rotateRandomly);
+        writer.setting(BO3Settings.ROTATE_RANDOMLY, this.rotateRandomly);
 
         writer.comment("The spawn height of the BO3: randomY, highestBlock or highestSolidBlock.");
-        writer.setting(BO3Settings.SPAWN_HEIGHT, spawnHeight);
+        writer.setting(BO3Settings.SPAWN_HEIGHT, this.spawnHeight);
 
 		writer.comment("The offset from the spawn height to spawn this BO3");
 		writer.comment("Ex. SpawnHeight = highestSolidBlock, SpawnHeightOffset = 3; This object will spawn 3 blocks above the highest solid block");
-        writer.setting(BO3Settings.SPAWN_HEIGHT_OFFSET, spawnHeightOffset);
+        writer.setting(BO3Settings.SPAWN_HEIGHT_OFFSET, this.spawnHeightOffset);
 
 		writer.comment("A random amount to offset the spawn location from the spawn offset height");
 		writer.comment("Ex. SpawnHeightOffset = 3, SpawnHeightVariance = 3; This object will spawn 3 to 6 blocks above the original spot it would have spawned");
-        writer.setting(BO3Settings.SPAWN_HEIGHT_VARIANCE, spawnHeightVariance);
+        writer.setting(BO3Settings.SPAWN_HEIGHT_VARIANCE, this.spawnHeightVariance);
 
         writer.smallTitle("Height Limits for the BO3.");
 
 		writer.comment("When in randomY mode used as the minimum Y or in atMinY mode as the actual Y to spawn this BO3 at.");
-        writer.setting(BO3Settings.MIN_HEIGHT, minHeight);
+        writer.setting(BO3Settings.MIN_HEIGHT, this.minHeight);
 
 		writer.comment("When in randomY mode used as the maximum Y to spawn this BO3 at.");
-        writer.setting(BO3Settings.MAX_HEIGHT, maxHeight);
+        writer.setting(BO3Settings.MAX_HEIGHT, this.maxHeight);
 
         writer.smallTitle("Extrusion settings");
 
 		writer.comment("The style of extrusion you wish to use - BottomDown, TopUp, None (Default)");
-        writer.setting(BO3Settings.EXTRUDE_MODE, extrudeMode);
+        writer.setting(BO3Settings.EXTRUDE_MODE, this.extrudeMode);
 
 		writer.comment("The blocks to extrude your BO3 through");
-        writer.setting(BO3Settings.EXTRUDE_THROUGH_BLOCKS, extrudeThroughBlocks);
+        writer.setting(BO3Settings.EXTRUDE_THROUGH_BLOCKS, this.extrudeThroughBlocks);
 
 		writer.comment("Objects can have other objects attacthed to it: branches. Branches can also");
 		writer.comment("have branches attached to it, which can also have branches, etc. This is the");
 		writer.comment("maximum branch depth for this objects.");
-        writer.setting(BO3Settings.MAX_BRANCH_DEPTH, maxBranchDepth);
+        writer.setting(BO3Settings.MAX_BRANCH_DEPTH, this.maxBranchDepth);
 
 		writer.comment("When spawned with the UseWorld keyword, this BO3 should NOT spawn in the following biomes.");
 		writer.comment("If you write the BO3 name directly in the BiomeConfigs, this will be ignored.");
-        writer.setting(BO3Settings.EXCLUDED_BIOMES, excludedBiomes);
+        writer.setting(BO3Settings.EXCLUDED_BIOMES, this.excludedBiomes);
 
         // Sourceblock
         writer.bigTitle("Source block settings");
 
 		writer.comment("The block(s) the BO3 should spawn in.");
-        writer.setting(BO3Settings.SOURCE_BLOCKS, sourceBlocks);
+        writer.setting(BO3Settings.SOURCE_BLOCKS, this.sourceBlocks);
 
 		writer.comment("The maximum percentage of the BO3 that can be outside the SourceBlock.");
 		writer.comment("The BO3 won't be placed on a location with more blocks outside the SourceBlock than this percentage.");
-        writer.setting(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, maxPercentageOutsideSourceBlock);
+        writer.setting(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, this.maxPercentageOutsideSourceBlock);
 
 		writer.comment("What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
-        writer.setting(BO3Settings.OUTSIDE_SOURCE_BLOCK, outsideSourceBlock);
+        writer.setting(BO3Settings.OUTSIDE_SOURCE_BLOCK, this.outsideSourceBlock);
 
         writer.comment("OTG+ settings #");
 
         writer.comment("Legacy setting, rename this file to .BO4 instead. Set this to true to enable the advanced customstructure features of OTG+.");
-        writer.setting(BO3Settings.IS_OTG_PLUS, isOTGPlus);
+        writer.setting(BO3Settings.IS_OTG_PLUS, this.isOTGPlus);
 
         // Blocks and other things
         writeResources(writer);
@@ -299,38 +374,38 @@ public class BO3Config extends CustomObjectConfigFile
     @Override
     protected void readConfigSettings() throws InvalidConfigException
     {
-    	isOTGPlus = readSettings(BO3Settings.IS_OTG_PLUS);
+    	this.isOTGPlus = readSettings(BO3Settings.IS_OTG_PLUS);
 
-    	if(isOTGPlus)
+    	if(this.isOTGPlus)
     	{
     		throw new InvalidConfigException("isOTGPlus: true for a .bo3 file, file must be .bo4.");
     	}
     	
-        author = readSettings(BO3Settings.AUTHOR);
-        description = readSettings(BO3Settings.DESCRIPTION);
-        settingsMode = readSettings(WorldStandardValues.SETTINGS_MODE_BO3);
+    	this.author = readSettings(BO3Settings.AUTHOR);
+    	this.description = readSettings(BO3Settings.DESCRIPTION);
+    	this.settingsMode = readSettings(WorldStandardValues.SETTINGS_MODE_BO3);
 
-        tree = readSettings(BO3Settings.TREE);
-        frequency = readSettings(BO3Settings.FREQUENCY);
-        rarity = readSettings(BO3Settings.RARITY);
-        rotateRandomly = readSettings(BO3Settings.ROTATE_RANDOMLY);
-        spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT);
-        spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET);
-        spawnHeightVariance = readSettings(BO3Settings.SPAWN_HEIGHT_VARIANCE);
-        extrudeMode = readSettings(BO3Settings.EXTRUDE_MODE);
-        extrudeThroughBlocks = readSettings(BO3Settings.EXTRUDE_THROUGH_BLOCKS);
-        minHeight = readSettings(BO3Settings.MIN_HEIGHT);
-        maxHeight = readSettings(BO3Settings.MAX_HEIGHT);
-		maxHeight = maxHeight < minHeight ? minHeight : maxHeight;
-        maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH);
-        excludedBiomes = new ArrayList<String>(readSettings(BO3Settings.EXCLUDED_BIOMES));
+    	this.tree = readSettings(BO3Settings.TREE);
+    	this.frequency = readSettings(BO3Settings.FREQUENCY);
+    	this.rarity = readSettings(BO3Settings.RARITY);
+    	this.rotateRandomly = readSettings(BO3Settings.ROTATE_RANDOMLY);
+    	this.spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT);
+    	this.spawnHeightOffset = readSettings(BO3Settings.SPAWN_HEIGHT_OFFSET);
+    	this.spawnHeightVariance = readSettings(BO3Settings.SPAWN_HEIGHT_VARIANCE);
+    	this.extrudeMode = readSettings(BO3Settings.EXTRUDE_MODE);
+    	this.extrudeThroughBlocks = readSettings(BO3Settings.EXTRUDE_THROUGH_BLOCKS);
+    	this.minHeight = readSettings(BO3Settings.MIN_HEIGHT);
+        this.maxHeight = readSettings(BO3Settings.MAX_HEIGHT);
+        this.maxHeight = this.maxHeight < this.minHeight ? this.minHeight : this.maxHeight;
+        this.maxBranchDepth = readSettings(BO3Settings.MAX_BRANCH_DEPTH);
+        this.excludedBiomes = new ArrayList<String>(readSettings(BO3Settings.EXCLUDED_BIOMES));
 
-        sourceBlocks = readSettings(BO3Settings.SOURCE_BLOCKS);
-        maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK);
-        outsideSourceBlock = readSettings(BO3Settings.OUTSIDE_SOURCE_BLOCK);
+        this.sourceBlocks = readSettings(BO3Settings.SOURCE_BLOCKS);
+        this.maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK);
+        this.outsideSourceBlock = readSettings(BO3Settings.OUTSIDE_SOURCE_BLOCK);
 
         // Read the resources
-        readResources(false);
+        readResources();
 
         this.reader.flushCache();
     }
@@ -349,11 +424,32 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment(" MinecraftObject(0,0,0," + DefaultStructurePart.IGLOO_BOTTOM.getPath() + ")");
         writer.comment(" spawns the bottom part of an igloo.");
 
-        for(BO3BlockFunction func : Arrays.asList(blocks[0]))
+        for(int i = 0; i < this.blocksX[0].length; i++)
         {
-        	writer.function(func);
-        }
+        	BO3BlockFunction blockFunction;
+        	
+        	if(this.randomBlocksBlocks[0][i] != null)
+        	{
+        		blockFunction = new BO3RandomBlockFunction(this);
+	            ((BO3RandomBlockFunction)blockFunction).blocks = this.randomBlocksBlocks[0][i];
+	            ((BO3RandomBlockFunction)blockFunction).blockChances = this.randomBlocksBlockChances[i];
+	            ((BO3RandomBlockFunction)blockFunction).metaDataNames = this.randomBlocksMetaDataNames[i];
+	            ((BO3RandomBlockFunction)blockFunction).metaDataTags = this.randomBlocksMetaDataTags[i];
+	            ((BO3RandomBlockFunction)blockFunction).blockCount = this.randomBlocksBlockCount[i];
+        	} else {
+        		blockFunction = new BO3BlockFunction(this);
+        	}
 
+        	blockFunction.x = this.blocksX[0][i];
+        	blockFunction.y = this.blocksY[0][i];
+        	blockFunction.z = this.blocksZ[0][i];
+        	blockFunction.material = this.blocksMaterial[0][i];
+        	blockFunction.metaDataTag = this.blocksMetaDataTag[i];
+        	blockFunction.metaDataName = this.blocksMetaDataName[i];
+        	
+        	writer.function(blockFunction);
+        }
+        
         writer.bigTitle("BO3 checks");
         writer.comment("Require a condition at a certain location in order for the BO3 to be spawned.");
         writer.comment("BlockCheck(x,y,z,BlockName[,BlockName[,...]]) - one of the blocks must be at the location");
@@ -370,7 +466,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("  BlockCheckNot(0,-1,0,WOOL:0)   Require that there is no white wool below the object");
         writer.comment("  LightCheck(0,0,0,0,1)          Require almost complete darkness just below the object");
 
-        for(BO3Check func : Arrays.asList(bo3Checks[0]))
+        for(BO3Check func : Arrays.asList(this.bo3Checks[0]))
         {
         	writer.function(func);
         }
@@ -405,7 +501,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("*Note: isRequiredBranch must be set to false. It is not possible to use isRequiredBranch:true with WeightedBranch() since isRequired:true branches must spawn and automatically have a rarity of 100.0.");
         writer.comment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
 
-        for(BO3BranchFunction func : Arrays.asList(branches[0]))
+        for(BO3BranchFunction func : Arrays.asList(this.branches[0]))
         {
         	writer.function(func);
         }
@@ -421,7 +517,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ");
         writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
 
-        for(BO3EntityFunction func : Arrays.asList(entityFunctions[0]))
+        for(BO3EntityFunction func : Arrays.asList(this.entityFunctions[0]))
         {
         	writer.function(func);
         }
@@ -441,7 +537,7 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("fallingdust, totem, spit.");
 		writer.comment("velocityX,velocityY,velocityZ - Spawn the enemy with the given velocity. If this is not filled in then a small random velocity is applied.");
 
-        for(BO3ParticleFunction func : Arrays.asList(particleFunctions[0]))
+        for(BO3ParticleFunction func : Arrays.asList(this.particleFunctions[0]))
         {
         	writer.function(func);
         }
@@ -465,7 +561,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("despawnTime - After despawnTime seconds, if there is no player within 32 blocks of the entity it will despawn..");
         writer.comment("velocityX,velocityY,velocityZ,yaw,pitch - Spawn the enemy with the given velocity and angle, handy for making traps and launchers (shooting arrows and fireballs etc).");
 
-        for(BO3SpawnerFunction func : Arrays.asList(spawnerFunctions[0]))
+        for(BO3SpawnerFunction func : Arrays.asList(this.spawnerFunctions[0]))
         {
         	writer.function(func);
         }
@@ -501,7 +597,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("ModName: name of the mod, for OTG commands use OTG ");
         writer.comment("Radius (optional): Radius in chunks around the player.");
 
-        for(BO3ModDataFunction func : Arrays.asList(modDataFunctions[0]))
+        for(BO3ModDataFunction func : Arrays.asList(this.modDataFunctions[0]))
         {
         	writer.function(func);
         }
@@ -525,50 +621,73 @@ public class BO3Config extends CustomObjectConfigFile
     private void rotateBlocksAndChecks()
     {
         for (int i = 1; i < 4; i++)
-        {
-            // Blocks (blocks[i - 1] is previous rotation)
-            blocks[i] = new BO3BlockFunction[blocks[i - 1].length];
-            for (int j = 0; j < blocks[i].length; j++)
+        {       	        
+        	BO3BlockFunction[] blocks = getBlocks(i);
+        	BO3BlockFunction[] blocksPreviousRotation = getBlocks(i - 1);
+        	
+            // Blocks (blocks[i - 1] is previous rotation)      	
+        	this.blocksX[i] = new byte[this.blocksX[i - 1].length];
+        	this.blocksY[i] = new short[this.blocksX[i - 1].length];
+        	this.blocksZ[i] = new byte[this.blocksX[i - 1].length];
+        	this.blocksMaterial[i] = new LocalMaterialData[this.blocksX[i - 1].length];
+        	
+            this.randomBlocksBlocks[i] = new LocalMaterialData[this.blocksX[i - 1].length][];
+        	
+            for (int j = 0; j < blocks.length; j++)
             {
-                blocks[i][j] = blocks[i - 1][j].rotate();
+            	blocks[j] = blocksPreviousRotation[j].rotate();
             }
-            // BO3 checks
-            bo3Checks[i] = new BO3Check[bo3Checks[i - 1].length];
-            for (int j = 0; j < bo3Checks[i].length; j++)
+            for(int h = 0; h < blocks.length; h++)
             {
-                bo3Checks[i][j] = bo3Checks[i - 1][j].rotate();
+            	BO3BlockFunction block = blocks[h];
+            	this.blocksX[i][h] = (byte) block.x;
+            	this.blocksY[i][h] = (short) block.y;
+            	this.blocksZ[i][h] = (byte) block.z;
+            	this.blocksMaterial[i][h] = block.material;
+            	
+            	if(block instanceof BO3RandomBlockFunction)
+            	{
+    	            this.randomBlocksBlocks[i][h] = ((BO3RandomBlockFunction)block).blocks;
+            	}
+            }
+            
+            // BO3 checks
+            this.bo3Checks[i] = new BO3Check[this.bo3Checks[i - 1].length];
+            for (int j = 0; j < this.bo3Checks[i].length; j++)
+            {
+            	this.bo3Checks[i][j] = this.bo3Checks[i - 1][j].rotate();
             }
             // Branches
-            branches[i] = new BO3BranchFunction[branches[i - 1].length];
-            for (int j = 0; j < branches[i].length; j++)
+            this.branches[i] = new BO3BranchFunction[this.branches[i - 1].length];
+            for (int j = 0; j < this.branches[i].length; j++)
             {
-                branches[i][j] = branches[i - 1][j].rotate();
+            	this.branches[i][j] = this.branches[i - 1][j].rotate();
             }
             // Bounding box
-            boundingBoxes[i] = boundingBoxes[i - 1].rotate();
+            this.boundingBoxes[i] = this.boundingBoxes[i - 1].rotate();
 
-            entityFunctions[i] = new BO3EntityFunction[entityFunctions[i - 1].length];
-            for (int j = 0; j < entityFunctions[i].length; j++)
+            this.entityFunctions[i] = new BO3EntityFunction[this.entityFunctions[i - 1].length];
+            for (int j = 0; j < this.entityFunctions[i].length; j++)
             {
-            	entityFunctions[i][j] = entityFunctions[i - 1][j].rotate();
+            	this.entityFunctions[i][j] = this.entityFunctions[i - 1][j].rotate();
             }
 
-            particleFunctions[i] = new BO3ParticleFunction[particleFunctions[i - 1].length];
-            for (int j = 0; j < particleFunctions[i].length; j++)
+            this.particleFunctions[i] = new BO3ParticleFunction[this.particleFunctions[i - 1].length];
+            for (int j = 0; j < this.particleFunctions[i].length; j++)
             {
-            	particleFunctions[i][j] = particleFunctions[i - 1][j].rotate();
+            	this.particleFunctions[i][j] = this.particleFunctions[i - 1][j].rotate();
             }
 
-            spawnerFunctions[i] = new BO3SpawnerFunction[spawnerFunctions[i - 1].length];
-            for (int j = 0; j < spawnerFunctions[i].length; j++)
+            this.spawnerFunctions[i] = new BO3SpawnerFunction[this.spawnerFunctions[i - 1].length];
+            for (int j = 0; j < this.spawnerFunctions[i].length; j++)
             {
-            	spawnerFunctions[i][j] = spawnerFunctions[i - 1][j].rotate();
+            	this.spawnerFunctions[i][j] = this.spawnerFunctions[i - 1][j].rotate();
             }
 
-            modDataFunctions[i] = new BO3ModDataFunction[modDataFunctions[i - 1].length];
-            for (int j = 0; j < modDataFunctions[i].length; j++)
+            this.modDataFunctions[i] = new BO3ModDataFunction[this.modDataFunctions[i - 1].length];
+            for (int j = 0; j < this.modDataFunctions[i].length; j++)
             {
-            	modDataFunctions[i][j] = modDataFunctions[i - 1][j].rotate();
+            	this.modDataFunctions[i][j] = this.modDataFunctions[i - 1][j].rotate();
             }
         }
     }

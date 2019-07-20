@@ -1,10 +1,10 @@
 package com.pg85.otg.generator.terrain;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Random;
@@ -12,8 +12,8 @@ import java.util.Random;
 public abstract class TerrainGenBase
 {
     // Hardcoded materials that cannot be changed for now
-    protected final LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
-    protected final LocalMaterialData lava = OTG.toLocalMaterialData(DefaultMaterial.STATIONARY_LAVA, 0);
+    protected final LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    protected final LocalMaterialData lava = MaterialHelper.toLocalMaterialData(DefaultMaterial.STATIONARY_LAVA, 0);
 
     protected int checkAreaSize = 8;
     protected Random random = new Random();

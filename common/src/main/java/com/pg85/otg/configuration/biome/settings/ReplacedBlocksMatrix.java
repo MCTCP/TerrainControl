@@ -1,9 +1,9 @@
 package com.pg85.otg.configuration.biome.settings;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 
 import java.util.ArrayList;
@@ -45,8 +45,8 @@ public class ReplacedBlocksMatrix
                 throw new InvalidConfigException("Replace parts must be in the format (from,to) or (from,to,minHeight,maxHeight)");
             }
 
-           	from = OTG.readMaterial(values[0]);
-            to = OTG.readMaterial(values[1]);
+           	from = MaterialHelper.readMaterial(values[0]);
+            to = MaterialHelper.readMaterial(values[1]);
 
             if (values.length == 4)
             {

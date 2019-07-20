@@ -37,13 +37,13 @@ public class OTGBiomeProvider extends BiomeProvider
     @Override
     public Biome getBiome(BlockPos blockPos)
     {
-        return this.localWorld.getBiomeByOTGIdOrNull(this.biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
+        return ((ForgeBiome)this.localWorld.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     @Override
     public Biome getBiome(BlockPos pos, Biome defaultOption)
     {
-        ForgeBiome biome = this.localWorld.getBiomeByOTGIdOrNull(this.biomeGenerator.getBiome(pos.getX(), pos.getZ()));
+        ForgeBiome biome = (ForgeBiome) this.localWorld.getBiome(pos.getX(), pos.getZ());
         if (biome != null)
         {
             return biome.getHandle();

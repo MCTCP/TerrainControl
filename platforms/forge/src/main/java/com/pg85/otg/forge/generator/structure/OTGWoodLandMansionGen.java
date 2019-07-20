@@ -6,6 +6,7 @@ import java.util.Random;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
@@ -28,8 +29,9 @@ public class OTGWoodLandMansionGen extends OTGMapGenStructure
 
     private final List<Biome> woodLandMansionSpawnBiomes;
 
-    public OTGWoodLandMansionGen(ConfigProvider settings)
+    public OTGWoodLandMansionGen(ConfigProvider settings, ForgeWorld world)
     {
+    	super(world);
         this.woodLandMansionSpawnBiomes = new ArrayList<Biome>();
 
         for (LocalBiome biome : settings.getBiomeArrayByOTGId())

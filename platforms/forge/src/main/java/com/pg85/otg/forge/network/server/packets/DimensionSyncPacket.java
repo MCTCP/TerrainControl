@@ -12,7 +12,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
@@ -26,6 +25,7 @@ import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigToNetworkSender;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 import io.netty.buffer.ByteBuf;
 
@@ -50,7 +50,7 @@ public class DimensionSyncPacket extends OTGPacket
 		stream.writeInt(0); // 0 == Normal packet
 		
 	    // Send ForgeWorldConfig
-		ConfigFile.writeStringToStream(stream, OTG.getDimensionsConfig().toYamlString());
+		StreamHelper.writeStringToStream(stream, OTG.getDimensionsConfig().toYamlString());
 		
 		LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 		
@@ -58,7 +58,7 @@ public class DimensionSyncPacket extends OTGPacket
 		stream.writeInt(ForgeEngine.Presets.size());
 		for(DimensionConfigGui dimConfig : ForgeEngine.Presets.values())
 		{
-			ConfigFile.writeStringToStream(stream, dimConfig.toYamlString());
+			StreamHelper.writeStringToStream(stream, dimConfig.toYamlString());
 		}
 		
 		stream.writeInt(otgDimData.orderedDimensions.size());
@@ -94,7 +94,7 @@ public class DimensionSyncPacket extends OTGPacket
 	{
 		// TODO: Test this and fix this if necessary.
 		//((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds(); // TODO: Is this necessary for Bukkit?
-	    ForgeWorld world = new ForgeWorld(ConfigFile.readStringFromStream(wrappedStream));
+	    ForgeWorld world = new ForgeWorld(StreamHelper.readStringFromStream(wrappedStream));
 	    ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world, Minecraft.getMinecraft().isSingleplayer());
 	    world.provideClientConfigsBukkit(mcWorld, configs);
 	    return world;

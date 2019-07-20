@@ -149,7 +149,7 @@ public class BO3 implements StructuredCustomObject
         {
             Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
             int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
-            return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), height, chunkZ * 16 + 8 + random.nextInt(16));
+            return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 8 + random.nextInt(16));
         }
         return null;
     }
@@ -253,8 +253,7 @@ public class BO3 implements StructuredCustomObject
 	        }
     	}
 
-        BO3BlockFunction[] blocks = settings.blocks[rotation.getRotationId()];
-
+        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());       
         if(!skipChecks)
         {
             HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
@@ -440,7 +439,7 @@ public class BO3 implements StructuredCustomObject
     		}
 		} else {
 
-			CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(world, this, this.getName(), Rotation.NORTH, x, 0, z));
+			CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(world, this, this.getName(), Rotation.NORTH, x, (short)0, z));
 			placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
 			placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);
 			placeHolderStructure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);

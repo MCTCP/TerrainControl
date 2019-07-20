@@ -31,7 +31,7 @@ public abstract class MinecraftObjectFunction<T extends CustomObjectConfigFile> 
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
         x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -1000, 1000);
+        y = (short) readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
         structurePart = DefaultStructurePart.getDefaultStructurePart(args.get(3));
     }

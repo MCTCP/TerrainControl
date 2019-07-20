@@ -1,11 +1,11 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
@@ -24,7 +24,7 @@ public class UndergroundLakeGen extends Resource
     public UndergroundLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        material = OTG.toLocalMaterialData(
+        material = MaterialHelper.toLocalMaterialData(
                 DefaultMaterial.STATIONARY_WATER, 0);
 
         assureSize(6, args);

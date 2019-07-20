@@ -1,8 +1,8 @@
 package com.pg85.otg.network;
 
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 import java.io.DataOutput;
 import java.io.IOException;
@@ -33,15 +33,15 @@ public final class ConfigToNetworkSender
         LocalBiome[] biomes = configProvider.getBiomeArrayByOTGId();
        
         // General information
-        ConfigFile.writeStringToStream(stream, worldConfig.getName());
+        StreamHelper.writeStringToStream(stream, worldConfig.getName());
 
         stream.writeInt(worldConfig.worldFog);
         stream.writeInt(worldConfig.worldNightFog);
 
         stream.writeInt(worldConfig.waterLevelMax);       
 
-        ConfigFile.writeStringToStream(stream, worldConfig.defaultOceanBiome); // Required for the biome generator
-        ConfigFile.writeStringToStream(stream, worldConfig.defaultFrozenOceanBiome); // Required for the biome generator
+        StreamHelper.writeStringToStream(stream, worldConfig.defaultOceanBiome); // Required for the biome generator
+        StreamHelper.writeStringToStream(stream, worldConfig.defaultFrozenOceanBiome); // Required for the biome generator
 		
         // Fetch all non-virtual biomes
         Collection<LocalBiome> nonVirtualBiomes = new ArrayList<LocalBiome>();

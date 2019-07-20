@@ -29,6 +29,8 @@ import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructure;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
+import com.pg85.otg.customobjects.structures.bo4.SmoothingAreaLine;
+import com.pg85.otg.customobjects.structures.bo4.SmoothingAreaLineDiagonal;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 
@@ -82,7 +84,7 @@ public class CustomStructureFileManager
 		    int minY = 0;
 		    CustomStructureCoordinate structureStart = null;
 		    Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
-		    Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+		    Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
 		    HashSet<ModDataFunction<?>> modData = new HashSet<ModDataFunction<?>>();
 		    HashSet<SpawnerFunction<?>> spawnerData = new HashSet<SpawnerFunction<?>>();
 		    HashSet<ParticleFunction<?>> particleData = new HashSet<ParticleFunction<?>>();
@@ -96,9 +98,9 @@ public class CustomStructureFileManager
 		    {
 		    	if(world.getConfigs().getWorldConfig().isOTGPlus)
 		    	{
-		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, 0, 0, 0, false, false, null);
+		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 		    	} else {
-		    		structureStart = new BO3CustomStructureCoordinate(world, null, null, null, 0, 0, 0);
+		    		structureStart = new BO3CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0);
 		    	}
 
 			    stringbuilder = null;
@@ -132,7 +134,7 @@ public class CustomStructureFileManager
 			    structureStart.bo3Name = structureStartString[0];
 			    structureStart.rotation = Rotation.FromString(structureStartString[1]);
 			    structureStart.x = Integer.parseInt(structureStartString[2]);
-			    structureStart.y = Integer.parseInt(structureStartString[3]);
+			    structureStart.y = Short.parseShort(structureStartString[3]);
 			    structureStart.z = Integer.parseInt(structureStartString[4]);
 
 			    ChunkCoordinate chunk;
@@ -148,38 +150,66 @@ public class CustomStructureFileManager
 			    	coords = new Stack<BO4CustomStructureCoordinate>();
 			    	for(int j = 2; j < objectAsString.length; j += 5)//9)
 			    	{
-					    coord = new BO4CustomStructureCoordinate(world, null, null, null, 0, 0, 0, 0, false, false, null);
+					    coord = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 
 					    coord.bo3Name = objectAsString[j];
 					    coord.rotation = Rotation.FromString(objectAsString[j + 1]);
 					    coord.x = Integer.parseInt(objectAsString[j + 2]);
-					    coord.y = Integer.parseInt(objectAsString[j + 3]);
+					    coord.y = Short.parseShort(objectAsString[j + 3]);
 					    coord.z = Integer.parseInt(objectAsString[j + 4]);
 					    coords.add(coord);
 			    	}
 			    	objectsToSpawn.put(chunk, coords);
 			    }
 
-			    ArrayList<Object[]> coords2;
-			    ArrayList<Object> objects;
+			    ArrayList<SmoothingAreaLine> coords2;
+			    SmoothingAreaLine object;
 			    for(String smoothingAreaToSpawn : smoothingAreasToSpawnString)
 			    {
 			    	objectAsString = smoothingAreaToSpawn.split(":");
 
 			    	chunk = ChunkCoordinate.fromChunkCoords(Integer.parseInt(objectAsString[0].split(",")[0]),Integer.parseInt(objectAsString[0].split(",")[1]));
 
-			    	coords2 = new ArrayList<Object[]>();
+			    	coords2 = new ArrayList<SmoothingAreaLine>();
 
 			    	for(String objectArray : objectAsString)
 			    	{
 			    		if(objectArray != objectAsString[0])
 			    		{
-			    			objects = new ArrayList<Object>();
-			    			for(String object : objectArray.split(","))
-			    			{
-			    				objects.add(Integer.parseInt(object));
-			    			}
-			    			coords2.add(objects.toArray());
+			    			
+			    			String params[] = objectArray.split(",");
+		    						    				
+		    				if(params.length > 12)
+		    				{
+		    					object = new SmoothingAreaLineDiagonal();
+		    				} else {
+		    					object = new SmoothingAreaLine();
+		    				}
+		    				
+		    				object.beginPointX = Integer.parseInt(params[0]);
+		    				object.beginPointY = Short.parseShort(params[1]);
+		    				object.beginPointZ = Integer.parseInt(params[2]);
+		    				object.endPointX = Integer.parseInt(params[3]);
+		    				object.endPointY = Short.parseShort(params[4]);
+		    				object.endPointZ = Integer.parseInt(params[5]);
+		    				object.originPointX = Integer.parseInt(params[6]);
+		    				object.originPointY = Short.parseShort(params[7]);
+		    				object.originPointZ = Integer.parseInt(params[8]);
+		    				object.finalDestinationPointX = Integer.parseInt(params[9]);
+		    				object.finalDestinationPointY = Short.parseShort(params[10]);
+		    				object.finalDestinationPointZ = Integer.parseInt(params[11]);
+
+		    				if(params.length > 12)
+		    				{
+		    					((SmoothingAreaLineDiagonal)object).diagonalLineOriginPointX = Integer.parseInt(params[12]);
+		    					((SmoothingAreaLineDiagonal)object).diagonalLineoriginPointY = Short.parseShort(params[13]);
+		    					((SmoothingAreaLineDiagonal)object).diagonalLineOriginPointZ = Integer.parseInt(params[14]);
+		    					((SmoothingAreaLineDiagonal)object).diagonalLineFinalDestinationPointX = Integer.parseInt(params[15]);
+		    					((SmoothingAreaLineDiagonal)object).diagonalLineFinalDestinationPointY = Short.parseShort(params[16]);
+		    					((SmoothingAreaLineDiagonal)object).diagonalLineFinalDestinationPointZ = Integer.parseInt(params[17]);		    					
+		    				}
+		    				
+			    			coords2.add(object);
 			    		}
 			    	}
 
@@ -619,9 +649,9 @@ public class CustomStructureFileManager
 				if(structure instanceof BO4CustomStructure && ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size() > 0 && chunkCoord.getChunkX() == ((BO4CustomStructureCoordinate)structure.start).getChunkX() && chunkCoord.getChunkZ() == ((BO4CustomStructureCoordinate)structure.start).getChunkZ())
 				{
 					boolean added = false;
-					ArrayList<Object[]> coords2;
+					ArrayList<SmoothingAreaLine> coords2;
 					String append;
-					for(Entry<ChunkCoordinate, ArrayList<Object[]>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet())
+					for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet())
 					{
 						if(added)
 						{
@@ -632,18 +662,36 @@ public class CustomStructureFileManager
 						added = true;
 
 						coords2 = smoothingAreaToSpawn.getValue();
-						for(Object[] coord : coords2)
+						for(SmoothingAreaLine coord : coords2)
 						{
 							append = ":";
-							for(int i = 0; i < coord.length; i++)
+							
+							append += coord.beginPointX;
+							append += "," + coord.beginPointY;
+							append += "," + coord.beginPointZ;
+
+							append += "," + coord.endPointX;
+							append += "," + coord.endPointY;
+							append += "," + coord.endPointZ;
+
+							append += "," + coord.originPointX;
+							append += "," + coord.originPointY;
+							append += "," + coord.originPointZ;
+
+							append += "," + coord.finalDestinationPointX;
+							append += "," + coord.finalDestinationPointY;
+							append += "," + coord.finalDestinationPointZ;
+							
+							if(coord instanceof SmoothingAreaLineDiagonal)
 							{
-								if(append.length() == 1)
-								{
-									append += coord[i];
-								} else {
-									append += "," + coord[i];
-								}
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointX; // 12;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineoriginPointY; // 13;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointZ; // 14;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointX; // 15;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointY; // 16;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointZ; // 17;								
 							}
+							
 							stringbuilder.append(append);
 						}
 					}

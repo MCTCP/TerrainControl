@@ -4,7 +4,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -85,9 +84,9 @@ public class ParticlesPacket extends OTGPacket
 		public IMessage handleClientMessage(EntityPlayer player, ParticlesPacket message, MessageContext ctx)
 		{
 			// For SP clients data is shared between client and server
-			if(Minecraft.getMinecraft().isSingleplayer())
+			//if(Minecraft.getMinecraft().isSingleplayer())
 			{
-				return null;
+				//return null;
 			}
 			
 	        try

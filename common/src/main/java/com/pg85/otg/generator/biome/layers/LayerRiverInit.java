@@ -18,12 +18,13 @@ public class LayerRiverInit extends Layer
         int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
 
+        int currentPiece;
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
             {
                 initChunkSeed(zi + z, xi + x);           // reversed
-                int currentPiece = childInts[(xi + zi * xSize)];
+                currentPiece = childInts[(xi + zi * xSize)];
                 if (nextInt(2) == 0)
                     currentPiece |= RiverBitOne;
                 else

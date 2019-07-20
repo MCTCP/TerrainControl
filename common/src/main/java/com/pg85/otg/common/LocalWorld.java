@@ -11,7 +11,6 @@ import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
@@ -226,7 +225,7 @@ public interface LocalWorld
 
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
 
-	public OTGBlock[] getBlockColumn(int x, int z);
+	public LocalMaterialData[] getBlockColumn(int x, int z);
 	
     /**
      * Executes ReplacedBlocks.

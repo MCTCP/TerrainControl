@@ -44,8 +44,7 @@ public class BO4CustomStructure extends CustomStructure
     private int minY;
 
     // A smoothing area is drawn around all outer blocks (or blocks neighbouring air) on the lowest layer of blocks in each BO3 of this branching structure that has a SmoothRadius set greater than 0.
-    // Object[] { int startpoint, int endpoint, int distance from real startpoint }
-    public Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+    public Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
 
     private int branchesTried = 0;
 
@@ -69,7 +68,7 @@ public class BO4CustomStructure extends CustomStructure
     	this.start = start;
     }
     
-    public BO4CustomStructure(LocalWorld world, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn, int minY)
+    public BO4CustomStructure(LocalWorld world, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, int minY)
     {
     	this(world, structureStart, false, false);
     	this.objectsToSpawn = objectsToSpawn;
@@ -196,7 +195,7 @@ public class BO4CustomStructure extends CustomStructure
 	        // terrain to the BO3. This way BO3's won't float above the ground
 	        // or spawn inside a hole with vertical walls.
 			smoothingAreasToSpawn = smoothingAreaManager.calculateSmoothingAreas(objectsToSpawn, (BO4CustomStructureCoordinate)this.start, world);
-			smoothingAreaManager.CustomObjectStructureSpawn(smoothingAreasToSpawn);
+			smoothingAreaManager.customObjectStructureSpawn(smoothingAreasToSpawn);
 			
 			for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
 			{
@@ -262,14 +261,14 @@ public class BO4CustomStructure extends CustomStructure
 			// Material checks:
 			// A BO3 may need to perform material checks to when using !CanSpawnOnWater or SpawnOnWaterOnly
 
-	    	int startY = 0;
+	    	short startY = 0;
 
 			if(((BO4)this.start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestBlock || ((BO4)this.start.getObject()).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock)
 			{
 				if(((BO4)this.start.getObject()).getSettings().spawnAtWaterLevel)
 				{
 					LocalBiome biome = world.getBiome(this.start.getX() + 8, this.start.getZ() + 7);
-					startY = biome.getBiomeConfig().useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biome.getBiomeConfig().waterLevelMax;
+					startY = (short) (biome.getBiomeConfig().useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biome.getBiomeConfig().waterLevelMax);
 				} else {
 					// OTG.log(LogMarker.INFO, "Request height for chunk X" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkX() + " Z" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkZ());
 					// If this chunk has not yet been populated then this will cause it to be! (ObjectSpawner.Populate() is called)
@@ -293,15 +292,15 @@ public class BO4CustomStructure extends CustomStructure
 							return false;
 						}
 					} else {
-						startY  = highestBlock + 1;
+						startY  = (short) (highestBlock + 1);
 					}
 				}
 			} else {
 				if(((BO4)this.start.getObject()).getSettings().maxHeight != ((BO4)this.start.getObject()).getSettings().minHeight)
 				{
-					startY = ((BO4)this.start.getObject()).getSettings().minHeight + new Random().nextInt(((BO4)this.start.getObject()).getSettings().maxHeight - ((BO4)this.start.getObject()).getSettings().minHeight);
+					startY = (short) (((BO4)this.start.getObject()).getSettings().minHeight + new Random().nextInt(((BO4)this.start.getObject()).getSettings().maxHeight - ((BO4)this.start.getObject()).getSettings().minHeight));
 				} else {
-					startY = ((BO4)this.start.getObject()).getSettings().minHeight;
+					startY = (short) ((BO4)this.start.getObject()).getSettings().minHeight;
 				}
 			}
 
@@ -327,26 +326,22 @@ public class BO4CustomStructure extends CustomStructure
 				}
 			}
 
-			Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn2 = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+			Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> SmoothingAreasToSpawn2 = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
 			SmoothingAreasToSpawn2.putAll(smoothingAreasToSpawn);
 			smoothingAreasToSpawn.clear();
 			for(ChunkCoordinate chunkCoord2 : SmoothingAreasToSpawn2.keySet())
 			{
-				ArrayList<Object[]> coords = new ArrayList<Object[]>();
-				Object[] coordToAdd;
-				for(Object[] coord : SmoothingAreasToSpawn2.get(chunkCoord2))
+				ArrayList<SmoothingAreaLine> coords = new ArrayList<SmoothingAreaLine>();
+				SmoothingAreaLine coordToAdd;
+				for(SmoothingAreaLine coord : SmoothingAreasToSpawn2.get(chunkCoord2))
 				{
-					if(coord.length == 18)
+					if(coord instanceof SmoothingAreaLineDiagonal)
 					{
-						coordToAdd = new Object[]{ ((Integer)coord[0]), ((Integer)coord[1]) + this.start.getY(), ((Integer)coord[2]), ((Integer)coord[3]), ((Integer)coord[4]) + this.start.getY(), ((Integer)coord[5]), ((Integer)coord[6]), -1, ((Integer)coord[8]), ((Integer)coord[9]), -1, ((Integer)coord[11]), ((Integer)coord[12]), ((Integer)coord[13]) + this.start.getY(), ((Integer)coord[14]), ((Integer)coord[15]), -1, ((Integer)coord[17]) };
-						coords.add(coordToAdd);
-					}
-					else if(coord.length == 12)
-					{
-						coordToAdd = new Object[]{ ((Integer)coord[0]), ((Integer)coord[1]) + this.start.getY(), ((Integer)coord[2]), ((Integer)coord[3]), ((Integer)coord[4]) + this.start.getY(), ((Integer)coord[5]), ((Integer)coord[6]), ((Integer)coord[7]) + this.start.getY(), ((Integer)coord[8]), ((Integer)coord[9]), -1, ((Integer)coord[11]) };
+						coordToAdd = new SmoothingAreaLineDiagonal(coord.beginPointX, (short)(coord.beginPointY + this.start.getY()), coord.beginPointZ, coord.endPointX, (short)(coord.endPointY + this.start.getY()), coord.endPointZ, coord.originPointX, (short)-1, coord.originPointZ, coord.finalDestinationPointX, (short)-1, coord.finalDestinationPointZ, ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointX, (short)(((SmoothingAreaLineDiagonal)coord).diagonalLineoriginPointY + this.start.getY()), ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointZ, ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointX, (short)-1, ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointZ);
 						coords.add(coordToAdd);
 					} else {
-						throw new RuntimeException(); // TODO: Remove after testing.
+						coordToAdd = new SmoothingAreaLine(coord.beginPointX, (short)(coord.beginPointY + this.start.getY()), coord.beginPointZ, coord.endPointX, (short)(coord.endPointY + this.start.getY()), coord.endPointZ, coord.originPointX, (short)(coord.originPointY + this.start.getY()), coord.originPointZ, coord.finalDestinationPointX, (short)-1, coord.finalDestinationPointZ);
+						coords.add(coordToAdd);
 					}
 				}
 				smoothingAreasToSpawn.put(ChunkCoordinate.fromChunkCoords(chunkCoord2.getChunkX(), chunkCoord2.getChunkZ()), coords);

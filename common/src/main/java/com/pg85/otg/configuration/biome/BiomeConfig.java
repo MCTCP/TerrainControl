@@ -1,6 +1,5 @@
 package com.pg85.otg.configuration.biome;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
@@ -20,6 +19,8 @@ import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
+import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
@@ -310,9 +311,9 @@ public class BiomeConfig extends ConfigFile
 
         this.stoneBlock = settings.getSetting(BiomeStandardValues.STONE_BLOCK);
         this.surfaceBlock = settings.getSetting(BiomeStandardValues.SURFACE_BLOCK,
-                OTG.toLocalMaterialData(defaultSettings.defaultSurfaceBlock, 0));
+                MaterialHelper.toLocalMaterialData(defaultSettings.defaultSurfaceBlock, 0));
         this.groundBlock = settings.getSetting(BiomeStandardValues.GROUND_BLOCK,
-                OTG.toLocalMaterialData(defaultSettings.defaultGroundBlock, 0));
+                MaterialHelper.toLocalMaterialData(defaultSettings.defaultGroundBlock, 0));
         this.replacedBlocks = settings.getSetting(BiomeStandardValues.REPLACED_BLOCKS);
         this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings(settings);
 
@@ -992,7 +993,7 @@ public class BiomeConfig extends ConfigFile
             {
                 try
                 {
-                    LocalMaterialData fromId = OTG.readMaterial(replacedBlock.split("=")[0]);
+                    LocalMaterialData fromId = MaterialHelper.readMaterial(replacedBlock.split("=")[0]);
                     String rest = replacedBlock.split("=")[1];
                     LocalMaterialData to;
                     int minHeight = 0;
@@ -1003,12 +1004,12 @@ public class BiomeConfig extends ConfigFile
                     if (start != -1 && end != -1)
                     {   // Found height settings
                         String[] ranges = rest.substring(start + 1, end).split("-");
-                        to = OTG.readMaterial(rest.substring(0, start));
+                        to = MaterialHelper.readMaterial(rest.substring(0, start));
                         minHeight = StringHelper.readInt(ranges[0], minHeight, maxHeight);
                         maxHeight = StringHelper.readInt(ranges[1], minHeight, maxHeight);
                     } else {
                     	// No height settings
-                        to = OTG.readMaterial(rest);
+                        to = MaterialHelper.readMaterial(rest);
                     }
 
                     output.add(new ReplacedBlocksInstruction(fromId, to, minHeight, maxHeight));
@@ -1074,7 +1075,7 @@ public class BiomeConfig extends ConfigFile
 
     public void writeToStream(DataOutput stream, boolean isSinglePlayer) throws IOException
     {
-        writeStringToStream(stream, getName());
+        StreamHelper.writeStringToStream(stream, getName());
 
         stream.writeFloat(this.biomeTemperature);
         stream.writeFloat(this.biomeWetness);
@@ -1085,7 +1086,7 @@ public class BiomeConfig extends ConfigFile
         stream.writeInt(this.foliageColor);
         stream.writeBoolean(this.foliageColorIsMultiplier);
 
-        writeStringToStream(stream, this.replaceToBiomeName);        
-        writeStringToStream(stream, this.biomeDictId);
+        StreamHelper.writeStringToStream(stream, this.replaceToBiomeName);        
+        StreamHelper.writeStringToStream(stream, this.biomeDictId);
     }
 }

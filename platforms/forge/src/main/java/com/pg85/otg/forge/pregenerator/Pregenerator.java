@@ -34,9 +34,11 @@ public class Pregenerator
 	private int iRight = Integer.MIN_VALUE;
 	private int iTop = Integer.MIN_VALUE;
 	private int iBottom = Integer.MIN_VALUE;
-	private int spawned = 1;
+	private int spawned = 0;
 	private double total;
 	private int spawnedThisTick = 0;
+	private int lastSpawnedWhenSaved = 0;
+	private int compressCustomStructureCacheThreshHold = 10000;
 	private boolean pregeneratorIsRunning;
 	private int maxSpawnPerTick;
 
@@ -195,7 +197,14 @@ public class Pregenerator
 	    		// Since the first cycle is cycle 1, the centermost chunk (at the spawnpoint) wont be pregenerated.
 				if(cycle == 0)
 				{
+					spawned++;
 					pregenerateChunk(spawnChunkX, spawnChunkZ);
+	    			if(spawnedThisTick >= maxSpawnPerTick)
+	    			{
+	    				cycle += 1;
+	    				pause();
+	    				return;
+	    			}
 				}
 
 				cycle += 1;
@@ -360,6 +369,7 @@ public class Pregenerator
 			}
 			
 			this.world.getChunkGenerator().clearChunkCache(false);
+			this.world.getStructureCache().compressCache();
 			savePregeneratorData(false);
         }
         pregeneratorIsRunning = false;
@@ -397,6 +407,12 @@ public class Pregenerator
         world.getWorld().getChunkProvider().provideChunk(currentX, currentZ);
 
 		spawnedThisTick++;
+		
+		if(spawned - lastSpawnedWhenSaved > compressCustomStructureCacheThreshHold)
+		{
+			lastSpawnedWhenSaved = spawned;
+			world.getStructureCache().compressCache();
+		}
 	}
 
 	private void updateProgressMessage (boolean loggingCanBeIgnored)
@@ -570,7 +586,8 @@ public class Pregenerator
 		if(pregeneratedChunksFileValues.length > 0)
 		{
 			spawned = Integer.parseInt(pregeneratedChunksFileValues[0]);
-
+    		lastSpawnedWhenSaved = spawned;
+			
 			left = Integer.parseInt(pregeneratedChunksFileValues[1]);
 			top = Integer.parseInt(pregeneratedChunksFileValues[2]);
 			right = Integer.parseInt(pregeneratedChunksFileValues[3]);

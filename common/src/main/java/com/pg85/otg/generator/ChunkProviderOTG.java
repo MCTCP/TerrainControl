@@ -15,6 +15,7 @@ import com.pg85.otg.generator.terrain.RavinesGen;
 import com.pg85.otg.generator.terrain.TerrainGenBase;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -29,7 +30,7 @@ public class ChunkProviderOTG
     private static final int NOISE_MAX_X = CHUNK_X_SIZE / 4 + 1;
     private static final int NOISE_MAX_Z = CHUNK_Z_SIZE / 4 + 1;
 
-    private final LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    private final LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
 
     private final Random random;
     private final NoiseGeneratorPerlinOctaves vol1NoiseGen;
@@ -116,7 +117,7 @@ public class ChunkProviderOTG
         }
 
     }
-
+    
     public void generate(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();

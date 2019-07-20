@@ -34,7 +34,7 @@ import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.OTGBlock;
+import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
@@ -143,13 +143,13 @@ public class ForgeWorld implements LocalWorld
 
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
-        this.netherFortressGen = new OTGNetherFortressGen();
+        this.netherFortressGen = new OTGNetherFortressGen(this);
         this.strongholdGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGStrongholdGen(configs, world), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
-        this.villageGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGVillageGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
-        this.mineshaftGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGMineshaftGen(), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);        
-        this.rareBuildingGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGRareBuildingGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.SCATTERED_FEATURE);
-        this.oceanMonumentGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGOceanMonumentGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.OCEAN_MONUMENT);
-        this.woodLandMansionGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGWoodLandMansionGen(configs), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.WOODLAND_MANSION);
+        this.villageGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGVillageGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
+        this.mineshaftGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGMineshaftGen(this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);        
+        this.rareBuildingGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGRareBuildingGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.SCATTERED_FEATURE);
+        this.oceanMonumentGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGOceanMonumentGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.OCEAN_MONUMENT);
+        this.woodLandMansionGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGWoodLandMansionGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.WOODLAND_MANSION);
         
         IBlockState jungleLog = Blocks.LOG.getDefaultState()
                 .withProperty(BlockOldLog.VARIANT, BlockPlanks.EnumType.JUNGLE);
@@ -350,31 +350,38 @@ public class ForgeWorld implements LocalWorld
 	}
     
     // Biomes
-        
+    
     @Override
     public LocalBiome getCalculatedBiome(int x, int z)
     {
     	return getBiomeByOTGIdOrNull(this.biomeGenerator.getBiome(x, z));
     }
-
+    
     @Override
     public LocalBiome getBiome(int x, int z)
-    {
+    {    	
         if (this.settings.getWorldConfig().populateUsingSavedBiomes)
         {
-            return getSavedBiome(x, z);
+        	return getSavedBiome(x, z);
         } else {
-            return getCalculatedBiome(x, z);
+        	return getCalculatedBiome(x, z);
         }
     }
 
+    FifoMap<BlockPos, LocalBiome> cachedSavedBiomes = new FifoMap<BlockPos, LocalBiome>(4096);
     @Override
     public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
     {
-    	BlockPos pos = new BlockPos(x, 0, z);
-    	Biome biome = this.world.getBiome(pos);
-    	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(biome); // Non-TC biomes don't have a generationId, only a saved id
-    	return this.settings.getBiomeBySavedIdOrNull(biomeId);
+    	LocalBiome localBiome = cachedSavedBiomes.get(new BlockPos(x, 0, z));
+    	if(localBiome == null)
+    	{
+        	BlockPos pos = new BlockPos(x, 0, z);
+        	Biome biome = this.world.getBiome(pos);
+        	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(biome); // Non-TC biomes don't have a generationId, only a saved id
+        	localBiome = this.settings.getBiomeBySavedIdOrNull(biomeId);        	       	
+	        cachedSavedBiomes.put(new BlockPos(x, 0, z), localBiome);
+    	}
+    	return localBiome;
     }
     
     @Override
@@ -624,7 +631,7 @@ public class ForgeWorld implements LocalWorld
     }
     
     @Override
-    public OTGBlock[] getBlockColumn(int x, int z)
+    public LocalMaterialData[] getBlockColumn(int x, int z)
     {
     	//OTG.log(LogMarker.INFO, "getBlockColumn at X" + x + " Z" + z);
     	return generator.getBlockColumnInUnloadedChunk(x,z);
@@ -685,8 +692,7 @@ public class ForgeWorld implements LocalWorld
                 if (rand.nextBoolean())
                 {
                     return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
-                } else
-                {
+                } else {
                     return this.hugeRedMushroom.generate(this.world, rand, blockPos);
                 }
             case HugeRedMushroom:
@@ -733,7 +739,7 @@ public class ForgeWorld implements LocalWorld
         if (worldConfig.netherFortressesEnabled)
             this.netherFortressGen.generate(this.world, chunkX, chunkZ, null);
         if (worldConfig.oceanMonumentsEnabled)
-            this.oceanMonumentGen.generate(this.world, chunkX, chunkZ, null);
+           this.oceanMonumentGen.generate(this.world, chunkX, chunkZ, null);
         if (worldConfig.woodLandMansionsEnabled)
             this.woodLandMansionGen.generate(this.world, chunkX, chunkZ, null);
     }
@@ -763,6 +769,11 @@ public class ForgeWorld implements LocalWorld
         return isVillagePlaced;
     }
         
+    /**
+     * Recreates data about structures intersecting given chunk (used for example by getPossibleCreatures), without
+     * placing any blocks. When called for the first time before any chunk is generated - also initializes the internal
+     * state needed by getPossibleCreatures.
+     */
     public void recreateStructures(Chunk chunkIn, int chunkX, int chunkZ)
     {
         // recreateStructures
@@ -933,6 +944,13 @@ public class ForgeWorld implements LocalWorld
 
         ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
 
+        IBlockState block;
+        int blockId;
+        int y;
+        ForgeMaterialData replaceTo;
+        LocalBiome biome;
+        LocalMaterialData[][] replaceArray;
+        
         for (ExtendedBlockStorage section : sectionsArray)
         {
             if (section == null)
@@ -944,26 +962,26 @@ public class ForgeWorld implements LocalWorld
             {
                 for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
                 {
-                    LocalBiome biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
+                    biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
                     if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
                     {
-                        LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
+                        replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
                         for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
-                            IBlockState block = section.getData().get(sectionX, sectionY, sectionZ);
-                            int blockId = Block.getIdFromBlock(block.getBlock());
+                            block = section.getData().get(sectionX, sectionY, sectionZ);
+                            blockId = Block.getIdFromBlock(block.getBlock());
                             if (replaceArray[blockId] == null)
                             {
                                 continue;
                             }
 
-                            int y = section.getYLocation() + sectionY;
+                            y = section.getYLocation() + sectionY;
                             if (y >= replaceArray[blockId].length)
                             {
                                 break;
                             }
 
-                            ForgeMaterialData replaceTo = (ForgeMaterialData) replaceArray[blockId][y];
+                            replaceTo = (ForgeMaterialData) replaceArray[blockId][y];
                             if (replaceTo == null || replaceTo.getBlockId() == blockId)
                             {
                                 continue;

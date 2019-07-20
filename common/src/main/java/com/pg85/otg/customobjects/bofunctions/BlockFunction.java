@@ -17,7 +17,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 {
     public LocalMaterialData material;
     public int x;
-    public int y;
+    public short y;
     public int z;
     public NamedBinaryTag metaDataTag;
     public String metaDataName;
@@ -29,7 +29,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
 		x = readInt(args.get(0), -100, 100);
-		y = readInt(args.get(1), -1000, 1000);
+		y = (short)readInt(args.get(1), -1000, 1000);
 		z = readInt(args.get(2), -100, 100);
 
 		String materialName = args.get(3);

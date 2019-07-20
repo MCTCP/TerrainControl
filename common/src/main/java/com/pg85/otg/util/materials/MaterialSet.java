@@ -3,6 +3,7 @@ package com.pg85.otg.util.materials;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 
 import java.util.Arrays;
@@ -78,7 +79,7 @@ public class MaterialSet
             return;
         }
 
-        LocalMaterialData material = OTG.readMaterial(input);
+        LocalMaterialData material = MaterialHelper.readMaterial(input);
         
         boolean checkIncludesBlockData = StringHelper.specifiesBlockData(input);
 

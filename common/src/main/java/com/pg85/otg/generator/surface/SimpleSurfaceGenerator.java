@@ -2,7 +2,6 @@ package com.pg85.otg.generator.surface;
 
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Y_SIZE;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -10,6 +9,7 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 /**
@@ -18,8 +18,8 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
  */
 public class SimpleSurfaceGenerator implements SurfaceGenerator
 {
-    private final LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
-    private final LocalMaterialData sandstone = OTG.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
+    private final LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    private final LocalMaterialData sandstone = MaterialHelper.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
 
     @Override
     public LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)

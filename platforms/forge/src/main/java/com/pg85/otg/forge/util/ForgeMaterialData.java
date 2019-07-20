@@ -1,9 +1,11 @@
 package com.pg85.otg.forge.util;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.BlockHelper;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.Block;
@@ -373,6 +375,43 @@ public class ForgeMaterialData implements LocalMaterialData
             int newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);
             if (newData != blockDataByte)
             {
+            	// Don't return a copy, return a cached object. OTG should only use forgematerialdata for BO2's/BO3's/BO4's and materialset,
+            	// and shouldn't need to edit them, so they can be re-used. TODO: Make sure this won't cause problems.
+            	try
+            	{
+					return MaterialHelper.readMaterial(Block.REGISTRY.getNameForObject(this.blockData.getBlock()).toString() + ":" + newData);
+				}
+            	catch (InvalidConfigException e)
+            	{
+					e.printStackTrace();
+					return null;
+				}
+                //return ofMinecraftBlockState(this.blockData.getBlock().getStateFromMeta(newData));
+            }
+        }
+
+        // No changes, return object itself
+        return this;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public LocalMaterialData rotate(int rotateTimes)
+    {
+        // Try to rotate
+        DefaultMaterial defaultMaterial = toDefaultMaterial();
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        {
+            // We only know how to rotate vanilla blocks
+        	byte blockDataByte = 0;
+            int newData = 0;
+            for(int i = 0; i < rotateTimes; i++)
+            {
+            	blockDataByte = getBlockData();
+            	newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);	
+            }
+            if (newData != blockDataByte)
+            {
                 return ofMinecraftBlockState(this.blockData.getBlock().getStateFromMeta(newData));
             }
         }
@@ -380,7 +419,7 @@ public class ForgeMaterialData implements LocalMaterialData
         // No changes, return object itself
         return this;
     }
-        
+    
     @Override
     public DefaultMaterial toDefaultMaterial()
     {

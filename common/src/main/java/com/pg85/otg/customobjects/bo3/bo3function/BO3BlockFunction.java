@@ -1,6 +1,7 @@
 package com.pg85.otg.customobjects.bo3.bo3function;
 
 import com.pg85.otg.customobjects.bo3.BO3Config;
+import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.bofunctions.BlockFunction;
 
 /**
@@ -8,6 +9,13 @@ import com.pg85.otg.customobjects.bofunctions.BlockFunction;
  */
 public class BO3BlockFunction extends BlockFunction<BO3Config>
 {
+	public BO3BlockFunction() { }
+	
+    public BO3BlockFunction(BO3Config holder)
+    {
+    	this.holder = holder;
+    }
+	
     public BO3BlockFunction rotate()
     {
         BO3BlockFunction rotatedBlock = new BO3BlockFunction();

@@ -8,6 +8,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.Block;
@@ -126,7 +127,7 @@ public class OTGBlockPortalSize
 		if(!worldUsesObsidian)
 		{				
 			ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
-			portalMaterials.add(OTG.toLocalMaterialData(DefaultMaterial.OBSIDIAN, 0));
+			portalMaterials.add(MaterialHelper.toLocalMaterialData(DefaultMaterial.OBSIDIAN, 0));
 			// Only allow portals to nether from overworld
 			if(sourceWorld.provider.getDimension() == 0 && getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
 			{

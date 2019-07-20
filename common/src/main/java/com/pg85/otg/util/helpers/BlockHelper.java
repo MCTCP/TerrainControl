@@ -1,10 +1,11 @@
 package com.pg85.otg.util.helpers;
 
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class BlockHelper
-{
-
+{	
     /**
      * Rotate the block. North -> west - > south - > east
      *

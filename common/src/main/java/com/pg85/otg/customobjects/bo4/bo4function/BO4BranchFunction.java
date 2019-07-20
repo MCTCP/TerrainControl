@@ -9,7 +9,12 @@ import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.helpers.StreamHelper;
+import com.pg85.otg.util.helpers.StringHelper;
 
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -22,9 +27,16 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
     String branchGroup = "";
     boolean isRequiredBranch = false;
    
+    public BO4BranchFunction() { }
+    
+    public BO4BranchFunction(BO4Config holder)
+    {
+    	this.holder = holder;
+    }
+    
     public BO4BranchFunction rotate(Rotation rotation)
     {
-    	BO4BranchFunction rotatedBranch = new BO4BranchFunction();
+    	BO4BranchFunction rotatedBranch = new BO4BranchFunction(this.getHolder());
 
     	rotatedBranch.x = x;
     	rotatedBranch.y = y;
@@ -160,6 +172,10 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
         {
             output.append(',').append(totalChance);
         }
+        if(branchGroup != null)
+        {
+        	output.append(',').append(branchGroup);
+        }
         return output.append(')').toString();
     }
 
@@ -180,7 +196,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
             {
                 BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
                 Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-                return new BO4CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
+                return new BO4CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
             }
         }
         return null;
@@ -190,5 +206,27 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
     public Class<BO4Config> getHolderType()
     {
         return BO4Config.class;
+    }
+    
+    public void writeToStream(DataOutput stream) throws IOException
+    {
+        StreamHelper.writeStringToStream(stream, makeString());
+    }
+    
+    public static BO4BranchFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException
+    {
+    	BO4BranchFunction branchFunction = new BO4BranchFunction(holder);  	
+    	
+        String configFunctionString = StreamHelper.readStringFromStream(stream);
+        int bracketIndex = configFunctionString.indexOf('(');
+        String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
+        List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
+        
+        try {
+			branchFunction.load(args);
+		} catch (InvalidConfigException e) {
+			e.printStackTrace();
+		}            	           
+    	return branchFunction;
     }
 }

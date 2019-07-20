@@ -4,6 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 
@@ -242,7 +243,7 @@ public abstract class CustomObjectConfigFunction<T>
      */
     protected final LocalMaterialData readMaterial(String string) throws InvalidConfigException
     {
-        return OTG.readMaterial(string);
+        return MaterialHelper.readMaterial(string);
     }
 
     /**

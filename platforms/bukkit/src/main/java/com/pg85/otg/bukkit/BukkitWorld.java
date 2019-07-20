@@ -29,7 +29,6 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
@@ -1667,7 +1666,7 @@ public class BukkitWorld implements LocalWorld
     }
     
 	@Override
-	public OTGBlock[] getBlockColumn(int x, int z)
+	public LocalMaterialData[] getBlockColumn(int x, int z)
 	{
 		// TODO Implement this
 		throw new RuntimeException();

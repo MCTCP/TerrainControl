@@ -1,7 +1,6 @@
 package com.pg85.otg;
 
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.PluginConfig;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
@@ -11,15 +10,11 @@ import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.events.EventPriority;
-import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.helpers.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -208,24 +203,6 @@ public class OTG
         return Engine.getAllWorlds();
     }
     
-    // Materials
-
-    /**
-     * @see OTGEngine#readMaterial(String)
-     */
-    public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
-    {
-        return MaterialHelper.readMaterial(name);
-    }
-
-    /**
-     * @see OTGEngine#toLocalMaterialData(DefaultMaterial, int)
-     */
-    public static LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
-    {
-        return MaterialHelper.toLocalMaterialData(defaultMaterial, blockData);
-    }
-
     // Events
     
     /**

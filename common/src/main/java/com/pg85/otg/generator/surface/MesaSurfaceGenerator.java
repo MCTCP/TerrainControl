@@ -1,6 +1,5 @@
 package com.pg85.otg.generator.surface;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -8,6 +7,7 @@ import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
 import com.pg85.otg.generator.noise.NoiseGeneratorBiomeBlocksOctaves;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -50,15 +50,15 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         this.isBryceMesa = mountainMesa;
         this.isForestMesa = forestMesa;
 
-        this.hardenedClay = OTG.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0);
-        this.redSand = OTG.toLocalMaterialData(DefaultMaterial.SAND, 1);
-        this.coarseDirt = OTG.toLocalMaterialData(DefaultMaterial.DIRT, 1);
-        this.whiteStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
-        this.orangeStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 1);
-        this.yellowStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 4);
-        this.brownStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 12);
-        this.redStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 14);
-        this.silverStainedClay = OTG.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 8);
+        this.hardenedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0);
+        this.redSand = MaterialHelper.toLocalMaterialData(DefaultMaterial.SAND, 1);
+        this.coarseDirt = MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 1);
+        this.whiteStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
+        this.orangeStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 1);
+        this.yellowStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 4);
+        this.brownStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 12);
+        this.redStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 14);
+        this.silverStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 8);
     }
 
     /**

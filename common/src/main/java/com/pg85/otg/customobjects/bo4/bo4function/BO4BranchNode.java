@@ -43,5 +43,5 @@ class BO4BranchNode extends BranchNode
 	protected String toBranchString()
     {
         return ',' + customObjectName + ',' + rotation.name() + ',' + chance + ',' + branchDepth;
-    }   
+    }
 }

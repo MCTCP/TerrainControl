@@ -12,7 +12,6 @@ import io.netty.buffer.ByteBufOutputStream;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.network.OTGPacket;
@@ -21,6 +20,7 @@ import com.pg85.otg.forge.pregenerator.Pregenerator;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 public class PregeneratorStatusPacket extends OTGPacket
 {
@@ -52,13 +52,13 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    
 	    for(Pregenerator pregenerator : pregenerators)
 	    {
-	    	ConfigFile.writeStringToStream(stream, pregenerator.pregenerationWorld);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.pregenerationWorld);
 	    	stream.writeBoolean(pregenerator.getPregeneratorIsRunning());
 	    	stream.writeInt(pregenerator.progressScreenWorldSizeInBlocks);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.preGeneratorProgress);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.preGeneratorProgressStatus);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.progressScreenElapsedTime);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.progressScreenEstimatedTime);	 
+	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgress);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgressStatus);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenElapsedTime);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenEstimatedTime);	 
 	    	
 	        long i = Runtime.getRuntime().maxMemory();
 	        long j = Runtime.getRuntime().totalMemory();
@@ -94,13 +94,13 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    			int listSize = message.getStream().readInt();
 	    			for(int i = 0; i < listSize; i++)
 	    			{		        	
-				    	String pregenerationWorld = ConfigFile.readStringFromStream(message.getStream());
+				    	String pregenerationWorld = StreamHelper.readStringFromStream(message.getStream());
 				    	Boolean pregeneratorIsRunning = message.getStream().readBoolean();
 				    	int progressScreenWorldSizeInBlocks = message.getStream().readInt();
-				    	String preGeneratorProgress = ConfigFile.readStringFromStream(message.getStream());
-				    	String preGeneratorProgressStatus = ConfigFile.readStringFromStream(message.getStream());
-				    	String progressScreenElapsedTime = ConfigFile.readStringFromStream(message.getStream());
-				    	String progressScreenEstimatedTime = ConfigFile.readStringFromStream(message.getStream());
+				    	String preGeneratorProgress = StreamHelper.readStringFromStream(message.getStream());
+				    	String preGeneratorProgressStatus = StreamHelper.readStringFromStream(message.getStream());
+				    	String progressScreenElapsedTime = StreamHelper.readStringFromStream(message.getStream());
+				    	String progressScreenEstimatedTime = StreamHelper.readStringFromStream(message.getStream());
 				    	
 				    	long mbUsed = message.getStream().readLong();
 				    	long mbTotal = message.getStream().readLong();

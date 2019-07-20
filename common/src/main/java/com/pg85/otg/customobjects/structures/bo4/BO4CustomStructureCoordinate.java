@@ -20,15 +20,13 @@ import java.util.Random;
  */
 public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 {
-	// OTG+
-
 	boolean isSpawned;
 	int branchDepth;
 	boolean isRequiredBranch;
 	boolean isWeightedBranch;
 	String branchGroup;
 	   
-    public BO4CustomStructureCoordinate(LocalWorld world, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, int y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
+    public BO4CustomStructureCoordinate(LocalWorld world, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
     {
     	this.worldName = world != null ? world.getName() : null;
 
@@ -176,7 +174,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     		rotatedZ = newZ;
     	}
 
-    	return new BO4CustomStructureCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, 0, false, false, null);
+    	return new BO4CustomStructureCoordinate(null, null, null, newRotation, rotatedX, (short)y, rotatedZ, 0, false, false, null);
     }
     
     public static BO4CustomStructureCoordinate getRotatedCoord(int x, int y, int z, Rotation newRotation)
@@ -201,7 +199,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     		rotatedZ = newZ;
     	}
 
-    	return new BO4CustomStructureCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, 0, false, false, null);
+    	return new BO4CustomStructureCoordinate(null, null, null, newRotation, rotatedX, (short)y, rotatedZ, 0, false, false, null);
     }    
     
     @Override
@@ -274,16 +272,16 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     		rotatedZ = newZ;
     	}
 
-    	return new BO4CustomStructureCoordinate(null, null, null, newRotation, rotatedX, y, rotatedZ, 0, false, false, null);
+    	return new BO4CustomStructureCoordinate(null, null, null, newRotation, rotatedX, (short)y, rotatedZ, 0, false, false, null);
     }
     
     // TODO: Why is this necessary for smoothing areas?
-    static BO4CustomStructureCoordinate getRotatedSmoothingCoords(int x, int y, int z, Rotation newRotation)
+    static BO4CustomStructureCoordinate getRotatedSmoothingCoords(int x, short y, int z, Rotation newRotation)
     {
         // Assuming initial rotation is always north
 
         int newX = 0;
-        int newY = 0;
+        short newY = 0;
         int newZ = 0;
         int rotations = 0;
 

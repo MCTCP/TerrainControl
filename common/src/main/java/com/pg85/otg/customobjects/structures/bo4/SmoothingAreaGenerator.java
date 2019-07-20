@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Map.Entry;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -20,84 +19,165 @@ import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
-class SmoothingAreaGenerator
+public class SmoothingAreaGenerator
 {   
-    private Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerDiagonalLineDestination = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
-    private Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerLineOrigin = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();    
-	
-    void CustomObjectStructureSpawn(Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn)
-	{
-		Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerDiagonalLineOrigin = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
-		SmoothingAreasToSpawnPerDiagonalLineDestination.clear();
-		SmoothingAreasToSpawnPerLineOrigin.clear();
-		Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawnPerLineDestination = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+    private Map<ChunkCoordinate, ArrayList<SmoothingAreaLineDiagonal>> smoothingAreasToSpawnPerDiagonalLineDestination = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLineDiagonal>>();
+    private Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawnPerLineOrigin = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();    
+    
+    private class SmoothingAreaBlock
+    {
+        public LocalMaterialData material;
+        public int x;
+        public short y;
+        public int z;
 
-		for(Entry<ChunkCoordinate, ArrayList<Object[]>> smoothingArea : SmoothingAreasToSpawn.entrySet())
+        public SmoothingAreaBlock() {}    
+    }
+    
+    private class BlockCoordsAndNeighbours
+    {
+        public BO4CustomStructureCoordinate bO3; // 0
+        public int blockX; // 1
+        public short blockY; // 2
+        public int blockZ; // 3
+        public boolean smoothInDirection1; // 4
+        public boolean smoothInDirection2; // 5
+        public boolean smoothInDirection3; // 6
+        public boolean smoothInDirection4; // 7
+        public int smoothRadius; // 8
+        public int smoothRadiusDiagonal; // 9
+        
+        public BlockCoordsAndNeighbours(BO4CustomStructureCoordinate bO3, int blockX, short blockY, int blockZ, boolean smoothInDirection1, boolean smoothInDirection2, boolean smoothInDirection3, boolean smoothInDirection4, int smoothRadius)
+        {
+        	this(bO3, blockX, blockY, blockZ, smoothInDirection1, smoothInDirection2, smoothInDirection3, smoothInDirection4, smoothRadius, 0);
+        }
+        
+        public BlockCoordsAndNeighbours(BO4CustomStructureCoordinate bO3, int blockX, short blockY, int blockZ, boolean smoothInDirection1, boolean smoothInDirection2, boolean smoothInDirection3, boolean smoothInDirection4, int smoothRadius, int smoothRadiusDiagonal)
+        {
+            this.bO3 = bO3;
+            this.blockX = blockX;
+            this.blockY = blockY;
+            this.blockZ = blockZ;
+            this.smoothInDirection1 = smoothInDirection1;
+            this.smoothInDirection2 = smoothInDirection2;
+            this.smoothInDirection3 = smoothInDirection3;
+            this.smoothInDirection4 = smoothInDirection4;
+            this.smoothRadius = smoothRadius;
+            this.smoothRadiusDiagonal = smoothRadiusDiagonal;
+        }
+    }
+    
+    // used for diagonal line child lines that make up corners
+    private class BlockCoordsAndNeighboursDiagonal extends BlockCoordsAndNeighbours // SmoothToBlock
+    {
+		public int originPointX; // 9
+    	public short originPointY; // 10
+    	public int originPointZ; // 11
+    	public int finalDestinationPointX; // 12
+    	public short finalDestinationPointY; // 13
+    	public int finalDestinationPointZ; // 14
+    	
+        public BlockCoordsAndNeighboursDiagonal(BO4CustomStructureCoordinate bO3, int blockX, short blockY, int blockZ, boolean smoothInDirection1, boolean smoothInDirection2, boolean smoothInDirection3, boolean smoothInDirection4, int smoothRadius, int originPointX, short originPointY, int originPointZ, int finalDestinationPointX, short finalDestinationPointY, int finalDestinationPointZ)
+        {
+        	super(bO3, blockX, blockY, blockZ, smoothInDirection1, smoothInDirection2, smoothInDirection3, smoothInDirection4, smoothRadius, 0);
+    		this.originPointX = originPointX;
+    		this.originPointY = originPointY;
+    		this.originPointZ = originPointZ;
+    		this.finalDestinationPointX = finalDestinationPointX;
+    		this.finalDestinationPointY = finalDestinationPointY;
+    		this.finalDestinationPointZ = finalDestinationPointZ;
+        }
+    }
+       
+    private class SmoothingAreaLineBlock
+    {
+    	SmoothingAreaBlock block; // 0
+    	boolean goingUp; // 1
+    	boolean goingDown; // 2
+    	boolean isPass2; // 3
+    	
+    	public SmoothingAreaLineBlock(SmoothingAreaBlock block, boolean goingUp, boolean goingDown, boolean isPass2)
+    	{
+        	this.block = block;
+        	this.goingUp = goingUp;
+        	this.goingDown = goingDown;
+        	this.isPass2 = isPass2;	
+    	}
+    }    
+    
+    void customObjectStructureSpawn(Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn)
+	{
+		Map<ChunkCoordinate, ArrayList<SmoothingAreaLineDiagonal>> smoothingAreasToSpawnPerDiagonalLineOrigin = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLineDiagonal>>();
+		this.smoothingAreasToSpawnPerDiagonalLineDestination.clear();
+		this.smoothingAreasToSpawnPerLineOrigin.clear();
+		Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawnPerLineDestination = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
+
+		for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingArea : smoothingAreasToSpawn.entrySet())
 		{
-			ArrayList<Object[]> smoothingAreaLines = smoothingArea.getValue();
-			for(Object[] smoothingAreaLine : smoothingAreaLines)
+			ArrayList<SmoothingAreaLine> smoothingAreaLines = smoothingArea.getValue();
+			for(SmoothingAreaLine smoothingAreaLine : smoothingAreaLines)
 			{
-    			int originPointX2 = (Integer)smoothingAreaLine[6];
-				int originPointZ2 = (Integer)smoothingAreaLine[8];
+    			int originPointX2 = smoothingAreaLine.originPointX;
+				int originPointZ2 = smoothingAreaLine.originPointZ;
 
 				ChunkCoordinate originChunk = ChunkCoordinate.fromBlockCoords(originPointX2, originPointZ2);
-            	ArrayList<Object[]> lineInOriginChunkSaved2 = SmoothingAreasToSpawnPerLineOrigin.get(originChunk);
+            	ArrayList<SmoothingAreaLine> lineInOriginChunkSaved2 = this.smoothingAreasToSpawnPerLineOrigin.get(originChunk);
             	if(lineInOriginChunkSaved2 == null)
             	{
-                	ArrayList<Object[]> smoothingAreaLines2 = new ArrayList<Object[]>();
+                	ArrayList<SmoothingAreaLine> smoothingAreaLines2 = new ArrayList<SmoothingAreaLine>();
                 	smoothingAreaLines2.add(smoothingAreaLine);
-                	SmoothingAreasToSpawnPerLineOrigin.put(ChunkCoordinate.fromChunkCoords(originPointX2, originPointZ2), smoothingAreaLines2);
+                	this.smoothingAreasToSpawnPerLineOrigin.put(ChunkCoordinate.fromChunkCoords(originPointX2, originPointZ2), smoothingAreaLines2);
                 } else {
                 	lineInOriginChunkSaved2.add(smoothingAreaLine);
                 }
 
-            	int finalDestinationPointX2 = (Integer)smoothingAreaLine[9];
-                int finalDestinationPointZ2 = (Integer)smoothingAreaLine[11];
+            	int finalDestinationPointX2 = smoothingAreaLine.finalDestinationPointX;
+                int finalDestinationPointZ2 = smoothingAreaLine.finalDestinationPointZ;
 
 				originChunk = ChunkCoordinate.fromBlockCoords(finalDestinationPointX2, finalDestinationPointZ2);
-            	ArrayList<Object[]> lineInOriginChunkSaved3 = SmoothingAreasToSpawnPerLineDestination.get(originChunk);
+            	ArrayList<SmoothingAreaLine> lineInOriginChunkSaved3 = smoothingAreasToSpawnPerLineDestination.get(originChunk);
             	if(lineInOriginChunkSaved3 == null)
             	{
-                	ArrayList<Object[]> smoothingAreaLines2 = new ArrayList<Object[]>();
+                	ArrayList<SmoothingAreaLine> smoothingAreaLines2 = new ArrayList<SmoothingAreaLine>();
                 	smoothingAreaLines2.add(smoothingAreaLine);
-                	SmoothingAreasToSpawnPerLineDestination.put(ChunkCoordinate.fromChunkCoords(finalDestinationPointX2, finalDestinationPointZ2), smoothingAreaLines2);
+                	smoothingAreasToSpawnPerLineDestination.put(ChunkCoordinate.fromChunkCoords(finalDestinationPointX2, finalDestinationPointZ2), smoothingAreaLines2);
                 } else {
                 	lineInOriginChunkSaved3.add(smoothingAreaLine);
                 }
 
-        		if(smoothingAreaLine.length > 17)
+        		if(smoothingAreaLine instanceof SmoothingAreaLineDiagonal)
         		{
-                	int diagonalLineFinalOriginPointX2 = (Integer)smoothingAreaLine[12];
-                    int diagonalLineFinalOriginPointZ2 = (Integer)smoothingAreaLine[14];
+                	int diagonalLineFinalOriginPointX2 = ((SmoothingAreaLineDiagonal)smoothingAreaLine).diagonalLineOriginPointX;
+                    int diagonalLineFinalOriginPointZ2 = ((SmoothingAreaLineDiagonal)smoothingAreaLine).diagonalLineOriginPointZ;
 
-                	int diagonalLineFinalDestinationPointX2 = (Integer)smoothingAreaLine[15];
-                    int diagonalLineFinalDestinationPointZ2 = (Integer)smoothingAreaLine[17];
+                	int diagonalLineFinalDestinationPointX2 = ((SmoothingAreaLineDiagonal)smoothingAreaLine).diagonalLineFinalDestinationPointX;
+                    int diagonalLineFinalDestinationPointZ2 = ((SmoothingAreaLineDiagonal)smoothingAreaLine).diagonalLineFinalDestinationPointZ;
 
                     originChunk = ChunkCoordinate.fromBlockCoords(diagonalLineFinalOriginPointX2, diagonalLineFinalOriginPointZ2);
-                    ArrayList<Object[]> lineInOriginChunkSaved4 = SmoothingAreasToSpawnPerDiagonalLineOrigin.get(originChunk);
+                    ArrayList<SmoothingAreaLineDiagonal> lineInOriginChunkSaved4 = smoothingAreasToSpawnPerDiagonalLineOrigin.get(originChunk);
                     if(lineInOriginChunkSaved4 == null)
                     {
-                    	ArrayList<Object[]> smoothingAreaLines2 = new ArrayList<Object[]>();
-                    	smoothingAreaLines2.add(smoothingAreaLine);
-                    	SmoothingAreasToSpawnPerDiagonalLineOrigin.put(ChunkCoordinate.fromChunkCoords(diagonalLineFinalOriginPointX2, diagonalLineFinalOriginPointZ2), smoothingAreaLines2);
+                    	ArrayList<SmoothingAreaLineDiagonal> smoothingAreaLines2 = new ArrayList<SmoothingAreaLineDiagonal>();
+                    	smoothingAreaLines2.add((SmoothingAreaLineDiagonal)smoothingAreaLine);
+                    	smoothingAreasToSpawnPerDiagonalLineOrigin.put(ChunkCoordinate.fromChunkCoords(diagonalLineFinalOriginPointX2, diagonalLineFinalOriginPointZ2), smoothingAreaLines2);
                     } else {
-                    	lineInOriginChunkSaved4.add(smoothingAreaLine);
+                    	lineInOriginChunkSaved4.add((SmoothingAreaLineDiagonal)smoothingAreaLine);
                     }
 
                     originChunk = ChunkCoordinate.fromBlockCoords(diagonalLineFinalDestinationPointX2, diagonalLineFinalDestinationPointZ2);
-                    ArrayList<Object[]> lineInOriginChunkSaved = SmoothingAreasToSpawnPerDiagonalLineDestination.get(originChunk);
+                    ArrayList<SmoothingAreaLineDiagonal> lineInOriginChunkSaved = this.smoothingAreasToSpawnPerDiagonalLineDestination.get(originChunk);
                     if(lineInOriginChunkSaved == null)
                     {
-                    	ArrayList<Object[]> smoothingAreaLines2 = new ArrayList<Object[]>();
-                    	smoothingAreaLines2.add(smoothingAreaLine);
-                    	SmoothingAreasToSpawnPerDiagonalLineDestination.put(ChunkCoordinate.fromChunkCoords(diagonalLineFinalDestinationPointX2, diagonalLineFinalDestinationPointZ2), smoothingAreaLines2);
+                    	ArrayList<SmoothingAreaLineDiagonal> smoothingAreaLines2 = new ArrayList<SmoothingAreaLineDiagonal>();
+                    	smoothingAreaLines2.add((SmoothingAreaLineDiagonal)smoothingAreaLine);
+                    	this.smoothingAreasToSpawnPerDiagonalLineDestination.put(ChunkCoordinate.fromChunkCoords(diagonalLineFinalDestinationPointX2, diagonalLineFinalDestinationPointZ2), smoothingAreaLines2);
                     } else {
-                    	lineInOriginChunkSaved.add(smoothingAreaLine);
+                    	lineInOriginChunkSaved.add((SmoothingAreaLineDiagonal)smoothingAreaLine);
                     }
             	}
 			}
@@ -113,19 +193,18 @@ class SmoothingAreaGenerator
      * and we'll be able to detect the highest solid block in the landscape that we'll need to smooth to) and the lines of blocks we've plotted are spawned, creating a nice
      * linear slope from the highest solid block in the landscape to the lowest block in the BO3 (the block we started at when drawing the line).
     */
-	Map<ChunkCoordinate, ArrayList<Object[]>> calculateSmoothingAreas(Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> ObjectsToSpawn, BO4CustomStructureCoordinate Start, LocalWorld World)
+	Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> calculateSmoothingAreas(Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate start, LocalWorld world)
     {
         // TODO: Don't check neighbouring BO3's with SmoothRadius -1
 
         // Get all solid blocks on the lowest layer of this BO3 that border an air block or have no neighbouring blocks
         // This may include blocks on the border of this BO3 that are supposed to seamlessly border another BO3, remove those later since they shouldnt be smoothed
-        Map<ChunkCoordinate, ArrayList<Object[]>> smoothToBlocksPerChunk = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+        Map<ChunkCoordinate, ArrayList<BlockCoordsAndNeighbours>> smoothToBlocksPerChunk = new HashMap<ChunkCoordinate, ArrayList<BlockCoordsAndNeighbours>>();
 
         // Declare these here instead of inside for loops to help the GC (good for memory usage)
         // TODO: Find out if this actually makes any noticeable difference, it doesn't exactly
         // make the code any easier to read..
-        // Object[] { bO3, blockX, blockY, blockZ, smoothInDirection1, smoothInDirection2, smoothInDirection3, smoothInDirection4, smoothRadius }
-        ArrayList<Object[]> smoothToBlocks;
+        ArrayList<BlockCoordsAndNeighbours> smoothToBlocks;
         ChunkCoordinate chunkCoord;
         Stack<BO4CustomStructureCoordinate> bO3sInChunk;
         boolean bFoundNeighbour1;
@@ -145,11 +224,11 @@ class SmoothingAreaGenerator
         int normalizedBlockToCheckZ;
 
         // Get all BO3's that are a part of this branching structure
-        for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : ObjectsToSpawn.entrySet())
+        for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : objectsToSpawn.entrySet())
         {
             chunkCoord = chunkCoordSet.getKey();
             bO3sInChunk = chunkCoordSet.getValue();
-            smoothToBlocks = new ArrayList<Object[]>();
+            smoothToBlocks = new ArrayList<BlockCoordsAndNeighbours>();
 
             for(BO4CustomStructureCoordinate objectInChunk : bO3sInChunk)
             {
@@ -159,17 +238,17 @@ class SmoothingAreaGenerator
             	}
 
             	BO4 bO3InChunk = ((BO4)objectInChunk.getObject());
-            	boolean SmoothStartTop = ((BO4)Start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)Start.getObject()).getSettings().smoothStartTop : bO3InChunk.getSettings().smoothStartTop;
+            	boolean SmoothStartTop = ((BO4)start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)start.getObject()).getSettings().smoothStartTop : bO3InChunk.getSettings().smoothStartTop;
 
                 //if((((BO4)Start.getObject(World.getName())).settings.overrideChildSettings && ((BO4)bO3InChunk.getObject(World.getName())).settings.overrideChildSettings && ((BO4)bO3InChunk.getObject(World.getName())).settings.smoothRadius != -1 ? ((BO4)Start.getObject(World.getName())).settings.smoothRadius : ((BO4)bO3InChunk.getObject(World.getName())).settings.smoothRadius) > 0)
-                int smoothRadius = ((BO4)Start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)Start.getObject()).getSettings().smoothRadius : bO3InChunk.getSettings().smoothRadius;
+                int smoothRadius = ((BO4)start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)start.getObject()).getSettings().smoothRadius : bO3InChunk.getSettings().smoothRadius;
                 if(smoothRadius == -1 || bO3InChunk.getSettings().smoothRadius == -1)
                 {
                 	smoothRadius = 0;
                 }
                 if(smoothRadius > 0)
                 {
-        			Map<ChunkCoordinate, BO4BlockFunction> heightMap = bO3InChunk.getSettings().getHeightMap((BO4)Start.getObject());
+        			Map<ChunkCoordinate, BO4BlockFunction> heightMap = bO3InChunk.getSettings().getHeightMap((BO4)start.getObject());
 
                     // if !SmoothStartTop then for each BO3 that has a smoothradius > 0 get the lowest layer of blocks and determine smooth area starting points
                 	// if SmoothStartTop then for each BO3 that has a smoothradius > 0 get the highest blocks of the BO3 and determine smooth area starting points
@@ -223,7 +302,7 @@ class SmoothingAreaGenerator
                                     // Get the chunk that the neighbouring block is in
                                     neighbouringBlockChunk = null;
                                     searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : ObjectsToSpawn.keySet())
+                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
                                     {
                                         // Find the chunk that contains the coordinates were looking for
                                         if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
@@ -235,7 +314,7 @@ class SmoothingAreaGenerator
                                     if(neighbouringBlockChunk != null)
                                     {
                                         // Found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = ObjectsToSpawn.get(neighbouringBlockChunk);
+                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
                                         if(bO3sInNeighbouringBlockChunk != null)
                                         {
                                             for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
@@ -243,7 +322,7 @@ class SmoothingAreaGenerator
                                                 if(bO3ToCheck != objectInChunk)
                                                 {
                                                     // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)Start.getObject());
+                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
 
                                                 	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
                                                     {
@@ -257,7 +336,7 @@ class SmoothingAreaGenerator
                                                         if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
                                                         {
                                                             // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, Start))
+                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
                                                             {
                                                             	bFoundNeighbour1 = true;
                                                                 break;
@@ -285,7 +364,7 @@ class SmoothingAreaGenerator
                                     // Get the chunk that the neighbouring block is in
                                     neighbouringBlockChunk = null;
                                     searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : ObjectsToSpawn.keySet())
+                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
                                     {
                                         // Find the chunk that contains the coordinates being looked for
                                         if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
@@ -297,7 +376,7 @@ class SmoothingAreaGenerator
                                     if(neighbouringBlockChunk != null)
                                     {
                                         //found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = ObjectsToSpawn.get(neighbouringBlockChunk);
+                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
                                         if(bO3sInNeighbouringBlockChunk != null)
                                         {
                                             for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
@@ -305,7 +384,7 @@ class SmoothingAreaGenerator
                                                 if(bO3ToCheck != objectInChunk)
                                                 {
                                                     // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)Start.getObject());
+                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
 
                                                 	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
                                                 	{
@@ -319,7 +398,7 @@ class SmoothingAreaGenerator
                                                         if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
                                                         {
                                                             // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, Start))
+                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
                                                             {
                                                                 bFoundNeighbour2 = true;
                                                                 break;
@@ -347,7 +426,7 @@ class SmoothingAreaGenerator
                                     // Get the chunk that the neighbouring block is in
                                     neighbouringBlockChunk = null;
                                     searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : ObjectsToSpawn.keySet())
+                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
                                     {
                                         // Find the chunk that contains the coordinates being looked for
                                         if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
@@ -359,7 +438,7 @@ class SmoothingAreaGenerator
                                     if(neighbouringBlockChunk != null)
                                     {
                                         //found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = ObjectsToSpawn.get(neighbouringBlockChunk);
+                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
                                         if(bO3sInNeighbouringBlockChunk != null)
                                         {
                                             for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
@@ -367,13 +446,13 @@ class SmoothingAreaGenerator
                                                 if(bO3ToCheck != objectInChunk)
                                                 {
                                                     // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)Start.getObject());
+                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
 
                                                 	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
                                                     {
                                                 		BO4BlockFunction blockToCheck = blockToCheckEntry.getValue();
 
-                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
+                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, (short)blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
                                                         normalizedBlockToCheckX = blockToCheckCoords.getX() + (bO3ToCheck.getX());
                                                         normalizedBlockToCheckY = blockToCheckCoords.getY() + bO3ToCheck.getY();
                                                         normalizedBlockToCheckZ = blockToCheckCoords.getZ() + (bO3ToCheck.getZ());
@@ -381,7 +460,7 @@ class SmoothingAreaGenerator
                                                         if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
                                                         {
                                                             // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, Start))
+                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
                                                             {
                                                             	bFoundNeighbour3 = true;
                                                                 break;
@@ -401,7 +480,7 @@ class SmoothingAreaGenerator
                                 {
                                     // Check if the BO3 contains a block at the location of the neighbouring block
                                     // Normalize the coordinates of the neighbouring block taking into consideration rotation
-                                    neighbouringBlockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x, block.y, block.z + 1, objectInChunk.getRotation());
+                                    neighbouringBlockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x, (short)block.y, block.z + 1, objectInChunk.getRotation());
                                     normalizedNeigbouringBlockX = neighbouringBlockCoords.getX() + (objectInChunk.getX());
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
@@ -409,7 +488,7 @@ class SmoothingAreaGenerator
                                     // Get the chunk that the neighbouring block is in
                                     neighbouringBlockChunk = null;
                                     searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : ObjectsToSpawn.keySet())
+                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
                                     {
                                         // Find the chunk that contains the coordinates being looked for
                                         if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
@@ -421,7 +500,7 @@ class SmoothingAreaGenerator
                                     if(neighbouringBlockChunk != null)
                                     {
                                         //found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = ObjectsToSpawn.get(neighbouringBlockChunk);
+                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
                                         if(bO3sInNeighbouringBlockChunk != null)
                                         {
                                             for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
@@ -429,13 +508,13 @@ class SmoothingAreaGenerator
                                                 if(bO3ToCheck != objectInChunk)
                                                 {
                                                     // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)Start.getObject());
+                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
 
                                                 	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
                                                     {
                                                 		BO4BlockFunction blockToCheck = blockToCheckEntry.getValue();
 
-                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
+                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, (short)blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
                                                         normalizedBlockToCheckX = blockToCheckCoords.getX() + (bO3ToCheck.getX());
                                                         normalizedBlockToCheckY = blockToCheckCoords.getY() + bO3ToCheck.getY();
                                                         normalizedBlockToCheckZ = blockToCheckCoords.getZ() + (bO3ToCheck.getZ());
@@ -443,7 +522,7 @@ class SmoothingAreaGenerator
                                                         if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
                                                         {
                                                             // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, Start))
+                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
                                                             {
                                                                 bFoundNeighbour4 = true;
                                                                 break;
@@ -465,12 +544,11 @@ class SmoothingAreaGenerator
                                 {
                                     // The first block of the smoothing area is placed at a 1 block offset in the direction of the smoothing area so that it is not directly underneath or above the origin block
                                     // for outside corner blocks (blocks with no neighbouring block on 2 adjacent sides) that means they will be placed at x AND z offsets of plus or minus one.
-                                    // smoothToBlocks is filled with Object[] { bO3, blockX, blockY, blockZ, smoothInDirection1, smoothInDirection2, smoothInDirection3, smoothInDirection4, smoothRadius }
                                     int xOffset = 0;
                                     int yOffset = 0;
                                     int zOffset = 0;
 
-                            		int smoothHeightOffset = ((BO4)Start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)Start.getObject()).getSettings().smoothHeightOffset : bO3InChunk.getSettings().smoothHeightOffset;
+                            		int smoothHeightOffset = ((BO4)start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)start.getObject()).getSettings().smoothHeightOffset : bO3InChunk.getSettings().smoothHeightOffset;
                                 	yOffset += smoothHeightOffset;
 
                                     // Shorten diagonal line to make circle x = sin(smoothradius)
@@ -485,8 +563,8 @@ class SmoothingAreaGenerator
                                     //test = true;
 
                                     // Circle / round corners
-                                    int smoothRadius1 = bO3InChunk.getSettings().smoothRadius == -1 ? 0 : (((BO4)Start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)Start.getObject()).getSettings().smoothRadius : bO3InChunk.getSettings().smoothRadius) - 1;
-                                    int smoothRadius2 = bO3InChunk.getSettings().smoothRadius == -1 ? 0 : (int)Math.ceil(((((BO4)Start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)Start.getObject()).getSettings().smoothRadius : bO3InChunk.getSettings().smoothRadius) - 1) * Math.sin(0.7853981634));
+                                    int smoothRadius1 = bO3InChunk.getSettings().smoothRadius == -1 ? 0 : (((BO4)start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)start.getObject()).getSettings().smoothRadius : bO3InChunk.getSettings().smoothRadius) - 1;
+                                    int smoothRadius2 = bO3InChunk.getSettings().smoothRadius == -1 ? 0 : (int)Math.ceil(((((BO4)start.getObject()).getSettings().overrideChildSettings && bO3InChunk.getSettings().overrideChildSettings ? ((BO4)start.getObject()).getSettings().smoothRadius : bO3InChunk.getSettings().smoothRadius) - 1) * Math.sin(0.7853981634));
 
                                     // Square / square corners
                                     //int smoothRadius1 = ((BO4)bO3InChunk.getObject(World.getName())).settings.smoothRadius - 1;
@@ -498,75 +576,75 @@ class SmoothingAreaGenerator
                                     if(!bFoundNeighbour1)
                                     {
                                         xOffset = -1;
-                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset1, objectInChunk.getRotation());
+                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, (short)(block.y + yOffset), block.z + zOffset1, objectInChunk.getRotation());
 
-                                        Object[] smoothDirections = rotateSmoothDirections(true, false, false, false, objectInChunk.getRotation());
-
-                                        smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
+                                        Object[] smoothDirections = rotateSmoothDirections(true, false, false, false, objectInChunk.getRotation());                                       
+                                        
+                                        smoothToBlocks.add(new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1));                                       
 
                                         if(!bFoundNeighbour3)
                                         {
                                             zOffset = -1;
-                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
+                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, (short)(block.y + yOffset), block.z + zOffset + zOffset1, objectInChunk.getRotation());
                                             smoothDirections = rotateSmoothDirections(true, false, true, false, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0,smoothRadius2 });
-                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1,smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2), world);
                                         }
                                         if(!bFoundNeighbour4)
                                         {
                                             zOffset = 1;
-                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
+                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, (short)(block.y + yOffset), block.z + zOffset + zOffset1, objectInChunk.getRotation());
                                             smoothDirections = rotateSmoothDirections(true, false, false, true, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0,smoothRadius2 });
-                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1,smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1,smoothRadius2), world);
                                         }
                                     }
 
                                     if(!bFoundNeighbour2)
                                     {
                                         xOffset = 1;
-                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset1, objectInChunk.getRotation());
+                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, (short)(block.y + yOffset), block.z + zOffset1, objectInChunk.getRotation());
                                         Object[] smoothDirections = rotateSmoothDirections(false, true, false, false, objectInChunk.getRotation());
 
-                                        smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
+                                        smoothToBlocks.add(new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1));
 
                                         if(!bFoundNeighbour3)
                                         {
                                             zOffset = -1;
-                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
+                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, (short)(block.y + yOffset), block.z + zOffset + zOffset1, objectInChunk.getRotation());
                                             smoothDirections = rotateSmoothDirections(false, true, true, false, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0, smoothRadius2 });
-                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2), world);
                                         }
                                         if(!bFoundNeighbour4)
                                         {
                                             zOffset = 1;
-                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
+                                            blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset + xOffset1, (short)(block.y + yOffset), block.z + zOffset + zOffset1, objectInChunk.getRotation());
                                             smoothDirections = rotateSmoothDirections(false, true, false, true, objectInChunk.getRotation());
 
                                             //PlotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ bO3InChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], 0, smoothRadius2 });
-                                            plotDiagonalLine(smoothToBlocksPerChunk, new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2 }, World);
+                                            plotDiagonalLine(smoothToBlocksPerChunk, new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1, smoothRadius2), world);
                                         }
                                     }
 
                                     if(!bFoundNeighbour3)
                                     {
                                         zOffset = -1;
-                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
+                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset1, (short)(block.y + yOffset), block.z + zOffset + zOffset1, objectInChunk.getRotation());
                                         Object[] smoothDirections = rotateSmoothDirections(false, false, true, false, objectInChunk.getRotation());
 
-                                        smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
+                                        smoothToBlocks.add(new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1));
                                     }
                                     if(!bFoundNeighbour4)
                                     {
                                         zOffset = 1;
-                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset1, block.y + yOffset, block.z + zOffset + zOffset1, objectInChunk.getRotation());
+                                        CustomStructureCoordinate blockCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(block.x + xOffset1, (short)(block.y + yOffset), block.z + zOffset + zOffset1, objectInChunk.getRotation());
                                         Object[] smoothDirections = rotateSmoothDirections(false, false, false, true, objectInChunk.getRotation());
 
-                                        smoothToBlocks.add(new Object[]{ objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1 });
+                                        smoothToBlocks.add(new BlockCoordsAndNeighbours(objectInChunk, blockCoords.getX(), blockCoords.getY(), blockCoords.getZ(), (Boolean)smoothDirections[0], (Boolean)smoothDirections[1], (Boolean)smoothDirections[2], (Boolean)smoothDirections[3], smoothRadius1));
                                     }
                                 }
                 			}
@@ -609,7 +687,7 @@ class SmoothingAreaGenerator
 		}
     }
 
-    private boolean isMaterialSmoothingAnchor(BO4BlockFunction blockToCheck, CustomStructureCoordinate bO3ToCheck, CustomStructureCoordinate Start)
+    private boolean isMaterialSmoothingAnchor(BO4BlockFunction blockToCheck, CustomStructureCoordinate bO3ToCheck, CustomStructureCoordinate start)
     {
 		boolean isSmoothAreaAnchor = false;
 		if(blockToCheck instanceof BO4RandomBlockFunction)
@@ -621,7 +699,7 @@ class SmoothingAreaGenerator
 				{
 					continue;
 				}
-				if(material.isSmoothAreaAnchor(((BO4)Start.getObject()).getSettings().overrideChildSettings && ((BO4)bO3ToCheck.getObject()).getSettings().overrideChildSettings ? ((BO4)Start.getObject()).getSettings().smoothStartWood : ((BO4)bO3ToCheck.getObject()).getSettings().smoothStartWood, ((BO4)Start.getObject()).getSettings().spawnUnderWater))
+				if(material.isSmoothAreaAnchor(((BO4)start.getObject()).getSettings().overrideChildSettings && ((BO4)bO3ToCheck.getObject()).getSettings().overrideChildSettings ? ((BO4)start.getObject()).getSettings().smoothStartWood : ((BO4)bO3ToCheck.getObject()).getSettings().smoothStartWood, ((BO4)start.getObject()).getSettings().spawnUnderWater))
 				{
 					isSmoothAreaAnchor = true;
 					break;
@@ -632,45 +710,45 @@ class SmoothingAreaGenerator
         // Neighbouring block found
     	if(
 			isSmoothAreaAnchor ||
-			(!(blockToCheck instanceof BO4RandomBlockFunction) && blockToCheck.material.isSmoothAreaAnchor(((BO4)Start.getObject()).getSettings().overrideChildSettings && ((BO4)bO3ToCheck.getObject()).getSettings().overrideChildSettings ? ((BO4)Start.getObject()).getSettings().smoothStartWood : ((BO4)bO3ToCheck.getObject()).getSettings().smoothStartWood, ((BO4)Start.getObject()).getSettings().spawnUnderWater))
+			(!(blockToCheck instanceof BO4RandomBlockFunction) && blockToCheck.material.isSmoothAreaAnchor(((BO4)start.getObject()).getSettings().overrideChildSettings && ((BO4)bO3ToCheck.getObject()).getSettings().overrideChildSettings ? ((BO4)start.getObject()).getSettings().smoothStartWood : ((BO4)bO3ToCheck.getObject()).getSettings().smoothStartWood, ((BO4)start.getObject()).getSettings().spawnUnderWater))
 		)
     	{
     		return true;
     	}
     	return false;
     }
-
-    private void plotDiagonalLine(Map<ChunkCoordinate, ArrayList<Object[]>> smoothToBlocksPerChunk, Object[] blockCoordsAndNeighbours, LocalWorld World)
+    
+    private void plotDiagonalLine(Map<ChunkCoordinate, ArrayList<BlockCoordsAndNeighbours>> smoothToBlocksPerChunk, BlockCoordsAndNeighbours blockCoordsAndNeighbours, LocalWorld world)
     {
-        Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+        Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
 
         // Declare these here instead of inside for loops to help the GC (good for memory usage)
         // TODO: Find out if this actually makes any noticeable difference, it doesn't exactly
         // make the code any easier to read..
 
         int normalizedSmoothFinalEndPointBlockX1;
-        int normalizedSmoothFinalEndPointBlockY1 = -1;
+        short normalizedSmoothFinalEndPointBlockY1 = -1;
         int normalizedSmoothFinalEndPointBlockZ1;
         int normalizedSmoothEndPointBlockX;
         int normalizedSmoothEndPointBlockZ;
         ChunkCoordinate destinationChunk;
         int beginPointX;
-        int beginPointY;
+        short beginPointY;
         int beginPointZ;
-        ArrayList<Object[]> beginningAndEndpoints;
+        ArrayList<SmoothingAreaLine> beginningAndEndpoints;
         ChunkCoordinate chunkcontainingSmoothArea;
-        ArrayList<Object[]> beginAndEndPoints;
+        ArrayList<SmoothingAreaLine> beginAndEndPoints;
 
-        CustomStructureCoordinate bO3 = (BO4CustomStructureCoordinate)blockCoordsAndNeighbours[0];
-        int blockX = (Integer)blockCoordsAndNeighbours[1];
-        int blockY = (Integer)blockCoordsAndNeighbours[2];
-        int blockZ = (Integer)blockCoordsAndNeighbours[3];
-        boolean smoothInDirection1 = (Boolean)blockCoordsAndNeighbours[4];
-        boolean smoothInDirection2 = (Boolean)blockCoordsAndNeighbours[5];
-        boolean smoothInDirection3 = (Boolean)blockCoordsAndNeighbours[6];
-        boolean smoothInDirection4 = (Boolean)blockCoordsAndNeighbours[7];
-        int smoothRadius = (Integer)blockCoordsAndNeighbours[8];
-       	int smoothRadiusDiagonal = (Integer)blockCoordsAndNeighbours[9];
+        BO4CustomStructureCoordinate bO3 = blockCoordsAndNeighbours.bO3;
+        int blockX = blockCoordsAndNeighbours.blockX;
+        short blockY = blockCoordsAndNeighbours.blockY;
+        int blockZ = blockCoordsAndNeighbours.blockZ;
+        boolean smoothInDirection1 = blockCoordsAndNeighbours.smoothInDirection1;
+        boolean smoothInDirection2 = blockCoordsAndNeighbours.smoothInDirection2;
+        boolean smoothInDirection3 = blockCoordsAndNeighbours.smoothInDirection3;
+        boolean smoothInDirection4 = blockCoordsAndNeighbours.smoothInDirection4;
+        int smoothRadius = blockCoordsAndNeighbours.smoothRadius;
+       	int smoothRadiusDiagonal = blockCoordsAndNeighbours.smoothRadiusDiagonal;
 
         // Find smooth end point and normalize coord
         // Add each chunk between the smooth-beginning and end points to a list along with the line-segment information (startcoords in chunk, endcoords in chunk, originCoords, finaldestinationCoords)
@@ -688,7 +766,7 @@ class SmoothingAreaGenerator
             // normalizedSmoothFinalEndPointBlockY1 will be detected later while spawning smooth areas
 
             beginPointX = blockX + bO3.getX();
-            beginPointY = blockY + bO3.getY();
+            beginPointY = (short) (blockY + bO3.getY());
             beginPointZ = blockZ + bO3.getZ();
 
             // First get all chunks between the beginning- and end-points
@@ -703,17 +781,17 @@ class SmoothingAreaGenerator
             	// only store the line once it's traversed an entire chunk or is at smoothRadiusDiagonal
             	if(!destinationChunk.equals(nextBlocksChunkCoord) || i == smoothRadiusDiagonal)
             	{
-                    beginningAndEndpoints = new ArrayList<Object[]> ();
-                    beginningAndEndpoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                    beginningAndEndpoints = new ArrayList<SmoothingAreaLine>();
+                    beginningAndEndpoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
 
                     // Check if there are already start and endpoints for this chunk
-                    for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                    for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                     {
                         chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                         if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
                         {
                             beginAndEndPoints = chunkcontainingSmoothAreaSet.getValue();
-                            beginAndEndPoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                            beginAndEndPoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
                             break;
                         }
                     }
@@ -732,7 +810,7 @@ class SmoothingAreaGenerator
             // normalizedSmoothFinalEndPointBlockY1 will be detected later while spawning smooth areas
 
             beginPointX = blockX + bO3.getX();
-            beginPointY = blockY + bO3.getY();
+            beginPointY = (short) (blockY + bO3.getY());
             beginPointZ = blockZ + bO3.getZ();
 
             // First get all chunks between the beginning- and end-points
@@ -747,17 +825,17 @@ class SmoothingAreaGenerator
             	// only store the line once it's traversed an entire chunk or is at smoothRadiusDiagonal
             	if(!destinationChunk.equals(nextBlocksChunkCoord) || i == smoothRadiusDiagonal)
             	{
-                    beginningAndEndpoints = new ArrayList<Object[]> ();
-                    beginningAndEndpoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                    beginningAndEndpoints = new ArrayList<SmoothingAreaLine>();
+                    beginningAndEndpoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
 
                     // Check if there are already start and endpoints for this chunk
-                    for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                    for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                     {
                         chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                         if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
                         {
                             beginAndEndPoints = chunkcontainingSmoothAreaSet.getValue();
-                            beginAndEndPoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                            beginAndEndPoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
                             break;
                         }
                     }
@@ -776,7 +854,7 @@ class SmoothingAreaGenerator
             // normalizedSmoothFinalEndPointBlockY1 will be detected later while spawning smooth areas
 
             beginPointX = blockX + bO3.getX();
-            beginPointY = blockY + bO3.getY();
+            beginPointY = (short) (blockY + bO3.getY());
             beginPointZ = blockZ + bO3.getZ();
 
             // First get all chunks between the beginning- and end-points
@@ -791,17 +869,17 @@ class SmoothingAreaGenerator
             	// only store the line once it's traversed an entire chunk or is at smoothRadiusDiagonal
             	if(!destinationChunk.equals(nextBlocksChunkCoord) || i == smoothRadiusDiagonal)
             	{
-                    beginningAndEndpoints = new ArrayList<Object[]> ();
-                    beginningAndEndpoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                    beginningAndEndpoints = new ArrayList<SmoothingAreaLine>();
+                    beginningAndEndpoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
 
                     // Check if there are already start and endpoints for this chunk
-                    for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                    for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                     {
                         chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                         if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
                         {
                             beginAndEndPoints = chunkcontainingSmoothAreaSet.getValue();
-                            beginAndEndPoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                            beginAndEndPoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
                             break;
                         }
                     }
@@ -820,7 +898,7 @@ class SmoothingAreaGenerator
             // normalizedSmoothFinalEndPointBlockY1 will be detected later while spawning smooth areas
 
             beginPointX = blockX + bO3.getX();
-            beginPointY = blockY + bO3.getY();
+            beginPointY = (short) (blockY + bO3.getY());
             beginPointZ = blockZ + bO3.getZ();
 
             // First get all chunks between the beginning- and end-points
@@ -835,17 +913,17 @@ class SmoothingAreaGenerator
             	// only store the line once it's traversed an entire chunk or is at smoothRadiusDiagonal
             	if(!destinationChunk.equals(nextBlocksChunkCoord) || i == smoothRadiusDiagonal)
             	{
-                    beginningAndEndpoints = new ArrayList<Object[]> ();
-                    beginningAndEndpoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                    beginningAndEndpoints = new ArrayList<SmoothingAreaLine>();
+                    beginningAndEndpoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
 
                     // Check if there are already start and endpoints for this chunk
-                    for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                    for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                     {
                         chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                         if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
                         {
                             beginAndEndPoints = chunkcontainingSmoothAreaSet.getValue();
-                            beginAndEndPoints.add(new Object[] { beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 });
+                            beginAndEndPoints.add(new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, normalizedSmoothEndPointBlockX, beginPointY, normalizedSmoothEndPointBlockZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1));
                             break;
                         }
                     }
@@ -864,43 +942,43 @@ class SmoothingAreaGenerator
         // TODO: Find out if this actually makes any noticeable difference, it doesnt exactly
         // make the code any easier to read..
         int distanceFromStart;
-        BO4BlockFunction beginPoint;
+        SmoothingAreaBlock beginPoint;
         int originPointX;
-        int originPointY;
+        short originPointY;
         int originPointZ;
         int finalDestinationPointX;
-        int finalDestinationPointY;
+        short finalDestinationPointY;
         int finalDestinationPointZ;
-        BO4BlockFunction endPoint;
-        BO4BlockFunction filler;
-        ArrayList<Object[]> smoothToBlocks;
+        SmoothingAreaBlock endPoint;
+        SmoothingAreaBlock filler;
+        ArrayList<BlockCoordsAndNeighbours> smoothToBlocks;
 
         int diagonalBlockSmoothRadius = 0;
         int diagonalBlockSmoothRadius2 = 0;
 
-        for(Entry<ChunkCoordinate, ArrayList<Object[]>> smoothingAreaInChunk : smoothingAreasToSpawn.entrySet())
+        for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaInChunk : smoothingAreasToSpawn.entrySet())
         {
-	        for(Object[] smoothingBeginAndEndPoints : smoothingAreaInChunk.getValue())
+	        for(SmoothingAreaLine smoothingBeginAndEndPoints : smoothingAreaInChunk.getValue())
 	        {
 	            distanceFromStart = 0;
 
-	            beginPoint = new BO4BlockFunction();
-	            beginPoint.x = (Integer)smoothingBeginAndEndPoints[0];
-	            beginPoint.y = (Integer)smoothingBeginAndEndPoints[1];
-	            beginPoint.z = (Integer)smoothingBeginAndEndPoints[2];
+	            beginPoint = new SmoothingAreaBlock();
+	            beginPoint.x = smoothingBeginAndEndPoints.beginPointX;
+	            beginPoint.y = smoothingBeginAndEndPoints.beginPointY;
+	            beginPoint.z = smoothingBeginAndEndPoints.beginPointZ;
 
-                endPoint = new BO4BlockFunction();
-                endPoint.x = (Integer)smoothingBeginAndEndPoints[3];
-                endPoint.y = (Integer)smoothingBeginAndEndPoints[4];
-                endPoint.z = (Integer)smoothingBeginAndEndPoints[5];
+                endPoint = new SmoothingAreaBlock();
+                endPoint.x = smoothingBeginAndEndPoints.endPointX;
+                endPoint.y = smoothingBeginAndEndPoints.endPointY;
+                endPoint.z = smoothingBeginAndEndPoints.endPointZ;
 
-	            originPointX = (Integer)smoothingBeginAndEndPoints[6];
-	            originPointY = (Integer)smoothingBeginAndEndPoints[7];
-	            originPointZ = (Integer)smoothingBeginAndEndPoints[8];
+	            originPointX = smoothingBeginAndEndPoints.originPointX;
+	            originPointY = smoothingBeginAndEndPoints.originPointY;
+	            originPointZ = smoothingBeginAndEndPoints.originPointZ;
 
-	            finalDestinationPointX = (Integer)smoothingBeginAndEndPoints[9];
-	            finalDestinationPointY = (Integer)smoothingBeginAndEndPoints[10];
-	            finalDestinationPointZ = (Integer)smoothingBeginAndEndPoints[11];
+	            finalDestinationPointX = smoothingBeginAndEndPoints.finalDestinationPointX;
+	            finalDestinationPointY = smoothingBeginAndEndPoints.finalDestinationPointY;
+	            finalDestinationPointZ = smoothingBeginAndEndPoints.finalDestinationPointZ;
 
                 diagonalBlockSmoothRadius = smoothRadius;
 
@@ -910,7 +988,7 @@ class SmoothingAreaGenerator
 	        	// its own child blocks seperately in x and y directions which creates the shape of the corner
 	            for(int i = 0; i <= Math.abs((beginPoint.z) - (endPoint.z)); i++)
 	            {
-	                filler = new BO4BlockFunction();
+	                filler = new SmoothingAreaBlock();
 	                if(smoothInDirection2)
 	                {
 	                    filler.x = beginPoint.x + i;
@@ -929,8 +1007,8 @@ class SmoothingAreaGenerator
 	                }
 	                filler.y = beginPoint.y;
 
-	                smoothToBlocks = new ArrayList<Object[]>();
-	                bO3 = new BO4CustomStructureCoordinate(World, null, null, null, 0, 0, 0, 0, false, false, null);
+	                smoothToBlocks = new ArrayList<BlockCoordsAndNeighbours>();
+	                bO3 = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 
 	        		// While drawing a circle:
 	        		// x^2 + y^2 = r^2
@@ -948,19 +1026,19 @@ class SmoothingAreaGenerator
 
 	                if(smoothInDirection1)
 	                {
-	                	smoothToBlocks.add(new Object[]{ bO3, filler.x, filler.y, filler.z, true, false, false, false, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ });
+	                	smoothToBlocks.add(new BlockCoordsAndNeighboursDiagonal(bO3, filler.x, filler.y, filler.z, true, false, false, false, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ));
 	                }
 	                if(smoothInDirection2)
 	                {
-	                	smoothToBlocks.add(new Object[]{ bO3, filler.x, filler.y, filler.z, false, true, false, false, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ });
+	                	smoothToBlocks.add(new BlockCoordsAndNeighboursDiagonal(bO3, filler.x, filler.y, filler.z, false, true, false, false, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ));
 	                }
 	                if(smoothInDirection3)
 	                {
-	                	smoothToBlocks.add(new Object[]{ bO3, filler.x, filler.y, filler.z, false, false, true, false, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ });
+	                	smoothToBlocks.add(new BlockCoordsAndNeighboursDiagonal(bO3, filler.x, filler.y, filler.z, false, false, true, false, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ));
 	                }
 	                if(smoothInDirection4)
 	                {
-	                	smoothToBlocks.add(new Object[]{ bO3, filler.x, filler.y, filler.z, false, false, false, true, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ });
+	                	smoothToBlocks.add(new BlockCoordsAndNeighboursDiagonal(bO3, filler.x, filler.y, filler.z, false, false, false, true, diagonalBlockSmoothRadius2, originPointX, originPointY, originPointZ, finalDestinationPointX, finalDestinationPointY, finalDestinationPointZ));
 	                }
 
                     if(!smoothToBlocksPerChunk.containsKey(destinationChunk))
@@ -979,16 +1057,16 @@ class SmoothingAreaGenerator
     // The lines we plot this way may traverse several chunks so divide them up into segments of one chunk and make a collection of line segments per chunk.
     // For each line-segment store the beginning and endpoints within the chunk as well as the origin coordinate of the line and the final destination coordinate of the line
     // we spawn the line-segments per chunk we can still see what the completed line looks like and how far along that line we are.
-    private Map<ChunkCoordinate, ArrayList<Object[]>> calculateBeginAndEndPointsPerChunk(Map<ChunkCoordinate, ArrayList<Object[]>> smoothToBlocksPerChunk)
+    private Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> calculateBeginAndEndPointsPerChunk(Map<ChunkCoordinate, ArrayList<BlockCoordsAndNeighbours>> smoothToBlocksPerChunk)
     {
-        Map<ChunkCoordinate, ArrayList<Object[]>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<Object[]>>();
+        Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
 
         // Declare these here instead of inside for loops to help the GC (good for memory usage)
         // TODO: Find out if this actually makes any noticeable difference, it doesn't exactly
         // make the code any easier to read..
         BO4CustomStructureCoordinate bO3;
         int blockX;
-        int blockY;
+        short blockY;
         int blockZ;
         boolean smoothInDirection1;
         boolean smoothInDirection2;
@@ -996,57 +1074,57 @@ class SmoothingAreaGenerator
         boolean smoothInDirection4;
         int smoothRadius;
         int normalizedSmoothFinalEndPointBlockX1;
-        int normalizedSmoothFinalEndPointBlockY1;
+        short normalizedSmoothFinalEndPointBlockY1;
         int normalizedSmoothFinalEndPointBlockZ1;
         ChunkCoordinate finalDestinationChunk;
         ArrayList<ChunkCoordinate>smoothingAreasToSpawnForThisBlock;
         int normalizedSmoothEndPointBlockX;
-        int normalizedSmoothEndPointBlockY;
+        short normalizedSmoothEndPointBlockY;
         int normalizedSmoothEndPointBlockZ;
         ChunkCoordinate destinationChunk;
         boolean bFound;
         int beginPointX;
-        int beginPointY;
+        short beginPointY;
         int beginPointZ;
         int endPointX;
-        int endPointY;
+        short endPointY;
         int endPointZ;
-        ArrayList<Object[]> beginningAndEndpoints;
+        ArrayList<SmoothingAreaLine> beginningAndEndpoints;
         ChunkCoordinate chunkcontainingSmoothArea;
-        ArrayList<Object[]> beginAndEndPoints;
+        ArrayList<SmoothingAreaLine> beginAndEndPoints;
 
         int originPointX = 0;
-		int originPointY = 0;
+        short originPointY = 0;
 		int originPointZ = 0;
 		int finalDestinationPointX = 0;
-		int finalDestinationPointY = 0;
+		short finalDestinationPointY = 0;
 		int finalDestinationPointZ = 0;
-        Object[] objectToAdd;
+		SmoothingAreaLine objectToAdd;
 
         // Loop through smooth-line starting blocks
-        for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkCoordSet : smoothToBlocksPerChunk.entrySet())
+        for(Entry<ChunkCoordinate, ArrayList<BlockCoordsAndNeighbours>> chunkCoordSet : smoothToBlocksPerChunk.entrySet())
         {
-            for(Object[] blockCoordsAndNeighbours : chunkCoordSet.getValue())
+            for(BlockCoordsAndNeighbours blockCoordsAndNeighbours : chunkCoordSet.getValue())
             {
-                bO3 = (BO4CustomStructureCoordinate)blockCoordsAndNeighbours[0];
-                blockX = (Integer)blockCoordsAndNeighbours[1];
-                blockY = (Integer)blockCoordsAndNeighbours[2];
-                blockZ = (Integer)blockCoordsAndNeighbours[3];
-                smoothInDirection1 = (Boolean)blockCoordsAndNeighbours[4];
-                smoothInDirection2 = (Boolean)blockCoordsAndNeighbours[5];
-                smoothInDirection3 = (Boolean)blockCoordsAndNeighbours[6];
-                smoothInDirection4 = (Boolean)blockCoordsAndNeighbours[7];
-                smoothRadius = (Integer)blockCoordsAndNeighbours[8];
+                bO3 = blockCoordsAndNeighbours.bO3;
+                blockX = blockCoordsAndNeighbours.blockX;
+                blockY = blockCoordsAndNeighbours.blockY;
+                blockZ = blockCoordsAndNeighbours.blockZ;
+                smoothInDirection1 = blockCoordsAndNeighbours.smoothInDirection1;
+                smoothInDirection2 = blockCoordsAndNeighbours.smoothInDirection2;
+                smoothInDirection3 = blockCoordsAndNeighbours.smoothInDirection3;
+                smoothInDirection4 = blockCoordsAndNeighbours.smoothInDirection4;
+                smoothRadius = blockCoordsAndNeighbours.smoothRadius;
 
                 // used for diagonal line child lines that make up corners
-                if(blockCoordsAndNeighbours.length > 14)
+                if(blockCoordsAndNeighbours instanceof BlockCoordsAndNeighboursDiagonal)
                 {
-	                originPointX = (Integer)blockCoordsAndNeighbours[9];
-	        		originPointY = (Integer)blockCoordsAndNeighbours[10];
-					originPointZ = (Integer)blockCoordsAndNeighbours[11];
-					finalDestinationPointX = (Integer)blockCoordsAndNeighbours[12];
-					finalDestinationPointY = (Integer)blockCoordsAndNeighbours[13];
-					finalDestinationPointZ = (Integer)blockCoordsAndNeighbours[14];
+	                originPointX = ((BlockCoordsAndNeighboursDiagonal)blockCoordsAndNeighbours).originPointX;
+	        		originPointY = ((BlockCoordsAndNeighboursDiagonal)blockCoordsAndNeighbours).originPointY;
+					originPointZ = ((BlockCoordsAndNeighboursDiagonal)blockCoordsAndNeighbours).originPointZ;
+					finalDestinationPointX = ((BlockCoordsAndNeighboursDiagonal)blockCoordsAndNeighbours).finalDestinationPointX;
+					finalDestinationPointY = ((BlockCoordsAndNeighboursDiagonal)blockCoordsAndNeighbours).finalDestinationPointY;
+					finalDestinationPointZ = ((BlockCoordsAndNeighboursDiagonal)blockCoordsAndNeighbours).finalDestinationPointZ;
                 }
 
                 // Find smooth end point and normalize coord
@@ -1056,11 +1134,6 @@ class SmoothingAreaGenerator
                 // for a smoothing line we need the landscape to be spawned so that we can find the highest solid block in the landscape.
                 // This problem is handled later during spawning, if the Y endpoint for a smoothing line in a chunk is not available when that chunk
                 // is being spawned (because the endpoint is in a neighbouring chunk that has not yet been spawned) then all spawning for the chunk is paused until the Y endpoint is available (the neighbouring chunk has spawned).
-
-                if(smoothRadius == 0 && blockCoordsAndNeighbours.length < 15)
-                {
-                	//throw new RuntimeException();
-                }
 
                 // If this block is a non-outer-corner block (it does not have the smoothInDirection boolean set to true for 2 neighbouring sides)
                 if(smoothInDirection1)// && (smoothRadius > 0 || test || blockCoordsAndNeighbours.length > 14))
@@ -1078,7 +1151,7 @@ class SmoothingAreaGenerator
                     for(int i = 0; i <= smoothRadius; i++)
                     {
                     	normalizedSmoothEndPointBlockX = blockX - i + (bO3.getX());
-                        normalizedSmoothEndPointBlockY = blockY + bO3.getY();
+                        normalizedSmoothEndPointBlockY = (short) (blockY + bO3.getY());
                         normalizedSmoothEndPointBlockZ = blockZ + (bO3.getZ());
                         destinationChunk = ChunkCoordinate.fromBlockCoords(normalizedSmoothEndPointBlockX, normalizedSmoothEndPointBlockZ);
 
@@ -1112,18 +1185,18 @@ class SmoothingAreaGenerator
                                 endPointX = normalizedSmoothEndPointBlockX -= (smoothRadius - i);
                             }
 
-                            beginningAndEndpoints = new ArrayList<Object[]> ();
-                            if(blockCoordsAndNeighbours.length > 14)
+                            beginningAndEndpoints = new ArrayList<SmoothingAreaLine> ();
+                            if(blockCoordsAndNeighbours instanceof BlockCoordsAndNeighboursDiagonal)
                             {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), -1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()) };
+                            	objectToAdd = new SmoothingAreaLineDiagonal(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), (short)-1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()));
                             } else {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 };
+                            	objectToAdd = new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1);
                             }
 
                         	beginningAndEndpoints.add(objectToAdd);
 
                             // Check if there are already start and endpoints for this chunk
-                            for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                            for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                             {
                                 chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                                 if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
@@ -1157,7 +1230,7 @@ class SmoothingAreaGenerator
                     for(int i = 0; i <= smoothRadius; i++)
                     {
                     	normalizedSmoothEndPointBlockX = blockX + i + (bO3.getX());
-                        normalizedSmoothEndPointBlockY = blockY + bO3.getY();
+                        normalizedSmoothEndPointBlockY = (short) (blockY + bO3.getY());
                         normalizedSmoothEndPointBlockZ = blockZ + (bO3.getZ());
                         destinationChunk = ChunkCoordinate.fromBlockCoords(normalizedSmoothEndPointBlockX, normalizedSmoothEndPointBlockZ);
 
@@ -1191,18 +1264,18 @@ class SmoothingAreaGenerator
                                 endPointX = normalizedSmoothEndPointBlockX += (smoothRadius - i);
                             }
 
-                            beginningAndEndpoints = new ArrayList<Object[]> ();
-                            if(blockCoordsAndNeighbours.length > 14)
+                            beginningAndEndpoints = new ArrayList<SmoothingAreaLine> ();
+                            if(blockCoordsAndNeighbours instanceof BlockCoordsAndNeighboursDiagonal)
                             {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), -1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()) };
+                            	objectToAdd = new SmoothingAreaLineDiagonal(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), (short)-1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()));
                             } else {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 };
+                            	objectToAdd = new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1);
                             }
 
                         	beginningAndEndpoints.add(objectToAdd);
 
                             // Check if there are already start and endpoints for this chunk
-                            for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                            for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                             {
                                 chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                                 if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
@@ -1236,7 +1309,7 @@ class SmoothingAreaGenerator
                     for(int i = 0; i <= smoothRadius; i++)
                     {
                     	normalizedSmoothEndPointBlockX = blockX + (bO3.getX());
-                        normalizedSmoothEndPointBlockY = blockY + bO3.getY();
+                        normalizedSmoothEndPointBlockY = (short) (blockY + bO3.getY());
                         normalizedSmoothEndPointBlockZ = blockZ - i + (bO3.getZ());
                         destinationChunk = ChunkCoordinate.fromBlockCoords(normalizedSmoothEndPointBlockX, normalizedSmoothEndPointBlockZ);
 
@@ -1270,18 +1343,18 @@ class SmoothingAreaGenerator
                                 endPointZ = normalizedSmoothEndPointBlockZ -= (smoothRadius - i);
                             }
 
-                            beginningAndEndpoints = new ArrayList<Object[]> ();
-                            if(blockCoordsAndNeighbours.length > 14)
+                            beginningAndEndpoints = new ArrayList<SmoothingAreaLine> ();
+                            if(blockCoordsAndNeighbours instanceof BlockCoordsAndNeighboursDiagonal)
                             {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), -1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()) };
+                            	objectToAdd = new SmoothingAreaLineDiagonal(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), (short)-1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()));
                             } else {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 };
+                            	objectToAdd = new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1);
                             }
 
                         	beginningAndEndpoints.add(objectToAdd);
 
                             // Check if there are already start and endpoints for this chunk
-                            for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                            for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                             {
                                 chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                                 if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
@@ -1316,7 +1389,7 @@ class SmoothingAreaGenerator
                     for(int i = 0; i <= smoothRadius; i++)
                     {
                     	normalizedSmoothEndPointBlockX = blockX + (bO3.getX());
-                        normalizedSmoothEndPointBlockY = blockY + bO3.getY();
+                        normalizedSmoothEndPointBlockY = (short) (blockY + bO3.getY());
                         normalizedSmoothEndPointBlockZ = blockZ + i + (bO3.getZ());
                         destinationChunk = ChunkCoordinate.fromBlockCoords(normalizedSmoothEndPointBlockX, normalizedSmoothEndPointBlockZ);
 
@@ -1350,18 +1423,18 @@ class SmoothingAreaGenerator
                                 endPointZ = normalizedSmoothEndPointBlockZ += (smoothRadius - i);
                             }
 
-                            beginningAndEndpoints = new ArrayList<Object[]> ();
-                            if(blockCoordsAndNeighbours.length > 14)
+                            beginningAndEndpoints = new ArrayList<SmoothingAreaLine> ();
+                            if(blockCoordsAndNeighbours instanceof BlockCoordsAndNeighboursDiagonal)
                             {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), -1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()) };
+                            	objectToAdd = new SmoothingAreaLineDiagonal(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), (short)-1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()));
                             } else {
-                            	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 };
+                            	objectToAdd = new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1);
                             }
 
                         	beginningAndEndpoints.add(objectToAdd);
 
                             // Check if there are already start and endpoints for this chunk
-                            for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                            for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                             {
                                 chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                                 if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
@@ -1395,7 +1468,7 @@ class SmoothingAreaGenerator
 
                     // First get all chunks between the beginning- and end-points
                 	normalizedSmoothEndPointBlockX = blockX + (bO3.getX());
-                    normalizedSmoothEndPointBlockY = blockY + bO3.getY();
+                    normalizedSmoothEndPointBlockY = (short) (blockY + bO3.getY());
                     normalizedSmoothEndPointBlockZ = blockZ + (bO3.getZ());
                     destinationChunk = ChunkCoordinate.fromBlockCoords(normalizedSmoothEndPointBlockX, normalizedSmoothEndPointBlockZ);
 
@@ -1420,12 +1493,12 @@ class SmoothingAreaGenerator
                         endPointY = normalizedSmoothEndPointBlockY;
                         endPointZ = normalizedSmoothEndPointBlockZ;
 
-                        beginningAndEndpoints = new ArrayList<Object[]> ();
-                        if(blockCoordsAndNeighbours.length > 14)
+                        beginningAndEndpoints = new ArrayList<SmoothingAreaLine> ();
+                        if(blockCoordsAndNeighbours instanceof BlockCoordsAndNeighboursDiagonal)
                         {
-                        	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), -1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()) };
+                        	objectToAdd = new SmoothingAreaLineDiagonal(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), (short)-1, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1, originPointX + (bO3.getX()), originPointY, originPointZ + (bO3.getZ()), finalDestinationPointX + (bO3.getX()), finalDestinationPointY, finalDestinationPointZ + (bO3.getZ()));
                         } else {
-                        	objectToAdd = new Object[] { beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1 };
+                        	objectToAdd = new SmoothingAreaLine(beginPointX, beginPointY, beginPointZ, endPointX, endPointY, endPointZ, blockX + (bO3.getX()), beginPointY, blockZ + (bO3.getZ()), normalizedSmoothFinalEndPointBlockX1, normalizedSmoothFinalEndPointBlockY1, normalizedSmoothFinalEndPointBlockZ1);
                         }
 
                         if(normalizedSmoothFinalEndPointBlockY1 != -1)
@@ -1436,7 +1509,7 @@ class SmoothingAreaGenerator
                     	beginningAndEndpoints.add(objectToAdd);
 
                         // Check if there are already start and endpoints for this chunk
-                        for(Entry<ChunkCoordinate, ArrayList<Object[]>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
+                        for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> chunkcontainingSmoothAreaSet : smoothingAreasToSpawn.entrySet())
                         {
                             chunkcontainingSmoothArea = chunkcontainingSmoothAreaSet.getKey();
                             if(chunkcontainingSmoothArea.getChunkX() == destinationChunk.getChunkX() && chunkcontainingSmoothArea.getChunkZ() == destinationChunk.getChunkZ())
@@ -1467,11 +1540,11 @@ class SmoothingAreaGenerator
      * and spawning has to be delayed until other chunks have spawned
      * @param chunkCoordinate
     */
-    boolean spawnSmoothAreas(ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, ArrayList<Object[]>> SmoothingAreasToSpawn, CustomStructureCoordinate Start, LocalWorld World)
+    boolean spawnSmoothAreas(ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, CustomStructureCoordinate start, LocalWorld world)
     {
         // Get all smoothing areas (lines) that should spawn in this chunk for this branching structure
-        Entry<ChunkCoordinate, ArrayList<Object[]>> smoothingAreaInChunk = null;
-        for(Entry<ChunkCoordinate, ArrayList<Object[]>> smoothingAreaToSpawn : SmoothingAreasToSpawn.entrySet())
+        Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaInChunk = null;
+        for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : smoothingAreasToSpawn.entrySet())
         {
             if(smoothingAreaToSpawn.getKey().getChunkX() == chunkCoordinate.getChunkX() && smoothingAreaToSpawn.getKey().getChunkZ() == chunkCoordinate.getChunkZ())
             {
@@ -1483,7 +1556,7 @@ class SmoothingAreaGenerator
         if(smoothingAreaInChunk != null && smoothingAreaInChunk.getValue() != null)
         {
             // Merge all smooth areas (lines) so that in one x + z coordinate there can be a maximum of 2 smoothing area blocks, 1 going up and 1 going down (first pass and second pass)
-            ArrayList<Object[]> blocksToSpawn = mergeSmoothingAreas(chunkCoordinate, smoothingAreaInChunk.getValue(), World, Start);
+            ArrayList<SmoothingAreaLineBlock> blocksToSpawn = mergeSmoothingAreas(chunkCoordinate, smoothingAreaInChunk.getValue(), world, start);
 
             // blocksToSpawn can be null if a smoothing line's endpoint Y coordinate could not be found. This can happen if
             // the chunk that the endpoint is located in has not yet been spawned. Return false so that the calling method (SpawnForChunk()) knows
@@ -1492,10 +1565,10 @@ class SmoothingAreaGenerator
 
         	boolean isOnBiomeBorder = false;
 
-        	LocalBiome biome = World.getBiome(chunkCoordinate.getChunkX() * 16, chunkCoordinate.getChunkZ() * 16);
-        	LocalBiome biome2 = World.getBiome(chunkCoordinate.getChunkX() * 16 + 15, chunkCoordinate.getChunkZ() * 16);
-        	LocalBiome biome3 = World.getBiome(chunkCoordinate.getChunkX() * 16, chunkCoordinate.getChunkZ() * 16 + 15);
-        	LocalBiome biome4 = World.getBiome(chunkCoordinate.getChunkX() * 16 + 15, chunkCoordinate.getChunkZ() * 16 + 15);
+        	LocalBiome biome = world.getBiome(chunkCoordinate.getChunkX() * 16, chunkCoordinate.getChunkZ() * 16);
+        	LocalBiome biome2 = world.getBiome(chunkCoordinate.getChunkX() * 16 + 15, chunkCoordinate.getChunkZ() * 16);
+        	LocalBiome biome3 = world.getBiome(chunkCoordinate.getChunkX() * 16, chunkCoordinate.getChunkZ() * 16 + 15);
+        	LocalBiome biome4 = world.getBiome(chunkCoordinate.getChunkX() * 16 + 15, chunkCoordinate.getChunkZ() * 16 + 15);
 
             if(!(biome == biome2 && biome == biome3 && biome == biome4))
             {
@@ -1510,10 +1583,10 @@ class SmoothingAreaGenerator
             byte groundBlockMaterialBlockData = biomeConfig.groundBlock.getBlockData();
 
             boolean surfaceBlockSet = false;
-			if(((BO4)Start.getObject()).getSettings().smoothingSurfaceBlock != null && ((BO4)Start.getObject()).getSettings().smoothingSurfaceBlock.trim().length() > 0)
+			if(((BO4)start.getObject()).getSettings().smoothingSurfaceBlock != null && ((BO4)start.getObject()).getSettings().smoothingSurfaceBlock.trim().length() > 0)
 			{
 				try {
-					LocalMaterialData material = OTG.readMaterial(((BO4)Start.getObject()).getSettings().smoothingSurfaceBlock);
+					LocalMaterialData material = MaterialHelper.readMaterial(((BO4)start.getObject()).getSettings().smoothingSurfaceBlock);
 					surfaceBlockSet = true;
 					surfaceBlockMaterial = material.toDefaultMaterial();
 					surfaceBlockMaterialBlockData = material.getBlockData();
@@ -1524,11 +1597,11 @@ class SmoothingAreaGenerator
 				}
 			}
             boolean groundBlockSet = false;
-			if(((BO4)Start.getObject()).getSettings().smoothingGroundBlock != null && ((BO4)Start.getObject()).getSettings().smoothingGroundBlock.trim().length() > 0)
+			if(((BO4)start.getObject()).getSettings().smoothingGroundBlock != null && ((BO4)start.getObject()).getSettings().smoothingGroundBlock.trim().length() > 0)
 			{
 				try
 				{
-					LocalMaterialData material = OTG.readMaterial(((BO4)Start.getObject()).getSettings().smoothingGroundBlock);
+					LocalMaterialData material = MaterialHelper.readMaterial(((BO4)start.getObject()).getSettings().smoothingGroundBlock);
 					groundBlockSet = true;
 					groundBlockMaterial = material.toDefaultMaterial();
 					groundBlockMaterialBlockData = material.getBlockData();
@@ -1554,11 +1627,11 @@ class SmoothingAreaGenerator
             DefaultMaterial replaceAboveMaterial = null;
             byte replaceAboveMaterialBlockData = 0;
             DefaultMaterial replaceBelowMaterial = null;
-			if(((BO4)Start.getObject()).getSettings().replaceAbove != null && ((BO4)Start.getObject()).getSettings().replaceAbove.trim().length() > 0)
+			if(((BO4)start.getObject()).getSettings().replaceAbove != null && ((BO4)start.getObject()).getSettings().replaceAbove.trim().length() > 0)
 			{
 				try
 				{
-					LocalMaterialData material = OTG.readMaterial(((BO4)Start.getObject()).getSettings().replaceAbove);
+					LocalMaterialData material = MaterialHelper.readMaterial(((BO4)start.getObject()).getSettings().replaceAbove);
 					replaceAboveMaterial = material.toDefaultMaterial();
 					replaceAboveMaterialBlockData = material.getBlockData();
 				}
@@ -1567,11 +1640,11 @@ class SmoothingAreaGenerator
 					e.printStackTrace();
 				}
 			}
-			if(((BO4)Start.getObject()).getSettings().replaceBelow != null && ((BO4)Start.getObject()).getSettings().replaceBelow.trim().length() > 0)
+			if(((BO4)start.getObject()).getSettings().replaceBelow != null && ((BO4)start.getObject()).getSettings().replaceBelow.trim().length() > 0)
 			{
 				try
 				{
-					LocalMaterialData material = OTG.readMaterial(((BO4)Start.getObject()).getSettings().replaceBelow);
+					LocalMaterialData material = MaterialHelper.readMaterial(((BO4)start.getObject()).getSettings().replaceBelow);
 					replaceBelowMaterial = material.toDefaultMaterial();
 				}
 				catch (InvalidConfigException e)
@@ -1594,7 +1667,7 @@ class SmoothingAreaGenerator
             // Declare these here instead of inside for loops to help the GC (good for memory usage)
             // TODO: Find out if this actually makes any noticeable difference, it doesnt exactly
             // make the code any easier to read..
-            BO4BlockFunction blockToSpawn;
+            SmoothingAreaBlock blockToSpawn;
             boolean goingUp;
             boolean secondPass;
             LocalMaterialData sourceBlockMaterial;
@@ -1602,20 +1675,20 @@ class SmoothingAreaGenerator
             DefaultMaterial materialToSet = null;
             Byte blockDataToSet = 0;
             boolean bBreak;
-            int yStart;
-            int yEnd;
-            BO4BlockFunction blockToQueueForSpawn = new BO4BlockFunction();
+            short yStart;
+            short yEnd;
+            SmoothingAreaBlock blockToQueueForSpawn = new SmoothingAreaBlock();
 
 
             HashMap<ChunkCoordinate, LocalMaterialData> originalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
 
             // Spawn blocks
             // For each block in the smoothing area replace blocks above and/or below it
-            for(Object[] blockItemToSpawn : blocksToSpawn)
+            for(SmoothingAreaLineBlock blockItemToSpawn : blocksToSpawn)
             {
-                blockToSpawn = (BO4BlockFunction)blockItemToSpawn[0];
-                goingUp = (Boolean)blockItemToSpawn[1];
-                secondPass =  (Boolean)blockItemToSpawn[3];
+                blockToSpawn = blockItemToSpawn.block;
+                goingUp = blockItemToSpawn.goingUp;
+                secondPass = blockItemToSpawn.isPass2;
 
                 if(blockToSpawn.y > 255)
                 {
@@ -1624,10 +1697,10 @@ class SmoothingAreaGenerator
 
             	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z)))
             	{
-        			int highestBlockY = World.getHighestBlockYAt(blockToSpawn.x, blockToSpawn.z, true, true, false, false);
+        			int highestBlockY = world.getHighestBlockYAt(blockToSpawn.x, blockToSpawn.z, true, true, false, false);
         			if(highestBlockY > PluginStandardValues.WORLD_DEPTH)
         			{
-        				originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z), World.getMaterial(blockToSpawn.x, highestBlockY, blockToSpawn.z, true));
+        				originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z), world.getMaterial(blockToSpawn.x, highestBlockY, blockToSpawn.z, true));
         			} else {
         				originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z), null);
         			}
@@ -1635,7 +1708,7 @@ class SmoothingAreaGenerator
 
                 if(isOnBiomeBorder && (!surfaceBlockSet || !groundBlockSet))
                 {
-	                biome = World.getBiome(blockToSpawn.x, blockToSpawn.z);
+	                biome = world.getBiome(blockToSpawn.x, blockToSpawn.z);
 	                biomeConfig = biome.getBiomeConfig();
 
 	                if(!surfaceBlockSet)
@@ -1693,11 +1766,11 @@ class SmoothingAreaGenerator
 				{
 					yStart = blockToSpawn.y;
 					yEnd = 0;
-					for(int y = yStart; y > yEnd; y--)
+					for(short y = yStart; y > yEnd; y--)
 					{
 						if(y >= 255){ continue;}
 
-						sourceBlockMaterial = World.getMaterial(blockToSpawn.x, y, blockToSpawn.z, true);
+						sourceBlockMaterial = world.getMaterial(blockToSpawn.x, y, blockToSpawn.z, true);
 	                    // When going down don't go lower than the highest solid block
 	                    if(sourceBlockMaterial.isSolid() && y < blockToSpawn.y)
 	                    {
@@ -1707,7 +1780,7 @@ class SmoothingAreaGenerator
 
 	                    if(y == blockToSpawn.y)
 	                    {
-	                		sourceBlockMaterialAbove = World.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
+	                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
 	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
 	                		{
 	                			materialToSet = surfaceBlockMaterial;
@@ -1727,11 +1800,11 @@ class SmoothingAreaGenerator
 
 	                    if(materialToSet != null && materialToSet != DefaultMaterial.UNKNOWN_BLOCK)
 	                    {
-	                        blockToQueueForSpawn = new BO4BlockFunction();
+	                        blockToQueueForSpawn = new SmoothingAreaBlock();
 	                        blockToQueueForSpawn.x = blockToSpawn.x;
 	                        blockToQueueForSpawn.y = y;
 	                        blockToQueueForSpawn.z = blockToSpawn.z;
-	                        blockToQueueForSpawn.material = OTG.toLocalMaterialData(materialToSet,blockDataToSet);
+	                        blockToQueueForSpawn.material = MaterialHelper.toLocalMaterialData(materialToSet,blockDataToSet);
 
 	                        // Apply mesa blocks if needed
 	                        if(
@@ -1752,16 +1825,16 @@ class SmoothingAreaGenerator
 								)
 							)
 	                        {
-            		        	LocalMaterialData customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(World, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+            		        	LocalMaterialData customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
             		        	if(customBlockData != null)
             		        	{
             		        		blockToQueueForSpawn.material = customBlockData;
             		        	}
-        		        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, World);
+        		        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world);
 	                        } else {
 	                        	if (!sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
 	                        	{
-	                        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, World);
+	                        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world);
 	                        	}
 	                        }
 	                    } else {
@@ -1785,13 +1858,13 @@ class SmoothingAreaGenerator
 						continue;
 					}
 
-					yStart = World.getHighestBlockYAt(blockToSpawn.x,blockToSpawn.z, true, true, false, false);
+					yStart = (short) world.getHighestBlockYAt(blockToSpawn.x,blockToSpawn.z, true, true, false, false);
 					yEnd = 0;
-					for(int y = yStart; y >= yEnd; y--)
+					for(short y = yStart; y >= yEnd; y--)
 					{
 						if(y >= 255){ continue;}
 
-						sourceBlockMaterial = World.getMaterial(blockToSpawn.x, y, blockToSpawn.z, true);
+						sourceBlockMaterial = world.getMaterial(blockToSpawn.x, y, blockToSpawn.z, true);
 						DefaultMaterial sourceBlockDefaultMaterial = sourceBlockMaterial.toDefaultMaterial();
 
                     	materialToSet = replaceAboveMaterial;
@@ -1799,16 +1872,16 @@ class SmoothingAreaGenerator
 
 	                    if(y < blockToSpawn.y)
                     	{
-	                    	if(!sourceBlockMaterial.isLiquid() || (secondPass && !((BO4)Start.getObject()).getSettings().spawnUnderWater))  // If this is the second pass then the first pass went down and we don't have to make a dam, otherwise we do
+	                    	if(!sourceBlockMaterial.isLiquid() || (secondPass && !((BO4)start.getObject()).getSettings().spawnUnderWater))  // If this is the second pass then the first pass went down and we don't have to make a dam, otherwise we do
 	                    	{
                     			break;
                     		}
-	                    	else if(((BO4)Start.getObject()).getSettings().spawnUnderWater)
+	                    	else if(((BO4)start.getObject()).getSettings().spawnUnderWater)
 	                    	{
 	                    		materialToSet = replaceAboveMaterial; // Replace liquid with replaceAboveMaterial
 	                    		blockDataToSet = replaceAboveMaterialBlockData;
 	                    	} else {
-	                    		sourceBlockMaterialAbove = World.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
+	                    		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
 		                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
 		                		{
 		                			materialToSet = surfaceBlockMaterial;
@@ -1822,12 +1895,12 @@ class SmoothingAreaGenerator
 
 	                    if(y == blockToSpawn.y)
 	                    {
-	                    	if(sourceBlockMaterial.isSolid() || (!secondPass && sourceBlockMaterial.isLiquid() && !((BO4)Start.getObject()).getSettings().spawnUnderWater))
+	                    	if(sourceBlockMaterial.isSolid() || (!secondPass && sourceBlockMaterial.isLiquid() && !((BO4)start.getObject()).getSettings().spawnUnderWater))
 	                    	{
-		                		sourceBlockMaterialAbove = World.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
+		                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
 		                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
 		                		{
-			                		sourceBlockMaterialAbove = World.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
+			                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
 			                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
 			                		{
 			                			materialToSet = surfaceBlockMaterial;
@@ -1841,7 +1914,7 @@ class SmoothingAreaGenerator
 		                        	blockDataToSet = groundBlockMaterialBlockData;
 		                		}
 	                    	} else {
-	                    		if(((BO4)Start.getObject()).getSettings().spawnUnderWater)
+	                    		if(((BO4)start.getObject()).getSettings().spawnUnderWater)
 		                    	{
 		                    		materialToSet = replaceAboveMaterial; // Replace liquid with replaceAboveMaterial
 		                    		blockDataToSet = replaceAboveMaterialBlockData;
@@ -1849,7 +1922,7 @@ class SmoothingAreaGenerator
 	                    			// After removing layers of blocks replace the heighest block left with the surfaceBlockMaterial
 	                    			if(!sourceBlockMaterial.isLiquid() && !sourceBlockDefaultMaterial.equals(DefaultMaterial.AIR))
 	                    			{
-	        	                		sourceBlockMaterialAbove = World.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
+	        	                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, true).toDefaultMaterial();
 	        	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
 	        	                		{
 	        	                			materialToSet = DefaultMaterial.AIR; // Make sure that canyons/caves etc aren't covered
@@ -1866,7 +1939,7 @@ class SmoothingAreaGenerator
 	                    	}
 	                    }
 
-                    	if(materialToSet.isLiquid() && ((BO4)Start.getObject()).getSettings().spawnUnderWater && y >= (biomeConfig.useWorldWaterLevel ? World.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
+                    	if(materialToSet.isLiquid() && ((BO4)start.getObject()).getSettings().spawnUnderWater && y >= (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
                     	{
                     		materialToSet = DefaultMaterial.AIR;
                     		blockDataToSet = 0;
@@ -1874,11 +1947,11 @@ class SmoothingAreaGenerator
 
 	                    if(materialToSet != null && materialToSet != DefaultMaterial.UNKNOWN_BLOCK)
 	                    {
-	                        blockToQueueForSpawn = new BO4BlockFunction();
+	                        blockToQueueForSpawn = new SmoothingAreaBlock();
 	                        blockToQueueForSpawn.x = blockToSpawn.x;
 	                        blockToQueueForSpawn.y = y;
 	                        blockToQueueForSpawn.z = blockToSpawn.z;
-	                        blockToQueueForSpawn.material = OTG.toLocalMaterialData(materialToSet, blockDataToSet);
+	                        blockToQueueForSpawn.material = MaterialHelper.toLocalMaterialData(materialToSet, blockDataToSet);
 
 	                        // Apply mesa blocks if needed
 	                        if(
@@ -1899,16 +1972,16 @@ class SmoothingAreaGenerator
 								)
 							)
 	                        {
-            		        	LocalMaterialData customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(World, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+            		        	LocalMaterialData customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
             		        	if(customBlockData != null)
             		        	{
             		        		blockToQueueForSpawn.material = customBlockData;
             		        	}
-        		        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, World);
+        		        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world);
 	                        } else {
 	                        	if (!sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
 	                        	{
-	                        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, World);
+	                        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world);
 	                        	}
 	                        }
 	                    } else {
@@ -1930,9 +2003,9 @@ class SmoothingAreaGenerator
         return true;
     }
 
-    private void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, LocalWorld World)
+    private void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, LocalWorld world)
     {
-	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = World.getConfigs().getWorldConfig().getReplaceBlocksDict();
+	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
 	    if(blocksToReplace != null && blocksToReplace.size() > 0)
 	    {
 	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
@@ -1941,12 +2014,12 @@ class SmoothingAreaGenerator
 	    		material = targetBlock;
 	    	}
 	    }
-	    World.setBlock(x, y, z, material, metaDataTag, true);
+	    world.setBlock(x, y, z, material, metaDataTag, true);
     }
 
-    private ArrayList<Object[]> mergeSmoothingAreas(ChunkCoordinate chunkCoordinate, ArrayList<Object[]> smoothingAreas, LocalWorld World, CustomStructureCoordinate Start)
+    private ArrayList<SmoothingAreaLineBlock> mergeSmoothingAreas(ChunkCoordinate chunkCoordinate, ArrayList<SmoothingAreaLine> smoothingAreas, LocalWorld world, CustomStructureCoordinate start)
     {
-        ArrayList<Object[]> blocksToSpawn = new ArrayList<Object[]>();
+        ArrayList<SmoothingAreaLineBlock> blocksToSpawn = new ArrayList<SmoothingAreaLineBlock>();
 
         // Declare these here instead of inside for loops to help the GC (good for memory usage)
         // TODO: Find out if this actually makes any noticeable difference, it doesnt exactly
@@ -1958,31 +2031,32 @@ class SmoothingAreaGenerator
         boolean diagonalLinegoingDown;
 
         int distanceFromStart;
-        BO4BlockFunction beginPoint;
+        SmoothingAreaBlock beginPoint;
         int originPointX;
-        int originPointY;
+        short originPointY;
         int originPointZ;
         int finalDestinationPointX;
-        int finalDestinationPointY;
+        short finalDestinationPointY;
         int finalDestinationPointZ;
 
         int diagonalLineOriginPointX;
-        int diagonalLineoriginPointY;
+        short diagonalLineoriginPointY;
         int diagonalLineOriginPointZ;
         int diagonalLineFinalDestinationPointX;
-        int diagonalLineFinalDestinationPointY;
+        short diagonalLineFinalDestinationPointY;
         int diagonalLineFinalDestinationPointZ;
 
         LocalMaterialData material;
         boolean dontAdd;
-        BO4BlockFunction existingBlock;
-        BO4BlockFunction endPoint;
-        int surfaceBlockHeight;
-        BO4BlockFunction filler;
-        ArrayList<Object[]> blocksToRemove;
+        SmoothingAreaBlock existingBlock;
+        SmoothingAreaBlock endPoint;
+        short surfaceBlockHeight;
+        SmoothingAreaBlock filler;
+        ArrayList<SmoothingAreaLineBlock> blocksToRemove;
 
-        OTGBlock[] blockColumn = null;
-        OTGBlock[] blockColumn2 = null;
+        LocalMaterialData block = null;
+        LocalMaterialData[] blockColumn = null;
+        LocalMaterialData[] blockColumn2 = null;
         int prevfinalDestinationPointX = 0;
         int prevfinalDestinationPointZ = 0;
         int prevDiagonalLineFinalDestinationPointX = 0;
@@ -1992,20 +2066,20 @@ class SmoothingAreaGenerator
         // Check if all smooth areas have been finalized (endpoint y set) for this chunk
         // if so then merge them down to a single smooth area. Otherwise queue them and
         // spawn them later
-        for(Object[] smoothingBeginAndEndPoints : smoothingAreas)
+        for(SmoothingAreaLine smoothingBeginAndEndPoints : smoothingAreas)
         {
-        	beginPoint = new BO4BlockFunction();
-            beginPoint.x = (Integer)smoothingBeginAndEndPoints[0];
-            beginPoint.y = (Integer)smoothingBeginAndEndPoints[1];
-            beginPoint.z = (Integer)smoothingBeginAndEndPoints[2];
+        	beginPoint = new SmoothingAreaBlock();
+            beginPoint.x = smoothingBeginAndEndPoints.beginPointX;
+            beginPoint.y = smoothingBeginAndEndPoints.beginPointY;
+            beginPoint.z = smoothingBeginAndEndPoints.beginPointZ;
 
-            originPointX = (Integer)smoothingBeginAndEndPoints[6];
-            originPointY = (Integer)smoothingBeginAndEndPoints[7];
-            originPointZ = (Integer)smoothingBeginAndEndPoints[8];
+            originPointX = smoothingBeginAndEndPoints.originPointX;
+            originPointY = smoothingBeginAndEndPoints.originPointY;
+            originPointZ = smoothingBeginAndEndPoints.originPointZ;
 
-        	finalDestinationPointX = (Integer)smoothingBeginAndEndPoints[9];
-            finalDestinationPointY = (Integer)smoothingBeginAndEndPoints[10];
-            finalDestinationPointZ = (Integer)smoothingBeginAndEndPoints[11];
+        	finalDestinationPointX = smoothingBeginAndEndPoints.finalDestinationPointX;
+            finalDestinationPointY = smoothingBeginAndEndPoints.finalDestinationPointY;
+            finalDestinationPointZ = smoothingBeginAndEndPoints.finalDestinationPointZ;
 
             diagonalLineOriginPointX = -1;
             diagonalLineoriginPointY = -1;
@@ -2015,14 +2089,14 @@ class SmoothingAreaGenerator
             diagonalLineFinalDestinationPointZ = -1;
 
             // if this line is a child line of a diagonal line
-        	if(smoothingBeginAndEndPoints.length > 17)
+        	if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
         	{
-	            diagonalLineOriginPointX = (Integer)smoothingBeginAndEndPoints[12];
-	            diagonalLineoriginPointY = (Integer)smoothingBeginAndEndPoints[13];
-	            diagonalLineOriginPointZ = (Integer)smoothingBeginAndEndPoints[14];
-	            diagonalLineFinalDestinationPointX = (Integer)smoothingBeginAndEndPoints[15];
-	            diagonalLineFinalDestinationPointY = (Integer)smoothingBeginAndEndPoints[16];
-	            diagonalLineFinalDestinationPointZ = (Integer)smoothingBeginAndEndPoints[17];
+	            diagonalLineOriginPointX = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineOriginPointX;
+	            diagonalLineoriginPointY = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineoriginPointY;
+	            diagonalLineOriginPointZ = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineOriginPointZ;
+	            diagonalLineFinalDestinationPointX = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointX;
+	            diagonalLineFinalDestinationPointY = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY;
+	            diagonalLineFinalDestinationPointZ = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointZ;
 
 	            // Line has been marked as do not spawn because it crossed another line
 	            if(diagonalLineFinalDestinationPointY == -2)
@@ -2033,16 +2107,16 @@ class SmoothingAreaGenerator
 
             if(!isInitialised || (prevfinalDestinationPointX != finalDestinationPointX || prevfinalDestinationPointZ != finalDestinationPointZ))
             {
-               	blockColumn = World.getBlockColumn(finalDestinationPointX, finalDestinationPointZ);
+               	blockColumn = world.getBlockColumn(finalDestinationPointX, finalDestinationPointZ);
 
             	prevfinalDestinationPointX = finalDestinationPointX;
             	prevfinalDestinationPointX = finalDestinationPointZ;
             }
-            if(smoothingBeginAndEndPoints.length > 17)
+            if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
             {
 	            if(!isInitialised || (prevDiagonalLineFinalDestinationPointX != diagonalLineFinalDestinationPointX || prevDiagonalLineFinalDestinationPointZ != diagonalLineFinalDestinationPointZ))
 	            {
-            		blockColumn2 = World.getBlockColumn(diagonalLineFinalDestinationPointX, diagonalLineFinalDestinationPointZ);
+            		blockColumn2 = world.getBlockColumn(diagonalLineFinalDestinationPointX, diagonalLineFinalDestinationPointZ);
 	            	prevDiagonalLineFinalDestinationPointX = diagonalLineFinalDestinationPointX;
 	            	prevDiagonalLineFinalDestinationPointZ = diagonalLineFinalDestinationPointZ;
 	            }
@@ -2050,27 +2124,28 @@ class SmoothingAreaGenerator
             isInitialised = true;
 
             // This is a line plotted as a child line of a diagonal line of which the endpointy has not yet been determined
-            if(originPointY == -1 && smoothingBeginAndEndPoints.length > 17)
+            if(originPointY == -1 && smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
             {
 	            if(diagonalLineFinalDestinationPointY == -1)
 	            {
 		            material = null;
-		            for(int i = 255; i > -1; i--)
+		            block = null;
+		            for(short i = 255; i > -1; i--)
 		            {
 		                // when going down dont stop at the waterline
 		                // when going up stop at the waterline
-		            	OTGBlock block = blockColumn2[i];
-		            	material = block.material;
+		            	block = blockColumn2[i];
+		            	material = block;
 		                if(
 		                    !material.isAir() &&
 		                    (
-		                        (block.y <= diagonalLineoriginPointY && !material.isLiquid()) ||
-		                        (block.y > diagonalLineoriginPointY && (!((BO4)Start.getObject()).getSettings().spawnUnderWater || !material.isLiquid()))
+		                        (i <= diagonalLineoriginPointY && !material.isLiquid()) ||
+		                        (i > diagonalLineoriginPointY && (!((BO4)start.getObject()).getSettings().spawnUnderWater || !material.isLiquid()))
 		                    )
 		                )
 		                {
 		                	// TODO: get all blocks using this endpoint and set this Y
-		                	diagonalLineFinalDestinationPointY = block.y;
+		                	diagonalLineFinalDestinationPointY = i;
 		                    break;
 		                }
 		            }
@@ -2098,15 +2173,15 @@ class SmoothingAreaGenerator
         		}
 
                 // Set diagonal-y-endpoint for all other smoothing area lines that are children of this diagonal line.
-                ArrayList<Object[]> smoothingAreasToSpawnPerLineDestination = SmoothingAreasToSpawnPerDiagonalLineDestination.get(ChunkCoordinate.fromChunkCoords(diagonalLineFinalDestinationPointX, diagonalLineFinalDestinationPointZ));
+                ArrayList<SmoothingAreaLineDiagonal> smoothingAreasToSpawnPerLineDestination = this.smoothingAreasToSpawnPerDiagonalLineDestination.get(ChunkCoordinate.fromChunkCoords(diagonalLineFinalDestinationPointX, diagonalLineFinalDestinationPointZ));
                 if(smoothingAreasToSpawnPerLineDestination != null)
                 {
-	                for(Object[] smoothingBeginAndEndPoints2 : smoothingAreasToSpawnPerLineDestination)
+	                for(SmoothingAreaLineDiagonal smoothingBeginAndEndPoints2 : smoothingAreasToSpawnPerLineDestination)
 	                {
-	                	int diagonalLineFinalOriginPointX2 = (Integer)smoothingBeginAndEndPoints2[12];
-	                	int diagonalLineFinalOriginPointZ2 = (Integer)smoothingBeginAndEndPoints2[14];
+	                	int diagonalLineFinalOriginPointX2 = smoothingBeginAndEndPoints2.diagonalLineOriginPointX;
+	                	int diagonalLineFinalOriginPointZ2 = smoothingBeginAndEndPoints2.diagonalLineOriginPointZ;
 
-	                    int diagonalLineFinalDestinationPointY2 = (Integer)smoothingBeginAndEndPoints2[16];
+	                    int diagonalLineFinalDestinationPointY2 = smoothingBeginAndEndPoints2.diagonalLineFinalDestinationPointY;
 
 	            		if(
             				diagonalLineOriginPointX == diagonalLineFinalOriginPointX2 && diagonalLineOriginPointZ == diagonalLineFinalOriginPointZ2
@@ -2114,15 +2189,15 @@ class SmoothingAreaGenerator
 	            		{
 	            			if(diagonalLineFinalDestinationPointY2 != -2)
 	            			{
-		            			smoothingBeginAndEndPoints2[16] = diagonalLineFinalDestinationPointY;
+		            			smoothingBeginAndEndPoints2.diagonalLineFinalDestinationPointY = diagonalLineFinalDestinationPointY;
 		            		}
 	        			}
 	                }
                 }
 
-                if((Integer)smoothingBeginAndEndPoints[16] != -2)
+                if(((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY != -2)
                 {
-                	smoothingBeginAndEndPoints[16] = diagonalLineFinalDestinationPointY;
+                	((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY = diagonalLineFinalDestinationPointY;
                 } else {
                 	continue;
                 }
@@ -2131,41 +2206,42 @@ class SmoothingAreaGenerator
         	if(finalDestinationPointY == -1)
         	{
 	            material = null;
-	            for(int i = 255; i > -1; i--)
+	            block = null;
+	            for(short i = 255; i > -1; i--)
 	            {
 	                // when going down dont stop at the waterline
 	                // when going up stop at the waterline
-	            	OTGBlock block = blockColumn[i];
-	            	material = block.material;
+	            	block = blockColumn[i];
+	            	material = block;
 
 	                if(
 	                    !material.isAir() &&
 	                    (
 	                        (
-                        		block.y <= (diagonalLineoriginPointY > -1 ? diagonalLineoriginPointY : originPointY) &&
+                        		i <= (diagonalLineoriginPointY > -1 ? diagonalLineoriginPointY : originPointY) &&
                         		!material.isLiquid()
                     		) ||
-	                        (block.y > (diagonalLineoriginPointY > -1 ? diagonalLineoriginPointY : originPointY) && (!((BO4)Start.getObject()).getSettings().spawnUnderWater || !material.isLiquid()))
+	                        (i > (diagonalLineoriginPointY > -1 ? diagonalLineoriginPointY : originPointY) && (!((BO4)start.getObject()).getSettings().spawnUnderWater || !material.isLiquid()))
 	                    )
 	                )
 	                {
-	                	finalDestinationPointY = block.y;
+	                	finalDestinationPointY = i;
 
-	                	smoothingBeginAndEndPoints[10] = finalDestinationPointY;
+	                	smoothingBeginAndEndPoints.finalDestinationPointY = finalDestinationPointY;
 
     	                // Set y-endpoint for all other smoothing area line-parts that are part of this line
 
-            			ArrayList<Object[]> smoothingAreasForLine = SmoothingAreasToSpawnPerLineOrigin.get(ChunkCoordinate.fromChunkCoords(originPointX, originPointZ));
+            			ArrayList<SmoothingAreaLine> smoothingAreasForLine = smoothingAreasToSpawnPerLineOrigin.get(ChunkCoordinate.fromChunkCoords(originPointX, originPointZ));
             			if(smoothingAreasForLine != null)
             			{
-		                	for(Object[] smoothingBeginAndEndPoints2 : smoothingAreasForLine)
+		                	for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreasForLine)
 		                	{
-			                	int finalDestinationPointX2 = (Integer)smoothingBeginAndEndPoints2[9];
-			                    int finalDestinationPointZ2 = (Integer)smoothingBeginAndEndPoints2[11];
+			                	int finalDestinationPointX2 = smoothingBeginAndEndPoints2.finalDestinationPointX;
+			                    int finalDestinationPointZ2 = smoothingBeginAndEndPoints2.finalDestinationPointZ;
 
 			            		if(finalDestinationPointX == finalDestinationPointX2 && finalDestinationPointZ == finalDestinationPointZ2)
 			            		{
-		            				smoothingBeginAndEndPoints2[10] = finalDestinationPointY; // - 1; // <-- -1 is a hack because the spawning area endpoints would always spawn 1 block too high
+		            				smoothingBeginAndEndPoints2.finalDestinationPointY = finalDestinationPointY; // - 1; // <-- -1 is a hack because the spawning area endpoints would always spawn 1 block too high
 			            		}
 	    	                }
             			}
@@ -2183,14 +2259,14 @@ class SmoothingAreaGenerator
 
             // This is a line plotted as a child line of a diagonal line of which the diagonalendpointy has been determined
             // but the originPointY hasnt
-            if((Integer)smoothingBeginAndEndPoints[7] == -1)
+            if(smoothingBeginAndEndPoints.originPointY == -1 && smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
             {
-	            diagonalLineOriginPointX = (Integer)smoothingBeginAndEndPoints[12];
-	            diagonalLineoriginPointY = (Integer)smoothingBeginAndEndPoints[13];
-	            diagonalLineFinalDestinationPointX = (Integer)smoothingBeginAndEndPoints[15];
-	            diagonalLineFinalDestinationPointY = (Integer)smoothingBeginAndEndPoints[16];
+	            diagonalLineOriginPointX = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineOriginPointX;
+	            diagonalLineoriginPointY = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineoriginPointY;
+	            diagonalLineFinalDestinationPointX = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointX;
+	            diagonalLineFinalDestinationPointY = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY;
 
-        		originPointY = (int)Math.round(
+        		originPointY = (short)Math.round(
                     (double)
                     (
                         (double)Math.abs(diagonalLineoriginPointY - diagonalLineFinalDestinationPointY)
@@ -2201,23 +2277,23 @@ class SmoothingAreaGenerator
 
         		if(diagonalLineoriginPointY > diagonalLineFinalDestinationPointY)
         		{
-        			originPointY = diagonalLineoriginPointY - originPointY;
+        			originPointY = (short) (diagonalLineoriginPointY - originPointY);
         		}
         		else if(diagonalLineoriginPointY < diagonalLineFinalDestinationPointY)
         		{
-        			originPointY = diagonalLineoriginPointY + originPointY;
+        			originPointY = (short) (diagonalLineoriginPointY + originPointY);
         		} else {
         			originPointY = diagonalLineoriginPointY;
         		}
 
-        		smoothingBeginAndEndPoints[7] = originPointY;
+        		smoothingBeginAndEndPoints.originPointY = originPointY;
             }
         }
 
-        for(Object[] smoothingBeginAndEndPoints : smoothingAreas)
+        for(SmoothingAreaLine smoothingBeginAndEndPoints : smoothingAreas)
         {
         	// if this line was set as do not spawn then skip it
-        	if(smoothingBeginAndEndPoints.length > 17 && (Integer)smoothingBeginAndEndPoints[16] == -2)
+        	if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal && ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY == -2)
         	{
 	            continue;
         	}
@@ -2229,18 +2305,18 @@ class SmoothingAreaGenerator
             goingDown = false;
             distanceFromStart = 0;
 
-            beginPoint = new BO4BlockFunction();
-            beginPoint.x = (Integer)smoothingBeginAndEndPoints[0];
-            beginPoint.y = (Integer)smoothingBeginAndEndPoints[1];
-            beginPoint.z = (Integer)smoothingBeginAndEndPoints[2];
+            beginPoint = new SmoothingAreaBlock();
+            beginPoint.x = smoothingBeginAndEndPoints.beginPointX;
+            beginPoint.y = smoothingBeginAndEndPoints.beginPointY;
+            beginPoint.z = smoothingBeginAndEndPoints.beginPointZ;
 
-            originPointX = (Integer)smoothingBeginAndEndPoints[6];
-            originPointY = (Integer)smoothingBeginAndEndPoints[7];
-            originPointZ = (Integer)smoothingBeginAndEndPoints[8];
+            originPointX = smoothingBeginAndEndPoints.originPointX;
+            originPointY = smoothingBeginAndEndPoints.originPointY;
+            originPointZ = smoothingBeginAndEndPoints.originPointZ;
 
-            finalDestinationPointX = (Integer)smoothingBeginAndEndPoints[9];
-            finalDestinationPointY = (Integer)smoothingBeginAndEndPoints[10];
-            finalDestinationPointZ = (Integer)smoothingBeginAndEndPoints[11];
+            finalDestinationPointX = smoothingBeginAndEndPoints.finalDestinationPointX;
+            finalDestinationPointY = smoothingBeginAndEndPoints.finalDestinationPointY;
+            finalDestinationPointZ = smoothingBeginAndEndPoints.finalDestinationPointZ;
 
             diagonalLineOriginPointX = -1;
             diagonalLineoriginPointY = -1;
@@ -2249,29 +2325,26 @@ class SmoothingAreaGenerator
             diagonalLineFinalDestinationPointY = -1;
             diagonalLineFinalDestinationPointZ = -1;
 
-            if(smoothingBeginAndEndPoints.length > 17)
+            if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
             {
-	            diagonalLineOriginPointX = (Integer)smoothingBeginAndEndPoints[12];
-	            diagonalLineoriginPointY = (Integer)smoothingBeginAndEndPoints[13];
-	            diagonalLineOriginPointZ = (Integer)smoothingBeginAndEndPoints[14];
-	            diagonalLineFinalDestinationPointX = (Integer)smoothingBeginAndEndPoints[15];
-	            diagonalLineFinalDestinationPointY = (Integer)smoothingBeginAndEndPoints[16];
-	            diagonalLineFinalDestinationPointZ = (Integer)smoothingBeginAndEndPoints[17];
-            }
-
-            if(smoothingBeginAndEndPoints.length > 17)
-            {
-        		if((Integer)smoothingBeginAndEndPoints[13] >= (Integer)smoothingBeginAndEndPoints[16])
+	            diagonalLineOriginPointX = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineOriginPointX;
+	            diagonalLineoriginPointY = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineoriginPointY;
+	            diagonalLineOriginPointZ = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineOriginPointZ;
+	            diagonalLineFinalDestinationPointX = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointX;
+	            diagonalLineFinalDestinationPointY = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY;
+	            diagonalLineFinalDestinationPointZ = ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointZ;
+	            
+        		if(((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineoriginPointY >= ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY)
         		{
         			diagonalLinegoingDown = true;
         		}
-        		else if((Integer)smoothingBeginAndEndPoints[13] < (Integer)smoothingBeginAndEndPoints[16])
+        		else if(((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineoriginPointY < ((SmoothingAreaLineDiagonal)smoothingBeginAndEndPoints).diagonalLineFinalDestinationPointY)
         		{
         			diagonalLinegoingUp = true;
         		}
             }
 
-            int highestBlock = -1;
+            short highestBlock = -1;
 
             // TODO: Check if this is really still needed
             // finalDestinationPointY may have been found so the chunk is loaded, however it might still be the wrong coordinate
@@ -2281,26 +2354,27 @@ class SmoothingAreaGenerator
 
             if((prevfinalDestinationPointX != finalDestinationPointX || prevfinalDestinationPointZ != finalDestinationPointZ))
             {
-            	blockColumn = World.getBlockColumn(finalDestinationPointX,finalDestinationPointZ);
+            	blockColumn = world.getBlockColumn(finalDestinationPointX,finalDestinationPointZ);
             	prevfinalDestinationPointX = finalDestinationPointX;
             	prevfinalDestinationPointZ = finalDestinationPointZ;
             }
 
-            for(int i = highestBlock; i > -1; i--)
+            block = null;
+            for(short i = highestBlock; i > -1; i--)
             {
                 // when going down dont stop at the waterline
                 // when going up stop at the waterline
-            	OTGBlock block = blockColumn[i];
-            	material = block.material;
+            	block = blockColumn[i];
+            	material = block;
                 if(
                     !material.isAir() &&
                     (
-                        (block.y <= originPointY && !material.isLiquid()) ||
-                        (block.y > originPointY && ((!((BO4)Start.getObject()).getSettings().spawnUnderWater || !material.isLiquid())))
+                        (i <= originPointY && !material.isLiquid()) ||
+                        (i > originPointY && ((!((BO4)start.getObject()).getSettings().spawnUnderWater || !material.isLiquid())))
                     )
                 )
                 {
-                    finalDestinationPointY = block.y;
+                    finalDestinationPointY = i;
                     break;
                 }
             }
@@ -2318,7 +2392,7 @@ class SmoothingAreaGenerator
             // as their parent
     		if(diagonalLinegoingUp && !goingUp)
     		{
-    			finalDestinationPointY = originPointY + 75 < 256 ? originPointY + 75 : 255;
+    			finalDestinationPointY = (short) (originPointY + 75 < 256 ? originPointY + 75 : 255);
                 goingUp = true;
                 goingDown = false;
     		}
@@ -2328,7 +2402,7 @@ class SmoothingAreaGenerator
                 goingDown = true;
 
                 int distanceFromOrigin = -1;
-                int firstSolidBlock = -1;
+                short firstSolidBlock = -1;
 
                 // Since this is the second pass and the first pass went up we'll have to detect
                 // the closest suitable block to smooth to without using getHeighestBlock()
@@ -2342,19 +2416,20 @@ class SmoothingAreaGenerator
                 // Look for a solid destination block that has air/water/lava above it below the originBlock
                 // If we cant find one within range (30 blocks) then use the first solid block without air/water/lava above it
 
-                for(int i = originPointY; i > -1; i--)
+                block = null;
+                for(short i = originPointY; i > -1; i--)
                 {
-                	OTGBlock block = blockColumn[i];
-                    distanceFromOrigin = Math.abs(originPointY - block.y);
-                    LocalMaterialData materialAbove = blockColumn[i + 1].material;
-                    material = blockColumn[block.y].material;
+                	block = blockColumn[i];
+                    distanceFromOrigin = Math.abs(originPointY - i);
+                    LocalMaterialData materialAbove = blockColumn[i + 1];
+                    material = blockColumn[i];
                     if(
                         firstSolidBlock == -1 &&
                         !material.isAir() &&
                         !material.isLiquid()
                     )
                     {
-                        firstSolidBlock = block.y;
+                        firstSolidBlock = i;
                     }
 
                     if(
@@ -2367,7 +2442,7 @@ class SmoothingAreaGenerator
                         )
                     )
                     {
-                        finalDestinationPointY = block.y;
+                        finalDestinationPointY = i;
                         break;
                     }
                     if(distanceFromOrigin > 30 && firstSolidBlock > -1)
@@ -2394,20 +2469,20 @@ class SmoothingAreaGenerator
             	//if(pass2 == 1) { break; }
 
                 // If this is a corner then on the second pass move the diagonal line
-                if(smoothingBeginAndEndPoints.length > 17 && pass2 == 1)
+                if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal && pass2 == 1)
                 {
     	            // Recalculate the diagonal line y endpoint
 
                     if(diagonalLinegoingDown)
                     {
                         // TODO: replace 75 with... configurable value? or some kinda block-detection routine?
-                    	diagonalLineFinalDestinationPointY = diagonalLineoriginPointY + 75 < 256 ? diagonalLineoriginPointY + 75 : 255;
+                    	diagonalLineFinalDestinationPointY = (short) (diagonalLineoriginPointY + 75 < 256 ? diagonalLineoriginPointY + 75 : 255);
                     	//diagonalLineFinalDestinationPointY = diagonalLineoriginPointY;
                     }
                     else if(diagonalLinegoingUp)// && !goingUp)
                     {
                         int distanceFromOrigin = -1;
-                        int firstSolidBlock = -1;
+                        short firstSolidBlock = -1;
                         // Since this is the second pass and the first pass went up we'll have to detect
                         // the closest suitable block to smooth to without using getHeighestBlock()
                         // this means we might accidentally detect a cave beneath the surface as the
@@ -2423,24 +2498,25 @@ class SmoothingAreaGenerator
 
         	            if((prevDiagonalLineFinalDestinationPointX != diagonalLineFinalDestinationPointX || prevDiagonalLineFinalDestinationPointZ != diagonalLineFinalDestinationPointZ))
         	            {
-        	            	blockColumn2 = World.getBlockColumn(diagonalLineFinalDestinationPointX,diagonalLineFinalDestinationPointZ);
+        	            	blockColumn2 = world.getBlockColumn(diagonalLineFinalDestinationPointX,diagonalLineFinalDestinationPointZ);
         	            	prevDiagonalLineFinalDestinationPointX = diagonalLineFinalDestinationPointX;
         	            	prevDiagonalLineFinalDestinationPointZ = diagonalLineFinalDestinationPointZ;
         	            }
 
-        	            for(int i = diagonalLineoriginPointY; i > 0; i--)
+        	            block = null;
+        	            for(short i = diagonalLineoriginPointY; i > 0; i--)
                         {
-        	            	OTGBlock block = blockColumn2[i];
-                            distanceFromOrigin = Math.abs(diagonalLineoriginPointY - block.y);
-                            LocalMaterialData materialAbove = blockColumn2[i + 1].material;
-                            material = block.material;
+        	            	block = blockColumn2[i];
+                            distanceFromOrigin = Math.abs(diagonalLineoriginPointY - i);
+                            LocalMaterialData materialAbove = blockColumn2[i + 1];
+                            material = block;
                             if(
                                 firstSolidBlock == -1 &&
                                 !material.isAir() &&
                                 !material.isLiquid()
                             )
                             {
-                                firstSolidBlock = block.y;
+                                firstSolidBlock = i;
                             }
 
                             if(
@@ -2453,7 +2529,7 @@ class SmoothingAreaGenerator
                                 )
                             )
                             {
-                            	diagonalLineFinalDestinationPointY = block.y;
+                            	diagonalLineFinalDestinationPointY = i;
                                 break;
                             }
                             if(distanceFromOrigin > 30 && firstSolidBlock > -1)
@@ -2464,7 +2540,7 @@ class SmoothingAreaGenerator
                         }
                     }
 
-	        		originPointY = (int)Math.ceil(
+	        		originPointY = (short)Math.ceil(
                         (double)
                         (
                             (double)Math.abs(diagonalLineoriginPointY - diagonalLineFinalDestinationPointY)
@@ -2474,11 +2550,11 @@ class SmoothingAreaGenerator
                     );
 	        		if(diagonalLineoriginPointY > diagonalLineFinalDestinationPointY)
 	        		{
-	        			originPointY = diagonalLineoriginPointY - originPointY;
+	        			originPointY = (short) (diagonalLineoriginPointY - originPointY);
 	        		}
 	        		else if(diagonalLineoriginPointY < diagonalLineFinalDestinationPointY)
 	        		{
-	        			originPointY = diagonalLineoriginPointY + originPointY;
+	        			originPointY = (short) (diagonalLineoriginPointY + originPointY);
 	        		} else {
 	        			originPointY = diagonalLineoriginPointY;
 	        		}
@@ -2487,23 +2563,24 @@ class SmoothingAreaGenerator
 	        		if(diagonalLinegoingUp)
 	        		{
 		                material = null;
-		                highestBlock = originPointY;
-
-		                for(int i = highestBlock; i > -1; i--)
+		                block = null;
+		                highestBlock = originPointY;		                
+		                
+		                for(short i = highestBlock; i > -1; i--)
 		                {
 		                    // when going down dont stop at the waterline
 		                    // when going up stop at the waterline
-		                	OTGBlock block = blockColumn[i];
-		                	material = block.material;
+		                	block = blockColumn[i];
+		                	material = block;
 		                    if(
 		                        !material.isAir() &&
 		                        (
-		                            (block.y <= originPointY && !material.isLiquid()) ||
-		                            (block.y > originPointY && (!((BO4)Start.getObject()).getSettings().spawnUnderWater || !material.isLiquid()))
+		                            (i <= originPointY && !material.isLiquid()) ||
+		                            (i > originPointY && (!((BO4)start.getObject()).getSettings().spawnUnderWater || !material.isLiquid()))
 		                        )
 		                    )
 		                    {
-		                        finalDestinationPointY = block.y;
+		                        finalDestinationPointY = i;
 		                        break;
 		                    }
 		                }
@@ -2513,10 +2590,10 @@ class SmoothingAreaGenerator
 	        		// Line has been switched so really this line is going up
 	        		else if(diagonalLinegoingDown)
 	        		{
-	        			finalDestinationPointY = World.getHighestBlockYAt(finalDestinationPointX, finalDestinationPointZ, true, true, false, true);
+	        			finalDestinationPointY = (short) world.getHighestBlockYAt(finalDestinationPointX, finalDestinationPointZ, true, true, false, true);
                     	if(finalDestinationPointY < diagonalLineoriginPointY)
                     	{
-		        			finalDestinationPointY = diagonalLineoriginPointY + 75 < 256 ? diagonalLineoriginPointY + 75 : 255;
+		        			finalDestinationPointY = (short) (diagonalLineoriginPointY + 75 < 256 ? diagonalLineoriginPointY + 75 : 255);
                     	}
 
                         goingUp = true;
@@ -2524,12 +2601,12 @@ class SmoothingAreaGenerator
 	        		}
                 }
 
-                if(pass2 == 1 && smoothingBeginAndEndPoints.length < 18)
+                if(pass2 == 1 && !(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal))
                 {
                     if(!goingUp)
                     {
                         // TODO: replace 75 with... configurable value? or some kinda block-detection routine?
-                        finalDestinationPointY = originPointY + 75 < 256 ? originPointY + 75 : 255;
+                        finalDestinationPointY = (short) (originPointY + 75 < 256 ? originPointY + 75 : 255);
                         goingUp = true;
                         goingDown = false;
                     }
@@ -2539,7 +2616,7 @@ class SmoothingAreaGenerator
                         goingDown = true;
 
                         int distanceFromOrigin = -1;
-                        int firstSolidBlock = -1;
+                        short firstSolidBlock = -1;
                         // Since this is the second pass and the first pass went up we'll have to detect
                         // the closest suitable block to smooth to without using getHeighestBlock()
                         // this means we might accidentally detect a cave beneath the surface as the
@@ -2552,19 +2629,20 @@ class SmoothingAreaGenerator
                         // Look for a solid destination block that has air/water/lava above it below the originBlock
                         // If we cant find one within range (30 blocks) then use the first solid block without air/water/lava above it
                         finalDestinationPointY = originPointY;
-                        for(int i = originPointY; i > -1; i--)
+                        block = null;
+                        for(short i = originPointY; i > -1; i--)
                         {
-                        	OTGBlock block = blockColumn[i];
-                            distanceFromOrigin = Math.abs(originPointY - block.y);
-                            LocalMaterialData materialAbove = blockColumn[i + 1].material;
-                            material = block.material;
+                        	block = blockColumn[i];
+                            distanceFromOrigin = Math.abs(originPointY - i);
+                            LocalMaterialData materialAbove = blockColumn[i + 1];
+                            material = block;
                             if(
                                 firstSolidBlock == -1 &&
                                 !material.isAir() &&
                                 !material.isLiquid()
                             )
                             {
-                                firstSolidBlock = block.y;
+                                firstSolidBlock = i;
                             }
 
                             if(
@@ -2577,7 +2655,7 @@ class SmoothingAreaGenerator
                                 )
                             )
                             {
-                                finalDestinationPointY = block.y;
+                                finalDestinationPointY = i;
                                 break;
                             }
                             if(distanceFromOrigin > 30 && firstSolidBlock > -1)
@@ -2598,17 +2676,17 @@ class SmoothingAreaGenerator
                 }
 
                 // Get the coordinates for the last block in this chunk for this line
-                endPoint = new BO4BlockFunction();
-                endPoint.x = (Integer)smoothingBeginAndEndPoints[3];
+                endPoint = new SmoothingAreaBlock();
+                endPoint.x = smoothingBeginAndEndPoints.endPointX;
                 endPoint.y = finalDestinationPointY;
-                endPoint.z = (Integer)smoothingBeginAndEndPoints[5];
+                endPoint.z = smoothingBeginAndEndPoints.endPointZ;
 
                 // Add to spawn list all the blocks in between the first and last block in this chunk for this line
 
                 if(originPointX != finalDestinationPointX && originPointZ == finalDestinationPointZ)
                 {
                 	double adjustedOriginPointY = 0;
-                	if(smoothingBeginAndEndPoints.length > 17)
+                	if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
                 	{
 	            		double originPointY2 =
                         (
@@ -2650,7 +2728,7 @@ class SmoothingAreaGenerator
 
 	    	            // (diagonalLineOriginPointX != originPointX) is to ignore any lines of blocks that use the very first block
 	    	            // in a diagonal line as an origin point because those lines can be treated like normal (non-corner/diagonal lines)
-	    	            if(smoothingBeginAndEndPoints.length > 17 && (diagonalLineOriginPointX != originPointX))
+	    	            if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal && (diagonalLineOriginPointX != originPointX))
 	    	            {
     	    	            //X difference
     	    	            distanceFromStart = Math.abs(beginPoint.x - diagonalLineOriginPointX) + i;
@@ -2665,13 +2743,13 @@ class SmoothingAreaGenerator
 	                        if(adjustedOriginPointY > finalDestinationPointY)
 	                        {
 	                            // Moving down
-	                        	surfaceBlockHeight = (int)Math.round(adjustedOriginPointY - surfaceBlockHeight2);
+	                        	surfaceBlockHeight = (short)Math.round(adjustedOriginPointY - surfaceBlockHeight2);
 	                        } else {
-	                        	surfaceBlockHeight = (int)Math.round(adjustedOriginPointY + surfaceBlockHeight2);
+	                        	surfaceBlockHeight = (short)Math.round(adjustedOriginPointY + surfaceBlockHeight2);
 	                        }
 	    	            } else {
 	                        //surfaceBlockHeight = (int)Math.ceil(
-	    	            	surfaceBlockHeight = (int)Math.round(
+	    	            	surfaceBlockHeight = (short)Math.round(
 	                            (double)
 	                            (
 	                                (double)Math.abs(originPointY - finalDestinationPointY)
@@ -2683,13 +2761,13 @@ class SmoothingAreaGenerator
 	                        if(originPointY > finalDestinationPointY)
 	                        {
 	                            // Moving down
-	                            surfaceBlockHeight = originPointY - surfaceBlockHeight;
+	                            surfaceBlockHeight = (short) (originPointY - surfaceBlockHeight);
 	                        } else {
-	                            surfaceBlockHeight = originPointY + surfaceBlockHeight;
+	                            surfaceBlockHeight = (short) (originPointY + surfaceBlockHeight);
 	                        }
 	    	            }
 
-                        filler = new BO4BlockFunction();
+                        filler = new SmoothingAreaBlock();
                         if(originPointX < finalDestinationPointX)
                         {
                             filler.x = beginPoint.x + i;
@@ -2710,14 +2788,14 @@ class SmoothingAreaGenerator
                         // but lower-lying smooth-areas going up do not replace higher smoothing areas going down
                         boolean abort = false;
                         // get smoothing blocks
-                        for(Object[] smoothingBeginAndEndPoints2 : smoothingAreas)
+                        for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreas)
                         {
                         	// TODO: Find out if this doesnt skip the block at
                         	// diagonal line index 0, it shouldnt!
-                        	if(smoothingBeginAndEndPoints2.length < 18)
+                        	if(!(smoothingBeginAndEndPoints2 instanceof SmoothingAreaLineDiagonal))
                         	{
-	                        	int originPointX2 = (Integer)smoothingBeginAndEndPoints2[6];
-	                        	int originPointZ2 = (Integer)smoothingBeginAndEndPoints2[8];
+	                        	int originPointX2 = smoothingBeginAndEndPoints2.originPointX;
+	                        	int originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
 
 	                            if((originPointX2 != filler.x || originPointZ2 != filler.z) || (originPointX == originPointX2 && originPointZ == originPointZ2))
 	                            {
@@ -2737,62 +2815,62 @@ class SmoothingAreaGenerator
                             break;
                         }
 
-                        blocksToRemove = new ArrayList<Object[]>();
+                        blocksToRemove = new ArrayList<SmoothingAreaLineBlock>();
                         dontAdd = false;
-                        for(Object[] existingBlockItem : blocksToSpawn)
+                        for(SmoothingAreaLineBlock existingBlockItem : blocksToSpawn)
                         {
-                            existingBlock = (BO4BlockFunction)existingBlockItem[0];
+                            existingBlock = existingBlockItem.block;
 
                             //Don't always override higher blocks when going down, instead do a second pass going up
                             if (existingBlock.x == filler.x && existingBlock.z == filler.z)
                             {
                                 // When this block is lower than existingblock and this block is going up and existingblock is going up
-                                if (filler.y < existingBlock.y && goingUp && (Boolean)existingBlockItem[1])
+                                if (filler.y < existingBlock.y && goingUp && existingBlockItem.goingUp)
                                 {
                                     blocksToRemove.add(existingBlockItem);
                                 }
                                 // When this block is higher than or equal to existingblock and this block is going up and existingblock is going up
-                                else if (filler.y >= existingBlock.y && goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y >= existingBlock.y && goingUp && existingBlockItem.goingUp)
                                 {
                                     dontAdd = true;
                                     break;
                                 }
                                 // When this block is lower than existingblock and this block is not going up and existingblock is going up
-                                else if (filler.y < existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y < existingBlock.y && !goingUp && existingBlockItem.goingUp)
                                 {
                                     // since goingDown does not remove higher blocks allow both blocks
                                 }
                                 // When this block is higher than or equal to existingblock and this block is not going up and existingblock is going up
-                                else if (filler.y > existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y > existingBlock.y && !goingUp && existingBlockItem.goingUp)
                                 {
                                     blocksToRemove.add(existingBlockItem);
                                 }
                                 // When this block is higher than or equal to existingblock and this block is not going up and existingblock is going up
-                                else if (filler.y == existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y == existingBlock.y && !goingUp && existingBlockItem.goingUp)
                                 {
                                     //Allow both
                                 }
 
                                 // When this block is lower than existingblock and this block is going up and existingblock is not going up
-                                if (filler.y < existingBlock.y && goingUp && !(Boolean)existingBlockItem[1])
+                                if (filler.y < existingBlock.y && goingUp && !existingBlockItem.goingUp)
                                 {
                                     //if the other block is higher and smoothing downwards then let it cover (smother) any smooth area below it (namely this one)
                                     dontAdd = true;
                                     break;
                                 }
                                 // When this block is higher than or equal to existingblock and this block is going up and existingblock is not going up
-                                else if (filler.y >= existingBlock.y && goingUp && !(Boolean)existingBlockItem[1])
+                                else if (filler.y >= existingBlock.y && goingUp && !existingBlockItem.goingUp)
                                 {
                                     // if this block is above another block that is going down and this block is going up then both are allowed
                                 }
                                 // When this block is lower than existingblock and this block is not going up and existingblock is not going up
-                                else if (filler.y < existingBlock.y && !goingUp && !(Boolean)existingBlockItem[1])
+                                else if (filler.y < existingBlock.y && !goingUp && !existingBlockItem.goingUp)
                                 {
                                     dontAdd = true;
                                     break;
                                 }
                                 // When this block is higher than or equal to existingblock and this block is not going up and existingblock is not going up
-                                else if (filler.y >= existingBlock.y && !goingUp && !(Boolean)existingBlockItem[1])
+                                else if (filler.y >= existingBlock.y && !goingUp && !existingBlockItem.goingUp)
                                 {
                                     blocksToRemove.add(existingBlockItem);
                                 }
@@ -2806,7 +2884,7 @@ class SmoothingAreaGenerator
 	                        if(filler.x == originPointX && filler.z == originPointZ)
 	                        {
 	            	    		try {
-	            					World.setBlock(originPointX, originPointY, originPointZ,OTG.readMaterial("STONE"), null, true);
+	            					World.setBlock(originPointX, originPointY, originPointZ,MaterialHelper.readMaterial("STONE"), null, true);
 	            				} catch (InvalidConfigException e) {
 	            					// TODO Auto-generated catch block
 	            					e.printStackTrace();
@@ -2816,20 +2894,20 @@ class SmoothingAreaGenerator
 
 	                        if(blocksToRemove.size() > 0)
 	                        {
-	                            for(Object[] blockToRemove : blocksToRemove)
+	                            for(SmoothingAreaLineBlock blockToRemove : blocksToRemove)
 	                            {
 	                                blocksToSpawn.remove(blockToRemove);
 	                            }
 	                        }
 
-                            blocksToSpawn.add(new Object[] { filler, goingUp, goingDown, pass2 == 1 });
+                            blocksToSpawn.add(new SmoothingAreaLineBlock(filler, goingUp, goingDown, pass2 == 1));
                         }
                     }
                 }
                 if(originPointX == finalDestinationPointX && originPointZ != finalDestinationPointZ)
                 {
                 	double adjustedOriginPointY = 0;
-                	if(smoothingBeginAndEndPoints.length > 17)
+                	if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
                 	{
 	            		double originPointY2 =
                         (
@@ -2871,7 +2949,7 @@ class SmoothingAreaGenerator
 
 	    	            // (diagonalLineOriginPointZ != originPointZ) is to ignore any lines of blocks that use the very first block
 	    	            // in a diagonal line as an origin point because those lines can be treated like normal (non-corner/diagonal lines)
-	    	            if(smoothingBeginAndEndPoints.length > 17 && (diagonalLineOriginPointZ != originPointZ))
+	    	            if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal && (diagonalLineOriginPointZ != originPointZ))
 	    	            {
     	    	            //Z difference
     	    	            distanceFromStart = Math.abs(beginPoint.z - diagonalLineOriginPointZ) + i;
@@ -2886,12 +2964,12 @@ class SmoothingAreaGenerator
 	                        if(adjustedOriginPointY > finalDestinationPointY)
 	                        {
 	                            // Moving down
-	                        	surfaceBlockHeight = (int)Math.round(adjustedOriginPointY - surfaceBlockHeight2);
+	                        	surfaceBlockHeight = (short)Math.round(adjustedOriginPointY - surfaceBlockHeight2);
 	                        } else {
-	                        	surfaceBlockHeight = (int)Math.round(adjustedOriginPointY + surfaceBlockHeight2);
+	                        	surfaceBlockHeight = (short)Math.round(adjustedOriginPointY + surfaceBlockHeight2);
 	                        }
 	    	            } else {
-                    		surfaceBlockHeight = (int)Math.round(
+                    		surfaceBlockHeight = (short)Math.round(
 	                            (double)
 	                            (
 	                                (double)Math.abs(originPointY - finalDestinationPointY)
@@ -2903,13 +2981,13 @@ class SmoothingAreaGenerator
 	                        if(originPointY > finalDestinationPointY)
 	                        {
 	                            // Moving down
-	                            surfaceBlockHeight = originPointY - surfaceBlockHeight;
+	                            surfaceBlockHeight = (short) (originPointY - surfaceBlockHeight);
 	                        } else {
-	                            surfaceBlockHeight = originPointY + surfaceBlockHeight;
+	                            surfaceBlockHeight = (short) (originPointY + surfaceBlockHeight);
 	                        }
 	    	            }
 
-                        filler = new BO4BlockFunction();
+                        filler = new SmoothingAreaBlock();
                         if(originPointZ < finalDestinationPointZ)
                         {
                             filler.x = beginPoint.x;
@@ -2930,16 +3008,16 @@ class SmoothingAreaGenerator
                         // but lower-lying smooth-areas going up do not replace higher smoothing areas going down
                         boolean abort = false;
                         // get smoothing blocks
-                        for(Object[] smoothingBeginAndEndPoints2 : smoothingAreas)
+                        for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreas)
                         {
                         	// TODO: Find out if this doesnt skip the block at
                         	// diagonal line index 0, it shouldnt!
-                        	if(smoothingBeginAndEndPoints2.length < 18)
+                        	if(!(smoothingBeginAndEndPoints2 instanceof SmoothingAreaLineDiagonal))
                         	{
 	                        	// TODO: Even diagonal block child line smooth origin points are included
 	                        	// here, find out if that doesn't cause bugs..
-	                        	int originPointX2 = (Integer)smoothingBeginAndEndPoints2[6];
-	                        	int originPointZ2 = (Integer)smoothingBeginAndEndPoints2[8];
+	                        	int originPointX2 = smoothingBeginAndEndPoints2.originPointX;
+	                        	int originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
 
 	                            if((originPointX2 != filler.x || originPointZ2 != filler.z) || (originPointX == originPointX2 && originPointZ == originPointZ2))
 	                            {
@@ -2960,60 +3038,60 @@ class SmoothingAreaGenerator
                         }
 
                         dontAdd = false;
-                        blocksToRemove = new ArrayList<Object[]>();
-                        for(Object[] existingBlockItem : blocksToSpawn)
+                        blocksToRemove = new ArrayList<SmoothingAreaLineBlock>();
+                        for(SmoothingAreaLineBlock existingBlockItem : blocksToSpawn)
                         {
-                            existingBlock = (BO4BlockFunction)existingBlockItem[0];
+                            existingBlock = existingBlockItem.block;
                             //Don't always override higher blocks when going down, instead do a second pass going up
                             if (existingBlock.x == filler.x && existingBlock.z == filler.z)
                             {
                                 // When this block is lower than existingblock and this block is going up and existingblock is going up
-                                if (filler.y < existingBlock.y && goingUp && (Boolean)existingBlockItem[1])
+                                if (filler.y < existingBlock.y && goingUp && existingBlockItem.goingUp)
                                 {
                                     blocksToRemove.add(existingBlockItem);
                                 }
                                 // When this block is higher than or equal to existingblock and this block is going up and existingblock is going up
-                                else if (filler.y >= existingBlock.y && goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y >= existingBlock.y && goingUp && existingBlockItem.goingUp)
                                 {
                                     dontAdd = true;
                                     break;
                                 }
                                 // When this block is lower than existingblock and this block is not going up and existingblock is going up
-                                else if (filler.y < existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y < existingBlock.y && !goingUp && existingBlockItem.goingUp)
                                 {
                                     // since goingDown does not remove higher blocks allow both blocks
                                 }
                                 // When this block is higher than or equal to existingblock and this block is not going up and existingblock is going up
-                                else if (filler.y > existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y > existingBlock.y && !goingUp && existingBlockItem.goingUp)
                                 {
                                     blocksToRemove.add(existingBlockItem);
                                 }
                                 // When this block is higher than or equal to existingblock and this block is not going up and existingblock is going up
-                                else if (filler.y == existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                                else if (filler.y == existingBlock.y && !goingUp && existingBlockItem.goingUp)
                                 {
                                     //Allow both
                                 }
 
                                 // When this block is lower than existingblock and this block is going up and existingblock is not going up
-                                if (filler.y < existingBlock.y && goingUp && !(Boolean)existingBlockItem[1])
+                                if (filler.y < existingBlock.y && goingUp && !existingBlockItem.goingUp)
                                 {
                                     //if the other block is higher and smoothing downwards then let it cover (smother) any smooth area below it (namely this one)
                                     dontAdd = true;
                                     break;
                                 }
                                 // When this block is higher than or equal to existingblock and this block is going up and existingblock is not going up
-                                else if (filler.y >= existingBlock.y && goingUp && !(Boolean)existingBlockItem[1])
+                                else if (filler.y >= existingBlock.y && goingUp && !existingBlockItem.goingUp)
                                 {
                                     // if this block is above another block that is going down and this block is going up then both are allowed
                                 }
                                 // When this block is lower than existingblock and this block is not going up and existingblock is not going up
-                                else if (filler.y < existingBlock.y && !goingUp && !(Boolean)existingBlockItem[1])
+                                else if (filler.y < existingBlock.y && !goingUp && !existingBlockItem.goingUp)
                                 {
                                     dontAdd = true;
                                     break;
                                 }
                                 // When this block is higher than or equal to existingblock and this block is not going up and existingblock is not going up
-                                else if (filler.y >= existingBlock.y && !goingUp && !(Boolean)existingBlockItem[1])
+                                else if (filler.y >= existingBlock.y && !goingUp && !existingBlockItem.goingUp)
                                 {
                                     blocksToRemove.add(existingBlockItem);
                                 }
@@ -3027,7 +3105,7 @@ class SmoothingAreaGenerator
 	                        if(filler.x == originPointX && filler.z == originPointZ)
 	                        {
 	            	    		try {
-	            					World.setBlock(originPointX, originPointY, originPointZ,OTG.readMaterial("STONE"), null, true);
+	            					World.setBlock(originPointX, originPointY, originPointZ,MaterialHelper.readMaterial("STONE"), null, true);
 	            				} catch (InvalidConfigException e) {
 	            					// TODO Auto-generated catch block
 	            					e.printStackTrace();
@@ -3037,20 +3115,20 @@ class SmoothingAreaGenerator
 
 	                        if(blocksToRemove.size() > 0)
 	                        {
-	                            for(Object[] blockToRemove : blocksToRemove)
+	                            for(SmoothingAreaLineBlock blockToRemove : blocksToRemove)
 	                            {
 	                                blocksToSpawn.remove(blockToRemove);
 	                            }
 	                        }
 
-                            blocksToSpawn.add(new Object[] { filler, goingUp, goingDown, pass2 == 1 });
+                            blocksToSpawn.add(new SmoothingAreaLineBlock(filler, goingUp, goingDown, pass2 == 1));
                         }
                     }
                 }
 
                 if(originPointX == finalDestinationPointX && originPointZ == finalDestinationPointZ)
                 {
-                    filler = new BO4BlockFunction();
+                    filler = new SmoothingAreaBlock();
                     filler.x = finalDestinationPointX;
                     filler.y = finalDestinationPointY;
                     filler.z = finalDestinationPointZ;
@@ -3067,14 +3145,14 @@ class SmoothingAreaGenerator
                     // but lower-lying smooth-areas going up do not replace higher smoothing areas going down
                     boolean abort = false;
                     // get smoothing blocks
-                    for(Object[] smoothingBeginAndEndPoints2 : smoothingAreas)
+                    for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreas)
                     {
                     	// TODO: Find out if this doesnt skip the block at
                     	// diagonal line index 0, it shouldnt!
-                    	if(smoothingBeginAndEndPoints2.length < 18)
+                    	if(!(smoothingBeginAndEndPoints2 instanceof SmoothingAreaLineDiagonal))
                     	{
-                        	int originPointX2 = (Integer)smoothingBeginAndEndPoints2[6];
-                        	int originPointZ2 = (Integer)smoothingBeginAndEndPoints2[8];
+                        	int originPointX2 = smoothingBeginAndEndPoints2.originPointX;
+                        	int originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
 
                             if((originPointX2 != filler.x || originPointZ2 != filler.z) || (originPointX == originPointX2 && originPointZ == originPointZ2))
                             {
@@ -3095,60 +3173,60 @@ class SmoothingAreaGenerator
                     }
 
                     dontAdd = false;
-                    blocksToRemove = new ArrayList<Object[]>();
-                    for(Object[] existingBlockItem : blocksToSpawn)
+                    blocksToRemove = new ArrayList<SmoothingAreaLineBlock>();
+                    for(SmoothingAreaLineBlock existingBlockItem : blocksToSpawn)
                     {
-                        existingBlock = (BO4BlockFunction)existingBlockItem[0];
+                        existingBlock = existingBlockItem.block;
                         //Don't always override higher blocks when going down, instead do a second pass going up
                         if (existingBlock.x == filler.x && existingBlock.z == filler.z)
                         {
                             // When this block is lower than existingblock and this block is going up and existingblock is going up
-                            if (filler.y < existingBlock.y && goingUp && (Boolean)existingBlockItem[1])
+                            if (filler.y < existingBlock.y && goingUp && existingBlockItem.goingUp)
                             {
                                 blocksToRemove.add(existingBlockItem);
                             }
                             // When this block is higher than or equal to existingblock and this block is going up and existingblock is going up
-                            else if (filler.y >= existingBlock.y && goingUp && (Boolean)existingBlockItem[1])
+                            else if (filler.y >= existingBlock.y && goingUp && existingBlockItem.goingUp)
                             {
                                 dontAdd = true;
                                 break;
                             }
                             // When this block is lower than existingblock and this block is not going up and existingblock is going up
-                            else if (filler.y < existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                            else if (filler.y < existingBlock.y && !goingUp && existingBlockItem.goingUp)
                             {
                                 // since goingDown does not remove higher blocks allow both blocks
                             }
                             // When this block is higher than or equal to existingblock and this block is not going up and existingblock is going up
-                            else if (filler.y > existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                            else if (filler.y > existingBlock.y && !goingUp && existingBlockItem.goingUp)
                             {
                                 blocksToRemove.add(existingBlockItem);
                             }
                             // When this block is higher than or equal to existingblock and this block is not going up and existingblock is going up
-                            else if (filler.y == existingBlock.y && !goingUp && (Boolean)existingBlockItem[1])
+                            else if (filler.y == existingBlock.y && !goingUp && existingBlockItem.goingUp)
                             {
                                 //Allow both
                             }
 
                             // When this block is lower than existingblock and this block is going up and existingblock is not going up
-                            if (filler.y < existingBlock.y && goingUp && !(Boolean)existingBlockItem[1])
+                            if (filler.y < existingBlock.y && goingUp && !existingBlockItem.goingUp)
                             {
                                 //if the other block is higher and smoothing downwards then let it cover (smother) any smooth area below it (namely this one)
                                 dontAdd = true;
                                 break;
                             }
                             // When this block is higher than or equal to existingblock and this block is going up and existingblock is not going up
-                            else if (filler.y >= existingBlock.y && goingUp && !(Boolean)existingBlockItem[1])
+                            else if (filler.y >= existingBlock.y && goingUp && !existingBlockItem.goingUp)
                             {
                                 // if this block is above another block that is going down and this block is going up then both are allowed
                             }
                             // When this block is lower than existingblock and this block is not going up and existingblock is not going up
-                            else if (filler.y < existingBlock.y && !goingUp && !(Boolean)existingBlockItem[1])
+                            else if (filler.y < existingBlock.y && !goingUp && !existingBlockItem.goingUp)
                             {
                                 dontAdd = true;
                                 break;
                             }
                             // When this block is higher than or equal to existingblock and this block is not going up and existingblock is not going up
-                            else if (filler.y >= existingBlock.y && !goingUp && !(Boolean)existingBlockItem[1])
+                            else if (filler.y >= existingBlock.y && !goingUp && !existingBlockItem.goingUp)
                             {
                                 blocksToRemove.add(existingBlockItem);
                             }
@@ -3162,7 +3240,7 @@ class SmoothingAreaGenerator
                         if(filler.x == originPointX && filler.z == originPointZ)
                         {
             	    		try {
-            					World.setBlock(originPointX, originPointY, originPointZ,OTG.readMaterial("STONE"), null, true);
+            					World.setBlock(originPointX, originPointY, originPointZ,MaterialHelper.readMaterial("STONE"), null, true);
             				} catch (InvalidConfigException e) {
             					// TODO Auto-generated catch block
             					e.printStackTrace();
@@ -3172,13 +3250,13 @@ class SmoothingAreaGenerator
 
                         if(blocksToRemove.size() > 0)
                         {
-                            for(Object[] blockToRemove : blocksToRemove)
+                            for(SmoothingAreaLineBlock blockToRemove : blocksToRemove)
                             {
                                 blocksToSpawn.remove(blockToRemove);
                             }
                         }
 
-                        blocksToSpawn.add(new Object[] { filler, goingUp, goingDown, pass2 == 1 });
+                        blocksToSpawn.add(new SmoothingAreaLineBlock(filler, goingUp, goingDown, pass2 == 1));
                     }
                 }
             }

@@ -55,8 +55,7 @@ public class ClientTickHandler
 						particleData.firstSpawn = false;        						
 					
         				if(particleName != null && particleName.trim().length() > 0)
-        				{
-       					
+        				{       					
         					if(Minecraft.getMinecraft().inGameHasFocus)
         					{
         						EnumParticleTypes enumParticleType = EnumParticleTypes.getByName(particleName);

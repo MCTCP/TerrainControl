@@ -111,9 +111,17 @@ public final class BiomeGroupManager
         return idToGroup.size();
     }
 
+    // TODO: Turn into array?
+    HashMap<Integer, TreeMap<Integer, BiomeGroup>> cachedGroupDepthMaps = new HashMap<Integer, TreeMap<Integer, BiomeGroup>>();
     public SortedMap<Integer, BiomeGroup> getGroupDepthMap(int depth)
     {
-        TreeMap<Integer, BiomeGroup> map = new TreeMap<Integer, BiomeGroup>();
+    	TreeMap<Integer, BiomeGroup> map = cachedGroupDepthMaps.get(new Integer(depth));
+    	if(map != null)
+    	{
+    		return map;
+    	}
+    	
+        map = new TreeMap<Integer, BiomeGroup>();
         this.cumulativeGroupRarity = 0;
         for (BiomeGroup group : getGroups())
         {
@@ -127,6 +135,9 @@ public final class BiomeGroupManager
         {
             map.put(map.size() * 100, null);
         }
+        
+        cachedGroupDepthMaps.put(new Integer(depth), map);
+        
         return map;
     }
 

@@ -3,6 +3,7 @@ package com.pg85.otg.forge.generator.structure;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
@@ -28,8 +29,9 @@ public class OTGVillageGen extends OTGMapGenStructure
     private int distance;
     private int minimumDistance;
 
-    public OTGVillageGen(ServerConfigProvider configs)
+    public OTGVillageGen(ServerConfigProvider configs, ForgeWorld world)
     {
+    	super(world);
         this.size = configs.getWorldConfig().villageSize;
         this.distance = configs.getWorldConfig().villageDistance;
         this.minimumDistance = 8;

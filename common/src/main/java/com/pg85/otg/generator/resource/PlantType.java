@@ -1,9 +1,9 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Collection;
@@ -54,7 +54,7 @@ public class PlantType
         PlantType plantType = LOOKUP_MAP.get(name);
         if (plantType == null)
         {
-        	LocalMaterialData material = OTG.readMaterial(name);
+        	LocalMaterialData material = MaterialHelper.readMaterial(name);
             // Fall back on block name + data
             plantType = new PlantType(material);
         }
@@ -99,7 +99,7 @@ public class PlantType
     {
         this.name = name;
         this.topBlock = null;
-        this.bottomBlock = OTG.toLocalMaterialData(material, data);
+        this.bottomBlock = MaterialHelper.toLocalMaterialData(material, data);
     }
 
     /**
@@ -125,8 +125,8 @@ public class PlantType
     private PlantType(String name, DefaultMaterial material, int bottomData, int topData)
     {
         this.name = name;
-        this.topBlock = OTG.toLocalMaterialData(material, topData);
-        this.bottomBlock = OTG.toLocalMaterialData(material, bottomData);
+        this.topBlock = MaterialHelper.toLocalMaterialData(material, topData);
+        this.bottomBlock = MaterialHelper.toLocalMaterialData(material, bottomData);
     }
 
     /**

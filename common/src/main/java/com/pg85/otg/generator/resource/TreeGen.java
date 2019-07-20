@@ -133,8 +133,7 @@ public class TreeGen extends Resource
                 			BiomeConfig biomeConfig = world.getBiome(chunkCoord.getChunkX() * 16 + 15, chunkCoord.getChunkZ() * 16 + 15).getBiomeConfig();
                 			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree in biome " + biomeConfig.getName() + ". BO3: " + treeNames.get(treeNumber));
                 		}
-                		//continue;
-                		throw new RuntimeException();
+                		continue;
                     }
                     
                     if(tree instanceof BO2 || tree instanceof BO3)

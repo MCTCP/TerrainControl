@@ -2,10 +2,10 @@ package com.pg85.otg.configuration.dimensions;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 
 public class SettingsEntry
 {
@@ -18,7 +18,7 @@ public class SettingsEntry
     	{
     		LocalMaterialData forgeMat;
 			try {
-				forgeMat = OTG.readMaterial(mat);
+				forgeMat = MaterialHelper.readMaterial(mat);
 				portalMaterials.add(forgeMat);
 			} catch (InvalidConfigException e) {
 				e.printStackTrace();

@@ -4,6 +4,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
+import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import java.util.List;
@@ -11,13 +12,20 @@ import java.util.Random;
 
 public class BO3RandomBlockFunction extends BO3BlockFunction
 {
-    private LocalMaterialData[] blocks;
-    private byte[] blockChances;
-    private String[] metaDataNames;
-    private NamedBinaryTag[] metaDataTags;
+    public LocalMaterialData[] blocks;
+    public byte[] blockChances;
+    public String[] metaDataNames;
+    public NamedBinaryTag[] metaDataTags;
 
-    private int blockCount = 0;
+    public byte blockCount = 0;
 	
+    public BO3RandomBlockFunction() { }
+    
+    public BO3RandomBlockFunction(BO3Config holder)
+    {
+    	super(holder);
+    }
+    
     public BO3RandomBlockFunction rotate()
     {
         BO3RandomBlockFunction rotatedBlock = new BO3RandomBlockFunction();
@@ -42,7 +50,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
     {
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -100, 100);
+        y = (short) readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
 
         // Now read the random parts

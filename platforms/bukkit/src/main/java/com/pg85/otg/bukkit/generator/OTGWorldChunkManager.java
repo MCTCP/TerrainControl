@@ -33,7 +33,7 @@ public class OTGWorldChunkManager extends WorldChunkManager
     @Override
     public BiomeBase getBiome(BlockPosition blockPos)
     {
-        return ((BukkitBiome)localWorld.getBiomeByOTGIdOrNull(biomeGenerator.getBiome(blockPos.getX(), blockPos.getZ()))).getHandle();
+        return ((BukkitBiome)localWorld.getBiome(blockPos.getX(), blockPos.getZ())).getHandle();
     }
 
     @Override

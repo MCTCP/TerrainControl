@@ -4,12 +4,12 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
@@ -38,7 +38,7 @@ public class TeleportPlayerPacket extends OTGPacket
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Teleport player packet
     	
-    	ConfigFile.writeStringToStream(stream, dimensionName);
+    	StreamHelper.writeStringToStream(stream, dimensionName);
 	}
 	
 	public static class Handler extends AbstractServerMessageHandler<TeleportPlayerPacket>
@@ -53,7 +53,7 @@ public class TeleportPlayerPacket extends OTGPacket
 				{
 					// Teleport player to dimension
 					
-					String dimensionName = ConfigFile.readStringFromStream(message.getStream());
+					String dimensionName = StreamHelper.readStringFromStream(message.getStream());
 
 					IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
 		            mainThread.addScheduledTask(new Runnable()

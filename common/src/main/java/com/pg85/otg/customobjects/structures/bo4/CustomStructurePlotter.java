@@ -112,7 +112,7 @@ public class CustomStructurePlotter
 			            		if(!((BO4)bo3AndRarity.getKey()).isInvalidConfig && ((BO4)bo3AndRarity.getKey()).getSettings().isSpawnPoint)
 			            		{
 				            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
-				                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ(), 0, false, false, null);
+				                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
 				                	structureStart2 = new BO4CustomStructure(world, structureCoord, false, false);
 				                	// Get minimum size (size if spawned with branchDepth 0)
 
@@ -140,7 +140,7 @@ public class CustomStructurePlotter
 			            			if(isBO3AllowedToSpawnAt(chunkCoord, ((BO4)bo3AndRarity.getKey())))
 			            			{
 					            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
-					                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ(), 0, false, false, null);
+					                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
 					                	structureStart2 = new BO4CustomStructure(world, structureCoord, false, false);
 					                	// Get minimum size (size if spawned with branchDepth 0)
 
@@ -631,7 +631,7 @@ public class CustomStructurePlotter
 
 				                		if(isBO3AllowedToSpawnAt(ChunkCoordinate.fromChunkCoords((int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)), (int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))), (BO4)currentStructureSpawning[0]))
 				                		{
-						                	structureCoord = new BO4CustomStructureCoordinate(world, ((BO4)currentStructureSpawning[0]), null, Rotation.NORTH, spawnCoordX * 16, 0, spawnCoordZ * 16, 0, false, false, null);
+						                	structureCoord = new BO4CustomStructureCoordinate(world, ((BO4)currentStructureSpawning[0]), null, Rotation.NORTH, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
 						                	structureStart2 = new BO4CustomStructure(world, structureCoord, true, spawningStructureAtSpawn);
 
 				            	        	if(structureStart2.IsSpawned)

@@ -44,8 +44,8 @@ public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends 
     public boolean velocityYSet = false;
     public boolean velocityZSet = false;
 
-    private String metaDataTag;
-    private boolean metaDataProcessed = false;
+    protected String metaDataTag;
+    protected boolean metaDataProcessed = false;
     
     @Override
     public void load(List<String> args) throws InvalidConfigException

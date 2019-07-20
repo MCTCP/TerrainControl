@@ -94,11 +94,11 @@ class BranchDataItem
 		    		{
     		    		if(childBO3.getSettings().spawnHeight == SpawnHeightEnum.highestBlock || childBO3.getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock || childBO3.getSettings().spawnAtWaterLevel)
     		    		{
-    		    			childCoordObject.y = world.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getSettings().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getSettings().spawnAtWaterLevel, childBO3.getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getSettings().spawnAtWaterLevel, true);
+    		    			childCoordObject.y = (short) world.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getSettings().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getSettings().spawnAtWaterLevel, childBO3.getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getSettings().spawnAtWaterLevel, true);
     		    		}
     		    		else if(childBO3.getSettings().spawnHeight == SpawnHeightEnum.randomY)
     		    		{
-    		    			childCoordObject.y = RandomHelper.numberInRange(this.random, childBO3.getSettings().minHeight, childBO3.getSettings().maxHeight);
+    		    			childCoordObject.y = (short) RandomHelper.numberInRange(this.random, childBO3.getSettings().minHeight, childBO3.getSettings().maxHeight);
     		    		}
 		    		}
 		    		childCoordObject.y += childBO3.getSettings().heightOffset;

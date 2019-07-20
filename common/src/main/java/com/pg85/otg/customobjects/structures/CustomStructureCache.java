@@ -110,9 +110,9 @@ public class CustomStructureCache
 
     // persistence
 
-    private void compressCache()
+    public void compressCache()
     {
-    	OTG.log(LogMarker.DEBUG, "Compressing structure-cache and pre-generator data");
+    	OTG.log(LogMarker.INFO, "Compressing structure-cache and pre-generator data");
 
     	// If a chunk in the structurecache is inside the outermost ring of
     	// chunks in the pre-generated area then it can be safely removed
@@ -150,7 +150,7 @@ public class CustomStructureCache
 
     	bo4StructureCache = newStructureCache;
 
-    	OTG.log(LogMarker.DEBUG, "Removed " + structuresRemoved + " cached chunks");
+    	OTG.log(LogMarker.INFO, "Removed " + structuresRemoved + " cached chunks");
     }
 
     public void saveToDisk()

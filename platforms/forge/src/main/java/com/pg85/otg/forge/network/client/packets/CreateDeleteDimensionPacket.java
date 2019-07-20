@@ -14,7 +14,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
@@ -23,6 +22,7 @@ import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 import io.netty.buffer.ByteBuf;
 
@@ -46,7 +46,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(0); // 0 == Create dimension packet
     	
-    	ConfigFile.writeStringToStream(stream, dimensionConfig.toYamlString());
+    	StreamHelper.writeStringToStream(stream, dimensionConfig.toYamlString());
 	}
 	
 	public static void writeDeletePacketToStream(String dimensionName, DataOutput stream) throws IOException
@@ -54,7 +54,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
     	stream.writeInt(PluginStandardValues.ProtocolVersion);
     	stream.writeInt(1); // 1 == Delete dimension packet
     	
-    	ConfigFile.writeStringToStream(stream, dimensionName);
+    	StreamHelper.writeStringToStream(stream, dimensionName);
 	}
 	
 	public static class Handler extends AbstractServerMessageHandler<CreateDeleteDimensionPacket>
@@ -67,7 +67,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 				int packetType = message.getStream().readInt();
 				if(packetType == 0) // Create dimension
 				{
-					String dimConfigYaml = ConfigFile.readStringFromStream(message.getStream());
+					String dimConfigYaml = StreamHelper.readStringFromStream(message.getStream());
 					DimensionConfig dimConfig = DimensionConfig.fromYamlString(dimConfigYaml);       			
 					
 		            IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
@@ -122,7 +122,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 				}
 				else if(packetType == 1) // Delete dimension
 				{
-					String worldName = ConfigFile.readStringFromStream(message.getStream());
+					String worldName = StreamHelper.readStringFromStream(message.getStream());
 					IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
 		            mainThread.addScheduledTask(new Runnable()
 		            {

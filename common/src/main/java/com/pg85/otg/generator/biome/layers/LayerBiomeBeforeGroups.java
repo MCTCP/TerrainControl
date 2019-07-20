@@ -29,25 +29,27 @@ public class LayerBiomeBeforeGroups extends Layer
         int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
 
+        int currentPiece;
+        LocalBiome biome;
         for (int i = 0; i < zSize; i++)
         {
             for (int j = 0; j < xSize; j++)
             {
                 initChunkSeed(j + x, i + z);
-                int currentPiece = childInts[(j + i * xSize)];
+                currentPiece = childInts[(j + i * xSize)];
 
                 if ((currentPiece & BiomeBits) == 0)    // without biome
                 {
                     if (this.biomes.length > 0 && (currentPiece & IceBit) == 0) // Normal
                                                                                 // Biome
                     {
-                        LocalBiome biome = this.biomes[nextInt(this.biomes.length)];
+                        biome = this.biomes[nextInt(this.biomes.length)];
                         if (biome != null)
                             currentPiece |= biome.getIds().getOTGBiomeId();
                     } else if (this.ice_biomes.length > 0 && (currentPiece & IceBit) != 0) // Ice
                                                                                            // biome
                     {
-                        LocalBiome biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
+                        biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
                         if (biome != null)
                             currentPiece |= biome.getIds().getOTGBiomeId();
                     }

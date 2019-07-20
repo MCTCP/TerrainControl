@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -30,7 +31,7 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
     	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
     	for(DefaultMaterial defaultMaterial : defaultValue)
     	{
-    		materials.add(OTG.toLocalMaterialData(defaultMaterial, 0));
+    		materials.add(MaterialHelper.toLocalMaterialData(defaultMaterial, 0));
     	}
         return materials;
     }
@@ -42,7 +43,7 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
     	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
     	for(String materialName : materialNames)
     	{
-    		LocalMaterialData material = OTG.readMaterial(materialName.trim());
+    		LocalMaterialData material = MaterialHelper.readMaterial(materialName.trim());
 			materials.add(material);
     	}
         return materials;

@@ -5,7 +5,6 @@ import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,8 +27,8 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
-import com.pg85.otg.util.OTGBlock;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.Block;
@@ -56,17 +55,61 @@ import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGChunkGenerator implements IChunkGenerator
-{
-    private int lastx2 = 0;
-    private int lastz2 = 0;
-    private boolean TestMode = false;
+{	
+	private class LocalCoords2D
+	{
+		byte x;
+		byte z;
+		
+		LocalCoords2D(byte x, byte z)
+		{
+			this.x = x;
+			this.z = z;
+		}
+		
+		public boolean equals(Object other)
+		{
+			if(this == other)
+			{
+				return true;
+			}
+			if(other instanceof LocalCoords2D)
+			{
+				if(((LocalCoords2D)other).x == this.x && ((LocalCoords2D)other).z == this.z)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+	
+	private class ChunkColumns
+	{
+		Chunk chunk;
+		HashMap<LocalCoords2D, LocalMaterialData[]> blockColumns;
+		
+		ChunkColumns(Chunk chunk, HashMap<LocalCoords2D, LocalMaterialData[]> blockColumns)
+		{
+			this.chunk = chunk;
+			this.blockColumns = blockColumns;
+		}
+	}
+	
+    private boolean testMode = false;
     private ForgeWorld world;
     private ChunkProviderOTG generator;
     public ObjectSpawner spawner;
-    
-	private ArrayList<Object[]> PopulatedChunks;
-    private FifoMap<ChunkCoordinate, Object[]> chunkCache = new FifoMap<ChunkCoordinate, Object[]>(128);
-    private ForgeChunkBuffer chunkBuffer;
+
+    // Caches
+	private ArrayList<ChunkCoordinate> populatedChunks;
+    private FifoMap<ChunkCoordinate, ChunkColumns> unloadedChunkCache = new FifoMap<ChunkCoordinate, ChunkColumns>(128);
+    private Map<ChunkCoordinate,Chunk> loadedChunkCache = new HashMap<ChunkCoordinate, Chunk>();
+    private Chunk lastUsedChunk;
+    private int lastUsedChunkX;
+    private int lastUsedChunkZ;
+    private ForgeChunkBuffer chunkBuffer;    
+    //   
     
     // The first run is used by MC to check for suitable locations for the spawn location. For some reason the spawn location must be on grass.
     private boolean firstRun = true; 
@@ -74,28 +117,24 @@ public class OTGChunkGenerator implements IChunkGenerator
     private ChunkCoordinate spawnChunk;
     private boolean spawnChunkFixed = false;
     
-    private Map<ChunkCoordinate,Chunk> chunkCacheOTGPlus = new HashMap<ChunkCoordinate, Chunk>();
-    private Chunk lastUsedChunk;
     private boolean allowSpawningOutsideBounds = false;   
-    private int lastUsedChunkX;
-    private int lastUsedChunkZ;
     
     /**
      * Used in {@link #fillBiomeArray(Chunk)}, to avoid creating
-     * new int arrays.
+     * new short arrays.
      */
-    private int[] biomeIntArray;
+    private int[] biomeShortArray;
     private	DataFixer dataFixer = DataFixesManager.createFixer();
     
     public OTGChunkGenerator(ForgeWorld _world)
     {
         this.world = _world;
 
-        this.TestMode = this.world.getConfigs().getWorldConfig().modeTerrain == WorldConfig.TerrainMode.TerrainTest;
+        this.testMode = this.world.getConfigs().getWorldConfig().modeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
         this.generator = new ChunkProviderOTG(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
-        this.PopulatedChunks = new ArrayList<Object[]>();
+        this.populatedChunks = new ArrayList<ChunkCoordinate>();
     }
     
 	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
@@ -105,13 +144,15 @@ public class OTGChunkGenerator implements IChunkGenerator
     
 	// Chunks
 	
-    public void clearChunkCache(boolean onlyLastPopulated)
+	// Called at the end of each chunk generation/population cycle.
+	// Also called by pregenerator and /otg flush command to clear memory.
+    public void clearChunkCache(boolean onlyLoadedChunks)
     {
-    	chunkCacheOTGPlus.clear();
+    	loadedChunkCache.clear();
     	lastUsedChunk = null;
-    	if(!onlyLastPopulated)
+    	if(!onlyLoadedChunks)
     	{
-    		chunkCache.clear();
+    		unloadedChunkCache.clear();
     	}
     }
 
@@ -120,18 +161,13 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
     	ChunkCoordinate chunkCoords = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
     	boolean bFound = false;
-    	synchronized(PopulatedChunks)
+    	synchronized(populatedChunks)
     	{
-			for(Object[] chunkCoord : PopulatedChunks)
+			if(!populatedChunks.contains(chunkCoords))
 			{
-				if((Integer)chunkCoord[0] == chunkX && (Integer)chunkCoord[1] == chunkZ)
-				{
-					bFound = true;
-				}
-			}
-			if(!bFound)
-			{
-				PopulatedChunks.add(new Object[] { chunkX, chunkZ });
+				populatedChunks.add(chunkCoords);
+			} else {
+				bFound = true;
 			}
     	}
 
@@ -149,6 +185,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
 					if(chunk == null)
 					{
+						// TODO: Test this..
 						throw new RuntimeException();
 					}
 					OTG.log(LogMarker.WARN, "Double population prevented");
@@ -171,9 +208,9 @@ public class OTGChunkGenerator implements IChunkGenerator
     public void populate(int chunkX, int chunkZ)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-    	if(this.TestMode || !world.isInsideWorldBorder(chunkCoord, false))
+    	if(this.testMode || !world.isInsideWorldBorder(chunkCoord, false))
         {
-    		if(this.TestMode)
+    		if(this.testMode)
     		{
     			world.getChunkGenerator().clearChunkCache(false);
     		}
@@ -262,7 +299,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         	}
         }
         
-        // TODO: Why do this?
+        // The chunk generator caches only the chunks being populated, clear them.
         this.clearChunkCache(true);
     }
     
@@ -286,7 +323,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         	return lastUsedChunk;
         }
 
-        Chunk chunk = chunkCacheOTGPlus.get(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
+        Chunk chunk = loadedChunkCache.get(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
         if(chunk != null)
         {
         	lastUsedChunk = chunk;
@@ -329,7 +366,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 					lastUsedChunk = loadedChunk;
 		        	lastUsedChunkX = chunkX;
 		        	lastUsedChunkZ = chunkZ;
-					chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), loadedChunk);
+					loadedChunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), loadedChunk);
 				}
 
 				if(!this.allowSpawningOutsideBounds || loadedChunk != null)
@@ -348,7 +385,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 		        	throw new RuntimeException("Chunk request failed X" + chunkX + " Z" + chunkZ);
 		        }
 
-		        chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
+		        loadedChunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
 				lastUsedChunk = spawnedChunk;
 		    	lastUsedChunkX = chunkX;
 		    	lastUsedChunkZ = chunkZ;
@@ -388,7 +425,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         	throw new RuntimeException("Chunk request failed X" + chunkX + " Z" + chunkZ);
         }
 
-        chunkCacheOTGPlus.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
+        loadedChunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), spawnedChunk);
 		lastUsedChunk = spawnedChunk;
     	lastUsedChunkX = chunkX;
     	lastUsedChunkZ = chunkZ;
@@ -448,11 +485,11 @@ public class OTGChunkGenerator implements IChunkGenerator
     
     private Chunk getBlocks(int chunkX, int chunkZ, boolean provideChunk)
     {
-    	Object[] chunkCacheEntry = chunkCache.get(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
+    	ChunkColumns chunkCacheEntry = unloadedChunkCache.get(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
     	Chunk chunk = null;
     	if(chunkCacheEntry != null)
     	{
-    		chunk = (Chunk)chunkCacheEntry[0];
+    		chunk = chunkCacheEntry.chunk;
     	}
 
     	if(chunk == null)
@@ -479,8 +516,8 @@ public class OTGChunkGenerator implements IChunkGenerator
 	    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
 	    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));
 
-	    					chunkBuffer.setBlock(x, 63, z, OTG.toLocalMaterialData(DefaultMaterial.GRASS, 0));
-	    					chunkBuffer.setBlock(x, 64, z, OTG.toLocalMaterialData(DefaultMaterial.AIR, 0));
+	    					chunkBuffer.setBlock(x, 63, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.GRASS, 0));
+	    					chunkBuffer.setBlock(x, 64, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0));
 	    				}
 	    			}
 	    		}
@@ -504,7 +541,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 		        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
 		        }
 	        }
-        	chunkCache.remove(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
+        	unloadedChunkCache.remove(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
     	}
 
     	return chunk;
@@ -519,11 +556,11 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
         byte[] chunkBiomeArray = chunk.getBiomeArray();
         ConfigProvider configProvider = this.world.getConfigs();
-        this.biomeIntArray = this.world.getBiomeGenerator().getBiomes(this.biomeIntArray, chunk.x * CHUNK_X_SIZE, chunk.z * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+        this.biomeShortArray = this.world.getBiomeGenerator().getBiomes(this.biomeShortArray, chunk.x * CHUNK_X_SIZE, chunk.z * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
 
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
-            int generationId = this.biomeIntArray[i];
+            int generationId = this.biomeShortArray[i];
 
             LocalBiome biome = configProvider.getBiomeByOTGIdOrNull(generationId);
 
@@ -531,25 +568,27 @@ public class OTGChunkGenerator implements IChunkGenerator
         }
     }
     
-    public OTGBlock[] getBlockColumnInUnloadedChunk(int x, int z)
+    public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z)
     {
-    	lastx2 = x;
-    	lastz2 = z;
-
-    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);    	
     	int chunkX = chunkCoord.getChunkX();
     	int chunkZ = chunkCoord.getChunkZ();
+    	
+		// Get internal coordinates for block in chunk
+    	byte blockX = (byte)(x &= 0xF);
+    	byte blockZ = (byte)(z &= 0xF);    	
+    	LocalCoords2D columnLocalCoords = new LocalCoords2D(blockX, blockZ);
 
-    	Object[] chunkCacheEntry = chunkCache.get(chunkCoord);
+    	ChunkColumns chunkCacheEntry = unloadedChunkCache.get(chunkCoord);
 
     	Chunk chunk = null;
-    	LinkedHashMap<ChunkCoordinate, OTGBlock[]> blockColumnCache = null;
-    	OTGBlock[] cachedColumn = null;
+    	HashMap<LocalCoords2D, LocalMaterialData[]> blockColumnCache = null;
+    	LocalMaterialData[] cachedColumn = null;
     	if(chunkCacheEntry != null)
     	{
-    		chunk = (Chunk)chunkCacheEntry[0];
-    		blockColumnCache = (LinkedHashMap<ChunkCoordinate, OTGBlock[]>)chunkCacheEntry[1];
-    		cachedColumn = blockColumnCache.get(ChunkCoordinate.fromChunkCoords(x,z));
+    		chunk = chunkCacheEntry.chunk;
+    		blockColumnCache = chunkCacheEntry.blockColumns;
+    		cachedColumn = blockColumnCache.get(columnLocalCoords);
     	}
     	if(cachedColumn != null)
     	{
@@ -567,50 +606,41 @@ public class OTGChunkGenerator implements IChunkGenerator
 
 	    		chunk = chunkBuffer.toChunk(this.world.getWorld());
             }
-        	blockColumnCache = new LinkedHashMap<ChunkCoordinate, OTGBlock[]>();
-        	chunkCache.put(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ), new Object[] { chunk, blockColumnCache });
+        	blockColumnCache = new HashMap<LocalCoords2D, LocalMaterialData[]>(256);
+        	unloadedChunkCache.put(chunkCoord, new ChunkColumns(chunk, blockColumnCache));
     	}
 
-		// Get internal coordinates for block in chunk
-    	int blockX = x &= 0xF;
-    	int blockZ = z &= 0xF;
-
-        OTGBlock[] blocksInColumn = new OTGBlock[256];
-        for(int y = 0; y < 256; y++)
+    	LocalMaterialData[] blocksInColumn = new LocalMaterialData[256];
+        for(short y = 0; y < 256; y++)
         {
-        	OTGBlock block = new OTGBlock();
-        	block.x = x;
-        	block.y = y;
-        	block.z = z;
         	IBlockState blockInChunk = chunk.getBlockState(new BlockPos(blockX, y, blockZ));
         	if(blockInChunk != null)
         	{
-        		block.material = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
-	        	blocksInColumn[y] = block;
+	        	blocksInColumn[y] = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
         	} else {
         		break;
         	}
         }
-        blockColumnCache.put(ChunkCoordinate.fromChunkCoords(lastx2,lastz2), blocksInColumn);
+        blockColumnCache.put(columnLocalCoords, blocksInColumn);
 
         return blocksInColumn;
     }
     
     public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
     {
-    	OTGBlock[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
-        return blockColumn[y].material;
+    	LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
+        return blockColumn[y];
     }
 
     public int getHighestBlockYInUnloadedChunk(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
     {
     	int height = -1;
 
-    	OTGBlock[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
+    	LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
 
         for(int y = 255; y > -1; y--)
         {
-        	ForgeMaterialData material = (ForgeMaterialData) blockColumn[y].material;
+        	ForgeMaterialData material = (ForgeMaterialData) blockColumn[y];
         	boolean isLiquid = material.isLiquid();
         	boolean isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
         	if(!(isLiquid && ignoreLiquid))

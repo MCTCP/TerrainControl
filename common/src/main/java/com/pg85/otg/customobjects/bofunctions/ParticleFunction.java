@@ -29,8 +29,6 @@ public abstract class ParticleFunction<T extends CustomObjectConfigFile> extends
     public boolean velocityYSet = false;
     public boolean velocityZSet = false;
 
-    public ParticleFunction(){ }
-    
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {

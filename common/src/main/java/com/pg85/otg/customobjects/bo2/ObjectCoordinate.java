@@ -1,8 +1,8 @@
 package com.pg85.otg.customobjects.bo2;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 
 class ObjectCoordinate
 {
@@ -87,7 +87,7 @@ class ObjectCoordinate
                 newCoordinate.BranchOdds = Integer.parseInt(branchData[1]);
 
             }
-            newCoordinate.material = OTG.readMaterial(workingDataString);
+            newCoordinate.material = MaterialHelper.readMaterial(workingDataString);
 
             return newCoordinate;
 

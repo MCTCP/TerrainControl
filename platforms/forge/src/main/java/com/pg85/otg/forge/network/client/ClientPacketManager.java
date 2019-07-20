@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
@@ -23,6 +22,7 @@ import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.forge.network.client.packets.TeleportPlayerPacket;
 import com.pg85.otg.network.ClientConfigProvider;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -141,14 +141,14 @@ public class ClientPacketManager
 	
 	public static void registerClientWorlds(DataInputStream wrappedStream, WorldLoader worldLoader) throws IOException
 	{		
-		DimensionsConfig dimsConfig = DimensionsConfig.fromYamlString(ConfigFile.readStringFromStream(wrappedStream)); 
+		DimensionsConfig dimsConfig = DimensionsConfig.fromYamlString(StreamHelper.readStringFromStream(wrappedStream)); 
 		OTG.setDimensionsConfig(dimsConfig);
 		
 		ForgeEngine.Presets.clear();
 		int presetCount = wrappedStream.readInt();
 		for(int i = 0; i < presetCount; i++)
 		{
-			DimensionConfigGui dimConfig = DimensionConfigGui.fromYamlString(ConfigFile.readStringFromStream(wrappedStream));
+			DimensionConfigGui dimConfig = DimensionConfigGui.fromYamlString(StreamHelper.readStringFromStream(wrappedStream));
 			ForgeEngine.Presets.put(dimConfig.PresetName, dimConfig);
 		}
 		
@@ -177,7 +177,7 @@ public class ClientPacketManager
 				dimsToRemove.remove(integerToRemove);
 			}
 	
-			String worldName = ConfigFile.readStringFromStream(wrappedStream);
+			String worldName = StreamHelper.readStringFromStream(wrappedStream);
 			
 			// Overworld can be null for MP clients
 			if(!DimensionManager.isDimensionRegistered(dimensionId) || (dimensionId == 0 && ((ForgeEngine)OTG.getEngine()).getOverWorld() == null))

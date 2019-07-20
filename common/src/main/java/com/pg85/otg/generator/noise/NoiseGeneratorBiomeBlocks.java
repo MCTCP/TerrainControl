@@ -12,6 +12,7 @@ public class NoiseGeneratorBiomeBlocks
     private int[] f;
     private double b;
     private double c;
+    public double d;
 
     public NoiseGeneratorBiomeBlocks() {
         this(new Random());
@@ -21,6 +22,9 @@ public class NoiseGeneratorBiomeBlocks
         this.f = new int[512];
         this.b = random.nextDouble() * 256.0D;
         this.c = random.nextDouble() * 256.0D;
+        // Legacy, useless but have to make a roll
+        // to make terrain look the same as before.
+        random.nextDouble(); 
 
         int i;
 

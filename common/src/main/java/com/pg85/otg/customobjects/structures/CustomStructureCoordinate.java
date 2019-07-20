@@ -21,7 +21,7 @@ public abstract class CustomStructureCoordinate
     protected transient StructuredCustomObject object;
     public Rotation rotation;
     public int x;
-    public int y;
+    public short y;
     public int z;
 	
     protected CustomStructureCoordinate() { } 
@@ -33,7 +33,7 @@ public abstract class CustomStructureCoordinate
         return x;
     }
 
-    public int getY()
+    public short getY()
     {
         return y;
     }

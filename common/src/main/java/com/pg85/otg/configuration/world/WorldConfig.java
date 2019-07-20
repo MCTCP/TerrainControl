@@ -17,6 +17,7 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -405,7 +406,7 @@ public class WorldConfig extends ConfigFile
     			try {
     				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
     				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-					replaceBlocksDict.put(OTG.readMaterial(blockNames.getSourceBlock()).toDefaultMaterial(), OTG.readMaterial(blockNames.getTargetBlock()));
+					replaceBlocksDict.put(MaterialHelper.readMaterial(blockNames.getSourceBlock()).toDefaultMaterial(), MaterialHelper.readMaterial(blockNames.getTargetBlock()));
 				} catch (InvalidConfigException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

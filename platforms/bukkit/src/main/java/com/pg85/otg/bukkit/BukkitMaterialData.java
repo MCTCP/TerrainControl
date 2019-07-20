@@ -237,6 +237,31 @@ public final class BukkitMaterialData implements LocalMaterialData
         // No changes, return object itself
         return this;
     }
+    
+    @Override
+    public LocalMaterialData rotate(int rotateTimes)
+    {
+        // Try to rotate
+        DefaultMaterial defaultMaterial = toDefaultMaterial();
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        {
+            // We only know how to rotate vanilla blocks
+        	byte blockDataByte = 0;
+            int newData = 0;
+            for(int i = 0; i < rotateTimes; i++)
+            {
+            	blockDataByte = getBlockData();
+            	newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);	
+            }
+            if (newData != blockDataByte)
+            {
+            	return ofDefaultMaterial(defaultMaterial, newData);
+            }
+        }
+
+        // No changes, return object itself
+        return this;
+    }
 
     @Override
     public boolean isAir() {

@@ -12,17 +12,12 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
  */
 public interface LocalMaterialData
 {
-	// OTG+
-	
     /**
      * Gets whether this material can be used as an anchor point for a smooth area    
      * 
      * @return True if this material is a solid block, false if it is a tile-entity, half-slab, stairs(?), water, wood or leaves
      */
     public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater);
-	
-	//
-	
 
     /**
      * Gets the name of this material. If a {@link #toDefaultMaterial()
@@ -166,6 +161,15 @@ public interface LocalMaterialData
      * @return The rotated material.
      */
     LocalMaterialData rotate();
+    
+    /**
+     * Gets a new material that is rotated 90 degrees. North -> west -> south ->
+     * east. If this material cannot be rotated, the material itself is
+     * returned.
+     * 
+     * @return The rotated material.
+     */
+    LocalMaterialData rotate(int rotateTimes);
 
     /**
      * Gets whether this material falls down when no other block supports this

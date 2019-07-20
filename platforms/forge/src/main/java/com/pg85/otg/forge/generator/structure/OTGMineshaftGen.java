@@ -1,12 +1,17 @@
 package com.pg85.otg.forge.generator.structure;
 
+import java.util.ArrayList;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.util.math.BlockPos;
@@ -17,24 +22,54 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 public class OTGMineshaftGen extends OTGMapGenStructure
 {
+	public OTGMineshaftGen(ForgeWorld world)
+	{
+		super(world);
+	}
+
+	private class CachedCoord
+	{
+		boolean canSpawnMineShaft;
+		double mineshaftsRarity;
+		
+		public CachedCoord(boolean canSpawnMineShaft2, double mineshaftsRarity2)
+		{
+			this.canSpawnMineShaft = canSpawnMineShaft2;
+			this.mineshaftsRarity = mineshaftsRarity2;
+		}
+	}
+	
+	FifoMap<ChunkCoordinate, CachedCoord> cachedCoordsByChunk = new FifoMap<ChunkCoordinate, CachedCoord>(256);
+	
+	
     @Override
     protected boolean canSpawnStructureAtCoords(int chunkX, int chunkZ)
     {
         if (this.rand.nextInt(80) < Math.max(Math.abs(chunkX), Math.abs(chunkZ)))
         {
-            LocalWorld world = ((ForgeEngine)OTG.getEngine()).getWorld(this.world);
-            if(world == null)
+            ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+            CachedCoord cachedCoord = this.cachedCoordsByChunk.get(chunkCoord);
+            if(cachedCoord == null)
             {
-            	world = ((ForgeEngine)OTG.getEngine()).getWorld(this.world);
-            	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
+            	//if(this.usedCoords2.contains(chunkCoord))
+            	//{
+            		//this.doubleBiome++;
+            	//} else {
+            		//this.usedCoords2.add(chunkCoord);
+            	//}
+                
+                LocalBiome biome = this.forgeWorld.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockXCenter());
+                BiomeConfig biomeConfig = biome.getBiomeConfig();
+                cachedCoord = new CachedCoord(biomeConfig.mineshaftType != MineshaftType.disabled, biomeConfig.mineshaftsRarity);
+                this.cachedCoordsByChunk.put(chunkCoord, cachedCoord);
+            } else {
+            	
             }
-            LocalBiome biome = world.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8);
-            BiomeConfig biomeConfig = biome.getBiomeConfig();
-            if (biomeConfig.mineshaftType == MineshaftType.disabled)
+            if (!cachedCoord.canSpawnMineShaft)
             {
                 return false;
             }
-            if (this.rand.nextDouble() * 100.0 < biomeConfig.mineshaftsRarity)
+            if (this.rand.nextDouble() * 100.0 < cachedCoord.mineshaftsRarity)
             {
                 return true;
             }

@@ -1,6 +1,5 @@
 package com.pg85.otg.generator.surface;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -8,6 +7,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -176,11 +176,11 @@ public class FrozenSurfaceHelper
         if (worldConfig.betterSnowFall && (materialToSnowOn.isMaterial(DefaultMaterial.LEAVES) || materialToSnowOn.isMaterial(DefaultMaterial.LEAVES_2)))
         {
             // Snow Layer(s) for trees
-            snowMass = OTG.toLocalMaterialData(DefaultMaterial.SNOW, MathHelper.clamp(snowHeightOnLeaves, 0, 8));
+            snowMass = MaterialHelper.toLocalMaterialData(DefaultMaterial.SNOW, MathHelper.clamp(snowHeightOnLeaves, 0, 8));
         } else
         {
             // Basic Snow Layer(s)
-            snowMass = OTG.toLocalMaterialData(DefaultMaterial.SNOW, MathHelper.clamp(baseSnowHeight - decreaseFactor, 0, 8));
+            snowMass = MaterialHelper.toLocalMaterialData(DefaultMaterial.SNOW, MathHelper.clamp(baseSnowHeight - decreaseFactor, 0, 8));
         }
         world.setBlock(x, y, z, snowMass, null, false);
     }

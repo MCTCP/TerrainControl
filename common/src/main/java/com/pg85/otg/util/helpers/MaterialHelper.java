@@ -15,6 +15,10 @@ public class MaterialHelper
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
     {
+    	if(name == null)
+    	{
+    		return null;
+    	}
     	// TODO: Make sure it won't cause problems to return the same material object multiple times, is it not changed anywhere?
     	LocalMaterialData material = CachedMaterials.get(name);
     	if(material != null)

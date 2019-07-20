@@ -27,6 +27,7 @@ import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.helpers.MaterialHelper;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -228,7 +229,7 @@ public class ServerTickHandler
 		    							else if(paramString2[0].equals("block"))
 		    							{
 		    								try {
-												LocalMaterialData material = OTG.readMaterial(paramString2[1]);
+												LocalMaterialData material = MaterialHelper.readMaterial(paramString2[1]);
 			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, true);
 											}
 		    								catch (InvalidConfigException e)

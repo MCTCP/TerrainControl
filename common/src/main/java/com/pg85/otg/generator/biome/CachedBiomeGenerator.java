@@ -2,6 +2,7 @@ package com.pg85.otg.generator.biome;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.FifoMap;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -18,18 +19,14 @@ class CachedBiomeGenerator extends BiomeGenerator
      * Caches the biomes of a single chunk.
      *
      */
-    private static class Block
+    private static class Chunk
     {
         /**
          * The array of biome types stored in this BiomeCache.Block.
          */
         private int[] biomes = new int[ChunkCoordinate.CHUNK_X_SIZE * ChunkCoordinate.CHUNK_Z_SIZE];
-        /**
-         * The last time this BiomeCacheBlock was accessed, in milliseconds.
-         */
-        private long lastAccessTime;
 
-        Block(BiomeGenerator generator, ChunkCoordinate chunkCoord)
+        Chunk(BiomeGenerator generator, ChunkCoordinate chunkCoord)
         {
             biomes = generator.getBiomes(biomes, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), ChunkCoordinate.CHUNK_X_SIZE,
                     ChunkCoordinate.CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
@@ -52,15 +49,11 @@ class CachedBiomeGenerator extends BiomeGenerator
     /**
      * The map of cached BiomeCacheBlocks.
      */
-    private Map<ChunkCoordinate, CachedBiomeGenerator.Block> cacheMap = new HashMap<ChunkCoordinate, Block>();
+    private FifoMap<ChunkCoordinate, CachedBiomeGenerator.Chunk> cacheMap = new FifoMap<ChunkCoordinate, Chunk>(4096);
     /**
      * The uncached biome generator.
      */
     private final BiomeGenerator generator;
-    /**
-     * The last time this BiomeCache was cleaned, in milliseconds.
-     */
-    private long lastCleanupTime;
 
     public CachedBiomeGenerator(BiomeGenerator generator)
     {
@@ -86,37 +79,13 @@ class CachedBiomeGenerator extends BiomeGenerator
     }
 
     @Override
-    public void cleanupCache()
-    {
-        long currentTime = System.currentTimeMillis();
-        long timeSinceLastCleanup = currentTime - this.lastCleanupTime;
-
-        if (timeSinceLastCleanup < 7500L && timeSinceLastCleanup > 0L)
-        {
-            return;
-        }
-
-        this.lastCleanupTime = currentTime;
-
-        for (Iterator<Entry<ChunkCoordinate, CachedBiomeGenerator.Block>> it = cacheMap.entrySet().iterator(); it.hasNext();)
-        {
-            Entry<ChunkCoordinate, CachedBiomeGenerator.Block> entry = it.next();
-            CachedBiomeGenerator.Block block = entry.getValue();
-            long timeSinceLastAccessed = currentTime - block.lastAccessTime;
-
-            if (timeSinceLastAccessed > 30000L || timeSinceLastAccessed < 0L)
-            {
-                it.remove();
-            }
-        }
-
-    }
+    public void cleanupCache() { }
 
     @Override
     public int getBiome(int x, int z)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-        CachedBiomeGenerator.Block cacheBlock = getBiomeCacheBlock(chunkCoord);
+        CachedBiomeGenerator.Chunk cacheBlock = getBiomeCacheChunk(chunkCoord);
         return cacheBlock.getCalculatedBiomeId(x, z);
     }
 
@@ -125,18 +94,17 @@ class CachedBiomeGenerator extends BiomeGenerator
      * @param chunkCoord The chunk to get the cache entry for.
      * @return The biome cache block.
      */
-    private CachedBiomeGenerator.Block getBiomeCacheBlock(ChunkCoordinate chunkCoord)
+    private CachedBiomeGenerator.Chunk getBiomeCacheChunk(ChunkCoordinate chunkCoord)
     {
-        CachedBiomeGenerator.Block block = this.cacheMap.get(chunkCoord);
+        CachedBiomeGenerator.Chunk chunk = this.cacheMap.get(chunkCoord);
 
-        if (block == null)
+        if (chunk == null)
         {
-            block = new CachedBiomeGenerator.Block(generator, chunkCoord);
-            this.cacheMap.put(chunkCoord, block);
+        	chunk = new CachedBiomeGenerator.Chunk(generator, chunkCoord);
+            this.cacheMap.put(chunkCoord, chunk);
         }
 
-        block.lastAccessTime = System.currentTimeMillis();
-        return block;
+        return chunk;
     }
 
     @Override
@@ -150,7 +118,7 @@ class CachedBiomeGenerator extends BiomeGenerator
             }
             int[] cachedBiomes = getCachedBiomes(ChunkCoordinate.fromBlockCoords(x, z));
             // Avoid leaking references to the cached array - Minecraft likes
-            // to change those arrays, corrupting the cache
+            // to change those arrays, corrupting the cache.
             System.arraycopy(cachedBiomes, 0, biomeArray, 0, xSize * zSize);
             return biomeArray;
         }
@@ -177,7 +145,7 @@ class CachedBiomeGenerator extends BiomeGenerator
      */
     private int[] getCachedBiomes(ChunkCoordinate chunkCoord)
     {
-        return this.getBiomeCacheBlock(chunkCoord).biomes;
+        return this.getBiomeCacheChunk(chunkCoord).biomes;
     }
 
     @Override

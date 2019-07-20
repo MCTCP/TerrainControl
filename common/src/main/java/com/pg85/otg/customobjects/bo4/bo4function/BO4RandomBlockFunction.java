@@ -1,5 +1,9 @@
 package com.pg85.otg.customobjects.bo4.bo4function;
 
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
@@ -11,6 +15,8 @@ import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 public class BO4RandomBlockFunction extends BO4BlockFunction
 {
@@ -19,84 +25,64 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
     public String[] metaDataNames;
     public NamedBinaryTag[] metaDataTags;
 
-    public int blockCount = 0;
+    public byte blockCount = 0;   
 
-    public BO4RandomBlockFunction rotate(Rotation rotation)
+    public BO4RandomBlockFunction() { }
+    
+    public BO4RandomBlockFunction(BO4Config holder)
     {
-    	BO4RandomBlockFunction rotatedBlock = new BO4RandomBlockFunction();
-
-        BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
-
-        rotatedBlock.x = rotatedCoords.getX();
-        rotatedBlock.y = rotatedCoords.getY();
-        rotatedBlock.z = rotatedCoords.getZ();
-
-        rotatedBlock.blocks = blocks;
-
-        if(material != null)
-        {
-        	throw new RuntimeException();
-        }
-
-    	// TODO: This makes no sense, why is rotation inverted??? Should be: NORTH:0,WEST:1,SOUTH:2,EAST:3
-        LocalMaterialData[] rotatedBlockBlocks = new LocalMaterialData[blockCount];
-        for (int a = 0; a < blockCount; a++)
-        {
-        	rotatedBlockBlocks[a] = rotatedBlock.blocks[a];
-
-		    // Apply rotation
-			if(rotation.getRotationId() == 3)
-			{
-				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
-			}
-			if(rotation.getRotationId() == 2)
-			{
-				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
-				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
-			}
-			if(rotation.getRotationId() == 1)
-			{
-				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
-				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
-				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate();
-			}
-        }
-        rotatedBlock.blocks = rotatedBlockBlocks;
-
-    	rotatedBlock.blockCount = blockCount;
-    	rotatedBlock.blockChances = blockChances;
-        rotatedBlock.metaDataTag = metaDataTag;
-        rotatedBlock.metaDataTags = metaDataTags;
-        rotatedBlock.metaDataName = metaDataName;
-        rotatedBlock.metaDataNames = metaDataNames;
-
-        return rotatedBlock;
-    }    
-
+    	super(holder);
+    }
+    
     @Override
     public void load(List<String> args) throws InvalidConfigException
     {
         assureSize(5, args);
         x = readInt(args.get(0), -100, 100);
-        y = readInt(args.get(1), -100, 100);
+        y = (short) readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
 
         // Now read the random parts
         int i = 3;
         int size = args.size();
 
-        // The arrays are a little bit too large, just to be sure <-- TODO: Why do this? Remove this?
-        blocks = new LocalMaterialData[size / 2 + 1];
-        blockChances = new byte[size / 2 + 1];
-        metaDataNames = new String[size / 2 + 1];
-        metaDataTags = new NamedBinaryTag[size / 2 + 1];
-
+        // Get number of blocks first, params can vary so can't just count.
+        while (i < size)
+        {           
+        	i++;
+            if (i >= size)
+            {
+                throw new InvalidConfigException("Missing chance parameter");
+            }
+            try
+            {
+                readInt(args.get(i), 1, 100);
+            }
+            catch (InvalidConfigException e)
+            {
+                // Get the chance
+                i++;
+                if (i >= size)
+                {
+                    throw new InvalidConfigException("Missing chance parameter");
+                }
+                readInt(args.get(i), 1, 100);
+            }
+            i++;
+            blockCount++;
+        }
+        
+        this.blocks = new LocalMaterialData[blockCount];
+        this.blockChances = new byte[blockCount];
+        this.metaDataNames = new String[blockCount];
+        this.metaDataTags = new NamedBinaryTag[blockCount];
+        
+        i = 3;
+        blockCount = 0;
         while (i < size)
         {
-            // Parse block id and data
-            blocks[blockCount] = readMaterial(args.get(i));
-
             // Parse chance and metadata
+        	this.blocks[blockCount] = MaterialHelper.readMaterial(args.get(i));
             i++;
             if (i >= size)
             {
@@ -105,7 +91,8 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
             try
             {
                 blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
-            } catch (InvalidConfigException e)
+            }
+            catch (InvalidConfigException e)
             {
                 // Maybe it's a NBT file?
 
@@ -129,6 +116,50 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
             i++;
             blockCount++;
         }
+    }
+    
+    public BO4RandomBlockFunction rotate(Rotation rotation)
+    {
+    	BO4RandomBlockFunction rotatedBlock = new BO4RandomBlockFunction(this.getHolder());
+
+        BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedBO3CoordsJustified(x, y, z, rotation);
+
+        rotatedBlock.x = rotatedCoords.getX();
+        rotatedBlock.y = rotatedCoords.getY();
+        rotatedBlock.z = rotatedCoords.getZ();
+
+        rotatedBlock.blocks = blocks;
+        
+    	// TODO: This makes no sense, why is rotation inverted??? Should be: NORTH:0,WEST:1,SOUTH:2,EAST:3
+        LocalMaterialData[] rotatedBlockBlocks = new LocalMaterialData[blockCount];
+        for (int a = 0; a < blockCount; a++)
+        {
+        	rotatedBlockBlocks[a] = rotatedBlock.blocks[a];
+
+		    // Apply rotation
+			if(rotation.getRotationId() == 3)
+			{
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate(1);
+			}
+			if(rotation.getRotationId() == 2)
+			{
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate(2);
+			}
+			if(rotation.getRotationId() == 1)
+			{
+				rotatedBlockBlocks[a] = rotatedBlockBlocks[a].rotate(3);
+			}
+        }
+        rotatedBlock.blocks = rotatedBlockBlocks;
+
+    	rotatedBlock.blockCount = blockCount;
+    	rotatedBlock.blockChances = blockChances;
+        rotatedBlock.metaDataTag = metaDataTag;
+        rotatedBlock.metaDataTags = metaDataTags;
+        rotatedBlock.metaDataName = metaDataName;
+        rotatedBlock.metaDataNames = metaDataNames;
+
+        return rotatedBlock;
     }
 
     @Override
@@ -165,5 +196,73 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
     public Class<BO4Config> getHolderType()
     {
         return BO4Config.class;
+    }
+    
+    @Override
+    public void writeToStream(DataOutput stream) throws IOException
+    {
+        stream.writeByte(this.x);
+        stream.writeShort(this.y);
+        stream.writeByte(this.z);    
+        
+        stream.writeByte(this.blocks.length);
+        for(int i = 0; i < this.blocks.length; i++)
+        {
+        	LocalMaterialData block = this.blocks[i];
+        	if(block != null)
+        	{
+        		String blockName = block.getName();
+        		StreamHelper.writeStringToStream(stream, blockName);	
+        	} else {
+        		StreamHelper.writeStringToStream(stream, null);
+        	}
+        	byte blockChance = this.blockChances[i];
+        	stream.writeByte(blockChance);
+        	String metaDataName = this.metaDataNames[i];
+        	StreamHelper.writeStringToStream(stream, metaDataName);        	
+        }
+    }
+    
+    public static BO4RandomBlockFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException
+    {
+    	BO4RandomBlockFunction rbf = new BO4RandomBlockFunction(holder);
+    	
+    	File file = holder.getFile();
+    	
+    	rbf.x = stream.readByte();
+    	rbf.y = stream.readShort();
+    	rbf.z = stream.readByte();
+    	
+    	rbf.blockCount = stream.readByte();
+    	
+    	rbf.blocks = new LocalMaterialData[rbf.blockCount];
+    	rbf.blockChances = new byte[rbf.blockCount];
+    	rbf.metaDataNames = new String[rbf.blockCount];
+    	rbf.metaDataTags = new NamedBinaryTag[rbf.blockCount];
+
+    	int blocksLength = stream.readByte();
+    	for(int i = 0; i < blocksLength; i++)
+    	{
+    		try {
+				rbf.blocks[i] = MaterialHelper.readMaterial(StreamHelper.readStringFromStream(stream));
+			}
+    		catch (InvalidConfigException e) { }
+    		rbf.blockChances[i] = stream.readByte();
+    		rbf.metaDataNames[i] = StreamHelper.readStringFromStream(stream);
+    		if(rbf.metaDataNames[i] != null)
+    		{
+	            // Get the file
+	            NamedBinaryTag metaData = BO3Loader.loadMetadata(rbf.metaDataNames[i], file);
+	       	   	
+	            if (metaData != null)
+	            {
+	            	rbf.metaDataTags[i] = metaData;
+	            } else {
+	            	rbf.metaDataNames[i] = null;
+	            }
+    		}
+    	}
+    	
+    	return rbf;
     }
 }

@@ -33,6 +33,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
         return rotatedBranch;
     }
 	
+    // TODO: accumulateChances is only used for weightedbranches, remove from this class (will affect loading..).
 	@Override
     protected double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
     {
@@ -77,7 +78,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
             double randomChance = random.nextDouble() * totalChance;
             if (randomChance < branch.getChance())
             {
-                return new BO3CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, y + this.y, z + this.z);
+                return new BO3CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
             }
         }
         return null;

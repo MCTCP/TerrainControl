@@ -45,7 +45,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
         {
         	// TODO: This may cause a problem if the biome id is not registered because it is a virtual biome?
         	biomeId = -1;
-        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(this.BiomeArray[i]); 
+        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(this.BiomeArray[i]);
         	if(biomeId == -1)
         	{
         		throw new RuntimeException();

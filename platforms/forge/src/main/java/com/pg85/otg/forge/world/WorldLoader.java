@@ -150,15 +150,10 @@ public final class WorldLoader
 			{
 				return this.getUnloadedWorld(world.provider.getDimensionType().getName());
 			}
-    		return this.getWorld(world.provider.getDimensionType().getName());
+    		return (ForgeWorld) localWorld;
     	}
-    	ForgeWorld forgeWorld = this.getWorld(world.getWorldInfo().getWorldName());
-		if(forgeWorld == null)
-		{
-			return this.getUnloadedWorld(world.getWorldInfo().getWorldName());
-		}
-
-        return forgeWorld;
+    	
+    	return null;
     }
     
     public ForgeWorld getWorldByDimId(int dimensionId)

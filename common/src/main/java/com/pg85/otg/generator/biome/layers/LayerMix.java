@@ -71,7 +71,8 @@ public class LayerMix extends Layer
         int cachedId;
         
         WorldConfig worldConfig = this.configs.getWorldConfig();
-                
+        LocalBiome biome;        
+        
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
@@ -94,7 +95,7 @@ public class LayerMix extends Layer
                     cachedId = this.defaultOceanId;
                 }
                 
-                LocalBiome biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
+                biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
                 
                 if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !biome.getBiomeConfig().riverBiome.isEmpty())
                 {
@@ -157,6 +158,7 @@ public class LayerMix extends Layer
         
         int currentPiece;
         int cachedId;
+        LocalBiome biome;
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
@@ -179,7 +181,7 @@ public class LayerMix extends Layer
                     cachedId = this.defaultOceanId;
                 }
 
-                LocalBiome biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
+                biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
 
                 if (worldConfig.riversEnabled && (currentPiece & RiverBits) != 0 && !biome.getBiomeConfig().riverBiome.isEmpty())
                 {

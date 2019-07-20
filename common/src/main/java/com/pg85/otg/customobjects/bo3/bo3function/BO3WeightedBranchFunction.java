@@ -35,7 +35,7 @@ public class BO3WeightedBranchFunction extends BO3BranchFunction
 		{
 			if (branch.getChance() >= randomChance)
 			{
-				return new BO3CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, y + this.y, z + this.z);
+				return new BO3CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
 			}
 		}
         return null;

@@ -40,7 +40,6 @@ class BO4Settings extends Settings
     static final Setting<String>
             AUTHOR = stringSetting("Author", "Unknown"),
             DESCRIPTION = stringSetting("Description", "No description given"),
-            VERSION = stringSetting("Version", "1"),
     		INHERITBO3 = stringSetting("InheritBO3", ""),
     		REPLACEABOVE = stringSetting("ReplaceAbove", ""),
 			REPLACEBELOW = stringSetting("ReplaceBelow", ""),

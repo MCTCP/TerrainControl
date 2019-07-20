@@ -1,11 +1,11 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -103,7 +103,7 @@ public class SmallLakeGen extends Resource
 
         synchronized (BooleanBuffer)
         {
-            LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
+            LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
             boolean[] BooleanBuffer = new boolean[2048];
             int i = rand.nextInt(4) + 4;
             for (int j = 0; j < i; j++)

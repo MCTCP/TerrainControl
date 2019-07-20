@@ -11,7 +11,6 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
@@ -20,6 +19,7 @@ import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 import io.netty.buffer.ByteBuf;
 
@@ -45,7 +45,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
     	
     	for(DimensionConfig dimConfig : dimConfigs)
     	{
-    		ConfigFile.writeStringToStream(stream, dimConfig.toYamlString());
+    		StreamHelper.writeStringToStream(stream, dimConfig.toYamlString());
     	}    	
 	}
 	
@@ -66,7 +66,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 					ArrayList<DimensionConfig> dimConfigs = new ArrayList<DimensionConfig>();
 					for(int i = 0; i < listSize; i++)
 					{
-						dimConfigs.add(DimensionConfig.fromYamlString(ConfigFile.readStringFromStream(message.getStream())));
+						dimConfigs.add(DimensionConfig.fromYamlString(StreamHelper.readStringFromStream(message.getStream())));
 					}					
 				
 					IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;

@@ -6,15 +6,28 @@ import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.helpers.StreamHelper;
+import com.pg85.otg.util.helpers.StringHelper;
 
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 public class BO4WeightedBranchFunction extends BO4BranchFunction
 {
 	private double cumulativeChance = 0;
-		
+	
+	public BO4WeightedBranchFunction() { }
+	
+	public BO4WeightedBranchFunction(BO4Config holder)
+	{
+		super(holder);
+	}
+	
 	@Override
     protected double readArgs(List<String> args, boolean accumulateChances) throws InvalidConfigException
     {
@@ -96,7 +109,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
             {
                 BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
                 Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-                return new BO4CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), y + rotatedCoords.getY(), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, true, branch.branchGroup);
+                return new BO4CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, true, branch.branchGroup);
             }
             randomChance -= branch.getChance();
             if(randomChance < 0)
@@ -109,7 +122,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
 
     public BO4WeightedBranchFunction rotate(Rotation rotation)
     {
-    	BO4WeightedBranchFunction rotatedBranch = new BO4WeightedBranchFunction();
+    	BO4WeightedBranchFunction rotatedBranch = new BO4WeightedBranchFunction(this.getHolder());
 
     	rotatedBranch.x = x;
     	rotatedBranch.y = y;
@@ -163,5 +176,28 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
     public Class<BO4Config> getHolderType()
     {
         return BO4Config.class;
+    }
+    
+    @Override
+    public void writeToStream(DataOutput stream) throws IOException
+    {    	
+        StreamHelper.writeStringToStream(stream, makeString());
+    }
+    
+    public static BO4WeightedBranchFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException
+    {
+    	BO4WeightedBranchFunction branchFunction = new BO4WeightedBranchFunction(holder);  	
+    	
+        String configFunctionString = StreamHelper.readStringFromStream(stream);
+        int bracketIndex = configFunctionString.indexOf('(');
+        String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
+        List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
+        
+        try {
+			branchFunction.load(args);
+		} catch (InvalidConfigException e) {
+			e.printStackTrace();
+		}            	           
+    	return branchFunction;
     }
 }

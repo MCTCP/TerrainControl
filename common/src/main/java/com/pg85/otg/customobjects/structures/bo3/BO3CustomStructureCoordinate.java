@@ -17,17 +17,12 @@ import java.util.Random;
  */
 public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 {
-    public BO3CustomStructureCoordinate(LocalWorld world, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, int y, int z)
+    public BO3CustomStructureCoordinate(LocalWorld world, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z)
     {
     	this.worldName = world.getName();
         this.object = object;
 
         bo3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
-
-        if(bo3Name == null)
-        {
-        	throw new RuntimeException(); // TODO: Remove this after testing
-        }
 
         this.rotation = rotation;
         this.x = x;

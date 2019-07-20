@@ -2,6 +2,7 @@ package com.pg85.otg.forge.dimensions;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
@@ -96,12 +97,7 @@ public class OTGWorldProvider extends WorldProviderSurface
 	}
 
 	public DimensionConfig getDimensionConfig()
-	{		
-		if(OTG.getDimensionsConfig() == null)
-		{
-			return null; // Happen for Forge clients connecting to Bukkit servers
-		}
-		
+	{				
 		// The config may be updated during a session, refresh it once per second
 		long currentTime = System.currentTimeMillis();
 		if(currentTime - lastFetchTime > 1000l)
@@ -117,7 +113,11 @@ public class OTGWorldProvider extends WorldProviderSurface
 			}
 			if(worldName != null)
 			{
-				dimConfig = OTG.getDimensionsConfig().getDimensionConfig(worldName);				
+				DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+				if(dimsConfig != null)
+				{
+					dimConfig = dimsConfig.getDimensionConfig(worldName);
+				}
 			}
 		}
 		return dimConfig;
