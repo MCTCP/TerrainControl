@@ -11,7 +11,7 @@ public class BO3ModDataFunction extends ModDataFunction<BO3Config>
     public BO3ModDataFunction rotate()
     {
         BO3ModDataFunction rotatedBlock = new BO3ModDataFunction();
-        rotatedBlock.x = z;
+        rotatedBlock.x = z - 1;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.modId = modId;

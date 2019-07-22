@@ -25,7 +25,11 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -75,7 +79,6 @@ public class BO4 implements StructuredCustomObject
     			FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
     		}
     		
-    		/*
             //write it down to disk
             File file = new File(this.settings.getFile().getAbsolutePath().replace(".BO3", ".BO4Data").replace(".BO4", ".BO4Data").replace(".bo3", ".BO4Data").replace(".bo4", ".BO4Data"));
             if(!file.exists() && file.getName().contains("we-jungletempleuppercity96x96C1"))
@@ -91,7 +94,6 @@ public class BO4 implements StructuredCustomObject
 	                e.printStackTrace();
 	            }
             }
-            */
     	}
     	catch(InvalidConfigException ex)
     	{

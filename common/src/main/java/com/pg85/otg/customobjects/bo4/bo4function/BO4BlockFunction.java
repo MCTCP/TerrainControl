@@ -5,6 +5,7 @@ import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.bofunctions.BlockFunction;
@@ -65,14 +66,44 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
     {
         return BO4Config.class;
     }
-    
-    public void writeToStream(DataOutput stream) throws IOException
+        
+    public void writeToStream(String[] metaDataNames, LocalMaterialData[] materials, DataOutput stream) throws IOException
     {
-        stream.writeByte(this.x);
         stream.writeShort(this.y);
-        stream.writeByte(this.z);       
-        StreamHelper.writeStringToStream(stream, this.material.getName());
-        StreamHelper.writeStringToStream(stream, this.metaDataName);
+        boolean bFound = false;
+        if(this.material != null)
+        {
+	        for(int i = 0; i < materials.length; i++)
+	        {
+	        	if(materials[i] == this.material)
+	        	{
+	        		stream.writeShort(i);
+	        		bFound = true;
+	        		break;
+	        	}
+	        }
+        }
+        if(!bFound)
+        {
+        	stream.writeShort(-1);
+        }
+        bFound = false;
+        if(this.metaDataName != null)
+        {
+	        for(int i = 0; i < metaDataNames.length; i++)
+	        {        	
+	        	if(metaDataNames[i].equals(this.metaDataName))
+	        	{
+	        		stream.writeShort(i);
+	        		bFound = true;
+	        		break;
+	        	}
+	        }
+        }
+        if(!bFound)
+        {
+        	stream.writeShort(-1);
+        }
     }
     
     public static BO4BlockFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException

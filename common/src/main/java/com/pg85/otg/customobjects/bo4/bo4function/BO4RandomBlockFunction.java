@@ -199,27 +199,71 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
     }
     
     @Override
-    public void writeToStream(DataOutput stream) throws IOException
+    public void writeToStream(String[] metaDataNames, LocalMaterialData[] materials, DataOutput stream) throws IOException
     {
-        stream.writeByte(this.x);
         stream.writeShort(this.y);
-        stream.writeByte(this.z);    
         
         stream.writeByte(this.blocks.length);
+        boolean bFound;
         for(int i = 0; i < this.blocks.length; i++)
         {
-        	LocalMaterialData block = this.blocks[i];
-        	if(block != null)
-        	{
-        		String blockName = block.getName();
-        		StreamHelper.writeStringToStream(stream, blockName);	
-        	} else {
-        		StreamHelper.writeStringToStream(stream, null);
-        	}
         	byte blockChance = this.blockChances[i];
         	stream.writeByte(blockChance);
-        	String metaDataName = this.metaDataNames[i];
-        	StreamHelper.writeStringToStream(stream, metaDataName);        	
+        	
+        	bFound = false;
+        	if(this.blocks[i] != null)
+        	{
+		        for(int j = 0; j < materials.length; j++)
+		        {
+		        	if(materials[j] == this.blocks[i])
+		        	{
+		        		stream.writeShort(j);
+		        		bFound = true;
+		        		break;
+		        	}
+		        }
+        	}
+	        if(!bFound)
+	        {
+	        	stream.writeShort(-1);
+	        }
+	    }
+        
+        boolean metaDataFound = false;
+        for(int i = 0; i < this.metaDataNames.length; i++)
+        {
+        	if(this.metaDataNames[i] != null)
+        	{
+        		metaDataFound = true;
+        		break;
+        	}
+        }
+        
+        if(metaDataFound)
+        {
+        	stream.writeByte(this.blocks.length);
+	        for(int i = 0; i < this.metaDataNames.length; i++)
+	        {
+	        	bFound = false;
+	        	if(this.metaDataNames[i] != null)
+	        	{
+		            for(int j = 0; j < metaDataNames.length; j++)
+		            {
+		            	if(metaDataNames[j].equals(this.metaDataNames[i]))
+		            	{
+		            		stream.writeShort(i);
+		            		bFound = true;
+		            		break;
+		            	}
+		            }
+	        	}
+		        if(!bFound)
+		        {
+		        	stream.writeShort(-1);
+		        }
+	        }
+        } else {
+        	stream.writeByte(0);
         }
     }
     

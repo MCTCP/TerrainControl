@@ -156,7 +156,7 @@ public class CustomStructureCache
     public void saveToDisk()
     {
     	OTG.log(LogMarker.DEBUG, "Saving structure data");
-    	int i = 0;
+    	boolean firstLog = false;
     	long starTime = System.currentTimeMillis();
 		while(true)
 		{
@@ -168,16 +168,16 @@ public class CustomStructureCache
 					break;
 				}
 			}
-			if(i == 0 || i == 100)
+			if(firstLog)
 			{
 				OTG.log(LogMarker.WARN, "SaveToDisk waiting on Populate. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
-				i = 0;
+				firstLog = false;
 			}
-			i += 1;
-			if(System.currentTimeMillis() - starTime > (300 * 1000))
+			int interval = 300;
+			if(System.currentTimeMillis() - starTime > (interval * 1000))
 			{
-				OTG.log(LogMarker.FATAL, "SaveToDisk waited on populate longer than 300 seconds, something went wrong!");
-				throw new RuntimeException("SaveToDisk waited on populate longer than 300 seconds, something went wrong!");
+				OTG.log(LogMarker.FATAL, "SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
+				throw new RuntimeException("SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
 			}
 		}
 

@@ -7,6 +7,8 @@ import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.helpers.MaterialHelper;
+
 import java.util.List;
 import java.util.Random;
 
@@ -29,7 +31,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
     public BO3RandomBlockFunction rotate()
     {
         BO3RandomBlockFunction rotatedBlock = new BO3RandomBlockFunction();
-        rotatedBlock.x = z;
+        rotatedBlock.x = z - 1;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.blockCount = blockCount;
@@ -57,18 +59,43 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
         int i = 3;
         int size = args.size();
 
-        // The arrays are a little bit too large, just to be sure <-- TODO: Why do this? Remove this?
-        blocks = new LocalMaterialData[size / 2 + 1];
-        blockChances = new byte[size / 2 + 1];
-        metaDataNames = new String[size / 2 + 1];
-        metaDataTags = new NamedBinaryTag[size / 2 + 1];
-
+        // Get number of blocks first, params can vary so can't just count.
+        while (i < size)
+        {           
+        	i++;
+            if (i >= size)
+            {
+                throw new InvalidConfigException("Missing chance parameter");
+            }
+            try
+            {
+                readInt(args.get(i), 1, 100);
+            }
+            catch (InvalidConfigException e)
+            {
+                // Get the chance
+                i++;
+                if (i >= size)
+                {
+                    throw new InvalidConfigException("Missing chance parameter");
+                }
+                readInt(args.get(i), 1, 100);
+            }
+            i++;
+            blockCount++;
+        }
+        
+        this.blocks = new LocalMaterialData[blockCount];
+        this.blockChances = new byte[blockCount];
+        this.metaDataNames = new String[blockCount];
+        this.metaDataTags = new NamedBinaryTag[blockCount];
+        
+        i = 3;
+        blockCount = 0;
         while (i < size)
         {
-            // Parse block id and data
-            blocks[blockCount] = readMaterial(args.get(i));
-
             // Parse chance and metadata
+        	this.blocks[blockCount] = MaterialHelper.readMaterial(args.get(i));
             i++;
             if (i >= size)
             {
@@ -77,7 +104,8 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
             try
             {
                 blockChances[blockCount] = (byte) readInt(args.get(i), 1, 100);
-            } catch (InvalidConfigException e)
+            }
+            catch (InvalidConfigException e)
             {
                 // Maybe it's a NBT file?
 

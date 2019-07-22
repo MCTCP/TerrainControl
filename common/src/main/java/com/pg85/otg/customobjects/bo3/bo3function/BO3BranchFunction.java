@@ -20,7 +20,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
     public BO3BranchFunction rotate()
     {
         BO3BranchFunction rotatedBranch = new BO3BranchFunction();
-        rotatedBranch.x = z;
+        rotatedBranch.x = z - 1;
         rotatedBranch.y = y;
         rotatedBranch.z = -x;
         rotatedBranch.branches = new TreeSet<BranchNode>();
