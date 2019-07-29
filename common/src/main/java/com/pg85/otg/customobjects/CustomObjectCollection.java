@@ -342,11 +342,11 @@ public class CustomObjectCollection
 	    			{
 	    				indexAllCustomObjectFilesInDir(fileInDir, customObjectFiles);
 	    			} else {
-	    				if(fileInDir.getName().toLowerCase().endsWith(".bo3") || fileInDir.getName().toLowerCase().endsWith(".bo2"))
+	    				if(fileInDir.getName().toLowerCase().endsWith(".bo4data") || fileInDir.getName().toLowerCase().endsWith(".bo4") || fileInDir.getName().toLowerCase().endsWith(".bo3") || fileInDir.getName().toLowerCase().endsWith(".bo2"))
 	    				{
-		    				if(!customObjectFiles.containsKey(fileInDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", "")))
+		    				if(fileInDir.getName().toLowerCase().endsWith(".bo4data") || !customObjectFiles.containsKey(fileInDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4", "").replace(".bo3", "").replace(".bo2", "")))
 		    				{
-		    					customObjectFiles.put(fileInDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", ""), fileInDir);
+		    					customObjectFiles.put(fileInDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4", "").replace(".bo3", "").replace(".bo2", ""), fileInDir);
 		    				} else {
 		    					if(OTG.getPluginConfig().spawnLog)
 		    					{
@@ -357,11 +357,11 @@ public class CustomObjectCollection
 	    			}
 	    		}
     		} else {
-    			if(searchDir.getName().toLowerCase().endsWith(".bo3") || searchDir.getName().toLowerCase().endsWith(".bo2"))
+    			if(searchDir.getName().toLowerCase().endsWith(".bo4data") ||searchDir.getName().toLowerCase().endsWith(".bo4") || searchDir.getName().toLowerCase().endsWith(".bo3") || searchDir.getName().toLowerCase().endsWith(".bo2"))
     			{
-	    			if(!customObjectFiles.containsKey(searchDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", "")))
+	    			if(searchDir.getName().toLowerCase().endsWith(".bo4data") || !customObjectFiles.containsKey(searchDir.getName().toLowerCase().replace(".bo4", "").replace(".bo3", "").replace(".bo2", "")))
 					{
-	    				customObjectFiles.put(searchDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", ""), searchDir);
+	    				customObjectFiles.put(searchDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4", "").replace(".bo3", "").replace(".bo2", ""), searchDir);
 					} else {
 						if(OTG.getPluginConfig().spawnLog)
 						{

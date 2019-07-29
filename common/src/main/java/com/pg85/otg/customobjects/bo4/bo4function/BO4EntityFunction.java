@@ -3,6 +3,7 @@ package com.pg85.otg.customobjects.bo4.bo4function;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
 
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
@@ -53,7 +54,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
 	}
 	
     public void writeToStream(DataOutput stream) throws IOException
-    {
+    {    	
         stream.writeInt(this.x);
         stream.writeInt(this.y);
         stream.writeInt(this.z);       
@@ -64,18 +65,18 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
         StreamHelper.writeStringToStream(stream, this.originalNameTagOrNBTFileName);        	
     }
     
-    public static BO4EntityFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException
+    public static BO4EntityFunction fromStream(BO4Config holder, MappedByteBuffer buffer) throws IOException
     {
     	BO4EntityFunction entityFunction = new BO4EntityFunction(holder);
     	   	
-    	entityFunction.x = stream.readInt();
-    	entityFunction.y = stream.readInt();
-    	entityFunction.z = stream.readInt();
+    	entityFunction.x = buffer.getInt();
+    	entityFunction.y = buffer.getInt();
+    	entityFunction.z = buffer.getInt();
     	
-    	entityFunction.mobName = StreamHelper.readStringFromStream(stream);
-    	entityFunction.groupSize = stream.readInt();
-    	entityFunction.nameTagOrNBTFileName= StreamHelper.readStringFromStream(stream);
-    	entityFunction.originalNameTagOrNBTFileName= StreamHelper.readStringFromStream(stream);
+    	entityFunction.mobName = StreamHelper.readStringFromBuffer(buffer);
+    	entityFunction.groupSize = buffer.getInt();
+    	entityFunction.nameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
+    	entityFunction.originalNameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
     	
     	return entityFunction;
     }

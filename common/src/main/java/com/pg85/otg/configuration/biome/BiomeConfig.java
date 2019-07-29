@@ -764,7 +764,10 @@ public class BiomeConfig extends ConfigFile
                 "Sapling types: " + StringHelper.join(SaplingType.values(), ", "),
                 "All - will make the tree spawn from all saplings, but not from mushrooms.",
                 "BigJungle - for when 4 jungle saplings grow at once.",
-                "RedMushroom/BrownMushroom - will only grow when bonemeal is used.");        
+                "RedMushroom/BrownMushroom - will only grow when bonemeal is used.",
+                "",
+                "",
+                "");        
         
         writer.addConfigFunctions(this.saplingGrowers.values());
         

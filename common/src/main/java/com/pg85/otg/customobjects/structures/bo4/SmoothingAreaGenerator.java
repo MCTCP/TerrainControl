@@ -215,13 +215,6 @@ public class SmoothingAreaGenerator
         int normalizedNeigbouringBlockX;
         int normalizedNeigbouringBlockY;
         int normalizedNeigbouringBlockZ;
-        ChunkCoordinate neighbouringBlockChunk;
-        ChunkCoordinate searchTarget;
-        Stack<BO4CustomStructureCoordinate> bO3sInNeighbouringBlockChunk;
-        BO4CustomStructureCoordinate blockToCheckCoords;
-        int normalizedBlockToCheckX;
-        int normalizedBlockToCheckY;
-        int normalizedBlockToCheckZ;
 
         // Get all BO3's that are a part of this branching structure
         for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : objectsToSpawn.entrySet())
@@ -248,7 +241,7 @@ public class SmoothingAreaGenerator
                 }
                 if(smoothRadius > 0)
                 {
-        			Map<ChunkCoordinate, BO4BlockFunction> heightMap = bO3InChunk.getSettings().getHeightMap((BO4)start.getObject());
+        			BO4BlockFunction[][] heightMap = bO3InChunk.getSettings().getSmoothingHeightMap((BO4)start.getObject());
 
                     // if !SmoothStartTop then for each BO3 that has a smoothradius > 0 get the lowest layer of blocks and determine smooth area starting points
                 	// if SmoothStartTop then for each BO3 that has a smoothradius > 0 get the highest blocks of the BO3 and determine smooth area starting points
@@ -257,7 +250,7 @@ public class SmoothingAreaGenerator
                 	{
                 		for(int z = 0; z <= 15; z ++)
                 		{
-                			BO4BlockFunction block = heightMap.get(ChunkCoordinate.fromChunkCoords(x, z));
+                			BO4BlockFunction block = heightMap[x][z];
 
                 			if(block != null)
                 			{
@@ -269,19 +262,19 @@ public class SmoothingAreaGenerator
                                 bFoundNeighbour4 = false;
 
                                 //Check if any neighbouring blocks are air or non-existent within this BO3
-                                if(heightMap.get(ChunkCoordinate.fromChunkCoords(block.x - 1, block.z)) != null)
+                                if(block.x - 1 >= 0 && heightMap[block.x - 1][block.z] != null)
                                 {
                                     bFoundNeighbour1 = true;
                                 }
-                                if(heightMap.get(ChunkCoordinate.fromChunkCoords(block.x + 1, block.z)) != null)
+                                if(block.x + 1 <= 15 && heightMap[block.x + 1][block.z] != null)
                                 {
                                     bFoundNeighbour2 = true;
                                 }
-                                if(heightMap.get(ChunkCoordinate.fromChunkCoords(block.x, block.z - 1)) != null)
+                                if(block.z - 1 >= 0 && heightMap[block.x][block.z - 1] != null)
                                 {
                                     bFoundNeighbour3 = true;
                                 }
-                                if(heightMap.get(ChunkCoordinate.fromChunkCoords(block.x, block.z + 1)) != null)
+                                if(block.z + 1 <= 15 && heightMap[block.x][block.z + 1] != null)
                                 {
                                     bFoundNeighbour4 = true;
                                 }
@@ -299,58 +292,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    // Get the chunk that the neighbouring block is in
-                                    neighbouringBlockChunk = null;
-                                    searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
-                                    {
-                                        // Find the chunk that contains the coordinates were looking for
-                                        if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
-                                        {
-                                            neighbouringBlockChunk = chunkInStructure;
-                                            break;
-                                        }
-                                    }
-                                    if(neighbouringBlockChunk != null)
-                                    {
-                                        // Found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
-                                        if(bO3sInNeighbouringBlockChunk != null)
-                                        {
-                                            for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
-                                            {
-                                                if(bO3ToCheck != objectInChunk)
-                                                {
-                                                    // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
-
-                                                	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
-                                                    {
-                                                		BO4BlockFunction blockToCheck = blockToCheckEntry.getValue();
-
-                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
-                                                        normalizedBlockToCheckX = blockToCheckCoords.getX() + (bO3ToCheck.getX());
-                                                        normalizedBlockToCheckY = blockToCheckCoords.getY() + bO3ToCheck.getY();
-                                                        normalizedBlockToCheckZ = blockToCheckCoords.getZ() + (bO3ToCheck.getZ());
-
-                                                        if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
-                                                        {
-                                                            // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
-                                                            {
-                                                            	bFoundNeighbour1 = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    if(bFoundNeighbour1)
-                                                    {
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    bFoundNeighbour1 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start);
                                 }
                                 if(!bFoundNeighbour2 && block.x + 1 > 15)
                                 {
@@ -361,58 +303,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    // Get the chunk that the neighbouring block is in
-                                    neighbouringBlockChunk = null;
-                                    searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
-                                    {
-                                        // Find the chunk that contains the coordinates being looked for
-                                        if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
-                                        {
-                                            neighbouringBlockChunk = chunkInStructure;
-                                            break;
-                                        }
-                                    }
-                                    if(neighbouringBlockChunk != null)
-                                    {
-                                        //found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
-                                        if(bO3sInNeighbouringBlockChunk != null)
-                                        {
-                                            for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
-                                            {
-                                                if(bO3ToCheck != objectInChunk)
-                                                {
-                                                    // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
-
-                                                	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
-                                                	{
-                                                		BO4BlockFunction blockToCheck = blockToCheckEntry.getValue();
-
-                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
-                                                        normalizedBlockToCheckX = blockToCheckCoords.getX() + (bO3ToCheck.getX());
-                                                        normalizedBlockToCheckY = blockToCheckCoords.getY() + bO3ToCheck.getY();
-                                                        normalizedBlockToCheckZ = blockToCheckCoords.getZ() + (bO3ToCheck.getZ());
-
-                                                        if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
-                                                        {
-                                                            // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
-                                                            {
-                                                                bFoundNeighbour2 = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    if(bFoundNeighbour2)
-                                                    {
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    bFoundNeighbour2 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start);
                                 }
                                 if(!bFoundNeighbour3 && block.z - 1 < 0)
                                 {
@@ -423,58 +314,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    // Get the chunk that the neighbouring block is in
-                                    neighbouringBlockChunk = null;
-                                    searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
-                                    {
-                                        // Find the chunk that contains the coordinates being looked for
-                                        if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
-                                        {
-                                            neighbouringBlockChunk = chunkInStructure;
-                                            break;
-                                        }
-                                    }
-                                    if(neighbouringBlockChunk != null)
-                                    {
-                                        //found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
-                                        if(bO3sInNeighbouringBlockChunk != null)
-                                        {
-                                            for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
-                                            {
-                                                if(bO3ToCheck != objectInChunk)
-                                                {
-                                                    // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
-
-                                                	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
-                                                    {
-                                                		BO4BlockFunction blockToCheck = blockToCheckEntry.getValue();
-
-                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, (short)blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
-                                                        normalizedBlockToCheckX = blockToCheckCoords.getX() + (bO3ToCheck.getX());
-                                                        normalizedBlockToCheckY = blockToCheckCoords.getY() + bO3ToCheck.getY();
-                                                        normalizedBlockToCheckZ = blockToCheckCoords.getZ() + (bO3ToCheck.getZ());
-
-                                                        if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
-                                                        {
-                                                            // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
-                                                            {
-                                                            	bFoundNeighbour3 = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    if(bFoundNeighbour3)
-                                                    {
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    bFoundNeighbour3 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start);
                                 }
                                 if(!bFoundNeighbour4 && block.z + 1 > 15)
                                 {
@@ -485,58 +325,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    // Get the chunk that the neighbouring block is in
-                                    neighbouringBlockChunk = null;
-                                    searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
-                                    for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
-                                    {
-                                        // Find the chunk that contains the coordinates being looked for
-                                        if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
-                                        {
-                                            neighbouringBlockChunk = chunkInStructure;
-                                            break;
-                                        }
-                                    }
-                                    if(neighbouringBlockChunk != null)
-                                    {
-                                        //found the neighbouring chunk
-                                        bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);
-                                        if(bO3sInNeighbouringBlockChunk != null)
-                                        {
-                                            for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
-                                            {
-                                                if(bO3ToCheck != objectInChunk)
-                                                {
-                                                    // Now find the actual block
-                                                	Map<ChunkCoordinate, BO4BlockFunction> neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getHeightMap((BO4)start.getObject());
-
-                                                	for(Entry<ChunkCoordinate, BO4BlockFunction> blockToCheckEntry : neighbouringBO3HeightMap.entrySet())
-                                                    {
-                                                		BO4BlockFunction blockToCheck = blockToCheckEntry.getValue();
-
-                                                        blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, (short)blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
-                                                        normalizedBlockToCheckX = blockToCheckCoords.getX() + (bO3ToCheck.getX());
-                                                        normalizedBlockToCheckY = blockToCheckCoords.getY() + bO3ToCheck.getY();
-                                                        normalizedBlockToCheckZ = blockToCheckCoords.getZ() + (bO3ToCheck.getZ());
-
-                                                        if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
-                                                        {
-                                                            // Neighbouring block found
-                                                        	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
-                                                            {
-                                                                bFoundNeighbour4 = true;
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                    if(bFoundNeighbour4)
-                                                    {
-                                                        break;
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
+                                    bFoundNeighbour4 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start);
                                 }
 
                                 // Only blocks that have air blocks or no blocks as neighbours should be part of the smoothing area
@@ -665,6 +454,69 @@ public class SmoothingAreaGenerator
         return calculateBeginAndEndPointsPerChunk(smoothToBlocksPerChunk);
     }
 
+	private boolean findNeighbouringBlock(boolean SmoothStartTop, int normalizedNeigbouringBlockX, int normalizedNeigbouringBlockY, int normalizedNeigbouringBlockZ, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate objectInChunk, BO4CustomStructureCoordinate start)
+	{
+        // Get the chunk that the neighbouring block is in
+        ChunkCoordinate neighbouringBlockChunk = null;
+        ChunkCoordinate searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
+        for(ChunkCoordinate chunkInStructure : objectsToSpawn.keySet())
+        {
+            // Find the chunk that contains the coordinates being looked for
+            if(chunkInStructure.getChunkX() == searchTarget.getChunkX() && chunkInStructure.getChunkZ() == searchTarget.getChunkZ())
+            {
+                neighbouringBlockChunk = chunkInStructure;
+                break;
+            }
+        }
+        if(neighbouringBlockChunk != null)
+        {
+            //found the neighbouring chunk
+        	Stack<BO4CustomStructureCoordinate> bO3sInNeighbouringBlockChunk = objectsToSpawn.get(neighbouringBlockChunk);        	
+            if(bO3sInNeighbouringBlockChunk != null)
+            {
+            	BO4CustomStructureCoordinate blockToCheckCoords;
+                int normalizedBlockToCheckX;
+                int normalizedBlockToCheckY;
+                int normalizedBlockToCheckZ;
+                BO4BlockFunction blockToCheck;
+                BO4BlockFunction[][] neighbouringBO3HeightMap;
+                for(CustomStructureCoordinate bO3ToCheck : bO3sInNeighbouringBlockChunk)
+                {
+                    if(bO3ToCheck != objectInChunk)
+                    {
+                        // Now find the actual block
+                    	neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject()).getSettings().getSmoothingHeightMap((BO4)start.getObject());
+
+                    	for(int x = 0; x < 16; x++)
+                    	{
+                        	for(int z = 0; z < 16; z++)
+                        	{
+	                    		blockToCheck = neighbouringBO3HeightMap[x][z];
+	                    		if(blockToCheck != null)
+	                    		{
+		                            blockToCheckCoords = BO4CustomStructureCoordinate.getRotatedSmoothingCoords(blockToCheck.x, (short)blockToCheck.y, blockToCheck.z, bO3ToCheck.getRotation());
+		                            normalizedBlockToCheckX = blockToCheckCoords.getX() + (bO3ToCheck.getX());
+		                            normalizedBlockToCheckY = blockToCheckCoords.getY() + bO3ToCheck.getY();
+		                            normalizedBlockToCheckZ = blockToCheckCoords.getZ() + (bO3ToCheck.getZ());
+		
+		                            if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
+		                            {
+		                                // Neighbouring block found
+		                            	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start))
+		                                {
+		                                    return true;
+		                                }
+		                            }
+	                    		}
+                        	}
+                    	}
+                    }
+                }
+            }
+        }
+        return false;
+	}
+	
     private Object[] rotateSmoothDirections(Boolean smoothDirection1, Boolean smoothDirection2, Boolean smoothDirection3, Boolean smoothDirection4, Rotation rotation)
     {
     	// smoothDirection1 -1x WEST

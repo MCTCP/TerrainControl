@@ -33,7 +33,7 @@ public class BiomeStandardValues extends Settings
             NETHER_FORTRESSES_ENABLED = WorldStandardValues.NETHER_FORTRESSES_ENABLED,
             OCEAN_MONUMENTS_ENABLED = WorldStandardValues.OCEAN_MONUMENTS_ENABLED,
     		WOODLAND_MANSIONS_ENABLED = WorldStandardValues.WOODLAND_MANSIONS_ENABLED,
-    		INHERIT_SAPLING_RESOURCE = booleanSetting("InheritSaplingResource", false);
+    		INHERIT_SAPLING_RESOURCE = booleanSetting("InheritSaplingResource", true);
 
     public static final Setting<String>
             BIOME_CONFIG_EXTENSION = stringSetting("BiomeConfigExtension", ".bc"),

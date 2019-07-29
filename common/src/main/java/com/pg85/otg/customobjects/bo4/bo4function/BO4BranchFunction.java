@@ -15,6 +15,7 @@ import com.pg85.otg.util.helpers.StringHelper;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
 import java.util.*;
 
 /**
@@ -213,11 +214,11 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
         StreamHelper.writeStringToStream(stream, makeString());
     }
     
-    public static BO4BranchFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException
+    public static BO4BranchFunction fromStream(BO4Config holder, MappedByteBuffer buffer) throws IOException
     {
     	BO4BranchFunction branchFunction = new BO4BranchFunction(holder);  	
     	
-        String configFunctionString = StreamHelper.readStringFromStream(stream);
+        String configFunctionString = StreamHelper.readStringFromBuffer(buffer);
         int bracketIndex = configFunctionString.indexOf('(');
         String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
         List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));

@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
@@ -75,7 +76,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
         {
 	        for(int i = 0; i < materials.length; i++)
 	        {
-	        	if(materials[i] == this.material)
+	        	if(materials[i].equals(this.material))
 	        	{
 	        		stream.writeShort(i);
 	        		bFound = true;
@@ -106,22 +107,27 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
         }
     }
     
-    public static BO4BlockFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException
+    public static BO4BlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, MappedByteBuffer buffer) throws IOException
     {
     	BO4BlockFunction rbf = new BO4BlockFunction(holder);
     	
     	File file = holder.getFile();
     	   	
-    	rbf.x = stream.readByte();
-    	rbf.y = stream.readShort();
-    	rbf.z = stream.readByte();
+    	rbf.x = x;
+    	rbf.y = buffer.getShort();
+    	rbf.z = z;
     	
-    	try {
-			rbf.material = MaterialHelper.readMaterial(StreamHelper.readStringFromStream(stream));
-		}
-    	catch (InvalidConfigException e) { }
-    	    	
-    	rbf.metaDataName = StreamHelper.readStringFromStream(stream);
+    	short materialId = buffer.getShort();
+    	if(materialId != -1)
+    	{
+    		rbf.material = materials[materialId];
+    	}
+    	
+    	short metaDataNameId = buffer.getShort();
+    	if(metaDataNameId != -1)
+    	{
+    		rbf.metaDataName = metaDataNames[metaDataNameId];
+    	}
     	
     	if(rbf.metaDataName != null)
     	{

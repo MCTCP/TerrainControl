@@ -9,6 +9,7 @@ import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
+import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
@@ -79,21 +80,10 @@ public class BO4 implements StructuredCustomObject
     			FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
     		}
     		
-            //write it down to disk
-            File file = new File(this.settings.getFile().getAbsolutePath().replace(".BO3", ".BO4Data").replace(".BO4", ".BO4Data").replace(".bo3", ".BO4Data").replace(".bo4", ".BO4Data"));
-            if(!file.exists() && file.getName().contains("we-jungletempleuppercity96x96C1"))
-            {
-	            try {
-	                FileOutputStream fos = new FileOutputStream(file);
-	                DataOutputStream dos = new DataOutputStream(fos);
-	                this.settings.writeToStream(dos);
-	                dos.close();
-	            } catch (FileNotFoundException e) {
-	                e.printStackTrace();
-	            } catch (IOException e) {
-	                e.printStackTrace();
-	            }
-            }
+    		if(OTG.getPluginConfig().generateCompressedBO4)
+    		{
+    			generateBO4Data();
+    		}
     	}
     	catch(InvalidConfigException ex)
     	{
@@ -102,6 +92,32 @@ public class BO4 implements StructuredCustomObject
     	}
     	
     	return true;
+    }
+    
+    private void generateBO4Data()
+    {
+        //write it down to disk
+		String filePath = 
+			this.settings.getFile().getAbsolutePath().endsWith(".BO4") ? this.settings.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
+			this.settings.getFile().getAbsolutePath().endsWith(".bo4") ? this.settings.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
+			this.settings.getFile().getAbsolutePath().endsWith(".BO3") ? this.settings.getFile().getAbsolutePath().replace(".BO3", ".BO4Data") :
+			this.settings.getFile().getAbsolutePath().endsWith(".bo3") ? this.settings.getFile().getAbsolutePath().replace(".bo3", ".BO4Data") :
+			this.settings.getFile().getAbsolutePath();
+
+        File file = new File(filePath);
+        if(!file.exists())
+        {
+            try {
+                FileOutputStream fos = new FileOutputStream(file);
+                DataOutputStream dos = new DataOutputStream(fos);
+                this.settings.writeToStream(dos);
+                dos.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
     
     @Override

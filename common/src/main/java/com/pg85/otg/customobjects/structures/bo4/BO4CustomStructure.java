@@ -16,6 +16,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.RandomHelper;
 
 import java.util.*;
@@ -589,7 +590,7 @@ public class BO4CustomStructure extends CustomStructure
     		}
     	}
     }
-
+    
     private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, LocalWorld world)
     {
     	// CanOverride optional branches are spawned only after the main structure has spawned.
@@ -936,7 +937,6 @@ public class BO4CustomStructure extends CustomStructure
 		        	{
 		        		if(OTG.getPluginConfig().spawnLog)
 		        		{
-
 			        		String allParentsString = "";
 			        		BranchDataItem tempBranch = childBranchDataItem;
 			        		while(tempBranch.parent != null)
@@ -1379,7 +1379,6 @@ public class BO4CustomStructure extends CustomStructure
      */
     private boolean checkCannotBeInside(BranchDataItem childBranchDataItem, BO4 bo3)
     {
-		// Check for cannotSpawnInside
 		boolean foundSpawnBlocker = false;
 		if(AllBranchesBranchDataByChunk.containsKey(childBranchDataItem.chunkCoordinate))
 		{
@@ -1413,7 +1412,7 @@ public class BO4CustomStructure extends CustomStructure
 				}
     			if(foundSpawnBlocker)
     			{
-						break;
+					break;
     			}
     		}
 		}
@@ -1422,56 +1421,51 @@ public class BO4CustomStructure extends CustomStructure
 
 	private boolean checkMustBeInside(BranchDataItem childBranchDataItem, BO4 bo3)
 	{
-		// Check for mustBeInside
-		// Only one branch has to be present
-		// TODO: Make AND/OR switch
-		boolean foundSpawnRequirement = false;
+		// AND/OR is supported, comma is OR, space is and, f.e: branch1, branch2 branch3, branch 4.
 		if(AllBranchesBranchDataByChunk.containsKey(childBranchDataItem.chunkCoordinate))
 		{		    	    			
-			boolean allBranchesFound = false;
-			ArrayList<BranchDataItem> branchDataInChunk = AllBranchesBranchDataByChunk.get(childBranchDataItem.chunkCoordinate);
+			ArrayList<BranchDataItem> branchDataInChunk = AllBranchesBranchDataByChunk.get(childBranchDataItem.chunkCoordinate);			
 			for(String mustBeInsideBO3 : bo3.getSettings().mustBeInsideBranches)
 			{
+				boolean foundSpawnRequirement = true;
+				String[] andSwitch = mustBeInsideBO3.split(" ");
 				boolean bFoundPart = false;
-    			for(BranchDataItem branchDataItem3 : branchDataInChunk)
+				for(String mustBeInsideBO3Name : andSwitch)
 				{
-					if(branchDataItem3 != childBranchDataItem && branchDataItem3 != childBranchDataItem.parent)
+					bFoundPart = false;
+	    			for(BranchDataItem branchDataItem3 : branchDataInChunk)
 					{
-						for(String branchName : ((BO4)branchDataItem3.branch.getObject()).getSettings().getInheritedBO3s()) // getInheritedBO3s also contains this BO3
+						if(branchDataItem3 != childBranchDataItem && branchDataItem3 != childBranchDataItem.parent)
 						{
-							if(branchName.equals(mustBeInsideBO3))
+							for(String branchName : ((BO4)branchDataItem3.branch.getObject()).getSettings().getInheritedBO3s()) // getInheritedBO3s also contains this BO3
 							{
-   	    						if(checkCollision(childBranchDataItem.branch, branchDataItem3.branch))
-   	    						{
-   	    							bFoundPart = true;
-   	    							break;
-   	    						}
+								if(branchName.equals(mustBeInsideBO3Name))
+								{
+	   	    						if(checkCollision(childBranchDataItem.branch, branchDataItem3.branch))
+	   	    						{
+	   	    							bFoundPart = true;
+	   	    							break;
+	   	    						}
+								}
 							}
+	   						if(bFoundPart)
+	   						{
+	   							break;
+	   						}
 						}
-   						if(bFoundPart)
-   						{
-   							break;
-   						}
 					}
+	    			if(!bFoundPart)
+	    			{
+	    				foundSpawnRequirement = false;
+	    			}
 				}
-    			// TODO
-    			if(bFoundPart)
-    			{
-    				allBranchesFound = true;
-    				break;
-    			}
-    			//if(!bFoundPart)
-    			{
-    				//allBranchesFound = false;
-					//break;
-    			}
+				if(foundSpawnRequirement)
+				{
+					return true;
+				}
     		}
-			if(allBranchesFound)
-			{
-				foundSpawnRequirement = true;
-			}
 		}
-		return foundSpawnRequirement;
+		return false;
 	}
 
 	private void rollBackBranch(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world)

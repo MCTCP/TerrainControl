@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
+import java.nio.MappedByteBuffer;
 import java.util.List;
 import java.util.Random;
 
@@ -204,6 +205,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         stream.writeShort(this.y);
         
         stream.writeByte(this.blocks.length);
+        
         boolean bFound;
         for(int i = 0; i < this.blocks.length; i++)
         {
@@ -215,7 +217,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         	{
 		        for(int j = 0; j < materials.length; j++)
 		        {
-		        	if(materials[j] == this.blocks[i])
+		        	if(materials[j].equals(this.blocks[i]))
 		        	{
 		        		stream.writeShort(j);
 		        		bFound = true;
@@ -267,32 +269,48 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         }
     }
     
-    public static BO4RandomBlockFunction fromStream(BO4Config holder, DataInputStream stream) throws IOException
-    {
+    public static BO4RandomBlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, MappedByteBuffer buffer) throws IOException
+    {    	
     	BO4RandomBlockFunction rbf = new BO4RandomBlockFunction(holder);
     	
     	File file = holder.getFile();
     	
-    	rbf.x = stream.readByte();
-    	rbf.y = stream.readShort();
-    	rbf.z = stream.readByte();
-    	
-    	rbf.blockCount = stream.readByte();
-    	
-    	rbf.blocks = new LocalMaterialData[rbf.blockCount];
-    	rbf.blockChances = new byte[rbf.blockCount];
-    	rbf.metaDataNames = new String[rbf.blockCount];
-    	rbf.metaDataTags = new NamedBinaryTag[rbf.blockCount];
+    	rbf.x = x;
+    	rbf.y = buffer.getShort();
+    	rbf.z = z;
 
-    	int blocksLength = stream.readByte();
+    	byte blocksLength = buffer.get();
+    	
+    	if(blocksLength < 0)
+		{
+    		String breakpoint = "";
+		}
+    				
+    	
+    	rbf.blockCount = blocksLength;
+    	rbf.blocks = new LocalMaterialData[blocksLength];
+    	rbf.blockChances = new byte[blocksLength];
+    	rbf.metaDataNames = new String[blocksLength];
+    	rbf.metaDataTags = new NamedBinaryTag[blocksLength];
+
     	for(int i = 0; i < blocksLength; i++)
     	{
-    		try {
-				rbf.blocks[i] = MaterialHelper.readMaterial(StreamHelper.readStringFromStream(stream));
-			}
-    		catch (InvalidConfigException e) { }
-    		rbf.blockChances[i] = stream.readByte();
-    		rbf.metaDataNames[i] = StreamHelper.readStringFromStream(stream);
+    		rbf.blockChances[i] = buffer.get();
+        	short materialId = buffer.getShort();
+        	if(materialId != -1)
+        	{
+        		rbf.blocks[i] = materials[materialId];
+        	}
+    	}
+    	
+    	blocksLength = buffer.get();
+    	for(int i = 0; i < blocksLength; i++)
+    	{
+        	short metaDataNameId = buffer.getShort();
+        	if(metaDataNameId != -1)
+        	{
+        		rbf.metaDataNames[i] = metaDataNames[metaDataNameId];
+        	}
     		if(rbf.metaDataNames[i] != null)
     		{
 	            // Get the file
@@ -305,7 +323,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 	            	rbf.metaDataNames[i] = null;
 	            }
     		}
-    	}
+    	}    	
     	
     	return rbf;
     }
