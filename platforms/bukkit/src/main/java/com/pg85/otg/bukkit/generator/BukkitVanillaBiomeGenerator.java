@@ -1,7 +1,7 @@
 package com.pg85.otg.bukkit.generator;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import net.minecraft.server.v1_12_R1.BiomeBase;

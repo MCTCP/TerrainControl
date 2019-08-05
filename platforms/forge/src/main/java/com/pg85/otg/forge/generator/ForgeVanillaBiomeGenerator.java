@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.generator;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.biomes.OTGBiomeProvider;
 import com.pg85.otg.generator.biome.OutputType;
@@ -45,7 +45,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
         {
         	// TODO: This may cause a problem if the biome id is not registered because it is a virtual biome?
         	biomeId = -1;
-        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(this.BiomeArray[i]); 
+        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(this.BiomeArray[i]);
         	if(biomeId == -1)
         	{
         		throw new RuntimeException();
@@ -68,7 +68,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
         {
         	// TODO: This may cause a problem if the biome id is not registered because it is a virtual biome?
         	biomeId = -1;
-        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(this.BiomeArray[i]);
+        	biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(this.BiomeArray[i]);
         	if(biomeId == -1)
         	{
         		throw new RuntimeException();
@@ -81,7 +81,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
     @Override
     public int getBiome(int x, int z)
     {
-    	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryId(this.worldChunkManager.getBiome(new BlockPos(x, 0, z)));
+    	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(this.worldChunkManager.getBiome(new BlockPos(x, 0, z)));
     	if(biomeId == -1)
     	{
     		throw new RuntimeException();

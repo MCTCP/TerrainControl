@@ -1,26 +1,23 @@
 package com.pg85.otg.customobjects.bo2;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.util.BoundingBox;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.NamedBinaryTag;
-import com.pg85.otg.util.Rotation;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialSet;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -28,99 +25,39 @@ import java.util.Random;
  * The good old BO2.
  */
 public class BO2 extends CustomObjectConfigFile implements CustomObject
-{
-	// OTG+
-		   
-    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
-    {
-	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
-	    if(blocksToReplace != null && blocksToReplace.size() > 0)
-	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
-	    	if(targetBlock != null)
-	    	{
-	    		material = targetBlock;	    		
-	    	}
-	    }
-	    world.setBlock(x, y, z, material, metaDataTag, false);
-    }
-    
-    public BO2(SettingsReaderOTGPlus reader)
+{	
+    private ObjectCoordinate[][] data = new ObjectCoordinate[4][];
+
+    private MaterialSet spawnOnBlockType;
+    private MaterialSet collisionBlockType;
+
+    private boolean spawnWater;
+    private boolean spawnLava;
+    private boolean spawnAboveGround;
+    private boolean spawnUnderGround;
+
+    private boolean spawnSunlight;
+    private boolean spawnDarkness;
+
+    private boolean randomRotation;
+    private boolean dig;
+    private boolean tree;
+    private boolean branch;
+    private boolean needsFoundation;
+    private int rarity;
+    private double collisionPercentage;
+    private int spawnElevationMin;
+    private int spawnElevationMax;
+
+    BO2(SettingsReaderOTGPlus reader)
     {
         super(reader);
-    }    
-
-    @Override
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory)
-    {
-        enable();
-    }
-
-    private void enable()
-    {
-        readConfigSettings();
-        correctSettings();
     }
     
-    @Override
-    public CustomObject applySettings(SettingsReaderOTGPlus extraSettings)
-    {
-        extraSettings.setFallbackReader(this.reader);
-        BO2 bo2WithSettings = new BO2(extraSettings);
-        bo2WithSettings.enable();
-        return bo2WithSettings;
-    }
-    
-	//
-	
-    public ObjectCoordinate[][] data = new ObjectCoordinate[4][];
-
-    public BO2[] groupObjects = null;
-
-    public List<String> spawnInBiome;
-
-    public String version;
-    public MaterialSet spawnOnBlockType;
-    public MaterialSet collisionBlockType;
-
-    public boolean spawnWater;
-    public boolean spawnLava;
-    public boolean spawnAboveGround;
-    public boolean spawnUnderGround;
-
-    public boolean spawnSunlight;
-    public boolean spawnDarkness;
-
-    public boolean underFill;
-    public boolean randomRotation;
-    public boolean dig;
-    public boolean tree;
-    public boolean branch;
-    public boolean diggingBranch;
-    public boolean needsFoundation;
-    public int rarity;
-    public double collisionPercentage;
-    public int spawnElevationMin;
-    public int spawnElevationMax;
-
-    public int groupFrequencyMin;
-    public int groupFrequencyMax;
-    public int groupSeparationMin;
-    public int groupSeparationMax;
-    public List<String> groupId;
-
-    public int branchLimit;
-
     @Override
     public boolean canSpawnAsTree()
     {
         return tree;
-    }
-
-    @Override
-    public boolean canSpawnAsObject()
-    {
-        return true;
     }
 
     @Override
@@ -159,7 +96,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {    	
         // Basic checks
     	
-        if (y < OTG.WORLD_DEPTH || y >= OTG.WORLD_HEIGHT)  // Isn't this already done before this method is called?
+        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)  // Isn't this already done before this method is called?
         {
             return false;
         }
@@ -218,7 +155,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         ChunkCoordinate chunkCoord;        
         for (ObjectCoordinate point : objData)
         {
-            if (y + point.y < OTG.WORLD_DEPTH || y + point.y >= OTG.WORLD_HEIGHT)
+            if (y + point.y < PluginStandardValues.WORLD_DEPTH || y + point.y >= PluginStandardValues.WORLD_HEIGHT)
             {
                 return false;
             }
@@ -274,7 +211,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
    		return spawn(world, random, x, z);
     } 
     
-    protected boolean spawn(LocalWorld world, Random random, int x, int z)
+    private boolean spawn(LocalWorld world, Random random, int x, int z)
     {
         int y;
         if (spawnAboveGround)
@@ -351,12 +288,8 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     @Override
     protected void readConfigSettings()
     {
-        this.version = readSettings(BO2Settings.VERSION);
-
         this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
         this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
-
-        this.spawnInBiome = readSettings(BO2Settings.SPAWN_IN_BIOME);
 
         this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
         this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
@@ -365,29 +298,15 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
         this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
 
-        this.underFill = readSettings(BO2Settings.UNDER_FILL);
-
         this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
         this.dig = readSettings(BO2Settings.DIG);
         this.tree = readSettings(BO2Settings.TREE);
         this.branch = readSettings(BO2Settings.BRANCH);
-        this.diggingBranch = readSettings(BO2Settings.DIGGING_BRANCH);
         this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
         this.rarity = readSettings(BO2Settings.RARITY);
         this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
         this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
         this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
-
-        this.groupFrequencyMin = readSettings(BO2Settings.GROUP_FREQUENCY_MIN);
-        this.groupFrequencyMax = readSettings(BO2Settings.GROUP_FREQUENCY_MAX);
-        this.groupSeparationMin = readSettings(BO2Settings.GROUP_SEPERATION_MIN);
-        this.groupSeparationMax = readSettings(BO2Settings.GROUP_SEPERATION_MAX);
-        // >> Is this not used anymore? Netbeans finds no references to it
-        // >> Nothing other than this line references BO2Settings.groupId
-        // either...
-        this.groupId = readSettings(BO2Settings.GROUP_ID);
-
-        this.branchLimit = readSettings(BO2Settings.BRANCH_LIMIT);
 
         this.readCoordinates();
     }
@@ -440,32 +359,40 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             ObjectCoordinate coordinate = coordinates.get(i);
 
             data[0][i] = coordinate;
-            coordinate = coordinate.Rotate();
+            coordinate = coordinate.rotate();
             data[1][i] = coordinate;
-            coordinate = coordinate.Rotate();
+            coordinate = coordinate.rotate();
             data[2][i] = coordinate;
-            coordinate = coordinate.Rotate();
+            coordinate = coordinate.rotate();
             data[3][i] = coordinate;
         }
 
     }
-
-    @Override
-    public boolean hasPreferenceToSpawnIn(LocalBiome biome)
-    {
-        return spawnInBiome.contains(biome.getName()) || spawnInBiome.contains("All");
-    }
-
-    @Override
-    public BoundingBox getBoundingBox(Rotation rotation)
-    {
-        // We just
-        return BoundingBox.newEmptyBox();
-    }
     
-    @Override
-    public int getMaxBranchDepth()
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
     {
-        return 0;
+	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+	    if(blocksToReplace != null && blocksToReplace.size() > 0)
+	    {
+	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+	    	if(targetBlock != null)
+	    	{
+	    		material = targetBlock;	    		
+	    	}
+	    }
+	    world.setBlock(x, y, z, material, metaDataTag, false);
+    }       
+
+    @Override
+    public boolean onEnable()
+    {
+        enable();
+        return true;
+    }
+
+    private void enable()
+    {
+        readConfigSettings();
+        correctSettings();
     }
 }

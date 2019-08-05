@@ -1,9 +1,10 @@
 package com.pg85.otg.bukkit;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.util.LocalMaterialData;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.util.helpers.BlockHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockFalling;
 import net.minecraft.server.v1_12_R1.IBlockData;
@@ -14,7 +15,16 @@ import net.minecraft.server.v1_12_R1.IBlockData;
  */
 public final class BukkitMaterialData implements LocalMaterialData
 {
-
+    /**
+     * Block id and data, calculated as {@code blockId << 4 | blockData}, or
+     * without binary operators: {@code blockId * 16 + blockData}.
+     *
+     * <p>Note that Minecraft's Block.getCombinedId uses another format (at
+     * least in Minecraft 1.8). However, Minecraft's ChunkSection uses the same
+     * format as this field.
+     */
+	private final int combinedBlockId;	
+	
     /**
      * Gets a {@code BukkitMaterialData} of the given id and data.
      * @param id   The block id.
@@ -32,7 +42,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * @param data     The block data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static BukkitMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
+    static BukkitMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
     {
         return ofIds(material.id, data);
     }
@@ -43,7 +53,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * @param block The material.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static BukkitMaterialData ofMinecraftBlock(Block block)
+    static BukkitMaterialData ofMinecraftBlock(Block block)
     {
         return ofIds(Block.getId(block), block.toLegacyData(block.getBlockData()));
     }
@@ -53,21 +63,11 @@ public final class BukkitMaterialData implements LocalMaterialData
      * @param blockData The material an data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
+    static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
     {
         Block block = blockData.getBlock();
         return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData));
     }
-
-    /**
-     * Block id and data, calculated as {@code blockId << 4 | blockData}, or
-     * without binary operators: {@code blockId * 16 + blockData}.
-     *
-     * <p>Note that Minecraft's Block.getCombinedId uses another format (at
-     * least in Minecraft 1.8). However, Minecraft's ChunkSection uses the same
-     * format as this field.
-     */
-    private final int combinedBlockId;
 
     private BukkitMaterialData(int blockId, int blockData)
     {
@@ -145,7 +145,7 @@ public final class BukkitMaterialData implements LocalMaterialData
     public int hashCode()
     {
         // From 4096 to 69632 when there are 4096 block ids
-        return OTG.SUPPORTED_BLOCK_IDS + combinedBlockId;
+        return PluginStandardValues.SUPPORTED_BLOCK_IDS + combinedBlockId;
     }
 
     @Override
@@ -213,8 +213,7 @@ public final class BukkitMaterialData implements LocalMaterialData
         return this.withBlockData(defaultData);
     }
 
-    @SuppressWarnings("deprecation")
-    public IBlockData internalBlock()
+    @SuppressWarnings("deprecation") IBlockData internalBlock()
     {
         return Block.getById(getBlockId()).fromLegacyData(getBlockData());
     }
@@ -238,6 +237,31 @@ public final class BukkitMaterialData implements LocalMaterialData
         // No changes, return object itself
         return this;
     }
+    
+    @Override
+    public LocalMaterialData rotate(int rotateTimes)
+    {
+        // Try to rotate
+        DefaultMaterial defaultMaterial = toDefaultMaterial();
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        {
+            // We only know how to rotate vanilla blocks
+        	byte blockDataByte = 0;
+            int newData = 0;
+            for(int i = 0; i < rotateTimes; i++)
+            {
+            	blockDataByte = getBlockData();
+            	newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);	
+            }
+            if (newData != blockDataByte)
+            {
+            	return ofDefaultMaterial(defaultMaterial, newData);
+            }
+        }
+
+        // No changes, return object itself
+        return this;
+    }
 
     @Override
     public boolean isAir() {
@@ -250,14 +274,10 @@ public final class BukkitMaterialData implements LocalMaterialData
         return Block.getById(getBlockId()) instanceof BlockFalling;
     }
 
-    // OTG+
-    
 	@Override
 	public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
 	{
 		// TODO: Implement this
 		return false;
 	}
-	
-	//
 }

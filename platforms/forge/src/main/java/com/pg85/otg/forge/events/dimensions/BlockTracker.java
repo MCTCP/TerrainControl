@@ -13,7 +13,7 @@ public class BlockTracker
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event)
     {
-    	DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(event.getWorld()));
+    	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(event.getWorld()));
     	if(dimConfig != null && !dimConfig.Settings.PlayersCanBreakBlocks)
     	{
     		event.setCanceled(true);
@@ -23,7 +23,7 @@ public class BlockTracker
 	@SubscribeEvent
 	public void onBlockPlace(BlockEvent.PlaceEvent event)
 	{
-		DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(event.getWorld()));
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(event.getWorld()));
 		if(dimConfig != null && !dimConfig.Settings.PlayersCanPlaceBlocks)
 		{
 			event.setCanceled(true);
@@ -33,7 +33,7 @@ public class BlockTracker
 	@SubscribeEvent
 	public void onExplosion(ExplosionEvent.Start event)
 	{
-		DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(WorldHelper.getName(event.getWorld()));
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(event.getWorld()));
 		if(dimConfig != null && !dimConfig.Settings.ExplosionsCanBreakBlocks)
 		{
 			event.setCanceled(true);

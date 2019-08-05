@@ -1,9 +1,10 @@
 package com.pg85.otg.bukkit.generator.structures;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
+
 import net.minecraft.server.v1_12_R1.*;
 import net.minecraft.server.v1_12_R1.BiomeBase.BiomeMeta;
 import net.minecraft.server.v1_12_R1.WorldGenNether.WorldGenNetherStart;
@@ -15,7 +16,7 @@ import java.util.Random;
 public class OTGNetherFortressGen extends StructureGenerator
 {
 
-    public List<BiomeMeta> spawnList = new ArrayList<BiomeMeta>();
+    private List<BiomeMeta> spawnList = new ArrayList<BiomeMeta>();
 
     public OTGNetherFortressGen()
     {
@@ -25,6 +26,7 @@ public class OTGNetherFortressGen extends StructureGenerator
         this.spawnList.add(new BiomeMeta(EntityMagmaCube.class, 3, 4, 4));
     }
 
+    // TODO: Never used, remove this?
     public List<BiomeMeta> b()
     {
         return this.spawnList;

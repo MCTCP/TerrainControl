@@ -1,6 +1,6 @@
 package com.pg85.otg.generator.biome;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.layers.Layer;
 
 /**
@@ -43,13 +43,13 @@ public abstract class LayeredBiomeGenerator extends BiomeGenerator
         {
             biomeArray = new int[x_size * z_size];
         }
-        ArraysCache cache = ArraysCacheManager.GetCache();
+        ArraysCache cache = ArraysCacheManager.getCache();
         if (outputType == OutputType.DEFAULT_FOR_WORLD)
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
         int[] arrayOfInt = this.unZoomedLayer.getInts(world, cache, x, z, x_size, z_size);
-        ArraysCacheManager.ReleaseCache(cache);
+        ArraysCacheManager.releaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
 
@@ -64,13 +64,13 @@ public abstract class LayeredBiomeGenerator extends BiomeGenerator
             biomeArray = new int[x_size * z_size];
         }
 
-        ArraysCache cache = ArraysCacheManager.GetCache();
+        ArraysCache cache = ArraysCacheManager.getCache();
         if (outputType == OutputType.DEFAULT_FOR_WORLD)
             cache.outputType = defaultOutputType;
         else
             cache.outputType = outputType;
         int[] arrayOfInt = this.biomeLayer.getInts(world, cache, x, z, x_size, z_size);
-        ArraysCacheManager.ReleaseCache(cache);
+        ArraysCacheManager.releaseCache(cache);
 
         System.arraycopy(arrayOfInt, 0, biomeArray, 0, x_size * z_size);
 

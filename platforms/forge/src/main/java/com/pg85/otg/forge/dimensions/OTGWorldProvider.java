@@ -2,13 +2,17 @@ package com.pg85.otg.forge.dimensions;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.util.ChunkCoordinate;
 
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProviderSurface;
@@ -20,72 +24,44 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class OTGWorldProvider extends WorldProviderSurface
 {
-	public DimensionConfig dimConfig = null;
-	public WorldConfig worldConfig = null;
-	public String worldName = null;
-
-	public WorldConfig GetWorldConfig()
-	{
-		if(worldConfig == null)
-		{
-			ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world);
-			if(forgeWorld != null)
-			{				
-				worldConfig = forgeWorld.getConfigs().getWorldConfig();
-			}			
-		}
-		return worldConfig;
-	}
-
-	long lastFetchTime = System.currentTimeMillis();	
-	public DimensionConfig GetDimensionConfig()
-	{		
-		if(OTG.GetDimensionsConfig() == null)
-		{
-			return null; // Happen for Forge clients connecting to Bukkit servers
-		}
-		
-		// The config may be updated during a session, refresh it once per second
-		long currentTime = System.currentTimeMillis();
-		if(currentTime - lastFetchTime > 1000l)
-		{
-			lastFetchTime = currentTime;
-			if(worldName == null)
-			{
-				ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world);
-				if(forgeWorld != null)
-				{
-					worldName = forgeWorld.getName();
-				}
-			}
-			if(worldName != null)
-			{
-				dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(worldName);				
-			}
-		}
-		return dimConfig;
-	}
+	private DimensionConfig dimConfig = null;
+	private WorldConfig worldConfig = null;
+	private String worldName = null;
+	private DimensionType dimType = null;
+	private long lastFetchTime = 0;	
+	public boolean isSPServerOverworld = false;
 	
 	public OTGWorldProvider()
 	{
 		
 	}
+	
+    // Creates a new {@link BiomeProvider} for the WorldProvider, and also sets the values of {@link #hasSkylight} and
+    // {@link #hasNoSky} appropriately.
+	@Override
+	protected void init()
+	{
+		// Creates a new world chunk manager for WorldProvider
+		this.hasSkyLight = true;
+   		if(!isSPServerOverworld)
+   		{
+   			this.biomeProvider = OTGPlugin.OtgWorldType.getBiomeProvider(world);
+   		}
+   	}
+	
+	public void init(BiomeProvider biomeProvider)
+	{
+		// Creates a new world chunk manager for WorldProvider
+		this.hasSkyLight = true;
+		this.biomeProvider = biomeProvider;
+	}
 
-    // A message to display to the user when they transfer to this dimension.
-    public String getWelcomeMessage()
-    {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-		return dimConfig != null ? dimConfig.Settings.WelcomeMessage : WorldStandardValues.welcomeMessage.getDefaultValue();
-    }
-
-	// A Message to display to the user when they transfer out of this dismension.
-    public String getDepartMessage()
-    {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-		return dimConfig != null ? dimConfig.Settings.DepartMessage : WorldStandardValues.departMessage.getDefaultValue();
-    }
-
-	DimensionType dimType = null;
+   @Override
+   public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()
+   {
+   	return OTGPlugin.OtgWorldType.getChunkGenerator(world, "OpenTerrainGenerator");
+   }
+   
 	@Override
     public DimensionType getDimensionType()
     {
@@ -110,46 +86,73 @@ public class OTGWorldProvider extends WorldProviderSurface
         return dimType;
     }
 	
-	public boolean isSPServerOverworld = false;
-     // Creates a new {@link BiomeProvider} for the WorldProvider, and also sets the values of {@link #hasSkylight} and
-     // {@link #hasNoSky} appropriately.
-	@Override
-    protected void init()
-    {
-        // Creates a new world chunk manager for WorldProvider
-    	this.hasSkyLight = true;
-    	if(!isSPServerOverworld)
-    	{
-    		this.biomeProvider = OTGPlugin.txWorldType.getBiomeProvider(world);
-    	}
-    }
-	
-	public void init(BiomeProvider biomeProvider)
+	public WorldConfig getWorldConfig()
 	{
-        // Creates a new world chunk manager for WorldProvider
-    	this.hasSkyLight = true;
-        this.biomeProvider = biomeProvider;
+		if(worldConfig == null)
+		{
+			ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world);
+			if(forgeWorld != null)
+			{				
+				worldConfig = forgeWorld.getConfigs().getWorldConfig();
+			}			
+		}
+		return worldConfig;
 	}
 
-    @Override
-    public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()
+	public DimensionConfig getDimensionConfig()
+	{				
+		// The config may be updated during a session, refresh it once per second
+		long currentTime = System.currentTimeMillis();
+		if(currentTime - lastFetchTime > 1000l)
+		{
+			lastFetchTime = currentTime;
+			if(worldName == null)
+			{
+				ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world);
+				if(forgeWorld != null)
+				{
+					worldName = forgeWorld.getName();
+				}
+			}
+			if(worldName != null)
+			{
+				DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+				if(dimsConfig != null)
+				{
+					dimConfig = dimsConfig.getDimensionConfig(worldName);
+				}
+			}
+		}		
+		return dimConfig;
+	}
+
+    // A message to display to the user when they transfer to this dimension.
+    public String getWelcomeMessage()
     {
-    	return OTGPlugin.txWorldType.getChunkGenerator(world, "OpenTerrainGenerator");
+    	DimensionConfig dimConfig = getDimensionConfig();
+		return dimConfig != null ? dimConfig.Settings.WelcomeMessage : WorldStandardValues.WelcomeMessage.getDefaultValue();
+    }
+
+	// A Message to display to the user when they transfer out of this dismension.
+    public String getDepartMessage()
+    {
+    	DimensionConfig dimConfig = getDimensionConfig();
+		return dimConfig != null ? dimConfig.Settings.DepartMessage : WorldStandardValues.DepartMessage.getDefaultValue();
     }
 
     // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions.
     @Override
     public boolean isSurfaceWorld()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.IsSurfaceWorld : WorldStandardValues.isSurfaceWorld.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+        return dimConfig != null ? dimConfig.Settings.IsSurfaceWorld : WorldStandardValues.IsSurfaceWorld.getDefaultValue();
     }
 
     // Will check if the x, z position specified is alright to be set as the map spawn point
     @Override
     public boolean canCoordinateBeSpawn(int x, int z)
     {
-        return false; // TODO: Make spawn pos detection method? (make sure it doesn't screw up BO3AtSpawn and cartographer in TXChunkGenerator)
+        return false; // TODO: Make spawn pos detection method? (make sure it doesn't screw up BO3AtSpawn)
     }
 
     @Override
@@ -162,8 +165,8 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public boolean canRespawnHere()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.CanRespawnHere : WorldStandardValues.canRespawnHere.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+        return dimConfig != null ? dimConfig.Settings.CanRespawnHere : WorldStandardValues.CanRespawnHere.getDefaultValue();
     }
 
     // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
@@ -175,7 +178,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public boolean shouldMapSpin(String entity, double x, double y, double z)
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
+    	DimensionConfig dimConfig = getDimensionConfig();
     	return dimConfig != null ? dimConfig.Settings.ShouldMapSpin : super.shouldMapSpin(entity, x, y, z);
     }
 
@@ -202,7 +205,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public Vec3d getFogColor(float p_76562_1_, float p_76562_2_)
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
+    	DimensionConfig dimConfig = getDimensionConfig();
         return dimConfig != null && dimConfig.Settings.UseCustomFogColor ? new Vec3d(dimConfig.Settings.FogColorRed, dimConfig.Settings.FogColorGreen, dimConfig.Settings.FogColorBlue) : super.getFogColor(p_76562_1_, p_76562_2_);
     }
 
@@ -212,8 +215,8 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public boolean doesXZShowFog(int x, int z)
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.DoesXZShowFog : WorldStandardValues.doesXZShowFog.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+        return dimConfig != null ? dimConfig.Settings.DoesXZShowFog : WorldStandardValues.DoesXZShowFog.getDefaultValue();
     }
 
     /**
@@ -225,8 +228,8 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public double getVoidFogYFactor()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.VoidFogYFactor : WorldStandardValues.voidFogYFactor.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+    	return dimConfig != null ? dimConfig.Settings.VoidFogYFactor : WorldStandardValues.VoidFogYFactor.getDefaultValue();
     }
 
     // TODO: Is this really needed to make sky colors work?
@@ -234,8 +237,8 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public boolean isSkyColored()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.IsSkyColored : WorldStandardValues.isSkyColored.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+        return dimConfig != null ? dimConfig.Settings.IsSkyColored : WorldStandardValues.IsSkyColored.getDefaultValue();
     }
 
     @SideOnly(Side.CLIENT)
@@ -257,14 +260,14 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public float getCloudHeight()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.CloudHeight : WorldStandardValues.cloudHeight.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+    	return dimConfig != null ? dimConfig.Settings.CloudHeight : WorldStandardValues.CloudHeight.getDefaultValue();
     }
 
     @Override
     public int getAverageGroundLevel()
     {
-    	WorldConfig worldConfig = GetWorldConfig();
+    	WorldConfig worldConfig = getWorldConfig();
    		return worldConfig != null ? worldConfig.waterLevelMax + 1 : this.world.getSeaLevel() + 1; // Sea level + 1 by default
     }
 
@@ -275,8 +278,8 @@ public class OTGWorldProvider extends WorldProviderSurface
     {
     	if(this.getDimension() != 0) // Never unload Overworld
     	{
-    		DimensionConfig dimConfig = GetDimensionConfig();
-	        return dimConfig != null ? dimConfig.Settings.CanDropChunk : WorldStandardValues.canDropChunk.getDefaultValue();
+    		DimensionConfig dimConfig = getDimensionConfig();
+	        return dimConfig != null ? dimConfig.Settings.CanDropChunk : WorldStandardValues.CanDropChunk.getDefaultValue();
     	} else {
     		return !this.world.isSpawnChunk(x, z) || !this.world.provider.getDimensionType().shouldLoadSpawn();
     	}
@@ -286,7 +289,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     protected void generateLightBrightnessTable()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
+    	DimensionConfig dimConfig = getDimensionConfig();
 		if(dimConfig != null && dimConfig.Settings.IsNightWorld)
     	{
 	        for (int i = 0; i <= 15; ++i)
@@ -300,18 +303,44 @@ public class OTGWorldProvider extends WorldProviderSurface
     	}
     }
 
-
-	@Override
     public WorldBorder createWorldBorder()
     {
-		return super.createWorldBorder();
-    }
+		WorldBorder worldBorder = new WorldBorder()
+        {
+            public double getCenterX()
+            {
+                return super.getCenterX() / getMovementFactor();
+            }
+            public double getCenterZ()
+            {
+                return super.getCenterZ() / getMovementFactor();
+            }
+        };
+           
+        if(world != null && world.provider != null)
+        {
+	    	DimensionConfig dimConfig = getDimensionConfig();
+	    	if(dimConfig != null && dimConfig.WorldBorderRadiusInChunks > 0)
+	    	{
+	    		ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world);
+	    		ChunkCoordinate worldBorderCenterPoint;
+	    		if(forgeWorld != null)
+	    		{
+	    			worldBorderCenterPoint = forgeWorld.getWorldSession().getWorldBorderCenterPoint();
+	                double d2 = MathHelper.clamp(dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16 , 1.0D, 6.0E7D);
+	                worldBorder.setCenter(worldBorderCenterPoint.getBlockX() * getMovementFactor() + 8, worldBorderCenterPoint.getBlockZ() * getMovementFactor() + 8);
+	                worldBorder.setTransition(d2);
+	    		}    		
+	    	}
+        }
+		return worldBorder;
+    }	
 
     // Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
     @Override
     public float calculateCelestialAngle(long worldTime, float partialTicks)
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
+    	DimensionConfig dimConfig = getDimensionConfig();
     	if(dimConfig != null && dimConfig.Settings.IsNightWorld)
     	{
     		return 0.49837038f;
@@ -323,22 +352,22 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public double getHorizon()
     {
-    	WorldConfig worldConfig = GetWorldConfig();
+    	WorldConfig worldConfig = getWorldConfig();
     	return worldConfig != null ? worldConfig.waterLevelMax : this.world.getSeaLevel();
     }
 
     @Override
     public boolean canDoLightning(net.minecraft.world.chunk.Chunk chunk)
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-        return dimConfig != null ? dimConfig.Settings.CanDoLightning : WorldStandardValues.canDoLightning.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+        return dimConfig != null ? dimConfig.Settings.CanDoLightning : WorldStandardValues.CanDoLightning.getDefaultValue();
     }
 
     @Override
     public boolean canDoRainSnowIce(net.minecraft.world.chunk.Chunk chunk)
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.CanDoRainSnowIce : WorldStandardValues.canDoRainSnowIce.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+    	return dimConfig != null ? dimConfig.Settings.CanDoRainSnowIce : WorldStandardValues.CanDoRainSnowIce.getDefaultValue();
     }
 
     // This only affects lillies, glass bottles and a few other unimportant things?
@@ -352,15 +381,15 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public boolean doesWaterVaporize()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.DoesWaterVaporize : WorldStandardValues.doesWaterVaporize.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+    	return dimConfig != null ? dimConfig.Settings.DoesWaterVaporize : WorldStandardValues.DoesWaterVaporize.getDefaultValue();
     }
 
     @Override
     public boolean hasSkyLight()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.HasSkyLight : WorldStandardValues.hasSkyLight.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+    	return dimConfig != null ? dimConfig.Settings.HasSkyLight : WorldStandardValues.HasSkyLight.getDefaultValue();
     }
 
     @Override
@@ -378,13 +407,13 @@ public class OTGWorldProvider extends WorldProviderSurface
 
     public double getGravityFactor()
     {
-    	DimensionConfig dimConfig = GetDimensionConfig();
-    	return dimConfig != null ? dimConfig.Settings.GravityFactor : WorldStandardValues.gravityFactor.getDefaultValue();
+    	DimensionConfig dimConfig = getDimensionConfig();
+    	return dimConfig != null ? dimConfig.Settings.GravityFactor : WorldStandardValues.GravityFactor.getDefaultValue();
     }
 
     public double getFallDamageFactor(double y)
     {
-    	double baseGravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
+    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
     	double gravityFactor = getGravityFactor();
     	return (y * (gravityFactor / baseGravityFactor));
     }
@@ -399,7 +428,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public double getMovementFactor()
     {
-    	DimensionConfig worldConfig = GetDimensionConfig();
+    	DimensionConfig worldConfig = getDimensionConfig();
     	return worldConfig != null ? worldConfig.Settings.MovementFactor : WorldStandardValues.MOVEMENT_FACTOR.getDefaultValue();
     }
 
@@ -412,7 +441,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public int getRespawnDimension(net.minecraft.entity.player.EntityPlayerMP player)
     {
-    	DimensionConfig worldConfig = GetDimensionConfig();
+    	DimensionConfig worldConfig = getDimensionConfig();
     	return worldConfig != null ? !worldConfig.Settings.CanRespawnHere ? worldConfig.Settings.RespawnDimension : super.getRespawnDimension(player) : super.getRespawnDimension(player);
     }
     

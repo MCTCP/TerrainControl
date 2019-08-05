@@ -9,7 +9,6 @@ import java.lang.reflect.Field;
  */
 public final class ReflectionHelper
 {
-
     private ReflectionHelper()
     {
         // No instances

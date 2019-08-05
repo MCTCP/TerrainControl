@@ -2,7 +2,8 @@ package com.pg85.otg.forge.util;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
+
 import net.minecraft.nbt.*;
 
 import java.lang.reflect.Field;
@@ -11,6 +12,9 @@ import java.util.Map.Entry;
 
 public class NBTHelper
 {
+    private NBTHelper()
+    {
+    }
 
     /**
      * Converts a net.minecraft.server compound NBT tag to a
@@ -294,9 +298,5 @@ public class NBTHelper
                 // Cannot make this into a tag
                 throw new IllegalArgumentException(type + "doesn't have a simple value!");
         }
-    }
-
-    private NBTHelper()
-    {
     }
 }

@@ -2,7 +2,7 @@ package com.pg85.otg.forge.network.client;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.WorldLoader;
+import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.logging.LogMarker;
 
 import io.netty.buffer.ByteBuf;
@@ -23,18 +23,6 @@ import java.util.Arrays;
 
 public class BukkitClientNetworkEventListener
 {
-    private final WorldLoader worldLoader;
-
-    public BukkitClientNetworkEventListener(WorldLoader worldLoader)
-    {
-        this.worldLoader = worldLoader;
-    }
-    
-    public BukkitClientNetworkEventListener()
-    {
-    	this.worldLoader = null;
-	}
-
 	// Only used when receiving packets from Spigot/Bukkit servers
     // Forge servers use a synchronous message channel for packet sending to ensure the packets with dimension and world data arrive before the world is loaded.
     // This is necessary for the multi-dimension features. See: DimensionSyncChannelHandler and PlayerTracker.onConnectionCreated()
@@ -72,7 +60,7 @@ public class BukkitClientNetworkEventListener
 
                     DataInputStream wrappedStream = new DataInputStream(new ByteBufInputStream(stream));
 
-                    this.worldLoader.registerClientWorldBukkit(worldMC, wrappedStream);
+                    ((ForgeEngine)OTG.getEngine()).getWorldLoader().registerClientWorldBukkit(worldMC, wrappedStream);
                 }
            	
                 OTG.log(LogMarker.DEBUG, "Config received from server");

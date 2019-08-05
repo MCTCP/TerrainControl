@@ -19,7 +19,7 @@ import java.util.Random;
 public class OTGChunkGenerator extends ChunkGenerator
 {	
     private ChunkProviderOTG chunkProviderTC;
-    // Why does the chunk generator require multiple block populators, each with their own ObjectSpawner instance? For multiple dims??
+    // Why does the chunk generator require multiple block populators, each with their own ObjectSpawner instance? For multiple dims?
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
     private OTGPlugin plugin;
@@ -54,7 +54,7 @@ public class OTGChunkGenerator extends ChunkGenerator
     {
         this.chunkProviderTC = new ChunkProviderOTG(_world.getConfigs(), _world);
 
-        WorldConfig.TerrainMode mode = _world.getConfigs().getWorldConfig().ModeTerrain;
+        WorldConfig.TerrainMode mode = _world.getConfigs().getWorldConfig().modeTerrain;
 
         if (mode == WorldConfig.TerrainMode.Normal || mode == WorldConfig.TerrainMode.OldGenerator)
             this.BlockPopulator.add(new OTGBlockPopulator(_world));

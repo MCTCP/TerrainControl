@@ -1,13 +1,13 @@
 package com.pg85.otg.configuration.standard;
 
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,7 +143,7 @@ public class MinecraftBiomeTemplates
 
             this.defaultColor = 0x606060;
             this.defaultDandelions = 4;
-            this.defaultEmeraldOre = BiomeStandardValues.emeraldDepositFrequency;
+            this.defaultEmeraldOre = BiomeStandardValues.EmeraldDepositFrequency;
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
             this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, 1.0,
                     DefaultMaterial.STONE, DefaultMaterial.STONE, 10.0};

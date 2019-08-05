@@ -1,92 +1,49 @@
 package com.pg85.otg.customobjects.bo3;
 
-import static com.pg85.otg.OTG.WORLD_DEPTH;
-import static com.pg85.otg.OTG.WORLD_HEIGHT;
-
-import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
-import com.pg85.otg.customobjects.StructurePartSpawnHeight;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.Rotation;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.util.materials.MaterialSet;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 
 public class BO3Settings extends Settings
 {
-    public static final Setting<Boolean>
+    static final Setting<Boolean>
             TREE = booleanSetting("Tree", true),
             ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false),
-            // OTG+
-            REMOVEAIR = booleanSetting("RemoveAir", true),
-    		CANOVERRIDE = booleanSetting("CanOverride", false),
-			MUSTBEBELOWOTHER = booleanSetting("MustBeBelowOther", false),
-			CANSPAWNONWATER = booleanSetting("CanSpawnOnWater", true),
-			SPAWNONWATERONLY = booleanSetting("SpawnOnWaterOnly", false),
-			SPAWNUNDERWATER = booleanSetting("SpawnUnderWater", false),
-			SPAWNATWATERLEVEL = booleanSetting("SpawnAtWaterLevel", false),
-			REPLACEWITHBIOMEBLOCKS = booleanSetting("ReplaceWithBiomeBlocks", true),
-			OVERRIDECHILDSETTINGS = booleanSetting("OverrideChildSettings", true),
-			OVERRIDEPARENTHEIGHT = booleanSetting("OverrideParentHeight", false),
-			ISSPAWNPOINT = booleanSetting("IsSpawnPoint",false),
-			SMOOTHSTARTTOP = booleanSetting("SmoothStartTop",false),
-			SMOOTHSTARTWOOD = booleanSetting("SmoothStartWood",false),
 			IS_OTG_PLUS = booleanSetting("IsOTGPlus",false)
             ;
 
-    public static final Setting<Double> RARITY = doubleSetting("Rarity", 100, 0.000001, 100);
+    static final Setting<Double> RARITY = doubleSetting("Rarity", 100, 0.000001, 100);
 
-    public static final Setting<Rotation> INHERITBO3ROTATION = rotationSetting("InheritBO3Rotation", Rotation.NORTH);
-
-    public static final Setting<Integer>
+    static final Setting<Integer>
             FREQUENCY = intSetting("Frequency", 0, 0, 9999),
-            MIN_HEIGHT = intSetting("MinHeight", 0, WORLD_DEPTH, WORLD_HEIGHT),
-            MAX_HEIGHT = intSetting("MaxHeight", 256, WORLD_DEPTH, WORLD_HEIGHT),
+            MIN_HEIGHT = intSetting("MinHeight", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+            MAX_HEIGHT = intSetting("MaxHeight", 256, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
             MAX_BRANCH_DEPTH = intSetting("MaxBranchDepth", 10, 1, 100),
             MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK = intSetting("MaxPercentageOutsideSourceBlock", 100, 0, 100),
             SPAWN_HEIGHT_OFFSET = intSetting("SpawnHeightOffset", 0, -255, 255),
-            SPAWN_HEIGHT_VARIANCE = intSetting("SpawnHeightVariance", 0, -255, 255),
-            // OTG+
-    		//FREQUENCY = intSetting("Frequency", 0, 0, 9999),
-    		BRANCH_FREQUENCY = intSetting("BranchFrequency", 0, 0, 9999),
-			HEIGHT_OFFSET = intSetting("HeightOffset", 0, -255, 255),
-			SMOOTH_HEIGHT_OFFSET = intSetting("SmoothHeightOffset", 0, -255, 255),
-    		SMOOTHRADIUS = intSetting("SmoothRadius", 0, -1, 9999),
-			SPAWNPOINTX =  intSetting("SpawnPointX", 8, -9999, 9999),
-			SPAWNPOINTY =  intSetting("SpawnPointY", -1, -1, 9999),
-			SPAWNPOINTZ =  intSetting("SpawnPointZ", 7, -9999, 9999)
+            SPAWN_HEIGHT_VARIANCE = intSetting("SpawnHeightVariance", 0, -255, 255)
             ;
 
-    public static final Setting<String>
+    static final Setting<String>
             AUTHOR = stringSetting("Author", "Unknown"),
             DESCRIPTION = stringSetting("Description", "No description given"),
-            VERSION = stringSetting("Version", "3"),
-            // OTG+
-    		INHERITBO3 = stringSetting("InheritBO3", ""),
-    		REPLACEABOVE = stringSetting("ReplaceAbove", ""),
-			REPLACEBELOW = stringSetting("ReplaceBelow", ""),
-			BO3GROUP = stringSetting("BO3Group", ""),
-			BRANCH_FREQUENCY_GROUP = stringSetting("BranchFrequencyGroup", ""),
-			REPLACEWITHGROUNDBLOCK = stringSetting("ReplaceWithGroundBlock", "DIRT"),
-			REPLACEWITHSURFACEBLOCK = stringSetting("ReplaceWithSurfaceBlock", "GRASS"),
-			SMOOTHINGSURFACEBLOCK = stringSetting("SmoothingSurfaceBlock", ""),
-			SMOOTHINGGROUNDBLOCK = stringSetting("SmoothingGroundBlock", ""),
-			MUSTBEINSIDE = stringSetting("MustBeInside", ""),
-			CANNOTBEINSIDE = stringSetting("CannotBeInside", ""),
-			REPLACESBO3 = stringSetting("ReplacesBO3", "")
+            VERSION = stringSetting("Version", "3")
             ;
 
-    public static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");
+    static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");
 
-    public static final Setting<MaterialSet>
+    static final Setting<MaterialSet>
             SOURCE_BLOCKS = materialSetSetting("SourceBlocks", DefaultMaterial.AIR),
             EXTRUDE_THROUGH_BLOCKS = materialSetSetting("ExtrudeThroughBlocks", DefaultMaterial.AIR);
 
     // Enum settings
-    public static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
+    static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
     public static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
-    public static final Setting<ExtrudeMode> EXTRUDE_MODE = enumSetting("ExtrudeMode", ExtrudeMode.None);
+    static final Setting<ExtrudeMode> EXTRUDE_MODE = enumSetting("ExtrudeMode", ExtrudeMode.None);
 
     // The spawn height
     public static enum SpawnHeightEnum
@@ -102,7 +59,7 @@ public class BO3Settings extends Settings
             this.height = height;
         }
 
-        public StructurePartSpawnHeight toStructurePartSpawnHeight()
+        StructurePartSpawnHeight toStructurePartSpawnHeight()
         {
             return height;
         }
@@ -112,8 +69,8 @@ public class BO3Settings extends Settings
     public static enum ExtrudeMode
     {
         None(-1, -1),
-        BottomDown(OTG.WORLD_HEIGHT, OTG.WORLD_DEPTH),
-        TopUp(OTG.WORLD_DEPTH, OTG.WORLD_HEIGHT);
+        BottomDown(PluginStandardValues.WORLD_HEIGHT, PluginStandardValues.WORLD_DEPTH),
+        TopUp(PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
 
         /**
          * Defines where calculation should begin

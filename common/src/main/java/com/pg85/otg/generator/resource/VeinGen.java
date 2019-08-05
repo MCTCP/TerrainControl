@@ -1,12 +1,12 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 import java.util.Random;
@@ -14,15 +14,15 @@ import java.util.Random;
 public class VeinGen extends Resource
 {
 
-    public int maxAltitude; // Maximum altitude of the vein
-    public int maxRadius; // Maximum size of the vein in blocks (inclusive)
-    public int minAltitude; // Minimum altitude of the vein
-    public int minRadius; // Minimum size of the vein in blocks (inclusive)
-    public int oreFrequency; // Frequency of the ores in the vein
-    public int oreRarity; // Rarity of the ores in the vein
-    public int oreSize; // Average size of a ore in the vein
-    public MaterialSet sourceBlocks; // Blocks for the ore to spawn in
-    public double veinRarity; // Chance for the vein to spawn in a chunk
+    int maxAltitude; // Maximum altitude of the vein
+    private int maxRadius; // Maximum size of the vein in blocks (inclusive)
+    int minAltitude; // Minimum altitude of the vein
+    private int minRadius; // Minimum size of the vein in blocks (inclusive)
+    int oreFrequency; // Frequency of the ores in the vein
+    int oreRarity; // Rarity of the ores in the vein
+    int oreSize; // Average size of a ore in the vein
+    MaterialSet sourceBlocks; // Blocks for the ore to spawn in
+    private double veinRarity; // Chance for the vein to spawn in a chunk
 
     public VeinGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -36,10 +36,10 @@ public class VeinGen extends Resource
         oreSize = readInt(args.get(4), 1, 64);
         oreFrequency = readInt(args.get(5), 1, 100);
         oreRarity = readInt(args.get(6), 1, 100);
-        minAltitude = readInt(args.get(7), OTG.WORLD_DEPTH,
-                OTG.WORLD_HEIGHT - 1);
+        minAltitude = readInt(args.get(7), PluginStandardValues.WORLD_DEPTH,
+                PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(8), minAltitude,
-                OTG.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 9);
     }
 
@@ -81,7 +81,7 @@ public class VeinGen extends Resource
      * @return The vein that starts in the chunk, or null if there is no
      *         starting vein.
      */
-    public Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
+    private Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
     {
         // Create a random generator that is constant for this chunk and vein
         Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, material.hashCode() * (minRadius + maxRadius + 100) + world.getSeed());

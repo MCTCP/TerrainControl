@@ -2,7 +2,8 @@ package com.pg85.otg.bukkit.util;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
+
 import net.minecraft.server.v1_12_R1.*;
 
 import java.lang.reflect.Field;

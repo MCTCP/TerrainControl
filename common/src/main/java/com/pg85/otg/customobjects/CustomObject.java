@@ -1,14 +1,9 @@
 package com.pg85.otg.customobjects;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
-import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
-import com.pg85.otg.generator.SpawnableObject;
-import com.pg85.otg.util.BoundingBox;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
-import java.util.Map;
 import java.util.Random;
 
 /**
@@ -29,7 +24,7 @@ public interface CustomObject extends SpawnableObject
      * @param otherObjectsInDirectory A map of all other objects in the
      *                                directory. Keys are lowercase.
      */
-    public void onEnable(Map<String, CustomObject> otherObjectsInDirectory);
+    public boolean onEnable();
 
     /**
      * Returns the name of this object.
@@ -45,14 +40,6 @@ public interface CustomObject extends SpawnableObject
      * @return Whether this object can spawn as a tree.
      */
     public boolean canSpawnAsTree();
-
-    /**
-     * Returns whether this object can spawn from the CustomObject() resource.
-     * Vanilla trees should return false; everything else should return true.
-     *
-     * @return Whether this object can spawn as an object.
-     */
-    public boolean canSpawnAsObject();
 
     /**
      * Returns whether this object can be placed with a random rotation. If
@@ -106,28 +93,5 @@ public interface CustomObject extends SpawnableObject
      * @param chunkCoord The chunk to spawn the objects in.
      * @return Whether at least one object spawned successfully.
      */
-    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);
-
-    /**
-     * Creates a new object with all settings applied.
-     *
-     * @param settings The settings. The settings of the existing object will
-     * be {@link SettingsReader#setFallbackReader(SettingsReader) set as a
-     * fallback}.
-     * @return A copy of this object will all the settings applied.
-     */
-    public CustomObject applySettings(SettingsReaderOTGPlus settings);
-
-    /**
-     * Returns whether this object would like to spawn in this biome. BO2s will
-     * return whether this biome is in their spawnInBiome setting.
-     *
-     * @param biome
-     * @return
-     */
-    public boolean hasPreferenceToSpawnIn(LocalBiome biome);
-    
-    public int getMaxBranchDepth(); // Only needed for Non-OTG+
-    
-    public BoundingBox getBoundingBox(Rotation rotation); // Only needed for Non-OTG+
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);  
 }

@@ -1,45 +1,44 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
 
 public class VinesGen extends Resource
 {
-
-    public static final int[] d =
+    private static final int[] D =
     {
         -1, -1, 2, 0, 1, 3
     };
-    public static final int[] OPPOSITE_FACING =
+    private static final int[] OPPOSITE_FACING =
     {
         1, 0, 3, 2, 5, 4
     };
-
     private final int maxAltitude;
-
     private final int minAltitude;
 
     public VinesGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        material = OTG.toLocalMaterialData(DefaultMaterial.VINE, 0);
+        material = MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 0);
 
         assureSize(4, args);
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
-        minAltitude = readInt(args.get(2), OTG.WORLD_DEPTH,
-                OTG.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(2), PluginStandardValues.WORLD_DEPTH,
+                PluginStandardValues.WORLD_HEIGHT);
         maxAltitude = readInt(args.get(3), minAltitude,
-                OTG.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT);
     }
-    public boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
+    
+    private boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
     {
         LocalMaterialData sourceBlock;
         switch (paramInt4)
@@ -64,6 +63,7 @@ public class VinesGen extends Resource
         }
         return sourceBlock.isSolid();
     }
+    
     @Override
     public boolean equals(Object other)
     {
@@ -116,7 +116,7 @@ public class VinesGen extends Resource
                 for (int direction = 2; direction <= 5; direction++)
                     if (canPlace(world, _x, y, _z, direction))
                     {
-                        world.setBlock(_x, y, _z, OTG.toLocalMaterialData(DefaultMaterial.VINE, 1 << d[OPPOSITE_FACING[direction]]), null, false);
+                        world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, false);
                         break;
                     }
             } else

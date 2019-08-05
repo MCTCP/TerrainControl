@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.minecraftTypes.TreeType;
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.io.File;
 import java.util.*;
@@ -23,10 +23,10 @@ public class CustomObjectCollection
     private HashMap<String, HashMap<String, CustomObject>> objectsByNamePerWorld = new HashMap<String, HashMap<String, CustomObject>>();
     private HashMap<String, ArrayList<String>> objectsNotFoundPerWorld = new HashMap<String, ArrayList<String>>();
 
-    HashMap<String, File> CustomObjectFilesGlobalObjects = null;
-    HashMap<String, HashMap<String, File>> CustomObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
+    private HashMap<String, File> customObjectFilesGlobalObjects = null;
+    private HashMap<String, HashMap<String, File>> customObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
 
-    public CustomObject loadObject(File file, String worldName)
+    private CustomObject loadObject(File file, String worldName)
     {
     	CustomObject object = null;
     	// Try to load single file
@@ -60,7 +60,57 @@ public class CustomObjectCollection
                 	} else {
                     	objectsGlobalObjects.add(object);
                 	}
-                    object.onEnable(null);
+                    ;
+                    if(!object.onEnable())
+                    {
+                    	// Remove the object
+                    	if(worldName != null)
+                    	{
+                    		ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+                			worldObjects.remove(object);
+                			if(worldObjects.size() == 0)
+                			{
+                    			objectsPerWorld.remove(worldName, worldObjects);
+                			}
+                    	} else {
+                        	objectsGlobalObjects.remove(object);
+                    	}
+                    	
+                    	// Try bo4
+                    	loader = OTG.getCustomObjectManager().getObjectLoaders().get("bo4");
+                        if (loader != null)
+                        {
+                        	object = loader.loadFromFile(objectName, file);
+	                    	if(worldName != null)
+	                    	{
+	                    		ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+	                    		if(worldObjects == null)
+	                    		{
+	                    			worldObjects = new ArrayList<CustomObject>();
+	                    			objectsPerWorld.put(worldName, worldObjects);
+	                    		}
+	                			worldObjects.add(object);
+	                    	} else {
+	                        	objectsGlobalObjects.add(object);
+	                    	}
+	                        ;
+	                        if(!object.onEnable())
+	                        {
+	                        	// Remove the object
+	                        	if(worldName != null)
+	                        	{
+	                        		ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+	                    			worldObjects.remove(object);
+	                    			if(worldObjects.size() == 0)
+	                    			{
+	                        			objectsPerWorld.remove(worldName, worldObjects);
+	                    			}
+	                        	} else {
+	                            	objectsGlobalObjects.remove(object);
+	                        	}
+	                        }
+                        }
+                    }
                 }
             }
     	} else {
@@ -75,7 +125,7 @@ public class CustomObjectCollection
      * same name (case insensitive) already exists, nothing happens.
      * @param object The object to add to the list of loaded objects.
      */
-    public void addLoadedGlobalObject(CustomObject object)
+    void addLoadedGlobalObject(CustomObject object)
     {
         String lowerCaseName = object.getName().toLowerCase();
         if (!objectsByNameGlobalObjects.containsKey(lowerCaseName))
@@ -85,7 +135,7 @@ public class CustomObjectCollection
         }
     }
 
-    public void ReloadCustomObjectFiles()
+    void reloadCustomObjectFiles()
     {
         objectsGlobalObjects.clear();
         objectsByNameGlobalObjects.clear();
@@ -95,8 +145,8 @@ public class CustomObjectCollection
         objectsByNamePerWorld.clear();
         objectsNotFoundPerWorld.clear();
 
-        CustomObjectFilesGlobalObjects = null;
-        CustomObjectFilesPerWorld.clear();
+        customObjectFilesGlobalObjects = null;
+        customObjectFilesPerWorld.clear();
     }
 
     /**
@@ -106,7 +156,7 @@ public class CustomObjectCollection
      */
     public CustomObject getObjectByName(String name, String worldName)
     {
-    	worldName = OTG.getEngine().GetPresetName(worldName);
+    	worldName = OTG.getEngine().getPresetName(worldName);
     	//OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ? worldName : "");
 
     	CustomObject object = null;
@@ -171,12 +221,12 @@ public class CustomObjectCollection
 
     	// Index GlobalObjects and WorldObjects directories
 
-    	if(CustomObjectFilesGlobalObjects == null)
+    	if(customObjectFilesGlobalObjects == null)
     	{
-    		CustomObjectFilesGlobalObjects = new HashMap<String, File>();
-    		if(new File(OTG.getEngine().getOTGDataFolder() + File.separator + "GlobalObjects").exists())
+    		customObjectFilesGlobalObjects = new HashMap<String, File>();
+    		if(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects").exists())
     		{
-    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGDataFolder() + File.separator + "GlobalObjects"), CustomObjectFilesGlobalObjects);
+    			indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects"), customObjectFilesGlobalObjects);
     		}
 
 	        // Add vanilla custom objects
@@ -186,13 +236,13 @@ public class CustomObjectCollection
 	        }
     	}
 
-    	if(!CustomObjectFilesPerWorld.containsKey(worldName))
+    	if(!customObjectFilesPerWorld.containsKey(worldName))
     	{
     		HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
-    		CustomObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
-			if(worldName != null && new File(OTG.getEngine().getOTGDataFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects").exists())
+    		customObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
+			if(worldName != null && new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects").exists())
 			{
-				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGDataFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
+				indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects"), worldCustomObjectFiles);
 			}
     	}
 
@@ -200,7 +250,7 @@ public class CustomObjectCollection
 
 		if(worldName != null && !bSearchedWorldObjects)
 		{
-			HashMap<String, File> worldCustomObjectFiles = CustomObjectFilesPerWorld.get(worldName);
+			HashMap<String, File> worldCustomObjectFiles = customObjectFilesPerWorld.get(worldName);
     		if(worldCustomObjectFiles != null)
     		{
     			File searchForFile = worldCustomObjectFiles.get(name.toLowerCase());
@@ -219,7 +269,7 @@ public class CustomObjectCollection
     			    	worldObjectsByName.put(name.toLowerCase(), object);
 	        	    	return object;
     				} else {
-    					if(OTG.getPluginConfig().SpawnLog)
+    					if(OTG.getPluginConfig().spawnLog)
     					{
     						OTG.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
     					}
@@ -249,7 +299,7 @@ public class CustomObjectCollection
     			return object;
     		}
 
-			File searchForFile = CustomObjectFilesGlobalObjects.get(name.toLowerCase());
+			File searchForFile = customObjectFilesGlobalObjects.get(name.toLowerCase());
 
 			if(searchForFile != null)
 	    	{
@@ -260,7 +310,7 @@ public class CustomObjectCollection
 	        		objectsByNameGlobalObjects.put(name.toLowerCase(), object);
 	    	    	return object;
 	        	} else {
-	        		if(OTG.getPluginConfig().SpawnLog)
+	        		if(OTG.getPluginConfig().spawnLog)
 	        		{
 	        			OTG.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
 	        		}
@@ -272,7 +322,7 @@ public class CustomObjectCollection
 			objectsNotFoundGlobalObjects.add(name.toLowerCase());
 		}
 
-		if(OTG.getPluginConfig().SpawnLog)
+		if(OTG.getPluginConfig().spawnLog)
 		{
 			OTG.log(LogMarker.WARN, "Could not find BO2/BO3 " + name + " in GlobalObjects " + (worldName != null ? "and WorldObjects" : "") + " directory " + (worldName != null ? "for world " + worldName : "") + ".");
 		}
@@ -292,13 +342,13 @@ public class CustomObjectCollection
 	    			{
 	    				indexAllCustomObjectFilesInDir(fileInDir, customObjectFiles);
 	    			} else {
-	    				if(fileInDir.getName().toLowerCase().endsWith(".bo3") || fileInDir.getName().toLowerCase().endsWith(".bo2"))
+	    				if(fileInDir.getName().toLowerCase().endsWith(".bo4data") || fileInDir.getName().toLowerCase().endsWith(".bo4") || fileInDir.getName().toLowerCase().endsWith(".bo3") || fileInDir.getName().toLowerCase().endsWith(".bo2"))
 	    				{
-		    				if(!customObjectFiles.containsKey(fileInDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", "")))
+		    				if(fileInDir.getName().toLowerCase().endsWith(".bo4data") || !customObjectFiles.containsKey(fileInDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4", "").replace(".bo3", "").replace(".bo2", "")))
 		    				{
-		    					customObjectFiles.put(fileInDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", ""), fileInDir);
+		    					customObjectFiles.put(fileInDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4", "").replace(".bo3", "").replace(".bo2", ""), fileInDir);
 		    				} else {
-		    					if(OTG.getPluginConfig().SpawnLog)
+		    					if(OTG.getPluginConfig().spawnLog)
 		    					{
 		    						OTG.log(LogMarker.WARN, "Duplicate file found: " + fileInDir.getName() + ".");
 		    					}
@@ -307,13 +357,13 @@ public class CustomObjectCollection
 	    			}
 	    		}
     		} else {
-    			if(searchDir.getName().toLowerCase().endsWith(".bo3") || searchDir.getName().toLowerCase().endsWith(".bo2"))
+    			if(searchDir.getName().toLowerCase().endsWith(".bo4data") ||searchDir.getName().toLowerCase().endsWith(".bo4") || searchDir.getName().toLowerCase().endsWith(".bo3") || searchDir.getName().toLowerCase().endsWith(".bo2"))
     			{
-	    			if(!customObjectFiles.containsKey(searchDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", "")))
+	    			if(searchDir.getName().toLowerCase().endsWith(".bo4data") || !customObjectFiles.containsKey(searchDir.getName().toLowerCase().replace(".bo4", "").replace(".bo3", "").replace(".bo2", "")))
 					{
-	    				customObjectFiles.put(searchDir.getName().toLowerCase().replace(".bo3", "").replace(".bo2", ""), searchDir);
+	    				customObjectFiles.put(searchDir.getName().toLowerCase().replace(".bo4data", "").replace(".bo4", "").replace(".bo3", "").replace(".bo2", ""), searchDir);
 					} else {
-						if(OTG.getPluginConfig().SpawnLog)
+						if(OTG.getPluginConfig().spawnLog)
 						{
 							OTG.log(LogMarker.WARN, "Duplicate file found: " + searchDir.getName() + ".");
 						}

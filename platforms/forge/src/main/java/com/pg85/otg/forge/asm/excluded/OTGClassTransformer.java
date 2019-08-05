@@ -25,7 +25,7 @@ import net.minecraft.launchwrapper.IClassTransformer;
 
 public class OTGClassTransformer implements IClassTransformer
 {
-	static String[] classesBeingTransformed =
+	static String[] ClassesBeingTransformed =
 	{
 		"net.minecraftforge.registries.GameData", // Biome registry
 		"net.minecraft.world.biome.Biome", // Biome registry
@@ -50,9 +50,9 @@ public class OTGClassTransformer implements IClassTransformer
 		{
 			boolean isObfuscated = !name.equals(transformedName);
 			int index = -1;
-			for(int i = 0; i < classesBeingTransformed.length; i++)
+			for(int i = 0; i < ClassesBeingTransformed.length; i++)
 			{
-				if(classesBeingTransformed[i].equals(transformedName))
+				if(ClassesBeingTransformed[i].equals(transformedName))
 				{
 					index = i;
 					break;
@@ -949,7 +949,7 @@ public class OTGClassTransformer implements IClassTransformer
 				InsnList toInsert = new InsnList();
 				toInsert.add(new VarInsnNode(ILOAD, 0));
 							
-				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "InitOTGDimension",  "(I)Z", false));
+				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "initOTGDimension",  "(I)Z", false));
 				LabelNode l4 = new LabelNode();
 				toInsert.add(new JumpInsnNode(IFEQ, l4));
 				LabelNode l5 = new LabelNode();
@@ -964,11 +964,6 @@ public class OTGClassTransformer implements IClassTransformer
 
 				return;
 			}
-		}
-
-		//for(MethodNode method : gameDataNode.methods)
-		{
-			//System.out.println("Biome: " + method.name + " + " + method.desc + " + " + method.signature);
 		}
 
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");

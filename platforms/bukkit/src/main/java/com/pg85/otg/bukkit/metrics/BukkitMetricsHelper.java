@@ -1,7 +1,6 @@
 package com.pg85.otg.bukkit.metrics;
 
 import com.pg85.otg.bukkit.OTGPlugin;
-import com.pg85.otg.bukkit.metrics.Metrics.Graph;
 import com.pg85.otg.util.helpers.MetricsHelper;
 import org.bukkit.Bukkit;
 
@@ -44,7 +43,7 @@ public class BukkitMetricsHelper extends MetricsHelper
 
             Graph usedBiomeModesGraph = metrics.createGraph("Biome modes used");
 
-            usedBiomeModesGraph.addPlotter(new Metrics.Plotter("Normal")
+            usedBiomeModesGraph.addPlotter(new Plotter("Normal")
             {
                 @Override
                 public int getValue()
@@ -52,7 +51,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return normalMode;
                 }
             });
-            usedBiomeModesGraph.addPlotter(new Metrics.Plotter("FromImage")
+            usedBiomeModesGraph.addPlotter(new Plotter("FromImage")
             {
                 @Override
                 public int getValue()
@@ -60,7 +59,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return fromImageMode;
                 }
             });
-            usedBiomeModesGraph.addPlotter(new Metrics.Plotter("Default")
+            usedBiomeModesGraph.addPlotter(new Plotter("Default")
             {
                 @Override
                 public int getValue()
@@ -68,7 +67,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return vanillaMode;
                 }
             });
-            usedBiomeModesGraph.addPlotter(new Metrics.Plotter("BeforeGroups")
+            usedBiomeModesGraph.addPlotter(new Plotter("BeforeGroups")
             {
                 @Override
                 public int getValue()
@@ -76,7 +75,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return beforeGroupsBiomeMode;
                 }
             });
-            usedBiomeModesGraph.addPlotter(new Metrics.Plotter("OldGenerator")
+            usedBiomeModesGraph.addPlotter(new Plotter("OldGenerator")
             {
                 @Override
                 public int getValue()
@@ -84,7 +83,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return oldBiomeMode;
                 }
             });
-            usedBiomeModesGraph.addPlotter(new Metrics.Plotter("Custom / Unknown")
+            usedBiomeModesGraph.addPlotter(new Plotter("Custom / Unknown")
             {
                 @Override
                 public int getValue()

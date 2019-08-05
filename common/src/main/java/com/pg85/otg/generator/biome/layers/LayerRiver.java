@@ -1,12 +1,12 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerRiver extends Layer
 {
 
-    public LayerRiver(long seed, Layer childLayer)
+    LayerRiver(long seed, Layer childLayer)
     {
         super(seed);
         this.child = childLayer;
@@ -22,17 +22,23 @@ public class LayerRiver extends Layer
         int[] childInts = this.child.getInts(world, cache, x0, z0, xSize0, zSize0);
         int[] thisInts = cache.getArray(xSize * zSize);
 
+        int northCheck;
+        int southCheck;
+        int eastCheck;
+        int westCheck;
+        int centerCheck;
+        int currentPiece;
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
             {
-                int northCheck = childInts[(xi + 1 + (zi) * xSize0)] & RiverBits;
-                int southCheck = childInts[(xi + 1 + (zi + 2) * xSize0)] & RiverBits;
-                int eastCheck = childInts[(xi + 2 + (zi + 1) * xSize0)] & RiverBits;
-                int westCheck = childInts[(xi + 0 + (zi + 1) * xSize0)] & RiverBits;
-                int centerCheck = childInts[(xi + 1 + (zi + 1) * xSize0)] & RiverBits;
+                northCheck = childInts[(xi + 1 + (zi) * xSize0)] & RiverBits;
+                southCheck = childInts[(xi + 1 + (zi + 2) * xSize0)] & RiverBits;
+                eastCheck = childInts[(xi + 2 + (zi + 1) * xSize0)] & RiverBits;
+                westCheck = childInts[(xi + 0 + (zi + 1) * xSize0)] & RiverBits;
+                centerCheck = childInts[(xi + 1 + (zi + 1) * xSize0)] & RiverBits;
                 
-                int currentPiece = childInts[(xi + 1 + (zi + 1) * xSize0)];
+                currentPiece = childInts[(xi + 1 + (zi + 1) * xSize0)];
                 if ((centerCheck == 0) || (westCheck == 0) || (eastCheck == 0) || (northCheck == 0) || (southCheck == 0))
                     currentPiece |= RiverBits;
                 else if ((centerCheck != westCheck) || (centerCheck != northCheck) || (centerCheck != eastCheck) || (centerCheck != southCheck))

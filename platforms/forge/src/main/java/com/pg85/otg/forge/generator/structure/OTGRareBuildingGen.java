@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.collect.Iterables;
-import com.pg85.otg.LocalBiome;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.entity.monster.EntityWitch;
 import net.minecraft.util.math.BlockPos;
@@ -20,7 +21,7 @@ import net.minecraft.world.gen.structure.*;
 
 public class OTGRareBuildingGen extends OTGMapGenStructure
 {
-    public List<Biome> biomeList;
+    private List<Biome> biomeList;
 
     /**
      * contains possible spawns for scattered features
@@ -38,8 +39,9 @@ public class OTGRareBuildingGen extends OTGMapGenStructure
     private int minDistanceBetweenScatteredFeatures;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public OTGRareBuildingGen(ServerConfigProvider configs)
+    public OTGRareBuildingGen(ServerConfigProvider configs, ForgeWorld world)
     {
+    	super(world);
         this.biomeList = new ArrayList<Biome>();
 
         for (LocalBiome biome : configs.getBiomeArrayByOTGId())
@@ -54,7 +56,7 @@ public class OTGRareBuildingGen extends OTGMapGenStructure
 
         this.scatteredFeatureSpawnList = new ArrayList();
         this.maxDistanceBetweenScatteredFeatures = configs.getWorldConfig().maximumDistanceBetweenRareBuildings;
-        // Minecraft's internal minimum distance is one lower than TC's value
+        // Minecraft's internal minimum distance is one lower than OTG's value
         this.minDistanceBetweenScatteredFeatures = configs.getWorldConfig().minimumDistanceBetweenRareBuildings - 1;
         this.scatteredFeatureSpawnList.add(new SpawnListEntry(EntityWitch.class, 1, 1, 1));
     }

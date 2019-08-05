@@ -1,11 +1,11 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -19,13 +19,12 @@ import java.util.Random;
 
 public class SpawnCommand extends BaseCommand
 {
-    public SpawnCommand(OTGPlugin _plugin)
+    SpawnCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "spawn";
         perm = OTGPerm.CMD_SPAWN.node;
         usage = "spawn Name [World]";
-        workOnConsole = false;
     }
 
     @Override
@@ -71,7 +70,7 @@ public class SpawnCommand extends BaseCommand
         return true;
     }
 
-    public Block getWatchedBlock(Player me, boolean verbose)
+    private Block getWatchedBlock(Player me, boolean verbose)
     {
         if (me == null)
             return null;

@@ -2,8 +2,7 @@ package com.pg85.otg.forge.events.client;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
-import com.pg85.otg.forge.gui.OTGGuiDimensionList;
-import com.pg85.otg.forge.gui.PregeneratorUI;
+import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.network.client.ClientProxy;
 
 import net.minecraft.client.Minecraft;
@@ -15,7 +14,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class KeyBoardEventListener
 {
-	// Used for pre-generator in-game UI toggle (F3) and OTG in-game menu (O)
+	// Used for OTG in-game menu (O)
 
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
@@ -23,20 +22,13 @@ public class KeyBoardEventListener
 	{
 		if (FMLClientHandler.instance().getClient().inGameHasFocus)
 		{
-			if (ClientProxy.pregeneratorUIKeyBinding.isPressed())
-			{
-				if(Minecraft.getMinecraft().isSingleplayer())
-				{
-					PregeneratorUI.ToggleIngameUI();
-				}
-			}
-			if (ClientProxy.otgInGameUIKeyBinding.isPressed())
+			if (ClientProxy.OtgInGameUIKeyBinding.isPressed())
 			{
 		    	if(
 					// The GUI screen requires the dimensions configuration to be available, so it shouldn't be opened
 					// with an unset configuration.
                     // This is the case when connecting to servers without the mod installed, for example.
-					OTG.GetDimensionsConfig() != null &&
+					OTG.getDimensionsConfig() != null &&
 					
 					// Only open the menu if players are opped
     				Minecraft.getMinecraft().player.canUseCommand(2, "") &&

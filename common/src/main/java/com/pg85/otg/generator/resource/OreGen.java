@@ -1,12 +1,12 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.MaterialSet;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 import java.util.Random;
@@ -27,8 +27,8 @@ public class OreGen extends Resource
         maxSize = readInt(args.get(1), 1, 128);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), OTG.WORLD_DEPTH, OTG.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(5), minAltitude, OTG.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(4), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
+        maxAltitude = readInt(args.get(5), minAltitude, PluginStandardValues.WORLD_HEIGHT);
         sourceBlocks = readMaterials(args, 6);
     }
 

@@ -1,7 +1,7 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeGroup;
 import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.generator.biome.ArraysCache;
@@ -15,7 +15,7 @@ public class LayerBiome extends Layer
     private int depth;
     private double freezeTemp;
 
-    public LayerBiome(long seed, Layer childLayer, BiomeGroupManager groupManager, int depth, double freezeTemp)
+    LayerBiome(long seed, Layer childLayer, BiomeGroupManager groupManager, int depth, double freezeTemp)
     {
         super(seed);
         this.child = childLayer;
@@ -30,21 +30,26 @@ public class LayerBiome extends Layer
         int[] childInts = this.child.getInts(world, cache, x, z, xSize, zSize);
         int[] thisInts = cache.getArray(xSize * zSize);
 
+        SortedMap<Integer, LocalBiome> possibleBiomes;
+        BiomeGroup group;
+        int currentPiece;
+        int newBiomeRarity;
+        
         for (int i = 0; i < zSize; i++)
         {
             for (int j = 0; j < xSize; j++)
             {
                 initChunkSeed(j + x, i + z);
-                int currentPiece = childInts[(j + i * xSize)];
+                currentPiece = childInts[(j + i * xSize)];
 
                 if ((currentPiece & BiomeGroupBits) != 0 && (currentPiece & BiomeBits) == 0)    // has biomegroup bits but not biome bits
                 {
-                    BiomeGroup group = manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
-                    SortedMap<Integer, LocalBiome> possibleBiomes = group.getDepthMapOrHigher(depth);
+                    group = manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
+                    possibleBiomes = group.getDepthMapOrHigher(depth);
                     //>>	Get Max Rarity
                     if (!possibleBiomes.isEmpty())
                     {
-                        int newBiomeRarity = nextInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleBiomes));
+                        newBiomeRarity = nextInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleBiomes));
                         //>>	Spawn the biome based on the rarity spectrum
                         for (Entry<Integer, LocalBiome> biome : possibleBiomes.entrySet())
                         {

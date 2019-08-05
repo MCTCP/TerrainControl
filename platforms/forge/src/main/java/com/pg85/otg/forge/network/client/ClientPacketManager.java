@@ -7,22 +7,22 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.WorldLoader;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
-import com.pg85.otg.forge.gui.OTGGuiDimensionList;
-import com.pg85.otg.forge.gui.OTGGuiPresetList;
+import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
+import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
 import com.pg85.otg.forge.network.PacketDispatcher;
 import com.pg85.otg.forge.network.client.packets.CreateDeleteDimensionPacket;
 import com.pg85.otg.forge.network.client.packets.UpdateDimensionSettingsPacket;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.forge.network.client.packets.TeleportPlayerPacket;
 import com.pg85.otg.network.ClientConfigProvider;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
@@ -35,14 +35,14 @@ public class ClientPacketManager
 {    
 	// Client to server
 	
-	public static void SendCreateDimensionPacket(DimensionConfig dimensionConfig)
+	public static void sendCreateDimensionPacket(DimensionConfig dimensionConfig)
 	{
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
 
         try
         {
-        	CreateDeleteDimensionPacket.WriteCreatePacketToStream(dimensionConfig, stream);
+        	CreateDeleteDimensionPacket.writeCreatePacketToStream(dimensionConfig, stream);
 		}
         catch (IOException e1)
         {
@@ -61,14 +61,14 @@ public class ClientPacketManager
 		}        
 	}
 
-	public static void SendUpdateDimensionSettingsPacket(ArrayList<DimensionConfig> dimConfigs, boolean isOverWorldIncluded)
+	public static void sendUpdateDimensionSettingsPacket(ArrayList<DimensionConfig> dimConfigs, boolean isOverWorldIncluded)
 	{
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
 
         try
         {
-        	UpdateDimensionSettingsPacket.WriteToStream(stream, dimConfigs, isOverWorldIncluded);
+        	UpdateDimensionSettingsPacket.writeToStream(stream, dimConfigs, isOverWorldIncluded);
 		}
         catch (IOException e1)
         {
@@ -87,14 +87,14 @@ public class ClientPacketManager
 		}	
 	}
 	
-	public static void SendDeleteDimensionPacket(String dimensionName)
+	public static void sendDeleteDimensionPacket(String dimensionName)
 	{
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
 
         try
         {
-        	CreateDeleteDimensionPacket.WriteDeletePacketToStream(dimensionName, stream);        
+        	CreateDeleteDimensionPacket.writeDeletePacketToStream(dimensionName, stream);        
 		}
         catch (IOException e1)
         {
@@ -113,14 +113,14 @@ public class ClientPacketManager
 		}
 	}
 	
-	public static void SendTeleportPlayerPacket(String dimensionName)
+	public static void sendTeleportPlayerPacket(String dimensionName)
 	{
         ByteBuf nettyBuffer = Unpooled.buffer();
         ByteBufOutputStream stream = new ByteBufOutputStream(nettyBuffer);
 
         try
         {
-        	TeleportPlayerPacket.WriteToStream(dimensionName, stream);
+        	TeleportPlayerPacket.writeToStream(dimensionName, stream);
 		}
         catch (IOException e1)
         {
@@ -139,22 +139,22 @@ public class ClientPacketManager
 		}
 	}
 	
-	public static void RegisterClientWorlds(DataInputStream wrappedStream, WorldLoader worldLoader) throws IOException
+	public static void registerClientWorlds(DataInputStream wrappedStream, WorldLoader worldLoader) throws IOException
 	{		
-		DimensionsConfig dimsConfig = DimensionsConfig.FromYamlString(ConfigFile.readStringFromStream(wrappedStream)); 
-		OTG.SetDimensionsConfig(dimsConfig);
+		DimensionsConfig dimsConfig = DimensionsConfig.fromYamlString(StreamHelper.readStringFromStream(wrappedStream)); 
+		OTG.setDimensionsConfig(dimsConfig);
 		
-		ForgeEngine.presets.clear();
+		ForgeEngine.Presets.clear();
 		int presetCount = wrappedStream.readInt();
 		for(int i = 0; i < presetCount; i++)
 		{
-			DimensionConfigGui dimConfig = DimensionConfigGui.FromYamlString(ConfigFile.readStringFromStream(wrappedStream));
-			ForgeEngine.presets.put(dimConfig.PresetName, dimConfig);
+			DimensionConfigGui dimConfig = DimensionConfigGui.fromYamlString(StreamHelper.readStringFromStream(wrappedStream));
+			ForgeEngine.Presets.put(dimConfig.PresetName, dimConfig);
 		}
 		
 		int worldCount = wrappedStream.readInt();
 		
-		HashMap<Integer, String> dimsToRemove = OTGDimensionManager.GetAllOTGDimensions(); // TODO: use String[] instead?
+		HashMap<Integer, String> dimsToRemove = OTGDimensionManager.getAllOTGDimensions(); // TODO: use String[] instead?
 		boolean isSinglePlayer = Minecraft.getMinecraft().isSingleplayer();
 		
 		for(int i = 0; i < worldCount; i++)
@@ -177,7 +177,7 @@ public class ClientPacketManager
 				dimsToRemove.remove(integerToRemove);
 			}
 	
-			String worldName = ConfigFile.readStringFromStream(wrappedStream);
+			String worldName = StreamHelper.readStringFromStream(wrappedStream);
 			
 			// Overworld can be null for MP clients
 			if(!DimensionManager.isDimensionRegistered(dimensionId) || (dimensionId == 0 && ((ForgeEngine)OTG.getEngine()).getOverWorld() == null))

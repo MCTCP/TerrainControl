@@ -2,8 +2,8 @@ package com.pg85.otg.bukkit.generator.structures;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.pg85.otg.LocalBiome;
 import com.pg85.otg.bukkit.BukkitBiome;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 import net.minecraft.server.v1_12_R1.BiomeBase;

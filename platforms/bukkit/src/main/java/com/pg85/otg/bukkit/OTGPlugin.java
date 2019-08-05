@@ -5,8 +5,8 @@ import com.pg85.otg.bukkit.commands.OTGCommandExecutor;
 import com.pg85.otg.bukkit.events.OTGListener;
 import com.pg85.otg.bukkit.generator.BukkitVanillaBiomeGenerator;
 import com.pg85.otg.bukkit.generator.OTGChunkGenerator;
-import com.pg85.otg.bukkit.generator.structures.OTGRareBuildingGen.RareBuildingStart;
-import com.pg85.otg.bukkit.generator.structures.OTGVillageGen.VillageStart;
+import com.pg85.otg.bukkit.generator.structures.RareBuildingStart;
+import com.pg85.otg.bukkit.generator.structures.VillageStart;
 import com.pg85.otg.bukkit.metrics.BukkitMetricsHelper;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
@@ -14,7 +14,8 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
+
 import net.minecraft.server.v1_12_R1.WorldGenFactory;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -30,7 +31,7 @@ import java.util.HashMap;
 
 public class OTGPlugin extends JavaPlugin
 {
-    public OTGListener listener;
+    private OTGListener listener;
     public OTGCommandExecutor commandExecutor;
 
     /*
@@ -38,7 +39,7 @@ public class OTGPlugin extends JavaPlugin
      * itself. However, terrain generators aren't cleaned up properly by
      * Bukkit, so this won't really work until that bug is fixed.
      */
-    public boolean cleanupOnDisable = false;
+    private boolean cleanupOnDisable = false;
 
     public final HashMap<String, BukkitWorld> worlds = new HashMap<String, BukkitWorld>();
     private final HashMap<String, BukkitWorld> notInitedWorlds = new HashMap<String, BukkitWorld>();
@@ -129,11 +130,11 @@ public class OTGPlugin extends JavaPlugin
         OTG.log(LogMarker.DEBUG, "Starting to enable world ''{}''...", (Object) worldName);
 
 		// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
-	    if(OTG.GetDimensionsConfig() == null)
+	    if(OTG.getDimensionsConfig() == null)
 	    {
 	    	DimensionsConfig dimsConfig = new DimensionsConfig();
 			dimsConfig.Overworld = new DimensionConfig();
-			OTG.SetDimensionsConfig(dimsConfig);
+			OTG.setDimensionsConfig(dimsConfig);
 		}
         
         // Create BukkitWorld instance
@@ -144,19 +145,19 @@ public class OTGPlugin extends JavaPlugin
         
         // Check if world exists
 	    File worldSaveDir = new File(".\\" + worldName + "\\");
-	    OTG.isNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
+	    OTG.IsNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
         
         ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld, worldSaveDir);
         localWorld.setSettings(configs);
         
-        OTG.isNewWorldBeingCreated = false;
+        OTG.IsNewWorldBeingCreated = false;
 
         // Add the world to the to-do list
         this.notInitedWorlds.put(worldName, localWorld);
 
         // Get the right chunk generator
         OTGChunkGenerator generator = null;
-        switch (configs.getWorldConfig().ModeTerrain)
+        switch (configs.getWorldConfig().modeTerrain)
         {
             case Normal:
             case TerrainTest:
@@ -173,7 +174,7 @@ public class OTGPlugin extends JavaPlugin
         return generator;
     }
 
-    public File getWorldSettingsFolder(String worldName)
+    private File getWorldSettingsFolder(String worldName)
     {
         File baseFolder = new File(this.getDataFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + worldName);
         if (!baseFolder.exists())

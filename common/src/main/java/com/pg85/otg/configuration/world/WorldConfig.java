@@ -1,12 +1,13 @@
 package com.pg85.otg.configuration.world;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeGroup;
 import com.pg85.otg.configuration.biome.BiomeGroupManager;
-import com.pg85.otg.configuration.biome.ReplaceBlocks;
+import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
 import com.pg85.otg.configuration.settingType.Setting;
@@ -16,9 +17,9 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.File;
 import java.util.*;
@@ -26,38 +27,6 @@ import java.util.Map.Entry;
 
 public class WorldConfig extends ConfigFile
 {
-	// OTG+
-
-	public boolean IsOTGPlus;
-
-	private List<ReplaceBlocks> replaceBlocksList = null;
-    private HashMap<DefaultMaterial,LocalMaterialData> replaceBlocksDict = null;
-    public HashMap<DefaultMaterial,LocalMaterialData> getReplaceBlocksDict()
-    {
-    	if(replaceBlocksDict != null)
-    	{
-    		return replaceBlocksDict;
-    	}
-    	if(replaceBlocksDict == null && replaceBlocksList != null)
-    	{
-    		replaceBlocksDict = new HashMap<DefaultMaterial,LocalMaterialData>();
-    		for(ReplaceBlocks blockNames : replaceBlocksList)
-    		{
-    			try {
-    				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
-    				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-					replaceBlocksDict.put(OTG.readMaterial(blockNames.getSourceBlock()).toDefaultMaterial(), OTG.readMaterial(blockNames.getTargetBlock()));
-				} catch (InvalidConfigException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
-    	}
-    	return replaceBlocksDict;
-    }
-
-	//
-
     public final File settingsDir;
 
     public ArrayList<String> worldBiomes = new ArrayList<String>();
@@ -67,12 +36,19 @@ public class WorldConfig extends ConfigFile
     // Biome Groups and special biome lists
     public BiomeGroupManager biomeGroupManager;
 
-    public List<String> IsleBiomes = new ArrayList<String>();
-    public List<String> BorderBiomes = new ArrayList<String>();
+    public List<String> isleBiomes = new ArrayList<String>();
+    public List<String> borderBiomes = new ArrayList<String>();
 
     // Dimensions
-    public List<String> Dimensions = new ArrayList<String>();
+    public List<String> dimensions = new ArrayList<String>();
 
+    // OTG+
+	public boolean isOTGPlus;
+	
+	// Replace blocks
+	private List<ReplaceBlocks> replaceBlocksList = null;
+    private HashMap<DefaultMaterial,LocalMaterialData> replaceBlocksDict = null;
+   
     // For old biome generator
 
     public double minMoisture;
@@ -81,18 +57,18 @@ public class WorldConfig extends ConfigFile
     public double maxTemperature;
 
     // Biome generator
-    public int GenerationDepth;
-    public int BiomeRarityScale;
+    public int generationDepth;
+    public int biomeRarityScale;
 
-    public int LandRarity;
-    public int LandSize;
-    public int LandFuzzy;
+    public int landRarity;
+    public int landSize;
+    public int landFuzzy;
 
     public int maxSmoothRadius = 2;
 
-    public boolean FrozenOcean;
-    public boolean FreezeAllColdGroupBiomes;
-    public double FrozenOceanTemperature;
+    public boolean frozenOcean;
+    public boolean freezeAllColdGroupBiomes;
+    public double frozenOceanTemperature;
     
 	public String defaultOceanBiome;
 	public String defaultFrozenOceanBiome;
@@ -118,15 +94,17 @@ public class WorldConfig extends ConfigFile
     public HashMap<Integer, Integer> biomeColorMap;
 
     // Look settings
-    public int WorldFog;
-    public float WorldFogR;
-    public float WorldFogG;
-    public float WorldFogB;
+    public int worldFog;
+    // TODO: Implement this?
+    public float worldFogR;
+    public float worldFogG;
+    public float worldFogB;
 
-    public int WorldNightFog;
-    public float WorldNightFogR;
-    public float WorldNightFogG;
-    public float WorldNightFogB;
+    public int worldNightFog;
+    // TODO: Implement this?
+    public float worldNightFogR;
+    public float worldNightFogG;
+    public float worldNightFogB;
 
     // Specific biome settings
 
@@ -201,13 +179,12 @@ public class WorldConfig extends ConfigFile
     public boolean removeSurfaceStone;
 
     public int objectSpawnRatio;
-    public File customObjectsDirectory;
 
-    public ConfigMode SettingsMode;
-    public TerrainMode ModeTerrain;
+    public ConfigMode settingsMode;
+    public TerrainMode modeTerrain;
     public Class<? extends BiomeGenerator> biomeMode;
 
-    public boolean BiomeConfigsHaveReplacement = false;
+    public boolean biomeConfigsHaveReplacement = false;
 
     public int worldHeightScaleBits;
     public int worldHeightScale;
@@ -222,19 +199,18 @@ public class WorldConfig extends ConfigFile
     public String description;
     public String worldPackerModName;
 
-	public int PreGenerationRadius;
-	public int WorldBorderRadius;
+	public int preGenerationRadius;
+	public int worldBorderRadius;
     public String worldSeed;
 
-    public boolean Cartographer;
-    public ArrayList<LocalMaterialData> DimensionPortalMaterials;
+    public ArrayList<LocalMaterialData> dimensionPortalMaterials;
     public String dimensionBelow;
     public String dimensionAbove;
 
     public int dimensionBelowHeight;
     public int dimensionAboveHeight;
 
-    public String BO3AtSpawn;
+    public String bo3AtSpawn;
 
     public boolean teleportToSpawnOnly; // If this is set to true then portals to this dimension will always teleport players to the world's spawn point.
 
@@ -266,10 +242,8 @@ public class WorldConfig extends ConfigFile
 
 	public String welcomeMessage; // A message to display to the user when they transfer to this dimension.
 	public String departMessage; // A Message to display to the user when they transfer out of this dimension.
-	//public boolean isHellWorld = false; // DoesWaterVaporize sets this
 	public boolean hasSkyLight; // A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.
 	public boolean isSurfaceWorld; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.
-	//public boolean canCoordinateBeSpawn; // Will check if the x, z position specified is alright to be set as the map spawn point
 	public boolean canRespawnHere; // True if the player can respawn in this dimension.
 
 	public boolean doesWaterVaporize; // True for nether, any water that is placed vaporises.
@@ -284,29 +258,16 @@ public class WorldConfig extends ConfigFile
 	public boolean isSkyColored; // Is set to false for End (black sky?)
 
 	//public int averageGroundlevel; // Affects spawn point location and village spawning. Should be equal to sea level + 1(?)
-
 	//public int horizonHeight; // Returns horizon height for use in rendering the sky. Should be equal to sea level(?)
-
 	public int cloudHeight;
-
     public boolean canDoLightning;
-
     public boolean canDoRainSnowIce;
-
-    //public boolean canMineBlock; // If set to false players are unable to mine blocks
-
-    public boolean isNightWorld; // Sky is always moon and stars but light levels are same as day, used for Cartographer
-
+    public boolean isNightWorld; // Sky is always moon and stars but light levels are same as day
     public double voidFogYFactor; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
-
     public double gravityFactor; // 0.08D; Affects entities jumping and falling
-
     public boolean shouldMapSpin; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
-
     public boolean canDropChunk; // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
-
     public int respawnDimension; // Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.
-
     public int movementFactor; // The dimension's movement factor. Whenever a player or entity changes dimension from world A to world B, their coordinates are multiplied by worldA.provider.getMovementFactor() / worldB.provider.getMovementFactor(). Example: Overworld factor is 1, nether factor is 8. Traveling from overworld to nether multiplies coordinates by 1/8.
 
     public String itemsToAddOnJoinDimension; // Similar to the /give command, gives players items when they enter a dimension/world.
@@ -325,6 +286,38 @@ public class WorldConfig extends ConfigFile
     public boolean playersCanPlaceBlocks;
 	//
 
+    public enum TerrainMode
+    {
+        Normal,
+        OldGenerator,
+        TerrainTest,
+        NotGenerate,
+        Default
+    }
+
+    public enum ImageMode
+    {
+        Repeat,
+        Mirror,
+        ContinueNormal,
+        FillEmpty,
+    }
+
+    public enum ImageOrientation
+    {
+        North,
+        East,
+        South,
+        West,
+    }
+
+    public enum ConfigMode
+    {
+        WriteAll,
+        WriteDisable,
+        WriteWithoutComments
+    }
+    
     /**
      * Creates a WorldConfig from the WorldConfig.ini file found in the given
      * directory.
@@ -346,26 +339,7 @@ public class WorldConfig extends ConfigFile
     		this.settingsMap = settingsMap;
     	}
     }
-    
-    public static DefaulWorldData CreateDefaultOTGWorldConfig(File settingsDir, String worldName)
-    {
-    	SimpleSettingsMap settingsMap = new SimpleSettingsMap(worldName, true);
-    	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, null, getDefaultBiomeNames());
-    	defaultWorldConfig.writeConfigSettings(settingsMap);
-    	return new DefaulWorldData(defaultWorldConfig, settingsMap);
-    }
-
-    private static ArrayList<String> getDefaultBiomeNames()
-    {
-        // If we're creating a new world with new configs then add the default biomes
-        ArrayList<String> defaultBiomes = new ArrayList<String>();
-        for (DefaultBiome defaultBiome : DefaultBiome.values())
-        {
-        	defaultBiomes.add(defaultBiome.Name);
-        }
-        return defaultBiomes;
-    }
-    
+        
     public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world, ArrayList<String> biomes)
     {
         super(settingsReader.getName());
@@ -388,7 +362,60 @@ public class WorldConfig extends ConfigFile
         // Clamp Settings to acceptable values.
        	this.correctSettings(biomes != null); // If biomes is null then we're not interested in loading biomes, squelch biome warnings.        
     }
+    
+    public static DefaulWorldData createDefaultOTGWorldConfig(File settingsDir, String worldName)
+    {
+    	SimpleSettingsMap settingsMap = new SimpleSettingsMap(worldName, true);
+    	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, null, getDefaultBiomeNames());
+    	defaultWorldConfig.writeConfigSettings(settingsMap);
+    	return new DefaulWorldData(defaultWorldConfig, settingsMap);
+    }
 
+    private static ArrayList<String> getDefaultBiomeNames()
+    {
+        // If we're creating a new world with new configs then add the default biomes
+        ArrayList<String> defaultBiomes = new ArrayList<String>();
+        for (DefaultBiome defaultBiome : DefaultBiome.values())
+        {
+        	defaultBiomes.add(defaultBiome.Name);
+        }
+        return defaultBiomes;
+    }
+    
+    public double getFractureHorizontal()
+    {
+        return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
+    }
+
+    public double getFractureVertical()
+    {
+        return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
+    }
+    
+    public HashMap<DefaultMaterial,LocalMaterialData> getReplaceBlocksDict()
+    {
+    	if(replaceBlocksDict != null)
+    	{
+    		return replaceBlocksDict;
+    	}
+    	if(replaceBlocksDict == null && replaceBlocksList != null)
+    	{
+    		replaceBlocksDict = new HashMap<DefaultMaterial,LocalMaterialData>();
+    		for(ReplaceBlocks blockNames : replaceBlocksList)
+    		{
+    			try {
+    				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
+    				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
+					replaceBlocksDict.put(MaterialHelper.readMaterial(blockNames.getSourceBlock()).toDefaultMaterial(), MaterialHelper.readMaterial(blockNames.getTargetBlock()));
+				} catch (InvalidConfigException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    		}
+    	}
+    	return replaceBlocksDict;
+    }
+    
     @Override
     protected void renameOldSettings(SettingsMap reader)
     {
@@ -453,15 +480,15 @@ public class WorldConfig extends ConfigFile
     @Override
     protected void correctSettings(boolean logWarnings)
     {
-        LandSize = lowerThanOrEqualTo(LandSize, GenerationDepth);
-        LandFuzzy = lowerThanOrEqualTo(LandFuzzy, GenerationDepth - LandSize);
+        landSize = lowerThanOrEqualTo(landSize, generationDepth);
+        landFuzzy = lowerThanOrEqualTo(landFuzzy, generationDepth - landSize);
 
-        riverRarity = lowerThanOrEqualTo(riverRarity, GenerationDepth);
-        riverSize = lowerThanOrEqualTo(riverSize, GenerationDepth - riverRarity);
+        riverRarity = lowerThanOrEqualTo(riverRarity, generationDepth);
+        riverSize = lowerThanOrEqualTo(riverSize, generationDepth - riverRarity);
 
         biomeGroupManager.filterBiomes(worldBiomes, logWarnings);
-        IsleBiomes = filterBiomes(IsleBiomes, worldBiomes);
-        BorderBiomes = filterBiomes(BorderBiomes, worldBiomes);
+        isleBiomes = filterBiomes(isleBiomes, worldBiomes);
+        borderBiomes = filterBiomes(borderBiomes, worldBiomes);
 
         if (biomeMode == OTG.getBiomeModeManager().FROM_IMAGE)
         {
@@ -493,13 +520,13 @@ public class WorldConfig extends ConfigFile
     protected void readConfigSettings(SettingsMap reader)
     {
     	// OTG+
-    	this.IsOTGPlus = reader.getSetting(WorldStandardValues.IS_OTG_PLUS);
+    	this.isOTGPlus = reader.getSetting(WorldStandardValues.IS_OTG_PLUS);
     	this.replaceBlocksList = reader.getSetting(WorldStandardValues.REPLACE_BLOCKS_LIST);
     	//
 
         // Main modes
-        this.SettingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
-        this.ModeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE);
+        this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
+        this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE);
         this.biomeMode = OTG.getBiomeModeManager().getBiomeManager(reader.getSetting(WorldStandardValues.BIOME_MODE));
 
         // World and water height
@@ -511,19 +538,19 @@ public class WorldConfig extends ConfigFile
         this.waterLevelMax = worldHeightCap / 2 - 1;
 
         // Biome placement
-        this.GenerationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH);
+        this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH);
 
-        this.BiomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE);
-        this.LandRarity = reader.getSetting(WorldStandardValues.LAND_RARITY);
-        this.LandSize = reader.getSetting(WorldStandardValues.LAND_SIZE);
-        this.LandFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY);
+        this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE);
+        this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY);
+        this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE);
+        this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY);
 
     	this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME);
         
         // Ice Area Settings
-        this.FrozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN);
-        this.FrozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
-        this.FreezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED);
+        this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN);
+        this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
+        this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED);
 
     	this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME);
     	
@@ -543,8 +570,8 @@ public class WorldConfig extends ConfigFile
 		readBiomeGroups(reader);
     
         // Specialized Biomes
-        this.IsleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES);
-        this.BorderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
+        this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES);
+        this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
         readCustomBiomes(reader);
 
         // Images
@@ -556,16 +583,16 @@ public class WorldConfig extends ConfigFile
         this.imageZOffset = reader.getSetting(WorldStandardValues.IMAGE_Z_OFFSET);
 
         // Fog
-        this.WorldFog = reader.getSetting(WorldStandardValues.WORLD_FOG);
-        this.WorldNightFog = reader.getSetting(WorldStandardValues.WORLD_NIGHT_FOG);
+        this.worldFog = reader.getSetting(WorldStandardValues.WORLD_FOG);
+        this.worldNightFog = reader.getSetting(WorldStandardValues.WORLD_NIGHT_FOG);
 
-        this.WorldFogR = ((WorldFog & 0xFF0000) >> 16) / 255F;
-        this.WorldFogG = ((WorldFog & 0xFF00) >> 8) / 255F;
-        this.WorldFogB = (WorldFog & 0xFF) / 255F;
+        this.worldFogR = ((worldFog & 0xFF0000) >> 16) / 255F;
+        this.worldFogG = ((worldFog & 0xFF00) >> 8) / 255F;
+        this.worldFogB = (worldFog & 0xFF) / 255F;
 
-        this.WorldNightFogR = ((WorldNightFog & 0xFF0000) >> 16) / 255F;
-        this.WorldNightFogG = ((WorldNightFog & 0xFF00) >> 8) / 255F;
-        this.WorldNightFogB = (WorldNightFog & 0xFF) / 255F;
+        this.worldNightFogR = ((worldNightFog & 0xFF0000) >> 16) / 255F;
+        this.worldNightFogG = ((worldNightFog & 0xFF00) >> 8) / 255F;
+        this.worldNightFogB = (worldNightFog & 0xFF) / 255F;
 
         // Structures
         this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED);
@@ -637,25 +664,21 @@ public class WorldConfig extends ConfigFile
         this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK);
         this.populateUsingSavedBiomes = reader.getSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES);
 
-        this.oldTerrainGenerator = this.ModeTerrain == TerrainMode.OldGenerator;
+        this.oldTerrainGenerator = this.modeTerrain == TerrainMode.OldGenerator;
 
         this.author = reader.getSetting(WorldStandardValues.AUTHOR);
         this.description = reader.getSetting(WorldStandardValues.DESCRIPTION);
         this.worldPackerModName = reader.getSetting(WorldStandardValues.WORLDPACKER_MODNAME);
         
-        this.PreGenerationRadius = reader.getSetting(WorldStandardValues.PREGENERATION_RADIUS);
-        this.WorldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS);
+        this.preGenerationRadius = reader.getSetting(WorldStandardValues.PREGENERATION_RADIUS);
+        this.worldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS);
 
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
-
-        this.BO3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
-
-        this.Cartographer = reader.getSetting(WorldStandardValues.CARTOGRAPHER);
-
-        this.DimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
+        this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
+        this.dimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
 
         // Dimensions
-        this.Dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
+        this.dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
 
         this.dimensionBelow = reader.getSetting(WorldStandardValues.DIMENSIONBELOW);
         this.dimensionAbove = reader.getSetting(WorldStandardValues.DIMENSIONABOVE);
@@ -670,87 +693,62 @@ public class WorldConfig extends ConfigFile
     		OTG.log(LogMarker.WARN, "World " + this.getName() + " WorldConfig setting dimensionBelowHeight was higher than dimensionAboveHeight, using default values instead.");
         }
 
-        this.teleportToSpawnOnly = reader.getSetting(WorldStandardValues.teleportToSpawnOnly);
-
-        this.commandBlockOutput = reader.getSetting(WorldStandardValues.commandBlockOutput).toString();
-        this.disableElytraMovementCheck = reader.getSetting(WorldStandardValues.disableElytraMovementCheck).toString();
-        this.doDaylightCycle = reader.getSetting(WorldStandardValues.doDaylightCycle).toString();
-        this.doEntityDrops = reader.getSetting(WorldStandardValues.doEntityDrops).toString();
-        this.doFireTick = reader.getSetting(WorldStandardValues.doFireTick).toString();
-        this.doLimitedCrafting = reader.getSetting(WorldStandardValues.doLimitedCrafting).toString();
-        this.doMobLoot = reader.getSetting(WorldStandardValues.doMobLoot).toString();
-        this.doMobSpawning = reader.getSetting(WorldStandardValues.doMobSpawning).toString();
-        this.doTileDrops = reader.getSetting(WorldStandardValues.doTileDrops).toString();
-        this.doWeatherCycle = reader.getSetting(WorldStandardValues.doWeatherCycle).toString();
-        this.gameLoopFunction = reader.getSetting(WorldStandardValues.gameLoopFunction).toString();
-        this.keepInventory = reader.getSetting(WorldStandardValues.keepInventory).toString();
-        this.logAdminCommands = reader.getSetting(WorldStandardValues.logAdminCommands).toString();
-        this.maxCommandChainLength = reader.getSetting(WorldStandardValues.maxCommandChainLength).toString();
-        this.maxEntityCramming = reader.getSetting(WorldStandardValues.maxEntityCramming).toString();
-        this.mobGriefing = reader.getSetting(WorldStandardValues.mobGriefing).toString();
-        this.naturalRegeneration = reader.getSetting(WorldStandardValues.naturalRegeneration).toString();
-        this.randomTickSpeed = reader.getSetting(WorldStandardValues.randomTickSpeed).toString();
-        this.reducedDebugInfo = reader.getSetting(WorldStandardValues.reducedDebugInfo).toString();
-        this.sendCommandFeedback = reader.getSetting(WorldStandardValues.sendCommandFeedback).toString();
-        this.showDeathMessages = reader.getSetting(WorldStandardValues.showDeathMessages).toString();
-        this.spawnRadius = reader.getSetting(WorldStandardValues.spawnRadius).toString(); // "10";
-        this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.spectatorsGenerateChunks).toString();
+        this.teleportToSpawnOnly = reader.getSetting(WorldStandardValues.TeleportToSpawnOnly);
+        this.commandBlockOutput = reader.getSetting(WorldStandardValues.CommandBlockOutput).toString();
+        this.disableElytraMovementCheck = reader.getSetting(WorldStandardValues.DisableElytraMovementCheck).toString();
+        this.doDaylightCycle = reader.getSetting(WorldStandardValues.DoDaylightCycle).toString();
+        this.doEntityDrops = reader.getSetting(WorldStandardValues.DoEntityDrops).toString();
+        this.doFireTick = reader.getSetting(WorldStandardValues.DoFireTick).toString();
+        this.doLimitedCrafting = reader.getSetting(WorldStandardValues.DoLimitedCrafting).toString();
+        this.doMobLoot = reader.getSetting(WorldStandardValues.DoMobLoot).toString();
+        this.doMobSpawning = reader.getSetting(WorldStandardValues.DoMobSpawning).toString();
+        this.doTileDrops = reader.getSetting(WorldStandardValues.DoTileDrops).toString();
+        this.doWeatherCycle = reader.getSetting(WorldStandardValues.DoWeatherCycle).toString();
+        this.gameLoopFunction = reader.getSetting(WorldStandardValues.GameLoopFunction).toString();
+        this.keepInventory = reader.getSetting(WorldStandardValues.KeepInventory).toString();
+        this.logAdminCommands = reader.getSetting(WorldStandardValues.LogAdminCommands).toString();
+        this.maxCommandChainLength = reader.getSetting(WorldStandardValues.MaxCommandChainLength).toString();
+        this.maxEntityCramming = reader.getSetting(WorldStandardValues.MaxEntityCramming).toString();
+        this.mobGriefing = reader.getSetting(WorldStandardValues.MobGriefing).toString();
+        this.naturalRegeneration = reader.getSetting(WorldStandardValues.NaturalRegeneration).toString();
+        this.randomTickSpeed = reader.getSetting(WorldStandardValues.RandomTickSpeed).toString();
+        this.reducedDebugInfo = reader.getSetting(WorldStandardValues.ReducedDebugInfo).toString();
+        this.sendCommandFeedback = reader.getSetting(WorldStandardValues.SendCommandFeedback).toString();
+        this.showDeathMessages = reader.getSetting(WorldStandardValues.ShowDeathMessages).toString();
+        this.spawnRadius = reader.getSetting(WorldStandardValues.SpawnRadius).toString(); // "10";
+        this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.SpectatorsGenerateChunks).toString();
 
         // World provider settings for Forge OTG worlds
 
-        this.welcomeMessage = reader.getSetting(WorldStandardValues.welcomeMessage);
-        this.departMessage = reader.getSetting(WorldStandardValues.departMessage);
-        //public boolean isHellWorld = false; // DoesWaterVaporize sets this
-        this.hasSkyLight = reader.getSetting(WorldStandardValues.hasSkyLight);
-        this.isSurfaceWorld = reader.getSetting(WorldStandardValues.isSurfaceWorld);
-        //this.canCoordinateBeSpawn = reader.getSetting(WorldStandardValues.canCoordinateBeSpawn);
-        this.canRespawnHere = reader.getSetting(WorldStandardValues.canRespawnHere);
-
-        this.doesWaterVaporize = reader.getSetting(WorldStandardValues.doesWaterVaporize);
-
-        this.doesXZShowFog = reader.getSetting(WorldStandardValues.doesXZShowFog);
-
-        this.useCustomFogColor = reader.getSetting(WorldStandardValues.useCustomFogColor);
-        this.fogColorRed = reader.getSetting(WorldStandardValues.fogColorRed);
-        this.fogColorGreen = reader.getSetting(WorldStandardValues.fogColorGreen);
-        this.fogColorBlue = reader.getSetting(WorldStandardValues.fogColorBlue);
-
-        this.isSkyColored = reader.getSetting(WorldStandardValues.isSkyColored);
-
+        this.welcomeMessage = reader.getSetting(WorldStandardValues.WelcomeMessage);
+        this.departMessage = reader.getSetting(WorldStandardValues.DepartMessage);
+        this.hasSkyLight = reader.getSetting(WorldStandardValues.HasSkyLight);
+        this.isSurfaceWorld = reader.getSetting(WorldStandardValues.IsSurfaceWorld);
+        this.canRespawnHere = reader.getSetting(WorldStandardValues.CanRespawnHere);
+        this.doesWaterVaporize = reader.getSetting(WorldStandardValues.DoesWaterVaporize);
+        this.doesXZShowFog = reader.getSetting(WorldStandardValues.DoesXZShowFog);
+        this.useCustomFogColor = reader.getSetting(WorldStandardValues.UseCustomFogColor);
+        this.fogColorRed = reader.getSetting(WorldStandardValues.FogColorRed);
+        this.fogColorGreen = reader.getSetting(WorldStandardValues.FogColorGreen);
+        this.fogColorBlue = reader.getSetting(WorldStandardValues.FogColorBlue);
+        this.isSkyColored = reader.getSetting(WorldStandardValues.IsSkyColored);
         //this.averageGroundlevel = reader.getSetting(WorldStandardValues.averageGroundlevel);
-
         //this.horizonHeight = reader.getSetting(WorldStandardValues.horizonHeight);
-
-        this.cloudHeight = reader.getSetting(WorldStandardValues.cloudHeight);
-
-        this.canDoLightning = reader.getSetting(WorldStandardValues.canDoLightning);
-
-        this.canDoRainSnowIce = reader.getSetting(WorldStandardValues.canDoRainSnowIce);
-
-        //this.canMineBlock = reader.getSetting(WorldStandardValues.canMineBlock);
-
-        this.isNightWorld = reader.getSetting(WorldStandardValues.isNightWorld);
-
-        this.voidFogYFactor = reader.getSetting(WorldStandardValues.voidFogYFactor);
-
-        this.gravityFactor = reader.getSetting(WorldStandardValues.gravityFactor);
-
-        this.shouldMapSpin = reader.getSetting(WorldStandardValues.shouldMapSpin);
-
-        this.canDropChunk = reader.getSetting(WorldStandardValues.canDropChunk);
-
+        this.cloudHeight = reader.getSetting(WorldStandardValues.CloudHeight);
+        this.canDoLightning = reader.getSetting(WorldStandardValues.CanDoLightning);
+        this.canDoRainSnowIce = reader.getSetting(WorldStandardValues.CanDoRainSnowIce);
+        this.isNightWorld = reader.getSetting(WorldStandardValues.IsNightWorld);
+        this.voidFogYFactor = reader.getSetting(WorldStandardValues.VoidFogYFactor);
+        this.gravityFactor = reader.getSetting(WorldStandardValues.GravityFactor);
+        this.shouldMapSpin = reader.getSetting(WorldStandardValues.ShouldMapSpin);
+        this.canDropChunk = reader.getSetting(WorldStandardValues.CanDropChunk);
         this.respawnDimension = reader.getSetting(WorldStandardValues.RESPAWN_DIMENSION);
-
         this.movementFactor = reader.getSetting(WorldStandardValues.MOVEMENT_FACTOR);
 
         this.itemsToAddOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION);
-
         this.itemsToRemoveOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION);
-
         this.itemsToAddOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION);
-
         this.itemsToRemoveOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION);
-
         this.itemsToAddOnRespawn = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN);
 
         this.spawnPointSet = reader.getSetting(WorldStandardValues.SPAWN_POINT_SET);
@@ -844,7 +842,7 @@ public class WorldConfig extends ConfigFile
             }
         }
     }
-
+    
     @Override
     protected void writeConfigSettings(SettingsMap writer)
     {
@@ -859,7 +857,7 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.WORLDPACKER_MODNAME, this.worldPackerModName,
                 "The mod name of a WorldPacker jar. The WorldPacker jar's mod image is shown in the world creation UI for this world.");
         
-        writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.SettingsMode,
+        writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.settingsMode,
                 "What " + PluginStandardValues.PLUGIN_NAME + " does with the config files.",
                 "Possible modes:",
                 "   WriteAll - default",
@@ -869,7 +867,7 @@ public class WorldConfig extends ConfigFile
         // The modes
         writer.bigTitle("The modes");
 
-        writer.putSetting(WorldStandardValues.TERRAIN_MODE, this.ModeTerrain,
+        writer.putSetting(WorldStandardValues.TERRAIN_MODE, this.modeTerrain,
                 "Possible terrain modes:",
                 "   Normal - use all features",
                 "   TerrainTest - generate only terrain without any resources",
@@ -889,20 +887,20 @@ public class WorldConfig extends ConfigFile
         // Custom biomes
         writer.bigTitle("Custom biomes");
 
-        WriteCustomBiomes(writer);
+        writeCustomBiomes(writer);
 
         // Settings for BiomeMode:Normal
         writer.bigTitle("Settings for BiomeMode: Normal",
                 "Also used in BiomeMode:FromImage when ImageMode is set to ContinueNormal");
 
-        writer.putSetting(WorldStandardValues.GENERATION_DEPTH, this.GenerationDepth,
+        writer.putSetting(WorldStandardValues.GENERATION_DEPTH, this.generationDepth,
                 "Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.",
                 "Large %/total area biomes (Continents) must be set small, (limit=0)",
                 "Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)",
                 "This could also represent \"Total number of biome sizes\" ",
                 "Small values (about 1-2) and Large values (about 20) may affect generator performance.");
 
-        writer.putSetting(WorldStandardValues.BIOME_RARITY_SCALE, this.BiomeRarityScale,
+        writer.putSetting(WorldStandardValues.BIOME_RARITY_SCALE, this.biomeRarityScale,
                 "Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for",
                 "fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
 
@@ -930,22 +928,22 @@ public class WorldConfig extends ConfigFile
                 //"Don't forget to register your custom biomes first in CustomBiomes!",
                 "");
 
-        writer.putSetting(WorldStandardValues.ISLE_BIOMES, this.IsleBiomes,
+        writer.putSetting(WorldStandardValues.ISLE_BIOMES, this.isleBiomes,
                 "Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.",
 
                 "Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
 
-        writer.putSetting(WorldStandardValues.BORDER_BIOMES, this.BorderBiomes);
+        writer.putSetting(WorldStandardValues.BORDER_BIOMES, this.borderBiomes);
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 
-        writer.putSetting(WorldStandardValues.LAND_RARITY, this.LandRarity,
+        writer.putSetting(WorldStandardValues.LAND_RARITY, this.landRarity,
                 "Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
 
-        writer.putSetting(WorldStandardValues.LAND_SIZE, this.LandSize,
+        writer.putSetting(WorldStandardValues.LAND_SIZE, this.landSize,
                 "Land size from 0 to GenerationDepth. Biome groups are placed on this.");
 
-        writer.putSetting(WorldStandardValues.LAND_FUZZY, this.LandFuzzy,
+        writer.putSetting(WorldStandardValues.LAND_FUZZY, this.landFuzzy,
                 "Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
 
         writer.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, this.defaultOceanBiome,
@@ -953,15 +951,15 @@ public class WorldConfig extends ConfigFile
         
         writer.smallTitle("Ice area settings");
 
-        writer.putSetting(WorldStandardValues.FROZEN_OCEAN, this.FrozenOcean,
+        writer.putSetting(WorldStandardValues.FROZEN_OCEAN, this.frozenOcean,
                 "Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
 
-        writer.putSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, this.FrozenOceanTemperature,
+        writer.putSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, this.frozenOceanTemperature,
                 "This is the biome temperature when water freezes if \"FrozenOcean\" is set to true.",
                 "This used to be the case for all biomes in the \"IceBiomes\" list. Default: 0.15; Min: 0.0; Max: 2.0",
                 "Temperature Reference from Vanilla: <0.15 for snow, 0.15 - 0.95 for rain, or >1.0 for dry");
 
-        writer.putSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.FreezeAllColdGroupBiomes,
+        writer.putSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.freezeAllColdGroupBiomes,
                 "If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:",
                 " - When this setting is true, all biomes in the group will have frozen oceans",
                 " - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
@@ -1198,16 +1196,11 @@ public class WorldConfig extends ConfigFile
         // Custom structures
         writer.smallTitle("Custom structures and objects");
 
-        // OTG+
-
-        writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.IsOTGPlus,
-                "Set this to true to use advanced (OTG+) features for CustomStructure().",
-                "This includes collision detection, fine control over structure distribution, advanced branching mechanics for",
+        writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.isOTGPlus,
+                "Set this to true to use BO4's for CustomStructure().",
+                "BO4's allow for collision detection, fine control over structure distribution, advanced branching mechanics for",
                 "procedurally generated structures, smoothing areas, extremely large structures, settings for blending structures",
-                "with surrounding terrain, etc.",
-        		"When this is enabled BO3's used with CustomStructure() must have IsOTGPlus:true set or they will be ignored.",
-        		"When this is disabled BO3's used with CustomStructure() should have IsOTGPlus:false set (the default value) ",
-        		"or they will be ignored. Defaults to false."
+                "with surrounding terrain, etc."
 		);
 
         writer.putSetting(WorldStandardValues.REPLACE_BLOCKS_LIST, this.replaceBlocksList,
@@ -1220,7 +1213,7 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
                 "Maximum radius of custom structures in chunks. Custom structures are spawned by",
-                "the CustomStructure resource in the biome configuration files. Only used when IsOTGPlus:false.");
+                "the CustomStructure resource in the biome configuration files. Not used for BO4's.");
 
         // Other structures
         writer.smallTitle("Other structures");
@@ -1231,10 +1224,10 @@ public class WorldConfig extends ConfigFile
         writer.bigTitle("Visual settings",
                 "Warning: this section will work only for players with the single version of Open Terrain Generator installed.");
 
-        writer.putSetting(WorldStandardValues.WORLD_FOG, this.WorldFog,
+        writer.putSetting(WorldStandardValues.WORLD_FOG, this.worldFog,
                 "World fog color");
 
-        writer.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, this.WorldNightFog,
+        writer.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, this.worldNightFog,
                 "World night fog color");
 
         // Cave settings (still using code from Bucyruss' BiomeTerrainMod)
@@ -1301,25 +1294,25 @@ public class WorldConfig extends ConfigFile
     	);
 
         writer.bigTitle("BO3 at spawn");
-        writer.putSetting(WorldStandardValues.BO3_AT_SPAWN, this.BO3AtSpawn,
+        writer.putSetting(WorldStandardValues.BO3_AT_SPAWN, this.bo3AtSpawn,
 	        "This BO3 will be spawned at the world's spawn point as a CustomObject."
     	);
 
         writer.bigTitle("Pre-generation radius");
-        writer.putSetting(WorldStandardValues.PREGENERATION_RADIUS, this.PreGenerationRadius,
+        writer.putSetting(WorldStandardValues.PREGENERATION_RADIUS, this.preGenerationRadius,
 	        "This is the radius in chunks around the spawn chunk within which chunks will automatically be spawned (uses a rectangle, not a circle around the spawn location!",
 			"Defaults to: 0 (disabled)"
 		);
 
         writer.bigTitle("World border radius");
-        writer.putSetting(WorldStandardValues.WORLD_BORDER_RADIUS, this.WorldBorderRadius,
+        writer.putSetting(WorldStandardValues.WORLD_BORDER_RADIUS, this.worldBorderRadius,
 	        "This is the radius in chunks around the spawn chunk within which chunks will have blocks spawned (uses a rectangle, not a circle around the spawn location!)",
 			"Defaults to: 0 (disabled)"
 		);
 
         // Dimensions
         writer.bigTitle("Dimension");
-        writer.putSetting(WorldStandardValues.DIMENSIONS, this.Dimensions,
+        writer.putSetting(WorldStandardValues.DIMENSIONS, this.dimensions,
                 "Dimensions that should be loaded for this world at world creation. A world directory of the same name must be present in mods/OpenTerrainGenerator/"+ PluginStandardValues.PresetsDirectoryName + "/");
         writer.putSetting(WorldStandardValues.DIMENSIONBELOW, this.dimensionBelow,
                 "When a player goes below Y 0, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
@@ -1329,115 +1322,107 @@ public class WorldConfig extends ConfigFile
                 "The Y coordinate (height) for the DimensionBelow setting.");
         writer.putSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT, this.dimensionAboveHeight,
         		"The Y coordinate (height) for the DimensionAbove setting.");
-        writer.putSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS, this.DimensionPortalMaterials,
+        writer.putSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS, this.dimensionPortalMaterials,
                 "A comma seperated list of blocks, dimension portals made of one or more of these blocks will lead to this world.",
                 "For blocks that have rotation such as stairs be sure to add all rotations (0,1,2,3,4,5,6,7), for instance: QUARTZ_STAIRS:0, QUARTZ_STAIRS:1, QUARTZ_STAIRS:2 etc.",
                 "For blocks that have rotation such as QUARTZ_STAIRS, \"QUARTZ_STAIRS\" is the same as \"QUARTZ_STAIRS:3\"."
         		);
 
-        writer.putSetting(WorldStandardValues.teleportToSpawnOnly, this.teleportToSpawnOnly,
+        writer.putSetting(WorldStandardValues.TeleportToSpawnOnly, this.teleportToSpawnOnly,
         		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
-
-        //writer.putSetting(WorldStandardValues.CARTOGRAPHER, this.Cartographer,
-                //"In development, don't use this.");
 
         writer.smallTitle("Game rules", "Game rules for this world. These settings are still in development, may not all work (please submit an issue on the git) and may be subject to change in upcoming releases.", "");
 
-        writer.putSetting(WorldStandardValues.commandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput),
+        writer.putSetting(WorldStandardValues.CommandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput),
         		"Whether command blocks should notify admins when they perform commands");
-        writer.putSetting(WorldStandardValues.disableElytraMovementCheck, Boolean.parseBoolean(this.disableElytraMovementCheck),
+        writer.putSetting(WorldStandardValues.DisableElytraMovementCheck, Boolean.parseBoolean(this.disableElytraMovementCheck),
         		"Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).");
-        writer.putSetting(WorldStandardValues.doDaylightCycle, Boolean.parseBoolean(this.doDaylightCycle),
+        writer.putSetting(WorldStandardValues.DoDaylightCycle, Boolean.parseBoolean(this.doDaylightCycle),
         		"Whether the day-night cycle and moon phases progress");
-        writer.putSetting(WorldStandardValues.doEntityDrops, Boolean.parseBoolean(this.doEntityDrops),
+        writer.putSetting(WorldStandardValues.DoEntityDrops, Boolean.parseBoolean(this.doEntityDrops),
         		"Whether entities that are not mobs should have drops");
-        writer.putSetting(WorldStandardValues.doFireTick, Boolean.parseBoolean(this.doFireTick),
+        writer.putSetting(WorldStandardValues.DoFireTick, Boolean.parseBoolean(this.doFireTick),
         		"Whether fire should spread and naturally extinguish");
-        writer.putSetting(WorldStandardValues.doLimitedCrafting, Boolean.parseBoolean(this.doLimitedCrafting),
+        writer.putSetting(WorldStandardValues.DoLimitedCrafting, Boolean.parseBoolean(this.doLimitedCrafting),
         		"Whether players should only be able to craft recipes that they've unlocked first");
-        writer.putSetting(WorldStandardValues.doMobLoot, Boolean.parseBoolean(this.doMobLoot),
+        writer.putSetting(WorldStandardValues.DoMobLoot, Boolean.parseBoolean(this.doMobLoot),
         		"Whether mobs should drop items");
-        writer.putSetting(WorldStandardValues.doMobSpawning, Boolean.parseBoolean(this.doMobSpawning),
+        writer.putSetting(WorldStandardValues.DoMobSpawning, Boolean.parseBoolean(this.doMobSpawning),
         		"Whether mobs should naturally spawn. Does not affect monster spawners.");
-        writer.putSetting(WorldStandardValues.doTileDrops, Boolean.parseBoolean(this.doTileDrops),
+        writer.putSetting(WorldStandardValues.DoTileDrops, Boolean.parseBoolean(this.doTileDrops),
         		"Whether blocks should have drops");
-        writer.putSetting(WorldStandardValues.doWeatherCycle, Boolean.parseBoolean(this.doWeatherCycle),
+        writer.putSetting(WorldStandardValues.DoWeatherCycle, Boolean.parseBoolean(this.doWeatherCycle),
         		"Whether the weather will change");
-        writer.putSetting(WorldStandardValues.gameLoopFunction, Boolean.parseBoolean(this.gameLoopFunction),
+        writer.putSetting(WorldStandardValues.GameLoopFunction, Boolean.parseBoolean(this.gameLoopFunction),
         		"The function to run every game tick");        
-        writer.putSetting(WorldStandardValues.keepInventory, Boolean.parseBoolean(this.keepInventory),
+        writer.putSetting(WorldStandardValues.KeepInventory, Boolean.parseBoolean(this.keepInventory),
         		"Whether the player should keep items in their inventory after death");
-        writer.putSetting(WorldStandardValues.logAdminCommands, Boolean.parseBoolean(this.logAdminCommands),
+        writer.putSetting(WorldStandardValues.LogAdminCommands, Boolean.parseBoolean(this.logAdminCommands),
         		"Whether to log admin commands to server log");
-        writer.putSetting(WorldStandardValues.maxCommandChainLength, Integer.parseInt(this.maxCommandChainLength),
+        writer.putSetting(WorldStandardValues.MaxCommandChainLength, Integer.parseInt(this.maxCommandChainLength),
         		"Determines the number at which the chain command block acts as a \"chain\"");        
-        writer.putSetting(WorldStandardValues.maxEntityCramming, Integer.parseInt(this.maxEntityCramming),
+        writer.putSetting(WorldStandardValues.MaxEntityCramming, Integer.parseInt(this.maxEntityCramming),
         		"The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.");
-        writer.putSetting(WorldStandardValues.mobGriefing, Boolean.parseBoolean(this.mobGriefing),
+        writer.putSetting(WorldStandardValues.MobGriefing, Boolean.parseBoolean(this.mobGriefing),
         		"Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items");
-        writer.putSetting(WorldStandardValues.naturalRegeneration, Boolean.parseBoolean(this.naturalRegeneration),
+        writer.putSetting(WorldStandardValues.NaturalRegeneration, Boolean.parseBoolean(this.naturalRegeneration),
         		"Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)");
-        writer.putSetting(WorldStandardValues.randomTickSpeed, Integer.parseInt(this.randomTickSpeed),
+        writer.putSetting(WorldStandardValues.RandomTickSpeed, Integer.parseInt(this.randomTickSpeed),
         		"How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks");
-        writer.putSetting(WorldStandardValues.reducedDebugInfo, Boolean.parseBoolean(this.reducedDebugInfo),
+        writer.putSetting(WorldStandardValues.ReducedDebugInfo, Boolean.parseBoolean(this.reducedDebugInfo),
         		"Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.");
-        writer.putSetting(WorldStandardValues.sendCommandFeedback, Boolean.parseBoolean(this.sendCommandFeedback),
+        writer.putSetting(WorldStandardValues.SendCommandFeedback, Boolean.parseBoolean(this.sendCommandFeedback),
         		"Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text");
-        writer.putSetting(WorldStandardValues.showDeathMessages, Boolean.parseBoolean(this.showDeathMessages),
+        writer.putSetting(WorldStandardValues.ShowDeathMessages, Boolean.parseBoolean(this.showDeathMessages),
         		"Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies");
-        writer.putSetting(WorldStandardValues.spawnRadius, Integer.parseInt(this.spawnRadius),
+        writer.putSetting(WorldStandardValues.SpawnRadius, Integer.parseInt(this.spawnRadius),
         		"The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.");
-        writer.putSetting(WorldStandardValues.spectatorsGenerateChunks, Boolean.parseBoolean(this.spectatorsGenerateChunks),
+        writer.putSetting(WorldStandardValues.SpectatorsGenerateChunks, Boolean.parseBoolean(this.spectatorsGenerateChunks),
         		"Whether players in spectator mode can generate chunks");
 
         // World provider settings for worlds used as dimensions with Forge
         writer.smallTitle("World provider settings", "World provider settings for this world. These settings are still in development, may not all work (please submit an issue on the git) and may be subject to change in upcoming releases.", "");
 
-        writer.putSetting(WorldStandardValues.welcomeMessage, this.welcomeMessage,
+        writer.putSetting(WorldStandardValues.WelcomeMessage, this.welcomeMessage,
         		"A message to display to the user when they transfer to this dimension.");
-        writer.putSetting(WorldStandardValues.departMessage, this.departMessage,
+        writer.putSetting(WorldStandardValues.DepartMessage, this.departMessage,
         		"A Message to display to the user when they transfer out of this dimension.");
-    	//public boolean isHellWorld = false; // DoesWaterVaporize sets this
-        writer.putSetting(WorldStandardValues.hasSkyLight, this.hasSkyLight,
+        writer.putSetting(WorldStandardValues.HasSkyLight, this.hasSkyLight,
         		"A boolean that tells if a world has a sky or not. Used for calculating weather and skylight. Also affects GetActualHeight(), hasSkyLight = false worlds are seen as 128 height worlds, which affects nether portal placement/detection.");
-        writer.putSetting(WorldStandardValues.isSurfaceWorld, this.isSurfaceWorld,
+        writer.putSetting(WorldStandardValues.IsSurfaceWorld, this.isSurfaceWorld,
         		"Returns 'true' if in the \"main surface world\", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.");
-        //writer.putSetting(WorldStandardValues.canCoordinateBeSpawn, this.canCoordinateBeSpawn,
-        		//"Will check if the x, z position specified is alright to be set as the map spawn point.");
-        writer.putSetting(WorldStandardValues.canRespawnHere, this.canRespawnHere,
+        writer.putSetting(WorldStandardValues.CanRespawnHere, this.canRespawnHere,
         		"True if the player can respawn in this dimension (true = overworld, false = nether).");
-        writer.putSetting(WorldStandardValues.doesWaterVaporize, this.doesWaterVaporize,
+        writer.putSetting(WorldStandardValues.DoesWaterVaporize, this.doesWaterVaporize,
         		"True for nether, any water that is placed vaporises.");
-        writer.putSetting(WorldStandardValues.doesXZShowFog, this.doesXZShowFog,
+        writer.putSetting(WorldStandardValues.DoesXZShowFog, this.doesXZShowFog,
         		"Returns true if the given X,Z coordinate should show environmental fog. True for Nether.");
-        writer.putSetting(WorldStandardValues.useCustomFogColor, this.useCustomFogColor,
+        writer.putSetting(WorldStandardValues.UseCustomFogColor, this.useCustomFogColor,
         		"Set this to true if you want to use the fog color settings below.");
-        writer.putSetting(WorldStandardValues.fogColorRed, this.fogColorRed);
-        writer.putSetting(WorldStandardValues.fogColorGreen, this.fogColorGreen);
-        writer.putSetting(WorldStandardValues.fogColorBlue, this.fogColorBlue);
-        writer.putSetting(WorldStandardValues.isSkyColored, this.isSkyColored,
+        writer.putSetting(WorldStandardValues.FogColorRed, this.fogColorRed);
+        writer.putSetting(WorldStandardValues.FogColorGreen, this.fogColorGreen);
+        writer.putSetting(WorldStandardValues.FogColorBlue, this.fogColorBlue);
+        writer.putSetting(WorldStandardValues.IsSkyColored, this.isSkyColored,
         		"Is set to false for End (black sky?)");
         //writer.putSetting(WorldStandardValues.averageGroundlevel, this.averageGroundlevel,
         		//"Affects spawn point location and village spawning. Should be equal to sea level + 1(?)");
         //writer.putSetting(WorldStandardValues.horizonHeight, this.horizonHeight,
         		//"Returns horizon height for use in rendering the sky. Should be equal to sea level(?)");
-        writer.putSetting(WorldStandardValues.cloudHeight, this.cloudHeight);
-        writer.putSetting(WorldStandardValues.canDoLightning, this.canDoLightning);
-        writer.putSetting(WorldStandardValues.canDoRainSnowIce, this.canDoRainSnowIce);
-        //writer.putSetting(WorldStandardValues.canMineBlock, this.canMineBlock,
-        		//"If set to false players are unable to mine blocks");
-        writer.putSetting(WorldStandardValues.isNightWorld, this.isNightWorld,
+        writer.putSetting(WorldStandardValues.CloudHeight, this.cloudHeight);
+        writer.putSetting(WorldStandardValues.CanDoLightning, this.canDoLightning);
+        writer.putSetting(WorldStandardValues.CanDoRainSnowIce, this.canDoRainSnowIce);
+        writer.putSetting(WorldStandardValues.IsNightWorld, this.isNightWorld,
         		"If true then the sky will be locked at midnight with the moon and stars above but the world will be lit as if it were day time. Useful for space dimensions.");
-        writer.putSetting(WorldStandardValues.voidFogYFactor, this.voidFogYFactor,
+        writer.putSetting(WorldStandardValues.VoidFogYFactor, this.voidFogYFactor,
         		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");
 
-        writer.putSetting(WorldStandardValues.gravityFactor, this.gravityFactor,
+        writer.putSetting(WorldStandardValues.GravityFactor, this.gravityFactor,
         		"A value above 0.0, defaults to 0.08. Affects entities jumping and falling. 0.04 would result in half the gravity and falling damage.",
         		"NOTE: Broken for Forge 1.11.2 MP atm, should work fine for SP and 1.12.2 SP & MP.");
 
-        writer.putSetting(WorldStandardValues.shouldMapSpin, this.shouldMapSpin,
+        writer.putSetting(WorldStandardValues.ShouldMapSpin, this.shouldMapSpin,
         		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
-        writer.putSetting(WorldStandardValues.canDropChunk, this.canDropChunk,
+        writer.putSetting(WorldStandardValues.CanDropChunk, this.canDropChunk,
         		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");
         writer.putSetting(WorldStandardValues.RESPAWN_DIMENSION, this.respawnDimension,
         		"Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.");
@@ -1501,7 +1486,7 @@ public class WorldConfig extends ConfigFile
         }
     };    
     
-    private void WriteCustomBiomes(SettingsMap writer)
+    private void writeCustomBiomes(SettingsMap writer)
     {
         List<String> output = new ArrayList<String>();
         // Custom biome id
@@ -1540,49 +1525,7 @@ public class WorldConfig extends ConfigFile
                 "snowfall and mobs to work as in the other biome.",
                 "",
                 "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
-                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome.",
-				"The Cartographer feature for Forge uses biome id 888.");
-    }    
-
-    public double getFractureHorizontal()
-    {
-        return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
-    }
-
-    public double getFractureVertical()
-    {
-        return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
-    }
-
-    public enum TerrainMode
-    {
-        Normal,
-        OldGenerator,
-        TerrainTest,
-        NotGenerate,
-        Default
-    }
-
-    public enum ImageMode
-    {
-        Repeat,
-        Mirror,
-        ContinueNormal,
-        FillEmpty,
-    }
-
-    public enum ImageOrientation
-    {
-        North,
-        East,
-        South,
-        West,
-    }
-
-    public enum ConfigMode
-    {
-        WriteAll,
-        WriteDisable,
-        WriteWithoutComments
-    }
+                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome."
+				);
+    }   
 }

@@ -2,23 +2,20 @@ package com.pg85.otg.forge.events.dimensions;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGBlockPortal;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
-import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.forge.util.ForgeMaterialData;
-import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
@@ -29,8 +26,6 @@ public class EntityTravelToDimensionListener
 	@SubscribeEvent
 	public void entityTravelToDimension(EntityTravelToDimensionEvent e)
 	{
-		boolean cartographerEnabled = ((ForgeEngine)OTG.getEngine()).getCartographerEnabled();
-
 		if(e.getDimension() == -1)
 		{
 			// Make sure the player is above a portal block so we can check if this is a Quartz portal
@@ -63,7 +58,7 @@ public class EntityTravelToDimensionListener
 			boolean bFound = false;
 			if(overWorld == null) // If overworld is null then it's a vanilla overworld
 			{
-				DimensionConfig dimConfig = OTG.GetDimensionsConfig().Overworld;
+				DimensionConfig dimConfig = OTG.getDimensionsConfig().Overworld;
 				ArrayList<LocalMaterialData> portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
 
 				boolean bIsPortalMaterial = false;
@@ -93,7 +88,7 @@ public class EntityTravelToDimensionListener
 				for(LocalWorld localWorld : forgeWorlds)
 				{
 					ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-					DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName());
+					DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
 					ArrayList<LocalMaterialData> portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
 	
 					boolean bIsPortalMaterial = false;
@@ -132,13 +127,6 @@ public class EntityTravelToDimensionListener
 				int originDimension = e.getEntity().dimension;
 				int newDimension = destinationDim;
 
-				// If the Cartographer dimension is enabled and this is a chiseled quartz block then tp to Cartographer
-				boolean isCartographerPortal = cartographerEnabled && blockState.getBlock() == Blocks.QUARTZ_BLOCK && (byte) blockState.getBlock().getMetaFromState(blockState) == 1;
-				if(isCartographerPortal)
-				{
-					newDimension = Cartographer.CartographerDimension;
-				}
-
 				if(newDimension == 0 && e.getEntity().dimension == 0)
 				{
 					// No custom dimensions exist, destroy the portal
@@ -154,16 +142,6 @@ public class EntityTravelToDimensionListener
 					OTGTeleporter.changeDimension(newDimension, (EntityPlayerMP)e.getEntity(), true, false);
 				} else {
 					OTGTeleporter.changeDimension(newDimension, e.getEntity());
-				}
-
-		    	// If coming from main world then update Cartographer map at last player position (should remove head+banner from Cartographer map)
-				if(originDimension == 0 && cartographerEnabled)
-				{
-					//LocalWorld localWorld = OTG.getEngine().getWorld(world.getWorldInfo().getWorldName());
-					//if(localWorld != null)
-					{
-						Cartographer.CreateBlockWorldMapAtSpawn(ChunkCoordinate.fromBlockCoords(playerPos.getX(), playerPos.getZ()), true);
-					}
 				}
 			}
 		}

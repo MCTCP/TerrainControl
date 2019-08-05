@@ -2,12 +2,8 @@ package com.pg85.otg.configuration;
 
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
-import java.io.DataInputStream;
-import java.io.DataOutput;
-import java.io.EOFException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,24 +132,6 @@ public abstract class ConfigFile
             }
         }
         return output;
-    }
-
-    public static void writeStringToStream(DataOutput stream, String value) throws IOException
-    {
-        byte[] bytes = (value == null || value.length() == 0 ? " " : value).getBytes();
-        stream.writeShort(bytes.length);
-        stream.write(bytes);
-    }
-
-    public static String readStringFromStream(DataInputStream stream) throws IOException
-    {
-        byte[] chars = new byte[stream.readShort()];
-        if (stream.read(chars, 0, chars.length) != chars.length)
-        {
-            throw new EOFException();
-        }
-
-        return new String(chars);
     }
 
     /**

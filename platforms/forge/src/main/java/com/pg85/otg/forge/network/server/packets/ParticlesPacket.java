@@ -4,7 +4,6 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -13,8 +12,12 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.customobjects.bo3.ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4ParticleFunction;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
+import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.events.client.ClientTickHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;
@@ -32,7 +35,7 @@ public class ParticlesPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(ArrayList<ParticleFunction> particleDataForOTGPerPlayer, DataOutput stream) throws IOException
+	public static void writeToStream(ArrayList<ParticleFunction<?>> particleDataForOTGPerPlayer, DataOutput stream) throws IOException
 	{
 	    stream.writeInt(PluginStandardValues.ProtocolVersion);
 	    stream.writeInt(0); // 0 == particles packet
@@ -40,7 +43,7 @@ public class ParticlesPacket extends OTGPacket
 		StringBuilder sb = new StringBuilder();
 		if(particleDataForOTGPerPlayer != null)
 		{
-			for(ParticleFunction particleData : particleDataForOTGPerPlayer)
+			for(ParticleFunction<?> particleData : particleDataForOTGPerPlayer)
 			{
 				sb.append(particleData.makeStringForPacket());
 			}
@@ -52,7 +55,7 @@ public class ParticlesPacket extends OTGPacket
         stream.write(bytes);
 	}
 	
-	public static ParticlesPacket CreateEmptyPacket()
+	public static ParticlesPacket createEmptyPacket()
 	{
 		// Create an empty packet
         ByteBuf nettyBuffer = Unpooled.buffer();
@@ -61,7 +64,7 @@ public class ParticlesPacket extends OTGPacket
         ParticlesPacket packet = new ParticlesPacket(nettyBuffer);
         
         try {
-			ParticlesPacket.WriteToStream(null, stream);
+			ParticlesPacket.writeToStream(null, stream);
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		} finally {
@@ -81,9 +84,9 @@ public class ParticlesPacket extends OTGPacket
 		public IMessage handleClientMessage(EntityPlayer player, ParticlesPacket message, MessageContext ctx)
 		{
 			// For SP clients data is shared between client and server
-			if(Minecraft.getMinecraft().isSingleplayer())
+			//if(Minecraft.getMinecraft().isSingleplayer())
 			{
-				return null;
+				//return null;
 			}
 			
 	        try
@@ -91,7 +94,7 @@ public class ParticlesPacket extends OTGPacket
 	        	int packetType = message.getStream().readInt(); // 0 == Particles packet
 	    		if(packetType == 0)
 	        	{
-	        		ArrayList<ParticleFunction> particleFunctions = new ArrayList<ParticleFunction>();
+	        		ArrayList<ParticleFunction<?>> particleFunctions = new ArrayList<ParticleFunction<?>>();
 	        		int msgLength = message.getStream().readShort();
 	                byte[] chars = new byte[msgLength];
 	                if (!(message.getStream().read(chars, 0, chars.length) != chars.length))
@@ -101,6 +104,7 @@ public class ParticlesPacket extends OTGPacket
 	            		if(particleFunctionString != null && particleFunctionString.length() > 0 && particleFunctionString.startsWith("Particle("))
 	            		{
 	            			//OTG.log(LogMarker.INFO, "Received Particle packet: " + particleFunctionString);
+	            			LocalWorld world = ((ForgeEngine)OTG.getEngine()).getWorld(player.getEntityWorld());
 	            			String[] particleStrings = particleFunctionString.replace(")", "").replace("Particle(", "'").split("'");
 	            			for(String particleString : particleStrings)
 	            			{
@@ -108,8 +112,13 @@ public class ParticlesPacket extends OTGPacket
 		            			if(parameters.length == 11)
 		            			{
 		            				//OTG.log(LogMarker.INFO, "Processing Particle packet: " + particleString);
-
-			            			ParticleFunction particle = new ParticleFunction();
+			            			ParticleFunction<?> particle;
+			            			if(world.getConfigs().getWorldConfig().isOTGPlus)
+			            			{
+			            				particle = new BO4ParticleFunction();
+			            			} else {
+			            				particle = new BO3ParticleFunction();
+			            			}
 		            				particle.x = Integer.parseInt(parameters[0]);
 		            				particle.y = Integer.parseInt(parameters[1]);
 		            				particle.z = Integer.parseInt(parameters[2]);
@@ -128,17 +137,17 @@ public class ParticlesPacket extends OTGPacket
 	            			}
 	            		}
 	        		}
-	        		ArrayList<ParticleFunction> existingParticleFunctions = new ArrayList<ParticleFunction>();
-	        		ArrayList<ParticleFunction> newParticleFunctions = new ArrayList<ParticleFunction>();
+	        		ArrayList<ParticleFunction<?>> existingParticleFunctions = new ArrayList<ParticleFunction<?>>();
+	        		ArrayList<ParticleFunction<?>> newParticleFunctions = new ArrayList<ParticleFunction<?>>();
 	        		// Keep existing ParticleFunctions instead of overriding with duplicates so as not to reset any timers
 	                synchronized(ClientTickHandler.ClientParticleFunctions)
 	                {
 	                	existingParticleFunctions.addAll(ClientTickHandler.ClientParticleFunctions);
 	                	ClientTickHandler.ClientParticleFunctions.clear();
-	                	for(ParticleFunction particleFunction : particleFunctions)
+	                	for(ParticleFunction<?> particleFunction : particleFunctions)
 	                	{
 	                		boolean bFound = false;
-	                		for(ParticleFunction existingParticleFunction : existingParticleFunctions)
+	                		for(ParticleFunction<?> existingParticleFunction : existingParticleFunctions)
 	                		{
 	                			if(
 	            					particleFunction.x == existingParticleFunction.x &&

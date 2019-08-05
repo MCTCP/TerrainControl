@@ -1,28 +1,44 @@
 package com.pg85.otg.configuration.customobjects;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public abstract class CustomObjectConfigFunction<T>
 {
-
+    protected T holder;
+	
+    /**
+     * Has a value when valid == false, otherwise null.
+     */
+    protected String error;
 
     /**
+     * Only has a value when {@link #invalidate(String, List, String)} is
+     * called.
+     */
+    protected List<String> inputArgs;
+    /**
+     * Only has a value when {@link #invalidate(String, List, String)} is
+     * called.
+     */
+    protected String inputName;
+    protected boolean valid = true;
+	
+    /**
      * Convenience method for creating a config function. Used to create
-     * the
-     * default config functions.
+     * the default config functions.
      *
      * @param <T>
      * @param clazz
      * @param args
-     *              <p/>
      * @return
      */
     public static final <T> CustomObjectConfigFunction<T> create(T holder, Class<? extends CustomObjectConfigFunction<T>> clazz, Object... args)
@@ -57,24 +73,6 @@ public abstract class CustomObjectConfigFunction<T>
 
         return configFunction;
     }
-
-
-    /**
-     * Has a value when valid == false, otherwise null.
-     */
-    protected String error;
-
-    /**
-     * Only has a value when {@link #invalidate(String, List, String)} is
-     * called.
-     */
-    protected List<String> inputArgs;
-    /**
-     * Only has a value when {@link #invalidate(String, List, String)} is
-     * called.
-     */
-    protected String inputName;
-    protected boolean valid = true;
 
     /**
      * Checks the size of the given list.
@@ -126,8 +124,6 @@ public abstract class CustomObjectConfigFunction<T>
      */
     public abstract Class<T> getHolderType();
 
-    protected T holder;
-
     /**
      * Initializes the function: the holder is set and the arguments are read.
      * @param holder The holder to set. Must be of the type returned by
@@ -135,7 +131,7 @@ public abstract class CustomObjectConfigFunction<T>
      * @param args   Arguments to parse.
      * @throws InvalidConfigException If the arguments are invalid.
      */
-    public final void init(T holder, List<String> args) throws InvalidConfigException
+    final void init(T holder, List<String> args) throws InvalidConfigException
     {
         this.holder = holder;
         load(args);
@@ -147,7 +143,7 @@ public abstract class CustomObjectConfigFunction<T>
      * @param args  Arguments used in this resource, for output.
      * @param error Error message detailing what went wrong.
      */
-    public final void invalidate(String name, List<String> args, String error)
+    final void invalidate(String name, List<String> args, String error)
     {
         valid = false;
         this.inputName = name;
@@ -247,7 +243,7 @@ public abstract class CustomObjectConfigFunction<T>
      */
     protected final LocalMaterialData readMaterial(String string) throws InvalidConfigException
     {
-        return OTG.readMaterial(string);
+        return MaterialHelper.readMaterial(string);
     }
 
     /**
@@ -269,18 +265,6 @@ public abstract class CustomObjectConfigFunction<T>
         }
 
         return materials;
-    }
-
-    /**
-     * Parses the string and returns the rarity between 0.000001 and 100
-     * (inclusive)
-     * @param string The string to parse.
-     * @return The rarity.
-     * @throws InvalidConfigException If the number is invalid.
-     */
-    protected final double readRarity(String string) throws InvalidConfigException
-    {
-        return StringHelper.readDouble(string, 0.000001, 100);
     }
 
     /**

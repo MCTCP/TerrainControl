@@ -1,16 +1,16 @@
 package com.pg85.otg.generator;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.ErroredFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.CustomObjectStructure;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
+import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.generator.resource.AboveWaterGen;
 import com.pg85.otg.generator.resource.BoulderGen;
 import com.pg85.otg.generator.resource.CactusGen;
@@ -33,10 +33,11 @@ import com.pg85.otg.generator.resource.UndergroundLakeGen;
 import com.pg85.otg.generator.resource.VeinGen;
 import com.pg85.otg.generator.resource.VinesGen;
 import com.pg85.otg.generator.resource.WellGen;
+import com.pg85.otg.generator.surface.FrozenSurfaceHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.Rotation;
+import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,23 +45,18 @@ import java.util.Random;
 
 public class ObjectSpawner
 {
-	// OTG+
-
 	public boolean populating;
-    public boolean saving;
+    public boolean processing = false;
+	public boolean saving;
 	public boolean saveRequired;
-
+    public boolean StructurePlottedAtSpawn = false;
 	public int populatingX = 0;
 	public int populatingZ = 0;
-
-	public Object lockingObject = new Object();
-
-	//
-
     private final ConfigProvider configProvider;
     private final Random rand;
     private final LocalWorld world;
-
+	public Object lockingObject = new Object();
+    
     public ObjectSpawner(ConfigProvider configProvider, LocalWorld localWorld)
     {
         this.configProvider = configProvider;
@@ -68,9 +64,6 @@ public class ObjectSpawner
         this.world = localWorld;
     }
 
-    public boolean StructurePlottedAtSpawn = false;
-
-    public boolean processing = false;
     public void populate(ChunkCoordinate chunkCoord)
     {
     	//OTG.log(LogMarker.INFO, "ObjectSpawner populate X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
@@ -94,11 +87,11 @@ public class ObjectSpawner
 			saveRequired = true;
 		}
 
-		if(world.getConfigs().getWorldConfig().IsOTGPlus)
+		if(world.getConfigs().getWorldConfig().isOTGPlus)
 		{
 			if(!StructurePlottedAtSpawn)
 			{
-				world.getStructureCache().PlotStructures(rand, world.getSpawnChunk(), true);
+				world.getStructureCache().plotStructures(rand, world.getSpawnChunk(), true);
 			}
 		}
 		StructurePlottedAtSpawn = true;
@@ -107,20 +100,20 @@ public class ObjectSpawner
 		{
 			processing = true;
 
-			if(world.getConfigs().getWorldConfig().IsOTGPlus)
+			if(world.getConfigs().getWorldConfig().isOTGPlus)
 			{
-				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
-				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().PlotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().PlotStructures(rand, chunkCoord, false);
+				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
+				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
+				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
+				world.getStructureCache().plotStructures(rand, chunkCoord, false);
 
 		        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
 
 		        boolean hasVillage = false;
 
-		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().BO3AtSpawn != null && this.world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0)
+		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
 		        {
-		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().BO3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
+		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
 		        	if(customObject != null)
 		        	{
 		        		if(customObject instanceof BO3)
@@ -168,10 +161,10 @@ public class ObjectSpawner
 
 				processResourcesPhase2(chunkCoord);
 
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()));
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
 
 				// Generate structures
 
@@ -210,9 +203,9 @@ public class ObjectSpawner
 
 		        boolean hasVillage = false;
 
-		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().BO3AtSpawn != null && this.world.getConfigs().getWorldConfig().BO3AtSpawn.trim().length() > 0)
+		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
 		        {
-		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().BO3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
+		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
 		        	if(customObject != null)
 		        	{
 		        		if(customObject instanceof BO3)
@@ -264,6 +257,7 @@ public class ObjectSpawner
 		        world.placePopulationMobs(biome, rand, chunkCoord);
 
 		        // Snow and ice
+				// TODO: Fire PopulateChunkEvent.Populate.EventType.ICE for Forge
 		        new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
 
 		        // Replace blocks
@@ -276,7 +270,7 @@ public class ObjectSpawner
 
 			processing = false;
 		} else {
-			if(world.getConfigs().getWorldConfig().IsOTGPlus)
+			if(world.getConfigs().getWorldConfig().isOTGPlus)
 			{
 				// This happens when:
 				// This chunk was populated because of a block being spawned on the
@@ -298,9 +292,9 @@ public class ObjectSpawner
 				// populate a chunk that has already been provided/populated before,
 				// which seems like a bug.
 
-				world.getStructureCache().PlotStructures(rand, chunkCoord, false);
+				world.getStructureCache().plotStructures(rand, chunkCoord, false);
 
-				SpawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
+				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
 
 				// Get the random generator
 				WorldConfig worldConfig = configProvider.getWorldConfig();
@@ -376,7 +370,7 @@ public class ObjectSpawner
 		//OTG.log(LogMarker.INFO, "ObjectSpawner DONE populating X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
     }
 
-	public void processResourcesPhase2(ChunkCoordinate chunkCoord)
+	private void processResourcesPhase2(ChunkCoordinate chunkCoord)
 	{
 		// Get the biome of the other corner TODO: explain why?
 		LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8);
@@ -398,7 +392,7 @@ public class ObjectSpawner
 				{
 					miscResources.add((Resource) res);
 				} else {
-					if(OTG.getPluginConfig().SpawnLog)
+					if(OTG.getPluginConfig().spawnLog)
 					{
 						OTG.log(LogMarker.WARN, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
 					}
@@ -422,7 +416,7 @@ public class ObjectSpawner
 		}
 	}
 
-	public void processResourcesPhase3(ChunkCoordinate chunkCoord, boolean hasGeneratedAVillage)
+	private void processResourcesPhase3(ChunkCoordinate chunkCoord, boolean hasGeneratedAVillage)
 	{
 		// Get the random generator
 		WorldConfig worldConfig = configProvider.getWorldConfig();
@@ -468,7 +462,7 @@ public class ObjectSpawner
 					miscResources.add((Resource) res);
 				}
 			} else {
-				if(OTG.getPluginConfig().SpawnLog)
+				if(OTG.getPluginConfig().spawnLog)
 				{
 					OTG.log(LogMarker.WARN, "Could not parse resource \"" + res.toString() + "\" for biome " + biome.getName());
 				}
@@ -510,13 +504,14 @@ public class ObjectSpawner
 		}
 
 		// Snow and ice
-        new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
+		// TODO: Fire PopulateChunkEvent.Populate.EventType.ICE for Forge
+		new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
 
 		// Replace blocks
 		world.replaceBlocks(chunkCoord);
 	}
 
-	public void SpawnBO3s(ChunkCoordinate chunkCoord)
+	private void spawnBO3s(ChunkCoordinate chunkCoord)
 	{
 		// Get the corner block coords
 		int x = chunkCoord.getChunkX() * 16;
@@ -528,26 +523,26 @@ public class ObjectSpawner
 		// Null check
 		if (biome == null)
 		{
-			if(OTG.getPluginConfig().SpawnLog)
+			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.ERROR, "Unknown biome at {},{}  (chunk {}). Population failed.", x + 15, z + 15, chunkCoord);
 			}
 			return;
 		}
 
-		CustomObjectStructure structureStart = world.getStructureCache().structureCache.get(chunkCoord);
-		if (structureStart != null && structureStart.Start != null)
+		BO4CustomStructure structureStart = world.getStructureCache().bo4StructureCache.get(chunkCoord);
+		if (structureStart != null && structureStart.start != null)
 		{
 			// SpawnForChunk will call placeComplexSurfaceBlocks for this
 			// chunk (after spawning smooth area but before spawning structure)
-			structureStart.SpawnForChunk(chunkCoord);
+			structureStart.spawnForChunkOTGPlus(chunkCoord, world);
 
 			// All done spawning structures for this chunk, clean up cache
-			if(!world.IsInsidePregeneratedRegion(chunkCoord, true))
+			if(!world.isInsidePregeneratedRegion(chunkCoord))
 			{
-				world.getStructureCache().structureCache.put(chunkCoord, null);
+				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
 			} else {
-				world.getStructureCache().structureCache.remove(chunkCoord);
+				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
 			}
 		}
 		// Only trees plotted here
@@ -556,11 +551,11 @@ public class ObjectSpawner
 			// Complex surface blocks
 			//placeComplexSurfaceBlocks(chunkCoord);
 
-			if(!world.IsInsidePregeneratedRegion(chunkCoord, true))
+			if(!world.isInsidePregeneratedRegion(chunkCoord))
 			{
-				world.getStructureCache().structureCache.put(chunkCoord, null);
+				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
 			} else {
-				world.getStructureCache().structureCache.remove(chunkCoord);
+				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
 			}
 		}
 	}

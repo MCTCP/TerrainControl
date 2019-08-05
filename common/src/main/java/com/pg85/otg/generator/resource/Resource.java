@@ -1,12 +1,12 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,15 @@ import java.util.Random;
  */
 public abstract class Resource extends ConfigFunction<BiomeConfig> implements Comparable<Resource>
 {
+    protected int frequency;
+    protected LocalMaterialData material;
+    protected double rarity;
 
+    Resource(BiomeConfig biomeConfig) throws InvalidConfigException
+    {
+        super(biomeConfig);
+    }
+    
     /**
      * Convenience method for creating a resource. Used to create the default
      * resources.
@@ -43,17 +51,6 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
         {
             throw new RuntimeException(e);
         }
-    }
-
-    protected int frequency;
-    protected LocalMaterialData material;
-    protected double rarity;
-
-
-
-    public Resource(BiomeConfig biomeConfig) throws InvalidConfigException
-    {
-        super(biomeConfig);
     }
 
     @Override

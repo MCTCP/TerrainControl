@@ -17,7 +17,7 @@ public class OTGWorldServerMulti extends WorldServer
     private IBorderListener borderListener;
     
     // Used when creating OTG dims
-    public OTGWorldServerMulti(MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn, WorldInfo otgDimWorldInfo)
+    OTGWorldServerMulti(MinecraftServer server, ISaveHandler saveHandlerIn, int dimensionId, WorldServer delegate, Profiler profilerIn, WorldInfo otgDimWorldInfo)
     {
         super(server, saveHandlerIn, new OTGDerivedWorldInfo(delegate.getWorldInfo(), otgDimWorldInfo), dimensionId, profilerIn);
         this.delegate = delegate;

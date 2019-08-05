@@ -10,17 +10,17 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.ForgeWorldSession;
-import com.pg85.otg.forge.generator.Pregenerator;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;
+import com.pg85.otg.forge.pregenerator.Pregenerator;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 public class PregeneratorStatusPacket extends OTGPacket
 {
@@ -34,7 +34,7 @@ public class PregeneratorStatusPacket extends OTGPacket
 		super(nettyBuffer);
 	}
 	
-	public static void WriteToStream(ByteBufOutputStream stream) throws IOException
+	public static void writeToStream(ByteBufOutputStream stream) throws IOException
 	{
 	    stream.writeInt(PluginStandardValues.ProtocolVersion);
 	    stream.writeInt(0); // 0 = Normal packet
@@ -42,9 +42,9 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
 	    for(LocalWorld localWorld : ((ForgeEngine)OTG.getEngine()).getAllWorlds())
 	    {
-	    	if(localWorld.GetWorldSession() != null && ((ForgeWorldSession)localWorld.GetWorldSession()).getPregenerator() != null)
+	    	if(localWorld.getWorldSession() != null && ((ForgeWorldSession)localWorld.getWorldSession()).getPregenerator() != null)
 	    	{
-	    		pregenerators.add(((ForgeWorldSession)localWorld.GetWorldSession()).getPregenerator());
+	    		pregenerators.add(((ForgeWorldSession)localWorld.getWorldSession()).getPregenerator());
 	    	}
 	    }
 	    
@@ -52,25 +52,25 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    
 	    for(Pregenerator pregenerator : pregenerators)
 	    {
-	    	ConfigFile.writeStringToStream(stream, pregenerator.pregenerationWorld);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.pregenerationWorld);
 	    	stream.writeBoolean(pregenerator.getPregeneratorIsRunning());
 	    	stream.writeInt(pregenerator.progressScreenWorldSizeInBlocks);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.preGeneratorProgress);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.preGeneratorProgressStatus);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.progressScreenElapsedTime);
-	    	ConfigFile.writeStringToStream(stream, pregenerator.progressScreenEstimatedTime);	 
+	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgress);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgressStatus);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenElapsedTime);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenEstimatedTime);	 
 	    	
 	        long i = Runtime.getRuntime().maxMemory();
 	        long j = Runtime.getRuntime().totalMemory();
 	        long k = Runtime.getRuntime().freeMemory();
 	        long l = j - k;
 	    	
-	    	stream.writeLong(Long.valueOf(BytesToMb(l)));
-	    	stream.writeLong(Long.valueOf(BytesToMb(i)));
+	    	stream.writeLong(Long.valueOf(bytesToMb(l)));
+	    	stream.writeLong(Long.valueOf(bytesToMb(i)));
 	    }
 	}
 	
-    private static long BytesToMb(long bytes)
+    private static long bytesToMb(long bytes)
     {
         return bytes / 1024L / 1024L;
     }
@@ -94,13 +94,13 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    			int listSize = message.getStream().readInt();
 	    			for(int i = 0; i < listSize; i++)
 	    			{		        	
-				    	String pregenerationWorld = ConfigFile.readStringFromStream(message.getStream());
+				    	String pregenerationWorld = StreamHelper.readStringFromStream(message.getStream());
 				    	Boolean pregeneratorIsRunning = message.getStream().readBoolean();
 				    	int progressScreenWorldSizeInBlocks = message.getStream().readInt();
-				    	String preGeneratorProgress = ConfigFile.readStringFromStream(message.getStream());
-				    	String preGeneratorProgressStatus = ConfigFile.readStringFromStream(message.getStream());
-				    	String progressScreenElapsedTime = ConfigFile.readStringFromStream(message.getStream());
-				    	String progressScreenEstimatedTime = ConfigFile.readStringFromStream(message.getStream());
+				    	String preGeneratorProgress = StreamHelper.readStringFromStream(message.getStream());
+				    	String preGeneratorProgressStatus = StreamHelper.readStringFromStream(message.getStream());
+				    	String progressScreenElapsedTime = StreamHelper.readStringFromStream(message.getStream());
+				    	String progressScreenEstimatedTime = StreamHelper.readStringFromStream(message.getStream());
 				    	
 				    	long mbUsed = message.getStream().readLong();
 				    	long mbTotal = message.getStream().readLong();
@@ -112,10 +112,10 @@ public class PregeneratorStatusPacket extends OTGPacket
 				    	}				    
 				    	
 				    	// WorldSession can be null if MP client has not received a world instance for the world
-				    	if(forgeWorld != null && forgeWorld.GetWorldSession() != null)
+				    	if(forgeWorld != null && forgeWorld.getWorldSession() != null)
 				    	{
-				    		Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.GetWorldSession()).getPregenerator();
-				    		pregenerator.SetPregeneratorIsRunning(pregeneratorIsRunning);
+				    		Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator();
+				    		pregenerator.setPregeneratorIsRunning(pregeneratorIsRunning);
 				    		pregenerator.progressScreenWorldSizeInBlocks = progressScreenWorldSizeInBlocks;
 				    		pregenerator.preGeneratorProgress = preGeneratorProgress;
 				    		pregenerator.preGeneratorProgressStatus = preGeneratorProgressStatus;

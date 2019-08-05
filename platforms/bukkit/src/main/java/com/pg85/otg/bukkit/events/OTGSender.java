@@ -1,8 +1,8 @@
 package com.pg85.otg.bukkit.events;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
@@ -19,12 +19,12 @@ public class OTGSender
 {   
     private OTGPlugin plugin;
 
-    public OTGSender(OTGPlugin plugin)
+    OTGSender(OTGPlugin plugin)
     {
         this.plugin = plugin;
     }
 
-    public void send(Player player)
+    void send(Player player)
     {
         // Send the configs
         World world = player.getWorld();

@@ -13,16 +13,13 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ClientProxy extends CommonProxy
 {
-	public static KeyBinding pregeneratorUIKeyBinding = null;
-	public static KeyBinding otgInGameUIKeyBinding = null;
+	public static KeyBinding OtgInGameUIKeyBinding = null;
 	
 	@Override
 	public void init(FMLInitializationEvent e)
 	{
-		otgInGameUIKeyBinding = new KeyBinding("key.otghud.desc", Keyboard.KEY_O, "key.otg.category");
-		pregeneratorUIKeyBinding = new KeyBinding("key.pregenerator.desc", Keyboard.KEY_F3, "key.otg.category");
-		ClientRegistry.registerKeyBinding(otgInGameUIKeyBinding);
-		ClientRegistry.registerKeyBinding(pregeneratorUIKeyBinding);
+		OtgInGameUIKeyBinding = new KeyBinding("key.otghud.desc", Keyboard.KEY_O, "key.otg.category");
+		ClientRegistry.registerKeyBinding(OtgInGameUIKeyBinding);
 	}
 	
 	@Override

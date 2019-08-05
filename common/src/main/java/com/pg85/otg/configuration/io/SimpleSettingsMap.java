@@ -2,8 +2,8 @@ package com.pg85.otg.configuration.io;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.ConfigFunction;
-import com.pg85.otg.configuration.ConfigFunctionsManager;
 import com.pg85.otg.configuration.ErroredFunction;
+import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.io.RawSettingValue.ValueType;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -76,7 +76,7 @@ public final class SimpleSettingsMap implements SettingsMap
     public <T> List<ConfigFunction<T>> getConfigFunctions(T holder, boolean useFallback)
     {
         List<ConfigFunction<T>> result = new ArrayList<ConfigFunction<T>>(configFunctions.size());
-        ConfigFunctionsManager manager = OTG.getConfigFunctionsManager();
+        BiomeResourcesManager manager = OTG.getBiomeResourcesManager();
         for (RawSettingValue configFunctionLine : configFunctions)
         {
             String configFunctionString = configFunctionLine.getRawValue();
@@ -94,7 +94,7 @@ public final class SimpleSettingsMap implements SettingsMap
             result.add(function);
             if (function instanceof ErroredFunction)
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
 	                OTG.log(LogMarker.WARN, "Invalid resource {} in {} on line {}: {}", functionName, this.name, configFunctionLine.getLineNumber(), ((ErroredFunction<?>) function).error);
             	}

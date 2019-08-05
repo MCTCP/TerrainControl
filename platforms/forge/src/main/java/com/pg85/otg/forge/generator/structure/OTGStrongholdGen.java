@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.LocalBiome;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.network.ServerConfigProvider;
 
@@ -21,7 +21,7 @@ import net.minecraft.world.gen.structure.StructureStart;
 
 public class OTGStrongholdGen extends MapGenStronghold
 {
-    public final List<Biome> allowedBiomes;
+    private final List<Biome> allowedBiomes;
     /** is spawned false and set true once the defined BiomeGenBases were compared with the present ones */
     private boolean ranBiomeCheck;
     private ChunkPos[] structureCoords;

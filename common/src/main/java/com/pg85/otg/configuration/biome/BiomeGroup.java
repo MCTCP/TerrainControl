@@ -1,15 +1,15 @@
 package com.pg85.otg.configuration.biome;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -23,7 +23,6 @@ import java.util.Map.Entry;
  */
 public final class BiomeGroup extends ConfigFunction<WorldConfig>
 {
-
     private int groupId;
     private String name;
     private int groupRarity;
@@ -53,7 +52,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         // Must have at least a GroupName and a Biome that belongs to it
         assureSize(4, args);
         this.name = args.get(0);
-        this.generationDepth = readInt(args.get(1), 0, config.GenerationDepth);
+        this.generationDepth = readInt(args.get(1), 0, config.generationDepth);
         this.groupRarity = readInt(args.get(2), 1, Integer.MAX_VALUE);
         for (String biome : readBiomes(args, 3))
         {
@@ -127,7 +126,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      * @throws InvalidConfigException If one of the elements in the list is
      *                                not a valid block id.
      */
-    protected List<String> readBiomes(List<String> strings, int start) throws InvalidConfigException
+    private List<String> readBiomes(List<String> strings, int start) throws InvalidConfigException
     {
         return new ArrayList<String>(strings.subList(start, strings.size()));
     }
@@ -227,10 +226,17 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
         return false;
     }
 
+	HashMap<Integer, TreeMap<Integer, LocalBiome>> cachedDepthMapOrHigher = new HashMap<Integer, TreeMap<Integer, LocalBiome>>();
     public SortedMap<Integer, LocalBiome> getDepthMapOrHigher(int depth)
-    {
+    {    	
+    	TreeMap<Integer, LocalBiome> map = cachedDepthMapOrHigher.get(new Integer(depth));
+    	if(map != null)
+    	{
+    		return map;
+    	}
+    	
         int cumulativeBiomeRarity = 0;
-        TreeMap<Integer, LocalBiome> map = new TreeMap<Integer, LocalBiome>();
+        map = new TreeMap<Integer, LocalBiome>();
         for (Entry<String, LocalBiome> biome : this.biomes.entrySet())
         {                                                           //>>	When depth given is negative, include all biomes in group
             if (biome.getValue().getBiomeConfig().biomeSize >= depth || depth < 0)
@@ -239,13 +245,23 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
                 map.put(cumulativeBiomeRarity, biome.getValue());
             }
         }
+        
+        cachedDepthMapOrHigher.put(new Integer(depth), map);
+        
         return map;
     }
 
-    public SortedMap<Integer, LocalBiome> getDepthMap(int depth)
+    HashMap<Integer, TreeMap<Integer, LocalBiome>> cachedDepthMaps = new HashMap<Integer, TreeMap<Integer, LocalBiome>>();
+    SortedMap<Integer, LocalBiome> getDepthMap(int depth)
     {
+    	TreeMap<Integer, LocalBiome> map = cachedDepthMaps.get(new Integer(depth));
+    	if(map != null)
+    	{
+    		return map;
+    	}
+    	
         int cumulativeBiomeRarity = 0;
-        TreeMap<Integer, LocalBiome> map = new TreeMap<Integer, LocalBiome>();
+        map = new TreeMap<Integer, LocalBiome>();
         for (Entry<String, LocalBiome> biome : this.biomes.entrySet())
         {                                                           //>>	When depth given is negative, include all biomes in group
             if (biome.getValue().getBiomeConfig().biomeSize == depth || depth < 0)
@@ -254,6 +270,9 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
                 map.put(cumulativeBiomeRarity, biome.getValue());
             }
         }
+        
+        cachedDepthMaps.put(new Integer(depth), map);
+        
         return map;
     }
 
@@ -272,9 +291,8 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
      * @return True if the group has no biomes and is thus empty, false
      * if the group has biomes.
      */
-    public boolean hasNoBiomes()
+    boolean hasNoBiomes()
     {
         return biomes.isEmpty();
     }
-
 }

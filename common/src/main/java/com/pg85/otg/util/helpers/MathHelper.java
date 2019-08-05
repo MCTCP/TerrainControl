@@ -2,8 +2,12 @@ package com.pg85.otg.util.helpers;
 
 public class MathHelper
 {
-    private static float[] a = new float[65536];
+    private static float[] A = new float[65536];
 
+    private MathHelper()
+    {
+    }
+    
     public static float sqrt(float paramFloat)
     {
         return (float) Math.sqrt(paramFloat);
@@ -11,12 +15,12 @@ public class MathHelper
 
     public static float sin(float paramFloat)
     {
-        return a[((int) (paramFloat * 10430.378F) & 0xFFFF)];
+        return A[((int) (paramFloat * 10430.378F) & 0xFFFF)];
     }
 
     public static float cos(float paramFloat)
     {
-        return a[((int) (paramFloat * 10430.378F + 16384.0F) & 0xFFFF)];
+        return A[((int) (paramFloat * 10430.378F + 16384.0F) & 0xFFFF)];
     }
 
     public static int floor(double d0)
@@ -46,24 +50,7 @@ public class MathHelper
     static
     {
         for (int i = 0; i < 65536; i++)
-            a[i] = (float) Math.sin(i * 3.141592653589793D * 2.0D / 65536.0D);
-    }
-
-    public static double max(double first, double second, double third, double fourth)
-    {
-        if (first > second && first > third && first > fourth)
-        {
-            return first;
-        }
-        if (second > third && second > fourth)
-        {
-            return second;
-        }
-        if (third > fourth)
-        {
-            return third;
-        }
-        return fourth;
+            A[i] = (float) Math.sin(i * 3.141592653589793D * 2.0D / 65536.0D);
     }
 
     public static int ceil(float floatNumber)
@@ -75,9 +62,5 @@ public class MathHelper
     public static int clamp(int check, int min, int max)
     {
         return check > max ? max : (check < min ? min : check);
-    }
-
-    private MathHelper()
-    {
     }
 }

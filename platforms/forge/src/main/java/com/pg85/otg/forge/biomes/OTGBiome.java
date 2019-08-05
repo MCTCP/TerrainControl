@@ -1,8 +1,7 @@
 package com.pg85.otg.forge.biomes;
 
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.forge.asm.excluded.IOTGASMBiome;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 
@@ -23,13 +22,8 @@ import java.util.List;
  */
 public class OTGBiome extends Biome implements IOTGASMBiome
 {
-
-    public static final int MAX_TC_BIOME_ID = 1023;
-
     private int skyColor;
-
-    public int otgBiomeId;
-    public int savedId;
+    int savedId;
 
     OTGBiome(BiomeConfig config, ResourceLocation registryKey)
     {
@@ -54,37 +48,6 @@ public class OTGBiome extends Biome implements IOTGASMBiome
         addMobs(this.spawnableCreatureList, config.spawnCreaturesMerged);
         addMobs(this.spawnableWaterCreatureList, config.spawnWaterCreaturesMerged);
         addMobs(this.spawnableCaveCreatureList, config.spawnAmbientCreaturesMerged);
-    }
-
-    /**
-     * Extension of BiomeProperties so that we are able to access the protected
-     * methods.
-     */
-    private static class BiomePropertiesCustom extends BiomeProperties
-    {
-        BiomePropertiesCustom(BiomeConfig biomeConfig)
-        {
-            super(biomeConfig.getName());
-            this.setBaseHeight(biomeConfig.biomeHeight);
-            this.setHeightVariation(biomeConfig.biomeVolatility);
-            this.setRainfall(biomeConfig.biomeWetness);
-            this.setWaterColor(biomeConfig.waterColor);
-            float safeTemperature = biomeConfig.biomeTemperature;
-            if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
-            {
-                // Avoid temperatures between 0.1 and 0.2, Minecraft restriction
-                safeTemperature = safeTemperature >= 1.5 ? 0.2f : 0.1f;
-            }
-            this.setTemperature(safeTemperature);
-            if (biomeConfig.biomeWetness <= 0.0001)
-            {
-                this.setRainDisabled();
-            }
-            if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
-            {
-                this.setSnowEnabled();
-            }
-        }
     }
     
     // Sky color from Temp
@@ -128,7 +91,7 @@ public class OTGBiome extends Biome implements IOTGASMBiome
     }
 
     // Adds the mobs to the internal list
-    public void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
+    private void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)
     {
     	List<SpawnListEntry> newList = new ArrayList<SpawnListEntry>();
     	List<SpawnListEntry> newListParent = new ArrayList<SpawnListEntry>();

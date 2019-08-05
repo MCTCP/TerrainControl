@@ -1,11 +1,23 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunctionsManager;
+import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectLoader;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3EntityFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3MinecraftObjectFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ModDataFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3SpawnerFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3WeightedBranchFunction;
+import com.pg85.otg.customobjects.bo3.checks.BlockCheck;
+import com.pg85.otg.customobjects.bo3.checks.BlockCheckNot;
+import com.pg85.otg.customobjects.bo3.checks.LightCheck;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.NamedBinaryTag;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
 
 import java.io.*;
 import java.util.HashMap;
@@ -14,55 +26,56 @@ import java.util.Map;
 public class BO3Loader implements CustomObjectLoader
 {
 
+	// TOOD: Update this
     /** A list of already loaded meta Tags. The path is the key, a NBT Tag is
      * the value.
      */
-    private static Map<String, NamedBinaryTag> loadedTags = new HashMap<String, NamedBinaryTag>();
+    private static Map<String, NamedBinaryTag> LoadedTags = new HashMap<String, NamedBinaryTag>();
 
     public BO3Loader()
     {
         // Register BO3 ConfigFunctions
-        CustomObjectConfigFunctionsManager registry = OTG.getCustomObjectConfigFunctionsManager();
-        registry.registerConfigFunction("Block", BlockFunction.class);
-        registry.registerConfigFunction("B", BlockFunction.class);
-        registry.registerConfigFunction("Branch", BranchFunction.class);
-        registry.registerConfigFunction("BR", BranchFunction.class);
-        registry.registerConfigFunction("WeightedBranch", WeightedBranchFunction.class);
-        registry.registerConfigFunction("WBR", WeightedBranchFunction.class);
-        registry.registerConfigFunction("RandomBlock", RandomBlockFunction.class);
-        registry.registerConfigFunction("RB", RandomBlockFunction.class);
-        registry.registerConfigFunction("MinecraftObject", MinecraftObjectFunction.class);
-        registry.registerConfigFunction("MCO", MinecraftObjectFunction.class);
+        CustomObjectResourcesManager registry = OTG.getCustomObjectResourcesManager();
+        registry.registerConfigFunction("Block", BO3BlockFunction.class);
+        registry.registerConfigFunction("B", BO3BlockFunction.class);
+        registry.registerConfigFunction("Branch", BO3BranchFunction.class);
+        registry.registerConfigFunction("BR", BO3BranchFunction.class);
+        registry.registerConfigFunction("WeightedBranch", BO3WeightedBranchFunction.class);
+        registry.registerConfigFunction("WBR", BO3WeightedBranchFunction.class);
+        registry.registerConfigFunction("RandomBlock", BO3RandomBlockFunction.class);
+        registry.registerConfigFunction("RB", BO3RandomBlockFunction.class);
+        registry.registerConfigFunction("MinecraftObject", BO3MinecraftObjectFunction.class);
+        registry.registerConfigFunction("MCO", BO3MinecraftObjectFunction.class);
         registry.registerConfigFunction("BlockCheck", BlockCheck.class);
         registry.registerConfigFunction("BC", BlockCheck.class);
         registry.registerConfigFunction("BlockCheckNot", BlockCheckNot.class);
         registry.registerConfigFunction("BCN", BlockCheckNot.class);
         registry.registerConfigFunction("LightCheck", LightCheck.class);
         registry.registerConfigFunction("LC", LightCheck.class);
-        registry.registerConfigFunction("Entity", EntityFunction.class);
-        registry.registerConfigFunction("E", EntityFunction.class);
-        registry.registerConfigFunction("Particle", ParticleFunction.class);
-        registry.registerConfigFunction("P", ParticleFunction.class);
-        registry.registerConfigFunction("Spawner", SpawnerFunction.class);
-        registry.registerConfigFunction("S", SpawnerFunction.class);
-        registry.registerConfigFunction("ModData", ModDataFunction.class);
-        registry.registerConfigFunction("MD", ModDataFunction.class);
+        registry.registerConfigFunction("Entity", BO3EntityFunction.class);
+        registry.registerConfigFunction("E", BO3EntityFunction.class);
+        registry.registerConfigFunction("Particle", BO3ParticleFunction.class);
+        registry.registerConfigFunction("P", BO3ParticleFunction.class);
+        registry.registerConfigFunction("Spawner", BO3SpawnerFunction.class);
+        registry.registerConfigFunction("S", BO3SpawnerFunction.class);
+        registry.registerConfigFunction("ModData", BO3ModDataFunction.class);
+        registry.registerConfigFunction("MD", BO3ModDataFunction.class);
     }
 
     @Override
     public CustomObject loadFromFile(String objectName, File file)
     {
-        return new BO3(objectName, file);
+   		return new BO3(objectName, file);
     }
 
     public static NamedBinaryTag loadMetadata(String name, File bo3Folder)
     {
         String path = bo3Folder.getParent() + File.separator + name;
 
-        if (loadedTags.containsKey(path))
+        if (LoadedTags.containsKey(path))
         {
             // Found a cached one
-            return loadedTags.get(path);
+            return LoadedTags.get(path);
         }
 
         NamedBinaryTag tag = loadTileEntityFromNBT(path);
@@ -84,7 +97,7 @@ public class BO3Loader implements CustomObjectLoader
         } catch (FileNotFoundException e)
         {
             // File not found
-        	if(OTG.getPluginConfig().SpawnLog)
+        	if(OTG.getPluginConfig().spawnLog)
         	{
         		OTG.log(LogMarker.WARN, "NBT file {} not found", (Object) path);
         	}
@@ -104,7 +117,7 @@ public class BO3Loader implements CustomObjectLoader
             }             
             catch (java.lang.ArrayIndexOutOfBoundsException corruptFile)
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
 	                OTG.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
 	                OTG.printStackTrace(LogMarker.ERROR, corruptFile);
@@ -113,7 +126,7 @@ public class BO3Loader implements CustomObjectLoader
             }
             catch (IOException corruptFile)
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
 	                OTG.log(LogMarker.ERROR, "Failed to read NBT meta file: ", e.getMessage());
 	                OTG.printStackTrace(LogMarker.ERROR, corruptFile);
@@ -162,10 +175,10 @@ public class BO3Loader implements CustomObjectLoader
      * @param metadata   The Tag object to be cached
      * @return the meta data that was cached
      */
-    public static NamedBinaryTag registerMetadata(String pathOnDisk, NamedBinaryTag metadata)
+    private static NamedBinaryTag registerMetadata(String pathOnDisk, NamedBinaryTag metadata)
     {
         // Add it to the cache
-        loadedTags.put(pathOnDisk, metadata);
+        LoadedTags.put(pathOnDisk, metadata);
         // Return it
         return metadata;
     }
@@ -188,7 +201,7 @@ public class BO3Loader implements CustomObjectLoader
     public void onShutdown()
     {
         // Clean up the cache
-        loadedTags.clear();
+        LoadedTags.clear();
     }
 
 }

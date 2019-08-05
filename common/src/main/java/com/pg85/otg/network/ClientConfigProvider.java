@@ -1,9 +1,9 @@
 package com.pg85.otg.network;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
+import com.pg85.otg.common.BiomeIds;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.io.SettingsMap;
@@ -12,7 +12,8 @@ import com.pg85.otg.configuration.standard.BiomeStandardValues;
 import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.util.BiomeIds;
+import com.pg85.otg.util.helpers.StreamHelper;
+import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -44,8 +45,8 @@ public final class ClientConfigProvider implements ConfigProvider
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_FOG, stream.readInt());
         worldSettingsReader.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, stream.readInt());
         worldSettingsReader.putSetting(WorldStandardValues.WATER_LEVEL_MAX, stream.readInt());
-        worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, ConfigFile.readStringFromStream(stream));       
-        worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, ConfigFile.readStringFromStream(stream));
+        worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, StreamHelper.readStringFromStream(stream));       
+        worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, StreamHelper.readStringFromStream(stream));
         worldConfig = new WorldConfig(new File("."), worldSettingsReader, world, null);
 
         // BiomeConfigs
@@ -58,7 +59,7 @@ public final class ClientConfigProvider implements ConfigProvider
         {
             int otgBiomeId = stream.readInt();
             int savedBiomeId = stream.readInt();
-            String biomeName = ConfigFile.readStringFromStream(stream);
+            String biomeName = StreamHelper.readStringFromStream(stream);
             SettingsMap biomeReader = new SimpleSettingsMap(biomeName, false);
             biomeReader.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, stream.readFloat());
             biomeReader.putSetting(BiomeStandardValues.BIOME_WETNESS, stream.readFloat());
@@ -69,11 +70,11 @@ public final class ClientConfigProvider implements ConfigProvider
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());
 
-            String replaceToBiomeName = ConfigFile.readStringFromStream(stream);
+            String replaceToBiomeName = StreamHelper.readStringFromStream(stream);
         	biomeReader.putSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME, replaceToBiomeName); // <-- This might be used even in MP by client mods?
             
             // TODO: Are these really necessary? <-- Maybe only for Forge SP? <-- In ClientNetworkEventListener for Forge SP packet is ignored so this doesn't actually do anything??
-            String biomeDictId = ConfigFile.readStringFromStream(stream);
+            String biomeDictId = StreamHelper.readStringFromStream(stream);
         	biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId); // <-- This might be used even in MP by client mods?
 
             BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, defaultSettings);
@@ -81,7 +82,7 @@ public final class ClientConfigProvider implements ConfigProvider
 
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(otgBiomeId, savedBiomeId), this);
             biomesByOTGId[otgBiomeId] = biome;
-            if(savedBiomeId == otgBiomeId || OTG.getRegistryNameForDefaultBiome(biomeName) != null) // Non-virtual and default biomes only
+            if(savedBiomeId == otgBiomeId || BiomeRegistryNames.getRegistryNameForDefaultBiome(biomeName) != null) // Non-virtual and default biomes only
             {
             	biomesBySavedId[savedBiomeId] = biome;
             }

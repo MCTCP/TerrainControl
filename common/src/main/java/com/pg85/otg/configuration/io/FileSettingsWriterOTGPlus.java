@@ -15,6 +15,20 @@ import java.io.IOException;
 
 public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
 {
+    private final File file;
+    private boolean writeComments;
+    private BufferedWriter writer;
+	
+    public FileSettingsWriterOTGPlus(CustomObjectConfigFile configFile)
+    {
+        this.file = configFile.getFile();
+    }
+
+    private FileSettingsWriterOTGPlus(File file)
+    {
+        this.file = file;
+    }
+    
     /**
      * Writes this configuration settings to a file. It will use the file
      * returned by {@link ConfigFile#getFile()}. If writing fails, the error
@@ -38,7 +52,7 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
      * @param configMode The configuration mode. If this is set to
      * WriteDisable, this method does nothing.
      */
-    public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode)
+    private static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode)
     {
         if (configMode == ConfigMode.WriteDisable)
         {
@@ -59,20 +73,6 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
     {
         OTG.log(LogMarker.ERROR, "Failed to write to file {}", file);
         OTG.printStackTrace(LogMarker.ERROR, e);
-    }
-
-    private final File file;
-    private boolean writeComments;
-    private BufferedWriter writer;
-
-    public FileSettingsWriterOTGPlus(CustomObjectConfigFile configFile)
-    {
-        this.file = configFile.getFile();
-    }
-
-    public FileSettingsWriterOTGPlus(File file)
-    {
-        this.file = file;
     }
 
     @Override
@@ -208,5 +208,4 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
         writer.newLine();
         writer.newLine();
     }
-
 }

@@ -1,8 +1,8 @@
 package com.pg85.otg.forge.biomes;
 
-import com.pg85.otg.LocalBiome;
+import com.pg85.otg.common.BiomeIds;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.util.BiomeIds;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
@@ -15,7 +15,7 @@ public class ForgeBiome implements LocalBiome
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
-    public ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
+    ForgeBiome(Biome biome, BiomeConfig biomeConfig, BiomeIds biomeIds)
     {
         this.biomeBase = biome;
         this.biomeIds = biomeIds;

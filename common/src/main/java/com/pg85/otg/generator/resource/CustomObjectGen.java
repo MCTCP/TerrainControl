@@ -1,7 +1,7 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
@@ -15,24 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 public class CustomObjectGen extends Resource
-{
-	// OTG+
-	
-    public List<CustomObject> getObjects(String worldName)
-    {
-    	if(objects.isEmpty() && !objectNames.isEmpty())
-    	{
-            for (int i = 0; i < objectNames.size(); i ++)
-            {
-            	CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
-            	objects.add(object);	              	
-            }
-    	}
-    	return objects;
-    }
-	
-	//
-	
+{	
     private List<CustomObject> objects;
     private List<String> objectNames;
 
@@ -51,6 +34,19 @@ public class CustomObjectGen extends Resource
         {
             objectNames.add(arg);
         }
+    }
+    
+    private List<CustomObject> getObjects(String worldName)
+    {
+    	if(objects.isEmpty() && !objectNames.isEmpty())
+    	{
+            for (int i = 0; i < objectNames.size(); i ++)
+            {
+            	CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(objectNames.get(i), worldName);
+            	objects.add(object);	              	
+            }
+    	}
+    	return objects;
     }
 
     @Override
@@ -125,6 +121,5 @@ public class CustomObjectGen extends Resource
     public int getPriority()
     {
         return -40;
-    }
-
+    }    
 }

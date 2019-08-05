@@ -1,11 +1,11 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.common.BiomeIds;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.BiomeNotFoundException;
-import com.pg85.otg.util.BiomeIds;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -14,13 +14,12 @@ import java.util.List;
 
 public class BiomeCommand extends BaseCommand
 {
-    public BiomeCommand(OTGPlugin _plugin)
+    BiomeCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "biome";
         perm = OTGPerm.CMD_BIOME.node;
         usage = "biome [-f] [-s]";
-        workOnConsole = false;
     }
 
     @Override

@@ -139,4 +139,9 @@ public interface SettingsReaderOTGPlus
      * @param reader The reader to fall back.
      */
     void setFallbackReader(SettingsReaderOTGPlus reader);
+    
+    /**
+     * Flushes any cached lines or settings
+     */
+    void flushCache();
 }

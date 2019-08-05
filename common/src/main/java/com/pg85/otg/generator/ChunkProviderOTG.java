@@ -1,11 +1,9 @@
 package com.pg85.otg.generator;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
-
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.BiomeGenerator;
@@ -17,9 +15,12 @@ import com.pg85.otg.generator.terrain.RavinesGen;
 import com.pg85.otg.generator.terrain.TerrainGenBase;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.MathHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
 import java.util.Random;
 
@@ -29,10 +30,7 @@ public class ChunkProviderOTG
     private static final int NOISE_MAX_X = CHUNK_X_SIZE / 4 + 1;
     private static final int NOISE_MAX_Z = CHUNK_Z_SIZE / 4 + 1;
 
-    public static final int HEIGHT_BITS = 8;
-    public static final int HEIGHT_BITS_PLUS_FOUR = HEIGHT_BITS + 4;
-
-    private final LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    private final LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
 
     private final Random random;
     private final NoiseGeneratorPerlinOctaves vol1NoiseGen;
@@ -78,6 +76,8 @@ public class ChunkProviderOTG
     private final int maxSmoothDiameter;
     private final int maxSmoothRadius;
 
+    private BiomeConfig[] biomes = new BiomeConfig[1024];
+    
     public ChunkProviderOTG(ConfigProvider configs, LocalWorld world)
     {
         this.configProvider = configs;
@@ -117,8 +117,7 @@ public class ChunkProviderOTG
         }
 
     }
-
-    BiomeConfig[] biomes = new BiomeConfig[1024];
+    
     public void generate(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
@@ -129,7 +128,7 @@ public class ChunkProviderOTG
         generateTerrain(chunkBuffer);
         
         boolean dry = false;
-        if(OTG.getEngine().fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld))
+        if(OTG.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld))
 		{
         	dry = addBiomeBlocksAndCheckWater(chunkBuffer);
 		}
@@ -138,13 +137,13 @@ public class ChunkProviderOTG
         this.canyonGen.generate(chunkBuffer);
 
         WorldConfig worldConfig = configProvider.getWorldConfig();
-        if (worldConfig.ModeTerrain == WorldConfig.TerrainMode.Normal || worldConfig.ModeTerrain == WorldConfig.TerrainMode.OldGenerator)
+        if (worldConfig.modeTerrain == WorldConfig.TerrainMode.Normal || worldConfig.modeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
     }
 
-    protected void generateTerrain(ChunkBuffer chunkBuffer)
+    private void generateTerrain(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
         int chunkX = chunkCoord.getChunkX();
@@ -274,7 +273,7 @@ public class ChunkProviderOTG
      * @return Whether there is a lot of water in this chunk. If yes, no
      *         villages will be placed.
      */
-    protected boolean addBiomeBlocksAndCheckWater(ChunkBuffer chunkBuffer)
+    private boolean addBiomeBlocksAndCheckWater(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
 

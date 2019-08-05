@@ -15,8 +15,5 @@ public class BO2Loader implements CustomObjectLoader
     }
 
     @Override
-    public void onShutdown()
-    {
-        // Stub method
-    }
+    public void onShutdown() { }
 }

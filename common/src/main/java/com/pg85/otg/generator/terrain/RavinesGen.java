@@ -1,14 +1,14 @@
 package com.pg85.otg.generator.terrain;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Random;
 
@@ -23,7 +23,7 @@ public class RavinesGen extends TerrainGenBase
         this.worldSettings = wrk;
     }
 
-    protected void placeBlocks(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
+    private void placeBlocks(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
     {
         Random localRandom = new Random(paramLong);
 

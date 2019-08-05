@@ -1,14 +1,14 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerLand extends Layer
 {
 
-    public int rarity = 5;
+    private int rarity = 5;
 
-    public LayerLand(long seed, Layer childLayer, int _rarity)
+    LayerLand(long seed, Layer childLayer, int _rarity)
     {
         super(seed);
         this.child = childLayer;

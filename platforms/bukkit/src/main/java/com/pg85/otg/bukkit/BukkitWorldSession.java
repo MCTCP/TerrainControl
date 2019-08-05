@@ -2,22 +2,22 @@ package com.pg85.otg.bukkit;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.LocalWorld;
-import com.pg85.otg.WorldSession;
-import com.pg85.otg.customobjects.bo3.ParticleFunction;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.WorldSession;
+import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 
 public class BukkitWorldSession extends WorldSession
 {
-	ArrayList<ParticleFunction> ParticleFunctions = new ArrayList<ParticleFunction>();
+	private ArrayList<ParticleFunction<?>> ParticleFunctions = new ArrayList<ParticleFunction<?>>();
 
-	public BukkitWorldSession(LocalWorld world)
+	BukkitWorldSession(LocalWorld world)
 	{
 		super(world);
 	}
 
 	@Override
-	public ArrayList<ParticleFunction> getParticleFunctions()
+	public ArrayList<ParticleFunction<?>> getParticleFunctions()
 	{
 		return ParticleFunctions;
 	}

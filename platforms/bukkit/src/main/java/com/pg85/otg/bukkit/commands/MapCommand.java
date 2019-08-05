@@ -13,13 +13,12 @@ import java.util.List;
 
 public class MapCommand extends BaseCommand
 {
-    public MapCommand(OTGPlugin _plugin)
+    MapCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "map";
         perm = OTGPerm.CMD_MAP.node;
         usage = "map [World] [-s size] [-r rotate_angle] [-o offsetX offsetZ] [-l (add coordinate label to filename)]";
-        workOnConsole = true;
     }
 
     @Override

@@ -1,13 +1,13 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.materials.MaterialSet;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -111,7 +111,7 @@ public class GrassGen extends Resource
         // Handled by spawnInChunk().
     }
 
-    protected void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    private void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         if (random.nextDouble() * 100.0 <= this.rarity)
         {
@@ -159,7 +159,7 @@ public class GrassGen extends Resource
         }
     }
 
-    protected void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    private void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
         for (int t = 0; t < frequency; t++)
         {

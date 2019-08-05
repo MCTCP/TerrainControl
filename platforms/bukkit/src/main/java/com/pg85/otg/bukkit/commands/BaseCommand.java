@@ -1,9 +1,10 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPlugin;
 import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.common.LocalWorld;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -16,13 +17,16 @@ import java.util.List;
 
 public abstract class BaseCommand
 {
-    public String name;
-    public String perm;
-    public String usage;
-    public boolean workOnConsole;
+    public static final String ERROR_COLOR = ChatColor.RED.toString();
+    public static final String MESSAGE_COLOR = ChatColor.GREEN.toString();
+    static final String VALUE_COLOR = ChatColor.DARK_GREEN.toString();
+	
+    String name;
+    String perm;
+    String usage;
     protected OTGPlugin plugin;
 
-    public BaseCommand(OTGPlugin _plugin)
+    BaseCommand(OTGPlugin _plugin)
     {
         this.plugin = _plugin;
     }
@@ -83,7 +87,7 @@ public abstract class BaseCommand
         return null;
     }
 
-    protected void ListMessage(CommandSender sender, List<String> lines, int page, String... headers)
+    protected void listMessage(CommandSender sender, List<String> lines, int page, String... headers)
     {
         int pageCount = (lines.size() >> 3) + 1;
         if (page > pageCount)
@@ -120,8 +124,4 @@ public abstract class BaseCommand
         }
         return ret;
     }
-
-    public static final String ERROR_COLOR = ChatColor.RED.toString();
-    public static final String MESSAGE_COLOR = ChatColor.GREEN.toString();
-    public static final String VALUE_COLOR = ChatColor.DARK_GREEN.toString();
 }

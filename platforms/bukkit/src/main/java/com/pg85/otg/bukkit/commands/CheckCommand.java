@@ -1,9 +1,9 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
 import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -14,13 +14,12 @@ import java.util.List;
 
 public class CheckCommand extends BaseCommand
 {
-    public CheckCommand(OTGPlugin _plugin)
+    CheckCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "check";
         perm = OTGPerm.CMD_CHECK.node;
         usage = "check World_Name";
-        workOnConsole = true;
     }
 
     @Override

@@ -2,13 +2,14 @@ package com.pg85.otg.configuration.dimensions;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.LocalMaterialData;
+import com.pg85.otg.util.helpers.MaterialHelper;
 
 public class SettingsEntry
 {
+	// Capital letters since we'll be serialising to yaml (and we want to make it look nice)
 	public String[] DimensionPortalMaterials = new String[] { "DIRT" }; // WorldStandardValues.DIMENSION_PORTAL_MATERIALS.getDefaultValue(); // TODO: Fetch from worldstandardvalues
 	public ArrayList<LocalMaterialData> GetDimensionPortalMaterials()
 	{
@@ -17,7 +18,7 @@ public class SettingsEntry
     	{
     		LocalMaterialData forgeMat;
 			try {
-				forgeMat = OTG.readMaterial(mat);
+				forgeMat = MaterialHelper.readMaterial(mat);
 				portalMaterials.add(forgeMat);
 			} catch (InvalidConfigException e) {
 				e.printStackTrace();
@@ -30,27 +31,27 @@ public class SettingsEntry
 	public String DimensionAbove = WorldStandardValues.DIMENSIONABOVE.getDefaultValue();
 	public int DimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue();
 	public int DimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue();
-	public boolean TeleportToSpawnOnly = WorldStandardValues.teleportToSpawnOnly.getDefaultValue();
-	public String WelcomeMessage = WorldStandardValues.welcomeMessage.getDefaultValue();
-	public String DepartMessage = WorldStandardValues.departMessage.getDefaultValue();
-	public boolean HasSkyLight = WorldStandardValues.hasSkyLight.getDefaultValue();
-	public boolean IsSurfaceWorld = WorldStandardValues.isSurfaceWorld.getDefaultValue();
-	public boolean CanRespawnHere = WorldStandardValues.canRespawnHere.getDefaultValue();
-	public boolean DoesWaterVaporize = WorldStandardValues.doesWaterVaporize.getDefaultValue();
-	public boolean DoesXZShowFog = WorldStandardValues.doesXZShowFog.getDefaultValue();
-	public boolean UseCustomFogColor = WorldStandardValues.useCustomFogColor.getDefaultValue();
-	public double FogColorRed = WorldStandardValues.fogColorRed.getDefaultValue();
-	public double FogColorGreen = WorldStandardValues.fogColorGreen.getDefaultValue();
-	public double FogColorBlue = WorldStandardValues.fogColorBlue.getDefaultValue();
-	public boolean IsSkyColored = WorldStandardValues.isSkyColored.getDefaultValue();
-	public int CloudHeight = WorldStandardValues.cloudHeight.getDefaultValue();
-	public boolean CanDoLightning = WorldStandardValues.canDoLightning.getDefaultValue();
-	public boolean CanDoRainSnowIce = WorldStandardValues.canDoRainSnowIce.getDefaultValue();
-	public boolean IsNightWorld = WorldStandardValues.isNightWorld.getDefaultValue();
-	public double VoidFogYFactor = WorldStandardValues.voidFogYFactor.getDefaultValue();
-	public double GravityFactor = WorldStandardValues.gravityFactor.getDefaultValue();
-	public boolean ShouldMapSpin = WorldStandardValues.shouldMapSpin.getDefaultValue();
-	public boolean CanDropChunk = WorldStandardValues.canDropChunk.getDefaultValue();
+	public boolean TeleportToSpawnOnly = WorldStandardValues.TeleportToSpawnOnly.getDefaultValue();
+	public String WelcomeMessage = WorldStandardValues.WelcomeMessage.getDefaultValue();
+	public String DepartMessage = WorldStandardValues.DepartMessage.getDefaultValue();
+	public boolean HasSkyLight = WorldStandardValues.HasSkyLight.getDefaultValue();
+	public boolean IsSurfaceWorld = WorldStandardValues.IsSurfaceWorld.getDefaultValue();
+	public boolean CanRespawnHere = WorldStandardValues.CanRespawnHere.getDefaultValue();
+	public boolean DoesWaterVaporize = WorldStandardValues.DoesWaterVaporize.getDefaultValue();
+	public boolean DoesXZShowFog = WorldStandardValues.DoesXZShowFog.getDefaultValue();
+	public boolean UseCustomFogColor = WorldStandardValues.UseCustomFogColor.getDefaultValue();
+	public double FogColorRed = WorldStandardValues.FogColorRed.getDefaultValue();
+	public double FogColorGreen = WorldStandardValues.FogColorGreen.getDefaultValue();
+	public double FogColorBlue = WorldStandardValues.FogColorBlue.getDefaultValue();
+	public boolean IsSkyColored = WorldStandardValues.IsSkyColored.getDefaultValue();
+	public int CloudHeight = WorldStandardValues.CloudHeight.getDefaultValue();
+	public boolean CanDoLightning = WorldStandardValues.CanDoLightning.getDefaultValue();
+	public boolean CanDoRainSnowIce = WorldStandardValues.CanDoRainSnowIce.getDefaultValue();
+	public boolean IsNightWorld = WorldStandardValues.IsNightWorld.getDefaultValue();
+	public double VoidFogYFactor = WorldStandardValues.VoidFogYFactor.getDefaultValue();
+	public double GravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
+	public boolean ShouldMapSpin = WorldStandardValues.ShouldMapSpin.getDefaultValue();
+	public boolean CanDropChunk = WorldStandardValues.CanDropChunk.getDefaultValue();
 	public int RespawnDimension = WorldStandardValues.RESPAWN_DIMENSION.getDefaultValue();
 	public int MovementFactor = WorldStandardValues.MOVEMENT_FACTOR.getDefaultValue();
 	public String ItemsToAddOnJoinDimension = WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();

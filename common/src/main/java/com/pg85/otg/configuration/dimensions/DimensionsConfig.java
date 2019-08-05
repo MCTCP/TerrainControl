@@ -14,41 +14,42 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 
 public class DimensionsConfig
-{	
-	private File WorldSavesDir;
-	private static String ConfigFileName = "Config.yaml";
+{
+	private static HashMap<String, DimensionsConfig> DefaultConfigs = new HashMap<String, DimensionsConfig>();
+	private File worldSavesDir;
 	
+	// Use capitals since we're serialising to yaml and we want to make it look nice
 	public String WorldName;
 	public DimensionConfig Overworld;
 	public ArrayList<DimensionConfig> Dimensions = new ArrayList<DimensionConfig>();
-	
+
 	public DimensionsConfig() { }
 	
 	public DimensionsConfig(File mcWorldSaveDir)
 	{
 		this.WorldName = mcWorldSaveDir.getName();
-       	this.WorldSavesDir = mcWorldSaveDir.getParentFile();
+       	this.worldSavesDir = mcWorldSaveDir.getParentFile();
 	}
 	
 	public DimensionsConfig(File mcWorldSavesDir, String worldDir)
 	{
-		this.WorldSavesDir = mcWorldSavesDir;
+		this.worldSavesDir = mcWorldSavesDir;
 		this.WorldName = worldDir;
 	}
 		
-	private static HashMap<String, DimensionsConfig> defaultConfigs = new HashMap<String, DimensionsConfig>();
 	public static DimensionsConfig getModPackConfig(String presetName)
 	{
-		DimensionsConfig forgeWorldConfig = defaultConfigs.get(presetName);
+		DimensionsConfig forgeWorldConfig = DefaultConfigs.get(presetName);
 		if(forgeWorldConfig != null)
 		{
 			return forgeWorldConfig;
 		}
 		
 		// TODO: Doesn't Forge provide a better way of getting the config dir?
-		File configDir = new File(OTG.getEngine().getOTGDataFolder().getParentFile().getParentFile() + "//config//OpenTerrainGenerator//");
+		File configDir = new File(OTG.getEngine().getOTGRootFolder().getParentFile().getParentFile() + "//config//OpenTerrainGenerator//");
 		if(configDir.exists())
 		{
 			for(File f : configDir.listFiles())
@@ -68,7 +69,7 @@ public class DimensionsConfig
 					)
 				)
 				{
-					defaultConfigs.put(presetName, forgeWorldConfig2);
+					DefaultConfigs.put(presetName, forgeWorldConfig2);
 					return forgeWorldConfig2;
 				}
 			}
@@ -93,26 +94,15 @@ public class DimensionsConfig
        	
        	return presetsConfig;
 	}
-
-	/**
-	 * 
-	 * @param mcWorldSaveDir Refers to mc/saves/
-	 * @param worldDir
-	 * @return
-	 */
-	public static DimensionsConfig LoadFromFile(File mcWorldSavesDir, String worldDir)
-	{
-		return LoadFromFile(new File(mcWorldSavesDir.getAbsolutePath() + "//" + worldDir));
-	}
 	
 	/**
 	 * 
 	 * @param mcWorldSaveDir Refers to mc/saves/worlddir/
 	 * @return
 	 */
-	public static DimensionsConfig LoadFromFile(File mcWorldSaveDir)
+	public static DimensionsConfig loadFromFile(File mcWorldSaveDir)
 	{
-		File forgeWorldConfigFile = new File(mcWorldSaveDir + "//OpenTerrainGenerator//" + ConfigFileName);
+		File forgeWorldConfigFile = new File(mcWorldSaveDir + "//OpenTerrainGenerator//" + WorldStandardValues.DimensionsConfigFileName);
         DimensionsConfig presetsConfig = null;
         
 		if(forgeWorldConfigFile.exists())
@@ -130,13 +120,13 @@ public class DimensionsConfig
 			}
 	       	
 	       	presetsConfig.WorldName = mcWorldSaveDir.getName();
-	       	presetsConfig.WorldSavesDir = mcWorldSaveDir.getParentFile();
+	       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
 		}
        	
        	return presetsConfig;
 	}
 	
-	public String ToYamlString()
+	public String toYamlString()
 	{
 		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 		try {
@@ -147,13 +137,13 @@ public class DimensionsConfig
 		return null;
 	}
 	
-	public void Save()
+	public void save()
 	{
 		// Don't save default configs (loaded via defaultConfigfromFile)
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?
-		if(WorldSavesDir != null)
+		if(worldSavesDir != null)
 		{
-			File forgeWorldConfigFile = new File(WorldSavesDir.getAbsolutePath() + "//" + WorldName + "//OpenTerrainGenerator//" + ConfigFileName);
+			File forgeWorldConfigFile = new File(worldSavesDir.getAbsolutePath() + "//" + WorldName + "//OpenTerrainGenerator//" + WorldStandardValues.DimensionsConfigFileName);
 			if(!forgeWorldConfigFile.exists())
 			{
 				forgeWorldConfigFile.getParentFile().mkdirs();
@@ -212,7 +202,7 @@ public class DimensionsConfig
 		}
 	}
 
-	public DimensionConfig GetDimensionConfig(String worldName)
+	public DimensionConfig getDimensionConfig(String worldName)
 	{
     	if(worldName.equals("overworld") || worldName.equals(this.WorldName)) // TODO: Any way to work around using "overworld"? This way presets named overworld will cause problems.
     	{
@@ -232,7 +222,7 @@ public class DimensionsConfig
 		return null;
 	}
 
-	public static DimensionsConfig FromYamlString(String readStringFromStream)
+	public static DimensionsConfig fromYamlString(String readStringFromStream)
 	{
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         DimensionsConfig presetsConfig = null;

@@ -1,12 +1,13 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.LocalMaterialData;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,8 +16,8 @@ import java.util.Random;
 public class SmallLakeGen extends Resource
 {
     private final boolean[] BooleanBuffer = new boolean[2048];
-    public int maxAltitude;
-    public int minAltitude;
+    private int maxAltitude;
+    private int minAltitude;
 
     public SmallLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -25,10 +26,10 @@ public class SmallLakeGen extends Resource
         material = readMaterial(args.get(0));
         frequency = readInt(args.get(1), 1, 100);
         rarity = readRarity(args.get(2));
-        minAltitude = readInt(args.get(3), OTG.WORLD_DEPTH,
-                OTG.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(3), PluginStandardValues.WORLD_DEPTH,
+                PluginStandardValues.WORLD_HEIGHT);
         maxAltitude = readInt(args.get(4), minAltitude,
-                OTG.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT);
     }
 
     @Override
@@ -102,7 +103,7 @@ public class SmallLakeGen extends Resource
 
         synchronized (BooleanBuffer)
         {
-            LocalMaterialData air = OTG.toLocalMaterialData(DefaultMaterial.AIR, 0);
+            LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
             boolean[] BooleanBuffer = new boolean[2048];
             int i = rand.nextInt(4) + 4;
             for (int j = 0; j < i; j++)

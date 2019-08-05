@@ -1,10 +1,10 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.LocalWorld;
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Collection;
 import java.util.Map;
@@ -49,12 +49,12 @@ public class PlantType
      * @return The plant type.
      * @throws InvalidConfigException If the name is invalid.
      */
-    public static PlantType getPlant(String name) throws InvalidConfigException
+    static PlantType getPlant(String name) throws InvalidConfigException
     {
         PlantType plantType = LOOKUP_MAP.get(name);
         if (plantType == null)
         {
-        	LocalMaterialData material = OTG.readMaterial(name);
+        	LocalMaterialData material = MaterialHelper.readMaterial(name);
             // Fall back on block name + data
             plantType = new PlantType(material);
         }
@@ -78,7 +78,7 @@ public class PlantType
      * @param plantType The plant type.
      * @return The plant type provided.
      */
-    public static PlantType register(PlantType plantType)
+    private static PlantType register(PlantType plantType)
     {
         LOOKUP_MAP.put(plantType.toString(), plantType);
         return plantType;
@@ -95,11 +95,11 @@ public class PlantType
      * @param material The material of the block.
      * @param data The data value of the block.
      */
-    protected PlantType(String name, DefaultMaterial material, int data)
+    private PlantType(String name, DefaultMaterial material, int data)
     {
         this.name = name;
         this.topBlock = null;
-        this.bottomBlock = OTG.toLocalMaterialData(material, data);
+        this.bottomBlock = MaterialHelper.toLocalMaterialData(material, data);
     }
 
     /**
@@ -107,7 +107,7 @@ public class PlantType
      * 
      * @param material Material of the plant.
      */
-    protected PlantType(LocalMaterialData material)
+    private PlantType(LocalMaterialData material)
     {
         this.name = material.toString();
         this.topBlock = null;
@@ -122,11 +122,11 @@ public class PlantType
      * @param bottomData Data value for the bottom.
      * @param topData Data value for the top.
      */
-    protected PlantType(String name, DefaultMaterial material, int bottomData, int topData)
+    private PlantType(String name, DefaultMaterial material, int bottomData, int topData)
     {
         this.name = name;
-        this.topBlock = OTG.toLocalMaterialData(material, topData);
-        this.bottomBlock = OTG.toLocalMaterialData(material, bottomData);
+        this.topBlock = MaterialHelper.toLocalMaterialData(material, topData);
+        this.bottomBlock = MaterialHelper.toLocalMaterialData(material, bottomData);
     }
 
     /**
@@ -148,7 +148,7 @@ public class PlantType
      * @param y Y position of the lowest block of the plant.
      * @param z Z position of the plant.
      */
-    public void spawn(LocalWorld world, int x, int y, int z)
+    void spawn(LocalWorld world, int x, int y, int z)
     {
         world.setBlock(x, y, z, bottomBlock, null, false);
         if (topBlock != null)

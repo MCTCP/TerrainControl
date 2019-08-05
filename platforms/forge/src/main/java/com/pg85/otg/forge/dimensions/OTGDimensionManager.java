@@ -23,12 +23,12 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
-import com.pg85.otg.forge.generator.Cartographer;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -52,6 +52,8 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 
 public class OTGDimensionManager
 {
+	private static HashMap<Integer,Integer> orderedDimensions;
+	
 	public static boolean isDimensionNameRegistered(String dimensionName)
 	{
 		if(dimensionName.equals("overworld"))
@@ -95,7 +97,7 @@ public class OTGDimensionManager
         FMLInterModComms.sendMessage(PluginStandardValues.MOD_ID, "registerDimension", compound);
 	}
 
-    public static void unregisterDimension(int dimensionId)
+    private static void unregisterDimension(int dimensionId)
     {
     	if(dimensionId == 0)
     	{
@@ -114,7 +116,7 @@ public class OTGDimensionManager
         FMLInterModComms.sendMessage(PluginStandardValues.MOD_ID, "unregisterDimension", compound);
     }
 
-    public static void writeNBTStrings(String id, Collection<String> strings, NBTTagCompound compound)
+    private static void writeNBTStrings(String id, Collection<String> strings, NBTTagCompound compound)
     {
         if (strings != null)
         {
@@ -128,8 +130,6 @@ public class OTGDimensionManager
             compound.setTag(id, nbtTagList);
         }
     }
-
-	static HashMap<Integer,Integer> orderedDimensions;
 	
 	public static boolean IsOTGDimension(int dimensionId)
 	{
@@ -137,7 +137,7 @@ public class OTGDimensionManager
 		//return orderedDimensions.containsKey(dimensionId);
 	}
 
-	public static ArrayList<Integer> GetOTGDimensions()
+	static ArrayList<Integer> GetOTGDimensions()
 	{
 		return new ArrayList<Integer>(orderedDimensions.keySet());
 	}
@@ -259,10 +259,10 @@ public class OTGDimensionManager
 	
 		world.unRegisterBiomes();
 
-		((ForgeEngine)OTG.getEngine()).getWorldLoader().RemoveUnloadedWorld(world.getName());
+		((ForgeEngine)OTG.getEngine()).getWorldLoader().removeUnloadedWorld(world.getName());
 
 		// Client side only
-		((ForgeEngine)OTG.getEngine()).getWorldLoader().RemoveLoadedWorld(world.getName());
+		((ForgeEngine)OTG.getEngine()).getWorldLoader().removeLoadedWorld(world.getName());
 
 		// For MP the client knows nothing about dimensions
 		if(isServerSide)
@@ -286,13 +286,13 @@ public class OTGDimensionManager
 
 			SaveDimensionData();
 			
-			ArrayList<DimensionConfig> dimConfigs = new ArrayList<DimensionConfig>(OTG.GetDimensionsConfig().Dimensions);
+			ArrayList<DimensionConfig> dimConfigs = new ArrayList<DimensionConfig>(OTG.getDimensionsConfig().Dimensions);
 			for(DimensionConfig dimensionConfig : dimConfigs)
 			{
 				if(dimensionConfig.PresetName.equals(world.getName()))
 				{
-					OTG.GetDimensionsConfig().Dimensions.remove(dimensionConfig);
-					OTG.GetDimensionsConfig().Save();
+					OTG.getDimensionsConfig().Dimensions.remove(dimensionConfig);
+					OTG.getDimensionsConfig().save();
 					break;
 				}
 			}
@@ -306,7 +306,7 @@ public class OTGDimensionManager
 		{
 			ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getUnloadedWorld(worldName);
 			OTGDimensionManager.DeleteDimension(forgeWorld.getDimensionId(), forgeWorld, server, true);
-			ServerPacketManager.SendDimensionSynchPacketToAllPlayers(server);
+			ServerPacketManager.sendDimensionSynchPacketToAllPlayers(server);
 			return true;
 		}		
 		return false;
@@ -317,7 +317,7 @@ public class OTGDimensionManager
 		initDimension(dim, -1l);
 	}
 		
-    public static void initDimension(int dim, long seed)
+    private static void initDimension(int dim, long seed)
     {
     	String dimensionName = DimensionManager.getProviderType(dim).getName();
         WorldServer overworld = DimensionManager.getWorld(0);
@@ -338,7 +338,7 @@ public class OTGDimensionManager
         MinecraftServer mcServer = overworld.getMinecraftServer();
         ISaveHandler savehandler = overworld.getSaveHandler();
 
-        DimensionConfig dimConfig = OTG.GetDimensionsConfig().GetDimensionConfig(dimensionName); 
+        DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(dimensionName); 
         if(seed == -1 && dimConfig != null && dimConfig.Seed != null && dimConfig.Seed.trim().length() > 0)
         {
             seed = (new Random()).nextLong();
@@ -361,14 +361,14 @@ public class OTGDimensionManager
             }        	
         }
         
-        WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+        WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
         
 		long seedIn = seed == -1 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : seed;
 		GameType gameType = dimConfig.GameType.equals("Creative") ? GameType.CREATIVE : GameType.SURVIVAL;
 		boolean enableMapFeatures = worldConfig.strongholdsEnabled;
 		boolean hardcoreMode = dimConfig.GameType.equals("Hardcore");
 
-		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, OTGPlugin.txWorldType);
+		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, OTGPlugin.OtgWorldType);
 		settings.setGeneratorOptions("OpenTerrainGenerator");
 		
 		WorldInfo worldInfo = new WorldInfo(settings, dimensionName);
@@ -384,8 +384,8 @@ public class OTGDimensionManager
         	forgeWorld = ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dim);
         }
         
-        OTG.GetDimensionsConfig().GetDimensionConfig(forgeWorld.getName()).Seed = "" + seedIn;
-        OTG.GetDimensionsConfig().Save();
+        OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Seed = "" + seedIn;
+        OTG.getDimensionsConfig().save();
         
         // Apply difficulty and game type
         // TODO: Independent difficulty / spawn types per world?
@@ -442,7 +442,7 @@ public class OTGDimensionManager
 	public static void SaveDimensionData()
 	{
 		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/Dimensions.txt");
+		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/" + WorldStandardValues.DimensionsDataFileName);
 		if(dimensionDataFile.exists())
 		{
 			dimensionDataFile.delete();
@@ -547,7 +547,7 @@ public class OTGDimensionManager
 	public static OTGDimensionInfo LoadOrderedDimensionData()
 	{
 		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/Dimensions.txt");
+		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/" + WorldStandardValues.DimensionsDataFileName);
 		String[] dimensionDataFileValues = {};
 		if(dimensionDataFile.exists())
 		{
@@ -614,7 +614,7 @@ public class OTGDimensionManager
 
 	public static ArrayList<DimensionData> GetDimensionData(File worldSaveDir)
 	{
-		File dimensionDataFile = new File(worldSaveDir + "/OpenTerrainGenerator/Dimensions.txt");
+		File dimensionDataFile = new File(worldSaveDir + "/OpenTerrainGenerator/" + WorldStandardValues.DimensionsDataFileName);
 		String[] dimensionDataFileValues = {};
 		if(dimensionDataFile.exists())
 		{
@@ -668,7 +668,7 @@ public class OTGDimensionManager
 	{
 		OTGDimensionInfo otgDimData = LoadOrderedDimensionData();
 
-		DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();
+		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
 		
 		// Recreate dimensions in the correct order
 		for(int i = 0; i <= otgDimData.highestOrder; i++)
@@ -694,7 +694,7 @@ public class OTGDimensionManager
 						{
 							// No DimensionConfig exists for this dimension
 							// Must be a legacy dimension, create a config for it based on the worldconfig
-							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
 							if(worldConfig == null)
 							{
 								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
@@ -707,7 +707,7 @@ public class OTGDimensionManager
 						{
 							// No DimensionConfig exists for the overworld
 							// Must be a legacy world, create a config for it based on the worldconfig
-							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).LoadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
 							if(worldConfig == null)
 							{
 								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
@@ -718,19 +718,15 @@ public class OTGDimensionManager
 					}
 					
 					OTGDimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, OTGWorldProvider.class, dimData.keepLoaded));
-					if(dimData.dimensionName.equals("DIM-Cartographer"))
-					{
-						Cartographer.CartographerDimension = dimData.dimensionId;
-					}
 					OTGDimensionManager.initDimension(dimData.dimensionId);
 				}
 			}
 		}
 		
-		dimsConfig.Save();
+		dimsConfig.save();
 	}
 	
-	public static HashMap<Integer, String> GetAllOTGDimensions()
+	public static HashMap<Integer, String> getAllOTGDimensions()
 	{
 		HashMap<Integer, String> otgDims = new HashMap<Integer, String>();
 
@@ -746,9 +742,9 @@ public class OTGDimensionManager
 		return otgDims;
 	}
 
-	public static void CreateNewDimensionSP(DimensionConfig dimensionConfig, MinecraftServer server)
+	public static void createNewDimensionSP(DimensionConfig dimensionConfig, MinecraftServer server)
 	{
-		DimensionsConfig dimsConfig = OTG.GetDimensionsConfig();
+		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
 		dimensionConfig.isNewConfig = false;
 		dimsConfig.Dimensions.add(dimensionConfig);
 		
@@ -774,6 +770,6 @@ public class OTGDimensionManager
 			DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
 		}
 
-		OTG.GetDimensionsConfig().Save();
+		OTG.getDimensionsConfig().save();
 	}
 }

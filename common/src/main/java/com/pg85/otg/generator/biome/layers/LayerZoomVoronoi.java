@@ -1,13 +1,13 @@
 package com.pg85.otg.generator.biome.layers;
 
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerZoomVoronoi extends Layer
 {
 
-    public LayerZoomVoronoi(long seed, Layer childLayer)
+    LayerZoomVoronoi(long seed, Layer childLayer)
     {
         super(seed);
         this.child = childLayer;
@@ -29,38 +29,56 @@ public class LayerZoomVoronoi extends Layer
         int i2 = n << i;
         int i3 = i1 << i;
         int[] thisInts = cache.getArray(i2 * i3);
+        int i5;
+        int i6;
+        double d1;
+        double d2;
+        double d3;
+        double d4;
+        double d5;
+        double d6;
+        double d7;
+        double d8;
+        double d9;
+        int i8;
+        int i9;
+        int i11;
+        double d10;
+        double d11;
+        double d12;
+        double d13;
         for (int i4 = 0; i4 < i1 - 1; i4++)
         {
-            int i5 = childInts[((i4) * n)];
-            int i6 = childInts[((i4 + 1) * n)];
+            i5 = childInts[((i4) * n)];
+            i6 = childInts[((i4 + 1) * n)];
             for (int i7 = 0; i7 < n - 1; i7++)
             {
-                double d1 = j * 0.9D;
+                d1 = j * 0.9D;
                 initChunkSeed(i7 + k << i, i4 + m << i);
-                double d2 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
-                double d3 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
+                d2 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
+                d3 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
                 initChunkSeed(i7 + k + 1 << i, i4 + m << i);
-                double d4 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
-                double d5 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
+                d4 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
+                d5 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
                 initChunkSeed(i7 + k << i, i4 + m + 1 << i);
-                double d6 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
-                double d7 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
+                d6 = (nextInt(1024) / 1024.0D - 0.5D) * d1;
+                d7 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
                 initChunkSeed(i7 + k + 1 << i, i4 + m + 1 << i);
-                double d8 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
-                double d9 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
+                d8 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
+                d9 = (nextInt(1024) / 1024.0D - 0.5D) * d1 + j;
 
-                int i8 = childInts[(i7 + 1 + (i4) * n)];
-                int i9 = childInts[(i7 + 1 + (i4 + 1) * n)];
+                i8 = childInts[(i7 + 1 + (i4) * n)];
+                i9 = childInts[(i7 + 1 + (i4 + 1) * n)];
 
                 for (int i10 = 0; i10 < j; i10++)
                 {
-                    int i11 = ((i4 << i) + i10) * i2 + (i7 << i);
+                    i11 = ((i4 << i) + i10) * i2 + (i7 << i);
                     for (int i12 = 0; i12 < j; i12++)
                     {
-                        double d10 = (i10 - d3) * (i10 - d3) + (i12 - d2) * (i12 - d2);
-                        double d11 = (i10 - d5) * (i10 - d5) + (i12 - d4) * (i12 - d4);
-                        double d12 = (i10 - d7) * (i10 - d7) + (i12 - d6) * (i12 - d6);
-                        double d13 = (i10 - d9) * (i10 - d9) + (i12 - d8) * (i12 - d8);
+                        d10 = (i10 - d3) * (i10 - d3) + (i12 - d2) * (i12 - d2);
+                        d11 = (i10 - d5) * (i10 - d5) + (i12 - d4) * (i12 - d4);
+                        d12 = (i10 - d7) * (i10 - d7) + (i12 - d6) * (i12 - d6);
+                        d13 = (i10 - d9) * (i10 - d9) + (i12 - d8) * (i12 - d8);
 
                         if ((d10 < d11) && (d10 < d12) && (d10 < d13))
                             thisInts[(i11++)] = i5;
@@ -80,9 +98,9 @@ public class LayerZoomVoronoi extends Layer
             }
         }
         int[] outputInts = cache.getArray(xSize * zSize);
-        for (int i5 = 0; i5 < zSize; i5++)
+        for (int i5b = 0; i5b < zSize; i5b++)
         {
-            System.arraycopy(thisInts, (i5 + (z & j - 1)) * (n << i) + (x & j - 1), outputInts, i5 * xSize, xSize);
+            System.arraycopy(thisInts, (i5b + (z & j - 1)) * (n << i) + (x & j - 1), outputInts, i5b * xSize, xSize);
         }
         return outputInts;
     }

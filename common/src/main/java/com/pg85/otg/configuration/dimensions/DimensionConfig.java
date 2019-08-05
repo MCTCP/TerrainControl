@@ -49,7 +49,7 @@ public class DimensionConfig extends DimensionConfigBase
 		return clone;
 	}
 	
-	public static DimensionConfig FromYamlString(String readStringFromStream)
+	public static DimensionConfig fromYamlString(String readStringFromStream)
 	{
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         DimensionConfig dimConfig = null;

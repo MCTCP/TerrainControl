@@ -18,10 +18,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class OTGDerivedWorldInfo extends WorldInfo
 {
     /** Instance of WorldInfo. */
-    public WorldInfo delegate;
-    public WorldInfo otgDimWorldInfo;
+    private WorldInfo delegate;
+    private WorldInfo otgDimWorldInfo;
 
-    public OTGDerivedWorldInfo(WorldInfo delegateWorldInfo, WorldInfo otgDimWorldInfo)
+    OTGDerivedWorldInfo(WorldInfo delegateWorldInfo, WorldInfo otgDimWorldInfo)
     {
         this.delegate = delegateWorldInfo;
         this.otgDimWorldInfo = otgDimWorldInfo;
@@ -275,7 +275,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
 
     public WorldType getTerrainType()
     {
-        return OTGPlugin.txWorldType;
+        return OTGPlugin.OtgWorldType;
     }
     
     public String getGeneratorOptions()

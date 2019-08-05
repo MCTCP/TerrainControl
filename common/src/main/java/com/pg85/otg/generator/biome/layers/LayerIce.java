@@ -1,20 +1,20 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerIce extends Layer
 {
 
-    public int rarity = 10;
+    private int rarity = 10;
 
-    public LayerIce(long seed, Layer childLayer)
+    LayerIce(long seed, Layer childLayer)
     {
         super(seed);
         this.child = childLayer;
     }
 
-    public LayerIce(long seed, Layer childLayer, int _rarity)
+    LayerIce(long seed, Layer childLayer, int _rarity)
     {
         super(seed);
         this.child = childLayer;

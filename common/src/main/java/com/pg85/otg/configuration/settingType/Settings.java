@@ -1,13 +1,13 @@
 package com.pg85.otg.configuration.settingType;
 
-import com.pg85.otg.configuration.biome.ReplaceBlocks;
-import com.pg85.otg.configuration.biome.ReplacedBlocksMatrix;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
+import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.MaterialSet;
-import com.pg85.otg.util.Rotation;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialSet;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 
@@ -21,15 +21,6 @@ import java.util.List;
  */
 public abstract class Settings
 {
-	// OTG+
-
-    protected static final Setting<List<ReplaceBlocks>> replaceBlocksListSetting(String name)
-    {
-        return new ReplaceBlocksListSetting(name);
-    }
-
-	//
-
     /**
      * Creates a setting that can be {@code true} or {@code false}.
      * @param name         Name of the setting.
@@ -175,6 +166,16 @@ public abstract class Settings
     protected static final Setting<ReplacedBlocksMatrix> replacedBlocksSetting(String name)
     {
         return new ReplacedBlocksSetting(name);
+    }
+    
+    /**
+     * Creates a setting that represents a replaceBlocks mappings list.
+     * @param value         The setting's value as a string.
+     * @return The newly created setting.
+     */
+    protected static final Setting<List<ReplaceBlocks>> replaceBlocksListSetting(String value)
+    {
+        return new ReplaceBlocksListSetting(value);
     }
 
     /**

@@ -14,6 +14,8 @@ import org.lwjgl.input.Keyboard;
 
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
+import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
 
 @SideOnly(Side.CLIENT)
 public class OTGGuiEnterWorldName extends GuiScreen
@@ -21,12 +23,25 @@ public class OTGGuiEnterWorldName extends GuiScreen
     private GuiScreen sender;
     private GuiTextField newWorldNameTextField;
     private GuiButton btnOk;
-    public String worldName;
+    private String worldName;
+    private boolean bExists = false;
+    private boolean bIsIllegal = false;
     
     public OTGGuiEnterWorldName(GuiScreen sender, String originalValue)
     {
         this.sender = sender;
         worldName = originalValue;
+    }
+        
+    @Override
+    public boolean doesGuiPauseGame()
+    {
+        return false;
+    }
+    
+    public void onGuiClosed()
+    {
+        Keyboard.enableRepeatEvents(false);
     }
 
     public void updateScreen()
@@ -34,6 +49,8 @@ public class OTGGuiEnterWorldName extends GuiScreen
         this.newWorldNameTextField.updateCursorCounter();
     }
     
+    // Init / drawing
+        
     public void initGui()
     {
         Keyboard.enableRepeatEvents(true);
@@ -59,7 +76,7 @@ public class OTGGuiEnterWorldName extends GuiScreen
         } 
         else if(sender instanceof OTGGuiPresetList)
         {
-            for(Entry<String, DimensionConfigGui> world : ForgeEngine.presets.entrySet())
+            for(Entry<String, DimensionConfigGui> world : ForgeEngine.Presets.entrySet())
             {
             	if(world.getKey().toLowerCase().trim().equals(this.worldName.toLowerCase().trim()))
             	{
@@ -76,12 +93,28 @@ public class OTGGuiEnterWorldName extends GuiScreen
         	btnOk.enabled = true;
         }
     }
-
-    public void onGuiClosed()
+    
+    public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
     {
-        Keyboard.enableRepeatEvents(false);
+        this.drawDefaultBackground();
+        this.drawCenteredString(this.fontRenderer, I18n.format("Name your new world", new Object[0]), this.width / 2, 20, 16777215);
+        this.drawString(this.fontRenderer, I18n.format("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, 10526880);
+        this.newWorldNameTextField.drawTextBox();
+        
+        if(bIsIllegal)
+        {
+        	this.drawString(this.fontRenderer, "Illegal world name", this.width / 2 + 110, 67, 0xB20000);
+        }
+        else if(bExists)
+        {
+        	this.drawString(this.fontRenderer, I18n.format("Already exists", new Object[0]), this.width / 2 + 110, 67, 0xB20000);
+        }
+        
+        super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
     }
-
+    
+    // Mouse / keyboard
+        
     protected void actionPerformed(GuiButton button)
     {
         if (button.enabled)
@@ -99,8 +132,6 @@ public class OTGGuiEnterWorldName extends GuiScreen
         }
     }
 
-    boolean bExists = false;
-    boolean bIsIllegal = false;
     protected void keyTyped(char p_73869_1_, int p_73869_2_)
     {
         this.newWorldNameTextField.textboxKeyTyped(p_73869_1_, p_73869_2_);
@@ -126,11 +157,11 @@ public class OTGGuiEnterWorldName extends GuiScreen
         } 
         else if(sender instanceof OTGGuiPresetList)
         {
-            for(Entry<String, DimensionConfigGui> world : ForgeEngine.presets.entrySet())
+            for(Entry<String, DimensionConfigGui> world : ForgeEngine.Presets.entrySet())
             {
             	if(world.getKey().toLowerCase().trim().equals(this.worldName.toLowerCase().trim()))
             	{
-            		bExists = ForgeEngine.presets.containsKey(this.worldName.trim());
+            		bExists = ForgeEngine.Presets.containsKey(this.worldName.trim());
             		break;            		
             	}
             }
@@ -148,30 +179,5 @@ public class OTGGuiEnterWorldName extends GuiScreen
     {
         super.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
         this.newWorldNameTextField.mouseClicked(p_73864_1_, p_73864_2_, p_73864_3_);
-    }
-
-    public void drawScreen(int p_73863_1_, int p_73863_2_, float p_73863_3_)
-    {
-        this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, I18n.format("Name your new world", new Object[0]), this.width / 2, 20, 16777215);
-        this.drawString(this.fontRenderer, I18n.format("selectWorld.enterName", new Object[0]), this.width / 2 - 100, 47, 10526880);
-        this.newWorldNameTextField.drawTextBox();
-        
-        if(bIsIllegal)
-        {
-        	this.drawString(this.fontRenderer, "Illegal world name", this.width / 2 + 110, 67, 0xB20000);
-        }
-        else if(bExists)
-        {
-        	this.drawString(this.fontRenderer, I18n.format("Already exists", new Object[0]), this.width / 2 + 110, 67, 0xB20000);
-        }
-        
-        super.drawScreen(p_73863_1_, p_73863_2_, p_73863_3_);
-    }
-    
-    @Override
-    public boolean doesGuiPauseGame()
-    {
-        return false;
-    }
+    }    
 }

@@ -1,12 +1,12 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerLandRandom extends Layer
 {
 
-    public LayerLandRandom(long seed, Layer childLayer)
+    LayerLandRandom(long seed, Layer childLayer)
     {
         super(seed);
         this.child = childLayer;
@@ -22,15 +22,20 @@ public class LayerLandRandom extends Layer
         int[] childInts = this.child.getInts(world, cache, x0, z0, xSize0, zSize0);
         int[] thisInts = cache.getArray(xSize * zSize);
 
+        int nwCheck;
+        int neCheck;
+        int swCheck;
+        int seCheck;
+        int centerCheck;
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
             {
-                int nwCheck = childInts[(xi + 0 + (zi) * xSize0)] & LandBit;
-                int neCheck = childInts[(xi + 2 + (zi) * xSize0)] & LandBit;
-                int swCheck = childInts[(xi + 0 + (zi + 2) * xSize0)] & LandBit;
-                int seCheck = childInts[(xi + 2 + (zi + 2) * xSize0)] & LandBit;
-                int centerCheck = childInts[(xi + 1 + (zi + 1) * xSize0)] & LandBit;
+                nwCheck = childInts[(xi + 0 + (zi) * xSize0)] & LandBit;
+                neCheck = childInts[(xi + 2 + (zi) * xSize0)] & LandBit;
+                swCheck = childInts[(xi + 0 + (zi + 2) * xSize0)] & LandBit;
+                seCheck = childInts[(xi + 2 + (zi + 2) * xSize0)] & LandBit;
+                centerCheck = childInts[(xi + 1 + (zi + 1) * xSize0)] & LandBit;
                 initChunkSeed(xi + x, zi + z);
                 initGroupSeed(xi + x, zi + z);
                 thisInts[(xi + zi * xSize)] = childInts[(xi + 1 + (zi + 1) * xSize0)] | LandBit;

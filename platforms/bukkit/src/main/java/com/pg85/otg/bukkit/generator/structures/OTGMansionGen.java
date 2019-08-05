@@ -1,9 +1,10 @@
 package com.pg85.otg.bukkit.generator.structures;
 
-import com.pg85.otg.LocalBiome;
 import com.pg85.otg.bukkit.BukkitBiome;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
+
 import net.minecraft.server.v1_12_R1.*;
 
 import java.util.ArrayList;

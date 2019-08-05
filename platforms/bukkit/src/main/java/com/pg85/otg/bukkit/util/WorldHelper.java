@@ -1,8 +1,9 @@
 package com.pg85.otg.bukkit.util;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGBiomeBase;
+import com.pg85.otg.common.LocalWorld;
+
 import net.minecraft.server.v1_12_R1.BiomeBase;
 
 public abstract class WorldHelper

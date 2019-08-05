@@ -16,7 +16,15 @@ import java.util.Collection;
  */
 public final class FileSettingsWriter
 {
+    private final File file;
+    private final boolean writeComments;
 
+    private FileSettingsWriter(File file, boolean writeComments)
+    {
+        this.file = file;
+        this.writeComments = writeComments;
+    }
+	
     /**
      * Writes the configuration settings to the given file. If writing fails,
      * the error is logged.
@@ -50,21 +58,12 @@ public final class FileSettingsWriter
         OTG.printStackTrace(LogMarker.ERROR, e);
     }
 
-    private final File file;
-    private final boolean writeComments;
-
-    public FileSettingsWriter(File file, boolean writeComments)
-    {
-        this.file = file;
-        this.writeComments = writeComments;
-    }
-
     /**
      * Writes the settings map to the file.
      * @param settingsMap The settings map.
      * @throws IOException If an IO error occurs.
      */
-    public void write(SettingsMap settingsMap) throws IOException
+    private void write(SettingsMap settingsMap) throws IOException
     {
         BufferedWriter writer = null;
         try
@@ -179,5 +178,4 @@ public final class FileSettingsWriter
         writer.newLine();
         writer.newLine();
     }
-
 }

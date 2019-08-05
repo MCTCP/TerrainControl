@@ -2,17 +2,17 @@ package com.pg85.otg.forge.events;
 
 import java.util.Random;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.resource.SaplingGen;
 import com.pg85.otg.generator.resource.SaplingType;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
@@ -30,13 +30,12 @@ public class SaplingListener
         private final LocalWorld world;
         private final LocalMaterialData material;
         private final SaplingType saplingType;
-
         private BlockPos blockPos;
 
         private SaplingGrower(LocalWorld world, BlockPos blockPos)
         {
             this.world = world;
-            this.material = world.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ(), false);
+            this.material = world.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ(), true);
             this.blockPos = blockPos;
 
             // Check whether block is a sapling

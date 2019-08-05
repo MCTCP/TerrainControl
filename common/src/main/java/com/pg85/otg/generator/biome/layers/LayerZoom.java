@@ -1,12 +1,12 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerZoom extends Layer
 {
 
-    public LayerZoom(long seed, Layer childLayer)
+    LayerZoom(long seed, Layer childLayer)
     {
         super(seed);
         this.child = childLayer;
@@ -23,21 +23,27 @@ public class LayerZoom extends Layer
         int[] thisInts = cache.getArray(xSize0 * 2 * (zSize0 * 2));
 
         int n = xSize0 << 1;
+        int i2;
+        int i3;
+        int i4;
+        int i5;
+        int northCheck;
+        int centerCheck;
         for (int zi = 0; zi < zSize0 - 1; zi++)
         {
-            int i2 = zi << 1;
-            int i3 = i2 * n;
-            int i4 = childInts[((zi) * xSize0)];
-            int i5 = childInts[((zi + 1) * xSize0)];
+            i2 = zi << 1;
+            i3 = i2 * n;
+            i4 = childInts[((zi) * xSize0)];
+            i5 = childInts[((zi + 1) * xSize0)];
             for (int xi = 0; xi < xSize0 - 1; xi++)
             {
                 initChunkSeed((long) (xi + x0 << 1), (long) (zi + z0 << 1));
-                int northCheck = childInts[(xi + 1 + (zi) * xSize0)];
-                int centerCheck = childInts[(xi + 1 + (zi + 1) * xSize0)];
+                northCheck = childInts[(xi + 1 + (zi) * xSize0)];
+                centerCheck = childInts[(xi + 1 + (zi + 1) * xSize0)];
 
                 thisInts[i3] = i4;
-                thisInts[(i3++ + n)] = RndParam(i4, i5);
-                thisInts[i3] = RndParam(i4, northCheck);
+                thisInts[(i3++ + n)] = rndParam(i4, i5);
+                thisInts[i3] = rndParam(i4, northCheck);
                 thisInts[(i3++ + n)] = getRandomOf4(i4, northCheck, i5, centerCheck);
 
                 i4 = northCheck;
@@ -45,14 +51,14 @@ public class LayerZoom extends Layer
             }
         }
         int[] ret = cache.getArray(xSize * zSize);
-        for (int i2 = 0; i2 < zSize; i2++)
+        for (int i2b = 0; i2b < zSize; i2b++)
         {
-            System.arraycopy(thisInts, (i2 + (z & 0x1)) * (xSize0 << 1) + (x & 0x1), ret, i2 * xSize, xSize);
+            System.arraycopy(thisInts, (i2b + (z & 0x1)) * (xSize0 << 1) + (x & 0x1), ret, i2b * xSize, xSize);
         }
         return ret;
     }
 
-    protected int RndParam(int a, int b)
+    private int rndParam(int a, int b)
     {
         return nextInt(2) == 0 ? a : b;
     }

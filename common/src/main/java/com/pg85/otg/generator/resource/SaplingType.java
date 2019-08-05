@@ -1,9 +1,9 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.util.minecraftTypes.TreeType;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 /**
  * Represents all sapling types, including mushrooms. Note that not every
@@ -67,7 +67,7 @@ public enum SaplingType
      *            The name to look up.
      * @return The sapling type.
      */
-    public static SaplingType get(String name)
+    static SaplingType get(String name)
     {
         return BY_NAME.get(name.toLowerCase());
     }

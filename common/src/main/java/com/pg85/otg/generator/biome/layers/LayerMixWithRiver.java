@@ -1,7 +1,7 @@
 package com.pg85.otg.generator.biome.layers;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.ArraysCache;
 import com.pg85.otg.network.ConfigProvider;
@@ -11,7 +11,7 @@ public class LayerMixWithRiver extends Layer
     private int defaultOceanId;
     private int defaultFrozenOceanId;
 	
-    public LayerMixWithRiver(long seed, Layer childLayer, Layer riverLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
+    LayerMixWithRiver(long seed, Layer childLayer, Layer riverLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
     {
         super(seed);
         this.defaultOceanId = defaultOceanId;
@@ -72,6 +72,7 @@ public class LayerMixWithRiver extends Layer
         int currentPiece;
         int currentRiver;
         int cachedId;
+        LocalBiome biome;
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
@@ -83,14 +84,14 @@ public class LayerMixWithRiver extends Layer
                 {
                     cachedId = currentPiece & BiomeBits;
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {
                     cachedId = this.defaultOceanId;
                 }
 
-                LocalBiome biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
+                biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
                 
                 if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !biome.getBiomeConfig().riverBiome.isEmpty())
                 {
@@ -125,7 +126,7 @@ public class LayerMixWithRiver extends Layer
                 {
                     cachedId = currentPiece & BiomeBits;
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {
@@ -154,6 +155,7 @@ public class LayerMixWithRiver extends Layer
         int currentPiece;
         int currentRiver;
         int cachedId;
+        LocalBiome biome;
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
@@ -165,14 +167,14 @@ public class LayerMixWithRiver extends Layer
                 {
                     cachedId = currentPiece & BiomeBits;
                 }
-                else if (worldConfig.FrozenOcean && (currentPiece & IceBit) != 0)
+                else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
                     cachedId = this.defaultFrozenOceanId;
                 } else {
                     cachedId = this.defaultOceanId;
                 }
 
-                LocalBiome biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
+                biome = this.configs.getBiomeByOTGIdOrNull(cachedId);
                 
                 if (worldConfig.riversEnabled && (currentRiver & RiverBits) != 0 && !biome.getBiomeConfig().riverBiome.isEmpty())
                 {

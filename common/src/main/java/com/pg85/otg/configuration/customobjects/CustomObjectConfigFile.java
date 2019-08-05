@@ -1,36 +1,16 @@
 package com.pg85.otg.configuration.customobjects;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.ConfigFile;
-import com.pg85.otg.configuration.io.FileSettingsWriter;
-import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.minecraftTypes.DefaultBiome;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 public abstract class CustomObjectConfigFile
 {
     public SettingsReaderOTGPlus reader;
-    /**
-     * Use {@link #getName()}.
-     */
-    public String name;
-    public File file;
-
-    /**
-     * True if the file does not exist yet on disk, false otherwise. Used to
-     * provide backwards compatible default settings.
-     */
-    protected final boolean isNewConfig;
 
     /**
      * Creates a new configuration file.
@@ -42,10 +22,6 @@ public abstract class CustomObjectConfigFile
     protected CustomObjectConfigFile(SettingsReaderOTGPlus reader) throws IllegalArgumentException
     {
         this.reader = reader;
-        this.isNewConfig = reader.isNewConfig();
-
-        this.file = reader.getFile();
-        this.name = reader.getName();
     }
 
     /**
@@ -67,7 +43,7 @@ public abstract class CustomObjectConfigFile
      * @param defaultValue Default value for the setting.
      * @return The value of the setting.
      */
-    protected <T> T readSettings(Setting<T> setting, T defaultValue)
+    private <T> T readSettings(Setting<T> setting, T defaultValue)
     {
         return reader.getSetting(setting, defaultValue);
     }
@@ -96,22 +72,6 @@ public abstract class CustomObjectConfigFile
         }
     }
 
-    /**
-     * @deprecated 29 May 2014
-     * @see {@link FileSettingsWriter#writeToFile(ConfigFile, ConfigMode)}
-     */
-    @Deprecated
-    public void writeSettingsFile(boolean comments)
-    {
-        FileSettingsWriterOTGPlus.writeToFile(this, comments ? ConfigMode.WriteAll : ConfigMode.WriteWithoutComments);
-    }
-
-    public void logIOError(IOException e)
-    {
-        OTG.log(LogMarker.ERROR, "Failed to write to file {}", file);
-        OTG.printStackTrace(LogMarker.ERROR, e);
-    }
-
     protected abstract void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException;
 
     protected abstract void readConfigSettings() throws InvalidConfigException;
@@ -121,110 +81,13 @@ public abstract class CustomObjectConfigFile
     protected abstract void renameOldSettings();
 
     /**
-     * Renames an old setting. If the old setting isn't found, this does
-     * nothing.
-     *
-     * @param oldValue Name of the old setting.
-     * @param newValue The new setting.
-     */
-    protected void renameOldSetting(String oldValue, Setting<?> newValue)
-    {
-        reader.renameOldSetting(oldValue, newValue);
-    }
-
-    /**
-     * Silently corrects the given number so that it is higher than the
-     * minimum value.
-     * @param currentValue The current value, will be corrected if needed.
-     * @param minimumValue The minimum value.
-     * @return The corrected value.
-     */
-    protected int higherThan(int currentValue, int minimumValue)
-    {
-        if (currentValue <= minimumValue)
-        {
-            return minimumValue + 1;
-        }
-        return currentValue;
-    }
-
-    /**
-     * Silently corrects the given number so that it is higher than or equal
-     * to the minimum value.
-     * @param currentValue The current value, will be corrected if needed.
-     * @param minimumValue The minimum value.
-     * @return The corrected value.
-     */
-    protected double higherThan(double currentValue, double minimumValue)
-    {
-        if (currentValue < minimumValue)
-        {
-            return minimumValue;
-        }
-        return currentValue;
-    }
-
-    /**
-     * Silently corrects the given number so that it is lower than or equal
-     * to the maximum value.
-     * @param currentValue The current value, will be corrected if needed.
-     * @param maximumValue The maximum value.
-     * @return The corrected value.
-     */
-    protected int lowerThanOrEqualTo(int currentValue, int maximumValue)
-    {
-        if (currentValue > maximumValue)
-        {
-            return maximumValue;
-        }
-        return currentValue;
-    }
-
-    protected ArrayList<String> filterBiomes(List<String> biomes, Set<String> customBiomes)
-    {
-        ArrayList<String> output = new ArrayList<String>();
-
-        for (String key : biomes)
-        {
-            key = key.trim();
-            if (customBiomes.contains(key))
-            {
-                output.add(key);
-                continue;
-            }
-
-            if (DefaultBiome.Contain(key))
-                output.add(key);
-
-        }
-        return output;
-    }
-
-    protected static void writeStringToStream(DataOutputStream stream, String value) throws IOException
-    {
-        byte[] bytes = value.getBytes();
-        stream.writeShort(bytes.length);
-        stream.write(bytes);
-    }
-
-    public static String readStringFromStream(DataInputStream stream) throws IOException
-    {
-        byte[] chars = new byte[stream.readShort()];
-        if (stream.read(chars, 0, chars.length) != chars.length)
-            throw new EOFException();
-
-        return new String(chars);
-    }
-
-    /**
      * Gets the name of this config file. For worlds, this is the world name,
      * for biomes this is the biome name, etc.
      * @return The name of this config file.
      */
     public String getName()
     {
-        return name;
-        //return reader.getName();
+        return reader.getName();
     }
 
     /**
@@ -234,7 +97,6 @@ public abstract class CustomObjectConfigFile
      */
     public File getFile()
     {
-    	return file;
-        //return reader.getFile();
+        return reader.getFile();
     }
 }

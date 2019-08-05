@@ -1,7 +1,7 @@
 package com.pg85.otg.bukkit.util;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.logging.LogMarker;
 
@@ -105,7 +105,7 @@ public final class MobSpawnGroupHelper
      * @param biomeMetas The BiomeMeta collection.
      * @return The WeightedMobSpawnGroup list.
      */
-    static List<WeightedMobSpawnGroup> fromMinecraftList(Collection<BiomeMeta> biomeMetas)
+    private static List<WeightedMobSpawnGroup> fromMinecraftList(Collection<BiomeMeta> biomeMetas)
     {
         List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
         for (BiomeMeta meta : biomeMetas)
@@ -132,7 +132,7 @@ public final class MobSpawnGroupHelper
                 biomeList.add(new BiomeMeta(entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else
             {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
             		OTG.log(LogMarker.WARN, "Mob type {} not found", mobGroup.getInternalName());
             	}
@@ -147,7 +147,7 @@ public final class MobSpawnGroupHelper
      * @param mobName The mob name.
      * @return The entity class, or null if not found.
      */
-    static Class<? extends EntityInsentient> toMinecraftClass(String mobName)
+    private static Class<? extends EntityInsentient> toMinecraftClass(String mobName)
     {    	
 		Class<? extends Entity> clazz = EntityTypes.b.get(new MinecraftKey(mobName));
 		if (clazz == null)

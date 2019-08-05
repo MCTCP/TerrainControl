@@ -1,9 +1,7 @@
 package com.pg85.otg.configuration.standard;
 
-import static com.pg85.otg.OTG.WORLD_DEPTH;
-import static com.pg85.otg.OTG.WORLD_HEIGHT;
-
-import com.pg85.otg.configuration.biome.ReplaceBlocks;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.settingType.MaterialListSetting;
 import com.pg85.otg.configuration.settingType.MaterialSetting;
 import com.pg85.otg.configuration.settingType.Setting;
@@ -12,8 +10,7 @@ import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.configuration.world.WorldConfig.ImageMode;
 import com.pg85.otg.configuration.world.WorldConfig.ImageOrientation;
 import com.pg85.otg.configuration.world.WorldConfig.TerrainMode;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +22,15 @@ public class WorldStandardValues extends Settings
     public static final String WORLD_BIOMES_DIRECTORY_NAME = "WorldBiomes";
     public static final String WORLD_OBJECTS_DIRECTORY_NAME = "WorldObjects";
 
+	// Modpack config name    
+	public static String DimensionsConfigFileName = "Config.yaml";
+	public static String DimensionsDataFileName = "Dimensions.txt";
+	public static String StructureDataFileName = "StructureData.txt";
+	public static String NullChunksFileName = "NullChunks.txt";
+	public static String SpawnedStructuresFileName = "SpawnedStructures.txt";
+	public static String ChunkProviderPopulatedChunksFileName = "ChunkProviderPopulatedChunks.txt";
+	public static String PregeneratedChunksFileName = "PregeneratedChunks.txt";
+    
     /**
      * Temperatures below this temperature will cause the biome to be covered
      * by snow.
@@ -61,8 +67,8 @@ public class WorldStandardValues extends Settings
 		DIMENSIONBELOW = stringSetting("DimensionBelow", ""),
 		DIMENSIONABOVE = stringSetting("DimensionAbove", ""),
 
-		welcomeMessage = stringSetting("WelcomeMessage", ""),
-		departMessage = stringSetting("DepartMessage", ""),
+		WelcomeMessage = stringSetting("WelcomeMessage", ""),
+		DepartMessage = stringSetting("DepartMessage", ""),
 		ITEMS_TO_ADD_ON_JOIN_DIMENSION = stringSetting("ItemsToAddOnJoinDimension", ""),
 		ITEMS_TO_REMOVE_ON_JOIN_DIMENSION = stringSetting("ItemsToRemoveOnJoinDimension", ""),
 		ITEMS_TO_ADD_ON_LEAVE_DIMENSION = stringSetting("ItemsToAddOnLeaveDimension", ""),
@@ -85,22 +91,22 @@ public class WorldStandardValues extends Settings
         ICE_SIZE = intSetting("IceSize", 3, 0, 20),
         RIVER_RARITY = intSetting("RiverRarity", 4, 0, 20),
         RIVER_SIZE = intSetting("RiverSize", 0, 0, 20),
-        WATER_LEVEL_MAX = intSetting("WaterLevelMax", 63, WORLD_DEPTH, WORLD_HEIGHT),
-        WATER_LEVEL_MIN = intSetting("WaterLevelMin", 0, WORLD_DEPTH, WORLD_HEIGHT),
+        WATER_LEVEL_MAX = intSetting("WaterLevelMax", 63, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+        WATER_LEVEL_MIN = intSetting("WaterLevelMin", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
         IMAGE_X_OFFSET = intSetting("ImageXOffset", 0, Integer.MIN_VALUE, Integer.MAX_VALUE),
         IMAGE_Z_OFFSET = intSetting("ImageZOffset", 0, Integer.MIN_VALUE, Integer.MAX_VALUE),
         CAVE_RARITY = intSetting("CaveRarity", 7, 0, 100),
         CAVE_FREQUENCY = intSetting("CaveFrequency", 40, 0, 200),
-        CAVE_MIN_ALTITUDE = intSetting("CaveMinAltitude", 8, WORLD_DEPTH, WORLD_HEIGHT),
-        CAVE_MAX_ALTITUDE = intSetting("CaveMaxAltitude", 127, WORLD_DEPTH, WORLD_HEIGHT),
+        CAVE_MIN_ALTITUDE = intSetting("CaveMinAltitude", 8, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+        CAVE_MAX_ALTITUDE = intSetting("CaveMaxAltitude", 127, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
         INDIVIDUAL_CAVE_RARITY = intSetting("IndividualCaveRarity", 25, 0, 100),
         CAVE_SYSTEM_FREQUENCY = intSetting("CaveSystemFrequency", 1, 0, 200),
         CAVE_SYSTEM_POCKET_CHANCE = intSetting("CaveSystemPocketChance", 0, 0, 100),
         CAVE_SYSTEM_POCKET_MIN_SIZE = intSetting("CaveSystemPocketMinSize", 0, 0, 100),
         CAVE_SYSTEM_POCKET_MAX_SIZE = intSetting("CaveSystemPocketMaxSize", 3, 0, 100),
         RAVINE_RARITY = intSetting("RavineRarity", 2, 0, 100),
-        RAVINE_MIN_ALTITUDE = intSetting("RavineMinAltitude", 20, WORLD_DEPTH, WORLD_HEIGHT),
-        RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 67, WORLD_DEPTH, WORLD_HEIGHT),
+        RAVINE_MIN_ALTITUDE = intSetting("RavineMinAltitude", 20, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+        RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 67, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
         RAVINE_MIN_LENGTH = intSetting("RavineMinLength", 84, 1, 500),
         RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
         OBJECT_SPAWN_RATIO = intSetting("ObjectSpawnRatio", 1, 1, 1000),
@@ -116,11 +122,11 @@ public class WorldStandardValues extends Settings
         PREGENERATION_RADIUS = intSetting("PreGenerationRadius", 0, 0, 999999),
         WORLD_BORDER_RADIUS = intSetting("WorldBorderRadius", 0, 0, 999999),
 
-		maxCommandChainLength = intSetting("MaxCommandChainLength", 65536, 0, 999999), 
-		maxEntityCramming = intSetting("MaxEntityCramming", 24, 0, 999999),
-		randomTickSpeed = intSetting("RandomTickSpeed", 3, 0, 999999),
-		spawnRadius = intSetting("SpawnRadius", 10, 0, 999999),
-		cloudHeight = intSetting("CloudHeight", 128, 0, 999999),
+		MaxCommandChainLength = intSetting("MaxCommandChainLength", 65536, 0, 999999), 
+		MaxEntityCramming = intSetting("MaxEntityCramming", 24, 0, 999999),
+		RandomTickSpeed = intSetting("RandomTickSpeed", 3, 0, 999999),
+		SpawnRadius = intSetting("SpawnRadius", 10, 0, 999999),
+		CloudHeight = intSetting("CloudHeight", 128, 0, 999999),
 
 		DIMENSIONBELOWHEIGHT = intSetting("DimensionBelowHeight", 0, -999999, 999999),
 		DIMENSIONABOVEHEIGHT = intSetting("DimensionAboveHeight", 256, -999999, 999999),
@@ -156,41 +162,39 @@ public class WorldStandardValues extends Settings
         OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
 		WOODLAND_MANSIONS_ENABLED = booleanSetting("WoodLandMansionsEnabled", true),
         POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
-		CARTOGRAPHER = booleanSetting("Cartographer", false),
 
-		teleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
-		commandBlockOutput = booleanSetting("CommandBlockOutput", true),
-		disableElytraMovementCheck = booleanSetting("DisableElytraMovementCheck", false),
-		doDaylightCycle = booleanSetting("DoDaylightCycle", true),
-		doEntityDrops = booleanSetting("DoEntityDrops", true),
-		doFireTick = booleanSetting("DoFireTick", true),
-		doLimitedCrafting = booleanSetting("DoLimitedCrafting", false),
-		doMobLoot = booleanSetting("DoMobLoot", true),
-		doMobSpawning = booleanSetting("DoMobSpawning", true),
-		doTileDrops = booleanSetting("DoTileDrops", true),
-		doWeatherCycle = booleanSetting("DoWeatherCycle", true),
-		gameLoopFunction = booleanSetting("GameLoopFunction", true),
-		keepInventory = booleanSetting("KeepInventory", false),
-		logAdminCommands = booleanSetting("LogAdminCommands", true),				
-		mobGriefing = booleanSetting("MobGriefing", true),
-		naturalRegeneration = booleanSetting("NaturalRegeneration", true),
-		reducedDebugInfo = booleanSetting("ReducedDebugInfo", false),
-		sendCommandFeedback = booleanSetting("SendCommandFeedback", true),
-		showDeathMessages = booleanSetting("ShowDeathMessages", true),
-		spectatorsGenerateChunks = booleanSetting("SpectatorsGenerateChunks", true),
-		hasSkyLight = booleanSetting("HasSkyLight", true),
-		isSurfaceWorld = booleanSetting("IsSurfaceWorld", true),
-		//canCoordinateBeSpawn = booleanSetting("CanCoordinateBeSpawn", false),
-		canRespawnHere = booleanSetting("CanRespawnHere", true),
-		doesWaterVaporize = booleanSetting("DoesWaterVaporize", false),
-		doesXZShowFog = booleanSetting("DoesXZShowFog", false),
-		isSkyColored = booleanSetting("IsSkyColored", true),
-		canDoLightning = booleanSetting("CanDoLightning", true),
-		canDoRainSnowIce = booleanSetting("CanDoRainSnowIce", true),
-		isNightWorld = booleanSetting("IsNightWorld", false),
-		shouldMapSpin = booleanSetting("ShouldMapSpin", false),
-		canDropChunk = booleanSetting("CanDropChunk", false),
-		useCustomFogColor = booleanSetting("UseCustomFogColor", false),
+		TeleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
+		CommandBlockOutput = booleanSetting("CommandBlockOutput", true),
+		DisableElytraMovementCheck = booleanSetting("DisableElytraMovementCheck", false),
+		DoDaylightCycle = booleanSetting("DoDaylightCycle", true),
+		DoEntityDrops = booleanSetting("DoEntityDrops", true),
+		DoFireTick = booleanSetting("DoFireTick", true),
+		DoLimitedCrafting = booleanSetting("DoLimitedCrafting", false),
+		DoMobLoot = booleanSetting("DoMobLoot", true),
+		DoMobSpawning = booleanSetting("DoMobSpawning", true),
+		DoTileDrops = booleanSetting("DoTileDrops", true),
+		DoWeatherCycle = booleanSetting("DoWeatherCycle", true),
+		GameLoopFunction = booleanSetting("GameLoopFunction", true),
+		KeepInventory = booleanSetting("KeepInventory", false),
+		LogAdminCommands = booleanSetting("LogAdminCommands", true),				
+		MobGriefing = booleanSetting("MobGriefing", true),
+		NaturalRegeneration = booleanSetting("NaturalRegeneration", true),
+		ReducedDebugInfo = booleanSetting("ReducedDebugInfo", false),
+		SendCommandFeedback = booleanSetting("SendCommandFeedback", true),
+		ShowDeathMessages = booleanSetting("ShowDeathMessages", true),
+		SpectatorsGenerateChunks = booleanSetting("SpectatorsGenerateChunks", true),
+		HasSkyLight = booleanSetting("HasSkyLight", true),
+		IsSurfaceWorld = booleanSetting("IsSurfaceWorld", true),
+		CanRespawnHere = booleanSetting("CanRespawnHere", true),
+		DoesWaterVaporize = booleanSetting("DoesWaterVaporize", false),
+		DoesXZShowFog = booleanSetting("DoesXZShowFog", false),
+		IsSkyColored = booleanSetting("IsSkyColored", true),
+		CanDoLightning = booleanSetting("CanDoLightning", true),
+		CanDoRainSnowIce = booleanSetting("CanDoRainSnowIce", true),
+		IsNightWorld = booleanSetting("IsNightWorld", false),
+		ShouldMapSpin = booleanSetting("ShouldMapSpin", false),
+		CanDropChunk = booleanSetting("CanDropChunk", false),
+		UseCustomFogColor = booleanSetting("UseCustomFogColor", false),
 		IS_OTG_PLUS = booleanSetting("IsOTGPlus", false),
 
         SPAWN_POINT_SET = booleanSetting("SpawnPointSet", false),
@@ -220,7 +224,6 @@ public class WorldStandardValues extends Settings
         BORDER_BIOMES = stringListSetting("BorderBiomes",
                 "JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
     	CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
-		WORLD_BIOMES = stringListSetting("WorldBiomes"),
 		DIMENSIONS = stringListSetting("Dimensions")
 	;
 
@@ -232,12 +235,12 @@ public class WorldStandardValues extends Settings
         FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500),
         STRONGHOLD_DISTANCE = doubleSetting("StrongholdDistance", 32, 1, 1000),
 
-		fogColorRed = doubleSetting("FogColorRed", 0.20000000298023224D, Double.MIN_VALUE, Double.MAX_VALUE),
-		fogColorGreen = doubleSetting("FogColorGreen", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
-		fogColorBlue = doubleSetting("FogColorBlue", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
-		voidFogYFactor = doubleSetting("VoidFogYFactor", 0.03125D, Double.MIN_VALUE, Double.MAX_VALUE),
+		FogColorRed = doubleSetting("FogColorRed", 0.20000000298023224D, Double.MIN_VALUE, Double.MAX_VALUE),
+		FogColorGreen = doubleSetting("FogColorGreen", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
+		FogColorBlue = doubleSetting("FogColorBlue", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
+		VoidFogYFactor = doubleSetting("VoidFogYFactor", 0.03125D, Double.MIN_VALUE, Double.MAX_VALUE),
 
-		gravityFactor = doubleSetting("GravityFactor", 0.08D, 0.0D, Double.MAX_VALUE)
+		GravityFactor = doubleSetting("GravityFactor", 0.08D, 0.0D, Double.MAX_VALUE)
     ;
 
     public static final Setting<Integer>
@@ -248,7 +251,6 @@ public class WorldStandardValues extends Settings
 
     // Deprecated settings
     public static final Setting<Boolean> FROZEN_RIVERS = booleanSetting("FrozenRivers", true);
-    public static final Setting<Integer> CUSTOM_TREE_CHANCE = intSetting("CustomTreeChance", 0, 0, 100);
     public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting("NormalBiomes", "Desert", "Forest", "Extreme Hills",
             "Swampland", "Plains", "Taiga", "Jungle", "River");
     public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");

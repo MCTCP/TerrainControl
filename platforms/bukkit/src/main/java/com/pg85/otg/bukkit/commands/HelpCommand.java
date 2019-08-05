@@ -9,13 +9,12 @@ import java.util.List;
 
 public class HelpCommand extends BaseCommand
 {
-    public HelpCommand(OTGPlugin _plugin)
+    HelpCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "help";
         perm = OTGPerm.CMD_HELP.node;
         usage = "help";
-        workOnConsole = false;
     }
 
     @Override
@@ -39,7 +38,7 @@ public class HelpCommand extends BaseCommand
             }
         }
 
-        this.ListMessage(sender, lines, page, "Available commands");
+        this.listMessage(sender, lines, page, "Available commands");
         return true;
     }
 }

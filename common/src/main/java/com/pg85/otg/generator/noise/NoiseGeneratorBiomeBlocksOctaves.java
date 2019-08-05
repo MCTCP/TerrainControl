@@ -32,7 +32,7 @@ public class NoiseGeneratorBiomeBlocksOctaves {
         return this.a(adouble, d0, d1, i, j, d2, d3, d4, 0.5D);
     }
 
-    public double[] a(double[] adouble, double d0, double d1, int i, int j, double d2, double d3, double d4, double d5) {
+    private double[] a(double[] adouble, double d0, double d1, int i, int j, double d2, double d3, double d4, double d5) {
         if (adouble != null && adouble.length >= i * j) {
             for (int k = 0; k < adouble.length; ++k) {
                 adouble[k] = 0.0D;

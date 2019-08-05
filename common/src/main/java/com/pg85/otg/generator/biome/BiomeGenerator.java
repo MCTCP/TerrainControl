@@ -1,6 +1,6 @@
 package com.pg85.otg.generator.biome;
 
-import com.pg85.otg.LocalWorld;
+import com.pg85.otg.common.LocalWorld;
 
 /**
  * The biome generator. External plugins are allowed to implement this class
@@ -24,7 +24,7 @@ public abstract class BiomeGenerator
 {
     protected final LocalWorld world;
 
-    public BiomeGenerator(LocalWorld world)
+    BiomeGenerator(LocalWorld world)
     {
         this.world = world;
     }

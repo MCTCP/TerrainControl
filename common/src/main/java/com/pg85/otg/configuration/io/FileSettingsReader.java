@@ -36,7 +36,7 @@ public class FileSettingsReader
      *                     read, but you'll have to close the stream yourself.
      * @throws IOException If an IO error occurs.
      */
-    public void readIntoMap(SettingsMap settings, BufferedReader fileContents) throws IOException
+    private void readIntoMap(SettingsMap settings, BufferedReader fileContents) throws IOException
     {
         int lineNumber = 0;
         String thisLine;
@@ -46,10 +46,12 @@ public class FileSettingsReader
             if (thisLine.trim().isEmpty())
             {
                 // Empty line, ignore
-            } else if (thisLine.startsWith("#") || thisLine.startsWith("<"))
+            }
+            else if (thisLine.startsWith("#") || thisLine.startsWith("<"))
             {
                 // Comment, ignore
-            } else if (thisLine.contains(":") || thisLine.toLowerCase().contains("("))
+            }
+            else if (thisLine.contains(":") || thisLine.toLowerCase().contains("("))
             {
                 // Setting or resource
                 if (thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(':')))
@@ -57,12 +59,12 @@ public class FileSettingsReader
                     // ( is first, so it's a resource
                     String configFunction = thisLine.trim();
                     settings.addRawSetting(RawSettingValue.create(ValueType.FUNCTION, configFunction).withLineNumber(lineNumber));
-                } else
-                {
+                } else {
                     // : is first, so it's a setting
                     settings.addRawSetting(RawSettingValue.create(ValueType.PLAIN_SETTING, thisLine.trim()).withLineNumber(lineNumber));
                 }
-            } else if (thisLine.contains("="))
+            }
+            else if (thisLine.contains("="))
             {
                 // Setting (old style), split it and add it
                 String modifiedLine = thisLine.replaceFirst("=", ":").trim();
@@ -76,7 +78,7 @@ public class FileSettingsReader
      * @param settings The settings map.
      * @param file     The file.
      */
-    public void readIntoMap(SettingsMap settings, File file)
+    private void readIntoMap(SettingsMap settings, File file)
     {
         BufferedReader settingsReader = null;
 
@@ -107,6 +109,4 @@ public class FileSettingsReader
         }
 
     }
-
-
 }

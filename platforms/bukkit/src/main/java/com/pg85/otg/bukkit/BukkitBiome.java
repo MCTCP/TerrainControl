@@ -1,9 +1,9 @@
 package com.pg85.otg.bukkit;
 
-import com.pg85.otg.LocalBiome;
 import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.common.BiomeIds;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.util.BiomeIds;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -16,10 +16,18 @@ public class BukkitBiome implements LocalBiome
 {
     private final BiomeBase biomeBase;
     private final boolean isCustom;
-
     private final BiomeIds biomeIds;
     private final BiomeConfig biomeConfig;
 
+    private BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
+    {
+        this.biomeBase = biome;
+        int savedBiomeId =  BiomeBase.a(biomeBase);
+        this.biomeIds = new BiomeIds(WorldHelper.getOTGBiomeId(biomeBase), savedBiomeId);
+        this.biomeConfig = biomeConfig;
+        this.isCustom = biome instanceof OTGBiomeBase;
+    }
+    
     /**
      * Creates and registers a new custom biome with the config and ids.
      *
@@ -27,18 +35,9 @@ public class BukkitBiome implements LocalBiome
      * @param biomeIds    Ids of the custom biome.
      * @return The custom biome.
      */
-    public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
+    static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
     {
         return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds, worldName));
-    }
-
-    protected BukkitBiome(BiomeConfig biomeConfig, BiomeBase biome)
-    {
-        this.biomeBase = biome;
-        int savedBiomeId =  BiomeBase.a(biomeBase);
-        this.biomeIds = new BiomeIds(WorldHelper.getOTGBiomeId(biomeBase), savedBiomeId);
-        this.biomeConfig = biomeConfig;
-        this.isCustom = biome instanceof OTGBiomeBase;
     }
 
     @Override

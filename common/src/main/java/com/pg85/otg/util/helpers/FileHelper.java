@@ -45,7 +45,7 @@ public final class FileHelper
      * otherwise. In other words: if this method returns true, you can be sure
      * now that this folder exists.
      */
-    public static boolean makeFolder(File folder)
+    private static boolean makeFolder(File folder)
     {
         if (!folder.exists() && !folder.mkdirs())
         {
@@ -53,46 +53,6 @@ public final class FileHelper
             return false;
         }
         return true;
-    }
-
-    /**
-     * Migrates an old folder to a new folder. If the old folder does not
-     * exist or is empty, no migration is needed. If the new folder does not
-     * exist, or exists but is empty, the migration is performed.
-     * @param oldFolder The old folder.
-     * @param newFolder The new folder.
-     * @return True if the migration was successful or wasn't needed, false if
-     * the migration was needed but failed.
-     */
-    public static boolean migrateFolder(File oldFolder, File newFolder)
-    {
-        // Check if migration is needed
-        if (!oldFolder.exists())
-        {
-            // Nothing to migrate
-            return true;
-        }
-        if (oldFolder.delete())
-        {
-            // Only empty folders can be deleted, so when this succeeds,
-            // there was nothing to migrate
-            return true;
-        }
-
-        // Check if new location is suitable
-        if (newFolder.exists())
-        {
-            if (!newFolder.delete())
-            {
-                // Only empty folders can be deleted, so when this fails there
-                // are files in both the old and new folders
-                // Migration failed
-                return false;
-            }
-        }
-
-        // Migrate
-        return oldFolder.renameTo(newFolder);
     }
 
     private FileHelper()

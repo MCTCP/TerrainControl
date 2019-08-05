@@ -1,19 +1,13 @@
 package com.pg85.otg.bukkit.generator.structures;
 
-import com.pg85.otg.LocalBiome;
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.bukkit.BukkitBiome;
-import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.minecraftTypes.StructureNames;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.server.v1_12_R1.*;
-import net.minecraft.server.v1_12_R1.WorldGenRegistration.WorldGenJungleTemple;
-import net.minecraft.server.v1_12_R1.WorldGenRegistration.WorldGenPyramidPiece;
 import net.minecraft.server.v1_12_R1.WorldGenRegistration.WorldGenWitchHut;
-import net.minecraft.server.v1_12_R1.WorldGenRegistration.b;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -130,51 +124,5 @@ public class OTGRareBuildingGen extends StructureGenerator
     public String a()
     {
         return StructureNames.RARE_BUILDING;
-    }
-
-    public static class RareBuildingStart extends StructureStart
-    {
-        public RareBuildingStart(World world, Random random, int chunkX, int chunkZ)
-        {
-            LocalWorld localWorld = WorldHelper.toLocalWorld(world);
-            BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();
-            StructurePiece building;
-            switch (biomeConfig.rareBuildingType)
-            {
-                case desertPyramid:
-                    building = new WorldGenPyramidPiece(random, chunkX * 16, chunkZ * 16);
-                    break;
-                case jungleTemple:
-                    building = new WorldGenJungleTemple(random, chunkX * 16, chunkZ * 16);
-                    break;
-                case swampHut:
-                    building = new WorldGenWitchHut(random, chunkX * 16, chunkZ * 16);
-                    break;
-                case igloo:
-                    building = new b(random, chunkX * 16, chunkZ * 16);
-                    break;
-                case disabled:
-                default:
-                    // Should never happen, but on biome borders there is chance
-                    // that a
-                    // structure gets started in a biome where it shouldn't.
-                    building = null;
-                    break;
-            }
-
-            if (building != null)
-            {
-                // Add building to components
-                this.a.add(building);
-            }
-
-            // Update boundingbox
-            this.d();
-        }
-
-        public RareBuildingStart()
-        {
-            // Required by Minecraft's structure loading code
-        }
     }
 }

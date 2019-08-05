@@ -1,21 +1,20 @@
 package com.pg85.otg.customobjects.bo2;
 
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.LocalMaterialData;
+import com.pg85.otg.util.helpers.MaterialHelper;
 
-public class ObjectCoordinate
+class ObjectCoordinate
 {
-    public int x;
-    public int y;
-    public int z;
+    int x;
+    int y;
+    int z;
     private int hash;
-    public LocalMaterialData material;
-    public int BranchDirection;
-    public int BranchOdds;
+    LocalMaterialData material;
+    private int BranchDirection;
+    private int BranchOdds;
 
-
-    public ObjectCoordinate(int _x, int _y, int _z)
+    private ObjectCoordinate(int _x, int _y, int _z)
     {
         this.x = _x;
         this.y = _y;
@@ -25,7 +24,6 @@ public class ObjectCoordinate
 
         hash = x + z << 8 + y << 16;
     }
-
 
     @Override
     public boolean equals(Object obj)
@@ -44,7 +42,7 @@ public class ObjectCoordinate
         return hash;
     }
 
-    public ObjectCoordinate Rotate()
+    ObjectCoordinate rotate()
     {
         ObjectCoordinate newCoordinate = new ObjectCoordinate(this.z, this.y, (this.x * -1));
         newCoordinate.material = material.rotate();
@@ -61,14 +59,7 @@ public class ObjectCoordinate
 
     }
 
-
-    public static boolean isCoordinateString(String key)
-    {
-        String[] coordinates = key.split(",");
-        return coordinates.length == 3;
-    }
-
-    public static ObjectCoordinate getCoordinateFromString(String key, String value)
+    static ObjectCoordinate getCoordinateFromString(String key, String value)
     {
         String[] coordinates = key.split(",", 3);
         if (coordinates.length != 3)
@@ -96,7 +87,7 @@ public class ObjectCoordinate
                 newCoordinate.BranchOdds = Integer.parseInt(branchData[1]);
 
             }
-            newCoordinate.material = OTG.readMaterial(workingDataString);
+            newCoordinate.material = MaterialHelper.readMaterial(workingDataString);
 
             return newCoordinate;
 

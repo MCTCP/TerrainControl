@@ -12,15 +12,15 @@ import java.util.HashMap;
 
 public class OTGCommandExecutor implements CommandExecutor
 {
-    protected final OTGPlugin plugin;
+    private final OTGPlugin plugin;
     protected HashMap<String, BaseCommand> commandHashMap = new HashMap<String, BaseCommand>();
-    protected HelpCommand helpCommand;
+    private HelpCommand helpCommand;
 
     public OTGCommandExecutor(OTGPlugin plugin)
     {
         this.plugin = plugin;
         this.helpCommand = new HelpCommand(plugin);
-        this.RegisterCommands();
+        this.registerCommands();
     }
 
     @Override
@@ -44,18 +44,18 @@ public class OTGCommandExecutor implements CommandExecutor
         return cmd.onCommand(commandSender, arg);
     }
 
-    private void RegisterCommands()
+    private void registerCommands()
     {
-        this.AddCommand(new ReloadCommand(plugin));
-        this.AddCommand(new CheckCommand(plugin));
-        this.AddCommand(new TPCommand(plugin));
-        this.AddCommand(new BiomeCommand(plugin));
-        this.AddCommand(new SpawnCommand(plugin));
-        this.AddCommand(new MapCommand(plugin));
-        this.AddCommand(this.helpCommand);
+        this.addCommand(new ReloadCommand(plugin));
+        this.addCommand(new CheckCommand(plugin));
+        this.addCommand(new TPCommand(plugin));
+        this.addCommand(new BiomeCommand(plugin));
+        this.addCommand(new SpawnCommand(plugin));
+        this.addCommand(new MapCommand(plugin));
+        this.addCommand(this.helpCommand);
     }
 
-    private void AddCommand(BaseCommand command)
+    private void addCommand(BaseCommand command)
     {
         this.commandHashMap.put(command.name, command);
     }

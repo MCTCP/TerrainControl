@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.util;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.logging.LogMarker;
 
@@ -26,7 +26,9 @@ import java.util.Set;
  */
 public final class MobSpawnGroupHelper
 {
-
+    private static HashMap<String, Class<? extends Entity>> FoundEntitiesByClassName = new HashMap<String, Class<? extends Entity>>();
+    private static HashMap<String, Class<? extends Entity>> FoundEntitiesByName = new HashMap<String, Class<? extends Entity>>();
+	
     /**
      * Transforms our MobType into Minecraft's EnumCreatureType.
      * @param type Our type.
@@ -81,7 +83,7 @@ public final class MobSpawnGroupHelper
      * @param biomeMetas The BiomeMeta collection.
      * @return The WeightedMobSpawnGroup list.
      */
-    static List<WeightedMobSpawnGroup> fromMinecraftList(Collection<SpawnListEntry> biomeMetas)
+    private static List<WeightedMobSpawnGroup> fromMinecraftList(Collection<SpawnListEntry> biomeMetas)
     {
         List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
         for (SpawnListEntry meta : biomeMetas)
@@ -112,7 +114,7 @@ public final class MobSpawnGroupHelper
             {
                 biomeList.add(new SpawnListEntry((Class<? extends EntityLiving>) entityClass, mobGroup.getWeight(), mobGroup.getMin(), mobGroup.getMax()));
             } else {
-            	if(OTG.getPluginConfig().SpawnLog)
+            	if(OTG.getPluginConfig().spawnLog)
             	{
 	            	entityClass = getEntityByClassName(mobGroup.getInternalName());	            
 	            	if(entityClass == null)
@@ -125,11 +127,10 @@ public final class MobSpawnGroupHelper
         return biomeList;
     }
     
-    private static HashMap<String, Class<? extends Entity>> foundEntitiesByClassName = new HashMap<String, Class<? extends Entity>>();
     private static Class<? extends Entity> getEntityByClassName(String mobClassName)
     {
     	mobClassName = mobClassName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","");
-    	Class<? extends Entity> entity = foundEntitiesByClassName.get(mobClassName);
+    	Class<? extends Entity> entity = FoundEntitiesByClassName.get(mobClassName);
     	if(entity == null)
     	{
 	    	List<EntityEntry> entityClasses = net.minecraftforge.fml.common.registry.ForgeRegistries.ENTITIES.getValues();
@@ -139,7 +140,7 @@ public final class MobSpawnGroupHelper
 	    		if(entityName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(mobClassName))
 	    		{
 	    			entity = (Class<? extends Entity>) entityClass.getEntityClass();
-	    			foundEntitiesByClassName.put(mobClassName, entity);
+	    			FoundEntitiesByClassName.put(mobClassName, entity);
 	    			break;
 	    		}
 	    	}
@@ -153,13 +154,11 @@ public final class MobSpawnGroupHelper
      * @param mobName The mob name.
      * @return The entity class, or null if not found.
      */
-    private static HashMap<String, Class<? extends Entity>> foundEntitiesByName = new HashMap<String, Class<? extends Entity>>();
-    @SuppressWarnings("unchecked")
 	public static Class<? extends Entity> toMinecraftClass(String entityName)
     {
     	ResourceLocation resourceLocation = new ResourceLocation(entityName);
     	entityName = entityName.toLowerCase().trim().replace("entity","").replace("_","").replace(" ","");
-    	Class<? extends Entity> entity = foundEntitiesByName.get(entityName);
+    	Class<? extends Entity> entity = FoundEntitiesByName.get(entityName);
     	if(entity == null)
     	{    		
 	    	Set<ResourceLocation> mobNames = EntityList.getEntityNameList();
@@ -168,7 +167,7 @@ public final class MobSpawnGroupHelper
 	    		if(mobName1.equals(resourceLocation))
 	    		{
 	    			entity = (Class<? extends Entity>) EntityList.getClass(mobName1);
-	    			foundEntitiesByName.put(entityName, entity);
+	    			FoundEntitiesByName.put(entityName, entity);
 	    			break;
 	    		}
 	    	}
@@ -176,10 +175,10 @@ public final class MobSpawnGroupHelper
 	    	{
 		    	for(ResourceLocation mobName1 : mobNames)
 		    	{
-		    		if(mobName1.getResourcePath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(entityName))
+		    		if(mobName1.getPath().toLowerCase().trim().replace("entity","").replace("_","").replace(" ","").equals(entityName))
 		    		{
 		    			entity = (Class<? extends Entity>) EntityList.getClass(mobName1);
-		    			foundEntitiesByName.put(entityName, entity);
+		    			FoundEntitiesByName.put(entityName, entity);
 		    			break;
 		    		}
 		    	}
@@ -191,7 +190,7 @@ public final class MobSpawnGroupHelper
     		entity = getEntityByClassName(entityName);
     		if(entity != null)
     		{
-    			foundEntitiesByName.put(entityName, entity);
+    			FoundEntitiesByName.put(entityName, entity);
     		}
     	}
     	
@@ -203,15 +202,15 @@ public final class MobSpawnGroupHelper
      * @param entityClass The entity class.
      * @return The entity name, or null if not found.
      */
-    public static String stringFromMinecraftClass(Class<? extends Entity> entityClass)
+    private static String stringFromMinecraftClass(Class<? extends Entity> entityClass)
     {
     	ResourceLocation mobName = EntityList.getKey(entityClass);
     	if(mobName != null)
     	{
-    		return mobName.getResourcePath();
+    		return mobName.getPath();
     	}
 
-    	if(OTG.getPluginConfig().SpawnLog)
+    	if(OTG.getPluginConfig().spawnLog)
     	{
     		OTG.log(LogMarker.DEBUG, "No EntityRegistry entry found for class: " + entityClass);
     	}
@@ -231,7 +230,7 @@ public final class MobSpawnGroupHelper
     		return mobName;
     	}
 
-    	if(OTG.getPluginConfig().SpawnLog)
+    	if(OTG.getPluginConfig().spawnLog)
     	{
     		OTG.log(LogMarker.WARN, "No EntityRegistry entry found for class: " + entityClass);
     	}

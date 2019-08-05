@@ -1,13 +1,13 @@
 package com.pg85.otg.bukkit;
 
-import com.pg85.otg.LocalWorld;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.minecraftTypes.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.Block;
 
@@ -18,7 +18,7 @@ public class BukkitEngine extends OTGEngine
 {
     private final OTGPlugin plugin;
 
-    public BukkitEngine(OTGPlugin plugin)
+    BukkitEngine(OTGPlugin plugin)
     {
         super(new BukkitLogger(plugin.getLogger()));
         this.plugin = plugin;
@@ -31,7 +31,7 @@ public class BukkitEngine extends OTGEngine
     }
 
     @Override
-    public File getOTGDataFolder()
+    public File getOTGRootFolder()
     {
         return plugin.getDataFolder();
     }
@@ -39,13 +39,13 @@ public class BukkitEngine extends OTGEngine
     @Override
     public File getGlobalObjectsDirectory()
     {
-        return new File(this.getOTGDataFolder(), PluginStandardValues.BO_DirectoryName);
+        return new File(this.getOTGRootFolder(), PluginStandardValues.BO_DirectoryName);
     }
 
     @Override
     public File getWorldsDirectory()
     {
-        return new File(this.getOTGDataFolder(), PluginStandardValues.PresetsDirectoryName);
+        return new File(this.getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName);
     }
     
     @Override

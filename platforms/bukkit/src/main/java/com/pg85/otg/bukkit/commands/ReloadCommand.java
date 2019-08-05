@@ -13,13 +13,12 @@ import java.util.List;
 public class ReloadCommand extends BaseCommand
 {
     
-    public ReloadCommand(OTGPlugin _plugin)
+    ReloadCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "reload";
         perm = OTGPerm.CMD_RELOAD.node;
         usage = "reload [world_name]";
-        workOnConsole = true;
     }
 
     @Override

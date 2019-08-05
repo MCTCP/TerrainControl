@@ -1,11 +1,11 @@
 package com.pg85.otg.configuration;
 
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.ReedGen;
-import com.pg85.otg.util.LocalMaterialData;
-import com.pg85.otg.util.MaterialSet;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 
@@ -121,7 +121,7 @@ public abstract class ConfigFunction<T>
      */
     protected final LocalMaterialData readMaterial(String string) throws InvalidConfigException
     {
-    	LocalMaterialData material = OTG.readMaterial(string);    		
+    	LocalMaterialData material = MaterialHelper.readMaterial(string);    		
         return material;
     }
 
