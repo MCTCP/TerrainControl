@@ -252,8 +252,6 @@ public interface LocalWorld
 	
 	boolean isInsidePregeneratedRegion(ChunkCoordinate chunk);
 
-	boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources);
-
 	public ChunkCoordinate getSpawnChunk();
 
 	public void setAllowSpawningOutsideBounds(boolean b);	

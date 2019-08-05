@@ -332,18 +332,26 @@ public class OTGTeleporter
                 } else {
             		if(entityPosY < 0) // Falling down into another dimension
             		{
+            			// TODO: Make this prettier.            			
             			toWorldIn.setBlockToAir(new BlockPos(d0, 254, d1));
         				toWorldIn.setBlockToAir(new BlockPos(d0, 255, d1));
-            			entityIn.setLocationAndAngles(d0 + 0.5, 255, d1 + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
-            			((EntityPlayerMP)entityIn).connection.setPlayerLocation(d0 + 0.5, 254, d1 + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
+            			entityIn.setLocationAndAngles(d0, 255, d1, entityIn.rotationYaw, entityIn.rotationPitch);
+            			((EntityPlayerMP)entityIn).connection.setPlayerLocation(d0, 254, d1, entityIn.rotationYaw, entityIn.rotationPitch);
             		}
             		else if(entityPosY > 255) // Climbing up to another dimension
             		{
+            			// TODO: Make this prettier.
             			toWorldIn.setBlockState(new BlockPos(d0, 0, d1), Blocks.GRASS.getDefaultState());
         				toWorldIn.setBlockToAir(new BlockPos(d0, 1, d1));
         				toWorldIn.setBlockToAir(new BlockPos(d0, 2, d1));
-            			entityIn.setLocationAndAngles(d0 + 0.5, 1, d1 + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
-            			((EntityPlayerMP)entityIn).connection.setPlayerLocation(d0 + 0.5, 1, d1 + 0.5, entityIn.rotationYaw, entityIn.rotationPitch);
+        				
+						// Make a hole next to the player
+        				toWorldIn.setBlockToAir(new BlockPos(d0 + 1, 1, d1));
+        				toWorldIn.setBlockToAir(new BlockPos(d0 + 1, 2, d1));
+        				toWorldIn.setBlockToAir(new BlockPos(d0 + 1, 0, d1));	
+        				
+            			entityIn.setLocationAndAngles(d0, 1, d1, entityIn.rotationYaw, entityIn.rotationPitch);
+            			((EntityPlayerMP)entityIn).connection.setPlayerLocation(d0, 1, d1, entityIn.rotationYaw, entityIn.rotationPitch);            			
             		} else { // Using /otg tp or teleport button
             			if(toWorldIn.provider.getDimension() != -1)
             			{

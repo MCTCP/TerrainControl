@@ -61,7 +61,7 @@ public class CustomStructurePlotter
     	if(!processing)
     	{
 	    	processing = true;
-	        if (!world.isInsidePregeneratedRegion(chunkCoord) && world.isInsideWorldBorder(chunkCoord, false) && !structureCache.containsKey(chunkCoord))
+	        if (!world.isInsidePregeneratedRegion(chunkCoord) && !structureCache.containsKey(chunkCoord))
 	        {
 	            LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8);
 	            BiomeConfig biomeConfig = biome.getBiomeConfig();
@@ -260,7 +260,7 @@ public class CustomStructurePlotter
 						            			for(int i = -top; i <= bottom; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + j, chunkCoord.getChunkZ() + i)) && world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + j, chunkCoord.getChunkZ() + i), true))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + j, chunkCoord.getChunkZ() + i)))
 			            							{
 							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + j), (chunkCoord.getChunkZ() + i)));
 
@@ -329,7 +329,7 @@ public class CustomStructurePlotter
 						            			for(int i = -top; i <= bottom; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() - j, chunkCoord.getChunkZ() + i)) && world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() - j, chunkCoord.getChunkZ() + i), true))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() - j, chunkCoord.getChunkZ() + i)))
 					            					{
 							        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
 
@@ -396,7 +396,7 @@ public class CustomStructurePlotter
 						            			for(int i = -left; i <= right; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() + j)) && world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() + j), true))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() + j)))
 					            					{
 							        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
 
@@ -463,7 +463,7 @@ public class CustomStructurePlotter
 						            			for(int i = -left; i <= right; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() - j)) && world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() - j), true))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() - j)))
 					            					{
 							        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
 

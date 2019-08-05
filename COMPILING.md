@@ -8,86 +8,28 @@ it using Git, or download it as a [ZIP file][].
 You also need to have the [JDK][JDK 7] installed. You will need version 7 or
 newer.
 
+## Setting up the project
+Run:
+1. gradle setupDecompWorkspace
+2. gradle eclipse
+3. gradle build
+
+For Forge, copy META-INF.jar to run/mods, or you'll have problems with OTG-Core, the core-mod part of OTG.
+
 ## Creating JAR files
-Run the command `./gradlew install` and/or `./gradlew build` in the OpenTerrainGenerator directory. If that
-doesn't work, you probably need to make the file executable by running
-`chmod +x gradlew`. You can then try the above command again.
+
+1. gradle build
+2. gradle createreleasejar
 
 You will be left with a Spigot plugin in `platforms/bukkit/build/distributions/`,
 a Forge mod in `platforms/forge/build/distributions` and a file that runs
 on both in `releases/build/distributions`.
 
-## Eclipse
-First of all, ForgeGradle and Eclipse are not the best friends. Sometimes, you'll
-find out that things don't work anymore. When things do work however, you have a
-nice test environment where you can quickly make changes to OpenTerrainGenerator.
-
-### Before you start
-Normally, you'd just use the import option of Eclipse. However, ForgeGradle
-requires us to run another command first. Run the command
-`./gradlew setupDecompWorkspace` in the OpenTerrainGenerator directory. This command
-decompiles Minecraft, so that you can quickly jump to the Minecraft source code
-from Eclipse.
-
-Sometimes this command will fail if the Forge web servers are offline. In that
+Some commands will fail if the Forge web servers are offline. In that
 case, simply try running the command again.
 
 ### Importing the project
-Make sure you have a recent version of Eclipse installed. Eclipse Neon should
-work, and the slightly older Eclipse Mars.1 should work too. Older versions,
-including the original Eclipse Mars release, will not work.
-
-To import OpenTerrainGenerator, use `File` -> `Import` -> `Gradle` -> `Gradle Project`
-and import the OpenTerrainGenerator directory.
-
-**Please note:** As of Nov. 2016 there is a [bug] in the latest release of Buildship (the eclipse plugin that manages 
-gradle) that may generate an `Unsupported method: HierarchicalEclipseProject.getIdentifier()` error when attempting to 
-import the project into Eclipse. If this is a case, you need to manually update Buildship to a later version. To do so, 
-click `Help` -> `Install New Software` and input this url: http://download.eclipse.org/buildship/updates/e46/milestones/2.x/.
+Import existing project -> Point to OTG root folder.
 
 ### Running the Forge client or server
-In the Forge version of OpenTerrainGenerator two classes are included to help you run
-the project from your IDE. Click `Run` -> `Edit Configurations...` -> `+`
--> `Application`. Use `forge` as the module (for the classpath) and use either
-the `com.pg85.otg.forge.launch.TCLaunchForgeClient` or the
-`com.pg85.otg.forge.launch.TCLaunchForgeServer` class and
-press the Run button in the menu bar to run the Forge client or server.
-
-### Formatting the source code
-If you are familiar with the Eclipse code formatter, you can use our
-[Eclipse formatting settings][] to automatically format the source code.
-
-Don't worry too much about the code formatting; it is easy for us to correct
-the code formatting when you submit a pull request. Focus on what the code
-actually does!
-
-### When you run into a problem with Eclipse
-When you run into a problem that you cannot solve, there's always the option to
-reset everything.
-
-* Delete the projects in Eclipse (but don't delete the files on disk)
-* Run `git clean -fdx` to remove all build files.
-* Run `./gradlew setupDecompWorkspace` again.
-* Import the project in Eclipse again.
-
-## IntelliJ
-First, we need a decompiled version of Minecraft, this makes it much easier to
-create mods. Run `./gradlew setupDecompWorkspace` in the OpenTerrainGenerator
-directory. You will need to rerun this command every time the Forge version
-OpenTerrainGenerator is built against changes.
-
-Now import the project as a Gradle project into IntelliJ.
-
-To launch the Forge client version of OpenTerrainGenerator from your IDE, click `Run`
--> `Edit Configurations...` -> `+` -> `Application`. Choose a name, use
-`com.pg85.otg.forge.launch.TCLaunchForgeClient` as the main
-class and select `forge` for the option `Use classpath of module`.
-
-To launch the server version, repeat the above steps, but use the main class
-`com.pg85.otg.forge.launch.TCLaunchForgeServer`.
-
-
-[ZIP file]: https://github.com/MCTCP/TerrainControl/archive/master.zip
-[JDK 7]: http://www.oracle.com/technetwork/java/javase/downloads/jdk7-downloads-1880260.html
-[Eclipse formatting settings]: https://dl.dropboxusercontent.com/u/23288978/terraincontrol/TerrainControl.xml
-[bug]: https://bugs.eclipse.org/bugs/show_bug.cgi?id=507423
+Create run/debug configurations for Forge and Spigot as for any mod/plugin.

@@ -138,16 +138,16 @@ public class OTG
 	* @return The biome name, or null if the world isn't managed by Terrain
     *         Control.
     */
-   public static String getBiomeName(String worldName, int x, int z)
-   {
-       LocalWorld world = getWorld(worldName);
+	public static String getBiomeName(String worldName, int x, int z)
+	{
+	   LocalWorld world = getWorld(worldName);
        if (world == null)
        {
-           // World isn't loaded by OTG
-           return null;
+    	   // World isn't loaded by OTG
+    	   return null;
        }
        return world.getSavedBiome(x, z).getName();
-   }
+   	}
 
    	public static LocalBiome getBiomeByOTGId(int id)
    	{

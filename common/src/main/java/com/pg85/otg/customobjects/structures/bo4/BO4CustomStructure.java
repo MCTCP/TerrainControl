@@ -669,7 +669,6 @@ public class BO4CustomStructure extends CustomStructure
 	        		boolean spaceIsOccupied = false;
 	        		boolean chunkIsIneligible = false;
 	        		boolean startChunkBlockChecksPassed = true;
-	        		boolean isInsideWorldBorder = true;
         			boolean branchFrequencyNotPassed = false;
         			boolean branchFrequencyGroupsNotPassed = false;
 
@@ -746,34 +745,6 @@ public class BO4CustomStructure extends CustomStructure
 	        		if(smoothRadius == -1 || bo3.getSettings().smoothRadius == -1)
 	        		{
 	        			smoothRadius = 0;
-	        		}
-
-	        		ChunkCoordinate worldBorderCenterPoint = world.getWorldSession().getWorldBorderCenterPoint();
-
-	        		if(
-        				canSpawn &&
-        				!minimumSize &&
-        				world.getWorldSession().getWorldBorderRadius() > 0 &&
-        				(
-    						(
-								smoothRadius == 0 &&
-								!world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(childBranchDataItem.branch.getChunkX(), childBranchDataItem.branch.getChunkZ()), true)
-							)
-    						||
-    						(
-								smoothRadius > 0 &&
-								(
-									childBranchDataItem.branch.getChunkX() - Math.ceil(smoothRadius / (double)16) < worldBorderCenterPoint.getChunkX() - (world.getWorldSession().getWorldBorderRadius() - 1) ||
-									childBranchDataItem.branch.getChunkX() + Math.ceil(smoothRadius / (double)16) > worldBorderCenterPoint.getChunkX() + (world.getWorldSession().getWorldBorderRadius() - 1) - 1 || // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
-									childBranchDataItem.branch.getChunkZ() - Math.ceil(smoothRadius / (double)16) < worldBorderCenterPoint.getChunkZ() - (world.getWorldSession().getWorldBorderRadius() - 1) ||
-									childBranchDataItem.branch.getChunkZ() + Math.ceil(smoothRadius / (double)16) > worldBorderCenterPoint.getChunkZ() + (world.getWorldSession().getWorldBorderRadius() - 1) - 1 // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
-								)
-							)
-						)
-    				)
-	        		{
-	        			canSpawn = false;
-	        			isInsideWorldBorder = false;
 	        		}
 
         			if(!doStartChunkBlockChecks(world))
@@ -1098,7 +1069,7 @@ public class BO4CustomStructure extends CustomStructure
 			        	    			}
 			        	    		}
 
-			        	    		String reason = (branchFrequencyGroupsNotPassed ? "BranchFrequencyGroupNotPassed " : "") + (branchFrequencyNotPassed ? "BranchFrequencyNotPassed " : "") + (!isInsideWorldBorder ? "IsOutsideWorldBorder " : "") + (!startChunkBlockChecksPassed ? "StartChunkBlockChecksNotPassed " : "") + (collidedWithParentOrSibling ? "CollidedWithParentOrSibling " : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (wasntInsideOther ? "WasntInsideOther " : "") + (cannotSpawnInsideOther ? "CannotSpawnInsideOther " : "") + (wasntOnWater ? "WasntOnWater " : "") + (wasOnWater ? "WasOnWater " : "") + (!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && isInsideWorldBorder && startChunkBlockChecksPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "TerrainIsUnsuitable (StartChunkBlockChecks (height or material) not passed or Y < 0 or Frequency/BO3Group checks not passed or BO3 collided with other CustomStructure or smoothing area collided with other CustomStructure or BO3 not in allowed Biome or Smoothing area not in allowed Biome)" : "");
+			        	    		String reason = (branchFrequencyGroupsNotPassed ? "BranchFrequencyGroupNotPassed " : "") + (branchFrequencyNotPassed ? "BranchFrequencyNotPassed " : "") + (!startChunkBlockChecksPassed ? "StartChunkBlockChecksNotPassed " : "") + (collidedWithParentOrSibling ? "CollidedWithParentOrSibling " : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (wasntInsideOther ? "WasntInsideOther " : "") + (cannotSpawnInsideOther ? "CannotSpawnInsideOther " : "") + (wasntOnWater ? "WasntOnWater " : "") + (wasOnWater ? "WasOnWater " : "") + (!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && startChunkBlockChecksPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "TerrainIsUnsuitable (StartChunkBlockChecks (height or material) not passed or Y < 0 or Frequency/BO3Group checks not passed or BO3 collided with other CustomStructure or smoothing area collided with other CustomStructure or BO3 not in allowed Biome or Smoothing area not in allowed Biome)" : "");
 			        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.branch.getChunkX() + " Z" + branchDataItem.branch.getChunkZ() + " Y" + branchDataItem.branch.getY() + " " + branchDataItem.branch.bo3Name + ":" + branchDataItem.branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.branch.bo3Name + " couldn't spawn. Reason: " + reason);
 			            		}
 
@@ -1186,8 +1157,7 @@ public class BO4CustomStructure extends CustomStructure
 
 							        	    		String reason =
 							        	    				(branchFrequencyGroupsNotPassed ? "BranchFrequencyGroupNotPassed " : "") +
-							        	    				(branchFrequencyNotPassed ? "BranchFrequencyNotPassed " : "") +
-							        	    				(!isInsideWorldBorder ? "IsOutsideWorldBorder " : "") +
+							        	    				(branchFrequencyNotPassed ? "BranchFrequencyNotPassed " : "") +							        	    				
 							        	    				(!startChunkBlockChecksPassed ? "StartChunkBlockChecksNotPassed " : "") +
 							        	    				(collidedWithParentOrSibling ? "CollidedWithParentOrSibling " : "") +
 							        	    				(wasntBelowOther ? "WasntBelowOther " : "") +
@@ -1196,7 +1166,7 @@ public class BO4CustomStructure extends CustomStructure
 							        	    				(wasntOnWater ? "WasntOnWater " : "") +
 							        	    				(wasOnWater ? "WasOnWater " : "") +
 							        	    				(childBranchDataItem.branch.getY() < 0 ? " WasBelowY0 " : "") +
-							        	    				(!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && isInsideWorldBorder && startChunkBlockChecksPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "ChunkIsIneligible: Either the chunk is occupied by another structure or a default structure, or the BO3/smoothing area is not allowed in the Biome)" : "");
+							        	    				(!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && startChunkBlockChecksPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "ChunkIsIneligible: Either the chunk is occupied by another structure or a default structure, or the BO3/smoothing area is not allowed in the Biome)" : "");
 							        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.branch.getChunkX() + " Z" + branchDataItem.branch.getChunkZ() + " Y" + branchDataItem.branch.getY() + " " + branchDataItem.branch.bo3Name + ":" + branchDataItem.branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.branch.bo3Name + " couldn't spawn. Reason: " + reason);
 							            		}
 						            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world);

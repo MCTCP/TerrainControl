@@ -176,20 +176,17 @@ public class OTGChunkGenerator implements IChunkGenerator
 			Chunk chunk = world.getChunk(chunkCoords.getBlockX(), chunkCoords.getBlockZ(), true);
 			if(chunk == null)
 			{
-				if(world.isInsideWorldBorder(chunkCoords, false))
-				{
-					// Can happen when chunkExists() in this.world.getChunk() mistakenly returns false
-					// This could potentially cause an infinite loop but than't can't be disallowed looping because of async calls
-					// to ProvideChunk() by updateBlocks() on server tick.
-					chunk = this.world.getWorld().getChunk(chunkX, chunkZ);
+				// Can happen when chunkExists() in this.world.getChunk() mistakenly returns false
+				// This could potentially cause an infinite loop but than't can't be disallowed looping because of async calls
+				// to ProvideChunk() by updateBlocks() on server tick.
+				chunk = this.world.getWorld().getChunk(chunkX, chunkZ);
 
-					if(chunk == null)
-					{
-						// TODO: Test this..
-						throw new RuntimeException();
-					}
-					OTG.log(LogMarker.WARN, "Double population prevented");
+				if(chunk == null)
+				{
+					// TODO: Test this..
+					throw new RuntimeException();
 				}
+				OTG.log(LogMarker.WARN, "Double population prevented");
 			}
 			if(chunk != null)
 			{
@@ -208,7 +205,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     public void populate(int chunkX, int chunkZ)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-    	if(this.testMode || !world.isInsideWorldBorder(chunkCoord, false))
+    	if(this.testMode)
         {
     		if(this.testMode)
     		{
@@ -394,18 +391,8 @@ public class OTGChunkGenerator implements IChunkGenerator
 			}
 		}
 
-        boolean outsideBorder = false;
-    	if(!this.world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), true))
-    	{
-    		// This can happen when net.minecraft.server.MinecraftServer.updateTimeLightAndEntities() is called
-    		//OTG.log(LogMarker.INFO, "Requested chunk outside world border X" + chunkX + " Z" + chunkZ);
-    		outsideBorder = true;
-    	}
-
     	// This never happens when we're spawning stuff on neighbouring BO3's inside the 2x2 population area
-    	if(
-			!outsideBorder && outsidePopulatingArea
-		)
+    	if(outsidePopulatingArea)
     	{
     		if(!((WorldServer)this.world.getWorld()).isBlockLoaded(new BlockPos(chunkX * 16, 1, chunkZ * 16)))
     		//if(!((WorldServer)this.getWorld()).isChunkGeneratedAt(chunkX, chunkZ))
@@ -441,7 +428,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     }
     
     // Spawn chunk fix for OTG+    
-
+	// TODO: This should no longer be needed, using the onCreateWorldSpawn event in WorldListener now?.
     private void fixSpawnChunk()
     {
     	if(!firstRun)
@@ -491,55 +478,49 @@ public class OTGChunkGenerator implements IChunkGenerator
     	{
     		chunk = chunkCacheEntry.chunk;
     	}
-
+    	
     	if(chunk == null)
     	{
     		chunk = new Chunk(this.world.getWorld(), chunkX, chunkZ);
 
-	    	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
+    		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
+    		this.generator.generate(chunkBuffer);
+
+    		// Before starting terrain generation MC tries to find a suitable spawn point. For some reason it looks for a grass block with an air block above it.
+    		// To prevent MC from looking in many chunks (if there is no grass block nearby) and causing them to be populated place grass in the first requested chunk
+    		// cache the original blocks so that they can be placed back when proper world generation starts.
+    		// Only needed for OTG+ isStructureAtSpawn setting for BO3's.
+    		if(firstRun && world.getConfigs().getWorldConfig().isOTGPlus)
+    		{
+    			spawnChunk = chunkCoord;
+    			for(int x = 0; x < 15; x++)
+    			{
+    				for(int z = 0; z < 15; z++)
+    				{
+    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
+    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));
+
+    					chunkBuffer.setBlock(x, 63, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.GRASS, 0));
+    					chunkBuffer.setBlock(x, 64, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0));
+    				}
+    			}
+    		}
+			firstRun = false;
+    		chunk = chunkBuffer.toChunk(this.world.getWorld());
+
+	        fillBiomeArray(chunk);
+	        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
 	        {
-	    		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-	    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-	    		this.generator.generate(chunkBuffer);
-
-	    		// Before starting terrain generation MC tries to find a suitable spawn point. For some reason it looks for a grass block with an air block above it.
-	    		// To prevent MC from looking in many chunks (if there is no grass block nearby) and causing them to be populated place grass in the first requested chunk
-	    		// cache the original blocks so that they can be placed back when proper world generation starts.
-	    		// Only needed for OTG+ isStructureAtSpawn setting for BO3's.
-	    		if(firstRun && world.getConfigs().getWorldConfig().isOTGPlus)
-	    		{
-	    			spawnChunk = chunkCoord;
-	    			for(int x = 0; x < 15; x++)
-	    			{
-	    				for(int z = 0; z < 15; z++)
-	    				{
-	    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
-	    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));
-
-	    					chunkBuffer.setBlock(x, 63, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.GRASS, 0));
-	    					chunkBuffer.setBlock(x, 64, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0));
-	    				}
-	    			}
-	    		}
-    			firstRun = false;
-	    		chunk = chunkBuffer.toChunk(this.world.getWorld());
-
-		        fillBiomeArray(chunk);
-		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
-		        {
-		        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
-		        }
-
-		        chunkBuffer = null;
+	        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
 	        }
+
+	        chunkBuffer = null;
     	} else {
-        	if(world.isInsideWorldBorder(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ), false))
+	        fillBiomeArray(chunk);
+	        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
 	        {
-		        fillBiomeArray(chunk);
-		        //if(world.getConfigs().getWorldConfig().ModeTerrain == TerrainMode.TerrainTest)
-		        {
-		        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
-		        }
+	        	chunk.generateSkylightMap(); // Normally chunks are lit in the ObjectSpawner after finishing their population step, TerrainTest skips the population step though so light blocks here.
 	        }
         	unloadedChunkCache.remove(ChunkCoordinate.fromChunkCoords(chunkX,chunkZ));
     	}
@@ -599,13 +580,9 @@ public class OTGChunkGenerator implements IChunkGenerator
     	{
         	chunk = new Chunk(this.world.getWorld(), chunkX, chunkZ);
 
-        	if(world.isInsideWorldBorder(chunkCoord, true))
-            {
-	    		ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-	    		this.generator.generate(chunkBuffer);
-
-	    		chunk = chunkBuffer.toChunk(this.world.getWorld());
-            }
+    		ForgeChunkBuffer chunkBuffer = new ForgeChunkBuffer(chunkCoord);
+    		this.generator.generate(chunkBuffer);
+    		chunk = chunkBuffer.toChunk(this.world.getWorld());
         	blockColumnCache = new HashMap<LocalCoords2D, LocalMaterialData[]>(256);
         	unloadedChunkCache.put(chunkCoord, new ChunkColumns(chunk, blockColumnCache));
     	}
@@ -658,7 +635,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     	return height;
     }
     
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTGPlus)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
     {
 	    /*
 	     * This method usually breaks on every Minecraft update. Always check
@@ -688,7 +665,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         BlockPos pos = new BlockPos(x, y, z);
 
         // Get chunk from (faster) custom cache
-        Chunk chunk = this.getChunk(x, z, isOTGPlus);
+        Chunk chunk = this.getChunk(x, z, allowOutsidePopulatingArea);
         if (chunk == null)
         {
             // Chunk is unloaded
@@ -704,7 +681,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
 	    if (metaDataTag != null)
 	    {
-	    	attachMetadata(x, y, z, metaDataTag, isOTGPlus);
+	    	attachMetadata(x, y, z, metaDataTag, allowOutsidePopulatingArea);
 	    }
 
     	this.world.getWorld().markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);

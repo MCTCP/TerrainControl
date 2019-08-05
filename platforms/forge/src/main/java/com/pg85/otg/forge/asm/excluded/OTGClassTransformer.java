@@ -949,7 +949,7 @@ public class OTGClassTransformer implements IClassTransformer
 				InsnList toInsert = new InsnList();
 				toInsert.add(new VarInsnNode(ILOAD, 0));
 							
-				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "InitOTGDimension",  "(I)Z", false));
+				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "initOTGDimension",  "(I)Z", false));
 				LabelNode l4 = new LabelNode();
 				toInsert.add(new JumpInsnNode(IFEQ, l4));
 				LabelNode l5 = new LabelNode();

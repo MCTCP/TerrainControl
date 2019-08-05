@@ -334,7 +334,7 @@ public class BO3 implements StructuredCustomObject
 
         for (BO3BlockFunction block : blocksToSpawn)
         {
-        	block.spawn(world, random, x + block.x, y + block.y, z + block.z, false);
+        	block.spawn(world, random, x + block.x, y + block.y, z + block.z, true);
         }
 
         oeh.extrude(world, random, x, y, z);

@@ -70,6 +70,7 @@ public class WorldListener
                     	// TODO: Bit of a hack, need to override the worldprovider for SP server or gravity won't work properly ><.
                     	// Creating a new biomeprovider causes problems, re-using the existing one seems to work though,
                     	((OTGWorldProvider)world.provider).init(oldProvider.getBiomeProvider());
+                    	world.worldBorder = ((OTGWorldProvider)world.provider).createWorldBorder(); 
                     }
                     
                     //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Overrode the WorldProvider in dimension {} with '{}'", dim, newClassName);
@@ -199,6 +200,7 @@ public class WorldListener
     @SubscribeEvent
     public void onCreateWorldSpawn(WorldEvent.CreateSpawnPosition event)
     {    
+    	// TODO: Make this prettier, this causes players to spawn in oceans.
     	// Make sure the world spawn doesn't get moved after the first chunks have been spawned  
     	LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(event.getWorld());
     	if(world != null)

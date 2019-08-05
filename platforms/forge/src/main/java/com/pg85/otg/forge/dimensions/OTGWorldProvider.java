@@ -8,8 +8,11 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.util.ChunkCoordinate;
 
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProviderSurface;
@@ -25,7 +28,7 @@ public class OTGWorldProvider extends WorldProviderSurface
 	private WorldConfig worldConfig = null;
 	private String worldName = null;
 	private DimensionType dimType = null;
-	private long lastFetchTime = System.currentTimeMillis();	
+	private long lastFetchTime = 0;	
 	public boolean isSPServerOverworld = false;
 	
 	public OTGWorldProvider()
@@ -119,7 +122,7 @@ public class OTGWorldProvider extends WorldProviderSurface
 					dimConfig = dimsConfig.getDimensionConfig(worldName);
 				}
 			}
-		}
+		}		
 		return dimConfig;
 	}
 
@@ -300,12 +303,38 @@ public class OTGWorldProvider extends WorldProviderSurface
     	}
     }
 
-
-	@Override
     public WorldBorder createWorldBorder()
     {
-		return super.createWorldBorder();
-    }
+		WorldBorder worldBorder = new WorldBorder()
+        {
+            public double getCenterX()
+            {
+                return super.getCenterX() / getMovementFactor();
+            }
+            public double getCenterZ()
+            {
+                return super.getCenterZ() / getMovementFactor();
+            }
+        };
+           
+        if(world != null && world.provider != null)
+        {
+	    	DimensionConfig dimConfig = getDimensionConfig();
+	    	if(dimConfig != null && dimConfig.WorldBorderRadiusInChunks > 0)
+	    	{
+	    		ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world);
+	    		ChunkCoordinate worldBorderCenterPoint;
+	    		if(forgeWorld != null)
+	    		{
+	    			worldBorderCenterPoint = forgeWorld.getWorldSession().getWorldBorderCenterPoint();
+	                double d2 = MathHelper.clamp(dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16 , 1.0D, 6.0E7D);
+	                worldBorder.setCenter(worldBorderCenterPoint.getBlockX() * getMovementFactor() + 8, worldBorderCenterPoint.getBlockZ() * getMovementFactor() + 8);
+	                worldBorder.setTransition(d2);
+	    		}    		
+	    	}
+        }
+		return worldBorder;
+    }	
 
     // Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
     @Override

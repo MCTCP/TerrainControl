@@ -774,16 +774,23 @@ public class ServerTickHandler
 		{
 			if(player.getPosition().getY() < dimConfig.Settings.DimensionBelowHeight)
 			{
-				ForgeWorld destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimConfig.Settings.DimensionBelow);
-				if(destinationWorld == null)
+				ForgeWorld destinationWorld;
+				if(OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.Settings.DimensionBelow))
 				{
-					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(dimConfig.Settings.DimensionBelow);
+					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
+				} else {
+					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimConfig.Settings.DimensionBelow);
+					if(destinationWorld == null)
+					{
+						destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(dimConfig.Settings.DimensionBelow);
+					}
 				}
 
 				if(destinationWorld != null) // Dimension does not exist
 				{
 					if(destinationWorld == playerWorld)
 					{
+						// TODO:  Make this prettier.
 						player.world.setBlockToAir(new BlockPos(player.getPosition().getX(), 254, player.getPosition().getZ()));
 						player.world.setBlockToAir(new BlockPos(player.getPosition().getX(), 255, player.getPosition().getZ()));
 						player.setPositionAndUpdate(player.getPosition().getX(), 254, player.getPosition().getZ());
@@ -800,18 +807,34 @@ public class ServerTickHandler
 		{
 			if(player.getPosition().getY() > dimConfig.Settings.DimensionAboveHeight)
 			{
-				ForgeWorld destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimConfig.Settings.DimensionAbove);
-				if(destinationWorld == null)
+				ForgeWorld destinationWorld;
+				if(OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.Settings.DimensionAbove))
 				{
-					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(dimConfig.Settings.DimensionAbove);
+					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
+				} else {
+					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimConfig.Settings.DimensionAbove);
+					if(destinationWorld == null)
+					{
+						destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(dimConfig.Settings.DimensionAbove);
+					}
 				}
 
 				if(destinationWorld != null) // Dimension does not exist
 				{
-					if(destinationWorld != playerWorld)
+					if(destinationWorld == playerWorld)
 					{
+						// TODO:  Make this prettier.
+						player.world.setBlockToAir(new BlockPos(player.getPosition().getX(), 1, player.getPosition().getZ()));
+						player.world.setBlockToAir(new BlockPos(player.getPosition().getX(), 2, player.getPosition().getZ()));
+						player.setPositionAndUpdate(player.getPosition().getX(), 1, player.getPosition().getZ());
+						
+						// Make a hole next to the player
+						player.world.setBlockToAir(new BlockPos(player.getPosition().getX() + 1, 1, player.getPosition().getZ()));
+						player.world.setBlockToAir(new BlockPos(player.getPosition().getX() + 1, 2, player.getPosition().getZ()));
+						player.world.setBlockToAir(new BlockPos(player.getPosition().getX() + 1, 0, player.getPosition().getZ()));						
+					} else {
 						teleportPlayerToDimension(playerWorld.getWorld().provider.getDimension(), destinationWorld.getWorld().provider.getDimension(), player);
-					}
+					}					
 				}
 			}
 		}

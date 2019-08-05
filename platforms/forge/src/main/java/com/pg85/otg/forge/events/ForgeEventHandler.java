@@ -54,19 +54,26 @@ public class ForgeEventHandler extends EventHandler
         int blockX = chunkX * CHUNK_X_SIZE;
         int blockZ = chunkZ * CHUNK_Z_SIZE;
         BlockPos blockPos = new BlockPos(blockX, 0, blockZ);
-
+                
         // Convert to Forge event and fire
-        if (resource instanceof DungeonGen ||
-                resource instanceof SmallLakeGen ||
-                resource instanceof UndergroundLakeGen ||
-                resource instanceof LiquidGen ||
-                resource instanceof CustomObjectGen)
+        if (
+    		resource instanceof DungeonGen ||
+            resource instanceof SmallLakeGen ||
+            resource instanceof UndergroundLakeGen ||
+            resource instanceof LiquidGen ||
+            resource instanceof CustomObjectGen
+        )
         {
             // Fire population event
             Populate.EventType forgeEvent = getPopulateEventType(resource.getMaterial());
             return TerrainGen.populate(world.getChunkGenerator(), world.getWorld(), random, blockX, blockZ, villageInChunk, forgeEvent);
-        }
-        else if (resource instanceof OreGen || resource instanceof VeinGen)
+        }        
+        else if(
+    		resource instanceof OreGen ||
+    		resource instanceof SurfacePatchGen || 
+    		resource instanceof UnderWaterOreGen ||    		
+    		resource instanceof VeinGen
+		)
         {
             if (!hasOreGenerationBegun(world))
             {
@@ -84,8 +91,14 @@ public class ForgeEventHandler extends EventHandler
                 MinecraftForge.EVENT_BUS.post(new DecorateBiomeEvent.Pre(world.getWorld(), random, blockPos));
                 setDecorationBegun(world, true);
             }
+                        
             // Fire decoration event
-            Decorate.EventType forgeEvent = getDecorateEventType(resource.getMaterial());
+            Decorate.EventType forgeEvent = 
+        		resource instanceof TreeGen ? Decorate.EventType.TREE : 
+            	resource instanceof BoulderGen ? Decorate.EventType.ROCK :
+        		resource instanceof FossilGen ? Decorate.EventType.FOSSIL :
+    			resource instanceof WellGen ? Decorate.EventType.DESERT_WELL :
+            	getDecorateEventType(resource.getMaterial(), resource instanceof TreeGen);
             return TerrainGen.decorate(world.getWorld(), random, blockPos, forgeEvent);
         }
     }
@@ -135,8 +148,12 @@ public class ForgeEventHandler extends EventHandler
         // There is no need to call GameRegistry.generateWorld, because it is done by the Chunk Provider in Forge.
     }
 
-    private Decorate.EventType getDecorateEventType(LocalMaterialData block)
+    private Decorate.EventType getDecorateEventType(LocalMaterialData block, boolean isTreeGen)
     {
+    	// Missing?
+        // LAKE_WATER
+        // LAKE_LAVA
+    	
         if (block == null)
         {
             // Some resources don't have a main material
@@ -155,13 +172,22 @@ public class ForgeEventHandler extends EventHandler
         if (block.isMaterial(DefaultMaterial.PUMPKIN))
             return Decorate.EventType.PUMPKIN;
         if (block.isMaterial(DefaultMaterial.BROWN_MUSHROOM) || block.isMaterial(DefaultMaterial.RED_MUSHROOM))
-            return Decorate.EventType.SHROOM;
+        	if(isTreeGen)
+        	{
+        		return Decorate.EventType.BIG_SHROOM;
+        	} else {
+        		return Decorate.EventType.SHROOM;
+        	}
         if (block.isMaterial(DefaultMaterial.SUGAR_CANE_BLOCK))
             return Decorate.EventType.REED;
         if (block.isMaterial(DefaultMaterial.SAND))
             return Decorate.EventType.SAND;
         if (block.isMaterial(DefaultMaterial.CLAY))
             return Decorate.EventType.CLAY;
+        if (block.isMaterial(DefaultMaterial.GRAVEL))
+            return Decorate.EventType.SAND_PASS2;
+        if (block.isMaterial(DefaultMaterial.ICE) || block.isMaterial(DefaultMaterial.PACKED_ICE) || block.isMaterial(DefaultMaterial.FROSTED_ICE) || block.isMaterial(DefaultMaterial.SNOW) || block.isMaterial(DefaultMaterial.SNOW_BLOCK))
+            return Decorate.EventType.ICE;        
         return Decorate.EventType.CUSTOM;
     }
 
@@ -176,6 +202,8 @@ public class ForgeEventHandler extends EventHandler
             return Populate.EventType.LAKE;
         if (block.isMaterial(DefaultMaterial.LAVA) || block.isMaterial(DefaultMaterial.STATIONARY_LAVA))
             return Populate.EventType.LAVA;
+        if (block.isMaterial(DefaultMaterial.ICE) || block.isMaterial(DefaultMaterial.FROSTED_ICE) || block.isMaterial(DefaultMaterial.PACKED_ICE))
+            return Populate.EventType.ICE;        
         return Populate.EventType.CUSTOM;
     }
 

@@ -1524,13 +1524,6 @@ public class BukkitWorld implements LocalWorld
 		// TODO Implement this
 		return false;
 	}
-
-	@Override
-	public boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
-	{
-		// TODO Implement this
-		return true;
-	}
     
     // Blocks / materials
     	

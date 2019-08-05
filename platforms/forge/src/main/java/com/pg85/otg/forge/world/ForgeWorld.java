@@ -475,12 +475,6 @@ public class ForgeWorld implements LocalWorld
 		return getWorldSession().isInsidePregeneratedRegion(chunk);
 	}
 
-    @Override
-	public boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
-	{
-		return getWorldSession().isInsideWorldBorder(chunk, spawningResources);
-	}
-
     // Blocks
     
     @Override
@@ -638,9 +632,9 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTGPlus)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
     {
-    	this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag, isOTGPlus);
+    	this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag, allowOutsidePopulatingArea);
     }
 
     @Override

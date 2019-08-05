@@ -70,35 +70,32 @@ public abstract class WorldSession
     {
     	HashMap<String,ArrayList<ModDataFunction<?>>> result = new HashMap<String,ArrayList<ModDataFunction<?>>>();
     	boolean bFound = false;
-    	if(world.isInsideWorldBorder(chunkCoord, true))
-    	{
-    		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-    		{
-    			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+		{
+			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
 
-				if(worldInfoChunk != null)
-	    		{
-	    			for(ModDataFunction<?> modData : worldInfoChunk.modDataManager.modData)
-	    			{
-	    				if(ChunkCoordinate.fromBlockCoords(modData.x, modData.z).equals(chunkCoord)) // modData for all branches of the structure is stored, make sure the modData is in this chunk
+			if(worldInfoChunk != null)
+    		{
+    			for(ModDataFunction<?> modData : worldInfoChunk.modDataManager.modData)
+    			{
+    				if(ChunkCoordinate.fromBlockCoords(modData.x, modData.z).equals(chunkCoord)) // modData for all branches of the structure is stored, make sure the modData is in this chunk
+    				{
+	    				if(!result.containsKey(modData.modId))
 	    				{
-		    				if(!result.containsKey(modData.modId))
-		    				{
-		    					result.put(modData.modId, new ArrayList<ModDataFunction<?>>());
-		    				}
-	    					result.get(modData.modId).add(modData);
+	    					result.put(modData.modId, new ArrayList<ModDataFunction<?>>());
 	    				}
-	    			}
-		    		bFound = true;
-				}
-	    	}
-	    	if(!bFound)
-	    	{
-	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
-	    		{
-	    			result = null;
-	    		}
-	    	}
+    					result.get(modData.modId).add(modData);
+    				}
+    			}
+	    		bFound = true;
+			}
+    	}
+    	if(!bFound)
+    	{
+    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
+    		{
+    			result = null;
+    		}
     	}
     	return result;
     }
@@ -107,31 +104,28 @@ public abstract class WorldSession
     {
     	ArrayList<SpawnerFunction<?>> result = new ArrayList<SpawnerFunction<?>>();
     	boolean bFound = false;
-    	if(world.isInsideWorldBorder(chunkCoord, true))
-    	{
-    		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-    		{
-    			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+		{
+			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
 
-				if(worldInfoChunk != null)
-	    		{
-	    			for(SpawnerFunction<?> spawnerData : worldInfoChunk.spawnerManager.spawnerData)
-	    			{
-	    				if(ChunkCoordinate.fromBlockCoords(spawnerData.x, spawnerData.z).equals(chunkCoord)) // spawnerData for all branches of the structure is stored, make sure the modData is in this chunk
-	    				{
-	    					result.add(spawnerData);
-	    				}
-	    			}
-	    		}
-	    		bFound = true;
-			}
-	    	if(!bFound)
-	    	{
-	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
-	    		{
-	    			result = null;
-	    		}
-	    	}
+			if(worldInfoChunk != null)
+    		{
+    			for(SpawnerFunction<?> spawnerData : worldInfoChunk.spawnerManager.spawnerData)
+    			{
+    				if(ChunkCoordinate.fromBlockCoords(spawnerData.x, spawnerData.z).equals(chunkCoord)) // spawnerData for all branches of the structure is stored, make sure the modData is in this chunk
+    				{
+    					result.add(spawnerData);
+    				}
+    			}
+    		}
+    		bFound = true;
+		}
+    	if(!bFound)
+    	{
+    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
+    		{
+    			result = null;
+    		}
     	}
     	return result;
     }
@@ -140,45 +134,39 @@ public abstract class WorldSession
     {
     	ArrayList<ParticleFunction<?>> result = new ArrayList<ParticleFunction<?>>();
     	boolean bFound = false;
-    	if(world.isInsideWorldBorder(chunkCoord, true))
-    	{
-    		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-    		{
-    			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+		{
+			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
 
-	    		if(worldInfoChunk != null)
-	    		{
-	    			for(ParticleFunction<?> particleData : worldInfoChunk.particlesManager.particleData)
-	    			{
-	    				if(ChunkCoordinate.fromBlockCoords(particleData.x, particleData.z).equals(chunkCoord)) // paticleData for all branches of the structure is stored, make sure the modData is in this chunk
-	    				{
-	    					result.add(particleData);
-	    				}
-	    			}
-	    		}
-	    		bFound = true;
-	    	}
-	    	if(!bFound)
-	    	{
-	    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
-	    		{
-	    			result = null;
-	    		}
-	    	}
+    		if(worldInfoChunk != null)
+    		{
+    			for(ParticleFunction<?> particleData : worldInfoChunk.particlesManager.particleData)
+    			{
+    				if(ChunkCoordinate.fromBlockCoords(particleData.x, particleData.z).equals(chunkCoord)) // paticleData for all branches of the structure is stored, make sure the modData is in this chunk
+    				{
+    					result.add(particleData);
+    				}
+    			}
+    		}
+    		bFound = true;
+    	}
+    	if(!bFound)
+    	{
+    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
+    		{
+    			result = null;
+    		}
     	}
     	return result;
     }
 
     public void removeParticles(ChunkCoordinate chunkCoord, ParticleFunction<?> particle)
     {
-    	if(world.isInsideWorldBorder(chunkCoord, true))
-    	{
-    		CustomStructure customObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
-    		if(customObject != null && customObject.particlesManager.particleData.contains(particle))
-    		{
-    			customObject.particlesManager.particleData.remove(particle);
-    		}
-    	}
+		CustomStructure customObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+		if(customObject != null && customObject.particlesManager.particleData.contains(particle))
+		{
+			customObject.particlesManager.particleData.remove(particle);
+		}
     }
     
 	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
@@ -206,20 +194,5 @@ public abstract class WorldSession
 				chunk.getChunkZ() <= getPreGeneratorCenterPoint().getChunkZ() + getPregeneratedBorderBottom()
 			)
 		;
-	}
-
-	public boolean isInsideWorldBorder(ChunkCoordinate chunk, boolean spawningResources)
-	{
-		return
-			getWorldBorderRadius() == 0 ||
-			(
-				chunk.getChunkX() >= getWorldBorderCenterPoint().getChunkX() - (getWorldBorderRadius() - 1)
-				&&
-				chunk.getChunkX() <= getWorldBorderCenterPoint().getChunkX() + (getWorldBorderRadius() - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
-				&&
-				chunk.getChunkZ() >= getWorldBorderCenterPoint().getChunkZ() - (getWorldBorderRadius() - 1)
-				&&
-				chunk.getChunkZ() <= getWorldBorderCenterPoint().getChunkZ() + (getWorldBorderRadius() - 1) - (spawningResources ? 1 : 0) // Resources are spawned at an offset of + half a chunk so stop 1 chunk short of the border
-			);
 	}
 }

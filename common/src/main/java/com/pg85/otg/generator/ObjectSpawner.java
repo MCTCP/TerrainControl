@@ -257,6 +257,7 @@ public class ObjectSpawner
 		        world.placePopulationMobs(biome, rand, chunkCoord);
 
 		        // Snow and ice
+				// TODO: Fire PopulateChunkEvent.Populate.EventType.ICE for Forge
 		        new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
 
 		        // Replace blocks
@@ -503,7 +504,8 @@ public class ObjectSpawner
 		}
 
 		// Snow and ice
-        new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
+		// TODO: Fire PopulateChunkEvent.Populate.EventType.ICE for Forge
+		new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
 
 		// Replace blocks
 		world.replaceBlocks(chunkCoord);
