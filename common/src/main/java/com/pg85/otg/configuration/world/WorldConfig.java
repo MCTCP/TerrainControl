@@ -78,7 +78,7 @@ public class WorldConfig extends ConfigFile
     public int riverRarity;
     public int riverSize;
     public boolean riversEnabled;
-    //public boolean improvedRivers;
+    public boolean improvedRivers;
     public boolean randomRivers;
 
     // Biome image
@@ -563,7 +563,7 @@ public class WorldConfig extends ConfigFile
         this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY);
         this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE);
         this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED);
-        //this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
+        this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
         this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
         
 		// Biome Groups
@@ -979,7 +979,6 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.RIVERS_ENABLED, this.riversEnabled,
                 "Set this to false to prevent the river generator from doing anything.");
 
-        /*
         writer.putSetting(WorldStandardValues.IMPROVED_RIVERS, this.improvedRivers,
                 "When this is set to false, the standard river generator of Minecraft will be used.",
                 "This means that a technical biome, determined by the RiverBiome setting of the biome",
@@ -987,7 +986,6 @@ public class WorldConfig extends ConfigFile
                 "",
                 "When enabled, the rivers won't use a technical biome in your world anymore, instead",
                 "you can control them using the river settings in the BiomeConfigs.");
-        */
 
         writer.putSetting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers,
                 "When set to true the rivers will no longer follow biome border most of the time.");
