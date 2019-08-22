@@ -118,29 +118,31 @@ task rootJar(type: Jar, dependsOn: ['compileJava', asmJar]) {
 }
 
 //task signAsmJar(type: SignJar, dependsOn: reobfAsmJar) {
-    //onlyIf { // Skip the task if our secret data isn't available
+	// Skip the task if our secret data isn't available
+    //onlyIf { 
         //project.hasProperty('keyStore')
     //}
-    //keyStore = project.keyStore // This needs to be a path to the keystore file
-    //alias = project.keyStoreAlias
-    //storePass = project.keyStorePass
-    //keyPass = project.keyStoreKeyPass
-    //inputFile = jar.archivePath // TODO: Sign a jar inside a jar? Find a better solution?
-    //outputFile = jar.archivePath // TODO: Sign a jar inside a jar? Find a better solution?
-//}
-
-//task signJar(type: SignJar, dependsOn: reobfJar) {
-    //onlyIf { // Skip the task if our secret data isn't available
-        //project.hasProperty('keyStore')
-    //}
-    //keyStore = project.keyStore // This needs to be a path to the keystore file
-    //alias = project.keyStoreAlias
-    //storePass = project.keyStorePass
-    //keyPass = project.keyStoreKeyPass
+	//keyStore = findProperty('keyStore')
+    //alias = findProperty('keyStoreAlias')
+    //storePass = findProperty('keyStorePass')
+    //keyPass = findProperty('keyStoreKeyPass')
     //inputFile = jar.archivePath
     //outputFile = jar.archivePath
 //}
 
+task signJar(type: SignJar, dependsOn: reobfJar) {
+	// Skip the task if our secret data isn't available
+    onlyIf { 
+        project.hasProperty('keyStore')
+    }
+	keyStore = findProperty('keyStore')
+    alias = findProperty('keyStoreAlias')
+    storePass = findProperty('keyStorePass')
+    keyPass = findProperty('keyStoreKeyPass')
+    inputFile = jar.archivePath
+    outputFile = jar.archivePath
+}
+
 build.dependsOn rootJar
-//build.dependsOn signJar
+build.dependsOn signJar
 //build.dependsOn signAsmJar // TODO: Figure out a way to sign the asm jar

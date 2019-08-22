@@ -41,8 +41,7 @@ public abstract class MetricsHelper
                 } else if (clazz.equals(BeforeGroupsBiomeGenerator.class))
                 {
                     beforeGroupsBiomeMode++;
-                } else
-                {
+                } else {
                     customMode++;
                 }
             }

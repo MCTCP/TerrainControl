@@ -159,7 +159,7 @@ public final class PluginConfig extends ConfigFile
 		);
         
         writer.putSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK, this.pregeneratorMaxChunksPerTick,
-		        "The number of chunks the pre-generator is allowed to generate for each server tick.",
+		        "The number of chunks the pre-generator is allowed to generate for each server tick, shoul be between 1-5.",
 		        "Higher numbers make pre-generation faster but increase memory usage and will cause lag.");
     }
 

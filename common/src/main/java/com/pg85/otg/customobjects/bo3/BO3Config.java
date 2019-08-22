@@ -18,8 +18,6 @@ import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3WeightedBranchFunction;
 import com.pg85.otg.customobjects.bo3.checks.BO3Check;
-import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
-import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
@@ -328,10 +326,10 @@ public class BO3Config extends CustomObjectConfigFile
 
 		writer.comment("When in randomY mode used as the minimum Y or in atMinY mode as the actual Y to spawn this BO3 at.");
         writer.setting(BO3Settings.MIN_HEIGHT, this.minHeight);
-
+        
 		writer.comment("When in randomY mode used as the maximum Y to spawn this BO3 at.");
         writer.setting(BO3Settings.MAX_HEIGHT, this.maxHeight);
-
+        
         writer.smallTitle("Extrusion settings");
 
 		writer.comment("The style of extrusion you wish to use - BottomDown, TopUp, None (Default)");
@@ -419,6 +417,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment(" So RandomBlock(0,0,0,CHEST,chest.nbt,50,CHEST,anotherchest.nbt,100) will spawn a chest at");
         writer.comment(" the BO3 origin, and give it a 50% chance to have the contents of chest.nbt, or, if that");
         writer.comment(" fails, a 100% percent chance to have the contents of anotherchest.nbt.");
+        writer.comment("*Note: Unlike Entity() and Spawner(), for Block() .txt files don't work, only .nbt files work.");
         writer.comment("MinecraftObject(x,y,z,name) (TODO: This may not work anymore and needs to be tested.");
         writer.comment(" Spawns an object in the Mojang NBT structure format. For example, ");
         writer.comment(" MinecraftObject(0,0,0," + DefaultStructurePart.IGLOO_BOTTOM.getPath() + ")");
@@ -516,6 +515,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("In the text file you can use the same mob spawning parameters used with the /summon command to equip the");
         writer.comment("entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ");
         writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
+        writer.comment("*Note: Unlike Block(), for Entity() .nbt files don't work, only .txt files work.");
 
         for(BO3EntityFunction func : Arrays.asList(this.entityFunctions[0]))
         {
@@ -554,6 +554,7 @@ public class BO3Config extends CustomObjectConfigFile
         writer.comment("In the text file you can use the same mob spawning parameters used with the /summon command to equip the");
         writer.comment("entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ");
         writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
+        writer.comment("*Note: Unlike Block(), for Spawner() .nbt files don't work, only .txt files work.");        
         writer.comment("groupSize - Number of entities that should spawn for each successful spawn attempt.");
         writer.comment("interval - Time in seconds between each spawn attempt.");
         writer.comment("spawnChance - For each spawn attempt, the chance between 0-100 that the spawn attempt will succeed.");

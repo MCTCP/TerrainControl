@@ -39,7 +39,7 @@ public class LayerBiomeGroups extends Layer
                 initGroupSeed(j + x, i + z);
                 currentPiece = childInts[(j + i * x_size)];
 
-                if ((currentPiece & LandBit) != 0 && (currentPiece & BiomeGroupBits) == 0)    // land without biome group
+                if ((currentPiece & LandBit) != 0 && (currentPiece & BiomeGroupBits) == 0) // land without biome group
                 {
                 	// TODO: even with rarity 1 this always spawns the biome
 

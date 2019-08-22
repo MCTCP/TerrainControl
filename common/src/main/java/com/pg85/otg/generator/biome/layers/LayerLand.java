@@ -27,9 +27,11 @@ public class LayerLand extends Layer
             {
                 initChunkSeed(x + xi, z + zi);
                 if (nextInt(rarity) == 0)
+                {
                     thisInts[(xi + zi * xSize)] = childInts[(xi + zi * xSize)] | LandBit;
-                else
+                } else {
                     thisInts[(xi + zi * xSize)] = childInts[(xi + zi * xSize)];
+                }
             }
         }
         return thisInts;

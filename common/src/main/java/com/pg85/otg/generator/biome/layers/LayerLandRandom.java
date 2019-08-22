@@ -5,7 +5,6 @@ import com.pg85.otg.generator.biome.ArraysCache;
 
 public class LayerLandRandom extends Layer
 {
-
     LayerLandRandom(long seed, Layer childLayer)
     {
         super(seed);
@@ -40,22 +39,27 @@ public class LayerLandRandom extends Layer
                 initGroupSeed(xi + x, zi + z);
                 thisInts[(xi + zi * xSize)] = childInts[(xi + 1 + (zi + 1) * xSize0)] | LandBit;
 
-                //>>	Chances to reset LandBit
+                // Chances to reset LandBit
                 if ((centerCheck == 0) && ((nwCheck != 0) || (neCheck != 0) || (swCheck != 0) || (seCheck != 0)))
                 {
                     if (nextInt(3) != 0)
+                    {
                         thisInts[(xi + zi * xSize)] ^= LandBit;
-
-                } else if ((centerCheck > 0) && ((nwCheck == 0) || (neCheck == 0) || (swCheck == 0) || (seCheck == 0)))
+                    }
+                }
+                else if ((centerCheck > 0) && ((nwCheck == 0) || (neCheck == 0) || (swCheck == 0) || (seCheck == 0)))
                 {
                     if (nextInt(5) == 0)
+                    {
                         thisInts[(xi + zi * xSize)] ^= LandBit;
-
-                } else if (centerCheck == 0)
+                    }
+                }
+                else if (centerCheck == 0)
+                {
                     thisInts[(xi + zi * xSize)] ^= LandBit;
+                }
             }
         }
         return thisInts;
     }
-
 }

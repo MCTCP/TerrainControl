@@ -49,7 +49,7 @@ public class DimensionsConfig
 		}
 		
 		// TODO: Doesn't Forge provide a better way of getting the config dir?
-		File configDir = new File(OTG.getEngine().getOTGRootFolder().getParentFile().getParentFile() + "//config//OpenTerrainGenerator//");
+		File configDir = new File(OTG.getEngine().getOTGRootFolder().getParentFile().getParentFile() + File.separator + "config" + File.separator + "OpenTerrainGenerator" + File.separator);
 		if(configDir.exists())
 		{
 			for(File f : configDir.listFiles())
@@ -102,7 +102,7 @@ public class DimensionsConfig
 	 */
 	public static DimensionsConfig loadFromFile(File mcWorldSaveDir)
 	{
-		File forgeWorldConfigFile = new File(mcWorldSaveDir + "//OpenTerrainGenerator//" + WorldStandardValues.DimensionsConfigFileName);
+		File forgeWorldConfigFile = new File(mcWorldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsConfigFileName);
         DimensionsConfig presetsConfig = null;
         
 		if(forgeWorldConfigFile.exists())
@@ -143,7 +143,7 @@ public class DimensionsConfig
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?
 		if(worldSavesDir != null)
 		{
-			File forgeWorldConfigFile = new File(worldSavesDir.getAbsolutePath() + "//" + WorldName + "//OpenTerrainGenerator//" + WorldStandardValues.DimensionsConfigFileName);
+			File forgeWorldConfigFile = new File(worldSavesDir.getAbsolutePath() + File.separator + WorldName + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsConfigFileName);
 			if(!forgeWorldConfigFile.exists())
 			{
 				forgeWorldConfigFile.getParentFile().mkdirs();

@@ -59,6 +59,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return fromImageMode;
                 }
             });
+            /*
             usedBiomeModesGraph.addPlotter(new Plotter("Default")
             {
                 @Override
@@ -67,6 +68,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return vanillaMode;
                 }
             });
+            */
             usedBiomeModesGraph.addPlotter(new Plotter("BeforeGroups")
             {
                 @Override
@@ -75,6 +77,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return beforeGroupsBiomeMode;
                 }
             });
+            /*
             usedBiomeModesGraph.addPlotter(new Plotter("OldGenerator")
             {
                 @Override
@@ -83,6 +86,7 @@ public class BukkitMetricsHelper extends MetricsHelper
                     return oldBiomeMode;
                 }
             });
+            */
             usedBiomeModesGraph.addPlotter(new Plotter("Custom / Unknown")
             {
                 @Override

@@ -56,7 +56,7 @@ public class OTGChunkGenerator extends ChunkGenerator
 
         WorldConfig.TerrainMode mode = _world.getConfigs().getWorldConfig().modeTerrain;
 
-        if (mode == WorldConfig.TerrainMode.Normal || mode == WorldConfig.TerrainMode.OldGenerator)
+        if (mode == WorldConfig.TerrainMode.Normal)// || mode == WorldConfig.TerrainMode.OldGenerator)
             this.BlockPopulator.add(new OTGBlockPopulator(_world));
 
         if (mode == WorldConfig.TerrainMode.NotGenerate)

@@ -19,32 +19,19 @@ import java.util.Random;
  * to accept {@link SpawnableObject}s instead of {@link CustomObject}s, so that
  * all the extra methods are no longer needed.
  */
-class TreeObject implements CustomObject
+public class TreeObject implements CustomObject
 {
     private TreeType type;
-    private int minHeight = PluginStandardValues.WORLD_DEPTH;
-    private int maxHeight = PluginStandardValues.WORLD_HEIGHT;
-    
-    private static class TreeSettings extends Settings
-    {
-        static final Setting<Integer> MIN_HEIGHT = intSetting("MinHeight",
-                PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-        static final Setting<Integer> MAX_HEIGHT = intSetting("MaxHeight",
-                PluginStandardValues.WORLD_HEIGHT, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-    }
+    public int defaultMinHeight = PluginStandardValues.WORLD_DEPTH;
+    public int defaultMaxHeight = PluginStandardValues.WORLD_HEIGHT;    
+    public int minHeight = PluginStandardValues.WORLD_DEPTH;
+    public int maxHeight = PluginStandardValues.WORLD_HEIGHT;
 
     TreeObject(TreeType type)
     {
         this.type = type;
     }
 
-    public TreeObject(TreeType type, SettingsReaderOTGPlus settings)
-    {
-        this.type = type;
-        this.minHeight = settings.getSetting(TreeSettings.MIN_HEIGHT, TreeSettings.MIN_HEIGHT.getDefaultValue());
-        this.maxHeight = settings.getSetting(TreeSettings.MAX_HEIGHT, TreeSettings.MAX_HEIGHT.getDefaultValue());
-    }
-    
     @Override
     public boolean onEnable()
     {
@@ -63,7 +50,6 @@ class TreeObject implements CustomObject
         return true;
     }
 
-    // Non-OTG+
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
@@ -73,6 +59,12 @@ class TreeObject implements CustomObject
         }
         
         return spawnForced(world, random, rotation, x, y, z);
+    }
+
+    @Override
+    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
+    {
+    	return false;
     }
     
     @Override
@@ -95,8 +87,29 @@ class TreeObject implements CustomObject
 
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {      	
-    	throw new RuntimeException(); // Fix this properly, re-do the abstraction/inheritance for BO2/BO3/TreeObject/MCObject/CustomObject
+    {
+        int y = world.getHighestBlockYAt(x, z);
+        Rotation rotation = Rotation.getRandomRotation(random);
+
+        if (trySpawnAt(world, random, rotation, x, y, z))
+        {
+        	return true;
+        }   
+        return false;
+    }
+    
+    @Override
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
+    {
+        int y = world.getHighestBlockYAt(x, z);
+        Rotation rotation = Rotation.getRandomRotation(random);
+
+        if (y < minY || y > maxY)
+        {
+            return false;
+        }
+        
+        return spawnForced(world, random, rotation, x, y, z);        
     }
     
     @Override

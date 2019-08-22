@@ -164,18 +164,34 @@ public class GrassGen extends Resource
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) >= rarity)
+            {
                 continue;
+            }
+            
             int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             int y = world.getHighestBlockYAt(x, z);
 
             LocalMaterialData material;
-            while (((material = world.getMaterial(x, y, z, false)).isAir() || material.isMaterial(DefaultMaterial.LEAVES) || material
-                    .isMaterial(DefaultMaterial.LEAVES_2)) && (y > 0))
+            while (
+        		(
+    				((material = world.getMaterial(x, y, z, false)) == null ||
+    				(
+	    				material.isAir()) || 
+						material.isMaterial(DefaultMaterial.LEAVES) || 
+						material.isMaterial(DefaultMaterial.LEAVES_2)
+					)
+				) && 
+        		y > 0
+    		)
+            {
                 y--;
+            }
 
             if ((!world.isNullOrAir(x, y + 1, z, false)) || (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
+            {
                 continue;
+            }
             plant.spawn(world, x, y + 1, z);
         }
     }

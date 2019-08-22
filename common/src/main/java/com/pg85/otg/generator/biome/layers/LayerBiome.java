@@ -42,15 +42,15 @@ public class LayerBiome extends Layer
                 initChunkSeed(j + x, i + z);
                 currentPiece = childInts[(j + i * xSize)];
 
-                if ((currentPiece & BiomeGroupBits) != 0 && (currentPiece & BiomeBits) == 0)    // has biomegroup bits but not biome bits
+                if ((currentPiece & BiomeGroupBits) != 0 && (currentPiece & BiomeBitsAreSetBit) == 0)    // has biomegroup bits but not biome bits
                 {
                     group = manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
                     possibleBiomes = group.getDepthMapOrHigher(depth);
-                    //>>	Get Max Rarity
+                    // Get Max Rarity
                     if (!possibleBiomes.isEmpty())
                     {
                         newBiomeRarity = nextInt(BiomeGroupManager.getMaxRarityFromPossibles(possibleBiomes));
-                        //>>	Spawn the biome based on the rarity spectrum
+                        // Spawn the biome based on the rarity spectrum
                         for (Entry<Integer, LocalBiome> biome : possibleBiomes.entrySet())
                         {
                             if (newBiomeRarity < biome.getKey())
@@ -58,8 +58,11 @@ public class LayerBiome extends Layer
                                 if (biome.getValue() != null && biome.getValue().getBiomeConfig().biomeSize == this.depth)
                                 {
                                     currentPiece |= biome.getValue().getIds().getOTGBiomeId() |
-                                                    //>>	Set IceBit based on Biome Temperature
-                                                    (biome.getValue().getBiomeConfig().biomeTemperature <= freezeTemp ? IceBit : 0);
+                                        // Set IceBit based on Biome Temperature
+                                        (biome.getValue().getBiomeConfig().biomeTemperature <= freezeTemp ? IceBit : 0) |
+                                        // Set BiomeBitsAreSetBit
+                                        BiomeBitsAreSetBit
+                                        ;
                                 }
                                 break;
                             }

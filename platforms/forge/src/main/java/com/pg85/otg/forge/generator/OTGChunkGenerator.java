@@ -177,8 +177,9 @@ public class OTGChunkGenerator implements IChunkGenerator
 			if(chunk == null)
 			{
 				// Can happen when chunkExists() in this.world.getChunk() mistakenly returns false
-				// This could potentially cause an infinite loop but than't can't be disallowed looping because of async calls
+				// This could potentially cause an infinite loop but can't be disallowed because of async calls
 				// to ProvideChunk() by updateBlocks() on server tick.
+				// TODO: This is causing stackoverflowexceptions
 				chunk = this.world.getWorld().getChunk(chunkX, chunkZ);
 
 				if(chunk == null)

@@ -40,11 +40,14 @@ public class LayerRiver extends Layer
                 
                 currentPiece = childInts[(xi + 1 + (zi + 1) * xSize0)];
                 if ((centerCheck == 0) || (westCheck == 0) || (eastCheck == 0) || (northCheck == 0) || (southCheck == 0))
-                    currentPiece |= RiverBits;
-                else if ((centerCheck != westCheck) || (centerCheck != northCheck) || (centerCheck != eastCheck) || (centerCheck != southCheck))
-                    currentPiece |= RiverBits;
-                else
                 {
+                    currentPiece |= RiverBits;
+                }
+                else if ((centerCheck != westCheck) || (centerCheck != northCheck) || (centerCheck != eastCheck) || (centerCheck != southCheck))
+                {
+                    currentPiece |= RiverBits;
+                } else {
+                	// Remove any river bits entirely(?)
                     currentPiece |= RiverBits;
                     currentPiece ^= RiverBits;
                 }

@@ -82,7 +82,13 @@ public class LayerMixWithRiver extends Layer
 
                 if ((currentPiece & LandBit) != 0)
                 {
-                    cachedId = currentPiece & BiomeBits;
+                	if((currentPiece & BiomeBitsAreSetBit) != 0)
+                	{
+                		cachedId = currentPiece & BiomeBits;	
+                	} else {
+                		// TODO: When does this happen, is it okay for this to happen, shouldn't there be a land biome available?
+                		cachedId = this.defaultOceanId;
+                	}
                 }
                 else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
@@ -124,7 +130,13 @@ public class LayerMixWithRiver extends Layer
 
                 if ((currentPiece & LandBit) != 0)
                 {
-                    cachedId = currentPiece & BiomeBits;
+                	if((currentPiece & BiomeBitsAreSetBit) != 0)
+                	{
+                		cachedId = currentPiece & BiomeBits;	
+                	} else {
+                		// TODO: When does this happen, is it okay for this to happen, shouldn't there be a land biome available?
+                		cachedId = this.defaultOceanId;
+                	}
                 }
                 else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {
@@ -165,7 +177,13 @@ public class LayerMixWithRiver extends Layer
 
                 if ((currentPiece & LandBit) != 0)
                 {
-                    cachedId = currentPiece & BiomeBits;
+                	if((currentPiece & BiomeBitsAreSetBit) != 0)
+                	{
+                		cachedId = currentPiece & BiomeBits;	
+                	} else {
+                		// TODO: When does this happen, is it okay for this to happen, shouldn't there be a land biome available?
+                		cachedId = this.defaultOceanId;
+                	}
                 }
                 else if (worldConfig.frozenOcean && (currentPiece & IceBit) != 0)
                 {

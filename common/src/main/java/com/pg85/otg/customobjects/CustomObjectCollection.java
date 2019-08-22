@@ -2,11 +2,13 @@ package com.pg85.otg.customobjects;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.io.File;
 import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Represents a collection of custom objects. Those objects can be loaded from
@@ -149,6 +151,33 @@ public class CustomObjectCollection
         customObjectFilesPerWorld.clear();
     }
 
+    public ArrayList<BO4> getAllBO4sForWorld(String worldName)
+    {
+    	ArrayList<BO4> allBO4s = new ArrayList<BO4>();
+    	
+    	if(worldName != null)
+    	{
+    		if(worldName.equals("overworld"))
+    		{
+    			worldName = OTG.getEngine().getPresetName("overworld");
+    		}
+    		
+    		HashMap<String, File> worldObjectFilesByName = customObjectFilesPerWorld.get(worldName);
+	    	if(worldObjectFilesByName != null)
+	    	{
+	    		for(Entry<String, File> entry : worldObjectFilesByName.entrySet())
+	    		{
+    				CustomObject object = getObjectByName(entry.getKey(), worldName);
+	    			if(object instanceof BO4)
+	    			{
+	    				allBO4s.add((BO4)object);
+	    			}
+	    		}
+	    	}
+    	}
+    	return allBO4s;
+    }
+    
     /**
      * Gets the object with the given name.
      * @param name Name of the object.
@@ -165,6 +194,11 @@ public class CustomObjectCollection
 
     	if(worldName != null)
     	{
+    		if(worldName.equals("overworld"))
+    		{
+    			worldName = OTG.getEngine().getPresetName("overworld");
+    		}
+    		
     		HashMap<String, CustomObject> worldObjectsByName = objectsByNamePerWorld.get(worldName);
 	    	if(worldObjectsByName != null)
 	    	{

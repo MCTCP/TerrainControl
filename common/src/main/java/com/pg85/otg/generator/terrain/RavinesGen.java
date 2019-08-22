@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.terrain;
 
 import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
@@ -166,8 +167,10 @@ public class RavinesGen extends TerrainGenBase
                 {
                     LocalBiome biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
                     BiomeConfig biomeConfig = biome.getBiomeConfig();
+                    DefaultMaterial surfaceblockDefaultMaterial = biomeConfig.surfaceBlock.toDefaultMaterial();
                     double d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
                     boolean surfaceBlockFound = false;
+                    LocalMaterialData surfaceBlockMaterial = null;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
                     	// If surfaceBlock is found then replace the bottom block with surfaceblock
@@ -176,17 +179,18 @@ public class RavinesGen extends TerrainGenBase
                             double d11 = ((currentDepth - 1) + 0.5D - paramDouble2) / d4;
                             if ((d9 * d9 + d10 * d10) * this.a[currentDepth - 1] + d11 * d11 / 6.0D < 1.0D)
                             {
-                                DefaultMaterial material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ).toDefaultMaterial();
+                            	LocalMaterialData material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ);
+                                DefaultMaterial defaultMaterial = material.toDefaultMaterial();
                                 
-                                if (!surfaceBlockFound && material == biomeConfig.surfaceBlock.toDefaultMaterial())
+                                if (!surfaceBlockFound && defaultMaterial == surfaceblockDefaultMaterial)
                                 {
                                 	surfaceBlockFound = true;
+                                	surfaceBlockMaterial = material;
                                 }
                                 
-                                
                                 if (
-                                	material != DefaultMaterial.BEDROCK &&
-                                	material != DefaultMaterial.AIR
+                            		defaultMaterial != DefaultMaterial.BEDROCK &&
+                    				defaultMaterial != DefaultMaterial.AIR
                         		)
                                 {                               	
                                     generatingChunkBuffer.setBlock(localX, currentDepth, localZ, air);
@@ -206,7 +210,7 @@ public class RavinesGen extends TerrainGenBase
                     				)
                                 )
                                 {
-                                    generatingChunkBuffer.setBlock(localX, currentDepth - 1, localZ, biomeConfig.surfaceBlock);
+                                    generatingChunkBuffer.setBlock(localX, currentDepth - 1, localZ, surfaceBlockMaterial);
                                 }
                             }
                         }

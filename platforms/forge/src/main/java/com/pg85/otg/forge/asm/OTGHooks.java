@@ -7,29 +7,14 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.asm.excluded.IOTGASMBiome;
-import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.DimensionManager;
 
 public class OTGHooks
-{
-	public static boolean initOTGDimension(int i)
-	{
-		if(DimensionManager.isDimensionRegistered(i))
-		{
-			if(OTGDimensionManager.IsOTGDimension(i))
-			{
-				OTGDimensionManager.initDimension(i);
-				return true;
-			}
-		}
-		return false;
-	}
-	
+{	
 	public static int getIDForObject(Biome biome)
 	{
 		if(biome instanceof IOTGASMBiome)

@@ -32,7 +32,7 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 	
     public boolean spawnWithChecks(CustomStructure structure, LocalWorld world, StructurePartSpawnHeight height, Random random)
     {
-        return ((BO3)object).trySpawnAt(false, structure, world, random, rotation, x, height.getCorrectY(world, x, this.y, z), z);
+        return ((BO3)object).trySpawnAt(false, structure, world, random, rotation, x, height.getCorrectY(world, x, this.y, z), z, ((BO3)object).getSettings().minHeight, ((BO3)object).getSettings().maxHeight);
     }
     
     /**

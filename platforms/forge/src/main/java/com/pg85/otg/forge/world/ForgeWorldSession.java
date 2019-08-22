@@ -113,7 +113,7 @@ public class ForgeWorldSession extends WorldSession
 	private void saveWorldBorderData()
 	{			
 		int dimensionId = world.getDimensionId();
-		File worldBorderFile = new File(world.getWorldSaveDir() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "WorldBorder.txt");		
+		File worldBorderFile = new File(world.getWorldSaveDir() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + "WorldBorder.txt");		
 		if(worldBorderFile.exists())
 		{
 			worldBorderFile.delete();
@@ -148,7 +148,7 @@ public class ForgeWorldSession extends WorldSession
 	private void loadWorldBorderData()
 	{	
 		int dimensionId = world.getDimensionId();
-		File worldBorderFile = new File(world.getWorldSaveDir() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + "WorldBorder.txt");				
+		File worldBorderFile = new File(world.getWorldSaveDir() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + "WorldBorder.txt");				
 		String[] worldBorderFileValues = {};
 		if(worldBorderFile.exists())
 		{

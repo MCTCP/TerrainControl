@@ -28,7 +28,7 @@ public interface SurfaceGenerator
      * @param xInWorld        X position in the world.
      * @param zInWorld        Z position in the world.
      */
-    void spawn(GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld);
+    void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld);
 
     /**
      * Writes the settings used to a string. There must be a constructor to

@@ -118,7 +118,7 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
     	// TODO: This is for legacy worlds only, the files are stored in the world saves directory now. Remove this?
 		
 		// Check for world settings for this world
-        File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+        File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName);
         if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
         {
         	for(File worldDir : OTGWorldsDirectory.listFiles())
@@ -126,43 +126,43 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
         		if(worldDir.isDirectory() && worldDir.getName().equals(worldName))
         		{
     				// Only delete temp world files, not WorldBiomes and WorldObjects
-    				File StructureDataDirectory = new File(worldDir.getAbsolutePath() + "/StructureData");
+    				File StructureDataDirectory = new File(worldDir.getAbsolutePath() + File.separator + "StructureData");
                     if (StructureDataDirectory.exists())
                     {
                     	IOHelper.deleteRecursive(StructureDataDirectory);
                     }
 
-                    File dimensionsDataFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.DimensionsDataFileName);
+                    File dimensionsDataFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.DimensionsDataFileName);
                     if (dimensionsDataFile.exists())
                     {
                     	IOHelper.deleteRecursive(dimensionsDataFile);
                     }
                     
-                    File structureDataFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.StructureDataFileName);
+                    File structureDataFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.StructureDataFileName);
                     if (structureDataFile.exists())
                     {
                     	IOHelper.deleteRecursive(structureDataFile);
                     }
                     
-                    File nullChunksFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.NullChunksFileName);
+                    File nullChunksFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.NullChunksFileName);
                     if (nullChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(nullChunksFile);
                     }
                     
-                    File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.SpawnedStructuresFileName);
+                    File spawnedStructuresFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.SpawnedStructuresFileName);
                     if (spawnedStructuresFile.exists())
                     {
                     	IOHelper.deleteRecursive(spawnedStructuresFile);
                     }
 
-                    File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.ChunkProviderPopulatedChunksFileName);
+                    File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.ChunkProviderPopulatedChunksFileName);
                     if (chunkProviderPopulatedChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(chunkProviderPopulatedChunksFile);
                     }
 
-                    File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + "/" + WorldStandardValues.PregeneratedChunksFileName);
+                    File pregeneratedChunksFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.PregeneratedChunksFileName);
                     if (pregeneratedChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(pregeneratedChunksFile);

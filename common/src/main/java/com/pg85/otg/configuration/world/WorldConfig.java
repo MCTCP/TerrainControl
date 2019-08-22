@@ -78,7 +78,7 @@ public class WorldConfig extends ConfigFile
     public int riverRarity;
     public int riverSize;
     public boolean riversEnabled;
-    public boolean improvedRivers;
+    //public boolean improvedRivers;
     public boolean randomRivers;
 
     // Biome image
@@ -165,7 +165,7 @@ public class WorldConfig extends ConfigFile
     public LocalMaterialData cooledLavaBlock;
     public boolean betterSnowFall;
     public boolean fullyFreezeLakes;
-    public boolean useTemperatureForSnowHeight;
+    //public boolean useTemperatureForSnowHeight;
 
     public double fractureHorizontal;
     public double fractureVertical;
@@ -289,10 +289,10 @@ public class WorldConfig extends ConfigFile
     public enum TerrainMode
     {
         Normal,
-        OldGenerator,
+        //OldGenerator,
         TerrainTest,
-        NotGenerate,
-        Default
+        NotGenerate //,
+        //Default
     }
 
     public enum ImageMode
@@ -555,7 +555,7 @@ public class WorldConfig extends ConfigFile
     	this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME);
     	
         // Freeze & Snow Settings
-        this.useTemperatureForSnowHeight = reader.getSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
+        //this.useTemperatureForSnowHeight = reader.getSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
         this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL);
         this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES);
 
@@ -563,7 +563,7 @@ public class WorldConfig extends ConfigFile
         this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY);
         this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE);
         this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED);
-        this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
+        //this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
         this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
         
 		// Biome Groups
@@ -664,7 +664,7 @@ public class WorldConfig extends ConfigFile
         this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK);
         this.populateUsingSavedBiomes = reader.getSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES);
 
-        this.oldTerrainGenerator = this.modeTerrain == TerrainMode.OldGenerator;
+        this.oldTerrainGenerator = false; //this.modeTerrain == TerrainMode.OldGenerator;
 
         this.author = reader.getSetting(WorldStandardValues.AUTHOR);
         this.description = reader.getSetting(WorldStandardValues.DESCRIPTION);
@@ -871,18 +871,18 @@ public class WorldConfig extends ConfigFile
                 "Possible terrain modes:",
                 "   Normal - use all features",
                 "   TerrainTest - generate only terrain without any resources",
-                "   NotGenerate - generate empty chunks",
-                "   Default - use default terrain generator",
-                "   OldGenerator - Minecraft Beta 1.7.3-like land generator");
+                "   NotGenerate - generate empty chunks");//,
+                //"   Default - use default terrain generator",
+                //"   OldGenerator - Minecraft Beta 1.7.3-like land generator");
 
         writer.putSetting(WorldStandardValues.BIOME_MODE, OTG.getBiomeModeManager().getName(biomeMode),
                 "Possible biome modes:",
                 "   Normal - use all features",
                 "   FromImage - get biomes from image file",
-                "   Default - use default Notch biome generator",
+                //"   Default - use default Notch biome generator",
                 "For old maps two more modes are available:",
-                "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes",
-                "   OldGenerator - Minecraft Beta 1.7.3 biome generator");
+                "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");//,
+                //"   OldGenerator - Minecraft Beta 1.7.3 biome generator");
 
         // Custom biomes
         writer.bigTitle("Custom biomes");
@@ -979,6 +979,7 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.RIVERS_ENABLED, this.riversEnabled,
                 "Set this to false to prevent the river generator from doing anything.");
 
+        /*
         writer.putSetting(WorldStandardValues.IMPROVED_RIVERS, this.improvedRivers,
                 "When this is set to false, the standard river generator of Minecraft will be used.",
                 "This means that a technical biome, determined by the RiverBiome setting of the biome",
@@ -986,6 +987,7 @@ public class WorldConfig extends ConfigFile
                 "",
                 "When enabled, the rivers won't use a technical biome in your world anymore, instead",
                 "you can control them using the river settings in the BiomeConfigs.");
+        */
 
         writer.putSetting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers,
                 "When set to true the rivers will no longer follow biome border most of the time.");
@@ -1096,11 +1098,13 @@ public class WorldConfig extends ConfigFile
                 "By Default in cold biomes, lakes freeze but only water exposed to sky is frozen.",
                 "Setting this to true causes any lake in a cold biome with at least one block exposed to sky to completely freeze");
 
+        /*
         writer.putSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT, this.useTemperatureForSnowHeight,
                 "By Default, all snow is 1 layer high. When this setting is set to true, snow height is",
                 "determined by biome temperature and therefore height.",
                 "For now: A block temp > -.5 yields a single snow layer. A block temp < -.75 yields max snow layers.",
                 "All values in the range -.75 < temp < -.5 are evenly distributed.");
+        */
 
         writer.putSetting(WorldStandardValues.BETTER_SNOW_FALL, this.betterSnowFall,
                 "By Default, snow falls on the highest block only.",

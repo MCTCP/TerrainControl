@@ -76,7 +76,7 @@ public interface LocalWorld
      * necessary.
      * @return The LocalBiome instance.
      */
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider);
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider, boolean isReload);
 
     /**
      * Gets how many different biome ids are in the world. Biome ids will start

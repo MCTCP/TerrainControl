@@ -122,7 +122,7 @@ public class OTGWorldType extends WorldType
 	        {
 			    // TODO: Why does MC add \\.? Removing.. 
 			    File worldSaveDir = new File(mcWorld.getSaveHandler().getWorldDirectory().getAbsolutePath().replace("\\.",  ""));
-			    OTG.IsNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
+			    OTG.IsNewWorldBeingCreated = !new File(worldSaveDir, File.separator + "region").exists();
 	        }
         }
 
@@ -182,11 +182,12 @@ public class OTGWorldType extends WorldType
     public net.minecraft.world.gen.IChunkGenerator getChunkGenerator(World mcWorld, String generatorOptions)
     {
         ForgeWorld world = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
-        if (world != null && world.getConfigs().getWorldConfig().modeTerrain != WorldConfig.TerrainMode.Default)
+        if (world != null)// && world.getConfigs().getWorldConfig().modeTerrain != WorldConfig.TerrainMode.Default)
         {
             return world.getChunkGenerator();
-        } else
+        } else {
             return super.getChunkGenerator(mcWorld, generatorOptions);
+        }
     }
 
     @Override

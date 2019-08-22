@@ -144,8 +144,8 @@ public class OTGPlugin extends JavaPlugin
         File baseFolder = getWorldSettingsFolder(worldName);
         
         // Check if world exists
-	    File worldSaveDir = new File(".\\" + worldName + "\\");
-	    OTG.IsNewWorldBeingCreated = !new File(worldSaveDir, "/region").exists();
+	    File worldSaveDir = new File("." + File.separator + worldName + File.separator);
+	    OTG.IsNewWorldBeingCreated = !new File(worldSaveDir, File.separator + "region").exists();
         
         ServerConfigProvider configs = new ServerConfigProvider(baseFolder, localWorld, worldSaveDir);
         localWorld.setSettings(configs);
@@ -161,12 +161,12 @@ public class OTGPlugin extends JavaPlugin
         {
             case Normal:
             case TerrainTest:
-            case OldGenerator:
+            //case OldGenerator:
             case NotGenerate:
                 generator = new OTGChunkGenerator(this);
                 break;
-            case Default:
-                break;
+            //case Default:
+                //break;
         }
 
         // Set and return the generator

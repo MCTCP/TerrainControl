@@ -23,8 +23,7 @@ public class ForgeBiome implements LocalBiome
         if (biome instanceof OTGBiome)
         {
             this.isCustom = true;
-        } else
-        {
+        } else {
             this.isCustom = false;
         }
         
