@@ -8,8 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LayerBiomeInBiome extends Layer
-{
-
+{	
     private static class Isle
     {
         short biomeId;
@@ -19,11 +18,13 @@ public class LayerBiomeInBiome extends Layer
         boolean inOcean = false;
     }
 
+	private int defaultOceanId;
     private final long worldSeed;
     private List<Isle> isles = new ArrayList<Isle>();
 
-    LayerBiomeInBiome(Layer childLayer, long worldSeed)
+    LayerBiomeInBiome(Layer childLayer, long worldSeed, int defaultOceanId)
     {
+    	this.defaultOceanId = defaultOceanId;
         this.worldSeed = worldSeed;
         this.child = childLayer;
     }
@@ -69,7 +70,6 @@ public class LayerBiomeInBiome extends Layer
         {
             for (int xi = 0; xi < xSize; xi++)
             {
-
                 // Start by just copying the biome from the child layer
                 selection = childInts[(xi + 1 + (zi + 1) * xSize0)];
 
@@ -90,19 +90,25 @@ public class LayerBiomeInBiome extends Layer
 
                         if (((selection & LandBit) == 0) && (nwCheck == 0) && (neCheck == 0) && (swCheck == 0) && (seCheck == 0) && nextInt(isle.chance) == 0)
                         {
-                            selection = (selection & IceBit) | (selection & RiverBits) | LandBit | isle.biomeId | IslandBit;
+                            selection = (selection & IceBit) | (selection & RiverBits) | LandBit | isle.biomeId | IslandBit | BiomeBitsAreSetBit;
                             alreadySpawned = true;
                         }
                     }
                     if (!alreadySpawned)
                     {
-                        nwCheck = childInts[(xi + 0 + (zi) * xSize0)] & BiomeBits;
+                        nwCheck = childInts[(xi + 0 + (zi) * xSize0)];
+                        nwCheck = (nwCheck & BiomeBitsAreSetBit) != 0 ? nwCheck & BiomeBits : this.defaultOceanId;
                         neCheck = childInts[(xi + 2 + (zi) * xSize0)] & BiomeBits;
+                        neCheck = (neCheck & BiomeBitsAreSetBit) != 0 ? neCheck & BiomeBits : this.defaultOceanId;
                         swCheck = childInts[(xi + 0 + (zi + 2) * xSize0)] & BiomeBits;
+                        swCheck = (swCheck & BiomeBitsAreSetBit) != 0 ? swCheck & BiomeBits : this.defaultOceanId;
                         seCheck = childInts[(xi + 2 + (zi + 2) * xSize0)] & BiomeBits;
+                        seCheck = (seCheck & BiomeBitsAreSetBit) != 0 ? seCheck & BiomeBits : this.defaultOceanId;
 
-                        if (isle.canSpawnIn[(selection & BiomeBits)] && isle.canSpawnIn[nwCheck] && isle.canSpawnIn[neCheck] && isle.canSpawnIn[swCheck] && isle.canSpawnIn[seCheck] && nextInt(isle.chance) == 0)
-                            selection = (selection & LandBit) | (selection & IceBit) | (selection & RiverBits) | isle.biomeId | IslandBit;
+                        if (isle.canSpawnIn[(selection & BiomeBitsAreSetBit) != 0 ? (selection & BiomeBits) : this.defaultOceanId] && isle.canSpawnIn[nwCheck] && isle.canSpawnIn[neCheck] && isle.canSpawnIn[swCheck] && isle.canSpawnIn[seCheck] && nextInt(isle.chance) == 0)
+                        {
+                            selection = (selection & LandBit) | (selection & IceBit) | (selection & RiverBits) | isle.biomeId | IslandBit | BiomeBitsAreSetBit;
+                        }
                     }
                 }
                 thisInts[(xi + zi * xSize)] = selection;

@@ -216,6 +216,7 @@ public class CavesGen extends TerrainGenBase
                     d10 = (local_z + generatingChunk.getBlockZ() + 0.5D - z) / d3;
 
                     surfaceBlockFound = false;
+                    LocalMaterialData surfaceBlockMaterial = null;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
                     	surfaceBlockDepth = 0;
@@ -238,23 +239,24 @@ public class CavesGen extends TerrainGenBase
                                 material = generatingChunkBuffer.getBlock(local_x, currentDepth, local_z);
                                 materialAbove = generatingChunkBuffer.getBlock(local_x, currentDepth + 1, local_z);
                                 //if (!surfaceBlockFound && material.isMaterial(biome.getBiomeConfig().surfaceBlock.toDefaultMaterial()))
-                                if(currentDepth == surfaceBlockDepth)
+                                if(!surfaceBlockFound && currentDepth == surfaceBlockDepth)
                                 {
                                 	surfaceBlockFound = true;
+                                	surfaceBlockMaterial = material;
                                 }
                                 if (this.isSuitableBlock(material, materialAbove))//, biome.getBiomeConfig()))
                                 {
                                     generatingChunkBuffer.setBlock(local_x, currentDepth, local_z, air);
                                     block = generatingChunkBuffer.getBlock(local_x, currentDepth - 1, local_z);
 
-                                    // If grass was just deleted, try to move it down
+                                    // If a surface block was just deleted, try to move it down
                                     if (
                                 		surfaceBlockFound &&
                                 		!block.isLiquid() &&
                                 		!block.isMaterial(DefaultMaterial.BEDROCK)
                             		)
                                     {
-                                        generatingChunkBuffer.setBlock(local_x, currentDepth - 1, local_z, material);//biome.getBiomeConfig().surfaceBlock);
+                                        generatingChunkBuffer.setBlock(local_x, currentDepth - 1, local_z, surfaceBlockMaterial);
                                     }
                                 }
                             }

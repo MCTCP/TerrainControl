@@ -1734,10 +1734,15 @@ public class BO4Config extends CustomObjectConfigFile
 		        LocalMaterialData[] blocksArr = new LocalMaterialData[blocksArrArrLength];
 		        for(int i = 0; i < blocksArrArrLength; i++)
 		        {
+		        	String materialName = StreamHelper.readStringFromBuffer(buffer);
 		        	try {
-						blocksArr[i] = MaterialHelper.readMaterial(StreamHelper.readStringFromBuffer(buffer));
+						blocksArr[i] = MaterialHelper.readMaterial(materialName);
 					} catch (InvalidConfigException e) {
-						e.printStackTrace();
+						if(OTG.getPluginConfig().spawnLog)
+						{
+							OTG.log(LogMarker.WARN, "Could not read material \"" + materialName + "\" for BO4 \"" + this.getName() + "\"");
+							e.printStackTrace();
+						}
 					}
 		        }
 		        

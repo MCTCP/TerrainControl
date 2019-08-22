@@ -48,6 +48,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.JsonToNBT;
@@ -55,6 +56,7 @@ import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
@@ -341,7 +343,7 @@ public class ForgeWorld implements LocalWorld
 		if(getWorld() != null)
 		{
 			int dimensionId = getWorld().provider.getDimension();
-			File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : ""));
+			File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : ""));
 			if(worldDataDir.exists())
 			{
 				IOHelper.deleteRecursive(worldDataDir);
@@ -413,7 +415,7 @@ public class ForgeWorld implements LocalWorld
     }
     
     @Override
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider, boolean isReload)
     {
     	ForgeBiome forgeBiome = ForgeBiomeRegistryManager.getOrCreateBiome(biomeConfig, biomeIds, this.getName(), configProvider);
         this.biomeNames.put(forgeBiome.getName(), forgeBiome);
@@ -590,21 +592,21 @@ public class ForgeWorld implements LocalWorld
         return chunk.getBlockState(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
     }
     
-    // TODO: This returns AIR for nothing and AIR, refactor?
     @Override
     public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
     {
         if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
         {
-        	return ForgeMaterialData.ofMinecraftBlock(Blocks.AIR);
+        	return null;
         	//throw new RuntimeException();
         }
 
+        // TODO: Return null when attempting to fetch/set blocks outside of populating area && !allowOutsidePopulatingArea?
         Chunk chunk = this.getChunk(x, z, allowOutsidePopulatingArea);
 
         if(chunk == null && !allowOutsidePopulatingArea)
         {
-        	return ForgeMaterialData.ofMinecraftBlock(Blocks.AIR);
+        	return null;
         }
 
         // Can happen when requesting a chunk outside the world border
@@ -1074,6 +1076,8 @@ public class ForgeWorld implements LocalWorld
 		ResourceLocation entityResourceLocation = MobSpawnGroupHelper.resourceLocationFromMinecraftClass(entityClass);
 
         Entity entityliving = null;
+        float rotationFromNbt = 0;
+        boolean rotationFromNbtSet = false;
 
         if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
         {
@@ -1105,6 +1109,14 @@ public class ForgeWorld implements LocalWorld
 
 	        nbttagcompound.setString("id", entityResourceLocation.toString());
 	        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
+	        // TODO: Rotated item frames don't stick to walls correctly or don't pop off when their support block is removed.
+	        if(nbttagcompound.hasKey("Facing"))
+	        {
+	        	EnumFacing facing = EnumFacing.byIndex(nbttagcompound.getByte("Facing"));
+	        	rotationFromNbt = facing.getHorizontalIndex() * 90;
+	        	rotationFromNbtSet = true;
+	        }
+	        
         } else {
 	        try
 	        {
@@ -1150,7 +1162,7 @@ public class ForgeWorld implements LocalWorld
 	            float f1 = (float)k1;
 	            float f2 = (float)l1 + 0.5F;
 
-	            entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
+	            entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F);
 
 	            if(entityliving instanceof EntityLiving)
 	            {
@@ -1199,7 +1211,7 @@ public class ForgeWorld implements LocalWorld
 	            		            return;
 	            		        }
 	            	        }
-	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
+	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F);
 	            		}
 
 	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
@@ -1224,21 +1236,66 @@ public class ForgeWorld implements LocalWorld
 	            	{
 	            		if(r != 0)
 	            		{
-	                        try
-	                        {
-	                        	entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
-	                        }
-	                        catch (Exception exception)
-	                        {
-	                            exception.printStackTrace();
-	                            return;
-	                        }
-	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F);
+	            	        if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+	            	        {
+	            	        	NBTTagCompound nbttagcompound = new NBTTagCompound();
+
+	            		        try
+	            		        {
+	            		            NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
+
+	            		            if (!(nbtbase instanceof NBTTagCompound))
+	            		            {
+	            		            	if(OTG.getPluginConfig().spawnLog)
+	            		            	{
+	            		            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		            	}
+	            			        	return;
+	            		            }
+
+	            		            nbttagcompound = (NBTTagCompound)nbtbase;
+	            		        }
+	            		        catch (NBTException nbtexception)
+	            		        {
+	            		        	if(OTG.getPluginConfig().spawnLog)
+	            		        	{
+	            		        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+	            		        	}
+	            		        	return;
+	            		        }
+
+	            		        nbttagcompound.setString("id", entityResourceLocation.toString());
+	            		        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
+	            		        // TODO: Rotated item frames don't stick to walls correctly or don't pop off when their support block is removed.
+	            		        if(nbttagcompound.hasKey("Facing"))
+	            		        {
+	            		        	EnumFacing facing = EnumFacing.byIndex(nbttagcompound.getByte("Facing"));
+	            		        	rotationFromNbt = facing.getHorizontalIndex() * 90;
+	            		        	rotationFromNbtSet = true;
+	            		        }
+	            		        
+	            	        } else {
+	            		        try
+	            		        {
+	            		            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
+	            		        }
+	            		        catch (Exception exception)
+	            		        {
+	            		            exception.printStackTrace();
+	            		            return;
+	            		        }
+	            	        }
+	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F);
 	            		}
 
     			    	if(OTG.getPluginConfig().spawnLog)
     			    	{
     			    		OTG.log(LogMarker.DEBUG, "Spawned OK");
+    			    	}
+    			    	
+    			    	if(entityliving instanceof EntityItemFrame)
+    			    	{
+    			    		((EntityItemFrame)entityliving).facingDirection = ((EntityItemFrame)entityliving).facingDirection == null ? EnumFacing.SOUTH : ((EntityItemFrame)entityliving).facingDirection;  
     			    	}
 
 	            		world.spawnEntity(entityliving);

@@ -132,5 +132,4 @@ public final class BiomeColorsListener
         	
         waterColorEvent.setNewColor(biomeConfig.waterColor);
     }
-
 }

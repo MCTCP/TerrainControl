@@ -250,6 +250,8 @@ public class BiomeConfig extends ConfigFile
      */
     public int getSnowHeight(float temp)
     {
+    	// TODO: Reimplement this
+    	/*
         if (this.worldConfig.useTemperatureForSnowHeight)
         {
             if (temp <= -.75)
@@ -267,6 +269,7 @@ public class BiomeConfig extends ConfigFile
             if (temp <= -.5)
                 return 1;
         }
+        */
         return 0;
     }
 
@@ -407,24 +410,25 @@ public class BiomeConfig extends ConfigFile
                 }
             }
         }
-    	
+
         for (ConfigFunction<BiomeConfig> res : settings.getConfigFunctions(this, this.doResourceInheritance))
         {
             if (res != null)
             {
                 if (!(res instanceof SaplingGen))
                 {
-                    this.resourceSequence.add(res);
+                	this.resourceSequence.add(res);
+                }
+                if(res instanceof CustomStructureGen)
+                {
+                	// Only allow one customstructure per biome.
+                	// For inherited biomes, let the child override the parent.
+                	if(this.customStructures.size() == 0)
+                	{
+                		this.customStructures.add((CustomStructureGen)res);
+                	}
                 }
             }
-        }
-        
-        for (ConfigFunction<BiomeConfig> res : this.resourceSequence)
-        {
-        	if(res instanceof CustomStructureGen)
-        	{
-        		this.customStructures.add((CustomStructureGen)res);
-        	}
         }
     }
 

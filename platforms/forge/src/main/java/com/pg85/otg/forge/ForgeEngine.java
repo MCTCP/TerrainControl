@@ -180,7 +180,7 @@ public class ForgeEngine extends OTGEngine
 		Presets.clear();
 		
 	    ArrayList<String> worldNames = new ArrayList<String>();
-	    File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+	    File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName);
 	    if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
 	    {
 	    	for(File worldDir : OTGWorldsDirectory.listFiles())

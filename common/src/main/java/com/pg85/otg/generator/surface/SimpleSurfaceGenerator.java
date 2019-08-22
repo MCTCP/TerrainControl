@@ -20,6 +20,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 {
     private final LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
     private final LocalMaterialData sandstone = MaterialHelper.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
+    private final LocalMaterialData red_sandstone = MaterialHelper.toLocalMaterialData(DefaultMaterial.RED_SANDSTONE, 0);
 
     @Override
     public LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
@@ -28,11 +29,12 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     }
     
     @Override
-    public void spawn(GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
+    public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {
         spawnColumn(biomeConfig.surfaceBlock, biomeConfig.groundBlock, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
     }
 
+    // net.minecraft.world.biome.Biome.generateBiomeTerrain
     protected final void spawnColumn(LocalMaterialData defaultSurfaceBlock, LocalMaterialData defaultGroundBlock, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
     {
         WorldConfig worldConfig = biomeConfig.worldConfig;
@@ -58,8 +60,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
             {
                 // Place bedrock
                 chunkBuffer.setBlock(x, y, z, worldConfig.bedrockBlock);
-            } else
-            {
+            } else {
                 // Surface blocks logic (grass, dirt, sand, sandstone)
                 final LocalMaterialData blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
 
@@ -67,7 +68,8 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                 {
                     // Reset when air is found
                     surfaceBlocksCount = -1;
-                } else if (blockOnCurrentPos.equals(biomeConfig.stoneBlock))
+                }
+                else if (blockOnCurrentPos.equals(biomeConfig.stoneBlock))
                 {
                     if (surfaceBlocksCount == -1)
                     {
@@ -76,7 +78,8 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         {
                             currentSurfaceBlock = air;
                             currentGroundBlock = biomeConfig.stoneBlock;
-                        } else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
+                        }
+                        else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
                         {
                             currentSurfaceBlock = defaultSurfaceBlock;
                             currentGroundBlock = defaultGroundBlock;
@@ -89,33 +92,31 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                             if (currentTemperature < WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
                             {
                                 currentSurfaceBlock = biomeConfig.iceBlock;
-                            } else
-                            {
+                            } else {
                                 currentSurfaceBlock = biomeConfig.waterBlock;
                             }
                         }
 
                         // Place surface block
-                        surfaceBlocksCount = surfaceBlocksNoise;
+                        surfaceBlocksCount = surfaceBlocksNoise;                       
                         if (y >= currentWaterLevel - 1)
                         {
-                            chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
-                        } else
-                        {
-                            chunkBuffer.setBlock(x, y, z, currentGroundBlock);
+                        	chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
+                        } else {
+                        	chunkBuffer.setBlock(x, y, z, currentGroundBlock);
                         }
-
-                    } else if (surfaceBlocksCount > 0)
+                    }
+                    else if (surfaceBlocksCount > 0)
                     {
                         // Place ground block
                         surfaceBlocksCount--;
                         chunkBuffer.setBlock(x, y, z, currentGroundBlock);
 
                         // Place sandstone under stand
-                        if ((surfaceBlocksCount == 0) && (currentGroundBlock.isMaterial(DefaultMaterial.SAND)))
+                        if ((surfaceBlocksCount == 0) && (currentGroundBlock.isMaterial(DefaultMaterial.SAND)) && surfaceBlocksNoise > 1)
                         {
-                            surfaceBlocksCount = generatingChunk.random.nextInt(4);
-                            currentGroundBlock = sandstone;
+                            surfaceBlocksCount = generatingChunk.random.nextInt(4) + Math.max(0, y - generatingChunk.getWaterLevel(x, z));
+                            currentGroundBlock = currentGroundBlock.getBlockData() == 1 ? red_sandstone : sandstone;
                         }
                     }
                 }

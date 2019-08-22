@@ -36,7 +36,7 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
     }
 
     @Override
-    public void spawn(GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
+    public void spawn(long worldSeed, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
     {
         int x = xInWorld & 0xf;
         int z = zInWorld & 0xf;

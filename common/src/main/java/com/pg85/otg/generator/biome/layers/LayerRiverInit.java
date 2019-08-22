@@ -26,11 +26,13 @@ public class LayerRiverInit extends Layer
                 initChunkSeed(zi + z, xi + x);           // reversed
                 currentPiece = childInts[(xi + zi * xSize)];
                 if (nextInt(2) == 0)
+                {
                     currentPiece |= RiverBitOne;
-                else
+                } else {
                     currentPiece |= RiverBitTwo;
+                }
 
-                thisInts[(xi + zi * xSize)] = currentPiece;
+                thisInts[(xi + zi * xSize)] = currentPiece;                
             }
         }
         return thisInts;

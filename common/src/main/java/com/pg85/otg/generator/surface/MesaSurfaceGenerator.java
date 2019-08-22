@@ -5,14 +5,11 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
-import com.pg85.otg.generator.noise.NoiseGeneratorBiomeBlocksOctaves;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.generator.noise.NoiseGeneratorPerlinMesaBlocks;
 import com.pg85.otg.util.helpers.MaterialHelper;
-import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Random;
 
 public class MesaSurfaceGenerator implements SurfaceGenerator
@@ -21,12 +18,13 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     public static final String NAME_FOREST = "MesaForest";
     public static final String NAME_BRYCE = "MesaBryce";
 
-    private LocalMaterialData[] blockDataValuesArray;
-    private boolean isForestMesa;
-    private boolean isBryceMesa;
-    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce1;
-    private NoiseGeneratorBiomeBlocksOctaves noiseGenBryce2;
-    private NoiseGeneratorBiomeBlocksOctaves noiseGenBlockData;
+    private LocalMaterialData[] clayBands;
+    private long worldSeed;
+    private boolean hasForest;
+    private boolean brycePillars;
+    private NoiseGeneratorPerlinMesaBlocks pillarNoise;
+    private NoiseGeneratorPerlinMesaBlocks pillarRoofNoise;
+    private NoiseGeneratorPerlinMesaBlocks clayBandsOffsetNoise;
 
     private final LocalMaterialData hardenedClay;
     private final LocalMaterialData redSand;
@@ -37,18 +35,11 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private final LocalMaterialData redStainedClay;
     private final LocalMaterialData silverStainedClay;
     private final LocalMaterialData coarseDirt;
-    
-    private HashMap<ChunkCoordinate, Double> bryceHeightPerColumn = new HashMap<ChunkCoordinate, Double>();
-    private HashMap<ChunkCoordinate, Integer> generatingChunkWaterLevelPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    private HashMap<ChunkCoordinate, Double> noisePerColumn = new HashMap<ChunkCoordinate, Double>();    
-    private HashMap<ChunkCoordinate, Integer> noisePlusRandomFactorPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    private HashMap<ChunkCoordinate, Boolean> cosNoiseIsLargerThanZeroPerColumn = new HashMap<ChunkCoordinate, Boolean>();
-    private HashMap<ChunkCoordinate, Integer> maxHeightPerColumn = new HashMap<ChunkCoordinate, Integer>();
-    
+        
     private MesaSurfaceGenerator(boolean mountainMesa, boolean forestMesa)
     {
-        this.isBryceMesa = mountainMesa;
-        this.isForestMesa = forestMesa;
+        this.brycePillars = mountainMesa;
+        this.hasForest = forestMesa;
 
         this.hardenedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0);
         this.redSand = MaterialHelper.toLocalMaterialData(DefaultMaterial.SAND, 1);
@@ -86,372 +77,161 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         return null;
     }    
     
-    private LocalMaterialData getBlockData(int i, int j, int k)
+    private LocalMaterialData getBand(int i, int j, int k)
     {
-        int l = (int) Math.round(this.noiseGenBlockData.a(i * 1.0D / 512.0D, i * 1.0D / 512.0D) * 2.0D);
-
-        return this.blockDataValuesArray[(j + l + 64) % 64];
+    	int l = (int)Math.round(this.clayBandsOffsetNoise.getValue((double)i / 512.0D, (double)i / 512.0D) * 2.0D);
+        return this.clayBands[(j + l + 64) % 64];
     }
 
-    private void initializeSmallByteArray(Random random)
+    // net.minecraft.world.biome.BiomeMesa.generateBands
+    private void generateBands(long p_150619_1_)
     {
-        this.blockDataValuesArray = new LocalMaterialData[64];
-        Arrays.fill(this.blockDataValuesArray, this.hardenedClay);
+        this.clayBands = new LocalMaterialData[64];
+        Arrays.fill(this.clayBands, this.hardenedClay);
+        Random random = new Random(p_150619_1_);
 
-        this.noiseGenBlockData = new NoiseGeneratorBiomeBlocksOctaves(random, 1);
-
-        int j;
-
-        for (j = 0; j < 64; ++j)
+        this.clayBandsOffsetNoise = new NoiseGeneratorPerlinMesaBlocks(random, 1);
+       
+        for (int l1 = 0; l1 < 64; ++l1)
         {
-            j += random.nextInt(5) + 1;
-            if (j < 64)
+            l1 += random.nextInt(5) + 1;
+
+            if (l1 < 64)
             {
-                this.blockDataValuesArray[j] = this.orangeStainedClay;
+                this.clayBands[l1] = this.orangeStainedClay;
+            }
+        }
+        
+        int i2 = random.nextInt(4) + 2;
+
+        for (int i = 0; i < i2; ++i)
+        {
+            int j = random.nextInt(3) + 1;
+            int k = random.nextInt(64);
+
+            for (int l = 0; k + l < 64 && l < j; ++l)
+            {
+                this.clayBands[k + l] = this.yellowStainedClay;
+            }
+        }
+        
+        int j2 = random.nextInt(4) + 2;
+
+        for (int k2 = 0; k2 < j2; ++k2)
+        {
+            int i3 = random.nextInt(3) + 2;
+            int l3 = random.nextInt(64);
+
+            for (int i1 = 0; l3 + i1 < 64 && i1 < i3; ++i1)
+            {
+                this.clayBands[l3 + i1] = this.brownStainedClay;
             }
         }
 
-        j = random.nextInt(4) + 2;
+        int l2 = random.nextInt(4) + 2;
 
-        int k;
-        int l;
-        int i1;
-        int j1;
-
-        for (k = 0; k < j; ++k)
+        for (int j3 = 0; j3 < l2; ++j3)
         {
-            l = random.nextInt(3) + 1;
-            i1 = random.nextInt(64);
+            int i4 = random.nextInt(3) + 1;
+            int k4 = random.nextInt(64);
 
-            for (j1 = 0; i1 + j1 < 64 && j1 < l; ++j1)
+            for (int j1 = 0; k4 + j1 < 64 && j1 < i4; ++j1)
             {
-                this.blockDataValuesArray[i1 + j1] = this.yellowStainedClay;
+                this.clayBands[k4 + j1] = this.redStainedClay;
             }
         }
 
-        k = random.nextInt(4) + 2;
+        int k3 = random.nextInt(3) + 3;
+        int j4 = 0;
 
-        int k1;
-
-        for (l = 0; l < k; ++l)
+        for (int l4 = 0; l4 < k3; ++l4)
         {
-            i1 = random.nextInt(3) + 2;
-            j1 = random.nextInt(64);
+            int i5 = 1;
+            j4 += random.nextInt(16) + 4;
 
-            for (k1 = 0; j1 + k1 < 64 && k1 < i1; ++k1)
+            for (int k1 = 0; j4 + k1 < 64 && k1 < 1; ++k1)
             {
-                this.blockDataValuesArray[j1 + k1] = this.brownStainedClay;
-            }
-        }
+                this.clayBands[j4 + k1] = this.whiteStainedClay;
 
-        l = random.nextInt(4) + 2;
-
-        for (i1 = 0; i1 < l; ++i1)
-        {
-            j1 = random.nextInt(3) + 1;
-            k1 = random.nextInt(64);
-
-            for (int l1 = 0; k1 + l1 < 64 && l1 < j1; ++l1)
-            {
-                this.blockDataValuesArray[k1 + l1] = this.redStainedClay;
-            }
-        }
-
-        i1 = random.nextInt(3) + 3;
-        j1 = 0;
-
-        for (k1 = 0; k1 < i1; ++k1)
-        {
-            byte b0 = 1;
-
-            j1 += random.nextInt(16) + 4;
-
-            for (int i2 = 0; j1 + i2 < 64 && i2 < b0; ++i2)
-            {
-                this.blockDataValuesArray[j1 + i2] = this.whiteStainedClay;
-                if (j1 + i2 > 1 && random.nextBoolean())
+                if (j4 + k1 > 1 && random.nextBoolean())
                 {
-                    this.blockDataValuesArray[j1 + i2 - 1] = this.silverStainedClay;
+                    this.clayBands[j4 + k1 - 1] = this.silverStainedClay;
                 }
 
-                if (j1 + i2 < 63 && random.nextBoolean())
+                if (j4 + k1 < 63 && random.nextBoolean())
                 {
-                    this.blockDataValuesArray[j1 + i2 + 1] = this.silverStainedClay;
+                    this.clayBands[j4 + k1 + 1] = this.silverStainedClay;
                 }
             }
         }
     }
    
-    @Override
+	@Override
     public LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
-    {   	                      
-        if(!noisePerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-        	return null;
-        } 
-        
-        if (this.blockDataValuesArray == null)
-        {
-    		throw new RuntimeException();
-        }
+    {        
+    	int l = (int)Math.round(this.clayBandsOffsetNoise.getValue((double)xInWorld / 512.0D, (double)xInWorld / 512.0D) * 2.0D);
+        return this.clayBands[(yInWorld + l + 64) % 64];
+    }   
 
-        // Bryce spike calculations
-        double bryceHeight = 0.0D;
-        if (this.isBryceMesa)
-        {
-	        if(!bryceHeightPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-	        {
-	    		throw new RuntimeException();
-	        } else {
-	        	bryceHeight = bryceHeightPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-	        }
-        }
-        
-        int waterLevel;
-        if(!generatingChunkWaterLevelPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-    		throw new RuntimeException();
-        } else {
-        	waterLevel = generatingChunkWaterLevelPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }
-        
-        LocalMaterialData currentSurfaceBlock = whiteStainedClay;
-        LocalMaterialData currentGroundBlock = whiteStainedClay;
-        
-        int noisePlusRandomFactor;
-        if(!noisePlusRandomFactorPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-    		throw new RuntimeException();
-        } else {
-        	noisePlusRandomFactor = noisePlusRandomFactorPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }        
-                
-        boolean cosNoiseIsLargerThanZero;
-        if(!cosNoiseIsLargerThanZeroPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-    		throw new RuntimeException();
-        } else {
-        	cosNoiseIsLargerThanZero = cosNoiseIsLargerThanZeroPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }        
-        
-        int k1 = -1;
-        boolean belowSand = false;
-
-        int maxHeight;
-        if(!maxHeightPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-    		throw new RuntimeException();
-        } else {
-        	maxHeight = maxHeightPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }
-        
-        if(yInWorld > maxHeight)
-        {
-        	maxHeight = yInWorld;
-        	maxHeightPerColumn.put(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld), maxHeight);
-        }
-        
-        int minHeight = 0;
-                
-        for (int y = maxHeight; y >= minHeight; y--)
-        {
-            LocalMaterialData material = null;
-            
-            if (world.isNullOrAir(xInWorld, y, zInWorld, false) && y < (int) bryceHeight)
-            {
-            	material = biomeConfig.stoneBlock;
-            }
-
-            LocalMaterialData blockAtPosition = world.getMaterial(xInWorld, y, zInWorld, false);
-
-            if(!blockAtPosition.toDefaultMaterial().equals(DefaultMaterial.BEDROCK))
-            {            
-	            if (blockAtPosition.isAir() && y > yInWorld)
-	            {
-	                k1 = -1;
-	            } else if (blockAtPosition.isSolid() || y <= yInWorld )
-	            {
-	                LocalMaterialData iblockdata3;
-	
-	                if (k1 == -1)
-	                {
-	                    belowSand = false;
-	                    if (noisePlusRandomFactor <= 0)
-	                    {
-	                        currentSurfaceBlock = null;
-	                        currentGroundBlock = biomeConfig.stoneBlock;
-	                    } else if (y >= waterLevel - 4 && y <= waterLevel + 1)
-	                    {
-	                        currentSurfaceBlock = this.whiteStainedClay;
-	                        currentGroundBlock = biomeConfig.groundBlock;
-	                    }
-	
-	                    if (y < waterLevel && (currentSurfaceBlock == null || currentSurfaceBlock.isAir()))
-	                    {
-	                        currentSurfaceBlock = biomeConfig.waterBlock;
-	                    }
-	
-	                    k1 = noisePlusRandomFactor + Math.max(0, y - waterLevel);
-	                    if (y >= waterLevel - 1)
-	                    {
-	                        if (this.isForestMesa && y > 86 + noisePlusRandomFactor * 2)
-	                        {
-	                            if (cosNoiseIsLargerThanZero)
-	                            {
-	                            	material =  this.coarseDirt;
-	                            } else {
-	                            	material =  biomeConfig.surfaceBlock;
-	                            }
-	                        }
-	                        else if (y > waterLevel + 3 + noisePlusRandomFactor)
-	                        {
-	                            if (y >= 64 && y <= 127)
-	                            {
-	                                if (cosNoiseIsLargerThanZero)
-	                                {
-	                                    iblockdata3 = this.hardenedClay;
-	                                } else {
-	                                    iblockdata3 = this.getBlockData(xInWorld, y, zInWorld);
-	                                }
-	                            } else {
-	                                iblockdata3 = this.orangeStainedClay;
-	                            }
-	
-	                            material =  iblockdata3;
-	                        } else {
-	                        	material =  redSand;
-	                            belowSand = true;
-	                        }
-	                    } else {
-	                    	material = currentGroundBlock;
-	                        if (currentGroundBlock.isMaterial(DefaultMaterial.STAINED_CLAY))
-	                        {
-	                        	material =  this.orangeStainedClay;
-	                        }
-	                    }
-	                }
-	                else if (k1 > 0)
-	                {
-	                    --k1;
-	                    if (belowSand)
-	                    {
-	                    	material = this.orangeStainedClay;
-	                    } else {
-	                        iblockdata3 = this.getBlockData(xInWorld, y, zInWorld);
-	                        material = iblockdata3;
-	                    }
-	                }
-	            }
-            }
-            
-        	if(y == yInWorld)
-        	{
-        		return material;
-        	}
-        }
-        return null;
-    }
-    
+    // net.minecraft.world.biome.BiomeMesa.genTerrainBlocks
     @Override
-    public void spawn(GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
+    public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {    	
-        int x = xInWorld & 0xf;
-        int z = zInWorld & 0xf;
-               
-        double noise;
-        if(!noisePerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
+        if (this.clayBands == null || this.worldSeed != worldSeed)
         {
-        	noise = generatingChunk.getNoise(x, z);
-        	noisePerColumn.put(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld), noise);
-        } else {
-        	noise = noisePerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        } 
-        
-        if (this.blockDataValuesArray == null)
-        {
-            this.initializeSmallByteArray(new Random(generatingChunk.getSeed()));
+            this.generateBands(worldSeed);
         }
-
+    	              
+        if (this.pillarNoise == null || this.pillarRoofNoise == null || this.worldSeed != worldSeed)
+        {
+            Random random = new Random(this.worldSeed);
+            this.pillarNoise = new NoiseGeneratorPerlinMesaBlocks(random, 4);
+            this.pillarRoofNoise = new NoiseGeneratorPerlinMesaBlocks(random, 1);
+        }
+        
+        int x = xInWorld & 15;
+        int z = zInWorld & 15;
+        double noise = generatingChunk.getNoise(x, z);
+        
+    	this.worldSeed = worldSeed;
         // Bryce spike calculations
         double bryceHeight = 0.0D;
-        if (this.isBryceMesa)
+        if (this.brycePillars)
         {
-	        if(!bryceHeightPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-	        {
-	            if (this.noiseGenBryce1 == null || this.noiseGenBryce2 == null)
-	            {
-	                Random newRandom = new Random(generatingChunk.getSeed());
+            int k = (xInWorld & -16) + (zInWorld & 15);
+            int l = (zInWorld & -16) + (xInWorld & 15);
+            double bryceNoiseValue = Math.min(Math.abs(noise), this.pillarNoise.getValue((double)k * 0.25D, (double)l * 0.25D));
 
-	                this.noiseGenBryce1 = new NoiseGeneratorBiomeBlocksOctaves(newRandom, 4);
-	                this.noiseGenBryce2 = new NoiseGeneratorBiomeBlocksOctaves(newRandom, 1);
-	            }
+            if (bryceNoiseValue > 0.0D)
+            {
+                double d3 = 0.001953125D;
+                double d4 = Math.abs(this.pillarRoofNoise.getValue((double)k * d3, (double)l * d3));
+                bryceHeight = bryceNoiseValue * bryceNoiseValue * 2.5D;
+                double d5 = Math.ceil(d4 * 50.0D) + 14.0D;
 
-	            int k = (xInWorld & -16) + (zInWorld & 15);
-	            int l = (zInWorld & -16) + (xInWorld & 15);
-	            double bryceNoiseValue = Math.min(Math.abs(noise), this.noiseGenBryce1.a(k * 0.25D, l * 0.25D));
+                if (bryceHeight > d5)
+                {
+                    bryceHeight = d5;
+                }
 
-	            if (bryceNoiseValue > 0.0D)
-	            {
-	                double d3 = 0.001953125D;
-	                double d4 = Math.abs(this.noiseGenBryce2.a(k * d3, l * d3));
-
-	                bryceHeight = bryceNoiseValue * bryceNoiseValue * 2.5D;
-	                double d5 = Math.ceil(d4 * 50.0D) + 14.0D;
-
-	                if (bryceHeight > d5)
-	                {
-	                    bryceHeight = d5;
-	                }
-
-	                bryceHeight += 64.0D;
-	            }
-	        	bryceHeightPerColumn.put(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld), bryceHeight);
-	        } else {
-	        	bryceHeight = bryceHeightPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-	        }
+                bryceHeight += 64.0D;
+            }
         }
         
-        int waterLevel;
-        if(!generatingChunkWaterLevelPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-        	waterLevel = generatingChunk.getWaterLevel(x, z);
-        	generatingChunkWaterLevelPerColumn.put(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld), waterLevel);
-        } else {
-        	waterLevel = generatingChunkWaterLevelPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }
+        int waterLevel = generatingChunk.getWaterLevel(x, z);
         
         LocalMaterialData currentSurfaceBlock = whiteStainedClay;
         LocalMaterialData currentGroundBlock = whiteStainedClay;
         
-        int noisePlusRandomFactor;
-        if(!noisePlusRandomFactorPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-        	noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
-        	noisePlusRandomFactorPerColumn.put(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld), noisePlusRandomFactor);
-        } else {
-        	noisePlusRandomFactor = noisePlusRandomFactorPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }        
+        int noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
                 
-        boolean cosNoiseIsLargerThanZero;
-        if(!cosNoiseIsLargerThanZeroPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-        	cosNoiseIsLargerThanZero = MathHelper.cos((float) (noise / 3.0D * Math.PI)) > 0.0D;
-        	cosNoiseIsLargerThanZeroPerColumn.put(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld), cosNoiseIsLargerThanZero);
-        } else {
-        	cosNoiseIsLargerThanZero = cosNoiseIsLargerThanZeroPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }        
+        boolean cosNoiseIsLargerThanZero = Math.cos(noise / 3.0D * Math.PI) > 0.0D;
         
         int k1 = -1;
         boolean belowSand = false;
+        int i1 = 0;
 
-        int maxHeight;
-        if(!maxHeightPerColumn.containsKey(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld)))
-        {
-        	maxHeight = generatingChunk.heightCap - 1;
-        	maxHeightPerColumn.put(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld), maxHeight);
-        } else {
-        	maxHeight = maxHeightPerColumn.get(ChunkCoordinate.fromChunkCoords(xInWorld,zInWorld));
-        }
+        int maxHeight = generatingChunk.heightCap - 1;
         
         int minHeight = 0;
 
@@ -465,14 +245,16 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             if (generatingChunk.mustCreateBedrockAt(biomeConfig.worldConfig, y))
             {
                 chunkBuffer.setBlock(x, y, z, biomeConfig.worldConfig.bedrockBlock);
-            } else
+            }
+            else if (i1 < 15 || this.brycePillars)
             {
                 LocalMaterialData blockAtPosition = chunkBuffer.getBlock(x, y, z);
 
                 if (blockAtPosition.isAir())
                 {
                     k1 = -1;
-                } else if (blockAtPosition.isSolid())
+                }
+                else if (blockAtPosition.isSolid())
                 {
                     LocalMaterialData iblockdata3;
 
@@ -483,7 +265,8 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         {
                             currentSurfaceBlock = null;
                             currentGroundBlock = biomeConfig.stoneBlock;
-                        } else if (y >= waterLevel - 4 && y <= waterLevel + 1)
+                        }
+                        else if (y >= waterLevel - 4 && y <= waterLevel + 1)
                         {
                             currentSurfaceBlock = this.whiteStainedClay;
                             currentGroundBlock = biomeConfig.groundBlock;
@@ -497,39 +280,35 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         k1 = noisePlusRandomFactor + Math.max(0, y - waterLevel);
                         if (y >= waterLevel - 1)
                         {
-                            if (this.isForestMesa && y > 86 + noisePlusRandomFactor * 2)
+                            if (this.hasForest && y > 86 + noisePlusRandomFactor * 2)
                             {
                                 if (cosNoiseIsLargerThanZero)
                                 {
                                     chunkBuffer.setBlock(x, y, z, this.coarseDirt);
-                                } else
-                                {
+                                } else {
                                     chunkBuffer.setBlock(x, y, z, biomeConfig.surfaceBlock);
                                 }
-                            } else if (y > waterLevel + 3 + noisePlusRandomFactor)
+                            }
+                            else if (y > waterLevel + 3 + noisePlusRandomFactor)
                             {
                                 if (y >= 64 && y <= 127)
                                 {
                                     if (cosNoiseIsLargerThanZero)
                                     {
                                         iblockdata3 = this.hardenedClay;
-                                    } else
-                                    {
-                                        iblockdata3 = this.getBlockData(xInWorld, y, zInWorld);
+                                    } else {
+                                        iblockdata3 = this.getBand(xInWorld, y, zInWorld);
                                     }
-                                } else
-                                {
+                                } else {
                                     iblockdata3 = this.orangeStainedClay;
                                 }
 
                                 chunkBuffer.setBlock(x, y, z, iblockdata3);
-                            } else
-                            {
+                            } else {
                                 chunkBuffer.setBlock(x, y, z, redSand);
                                 belowSand = true;
                             }
-                        } else
-                        {
+                        } else {
                             chunkBuffer.setBlock(x, y, z, currentGroundBlock);
                             if (currentGroundBlock.isMaterial(DefaultMaterial.STAINED_CLAY))
                             {
@@ -543,12 +322,13 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         if (belowSand)
                         {
                             chunkBuffer.setBlock(x, y, z, this.orangeStainedClay);
-                        } else
-                        {
-                            iblockdata3 = this.getBlockData(xInWorld, y, zInWorld);
+                        } else {
+                            iblockdata3 = this.getBand(xInWorld, y, zInWorld);
                             chunkBuffer.setBlock(x, y, z, iblockdata3);
                         }
                     }
+                    
+                    ++i1;
                 }
             }
         }
@@ -557,15 +337,14 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     @Override
     public String toString()
     {
-        if (this.isForestMesa)
+        if (this.hasForest)
         {
             return NAME_FOREST;
         }
-        if (this.isBryceMesa)
+        if (this.brycePillars)
         {
             return NAME_BRYCE;
         }
         return NAME_NORMAL;
     }
-
 }

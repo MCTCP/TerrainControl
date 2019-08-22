@@ -70,7 +70,7 @@ public final class ServerConfigProvider implements ConfigProvider
         this.biomesByOTGId = new LocalBiome[world.getMaxBiomesCount()];
         this.biomesBySavedId = new LocalBiome[world.getMaxBiomesCount()];
         
-        loadSettings(worldSaveFolder);
+        loadSettings(worldSaveFolder, false);
     }
 
     @Override
@@ -115,10 +115,10 @@ public final class ServerConfigProvider implements ConfigProvider
      * nulls), the savedBiomes collection to be empty and the biomesCount
      * field to be zero.
      */
-    private void loadSettings(File worldSaveFolder)
+    private void loadSettings(File worldSaveFolder, boolean isReload)
     {   	
         SettingsMap worldConfigSettings = loadWorldConfig();
-        loadBiomes(worldConfigSettings, worldSaveFolder);
+        loadBiomes(worldConfigSettings, worldSaveFolder, isReload);
 
         // We have to wait for the loading in order to get things like
         // temperature
@@ -159,7 +159,7 @@ public final class ServerConfigProvider implements ConfigProvider
     	}
     }
 
-    private void loadBiomes(SettingsMap worldConfigSettings, File worldSaveFolder)
+    private void loadBiomes(SettingsMap worldConfigSettings, File worldSaveFolder, boolean isReload)
     {
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
@@ -192,7 +192,7 @@ public final class ServerConfigProvider implements ConfigProvider
         Map<String, BiomeConfig> loadedBiomes = readAndWriteSettings(worldConfigSettings, biomeConfigStubs);
 
         // Index all necessary settings
-        String loadedBiomeNames = indexSettings(worldConfig.customBiomeGenerationIds, worldConfigSettings.isNewConfig(), loadedBiomes, worldSaveFolder);
+        String loadedBiomeNames = indexSettings(worldConfig.customBiomeGenerationIds, worldConfigSettings.isNewConfig(), loadedBiomes, worldSaveFolder, isReload);
 
         OTG.log(LogMarker.DEBUG, "{} biomes Loaded", biomesCount);
         OTG.log(LogMarker.DEBUG, "{}", loadedBiomeNames);
@@ -207,7 +207,7 @@ public final class ServerConfigProvider implements ConfigProvider
         this.biomesCount = 0;
 
         // Load again
-        loadSettings(this.world.getWorldSaveDir());
+        loadSettings(this.world.getWorldSaveDir(), true);
     }
 
     private Map<String, BiomeConfig> readAndWriteSettings(SettingsMap worldConfigSettings, Map<String, BiomeConfigStub> biomeConfigStubs)
@@ -239,7 +239,7 @@ public final class ServerConfigProvider implements ConfigProvider
         return loadedBiomes;
     }
     
-    private String indexSettings(Map<String, Integer> worldBiomes, boolean isNewWorldConfig, Map<String, BiomeConfig> loadedBiomes, File worldSaveFolder)
+    private String indexSettings(Map<String, Integer> worldBiomes, boolean isNewWorldConfig, Map<String, BiomeConfig> loadedBiomes, File worldSaveFolder, boolean isReload)
     {
         StringBuilder loadedBiomeNames = new StringBuilder();
 
@@ -428,19 +428,19 @@ public final class ServerConfigProvider implements ConfigProvider
         // When loading an existing world load the existing biomes first, new biomes after so they don't claim reserved biome id's.
         for (BiomeConfig biomeConfig : nonVirtualBiomesExisting)
         {
-        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig);
+        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig, isReload);
         }
         for (BiomeConfig biomeConfig : virtualBiomesExisting)
         {
-        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig);
+        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig, isReload);
         }
         for (BiomeConfig biomeConfig : nonVirtualBiomes)
         {
-        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig);
+        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig, isReload);
         }
         for (BiomeConfig biomeConfig : virtualBiomes)
         {
-        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig);
+        	createAndRegisterBiome(loadedBiomeIdData, biomeConfig, isReload);
         }
         
         BiomeIdData.saveBiomeIdData(worldSaveFolder, this, this.world);
@@ -469,7 +469,7 @@ public final class ServerConfigProvider implements ConfigProvider
         return loadedBiomeNames.toString();
     }
     	
-    private void createAndRegisterBiome(ArrayList<BiomeIdData> loadedBiomeIdData, BiomeConfig biomeConfig)
+    private void createAndRegisterBiome(ArrayList<BiomeIdData> loadedBiomeIdData, BiomeConfig biomeConfig, boolean isReload)
     {   	    	
     	// Restore the saved id (if any)
     	int savedBiomeId = -1;
@@ -553,10 +553,11 @@ public final class ServerConfigProvider implements ConfigProvider
         }
                
         // Create biome
-        LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(otgBiomeId, savedBiomeId), this);
+        LocalBiome biome = world.createBiomeFor(biomeConfig, new BiomeIds(otgBiomeId, savedBiomeId), this, isReload);
         
         this.biomesByOTGId[biome.getIds().getOTGBiomeId()] = biome;
-        if(biome.getIds().getSavedId() == biome.getIds().getOTGBiomeId() || BiomeRegistryNames.getRegistryNameForDefaultBiome(biome.getBiomeConfig().getName()) != null) // Non-virtual and default biomes only
+        // Non-virtual and default biomes only
+        if(!biome.getIds().isVirtual()) 
         {
         	this.biomesBySavedId[biome.getIds().getSavedId()] = biome;
         }

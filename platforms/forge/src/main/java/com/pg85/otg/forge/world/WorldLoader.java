@@ -88,7 +88,7 @@ public final class WorldLoader
 
     private File getWorldDir(String worldName)
     {
-        return new File(this.configsDir, PluginStandardValues.PresetsDirectoryName + "/" + worldName);
+        return new File(this.configsDir, PluginStandardValues.PresetsDirectoryName + File.separator + worldName);
     }
 
     public void onServerStopped()
@@ -384,7 +384,7 @@ public final class WorldLoader
     {
 		// Create default OTG world
 
-    	File worldDir = new File(OTG.getEngine().getWorldsDirectory() + "/" + worldName);
+    	File worldDir = new File(OTG.getEngine().getWorldsDirectory() + File.separator + worldName);
         List<File> worldDirs = new ArrayList<File>(2);
         worldDirs.add(new File(worldDir, WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME));
         worldDirs.add(new File(worldDir, WorldStandardValues.WORLD_OBJECTS_DIRECTORY_NAME));

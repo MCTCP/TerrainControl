@@ -20,8 +20,8 @@ public abstract class LayeredBiomeGenerator extends BiomeGenerator
 
         Layer[] layers = initLayers();
 
-        if (world.getConfigs().getWorldConfig().improvedRivers)
-            defaultOutputType = OutputType.WITHOUT_RIVERS;
+        //if (world.getConfigs().getWorldConfig().improvedRivers)
+            //defaultOutputType = OutputType.WITHOUT_RIVERS;
 
         this.unZoomedLayer = layers[0];
         this.biomeLayer = layers[1];

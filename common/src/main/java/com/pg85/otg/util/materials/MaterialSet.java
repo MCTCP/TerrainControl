@@ -82,7 +82,12 @@ public class MaterialSet
         LocalMaterialData material = MaterialHelper.readMaterial(input);
         
         boolean checkIncludesBlockData = StringHelper.specifiesBlockData(input);
-
+        
+        if(material == null)
+        {
+        	throw new InvalidConfigException("Invalid block check, material \"" + input + "\" could not be found.");
+        }
+        
         // Add to set
         add(new MaterialSetEntry(material, checkIncludesBlockData));
     }

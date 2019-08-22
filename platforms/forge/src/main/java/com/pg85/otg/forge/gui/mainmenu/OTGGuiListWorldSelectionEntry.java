@@ -74,7 +74,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         this.worldSelScreen = listWorldSelIn.getGuiWorldSelection();
         this.worldSummary = worldSummaryIn;
         this.client = Minecraft.getMinecraft();
-        this.iconLocation = new ResourceLocation(PluginStandardValues.PresetsDirectoryName + "/" + worldSummaryIn.getFileName() + "/icon");
+        this.iconLocation = new ResourceLocation(PluginStandardValues.PresetsDirectoryName + File.separator + worldSummaryIn.getFileName() + File.separator + "icon");
         this.iconFile = saveFormat.getFile(worldSummaryIn.getFileName(), "icon.png");
 
         if (!this.iconFile.isFile())
@@ -93,7 +93,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
     	// Check if an OTG dim is present
-    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(Minecraft.getMinecraft().gameDir + "/saves/" + this.getSelectedWorldName()));    	
+    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(Minecraft.getMinecraft().gameDir + File.separator + "saves" + File.separator + this.getSelectedWorldName()));    	
     	boolean bFound = dimensionDatas != null && dimensionDatas.size() > 0;
 
         String s = (bFound ? TextFormatting.GOLD + "OTG " + TextFormatting.RESET : "") + this.worldSummary.getDisplayName();
@@ -223,7 +223,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     		ForgeEngine.loadPresets(); // Load all WorldConfigs for the ingame UI
     	}
     	
-        DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(new File(Minecraft.getMinecraft().gameDir + "/saves/" + this.getSelectedWorldName()));
+        DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(new File(Minecraft.getMinecraft().gameDir + File.separator + "saves" + File.separator + this.getSelectedWorldName()));
         if(dimsConfig != null)
         {
         	ArrayList<String> missingPresets = new ArrayList<String>();
@@ -315,7 +315,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     {
     	// If this world has OTG overworld/dimensions then check if it has a DimensionsConfig
     	// If this is a legacy world then we'll need to create a new one.
-    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + "/" + this.worldSummary.getFileName()));
+    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + File.separator + this.worldSummary.getFileName()));
     	DimensionsConfig dimensionsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()));
     	if(dimensionsConfig == null && dimensionDatas.size() > 0)
     	{

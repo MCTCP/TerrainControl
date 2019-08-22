@@ -89,16 +89,18 @@ public class OTGBiomeBase extends BiomeBase
         internalList.addAll(MobSpawnGroupHelper.toMinecraftlist(configList));
     }
     
-    static OTGBiomeBase createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
+    static OTGBiomeBase createInstance(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName, boolean isReload)
     {
         // We need to init array size because Mojang uses a strange custom
         // ArrayList. RegistryID arrays are not correctly (but randomly!) copied
         // when resized.
         if(BiomeBase.getBiome(MAX_OTG_BIOME_ID) == null)
         {
-            BiomeBase.REGISTRY_ID.a(MAX_OTG_BIOME_ID,
-                    new MinecraftKey(PluginStandardValues.PLUGIN_NAME, "null"),
-                    new OTGBiomeBase(biomeConfig));
+            BiomeBase.REGISTRY_ID.a(
+        		MAX_OTG_BIOME_ID,
+	            new MinecraftKey(PluginStandardValues.PLUGIN_NAME, "null"),
+	            new OTGBiomeBase(biomeConfig)
+            );
         }
     	
         String biomeNameWithoutSpaces = worldName.toLowerCase() + "_" + StringHelper.toComputerFriendlyName(biomeConfig.getName());
@@ -128,15 +130,13 @@ public class OTGBiomeBase extends BiomeBase
                 // if(existingBiome instanceof CustomBiome) {
                 //     existingBiomeName = String.valueOf(((CustomBiome) existingBiome).generationId);
                 // }
-            } else {
-            	throw new RuntimeException("ARSCHLOCH");
             }
         }
         else if(biomeIds.getSavedId() > -1) 
         {
         	// This is a biome for an existing world, make sure it uses the same biome id as before.         
         	BiomeBase biomeAtId = BiomeBase.REGISTRY_ID.getId(biomeIds.getSavedId());
-            if(biomeAtId != null)
+            if(biomeAtId != null && !isReload)
             {
             	throw new RuntimeException("Tried to register biome " + biomeKey.toString() + " to a id " + biomeIds.getSavedId() + " but it is occupied by biome: " + biomeAtId.toString() + ". This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
             }

@@ -30,7 +30,7 @@ public class PluginStandardValues extends Settings
     public static final Setting<Boolean> SPAWN_LOG = booleanSetting("SpawnLog", false);    
     public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
     public static final Setting<Boolean> GENERATE_COMPRESSED_BO4 = booleanSetting("GenerateCompressedBO4", false);    
-    public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 2, 1, Integer.MAX_VALUE);
+    public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 2, 1, 5);
 	public static final String MOD_ID = "openterraingenerator";
 
 	/**

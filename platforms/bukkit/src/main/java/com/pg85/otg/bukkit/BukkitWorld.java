@@ -34,6 +34,7 @@ import com.pg85.otg.util.helpers.ReflectionHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
+import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockLeaves;
@@ -55,10 +56,12 @@ import net.minecraft.server.v1_12_R1.DefinedStructureManager;
 import net.minecraft.server.v1_12_R1.DimensionManager;
 import net.minecraft.server.v1_12_R1.Entity;
 import net.minecraft.server.v1_12_R1.EntityFallingBlock;
+import net.minecraft.server.v1_12_R1.EntityHanging;
 import net.minecraft.server.v1_12_R1.EntityLightning;
 import net.minecraft.server.v1_12_R1.EntityOcelot;
 import net.minecraft.server.v1_12_R1.EntityTippedArrow;
 import net.minecraft.server.v1_12_R1.EnumCreatureType;
+import net.minecraft.server.v1_12_R1.EnumDirection;
 import net.minecraft.server.v1_12_R1.IBlockData;
 import net.minecraft.server.v1_12_R1.ITileEntity;
 import net.minecraft.server.v1_12_R1.Material;
@@ -335,7 +338,9 @@ public class BukkitWorld implements LocalWorld
             switch (this.settings.getWorldConfig().modeTerrain)
             {
                 case Normal:
+            	/*
                 case OldGenerator:
+                */
                     this.strongholdGen = new OTGStrongholdGen(settings);
                     this.villageGen = new OTGVillageGen(settings);
                     this.mineshaftGen = new OTGMineshaftGen();
@@ -350,8 +355,8 @@ public class BukkitWorld implements LocalWorld
                 case TerrainTest:
                     this.generator.onInitialize(this);
                     break;
-                case Default:
-                    break;
+                //case Default:
+                    //break;
             }
 
             this.dungeon = new WorldGenDungeons();
@@ -464,9 +469,9 @@ public class BukkitWorld implements LocalWorld
     // Biomes
     
     @Override
-    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider)
+    public LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, ConfigProvider configProvider, boolean isReload)
     {
-    	return createBiomeFor(biomeConfig, biomeIds);
+    	return createBiomeFor(biomeConfig, biomeIds, isReload);
 	}
     
 	@Override
@@ -517,9 +522,9 @@ public class BukkitWorld implements LocalWorld
     	return this.settings.getBiomeBySavedIdOrNull(biomeId);
     }
     
-    private LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds)
+    private LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, boolean isReload)
     {
-        BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds, this.getName());
+        BukkitBiome biome = BukkitBiome.forCustomBiome(biomeConfig, biomeIds, this.getName(), isReload);
         this.biomeNames.put(biome.getName(), biome);
 
         return biome;
@@ -589,19 +594,33 @@ public class BukkitWorld implements LocalWorld
         WorldConfig worldConfig = this.settings.getWorldConfig();
 
         if (worldConfig.strongholdsEnabled)
+        {
             this.strongholdGen.a(this.world, chunkX, chunkZ, null);
+        }
         if (worldConfig.mineshaftsEnabled)
+        {
             this.mineshaftGen.a(this.world, chunkX, chunkZ, null);
+        }
         if (worldConfig.villagesEnabled && dry)
+        {
             this.villageGen.a(this.world, chunkX, chunkZ, null);
+        }
         if (worldConfig.rareBuildingsEnabled)
+        {
         	this.rareBuildingGen.a(this.world, chunkX, chunkZ, null);
+        }
         if (worldConfig.netherFortressesEnabled)
+        {
             this.netherFortressGen.a(this.world, chunkX, chunkZ, null);
+        }
         if (worldConfig.oceanMonumentsEnabled)
+        {
             this.oceanMonumentGen.a(this.world, chunkX, chunkZ, null);
+        }
         if (worldConfig.woodLandMansionsEnabled)
+        {
         	this.mansionGen.a(this.world, chunkX, chunkZ, null);
+        }
     }
 
     @Override
@@ -785,7 +804,7 @@ public class BukkitWorld implements LocalWorld
         SpawnerCreature.a(this.world, ((BukkitBiome) biome).getHandle(), chunkCoord.getChunkX() * 16 + 8, chunkCoord.getChunkZ() * 16 + 8, 16, 16, random);
     }
 
-	private Entity getEntity(Class<? extends org.bukkit.entity.Entity> clazz)
+	private Entity getEntity(Class<? extends org.bukkit.entity.Entity> clazz, EnumDirection direction)
 	{
 		// TODO: Clean up and optimise this
 
@@ -1063,79 +1082,23 @@ public class BukkitWorld implements LocalWorld
 				}
 			}
 		}
-
-		//TODO: Does this need to be re-enabled??
-		/*
+		// TODO: Improve this to look for blocks to attach to (without causing cascading chunk gen..)
 		else if (org.bukkit.entity.Hanging.class.isAssignableFrom(clazz))
 		{
-			org.bukkit.block.Block block = getBlockAt(location);
-			BlockFace face = BlockFace.SELF;
-
-			int width = 16;
-			int height = 16;
-
-			if (org.bukkit.entity.ItemFrame.class.isAssignableFrom(clazz))
-			{
-				width = 12;
-				height = 12;
-			}
-			else if (org.bukkit.entity.LeashHitch.class.isAssignableFrom(clazz))
-			{
-				width = 9;
-				height = 9;
-			}
-
-			BlockFace[] faces = { BlockFace.EAST, BlockFace.NORTH, BlockFace.WEST, BlockFace.SOUTH };
-			BlockPosition pos = new BlockPosition((int)x, (int)y, (int)z);
-			for (BlockFace dir : faces)
-			{
-				net.minecraft.server.v1_10_R1.Block nmsBlock = org.bukkit.craftbukkit.v1_10_R1.util.CraftMagicNumbers.getBlock(block.getRelative(dir));
-				if ((nmsBlock.getBlockData().getMaterial().isBuildable()) || (net.minecraft.server.v1_10_R1.BlockDiodeAbstract.isDiode(nmsBlock.getBlockData())))
-				{
-					boolean taken = false;
-					AxisAlignedBB bb = EntityHanging.calculateBoundingBox(null, pos, CraftBlock.blockFaceToNotch(dir).opposite(), width, height);
-					List<net.minecraft.server.v1_10_R1.Entity> list = world.getEntities(null, bb);
-					for (Iterator<net.minecraft.server.v1_10_R1.Entity> it = list.iterator(); (!taken) && (it.hasNext());)
-					{
-						net.minecraft.server.v1_10_R1.Entity e = (net.minecraft.server.v1_10_R1.Entity)it.next();
-						if ((e instanceof EntityHanging))
-						{
-							taken = true;
-						}
-					}
-
-					if (!taken)
-					{
-						face = dir;
-						break;
-					}
-			    }
-		  	}
-
 			if (org.bukkit.entity.LeashHitch.class.isAssignableFrom(clazz))
 			{
-			    return new net.minecraft.server.v1_10_R1.EntityLeash(world, new BlockPosition((int)x, (int)y, (int)z));
-			    attachedToPlayer = true;
+			    return new net.minecraft.server.v1_12_R1.EntityLeash(world, new BlockPosition((int)x, (int)y, (int)z));
 			} else {
-			    com.google.common.base.Preconditions.checkArgument(face != BlockFace.SELF, "Cannot spawn hanging entity for %s at %s (no free face)", new Object[] { clazz.getName(), location });
-
-			    EnumDirection dir = CraftBlock.blockFaceToNotch(face).opposite();
 			    if (org.bukkit.entity.Painting.class.isAssignableFrom(clazz))
 			    {
-			      return new net.minecraft.server.v1_10_R1.EntityPainting(world, new BlockPosition((int)x, (int)y, (int)z), dir);
+			      return new net.minecraft.server.v1_12_R1.EntityPainting(world, new BlockPosition((int)x, (int)y, (int)z), direction); // TODO: Use Facing from nbt data
 			    }
 			    else if (org.bukkit.entity.ItemFrame.class.isAssignableFrom(clazz))
 			    {
-			      return new net.minecraft.server.v1_10_R1.EntityItemFrame(world, new BlockPosition((int)x, (int)y, (int)z), dir);
+			      return new net.minecraft.server.v1_12_R1.EntityItemFrame(world, new BlockPosition((int)x, (int)y, (int)z), direction); // TODO: Use Facing from nbt data
 			    }
 			}
-
-			if ((entity != null) && (!((EntityHanging)entity).survives()))
-			{
-			    throw new IllegalArgumentException("Cannot spawn hanging entity for " + clazz.getName() + " at " + location);
-			}
 		}
-		*/
 		else if (org.bukkit.entity.TNTPrimed.class.isAssignableFrom(clazz))
 		{
 			return new net.minecraft.server.v1_12_R1.EntityTNTPrimed(world, x, y, z, null);
@@ -1278,13 +1241,75 @@ public class BukkitWorld implements LocalWorld
 			return;
 		}
 
-		Entity entityLiving = getEntity(entityType.getEntityClass());
-		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();
+		EnumDirection direction = EnumDirection.SOUTH;
+        float rotationFromNbt = 0;
+        boolean rotationFromNbtSet = false;
+        
+		String nbtData = entityData.getMetaData();
+		if(nbtData != null && nbtData.trim().length() > 0)
+		{
+			NBTTagCompound nbttagcompound = new NBTTagCompound();
+	        try
+	        {
+	            NBTBase nbtbase = JsonToNBT.getTagFromJson(nbtData);
 
-		boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian || bukkitEntityLiving instanceof CraftElderGuardian;
-
+	            if (!(nbtbase instanceof NBTTagCompound))
+	            {
+	            	if(OTG.getPluginConfig().spawnLog)
+	            	{
+	            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + nbtData + ". Skipping mob.");
+	            	}
+	            	return;
+	            }
+	            nbttagcompound = (NBTTagCompound)nbtbase;
+	        }
+	        catch (NBTException nbtexception)
+	        {
+	        	if(OTG.getPluginConfig().spawnLog)
+	        	{
+	        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + nbtData + ". Skipping mob.");
+	        	}
+	        	return;
+	        }
+	        if(nbttagcompound.hasKey("Facing"))
+	        {
+	        	int facing = nbttagcompound.getByte("Facing");
+	        	switch(facing)
+	        	{
+	        		case 0:
+	        			direction = EnumDirection.DOWN;
+        			break;
+	        		case 1:
+	        			direction = EnumDirection.UP;
+        			break;
+	        		case 2:
+	        			direction = EnumDirection.NORTH;
+        			break;
+	        		case 3:
+	        			direction = EnumDirection.SOUTH;
+        			break;
+	        		case 4:
+	        			direction = EnumDirection.WEST;
+        			break;
+	        		case 5:
+	        			direction = EnumDirection.EAST;
+        			break;        			        			
+	        	}
+    			rotationFromNbt = direction.get2DRotationValue() * 90;
+	        	rotationFromNbtSet = true;
+	        }
+	        else if(nbttagcompound.hasKey("Rotation"))
+	        {
+	        	rotationFromNbt = nbttagcompound.getByte("Rotation");
+	        	rotationFromNbtSet = true;
+	        }
+		}
+		
+		Entity entityLiving = getEntity(entityType.getEntityClass(), direction);
         if(entityLiving != null)
         {
+    		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();
+    		boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian || bukkitEntityLiving instanceof CraftElderGuardian;        	
 			EnumCreatureType creatureType = EnumCreatureType.CREATURE;
 
 			// MONSTER
@@ -1374,12 +1399,22 @@ public class BukkitWorld implements LocalWorld
 	            } else {
 	            	for(int r = 0; r < groupSize; r++)
 	            	{
-	            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
-
-	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-	           			{
-	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
-	           			}
+	            		try
+	            		{
+		            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());	            		
+		            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+		           			{
+		           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
+		           			}
+	            		}
+	            		catch(IllegalArgumentException ex)
+	            		{
+	            			if(OTG.getPluginConfig().spawnLog)
+	            			{
+	            				OTG.log(LogMarker.WARN, "Could not spawn entity " + entityData.mobName + " in world. Please note that hanging entities such as item frames may cause problems, this will be fixed in a future update. Exception: ");
+	            				ex.printStackTrace();
+	            			}
+	            		}
 	            	}
 	            }
             }
@@ -1422,13 +1457,14 @@ public class BukkitWorld implements LocalWorld
 		nmsEntity.c(originalTag);
 
 		NBTBase originalPos = originalTag.get("Pos");
+		nbttagcompound.set("Pos", originalPos);
+		
 		NBTBase originalRot = originalTag.get("Rotation");
-
+		nbttagcompound.set("Rotation", originalRot);
+	
 		NBTBase originalUUIDLeast = originalTag.get("UUIDLeast");
 		NBTBase originalUUIDMost = originalTag.get("UUIDMost");
 
-		nbttagcompound.set("Pos", originalPos);
-		nbttagcompound.set("Rotation", originalRot);
 		nbttagcompound.set("UUIDLeast", originalUUIDLeast);
 		nbttagcompound.set("UUIDMost", originalUUIDMost);
 

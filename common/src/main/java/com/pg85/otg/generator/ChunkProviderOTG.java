@@ -8,7 +8,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
-import com.pg85.otg.generator.noise.NoiseGeneratorBiomeBlocksOctaves;
+import com.pg85.otg.generator.noise.NoiseGeneratorPerlinMesaBlocks;
 import com.pg85.otg.generator.noise.NoiseGeneratorPerlinOctaves;
 import com.pg85.otg.generator.terrain.CavesGen;
 import com.pg85.otg.generator.terrain.RavinesGen;
@@ -36,7 +36,7 @@ public class ChunkProviderOTG
     private final NoiseGeneratorPerlinOctaves vol1NoiseGen;
     private final NoiseGeneratorPerlinOctaves vol2NoiseGen;
     private final NoiseGeneratorPerlinOctaves volNoiseGen;
-    private final NoiseGeneratorBiomeBlocksOctaves biomeBlocksNoiseGen;
+    private final NoiseGeneratorPerlinMesaBlocks biomeBlocksNoiseGen;
     private final NoiseGeneratorPerlinOctaves oldTerrainGeneratorNoiseGen;
     private final NoiseGeneratorPerlinOctaves noiseHeightNoiseGen;
     private double[] rawTerrain;
@@ -90,7 +90,7 @@ public class ChunkProviderOTG
         this.vol1NoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
         this.vol2NoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
         this.volNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 8);
-        this.biomeBlocksNoiseGen = new NoiseGeneratorBiomeBlocksOctaves(this.random, 4);
+        this.biomeBlocksNoiseGen = new NoiseGeneratorPerlinMesaBlocks(this.random, 4);
         this.oldTerrainGeneratorNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 10);
         this.noiseHeightNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
 
@@ -137,7 +137,7 @@ public class ChunkProviderOTG
         this.canyonGen.generate(chunkBuffer);
 
         WorldConfig worldConfig = configProvider.getWorldConfig();
-        if (worldConfig.modeTerrain == WorldConfig.TerrainMode.Normal || worldConfig.modeTerrain == WorldConfig.TerrainMode.OldGenerator)
+        if (worldConfig.modeTerrain == WorldConfig.TerrainMode.Normal)// || worldConfig.modeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
@@ -155,11 +155,11 @@ public class ChunkProviderOTG
         final int maxYSections = this.heightCap / 8 + 1;
         final int usedYSections = this.heightScale / 8 + 1;
 
-        WorldConfig worldConfig = configProvider.getWorldConfig();
+        //WorldConfig worldConfig = configProvider.getWorldConfig();
         BiomeGenerator biomeGenerator = this.localWorld.getBiomeGenerator();
-        if (worldConfig.improvedRivers)
+        //if (worldConfig.improvedRivers)
         {
-            this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter, OutputType.ONLY_RIVERS);
+            //this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter, OutputType.ONLY_RIVERS);
         }
 
         if (biomeGenerator.canGenerateUnZoomed())
@@ -280,9 +280,9 @@ public class ChunkProviderOTG
         int dryBlocksOnSurface = 256;
 
         final double d1 = 0.03125D;
-        this.biomeBlocksNoise = this.biomeBlocksNoiseGen.a(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
+        this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
 
-        GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, biomeBlocksNoise, heightCap);
+        GeneratingChunk generatingChunk = new GeneratingChunk(this.random, this.waterLevel, this.biomeBlocksNoise, this.heightCap);
 
         for (int x = 0; x < CHUNK_X_SIZE; x++)
         {
@@ -293,9 +293,9 @@ public class ChunkProviderOTG
                 // Get the current biome config and some properties
                 final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + z * CHUNK_X_SIZE)]);
 
-                biomeConfig.surfaceAndGroundControl.spawn(generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+                biomeConfig.surfaceAndGroundControl.spawn(this.localWorld.getSeed(), generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
-                // Count how many water there is
+                // Count water blocks
                 if (chunkBuffer.getBlock(x, biomeConfig.waterLevelMax, z).equals(biomeConfig.waterBlock))
                 {
                     dryBlocksOnSurface--;
@@ -368,10 +368,10 @@ public class ChunkProviderOTG
 
                 if (!worldConfig.oldTerrainGenerator)
                 {
-                    if (worldConfig.improvedRivers)
+                    //if (worldConfig.improvedRivers)
                     {
-                        this.biomeFactorWithRivers(x, z, usedYSections, noiseHeight);
-                    } else {
+                        //this.biomeFactorWithRivers(x, z, usedYSections, noiseHeight);
+                    //} else {
                         this.biomeFactor(x, z, usedYSections, noiseHeight);
                     }
                 } else {

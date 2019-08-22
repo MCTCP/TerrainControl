@@ -35,9 +35,9 @@ public class BukkitBiome implements LocalBiome
      * @param biomeIds    Ids of the custom biome.
      * @return The custom biome.
      */
-    static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName)
+    static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName, boolean isReload)
     {
-        return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds, worldName));
+        return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds, worldName, isReload));
     }
 
     @Override

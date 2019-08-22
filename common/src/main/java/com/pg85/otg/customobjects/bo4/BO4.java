@@ -94,7 +94,7 @@ public class BO4 implements StructuredCustomObject
     	return true;
     }
     
-    private void generateBO4Data()
+    public void generateBO4Data()
     {
         //write it down to disk
 		String filePath = 
@@ -140,6 +140,12 @@ public class BO4 implements StructuredCustomObject
     	return false;
     }
     
+    @Override
+    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
+    {
+    	return false;
+    }
+    
     // Used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc).
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
@@ -152,7 +158,13 @@ public class BO4 implements StructuredCustomObject
 	{
 		return false;
 	}
-
+	
+	@Override
+	public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
+	{
+		return false;
+	}
+	
 	// This method is only used to spawn CustomObject.
     @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)

@@ -19,6 +19,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
@@ -76,7 +77,7 @@ public final class OTGCommandHandler implements ICommand
             ForgeWorld world = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);
 
             boolean isOTGWorld = false;
-            if (!(world == null && (argString.length == 0 || !((argString[0].equals("dimension") || argString[0].equals("dim")) && argString.length < 3))))
+            if (!(world == null && (argString.length == 0 || !((argString[0].toLowerCase().trim().equals("dimension") || argString[0].toLowerCase().trim().equals("dim")) && argString.length < 3))))
             {
             	isOTGWorld = true;
             }
@@ -86,7 +87,13 @@ public final class OTGCommandHandler implements ICommand
             int playerY = pos.getY();
             int playerZ = pos.getZ();
 
-    		if(argString != null && argString.length > 0 && argString[0].equals("summon"))
+            if(argString != null && argString.length > 0 && (argString[0].toLowerCase().trim().equals("pregen") || argString[0].toLowerCase().trim().equals("pregenerator")))
+            {
+            	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "The /pregen command has been deprecated. Press the \"O\" button to access the OTG dimensions menu, you can manage the pregenerator from there."));
+            	return;
+            }
+            
+    		if(argString != null && argString.length > 0 && argString[0].toLowerCase().trim().equals("summon"))
 			{
     			int radius = 1;
     			if(argString.length > 1)
@@ -116,16 +123,11 @@ public final class OTGCommandHandler implements ICommand
                 if(isOp)
                 {
                     sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg tp <biome name or id / dimension name> " + VALUE_COLOR + "Teleport to the given dimension or the nearest biome with the given name or id (max distance 16000 blocks)."));
-                	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen " + VALUE_COLOR + "Shows the status of any currently active pre-generators. Same as /otg pregenerator."));
-	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> " + VALUE_COLOR + "Sets the pre-generation radius for the curren world to <radius> chunks. Same as /otg pregenerator <radius>."));
-	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg pregen <radius> <dimension id> " + VALUE_COLOR + "Sets the pre-generation radius for dimension <dimension id> to <radius> chunks. Same as /otg pregenerator <radius> <dimension id>."));
                 }
 
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim " + VALUE_COLOR + "Shows information about OTG dimensions. Same as /otg dimension."));
                 if(isOp)
                 {
-	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim -c <dimension name> " + VALUE_COLOR + "Creates a dimension using world and biome configs from mods/OpenTerrainGenerator/" + PluginStandardValues.PresetsDirectoryName + "/<dimension name>. Custom dimensions can be accessed via a quartz portal. Biome names must be unique across dimensions. Same as /otg dimension -c <dimension name>"));
-	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim -d <dimension name> " + VALUE_COLOR + "Deletes the specified dimension. Dimension must be unloaded (dimensions unload automatically when no players are inside, this may take a minute). Same as /otg dimension -d <dimension name>"));
 	                sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg dim -u <dimension name> " + VALUE_COLOR + "Flags the dimension for unloading, even if it has forceDrupChunk set to true in the WorldConfig to make sure it never unloads. Same as /otg dimension -u <dimension name>"));
                 }
 
@@ -136,17 +138,28 @@ public final class OTGCommandHandler implements ICommand
 					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg flushcache " + VALUE_COLOR + "Unloads all loaded BO2/BO3 files, use this to refresh BO2's/BO3's after editing them. Also flushes chunk generator cache to free up memory."));
 					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg GetModData <ModName> <Radius> " + VALUE_COLOR + "Sends any ModData() tags in BO3's within the specified <Radius> in chunks to the specified <ModName>. Some OTG mob spawning commands can be used this way. Be sure to set up ModData() tags in your BO3 to make this work."));
 					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg summon <Radius> " + VALUE_COLOR + "Shorthand for /mcw GetModData OTG <Radius>. Used to summon mobs and entities that are configured to spawn inside BO3's."));
+					sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "/otg exportBO4Data " + VALUE_COLOR + "Exports all BO4 files and BO3 files that have isOTGPlus:true as BO4Data files (if none exist already). BO4Data files can significantly reduce filesize and loading times, and should be used by OTG content creators when packaging presets for players."));
 				}
 
                 sender.sendMessage(new TextComponentString(""));
                 sender.sendMessage(new TextComponentString("Tips:"));
-        		//sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- Check out OTG.ini and each world's WorldConfig.ini for optional features."));
-        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator in single player open the chat window so you can background MC without pausing the game."));
-        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator in single player press F3 to toggle the pre-generator HUD showing the pre-generator status."));
-        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- When using the pre-generator in multiplayer use the /otg pregen command to see the pre-generator status."));
         		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- If you're an op, press the \"O\" button to access the OTG dimensions menu."));
             }
-        	else if(argString[0].equals("blocks") && isOp)
+        	else if(argString[0].toLowerCase().trim().equals("exportbo4data") && isOp)
+        	{
+        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Exporting .BO4Data files for world, this may take a while."));
+        		ArrayList<BO4> bo4s = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBO4sForWorld(world.getName());
+        		
+        		int i = 0;
+        		for(BO4 bo4 : bo4s)
+        		{
+        			i++;
+        			sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Exporting .BO4Data " + i + "/" + bo4s.size() + " \"" + VALUE_COLOR + bo4.getName() + MESSAGE_COLOR + "\""));
+        			bo4.generateBO4Data();
+        		}
+        		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + ".BO4Data export complete."));
+        	}
+        	else if(argString[0].toLowerCase().trim().equals("blocks") && isOp)
         	{
 	    		OTG.log(LogMarker.INFO, "-- Blocks List --");
 	    		sender.sendMessage(new TextComponentString("-- Blocks List --"));
@@ -160,7 +173,7 @@ public final class OTGCommandHandler implements ICommand
 
 	    		OTG.log(LogMarker.INFO, "----");
         	}
-        	else if(argString[0].toLowerCase().equals("flushcache") && isOp)
+        	else if(argString[0].toLowerCase().trim().equals("flushcache") && isOp)
         	{
         		OTG.log(LogMarker.INFO, "Clearing caches");
 	    		OTG.log(LogMarker.INFO, "Unloading BO3's");
@@ -171,7 +184,7 @@ public final class OTGCommandHandler implements ICommand
 	    		world.getChunkGenerator().clearChunkCache(false);
 	    		OTG.log(LogMarker.INFO, "Caches cleared");
         	}
-            else if (isOp && argString[0].equals("tp") && argString.length > 1)
+            else if (isOp && argString[0].toLowerCase().trim().equals("tp") && argString.length > 1)
             {
             	String biomeOrDimensionName = "";
             	for(int i = 1; i < argString.length; i++)
@@ -254,7 +267,7 @@ public final class OTGCommandHandler implements ICommand
             	    return;
             	}
             }         
-            else if (argString[0].equals("worldinfo") || argString[0].equals("world"))
+            else if (argString[0].toLowerCase().trim().equals("worldinfo") || argString[0].toLowerCase().trim().equals("world"))
             {
             	if(!isOTGWorld)
             	{
@@ -272,107 +285,7 @@ public final class OTGCommandHandler implements ICommand
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Author: " + VALUE_COLOR + worldConfig.author));
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Description: " + VALUE_COLOR + worldConfig.description));
             }
-            else if (isOp && (argString[0].equals("pregenerator") || argString[0].equals("pregen")))
-            {
-            	if(!isOTGWorld)
-            	{
-                	sender.sendMessage(new TextComponentString(""));
-                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "This command is only available for OpenTerrainGenerator worlds."));
-                    return;
-            	}
-            	
-            	if (argString.length == 1)
-            	{
-        			boolean isRunningAndNotDone = false;
-        			ArrayList<Pregenerator> pregenerators = new ArrayList<Pregenerator>();
-        			for(LocalWorld localWorld : OTG.getAllWorlds())
-        			{
-        				ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-        				Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator();
-        				if(pregenerator.getPregeneratorIsRunning() && pregenerator.preGeneratorProgressStatus != "Done")
-        				{
-        					isRunningAndNotDone = true;
-        					pregenerators.add(pregenerator);
-        				}
-        			}
-
-        	    	if(isRunningAndNotDone)
-        	    	{
-        		        for(Pregenerator pregenerator : pregenerators)
-        		        {
-        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Generating \"" + VALUE_COLOR + pregenerator.pregenerationWorld + "\" " + MESSAGE_COLOR + (pregenerator.progressScreenWorldSizeInBlocks > 0 ? "(" + pregenerator.progressScreenWorldSizeInBlocks + "x" + pregenerator.progressScreenWorldSizeInBlocks  + " blocks)" : "")));
-        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Progress: " + VALUE_COLOR + pregenerator.preGeneratorProgress + "%"));
-        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Chunks: " + VALUE_COLOR + pregenerator.preGeneratorProgressStatus));
-        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Elapsed: " + VALUE_COLOR + pregenerator.progressScreenElapsedTime));
-        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Estimated: " + VALUE_COLOR + pregenerator.progressScreenEstimatedTime));
-        		        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "---"));
-        		        }
-
-        		        long i = Runtime.getRuntime().maxMemory();
-        		        long j = Runtime.getRuntime().totalMemory();
-        		        long k = Runtime.getRuntime().freeMemory();
-        		        long l = j - k;
-        		        sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Memory: " + VALUE_COLOR + Long.valueOf(bytesToMb(l)) + "/" +  Long.valueOf(bytesToMb(i)) + " MB"));
-        	    	} else {
-        	    		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "No pre-generator is currently running."));
-        	    	}
-            	}
-            	if (argString.length > 1)
-            	{
-            		int radius = 0;
-            		try
-            		{
-            			radius = Integer.parseInt(argString[1]);
-            		} catch(java.lang.NumberFormatException ex)
-            		{
-            			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "\"" + argString[1] + "\" could not be parsed as a number."));
-            			return;
-            		}
-
-            		int dimensionId = 0;
-                	if (argString.length > 2)
-                	{
-                		try
-                		{
-                			dimensionId = Integer.parseInt(argString[2]);
-                		}
-                		catch(java.lang.NumberFormatException ex)
-                		{
-                			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "\"" + argString[1] + "\" could not be parsed as a number."));
-                			return;
-                		}
-                	}
-
-                	ForgeWorld targetWorld = world;
-
-                	if(!DimensionManager.isDimensionRegistered(dimensionId))
-                	{
-            			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Dimension with id \"" + dimensionId + "\" does not exist."));
-            			return;
-                	} else {
-                		targetWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionId);
-                		if(targetWorld == null)
-                		{
-                			OTGDimensionManager.initDimension(dimensionId);
-                			targetWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionId);
-                		}
-                		if(targetWorld == null)
-                		{
-                			sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not find OTG world for dimension with id \"" + dimensionId + "\"."));
-                			return;
-                		}
-                	}
-
-                	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(targetWorld.getName());                	
-                	targetWorld.getWorldSession().setPregenerationRadius(radius);
-	                int newRadius = dimConfig.PregeneratorRadiusInChunks = targetWorld.getWorldSession().getPregenerationRadius();
-	                OTG.getDimensionsConfig().save();
-
-        			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Pre-generator radius set to " + VALUE_COLOR + newRadius + MESSAGE_COLOR + "."));
-        			return;
-            	}
-            }
-            else if (argString[0].equals("entities"))
+            else if (argString[0].toLowerCase().trim().equals("entities"))
             {
         		sender.sendMessage(new TextComponentString(""));
 	    		OTG.log(LogMarker.INFO, "-- Entities List --");
@@ -405,7 +318,7 @@ public final class OTGCommandHandler implements ICommand
 	        	}
 	    		OTG.log(LogMarker.INFO, "----");
             }
-            else if(argString[0].equals("dimension") || argString[0].equals("dim"))
+            else if(argString[0].toLowerCase().trim().equals("dimension") || argString[0].toLowerCase().trim().equals("dim"))
             {
             	if(argString.length < 2 || containsArgument(argString, "-l"))
         		{
@@ -519,68 +432,11 @@ public final class OTGCommandHandler implements ICommand
 							if(OTGDimensionManager.IsOTGDimension(i) && dimensionType.getName().equals(dimName))
 							{
 								existingDim = i;
-								if(containsArgument(argString, "-c"))
-								{
-				    				sender.sendMessage(new TextComponentString(""));
-				                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Dimension '" + dimName + "' already exists."));
-				    				return;
-								}								
 							}
 						}
 					}
 
-	            	if (containsArgument(argString, "-d"))
-	            	{
-	            		if(existingDim > 1)
-	            		{
-	            			if(((ForgeEngine)OTG.getEngine()).getWorldLoader().getWorld(dimName) == null && ((ForgeEngine)OTG.getEngine()).getWorldLoader().getUnloadedWorld(dimName) == null)
-	            			{
-	    	    				sender.sendMessage(new TextComponentString(""));
-	    	                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Cannot delete dimension, dimension is not an OTG world."));
-
-	            				return;
-	            			}
-	            		
-	            			// First make sure world is unloaded
-	            			
-	            			if(OTGDimensionManager.DeleteDimensionServer(dimName, server))
-	            			{
-	            				sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Deleted dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + existingDim + MESSAGE_COLOR + "."));
-	            			} else {
-	            				sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Cannot delete dimension " + VALUE_COLOR + dimName + ERROR_COLOR + ", it is currently loaded. Dimensions are unloaded automatically if no players are inside (this may take a minute)."));
-	            			}
-	            		}
-	            	}
-	            	else if(containsArgument(argString, "-c"))
-	            	{
-        				File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName + "/" + dimName + "/WorldConfig.ini");
-        				if(!worldConfigFile.exists())
-        				{
-		    				sender.sendMessage(new TextComponentString(""));
-		                    sender.sendMessage(new TextComponentTranslation(ERROR_COLOR + "Could not create dimension, mods/OpenTerrainGenerator/" + PluginStandardValues.PresetsDirectoryName + "/" + dimName + " could not be found or does not contain a WorldConfig.ini file."));
-        				} else {
-
-        					sender.sendMessage(new TextComponentString(""));
-			    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Creating new dimension..."));
-      																
-							WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimName));
-							
-			    			DimensionConfig dimConfig = new DimensionConfig(dimName, worldConfig);
-							OTG.getDimensionsConfig().Dimensions.add(dimConfig);
-							
-							int newDimId = OTGDimensionManager.createDimension(seed, dimName, false, true, true);
-							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimName);
-							if(dimConfig.Settings.CanDropChunk)
-							{
-								DimensionManager.unloadWorld(createdWorld.getWorld().provider.getDimension());
-							}
-							
-			    			sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "Created dimension " + VALUE_COLOR + dimName + MESSAGE_COLOR + " at id " + VALUE_COLOR + newDimId + MESSAGE_COLOR + "."));
-
-			    			ServerPacketManager.sendDimensionSynchPacketToAllPlayers(sender.getServer());
-        				}
-	            	}
-	            	else if (containsArgument(argString, "-u"))
+	            	if (containsArgument(argString, "-u"))
 	            	{
 	            		if(existingDim > 1)
 	            		{
@@ -598,7 +454,7 @@ public final class OTGCommandHandler implements ICommand
 	            	}
         		}
             }
-            else if (argString[0].equals("biomes") && isOp)
+            else if (argString[0].toLowerCase().trim().equals("biomes") && isOp)
             {
             	if(!isOTGWorld)
             	{
@@ -630,7 +486,7 @@ public final class OTGCommandHandler implements ICommand
             		sender.sendMessage(new TextComponentTranslation(VALUE_COLOR + entry.getKey().toString() + MESSAGE_COLOR + " : " + VALUE_COLOR + entry.getValue().toString()));
             	}
             }
-            else if (argString[0].equals("biome"))
+            else if (argString[0].toLowerCase().trim().equals("biome"))
             {
             	if(!isOTGWorld)
             	{
@@ -761,7 +617,7 @@ public final class OTGCommandHandler implements ICommand
         			sender.sendMessage(new TextComponentTranslation("There's nothing here."));
         		}
         	}
-        	else if(argString[0].equals("GetModData") && argString.length > 1)
+        	else if(argString[0].toLowerCase().trim().equals("getmoddata") && argString.length > 1)
         	{
             	if(!isOTGWorld)
             	{
@@ -842,16 +698,14 @@ public final class OTGCommandHandler implements ICommand
 		listComplet.add("bo4");
 		listComplet.add("tp");
 
-		listComplet.add("pregenerator");
-		listComplet.add("pregen");
-
 		listComplet.add("dimension");
 		listComplet.add("dim");
 
 		listComplet.add("blocks");
 		listComplet.add("entities");
 		listComplet.add("flushcache");
-		listComplet.add("GetModData");
+		listComplet.add("getmoddata");
+		listComplet.add("exportbo4data");
 
 		return listComplet;
 	}
@@ -866,11 +720,6 @@ public final class OTGCommandHandler implements ICommand
 	{
 		return true;
 	}
-	
-    private static long bytesToMb(long bytes)
-    {
-        return bytes / 1024L / 1024L;
-    }
 	
     private boolean containsArgument(String[] args, String arg)
     {

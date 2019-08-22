@@ -59,8 +59,12 @@ public class LayerBiomeBorder extends Layer
                     
                     biomeFrom = bordersFrom[biomeId];
                     if (biomeFrom[northCheck] && biomeFrom[eastCheck] && biomeFrom[westCheck] && biomeFrom[southCheck])
+                    {
                         if ((northCheck != biomeId) || (eastCheck != biomeId) || (westCheck != biomeId) || (southCheck != biomeId))
-                            selection = (selection & (IslandBit | RiverBits | IceBit)) | LandBit | bordersTo[biomeId];
+                        {
+                            selection = (selection & (IslandBit | RiverBits | IceBit)) | LandBit | bordersTo[biomeId] | BiomeBitsAreSetBit;
+                        }
+                    }
                 }
 
                 thisInts[(xi + zi * xSize)] = selection;
@@ -74,10 +78,13 @@ public class LayerBiomeBorder extends Layer
     /**
      * In a single step, checks for land and when present returns biome data
      * @param selection The location to be checked
-     * @return Biome Data or 0 when not on land
+     * @return Biome Data or defaultOceanId when not on land
      */
     private int getBiomeFromLayer(int selection)
     {
-        return (selection & LandBit) != 0 ? (selection & BiomeBits) : this.defaultOceanId;
+        return 
+    		(selection & LandBit) != 0 && (selection & BiomeBitsAreSetBit) != 0 ? 
+    		(selection & BiomeBits) : 
+			this.defaultOceanId;
     }
 }

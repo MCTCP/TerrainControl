@@ -37,7 +37,7 @@ public class BiomeIdData
         // If this is a previously created world then register biomes to the same OTG biome id as before.
         ArrayList<BiomeIdData> loadedBiomeIdData = loadBiomeIdData(worldSaveDir);
 		
-		File biomeIdDataFile = new File(worldSaveDir + "/OpenTerrainGenerator/BiomeIds.txt");
+		File biomeIdDataFile = new File(worldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + "BiomeIds.txt");
 		if(biomeIdDataFile.exists())
 		{
 			biomeIdDataFile.delete();
@@ -88,7 +88,7 @@ public class BiomeIdData
 		
 	static ArrayList<BiomeIdData> loadBiomeIdData(File worldSaveDir)
 	{
-		File biomeIdDataFile = new File(worldSaveDir + "/OpenTerrainGenerator/BiomeIds.txt");
+		File biomeIdDataFile = new File(worldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + "BiomeIds.txt");
 		String[] biomeIdDataFileValues = {};
 		if(biomeIdDataFile.exists())
 		{

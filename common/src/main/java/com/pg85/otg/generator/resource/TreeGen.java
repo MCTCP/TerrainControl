@@ -4,7 +4,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.customobjects.TreeObject;
 import com.pg85.otg.customobjects.bo2.BO2;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -20,7 +22,6 @@ public class TreeGen extends Resource
 {
     private final List<Integer> treeChances;
     private final List<String> treeNames;
-    private final List<CustomObject> trees;
 
     public TreeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -29,7 +30,6 @@ public class TreeGen extends Resource
 
         frequency = readInt(args.get(0), 1, 100);
 
-        trees = new ArrayList<CustomObject>();
         treeNames = new ArrayList<String>();
         treeChances = new ArrayList<Integer>();
 
@@ -52,9 +52,7 @@ public class TreeGen extends Resource
         if (getClass() != other.getClass())
             return false;
         final TreeGen compare = (TreeGen) other;
-        return (this.trees == null ? this.trees == compare.trees
-                : this.trees.equals(compare.trees))
-                && (this.treeNames == null ? this.treeNames == compare.treeNames
+        return (this.treeNames == null ? this.treeNames == compare.treeNames
                         : this.treeNames.equals(compare.treeNames))
                 && (this.treeChances == null ? this.treeChances == compare.treeChances
                         : this.treeChances.equals(compare.treeChances));
@@ -71,7 +69,6 @@ public class TreeGen extends Resource
     {
         int hash = 3;
         hash = 53 * hash + super.hashCode();
-        hash = 53 * hash + (this.trees != null ? this.trees.hashCode() : 0);
         hash = 53 * hash + (this.treeNames != null ? this.treeNames.hashCode() : 0);
         hash = 53 * hash + (this.treeChances != null ? this.treeChances.hashCode() : 0);
         return hash;
@@ -124,52 +121,62 @@ public class TreeGen extends Resource
                     int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
                     int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);               	
                     
-                    CustomObject tree = getTrees(world.getName()).get(treeNumber);                   
-                   
-                    if(tree == null)
-                    {
-                		if(OTG.getPluginConfig().spawnLog)
-                		{
-                			BiomeConfig biomeConfig = world.getBiome(chunkCoord.getChunkX() * 16 + 15, chunkCoord.getChunkZ() * 16 + 15).getBiomeConfig();
-                			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree in biome " + biomeConfig.getName() + ". BO3: " + treeNames.get(treeNumber));
-                		}
-                		continue;
-                    }
+                    //CustomObject tree = getTrees(world.getName()).get(treeNumber);
                     
-                    if(tree instanceof BO2 || tree instanceof BO3)
-                    {   
-                		if(
-            				(tree instanceof BO2 && ((BO2)tree).spawnAsTree(world, random, x, z)) ||
-            				(tree instanceof BO3 && ((BO3)tree).spawnAsTree(world, random, x, z))
-        				)
+    	        	String treeName = treeNames.get(treeNumber);
+    	        	CustomObject tree = null;
+        			int minHeight = 0;
+        			int maxHeight = 0;
+    	        	if(treeName.contains("("))
+    	        	{
+    	        		String[] params = treeName.replace(")", "").split("\\(");
+    	        		treeName = params[0];
+    	        		tree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeName, world.getName());
+                        if(tree == null)
+                        {
+                    		if(OTG.getPluginConfig().spawnLog)
+                    		{
+                    			BiomeConfig biomeConfig = world.getBiome(chunkCoord.getChunkX() * 16 + 15, chunkCoord.getChunkZ() * 16 + 15).getBiomeConfig();
+                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree in biome " + biomeConfig.getName() + ". BO3: " + treeNames.get(treeNumber));
+                    		}
+                    		continue;
+                        }                    
+    	        		
+            			params = params[1].split(";");
+            			String sMinHeight = params[0].toLowerCase().replace("minheight=", "");
+            			String sMaxHeight = params[1].toLowerCase().replace("maxheight=", "");
+
+            			try
+            			{
+    	        			minHeight = Integer.parseInt(sMinHeight);
+    	        			maxHeight = Integer.parseInt(sMaxHeight);
+            			} catch(NumberFormatException ex) {  }	        				        			
+
+                		if(tree.spawnAsTree(world, random, x, z, minHeight, maxHeight))
                 		{
         	                // Success!
         	                break;
                 		}
-                    } else {
-                        int y = world.getHighestBlockYAt(x, z);
-                        Rotation rotation = Rotation.getRandomRotation(random);
 
-                        if (tree.trySpawnAt(world, random, rotation, x, y, z))
+    	        	} else {
+    	        		tree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeName, world.getName());
+                        if(tree == null)
                         {
+                    		if(OTG.getPluginConfig().spawnLog)
+                    		{
+                    			BiomeConfig biomeConfig = world.getBiome(chunkCoord.getChunkX() * 16 + 15, chunkCoord.getChunkZ() * 16 + 15).getBiomeConfig();
+                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree in biome " + biomeConfig.getName() + ". BO3: " + treeNames.get(treeNumber));
+                    		}
+                    		continue;
+                        }                        	        		
+                		if(tree.spawnAsTree(world, random, x, z))
+                		{
         	                // Success!
-                        	break;
-                        }                    
-                    }
+        	                break;
+                		}
+    	        	}
                 }
             }
         }    		
-    }
-    	
-    private List<CustomObject> getTrees(String worldName)
-    {
-    	if(trees.size() == 0 && treeNames.size() > 0)
-    	{
-	        for (int i = 0; i < treeNames.size(); i++)
-	        {
-	        	trees.add(OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeNames.get(i), worldName));
-	        }
-    	}
-    	return trees;
-    }		
+    }	
 }

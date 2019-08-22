@@ -430,7 +430,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 					GuiYesNo guiyesno = askDeleteSettings(this, presetNameToDelete);
 					this.mc.displayGuiScreen(guiyesno);
 	
-		            File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/" + PluginStandardValues.PresetsDirectoryName);
+		            File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName);
 		            if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
 		            {
 		            	for(File worldDir : OTGWorldsDirectory.listFiles())

@@ -148,16 +148,16 @@ public class FrozenSurfaceHelper
             {
                 materialToSnowAt = world.getMaterial(x, --y, z, false);
                 materialToSnowOn = world.getMaterial(x, y - 1, z, false);
-                if (materialToSnowAt.isAir() && materialToSnowOn.canSnowFallOn())
+                if (materialToSnowAt != null && materialToSnowOn != null && materialToSnowAt.isAir() && materialToSnowOn.canSnowFallOn())
                 {
                     this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn);
                     continue;
                 }
-                if (!materialToSnowAt.isAir())
+                if (materialToSnowAt != null && !materialToSnowAt.isAir())
                 {
                     ++decreaseFactor;
                 }
-            } while (!materialToSnowAt.isSolid() && y > 0);
+            } while (materialToSnowAt == null || !materialToSnowAt.isSolid() && y > 0);
         }
     }
 

@@ -92,6 +92,12 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     	throw new RuntimeException();
     }
     
+    @Override
+    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
+    {
+    	throw new RuntimeException();
+    }
+    
     private boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {    	
         // Basic checks
@@ -206,12 +212,19 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         return true;
     }    
 
+    @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-   		return spawn(world, random, x, z);
+   		return spawn(world, random, x, z, this.spawnElevationMin, this.spawnElevationMax);
+    }
+    
+    @Override
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
+    {
+   		return spawn(world, random, x, z, minY, maxY);
     } 
     
-    private boolean spawn(LocalWorld world, Random random, int x, int z)
+    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY)
     {
         int y;
         if (spawnAboveGround)
@@ -221,15 +234,15 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         else if (spawnUnderGround)
         {
             int solidHeight = world.getSolidHeight(x, z);
-            if (solidHeight < 1 || solidHeight <= spawnElevationMin)
+            if (solidHeight < 1 || solidHeight <= minY)
             {
                 return false;
             }
-            if (solidHeight > spawnElevationMax)
+            if (solidHeight > maxY)
             {
-                solidHeight = spawnElevationMax;
+                solidHeight = maxY;
             }
-            y = random.nextInt(solidHeight - spawnElevationMin) + spawnElevationMin;
+            y = random.nextInt(solidHeight - minY) + minY;
         } else {
             y = world.getHighestBlockYAt(x, z);
         }
@@ -273,7 +286,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
             
-            objectSpawned = spawn(world, rand, x, z);
+            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);
         }
 
         return objectSpawned;

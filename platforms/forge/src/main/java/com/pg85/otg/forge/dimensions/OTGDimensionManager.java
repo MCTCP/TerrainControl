@@ -272,7 +272,7 @@ public class OTGDimensionManager
 			removeFromUsedIds(dimToRemove);	
 	
 			// This biome was unregistered via a console command, delete its world data
-			File dimensionSaveDir = new File(world.getWorld().getSaveHandler().getWorldDirectory() + "/DIM" + dimToRemove);
+			File dimensionSaveDir = new File(world.getWorld().getSaveHandler().getWorldDirectory() + File.separator + "DIM" + dimToRemove);
 			if(dimensionSaveDir.exists() && dimensionSaveDir.isDirectory())
 			{
 				OTG.log(LogMarker.INFO, "Deleting world save data for dimension " + dimToRemove);
@@ -442,7 +442,7 @@ public class OTGDimensionManager
 	public static void SaveDimensionData()
 	{
 		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/" + WorldStandardValues.DimensionsDataFileName);
+		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsDataFileName);
 		if(dimensionDataFile.exists())
 		{
 			dimensionDataFile.delete();
@@ -547,7 +547,7 @@ public class OTGDimensionManager
 	public static OTGDimensionInfo LoadOrderedDimensionData()
 	{
 		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + "/OpenTerrainGenerator/" + WorldStandardValues.DimensionsDataFileName);
+		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsDataFileName);
 		String[] dimensionDataFileValues = {};
 		if(dimensionDataFile.exists())
 		{
@@ -614,7 +614,7 @@ public class OTGDimensionManager
 
 	public static ArrayList<DimensionData> GetDimensionData(File worldSaveDir)
 	{
-		File dimensionDataFile = new File(worldSaveDir + "/OpenTerrainGenerator/" + WorldStandardValues.DimensionsDataFileName);
+		File dimensionDataFile = new File(worldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsDataFileName);
 		String[] dimensionDataFileValues = {};
 		if(dimensionDataFile.exists())
 		{

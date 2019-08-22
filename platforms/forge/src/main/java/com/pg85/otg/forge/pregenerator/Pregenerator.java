@@ -509,7 +509,7 @@ public class Pregenerator
 		if(pregeneratorIsRunning || forceSave)
 		{
 			int dimensionId = world.getDimensionId();
-			File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + WorldStandardValues.PregeneratedChunksFileName);
+			File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksFileName);
 
 			if(pregeneratedChunksFile.exists())
 			{
@@ -545,7 +545,7 @@ public class Pregenerator
 	private void loadPregeneratorData()
 	{
 		int dimensionId = world.getDimensionId();
-		File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + "/OpenTerrainGenerator/" + (dimensionId != 0 ? "DIM-" + dimensionId + "/" : "") + WorldStandardValues.PregeneratedChunksFileName);
+		File pregeneratedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksFileName);
 
 		String[] pregeneratedChunksFileValues = {};
 		if(pregeneratedChunksFile.exists())

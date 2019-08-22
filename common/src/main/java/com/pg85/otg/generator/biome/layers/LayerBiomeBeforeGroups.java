@@ -38,22 +38,26 @@ public class LayerBiomeBeforeGroups extends Layer
                 initChunkSeed(j + x, i + z);
                 currentPiece = childInts[(j + i * xSize)];
 
-                if ((currentPiece & BiomeBits) == 0)    // without biome
+                if ((currentPiece & BiomeBitsAreSetBit) == 0) // without biome
                 {
-                    if (this.biomes.length > 0 && (currentPiece & IceBit) == 0) // Normal
-                                                                                // Biome
+                    if (this.biomes.length > 0 && (currentPiece & IceBit) == 0) // Normal biome
                     {
                         biome = this.biomes[nextInt(this.biomes.length)];
                         if (biome != null)
-                            currentPiece |= biome.getIds().getOTGBiomeId();
-                    } else if (this.ice_biomes.length > 0 && (currentPiece & IceBit) != 0) // Ice
-                                                                                           // biome
+                        {
+                            currentPiece |= biome.getIds().getOTGBiomeId() | BiomeBitsAreSetBit;
+                        }
+                    }
+                    else if (this.ice_biomes.length > 0 && (currentPiece & IceBit) != 0) // Ice biome
                     {
                         biome = this.ice_biomes[nextInt(this.ice_biomes.length)];
                         if (biome != null)
-                            currentPiece |= biome.getIds().getOTGBiomeId();
+                        {
+                            currentPiece |= biome.getIds().getOTGBiomeId() | BiomeBitsAreSetBit;
+                        }
                     }
-                }
+                }            
+
                 thisInts[(j + i * xSize)] = currentPiece;
             }
         }

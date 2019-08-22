@@ -43,16 +43,21 @@ public class LayerSmooth extends Layer
                     this.initChunkSeed((long) (xi + x), (long) (zi + z));
 
                     if (this.nextInt(2) == 0)
+                    {
                         centerCheck = westCheck;
-                    else
+                    } else {
                         centerCheck = northCheck;
-                } else
-                {
+                    }
+                } else {
                     if (westCheck == eastCheck)
-                        centerCheck = westCheck;
+                    {
+                       centerCheck = westCheck;
+                    }
 
                     if (northCheck == southCheck)
+                    {
                         centerCheck = northCheck;
+                    }
                 }
 
                 thisInts[xi + zi * xSize] = centerCheck;
@@ -61,5 +66,4 @@ public class LayerSmooth extends Layer
 
         return thisInts;
     }
-
 }

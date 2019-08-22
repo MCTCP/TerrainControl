@@ -95,14 +95,20 @@ public class BO3 implements StructuredCustomObject
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-    	return trySpawnAt(false, null, world, random, rotation, x, y, z);
+    	return trySpawnAt(false, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
+    }
+    
+    @Override
+    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
+    {
+    	return trySpawnAt(false, null, world, random, rotation, x, y, z, minY, maxY);
     }
     
     // Used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc).
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-		return trySpawnAt(true, null, world, random, rotation, x, y, z);
+		return trySpawnAt(true, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
     }
 
 	// This method is only used to spawn CustomObject.
@@ -120,7 +126,7 @@ public class BO3 implements StructuredCustomObject
                 int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
                 int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
-                if (spawn(world, random, x, z))
+                if (spawn(world, random, x, z, settings.minHeight, settings.maxHeight))
                 {
                     atLeastOneObjectHasSpawned = true;
                 }
@@ -197,19 +203,26 @@ public class BO3 implements StructuredCustomObject
         return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
     }
    
+    @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-		return spawn(world, random, x, z);
+    	return spawn(world, random, x, z, this.getSettings().minHeight, this.getSettings().maxHeight);
+    }
+    
+    @Override
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
+    {
+		return spawn(world, random, x, z, minY, maxY);
     }
 
     // Used for customobject and trees
-    private boolean spawn(LocalWorld world, Random random, int x, int z)
+    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY)
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
         if (settings.spawnHeight == SpawnHeightEnum.randomY)
         {
-            y = settings.minHeight == settings.maxHeight ? settings.minHeight : RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
+            y = minY == maxY ? minY : RandomHelper.numberInRange(random, minY, maxY);
         }
         if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
@@ -221,11 +234,11 @@ public class BO3 implements StructuredCustomObject
         }
         // Offset by static and random settings values
         y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
-        return trySpawnAt(world, random, rotation, x, y, z);
+        return trySpawnAt(world, random, rotation, x, y, z, minY, maxY);
     }
     
     // Used for saplings, trees, customobjects and customstructures
-    public boolean trySpawnAt(boolean skipChecks, CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    public boolean trySpawnAt(boolean skipChecks, CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
     {
     	if(!skipChecks)
     	{
@@ -235,7 +248,7 @@ public class BO3 implements StructuredCustomObject
 	        }
 
 	        // Height check
-	        if (y < settings.minHeight || y > settings.maxHeight)
+	        if (y < minY || y > maxY)
 	        {
 	            return false;
 	        }

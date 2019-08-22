@@ -103,7 +103,8 @@ public abstract class Layer
      */
     // [ Biome Data ]
     protected static final int BiomeBits = 1023;            //>>	1st-10th Bits           // 255 63
-
+    protected static final int BiomeBitsAreSetBit = (1 << 22);       //	23rd Bit, 4194304
+    
     // [ Flags ]
     protected static final int LandBit = (1 << 10);         //>>	11th Bit, 1024          // 256 64
     protected static final int IslandBit = (1 << 11);       //>>	12th Bit, 2048          // 4096 1024
@@ -193,7 +194,9 @@ public abstract class Layer
     {
         int i = (int) ((this.scrambledChunkSeed >> 24) % x);
         if (i < 0)
+        {
             i += x;
+        }
         this.scrambledChunkSeed *= (this.scrambledChunkSeed * 6364136223846793005L + 1442695040888963407L);
         this.scrambledChunkSeed += this.scrambledWorldSeed;
         return i;
@@ -203,7 +206,9 @@ public abstract class Layer
     {
         int i = (int) ((this.scrambledGroupSeed >> 24) % x);
         if (i < 0)
+        {
             i += x;
+        }
         this.scrambledGroupSeed *= (this.scrambledGroupSeed * 6364136223846793005L + 1442695040888963407L);
         this.scrambledGroupSeed += this.scrambledChunkSeed;
         return i;

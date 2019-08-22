@@ -111,8 +111,8 @@ public class ForgeBiomeRegistryManager
 	
 	        ForgeEngine forgeEngine = ((ForgeEngine) OTG.getEngine());
 	
-	        //if (biomeIds.isVirtual())
-	        if(biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.length() > 0) // This biome uses ReplaceToBiomeName and should use the ReplaceToBiomeName biome's id.
+	        if (biomeIds.isVirtual())
+	        //if(biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.length() > 0) // This biome uses ReplaceToBiomeName and should use the ReplaceToBiomeName biome's id.
 	        {
 	        	// Only register by resourcelocation.
 	        	// TODO: Make sure this is enough for Forge 1.12+ <- It looks like the server may not send the biomes to the client if they are not added to the registry. TODO: Check if only virtual biomes have this problem.
