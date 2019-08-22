@@ -155,11 +155,11 @@ public class ChunkProviderOTG
         final int maxYSections = this.heightCap / 8 + 1;
         final int usedYSections = this.heightScale / 8 + 1;
 
-        //WorldConfig worldConfig = configProvider.getWorldConfig();
+        WorldConfig worldConfig = configProvider.getWorldConfig();
         BiomeGenerator biomeGenerator = this.localWorld.getBiomeGenerator();
-        //if (worldConfig.improvedRivers)
+        if (worldConfig.improvedRivers)
         {
-            //this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter, OutputType.ONLY_RIVERS);
+            this.riverArray = biomeGenerator.getBiomesUnZoomed(this.riverArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter, OutputType.ONLY_RIVERS);
         }
 
         if (biomeGenerator.canGenerateUnZoomed())
@@ -368,10 +368,10 @@ public class ChunkProviderOTG
 
                 if (!worldConfig.oldTerrainGenerator)
                 {
-                    //if (worldConfig.improvedRivers)
+                    if (worldConfig.improvedRivers)
                     {
-                        //this.biomeFactorWithRivers(x, z, usedYSections, noiseHeight);
-                    //} else {
+                        this.biomeFactorWithRivers(x, z, usedYSections, noiseHeight);
+                    } else {
                         this.biomeFactor(x, z, usedYSections, noiseHeight);
                     }
                 } else {
