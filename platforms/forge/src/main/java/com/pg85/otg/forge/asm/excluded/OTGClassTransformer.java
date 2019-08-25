@@ -39,7 +39,10 @@ public class OTGClassTransformer implements IClassTransformer
 		"net.minecraft.entity.projectile.EntityShulkerBullet", // Gravity
 		"net.minecraft.entity.projectile.EntityThrowable", // Gravity
 		"net.minecraft.entity.item.EntityTNTPrimed", // Gravity
-		"net.minecraft.entity.item.EntityXPOrb" // Gravity
+		"net.minecraft.entity.item.EntityXPOrb", // Gravity
+		"net.minecraftforge.common.DimensionManager", // Dimensions
+		"net.minecraft.entity.Entity", // Log obf name for debugging
+		"net.minecraft.util.math.BlockPos$PooledMutableBlockPos" // Log obf name for debugging
 	};
 	
 	String entityObfuscatedClassName = "vg";
@@ -56,15 +59,14 @@ public class OTGClassTransformer implements IClassTransformer
 			{
 				if(ClassesBeingTransformed[i].equals(transformedName))
 				{
-					System.out.println("OTG-Core transforming: " + transformedName);			
-					return transform(i, classBeingTransformed, isObfuscated);
+					return transform(i, classBeingTransformed, isObfuscated, transformedName);
 				}
 			}
 		}
 		return classBeingTransformed;
 	}
 
-	public byte[] transform(int index, byte[] classBeingTransformed, boolean isObfuscated)
+	public byte[] transform(int index, byte[] classBeingTransformed, boolean isObfuscated, String transformedName)
 	{
 		try
 		{
@@ -72,6 +74,8 @@ public class OTGClassTransformer implements IClassTransformer
 			ClassReader classReader = new ClassReader(classBeingTransformed);
 			classReader.accept(classNode, 0);
 
+			System.out.println("OTG-Core transforming: " + transformedName + " : " + classNode.name);
+			
 			// Do the transformation
 			switch(index)
 			{
@@ -113,7 +117,10 @@ public class OTGClassTransformer implements IClassTransformer
 				break;
 				case 12: // net.minecraft.entity.item.EntityXPOrb.onUpdate
 					transformOnUpdateXPOrb(classNode, isObfuscated);
-				break;				
+				break;
+				case 13: // net.minecraftforge.common.DimensionManager.initDimension
+					transformInitDimension(classNode, isObfuscated);
+				break;
 			}
 
 			ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
@@ -129,7 +136,7 @@ public class OTGClassTransformer implements IClassTransformer
 
 	// net.minecraft.world.biome.Biome.getIdForBiome(ClassNode gameDataNode, boolean isObfuscated)
 	private void transformGetIdForBiome(ClassNode gameDataNode, boolean isObfuscated)
-	{
+	{	
 		String injectSnapShot = isObfuscated ? "a" : "getIdForBiome";
 		String injectSnapShotDescriptor = isObfuscated ? "(L" + gameDataNode.name + ";)I" : "(Lnet/minecraft/world/biome/Biome;)I";
 		
@@ -887,5 +894,81 @@ public class OTGClassTransformer implements IClassTransformer
 		}
 
 		System.out.println("OTG-Core could not override net.minecraft.entity.item.EntityXPOrb.onUpdate, this may cause problems with OTG dimensions using non-default gravity settings. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
+	}
+	
+	// Make sure that OTG dimensions get initialised by OTGDimensionManager.initDimension
+	// net.minecraftforge.common.DimensionManager.initDimension(int dim)
+	private void transformInitDimension(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "initDimension" : "initDimension";
+		String injectSnapShotDescriptor = isObfuscated ? "(I)V" : "(I)V";
+
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				AbstractInsnNode targetNode = null;
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					if(instruction instanceof LineNumberNode)
+					{
+						if(targetNode == null)
+						{
+							targetNode = instruction;
+						} else {
+							// Inserting 5 new lines before this, so add +5 to all linenumber nodes.
+							((LineNumberNode)instruction).line += 5;
+						}
+					}
+				}
+
+				if(targetNode == null)
+				{
+					throw new RuntimeException("OTG is not compatible with this version of Forge.");
+				}				
+				
+				/*
+				Inserting at start of net.minecraftforge.common.DimensionManager.initDimension(int dim):
+				if(OTGHooks.InitOTGDimension(dim))
+				{
+					return;
+				}
+				mv.visitVarInsn(ILOAD, 0);
+				mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "InitOTGDimension", "(I)Z", false);
+				Label l4 = new Label();
+				mv.visitJumpInsn(IFEQ, l4);
+				Label l5 = new Label();
+				mv.visitLabel(l5);
+				mv.visitLineNumber(247, l5);
+				mv.visitInsn(RETURN);
+				mv.visitLabel(l4);
+				mv.visitLineNumber(250, l4);
+				mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
+				Inserting 5 lines of code directly below:
+				
+				mv.visitLineNumber(245, l3);
+			 	*/
+				
+				InsnList toInsert = new InsnList();
+				toInsert.add(new VarInsnNode(ILOAD, 0));
+							
+				toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "initOTGDimension",  "(I)Z", false));
+				LabelNode l4 = new LabelNode();
+				toInsert.add(new JumpInsnNode(IFEQ, l4));
+				LabelNode l5 = new LabelNode();
+				toInsert.add(l5);
+				toInsert.add(new LineNumberNode(247, l5));
+				toInsert.add(new InsnNode(RETURN));
+				toInsert.add(l4);
+				toInsert.add(new LineNumberNode(250, l5));
+				toInsert.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+				
+				method.instructions.insertBefore(targetNode, toInsert);
+
+				return;
+			}
+		}
+
+		throw new RuntimeException("OTG is not compatible with this version of Forge.");
 	}
 }

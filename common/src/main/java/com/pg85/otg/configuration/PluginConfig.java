@@ -29,11 +29,6 @@ public final class PluginConfig extends ConfigFile
     public boolean developerMode = false;
     
 	/**
-	 * Having generateCompressedBO4 enabled means compressed BO4 files (BO4Data files) are created when BO4 files are loaded. 
-	 */
-    public boolean generateCompressedBO4 = false;
-	
-	/**
 	 * Forge only: This is the number of chunks the pre-generator generates each server tick.
 	 * Higher values make pre-generation faster but can cause lag and increased memory usage.
 	 */
@@ -99,7 +94,6 @@ public final class PluginConfig extends ConfigFile
         this.pregeneratorMaxChunksPerTick = reader.getSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK);
         
         this.developerMode = reader.getSetting(PluginStandardValues.DEVELOPER_MODE);
-        this.generateCompressedBO4 = reader.getSetting(PluginStandardValues.GENERATE_COMPRESSED_BO4);
     }
 
     @Override
@@ -152,12 +146,7 @@ public final class PluginConfig extends ConfigFile
         		"Clears the BO2/BO3 cache whenever a world or dimension is unloaded (similar to using /otg unloadbo3s and recreating a world).",
         		"Defaults to: false"
 		);         
-
-        writer.putSetting(PluginStandardValues.GENERATE_COMPRESSED_BO4, this.generateCompressedBO4,
-        		"Having generateCompressedBO4 enabled means compressed BO4 files (BO4Data files) are created when BO4 files are loaded.",
-        		"Defaults to: false"
-		);
-        
+       
         writer.putSetting(PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK, this.pregeneratorMaxChunksPerTick,
 		        "The number of chunks the pre-generator is allowed to generate for each server tick, shoul be between 1-5.",
 		        "Higher numbers make pre-generation faster but increase memory usage and will cause lag.");

@@ -203,4 +203,23 @@ public enum DefaultBiome
         }
         return false;
     }
+    
+    /**
+     * Returns the biome id depending on if this DefaultBiome has the given name
+     * <p/>
+     * @param name The string to test this.Name against
+     * <p/>
+     * @return int the Id of the biome with String name
+     */
+    public static Integer getId(String name)
+    {
+        for (DefaultBiome biome : DefaultBiome.values())
+        {
+            if (biome.Name.equals(name))
+            {
+                return biome.Id;
+            }
+        }
+        return null;
+    }
 }

@@ -8,6 +8,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraft.world.gen.ChunkProviderServer;
 
 import com.pg85.otg.OTG;
@@ -398,15 +400,25 @@ public class Pregenerator
 	{
 		updateProgressMessage(true);
 		
-		// Make sure the 3 surrounding chunks are loaded, or this chunk won't get populated.
-        world.getWorld().getChunkProvider().provideChunk(currentX + 1, currentZ);
-        world.getWorld().getChunkProvider().provideChunk(currentX, currentZ + 1);
-        world.getWorld().getChunkProvider().provideChunk(currentX + 1, currentZ + 1);
+		ChunkProviderServer chunkProvider = (ChunkProviderServer) world.getWorld().getChunkProvider();
 
-        // Provide and populate this chunk
-        world.getWorld().getChunkProvider().provideChunk(currentX, currentZ);
-
-		spawnedThisTick++;
+        if (
+        	!(
+	    		(
+    				chunkProvider.chunkExists(currentX, currentZ) ||
+					RegionFileCache.createOrLoadRegionFile(((WorldServer)world.getWorld()).getChunkSaveLocation(), currentX, currentZ).chunkExists(currentX & 0x1F, currentZ & 0x1F)
+				) &&
+				chunkProvider.provideChunk(currentX, currentZ).isPopulated()
+			)
+		)
+		{
+    		spawnedThisTick++;
+        	
+        	chunkProvider.provideChunk(currentX, currentZ).needsSaving(true);
+        	chunkProvider.provideChunk(currentX, currentZ + 1).needsSaving(true);
+        	chunkProvider.provideChunk(currentX + 1, currentZ).needsSaving(true);
+        	chunkProvider.provideChunk(currentX + 1, currentZ + 1).needsSaving(true);
+		}	
 		
 		if(spawned - lastSpawnedWhenSaved > compressCustomStructureCacheThreshHold)
 		{

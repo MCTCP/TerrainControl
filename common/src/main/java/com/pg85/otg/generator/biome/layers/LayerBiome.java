@@ -15,9 +15,9 @@ public class LayerBiome extends Layer
     private int depth;
     private double freezeTemp;
 
-    LayerBiome(long seed, Layer childLayer, BiomeGroupManager groupManager, int depth, double freezeTemp)
+    LayerBiome(long seed, int defaultOceanId, Layer childLayer, BiomeGroupManager groupManager, int depth, double freezeTemp)
     {
-        super(seed);
+        super(seed, defaultOceanId);
         this.child = childLayer;
         this.manager = groupManager;
         this.depth = depth;
@@ -42,7 +42,7 @@ public class LayerBiome extends Layer
                 initChunkSeed(j + x, i + z);
                 currentPiece = childInts[(j + i * xSize)];
 
-                if ((currentPiece & BiomeGroupBits) != 0 && (currentPiece & BiomeBitsAreSetBit) == 0)    // has biomegroup bits but not biome bits
+                if ((currentPiece & BiomeGroupBits) != 0 && ((currentPiece & BiomeBitsAreSetBit) == 0 || (currentPiece & BiomeBits) == this.defaultOceanId))    // has biomegroup bits but not biome bits
                 {
                     group = manager.getGroupById((currentPiece & BiomeGroupBits) >> BiomeGroupShift);
                     possibleBiomes = group.getDepthMapOrHigher(depth);

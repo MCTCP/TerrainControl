@@ -14,10 +14,16 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Holds the WorldConfig and all BiomeConfigs.
@@ -105,17 +111,7 @@ public final class ClientConfigProvider implements ConfigProvider
             return null;
         }
         return biomesByOTGId[id];
-    }
-    
-    @Override
-    public LocalBiome getBiomeBySavedIdOrNull(int id)
-    {
-        if (id < 0 || id > biomesBySavedId.length)
-        {
-            return null;
-        }
-        return biomesBySavedId[id];
-    }
+    }   
 
     @Override
     public void reload()
@@ -128,4 +124,38 @@ public final class ClientConfigProvider implements ConfigProvider
     {
         return this.biomesByOTGId;
     }
+    
+    
+	@Override
+	public List<LocalBiome> getBiomeArrayLegacy()
+	{        
+        // For backwards compatibility, sort the biomes by saved id and return default biomes as if they were custom biomes 
+        List<LocalBiome> nonDefaultbiomes = new ArrayList<LocalBiome>();
+        LocalBiome[] defaultBiomes = new LocalBiome[256];
+        for(LocalBiome biome : this.biomesByOTGId)
+        {
+        	if(biome != null)
+        	{
+        		Integer defaultBiomeId = DefaultBiome.getId(biome.getName());
+        		if(defaultBiomeId != null)
+        		{
+        			defaultBiomes[defaultBiomeId.intValue()] = biome;
+        		} else {
+        			nonDefaultbiomes.add(biome);
+        		}
+        	}
+        }
+
+        List<LocalBiome> outputBiomes = new ArrayList<LocalBiome>();
+        for(LocalBiome biome : defaultBiomes)
+        {
+        	if(biome != null)
+        	{
+        		outputBiomes.add(biome);
+        	}
+        }
+        outputBiomes.addAll(nonDefaultbiomes);
+        
+		return outputBiomes;
+	}
 }

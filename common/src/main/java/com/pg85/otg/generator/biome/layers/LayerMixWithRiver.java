@@ -1,20 +1,20 @@
 package com.pg85.otg.generator.biome.layers;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.ArraysCache;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 
 public class LayerMixWithRiver extends Layer
 {
-    private int defaultOceanId;
     private int defaultFrozenOceanId;
 	
     LayerMixWithRiver(long seed, Layer childLayer, Layer riverLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
     {
-        super(seed);
-        this.defaultOceanId = defaultOceanId;
+        super(seed, defaultOceanId);
         this.defaultFrozenOceanId = defaultFrozenOceanId;
         this.child = childLayer;
         this.configs = configs;
@@ -24,12 +24,17 @@ public class LayerMixWithRiver extends Layer
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
             LocalBiome biome = configs.getBiomeByOTGIdOrNull(id);
-            
-            if (biome == null || biome.getBiomeConfig().riverBiome.isEmpty())
+
+            this.riverBiomes[id] = -1;
+            if (biome != null && !biome.getBiomeConfig().riverBiome.isEmpty())
             {
-                this.riverBiomes[id] = -1;
-            } else {
-            	this.riverBiomes[id] = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome).getIds().getOTGBiomeId();
+            	LocalBiome riverBiome = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome);
+            	if(riverBiome != null)
+            	{
+            		this.riverBiomes[id] = riverBiome.getIds().getOTGBiomeId();
+            	} else {
+            		OTG.log(LogMarker.WARN, "River biome \"" + biome.getBiomeConfig().riverBiome + "\" for biome " + biome.getBiomeConfig().getName() + " could not be found.");
+            	}
             }
         }
     }

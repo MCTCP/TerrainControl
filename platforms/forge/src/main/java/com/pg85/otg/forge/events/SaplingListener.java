@@ -301,14 +301,12 @@ public class SaplingListener
         }
         if(gen == null && biomeConfig.inheritSaplingResource && biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.trim().length() > 0)
         {
-            try
-            {
-            	// Get the biome by saved id (parent biome)
-            	biome = world.getSavedBiome(blockPos.getX(), blockPos.getZ());
+        	// Get the biome by saved id (parent biome)
+        	biome = world.getBiomeByNameOrNull(biomeConfig.replaceToBiomeName);
+        	if(biome != null)
+        	{
                 gen = biome.getBiomeConfig().getSaplingGen(type);
-            }
-            catch (BiomeNotFoundException e)
-            {
+        	} else {
                 return null;
             }
         }

@@ -79,11 +79,6 @@ public class BO4 implements StructuredCustomObject
     		{
     			FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
     		}
-    		
-    		if(OTG.getPluginConfig().generateCompressedBO4)
-    		{
-    			generateBO4Data();
-    		}
     	}
     	catch(InvalidConfigException ex)
     	{

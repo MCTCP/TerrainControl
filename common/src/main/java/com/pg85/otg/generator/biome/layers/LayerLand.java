@@ -8,9 +8,9 @@ public class LayerLand extends Layer
 
     private int rarity = 5;
 
-    LayerLand(long seed, Layer childLayer, int _rarity)
+    LayerLand(long seed, int defaultOceanId, Layer childLayer, int _rarity)
     {
-        super(seed);
+        super(seed, defaultOceanId);
         this.child = childLayer;
         this.rarity = 101 - _rarity;
     }

@@ -145,16 +145,16 @@ public abstract class Layer
         return scrambledWorldSeed;
     }
 
-    protected Layer(long seed)
+    protected int defaultOceanId;
+    protected Layer(long seed, int defaultOceanId)
     {
         this.baseSeed = seed;
+        this.defaultOceanId = defaultOceanId;
     }
 
     public Layer()
     {
     }
-
-
 
     public void initWorldGenSeed(long worldSeed)
     {
@@ -249,4 +249,16 @@ public abstract class Layer
         }))))))))));
     }
 
+    /**
+     * In a single step, checks for land and when present returns biome data
+     * @param selection The location to be checked
+     * @return Biome Data or defaultOceanId when not on land
+     */
+    protected int getBiomeFromLayer(int selection)
+    {
+        return 
+    		(selection & LandBit) != 0 && (selection & BiomeBitsAreSetBit) != 0 ? 
+    		(selection & BiomeBits) : 
+			this.defaultOceanId;
+    }
 }

@@ -1064,6 +1064,7 @@ public class WorldConfig extends ConfigFile
         if (this.populateUsingSavedBiomes)
         {
             writer.putSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, this.populateUsingSavedBiomes,
+            		"Update: Broken since 1.12.2 v7, still need to update this to work with changes.",
                     "Advanced setting, only written to this file when set to true.",
                     "If it is set to true the biome populator will use the biome ids present in the",
                     "chunk data, ignoring the biome generator. This is useful if you have a premade",

@@ -13,13 +13,11 @@ public class LayerMix extends Layer
 
     private ConfigProvider configs;
     private int[] riverBiomes;
-    private int defaultOceanId;
     private int defaultFrozenOceanId;
 
     LayerMix(long seed, Layer childLayer, ConfigProvider configs, LocalWorld world, int defaultOceanId, int defaultFrozenOceanId)
     {
-        super(seed);
-        this.defaultOceanId = defaultOceanId;
+        super(seed, defaultOceanId);
         this.defaultFrozenOceanId = defaultFrozenOceanId;
         this.child = childLayer;
         this.configs = configs;

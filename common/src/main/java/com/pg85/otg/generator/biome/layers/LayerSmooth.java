@@ -6,9 +6,9 @@ import com.pg85.otg.generator.biome.ArraysCache;
 public class LayerSmooth extends Layer
 {
 
-    LayerSmooth(long seed, Layer childLayer)
+    LayerSmooth(long seed, int defaultOceanId, Layer childLayer)
     {
-        super(seed);
+        super(seed, defaultOceanId);
         this.child = childLayer;
     }
 

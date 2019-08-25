@@ -15,9 +15,9 @@ public class LayerBiomeBeforeGroups extends Layer
     private LocalBiome[] biomes;
     private LocalBiome[] ice_biomes;
 
-    LayerBiomeBeforeGroups(long seed, Layer childLayer, LocalBiome[] biomes, LocalBiome[] ice_biomes)
+    LayerBiomeBeforeGroups(long seed, int defaultOceanId, Layer childLayer, LocalBiome[] biomes, LocalBiome[] ice_biomes)
     {
-        super(seed);
+        super(seed, defaultOceanId);
         this.child = childLayer;
         this.biomes = biomes;
         this.ice_biomes = ice_biomes;
@@ -38,7 +38,7 @@ public class LayerBiomeBeforeGroups extends Layer
                 initChunkSeed(j + x, i + z);
                 currentPiece = childInts[(j + i * xSize)];
 
-                if ((currentPiece & BiomeBitsAreSetBit) == 0) // without biome
+                if ((currentPiece & BiomeBitsAreSetBit) == 0 || (currentPiece & BiomeBits) == this.defaultOceanId) // without biome
                 {
                     if (this.biomes.length > 0 && (currentPiece & IceBit) == 0) // Normal biome
                     {
