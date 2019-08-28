@@ -17,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiConfirmOpenLink;
+import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiYesNo;
 import net.minecraft.client.gui.GuiYesNoCallback;
@@ -30,6 +31,7 @@ import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
+import org.apache.commons.io.FileUtils;
 import org.lwjgl.input.Mouse;
 
 import com.pg85.otg.OTG;
@@ -67,10 +69,12 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     private final int iContinueButton = 0;
     private final int iCancelButton = 1;
     private final int iNewButton = 2;
+    private final int iCloneButton = 4;
     private final int iDeleteButton = 3;
     
 	private boolean askDeleteSettings = false;
-	private boolean selectingPresetName = true;
+	private boolean selectingNewPresetName = true;
+	private boolean selectingClonePresetName = true;
     public String newPresetName;
 
     private int wikiBtnLeft;
@@ -235,7 +239,8 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     
     private GuiYesNo askDeleteSettings(GuiYesNoCallback p_152129_0_, String worldName)
     {
-    	selectingPresetName = false;
+    	selectingNewPresetName = false;
+    	selectingClonePresetName = false;
     	askDeleteSettings = true;    	
 
         String s1 = "Delete the OpenTerrainGenerator preset for '" + worldName + "'?";
@@ -305,11 +310,16 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     	} else {
     		this.presetsList.resize();
     	}
-    	GuiButton btnNew = new GuiButton(iNewButton, OTGGuiPresetList.this.leftMargin, this.height - btnBottomMargin, listWidth, 20, "New");
-    	btnNew.enabled = this.mc.world == null || this.mc.isSingleplayer(); // Don't allow creating/deleting presets for MP    	
+    	GuiButton btnNew = new GuiButton(iNewButton, OTGGuiPresetList.this.leftMargin, this.height - btnBottomMargin, (listWidth - 3) / 2 + 1, 20, "New");
+    	btnNew.enabled = this.mc.world == null || this.mc.isSingleplayer(); // Don't allow creating/cloning/deleting presets for MP    	
     	this.buttonList.add(btnNew);
+    	
+    	GuiButton btnClone = new GuiButton(iCloneButton, OTGGuiPresetList.this.leftMargin + (listWidth - 3) / 2 + 3 + 2, this.height - btnBottomMargin, (listWidth - 3) / 2, 20, "Clone");
+    	btnClone.enabled = this.mc.world == null || this.mc.isSingleplayer(); // Don't allow creating/deleting presets for MP    	
+    	this.buttonList.add(btnClone);
+    	
     	GuiButton btnDelete = new GuiButton(iDeleteButton, OTGGuiPresetList.this.leftMargin, this.height - (btnBottomMargin - 24), listWidth, 20, "Delete");
-    	btnDelete.enabled = this.mc.world == null || this.mc.isSingleplayer(); // Don't allow creating/deleting presets for MP
+    	btnDelete.enabled = this.mc.world == null || this.mc.isSingleplayer(); // Don't allow creating/cloning/deleting presets for MP
         this.buttonList.add(btnDelete);
 
         int maxBtnWidth = 330; // Buttons show visual artifacts when they get too wide        
@@ -398,10 +408,19 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
                 case iNewButton:
                 {
                 	askDeleteSettings = false;
-                	selectingPresetName = true;
+                	selectingClonePresetName = false;
+                	selectingNewPresetName = true;
     				this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, "New World"));
                     return;
                 }
+                case iCloneButton:
+                {
+                	askDeleteSettings = false;
+                	selectingNewPresetName = false;
+                	selectingClonePresetName = true;
+    				this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, selectedPreset.getFirst()));
+                    return;
+                }                
                 case iDeleteButton:
                 {
                 	if(selectedPreset != null)
@@ -459,12 +478,32 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 			}
 			this.mc.displayGuiScreen(this);
 		}
-		else if(selectingPresetName)
+		else if(selectingNewPresetName)
 		{
 			if(ok)
 			{
 				((ForgeEngine)OTG.getEngine()).getWorldLoader().createDefaultOTGWorld(this.newPresetName);
 				ForgeEngine.loadPresets();
+			}
+		}
+		else if(selectingClonePresetName)
+		{
+			if(ok)
+			{
+				// Clone preset
+				// Copy world settings
+
+				String presetNameToClone = selectedPreset.getFirst();
+				
+	            File sourceDir = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/worlds/" +  presetNameToClone);
+				File destDir = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + "/worlds/" +  this.newPresetName);
+				try {
+					FileUtils.copyDirectory(sourceDir, destDir);
+				} catch (IOException e) {
+					e.printStackTrace();
+	        		this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Could not copy directory \"" + presetNameToClone + "\", files may be in use."));
+	        		return;
+				}
 			}
 		}
 		
@@ -485,7 +524,8 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 		}
 				
 		askDeleteSettings = false;
-		selectingPresetName = false;
+		selectingNewPresetName = false;
+		selectingClonePresetName = false;
 		ShowingOpenLinkDialogue = false;
 		
 		super.confirmClicked(ok, worldId);
