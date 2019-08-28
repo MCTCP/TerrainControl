@@ -3,6 +3,7 @@ package com.pg85.otg.generator.biome.layers;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.generator.biome.ArraysCache;
+import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,6 @@ public class LayerBiomeInBiome extends Layer
         boolean inOcean = false;
     }
 
-	private int defaultOceanId;
     private final long worldSeed;
     private List<Isle> isles = new ArrayList<Isle>();
 
@@ -45,7 +45,19 @@ public class LayerBiomeInBiome extends Layer
 
         // Pre-calculate the seeds unique for this layer
         // (keep in mind that the resulting world seed is based on the base seed)
-        isle.scrambledWorldSeed = getScrambledWorldSeed(4000 + isle.biomeId, this.worldSeed);
+        
+        // OTGBiomeId's changed for v7, to support legacy worlds we need the same rng as for v6, we'll have to make sure that:
+        // 1. Default biomes produce the same biomeid as their saved id, as it was for v6.
+        // 2. Virtual biomes and custom biomes use the same OTG biome id as for v6, at least for legacy worlds. 
+        // 2 is taken care of by using custombiomes id data from the worldconfig in ServerConfigProvider. 1 We'll have to do here.
+        
+        int rngSeed = isle.biomeId;        
+        if(DefaultBiome.getId(biome.getName()) != null)
+        {
+        	rngSeed = (short) biome.getIds().getSavedId();        	
+        }
+        
+        isle.scrambledWorldSeed = getScrambledWorldSeed(4000 + rngSeed, this.worldSeed);
 
         this.isles.add(isle);
     }
@@ -96,16 +108,19 @@ public class LayerBiomeInBiome extends Layer
                     }
                     if (!alreadySpawned)
                     {
-                        nwCheck = childInts[(xi + 0 + (zi) * xSize0)];
-                        nwCheck = (nwCheck & BiomeBitsAreSetBit) != 0 ? nwCheck & BiomeBits : this.defaultOceanId;
-                        neCheck = childInts[(xi + 2 + (zi) * xSize0)] & BiomeBits;
-                        neCheck = (neCheck & BiomeBitsAreSetBit) != 0 ? neCheck & BiomeBits : this.defaultOceanId;
-                        swCheck = childInts[(xi + 0 + (zi + 2) * xSize0)] & BiomeBits;
-                        swCheck = (swCheck & BiomeBitsAreSetBit) != 0 ? swCheck & BiomeBits : this.defaultOceanId;
-                        seCheck = childInts[(xi + 2 + (zi + 2) * xSize0)] & BiomeBits;
-                        seCheck = (seCheck & BiomeBitsAreSetBit) != 0 ? seCheck & BiomeBits : this.defaultOceanId;
+                        nwCheck = getBiomeFromLayer(childInts[(xi + 0 + (zi) * xSize0)]);
+                        neCheck = getBiomeFromLayer(childInts[(xi + 2 + (zi) * xSize0)]);
+                        swCheck = getBiomeFromLayer(childInts[(xi + 0 + (zi + 2) * xSize0)]);
+                        seCheck = getBiomeFromLayer(childInts[(xi + 2 + (zi + 2) * xSize0)]);
 
-                        if (isle.canSpawnIn[(selection & BiomeBitsAreSetBit) != 0 ? (selection & BiomeBits) : this.defaultOceanId] && isle.canSpawnIn[nwCheck] && isle.canSpawnIn[neCheck] && isle.canSpawnIn[swCheck] && isle.canSpawnIn[seCheck] && nextInt(isle.chance) == 0)
+                        if (
+                    		isle.canSpawnIn[getBiomeFromLayer(selection)] && 
+                    		isle.canSpawnIn[nwCheck] && 
+                    		isle.canSpawnIn[neCheck] && 
+                    		isle.canSpawnIn[swCheck] && 
+                    		isle.canSpawnIn[seCheck] && 
+                    		nextInt(isle.chance) == 0
+                		)
                         {
                             selection = (selection & LandBit) | (selection & IceBit) | (selection & RiverBits) | isle.biomeId | IslandBit | BiomeBitsAreSetBit;
                         }
@@ -116,5 +131,4 @@ public class LayerBiomeInBiome extends Layer
         }
         return thisInts;
     }
-
 }

@@ -49,15 +49,11 @@ class SaplingListener
         
         if (saplingType == null && biomeConfig.inheritSaplingResource && biomeConfig.replaceToBiomeName != null && biomeConfig.replaceToBiomeName.trim().length() > 0)
         {
-        	biome = null;
-            try
-            {
-            	// Get the biome by saved id (parent biome)
-                biome = world.getSavedBiome(location.getBlockX(), location.getBlockZ());
-            } catch (BiomeNotFoundException e)
-            {
-                return;
-            }
+        	biome = world.getBiomeByNameOrNull(biomeConfig.replaceToBiomeName);
+        	if(biome == null)
+        	{
+        		return;
+        	}
             biomeConfig = biome.getBiomeConfig();
             saplingType = toSaplingType(event.getSpecies());
         }

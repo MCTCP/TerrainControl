@@ -361,29 +361,28 @@ public class ForgeWorld implements LocalWorld
     
     @Override
     public LocalBiome getBiome(int x, int z)
-    {    	
-        if (this.settings.getWorldConfig().populateUsingSavedBiomes)
-        {
-        	return getSavedBiome(x, z);
-        } else {
+    {
+    	// TODO: Fix populateUsingSavedBiomes, just fixing this method may not work though, as the biome gen now uses otg biome id's everywhere.
+        //if (this.settings.getWorldConfig().populateUsingSavedBiomes)
+        //{
+        	//return getSavedBiome(x, z);
+        //} else {
         	return getCalculatedBiome(x, z);
-        }
+        //}
     }
 
-    FifoMap<BlockPos, LocalBiome> cachedSavedBiomes = new FifoMap<BlockPos, LocalBiome>(4096);
     @Override
-    public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
+    public String getSavedBiomeName(int x, int z)
     {
-    	LocalBiome localBiome = cachedSavedBiomes.get(new BlockPos(x, 0, z));
-    	if(localBiome == null)
-    	{
-        	BlockPos pos = new BlockPos(x, 0, z);
-        	Biome biome = this.world.getBiome(pos);
-        	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(biome); // Non-TC biomes don't have a generationId, only a saved id
-        	localBiome = this.settings.getBiomeBySavedIdOrNull(biomeId);        	       	
-	        cachedSavedBiomes.put(new BlockPos(x, 0, z), localBiome);
-    	}
-    	return localBiome;
+        // TODO: Should this return resourcelocation?
+    	// TODO: Fetch name from registry instead of replacetobiomename?
+        BiomeConfig biomeConfig = getBiome(x, z).getBiomeConfig();
+        if(biomeConfig.replaceToBiomeName == null || biomeConfig.replaceToBiomeName.trim().length() == 0)
+        {
+     	   return biomeConfig.getName();
+        } else {
+     	   return biomeConfig.replaceToBiomeName;
+        }
     }
     
     @Override

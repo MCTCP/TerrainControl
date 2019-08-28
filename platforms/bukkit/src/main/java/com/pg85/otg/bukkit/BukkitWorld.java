@@ -505,21 +505,27 @@ public class BukkitWorld implements LocalWorld
     @Override
     public LocalBiome getBiome(int x, int z)
     {
-        if (this.settings.getWorldConfig().populateUsingSavedBiomes)
-        {
-            return getSavedBiome(x, z);
-        } else
-        {
+    	// TODO: Fix populateUsingSavedBiomes, just fixing this method may not work though, as the biome gen now uses otg biome id's everywhere.
+        //if (this.settings.getWorldConfig().populateUsingSavedBiomes)
+        //{       	
+
+        //} else {
             return getCalculatedBiome(x, z);
-        }
+        //}
     }
 
     @Override
-    public LocalBiome getSavedBiome(int x, int z) throws BiomeNotFoundException
-    {    	
-    	BiomeBase biome = world.getBiome(new BlockPosition(x, 0, z));        		
-    	int biomeId = BiomeBase.a(biome);
-    	return this.settings.getBiomeBySavedIdOrNull(biomeId);
+    public String getSavedBiomeName(int x, int z)
+    {
+        // TODO: Should this return resourcelocation?
+    	// TODO: Fetch name from registry instead of replacetobiomename?
+        BiomeConfig biomeConfig = getBiome(x, z).getBiomeConfig();
+        if(biomeConfig.replaceToBiomeName == null || biomeConfig.replaceToBiomeName.trim().length() == 0)
+        {
+     	   return biomeConfig.getName();
+        } else {
+     	   return biomeConfig.replaceToBiomeName;
+        }
     }
     
     private LocalBiome createBiomeFor(BiomeConfig biomeConfig, BiomeIds biomeIds, boolean isReload)

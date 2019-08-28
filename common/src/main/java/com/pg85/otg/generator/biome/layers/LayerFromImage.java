@@ -23,9 +23,9 @@ public class LayerFromImage extends Layer
     private int zOffset;
     private WorldConfig.ImageMode imageMode;
 
-    LayerFromImage(long seed, Layer childLayer, WorldConfig config, LocalWorld world)
+    LayerFromImage(long seed, int defaultOceanId, Layer childLayer, WorldConfig config, LocalWorld world)
     {
-        super(seed);
+        super(seed, defaultOceanId);
         this.child = childLayer;
         xOffset = config.imageXOffset;
         zOffset = config.imageZOffset;

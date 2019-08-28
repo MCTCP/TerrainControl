@@ -768,7 +768,7 @@ public class ServerTickHandler
 	{
 		ForgeWorld playerWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(player.world);
 		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(player.world));
-		
+			
 		// DimensionBelow
 		if(playerWorld != null && dimConfig.Settings.DimensionBelow != null && dimConfig.Settings.DimensionBelow.trim().length() > 0)
 		{

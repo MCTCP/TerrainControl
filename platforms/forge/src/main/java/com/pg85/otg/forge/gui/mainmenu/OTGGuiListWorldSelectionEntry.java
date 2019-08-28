@@ -47,6 +47,7 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.client.gui.GuiListExtended;;
 
@@ -90,11 +91,17 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 		return this.worldSummary != null ? this.worldSummary.getFileName() : null;
 	}
 
+	String lastSelectedWorldName = null;
+	ArrayList<DimensionData> cachedDimData = null;
     public void drawEntry(int slotIndex, int x, int y, int listWidth, int slotHeight, int mouseX, int mouseY, boolean isSelected, float partialTicks)
     {
     	// Check if an OTG dim is present
-    	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(Minecraft.getMinecraft().gameDir + File.separator + "saves" + File.separator + this.getSelectedWorldName()));    	
-    	boolean bFound = dimensionDatas != null && dimensionDatas.size() > 0;
+    	if(this.lastSelectedWorldName == null || !this.getSelectedWorldName().equals(this.lastSelectedWorldName))
+    	{
+    		lastSelectedWorldName = this.getSelectedWorldName();
+    		cachedDimData = OTGDimensionManager.GetDimensionData(new File(Minecraft.getMinecraft().gameDir + File.separator + "saves" + File.separator + this.getSelectedWorldName()));
+    	}
+    	boolean bFound = cachedDimData != null && cachedDimData.size() > 0;
 
         String s = (bFound ? TextFormatting.GOLD + "OTG " + TextFormatting.RESET : "") + this.worldSummary.getDisplayName();
         String s1 = this.worldSummary.getFileName() + " (" + DATE_FORMAT.format(new Date(this.worldSummary.getLastTimePlayed())) + ")";       
@@ -108,9 +115,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         if (this.worldSummary.requiresConversion())
         {
             s2 = I18n.format("selectWorld.conversion") + " " + s2;
-        }
-        else
-        {
+        } else {
             s2 = I18n.format("gameMode." + this.worldSummary.getEnumGameType().getName());
 
             if (this.worldSummary.isHardcoreModeEnabled())
@@ -327,12 +332,22 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     				// If this is a legacy overworld then the world name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), comparator.getFileName());
     				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(worldConfigLocation);
+    				if(worldConfig == null)
+    				{
+    					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);
+    					return;
+    				}
     				DimensionConfig overWorld = new DimensionConfig(comparator.getFileName(), worldConfig);
     				dimensionsConfig.Overworld = overWorld;
     			} else {
     				// If this is a legacy dim then the dim name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), dimensionData.dimensionName);
     				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(worldConfigLocation);
+    				if(worldConfig == null)
+    				{
+    					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);
+    					return;
+    				}    				
     				DimensionConfig dimension = new DimensionConfig(dimensionData.dimensionName, worldConfig);
     				dimensionsConfig.Dimensions.add(dimension);
     			}

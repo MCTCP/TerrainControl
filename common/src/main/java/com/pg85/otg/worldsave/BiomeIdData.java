@@ -1,4 +1,4 @@
-package com.pg85.otg.network;
+package com.pg85.otg.worldsave;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -13,16 +13,17 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.network.ServerConfigProvider;
 
 public class BiomeIdData
 {
-	String biomeName;
-	int otgBiomeId;
-	int savedBiomeId;
+	public String biomeName;
+	public int otgBiomeId;
+	public int savedBiomeId;
 	
 	public BiomeIdData() {}
 	
-	BiomeIdData(String biomeName, int otgBiomeId, int savedBiomeId)
+	public BiomeIdData(String biomeName, int otgBiomeId, int savedBiomeId)
 	{
 		this.biomeName = biomeName;
 		this.otgBiomeId = otgBiomeId;
@@ -32,7 +33,7 @@ public class BiomeIdData
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
     
-	static void saveBiomeIdData(File worldSaveDir, ServerConfigProvider serverConfigProvider, LocalWorld world)
+	public static void saveBiomeIdData(File worldSaveDir, ServerConfigProvider serverConfigProvider, LocalWorld world)
 	{
         // If this is a previously created world then register biomes to the same OTG biome id as before.
         ArrayList<BiomeIdData> loadedBiomeIdData = loadBiomeIdData(worldSaveDir);
@@ -86,7 +87,7 @@ public class BiomeIdData
         }
 	}
 		
-	static ArrayList<BiomeIdData> loadBiomeIdData(File worldSaveDir)
+	public static ArrayList<BiomeIdData> loadBiomeIdData(File worldSaveDir)
 	{
 		File biomeIdDataFile = new File(worldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + "BiomeIds.txt");
 		String[] biomeIdDataFileValues = {};

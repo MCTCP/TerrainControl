@@ -154,7 +154,7 @@ public final class OTGCommandHandler implements ICommand
         		for(BO4 bo4 : bo4s)
         		{
         			i++;
-        			sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Exporting .BO4Data " + i + "/" + bo4s.size() + " \"" + VALUE_COLOR + bo4.getName() + MESSAGE_COLOR + "\""));
+        			OTG.log(LogMarker.INFO, "Exporting .BO4Data " + i + "/" + bo4s.size() + " \"" + bo4.getName() + "\"");
         			bo4.generateBO4Data();
         		}
         		sender.sendMessage(new TextComponentString(MESSAGE_COLOR + ".BO4Data export complete."));
@@ -526,9 +526,9 @@ public final class OTGCommandHandler implements ICommand
                 {
                     try
                     {
-                    	LocalBiome savedBiome = world.getSavedBiome(playerX, playerZ);
+                    	String savedBiomeName = world.getSavedBiomeName(playerX, playerZ);
                         sender.sendMessage(new TextComponentString(""));
-                        sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiome.getBiomeConfig().getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biome.getIds().getSavedId()));
+                        sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiomeName + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biome.getIds().getSavedId()));
                     } catch (BiomeNotFoundException e)
                     {
                     	sender.sendMessage(new TextComponentString(""));

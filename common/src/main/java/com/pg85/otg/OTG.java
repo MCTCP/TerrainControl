@@ -3,6 +3,7 @@ package com.pg85.otg;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.PluginConfig;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
@@ -129,7 +130,7 @@ public class OTG
     
     // For bukkit plugin developers, do not remove. See: https://github.com/MCTCP/TerrainControl/wiki/Developer-page
     /*
-	* Convienence method to quickly get the biome name at the given
+	* Convenience method to quickly get the biome name at the given
 	* coordinates. Will return null if the world isn't loaded by OTG
 	* <p>
 	* @param worldName The world name.
@@ -145,8 +146,9 @@ public class OTG
        {
     	   // World isn't loaded by OTG
     	   return null;
-       }
-       return world.getSavedBiome(x, z).getName();
+       }       
+       
+       return world.getSavedBiomeName(x, z);
    	}
 
    	public static LocalBiome getBiomeByOTGId(int id)
