@@ -117,32 +117,4 @@ task rootJar(type: Jar, dependsOn: ['compileJava', asmJar]) {
     // classifier = 'root'
 }
 
-//task signAsmJar(type: SignJar, dependsOn: reobfAsmJar) {
-	// Skip the task if our secret data isn't available
-    //onlyIf { 
-        //project.hasProperty('keyStore')
-    //}
-	//keyStore = findProperty('keyStore')
-    //alias = findProperty('keyStoreAlias')
-    //storePass = findProperty('keyStorePass')
-    //keyPass = findProperty('keyStoreKeyPass')
-    //inputFile = jar.archivePath
-    //outputFile = jar.archivePath
-//}
-
-task signJar(type: SignJar, dependsOn: reobfJar) {
-	// Skip the task if our secret data isn't available
-    onlyIf { 
-        project.hasProperty('keyStore')
-    }
-	keyStore = findProperty('keyStore')
-    alias = findProperty('keyStoreAlias')
-    storePass = findProperty('keyStorePass')
-    keyPass = findProperty('keyStoreKeyPass')
-    inputFile = jar.archivePath
-    outputFile = jar.archivePath
-}
-
 build.dependsOn rootJar
-build.dependsOn signJar
-//build.dependsOn signAsmJar // TODO: Figure out a way to sign the asm jar
