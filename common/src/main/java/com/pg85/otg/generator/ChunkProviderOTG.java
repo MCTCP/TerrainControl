@@ -133,7 +133,10 @@ public class ChunkProviderOTG
         	dry = addBiomeBlocksAndCheckWater(chunkBuffer);
 		}
         
-        this.caveGen.generate(chunkBuffer);
+        if(!this.localWorld.generateModdedCaveGen(x, z, chunkBuffer))
+        {
+            this.caveGen.generate(chunkBuffer);        	
+        }
         this.canyonGen.generate(chunkBuffer);
 
         WorldConfig worldConfig = configProvider.getWorldConfig();

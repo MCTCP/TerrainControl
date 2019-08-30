@@ -20,6 +20,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.generator.ForgeChunkBuffer;
 import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
 import com.pg85.otg.forge.util.ForgeMaterialData;
@@ -27,8 +28,11 @@ import com.pg85.otg.forge.util.IOHelper;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.forge.util.WorldHelper;
+import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
+import com.pg85.otg.generator.terrain.CavesGen;
+import com.pg85.otg.generator.terrain.TerrainGenBase;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigProvider;
@@ -66,7 +70,10 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
+import net.minecraft.world.gen.MapGenBase;
+import net.minecraft.world.gen.MapGenCaves;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.MapGenScatteredFeature;
 import net.minecraft.world.gen.structure.MapGenStructure;
@@ -100,6 +107,7 @@ public class ForgeWorld implements LocalWorld
     public MapGenStructure villageGen;
     private MapGenStructure mineshaftGen;
     private MapGenStructure rareBuildingGen;
+    private MapGenBase cavesGen;
     private OTGNetherFortressGen netherFortressGen;
     private MapGenStructure oceanMonumentGen;
     private MapGenStructure woodLandMansionGen;
@@ -146,6 +154,13 @@ public class ForgeWorld implements LocalWorld
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
         this.netherFortressGen = new OTGNetherFortressGen(this);
+        // If there's a modded cavegen, use that, otherwise use the OTG cavegen from the common project.
+        this.cavesGen = new MapGenCaves(); 
+        MapGenBase moddedCaveGen = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.cavesGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.CAVE);
+        if(this.cavesGen == moddedCaveGen)
+        {
+        	this.cavesGen = null;
+        }
         this.strongholdGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGStrongholdGen(configs, world), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
         this.villageGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGVillageGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
         this.mineshaftGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGMineshaftGen(this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);        
@@ -1303,4 +1318,18 @@ public class ForgeWorld implements LocalWorld
             }
 		}
     }
+
+	@Override
+	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer)
+	{
+		if(this.cavesGen == null)
+		{
+			return false;	
+		}
+
+		ChunkPrimer primer = ((ForgeChunkBuffer)chunkBuffer).getChunkPrimer();
+		this.cavesGen.generate(this.world, x, z, primer);
+		
+		return true;
+	}
 }

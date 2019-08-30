@@ -11,13 +11,16 @@ import com.pg85.otg.forge.dimensions.OTGBlockPortal;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServerMulti;
 import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -28,31 +31,54 @@ public class EntityTravelToDimensionListener
 	{
 		if(e.getDimension() == -1)
 		{
-			// Make sure the player is above a portal block so we can check if this is a Quartz portal
-			if(!ForgeMaterialData.ofMinecraftBlockState(e.getEntity().getEntityWorld().getBlockState(e.getEntity().getPosition())).toDefaultMaterial().equals(DefaultMaterial.PORTAL))
+			World entityWorld = e.getEntity().getEntityWorld();
+			
+			// Find the nearest portal to the player.
+			// Hopefully the search radius is large enough to work for fast moving players, could improve that.
+			boolean portalFound = false;
+			BlockPos entityPos = e.getEntity().getPosition();
+			BlockPos closestPortalPos = null;
+			for(int x = -2; x < 3; x++)
 			{
-				e.getEntity().timeUntilPortal = 0;
-				e.setCanceled(true);
+				for(int z = -2; z < 3; z++)
+				{
+					for(int y = -2; y < 4; y++)
+					{
+						if(ForgeMaterialData.ofMinecraftBlockState(entityWorld.getBlockState(new BlockPos(entityPos.getX() + x, entityPos.getY() + y, entityPos.getZ() + z))).toDefaultMaterial().equals(DefaultMaterial.PORTAL))
+						{
+							if(closestPortalPos == null || Math.abs(entityPos.getX() + x) + Math.abs(entityPos.getY() + y) + Math.abs(entityPos.getZ() + z) < Math.abs(entityPos.getX() - closestPortalPos.getX()) + Math.abs(entityPos.getY() - closestPortalPos.getY()) + Math.abs(entityPos.getZ() - closestPortalPos.getZ()))
+							{
+								closestPortalPos = new BlockPos(entityPos.getX() + x, entityPos.getY() + y, entityPos.getZ() + z);								
+							} 
+							portalFound = true;
+						}
+					}
+				}
+			}
+			
+			OTG.log(LogMarker.INFO, "PortalFound: " + portalFound);
+			if(!portalFound)
+			{
 				return;
-			}
+			}		
 
-			Entity sender = e.getEntity();
-			BlockPos playerPos = new BlockPos(sender.getPosition());
-			World world = sender.getEntityWorld();
-
-			BlockPos pos = new BlockPos(sender.getPosition());
-			IBlockState blockState = world.getBlockState(pos);
-			while(!blockState.getMaterial().isSolid() && pos.getY() > 0)
+			// Find portal material
+			BlockPos playerPortalMaterialBlockPos = new BlockPos(closestPortalPos);
+			IBlockState blockState = entityWorld.getBlockState(playerPortalMaterialBlockPos);
+			while(ForgeMaterialData.ofMinecraftBlockState(blockState).toDefaultMaterial() == DefaultMaterial.PORTAL && playerPortalMaterialBlockPos.getY() > 0)
 			{
-				pos = new BlockPos(pos.getX(), pos.getY() - 1, pos.getZ());
-				blockState = world.getBlockState(pos);
+				playerPortalMaterialBlockPos = new BlockPos(playerPortalMaterialBlockPos.getX(), playerPortalMaterialBlockPos.getY() - 1, playerPortalMaterialBlockPos.getZ());
+				blockState = entityWorld.getBlockState(playerPortalMaterialBlockPos);
 			}
-
+			
+			OTG.log(LogMarker.INFO, "PortalMaterial: " + ForgeMaterialData.ofMinecraftBlockState(blockState).toDefaultMaterial().toString());
+			
+			// Find portal material for OTG dimensions and see if they match
 			ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
 			int destinationDim = 0;
-			boolean bPortalMaterialFound = false;
+			boolean bOTGPortalFound = false;
 
-			ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockState);
+			ForgeMaterialData playerPortalMaterial = ForgeMaterialData.ofMinecraftBlockState(blockState);
 
 			ForgeWorld overWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 			boolean bFound = false;
@@ -64,10 +90,11 @@ public class EntityTravelToDimensionListener
 				boolean bIsPortalMaterial = false;
 				for(LocalMaterialData portalMaterial : portalMaterials)
 				{
-					if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+					if(playerPortalMaterial.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && playerPortalMaterial.getBlockData() == portalMaterial.getBlockData())
 					{
 						bIsPortalMaterial = true;
-						bPortalMaterialFound = true;
+						bOTGPortalFound = true;
+						OTG.log(LogMarker.INFO, "OTG PortalMaterial found: " + portalMaterial.toDefaultMaterial().toString());
 						break;
 					}
 				}
@@ -94,10 +121,10 @@ public class EntityTravelToDimensionListener
 					boolean bIsPortalMaterial = false;
 					for(LocalMaterialData portalMaterial : portalMaterials)
 					{
-						if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+						if(playerPortalMaterial.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && playerPortalMaterial.getBlockData() == portalMaterial.getBlockData())
 						{
 							bIsPortalMaterial = true;
-							bPortalMaterialFound = true;
+							bOTGPortalFound = true;
 							break;
 						}
 					}
@@ -112,15 +139,14 @@ public class EntityTravelToDimensionListener
 				}
 			}
 
-			if(!bPortalMaterialFound && !material.toDefaultMaterial().equals(DefaultMaterial.OBSIDIAN))
+			if(!bOTGPortalFound)
 			{
-				// No custom dimensions exist, destroy the portal
-				e.getEntity().getEntityWorld().setBlockToAir(e.getEntity().getPosition());
-				e.setCanceled(true); // Don't tp to nether
+				// No custom OTG dimensions exists with this material.
+				OTG.log(LogMarker.INFO, "No OTG portal material found for portal.");
 				return;
 			}
 
-			if(pos.getY() > 0 && bPortalMaterialFound)
+			if(playerPortalMaterialBlockPos.getY() > 0 && bOTGPortalFound)
 			{
 				e.setCanceled(true); // Don't tp to nether
 
@@ -130,12 +156,12 @@ public class EntityTravelToDimensionListener
 				if(newDimension == 0 && e.getEntity().dimension == 0)
 				{
 					// No custom dimensions exist, destroy the portal
-					e.getEntity().getEntityWorld().setBlockToAir(e.getEntity().getPosition());
+					entityWorld.setBlockToAir(entityPos);
 					return;
 				}
 
 				// Register the portal to the world's portals list
-		    	OTGBlockPortal.placeInExistingPortal(originDimension, playerPos);
+		    	OTGBlockPortal.placeInExistingPortal(originDimension, entityPos);
 
 				if(e.getEntity() instanceof EntityPlayerMP)
 				{

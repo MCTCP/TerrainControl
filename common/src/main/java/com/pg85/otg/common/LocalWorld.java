@@ -7,6 +7,7 @@ import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
+import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
@@ -253,5 +254,7 @@ public interface LocalWorld
 
 	public ChunkCoordinate getSpawnChunk();
 
-	public void setAllowSpawningOutsideBounds(boolean b);	
+	public void setAllowSpawningOutsideBounds(boolean b);
+
+	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer);
 }
