@@ -23,6 +23,7 @@ import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
+import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
@@ -1822,5 +1823,11 @@ public class BukkitWorld implements LocalWorld
 	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
 	{
 		// TODO: Implement this?
+	}
+
+	@Override
+	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer)
+	{
+		return false;
 	}
 }
