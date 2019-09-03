@@ -13,6 +13,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;

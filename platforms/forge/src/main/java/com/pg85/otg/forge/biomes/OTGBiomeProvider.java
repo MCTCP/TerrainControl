@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.google.common.collect.Lists;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.generator.structure.OTGVillageGen;
-import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;

@@ -6,8 +6,8 @@ import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
-import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.ChunkCoordinate;
 
 import net.minecraft.command.WrongUsageException;

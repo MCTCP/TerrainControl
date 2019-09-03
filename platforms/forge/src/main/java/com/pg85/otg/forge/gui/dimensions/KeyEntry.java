@@ -2,11 +2,11 @@ package com.pg85.otg.forge.gui.dimensions;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.gui.IGuiListEntry;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionSettingsList;
 import com.pg85.otg.forge.gui.dimensions.SettingEntry.ValueType;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
-import com.pg85.otg.forge.world.ForgeWorld;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;

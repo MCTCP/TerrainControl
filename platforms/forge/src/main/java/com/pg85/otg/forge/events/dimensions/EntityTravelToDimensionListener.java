@@ -7,10 +7,10 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGBlockPortal;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.util.ForgeMaterialData;
-import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 

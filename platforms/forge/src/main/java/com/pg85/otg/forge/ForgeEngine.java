@@ -19,7 +19,6 @@ import com.pg85.otg.forge.generator.ForgeChunkBuffer;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeMaterialData;
-import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.generator.ChunkBuffer;

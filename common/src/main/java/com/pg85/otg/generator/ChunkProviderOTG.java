@@ -125,7 +125,7 @@ public class ChunkProviderOTG
         int z = chunkCoord.getChunkZ();
         this.random.setSeed(x * 341873128712L + z * 132897987541L);
 
-        generateTerrain(chunkBuffer);
+        generateTerrainA(chunkBuffer);
         
         boolean dry = false;
         if(OTG.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld))
@@ -147,6 +147,14 @@ public class ChunkProviderOTG
     }
 
     private void generateTerrain(ChunkBuffer chunkBuffer)
+    {
+    	
+    }
+    
+    // Renamed this to generateTerrainA for v8, since Streams injects code into generateTerrain for v6
+    // to make it fire the ReplaceBiomeBlocks event. V8 fires the event itself, so just to make sure 
+    // Streams doesnt crash when trying to inject code, have an empty generateTerrain method.
+    private void generateTerrainA(ChunkBuffer chunkBuffer)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
         int chunkX = chunkCoord.getChunkX();

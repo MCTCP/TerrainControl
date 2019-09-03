@@ -13,9 +13,9 @@ import com.pg85.otg.configuration.settingType.DoubleSetting;
 import com.pg85.otg.configuration.settingType.IntSetting;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.gui.IGuiListEntry;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
-import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.util.helpers.StringHelper;
 

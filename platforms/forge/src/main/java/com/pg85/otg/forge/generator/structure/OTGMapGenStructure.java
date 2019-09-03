@@ -3,7 +3,7 @@ package com.pg85.otg.forge.generator.structure;
 import java.util.ArrayList;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 
