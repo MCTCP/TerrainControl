@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.world;
+package com.pg85.otg.forge;
 
 import com.pg85.otg.*;
 import com.pg85.otg.common.BiomeIds;
@@ -16,7 +16,6 @@ import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
-import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
@@ -28,6 +27,7 @@ import com.pg85.otg.forge.util.IOHelper;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.forge.util.WorldHelper;
+import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
@@ -86,6 +86,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.File;
 import java.util.*;
 
+// TODO: Move this to com.pg85.otg.forge.world for 1.13. Has to be in com.pg85.otg.forge for Streams 1.12, which depends on it. 
 public class ForgeWorld implements LocalWorld
 {
     private static final int MAX_BIOMES_COUNT = 4096;
@@ -141,7 +142,7 @@ public class ForgeWorld implements LocalWorld
      * after {@link #provideConfigs(ServerConfigProvider)} has been called.
      * @param world The Minecraft world.
      */
-    void provideWorldInstance(WorldServer world)
+    public void provideWorldInstance(WorldServer world)
     {
         ServerConfigProvider configs = (ServerConfigProvider) this.settings;
         DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(world));        
@@ -223,7 +224,7 @@ public class ForgeWorld implements LocalWorld
      * Call this method when the configs are loaded.
      * @param configs The configs.
      */
-    void provideConfigs(ServerConfigProvider configs)
+    public void provideConfigs(ServerConfigProvider configs)
     {
         this.settings = configs;
     }

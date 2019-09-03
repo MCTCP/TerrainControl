@@ -16,7 +16,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
-import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 

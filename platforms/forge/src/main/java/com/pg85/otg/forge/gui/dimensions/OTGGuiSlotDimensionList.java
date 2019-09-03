@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.gui.OTGGuiScrollingList;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
-import com.pg85.otg.forge.world.ForgeWorld;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;

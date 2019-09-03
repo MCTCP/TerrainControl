@@ -3,7 +3,7 @@ package com.pg85.otg.forge.events;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.events.EventHandler;
-import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 

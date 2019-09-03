@@ -131,7 +131,7 @@ public class UndergroundLakeGen extends Resource
                             continue;
                         }
                         LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake, false);
-                        if (materialBelow.isAir())
+                        if (materialBelow != null && materialBelow.isAir())
                         {
                             // Air block, also set position above to air
                             world.setBlock(xLake, yLake, zLake, materialBelow, null, false);

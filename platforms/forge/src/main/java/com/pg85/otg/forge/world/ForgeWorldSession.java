@@ -14,6 +14,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -25,7 +26,7 @@ public class ForgeWorldSession extends WorldSession
 	private ArrayList<ParticleFunction<?>> particleFunctions = new ArrayList<ParticleFunction<?>>();
 	private Pregenerator pregenerator;
 
-	ForgeWorldSession(LocalWorld world)
+	public ForgeWorldSession(LocalWorld world)
 	{
 		super(world);
 		pregenerator = new Pregenerator(world);

@@ -18,9 +18,9 @@ import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
-import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -235,8 +235,8 @@ public class ForgeBiomeRegistryManager
 	
 		String[] resourceLocationArr = biomeResourceLocation.split(":");
 		    	
-		String resourceDomain = resourceLocationArr[0];
-		String resourceLocation = resourceLocationArr[1];
+		String resourceDomain = resourceLocationArr.length > 1 ? resourceLocationArr[0] : null;
+		String resourceLocation = resourceLocationArr.length > 1 ? resourceLocationArr[1] : resourceLocationArr[0];
 	
 		biome = ForgeRegistries.BIOMES.getValue(new ResourceLocation(resourceDomain, resourceLocation));
 	
@@ -250,7 +250,7 @@ public class ForgeBiomeRegistryManager
 			biomeConfigStub.spawnAmbientCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnAmbientCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityCategory.AMBIENT_CREATURE));
 			biomeConfigStub.spawnWaterCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnWaterCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityCategory.WATER_CREATURE));
 		} else {
-			throw new RuntimeException("Biome " + biomeResourceLocation + " not found for InheritMobsFromBiomeName in " + biomeConfigStub.getBiomeName() + ".bc");
+			OTG.log(LogMarker.WARN, "Biome " + biomeResourceLocation + " not found for InheritMobsFromBiomeName in " + biomeConfigStub.getBiomeName() + ".bc");
 		}
 	}
    
