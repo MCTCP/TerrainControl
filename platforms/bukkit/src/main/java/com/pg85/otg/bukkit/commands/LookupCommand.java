@@ -24,7 +24,9 @@ public class LookupCommand extends BaseCommand
     {
 
         if (args.isEmpty())
+		{
             sender.sendMessage("Usage: /otg " + usage);
+		}
 
         LocalWorld world = this.getWorld(sender, "");
 

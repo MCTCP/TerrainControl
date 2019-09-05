@@ -108,7 +108,6 @@ public final class OTGCommandHandler implements ICommand
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos targetPos)
     {
-		// TODO: Is this really necessary?
         if (args.length == 1)
         {
             List<String> commands = new ArrayList<String>();
