@@ -19,7 +19,6 @@ public class TPCommand extends BaseCommand
 {
     TPCommand()
     {
-
         name = "tp";
         usage = "tp <biome/dimension name or id>";
         description = "Attempt to teleport to the target biome or dimension (Max range: 1000 chunks).";
@@ -28,9 +27,10 @@ public class TPCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         if (args.isEmpty())
+		{
             return false;
+		}
 
         BlockPos pos = sender.getPosition();
         int playerX = pos.getX();

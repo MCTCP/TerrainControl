@@ -21,7 +21,6 @@ public class MapCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         World world = sender.getEntityWorld();
         int size = 200;
         int offsetX = 0;

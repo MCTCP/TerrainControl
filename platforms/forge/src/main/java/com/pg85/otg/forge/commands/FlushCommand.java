@@ -13,7 +13,6 @@ public class FlushCommand extends BaseCommand
 {
     FlushCommand()
     {
-
         name = "flushcache";
         usage = "flushcache";
         description = "Unloads all loaded object files, use this to refresh objects after editing them. Also flushes chunk generator cache to free up memory.";
@@ -22,7 +21,6 @@ public class FlushCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         ForgeWorld world = (ForgeWorld) this.getWorld(sender, "");
 
         OTG.log(LogMarker.INFO, "Clearing caches");

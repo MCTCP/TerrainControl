@@ -15,7 +15,6 @@ public class ExportDataCommand extends BaseCommand
 {
     ExportDataCommand()
     {
-
         name = "exportBO4Data";
         usage = "exportBO4Data";
         description = "Exports all BO4 files and BO3 files that have isOTGPlus:true as BO4Data files (if none exist already). BO4Data files can significantly reduce filesize and loading times, and should be used by OTG content creators when packaging presets for players.";
@@ -24,7 +23,6 @@ public class ExportDataCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         LocalWorld world = this.getWorld(sender, "");
 
         sender.sendMessage(

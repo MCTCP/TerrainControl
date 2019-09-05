@@ -17,7 +17,6 @@ public class ModDataCommand extends BaseCommand
 {
     ModDataCommand()
     {
-
         name = "getmoddata";
         usage = "getmoddata <ModName> <Radius>";
         description = "Sends any ModData() tags in BO3's within the specified <Radius> in chunks to the specified <ModName>. Some OTG mob spawning commands can be used this way. Be sure to set up ModData() tags in your BO3 to make this work.";
@@ -26,7 +25,6 @@ public class ModDataCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         LocalWorld world = this.getWorld(sender, "");
 
         BlockPos pos = sender.getPosition();
@@ -45,7 +43,8 @@ public class ModDataCommand extends BaseCommand
             ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
             FMLInterModComms.sendRuntimeMessage(OTGPlugin.Instance, args.get(1), "GetModData",
                     sender.getEntityWorld().getWorldInfo().getWorldName() + "," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ());
-        } else if (args.size() == 3)
+        }
+		else if (args.size() == 3)
         {
             try {
                 ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(playerX, playerZ);

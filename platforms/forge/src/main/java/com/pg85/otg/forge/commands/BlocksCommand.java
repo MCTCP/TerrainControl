@@ -16,7 +16,6 @@ public class BlocksCommand extends BaseCommand
 {
     BlocksCommand()
     {
-
         name = "blocks";
         usage = "blocks";
         description = "View a list of block names that can be spawned inside objects with the Block() tag and used in biome- and world-configs.";
@@ -25,7 +24,6 @@ public class BlocksCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         OTG.log(LogMarker.INFO, "-- Blocks List --");
         sender.sendMessage(new TextComponentString(TextFormatting.AQUA + "-- Blocks List --"));
 
@@ -39,5 +37,4 @@ public class BlocksCommand extends BaseCommand
         OTG.log(LogMarker.INFO, "----");
         return true;
     }
-
 }

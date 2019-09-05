@@ -238,5 +238,4 @@ public class MapWriter implements Runnable
         }
         return Biome.getIdForBiome(biome);
     }
-
 }

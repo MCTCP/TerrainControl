@@ -11,7 +11,6 @@ public class StructureCommand extends BaseCommand
 {
     StructureCommand()
     {
-
         name = "structure";
         usage = "structure";
         description = "View author and description information for any structure at the player's coordinates.";
@@ -20,7 +19,6 @@ public class StructureCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         LocalWorld world = this.getWorld(sender, "");
 
         if (world == null)

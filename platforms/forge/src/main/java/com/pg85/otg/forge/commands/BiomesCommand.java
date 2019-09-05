@@ -16,7 +16,6 @@ public class BiomesCommand extends BaseCommand
 {
     BiomesCommand()
     {
-
         name = "biomes";
         usage = "biomes";
         description = "View a list of registerd biomes.";
@@ -25,7 +24,6 @@ public class BiomesCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         LocalWorld world = this.getWorld(sender, "");
         if (world == null)
         {
@@ -63,5 +61,4 @@ public class BiomesCommand extends BaseCommand
         }
         return true;
     }
-
 }

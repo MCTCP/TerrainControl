@@ -15,7 +15,6 @@ public class EntitiesCommand extends BaseCommand
 {
     EntitiesCommand()
     {
-
         name = "entities";
         usage = "entities";
         description = "View a list of entities that can be spawned inside objects using the Entity() tag.";
@@ -24,7 +23,6 @@ public class EntitiesCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         sender.sendMessage(new TextComponentString(""));
         OTG.log(LogMarker.INFO, "-- Entities List --");
         sender.sendMessage(new TextComponentString("-- Entities List --"));
@@ -49,14 +47,10 @@ public class EntitiesCommand extends BaseCommand
                 OTG.log(LogMarker.INFO, msg.replace("§2", "").replace("§", "").replace("§a", ""));
                 sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- " + msg));
             } else {
-                // This can happen for LIGHTNING_BOLT since it appears to be
-                // added to the
-                // getEntityNameList list but doesn't actually have an entity
-                // registered
-                // TODO: Find out how lightning bolt is supposed to work and
-                // make sure
-                // all other entities are registered properly (including ones
-                // added by other
+                // This can happen for LIGHTNING_BOLT since it appears to be added to the
+                // getEntityNameList list but doesn't actually have an entity registered
+                // TODO: Find out how lightning bolt is supposed to work and make sure
+                // all other entities are registered properly (including ones added by other
                 // mods).
             }
         }
@@ -64,5 +58,4 @@ public class EntitiesCommand extends BaseCommand
         OTG.log(LogMarker.INFO, "----");
         return true;
     }
-
 }
