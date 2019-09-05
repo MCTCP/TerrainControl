@@ -53,3 +53,6 @@ permissions:
     otg.cmd.tp:
         default: op
         description: Teleport to the given biome (name or id, max range 1000 chunks)
+    otg.cmd.lookup:
+        default: op
+        description: Look up a registered biome by name or id

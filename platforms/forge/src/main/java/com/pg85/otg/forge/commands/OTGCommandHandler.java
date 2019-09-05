@@ -93,13 +93,17 @@ public final class OTGCommandHandler implements ICommand {
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			BlockPos targetPos) {
 
-		List<String> commands = new ArrayList<String>();
+		if (args.length == 1) {
 
-		for (BaseCommand command : commandHashMap.values()) {
-			commands.add(command.name);
+			List<String> commands = new ArrayList<String>();
+
+			for (BaseCommand command : commandHashMap.values()) {
+				commands.add(command.name);
+			}
+
+			return commands;
 		}
-		
-		return commands;
+		return new ArrayList<String>();
 	}
 
 	@Override
