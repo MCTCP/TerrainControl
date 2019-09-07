@@ -32,7 +32,6 @@ import net.minecraft.world.World;
 
 public class BO3Creator
 {
-
     private String name;
     private boolean includeAir = false;
     private boolean includeTiles = false;
@@ -337,5 +336,4 @@ public class BO3Creator
     {
         this.includeTiles = include;
     }
-
 }

@@ -32,7 +32,6 @@ import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
 
 public class BO3Creator
 {
-
     private String name;
     private boolean includeAir = false;
     private boolean includeTiles = false;
@@ -343,5 +342,4 @@ public class BO3Creator
     {
         this.includeTiles = include;
     }
-
 }

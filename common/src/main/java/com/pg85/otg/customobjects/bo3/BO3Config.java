@@ -705,14 +705,23 @@ public class BO3Config extends CustomObjectConfigFile {
 		}
 	}
 
-	public boolean parseModChecks() {
-		for (BO3Check check : bo3Checks[0]) {
-			if (check instanceof ModCheck) {
+	public boolean parseModChecks()
+	{
+		for (BO3Check check : bo3Checks[0])
+		{
+			if (check instanceof ModCheck)
+			{
 				if (!((ModCheck) check).evaluate())
+				{
 					return false;
-			} else if (check instanceof ModCheckNot) {
+				}
+			}
+			else if (check instanceof ModCheckNot)
+			{
 				if (!((ModCheckNot) check).evaluate())
+				{
 					return false;
+				}
 			}
 		}
 		return true;

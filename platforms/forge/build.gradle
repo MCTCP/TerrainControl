@@ -44,7 +44,7 @@ repositories
 
 dependencies
 {
-    compile project(':common')	
+    compile project(':common')
 	provided ('com.sk89q.worldedit:worldedit-forge-mc1.11:6.1.6') {
 		exclude group: 'com.google.guava'
 		exclude group: 'com.google.gson'

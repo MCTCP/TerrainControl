@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.Loader;
 
 public class ExportCommand extends BaseCommand
 {
-
     private final boolean hasWorldedit;
 
     public ExportCommand()
@@ -89,5 +88,4 @@ public class ExportCommand extends BaseCommand
 
         return true;
     }
-
 }
