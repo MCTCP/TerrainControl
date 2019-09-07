@@ -10,7 +10,8 @@ public enum OTGPerm
     CMD_MAP("cmd.map"),
     CMD_RELOAD("cmd.reload"),
     CMD_SPAWN("cmd.spawn"), 
-    CMD_LOOKUP("cmd.lookup");
+    CMD_LOOKUP("cmd.lookup"), 
+    CMD_EXPORT("cmd.export");
 
     public final String node;
 

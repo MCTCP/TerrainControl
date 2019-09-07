@@ -42,8 +42,7 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-//@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", acceptableRemoteVersions = "*", version = "v2")
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v8.3", dependencies="required-after:otgcore@[1.12.2 - v8.3]")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v8.3", dependencies="required-after:otgcore@[1.12.2 - v8.3];after:worldedit")
 public class OTGPlugin
 {	
 	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")

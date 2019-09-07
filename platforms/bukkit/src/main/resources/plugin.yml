@@ -56,3 +56,6 @@ permissions:
     otg.cmd.lookup:
         default: op
         description: Look up a registered biome by name or id
+    otg.cmd.export:
+        default: op
+        description: Exports the current WorldEdit selection as a new BO3.

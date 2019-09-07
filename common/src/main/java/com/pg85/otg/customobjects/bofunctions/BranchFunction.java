@@ -51,7 +51,7 @@ public abstract class BranchFunction<T extends CustomObjectConfigFile> extends C
             .append('(')
             .append(x).append(',')
             .append(y).append(',')
-            .append(z).append(',');
+            .append(z);
 
         for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
         {

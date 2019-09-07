@@ -51,6 +51,8 @@ public class OTGCommandExecutor implements CommandExecutor
         this.addCommand(new TPCommand(plugin));
         this.addCommand(new BiomeCommand(plugin));
         this.addCommand(new SpawnCommand(plugin));
+        this.addCommand(new LookupCommand(plugin));
+        this.addCommand(new ExportCommand(plugin));
         this.addCommand(new MapCommand(plugin));
         this.addCommand(this.helpCommand);
     }

@@ -5,6 +5,9 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 
 import net.minecraft.nbt.*;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 import java.lang.reflect.Field;
 import java.util.Map;
@@ -299,4 +302,18 @@ public class NBTHelper
                 throw new IllegalArgumentException(type + "doesn't have a simple value!");
         }
     }
+
+	public static NamedBinaryTag getMetadata(World world, int x, int y, int z) {
+		 TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
+	        if (tileEntity == null)
+	        {
+	            return null;
+	        }
+	        NBTTagCompound nmsTag = new NBTTagCompound();
+	        tileEntity.writeToNBT(nmsTag);
+	        nmsTag.removeTag("x");
+	        nmsTag.removeTag("y");
+	        nmsTag.removeTag("z");
+	        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
+	}
 }

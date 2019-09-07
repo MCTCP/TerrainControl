@@ -51,6 +51,7 @@ public final class OTGCommandHandler implements ICommand {
 		this.addCommand(new TPCommand());
 		this.addCommand(new LookupCommand());
 		this.addCommand(new SpawnCommand());
+		this.addCommand(new ExportCommand());
 		this.addCommand(new MapCommand());
 		this.addCommand(new StructureCommand());
 		this.addCommand(new FlushCommand());

@@ -1,11 +1,8 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.bukkit.OTGPerm;
-import com.pg85.otg.bukkit.OTGPlugin;
-import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.util.bo3.Rotation;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -13,13 +10,16 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import com.pg85.otg.OTG;
+import com.pg85.otg.bukkit.OTGPerm;
+import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.util.bo3.Rotation;
 
 public class SpawnCommand extends BaseCommand
 {
-    SpawnCommand(OTGPlugin _plugin)
+    public SpawnCommand(OTGPlugin _plugin)
     {
         super(_plugin);
         name = "spawn";
@@ -37,14 +37,14 @@ public class SpawnCommand extends BaseCommand
 
         if (args.isEmpty())
         {
-            me.sendMessage(ERROR_COLOR + "You must enter the name of the BO2.");
+            me.sendMessage(ERROR_COLOR + "You must enter the name of the BO2/BO3.");
             return true;
         }
         CustomObject spawnObject = null;
 
         if (bukkitWorld != null)
         {
-        	spawnObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(args.get(0), args.size() > 1 ? args.get(1) : "");
+        	spawnObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(args.get(0), bukkitWorld.getName());
         }
 
         if (spawnObject == null)
@@ -70,7 +70,7 @@ public class SpawnCommand extends BaseCommand
         return true;
     }
 
-    private Block getWatchedBlock(Player me, boolean verbose)
+    public Block getWatchedBlock(Player me, boolean verbose)
     {
         if (me == null)
             return null;

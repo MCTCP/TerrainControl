@@ -1806,17 +1806,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
-        if (tileEntity == null)
-        {
-            return null;
-        }
-        NBTTagCompound nmsTag = new NBTTagCompound();
-        tileEntity.save(nmsTag);
-        nmsTag.remove("x");
-        nmsTag.remove("y");
-        nmsTag.remove("z");
-        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
+        return NBTHelper.getMetadata(world, x, y, z);
     }
 
 	@Override

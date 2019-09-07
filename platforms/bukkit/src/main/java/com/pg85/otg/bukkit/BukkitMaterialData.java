@@ -63,7 +63,7 @@ public final class BukkitMaterialData implements LocalMaterialData
      * @param blockData The material an data.
      * @return The {@code BukkitMateialData} instance.
      */
-    static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
+    public static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
     {
         Block block = blockData.getBlock();
         return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData));
