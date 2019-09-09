@@ -82,9 +82,7 @@ public class BO3Creator {
 					IBlockState block = world.getBlockState(
 							new BlockPos(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ()));
 
-					LocalMaterialData data = OTG.getEngine().toLocalMaterialData(
-							DefaultMaterial.getMaterial(block.getBlock().getRegistryName().getNamespace()),
-							block.getBlock().getMetaFromState(block));
+					ForgeMaterialData data = ForgeMaterialData.ofMinecraftBlockState(block);
 
 					if (centerBlock != null && centerBlock.equals(data)) {
 						centerPointX = x + start.getBlockX();
@@ -148,9 +146,7 @@ public class BO3Creator {
 
 					IBlockState block = world.getBlockState(new BlockPos(x, y, z));
 
-					LocalMaterialData material = OTG.getEngine().toLocalMaterialData(
-							DefaultMaterial.getMaterial(block.getBlock().getRegistryName().getNamespace()),
-							block.getBlock().getMetaFromState(block));
+					ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(block);
 
 					if (includeAir || !material.isMaterial(DefaultMaterial.AIR)) {
 						BO3BlockFunction blockFunction;

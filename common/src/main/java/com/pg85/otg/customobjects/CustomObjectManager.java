@@ -86,7 +86,7 @@ public class CustomObjectManager
      *
      * @param object The object to register.
      */
-    private void registerGlobalObject(CustomObject object)
+    public void registerGlobalObject(CustomObject object)
     {
     	globalCustomObjects.addLoadedGlobalObject(object);
     }

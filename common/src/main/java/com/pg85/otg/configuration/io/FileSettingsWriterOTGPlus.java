@@ -24,7 +24,7 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
         this.file = configFile.getFile();
     }
 
-    private FileSettingsWriterOTGPlus(File file)
+    public FileSettingsWriterOTGPlus(File file)
     {
         this.file = file;
     }

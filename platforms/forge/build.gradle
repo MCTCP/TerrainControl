@@ -45,8 +45,16 @@ repositories
 dependencies
 {
     compile project(':common')	
-	compileOnly 'com.sk89q.worldedit:worldedit-core:6.1'
-	compileOnly 'com.sk89q.worldedit:worldedit-forge-mc1.11:6.1.6'
+	provided ('com.sk89q.worldedit:worldedit-forge-mc1.11:6.1.6') {
+		exclude group: 'com.google.guava'
+		exclude group: 'com.google.gson'
+	}
+	provided ('com.sk89q.worldedit:worldedit-core:6.1') {
+		exclude group: 'com.google.guava'
+		exclude group: 'com.google.gson'
+	}
+	compile 'com.google.guava:guava:23.0'
+	compile 'com.google.code.gson:gson:2.6.2'
 }
 
 processResources {
