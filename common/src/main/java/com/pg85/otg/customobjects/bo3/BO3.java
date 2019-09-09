@@ -542,4 +542,9 @@ public class BO3 implements StructuredCustomObject
             world.spawnEntity(newEntityData);
         }
     }
+
+	@Override
+	public boolean loadChecks() {
+		return this.settings.parseModChecks();
+	}
 }

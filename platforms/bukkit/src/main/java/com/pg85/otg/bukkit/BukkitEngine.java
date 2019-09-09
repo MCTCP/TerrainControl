@@ -146,4 +146,11 @@ public class BukkitEngine extends OTGEngine
 	{
 		return null;
 	}
+
+	// Mods are never loaded on Spigot
+	
+	@Override
+	public boolean isModLoaded(String mod) {
+		return false;
+	}
 }

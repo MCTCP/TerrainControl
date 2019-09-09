@@ -1,5 +1,11 @@
 package com.pg85.otg.customobjects.bo3;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
@@ -18,17 +24,13 @@ import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3WeightedBranchFunction;
 import com.pg85.otg.customobjects.bo3.checks.BO3Check;
+import com.pg85.otg.customobjects.bo3.checks.ModCheck;
+import com.pg85.otg.customobjects.bo3.checks.ModCheckNot;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultStructurePart;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class BO3Config extends CustomObjectConfigFile {
 	private boolean isOTGPlus; // Legacy setting
@@ -699,5 +701,18 @@ public class BO3Config extends CustomObjectConfigFile {
 				this.modDataFunctions[i][j] = this.modDataFunctions[i - 1][j].rotate();
 			}
 		}
+	}
+
+	public boolean parseModChecks() {
+		for (BO3Check check : bo3Checks[0]) {
+			if (check instanceof ModCheck) {
+				if (!((ModCheck) check).evaluate())
+					return false;
+			} else if (check instanceof ModCheckNot) {
+				if (!((ModCheckNot) check).evaluate())
+					return false;
+			}
+		}
+		return true;
 	}
 }

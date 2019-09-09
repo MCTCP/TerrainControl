@@ -298,148 +298,135 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 //        if (objectSpawned)
 //            GenerateCustomObjectFromGroup(world, random, x, y, z);
 
-        return objectSpawned;
-    }
+		return objectSpawned;
+	}
 
-    @Override
-    public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
-    {
-        if (branch)
-        {
-            return false;
-        }
+	@Override
+	public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord) {
+		if (branch) {
+			return false;
+		}
 
-        int randomRoll = rand.nextInt(100);
-        int ObjectRarity = rarity;
-        boolean objectSpawned = false;
-        
-        while (randomRoll < ObjectRarity)
-        {
-            ObjectRarity -= 100;
+		int randomRoll = rand.nextInt(100);
+		int ObjectRarity = rarity;
+		boolean objectSpawned = false;
 
-            int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            
-            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);
-        }
+		while (randomRoll < ObjectRarity) {
+			ObjectRarity -= 100;
 
-        return objectSpawned;
-    }
+			int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+			int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
-    @Override
-    protected void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException
-    {
-        // It doesn't write.
-    }
+			objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);
+		}
 
-    @Override
-    protected void readConfigSettings()
-    {
-        this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
-        this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
+		return objectSpawned;
+	}
 
-        this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
-        this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
-        this.spawnWater = readSettings(BO2Settings.SPAWN_WATER);
-        this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA);
-        this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
-        this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
+	@Override
+	protected void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException {
+		// It doesn't write.
+	}
 
-        this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
-        this.dig = readSettings(BO2Settings.DIG);
-        this.tree = readSettings(BO2Settings.TREE);
-        this.branch = readSettings(BO2Settings.BRANCH);
-        this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
-        this.rarity = readSettings(BO2Settings.RARITY);
-        this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
-        this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
-        this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
+	@Override
+	protected void readConfigSettings() {
+		this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
+		this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
 
-        this.readCoordinates();
-    }
+		this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
+		this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
+		this.spawnWater = readSettings(BO2Settings.SPAWN_WATER);
+		this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA);
+		this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
+		this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
 
-    @Override
-    protected void correctSettings()
-    {
-        // Stub method
-    }
+		this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
+		this.dig = readSettings(BO2Settings.DIG);
+		this.tree = readSettings(BO2Settings.TREE);
+		this.branch = readSettings(BO2Settings.BRANCH);
+		this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
+		this.rarity = readSettings(BO2Settings.RARITY);
+		this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
+		this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
+		this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
 
-    @Override
-    protected void renameOldSettings()
-    {
-        // Stub method
-    }
+		this.readCoordinates();
+	}
 
-    private void readCoordinates()
-    {
-        ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
+	@Override
+	protected void correctSettings() {
+		// Stub method
+	}
 
-        // TODO: Reimplement this?       
-        /*
-        for (RawSettingValue line : reader.getRawSettings())
-        {
-            String[] lineSplit = line.getRawValue().split(":", 2);
-            if (lineSplit.length != 2)
-                continue;
+	@Override
+	protected void renameOldSettings() {
+		// Stub method
+	}
 
-            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]);
-            if (buffer != null)
-                coordinates.add(buffer);
-        }
-        */
-        for (Entry<String, String> line : reader.getRawSettings())
-        {
-            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
-            if (buffer != null)
-            {
-                coordinates.add(buffer);
-            }
-        }
+	private void readCoordinates() {
+		ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
 
-        data[0] = new ObjectCoordinate[coordinates.size()];
-        data[1] = new ObjectCoordinate[coordinates.size()];
-        data[2] = new ObjectCoordinate[coordinates.size()];
-        data[3] = new ObjectCoordinate[coordinates.size()];
+		// TODO: Reimplement this?
+		/*
+		 * for (RawSettingValue line : reader.getRawSettings()) { String[] lineSplit =
+		 * line.getRawValue().split(":", 2); if (lineSplit.length != 2) continue;
+		 * 
+		 * ObjectCoordinate buffer =
+		 * ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]); if
+		 * (buffer != null) coordinates.add(buffer); }
+		 */
+		for (Entry<String, String> line : reader.getRawSettings()) {
+			ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
+			if (buffer != null) {
+				coordinates.add(buffer);
+			}
+		}
 
-        for (int i = 0; i < coordinates.size(); i++)
-        {
-            ObjectCoordinate coordinate = coordinates.get(i);
+		data[0] = new ObjectCoordinate[coordinates.size()];
+		data[1] = new ObjectCoordinate[coordinates.size()];
+		data[2] = new ObjectCoordinate[coordinates.size()];
+		data[3] = new ObjectCoordinate[coordinates.size()];
 
-            data[0][i] = coordinate;
-            coordinate = coordinate.rotate();
-            data[1][i] = coordinate;
-            coordinate = coordinate.rotate();
-            data[2][i] = coordinate;
-            coordinate = coordinate.rotate();
-            data[3][i] = coordinate;
-        }
+		for (int i = 0; i < coordinates.size(); i++) {
+			ObjectCoordinate coordinate = coordinates.get(i);
 
-    }
-    
-    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
-    {
-	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
-	    if(blocksToReplace != null && blocksToReplace.size() > 0)
-	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
-	    	if(targetBlock != null)
-	    	{
-	    		material = targetBlock;	    		
-	    	}
-	    }
-	    world.setBlock(x, y, z, material, metaDataTag, false);
-    }       
+			data[0][i] = coordinate;
+			coordinate = coordinate.rotate();
+			data[1][i] = coordinate;
+			coordinate = coordinate.rotate();
+			data[2][i] = coordinate;
+			coordinate = coordinate.rotate();
+			data[3][i] = coordinate;
+		}
 
-    @Override
-    public boolean onEnable()
-    {
-        enable();
-        return true;
-    }
+	}
 
-    private void enable()
-    {
-        readConfigSettings();
-        correctSettings();
-    }
+	private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag,
+			boolean isStructureAtSpawn) {
+		HashMap<DefaultMaterial, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig()
+				.getReplaceBlocksDict();
+		if (blocksToReplace != null && blocksToReplace.size() > 0) {
+			LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+			if (targetBlock != null) {
+				material = targetBlock;
+			}
+		}
+		world.setBlock(x, y, z, material, metaDataTag, false);
+	}
+
+	@Override
+	public boolean onEnable() {
+		enable();
+		return true;
+	}
+
+	private void enable() {
+		readConfigSettings();
+		correctSettings();
+	}
+
+	@Override
+	public boolean loadChecks() {
+		return true;
+	}
 }

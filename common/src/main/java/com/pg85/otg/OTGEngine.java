@@ -364,4 +364,6 @@ public abstract class OTGEngine
         return logger;
     }
 
+	public abstract boolean isModLoaded(String mod);
+
 }

@@ -1,5 +1,14 @@
 package com.pg85.otg.customobjects.bo4;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
@@ -9,7 +18,6 @@ import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
-import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
@@ -947,9 +955,14 @@ public class BO4 implements StructuredCustomObject
 
         if(OTG.getPluginConfig().spawnLog && (System.currentTimeMillis() - startTime) > 50)
         {
-        	OTG.log(LogMarker.WARN, "Warning: Spawning BO3 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+        	OTG.log(LogMarker.WARN, "Warning: Spawning BO4 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
         }
 
         return true;
     }
+
+	@Override
+	public boolean loadChecks() {
+		return true;
+	}
 }
