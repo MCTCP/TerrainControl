@@ -56,6 +56,7 @@ public final class OTGCommandHandler implements ICommand {
 		this.addCommand(new StructureCommand());
 		this.addCommand(new FlushCommand());
 		this.addCommand(new ExportDataCommand());
+		this.addCommand(new ModsCommand());
 		this.addCommand(new BiomesCommand());
 		this.addCommand(new BlocksCommand());
 		this.addCommand(new EntitiesCommand());
