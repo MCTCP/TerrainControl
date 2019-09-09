@@ -12,5 +12,4 @@ public class ModCheckNot extends ModCheck
     {
         return !super.evaluate();
     }
-
 }

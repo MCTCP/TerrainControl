@@ -65,5 +65,4 @@ public class ModCheck extends BO3Check
         }
         return true;
     }
-
 }

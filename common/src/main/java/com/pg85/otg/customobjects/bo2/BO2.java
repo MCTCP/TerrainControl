@@ -201,7 +201,6 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             {
                 return false;
             }
-<<<<<<< HEAD
         	
         	chunkCoord = ChunkCoordinate.fromBlockCoords((x + point.x), (z + point.z));
     		
