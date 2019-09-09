@@ -13,7 +13,6 @@ public class ModsCommand extends BaseCommand
 {
     ModsCommand()
     {
-
         name = "mods";
         usage = "mods";
         description = "View a list of loaded mods.";
@@ -22,7 +21,6 @@ public class ModsCommand extends BaseCommand
     @Override
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
-
         sender.sendMessage(new TextComponentString("-- Mod List --"));
         sender.sendMessage(new TextComponentString(""));
         sender.sendMessage(new TextComponentString("The modid shown is what's required for ModChecks."));
@@ -36,5 +34,4 @@ public class ModsCommand extends BaseCommand
         }
         return true;
     }
-
 }
