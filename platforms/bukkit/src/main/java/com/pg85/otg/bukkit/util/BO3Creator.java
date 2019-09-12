@@ -63,12 +63,15 @@ public class BO3Creator
         {
             try {
                 centerBlock = MaterialHelper.readMaterial(blockName);
-            } catch (InvalidConfigException e1) {
+            }
+			catch (InvalidConfigException e1)
+			{
                 centerBlock = null;
             }
         }
         
-        if(centerBlock != null && !centerBlock.isParsed()) {
+        if(centerBlock != null && !centerBlock.isParsed())
+		{
             centerBlock = null;
         }
 
@@ -96,8 +99,7 @@ public class BO3Creator
                 {
                     Block block = world.getBlockAt(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ());
 
-                    LocalMaterialData data = MaterialHelper.toLocalMaterialData(
-                            DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
+                    LocalMaterialData data = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
 
                     if (centerBlock != null && centerBlock.equals(data))
                     {
@@ -171,9 +173,7 @@ public class BO3Creator
                     }
 
                     Block block = world.getBlockAt(x, y, z);
-
-                    LocalMaterialData material = MaterialHelper.toLocalMaterialData(
-                            DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
+                    LocalMaterialData material = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
 
                     if (includeAir || !material.isMaterial(DefaultMaterial.AIR))
                     {

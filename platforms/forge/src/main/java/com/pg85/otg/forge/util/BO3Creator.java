@@ -54,7 +54,6 @@ public class BO3Creator
 
         Vector start = selection.getMinimumPoint();
         Vector end = selection.getMaximumPoint();
-        
         LocalMaterialData centerBlock = null;
         if (!blockName.isEmpty())
         {

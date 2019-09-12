@@ -68,32 +68,32 @@ public class CustomObjectCollection
                     {
                         // Remove the object
                         removeLoadedObject(worldName, object);
+						
+						// Try bo4
+						loader = OTG.getCustomObjectManager().getObjectLoaders().get("bo4");
+						if (loader != null)
+						{
+							object = loader.loadFromFile(objectName, file);
+							if (worldName != null)
+							{
+								ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+								if (worldObjects == null)
+								{
+									worldObjects = new ArrayList<CustomObject>();
+									objectsPerWorld.put(worldName, worldObjects);
+								}
+								worldObjects.add(object);
+							} else {
+								objectsGlobalObjects.add(object);
+							}
 
-                            // Try bo4
-                            loader = OTG.getCustomObjectManager().getObjectLoaders().get("bo4");
-                            if (loader != null)
-                            {
-                                object = loader.loadFromFile(objectName, file);
-                                if (worldName != null)
-                                {
-                                    ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
-                                    if (worldObjects == null)
-                                    {
-                                        worldObjects = new ArrayList<CustomObject>();
-                                    objectsPerWorld.put(worldName, worldObjects);
-                                }
-                                worldObjects.add(object);
-                            } else {
-                                objectsGlobalObjects.add(object);
-                            }
-
-                            if (!object.onEnable() || !object.loadChecks())
-                            {
-                                // Remove the object
-                                removeLoadedObject(worldName, object);
-                                return null;
-                            }
-                        }
+							if (!object.onEnable() || !object.loadChecks())
+							{
+								// Remove the object
+								removeLoadedObject(worldName, object);
+								return null;
+							}
+						}
                     }
                 }
             }

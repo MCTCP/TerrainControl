@@ -69,7 +69,6 @@ public class ModDataCommand extends BaseCommand
                 OTG.log(LogMarker.WARN,
                         "Error in GetModData call: value \"" + args.get(2) + "\" was expected to be a number");
             }
-
         } else {
             return false;
         }

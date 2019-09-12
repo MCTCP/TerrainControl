@@ -9,7 +9,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 
 public class ModCheck extends BO3Check
 {
-
     private String[] mods;
 
     @Override

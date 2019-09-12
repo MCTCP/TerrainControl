@@ -16,7 +16,6 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 
 public class ExportCommand extends BaseCommand
 {
-
     private final boolean hasWorldedit;
 
     public ExportCommand(OTGPlugin _plugin)
@@ -77,7 +76,9 @@ public class ExportCommand extends BaseCommand
                 MESSAGE_COLOR, VALUE_COLOR, name, selection.getWidth(), selection.getHeight(), selection.getLength()));
 
         if (branch)
+		{
             sender.sendMessage(MESSAGE_COLOR + "BO3 was larger than 32x32 so it has been split into branches.");
+		}
 
         return true;
     }
