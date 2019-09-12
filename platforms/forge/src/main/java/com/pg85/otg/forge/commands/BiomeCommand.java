@@ -21,108 +21,124 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeDictionary.Type;
 
-public class BiomeCommand extends BaseCommand {
-	BiomeCommand() {
+public class BiomeCommand extends BaseCommand
+{
+    BiomeCommand()
+    {
 
-		name = "biome";
-		usage = "biome [-f] [-s] [-d] [-m]";
-		description = "View information about your current biome.";
-		needsOp = false;
-	}
+        name = "biome";
+        usage = "biome [-f] [-s] [-d] [-m]";
+        description = "View information about your current biome.";
+        needsOp = false;
+    }
 
-	@Override
-	public boolean onCommand(ICommandSender sender, List<String> args) {
-		BlockPos location = this.getLocation(sender);
-		int x = location.getX();
-		int y = location.getY();
-		int z = location.getZ();
+    @Override
+    public boolean onCommand(ICommandSender sender, List<String> args)
+    {
+        BlockPos location = this.getLocation(sender);
+        int x = location.getX();
+        int y = location.getY();
+        int z = location.getZ();
 
-		LocalWorld world = this.getWorld(sender, "");
+        LocalWorld world = this.getWorld(sender, "");
 
-		if (world == null) {
-			sender.sendMessage(new TextComponentString(ERROR_COLOR + "OTG is not enabled for this world."));
-			return true;
-		}
+        if (world == null)
+        {
+            sender.sendMessage(new TextComponentString(ERROR_COLOR + "OTG is not enabled for this world."));
+            return true;
+        }
 
-		LocalBiome biome = world.getBiome(x, z);
-		BiomeIds biomeIds = biome.getIds();
+        LocalBiome biome = world.getBiome(x, z);
+        BiomeIds biomeIds = biome.getIds();
 
-		sender.sendMessage(new TextComponentString(
-				MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName()
-						+ MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getOTGBiomeId()));
+        sender.sendMessage(
+                new TextComponentString(MESSAGE_COLOR + "According to the biome generator, you are in the " + VALUE_COLOR + biome.getName() + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biomeIds.getOTGBiomeId()));
 
-		if (args.contains("-f")) {
-			sender.sendMessage(new TextComponentString(""));
-			sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "The base temperature of this biome is "
-					+ VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", at your height it is "
-					+ VALUE_COLOR + biome.getTemperatureAt(x, y, z)));
-		}
+        if (args.contains("-f"))
+        {
+            sender.sendMessage(new TextComponentString(""));
+            sender.sendMessage(
+                    new TextComponentString(MESSAGE_COLOR + "The base temperature of this biome is " + VALUE_COLOR + biome.getBiomeConfig().biomeTemperature + MESSAGE_COLOR + ", at your height it is " + VALUE_COLOR + biome.getTemperatureAt(
+                            x, y, z)));
+        }
 
-		if (args.contains("-s")) {
-			try {
-				String savedBiomeName = world.getSavedBiomeName(x, y);
-				sender.sendMessage(new TextComponentString(""));
-				sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR
-						+ "According to the world save files, you are in the " + VALUE_COLOR + savedBiomeName
-						+ MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biome.getIds().getSavedId()));
-			} catch (BiomeNotFoundException e) {
-				sender.sendMessage(new TextComponentString(""));
-				sender.sendMessage(new TextComponentTranslation(
-						ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
-			}
-		}
+        if (args.contains("-s"))
+        {
+            try
+            {
+                String savedBiomeName = world.getSavedBiomeName(x, y);
+                sender.sendMessage(new TextComponentString(""));
+                sender.sendMessage(
+                        new TextComponentTranslation(MESSAGE_COLOR + "According to the world save files, you are in the " + VALUE_COLOR + savedBiomeName + MESSAGE_COLOR + " biome, with id " + VALUE_COLOR + biome.getIds().getSavedId()));
+            } catch (BiomeNotFoundException e)
+            {
+                sender.sendMessage(new TextComponentString(""));
+                sender.sendMessage(
+                        new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+            }
+        }
 
-		if (args.contains("-d")) {
-			try {
-				ForgeBiome forgeBiome = (ForgeBiome) world.getBiome(x, z);
+        if (args.contains("-d"))
+        {
+            try
+            {
+                ForgeBiome forgeBiome = (ForgeBiome) world.getBiome(x, z);
 
-				Set<Type> types = BiomeDictionary.getTypes(forgeBiome.biomeBase);
-				String typesString = "";
-				for (Type type : types) {
-					if (typesString.length() == 0) {
-						typesString += type.getName();
-					} else {
-						typesString += ", " + type.getName();
-					}
-				}
-				sender.sendMessage(new TextComponentString(""));
-				sender.sendMessage(
-						new TextComponentTranslation(MESSAGE_COLOR + "BiomeDict: " + VALUE_COLOR + typesString));
-			} catch (BiomeNotFoundException e) {
-				sender.sendMessage(new TextComponentString(""));
-				sender.sendMessage(new TextComponentTranslation(
-						ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
-			}
-		}
+                Set<Type> types = BiomeDictionary.getTypes(forgeBiome.biomeBase);
+                String typesString = "";
+                for (Type type : types)
+                {
+                    if (typesString.length() == 0)
+                    {
+                        typesString += type.getName();
+                    } else
+                    {
+                        typesString += ", " + type.getName();
+                    }
+                }
+                sender.sendMessage(new TextComponentString(""));
+                sender.sendMessage(
+                        new TextComponentTranslation(MESSAGE_COLOR + "BiomeDict: " + VALUE_COLOR + typesString));
+            } catch (BiomeNotFoundException e)
+            {
+                sender.sendMessage(new TextComponentString(""));
+                sender.sendMessage(
+                        new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+            }
+        }
 
-		if (args.contains("-m")) {
-			try {
-				ForgeBiome calculatedBiome = (ForgeBiome) world.getCalculatedBiome(x, z);
+        if (args.contains("-m"))
+        {
+            try
+            {
+                ForgeBiome calculatedBiome = (ForgeBiome) world.getCalculatedBiome(x, z);
 
-				sender.sendMessage(new TextComponentString(""));
-				sender.sendMessage(
-						new TextComponentTranslation(TextFormatting.AQUA + "-- Biome mob spawning settings --"));
-				for (EnumCreatureType creatureType : EnumCreatureType.values()) {
-					sender.sendMessage(new TextComponentString(""));
-					sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + creatureType.name() + ": "));
-					ArrayList<SpawnListEntry> creatureList = (ArrayList<SpawnListEntry>) calculatedBiome.biomeBase
-							.getSpawnableList(creatureType);
-					if (creatureList != null && creatureList.size() > 0) {
-						for (SpawnListEntry spawnListEntry : creatureList) {
-							sender.sendMessage(new TextComponentTranslation(VALUE_COLOR + "{\"mob\": \""
-									+ MobNames.toInternalName(spawnListEntry.entityClass.getSimpleName())
-									+ "\", \"weight\": " + spawnListEntry.itemWeight + ", \"min\": "
-									+ spawnListEntry.minGroupCount + ", \"max\": " + spawnListEntry.maxGroupCount
-									+ "}"));
-						}
-					}
-				}
-			} catch (BiomeNotFoundException e) {
-				sender.sendMessage(new TextComponentString(""));
-				sender.sendMessage(new TextComponentTranslation(
-						ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
-			}
-		}
-		return true;
-	}
+                sender.sendMessage(new TextComponentString(""));
+                sender.sendMessage(
+                        new TextComponentTranslation(TextFormatting.AQUA + "-- Biome mob spawning settings --"));
+                for (EnumCreatureType creatureType : EnumCreatureType.values())
+                {
+                    sender.sendMessage(new TextComponentString(""));
+                    sender.sendMessage(new TextComponentTranslation(MESSAGE_COLOR + creatureType.name() + ": "));
+                    ArrayList<SpawnListEntry> creatureList = (ArrayList<SpawnListEntry>) calculatedBiome.biomeBase.getSpawnableList(
+                            creatureType);
+                    if (creatureList != null && creatureList.size() > 0)
+                    {
+                        for (SpawnListEntry spawnListEntry : creatureList)
+                        {
+                            sender.sendMessage(
+                                    new TextComponentTranslation(VALUE_COLOR + "{\"mob\": \"" + MobNames.toInternalName(
+                                            spawnListEntry.entityClass.getSimpleName()) + "\", \"weight\": " + spawnListEntry.itemWeight + ", \"min\": " + spawnListEntry.minGroupCount + ", \"max\": " + spawnListEntry.maxGroupCount + "}"));
+                        }
+                    }
+                }
+            } catch (BiomeNotFoundException e)
+            {
+                sender.sendMessage(new TextComponentString(""));
+                sender.sendMessage(
+                        new TextComponentTranslation(ERROR_COLOR + "An unknown biome (" + e.getBiomeName() + ") was saved to the save files here."));
+            }
+        }
+        return true;
+    }
 }
