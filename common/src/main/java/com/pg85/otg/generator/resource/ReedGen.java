@@ -2,6 +2,7 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -98,6 +99,11 @@ public class ReedGen extends Resource
         if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
         {
             return;
+        }
+        
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
         }
 
         int n = 1 + rand.nextInt(2);

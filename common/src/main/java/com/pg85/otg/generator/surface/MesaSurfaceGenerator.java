@@ -2,6 +2,7 @@ package com.pg85.otg.generator.surface;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
@@ -35,7 +36,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private final LocalMaterialData redStainedClay;
     private final LocalMaterialData silverStainedClay;
     private final LocalMaterialData coarseDirt;
-        
+
     private MesaSurfaceGenerator(boolean mountainMesa, boolean forestMesa)
     {
         this.brycePillars = mountainMesa;
@@ -75,11 +76,11 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             return new MesaSurfaceGenerator(true, false);
         }
         return null;
-    }    
-    
+    }
+
     private LocalMaterialData getBand(int i, int j, int k)
     {
-    	int l = (int)Math.round(this.clayBandsOffsetNoise.getValue((double)i / 512.0D, (double)i / 512.0D) * 2.0D);
+        int l = (int) Math.round(this.clayBandsOffsetNoise.getValue((double) i / 512.0D, (double) i / 512.0D) * 2.0D);
         return this.clayBands[(j + l + 64) % 64];
     }
 
@@ -91,7 +92,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         Random random = new Random(p_150619_1_);
 
         this.clayBandsOffsetNoise = new NoiseGeneratorPerlinMesaBlocks(random, 1);
-       
+
         for (int l1 = 0; l1 < 64; ++l1)
         {
             l1 += random.nextInt(5) + 1;
@@ -101,7 +102,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                 this.clayBands[l1] = this.orangeStainedClay;
             }
         }
-        
+
         int i2 = random.nextInt(4) + 2;
 
         for (int i = 0; i < i2; ++i)
@@ -114,7 +115,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                 this.clayBands[k + l] = this.yellowStainedClay;
             }
         }
-        
+
         int j2 = random.nextInt(4) + 2;
 
         for (int k2 = 0; k2 < j2; ++k2)
@@ -165,18 +166,20 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             }
         }
     }
-   
-	@Override
+
+    @Override
     public LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
-    {        
-    	int l = (int)Math.round(this.clayBandsOffsetNoise.getValue((double)xInWorld / 512.0D, (double)xInWorld / 512.0D) * 2.0D);
+    {
+        int l = (int) Math.round(
+                this.clayBandsOffsetNoise.getValue((double) xInWorld / 512.0D, (double) xInWorld / 512.0D) * 2.0D);
         return this.clayBands[(yInWorld + l + 64) % 64];
-    }   
+    }
 
     // net.minecraft.world.biome.BiomeMesa.genTerrainBlocks
     @Override
-    public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
+    public void spawn(LocalWorld world, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {    	
+        long worldSeed = world.getSeed();
         if (this.clayBands == null || this.worldSeed != worldSeed)
         {
             this.generateBands(worldSeed);
@@ -223,6 +226,12 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         LocalMaterialData currentSurfaceBlock = whiteStainedClay;
         LocalMaterialData currentGroundBlock = whiteStainedClay;
         
+        LocalMaterialData surfaceBlock = checkAndParseRawData(world, biomeConfig.surfaceBlock);
+        LocalMaterialData groundBlock = checkAndParseRawData(world, biomeConfig.groundBlock);
+        LocalMaterialData stoneBlock = checkAndParseRawData(world, biomeConfig.stoneBlock);
+        LocalMaterialData bedrockBlock = checkAndParseRawData(world, biomeConfig.worldConfig.bedrockBlock);
+        LocalMaterialData waterBlock = checkAndParseRawData(world, biomeConfig.waterBlock);
+        
         int noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
                 
         boolean cosNoiseIsLargerThanZero = Math.cos(noise / 3.0D * Math.PI) > 0.0D;
@@ -239,12 +248,12 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         {
             if (chunkBuffer.getBlock(x, y, z).isAir() && y < (int) bryceHeight)
             {
-                chunkBuffer.setBlock(x, y, z, biomeConfig.stoneBlock);
+                chunkBuffer.setBlock(x, y, z, stoneBlock);
             }
 
             if (generatingChunk.mustCreateBedrockAt(biomeConfig.worldConfig, y))
             {
-                chunkBuffer.setBlock(x, y, z, biomeConfig.worldConfig.bedrockBlock);
+                chunkBuffer.setBlock(x, y, z, bedrockBlock);
             }
             else if (i1 < 15 || this.brycePillars)
             {
@@ -264,17 +273,17 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         if (noisePlusRandomFactor <= 0)
                         {
                             currentSurfaceBlock = null;
-                            currentGroundBlock = biomeConfig.stoneBlock;
+                            currentGroundBlock = stoneBlock;
                         }
                         else if (y >= waterLevel - 4 && y <= waterLevel + 1)
                         {
                             currentSurfaceBlock = this.whiteStainedClay;
-                            currentGroundBlock = biomeConfig.groundBlock;
+                            currentGroundBlock = groundBlock;
                         }
 
                         if (y < waterLevel && (currentSurfaceBlock == null || currentSurfaceBlock.isAir()))
                         {
-                            currentSurfaceBlock = biomeConfig.waterBlock;
+                            currentSurfaceBlock = waterBlock;
                         }
 
                         k1 = noisePlusRandomFactor + Math.max(0, y - waterLevel);
@@ -286,7 +295,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                                 {
                                     chunkBuffer.setBlock(x, y, z, this.coarseDirt);
                                 } else {
-                                    chunkBuffer.setBlock(x, y, z, biomeConfig.surfaceBlock);
+                                    chunkBuffer.setBlock(x, y, z, surfaceBlock);
                                 }
                             }
                             else if (y > waterLevel + 3 + noisePlusRandomFactor)
@@ -331,6 +340,16 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                     ++i1;
                 }
             }
+        }
+    }
+    
+
+    private LocalMaterialData checkAndParseRawData(LocalWorld world, LocalMaterialData data)
+    {
+        if (data instanceof RawMaterialData) {
+            return ((RawMaterialData) data).readForWorld(world);
+        } else {
+            return data;
         }
     }
 

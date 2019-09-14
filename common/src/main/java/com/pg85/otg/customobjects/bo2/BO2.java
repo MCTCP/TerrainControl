@@ -3,6 +3,7 @@ package com.pg85.otg.customobjects.bo2;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
@@ -54,7 +55,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
         super(reader);
     }
-    
+
     @Override
     public boolean canSpawnAsTree()
     {
@@ -99,7 +100,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
         return true;
     }
-    
+
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
@@ -108,11 +109,16 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         // Spawn
         for (ObjectCoordinate point : data)
         {
+            if (point.material instanceof RawMaterialData)
+            {
+                point.material = ((RawMaterialData) point.material).readForWorld(world);
+            }
+            
             if (world.isNullOrAir(x + point.x, y + point.y, z + point.z, false))
             {
                 setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
             }
-            else if (dig)
+			else if (dig)
             {
                 setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
             }
@@ -125,13 +131,13 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
     	throw new RuntimeException();
     }
-    
+
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
     {
     	throw new RuntimeException();
     }
-    
+
     private boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {    	
         // Basic checks
@@ -145,17 +151,17 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         {
             return false;
         }
-    	
+
         if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z, false)))
         {
             return false;
         }
-        
+
         if (needsFoundation && world.isNullOrAir(x, y - 5, z, false))
         {
             return false;
         }
-        
+
         LocalMaterialData checkBlock = !spawnWater || !spawnLava ? world.getMaterial(x, y + 2, z, false) : null;
         DefaultMaterial checkBlockDefaultMaterial = checkBlock.toDefaultMaterial();
         if (!spawnWater)
@@ -193,12 +199,14 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
         HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
         ChunkCoordinate chunkCoord;        
+
         for (ObjectCoordinate point : objData)
         {
             if (y + point.y < PluginStandardValues.WORLD_DEPTH || y + point.y >= PluginStandardValues.WORLD_HEIGHT)
             {
                 return false;
             }
+<<<<<<< HEAD
         	
         	chunkCoord = ChunkCoordinate.fromBlockCoords((x + point.x), (z + point.z));
     		
@@ -298,135 +306,156 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 //        if (objectSpawned)
 //            GenerateCustomObjectFromGroup(world, random, x, y, z);
 
-		return objectSpawned;
-	}
+        return objectSpawned;
+    }
 
-	@Override
-	public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord) {
-		if (branch) {
-			return false;
-		}
+    @Override
+    public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
+    {
+        if (branch)
+        {
+            return false;
+        }
 
-		int randomRoll = rand.nextInt(100);
-		int ObjectRarity = rarity;
-		boolean objectSpawned = false;
+        int randomRoll = rand.nextInt(100);
+        int ObjectRarity = rarity;
+        boolean objectSpawned = false;
 
-		while (randomRoll < ObjectRarity) {
-			ObjectRarity -= 100;
+        while (randomRoll < ObjectRarity)
+        {
+            ObjectRarity -= 100;
 
-			int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-			int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
-			objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);
-		}
+            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);
+        }
 
-		return objectSpawned;
-	}
+        return objectSpawned;
+    }
 
-	@Override
-	protected void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException {
-		// It doesn't write.
-	}
+    @Override
+    protected void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException
+    {
+        // It doesn't write.
+    }
 
-	@Override
-	protected void readConfigSettings() {
-		this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
-		this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
+    @Override
+    protected void readConfigSettings()
+    {
+        this.spawnOnBlockType = readSettings(BO2Settings.SPAWN_ON_BLOCK_TYPE);
+        this.collisionBlockType = readSettings(BO2Settings.COLLISTION_BLOCK_TYPE);
 
-		this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
-		this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
-		this.spawnWater = readSettings(BO2Settings.SPAWN_WATER);
-		this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA);
-		this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
-		this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
+        this.spawnSunlight = readSettings(BO2Settings.SPAWN_SUNLIGHT);
+        this.spawnDarkness = readSettings(BO2Settings.SPAWN_DARKNESS);
+        this.spawnWater = readSettings(BO2Settings.SPAWN_WATER);
+        this.spawnLava = readSettings(BO2Settings.SPAWN_LAVA);
+        this.spawnAboveGround = readSettings(BO2Settings.SPAWN_ABOVE_GROUND);
+        this.spawnUnderGround = readSettings(BO2Settings.SPAWN_UNDER_GROUND);
 
-		this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
-		this.dig = readSettings(BO2Settings.DIG);
-		this.tree = readSettings(BO2Settings.TREE);
-		this.branch = readSettings(BO2Settings.BRANCH);
-		this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
-		this.rarity = readSettings(BO2Settings.RARITY);
-		this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
-		this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
-		this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
+        this.randomRotation = readSettings(BO2Settings.RANDON_ROTATION);
+        this.dig = readSettings(BO2Settings.DIG);
+        this.tree = readSettings(BO2Settings.TREE);
+        this.branch = readSettings(BO2Settings.BRANCH);
+        this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
+        this.rarity = readSettings(BO2Settings.RARITY);
+        this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
+        this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);
+        this.spawnElevationMax = readSettings(BO2Settings.SPAWN_ELEVATION_MAX);
 
-		this.readCoordinates();
-	}
+        this.readCoordinates();
+    }
 
-	@Override
-	protected void correctSettings() {
-		// Stub method
-	}
+    @Override
+    protected void correctSettings()
+    {
+        // Stub method
+    }
 
-	@Override
-	protected void renameOldSettings() {
-		// Stub method
-	}
+    @Override
+    protected void renameOldSettings()
+    {
+        // Stub method
+    }
 
-	private void readCoordinates() {
-		ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
+    private void readCoordinates()
+    {
+        ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
 
-		// TODO: Reimplement this?
-		/*
-		 * for (RawSettingValue line : reader.getRawSettings()) { String[] lineSplit =
-		 * line.getRawValue().split(":", 2); if (lineSplit.length != 2) continue;
-		 * 
-		 * ObjectCoordinate buffer =
-		 * ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]); if
-		 * (buffer != null) coordinates.add(buffer); }
-		 */
-		for (Entry<String, String> line : reader.getRawSettings()) {
-			ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
-			if (buffer != null) {
-				coordinates.add(buffer);
-			}
-		}
+        // TODO: Reimplement this?
+        /*
+         * for (RawSettingValue line : reader.getRawSettings()) { String[]
+         * lineSplit = line.getRawValue().split(":", 2); if (lineSplit.length !=
+         * 2) continue;
+         * 
+         * ObjectCoordinate buffer =
+         * ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]);
+         * if (buffer != null) coordinates.add(buffer); }
+         */
+        for (Entry<String, String> line : reader.getRawSettings())
+        {
+            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
+            if (buffer != null)
+            {
+                coordinates.add(buffer);
+            }
+        }
 
-		data[0] = new ObjectCoordinate[coordinates.size()];
-		data[1] = new ObjectCoordinate[coordinates.size()];
-		data[2] = new ObjectCoordinate[coordinates.size()];
-		data[3] = new ObjectCoordinate[coordinates.size()];
+        data[0] = new ObjectCoordinate[coordinates.size()];
+        data[1] = new ObjectCoordinate[coordinates.size()];
+        data[2] = new ObjectCoordinate[coordinates.size()];
+        data[3] = new ObjectCoordinate[coordinates.size()];
 
-		for (int i = 0; i < coordinates.size(); i++) {
-			ObjectCoordinate coordinate = coordinates.get(i);
+        for (int i = 0; i < coordinates.size(); i++)
+        {
+            ObjectCoordinate coordinate = coordinates.get(i);
 
-			data[0][i] = coordinate;
-			coordinate = coordinate.rotate();
-			data[1][i] = coordinate;
-			coordinate = coordinate.rotate();
-			data[2][i] = coordinate;
-			coordinate = coordinate.rotate();
-			data[3][i] = coordinate;
-		}
+            data[0][i] = coordinate;
+            coordinate = coordinate.rotate();
+            data[1][i] = coordinate;
+            coordinate = coordinate.rotate();
+            data[2][i] = coordinate;
+            coordinate = coordinate.rotate();
+            data[3][i] = coordinate;
+        }
 
-	}
+    }
 
-	private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag,
-			boolean isStructureAtSpawn) {
-		HashMap<DefaultMaterial, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig()
-				.getReplaceBlocksDict();
-		if (blocksToReplace != null && blocksToReplace.size() > 0) {
-			LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
-			if (targetBlock != null) {
-				material = targetBlock;
-			}
-		}
-		world.setBlock(x, y, z, material, metaDataTag, false);
-	}
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
+    {
+        HashMap<DefaultMaterial, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+        if (blocksToReplace != null && blocksToReplace.size() > 0)
+        {
+            LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+            if (targetBlock != null)
+            {
+                material = targetBlock;
+            }
+        }
+        
+        if (material instanceof RawMaterialData) {
+            material = ((RawMaterialData) material).readForWorld(world);
+        }
 
-	@Override
-	public boolean onEnable() {
-		enable();
-		return true;
-	}
+        world.setBlock(x, y, z, material, metaDataTag, false);
+    }
 
-	private void enable() {
-		readConfigSettings();
-		correctSettings();
-	}
+    @Override
+    public boolean onEnable()
+    {
+        enable();
+        return true;
+    }
 
-	@Override
-	public boolean loadChecks() {
-		return true;
-	}
+    private void enable()
+    {
+        readConfigSettings();
+        correctSettings();
+    }
+
+    @Override
+    public boolean loadChecks()
+    {
+        return true;
+    }
 }

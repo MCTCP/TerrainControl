@@ -11,6 +11,7 @@ import java.util.Random;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
@@ -171,6 +172,10 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         {
             if (random.nextInt(100) < blockChances[i])
             {
+                if (blocks[i] instanceof RawMaterialData)
+                {
+                    blocks[i] = ((RawMaterialData) blocks[i]).readForWorld(world);
+                }
                 world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
                 break;
             }

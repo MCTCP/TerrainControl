@@ -21,6 +21,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
@@ -59,7 +60,7 @@ public class BO3Creator
         if (!blockName.isEmpty())
         {
             try {
-                centerBlock = OTG.getEngine().readMaterial(blockName);
+                centerBlock = MaterialHelper.readMaterial(blockName);
             } catch (InvalidConfigException e1) {
                 centerBlock = null;
             }

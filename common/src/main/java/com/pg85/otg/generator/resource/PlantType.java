@@ -2,6 +2,7 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
@@ -85,8 +86,8 @@ public class PlantType
     }
 
     private final String name;
-    private final LocalMaterialData topBlock;
-    private final LocalMaterialData bottomBlock;
+    private LocalMaterialData topBlock;
+    private LocalMaterialData bottomBlock;
 
     /**
      * Creates a single-block plant with the given name.
@@ -150,6 +151,17 @@ public class PlantType
      */
     void spawn(LocalWorld world, int x, int y, int z)
     {
+        
+        if (bottomBlock instanceof RawMaterialData)
+        {
+            bottomBlock = ((RawMaterialData) bottomBlock).readForWorld(world);
+        }
+        
+        if (topBlock instanceof RawMaterialData)
+        {
+            topBlock = ((RawMaterialData) topBlock).readForWorld(world);
+        }
+        
         world.setBlock(x, y, z, bottomBlock, null, false);
         if (topBlock != null)
         {

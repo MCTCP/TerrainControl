@@ -1,13 +1,26 @@
 package com.pg85.otg.network;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder;
-import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.fallbacks.FallbackConfig;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.io.SettingsMap;
@@ -21,10 +34,6 @@ import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.worldsave.BiomeIdData;
 import com.pg85.otg.worldsave.WorldSaveData;
-
-import java.io.File;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Holds the WorldConfig and all BiomeConfigs.
@@ -131,11 +140,22 @@ public final class ServerConfigProvider implements ConfigProvider
     private void loadSettings(File worldSaveFolder, boolean isReload)
     {   	
         SettingsMap worldConfigSettings = loadWorldConfig();
+        loadFallbacks();
         loadBiomes(worldConfigSettings, worldSaveFolder, isReload);
 
         // We have to wait for the loading in order to get things like
         // temperature
         worldConfig.biomeGroupManager.processBiomeData(world);
+    }
+    
+    private void loadFallbacks() {
+        File fallbackFile = new File(settingsDir, WorldStandardValues.FALLBACK_FILE_NAME);
+        SettingsMap settingsMap = FileSettingsReader.read(world.getName(), fallbackFile);   
+
+        FallbackConfig fallbacks = new FallbackConfig(settingsMap);
+
+       this.worldConfig.addWorldFallbacks(fallbacks);
+       FileSettingsWriter.writeToFile(fallbacks.getSettingsAsMap(), fallbackFile, OTG.getPluginConfig().settingsMode);
     }
 
     private SettingsMap loadWorldConfig()

@@ -2,6 +2,7 @@ package com.pg85.otg.customobjects.bofunctions;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
@@ -28,11 +29,11 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
         assureSize(4, args);
         // Those limits are arbitrary, LocalWorld.setBlock will limit it
         // correctly based on what chunks can be accessed
-		x = readInt(args.get(0), -100, 100);
-		y = (short)readInt(args.get(1), -1000, 1000);
-		z = readInt(args.get(2), -100, 100);
+        x = readInt(args.get(0), -100, 100);
+        y = (short) readInt(args.get(1), -1000, 1000);
+        z = readInt(args.get(2), -100, 100);
 
-		String materialName = args.get(3);
+        String materialName = args.get(3);
         material = readMaterial(materialName);
 
         if (args.size() == 5)
@@ -43,6 +44,14 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
                 metaDataName = args.get(4);
             }
         }
+    }
+    
+    public LocalMaterialData parseForWorld(LocalWorld world) {
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
+        }
+        return material;
     }
 
     @Override
@@ -71,13 +80,18 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean isOTGPlus)
     {
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
+        }
         world.setBlock(x, y, z, material, metaDataTag, isOTGPlus);
     }
 
     @Override
     public boolean isAnalogousTo(CustomObjectConfigFunction<T> other)
     {
-        if(!getClass().equals(other.getClass())) {
+        if (!getClass().equals(other.getClass()))
+        {
             return false;
         }
         BlockFunction<T> block = (BlockFunction<T>) other;

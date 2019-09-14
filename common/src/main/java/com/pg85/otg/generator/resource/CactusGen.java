@@ -2,6 +2,7 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -37,6 +38,13 @@ public class CactusGen extends Resource
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
+        
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
+        }
+        
+        sourceBlocks.parseForWorld(world);
 
         for (int i = 0; i < 10; i++)
         {

@@ -24,6 +24,7 @@ import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
@@ -62,7 +63,7 @@ public class BO3Creator
         if (!blockName.isEmpty())
         {
             try {
-                centerBlock = OTG.getEngine().readMaterial(blockName);
+                centerBlock = MaterialHelper.readMaterial(blockName);
             } catch (InvalidConfigException e1) {
                 centerBlock = null;
             }
@@ -92,7 +93,7 @@ public class BO3Creator
                 {
                     Block block = world.getBlockAt(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ());
 
-                    LocalMaterialData data = OTG.getEngine().toLocalMaterialData(
+                    LocalMaterialData data = MaterialHelper.toLocalMaterialData(
                             DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
 
                     if (centerBlock != null && centerBlock.equals(data))
@@ -168,7 +169,7 @@ public class BO3Creator
 
                     Block block = world.getBlockAt(x, y, z);
 
-                    LocalMaterialData material = OTG.getEngine().toLocalMaterialData(
+                    LocalMaterialData material = MaterialHelper.toLocalMaterialData(
                             DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
 
                     if (includeAir || !material.isMaterial(DefaultMaterial.AIR))

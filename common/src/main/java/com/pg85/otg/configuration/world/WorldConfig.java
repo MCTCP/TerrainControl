@@ -1,13 +1,27 @@
 package com.pg85.otg.configuration.world;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeGroup;
 import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
+import com.pg85.otg.configuration.fallbacks.BlockFallback;
+import com.pg85.otg.configuration.fallbacks.FallbackConfig;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
 import com.pg85.otg.configuration.settingType.Setting;
@@ -20,10 +34,6 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
-import java.io.File;
-import java.util.*;
-import java.util.Map.Entry;
 
 public class WorldConfig extends ConfigFile
 {
@@ -48,6 +58,9 @@ public class WorldConfig extends ConfigFile
 	// Replace blocks
 	private List<ReplaceBlocks> replaceBlocksList = null;
     private HashMap<DefaultMaterial,LocalMaterialData> replaceBlocksDict = null;
+    private FallbackConfig fallbacks;
+    private Map<String, LocalMaterialData> fallbackCache = new HashMap<String, LocalMaterialData>();
+
    
     // For old biome generator
 
@@ -380,6 +393,44 @@ public class WorldConfig extends ConfigFile
         	defaultBiomes.add(defaultBiome.Name);
         }
         return defaultBiomes;
+    }
+    
+    public void addWorldFallbacks(FallbackConfig config)
+    {
+        this.fallbacks = config;
+        
+    }
+    
+    public LocalMaterialData parseFallback(String raw)
+    {
+        LocalMaterialData material = fallbackCache.get(raw);
+
+        if (material != null)
+        {
+            return material;
+        }
+
+        for (BlockFallback fallback : fallbacks.getAllFallbacks())
+        {
+            if (fallback.materialFrom.equals(raw))
+            {
+                for (String replacement : fallback.materialsTo)
+                {
+                    try
+                    {
+                        material = MaterialHelper.readMaterial(replacement);
+                    } catch (InvalidConfigException e)
+                    {
+                        e.printStackTrace();
+                    }
+                    if (material != null && !(material instanceof RawMaterialData)) {
+                        fallbackCache.put(raw, material);
+                        return material;
+                    }
+                }
+            }
+        }
+        return OTG.getEngine().toLocalMaterialData(DefaultMaterial.AIR, 0);
     }
     
     public double getFractureHorizontal()
@@ -1530,5 +1581,5 @@ public class WorldConfig extends ConfigFile
                 "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
                 "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome."
 				);
-    }   
+    }
 }

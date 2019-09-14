@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -78,6 +79,14 @@ public class OreGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
+        
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
+        }
+        
+        sourceBlocks.parseForWorld(world);
+        
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         float f = rand.nextFloat() * (float) Math.PI;

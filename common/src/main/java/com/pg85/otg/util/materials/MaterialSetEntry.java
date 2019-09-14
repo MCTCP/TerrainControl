@@ -1,10 +1,12 @@
 package com.pg85.otg.util.materials;
 
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 
 public class MaterialSetEntry
 {
-    private final LocalMaterialData material;
+    private LocalMaterialData material;
     private final boolean includesBlockData;
 
     MaterialSetEntry(LocalMaterialData material, boolean includesBlockData)
@@ -41,6 +43,14 @@ public class MaterialSetEntry
         } else
         {
             return material.hashCodeWithoutBlockData();
+        }
+    }
+
+    public void parseForWorld(LocalWorld world)
+    {
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
         }
     }
 

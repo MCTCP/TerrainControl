@@ -2,6 +2,7 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -117,6 +118,13 @@ public class SurfacePatchGen extends Resource
         int y = world.getHighestBlockYAt(x, z) - 1;
         if (y < minAltitude || y > maxAltitude)
             return;
+        
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
+        }
+        
+        sourceBlocks.parseForWorld(world);
 
         double yNoise = noiseGen.getYNoise(x * 0.25D, z * 0.25D);
         if (yNoise > 0.0D)

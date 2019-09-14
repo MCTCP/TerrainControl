@@ -2,6 +2,7 @@ package com.pg85.otg.util.materials;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
@@ -43,6 +44,7 @@ public class MaterialSet
     private int[] materialIntSet = new int[0];
     private Set<MaterialSetEntry> materials = new LinkedHashSet<MaterialSetEntry>();
     private boolean intSetUpToDate = true;
+    private boolean parsed = false;
 
     /**
      * Adds the given material to the list.
@@ -149,6 +151,18 @@ public class MaterialSet
         // Add the appropriate hashCode
         intSetUpToDate = false;
         materials.add(entry);
+    }
+    
+    public void parseForWorld(LocalWorld world) {
+        if (!parsed)
+        {
+            for (MaterialSetEntry material : materials)
+            {
+                material.parseForWorld(world);
+            }
+            parsed = true;
+            intSetUpToDate = false;
+        }
     }
 
     /**

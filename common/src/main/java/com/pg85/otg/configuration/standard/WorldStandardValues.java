@@ -19,6 +19,7 @@ public class WorldStandardValues extends Settings
 {
     // Files and folders
     public static final String WORLD_CONFIG_FILE_NAME = "WorldConfig.ini";
+    public static final String FALLBACK_FILE_NAME = "Fallbacks.ini";
     public static final String WORLD_BIOMES_DIRECTORY_NAME = "WorldBiomes";
     public static final String WORLD_OBJECTS_DIRECTORY_NAME = "WorldObjects";
 

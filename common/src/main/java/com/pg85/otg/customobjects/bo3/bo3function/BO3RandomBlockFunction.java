@@ -2,6 +2,7 @@ package com.pg85.otg.customobjects.bo3.bo3function;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
@@ -155,6 +156,10 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
         {
             if (random.nextInt(100) < blockChances[i])
             {
+                if (blocks[i] instanceof RawMaterialData)
+                {
+                    blocks[i] = ((RawMaterialData) blocks[i]).readForWorld(world);
+                }
                 world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
                 break;
             }
