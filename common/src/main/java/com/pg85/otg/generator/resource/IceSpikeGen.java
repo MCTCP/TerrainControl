@@ -2,6 +2,7 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -144,6 +145,13 @@ public class IceSpikeGen extends Resource
         {
             return;
         }
+        
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(par1World);
+        }
+        
+        sourceBlocks.parseForWorld(par1World);
 
         y += random.nextInt(4);
         int var6 = random.nextInt(4) + 7;

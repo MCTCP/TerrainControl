@@ -7,7 +7,7 @@ public class ModCheckNot extends ModCheck
     {
         return makeString("ModCheckNot");
     }
-   
+	
     public boolean evaluate()
     {
         return !super.evaluate();

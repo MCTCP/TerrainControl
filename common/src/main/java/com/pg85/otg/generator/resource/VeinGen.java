@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -13,7 +14,6 @@ import java.util.Random;
 
 public class VeinGen extends Resource
 {
-
     int maxAltitude; // Maximum altitude of the vein
     private int maxRadius; // Maximum size of the vein in blocks (inclusive)
     int minAltitude; // Minimum altitude of the vein

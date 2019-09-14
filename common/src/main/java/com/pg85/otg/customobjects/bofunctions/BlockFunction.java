@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
@@ -43,6 +44,14 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
                 metaDataName = args.get(4);
             }
         }
+    }
+    
+    public LocalMaterialData parseForWorld(LocalWorld world) {
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).readForWorld(world);
+        }
+        return material;
     }
 
     @Override

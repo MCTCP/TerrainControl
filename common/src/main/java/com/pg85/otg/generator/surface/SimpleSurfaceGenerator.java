@@ -4,6 +4,7 @@ import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Y_SIZE;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
@@ -130,6 +131,15 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                     }
                 }
             }
+        }
+    }
+
+    private LocalMaterialData checkAndParseRawData(LocalWorld world, LocalMaterialData data)
+    {
+        if (data instanceof RawMaterialData) {
+            return ((RawMaterialData) data).readForWorld(world);
+        } else {
+            return data;
         }
     }
 

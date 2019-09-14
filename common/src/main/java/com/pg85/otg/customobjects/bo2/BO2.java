@@ -10,6 +10,7 @@ import java.util.Random;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
@@ -107,8 +108,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
         // Spawn
         for (ObjectCoordinate point : data)
-        {
-            
+        {            
             if (world.isNullOrAir(x + point.x, y + point.y, z + point.z, false))
             {
                 setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);

@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 
@@ -25,7 +26,9 @@ public class AboveWaterGen extends Resource
     {
         int y = world.getLiquidHeight(x, z);
         if (y == -1)
+		{
             return;
+		}
 
         parseMaterials(world, material, null);
         

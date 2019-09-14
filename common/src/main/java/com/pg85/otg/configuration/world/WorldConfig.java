@@ -14,6 +14,7 @@ import java.util.Map.Entry;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeGroup;
@@ -422,7 +423,8 @@ public class WorldConfig extends ConfigFile
                     {
                         e.printStackTrace();
                     }
-                    if (material != null && material.isParsed()) {
+                    if (material != null && material.isParsed())
+					{
                         fallbackCache.put(raw, material);
                         return material;
                     }
