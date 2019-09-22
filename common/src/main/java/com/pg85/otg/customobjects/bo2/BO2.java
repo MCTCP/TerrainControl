@@ -111,7 +111,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         {
             if (point.material instanceof RawMaterialData)
             {
-                point.material = ((RawMaterialData) point.material).readForWorld(world);
+                point.material = ((RawMaterialData) point.material).parseForWorld(world);
             }
             
             if (world.isNullOrAir(x + point.x, y + point.y, z + point.z, false))
@@ -434,7 +434,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
         
         if (material instanceof RawMaterialData) {
-            material = ((RawMaterialData) material).readForWorld(world);
+            material = ((RawMaterialData) material).parseForWorld(world);
         }
 
         world.setBlock(x, y, z, material, metaDataTag, false);

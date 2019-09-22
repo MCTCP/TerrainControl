@@ -441,6 +441,8 @@ public class BO3Config extends CustomObjectConfigFile {
 		writer.comment("BlockCheck(x,y,z,BlockName[,BlockName[,...]]) - one of the blocks must be at the location");
 		writer.comment("BlockCheckNot(x,y,z,BlockName[,BlockName[,...]]) - all the blocks must not be at the location");
 		writer.comment("LightCheck(x,y,z,minLightLevel,maxLightLevel) - light must be between min and max (inclusive)");
+		writer.comment("ModCheck(ModName[,ModName[,...]]) - all the mods listed must be loaded");
+		writer.comment("ModCheckNot(ModName[,ModName[,...]]) - all the mods listed must not be loaded");
 		writer.comment("");
 		writer.comment(
 				"You can use \"Solid\" as a BlockName for matching all solid blocks or \"All\" to match all blocks that aren't air.");

@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -88,11 +87,6 @@ public class UndergroundLakeGen extends Resource
 
         if (y >= world.getHighestBlockYAt(x, z))
             return;
-        
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).readForWorld(world);
-        }
         
         int size = RandomHelper.numberInRange(rand, minSize, maxSize);
 

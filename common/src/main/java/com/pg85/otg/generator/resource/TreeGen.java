@@ -4,15 +4,10 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.TreeObject;
-import com.pg85.otg.customobjects.bo2.BO2;
-import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.ArrayList;
 import java.util.List;

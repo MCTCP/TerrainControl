@@ -5,6 +5,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Collection;
@@ -89,6 +90,9 @@ public class PlantType
     private LocalMaterialData topBlock;
     private LocalMaterialData bottomBlock;
 
+    private boolean bLoadedBottom = false;
+    private boolean bLoadedTop = false;
+
     /**
      * Creates a single-block plant with the given name.
      * 
@@ -152,20 +156,33 @@ public class PlantType
     void spawn(LocalWorld world, int x, int y, int z)
     {
         
-        if (bottomBlock instanceof RawMaterialData)
-        {
-            bottomBlock = ((RawMaterialData) bottomBlock).readForWorld(world);
+        if (!bLoadedTop) {
+            parseMaterials(world, topBlock, null);
+            bLoadedTop = true;
         }
         
-        if (topBlock instanceof RawMaterialData)
-        {
-            topBlock = ((RawMaterialData) topBlock).readForWorld(world);
+        if (!bLoadedBottom) {
+            parseMaterials(world, bottomBlock, null);
+            bLoadedBottom = true;
         }
         
         world.setBlock(x, y, z, bottomBlock, null, false);
         if (topBlock != null)
         {
             world.setBlock(x, y + 1, z, topBlock, null, false);
+        }
+    }
+    
+    private void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
+    {
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).parseForWorld(world);
+        }
+
+        if (sourceBlocks != null)
+        {
+            sourceBlocks.parseForWorld(world);
         }
     }
 

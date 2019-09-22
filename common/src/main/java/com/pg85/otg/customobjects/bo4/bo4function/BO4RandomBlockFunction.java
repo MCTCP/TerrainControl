@@ -174,7 +174,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
             {
                 if (blocks[i] instanceof RawMaterialData)
                 {
-                    blocks[i] = ((RawMaterialData) blocks[i]).readForWorld(world);
+                    blocks[i] = ((RawMaterialData) blocks[i]).parseForWorld(world);
                 }
                 world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
                 break;

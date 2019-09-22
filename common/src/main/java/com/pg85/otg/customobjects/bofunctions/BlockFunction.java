@@ -49,7 +49,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
     public LocalMaterialData parseForWorld(LocalWorld world) {
         if (material instanceof RawMaterialData)
         {
-            material = ((RawMaterialData) material).readForWorld(world);
+            material = ((RawMaterialData) material).parseForWorld(world);
         }
         return material;
     }
@@ -82,7 +82,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
     {
         if (material instanceof RawMaterialData)
         {
-            material = ((RawMaterialData) material).readForWorld(world);
+            material = ((RawMaterialData) material).parseForWorld(world);
         }
         world.setBlock(x, y, z, material, metaDataTag, isOTGPlus);
     }

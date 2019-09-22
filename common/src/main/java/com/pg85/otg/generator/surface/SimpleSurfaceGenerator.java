@@ -39,10 +39,10 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     protected final void spawnColumn(LocalWorld world, LocalMaterialData defaultSurfaceBlock, LocalMaterialData defaultGroundBlock, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
     {
         if (defaultSurfaceBlock instanceof RawMaterialData) {
-            defaultSurfaceBlock = ((RawMaterialData) defaultSurfaceBlock).readForWorld(world);
+            defaultSurfaceBlock = ((RawMaterialData) defaultSurfaceBlock).parseForWorld(world);
         }
         if (defaultGroundBlock instanceof RawMaterialData) {
-            defaultGroundBlock = ((RawMaterialData) defaultGroundBlock).readForWorld(world);
+            defaultGroundBlock = ((RawMaterialData) defaultGroundBlock).parseForWorld(world);
         }
         
         WorldConfig worldConfig = biomeConfig.worldConfig;
@@ -141,7 +141,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     private LocalMaterialData checkAndParseRawData(LocalWorld world, LocalMaterialData data)
     {
         if (data instanceof RawMaterialData) {
-            return ((RawMaterialData) data).readForWorld(world);
+            return ((RawMaterialData) data).parseForWorld(world);
         } else {
             return data;
         }

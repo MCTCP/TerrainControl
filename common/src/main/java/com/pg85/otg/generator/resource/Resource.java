@@ -3,10 +3,12 @@ package com.pg85.otg.generator.resource;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +98,19 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     public LocalMaterialData getMaterial()
     {
         return material;
+    }
+    
+    protected void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
+    {
+        if (material instanceof RawMaterialData)
+        {
+            material = ((RawMaterialData) material).parseForWorld(world);
+        }
+
+        if (sourceBlocks != null)
+        {
+            sourceBlocks.parseForWorld(world);
+        }
     }
 
     public int getPriority()

@@ -708,6 +708,28 @@ public class BiomeConfig extends ConfigFile
              
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, this.foliageColorIsMultiplier,
                 "Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
+        
+        // Fog
+        writer.putSetting(BiomeStandardValues.FOG_COLOR, this.fogColor, "Biome fog color.");
+
+        writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity,
+                "How dense the fog is this biome is, Float value from 0.0 to 1.0.",
+                "A value of 0 produces almost no fog while a value of 1 will cover the entire screen with fog.");
+
+        writer.putSetting(BiomeStandardValues.FOG_TIME_WEIGHT, this.fogTimeWeight,
+                "How much the world time should affect the fog color, Float value from 0.0 to 1.0.",
+                "A value of 0.0 means the fog will stay the same color all day.",
+                "A value of 1.0 will make the fog turn completely black at midnight.");
+
+        writer.putSetting(BiomeStandardValues.FOG_RAIN_WEIGHT, this.fogRainWeight,
+                "How much rain should affect the fog color, Float value from 0.0 to 1.0.",
+                "A value of 0.0 means the fog will stay the same color in the rain.",
+                "A value of 1.0 will make the fog turn completely black during rain.");
+
+        writer.putSetting(BiomeStandardValues.FOG_THUNDER_WEIGHT, this.fogThunderWeight,
+                "How much thunderstorms should affect the fog color, Float value from 0.0 to 1.0.",
+                "A value of 0.0 means the fog will stay the same color during thunderstorms.",
+                "A value of 1.0 will make the fog turn completely black during thunderstorms.");
 
         writer.bigTitle("Resource queue",
                 "This section control all resources spawning after terrain generation.",

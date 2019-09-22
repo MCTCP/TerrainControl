@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -18,6 +17,7 @@ public class CactusGen extends Resource
     private int minAltitude;
     private int maxAltitude;
     private MaterialSet sourceBlocks;
+    private boolean bLoaded = false;
 
     public CactusGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -39,12 +39,10 @@ public class CactusGen extends Resource
     {
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
         
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).readForWorld(world);
+        if (!bLoaded) {
+            parseMaterials(world, material, sourceBlocks);
+            bLoaded  = true;
         }
-        
-        sourceBlocks.parseForWorld(world);
 
         for (int i = 0; i < 10; i++)
         {

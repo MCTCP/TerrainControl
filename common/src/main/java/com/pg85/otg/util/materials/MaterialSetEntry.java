@@ -50,7 +50,7 @@ public class MaterialSetEntry
     {
         if (material instanceof RawMaterialData)
         {
-            material = ((RawMaterialData) material).readForWorld(world);
+            material = ((RawMaterialData) material).parseForWorld(world);
         }
     }
 

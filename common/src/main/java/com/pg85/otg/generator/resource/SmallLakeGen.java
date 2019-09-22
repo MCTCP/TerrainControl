@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -19,6 +18,7 @@ public class SmallLakeGen extends Resource
     private final boolean[] BooleanBuffer = new boolean[2048];
     private int maxAltitude;
     private int minAltitude;
+    private boolean bLoaded = false;
 
     public SmallLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -102,9 +102,9 @@ public class SmallLakeGen extends Resource
         // y = floor
         y -= 4;
         
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).readForWorld(world);
+        if (!bLoaded  ) {
+            parseMaterials(world, material, null);
+            bLoaded = true;
         }
 
         synchronized (BooleanBuffer)

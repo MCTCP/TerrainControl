@@ -1,7 +1,6 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 
@@ -10,6 +9,8 @@ import java.util.Random;
 
 public class AboveWaterGen extends Resource
 {
+    private boolean bLoaded = false;
+
     public AboveWaterGen(BiomeConfig config, List<String> args) throws InvalidConfigException
     {
         super(config);
@@ -27,10 +28,10 @@ public class AboveWaterGen extends Resource
         if (y == -1)
             return;
 
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).readForWorld(world);
-        }
+       if (!bLoaded) {
+           parseMaterials(world, material, null);
+           bLoaded = true;
+       }
         
         for (int i = 0; i < 10; i++)
         {
