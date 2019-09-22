@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -25,6 +24,7 @@ public class SurfacePatchGen extends Resource
     private final NoiseGeneratorSurfacePatchOctaves noiseGen;
     private final Random random;
     private final MaterialSet sourceBlocks;
+    private boolean bLoaded = false;
 
     public SurfacePatchGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -120,7 +120,7 @@ public class SurfacePatchGen extends Resource
             return;
         
         parseMaterials(world, material, sourceBlocks);
-        
+
         double yNoise = noiseGen.getYNoise(x * 0.25D, z * 0.25D);
         if (yNoise > 0.0D)
         {

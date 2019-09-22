@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -18,6 +17,7 @@ public class WellGen extends Resource
     private final LocalMaterialData slab;
     private final LocalMaterialData water;
     private final MaterialSet sourceBlocks;
+    private boolean bLoaded = false;
 
     public WellGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -98,7 +98,7 @@ public class WellGen extends Resource
         {
             return;
         }
-               
+
         int i;
         int j;
 

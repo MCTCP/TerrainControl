@@ -1,7 +1,6 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -18,6 +17,7 @@ public class OreGen extends Resource
     private final int maxSize;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
+    private boolean bLoaded = true;
 
     public OreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {

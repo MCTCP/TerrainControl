@@ -118,7 +118,7 @@ public class RawMaterialData implements LocalMaterialData
         return false;
     }
 
-    public LocalMaterialData readForWorld(LocalWorld world)
+    public LocalMaterialData parseForWorld(LocalWorld world)
     {
         return world.getConfigs().getWorldConfig().parseFallback(this.rawString);
     }

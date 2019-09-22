@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -26,6 +25,8 @@ public class IceSpikeGen extends Resource
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
     private SpikeType type;
+    private boolean bLoaded = false;
+    private boolean bLoadedBasement = false;
 
     public IceSpikeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -146,12 +147,10 @@ public class IceSpikeGen extends Resource
             return;
         }
         
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).readForWorld(par1World);
+        if (!bLoaded) {
+            parseMaterials(par1World, material, sourceBlocks);
+            bLoaded = true;
         }
-        
-        sourceBlocks.parseForWorld(par1World);
 
         y += random.nextInt(4);
         int var6 = random.nextInt(4) + 7;

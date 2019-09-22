@@ -1,7 +1,6 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -23,6 +22,7 @@ public class VeinGen extends Resource
     int oreSize; // Average size of a ore in the vein
     MaterialSet sourceBlocks; // Blocks for the ore to spawn in
     private double veinRarity; // Chance for the vein to spawn in a chunk
+    private boolean bLoaded = false;
 
     public VeinGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {

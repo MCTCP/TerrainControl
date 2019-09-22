@@ -1,7 +1,6 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 
@@ -10,7 +9,6 @@ import java.util.Random;
 
 public class AboveWaterGen extends Resource
 {
-
     public AboveWaterGen(BiomeConfig config, List<String> args) throws InvalidConfigException
     {
         super(config);

@@ -137,7 +137,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     private LocalMaterialData checkAndParseRawData(LocalWorld world, LocalMaterialData data)
     {
         if (data instanceof RawMaterialData) {
-            return ((RawMaterialData) data).readForWorld(world);
+            return ((RawMaterialData) data).parseForWorld(world);
         } else {
             return data;
         }

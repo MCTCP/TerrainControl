@@ -7,6 +7,7 @@ import java.util.Random;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -101,7 +102,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     
     protected void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
     {
-       material.parseForWorld(world);
+		material.parseForWorld(world);
 
         if (sourceBlocks != null)
         {

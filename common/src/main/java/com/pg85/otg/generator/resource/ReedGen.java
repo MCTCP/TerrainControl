@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -16,7 +15,7 @@ public class ReedGen extends Resource
     private final int maxAltitude;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
-    
+
     public ReedGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);

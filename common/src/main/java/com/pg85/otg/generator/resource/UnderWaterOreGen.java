@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -14,6 +13,7 @@ public class UnderWaterOreGen extends Resource
 {
     private final int size;
     private final MaterialSet sourceBlocks;
+    private boolean bLoaded = false;
 
     public UnderWaterOreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {

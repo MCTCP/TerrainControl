@@ -2,7 +2,6 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -17,6 +16,7 @@ public class LiquidGen extends Resource
     private final int maxAltitude;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
+    private boolean bLoaded = false;
 
     public LiquidGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -89,12 +89,10 @@ public class LiquidGen extends Resource
         if (!world.isNullOrAir(x, y, z, false) && (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
             return;
         
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).readForWorld(world);
+        if (!bLoaded ) {
+            parseMaterials(world, material, sourceBlocks);
+            bLoaded = true;
         }
-        
-        sourceBlocks.parseForWorld(world);
 
         int i = 0;
         int j = 0;
