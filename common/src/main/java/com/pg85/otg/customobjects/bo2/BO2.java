@@ -8,6 +8,7 @@ import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
@@ -64,6 +65,39 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     public boolean canRotateRandomly()
     {
         return randomRotation;
+    }
+    
+    // Used to safely spawn this object from a grown sapling
+    @Override
+    public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+        ObjectCoordinate[] data = this.data[rotation.getRotationId()];
+        ArrayList<ObjectCoordinate> blocksToSpawn = new ArrayList<ObjectCoordinate>();
+
+        for (ObjectCoordinate point : data)
+        {
+            DefaultMaterial material = world.getMaterial(x + point.x, y + point.y, z + point.z,
+                    false).toDefaultMaterial();
+
+            // Do not spawn if non-tree blocks are in the way
+            if (material != DefaultMaterial.AIR && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2)
+            {
+                return false;
+            }
+
+            // Only overwrite air
+            if (material == DefaultMaterial.AIR)
+            {
+                blocksToSpawn.add(point);
+            }
+
+        }
+
+        for (ObjectCoordinate point : blocksToSpawn)
+        {
+            setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
+        }
+        return true;
     }
     
     @Override

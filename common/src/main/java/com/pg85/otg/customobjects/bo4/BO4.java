@@ -127,6 +127,14 @@ public class BO4 implements StructuredCustomObject
     {
     	return false;
     }
+    
+    // Used to safely spawn this object from a grown sapling
+    // BO4s cannot be spawned from saplings
+    @Override
+    public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+        return false;
+    }
         
     // Used for Tree() and CustomObject
     @Override

@@ -126,7 +126,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
                     spawnZ += offset[1];
                 }
 
-                if (tree.spawnForced(world, random, rotation, spawnX, y, spawnZ))
+                if (tree.spawnFromSapling(world, random, rotation, spawnX, y, spawnZ))
                 {
                     // Success!
                     return true;
