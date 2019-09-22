@@ -5,6 +5,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.events.EventPriority;
 import com.pg85.otg.forge.events.*;
 import com.pg85.otg.forge.events.client.ClientConnectionEventListener;
+import com.pg85.otg.forge.events.client.ClientFogHandler;
 import com.pg85.otg.forge.events.client.ClientTickHandler;
 import com.pg85.otg.forge.events.client.KeyBoardEventListener;
 import com.pg85.otg.forge.events.dimensions.BlockTracker;
@@ -42,7 +43,7 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v8.3", dependencies="required-after:otgcore@[1.12.2 - v8.3];after:worldedit")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v8.3", dependencies="required-after:otgcore@[1.12.2 - v8.3]")
 public class OTGPlugin
 {	
 	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
@@ -108,6 +109,9 @@ public class OTGPlugin
 
         // Register client tick handler for handling particles.
         MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
+        
+        // Register fog event handler for biome-specific fog color
+        MinecraftForge.EVENT_BUS.register(new ClientFogHandler());
 
         // Register gui handler for replacing MC's gui with OTG's
         MinecraftForge.EVENT_BUS.register(new GuiHandler());

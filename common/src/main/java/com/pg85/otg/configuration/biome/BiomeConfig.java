@@ -93,6 +93,12 @@ public class BiomeConfig extends ConfigFile
     public boolean grassColorIsMultiplier;
     public int foliageColor;
     public boolean foliageColorIsMultiplier;
+    
+    public int fogColor;
+    public float fogDensity;
+    public float fogTimeWeight;
+    public float fogRainWeight;
+    public float fogThunderWeight;
 
     public List<ConfigFunction<BiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<BiomeConfig>>();
     private List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
@@ -333,7 +339,13 @@ public class BiomeConfig extends ConfigFile
         this.grassColorIsMultiplier = settings.getSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER);
         this.foliageColor = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR, defaultSettings.defaultFoliageColor);
         this.foliageColorIsMultiplier = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER);
+        this.fogColor = settings.getSetting(BiomeStandardValues.FOG_COLOR);
+        this.fogDensity = settings.getSetting(BiomeStandardValues.FOG_DENSITY);
 
+        this.fogTimeWeight = settings.getSetting(BiomeStandardValues.FOG_TIME_WEIGHT);
+        this.fogRainWeight = settings.getSetting(BiomeStandardValues.FOG_RAIN_WEIGHT);
+        this.fogThunderWeight = settings.getSetting(BiomeStandardValues.FOG_THUNDER_WEIGHT);
+        
         this.volatilityRaw1 = settings.getSetting(BiomeStandardValues.VOLATILITY_1);
         this.volatilityRaw2 = settings.getSetting(BiomeStandardValues.VOLATILITY_2);
         this.volatilityWeightRaw1 = settings.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_1);

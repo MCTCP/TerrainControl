@@ -59,7 +59,8 @@ public class BiomeStandardValues extends Settings
             SKY_COLOR = colorSetting("SkyColor", "#7BA5FF"),
             WATER_COLOR = colorSetting("WaterColor", "#FFFFFF"),
             GRASS_COLOR = colorSetting("GrassColor", "#000000"),
-            FOLIAGE_COLOR = colorSetting("FoliageColor", "#000000");
+            FOLIAGE_COLOR = colorSetting("FoliageColor", "#000000"), 
+            FOG_COLOR = colorSetting("FogColor", "#000000");
 
     public static final Setting<List<String>>
             ISLE_IN_BIOME = stringListSetting("IsleInBiome", "Ocean"),
@@ -94,7 +95,11 @@ public class BiomeStandardValues extends Settings
             BIOME_HEIGHT = floatSetting("BiomeHeight", 0.1f, -10, 10),
             BIOME_VOLATILITY = floatSetting("BiomeVolatility", 0.3f, -1000, 1000),
             RIVER_HEIGHT = floatSetting("RiverHeight", -1, -10, 10),
-            RIVER_VOLATILITY = floatSetting("RiverVolatility", 0.3f, -1000, 1000);
+            RIVER_VOLATILITY = floatSetting("RiverVolatility", 0.3f, -1000, 1000),
+            FOG_DENSITY = floatSetting("FogDensity", 0.5f, 0f, 1f),
+            FOG_TIME_WEIGHT = floatSetting("FogTimeWeight", 0.1f, 0f, 1f),
+            FOG_RAIN_WEIGHT = floatSetting("FogRainWeight", 0.25f, 0f, 1f),
+            FOG_THUNDER_WEIGHT = floatSetting("FogThunderWeight", 0.5f, 0f, 1f);
 
     public static final Setting<List<WeightedMobSpawnGroup>>
             SPAWN_MONSTERS = mobGroupListSetting("SpawnMonsters"),
