@@ -285,5 +285,4 @@ public class ClientFogHandler {
 			return biome.getBiomeConfig();
 		}
 	}
-
 }
