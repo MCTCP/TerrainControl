@@ -1,7 +1,6 @@
 package com.pg85.otg.forge.events.client;
 
 import java.util.Arrays;
-
 import org.lwjgl.opengl.GL11;
 
 import com.pg85.otg.OTG;
