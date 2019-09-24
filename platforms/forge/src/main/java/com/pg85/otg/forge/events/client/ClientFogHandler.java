@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.events.client;
 
+import java.util.Arrays;
 import org.lwjgl.opengl.GL11;
 
 import com.pg85.otg.OTG;
@@ -23,7 +24,6 @@ import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import scala.actors.threadpool.Arrays;
 
 public class ClientFogHandler
 {
