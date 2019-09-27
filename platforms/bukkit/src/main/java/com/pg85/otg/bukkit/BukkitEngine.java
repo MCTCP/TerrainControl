@@ -72,7 +72,7 @@ public class BukkitEngine extends OTGEngine
     }
 
     @SuppressWarnings("deprecation")
-    private LocalMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
+    private LocalMaterialData getMaterial0(String input) throws NumberFormatException
     {
         String blockName = input;
         int blockData = -1;
@@ -122,7 +122,7 @@ public class BukkitEngine extends OTGEngine
         }
 
         // Failed
-        throw new InvalidConfigException("Unknown material: " + input);
+        return BukkitMaterialData.ofString(input);
     }
 
     @Override

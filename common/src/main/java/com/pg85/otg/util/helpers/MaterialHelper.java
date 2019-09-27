@@ -3,7 +3,6 @@ package com.pg85.otg.util.helpers;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
 import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
@@ -56,7 +55,7 @@ public class MaterialHelper
     	}
     	catch(InvalidConfigException ex)
     	{
-    		material = new RawMaterialData(name);
+    		//TODO this shouldn't happen anymore
     	}
 
     	CachedMaterials.put(originalName, material);

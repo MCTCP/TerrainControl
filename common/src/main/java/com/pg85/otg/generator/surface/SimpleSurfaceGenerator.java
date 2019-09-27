@@ -4,7 +4,6 @@ import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Y_SIZE;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
@@ -38,12 +37,8 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     // net.minecraft.world.biome.Biome.generateBiomeTerrain
     protected final void spawnColumn(LocalWorld world, LocalMaterialData defaultSurfaceBlock, LocalMaterialData defaultGroundBlock, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
     {
-        if (defaultSurfaceBlock instanceof RawMaterialData) {
-            defaultSurfaceBlock = ((RawMaterialData) defaultSurfaceBlock).parseForWorld(world);
-        }
-        if (defaultGroundBlock instanceof RawMaterialData) {
-            defaultGroundBlock = ((RawMaterialData) defaultGroundBlock).parseForWorld(world);
-        }
+        defaultGroundBlock.parseForWorld(world);
+        defaultSurfaceBlock.parseForWorld(world);
         
         WorldConfig worldConfig = biomeConfig.worldConfig;
         float currentTemperature = biomeConfig.biomeTemperature;
@@ -61,10 +56,10 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         LocalMaterialData currentSurfaceBlock = defaultSurfaceBlock;
         LocalMaterialData currentGroundBlock = defaultGroundBlock;
         
-        LocalMaterialData stoneBlock = checkAndParseRawData(world, biomeConfig.stoneBlock);
-        LocalMaterialData bedrockBlock = checkAndParseRawData(world, worldConfig.bedrockBlock);
-        LocalMaterialData waterBlock = checkAndParseRawData(world, biomeConfig.waterBlock);
-        LocalMaterialData iceBlock = checkAndParseRawData(world, biomeConfig.iceBlock);
+        LocalMaterialData stoneBlock = biomeConfig.stoneBlock.parseForWorld(world);
+        LocalMaterialData bedrockBlock = worldConfig.bedrockBlock.parseForWorld(world);
+        LocalMaterialData waterBlock = biomeConfig.waterBlock.parseForWorld(world);
+        LocalMaterialData iceBlock = biomeConfig.iceBlock.parseForWorld(world);
         
         int surfaceBlocksCount = -1;
         final int currentWaterLevel = generatingChunk.getWaterLevel(x, z);
@@ -135,15 +130,6 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                     }
                 }
             }
-        }
-    }
-
-    private LocalMaterialData checkAndParseRawData(LocalWorld world, LocalMaterialData data)
-    {
-        if (data instanceof RawMaterialData) {
-            return ((RawMaterialData) data).parseForWorld(world);
-        } else {
-            return data;
         }
     }
 

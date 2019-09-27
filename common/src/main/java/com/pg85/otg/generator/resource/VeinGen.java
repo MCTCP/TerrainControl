@@ -23,7 +23,6 @@ public class VeinGen extends Resource
     int oreSize; // Average size of a ore in the vein
     MaterialSet sourceBlocks; // Blocks for the ore to spawn in
     private double veinRarity; // Chance for the vein to spawn in a chunk
-    private boolean bLoaded = false;
 
     public VeinGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -135,10 +134,7 @@ public class VeinGen extends Resource
         // Find all veins that reach this chunk, and spawn them
         int searchRadius = (this.maxRadius + 15) / 16;
         
-        if (!bLoaded  ) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoaded = true;
-        }
+        parseMaterials(world, material, sourceBlocks);
 
         int currentChunkX = chunkCoord.getChunkX();
         int currentChunkZ = chunkCoord.getChunkZ();

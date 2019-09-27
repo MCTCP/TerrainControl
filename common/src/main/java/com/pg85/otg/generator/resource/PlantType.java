@@ -1,16 +1,15 @@
 package com.pg85.otg.generator.resource;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Holds all small plants (1 or 2 blocks) of Minecraft so that users don't
@@ -175,10 +174,7 @@ public class PlantType
     
     private void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
     {
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).parseForWorld(world);
-        }
+    	material.parseForWorld(world);
 
         if (sourceBlocks != null)
         {

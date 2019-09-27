@@ -25,8 +25,6 @@ public class IceSpikeGen extends Resource
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
     private SpikeType type;
-    private boolean bLoaded = false;
-    private boolean bLoadedBasement = false;
 
     public IceSpikeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -106,10 +104,7 @@ public class IceSpikeGen extends Resource
             return;
         }
         
-        if (!bLoadedBasement ) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoadedBasement = true;
-        }
+        parseMaterials(world, material, sourceBlocks);
         
         int radius = random.nextInt(2) + 2;
         int one = 1;
@@ -147,10 +142,7 @@ public class IceSpikeGen extends Resource
             return;
         }
         
-        if (!bLoaded) {
-            parseMaterials(par1World, material, sourceBlocks);
-            bLoaded = true;
-        }
+        parseMaterials(par1World, material, sourceBlocks);
 
         y += random.nextInt(4);
         int var6 = random.nextInt(4) + 7;

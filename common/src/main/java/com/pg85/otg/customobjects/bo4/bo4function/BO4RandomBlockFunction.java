@@ -1,6 +1,5 @@
 package com.pg85.otg.customobjects.bo4.bo4function;
 
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
@@ -11,7 +10,6 @@ import java.util.Random;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
@@ -19,7 +17,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MaterialHelper;
-import com.pg85.otg.util.helpers.StreamHelper;
 
 public class BO4RandomBlockFunction extends BO4BlockFunction
 {
@@ -172,10 +169,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         {
             if (random.nextInt(100) < blockChances[i])
             {
-                if (blocks[i] instanceof RawMaterialData)
-                {
-                    blocks[i] = ((RawMaterialData) blocks[i]).parseForWorld(world);
-                }
+            	blocks[i].parseForWorld(world);
                 world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
                 break;
             }

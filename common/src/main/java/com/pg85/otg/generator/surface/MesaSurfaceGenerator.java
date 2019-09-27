@@ -1,17 +1,16 @@
 package com.pg85.otg.generator.surface;
 
+import java.util.Arrays;
+import java.util.Random;
+
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
 import com.pg85.otg.generator.noise.NoiseGeneratorPerlinMesaBlocks;
 import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
-import java.util.Arrays;
-import java.util.Random;
 
 public class MesaSurfaceGenerator implements SurfaceGenerator
 {
@@ -226,11 +225,11 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         LocalMaterialData currentSurfaceBlock = whiteStainedClay;
         LocalMaterialData currentGroundBlock = whiteStainedClay;
         
-        LocalMaterialData surfaceBlock = checkAndParseRawData(world, biomeConfig.surfaceBlock);
-        LocalMaterialData groundBlock = checkAndParseRawData(world, biomeConfig.groundBlock);
-        LocalMaterialData stoneBlock = checkAndParseRawData(world, biomeConfig.stoneBlock);
-        LocalMaterialData bedrockBlock = checkAndParseRawData(world, biomeConfig.worldConfig.bedrockBlock);
-        LocalMaterialData waterBlock = checkAndParseRawData(world, biomeConfig.waterBlock);
+        LocalMaterialData surfaceBlock = biomeConfig.surfaceBlock.parseForWorld(world);
+        LocalMaterialData groundBlock = biomeConfig.groundBlock.parseForWorld(world);
+        LocalMaterialData stoneBlock = biomeConfig.stoneBlock.parseForWorld(world);
+        LocalMaterialData bedrockBlock = biomeConfig.worldConfig.bedrockBlock.parseForWorld(world);
+        LocalMaterialData waterBlock = biomeConfig.waterBlock.parseForWorld(world);
         
         int noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
                 
@@ -340,16 +339,6 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                     ++i1;
                 }
             }
-        }
-    }
-    
-
-    private LocalMaterialData checkAndParseRawData(LocalWorld world, LocalMaterialData data)
-    {
-        if (data instanceof RawMaterialData) {
-            return ((RawMaterialData) data).parseForWorld(world);
-        } else {
-            return data;
         }
     }
 

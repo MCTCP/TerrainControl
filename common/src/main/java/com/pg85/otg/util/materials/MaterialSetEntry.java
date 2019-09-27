@@ -2,7 +2,6 @@ package com.pg85.otg.util.materials;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 
 public class MaterialSetEntry
 {
@@ -48,10 +47,7 @@ public class MaterialSetEntry
 
     public void parseForWorld(LocalWorld world)
     {
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).parseForWorld(world);
-        }
+    	material.parseForWorld(world);
     }
 
     @Override

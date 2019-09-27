@@ -16,7 +16,6 @@ public class LiquidGen extends Resource
     private final int maxAltitude;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = false;
 
     public LiquidGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -87,10 +86,7 @@ public class LiquidGen extends Resource
         if (!world.isNullOrAir(x, y, z, false) && (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
             return;
         
-        if (!bLoaded ) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoaded = true;
-        }
+        parseMaterials(world, material, sourceBlocks);
 
         int i = 0;
         int j = 0;

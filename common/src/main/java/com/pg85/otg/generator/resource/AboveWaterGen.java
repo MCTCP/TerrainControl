@@ -9,7 +9,6 @@ import java.util.Random;
 
 public class AboveWaterGen extends Resource
 {
-    private boolean bLoaded = false;
 
     public AboveWaterGen(BiomeConfig config, List<String> args) throws InvalidConfigException
     {
@@ -28,10 +27,7 @@ public class AboveWaterGen extends Resource
         if (y == -1)
             return;
 
-       if (!bLoaded) {
-           parseMaterials(world, material, null);
-           bLoaded = true;
-       }
+        parseMaterials(world, material, null);
         
         for (int i = 0; i < 10; i++)
         {

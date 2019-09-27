@@ -13,7 +13,6 @@ public class UnderWaterOreGen extends Resource
 {
     private final int size;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = false;
 
     public UnderWaterOreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -74,10 +73,7 @@ public class UnderWaterOreGen extends Resource
             return;
         }
         
-        if (!bLoaded  ) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoaded = true;
-        }
+        parseMaterials(world, material, sourceBlocks);
 
         int currentSize = rand.nextInt(size);
         int two = 2;

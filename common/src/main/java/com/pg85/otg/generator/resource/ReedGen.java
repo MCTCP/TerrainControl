@@ -15,8 +15,7 @@ public class ReedGen extends Resource
     private final int maxAltitude;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = false;
-
+    
     public ReedGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
@@ -101,10 +100,7 @@ public class ReedGen extends Resource
             return;
         }
         
-        if (!bLoaded  ) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoaded = true;
-        }
+        parseMaterials(world, material, sourceBlocks);
 
         int n = 1 + rand.nextInt(2);
         for (int i1 = 0; i1 < n; i1++)

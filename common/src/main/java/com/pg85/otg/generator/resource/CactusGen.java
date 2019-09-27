@@ -17,8 +17,7 @@ public class CactusGen extends Resource
     private int minAltitude;
     private int maxAltitude;
     private MaterialSet sourceBlocks;
-    private boolean bLoaded = false;
-
+    
     public CactusGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
@@ -39,10 +38,7 @@ public class CactusGen extends Resource
     {
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
         
-        if (!bLoaded) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoaded  = true;
-        }
+        parseMaterials(world, material, sourceBlocks);
 
         for (int i = 0; i < 10; i++)
         {

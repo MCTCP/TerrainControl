@@ -1,15 +1,15 @@
 package com.pg85.otg.customobjects.bofunctions;
 
+import java.util.List;
+import java.util.Random;
+
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import java.util.List;
-import java.util.Random;
 
 /**
  * Represents a block in a BO3.
@@ -33,8 +33,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
         y = (short) readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
 
-        String materialName = args.get(3);
-        material = readMaterial(materialName);
+        material = readMaterial(args.get(3));
 
         if (args.size() == 5)
         {
@@ -44,14 +43,6 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
                 metaDataName = args.get(4);
             }
         }
-    }
-    
-    public LocalMaterialData parseForWorld(LocalWorld world) {
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).parseForWorld(world);
-        }
-        return material;
     }
 
     @Override
@@ -80,10 +71,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
      */
     public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean isOTGPlus)
     {
-        if (material instanceof RawMaterialData)
-        {
-            material = ((RawMaterialData) material).parseForWorld(world);
-        }
+        material.parseForWorld(world);
         world.setBlock(x, y, z, material, metaDataTag, isOTGPlus);
     }
 

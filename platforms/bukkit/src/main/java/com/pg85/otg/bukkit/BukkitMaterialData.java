@@ -1,6 +1,7 @@
 package com.pg85.otg.bukkit;
 
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.util.helpers.BlockHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
@@ -23,7 +24,9 @@ public final class BukkitMaterialData implements LocalMaterialData
      * least in Minecraft 1.8). However, Minecraft's ChunkSection uses the same
      * format as this field.
      */
-	private final int combinedBlockId;	
+	private int combinedBlockId;
+	private String rawEntry;
+	private boolean checkFallbacks;
 	
     /**
      * Gets a {@code BukkitMaterialData} of the given id and data.
@@ -68,13 +71,24 @@ public final class BukkitMaterialData implements LocalMaterialData
         Block block = blockData.getBlock();
         return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData));
     }
+    
+
+	public static LocalMaterialData ofString(String input) {
+		return new BukkitMaterialData(input);
+	}
 
     private BukkitMaterialData(int blockId, int blockData)
     {
         this.combinedBlockId = blockId << 4 | blockData;
     }
 
-    @Override
+    public BukkitMaterialData(String input) {
+		this.combinedBlockId = -1;
+		this.rawEntry = input;
+		this.checkFallbacks = true;
+	}
+
+	@Override
     public boolean canSnowFallOn()
     {
         DefaultMaterial defaultMaterial = toDefaultMaterial();
@@ -268,6 +282,15 @@ public final class BukkitMaterialData implements LocalMaterialData
         // No changes, return object itself
         return this;
     }
+    
+	@Override
+	public LocalMaterialData parseForWorld(LocalWorld world) {
+		if (this.checkFallbacks) {
+			this.checkFallbacks = false;
+			this.combinedBlockId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;
+		}
+		return this;
+	}
 
     @Override
     public boolean isAir() {
@@ -285,5 +308,10 @@ public final class BukkitMaterialData implements LocalMaterialData
 	{
 		// TODO: Implement this
 		return false;
+	}
+
+	@Override
+	public boolean isParsed() {
+		return !checkFallbacks;
 	}
 }

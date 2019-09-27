@@ -17,7 +17,6 @@ public class WellGen extends Resource
     private final LocalMaterialData slab;
     private final LocalMaterialData water;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = false;
 
     public WellGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -89,6 +88,8 @@ public class WellGen extends Resource
         {
             --y;
         }
+        
+        parseMaterials(world, material, sourceBlocks);
 
         LocalMaterialData sourceBlock = world.getMaterial(x, y, z, false);
 
@@ -97,10 +98,6 @@ public class WellGen extends Resource
             return;
         }
         
-        if (!bLoaded  ) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoaded = true;
-        }
         
         int i;
         int j;

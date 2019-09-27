@@ -1,9 +1,15 @@
 package com.pg85.otg.customobjects.bo2;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Random;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
@@ -15,13 +21,6 @@ import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Random;
 
 /**
  * The good old BO2.
@@ -109,10 +108,6 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         // Spawn
         for (ObjectCoordinate point : data)
         {
-            if (point.material instanceof RawMaterialData)
-            {
-                point.material = ((RawMaterialData) point.material).parseForWorld(world);
-            }
             
             if (world.isNullOrAir(x + point.x, y + point.y, z + point.z, false))
             {
@@ -433,9 +428,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             }
         }
         
-        if (material instanceof RawMaterialData) {
-            material = ((RawMaterialData) material).parseForWorld(world);
-        }
+        material.parseForWorld(world);
 
         world.setBlock(x, y, z, material, metaDataTag, false);
     }

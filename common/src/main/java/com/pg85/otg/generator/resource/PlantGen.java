@@ -82,6 +82,7 @@ public class PlantGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
+    	sourceBlocks.parseForWorld(world);
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         for (int i = 0; i < 64; i++)

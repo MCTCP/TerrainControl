@@ -17,7 +17,6 @@ public class OreGen extends Resource
     private final int maxSize;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = true;
 
     public OreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -80,10 +79,7 @@ public class OreGen extends Resource
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         
-        if (!bLoaded ) {
-            parseMaterials(world, material, sourceBlocks);
-            bLoaded = true;
-        }
+        parseMaterials(world, material, sourceBlocks);
         
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 

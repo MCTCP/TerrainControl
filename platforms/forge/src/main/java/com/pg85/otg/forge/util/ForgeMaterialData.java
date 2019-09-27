@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.util;
 
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.BlockHelper;
@@ -19,11 +20,19 @@ import net.minecraft.init.Blocks;
  */
 public class ForgeMaterialData implements LocalMaterialData
 {
-    private final IBlockState blockData;
+    private IBlockState blockData;
+    private boolean checkFallbacks = false;
+    private String rawEntry;
 
     private ForgeMaterialData(IBlockState blockData)
     {
         this.blockData = blockData;
+    }
+    
+    private ForgeMaterialData(String raw) {
+    	this.blockData = null;
+    	this.rawEntry = raw;
+    	this.checkFallbacks = true;
     }
 
     public static ForgeMaterialData ofString(String input) throws InvalidConfigException
@@ -36,7 +45,7 @@ public class ForgeMaterialData implements LocalMaterialData
     	// Used in BO3's as placeholder/detector block.
     	if(input.toLowerCase().equals("blank"))
     	{
-    		return new ForgeMaterialData(null);
+    		return new ForgeMaterialData((IBlockState)null);
     	}
 
     	String newInput = input;
@@ -162,8 +171,8 @@ public class ForgeMaterialData implements LocalMaterialData
             }
         }
 
-        // Failed
-        throw new InvalidConfigException("Unknown material: " + input);
+        // Failed, try parsing later as a fallback.
+        return new ForgeMaterialData(input);
     }
     
     /**
@@ -367,7 +376,6 @@ public class ForgeMaterialData implements LocalMaterialData
 			!defaultMaterial.equals(DefaultMaterial.WATER_LILY);
     }
     
-    @SuppressWarnings("deprecation")
     @Override
     public LocalMaterialData rotate()
     {
@@ -425,6 +433,17 @@ public class ForgeMaterialData implements LocalMaterialData
         return this;
     }
     
+
+	@Override
+	public LocalMaterialData parseForWorld(LocalWorld world) {
+		if (this.checkFallbacks) {
+			this.checkFallbacks = false;
+			this.blockData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).blockData;
+		}
+		return this;
+	}
+
+    
     @Override
     public DefaultMaterial toDefaultMaterial()
     {
@@ -434,6 +453,12 @@ public class ForgeMaterialData implements LocalMaterialData
     	}
     	return DefaultMaterial.getMaterial(getBlockId());
     }
+    
+
+	@Override
+	public boolean isParsed() {
+		return !checkFallbacks;
+	}
     
     @Override
     public int hashCode()

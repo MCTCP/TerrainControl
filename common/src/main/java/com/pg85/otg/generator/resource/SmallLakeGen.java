@@ -18,7 +18,6 @@ public class SmallLakeGen extends Resource
     private final boolean[] BooleanBuffer = new boolean[2048];
     private int maxAltitude;
     private int minAltitude;
-    private boolean bLoaded = false;
 
     public SmallLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -102,10 +101,7 @@ public class SmallLakeGen extends Resource
         // y = floor
         y -= 4;
         
-        if (!bLoaded  ) {
-            parseMaterials(world, material, null);
-            bLoaded = true;
-        }
+        parseMaterials(world, material, null);
 
         synchronized (BooleanBuffer)
         {
