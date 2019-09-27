@@ -65,8 +65,8 @@ public class MapWriter implements Runnable
     {
         // OTG.log(LogMarker.DEBUG, "BukkitWorld::UUID:: {}",
         // world.getWorldInfo().geti;
-        LocalWorld bukkitWorld = OTG.getWorld(WorldHelper.getName(world2));
-        if (bukkitWorld == null)
+        LocalWorld forgeWorld = OTG.getWorld(WorldHelper.getName(world2));
+        if (forgeWorld == null)
         {
             // OTG.log(LogMarker.ERROR, "BukkitWorld is null :: Make sure you
             // add `{}` to
@@ -74,9 +74,9 @@ public class MapWriter implements Runnable
             return defaultColors;
         }
 
-        LocalBiome[] biomes = bukkitWorld.getConfigs().getBiomeArrayByOTGId();
+        LocalBiome[] biomes = forgeWorld.getConfigs().getBiomeArrayByOTGId();
         int[] colors = new int[biomes.length];
-        OTG.log(LogMarker.DEBUG, "BukkitWorld settings biomes.length::{}", biomes.length);
+        OTG.log(LogMarker.DEBUG, "ForgeWorld settings biomes.length::{}", biomes.length);
 
         for (LocalBiome biome : biomes)
         {
@@ -165,7 +165,7 @@ public class MapWriter implements Runnable
                         }
 
                         int arrayPosition = x1 + 16 * z1;
-                        int biomeId = OTGBiome.getIdForBiome(biomeBuffer[arrayPosition]);
+                        int biomeId = getOTGBiomeId(localWorld, biomeBuffer[arrayPosition]);
                         try {
                             // Biome color
                             biomeImage.setRGB(imageX, imageY, colors[biomeId]);
@@ -218,7 +218,7 @@ public class MapWriter implements Runnable
         float temperature;
         if (world != null)
         {
-            temperature = world.getBiomeByOTGIdOrNull(OTGBiome.getIdForBiome(biome)).getBiomeConfig().biomeTemperature;
+            temperature = world.getBiomeByOTGIdOrNull(getOTGBiomeId(world, biome)).getBiomeConfig().biomeTemperature;
         } else {
             temperature = biome.getDefaultTemperature();
         }
@@ -228,6 +228,15 @@ public class MapWriter implements Runnable
         float cappedTemperature = Math.min(1.0f, temperature);
 
         return Color.getHSBColor(0.7f - cappedTemperature * 0.7f, 0.9f, temperature * 0.7f + 0.3f);
+    }
+    
+    private int getOTGBiomeId(LocalWorld world, Biome biome)
+    {
+        if (biome instanceof OTGBiome)
+        {
+            return world.getBiomeByNameOrNull(biome.getBiomeName()).getIds().getOTGBiomeId();
+        }
+        return Biome.getIdForBiome(biome);
     }
 
 }
