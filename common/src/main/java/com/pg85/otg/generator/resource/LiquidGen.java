@@ -87,8 +87,6 @@ public class LiquidGen extends Resource
 
         if (!world.isNullOrAir(x, y, z, false) && (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
             return;
-        
-        parseMaterials(world, material, sourceBlocks);
 
         int i = 0;
         int j = 0;

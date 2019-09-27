@@ -144,8 +144,6 @@ public class IceSpikeGen extends Resource
         {
             return;
         }
-        
-        parseMaterials(par1World, material, sourceBlocks);
 
         y += random.nextInt(4);
         int var6 = random.nextInt(4) + 7;

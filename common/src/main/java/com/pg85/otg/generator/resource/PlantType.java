@@ -89,9 +89,6 @@ public class PlantType
     private LocalMaterialData topBlock;
     private LocalMaterialData bottomBlock;
 
-    private boolean bLoadedBottom = false;
-    private boolean bLoadedTop = false;
-
     /**
      * Creates a single-block plant with the given name.
      * 
