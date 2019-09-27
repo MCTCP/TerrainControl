@@ -99,12 +99,13 @@ public class IceSpikeGen extends Resource
         {
             y--;
         }
+        
+        parseMaterials(world, material, sourceBlocks);
+        
         if (!this.sourceBlocks.contains(world.getMaterial(x, y, z, false)))
         {
             return;
         }
-        
-        parseMaterials(world, material, sourceBlocks);
         
         int radius = random.nextInt(2) + 2;
         int one = 1;
@@ -136,13 +137,13 @@ public class IceSpikeGen extends Resource
         {
             --y;
         }
+        
+        parseMaterials(par1World, material, sourceBlocks);
 
         if (!sourceBlocks.contains(par1World.getMaterial(x, y, z, false)))
         {
             return;
         }
-        
-        parseMaterials(par1World, material, sourceBlocks);
 
         y += random.nextInt(4);
         int var6 = random.nextInt(4) + 7;

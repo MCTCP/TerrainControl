@@ -89,9 +89,6 @@ public class PlantType
     private LocalMaterialData topBlock;
     private LocalMaterialData bottomBlock;
 
-    private boolean bLoadedBottom = false;
-    private boolean bLoadedTop = false;
-
     /**
      * Creates a single-block plant with the given name.
      * 
@@ -153,21 +150,13 @@ public class PlantType
      * @param z Z position of the plant.
      */
     void spawn(LocalWorld world, int x, int y, int z)
-    {
-        
-        if (!bLoadedTop) {
-            parseMaterials(world, topBlock, null);
-            bLoadedTop = true;
-        }
-        
-        if (!bLoadedBottom) {
-            parseMaterials(world, bottomBlock, null);
-            bLoadedBottom = true;
-        }
+    {      
+        parseMaterials(world, bottomBlock, null);
         
         world.setBlock(x, y, z, bottomBlock, null, false);
         if (topBlock != null)
         {
+            parseMaterials(world, topBlock, null);
             world.setBlock(x, y + 1, z, topBlock, null, false);
         }
     }

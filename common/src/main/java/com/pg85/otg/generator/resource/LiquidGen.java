@@ -77,6 +77,8 @@ public class LiquidGen extends Resource
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
+        
+        parseMaterials(world, material, sourceBlocks);
 
         if (!sourceBlocks.contains(world.getMaterial(x, y + 1, z, false)))
             return;
@@ -85,8 +87,6 @@ public class LiquidGen extends Resource
 
         if (!world.isNullOrAir(x, y, z, false) && (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
             return;
-        
-        parseMaterials(world, material, sourceBlocks);
 
         int i = 0;
         int j = 0;

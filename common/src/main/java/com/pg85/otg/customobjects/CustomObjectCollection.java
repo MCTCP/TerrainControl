@@ -80,23 +80,21 @@ public class CustomObjectCollection
                                     if (worldObjects == null)
                                     {
                                         worldObjects = new ArrayList<CustomObject>();
-                                        objectsPerWorld.put(worldName, worldObjects);
-                                    }
-                                    worldObjects.add(object);
-                                } else {
-                                    objectsGlobalObjects.add(object);
+                                    objectsPerWorld.put(worldName, worldObjects);
                                 }
-
-                                if (!object.onEnable() || !object.loadChecks())
-                                {
-                                    // Remove the object
-                                    removeLoadedObject(worldName, object);
-                                    return null;
-                                }
+                                worldObjects.add(object);
+                            } else {
+                                objectsGlobalObjects.add(object);
                             }
-                        } else {
-                            return null;
-                        }                   
+
+                            if (!object.onEnable() || !object.loadChecks())
+                            {
+                                // Remove the object
+                                removeLoadedObject(worldName, object);
+                                return null;
+                            }
+                        }
+                    }
                 }
             }
         } else {

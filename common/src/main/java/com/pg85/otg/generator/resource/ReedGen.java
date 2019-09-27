@@ -94,13 +94,13 @@ public class ReedGen extends Resource
             return;
         }
         
+        parseMaterials(world, material, sourceBlocks);
+        
         LocalMaterialData worldMaterial = world.getMaterial(x, y - 1, z, false);        
         if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
         {
             return;
-        }
-        
-        parseMaterials(world, material, sourceBlocks);
+        }  
 
         int n = 1 + rand.nextInt(2);
         for (int i1 = 0; i1 < n; i1++)
