@@ -64,15 +64,11 @@ public class CustomObjectCollection
                         objectsGlobalObjects.add(object);
                     }
 
-                    boolean passedEnable = object.onEnable();
-                    boolean passedChecks = object.loadChecks();
-                    if (!passedEnable || !passedChecks)
+                    if (!object.onEnable() || !object.loadChecks())
                     {
                         // Remove the object
                         removeLoadedObject(worldName, object);
 
-                        if (passedChecks)
-                        {
                             // Try bo4
                             loader = OTG.getCustomObjectManager().getObjectLoaders().get("bo4");
                             if (loader != null)
@@ -100,8 +96,7 @@ public class CustomObjectCollection
                             }
                         } else {
                             return null;
-                        }
-                    }
+                        }                   
                 }
             }
         } else {
