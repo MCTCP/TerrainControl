@@ -15,7 +15,6 @@ public class BoulderGen extends Resource
     private MaterialSet sourceBlocks;
     private int minAltitude;
     private int maxAltitude;
-    private boolean bLoaded = false;
 
     public BoulderGen(BiomeConfig config, List<String> args) throws InvalidConfigException
     {

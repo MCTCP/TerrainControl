@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.RawMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
@@ -340,16 +339,6 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                     ++i1;
                 }
             }
-        }
-    }
-    
-
-    private LocalMaterialData checkAndParseRawData(LocalWorld world, LocalMaterialData data)
-    {
-        if (data instanceof RawMaterialData) {
-            return ((RawMaterialData) data).parseForWorld(world);
-        } else {
-            return data;
         }
     }
 

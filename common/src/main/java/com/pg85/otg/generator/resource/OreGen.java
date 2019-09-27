@@ -17,7 +17,6 @@ public class OreGen extends Resource
     private final int maxSize;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = true;
 
     public OreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {

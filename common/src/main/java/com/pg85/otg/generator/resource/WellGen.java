@@ -17,7 +17,6 @@ public class WellGen extends Resource
     private final LocalMaterialData slab;
     private final LocalMaterialData water;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = false;
 
     public WellGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -98,7 +97,7 @@ public class WellGen extends Resource
         {
             return;
         }
-
+		
         int i;
         int j;
 

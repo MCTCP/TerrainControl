@@ -22,7 +22,6 @@ public class VeinGen extends Resource
     int oreSize; // Average size of a ore in the vein
     MaterialSet sourceBlocks; // Blocks for the ore to spawn in
     private double veinRarity; // Chance for the vein to spawn in a chunk
-    private boolean bLoaded = false;
 
     public VeinGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {

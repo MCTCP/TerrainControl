@@ -13,7 +13,6 @@ public class UnderWaterOreGen extends Resource
 {
     private final int size;
     private final MaterialSet sourceBlocks;
-    private boolean bLoaded = false;
 
     public UnderWaterOreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
