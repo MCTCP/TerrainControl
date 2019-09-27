@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.events.client;
 
 import java.util.Arrays;
+
 import org.lwjgl.opengl.GL11;
 
 import com.pg85.otg.OTG;
@@ -36,7 +37,6 @@ public class ClientFogHandler {
 
 	// Max blend distance in ForgeModContainer.blendRanges
 	private final int MAX_BLEND_DISTANCE = 34;
-
 	private short[][] biomeCache = new short[(MAX_BLEND_DISTANCE * 2) + 1][(MAX_BLEND_DISTANCE * 2) + 1];
 	private double lastX, lastZ;
 
