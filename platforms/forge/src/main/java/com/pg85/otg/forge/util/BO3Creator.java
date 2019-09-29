@@ -55,7 +55,7 @@ public class BO3Creator
 
         Vector start = selection.getMinimumPoint();
         Vector end = selection.getMaximumPoint();
-
+        
         LocalMaterialData centerBlock = null;
         if (!blockName.isEmpty())
         {
@@ -64,6 +64,10 @@ public class BO3Creator
             } catch (InvalidConfigException e1) {
                 centerBlock = null;
             }
+        }
+        
+        if(centerBlock != null && !centerBlock.isParsed()) {
+            centerBlock = null;
         }
 
         int width = selection.getWidth();
@@ -197,8 +201,7 @@ public class BO3Creator
                                 {
                                     tileEntityName = tileEntityCount + "-" + getTileEntityName(
                                             tag) + "C" + chunkCoordinates.getBlockX() + "R" + chunkCoordinates.getBlockZ() + ".nbt";
-                                } else
-                                {
+                                } else {
                                     tileEntityName = tileEntityCount + "-" + getTileEntityName(tag) + ".nbt";
                                 }
 

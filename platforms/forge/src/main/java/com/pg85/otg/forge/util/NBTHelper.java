@@ -37,14 +37,22 @@ public class NBTHelper
         // Get the child tags using some reflection magic
         Field mapField;
         Map<String, NBTBase> nmsChildTags = null;
+        
         try
         {
-            mapField = NBTTagCompound.class.getDeclaredField("map");
+            // TODO better implementation
+            mapField = NBTTagCompound.class.getDeclaredField("tagMap"); // The field name was changed in newer forge versions
             mapField.setAccessible(true);
             nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
-        } catch (Exception e)
-        {
-            OTG.printStackTrace(LogMarker.FATAL, e);
+        } catch (Exception e) {
+            try
+            {
+                mapField = NBTTagCompound.class.getDeclaredField("map");
+                mapField.setAccessible(true);
+                nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
+            } catch (Exception e2) {
+                OTG.printStackTrace(LogMarker.FATAL, e2);
+            }
         }
 
         if (nmsChildTags == null)

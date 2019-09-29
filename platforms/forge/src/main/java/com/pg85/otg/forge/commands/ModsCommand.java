@@ -2,6 +2,8 @@ package com.pg85.otg.forge.commands;
 
 import java.util.List;
 
+import com.pg85.otg.OTG;
+
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fml.common.Loader;
@@ -29,7 +31,7 @@ public class ModsCommand extends BaseCommand
         for (ModContainer mod : Loader.instance().getActiveModList())
         {
             sender.sendMessage(
-                    new TextComponentString(MESSAGE_COLOR + mod.getName() + "(" + mod.getDisplayVersion() + ")"));
+                    new TextComponentString(MESSAGE_COLOR + mod.getName() + " (" + mod.getDisplayVersion() + ")"));
             sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "   modid: " + VALUE_COLOR + mod.getModId()));
         }
         return true;

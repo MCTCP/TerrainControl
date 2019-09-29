@@ -68,6 +68,10 @@ public class BO3Creator
                 centerBlock = null;
             }
         }
+        
+        if(centerBlock != null && !centerBlock.isParsed()) {
+            centerBlock = null;
+        }
 
         int width = selection.getWidth();
         int length = selection.getLength();
