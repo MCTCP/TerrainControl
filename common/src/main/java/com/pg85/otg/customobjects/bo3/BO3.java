@@ -1,5 +1,10 @@
 package com.pg85.otg.customobjects.bo3;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
@@ -26,10 +31,7 @@ import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Random;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class BO3 implements StructuredCustomObject
 {
@@ -48,7 +50,7 @@ public class BO3 implements StructuredCustomObject
         this.name = name;
         this.file = file;
     }
-    
+
     @Override
     public String getName()
     {
@@ -59,24 +61,23 @@ public class BO3 implements StructuredCustomObject
     {
         return settings;
     }
-    
+
     @Override
     public boolean onEnable()
     {
-    	try
-    	{
-    		this.settings = new BO3Config(new FileSettingsReaderOTGPlus(name, file));
-    		if(this.settings.settingsMode != ConfigMode.WriteDisable)
-    		{
-    			FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
-    		}
-    	}
-    	catch(InvalidConfigException ex)
-    	{
-    		return false;
-    	}
-    	return true;
-    }    
+        try
+        {
+            this.settings = new BO3Config(new FileSettingsReaderOTGPlus(name, file));
+            if (this.settings.settingsMode != ConfigMode.WriteDisable)
+            {
+                FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
+            }
+        } catch (InvalidConfigException ex)
+        {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public boolean canSpawnAsTree()
@@ -90,28 +91,82 @@ public class BO3 implements StructuredCustomObject
     {
         return settings.rotateRandomly;
     }
-        
+
     // Used for Tree() and CustomObject
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-    	return trySpawnAt(false, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
+        return trySpawnAt(false, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
     }
-    
+
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
     {
-    	return trySpawnAt(false, null, world, random, rotation, x, y, z, minY, maxY);
+        return trySpawnAt(false, null, world, random, rotation, x, y, z, minY, maxY);
     }
-    
-    // Used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc).
+
+    // Used to safely spawn this object from a grown sapling
+    @Override
+    public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
+
+        ArrayList<BO3BlockFunction> blocksToSpawn = new ArrayList<BO3BlockFunction>();
+
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
+        HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
+
+        for (BO3BlockFunction block : blocks)
+        {
+            DefaultMaterial material = world.getMaterial(x + block.x, y + block.y, z + block.z,
+                    false).toDefaultMaterial();
+            
+            // Ignore blocks in the ground when checking spawn conditions
+            if (block.y >= 0)
+            {
+                // Do not spawn if non-tree blocks are in the way
+                if (material != DefaultMaterial.AIR && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2 && material != DefaultMaterial.SAPLING)
+                {
+                    return false;
+                }
+            }
+            
+            // Only overwrite air
+            if (material == DefaultMaterial.AIR)
+            {
+                chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
+                blocksToSpawn.add(block);
+            }
+
+            if (block instanceof BO3BlockFunction)
+            {
+                oeh.addBlock((BO3BlockFunction) block);
+            }
+
+        }
+
+        // Spawn
+
+        for (BO3BlockFunction block : blocksToSpawn)
+        {
+            block.spawn(world, random, x + block.x, y + block.y, z + block.z, true);
+        }
+
+        oeh.extrude(world, random, x, y, z);
+        handleBO3Functions(null, world, random, rotation, x, y, z, chunks);
+
+        return true;
+    }
+
+    // Used for spawning saplings and customobjects without doing checks (for
+    // growing saplings, /spawn command, StructureAtSpawn etc).
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-		return trySpawnAt(true, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
+        return trySpawnAt(true, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
     }
 
-	// This method is only used to spawn CustomObject.
+    // This method is only used to spawn CustomObject.
     @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
@@ -141,11 +196,11 @@ public class BO3 implements StructuredCustomObject
     {
         return null;
     }
-    
+
     @Override
     public Branch[] getBranches(Rotation rotation)
     {
-   		return settings.branches[rotation.getRotationId()];
+        return settings.branches[rotation.getRotationId()];
     }
 
     @Override
@@ -178,7 +233,7 @@ public class BO3 implements StructuredCustomObject
     {
         return settings.maxBranchDepth;
     }
-    
+
     /**
      * Computes the offset and variance for spawning a bo3
      *
@@ -196,23 +251,22 @@ public class BO3 implements StructuredCustomObject
         } else if (variance < 0)
         {
             variance = -random.nextInt(MathHelper.abs(variance) + 1);
-        } else
-        {
+        } else {
             variance = random.nextInt(variance + 1);
         }
         return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
     }
-   
+
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
     {
-    	return spawn(world, random, x, z, this.getSettings().minHeight, this.getSettings().maxHeight);
+        return spawn(world, random, x, z, this.getSettings().minHeight, this.getSettings().maxHeight);
     }
-    
+
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
     {
-		return spawn(world, random, x, z, minY, maxY);
+        return spawn(world, random, x, z, minY, maxY);
     }
 
     // Used for customobject and trees
@@ -236,7 +290,7 @@ public class BO3 implements StructuredCustomObject
         y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
         return trySpawnAt(world, random, rotation, x, y, z, minY, maxY);
     }
-    
+
     // Used for saplings, trees, customobjects and customstructures
     // SkipChecks is used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc). TODO: Split this into 2 methods?
     public boolean trySpawnAt(boolean skipChecks, CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
@@ -299,20 +353,12 @@ public class BO3 implements StructuredCustomObject
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
         int blocksOutsideSourceBlock = 0;
-        int maxBlocksOutsideSourceBlock = (int)Math.ceil(blocks.length * (settings.maxPercentageOutsideSourceBlock / 100.0));
+        int maxBlocksOutsideSourceBlock = (int) Math.ceil(
+                blocks.length * (settings.maxPercentageOutsideSourceBlock / 100.0));
         for (BO3BlockFunction block : blocks)
         {
-            if (
-        		!skipChecks &&
-	    		(
-					(
-						settings.maxPercentageOutsideSourceBlock < 100 &&
-						blocksOutsideSourceBlock <= maxBlocksOutsideSourceBlock
-					) ||
-					settings.outsideSourceBlock == OutsideSourceBlock.dontPlace
-	            ) &&
-	    		!settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z, false))
-        	)
+            if (!skipChecks && ((settings.maxPercentageOutsideSourceBlock < 100 && blocksOutsideSourceBlock <= maxBlocksOutsideSourceBlock) || settings.outsideSourceBlock == OutsideSourceBlock.dontPlace) && !settings.sourceBlocks.contains(
+                    world.getMaterial(x + block.x, y + block.y, z + block.z, false)))
             {
                 blocksOutsideSourceBlock++;
                 if (blocksOutsideSourceBlock > maxBlocksOutsideSourceBlock)
@@ -321,14 +367,14 @@ public class BO3 implements StructuredCustomObject
                     return false;
                 }
 
-                if(settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway)
+                if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway)
                 {
-            		chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
-                	blocksToSpawn.add(block);
+                    chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
+                    blocksToSpawn.add(block);
                 }
             } else {
-        		chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
-            	blocksToSpawn.add(block);
+                chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
+                blocksToSpawn.add(block);
             }
             if (block instanceof BO3BlockFunction)
             {
@@ -345,151 +391,155 @@ public class BO3 implements StructuredCustomObject
 
         // Spawn
 
-        HashSet<ChunkCoordinate> chunksCustomObject = new HashSet<ChunkCoordinate>();
-
         for (BO3BlockFunction block : blocksToSpawn)
         {
-        	block.spawn(world, random, x + block.x, y + block.y, z + block.z, true);
+            block.spawn(world, random, x + block.x, y + block.y, z + block.z, true);
         }
 
         oeh.extrude(world, random, x, y, z);
-
-        HashSet<BO3ModDataFunction> newModDataInObject = new HashSet<BO3ModDataFunction>();
-    	BO3ModDataFunction[] modDataInObject = settings.modDataFunctions[rotation.getRotationId()];
-		for (BO3ModDataFunction modData : modDataInObject)
-    	{
-    		BO3ModDataFunction newModData = new BO3ModDataFunction();
-
-    		newModData.y = y + modData.y;
-    		newModData.x = x + modData.x;
-    		newModData.z = z + modData.z;
-
-        	newModData.modData = modData.modData;
-        	newModData.modId = modData.modId;
-
-        	newModDataInObject.add(newModData);
-        	chunks.add(ChunkCoordinate.fromBlockCoords(newModData.x, newModData.z));
-        	chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newModData.x, newModData.z));
-    	}
-
-		HashSet<BO3SpawnerFunction> newSpawnerDataInObject = new HashSet<BO3SpawnerFunction>();
-    	BO3SpawnerFunction[] spawnerDataInObject = settings.spawnerFunctions[rotation.getRotationId()];
-		for (BO3SpawnerFunction spawnerData : spawnerDataInObject)
-    	{
-    		BO3SpawnerFunction newSpawnerData = new BO3SpawnerFunction();
-
-    		newSpawnerData.y = y + spawnerData.y;
-        	newSpawnerData.x = x + spawnerData.x;
-        	newSpawnerData.z = z + spawnerData.z;
-
-        	newSpawnerData.mobName = spawnerData.mobName;
-        	newSpawnerData.originalnbtFileName = spawnerData.originalnbtFileName;
-        	newSpawnerData.nbtFileName = spawnerData.nbtFileName;
-        	newSpawnerData.groupSize = spawnerData.groupSize;
-        	newSpawnerData.interval = spawnerData.interval;
-        	newSpawnerData.spawnChance = spawnerData.spawnChance;
-        	newSpawnerData.maxCount= spawnerData.maxCount;
-
-        	newSpawnerData.despawnTime = spawnerData.despawnTime;
-
-        	newSpawnerData.velocityX = spawnerData.velocityX;
-        	newSpawnerData.velocityY = spawnerData.velocityY;
-        	newSpawnerData.velocityZ = spawnerData.velocityZ;
-
-        	newSpawnerData.velocityXSet = spawnerData.velocityXSet;
-        	newSpawnerData.velocityYSet = spawnerData.velocityYSet;
-        	newSpawnerData.velocityZSet = spawnerData.velocityZSet;
-
-        	newSpawnerData.yaw = spawnerData.yaw;
-        	newSpawnerData.pitch = spawnerData.pitch;
-
-        	newSpawnerDataInObject.add(newSpawnerData);
-        	chunks.add(ChunkCoordinate.fromBlockCoords(newSpawnerData.x, newSpawnerData.z));
-        	chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newSpawnerData.x, newSpawnerData.z));
-    	}
-
-		HashSet<BO3ParticleFunction> newParticleDataInObject = new HashSet<BO3ParticleFunction>();
-    	BO3ParticleFunction[] particleDataInObject = settings.particleFunctions[rotation.getRotationId()];
-		for (BO3ParticleFunction particleData : particleDataInObject)
-    	{
-    		BO3ParticleFunction newParticleData = new BO3ParticleFunction();
-
-    		newParticleData.y = y + particleData.y;
-    		newParticleData.x = x + particleData.x;
-    		newParticleData.z = z + particleData.z;
-
-    		newParticleData.particleName = particleData.particleName;
-
-    		newParticleData.interval = particleData.interval;
-
-    		newParticleData.velocityX = particleData.velocityX;
-    		newParticleData.velocityY = particleData.velocityY;
-        	newParticleData.velocityZ = particleData.velocityZ;
-
-        	newParticleData.velocityXSet = particleData.velocityXSet;
-        	newParticleData.velocityYSet = particleData.velocityYSet;
-        	newParticleData.velocityZSet = particleData.velocityZSet;
-
-        	newParticleDataInObject.add(newParticleData);
-        	chunks.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
-        	chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
-    	}
-
-		if(structure != null)
-		{
-			structure.modDataManager.modData.addAll(newModDataInObject);
-			structure.particlesManager.particleData.addAll(newParticleDataInObject);
-			structure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
-
-   			for(ChunkCoordinate structureCoord : chunks)
-    		{
-				if(world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
-				{
-					CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
-					structure.modDataManager.modData.addAll(existingObject.modDataManager.modData);
-					structure.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
-					structure.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
-				}
-				world.getStructureCache().worldInfoChunks.put(structureCoord, structure);
-    		}
-		} else {
-
-			CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(world, this, this.getName(), Rotation.NORTH, x, (short)0, z));
-			placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
-			placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);
-			placeHolderStructure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
-
-   			for(ChunkCoordinate structureCoord : chunksCustomObject)
-    		{
-				if(world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
-				{
-					CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
-					existingObject.modDataManager.modData.addAll(placeHolderStructure.modDataManager.modData);
-					existingObject.particlesManager.particleData.addAll(placeHolderStructure.particlesManager.particleData);
-					existingObject.spawnerManager.spawnerData.addAll(placeHolderStructure.spawnerManager.spawnerData);
-				} else {
-					world.getStructureCache().worldInfoChunks.put(structureCoord, placeHolderStructure);
-				}
-    		}
-		}
-
-    	BO3EntityFunction[] entityDataInObject = settings.entityFunctions[rotation.getRotationId()];
-    	for (BO3EntityFunction entity : entityDataInObject)
-    	{
-    		BO3EntityFunction newEntityData = new BO3EntityFunction();
-
-        	newEntityData.y = y + entity.y;
-        	newEntityData.x = x + entity.x;
-        	newEntityData.z = z + entity.z;
-
-        	newEntityData.mobName = entity.mobName;
-        	newEntityData.groupSize = entity.groupSize;
-        	newEntityData.nameTagOrNBTFileName = entity.nameTagOrNBTFileName;
-        	newEntityData.originalNameTagOrNBTFileName = entity.originalNameTagOrNBTFileName;
-
-        	world.spawnEntity(newEntityData);
-    	}
+        handleBO3Functions(structure, world, random, rotation, x, y, z, chunks);
 
         return true;
+    }
+
+    public void handleBO3Functions(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, HashSet<ChunkCoordinate> chunks)
+    {
+        HashSet<ChunkCoordinate> chunksCustomObject = new HashSet<ChunkCoordinate>();
+
+        HashSet<BO3ModDataFunction> newModDataInObject = new HashSet<BO3ModDataFunction>();
+        BO3ModDataFunction[] modDataInObject = settings.modDataFunctions[rotation.getRotationId()];
+        for (BO3ModDataFunction modData : modDataInObject)
+        {
+            BO3ModDataFunction newModData = new BO3ModDataFunction();
+
+            newModData.y = y + modData.y;
+            newModData.x = x + modData.x;
+            newModData.z = z + modData.z;
+
+            newModData.modData = modData.modData;
+            newModData.modId = modData.modId;
+
+            newModDataInObject.add(newModData);
+            chunks.add(ChunkCoordinate.fromBlockCoords(newModData.x, newModData.z));
+            chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newModData.x, newModData.z));
+        }
+
+        HashSet<BO3SpawnerFunction> newSpawnerDataInObject = new HashSet<BO3SpawnerFunction>();
+        BO3SpawnerFunction[] spawnerDataInObject = settings.spawnerFunctions[rotation.getRotationId()];
+        for (BO3SpawnerFunction spawnerData : spawnerDataInObject)
+        {
+            BO3SpawnerFunction newSpawnerData = new BO3SpawnerFunction();
+
+            newSpawnerData.y = y + spawnerData.y;
+            newSpawnerData.x = x + spawnerData.x;
+            newSpawnerData.z = z + spawnerData.z;
+
+            newSpawnerData.mobName = spawnerData.mobName;
+            newSpawnerData.originalnbtFileName = spawnerData.originalnbtFileName;
+            newSpawnerData.nbtFileName = spawnerData.nbtFileName;
+            newSpawnerData.groupSize = spawnerData.groupSize;
+            newSpawnerData.interval = spawnerData.interval;
+            newSpawnerData.spawnChance = spawnerData.spawnChance;
+            newSpawnerData.maxCount = spawnerData.maxCount;
+
+            newSpawnerData.despawnTime = spawnerData.despawnTime;
+
+            newSpawnerData.velocityX = spawnerData.velocityX;
+            newSpawnerData.velocityY = spawnerData.velocityY;
+            newSpawnerData.velocityZ = spawnerData.velocityZ;
+
+            newSpawnerData.velocityXSet = spawnerData.velocityXSet;
+            newSpawnerData.velocityYSet = spawnerData.velocityYSet;
+            newSpawnerData.velocityZSet = spawnerData.velocityZSet;
+
+            newSpawnerData.yaw = spawnerData.yaw;
+            newSpawnerData.pitch = spawnerData.pitch;
+
+            newSpawnerDataInObject.add(newSpawnerData);
+            chunks.add(ChunkCoordinate.fromBlockCoords(newSpawnerData.x, newSpawnerData.z));
+            chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newSpawnerData.x, newSpawnerData.z));
+        }
+
+        HashSet<BO3ParticleFunction> newParticleDataInObject = new HashSet<BO3ParticleFunction>();
+        BO3ParticleFunction[] particleDataInObject = settings.particleFunctions[rotation.getRotationId()];
+        for (BO3ParticleFunction particleData : particleDataInObject)
+        {
+            BO3ParticleFunction newParticleData = new BO3ParticleFunction();
+
+            newParticleData.y = y + particleData.y;
+            newParticleData.x = x + particleData.x;
+            newParticleData.z = z + particleData.z;
+
+            newParticleData.particleName = particleData.particleName;
+
+            newParticleData.interval = particleData.interval;
+
+            newParticleData.velocityX = particleData.velocityX;
+            newParticleData.velocityY = particleData.velocityY;
+            newParticleData.velocityZ = particleData.velocityZ;
+
+            newParticleData.velocityXSet = particleData.velocityXSet;
+            newParticleData.velocityYSet = particleData.velocityYSet;
+            newParticleData.velocityZSet = particleData.velocityZSet;
+
+            newParticleDataInObject.add(newParticleData);
+            chunks.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
+            chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
+        }
+
+        if (structure != null)
+        {
+            structure.modDataManager.modData.addAll(newModDataInObject);
+            structure.particlesManager.particleData.addAll(newParticleDataInObject);
+            structure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
+
+            for (ChunkCoordinate structureCoord : chunks)
+            {
+                if (world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
+                {
+                    CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
+                    structure.modDataManager.modData.addAll(existingObject.modDataManager.modData);
+                    structure.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
+                    structure.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
+                }
+                world.getStructureCache().worldInfoChunks.put(structureCoord, structure);
+            }
+        } else {
+            CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(world, this, this.getName(), Rotation.NORTH, x, (short) 0, z));
+            placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
+            placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);
+            placeHolderStructure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
+
+            for (ChunkCoordinate structureCoord : chunksCustomObject)
+            {
+                if (world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
+                {
+                    CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
+                    existingObject.modDataManager.modData.addAll(placeHolderStructure.modDataManager.modData);
+                    existingObject.particlesManager.particleData.addAll(
+                            placeHolderStructure.particlesManager.particleData);
+                    existingObject.spawnerManager.spawnerData.addAll(placeHolderStructure.spawnerManager.spawnerData);
+                } else {
+                    world.getStructureCache().worldInfoChunks.put(structureCoord, placeHolderStructure);
+                }
+            }
+        }
+
+        BO3EntityFunction[] entityDataInObject = settings.entityFunctions[rotation.getRotationId()];
+        for (BO3EntityFunction entity : entityDataInObject)
+        {
+            BO3EntityFunction newEntityData = new BO3EntityFunction();
+
+            newEntityData.y = y + entity.y;
+            newEntityData.x = x + entity.x;
+            newEntityData.z = z + entity.z;
+
+            newEntityData.mobName = entity.mobName;
+            newEntityData.groupSize = entity.groupSize;
+            newEntityData.nameTagOrNBTFileName = entity.nameTagOrNBTFileName;
+            newEntityData.originalNameTagOrNBTFileName = entity.originalNameTagOrNBTFileName;
+
+            world.spawnEntity(newEntityData);
+        }
     }
 }

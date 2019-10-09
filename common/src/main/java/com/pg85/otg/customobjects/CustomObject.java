@@ -117,5 +117,7 @@ public interface CustomObject extends SpawnableObject
      * @param chunkCoord The chunk to spawn the objects in.
      * @return Whether at least one object spawned successfully.
      */
-    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);  
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);
+
+    boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);  
 }
