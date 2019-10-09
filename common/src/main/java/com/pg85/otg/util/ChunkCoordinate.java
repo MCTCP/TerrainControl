@@ -114,7 +114,7 @@ public class ChunkCoordinate
     {
         // Because of the way Minecraft population works, objects should never
         // be placed in the bottom left corner of a chunk. That's why this
-        // formula looks a bit overly complicated.
+        // formula looks a bit overly complicated. <-- TODO: Why should objects never be placed in the bottom-left corner of a chunk?
         return new ChunkCoordinate(
                 MathHelper.floor((blockX - CHUNK_POPULATION_OFFSET_X) / (double) CHUNK_X_SIZE),
                 MathHelper.floor((blockZ - CHUNK_POPULATION_OFFSET_Z) / (double) CHUNK_Z_SIZE));

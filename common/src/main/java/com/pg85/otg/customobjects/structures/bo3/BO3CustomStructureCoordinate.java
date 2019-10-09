@@ -32,7 +32,7 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 	
     public boolean spawnWithChecks(CustomStructure structure, LocalWorld world, StructurePartSpawnHeight height, Random random)
     {
-        return ((BO3)object).trySpawnAt(false, structure, world, random, rotation, x, height.getCorrectY(world, x, this.y, z), z, ((BO3)object).getSettings().minHeight, ((BO3)object).getSettings().maxHeight);
+        return ((BO3)object).trySpawnAt(false, structure, world, random, rotation, this.x, height.getCorrectY(world, x, this.y, z), this.z, ((BO3)object).getSettings().minHeight, ((BO3)object).getSettings().maxHeight);
     }
     
     /**
@@ -44,7 +44,7 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
         // In the past we simply returned the chunk populating for the origin
         // of the object. However, the origin is not guaranteed to be at the
         // center of the object. We need to know the exact center to choose
-        // the appropriate spawning chunk.
+        // the appropriate spawning chunk. <-- TODO: Isn't this only the case for BO4's?
 
     	StructuredCustomObject object = getObject();
     	if(object == null)
