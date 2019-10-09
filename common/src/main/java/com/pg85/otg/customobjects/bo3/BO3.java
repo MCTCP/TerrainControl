@@ -155,7 +155,7 @@ public class BO3 implements StructuredCustomObject
         {
             Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
             int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
-            return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 8 + random.nextInt(16));
+            return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
         }
         return null;
     }
@@ -238,6 +238,7 @@ public class BO3 implements StructuredCustomObject
     }
     
     // Used for saplings, trees, customobjects and customstructures
+    // SkipChecks is used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc). TODO: Split this into 2 methods?
     public boolean trySpawnAt(boolean skipChecks, CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
     {
     	if(!skipChecks)
@@ -266,6 +267,7 @@ public class BO3 implements StructuredCustomObject
 	        }
     	}
 
+    	// TODO: Optimise this! Should we really have to check for each block if the world is loaded? ><
         BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());       
         if(!skipChecks)
         {
@@ -281,9 +283,9 @@ public class BO3 implements StructuredCustomObject
 	           	chunkCoord = ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z);
 	        	if(!loadedChunks.contains(chunkCoord))
 	    		{
-	        		if(!world.isLoaded(x + block.x, y + block.y, z + block.z))
+	        		if(!world.isLoaded(x + block.x, y + block.y, z + block.z)) 
 		            {
-	                    // Cannot spawn BO3, part of world is not loaded
+	                    // Cannot spawn BO3, part of world is not loaded TODO: Is this really necessary / should this be necessary? Aren't invalid BO3 customstructures detected when loading branches? Branches shouldn't be able to spawn outside of bounds.
 		                return false;
 		            }
 		            loadedChunks.add(chunkCoord);

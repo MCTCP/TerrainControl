@@ -63,7 +63,7 @@ public class CustomStructurePlotter
 	    	processing = true;
 	        if (!world.isInsidePregeneratedRegion(chunkCoord) && !structureCache.containsKey(chunkCoord))
 	        {
-	            LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8);
+	            LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 7);
 	            BiomeConfig biomeConfig = biome.getBiomeConfig();
 	            ArrayList<CustomStructureGen> customStructureGens = new ArrayList<CustomStructureGen>();
 
@@ -89,8 +89,13 @@ public class CustomStructurePlotter
 	        			{
 	        				if(structure != null) // Structure was in resource list but file could not be found. TODO: Make this prettier!
 	        				{
-		        				structuredCustomObjects.put(structure, structureGen.objectChances.get(i));
-		        				i += 1;
+	        					if(structure instanceof BO4)
+	        					{
+	        						structuredCustomObjects.put(structure, structureGen.objectChances.get(i));
+	        						i += 1;
+	        					} else if(OTG.getPluginConfig().spawnLog) {
+	        						OTG.log(LogMarker.WARN, "CustomStructure " + structure.getName() + " in biome " + biome.getName() + " has IsOTGPlus:false, ignoring.");
+	        					}
 	        				}
 	        			}
 	        		}
@@ -271,7 +276,7 @@ public class CustomStructurePlotter
 							        	            	{
 						            						if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 						            						{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() + j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 8);
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() + j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
 								            					// Get cached data if available
 								            					if(!biome3.getName().equals(biome.getName()))
 									            				{
@@ -339,7 +344,7 @@ public class CustomStructurePlotter
 							        	            	{
 							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 							            					{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() - j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 8);
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() - j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
 								            					if(!biome3.getName().equals(biome.getName()))
 									            				{
 										        	                biomeConfig3 = biome3.getBiomeConfig();
@@ -406,7 +411,7 @@ public class CustomStructurePlotter
 							        	            	{
 							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 							            					{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + j) * 16 + 8);
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + j) * 16 + 7);
 								            					if(!biome3.getName().equals(biome.getName()))
 									            				{
 										        	                biomeConfig3 = biome3.getBiomeConfig();
@@ -473,7 +478,7 @@ public class CustomStructurePlotter
 							        	            	{
 							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 							            					{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - j) * 16 + 8);
+								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - j) * 16 + 7);
 								            					if(!biome3.getName().equals(biome.getName()))
 									            				{
 										        	                biomeConfig3 = biome3.getBiomeConfig();
@@ -644,7 +649,7 @@ public class CustomStructurePlotter
 				            	    			worldInfoChunks.put(chunkCoord, structureStart2);
 
 						                		((BO4)structureCoord.getObject()).getSettings().timesSpawned += 1;
-							                	//biome3 = world.getBiome(spawnCoordX * 16 + 8, spawnCoordZ * 16 + 8);
+							                	//biome3 = world.getBiome(spawnCoordX * 16 + 8, spawnCoordZ * 16 + 7);
 						                		if(OTG.getPluginConfig().spawnLog)
 						                		{
 						                			OTG.log(LogMarker.INFO, "Plotted structure " + structureCoord.getObject().getName() + " at chunk X" + spawnCoordX + " Z" + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
