@@ -17,12 +17,36 @@ import net.minecraftforge.common.DimensionManager;
 
 public class OTGHooks
 {	
+	static boolean checkedOTGInstall = false;
+	static boolean otgIsInstalled = false;
+	private static boolean isOTGInstalled()
+	{
+		if(!checkedOTGInstall)
+		{
+			checkedOTGInstall = true;
+			Object isOTGInstalled = "NoClassDefFoundError";
+			try
+			{
+				if(isOTGInstalled instanceof OTGWorldProvider)
+				{
+
+				}
+				otgIsInstalled = true;
+			}
+			catch(NoClassDefFoundError ex)
+			{
+				// OTG isn't present.
+			}
+		}
+		return otgIsInstalled;
+	}
+	
 	// Make sure that OTG dimensions get initialised by OTGDimensionManager.initDimension
 	// TODO: Isn't OTGDimensionManager.initDimension called in all cases already, does this really need to be core-modded?
 	// Causes problems for Sponge apparently.	
 	public static boolean initOTGDimension(int i)
 	{
-		if(DimensionManager.isDimensionRegistered(i))
+		if(isOTGInstalled() && DimensionManager.isDimensionRegistered(i))
 		{
 			if(OTGDimensionManager.IsOTGDimension(i))
 			{
@@ -35,7 +59,7 @@ public class OTGHooks
 	
 	public static int getIDForObject(Biome biome)
 	{
-		if(biome instanceof IOTGASMBiome)
+		if(isOTGInstalled() && biome instanceof IOTGASMBiome)
 		{
 			return ((IOTGASMBiome)biome).getSavedId();
 		}
@@ -44,22 +68,26 @@ public class OTGHooks
 	
 	public static double getGravityFactor(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled())
 		{
-			return ((OTGWorldProvider)entity.world.provider).getGravityFactor();
-		} else {
-			return 0.08D;
+			if(entity.world.provider instanceof OTGWorldProvider)
+			{
+				return ((OTGWorldProvider)entity.world.provider).getGravityFactor();
+			} else {
+				return 0.08D;
+			}
 		}
+		return 0.08D;
 	}
 	
 	public static boolean isOTGWorld(Entity entity)
 	{
-		return entity.getEntityWorld().provider instanceof OTGWorldProvider;
+		return isOTGInstalled() && entity.getEntityWorld().provider instanceof OTGWorldProvider;
 	}
 
 	public static double getGravityFactorMineCart(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -71,7 +99,7 @@ public class OTGHooks
 
 	public static double getGravityFactorArrow(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -83,7 +111,7 @@ public class OTGHooks
 
 	public static double getGravityFactorBoat(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -95,7 +123,7 @@ public class OTGHooks
 
 	public static double getGravityFactorFallingBlock(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -107,7 +135,7 @@ public class OTGHooks
 
 	public static double getGravityFactorItem(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -119,7 +147,7 @@ public class OTGHooks
 
 	public static double getGravityFactorLlamaSpit(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -131,7 +159,7 @@ public class OTGHooks
 
 	public static double getGravityFactorShulkerBullet(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -143,7 +171,7 @@ public class OTGHooks
 
 	public static float getGravityFactorThrowable(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -155,7 +183,7 @@ public class OTGHooks
 
 	public static double getGravityFactorTNTPrimed(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -167,7 +195,7 @@ public class OTGHooks
 
 	public static double getGravityFactorXPOrb(Entity entity)
 	{
-		if(entity.world.provider instanceof OTGWorldProvider)
+		if(isOTGInstalled() && entity.world.provider instanceof OTGWorldProvider)
 		{
 	    	double baseGravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
 	    	double gravityFactor = ((OTGWorldProvider)entity.world.provider).getGravityFactor();
@@ -180,7 +208,7 @@ public class OTGHooks
 	public static int countMissingRegistryEntries(LinkedHashMap<ResourceLocation, Map<ResourceLocation, Integer>> missing)
 	{
 		// Exclude OTG Biomes.
-		if(missing.containsKey(new ResourceLocation("minecraft", "biomes")))
+		if(isOTGInstalled() && missing.containsKey(new ResourceLocation("minecraft", "biomes")))
 		{
 			Gson gson = new Gson();
 			ArrayList<ResourceLocation> biomesToRemove = new ArrayList<ResourceLocation>();
@@ -194,7 +222,6 @@ public class OTGHooks
 					if(jsonInString.contains(":\"openterraingenerator\","))
 					{
 						biomesToRemove.add(biomeResourceLocation);
-					} else {
 					}
 				}
 			}
