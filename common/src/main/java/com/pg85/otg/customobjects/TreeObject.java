@@ -77,7 +77,12 @@ public class TreeObject implements CustomObject
         int y = world.getHighestBlockYAt(x, z);
         return trySpawnAt(world, random, Rotation.NORTH, x, y, z);
     }
-    //
+    
+    @Override
+    public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+        return world.placeTree(type, random, x, y, z);
+    }
     
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
