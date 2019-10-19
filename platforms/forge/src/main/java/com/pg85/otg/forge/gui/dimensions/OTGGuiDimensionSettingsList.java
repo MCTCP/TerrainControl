@@ -103,15 +103,20 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	        	listEntries.add(new ButtonEntry(this, this, "Teleport"));
 	        }
     	} else {
-	        // If a modder has added default values for this preset then use those, otherwise use the worldconfig
-	        // If this.mc.world is not null then we're ingame
-	        DimensionsConfig defaultConfigs = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.controlsScreen.previousMenu.selectedPreset.getSecond().PresetName);
-	        DimensionConfig defaultConfig = defaultConfigs != null ? defaultConfigs.getDimensionConfig(this.controlsScreen.selectedDimension.PresetName) : null;        
-	        if(defaultConfig == null)
-	        {
-	        	// Get the default values from the world config, stored in presets
-        		defaultConfig = new DimensionConfig(ForgeEngine.Presets.get(this.controlsScreen.selectedDimension.PresetName));
-	        }
+	        
+    		// If a modder has added default values for this preset then use those, otherwise use the worldconfig
+    		DimensionConfig defaultConfig = null;
+    		if(this.mc.isSingleplayer())
+    		{
+		        // If this.mc.world is not null then we're ingame
+		        DimensionsConfig defaultConfigs = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.controlsScreen.previousMenu.selectedPreset.getSecond().PresetName);
+		        defaultConfig = defaultConfigs != null ? defaultConfigs.getDimensionConfig(this.controlsScreen.selectedDimension.PresetName) : null;        
+		        if(defaultConfig == null)
+		        {
+		        	// Get the default values from the world config, stored in presets
+	        		defaultConfig = new DimensionConfig(ForgeEngine.Presets.get(this.controlsScreen.selectedDimension.PresetName));
+		        }
+    		}
         	// TODO: Use const strings instead of hardcoding the same string in multiple places
 	        if(mainMenu)
 	        {

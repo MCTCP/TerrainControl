@@ -46,6 +46,7 @@ public class OTGTeleporter
 {
 	// Items
 
+	// TODO: Dont use worldserver getspawnpoint / getheight etc, use ForgeWorld
     public static Entity changeDimension(int dimensionIn, Entity _this)
     {
     	ITeleporter teleporter = _this.getServer().getWorld(dimensionIn).getDefaultTeleporter();
@@ -147,22 +148,8 @@ public class OTGTeleporter
 		
 		if(forgeWorld == null && ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dimensionIn) != null)
 		{		
-			OTGDimensionManager.initDimension(dimensionIn);
-			
+			OTGDimensionManager.initDimension(dimensionIn);			
 			forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
-	
-			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(dimensionIn == 0 ? "overworld" : forgeWorld.getName());
-			
-			// TODO: Fix teleporttospawnonly when making portals
-			if(dimConfig.Settings.TeleportToSpawnOnly)
-			{
-				BlockPos forgeWorldSpawnPoint = forgeWorld.getSpawnPoint();
-				_this.setLocationAndAngles(forgeWorldSpawnPoint.getX(), forgeWorld.getHighestBlockYAt(forgeWorldSpawnPoint.getX(), forgeWorldSpawnPoint.getZ()), forgeWorldSpawnPoint.getZ(), 0, 0);
-				placeOnHighestBlock = true;
-			} //else {
-				// Find suitable spawn location
-				//_this.setLocationAndAngles(_this.getPosition().getX(), forgeWorld.getHighestBlockYAt(_this.getPosition().getX(), _this.getPosition().getZ(), true, true, false, false), _this.getPosition().getZ(), 0, 0);
-			//}
 		}
        
 		// Entity.setPortal has updated the entity's lastPortalVec incorrectly, 
@@ -213,14 +200,21 @@ public class OTGTeleporter
             {
                 dimensionIn = 1;
             }
-
+            
             //_this.mcServer.getPlayerList().transferPlayerToDimension(_this, dimensionIn, teleporter);
             transferPlayerToDimension(_this, dimensionIn, teleporter, _this.getServer().getPlayerList(), createPortal, false);
             _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
             _this.lastExperience = -1;
             _this.lastHealth = -1.0F;
             _this.lastFoodLevel = -1;
-            ServerPacketManager.sendParticlesPacket(null, _this); // Clear particles            
+            ServerPacketManager.sendParticlesPacket(null, _this); // Clear particles
+            
+            // When using /otg tp and teleportToSpawnOnly:true, place the player at the spawn point
+            if(!createPortal && (forgeWorld != null && forgeWorld.getConfigs().getWorldConfig().teleportToSpawnOnly))
+            {
+            	_this.setPositionAndUpdate(forgeWorld.getSpawnPoint().getX(), forgeWorld.getHighestBlockYAt(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ()) + 1, forgeWorld.getSpawnPoint().getZ());
+            }
+            
             return _this;
         }		
 
@@ -268,6 +262,7 @@ public class OTGTeleporter
         net.minecraftforge.fml.common.FMLCommonHandler.instance().firePlayerChangedDimensionEvent(player, i, dimensionIn);
     }
 
+	// TODO: Dont use worldserver getspawnpoint / getheight etc, use ForgeWorld
     private static void transferEntityToWorld(Entity entityIn, int lastDimension, WorldServer oldWorldIn, WorldServer toWorldIn, net.minecraft.world.Teleporter teleporter, boolean createPortal, boolean placeOnHighestBlock)
     {
     	double entityPosY = entityIn.getPosition().getY();
@@ -587,8 +582,15 @@ public class OTGTeleporter
     {
         if (destinationWorld.provider.getDimensionType().getId() != 1) // If not End
         {
+        	ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(destinationWorld);
+        	if(forgeWorld != null && forgeWorld.getConfigs().getWorldConfig().teleportToSpawnOnly)
+        	{
+        		entityIn.posX = forgeWorld.getSpawnPoint().getX();
+        		entityIn.posY = forgeWorld.getHighestBlockYAt(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ());
+        		entityIn.posZ = forgeWorld.getSpawnPoint().getZ();
+        	}
             if (!placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this))
-            {
+            {            	
             	makePortal(portalMaterial, destinationWorld, entityIn, _this);
             	placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this);
             }
@@ -601,7 +603,7 @@ public class OTGTeleporter
     {
         double d0 = -1.0D;
         int j = MathHelper.floor(entityIn.posX);
-        int k = MathHelper.floor(entityIn.posY);
+        int k = MathHelper.floor(255);
         int l = MathHelper.floor(entityIn.posZ);
         int i1 = j;
         int j1 = k;
@@ -619,7 +621,7 @@ public class OTGTeleporter
                 double d2 = (double)l2 + 0.5D - entityIn.posZ;
                 label146:
 
-                for (int j3 = destinationWorld.getActualHeight() - 1; j3 >= 0; --j3)
+                for (int j3 = 255 - 1; j3 >= 0; --j3)
                 {
                     if (destinationWorld.isAirBlock(blockpos$mutableblockpos.setPos(j2, j3, l2)))
                     {
@@ -658,7 +660,7 @@ public class OTGTeleporter
                                 }
                             }
 
-                            double d5 = (double)j3 + 0.5D - entityIn.posY;
+                            double d5 = (double)j3 + 0.5D - 255;
                             double d7 = d1 * d1 + d5 * d5 + d2 * d2;
 
                             if (d0 < 0.0D || d7 < d0)
@@ -686,7 +688,7 @@ public class OTGTeleporter
                     double d4 = (double)j6 + 0.5D - entityIn.posZ;
                     label567:
 
-                    for (int i7 = destinationWorld.getActualHeight() - 1; i7 >= 0; --i7)
+                    for (int i7 = 255 - 1; i7 >= 0; --i7)
                     {
                         if (destinationWorld.isAirBlock(blockpos$mutableblockpos.setPos(l5, i7, j6)))
                         {
@@ -716,7 +718,7 @@ public class OTGTeleporter
                                     }
                                 }
 
-                                double d6 = (double)i7 + 0.5D - entityIn.posY;
+                                double d6 = (double)i7 + 0.5D - 255;
                                 double d8 = d3 * d3 + d6 * d6 + d4 * d4;
 
                                 if (d0 < 0.0D || d8 < d0)
@@ -748,7 +750,7 @@ public class OTGTeleporter
 
         if (d0 < 0.0D)
         {
-            j1 = MathHelper.clamp(j1, 70, destinationWorld.getActualHeight() - 10);
+            j1 = MathHelper.clamp(j1, 70, 255 - 10);
             k2 = j1;
 
             for (int j7 = -1; j7 <= 1; ++j7)

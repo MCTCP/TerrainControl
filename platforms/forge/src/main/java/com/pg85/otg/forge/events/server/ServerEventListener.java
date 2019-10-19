@@ -1,6 +1,8 @@
 package com.pg85.otg.forge.events.server;
 
 import java.io.File;
+import java.util.ArrayList;
+
 import net.minecraft.world.World;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
@@ -74,7 +76,20 @@ public class ServerEventListener
 						if(modPackConfig != null)
 						{
 							dimsConfig.Overworld = modPackConfig.Overworld;
-							dimsConfig.Dimensions = modPackConfig.Dimensions;
+							ArrayList<DimensionConfig> newDimensions = new ArrayList<DimensionConfig>();
+							for(DimensionConfig dimConfig : modPackConfig.Dimensions)
+							{
+						    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
+					    		{
+						    		File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName + File.separator + "WorldConfig.ini");
+						    		if(worldConfigFile.exists())
+						    		{
+						    			newDimensions.add(dimConfig);
+						    		}
+					    		}
+							}
+							
+							dimsConfig.Dimensions = newDimensions;
 						}
 					}
 					dimsConfig.save();
