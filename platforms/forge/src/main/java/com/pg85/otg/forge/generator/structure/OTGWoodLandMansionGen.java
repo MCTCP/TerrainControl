@@ -17,6 +17,7 @@ import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.structure.MapGenStructureIO;
 import net.minecraft.world.gen.structure.StructureStart;
 
+//TODO: This should inherit from WoodlandMansion, or other mods may trip on it when Forge fires a spawn event.
 public class OTGWoodLandMansionGen extends OTGMapGenStructure
 {
 	static

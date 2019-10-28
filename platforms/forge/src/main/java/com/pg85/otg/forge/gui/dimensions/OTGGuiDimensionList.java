@@ -637,7 +637,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 			// Don't overwrite existing worlds, UI shouldn't allow it anyway
             if (this.mc.getSaveLoader().getWorldInfo(worldName) == null)
             {    				
-        		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.gameDir.getAbsolutePath() + "\\saves\\"), this.worldName);
+        		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.gameDir.getAbsolutePath() + File.separator + "saves" + File.separator), this.worldName);
         		forgeWorldConfig.WorldName = this.worldName;
         		forgeWorldConfig.Overworld = this.dimensions.get(0).clone();
         		forgeWorldConfig.Dimensions = new ArrayList<DimensionConfig>();
