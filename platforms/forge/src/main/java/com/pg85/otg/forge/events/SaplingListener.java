@@ -98,10 +98,9 @@ public class SaplingListener
          */
         private boolean isSameSapling(LocalMaterialData sapling1, LocalMaterialData sapling2)
         {
-        	return (
-					sapling1 == null || 
-            		sapling2 == null
-        			) || (
+        	return 	sapling1 != null && 
+            		sapling2 != null &&
+        			(
     					sapling1.isMaterial(DefaultMaterial.SAPLING) && 
                 		sapling2.isMaterial(DefaultMaterial.SAPLING) && 
                     	sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8
