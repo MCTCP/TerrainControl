@@ -56,7 +56,7 @@ public class ServerEventListener
 		if(!overWorld.isRemote) // Server side only
 		{
 			// This is a vanilla overworld, a new OTG world or a legacy OTG world without a dimensionconfig
-		    if(OTG.getDimensionsConfig() == null)
+		    if(OTG.getDimensionsConfig() == null) // Only happens when creating a new world?
 		    {
 				// Check if there is a dimensionsConfig saved for this world
 				DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(overWorld.getSaveHandler().getWorldDirectory());

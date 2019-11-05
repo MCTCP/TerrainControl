@@ -333,7 +333,13 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean canSnowFallOn()
     {
-        return toDefaultMaterial().canSnowFallOn();
+        DefaultMaterial defaultMaterial = toDefaultMaterial();
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        {
+            return defaultMaterial.canSnowFallOn();
+        }
+
+        return this.blockData == null ? false : this.blockData.getMaterial().isSolid();    	
     }
     
     @Override
