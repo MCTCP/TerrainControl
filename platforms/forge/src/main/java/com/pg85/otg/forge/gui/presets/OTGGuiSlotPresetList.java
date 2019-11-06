@@ -52,22 +52,6 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
     @Override
     protected void elementClicked(int index, boolean doubleClick)
     {
-    	ArrayList<String> presets = new ArrayList<String>(ForgeEngine.Presets.keySet());
-    	// Can't add a preset multiple times for the same world, make name gray and unselectable if it's already present in the world.
-    	if(this.parent.previousMenu instanceof OTGGuiDimensionList)
-    	{
-        	for(DimensionConfig dimConfig : ((OTGGuiDimensionList)this.parent.previousMenu).dimensions)
-        	{
-        		if(
-    				(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(index))) ||
-    				(dimConfig.PresetName == null && OTG.getDimensionsConfig().WorldName.equals(presets.get(index)))
-				)
-        		{
-        			return;
-        		}
-        	}
-    	}
-    	
         this.parent.selectPresetIndex(index);
     }
 

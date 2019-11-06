@@ -155,13 +155,7 @@ public class ForgeWorld implements LocalWorld
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
         this.netherFortressGen = new OTGNetherFortressGen(this);
-        // If there's a modded cavegen, use that, otherwise use the OTG cavegen from the common project.
-        this.cavesGen = new MapGenCaves(); 
-        MapGenBase moddedCaveGen = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(this.cavesGen, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.CAVE);
-        if(this.cavesGen == moddedCaveGen)
-        {
-        	this.cavesGen = null;
-        }
+        this.cavesGen = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new MapGenCaves(), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.CAVE);
         this.strongholdGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGStrongholdGen(configs, world), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
         this.villageGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGVillageGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
         this.mineshaftGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGMineshaftGen(this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);        

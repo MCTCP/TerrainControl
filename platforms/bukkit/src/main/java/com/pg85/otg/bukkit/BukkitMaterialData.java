@@ -77,7 +77,13 @@ public final class BukkitMaterialData implements LocalMaterialData
     @Override
     public boolean canSnowFallOn()
     {
-        return toDefaultMaterial().canSnowFallOn();
+        DefaultMaterial defaultMaterial = toDefaultMaterial();
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        {
+            return defaultMaterial.canSnowFallOn();
+        }
+
+        return this.internalBlock().getMaterial().isSolid();
     }
 
     @Override

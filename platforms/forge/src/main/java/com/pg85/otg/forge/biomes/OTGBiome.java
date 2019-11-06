@@ -16,9 +16,6 @@ import java.util.List;
 
 /**
  * Used for all custom biomes.
- * Note: This class implements some fishy stuff in equals() and hashCode().
- * As a result, comparing any OTGBiome with biomeName "Ocean" to any other
- * OTGBiome with biomeName "Ocean" will return true.
  */
 public class OTGBiome extends Biome implements IOTGASMBiome
 {

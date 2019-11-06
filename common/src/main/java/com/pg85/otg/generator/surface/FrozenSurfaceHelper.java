@@ -139,7 +139,7 @@ public class FrozenSurfaceHelper
         // Decreased snow amounts for leaves
         LocalMaterialData materialToSnowAt = world.getMaterial(x, y, z, false);
         LocalMaterialData materialToSnowOn = world.getMaterial(x, y - 1, z, false);
-        if (materialToSnowAt.isAir() && materialToSnowOn.canSnowFallOn())
+        if (materialToSnowAt != null && materialToSnowAt.isAir() && materialToSnowOn != null && materialToSnowOn.canSnowFallOn())
         {
             this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn);
         }

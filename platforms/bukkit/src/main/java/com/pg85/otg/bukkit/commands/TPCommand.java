@@ -40,9 +40,10 @@ public class TPCommand extends BaseCommand
     	String biomeName = "";
     	for(int i = 0; i < args.size(); i++)
     	{
-    		biomeName += args.get(i);
+    		biomeName += args.get(i) + " ";
     	}
-    	if(biomeName != null && biomeName.length() > 0)
+    	biomeName = biomeName.trim();
+    	if(biomeName.length() > 0)
     	{
     		int biomeId = -1;
     		try

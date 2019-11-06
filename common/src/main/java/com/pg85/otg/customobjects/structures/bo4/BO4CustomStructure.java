@@ -536,9 +536,9 @@ public class BO4CustomStructure extends CustomStructure
     			{
     				if(OTG.getPluginConfig().spawnLog)
     				{
-    					OTG.log(LogMarker.WARN, "Error: Branching BO3 " + this.start.bo3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
+    					OTG.log(LogMarker.WARN, "Error: Branching BO4 " + this.start.bo3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
     				}
-            		throw new InvalidConfigException("Error: Branching BO3 " + this.start.bo3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
+            		throw new InvalidConfigException("Error: Branching BO4 " + this.start.bo3Name + " could not be spawned in minimum configuration (isRequiredBranch branches only).");
     			}
     			
     	        AllBranchesBranchData.clear();
@@ -1895,7 +1895,7 @@ public class BO4CustomStructure extends CustomStructure
 		    {
 		    	ArrayList<String> biomeStructures;
 
-            	LocalBiome biome3 = world.getBiome(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 8);
+            	LocalBiome biome3 = world.getBiome(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
                 BiomeConfig biomeConfig3 = biome3.getBiomeConfig();
                 // Get Bo3's for this biome
                 ArrayList<String> structuresToSpawn = new ArrayList<String>();
@@ -1956,7 +1956,7 @@ public class BO4CustomStructure extends CustomStructure
 		            		    // Check if the structure can spawn in this biome
 		            			ArrayList<String> biomeStructures;
 
-	        	            	LocalBiome biome3 = world.getBiome(x * 16 + 8, z * 16 + 8);
+	        	            	LocalBiome biome3 = world.getBiome(x * 16 + 8, z * 16 + 7);
 	        	                BiomeConfig biomeConfig3 = biome3.getBiomeConfig();
 	        	                // Get Bo3's for this biome
 	        	                ArrayList<String> structuresToSpawn = new ArrayList<String>();

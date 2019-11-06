@@ -179,7 +179,6 @@ public class ObjectSpawner
 		        int x = chunkCoord.getChunkX() * 16;
 		        int z = chunkCoord.getChunkZ() * 16;
 
-		        // Get the biome of the other corner
 		        LocalBiome biome = world.getBiome(x + 15, z + 15);
 
 		        // Null check
@@ -312,7 +311,6 @@ public class ObjectSpawner
 				int x = chunkCoord.getChunkX() * 16;
 				int z = chunkCoord.getChunkZ() * 16;
 
-				// Get the biome of the other corner TODO: explain why?
 				LocalBiome biome = world.getBiome(x + 8, z + 8);
 
 				// Default structures can cause a bigger cascade but we have to spawn them to prevent holes in villages etc
@@ -372,7 +370,6 @@ public class ObjectSpawner
 
 	private void processResourcesPhase2(ChunkCoordinate chunkCoord)
 	{
-		// Get the biome of the other corner TODO: explain why?
 		LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 8);
 
 		if (biome == null)
@@ -430,7 +427,6 @@ public class ObjectSpawner
 		int x = chunkCoord.getChunkX() * 16;
 		int z = chunkCoord.getChunkZ() * 16;
 
-		// Get the biome of the other corner TODO: explain why?
 		LocalBiome biome = world.getBiome(x + 8, z + 8);
 
 		if (biome == null)

@@ -358,6 +358,27 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     	{
     		// This is a vanilla world without dims, save a config without overworld / dims
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+			// Create a dummy overworld config
+    		dimensionsConfig.Overworld = new DimensionConfig();
+			// Check if there is a modpack config for vanilla worlds, 
+			DimensionsConfig modPackConfig = DimensionsConfig.getModPackConfig(null);
+			if(modPackConfig != null)
+			{
+				dimensionsConfig.Overworld = modPackConfig.Overworld;
+				ArrayList<DimensionConfig> newDimensions = new ArrayList<DimensionConfig>();
+				for(DimensionConfig dimConfig : modPackConfig.Dimensions)
+				{
+			    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
+		    		{
+			    		File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName + File.separator + "WorldConfig.ini");
+			    		if(worldConfigFile.exists())
+			    		{
+			    			newDimensions.add(dimConfig);
+			    		}
+		    		}
+				}				
+				dimensionsConfig.Dimensions = newDimensions;
+			}   		
     		dimensionsConfig.save();
     	}
 

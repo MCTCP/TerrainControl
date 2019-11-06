@@ -20,6 +20,7 @@ import net.minecraft.world.gen.structure.MapGenMineshaft;
 import net.minecraft.world.gen.structure.StructureMineshaftStart;
 import net.minecraft.world.gen.structure.StructureStart;
 
+// TODO: This should inherit from MapGenMineshaft, or other mods may trip on it when Forge fires a spawn event.
 public class OTGMineshaftGen extends OTGMapGenStructure
 {
 	public OTGMineshaftGen(ForgeWorld world)

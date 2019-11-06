@@ -19,6 +19,7 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.StructureStart;
 
+//TODO: This should inherit from StructureOceanMonument, or other mods may trip on it when Forge fires a spawn event.
 public class OTGOceanMonumentGen extends OTGMapGenStructure
 {
     private int spacing = 32;

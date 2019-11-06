@@ -55,6 +55,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     private OTGGuiScrollingList presetInfo;
     private int selected = -1;
     public Tuple<String, DimensionConfigGui> selectedPreset;
+    private GuiButton btnDelete;
     private GuiButton btnContinue;
     
     int listWidth = 150;
@@ -122,7 +123,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         this.selected = index;
         Entry<String, DimensionConfigGui> entry = index >= 0 ? new ArrayList<Entry<String, DimensionConfigGui>>(ForgeEngine.Presets.entrySet()).get(selected) : null;
         this.selectedPreset = entry != null ? new Tuple<String, DimensionConfigGui>(entry.getKey(), entry.getValue()) : null;
-
+    	
         updateCache();
     }
 
@@ -141,6 +142,29 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         	this.presetInfo = new OTGGuiScrollingListInfo(this, null, null, null);           	
             return;
         }
+        
+    	ArrayList<String> presets = new ArrayList<String>(ForgeEngine.Presets.keySet());
+    	// When using the O menu ingame, can't delete a preset that's currently in use. 
+    	if(this.previousMenu instanceof OTGGuiDimensionList)
+    	{
+    		boolean bFound = false;
+        	for(DimensionConfig dimConfig : ((OTGGuiDimensionList)this.previousMenu).dimensions)
+        	{
+        		if(
+    				(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(this.selected))) ||
+    				(dimConfig.PresetName == null && OTG.getDimensionsConfig().WorldName.equals(presets.get(this.selected)))
+				)
+        		{
+        			bFound = true;
+        			break;
+        		}
+        	}
+			this.btnContinue.enabled = !bFound;
+			this.btnDelete.enabled = !bFound;
+    	} else {
+        	this.btnContinue.enabled = true;
+        	this.btnDelete.enabled = true;
+    	}
 
         // Use OTG's logo as the default logo if there is no worldpacker jar for this world.
         String modId = this.selectedPreset.getSecond().worldPackerModName;
@@ -268,30 +292,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         if(ForgeEngine.Presets.size() > 0)
         {
         	ArrayList<String> presets = new ArrayList<String>(ForgeEngine.Presets.keySet());
-        	int selectPreset = -1;
-        	// Can't add a preset multiple times for the same world, make name gray and unselectable if it's already present in the world.
-        	if(this.previousMenu instanceof OTGGuiDimensionList)
-        	{
-        		for(int i = 0; i < presets.size(); i++)
-        		{
-        			boolean bFound = false;
-		        	for(DimensionConfig dimConfig : ((OTGGuiDimensionList)this.previousMenu).dimensions)
-		        	{
-		        		if(dimConfig.PresetName != null && dimConfig.PresetName.equals(presets.get(i)))
-		        		{
-		        			bFound = true;
-		        			break;
-		        		}
-		        	}
-		        	if(!bFound)
-		        	{
-		        		selectPreset = i;
-		        		break;
-		        	}
-        		}
-        	} else {
-        		selectPreset = 0;
-        	}
+        	int selectPreset = 0;
         	
             this.selected = selectPreset;
             if(selectPreset > -1)
@@ -318,7 +319,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     	btnClone.enabled = this.mc.world == null || this.mc.isSingleplayer(); // Don't allow creating/deleting presets for MP    	
     	this.buttonList.add(btnClone);
     	
-    	GuiButton btnDelete = new GuiButton(iDeleteButton, OTGGuiPresetList.this.leftMargin, this.height - (btnBottomMargin - 24), listWidth, 20, "Delete");
+    	btnDelete = new GuiButton(iDeleteButton, OTGGuiPresetList.this.leftMargin, this.height - (btnBottomMargin - 24), listWidth, 20, "Delete");
     	btnDelete.enabled = this.mc.world == null || this.mc.isSingleplayer(); // Don't allow creating/cloning/deleting presets for MP
         this.buttonList.add(btnDelete);
 
@@ -415,15 +416,18 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
                 }
                 case iCloneButton:
                 {
-                	askDeleteSettings = false;
-                	selectingNewPresetName = false;
-                	selectingClonePresetName = true;
-    				this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, selectedPreset.getFirst()));
-                    return;
+                	if(this.selectedPreset != null)
+                	{
+	                	askDeleteSettings = false;
+	                	selectingNewPresetName = false;
+	                	selectingClonePresetName = true;
+	    				this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, selectedPreset.getFirst()));
+	                    return;
+                	}
                 }                
                 case iDeleteButton:
                 {
-                	if(selectedPreset != null)
+                	if(this.selectedPreset != null)
                 	{
                 		this.mc.displayGuiScreen(askDeleteSettings(this, selectedPreset.getFirst()));
                 	}

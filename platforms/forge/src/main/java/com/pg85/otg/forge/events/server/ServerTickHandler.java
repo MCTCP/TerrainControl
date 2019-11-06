@@ -775,7 +775,18 @@ public class ServerTickHandler
 			if(player.getPosition().getY() < dimConfig.Settings.DimensionBelowHeight)
 			{
 				ForgeWorld destinationWorld;
-				if(OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.Settings.DimensionBelow))
+				// TODO: NullPointerException here, only happens sometimes when adding a dim with dimensionbelow that doesnt exist,
+				// then teleporting to the dim after having just created it, then falling down and trying to load the dim below.
+				// May be some race condition where the dimconfig isnt loaded yet?
+				if(
+					(
+						OTG.getDimensionsConfig().Overworld.PresetName == null && 
+						dimConfig.Settings.DimensionBelow.toLowerCase().trim().equals("overworld")
+					) || (
+						OTG.getDimensionsConfig().Overworld.PresetName != null && 
+						OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.Settings.DimensionBelow)
+					)
+				)
 				{
 					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
 				} else {
@@ -808,7 +819,15 @@ public class ServerTickHandler
 			if(player.getPosition().getY() > dimConfig.Settings.DimensionAboveHeight)
 			{
 				ForgeWorld destinationWorld;
-				if(OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.Settings.DimensionAbove))
+				if(
+					(
+						OTG.getDimensionsConfig().Overworld.PresetName == null && 
+						dimConfig.Settings.DimensionAbove.toLowerCase().trim().equals("overworld")
+					) ||  (
+						OTG.getDimensionsConfig().Overworld.PresetName != null && 
+						OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.Settings.DimensionAbove)
+					)
+				)
 				{
 					destinationWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
 				} else {

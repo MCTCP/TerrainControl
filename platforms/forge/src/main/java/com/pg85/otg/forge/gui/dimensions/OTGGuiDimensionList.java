@@ -124,15 +124,21 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         } else {
 	        
 	        // If a modpack creator has added a default config, use that, otherwise use world config.
-	        DimensionsConfig defaultConfig = DimensionsConfig.getModPackConfig(previousMenu.selectedPreset.getFirst());
-	        if(defaultConfig != null)
-	        {
-	        	this.dimensions.add(defaultConfig.Overworld.clone());
-	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
-	        	{
-	        		this.dimensions.add(dimConfig.clone());	        		
-	        	}	        	
-	        } else {
+        	DimensionsConfig defaultConfig = null;
+        	if(Minecraft.getMinecraft().isSingleplayer())
+        	{
+		        defaultConfig = DimensionsConfig.getModPackConfig(previousMenu.selectedPreset.getFirst());
+		        if(defaultConfig != null)
+		        {
+		        	this.dimensions.add(defaultConfig.Overworld.clone());
+		        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
+		        	{
+		        		this.dimensions.add(dimConfig.clone());	        		
+		        	}
+		        }
+	        }
+        	if(!Minecraft.getMinecraft().isSingleplayer() || defaultConfig == null)
+        	{
 	        	// Add overworld
 		        this.dimensions.add(new DimensionConfig(previousMenu.selectedPreset.getSecond()));
 		                
@@ -233,21 +239,28 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    			// Creating a new dim, create config with the chosen preset
 	    	        // If a modpack creator has included a default config for the chosen preset in the overworld's preset, use that, otherwise use the preset's world config.
     				// If world isn't null the we're ingame
-	    	        DimensionsConfig defaultConfig = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.previousMenu.selectedPreset.getFirst());
-	    	        if(defaultConfig != null)
+    				boolean bFoundDefaultSettigForDim = false;
+    				if(Minecraft.getMinecraft().isSingleplayer())
+    				{
+		    	        DimensionsConfig defaultConfig = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.previousMenu.selectedPreset.getFirst());
+		    	        if(defaultConfig != null)
+		    	        {
+		    	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
+		    	        	{
+		    	        		if(dimConfig.PresetName.equals(this.selectPresetForDimensionMenu.selectedPreset.getFirst()))
+	    	        			{
+		    	        			DimensionConfig newConfig = dimConfig.clone();
+		    	        			// If world is not null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
+		    	        			newConfig.isNewConfig = this.mc.world != null;
+		    	        			this.dimensions.add(newConfig);
+		    	        			bFoundDefaultSettigForDim = true;
+		    	        			break;
+		    	        		}
+		    	        	}
+		    	        }
+    				}
+	    	        if(!bFoundDefaultSettigForDim)
 	    	        {
-	    	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
-	    	        	{
-	    	        		if(dimConfig.PresetName.equals(this.selectPresetForDimensionMenu.selectedPreset.getFirst()))
-    	        			{
-	    	        			DimensionConfig newConfig = dimConfig.clone();
-	    	        			// If world is not null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
-	    	        			newConfig.isNewConfig = this.mc.world != null;
-	    	        			this.dimensions.add(newConfig);	    	        			
-	    	        			break;
-	    	        		}
-	    	        	}
-	    	        } else {
 	    	        	// Add only the overworld for the chosen preset, don't add dimensions.
 	    	        	DimensionConfig newConfig = new DimensionConfig(this.selectPresetForDimensionMenu.selectedPreset.getSecond());
 	        			// If world is nnot null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
@@ -624,7 +637,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 			// Don't overwrite existing worlds, UI shouldn't allow it anyway
             if (this.mc.getSaveLoader().getWorldInfo(worldName) == null)
             {    				
-        		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.gameDir.getAbsolutePath() + "\\saves\\"), this.worldName);
+        		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.gameDir.getAbsolutePath() + File.separator + "saves" + File.separator), this.worldName);
         		forgeWorldConfig.WorldName = this.worldName;
         		forgeWorldConfig.Overworld = this.dimensions.get(0).clone();
         		forgeWorldConfig.Dimensions = new ArrayList<DimensionConfig>();

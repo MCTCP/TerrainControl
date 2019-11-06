@@ -56,7 +56,6 @@ public class EntityTravelToDimensionListener
 				}
 			}
 			
-			OTG.log(LogMarker.INFO, "PortalFound: " + portalFound);
 			if(!portalFound)
 			{
 				return;
@@ -70,9 +69,7 @@ public class EntityTravelToDimensionListener
 				playerPortalMaterialBlockPos = new BlockPos(playerPortalMaterialBlockPos.getX(), playerPortalMaterialBlockPos.getY() - 1, playerPortalMaterialBlockPos.getZ());
 				blockState = entityWorld.getBlockState(playerPortalMaterialBlockPos);
 			}
-			
-			OTG.log(LogMarker.INFO, "PortalMaterial: " + ForgeMaterialData.ofMinecraftBlockState(blockState).toDefaultMaterial().toString());
-			
+					
 			// Find portal material for OTG dimensions and see if they match
 			ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
 			int destinationDim = 0;
@@ -94,7 +91,6 @@ public class EntityTravelToDimensionListener
 					{
 						bIsPortalMaterial = true;
 						bOTGPortalFound = true;
-						OTG.log(LogMarker.INFO, "OTG PortalMaterial found: " + portalMaterial.toDefaultMaterial().toString());
 						break;
 					}
 				}
@@ -142,7 +138,6 @@ public class EntityTravelToDimensionListener
 			if(!bOTGPortalFound)
 			{
 				// No custom OTG dimensions exists with this material.
-				OTG.log(LogMarker.INFO, "No OTG portal material found for portal.");
 				return;
 			}
 

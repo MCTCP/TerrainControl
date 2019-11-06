@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+//TODO: This should inherit from MapGenVillage, or other mods may trip on it when Forge fires a spawn event.
 public class OTGVillageGen extends OTGMapGenStructure
 {
     /**

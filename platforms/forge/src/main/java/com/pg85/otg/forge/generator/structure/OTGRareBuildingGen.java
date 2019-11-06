@@ -19,6 +19,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.gen.structure.*;
 
+//TODO: This should inherit from MapGenScatteredFeature, or other mods may trip on it when Forge fires a spawn event.
 public class OTGRareBuildingGen extends OTGMapGenStructure
 {
     private List<Biome> biomeList;

@@ -133,8 +133,16 @@ public class OTGDimensionManager
 	
 	public static boolean IsOTGDimension(int dimensionId)
 	{
-		return dimensionId == 0 || (DimensionManager.isDimensionRegistered(dimensionId) && DimensionManager.getProviderType(dimensionId).suffix.equals("OTG")); 
-		//return orderedDimensions.containsKey(dimensionId);
+		if(dimensionId == 0)
+		{
+			return true;
+		}			
+		DimensionType dimType = DimensionManager.isDimensionRegistered(dimensionId) ? DimensionManager.getProviderType(dimensionId) : null;
+		if(dimType != null && dimType.suffix != null) // Can be null for modded dims like Galacticraft dims.
+		{
+			return dimType.suffix.equals("OTG"); 
+		}
+		return false;
 	}
 
 	static ArrayList<Integer> GetOTGDimensions()
