@@ -1,5 +1,5 @@
 name: OpenTerrainGenerator
-version: 1.12.2 v8.2_r1
+version: 1.12.2 v8.3_r1
 description: Generate anything! This mod is made by PG85 and is a fork of TerrainControl, which was made by Khorn, Olof Cayorion Larsson, RutgerKok and Timethor.
 authors: ['PeeGee85', 'RutgerKok', 'TimeThor', 'Khorn', 'Olof Cayorion Larsson']
 main: com.pg85.otg.bukkit.OTGPlugin
