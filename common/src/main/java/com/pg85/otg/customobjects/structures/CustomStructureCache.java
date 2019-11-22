@@ -28,7 +28,7 @@ import java.util.Random;
 public class CustomStructureCache
 {
 	// Key not present in structurecache == was never populated or plotted
-	// Key is present and Value is CustomObjectStructure with null as Start == plotted as emtpy chunk (this chunk was populated but no BO3 was plotted on it so only add trees, lakes, ores etc)
+	// Key is present and Value is CustomObjectStructure with null as Start == plotted as empty chunk (this chunk was populated but no BO3 was plotted on it so only add trees, lakes, ores etc)
 	// Key is present and Value is CustomObjectStructure with non-null as Start == plotted with BO3
 	// Key is present and Value is null == plotted and spawned
 	// If a chunk of a CustomObjectStructure has been spawned then the CustomObjectStructure's SmoothingAreasToSpawn and ObjectsToSpawn entries for that chunk

@@ -18,7 +18,7 @@ public class OTGASMModContainer extends DummyModContainer
 		meta.modId = "otgcore";
 		meta.name = "OTG Core";
 		meta.description = "Allows missing OTG biomes in the registry when a client connects to the server. OTG sends and registers the missing biomes on the client before the player joins the world. Also makes sure the correct biome is returned when querying the registry by id. Also allows gravity settings per world/dimension.";
-		meta.version = "1.12.2 - v8.3_r1";
+		meta.version = "1.12.2 - v8.3_r2";
 		List<String> authorList = new ArrayList<String>();
 		authorList.add("PG85");
 		meta.authorList = authorList;
