@@ -3,6 +3,7 @@ package com.pg85.otg.customobjects.bo4.bo4function;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 import com.pg85.otg.customobjects.bo4.BO4Config;
@@ -61,7 +62,7 @@ public class BO4ModDataFunction extends ModDataFunction<BO4Config>
         StreamHelper.writeStringToStream(stream, this.modData);
     }
     
-    public static BO4ModDataFunction fromStream(BO4Config holder, MappedByteBuffer buffer) throws IOException
+    public static BO4ModDataFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException
     {
     	BO4ModDataFunction modDataFunction = new BO4ModDataFunction(holder);
     	

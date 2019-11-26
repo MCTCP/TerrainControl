@@ -45,7 +45,7 @@ public class StreamHelper
 	    }
 	}
 	
-	public static String readStringFromBuffer(MappedByteBuffer buffer) throws IOException
+	public static String readStringFromBuffer(ByteBuffer buffer) throws IOException
 	{
 		boolean isNull = buffer.get() != 0;
 		if(isNull)

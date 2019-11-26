@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.List;
 import java.util.Random;
@@ -269,7 +270,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         }
     }
     
-    public static BO4RandomBlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, MappedByteBuffer buffer) throws IOException
+    public static BO4RandomBlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer) throws IOException
     {    	
     	BO4RandomBlockFunction rbf = new BO4RandomBlockFunction(holder);
     	
