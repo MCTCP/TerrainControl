@@ -588,9 +588,12 @@ public class Pregenerator
 			right = Integer.parseInt(pregeneratedChunksFileValues[3]);
 			bottom = Integer.parseInt(pregeneratedChunksFileValues[4]);
 
-			cycle = Integer.parseInt(pregeneratedChunksFileValues[5]);
+			//cycle = Integer.parseInt(pregeneratedChunksFileValues[5]);
+			// This should hopefully fix corrupted pregendata saves for > v6 < v8.3_r4
+			cycle = Math.min(Math.min(Math.min(left, top), right), bottom) + 1;
+			
 			startTime = System.currentTimeMillis() - Long.parseLong(pregeneratedChunksFileValues[6]); // Elapsed time
-
+		
 			iTop = Integer.parseInt(pregeneratedChunksFileValues[7]);
 			iBottom = Integer.parseInt(pregeneratedChunksFileValues[8]);
 			iLeft = Integer.parseInt(pregeneratedChunksFileValues[9]);
