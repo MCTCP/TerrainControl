@@ -40,6 +40,11 @@ public final class BiomeColorsListener
                 {
                     // Ignored, try in next world
                 }
+                catch (NoSuchMethodError e)
+                {
+                    // Thrown when a mod biome doesn't have the method getBiomeName, making it fail to get the biomeconfig
+                    // Ignored, as biomes from OTG should never throw this
+                }
 
                 if (biome == null)
                 {
