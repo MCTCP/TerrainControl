@@ -1,5 +1,12 @@
 package com.pg85.otg.customobjects.bo2;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map.Entry;
+import java.util.Random;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -14,13 +21,6 @@ import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map.Entry;
-import java.util.Random;
 
 /**
  * The good old BO2.
@@ -54,7 +54,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
         super(reader);
     }
-    
+
     @Override
     public boolean canSpawnAsTree()
     {
@@ -99,7 +99,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
         return true;
     }
-    
+
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
@@ -112,7 +112,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             {
                 setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
             }
-            else if (dig)
+			else if (dig)
             {
                 setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
             }
@@ -125,13 +125,13 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
     	throw new RuntimeException();
     }
-    
+
     @Override
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
     {
     	throw new RuntimeException();
     }
-    
+
     private boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
     {    	
         // Basic checks
@@ -145,17 +145,17 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         {
             return false;
         }
-    	
+
         if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z, false)))
         {
             return false;
         }
-        
+
         if (needsFoundation && world.isNullOrAir(x, y - 5, z, false))
         {
             return false;
         }
-        
+
         LocalMaterialData checkBlock = !spawnWater || !spawnLava ? world.getMaterial(x, y + 2, z, false) : null;
         DefaultMaterial checkBlockDefaultMaterial = checkBlock.toDefaultMaterial();
         if (!spawnWater)
@@ -193,6 +193,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
         HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
         ChunkCoordinate chunkCoord;        
+
         for (ObjectCoordinate point : objData)
         {
             if (y + point.y < PluginStandardValues.WORLD_DEPTH || y + point.y >= PluginStandardValues.WORLD_HEIGHT)
@@ -312,14 +313,14 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         int randomRoll = rand.nextInt(100);
         int ObjectRarity = rarity;
         boolean objectSpawned = false;
-        
+
         while (randomRoll < ObjectRarity)
         {
             ObjectRarity -= 100;
 
             int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            
+
             objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);
         }
 
@@ -374,19 +375,16 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
         ArrayList<ObjectCoordinate> coordinates = new ArrayList<ObjectCoordinate>();
 
-        // TODO: Reimplement this?       
+        // TODO: Reimplement this?
         /*
-        for (RawSettingValue line : reader.getRawSettings())
-        {
-            String[] lineSplit = line.getRawValue().split(":", 2);
-            if (lineSplit.length != 2)
-                continue;
-
-            ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]);
-            if (buffer != null)
-                coordinates.add(buffer);
-        }
-        */
+         * for (RawSettingValue line : reader.getRawSettings()) { String[]
+         * lineSplit = line.getRawValue().split(":", 2); if (lineSplit.length !=
+         * 2) continue;
+         * 
+         * ObjectCoordinate buffer =
+         * ObjectCoordinate.getCoordinateFromString(lineSplit[0], lineSplit[1]);
+         * if (buffer != null) coordinates.add(buffer); }
+         */
         for (Entry<String, String> line : reader.getRawSettings())
         {
             ObjectCoordinate buffer = ObjectCoordinate.getCoordinateFromString(line.getKey(), line.getValue());
@@ -415,20 +413,23 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
 
     }
-    
+
     private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
     {
-	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
-	    if(blocksToReplace != null && blocksToReplace.size() > 0)
-	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
-	    	if(targetBlock != null)
-	    	{
-	    		material = targetBlock;	    		
-	    	}
-	    }
-	    world.setBlock(x, y, z, material, metaDataTag, false);
-    }       
+        HashMap<DefaultMaterial, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+        if (blocksToReplace != null && blocksToReplace.size() > 0)
+        {
+            LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+            if (targetBlock != null)
+            {
+                material = targetBlock;
+            }
+        }
+        
+        material.parseForWorld(world);
+
+        world.setBlock(x, y, z, material, metaDataTag, false);
+    }
 
     @Override
     public boolean onEnable()
@@ -441,5 +442,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
         readConfigSettings();
         correctSettings();
+    }
+
+    @Override
+    public boolean loadChecks()
+    {
+        return true;
     }
 }

@@ -223,4 +223,9 @@ public class ForgeEngine extends OTGEngine
 	{
         return ForgeEventFactory.onReplaceBiomeBlocks(((ForgeWorld)localWorld).getChunkGenerator(), x, z, ((ForgeChunkBuffer)chunkBuffer).getChunkPrimer(), ((ForgeWorld)localWorld).getWorld());
 	}
+
+	@Override
+	public boolean isModLoaded(String mod) {
+		return Loader.isModLoaded(mod);
+	}
 }

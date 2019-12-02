@@ -11,6 +11,7 @@ public class MaterialHelper
 {
     private static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
     /**
+     * @throws InvalidConfigException 
      * @see OTGEngine#readMaterial(String)
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
@@ -54,8 +55,7 @@ public class MaterialHelper
     	}
     	catch(InvalidConfigException ex)
     	{
-    		CachedMaterials.put(originalName, null);
-    		throw ex;
+    		//TODO this shouldn't happen anymore
     	}
 
     	CachedMaterials.put(originalName, material);

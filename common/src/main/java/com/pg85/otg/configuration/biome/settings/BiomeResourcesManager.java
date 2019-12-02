@@ -1,17 +1,18 @@
 package com.pg85.otg.configuration.biome.settings;
 
-import com.pg85.otg.configuration.ConfigFunction;
-import com.pg85.otg.configuration.ErroredFunction;
-import com.pg85.otg.configuration.biome.BiomeGroup;
-import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.generator.resource.*;
-
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.ErroredFunction;
+import com.pg85.otg.configuration.biome.BiomeGroup;
+import com.pg85.otg.configuration.fallbacks.BlockFallback;
+import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.generator.resource.*;
 
 public class BiomeResourcesManager
 {
@@ -24,6 +25,8 @@ public class BiomeResourcesManager
 
         // Functions in WorldConfigs
         registerConfigFunction("BiomeGroup", BiomeGroup.class);
+        
+        registerConfigFunction("BlockFallback", BlockFallback.class);
 
         // Functions in BiomeConfigs
         registerConfigFunction("AboveWaterRes", AboveWaterGen.class);

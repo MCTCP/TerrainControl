@@ -1,5 +1,14 @@
 package com.pg85.otg.customobjects.bo4;
 
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
@@ -9,7 +18,6 @@ import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
-import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
@@ -26,11 +34,13 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -91,7 +101,7 @@ public class BO4 implements StructuredCustomObject
     
     public void generateBO4Data()
     {
-        //write it down to disk
+        //write to disk
 		String filePath = 
 			this.settings.getFile().getAbsolutePath().endsWith(".BO4") ? this.settings.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
 			this.settings.getFile().getAbsolutePath().endsWith(".bo4") ? this.settings.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
@@ -102,14 +112,23 @@ public class BO4 implements StructuredCustomObject
         File file = new File(filePath);
         if(!file.exists())
         {
-            try {
-                FileOutputStream fos = new FileOutputStream(file);
-                DataOutputStream dos = new DataOutputStream(fos);
-                this.settings.writeToStream(dos);
-                dos.close();
-            } catch (FileNotFoundException e) {
+            try {                
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				DataOutputStream dos = new DataOutputStream(bos);
+				this.settings.writeToStream(dos);
+				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
+				dos.close();
+				FileOutputStream fos = new FileOutputStream(file);
+				DataOutputStream dos2 = new DataOutputStream(fos);
+				dos2.write(compressedBytes, 0, compressedBytes.length);
+				dos2.close();
+            }
+            catch (FileNotFoundException e)
+            {
                 e.printStackTrace();
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 e.printStackTrace();
             }
         }
@@ -936,9 +955,14 @@ public class BO4 implements StructuredCustomObject
 
         if(OTG.getPluginConfig().spawnLog && (System.currentTimeMillis() - startTime) > 50)
         {
-        	OTG.log(LogMarker.WARN, "Warning: Spawning BO3 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
+        	OTG.log(LogMarker.WARN, "Warning: Spawning BO4 " + this.getName()  + " took " + (System.currentTimeMillis() - startTime) + " Ms.");
         }
 
         return true;
     }
+
+	@Override
+	public boolean loadChecks() {
+		return true;
+	}
 }

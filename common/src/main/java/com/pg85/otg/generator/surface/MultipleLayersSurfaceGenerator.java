@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.surface;
 
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.ChunkBuffer;
@@ -36,7 +37,7 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
     }
 
     @Override
-    public void spawn(long worldSeed, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
+    public void spawn(LocalWorld world, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
     {
         int x = xInWorld & 0xf;
         int z = zInWorld & 0xf;
@@ -46,13 +47,13 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         {
             if (noise <= layer.maxNoise)
             {
-                spawnColumn(layer.surfaceBlock, layer.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
+                spawnColumn(world, layer.surfaceBlock, layer.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
                 return;
             }
         }
 
         // Fall back on normal column
-        spawnColumn(config.surfaceBlock, config.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
+        spawnColumn(world, config.surfaceBlock, config.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
     }
 
     @Override

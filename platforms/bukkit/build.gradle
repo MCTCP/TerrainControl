@@ -5,6 +5,7 @@ apply plugin: 'java'
 // Project properties
 archivesBaseName = "openterraingenerator-bukkit"
 description = "Open Terrain Generator for Bukkit"
+ext.worldeditVersion = "6.1.5"
 ext.bukkitVersion = "1.12.2-R0.1-SNAPSHOT"
 
 repositories
@@ -19,12 +20,17 @@ repositories
     {   // For Bukkit API, updated by Spigot
 		url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
     }
+    maven 
+    {   // Worldedit API
+   		url "https://maven.sk89q.com/repo/" 
+   	}
 }
 
 dependencies
 {
     compile 'org.bukkit:bukkit:' + project.ext.bukkitVersion
     compile 'org.spigotmc:spigot:' + project.ext.bukkitVersion
+    compileOnly 'com.sk89q.worldedit:worldedit-bukkit:' + project.ext.worldeditVersion
     compile project(':common')
     compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
     compile 'org.apache.logging.log4j:log4j-core:2.0-beta9'

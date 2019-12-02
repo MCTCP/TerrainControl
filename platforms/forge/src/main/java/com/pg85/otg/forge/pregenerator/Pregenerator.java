@@ -9,6 +9,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import net.minecraft.world.gen.ChunkProviderServer;
 
@@ -17,6 +18,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 
@@ -40,7 +42,7 @@ public class Pregenerator
 	private double total;
 	private int spawnedThisTick = 0;
 	private int lastSpawnedWhenSaved = 0;
-	private int compressCustomStructureCacheThreshHold = 10000;
+	private int compressCustomStructureCacheThreshHold = 1000;
 	private boolean pregeneratorIsRunning;
 	private int maxSpawnPerTick;
 
@@ -182,10 +184,10 @@ public class Pregenerator
         	// Rectangle grows: Add row to right, add row to left, add row to bottom, add row to top, repeat.
         	// TODO: Rewrite to make use of the way MC groups chunks into region files?
 
-    		boolean leftEdgeFound = false;
-    		boolean rightEdgeFound = false;
-    		boolean topEdgeFound = false;
-    		boolean bottomEdgeFound = false;
+    		boolean leftEdgeFound = left >= pregenerationRadius;
+    		boolean rightEdgeFound = right >= pregenerationRadius;
+    		boolean topEdgeFound = top >= pregenerationRadius;
+    		boolean bottomEdgeFound = bottom >= pregenerationRadius;
 
     		spawnedThisTick = 0;
 
@@ -193,32 +195,23 @@ public class Pregenerator
     		int spawnChunkZ = preGeneratorCenterPoint.getChunkZ();
 
 			// This cycle might be stopped at any point because of the max chunks per server tick.
-			// Progress within a cycle is tracked using iTop, iBottom, iLeft, iRight
-			while(!(leftEdgeFound && rightEdgeFound && topEdgeFound && bottomEdgeFound))
+			// Progress within a cycle is tracked using iTop, iBottom, iLeft, iRight		    	
+    		while(!(leftEdgeFound && rightEdgeFound && topEdgeFound && bottomEdgeFound))
 			{
-	    		// Since the first cycle is cycle 1, the centermost chunk (at the spawnpoint) wont be pregenerated.
-				if(cycle == 0)
+	    		// Generate the center block
+				if(cycle == 0 && spawned == 0)
 				{
-					spawned++;
 					pregenerateChunk(spawnChunkX, spawnChunkZ);
+					cycle += 1;
 	    			if(spawnedThisTick >= maxSpawnPerTick)
 	    			{
-	    				cycle += 1;
 	    				pause();
 	    				return;
 	    			}
 				}
-
-				cycle += 1;
-
-	    		// Check Right
-	    		if(right >= pregenerationRadius)
+				
+	    		if(!rightEdgeFound && iBottom == Integer.MIN_VALUE && iTop == Integer.MIN_VALUE && iRight < bottom)
 	    		{
-	    			rightEdgeFound = true;
-	    		}
-	    		if(!rightEdgeFound && iLeft == Integer.MIN_VALUE && iTop == Integer.MIN_VALUE && iBottom == Integer.MIN_VALUE)
-	    		{
-	    			boolean bSpawned = false;
 	    			for(int i = -top; i <= bottom; i++)
 	    			{
 	    				currentX = spawnChunkX + cycle;
@@ -226,10 +219,8 @@ public class Pregenerator
 
 						if(i > iRight) // Check if we haven't generated this chunk in a previous server tick
 						{
-							bSpawned = true;
 							iRight = i;
-		    				spawned++;
-
+							
 							pregenerateChunk(currentX, currentZ);
 
 			    			if(spawnedThisTick >= maxSpawnPerTick)
@@ -237,26 +228,25 @@ public class Pregenerator
 			    				if(i == bottom)
 			    				{
 			    					right++;
+			    	        		if(right >= pregenerationRadius)
+			    	        		{
+			    	        			rightEdgeFound = true;
+			    	        		}
 			    				}
 			    				pause();
 			    				return;
 			    			}
 						}
 	    			}
-	    			if(bSpawned)
-	    			{
-	    				right++;
-	    			}
+    				right++;
+	        		if(right >= pregenerationRadius)
+	        		{
+	        			rightEdgeFound = true;
+	        		}
 	    		}
 
-        		// Check Left
-	    		if(left >= pregenerationRadius)
+	    		if(!leftEdgeFound && iBottom == Integer.MIN_VALUE && iTop == Integer.MIN_VALUE && iLeft < bottom)
 	    		{
-	    			leftEdgeFound = true;
-	    		}
-	    		if(!leftEdgeFound && iTop == Integer.MIN_VALUE && iBottom == Integer.MIN_VALUE)
-	    		{
-	    			boolean bSpawned = false;
 	    			for(int i = -top; i <= bottom; i++)
 	    			{
 	    				currentX = spawnChunkX - cycle;
@@ -264,10 +254,8 @@ public class Pregenerator
 
 						if(i > iLeft) // Check if we haven't generated this chunk in a previous server tick
 						{
-							bSpawned = true;
 							iLeft = i;
-							spawned++;
-
+							
 							pregenerateChunk(currentX, currentZ);
 
 			    			if(spawnedThisTick >= maxSpawnPerTick)
@@ -275,26 +263,25 @@ public class Pregenerator
 			    				if(i == bottom)
 			    				{
 			    					left++;
+			    		    		if(left >= pregenerationRadius)
+			    		    		{
+			    		    			leftEdgeFound = true;
+			    		    		}
 			    				}
 			    				pause();
 			    				return;
 			    			}
 						}
 	    			}
-	    			if(bSpawned)
-	    			{
-	    				left++;
-	    			}
+    				left++;
+    	    		if(left >= pregenerationRadius)
+    	    		{
+    	    			leftEdgeFound = true;
+    	    		}
 	    		}
 
-        		// Check Bottom
-	    		if(bottom >= pregenerationRadius)
+	    		if(!bottomEdgeFound && iBottom < right)
 	    		{
-	    			bottomEdgeFound = true;
-	    		}
-	    		if(!bottomEdgeFound && iTop == Integer.MIN_VALUE)
-	    		{
-	    			boolean bSpawned = false;
 	    			for(int i = -left; i <= right; i++)
 	    			{
 	    				currentX = spawnChunkX + i;
@@ -302,10 +289,8 @@ public class Pregenerator
 
 						if(i > iBottom) // Check if we haven't generated this chunk in a previous server tick
 						{
-							bSpawned = true;
 							iBottom = i;
-							spawned++;
-
+							
 							pregenerateChunk(currentX, currentZ);
 
 			    			if(spawnedThisTick >= maxSpawnPerTick)
@@ -313,26 +298,25 @@ public class Pregenerator
 			    				if(i == right)
 			    				{
 			    					bottom++;
+			    		    		if(bottom >= pregenerationRadius)
+			    		    		{
+			    		    			bottomEdgeFound = true;
+			    		    		}
 			    				}
 			    				pause();
 			    				return;
 			    			}
 						}
 	    			}
-	    			if(bSpawned)
-	    			{
-	    				bottom++;
-	    			}
+    				bottom++;
+    	    		if(bottom >= pregenerationRadius)
+    	    		{
+    	    			bottomEdgeFound = true;
+    	    		}
 	    		}
 
-        		// Check Top
-	    		if(top >= pregenerationRadius)
+	    		if(!topEdgeFound && iTop < right)
 	    		{
-	    			topEdgeFound = true;
-	    		}
-	    		if(!topEdgeFound)
-	    		{
-	    			boolean bSpawned = false;
 	    			for(int i = -left; i <= right; i++)
 	    			{
 	    				currentX = spawnChunkX + i;
@@ -340,9 +324,7 @@ public class Pregenerator
 
 						if(i > iTop) // Check if we haven't generated this chunk in a previous server tick
 						{
-							bSpawned = true;
 							iTop = i;
-							spawned++;
 
 							pregenerateChunk(currentX, currentZ);
 
@@ -351,23 +333,29 @@ public class Pregenerator
 			    				if(i == right)
 			    				{
 			    					top++;
+			    		    		if(top >= pregenerationRadius)
+			    		    		{
+			    		    			topEdgeFound = true;
+			    		    		}
 			    				}
 			    				pause();
 			    				return;
 			    			}
 						}
 	    			}
-	    			if(bSpawned)
-	    			{
-	    				top++;
-	    			}
+    				top++;
+    	    		if(top >= pregenerationRadius)
+    	    		{
+    	    			topEdgeFound = true;
+    	    		}
 	    		}
 
-	    		// Cycle completed, reset cycle progress
+	    		// Cycle completed, update/reset cycle progress
     			iLeft = Integer.MIN_VALUE;
     			iBottom = Integer.MIN_VALUE;
     			iRight = Integer.MIN_VALUE;
     			iTop = Integer.MIN_VALUE;
+				cycle += 1;
 			}
 			
 			this.world.getChunkGenerator().clearChunkCache(false);
@@ -386,39 +374,34 @@ public class Pregenerator
 			iBottom = Integer.MIN_VALUE;
 			iRight = Integer.MIN_VALUE;
 			iTop = Integer.MIN_VALUE;
-
+			cycle += 1;
+			
+			this.world.getChunkGenerator().clearChunkCache(false);
+			this.world.getStructureCache().compressCache();
 			savePregeneratorData(false);
 		} else {
 			// Pre-generation cycle cannot be completed.
 			// Save progress so we can continue and retry on the next server tick.
-			cycle -= 1;
+			// cycle -= 1;
 			processing = false;
 		}		
 	}
 
 	private void pregenerateChunk(int currentX, int currentZ)
 	{
+		spawned++;
+		spawnedThisTick++;
 		updateProgressMessage(true);
 		
-		ChunkProviderServer chunkProvider = (ChunkProviderServer) world.getWorld().getChunkProvider();
-
-        if (
-        	!(
-	    		(
-    				chunkProvider.chunkExists(currentX, currentZ) ||
-					RegionFileCache.createOrLoadRegionFile(((WorldServer)world.getWorld()).getChunkSaveLocation(), currentX, currentZ).chunkExists(currentX & 0x1F, currentZ & 0x1F)
-				) &&
-				chunkProvider.provideChunk(currentX, currentZ).isPopulated()
-			)
-		)
-		{
-    		spawnedThisTick++;
-        	
-        	chunkProvider.provideChunk(currentX, currentZ).needsSaving(true);
+		ChunkProviderServer chunkProvider = (ChunkProviderServer) world.getWorld().getChunkProvider();		
+		Chunk chunk = chunkProvider.provideChunk(currentX, currentZ);
+    	if(!chunk.isPopulated())
+    	{	        	
+    		chunk.needsSaving(true);
         	chunkProvider.provideChunk(currentX, currentZ + 1).needsSaving(true);
         	chunkProvider.provideChunk(currentX + 1, currentZ).needsSaving(true);
-        	chunkProvider.provideChunk(currentX + 1, currentZ + 1).needsSaving(true);
-		}	
+        	chunkProvider.provideChunk(currentX + 1, currentZ + 1).needsSaving(true);	        	
+    	}      
 		
 		if(spawned - lastSpawnedWhenSaved > compressCustomStructureCacheThreshHold)
 		{
@@ -467,7 +450,7 @@ public class Pregenerator
 			progressScreenEstimatedTime = estimatedTime;
 			if(!dontLog)
 			{
-				OTG.log(LogMarker.INFO, "Pre-generating world \"" + pregenerationWorld + "\". Radius: " + pregenerationRadius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
+				OTG.log(LogMarker.INFO, "Pre-generating world \"" + pregenerationWorld + "\". Radius: " + cycle + "/" + pregenerationRadius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
 			}
 		} else {
 
@@ -605,9 +588,12 @@ public class Pregenerator
 			right = Integer.parseInt(pregeneratedChunksFileValues[3]);
 			bottom = Integer.parseInt(pregeneratedChunksFileValues[4]);
 
-			cycle = Integer.parseInt(pregeneratedChunksFileValues[5]);
+			//cycle = Integer.parseInt(pregeneratedChunksFileValues[5]);
+			// This should hopefully fix corrupted pregendata saves for > v6 < v8.3_r4
+			cycle = Math.min(Math.min(Math.min(left, top), right), bottom) + 1;
+			
 			startTime = System.currentTimeMillis() - Long.parseLong(pregeneratedChunksFileValues[6]); // Elapsed time
-
+		
 			iTop = Integer.parseInt(pregeneratedChunksFileValues[7]);
 			iBottom = Integer.parseInt(pregeneratedChunksFileValues[8]);
 			iLeft = Integer.parseInt(pregeneratedChunksFileValues[9]);
@@ -619,7 +605,7 @@ public class Pregenerator
 
 	    	total = (pregenerationRadius * 2 + 1) * (pregenerationRadius * 2 + 1);
 		} else {
-			spawned = 1;
+			spawned = 0;
 
 			left = 0;
 			top = 0;

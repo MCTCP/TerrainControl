@@ -12,6 +12,7 @@ import com.pg85.otg.util.helpers.StringHelper;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -185,7 +186,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
         StreamHelper.writeStringToStream(stream, makeString());
     }
     
-    public static BO4WeightedBranchFunction fromStream(BO4Config holder, MappedByteBuffer buffer) throws IOException
+    public static BO4WeightedBranchFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException
     {
     	BO4WeightedBranchFunction branchFunction = new BO4WeightedBranchFunction(holder);  	
     	

@@ -1,12 +1,53 @@
 package com.pg85.otg.bukkit;
 
-import com.pg85.otg.*;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+
+import org.bukkit.Location;
+import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftAmbient;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftAnimals;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftComplexLivingEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftElderGuardian;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftFlying;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftGolem;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftGuardian;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftMonster;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftSlime;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager;
+import org.bukkit.craftbukkit.v1_12_R1.entity.CraftWaterMob;
+import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
+import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
+import org.bukkit.entity.Arrow;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.LightningStrike;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.generator.BukkitVanillaBiomeGenerator;
 import com.pg85.otg.bukkit.generator.OTGChunkGenerator;
 import com.pg85.otg.bukkit.generator.OTGInternalChunkGenerator;
 import com.pg85.otg.bukkit.generator.OTGWorldChunkManager;
 import com.pg85.otg.bukkit.generator.OTGWorldProvider;
-import com.pg85.otg.bukkit.generator.structures.*;
+import com.pg85.otg.bukkit.generator.structures.MojangStructurePart;
+import com.pg85.otg.bukkit.generator.structures.OTGMansionGen;
+import com.pg85.otg.bukkit.generator.structures.OTGMineshaftGen;
+import com.pg85.otg.bukkit.generator.structures.OTGNetherFortressGen;
+import com.pg85.otg.bukkit.generator.structures.OTGOceanMonumentGen;
+import com.pg85.otg.bukkit.generator.structures.OTGRareBuildingGen;
+import com.pg85.otg.bukkit.generator.structures.OTGStrongholdGen;
+import com.pg85.otg.bukkit.generator.structures.OTGVillageGen;
 import com.pg85.otg.bukkit.util.NBTHelper;
 import com.pg85.otg.bukkit.util.WorldHelper;
 import com.pg85.otg.common.BiomeIds;
@@ -15,14 +56,13 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
-import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
@@ -35,7 +75,6 @@ import com.pg85.otg.util.helpers.ReflectionHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
-import net.minecraft.server.v1_12_R1.AxisAlignedBB;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockLeaves;
@@ -57,8 +96,8 @@ import net.minecraft.server.v1_12_R1.DefinedStructureManager;
 import net.minecraft.server.v1_12_R1.DimensionManager;
 import net.minecraft.server.v1_12_R1.Entity;
 import net.minecraft.server.v1_12_R1.EntityFallingBlock;
-import net.minecraft.server.v1_12_R1.EntityHanging;
 import net.minecraft.server.v1_12_R1.EntityLightning;
+import net.minecraft.server.v1_12_R1.EntityLiving;
 import net.minecraft.server.v1_12_R1.EntityOcelot;
 import net.minecraft.server.v1_12_R1.EntityTippedArrow;
 import net.minecraft.server.v1_12_R1.EnumCreatureType;
@@ -88,36 +127,6 @@ import net.minecraft.server.v1_12_R1.WorldGenTaiga1;
 import net.minecraft.server.v1_12_R1.WorldGenTaiga2;
 import net.minecraft.server.v1_12_R1.WorldGenTrees;
 import net.minecraft.server.v1_12_R1.WorldServer;
-import net.minecraft.server.v1_12_R1.EntityLiving;
-
-import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftAmbient;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftAnimals;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftComplexLivingEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftElderGuardian;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftFlying;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftGolem;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftGuardian;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftMonster;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftSlime;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftWaterMob;
-import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.LightningStrike;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
-
-import java.io.File;
-import java.util.*;
 
 public class BukkitWorld implements LocalWorld
 {
@@ -209,8 +218,7 @@ public class BukkitWorld implements LocalWorld
         if (this.settings == null)
         {
             this.settings = newSettings;
-        } else
-        {
+        } else {
             throw new IllegalStateException("Settings are already set");
         }
     }
@@ -1806,17 +1814,7 @@ public class BukkitWorld implements LocalWorld
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
-        if (tileEntity == null)
-        {
-            return null;
-        }
-        NBTTagCompound nmsTag = new NBTTagCompound();
-        tileEntity.save(nmsTag);
-        nmsTag.remove("x");
-        nmsTag.remove("y");
-        nmsTag.remove("z");
-        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
+        return NBTHelper.getMetadata(world, x, y, z);
     }
 
 	@Override

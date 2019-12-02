@@ -1,5 +1,9 @@
 package com.pg85.otg.generator.resource;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -7,10 +11,7 @@ import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import com.pg85.otg.util.materials.MaterialSet;
 
 /**
  * Represents a Resource: something that can generate in the world.
@@ -96,6 +97,16 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     public LocalMaterialData getMaterial()
     {
         return material;
+    }
+    
+    protected void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
+    {
+		material.parseForWorld(world);
+
+        if (sourceBlocks != null)
+        {
+            sourceBlocks.parseForWorld(world);
+        }
     }
 
     public int getPriority()

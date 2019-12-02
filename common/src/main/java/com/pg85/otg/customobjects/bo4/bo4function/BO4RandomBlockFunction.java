@@ -1,9 +1,9 @@
 package com.pg85.otg.customobjects.bo4.bo4function;
 
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.util.List;
 import java.util.Random;
@@ -17,7 +17,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MaterialHelper;
-import com.pg85.otg.util.helpers.StreamHelper;
 
 public class BO4RandomBlockFunction extends BO4BlockFunction
 {
@@ -170,6 +169,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         {
             if (random.nextInt(100) < blockChances[i])
             {
+            	blocks[i].parseForWorld(world);
                 world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
                 break;
             }
@@ -269,7 +269,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         }
     }
     
-    public static BO4RandomBlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, MappedByteBuffer buffer) throws IOException
+    public static BO4RandomBlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer) throws IOException
     {    	
     	BO4RandomBlockFunction rbf = new BO4RandomBlockFunction(holder);
     	

@@ -45,7 +45,7 @@ public class BO3 implements StructuredCustomObject
      * @param name Name of the BO3.
      * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
      */
-    BO3(String name, File file)
+    public BO3(String name, File file)
     {
         this.name = name;
         this.file = file;
@@ -542,4 +542,10 @@ public class BO3 implements StructuredCustomObject
             world.spawnEntity(newEntityData);
         }
     }
+
+	@Override
+	public boolean loadChecks()
+	{
+		return settings == null ? false : this.settings.parseModChecks();
+	}
 }

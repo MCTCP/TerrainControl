@@ -13,7 +13,6 @@ import java.util.Random;
 
 public class CactusGen extends Resource
 {
-
     private int minAltitude;
     private int maxAltitude;
     private MaterialSet sourceBlocks;
@@ -37,6 +36,8 @@ public class CactusGen extends Resource
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
+        
+        parseMaterials(world, material, sourceBlocks);
 
         for (int i = 0; i < 10; i++)
         {

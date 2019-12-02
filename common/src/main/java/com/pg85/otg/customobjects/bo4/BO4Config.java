@@ -42,6 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.DataFormatException;
 
 public class BO4Config extends CustomObjectConfigFile
 {
@@ -1573,8 +1575,18 @@ public class BO4Config extends CustomObjectConfigFile
 	    	fis = new FileInputStream(this.reader.getFile());			
 	    	try
 	    	{
-				MappedByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
-											
+	    		ByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
+				
+				byte[] compressedBytes = new byte[(int) fis.getChannel().size()];
+				buffer.get(compressedBytes);
+				try {
+					byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
+		    		buffer = ByteBuffer.wrap(decompressedBytes);
+				} catch (DataFormatException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}				
+				
 				//buffer.get(data, 0, remaining);
 				// do something with data
 		      

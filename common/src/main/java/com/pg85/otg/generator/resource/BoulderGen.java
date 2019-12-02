@@ -38,6 +38,8 @@ public class BoulderGen extends Resource
         if (y < this.minAltitude || y > this.maxAltitude) {
             return;
         }
+        
+        parseMaterials(world, material, sourceBlocks);
 
         while (y > 3)
         {

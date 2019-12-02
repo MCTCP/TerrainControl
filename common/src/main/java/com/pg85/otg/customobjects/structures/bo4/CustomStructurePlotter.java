@@ -641,8 +641,9 @@ public class CustomStructurePlotter
 
 				            	        	if(structureStart2.IsSpawned)
 						                	{
-				            	    			// Always add the Start chunk to the structureCache etc even if it doesnt have any blocks. This is done to make sure that Start will get saved correctly when the server saves to disk.
-				            	    			// TODO: This means that the start chunk can be empty and cannot be populated by another structure :(. It will also show /mcw BO3Info in the apparently empty chunk
+				            	    			// Always add the Start chunk to the structureCache etc even if it doesnt have any blocks. 
+				            	        		// This is done to make sure that Start will get saved correctly when the server saves to disk.
+				            	    			// TODO: This means that the start chunk can be empty and cannot be populated by another structure :(. It will also show /otg BO3Info in the apparently empty chunk
 
 				            	        		structureCache.put(chunkCoord, structureStart2);
 				            	    			this.structuresPerChunk.put(chunkCoord, new ArrayList<String>());
@@ -658,51 +659,50 @@ public class CustomStructurePlotter
 						                		if(((BO4)currentStructureSpawning[0]).getSettings().frequency > 0 || ((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.size() > 0)
 						                		{
 						                			String bO3Name = ((BO4)currentStructureSpawning[0]).getName();
-						                			ArrayList<ChunkCoordinate> chunkCoords = this.spawnedStructuresByName.get(bO3Name);
-							                		if(chunkCoords != null)
-							                		{
-							                			chunkCoords.add(ChunkCoordinate.fromChunkCoords(spawnCoordX, spawnCoordZ));
-							                		} else {
-							                			ArrayList<ChunkCoordinate> centerChunk = new ArrayList<ChunkCoordinate>();
-							                			centerChunk.add(
-						                					ChunkCoordinate.fromChunkCoords(
-					                							(int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)),
-					                							(int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))
-				                							)
-					                					);
-							                			
-							                			spawnedStructuresByName.put(bO3Name, centerChunk);
+						                			ChunkCoordinate bo4SpawnCoord = ChunkCoordinate.fromChunkCoords(spawnCoordX, spawnCoordZ);
 
-							                			if(((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.size() > 0)
-							                			{
-							                				for(Entry<String, Integer> entry : ((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.entrySet())
-							                				{
-						                						String bo3GroupName = entry.getKey();
-						                						int bo3GroupFrequency = entry.getValue().intValue();
-						                						if(bo3GroupFrequency > 0)
-						                						{
-						                							HashMap<ChunkCoordinate, Integer> spawnedStructures = this.spawnedStructuresByGroup.get(bo3GroupName);
-						                							if(spawnedStructures == null)
-						                							{
-						                								spawnedStructures = new HashMap<ChunkCoordinate, Integer>();
-						                								spawnedStructures.put(centerChunk.get(0), entry.getValue());
-						                								this.spawnedStructuresByGroup.put(bo3GroupName, spawnedStructures);
-						                							} else {							                							
-							                							Integer frequency = spawnedStructures.get(centerChunk.get(0));
-							                							if(frequency != null)
-							                							{
-							                								if(frequency.intValue() < bo3GroupFrequency)
-							                								{
-							                									spawnedStructures.put(centerChunk.get(0), entry.getValue().intValue());
-							                								}
-							                							} else {
-							                								spawnedStructures.put(centerChunk.get(0), entry.getValue().intValue());
-							                							}
-						                							}
-						                						}
-							                				}
-							                			}
+						                			ArrayList<ChunkCoordinate> chunkCoords = this.spawnedStructuresByName.get(bO3Name);
+					                				if(chunkCoords == null)
+							                		{
+							                			chunkCoords = new ArrayList<ChunkCoordinate>();
+							                			spawnedStructuresByName.put(bO3Name, chunkCoords);
 							                		}
+					                				chunkCoords.add(bo4SpawnCoord);
+
+						                			if(((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.size() > 0)
+						                			{
+							                			ChunkCoordinate bo4CenterSpawnCoord = ChunkCoordinate.fromChunkCoords(
+				                							(int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)),
+				                							(int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))
+			                							);
+						                				
+						                				for(Entry<String, Integer> entry : ((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.entrySet())
+						                				{
+					                						String bo3GroupName = entry.getKey();
+					                						int bo3GroupFrequency = entry.getValue().intValue();
+					                						if(bo3GroupFrequency > 0)
+					                						{
+					                							HashMap<ChunkCoordinate, Integer> spawnedStructures = this.spawnedStructuresByGroup.get(bo3GroupName);
+					                							if(spawnedStructures == null)
+					                							{
+					                								spawnedStructures = new HashMap<ChunkCoordinate, Integer>();
+					                								spawnedStructures.put(bo4CenterSpawnCoord, entry.getValue());
+					                								this.spawnedStructuresByGroup.put(bo3GroupName, spawnedStructures);
+					                							} else {
+						                							Integer frequency = spawnedStructures.get(bo4CenterSpawnCoord);
+						                							if(frequency != null)
+						                							{
+						                								if(frequency.intValue() < bo3GroupFrequency)
+						                								{
+						                									spawnedStructures.put(bo4CenterSpawnCoord, entry.getValue().intValue());
+						                								}
+						                							} else {
+						                								spawnedStructures.put(bo4CenterSpawnCoord, entry.getValue().intValue());
+						                							}
+					                							}
+					                						}
+						                				}
+						                			}
 						                		}
 
 						                		spawned = true;

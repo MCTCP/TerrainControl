@@ -16,6 +16,8 @@ import com.pg85.otg.customobjects.bo3.bo3function.BO3WeightedBranchFunction;
 import com.pg85.otg.customobjects.bo3.checks.BlockCheck;
 import com.pg85.otg.customobjects.bo3.checks.BlockCheckNot;
 import com.pg85.otg.customobjects.bo3.checks.LightCheck;
+import com.pg85.otg.customobjects.bo3.checks.ModCheck;
+import com.pg85.otg.customobjects.bo3.checks.ModCheckNot;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 
@@ -60,6 +62,10 @@ public class BO3Loader implements CustomObjectLoader
         registry.registerConfigFunction("S", BO3SpawnerFunction.class);
         registry.registerConfigFunction("ModData", BO3ModDataFunction.class);
         registry.registerConfigFunction("MD", BO3ModDataFunction.class);
+        registry.registerConfigFunction("ModCheck", ModCheck.class);
+        registry.registerConfigFunction("MC", ModCheck.class);
+        registry.registerConfigFunction("ModCheckNot", ModCheckNot.class);
+        registry.registerConfigFunction("MCN", ModCheckNot.class);
     }
 
     @Override

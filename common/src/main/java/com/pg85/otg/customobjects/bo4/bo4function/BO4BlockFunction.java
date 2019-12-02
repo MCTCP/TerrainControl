@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 
 import com.pg85.otg.common.LocalMaterialData;
@@ -107,7 +108,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
         }
     }
     
-    public static BO4BlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, MappedByteBuffer buffer) throws IOException
+    public static BO4BlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer) throws IOException
     {
     	BO4BlockFunction rbf = new BO4BlockFunction(holder);
     	

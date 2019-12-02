@@ -100,6 +100,8 @@ public class SmallLakeGen extends Resource
 
         // y = floor
         y -= 4;
+        
+        parseMaterials(world, material, null);
 
         synchronized (BooleanBuffer)
         {

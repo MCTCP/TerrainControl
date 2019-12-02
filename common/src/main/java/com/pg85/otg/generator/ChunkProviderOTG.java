@@ -304,7 +304,7 @@ public class ChunkProviderOTG
                 // Get the current biome config and some properties
                 final BiomeConfig biomeConfig = toBiomeConfig(this.biomeArray[(x + z * CHUNK_X_SIZE)]);
 
-                biomeConfig.surfaceAndGroundControl.spawn(this.localWorld.getSeed(), generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+                biomeConfig.surfaceAndGroundControl.spawn(localWorld, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
                 // Count water blocks
                 if (chunkBuffer.getBlock(x, biomeConfig.waterLevelMax, z).equals(biomeConfig.waterBlock))

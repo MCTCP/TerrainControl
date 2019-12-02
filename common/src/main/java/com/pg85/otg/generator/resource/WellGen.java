@@ -88,6 +88,8 @@ public class WellGen extends Resource
         {
             --y;
         }
+        
+        parseMaterials(world, material, sourceBlocks);
 
         LocalMaterialData sourceBlock = world.getMaterial(x, y, z, false);
 
@@ -95,6 +97,7 @@ public class WellGen extends Resource
         {
             return;
         }
+		
         int i;
         int j;
 

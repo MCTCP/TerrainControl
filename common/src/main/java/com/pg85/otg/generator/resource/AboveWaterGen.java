@@ -24,8 +24,12 @@ public class AboveWaterGen extends Resource
     {
         int y = world.getLiquidHeight(x, z);
         if (y == -1)
+		{
             return;
+		}
 
+        parseMaterials(world, material, null);
+        
         for (int i = 0; i < 10; i++)
         {
             int j = x + rand.nextInt(8) - rand.nextInt(8);
@@ -33,6 +37,7 @@ public class AboveWaterGen extends Resource
             int m = z + rand.nextInt(8) - rand.nextInt(8);
             if (!world.isNullOrAir(j, k, m, false) || !world.getMaterial(j, k - 1, m, false).isLiquid())
                 continue;
+            
             world.setBlock(j, k, m, material, null, false);
         }
     }

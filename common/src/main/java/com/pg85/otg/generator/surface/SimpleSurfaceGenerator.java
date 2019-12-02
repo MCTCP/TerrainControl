@@ -29,14 +29,17 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
     }
     
     @Override
-    public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
+    public void spawn(LocalWorld world, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {
-        spawnColumn(biomeConfig.surfaceBlock, biomeConfig.groundBlock, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
+        spawnColumn(world, biomeConfig.surfaceBlock, biomeConfig.groundBlock, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
     }
 
     // net.minecraft.world.biome.Biome.generateBiomeTerrain
-    protected final void spawnColumn(LocalMaterialData defaultSurfaceBlock, LocalMaterialData defaultGroundBlock, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
+    protected final void spawnColumn(LocalWorld world, LocalMaterialData defaultSurfaceBlock, LocalMaterialData defaultGroundBlock, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
     {
+        defaultGroundBlock.parseForWorld(world);
+        defaultSurfaceBlock.parseForWorld(world);
+        
         WorldConfig worldConfig = biomeConfig.worldConfig;
         float currentTemperature = biomeConfig.biomeTemperature;
         int surfaceBlocksNoise = (int) (generatingChunk.getNoise(x, z) / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
@@ -52,6 +55,12 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         // blocks
         LocalMaterialData currentSurfaceBlock = defaultSurfaceBlock;
         LocalMaterialData currentGroundBlock = defaultGroundBlock;
+        
+        LocalMaterialData stoneBlock = biomeConfig.stoneBlock.parseForWorld(world);
+        LocalMaterialData bedrockBlock = worldConfig.bedrockBlock.parseForWorld(world);
+        LocalMaterialData waterBlock = biomeConfig.waterBlock.parseForWorld(world);
+        LocalMaterialData iceBlock = biomeConfig.iceBlock.parseForWorld(world);
+        
         int surfaceBlocksCount = -1;
         final int currentWaterLevel = generatingChunk.getWaterLevel(x, z);
         for (int y = CHUNK_Y_SIZE - 1; y >= 0; y--)
@@ -59,7 +68,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
             if (generatingChunk.mustCreateBedrockAt(worldConfig, y))
             {
                 // Place bedrock
-                chunkBuffer.setBlock(x, y, z, worldConfig.bedrockBlock);
+                chunkBuffer.setBlock(x, y, z, bedrockBlock);
             } else {
                 // Surface blocks logic (grass, dirt, sand, sandstone)
                 final LocalMaterialData blockOnCurrentPos = chunkBuffer.getBlock(x, y, z);
@@ -69,7 +78,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                     // Reset when air is found
                     surfaceBlocksCount = -1;
                 }
-                else if (blockOnCurrentPos.equals(biomeConfig.stoneBlock))
+                else if (blockOnCurrentPos.equals(stoneBlock))
                 {
                     if (surfaceBlocksCount == -1)
                     {
@@ -77,7 +86,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         if (surfaceBlocksNoise <= 0 && !worldConfig.removeSurfaceStone)
                         {
                             currentSurfaceBlock = air;
-                            currentGroundBlock = biomeConfig.stoneBlock;
+                            currentGroundBlock = stoneBlock;
                         }
                         else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
                         {
@@ -91,9 +100,9 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         {
                             if (currentTemperature < WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
                             {
-                                currentSurfaceBlock = biomeConfig.iceBlock;
+                                currentSurfaceBlock = iceBlock;
                             } else {
-                                currentSurfaceBlock = biomeConfig.waterBlock;
+                                currentSurfaceBlock = waterBlock;
                             }
                         }
 

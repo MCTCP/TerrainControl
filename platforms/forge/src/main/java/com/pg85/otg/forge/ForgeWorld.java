@@ -651,17 +651,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public NamedBinaryTag getMetadata(int x, int y, int z)
     {
-        TileEntity tileEntity = this.world.getTileEntity(new BlockPos(x, y, z));
-        if (tileEntity == null)
-        {
-            return null;
-        }
-        NBTTagCompound nmsTag = new NBTTagCompound();
-        tileEntity.writeToNBT(nmsTag);
-        nmsTag.removeTag("x");
-        nmsTag.removeTag("y");
-        nmsTag.removeTag("z");
-        return NBTHelper.getNBTFromNMSTagCompound(null, nmsTag);
+       return NBTHelper.getMetadata(world, x, y, z);
     }
     
     // Structures / trees

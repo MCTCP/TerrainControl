@@ -93,6 +93,12 @@ public class BiomeConfig extends ConfigFile
     public boolean grassColorIsMultiplier;
     public int foliageColor;
     public boolean foliageColorIsMultiplier;
+    
+    public int fogColor;
+    public float fogDensity;
+    public float fogTimeWeight;
+    public float fogRainWeight;
+    public float fogThunderWeight;
 
     public List<ConfigFunction<BiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<BiomeConfig>>();
     private List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
@@ -333,7 +339,13 @@ public class BiomeConfig extends ConfigFile
         this.grassColorIsMultiplier = settings.getSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER);
         this.foliageColor = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR, defaultSettings.defaultFoliageColor);
         this.foliageColorIsMultiplier = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER);
+        this.fogColor = settings.getSetting(BiomeStandardValues.FOG_COLOR);
+        this.fogDensity = settings.getSetting(BiomeStandardValues.FOG_DENSITY);
 
+        this.fogTimeWeight = settings.getSetting(BiomeStandardValues.FOG_TIME_WEIGHT);
+        this.fogRainWeight = settings.getSetting(BiomeStandardValues.FOG_RAIN_WEIGHT);
+        this.fogThunderWeight = settings.getSetting(BiomeStandardValues.FOG_THUNDER_WEIGHT);
+        
         this.volatilityRaw1 = settings.getSetting(BiomeStandardValues.VOLATILITY_1);
         this.volatilityRaw2 = settings.getSetting(BiomeStandardValues.VOLATILITY_2);
         this.volatilityWeightRaw1 = settings.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_1);
@@ -421,9 +433,9 @@ public class BiomeConfig extends ConfigFile
                 }
                 if(res instanceof CustomStructureGen)
                 {
-                	// Only allow one customstructure per biome.
-                	// For inherited biomes, let the child override the parent.
-                	if(this.customStructures.size() == 0)
+                	// For non-OTG+ worlds, only allow one customstructure per biome.
+                	// For inherited biomes, the child overrides the parent.
+                	if(this.worldConfig.isOTGPlus || this.customStructures.size() == 0)
                 	{
                 		this.customStructures.add((CustomStructureGen)res);
                 	}
@@ -696,6 +708,28 @@ public class BiomeConfig extends ConfigFile
              
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, this.foliageColorIsMultiplier,
                 "Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
+        
+        // Fog
+        writer.putSetting(BiomeStandardValues.FOG_COLOR, this.fogColor, "Biome fog color.");
+
+        writer.putSetting(BiomeStandardValues.FOG_DENSITY, this.fogDensity,
+                "How dense the fog is this biome is, Float value from 0.0 to 1.0.",
+                "A value of 0 produces almost no fog while a value of 1 will cover the entire screen with fog.");
+
+        writer.putSetting(BiomeStandardValues.FOG_TIME_WEIGHT, this.fogTimeWeight,
+                "How much the world time should affect the fog color, Float value from 0.0 to 1.0.",
+                "A value of 0.0 means the fog will stay the same color all day.",
+                "A value of 1.0 will make the fog turn completely black at midnight.");
+
+        writer.putSetting(BiomeStandardValues.FOG_RAIN_WEIGHT, this.fogRainWeight,
+                "How much rain should affect the fog color, Float value from 0.0 to 1.0.",
+                "A value of 0.0 means the fog will stay the same color in the rain.",
+                "A value of 1.0 will make the fog turn completely black during rain.");
+
+        writer.putSetting(BiomeStandardValues.FOG_THUNDER_WEIGHT, this.fogThunderWeight,
+                "How much thunderstorms should affect the fog color, Float value from 0.0 to 1.0.",
+                "A value of 0.0 means the fog will stay the same color during thunderstorms.",
+                "A value of 1.0 will make the fog turn completely black during thunderstorms.");
 
         writer.bigTitle("Resource queue",
                 "This section control all resources spawning after terrain generation.",

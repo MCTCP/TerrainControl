@@ -15,6 +15,7 @@ public class BlockCheck extends BO3Check
     @Override
     public boolean preventsSpawn(LocalWorld world, int x, int y, int z)
     {
+        toCheck.parseForWorld(world);
         return y > PluginStandardValues.WORLD_DEPTH && y < PluginStandardValues.WORLD_HEIGHT && !toCheck.contains(world.getMaterial(x, y, z, false));
     }
 

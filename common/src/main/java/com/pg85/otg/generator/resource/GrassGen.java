@@ -148,6 +148,7 @@ public class GrassGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
+        sourceBlocks.parseForWorld(world);
         switch (groupOption)
         {
             case Grouped:

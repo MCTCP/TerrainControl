@@ -13,6 +13,7 @@ apply plugin: 'signing'
 // Project properties
 archivesBaseName = "openterraingenerator-forge"
 description = "OpenTerrainGenerator for Minecraft Forge"
+ext.worldeditVersion = "6.1"
 minecraft.runDir = "run"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
@@ -33,9 +34,27 @@ minecraft {
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
 }
 
+repositories
+{
+    maven 
+    {   // Worldedit API
+   		url "https://maven.sk89q.com/repo/" 
+   	}
+}
+
 dependencies
 {
-    compile project(':common')	
+    compile project(':common')
+	provided ('com.sk89q.worldedit:worldedit-forge-mc1.11:6.1.6') {
+		exclude group: 'com.google.guava'
+		exclude group: 'com.google.gson'
+	}
+	provided ('com.sk89q.worldedit:worldedit-core:6.1') {
+		exclude group: 'com.google.guava'
+		exclude group: 'com.google.gson'
+	}
+	compile 'com.google.guava:guava:23.0'
+	compile 'com.google.code.gson:gson:2.6.2'
 }
 
 processResources {

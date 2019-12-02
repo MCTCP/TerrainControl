@@ -123,4 +123,9 @@ public class TreeObject implements CustomObject
         // Trees cannot be rotated
         return false;
     }
+
+	@Override
+	public boolean loadChecks() {
+		return true;
+	}
 }

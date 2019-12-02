@@ -120,4 +120,6 @@ public interface CustomObject extends SpawnableObject
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);
 
     boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);  
+
+	public boolean loadChecks();
 }

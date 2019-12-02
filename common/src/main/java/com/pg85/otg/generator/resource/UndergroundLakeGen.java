@@ -15,7 +15,6 @@ import java.util.Random;
 
 public class UndergroundLakeGen extends Resource
 {
-
     private final int maxAltitude;
     private final int maxSize;
     private final int minAltitude;
@@ -87,6 +86,7 @@ public class UndergroundLakeGen extends Resource
 
         if (y >= world.getHighestBlockYAt(x, z))
             return;
+        
         int size = RandomHelper.numberInRange(rand, minSize, maxSize);
 
         float mPi = rand.nextFloat() * 3.141593F;

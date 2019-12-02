@@ -1,16 +1,15 @@
 package com.pg85.otg.customobjects.bo3.bo3function;
 
+import java.util.List;
+import java.util.Random;
+
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
-import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.MaterialHelper;
-
-import java.util.List;
-import java.util.Random;
 
 public class BO3RandomBlockFunction extends BO3BlockFunction
 {
@@ -155,6 +154,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
         {
             if (random.nextInt(100) < blockChances[i])
             {
+                blocks[i].parseForWorld(world);
                 world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
                 break;
             }

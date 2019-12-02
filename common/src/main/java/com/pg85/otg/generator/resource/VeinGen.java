@@ -13,7 +13,6 @@ import java.util.Random;
 
 public class VeinGen extends Resource
 {
-
     int maxAltitude; // Maximum altitude of the vein
     private int maxRadius; // Maximum size of the vein in blocks (inclusive)
     int minAltitude; // Minimum altitude of the vein
@@ -133,6 +132,8 @@ public class VeinGen extends Resource
     {
         // Find all veins that reach this chunk, and spawn them
         int searchRadius = (this.maxRadius + 15) / 16;
+        
+        parseMaterials(world, material, sourceBlocks);
 
         int currentChunkX = chunkCoord.getChunkX();
         int currentChunkZ = chunkCoord.getChunkZ();

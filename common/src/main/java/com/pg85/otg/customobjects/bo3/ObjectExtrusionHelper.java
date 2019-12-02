@@ -94,7 +94,7 @@ class ObjectExtrusionHelper
                      yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, false));
                      --yi)
                 {
-                	world.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, false);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, false);
                 }
             } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp)
             {
@@ -102,7 +102,7 @@ class ObjectExtrusionHelper
                      yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, false));
                      ++yi)
                 {
-                	world.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, false);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, false);
                 }
             }
         }

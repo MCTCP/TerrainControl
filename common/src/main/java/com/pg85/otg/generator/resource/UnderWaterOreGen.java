@@ -72,6 +72,8 @@ public class UnderWaterOreGen extends Resource
         {
             return;
         }
+        
+        parseMaterials(world, material, sourceBlocks);
 
         int currentSize = rand.nextInt(size);
         int two = 2;

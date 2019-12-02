@@ -1,14 +1,15 @@
 package com.pg85.otg.generator.resource;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.TreeMap;
+
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Holds all small plants (1 or 2 blocks) of Minecraft so that users don't
@@ -85,8 +86,8 @@ public class PlantType
     }
 
     private final String name;
-    private final LocalMaterialData topBlock;
-    private final LocalMaterialData bottomBlock;
+    private LocalMaterialData topBlock;
+    private LocalMaterialData bottomBlock;
 
     /**
      * Creates a single-block plant with the given name.
@@ -149,11 +150,24 @@ public class PlantType
      * @param z Z position of the plant.
      */
     void spawn(LocalWorld world, int x, int y, int z)
-    {
+    {      
+        parseMaterials(world, bottomBlock, null);
+        
         world.setBlock(x, y, z, bottomBlock, null, false);
         if (topBlock != null)
         {
+            parseMaterials(world, topBlock, null);
             world.setBlock(x, y + 1, z, topBlock, null, false);
+        }
+    }
+    
+    private void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
+    {
+    	material.parseForWorld(world);
+
+        if (sourceBlocks != null)
+        {
+            sourceBlocks.parseForWorld(world);
         }
     }
 

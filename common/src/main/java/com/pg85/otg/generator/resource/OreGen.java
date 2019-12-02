@@ -78,6 +78,8 @@ public class OreGen extends Resource
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
     {
+        parseMaterials(world, material, sourceBlocks);
+        
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         float f = rand.nextFloat() * (float) Math.PI;
