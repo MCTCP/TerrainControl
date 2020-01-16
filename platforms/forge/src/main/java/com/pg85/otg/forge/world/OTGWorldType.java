@@ -43,7 +43,7 @@ public class OTGWorldType extends WorldType
     @Override
     public BiomeProvider getBiomeProvider(World mcWorld)
     {   	
-        // Ignore client worlds
+        // Ignore client worlds, no need to know about OTG biomes and biome id's on the client.
         if (mcWorld.isRemote)
         {
             return super.getBiomeProvider(mcWorld);
