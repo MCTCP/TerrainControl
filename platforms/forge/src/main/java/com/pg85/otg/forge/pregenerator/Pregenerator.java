@@ -99,12 +99,22 @@ public class Pregenerator
 	 */
 	public int setPregenerationRadius(int radius)
 	{
-		if(radius > cycle && radius > 0)
+		if(radius > -1 && radius != pregenerationRadius)
 		{
-			pregenerationRadius = radius;
+			// Cycle points to the current cycle, which could be: 
+			// 2, if pregenerationRadius is 1 and pregeneration is finished.
+			// 0-1, if pregenerationRadius is 1 and pregeneration is not yet finished
+			// If the radius is smaller than the current cycle, set it to the current cycle (cycle - 1 if pregeneration finished).
+			if(cycle != 0 && (radius < (total == spawned ? cycle - 1 : cycle)))
+			{
+				pregenerationRadius = (total == spawned ? cycle - 1 : cycle);
+			} else {
+				pregenerationRadius = radius;
+			}
 		} else {
-			pregenerationRadius = cycle;
+			return pregenerationRadius;
 		}
+		
 		// World can be null when creating new worlds on MP client
 		if(world != null)
 		{
@@ -134,6 +144,16 @@ public class Pregenerator
 	public int getPregenerationBorderBottom()
 	{
 		return bottom;
+	}
+	
+	public void setPreGeneratorCenterPoint(ChunkCoordinate chunkCoord)
+	{
+		// Don't allow moving of the center point if pregeneration has already started
+		if(!pregeneratorIsRunning && spawned == 0)
+		{
+			preGeneratorCenterPoint = chunkCoord;
+			savePregeneratorData(true);
+		}
 	}
 
 	public ChunkCoordinate getPregenerationCenterPoint()
@@ -382,7 +402,6 @@ public class Pregenerator
 		} else {
 			// Pre-generation cycle cannot be completed.
 			// Save progress so we can continue and retry on the next server tick.
-			// cycle -= 1;
 			processing = false;
 		}		
 	}
@@ -620,7 +639,7 @@ public class Pregenerator
 			iLeft = Integer.MIN_VALUE;
 			iRight = Integer.MIN_VALUE;
 
-			preGeneratorCenterPoint = world.getSpawnChunk();
+			preGeneratorCenterPoint = null; // Will be set after world spawn point has been determined
 
 			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
 			this.setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
