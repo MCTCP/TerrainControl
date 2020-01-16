@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui;
+package com.pg85.otg.forge.gui.dimensions.base;
 
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;

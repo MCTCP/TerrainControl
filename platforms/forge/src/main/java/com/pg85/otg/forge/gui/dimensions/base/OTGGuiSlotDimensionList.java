@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui.dimensions;
+package com.pg85.otg.forge.gui.dimensions.base;
 
 import java.util.ArrayList;
 
@@ -6,14 +6,13 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.gui.OTGGuiScrollingList;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.text.TextFormatting;
 
-class OTGGuiSlotDimensionList extends OTGGuiScrollingList
+public class OTGGuiSlotDimensionList extends OTGGuiScrollingList
 {   
 	private final OTGGuiDimensionList otgGuiDimensionList;
 	private OTGGuiDimensionList parent;
@@ -48,7 +47,7 @@ class OTGGuiSlotDimensionList extends OTGGuiScrollingList
     }
     
     @Override
-    protected int getSize()
+	public int getSize()
     {
         return dimensions.size();
     }

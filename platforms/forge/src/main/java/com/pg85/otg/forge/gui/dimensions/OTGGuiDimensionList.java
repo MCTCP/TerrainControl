@@ -34,6 +34,8 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.OTGGuiEnterWorldName;
+import com.pg85.otg.forge.gui.dimensions.base.OTGGuiSlotDimensionList;
+import com.pg85.otg.forge.gui.dimensions.base.SettingEntry;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
@@ -48,32 +50,32 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	}
     private static boolean ShowingOpenLinkDialogue = false;
 	
-	SettingEntry<?> buttonId;
+	public SettingEntry<?> buttonId;
     public OTGGuiDimensionSettingsList dimensionSettingsList;
 	
-    OTGGuiPresetList selectPresetForDimensionMenu = new OTGGuiPresetList(this);
-    boolean selectingPresetForDimension = false;
+    public OTGGuiPresetList selectPresetForDimensionMenu = new OTGGuiPresetList(this);
+    public boolean selectingPresetForDimension = false;
     private boolean creatingNewDimension = false;
 	
-    OTGGuiPresetList previousMenu;
+    public OTGGuiPresetList previousMenu;
     private OTGGuiSlotDimensionList dimensionsList;
     public int selectedDimensionIndex = -1;
     public String worldName;
     public final ArrayList<DimensionConfig> dimensions;
     private final ArrayList<DimensionConfig> originalDimensions;
-    DimensionConfig selectedDimension;
+    public DimensionConfig selectedDimension;
     
-    int listWidth = 100;
-    int topMargin = 37;
-    int bottomMargin = 73;
+    public int listWidth = 100;
+    public int topMargin = 37;
+    public int bottomMargin = 73;
     private int btnBottomMargin = 63;
-    int leftMargin = 10;
+    public int leftMargin = 10;
     private int rightMargin = 10;
-    int slotHeight = 16;
+    public int slotHeight = 16;
     private int margin = 20;
     
     private GuiButton btnContinue;
-    GuiButton btnCancel;
+    public GuiButton btnCancel;
     private GuiButton btnDelete;
     private final int iContinueButton = 0;
     private final int iCancelButton = 1;
@@ -203,12 +205,12 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         }
 	}
     
-    Minecraft getMinecraftInstance()
+    public Minecraft getMinecraftInstance()
     {
         return mc;
     }
 
-    FontRenderer getFontRenderer()
+    public FontRenderer getFontRenderer()
     {
         return fontRenderer;
     }
@@ -753,7 +755,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    
     // Misc    
 
-    void compareSettingsToOriginal()
+    public void compareSettingsToOriginal()
     {  
     	// Only do this for MP server (not SP or main menu)
     	if(this.mc.world != null && !this.mc.isSingleplayer())
@@ -820,7 +822,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         }
     }  
     
-    void selectDimensionIndex(int index)
+    public void selectDimensionIndex(int index)
     {   	    	
     	if(index >= dimensions.size())
     	{
@@ -852,7 +854,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		this.btnDelete.enabled = this.selectedDimensionIndex != 0 && (isNewDim || !isLoaded); // Overworld and unloaded dims can't be deleted
     }
 
-    boolean isDimensionIndexSelected(int index)
+    public boolean isDimensionIndexSelected(int index)
     {
         return index == selectedDimensionIndex;
     }
