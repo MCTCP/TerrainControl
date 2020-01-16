@@ -13,6 +13,7 @@ class BO4Settings extends Settings
             REMOVEAIR = booleanSetting("RemoveAir", true),
     		CANOVERRIDE = booleanSetting("CanOverride", false),
 			MUSTBEBELOWOTHER = booleanSetting("MustBeBelowOther", false),
+			MUSTBEINSIDEWORLDBORDERS = booleanSetting("MustBeInsideWorldBorders", false),
 			CANSPAWNONWATER = booleanSetting("CanSpawnOnWater", true),
 			SPAWNONWATERONLY = booleanSetting("SpawnOnWaterOnly", false),
 			SPAWNUNDERWATER = booleanSetting("SpawnUnderWater", false),

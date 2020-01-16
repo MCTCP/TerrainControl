@@ -257,4 +257,6 @@ public interface LocalWorld
 	public void setAllowSpawningOutsideBounds(boolean b);
 
 	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer);
+
+	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 }

@@ -1319,4 +1319,10 @@ public class ForgeWorld implements LocalWorld
 		
 		return true;
 	}
+
+	@Override
+	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate)
+	{
+		return this.world.getWorldBorder().contains(new BlockPos(chunkCoordinate.getBlockXCenter(), 0, chunkCoordinate.getBlockZCenter()));
+	}
 }
