@@ -134,6 +134,9 @@ public class BO4Config extends CustomObjectConfigFile
 
     // Used to make sure that dungeons can only spawn underneath other structures
     public boolean mustBeBelowOther;
+    
+    // Used to make sure that dungeons can only spawn inside worldborders
+    public boolean mustBeInsideWorldBorders;
 
     private String replacesBO3;
     public ArrayList<String> replacesBO3Branches;
@@ -966,7 +969,7 @@ public class BO4Config extends CustomObjectConfigFile
 
         writer.comment("If this is set to true then this BO3 can only spawn underneath an existing BO3. Used to make sure that dungeons only appear underneath buildings.");
         writer.setting(BO4Settings.MUSTBEBELOWOTHER, this.mustBeBelowOther);
-
+       
         writer.comment("Used with CanOverride: true. A comma-seperated list of BO3s, this BO3's bounding box must collide with one of the BO3's in the list or this BO3 fails to spawn and the current branch is rolled back.");
         writer.setting(BO4Settings.MUSTBEINSIDE, this.mustBeInside);
 
@@ -976,6 +979,9 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("Used with CanOverride: true. A comma-seperated list of BO3s, if this BO3's bounding box collides with any of the BO3's in the list then those BO3's won't spawn any blocks. This does not remove or roll back any BO3's.");
         writer.setting(BO4Settings.REPLACESBO3, this.replacesBO3);
 
+        writer.comment("If this is set to true then this BO3 can only spawn inside world borders. Used to make sure that dungeons only appear inside the world borders.");
+        writer.setting(BO4Settings.MUSTBEINSIDEWORLDBORDERS, this.mustBeInsideWorldBorders);       
+        
         writer.comment("Defaults to true. Set to false if the BO3 is not allowed to spawn on a water block");
         writer.setting(BO4Settings.CANSPAWNONWATER, this.canSpawnOnWater);
 
@@ -1091,6 +1097,7 @@ public class BO4Config extends CustomObjectConfigFile
         
         this.canOverride = readSettings(BO4Settings.CANOVERRIDE);
         this.mustBeBelowOther = readSettings(BO4Settings.MUSTBEBELOWOTHER);
+        this.mustBeInsideWorldBorders = readSettings(BO4Settings.MUSTBEINSIDEWORLDBORDERS);
         
         this.mustBeInside = readSettings(BO4Settings.MUSTBEINSIDE);
         this.mustBeInsideBranches = new ArrayList<String>();
@@ -1346,8 +1353,10 @@ public class BO4Config extends CustomObjectConfigFile
         }
     }
 
+    int bo4DataVersion = 1;
     public void writeToStream(DataOutput stream) throws IOException
     {
+    	stream.writeInt(this.bo4DataVersion);    	
     	stream.writeInt(this.minimumSizeTop);
     	stream.writeInt(this.minimumSizeBottom);
     	stream.writeInt(this.minimumSizeLeft);
@@ -1378,6 +1387,7 @@ public class BO4Config extends CustomObjectConfigFile
         stream.writeInt(this.branchFrequency);
         StreamHelper.writeStringToStream(stream, this.branchFrequencyGroup);
         stream.writeBoolean(this.mustBeBelowOther);
+        stream.writeBoolean(this.mustBeInsideWorldBorders);
         StreamHelper.writeStringToStream(stream, this.mustBeInside);
         StreamHelper.writeStringToStream(stream, this.cannotBeInside);
         StreamHelper.writeStringToStream(stream, this.replacesBO3);
@@ -1591,6 +1601,7 @@ public class BO4Config extends CustomObjectConfigFile
 				// do something with data
 		      
 	        	this.inheritedBO3Loaded = true;
+	        	int bo4DataVersion = buffer.getInt();
 	        	this.minimumSizeTop = buffer.getInt();
 	        	this.minimumSizeBottom = buffer.getInt();
 	        	this.minimumSizeLeft = buffer.getInt();
@@ -1625,6 +1636,7 @@ public class BO4Config extends CustomObjectConfigFile
 				this.branchFrequency = buffer.getInt();
 				this.branchFrequencyGroup = StreamHelper.readStringFromBuffer(buffer);
 				this.mustBeBelowOther = buffer.get() != 0;
+				this.mustBeInsideWorldBorders = buffer.get() != 0;
 				this.mustBeInside = StreamHelper.readStringFromBuffer(buffer);
 				this.cannotBeInside = StreamHelper.readStringFromBuffer(buffer);
 				this.replacesBO3 = StreamHelper.readStringFromBuffer(buffer);

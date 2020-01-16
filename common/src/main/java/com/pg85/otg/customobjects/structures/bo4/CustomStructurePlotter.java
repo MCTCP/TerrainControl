@@ -118,7 +118,7 @@ public class CustomStructurePlotter
 			            		{
 				            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
 				                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
-				                	structureStart2 = new BO4CustomStructure(world, structureCoord, false, false);
+				                	structureStart2 = new BO4CustomStructure(world, structureCoord);
 				                	// Get minimum size (size if spawned with branchDepth 0)
 
 				                	try {
@@ -146,7 +146,7 @@ public class CustomStructurePlotter
 			            			{
 					            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
 					                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
-					                	structureStart2 = new BO4CustomStructure(world, structureCoord, false, false);
+					                	structureStart2 = new BO4CustomStructure(world, structureCoord);
 					                	// Get minimum size (size if spawned with branchDepth 0)
 
 					                	try {
@@ -177,7 +177,7 @@ public class CustomStructurePlotter
 		            	if(BO3sBySize.size() > 0)
 		            	{
 			            	int pass = 1;
-			            	Object[] currentStructureSpawning = BO3sBySize.size() > 0 ? (spawningStructureAtSpawn ? BO3sBySize.get(random.nextInt(BO3sBySize.size()))  : BO3sBySize.get(0)) : null;
+			            	Object[] currentStructureSpawning = BO3sBySize.size() > 0 ? (spawningStructureAtSpawn ? BO3sBySize.get(random.nextInt(BO3sBySize.size())) : BO3sBySize.get(0)) : null;
 
 		            		int left = 0;
 		            		int right = 0;
@@ -566,22 +566,6 @@ public class CustomStructurePlotter
 				            			right = (int) Math.floor(((Integer)topLeftAndLowerRightChunkCoordinates[3] + (Integer)topLeftAndLowerRightChunkCoordinates[1]) / 2d);
 				            			top = (int) Math.ceil(((Integer)topLeftAndLowerRightChunkCoordinates[0] + (Integer)topLeftAndLowerRightChunkCoordinates[2]) / 2d);
 				            			bottom = (int) Math.floor(((Integer)topLeftAndLowerRightChunkCoordinates[0] + (Integer)topLeftAndLowerRightChunkCoordinates[2]) / 2d);
-
-				            			if(
-			            					world.getWorldSession().getWorldBorderRadius() > 0 &&
-			            					(
-		            							world.getWorldSession().getWorldBorderRadius() < left ||
-		            							world.getWorldSession().getWorldBorderRadius() < right ||
-		            							world.getWorldSession().getWorldBorderRadius() < top ||
-		            							world.getWorldSession().getWorldBorderRadius() < bottom
-			            					)
-		            					)
-				            			{
-				            				left = 0;
-				            				right = 0;
-				            				top = 0;
-				            				bottom = 0;
-				            			}
 				            		}
 
 				        			areaSizeX = left + right + 1;
@@ -637,7 +621,7 @@ public class CustomStructurePlotter
 				                		if(isBO3AllowedToSpawnAt(ChunkCoordinate.fromChunkCoords((int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)), (int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))), (BO4)currentStructureSpawning[0]))
 				                		{
 						                	structureCoord = new BO4CustomStructureCoordinate(world, ((BO4)currentStructureSpawning[0]), null, Rotation.NORTH, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
-						                	structureStart2 = new BO4CustomStructure(world, structureCoord, true, spawningStructureAtSpawn);
+						                	structureStart2 = new BO4CustomStructure(world, structureCoord, spawningStructureAtSpawn);
 
 				            	        	if(structureStart2.IsSpawned)
 						                	{
@@ -732,7 +716,7 @@ public class CustomStructurePlotter
 				                		// If we've tried 4 passes for all structures then give up
 				                		if(BO3sBySize.size() == 1)
 				                		{
-			                        		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
+			                        		structureCache.put(chunkCoord, new BO4CustomStructure(world));
 				                		} else {
 				                			// Try 4 passes for next structure
 				                			// Find next structure
@@ -788,13 +772,13 @@ public class CustomStructurePlotter
 		                		}
 			        		}
 		            	} else {
-		            		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
+		            		structureCache.put(chunkCoord, new BO4CustomStructure(world));
 		            	}
 		            } else {
-	            		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
+	            		structureCache.put(chunkCoord, new BO4CustomStructure(world));
 		            }
 	            } else {
-            		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
+            		structureCache.put(chunkCoord, new BO4CustomStructure(world));
 	            }
 	    	}
 	        processing = false;

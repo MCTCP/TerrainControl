@@ -1828,4 +1828,10 @@ public class BukkitWorld implements LocalWorld
 	{
 		return false;
 	}
+
+	@Override
+	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate)
+	{
+		return true;
+	}
 }
