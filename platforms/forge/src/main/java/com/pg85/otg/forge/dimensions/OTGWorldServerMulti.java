@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.dimensions;
 
+import net.minecraft.network.play.server.SPacketWorldBorder;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.village.VillageCollection;
@@ -25,34 +26,32 @@ public class OTGWorldServerMulti extends WorldServer
         {
             public void onSizeChanged(WorldBorder border, double newSize)
             {
-                getWorldBorder().setTransition(newSize);
+            	server.getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_SIZE), dimensionId);
             }
             public void onTransitionStarted(WorldBorder border, double oldSize, double newSize, long time)
             {
-            	getWorldBorder().setTransition(oldSize, newSize, time);
+            	server.getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.LERP_SIZE), dimensionId);
             }
             public void onCenterChanged(WorldBorder border, double x, double z)
             {
-            	getWorldBorder().setCenter(x, z);
+            	server.getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_CENTER), dimensionId);
             }
             public void onWarningTimeChanged(WorldBorder border, int newTime)
             {
-            	getWorldBorder().setWarningTime(newTime);
+            	server.getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_TIME), dimensionId);
             }
             public void onWarningDistanceChanged(WorldBorder border, int newDistance)
             {
-            	getWorldBorder().setWarningDistance(newDistance);
+            	server.getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_BLOCKS), dimensionId);
             }
             public void onDamageAmountChanged(WorldBorder border, double newAmount)
             {
-            	getWorldBorder().setDamageAmount(newAmount);
             }
             public void onDamageBufferChanged(WorldBorder border, double newSize)
             {
-            	getWorldBorder().setDamageBuffer(newSize);
             }
         };
-        this.delegate.getWorldBorder().addListener(this.borderListener);
+        getWorldBorder().addListener(this.borderListener);
     }
 
     /**
@@ -78,9 +77,7 @@ public class OTGWorldServerMulti extends WorldServer
 	        {
 	            this.villageCollection = new VillageCollection(this);
 	            this.perWorldStorage.setData(s, this.villageCollection);
-	        }
-	        else
-	        {
+	        } else {
 	            this.villageCollection = villagecollection;
 	            this.villageCollection.setWorldsForAll(this);
 	        }

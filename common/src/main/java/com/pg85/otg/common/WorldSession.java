@@ -24,13 +24,11 @@ public abstract class WorldSession
 
 	public abstract ArrayList<ParticleFunction<?>> getParticleFunctions();
 
-	public abstract int getWorldBorderRadius();
-	public abstract ChunkCoordinate getWorldBorderCenterPoint();
-
 	public abstract int getPregenerationRadius();
 	public abstract int setPregenerationRadius(int value);
 
 	public abstract ChunkCoordinate getPreGeneratorCenterPoint();
+	public abstract void setPreGeneratorCenterPoint(ChunkCoordinate chunkCoord);
 
 	public abstract int getPregeneratedBorderLeft();
 	public abstract int getPregeneratedBorderRight();

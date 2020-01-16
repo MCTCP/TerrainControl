@@ -1,6 +1,10 @@
 package com.pg85.otg.forge.dimensions;
 
+import java.util.List;
+import java.util.Random;
+
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
@@ -10,12 +14,15 @@ import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.util.ChunkCoordinate;
 
+import net.minecraft.block.Block;
 import net.minecraft.command.WrongUsageException;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldProviderSurface;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraftforge.common.DimensionManager;
@@ -31,10 +38,7 @@ public class OTGWorldProvider extends WorldProviderSurface
 	private long lastFetchTime = 0;	
 	public boolean isSPServerOverworld = false;
 	
-	public OTGWorldProvider()
-	{
-		
-	}
+	public OTGWorldProvider() { }
 	
     // Creates a new {@link BiomeProvider} for the WorldProvider, and also sets the values of {@link #hasSkylight} and
     // {@link #hasNoSky} appropriately.
@@ -43,7 +47,7 @@ public class OTGWorldProvider extends WorldProviderSurface
 	{
 		// Creates a new world chunk manager for WorldProvider
 		this.hasSkyLight = true;
-   		if(!isSPServerOverworld)
+   		if(!isSPServerOverworld) // TODO: Why is this necessary?
    		{
    			this.biomeProvider = OTGPlugin.OtgWorldType.getBiomeProvider(world);
    		}
@@ -59,7 +63,7 @@ public class OTGWorldProvider extends WorldProviderSurface
    @Override
    public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()
    {
-   	return OTGPlugin.OtgWorldType.getChunkGenerator(world, "OpenTerrainGenerator");
+	   return OTGPlugin.OtgWorldType.getChunkGenerator(world, "OpenTerrainGenerator");
    }
    
 	@Override
@@ -152,13 +156,34 @@ public class OTGWorldProvider extends WorldProviderSurface
     @Override
     public boolean canCoordinateBeSpawn(int x, int z)
     {
-        return false; // TODO: Make spawn pos detection method? (make sure it doesn't screw up BO3AtSpawn)
+        BlockPos blockpos = new BlockPos(x, 0, z);
+
+        if (this.world.getBiome(blockpos).ignorePlayerSpawnSuitability())
+        {
+            return true;
+        } else {
+        	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(this.world);
+            return forgeWorld.getHighestBlockYAt(x, z, true, false, false, true) != -1;
+        }
     }
 
     @Override
     public BlockPos getRandomizedSpawnPoint()
     {
-    	return super.getRandomizedSpawnPoint();
+    	DimensionConfig dimConfig = getDimensionConfig();   	
+    	if(dimConfig != null && dimConfig.Settings.SpawnPointSet)
+    	{
+			// Calculate random spawn position within a circular radius around the spawn coords
+			Random rand = new Random();	    			
+			int randX = -dimConfig.GameRules.SpawnRadius + rand.nextInt(dimConfig.GameRules.SpawnRadius * 2);
+			// MaxZ = sqrt(spawnradius^2 - randX^2)
+			int maxZ =  (int)Math.floor(Math.sqrt((dimConfig.GameRules.SpawnRadius * dimConfig.GameRules.SpawnRadius) - (randX * randX)));
+			int randZ = maxZ == 0 ? 0 : -maxZ + rand.nextInt(maxZ * 2);
+
+			return new BlockPos(this.world.getWorldInfo().getSpawnX() + randX, this.world.getWorldInfo().getSpawnY(), this.world.getWorldInfo().getSpawnZ() + randZ);
+    	} else {
+    		return super.getRandomizedSpawnPoint();
+    	}
     }
 
     // True if the player can respawn in this dimension (true = overworld, false = nether).
@@ -303,38 +328,33 @@ public class OTGWorldProvider extends WorldProviderSurface
     	}
     }
 
+    @Override
     public WorldBorder createWorldBorder()
     {
-		WorldBorder worldBorder = new WorldBorder()
-        {
-            public double getCenterX()
-            {
-                return super.getCenterX() / getMovementFactor();
-            }
-            public double getCenterZ()
-            {
-                return super.getCenterZ() / getMovementFactor();
-            }
-        };
-           
+    	return new WorldBorder();
+    }
+    
+    public WorldBorder createWorldBorderA(WorldBorder worldBorder)
+    {
+		worldBorder = worldBorder != null ? worldBorder : new WorldBorder();
         if(world != null && world.provider != null)
         {
 	    	DimensionConfig dimConfig = getDimensionConfig();
 	    	if(dimConfig != null && dimConfig.WorldBorderRadiusInChunks > 0)
 	    	{
 	    		ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(world);
-	    		ChunkCoordinate worldBorderCenterPoint;
 	    		if(forgeWorld != null)
 	    		{
-	    			worldBorderCenterPoint = forgeWorld.getWorldSession().getWorldBorderCenterPoint();
-	                double d2 = MathHelper.clamp(dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16 , 1.0D, 6.0E7D);
-	                worldBorder.setCenter(worldBorderCenterPoint.getBlockX() * getMovementFactor() + 8, worldBorderCenterPoint.getBlockZ() * getMovementFactor() + 8);
+	    			ChunkCoordinate worldBorderCenterPoint = ChunkCoordinate.fromBlockCoords(forgeWorld.getWorld().getWorldInfo().getSpawnX(),forgeWorld.getWorld().getWorldInfo().getSpawnZ());                
+	    			// 0 is disabled, 1 is 1 chunk, 2 is 3 chunks, 3 is 5 chunks etc
+	    			double d2 = dimConfig.WorldBorderRadiusInChunks == 0 ? 6.0E7D : dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16;
+	                worldBorder.setCenter(worldBorderCenterPoint.getBlockX() + 8, worldBorderCenterPoint.getBlockZ() + 8);
 	                worldBorder.setTransition(d2);
-	    		}    		
+	    		}
 	    	}
         }
 		return worldBorder;
-    }	
+    }
 
     // Calculates the angle of sun and moon in the sky relative to a specified time (usually worldTime)
     @Override

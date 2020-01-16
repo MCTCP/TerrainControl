@@ -23,18 +23,6 @@ public class BukkitWorldSession extends WorldSession
 	}
 
 	@Override
-	public int getWorldBorderRadius()
-	{
-		return 0;
-	}
-
-	@Override
-	public ChunkCoordinate getWorldBorderCenterPoint()
-	{
-		return ChunkCoordinate.fromBlockCoords(0, 0);
-	}
-
-	@Override
 	public int getPregenerationRadius()
 	{
 		return 0;
@@ -70,6 +58,9 @@ public class BukkitWorldSession extends WorldSession
 		return 0;
 	}
 
+	@Override
+	public void setPreGeneratorCenterPoint(ChunkCoordinate chunkCoord) { }
+	
 	@Override
 	public ChunkCoordinate getPreGeneratorCenterPoint()
 	{

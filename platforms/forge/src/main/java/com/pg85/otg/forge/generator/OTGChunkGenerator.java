@@ -111,12 +111,6 @@ public class OTGChunkGenerator implements IChunkGenerator
     private ForgeChunkBuffer chunkBuffer;    
     //   
     
-    // The first run is used by MC to check for suitable locations for the spawn location. For some reason the spawn location must be on grass.
-    private boolean firstRun = true; 
-    private ArrayList<LocalMaterialData> originalBlocks = new ArrayList<LocalMaterialData>(); // Don't need to store coords, will place the blocks back in the same order we got them so coords can be inferred    
-    private ChunkCoordinate spawnChunk;
-    private boolean spawnChunkFixed = false;
-    
     private boolean allowSpawningOutsideBounds = false;   
     
     /**
@@ -181,12 +175,6 @@ public class OTGChunkGenerator implements IChunkGenerator
 				// to ProvideChunk() by updateBlocks() on server tick.
 				// TODO: This is causing stackoverflowexceptions
 				chunk = this.world.getWorld().getChunk(chunkX, chunkZ);
-
-				if(chunk == null)
-				{
-					// TODO: Test this..
-					throw new RuntimeException();
-				}
 				OTG.log(LogMarker.WARN, "Double population prevented");
 			}
 			if(chunk != null)
@@ -194,7 +182,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 				OTG.log(LogMarker.WARN, "Double population prevented");
 				return chunk;
 			} else {
-				OTG.log(LogMarker.WARN, "Double population could not be prevented for chunk X" + chunkX + " Z" + chunkZ);
+				OTG.log(LogMarker.WARN, "Double population could not be prevented for chunk X" + chunkX + " Z" + chunkZ);				
 			}
 		}
 
@@ -243,15 +231,6 @@ public class OTGChunkGenerator implements IChunkGenerator
 			// populate a chunk that has already been provided/populated before,
 			// which seems like a bug.
         	//throw new RuntimeException();
-        }
-
-        fixSpawnChunk();
-
-        DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
-        if(dimConfig.Settings.SpawnPointSet)
-        {
-    		world.getWorld().provider.setSpawnPoint(new BlockPos(dimConfig.Settings.SpawnPointX, dimConfig.Settings.SpawnPointY, dimConfig.Settings.SpawnPointZ));
-    		dimConfig.Settings.SpawnPointSet = false; // This will reset when the world is reloaded, so if users manually reconfigure the spawn point it will be reverted. They will have to set spawnPointSet: false to prevent this.
         }
 
         this.spawner.populate(chunkCoord);
@@ -427,47 +406,6 @@ public class OTGChunkGenerator implements IChunkGenerator
         long i = ChunkPos.asLong(chunkX, chunkZ);
         return (Chunk) ((ChunkProviderServer) this.world.getWorld().getChunkProvider()).loadedChunks.get(i);
     }
-    
-    // Spawn chunk fix for OTG+    
-	// TODO: This should no longer be needed, using the onCreateWorldSpawn event in WorldListener now?.
-    private void fixSpawnChunk()
-    {
-    	if(!firstRun)
-    	{
-    		// Only required for OTG+ isStructureAtSpawn setting for BO3's.
-    		if(!spawnChunkFixed && world.getConfigs().getWorldConfig().isOTGPlus)
-			{
-	    		// TODO: This shouldn't be necessary, the first chunk spawned should be in the are being populated?
-	    		this.setAllowSpawningOutsideBounds(true);
-				int i = 0;
-				for(int x = 0; x < 15; x++)
-				{
-					for(int z = 0; z < 15; z++)
-					{
-						if(!originalBlocks.get(i).toDefaultMaterial().equals(DefaultMaterial.AIR) || !originalBlocks.get(i + 1).toDefaultMaterial().equals(DefaultMaterial.AIR))
-						{
-							world.setBlock(spawnChunk.getBlockX() + x, 63, spawnChunk.getBlockZ() + z, originalBlocks.get(i), null, true);
-							world.setBlock(spawnChunk.getBlockX() + x, 64, spawnChunk.getBlockZ() + z, originalBlocks.get(i + 1), null, true);
-						} else {
-							for(int h = 62; h > 0; h++)
-							{
-								if(!world.getMaterial(spawnChunk.getBlockX() + x, h, spawnChunk.getBlockZ() + z, true).toDefaultMaterial().equals(DefaultMaterial.AIR))
-								{
-									world.setBlock(spawnChunk.getBlockX() + x, 63, spawnChunk.getBlockZ() + z, originalBlocks.get(i), null, true);
-									world.setBlock(spawnChunk.getBlockX() + x, 64, spawnChunk.getBlockZ() + z, originalBlocks.get(i + 1), null, true);
-									break;
-								}
-							}
-						}
-						i += 2;
-					}
-				}
-	
-				this.setAllowSpawningOutsideBounds(false);
-			}
-    		spawnChunkFixed = true;
-    	}
-    }
 
     // Blocks
     
@@ -488,26 +426,6 @@ public class OTGChunkGenerator implements IChunkGenerator
     		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
     		this.generator.generate(chunkBuffer);
 
-    		// Before starting terrain generation MC tries to find a suitable spawn point. For some reason it looks for a grass block with an air block above it.
-    		// To prevent MC from looking in many chunks (if there is no grass block nearby) and causing them to be populated place grass in the first requested chunk
-    		// cache the original blocks so that they can be placed back when proper world generation starts.
-    		// Only needed for OTG+ isStructureAtSpawn setting for BO3's.
-    		if(firstRun && world.getConfigs().getWorldConfig().isOTGPlus)
-    		{
-    			spawnChunk = chunkCoord;
-    			for(int x = 0; x < 15; x++)
-    			{
-    				for(int z = 0; z < 15; z++)
-    				{
-    					originalBlocks.add(chunkBuffer.getBlock(x, 63, z));
-    					originalBlocks.add(chunkBuffer.getBlock(x, 64, z));
-
-    					chunkBuffer.setBlock(x, 63, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.GRASS, 0));
-    					chunkBuffer.setBlock(x, 64, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0));
-    				}
-    			}
-    		}
-			firstRun = false;
     		chunk = chunkBuffer.toChunk(this.world.getWorld());
 
 	        fillBiomeArray(chunk);
