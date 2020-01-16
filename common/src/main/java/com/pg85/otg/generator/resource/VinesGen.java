@@ -33,9 +33,9 @@ public class VinesGen extends Resource
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
         minAltitude = readInt(args.get(2), PluginStandardValues.WORLD_DEPTH,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(3), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
     }
     
     private boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)

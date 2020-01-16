@@ -254,7 +254,7 @@ public class BO3 implements StructuredCustomObject
         } else {
             variance = random.nextInt(variance + 1);
         }
-        return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
+        return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
     }
 
     @Override
