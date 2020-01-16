@@ -8,7 +8,10 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.GameSettings;
@@ -20,6 +23,7 @@ import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import net.minecraftforge.common.ForgeModContainer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -51,13 +55,17 @@ public class ClientFogHandler {
 	@SubscribeEvent
 	public void onGetFogColor(EntityViewRenderEvent.FogColors event) {
 		if (!(event.getEntity() instanceof EntityPlayer))
+		{
 			return;
-
+		}
+	
 		LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(event.getEntity().world);
 
 		// Not an OTG world
 		if (world == null)
+		{
 			return;
+		}
 
 		Vec3d fogColor = blendFogColors(event.getEntity().world, (EntityLivingBase) event.getEntity(), event.getRed(),
 				event.getGreen(), event.getBlue(), event.getRenderPartialTicks());
@@ -88,10 +96,12 @@ public class ClientFogHandler {
 
 		boolean hasMoved = entity.posX != lastX || entity.posZ != lastZ;
 
-		LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(mcworld);
+		ForgeWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(mcworld);
 
 		if (world == null)
+		{
 			return;
+		}
 
 		float biomeFogDistance = 0F;
 		float weightBiomeFog = 0;
@@ -102,7 +112,7 @@ public class ClientFogHandler {
 				blockPos.setPos(blockX + x, 0, blockZ + z);
 				BiomeConfig config = getBiomeConfig(world, x + blendDistance, z + blendDistance, blockPos, hasMoved);
 
-				if (config.fogColor != 0x000000) {
+				if (config != null && config.fogColor != 0x000000) {
 					float fogDensity = 1f - config.fogDensity;
 					float densityWeight = 1;
 
@@ -173,7 +183,7 @@ public class ClientFogHandler {
 			blendDistance = ranges[settings.renderDistanceChunks];
 		}
 
-		LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(mcworld);
+		ForgeWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(mcworld);
 		int blockX = (int) Math.floor(entity.posX);
 		int blockZ = (int) Math.floor(entity.posZ);
 
@@ -192,38 +202,41 @@ public class ClientFogHandler {
 			for (int z = -blendDistance; z <= blendDistance; ++z) {
 				blockPos.setPos(blockX + x, 0, blockZ + z);
 				BiomeConfig config = getBiomeConfig(world, x + blendDistance, z + blendDistance, blockPos, hasMoved);
-				int fogColour = config.fogColor;
-
-				if (fogColour != 0x000000) {
-
-					double fogRed = (fogColour & 0xFF0000) >> 16;
-					double fogGreen = (fogColour & 0x00FF00) >> 8;
-					double fogBlue = fogColour & 0x0000FF;
-					float fogWeight = 1;
-
-					double differenceX = getDifference(entity.posX, blockX, x, blendDistance);
-
-					double differenceZ = getDifference(entity.posZ, blockZ, z, blendDistance);
-
-					if (differenceX != -1) {
-						fogRed *= differenceX;
-						fogGreen *= differenceX;
-						fogBlue *= differenceX;
-						fogWeight *= differenceX;
+				if(config != null)
+				{
+					int fogColour = config.fogColor;
+	
+					if (fogColour != 0x000000) {
+	
+						double fogRed = (fogColour & 0xFF0000) >> 16;
+						double fogGreen = (fogColour & 0x00FF00) >> 8;
+						double fogBlue = fogColour & 0x0000FF;
+						float fogWeight = 1;
+	
+						double differenceX = getDifference(entity.posX, blockX, x, blendDistance);
+	
+						double differenceZ = getDifference(entity.posZ, blockZ, z, blendDistance);
+	
+						if (differenceX != -1) {
+							fogRed *= differenceX;
+							fogGreen *= differenceX;
+							fogBlue *= differenceX;
+							fogWeight *= differenceX;
+						}
+	
+						if (differenceZ != -1) {
+							fogRed *= differenceZ;
+							fogGreen *= differenceZ;
+							fogBlue *= differenceZ;
+							fogWeight *= differenceZ;
+						}
+	
+						biomeFogRed += fogRed;
+						biomeFogGreen += fogGreen;
+						biomeFogBlue += fogBlue;
+						biomeFogWeight += fogWeight;
+	
 					}
-
-					if (differenceZ != -1) {
-						fogRed *= differenceZ;
-						fogGreen *= differenceZ;
-						fogBlue *= differenceZ;
-						fogWeight *= differenceZ;
-					}
-
-					biomeFogRed += fogRed;
-					biomeFogGreen += fogGreen;
-					biomeFogBlue += fogBlue;
-					biomeFogWeight += fogWeight;
-
 				}
 			}
 		}
@@ -274,14 +287,36 @@ public class ClientFogHandler {
 	}
 
 	// Get the biome config from the cache or freshly from the world if needed
-	private BiomeConfig getBiomeConfig(LocalWorld world, int x, int z, MutableBlockPos blockPos, boolean hasMoved) {
+	private BiomeConfig getBiomeConfig(ForgeWorld world, int x, int z, MutableBlockPos blockPos, boolean hasMoved) {
 		short cachedId = biomeCache[x][z];
 		if (cachedId != -1 && !hasMoved) {
 			return OTG.getEngine().getOTGBiomeIds(world.getName())[cachedId];
 		} else {
-			LocalBiome biome = world.getBiome(blockPos.getX(), blockPos.getZ());
-			biomeCache[x][z] = (short) biome.getIds().getOTGBiomeId();
-			return biome.getBiomeConfig();
+			Biome biome = world.getWorld().getBiome(blockPos);
+            LocalBiome localBiome = null;
+            try
+            {
+            	// Get world name from resourcelocation
+            	// TODO: Get world name from somewhere sensical...
+            	localBiome = OTG.getBiome(biome.getBiomeName(), biome.getRegistryName().getPath().split("_")[0]);
+            }
+            catch (BiomeNotFoundException e)
+            {
+                // Ignored, try in next world
+            }
+            catch (NoSuchMethodError e)
+            {
+                // Thrown when a mod biome doesn't have the method getBiomeName, making it fail to get the biomeconfig
+                // Ignored, as biomes from OTG should never throw this
+            }
+
+            if (localBiome == null)
+            {
+                return null;
+            }
+
+			biomeCache[x][z] = (short) localBiome.getIds().getOTGBiomeId();
+			return localBiome.getBiomeConfig();
 		}
 	}
 }
