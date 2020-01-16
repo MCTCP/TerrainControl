@@ -281,12 +281,6 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 
     	byte blocksLength = buffer.get();
     	
-    	if(blocksLength < 0)
-		{
-    		String breakpoint = "";
-		}
-    				
-    	
     	rbf.blockCount = blocksLength;
     	rbf.blocks = new LocalMaterialData[blocksLength];
     	rbf.blockChances = new byte[blocksLength];

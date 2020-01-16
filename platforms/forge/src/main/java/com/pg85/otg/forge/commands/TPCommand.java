@@ -73,6 +73,7 @@ public class TPCommand extends BaseCommand
             ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
             if (world != null)
             {
+            	// TODO: Use BiomeProvider.findBiomePosition instead?
                 int maxRadius = 1000;
 
                 if (biomeId == -1)
