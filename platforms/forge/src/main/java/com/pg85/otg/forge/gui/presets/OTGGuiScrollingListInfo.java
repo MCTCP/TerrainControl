@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
-import com.pg85.otg.forge.gui.OTGGuiScrollingList;
+import com.pg85.otg.forge.gui.dimensions.base.OTGGuiScrollingList;
 
 import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.renderer.BufferBuilder;

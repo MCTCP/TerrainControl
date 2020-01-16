@@ -1,12 +1,12 @@
-package com.pg85.otg.forge.gui.dimensions;
+package com.pg85.otg.forge.gui.dimensions.base;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.gui.IGuiListEntry;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionSettingsList;
-import com.pg85.otg.forge.gui.dimensions.SettingEntry.ValueType;
+import com.pg85.otg.forge.gui.dimensions.base.SettingEntry.ValueType;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
+import com.pg85.otg.util.ChunkCoordinate;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -22,7 +22,7 @@ public class KeyEntry implements IGuiListEntry
 {
 	private final OTGGuiDimensionSettingsList otgGuiDimensionSettingsList;
 	/** The keybinding specified for this KeyEntry */
-    final SettingEntry settingEntry;
+    public final SettingEntry settingEntry;
     /** The localized key description for this KeyEntry */
     private final String keyDesc;
     private final GuiButton btnSettingEntry;
@@ -30,13 +30,13 @@ public class KeyEntry implements IGuiListEntry
     private final GuiButton btnReset;
     private final OTGGuiDimensionSettingsList parent;
 
-    KeyEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, SettingEntry settingEntry, OTGGuiDimensionSettingsList parent, boolean isEnabled)
+    public KeyEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, SettingEntry settingEntry, OTGGuiDimensionSettingsList parent, boolean isEnabled)
     {
     	this(otgGuiDimensionSettingsList, settingEntry, parent);
     	this.btnSettingEntry.enabled = isEnabled;
     }
     
-    KeyEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, SettingEntry<?> settingEntry, OTGGuiDimensionSettingsList parent)
+    public KeyEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, SettingEntry<?> settingEntry, OTGGuiDimensionSettingsList parent)
     {
         this.otgGuiDimensionSettingsList = otgGuiDimensionSettingsList;
 		this.settingEntry = settingEntry;
@@ -197,6 +197,36 @@ public class KeyEntry implements IGuiListEntry
         						integer = (int)this.settingEntry.minValue;
         					}
         					
+        					if(this.settingEntry.name.equals("World border radius"))
+        					{
+            					int radius = integer;
+            					if(!this.parent.controlsScreen.selectedDimension.isNewConfig)
+            					{
+	            					ForgeWorld forgeWorld = null;
+            						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);
+	            					if(forgeWorld == null)
+	            					{
+	            						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
+	            					}
+	            					
+	            					// ForgeWorld can be null in SP world creation menu.
+	            					if(
+            							Minecraft.getMinecraft().isSingleplayer() && 
+            							forgeWorld != null && 
+            							forgeWorld.getWorldSession() != null 
+        							)
+	            					{
+	            						ChunkCoordinate worldBorderCenterPoint = ChunkCoordinate.fromBlockCoords(forgeWorld.getWorld().getWorldInfo().getSpawnX(),forgeWorld.getWorld().getWorldInfo().getSpawnZ());                
+	            						// 0 is disabled, 1 is 1 chunk, 2 is 3 chunks, 3 is 5 chunks etc
+	            						double d2 = radius == 0 ? 6.0E7D : radius == 1 ? 16 : ((radius - 1) * 2 + 1) * 16;
+	            						forgeWorld.getWorld().getWorldBorder().setCenter(worldBorderCenterPoint.getBlockX() + 8, worldBorderCenterPoint.getBlockZ() + 8);
+	            						forgeWorld.getWorld().getWorldBorder().setTransition(d2);			                            	
+	            					}
+            					}
+	            				this.settingEntry.value = radius;
+	            				this.txtSettingsEntry.setText(radius + "");
+        					}
+        					
             				if(this.settingEntry.name.equals("Pregenerator radius"))
             				{
             					int radius = integer;
@@ -209,7 +239,11 @@ public class KeyEntry implements IGuiListEntry
 	            						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
 	            					}
 	            					// ForgeWorld can be null in SP world creation menu.
-	            					if(Minecraft.getMinecraft().isSingleplayer() && forgeWorld != null && forgeWorld.getWorldSession() != null && forgeWorld.getWorldSession().getPregenerationRadius() != radius)
+	            					if(
+            							Minecraft.getMinecraft().isSingleplayer() && 
+            							forgeWorld != null && 
+            							forgeWorld.getWorldSession() != null
+        							)
 	            					{
 		            					forgeWorld.getWorldSession().setPregenerationRadius(radius);
 		            					radius = forgeWorld.getWorldSession().getPregenerationRadius();
@@ -375,7 +409,36 @@ public class KeyEntry implements IGuiListEntry
         
         if (this.btnReset.mousePressed(this.otgGuiDimensionSettingsList.mc, mouseX, mouseY))
         {
-        	this.settingEntry.value = this.settingEntry.defaultValue;
+        	this.settingEntry.value = this.settingEntry.defaultValue;       	
+        	       	
+        	if(this.settingEntry.name.equals("World border radius"))
+    		{
+				int radius = (int)this.settingEntry.value;
+        		if(!this.parent.controlsScreen.selectedDimension.isNewConfig)
+        		{
+					ForgeWorld forgeWorld = null;
+					forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);
+					if(forgeWorld == null)
+					{
+						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
+					}
+					// ForgeWorld can be null for SP world creation menu
+					if(
+						Minecraft.getMinecraft().isSingleplayer() && 
+						forgeWorld != null && 
+						forgeWorld.getWorldSession() != null
+					)
+					{
+						ChunkCoordinate worldBorderCenterPoint = ChunkCoordinate.fromBlockCoords(forgeWorld.getWorld().getWorldInfo().getSpawnX(),forgeWorld.getWorld().getWorldInfo().getSpawnZ());                
+						// 0 is disabled, 1 is 1 chunk, 2 is 3 chunks, 3 is 5 chunks etc
+						double d2 = radius == 0 ? 6.0E7D : radius == 1 ? 16 : ((radius - 1) * 2 + 1) * 16;
+						forgeWorld.getWorld().getWorldBorder().setCenter(worldBorderCenterPoint.getBlockX() + 8, worldBorderCenterPoint.getBlockZ() + 8);
+						forgeWorld.getWorld().getWorldBorder().setTransition(d2);
+					}
+        		}
+				this.settingEntry.value = radius;
+				this.txtSettingsEntry.setText(radius + "");
+    		}
         	if(this.settingEntry.name.equals("Pregenerator radius"))
     		{
 				int radius = (int)this.settingEntry.value;
@@ -388,7 +451,11 @@ public class KeyEntry implements IGuiListEntry
 						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(this.parent.controlsScreen.selectedDimensionIndex == 0 ? "overworld" : this.parent.controlsScreen.selectedDimension.PresetName);	
 					}
 					// ForgeWorld can be null for SP world creation menu
-					if(Minecraft.getMinecraft().isSingleplayer() && forgeWorld != null && forgeWorld.getWorldSession() != null && forgeWorld.getWorldSession().getPregenerationRadius() != radius)
+					if(
+						Minecraft.getMinecraft().isSingleplayer() && 
+						forgeWorld != null && 
+						forgeWorld.getWorldSession() != null
+					)
 					{
     					forgeWorld.getWorldSession().setPregenerationRadius(radius);
     					radius = forgeWorld.getWorldSession().getPregenerationRadius();

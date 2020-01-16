@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui.dimensions;
+package com.pg85.otg.forge.gui.dimensions.base;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -19,14 +19,14 @@ import org.lwjgl.opengl.GL11;
 public abstract class OTGGuiSlot
 {
     private final Minecraft mc;
-    int width;
-    int height;
+    protected int width;
+    protected int height;
     /** The top of the slot container. Affects the overlays and scrolling. */
-    int top;
+    protected int top;
     /** The bottom of the slot container. Affects the overlays and scrolling. */
-    int bottom;
-    int right;
-    int left;
+    protected int bottom;
+    protected int right;
+    protected int left;
     /** The height of a slot. */
     final int slotHeight;
     /** The buttonID of the button used to scroll up */
@@ -43,7 +43,7 @@ public abstract class OTGGuiSlot
      */
     private float scrollMultiplier;
     /** How far down this slot has been scrolled */
-    protected float amountScrolled;
+    public float amountScrolled;
     /** The element in the list that was selected */
     private int selectedElement = -1;
     /** The time when this button was last clicked. */
@@ -159,7 +159,7 @@ public abstract class OTGGuiSlot
     /**
      * Scrolls the slot by the given amount. A positive value scrolls down, and a negative value scrolls up.
      */
-    void scrollBy(int amount)
+    public void scrollBy(int amount)
     {
         this.amountScrolled += (float)amount;
         this.bindAmountScrolled();
@@ -211,7 +211,7 @@ public abstract class OTGGuiSlot
     
     protected abstract void drawBackground();
 
-    void drawScreen(int mouseXIn, int mouseYIn, float partialTicks)
+    public void drawScreen(int mouseXIn, int mouseYIn, float partialTicks)
     {
         if (this.visible)
         {
@@ -496,7 +496,7 @@ public abstract class OTGGuiSlot
         }
     }
     
-    void handleMouseInput()
+    public void handleMouseInput()
     {
         if (this.isMouseYWithinSlotBounds(this.mouseY))
         {

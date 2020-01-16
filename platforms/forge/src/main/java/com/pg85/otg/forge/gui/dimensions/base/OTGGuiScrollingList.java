@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui;
+package com.pg85.otg.forge.gui.dimensions.base;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;

@@ -1,8 +1,6 @@
-package com.pg85.otg.forge.gui.dimensions;
+package com.pg85.otg.forge.gui.dimensions.base;
 
 import java.util.ArrayList;
-
-import com.pg85.otg.forge.gui.IGuiListEntry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.relauncher.Side;
@@ -11,7 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public abstract class OTGGuiListExtended extends OTGGuiSlot
 {
-    OTGGuiListExtended(Minecraft mcIn, int left, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
+    protected OTGGuiListExtended(Minecraft mcIn, int left, int widthIn, int heightIn, int topIn, int bottomIn, int slotHeightIn)
     {
         super(mcIn, left, widthIn, heightIn, topIn, bottomIn, slotHeightIn);
     }
@@ -45,7 +43,7 @@ public abstract class OTGGuiListExtended extends OTGGuiSlot
         this.getListEntry(entryID).updatePosition(entryID, insideLeft, yPos, partialTicks);
     }
     
-    boolean mouseClicked(int mouseX, int mouseY, int mouseEvent)
+    public boolean mouseClicked(int mouseX, int mouseY, int mouseEvent)
     {
         for(IGuiListEntry entry : this.getAllListEntries())
         {
@@ -77,7 +75,7 @@ public abstract class OTGGuiListExtended extends OTGGuiSlot
         return false;
     }
 
-    void keyTyped(char typedChar, int keyCode)
+    public void keyTyped(char typedChar, int keyCode)
     {
     	for(IGuiListEntry entry : this.getAllListEntries())
     	{
@@ -88,7 +86,7 @@ public abstract class OTGGuiListExtended extends OTGGuiSlot
     	}
     }
     
-    boolean mouseReleased(int x, int y, int mouseEvent)
+    public boolean mouseReleased(int x, int y, int mouseEvent)
     {
         for (int i = 0; i < this.getSize(); ++i)
         {
