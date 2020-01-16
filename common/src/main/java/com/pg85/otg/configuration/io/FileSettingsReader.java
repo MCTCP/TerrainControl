@@ -54,7 +54,13 @@ public class FileSettingsReader
             else if (thisLine.contains(":") || thisLine.toLowerCase().contains("("))
             {
                 // Setting or resource
-                if (thisLine.contains("(") && (!thisLine.contains(":") || thisLine.indexOf('(') < thisLine.indexOf(':')))
+                if (
+                		thisLine.contains("(") && 
+                		(
+            				!thisLine.contains(":") || 
+            				thisLine.indexOf('(') < thisLine.indexOf(':')
+        				)
+            		)
                 {
                     // ( is first, so it's a resource
                     String configFunction = thisLine.trim();

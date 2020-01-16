@@ -34,7 +34,12 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
         z = readInt(args.get(2), -100, 100);
 
         material = readMaterial(args.get(3));
-
+       
+        if(material == null)
+        {
+        	throw new InvalidConfigException("Material \"" + args.get(3) + "\" could not be read.");
+        }
+        
         if (args.size() == 5)
         {
             metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().getFile());
