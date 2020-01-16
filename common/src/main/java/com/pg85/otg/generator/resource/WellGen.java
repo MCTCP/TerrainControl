@@ -28,8 +28,8 @@ public class WellGen extends Resource
         water = readMaterial(args.get(2));
         frequency = readInt(args.get(3), 1, 100);
         rarity = readRarity(args.get(4));
-        minAltitude = readInt(args.get(5), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(6), minAltitude + 1, PluginStandardValues.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(5), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
+        maxAltitude = readInt(args.get(6), minAltitude + 1, PluginStandardValues.WORLD_HEIGHT - 1);
         sourceBlocks = readMaterials(args, 7);
     }
 

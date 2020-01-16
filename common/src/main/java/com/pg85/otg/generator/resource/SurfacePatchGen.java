@@ -32,8 +32,8 @@ public class SurfacePatchGen extends Resource
 
         material = readMaterial(args.get(0));
         decorationAboveReplacements = readMaterial(args.get(1));
-        minAltitude = readInt(args.get(2), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(3), minAltitude, PluginStandardValues.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(2), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
+        maxAltitude = readInt(args.get(3), minAltitude, PluginStandardValues.WORLD_HEIGHT - 1);
         sourceBlocks = readMaterials(args, 4);
         random = new Random(2345L);
         noiseGen = new NoiseGeneratorSurfacePatchOctaves(random, 1);

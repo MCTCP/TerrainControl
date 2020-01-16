@@ -23,9 +23,9 @@ public class TreeObject implements CustomObject
 {
     private TreeType type;
     public int defaultMinHeight = PluginStandardValues.WORLD_DEPTH;
-    public int defaultMaxHeight = PluginStandardValues.WORLD_HEIGHT;    
+    public int defaultMaxHeight = PluginStandardValues.WORLD_HEIGHT - 1;    
     public int minHeight = PluginStandardValues.WORLD_DEPTH;
-    public int maxHeight = PluginStandardValues.WORLD_HEIGHT;
+    public int maxHeight = PluginStandardValues.WORLD_HEIGHT - 1;
 
     TreeObject(TreeType type)
     {
