@@ -16,7 +16,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.RandomHelper;
 
 import java.util.*;
@@ -77,7 +76,7 @@ public class BO4CustomStructure extends CustomStructure
     	this.minY = minY;
     }
 
-    public BO4CustomStructure(LocalWorld world)
+    public BO4CustomStructure()
     {
     
     }
@@ -167,8 +166,6 @@ public class BO4CustomStructure extends CustomStructure
         	}
 		}
 
-		//TODO: Smoothing areas should count as must spawn/required branches! <-- Is this really a problem? Smoothing areas from different structures don't overlap?
-
         // Calculate smoothing areas around the entire branching structure
         // Smooth the terrain in all directions bordering the structure so
         // that there is a smooth transition in height from the surrounding
@@ -180,7 +177,7 @@ public class BO4CustomStructure extends CustomStructure
 		for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
 		{
 			world.getStructureCache().bo4StructureCache.put(chunkCoord, this);
-			world.getStructureCache().getPlotter().addToStructuresPerChunkCache(chunkCoord, new ArrayList<String>());
+			world.getStructureCache().getPlotter().invalidateChunkInStructuresPerChunkCache(chunkCoord);
 			// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
 			if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 			{
@@ -195,7 +192,7 @@ public class BO4CustomStructure extends CustomStructure
 		for(ChunkCoordinate chunkCoord : smoothingAreasToSpawn.keySet())
 		{
 			world.getStructureCache().bo4StructureCache.put(chunkCoord, this);
-			world.getStructureCache().getPlotter().addToStructuresPerChunkCache(chunkCoord, new ArrayList<String>());
+			world.getStructureCache().getPlotter().invalidateChunkInStructuresPerChunkCache(chunkCoord);
 			// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
 			if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 			{
@@ -228,8 +225,6 @@ public class BO4CustomStructure extends CustomStructure
     	if(!startChunkBlockChecksDone)
     	{
 	    	startChunkBlockChecksDone = true;
-
-	    	//OTG.log(LogMarker.INFO, "DoStartChunkBlockChecks");
 
 			// Requesting the Y position or material of a block in an unpopulated chunk causes some of that chunk's blocks to be calculated, this is expensive and should be kept at a minimum.
 
@@ -283,11 +278,9 @@ public class BO4CustomStructure extends CustomStructure
 				}
 			}
 
-			//if((MinY + startY) < 1 || (startY) < ((BO4)Start.getObject(World.getName())).settings.minHeight || (startY) > ((BO4)Start.getObject(World.getName())).settings.maxHeight)
 			if(startY < ((BO4)this.start.getObject()).getSettings().minHeight || startY > ((BO4)this.start.getObject()).getSettings().maxHeight)
 			{
 				return false;
-				//throw new IllegalArgumentException("Structure could not be plotted at these coordinates, it does not fit in the Y direction. " + ((BO4)Start.getObject(World.getName())).getName() + " at Y " + startY);
 			}
 
 			startY += ((BO4)this.start.getObject()).getSettings().heightOffset;
@@ -406,12 +399,6 @@ public class BO4CustomStructure extends CustomStructure
 
     	return returnValue;
     }
-
-    // TODO: Make sure that canOverride optional branches cannot be in the same branch group as required branches.
-    // This makes sure that when the first spawn phase is complete and all required branches and non-canOverride optional branches have spawned
-    // those can never be rolled back because of canOverride optional branches that are unable to spawn.
-    // canOverride required branches: things that need to be spawned in the same cycle as their parent branches, for instance door/wall markers for rooms
-    // canOverride optional branches: things that should be spawned after the base of the structure has spawned, for instance room interiors, adapter/modifier pieces that knock out walls/floors between rooms etc.
 
     private void calculateBranches(boolean minimumSize, LocalWorld world) throws InvalidConfigException
     {
@@ -563,6 +550,77 @@ public class BO4CustomStructure extends CustomStructure
     	}
     }
     
+	// Branches:
+    // BO4 structures are rasterized and split into 16x16 chunks, each BO4 containing the blocks for one chunk. Branch syntax is used to glue all the 
+    // chunks of a structure together and allows OTG to spawn one chunk at a time. Each BO4 can have branches that are used to place more BO4's at specified 
+    // coordinates relative to the parent.   
+    //
+    // Procedural generation:
+    // Branches can be randomised to create procedurally generated structures. OTG branch spawning mechanics work by the principle of spawning a basic (required) 
+    // structure layout first, then spawning any optional additions/modifications on top. Different kinds of branches are used to create these.
+    //
+    // Branch spawn cycles:
+    // Each structure starts with one master BO4, that can contain any number of branches and/or branch groups, that can in turn contain branches.
+    // Branches are spawned in pulses/cycles, where each pulse/cycle spawns one layer of child-branches. Branches are spawned one at a time, in the order
+    // they are listed in the BO4. There is a specific spawn order for different types of branches, this is explained in the Spawn order 
+    // section below.
+    //
+    // Required and optional branches:
+    // Required branches are used to mark parts of structures that must spawn together in the same cycle (such as a 2x2 chunk room, consisting of 4 BO4's 
+    // that must all spawn), optional branches are used to create randomised components and add interiors and decorations. 
+    //
+    // Branch groups:
+    // Branches can be assigned to a group. When a group contains multiple branches, OTG tries to spawn each of the branches. 
+    // If a branch spawns, it considers the group successfully spawned and skips the remaining branches in the group.
+    //
+    // Spawn requirements and rollbacks:
+    // Branches can have spawn requirements such as a biome or material to be placed upon (water/land), they can also use collision detection to make sure they 
+    // don't overlap with other branches. When a required branch or branch group fails to spawn, its parent is rolled back, and spawning of the rolled-back branch's 
+    // sibling branches continues as if the branch had originally failed to spawn. This will delete the current branch and in the parent branch tries to spawn any 
+    // branches that couldn't spawn because of this branch. This means that each branch only tries to spawn once, if it fails, it is never tried again, even if the 
+    // surrounding chunks/branches have changed and spawning might be possible. This is done to prevent infinite recursion. 
+    // If rollbacks cascade up to the master BO4, the structure fails to spawn entirely.
+    //
+    // Branch depth:
+    // For BO4's with optional branches, the master BO4 passes a branch depth to each of its branches. This number is passed down to each child branch, and is decreased 
+    // by one for each optional branch. When branch depth is depleted, optional branches are no longer able to spawn and only required branches attempt to spawn.
+    // This allows the maximum size of the structure's optional parts (such as tunnels with random length) to be set via the master BO4. Alternatively, branch depth can 
+	// be overridden for each branch, this can be useful for spawning optional components at the ends of a branch, when the master BO4's branch depth is depleted (to cap the end of a tunnel f.e). 
+    // Be careful not to create infinite loops when overriding the master BO4's branch depth. 
+    // 
+    // CanOverride branches:
+    // CanOverride branches can override any other branch, so aren't affected by collision detection. CanOverride branches don't care about spawning on !canOverride branches, 
+    // though !canOverride branches do care about spawning on canOverride branches.   
+    //
+    // CanOverride required branches:
+    // CanOverride required branches are used for things that need to be spawned in the same cycle as their parent branch, and override/overlap with existing branches. 
+    // Typically things that should be part of the base layout of the structure, for instance non-optional components that override/modify the base structure or marker BO4's 
+    // used for collision detection.
+    //
+    // CanOverride optional branches:
+    // Optional things that should be spawned after the base of the structure has spawned, and override/overlap with existing branches. For instance randomised room interiors, 
+    // adapter/modifier pieces that knock out walls/ceilings/floors between rooms and creates stairs/bridges etc.
+    //
+    // Spawn order:
+    // *CanOverride optional branches are completely ignored during step 1-3, that spawn the basic (required) structure layout.
+    // 1. Traverse all spawned branches until a branch is found that has unspawned children and try spawning required branches, if optional branches 
+    // exist in the same branchgroups (if any) that haven't tried to spawn yet, skip the required branches. 
+    // 2. Traverse all spawned branches until a branch is found that has unspawned children and try spawning optional branches. If an optional branch spawns, 
+    // immediately spawn its required branches (same as 1, skips required branches if optional branches queued).
+    // 3. Repeat 1-2 until all branches have spawned or until a required branch (or branchgroup containing a required branch) cannot spawn, which triggers a rollback. If
+    // rollbacks cascade up to the master BO4, cancel spawning the structure.
+    // 4. Spawn CanOverride optional branches and their children: 
+    // Optional CanOverride branches never cause a rollback for their parent, so are used to add optional additions/modification on top of existing branches, and are completely 
+    // ignored during step 1-3. Step 4 repeats steps 1-3, starting at any unspawned optional CanOverride:true branches that were ignored before. Each optional CanOverride branch spawns 
+    // its children as usual, until all branches are depleted. Optional CanOverride:true branches should not have other optional CanOverride:true branches as children, they are ignored.
+    //
+    // *NOTE: Optional CanOverride:true branches should not be placed in a branchgroup with required branches. If an optional CanOverride:true branch is placed in a group with a 
+    // required branch, it is ignored during steps 1-3. During step 4, the branch will try to spawn, but won't cause a rollback for its branchgroup if it fails, since the branchgroup is 
+    // guaranteed to have already spawned a branch during steps 1-3.
+    //
+    // *NOTE2: MustSpawnBelow branches retry spawning each cycle during steps 1-3 until no branch was spawned the last cycle. If they still can't spawn, they fail and can cause a rollback.
+
+    //  TODO: Don't allow canOverride optional branches in the same branch group as required branches.
     private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, LocalWorld world)
     {
     	// CanOverride optional branches are spawned only after the main structure has spawned.
@@ -587,12 +645,7 @@ public class BO4CustomStructure extends CustomStructure
 	    	}
     	}
 
-    	// TODO: Remove these
-    	if(spawningRequiredChildrenForOptionalBranch && traverseOnlySpawnedChildren)
-    	{
-    		throw new RuntimeException();
-    	}
-
+    	// Mark branch as done spawning if we know all branches will be done spawning at the end of this method.
     	// If we are spawning optional branches then we know this branch will be done spawning when this method returns
     	// (all optional branches will try to spawn, then if none have spawned any leftover required branches will try to spawn)
     	// and won't try to spawn anything in the second phase of this branch spawning cycle
@@ -631,7 +684,6 @@ public class BO4CustomStructure extends CustomStructure
 		        	// Check if children should be spawned
 	        		boolean canSpawn = true;
 
-	        		boolean collidedWithParentOrSibling = false;
 	        		boolean wasntBelowOther = false;
 	        		boolean wasntInsideOther = false;
 	        		boolean cannotSpawnInsideOther = false;
@@ -663,7 +715,8 @@ public class BO4CustomStructure extends CustomStructure
 	        		}
 
 	        		// Before spawning any required branch make sure there are no optional branches in its branch group that haven't tried to spawn yet.
-    	        	if(spawningRequiredBranchesOnly)// && !isRollBack)
+	        		// Skip the branch if there are still spawnable optional branches.
+    	        	if(spawningRequiredBranchesOnly)
     	        	{
     	    			if(childBranchDataItem.branch.isRequiredBranch)
     	    			{
@@ -696,6 +749,7 @@ public class BO4CustomStructure extends CustomStructure
     	    			}
     	        	}
 
+    	        	// Check if there is enough branch depth left to spawn this branch
 	        		if(canSpawn && (childBranchDataItem.maxDepth == 0 || childBranchDataItem.currentDepth > childBranchDataItem.maxDepth) && !childBranchDataItem.branch.isRequiredBranch)
 	        		{
 	        			canSpawn = false;
@@ -703,7 +757,7 @@ public class BO4CustomStructure extends CustomStructure
 
 	        		branchesTried += 1;
 
-	        		// Ignore weightedbranches when measuring
+	        		// Ignore weightedbranches when measuring minimumSize
 	        		if(minimumSize && childBranchDataItem.branch.isWeightedBranch)
 	        		{
 	        			childBranchDataItem.doneSpawning = true;
@@ -711,6 +765,7 @@ public class BO4CustomStructure extends CustomStructure
         				continue;
 	        		}
 
+	        		// Do spawn checks
 	        		int smoothRadius = ((BO4)this.start.getObject()).getSettings().overrideChildSettings && bo3.getSettings().overrideChildSettings ? ((BO4)this.start.getObject()).getSettings().smoothRadius : bo3.getSettings().smoothRadius;
 	        		if(smoothRadius == -1 || bo3.getSettings().smoothRadius == -1)
 	        		{
@@ -802,9 +857,29 @@ public class BO4CustomStructure extends CustomStructure
 	        		    	}
 	        		    }	        		    
 
+	        		    if(!minimumSize && canSpawn)
+	        		    {
+	        	    		if(!checkYBounds(childBranchDataItem.branch))
+	        	    		{
+		    					canSpawn = false;
+        						chunkIsIneligible = true;
+	        	    		}
+	        		    }
+	        		    
+	        		    if(!minimumSize && canSpawn)
+	        		    {
+	        			    // Check if any other structures in the world are in this chunk
+	        			    if((world.isInsidePregeneratedRegion(childBranchDataItem.chunkCoordinate) || world.getStructureCache().bo4StructureCache.containsKey(childBranchDataItem.chunkCoordinate)))
+	        			    {
+		    					canSpawn = false;
+        						chunkIsIneligible = true;
+	        			    }
+	        		    }
+	        	    	
 	        			if(canSpawn)
 	        			{
-	        				// Returns null if the branch cannot spawn in the given biome, if y < 0, or if the given chunk is occupied by another structure
+	        				// Returns null if the branch cannot spawn in the given biome or if there's another BO4 structure in the chunk, otherwise returns colliding branches. 
+	        				// CanOverride branches never collide with other branches, but may be unable to spawn if there's not enough space for smoothing areas.
 	    					collidingBranches = checkSpawnRequirementsAndCollisions(childBranchDataItem, minimumSize, world);
 	    					if(collidingBranches == null)
 	    					{
@@ -813,59 +888,15 @@ public class BO4CustomStructure extends CustomStructure
 	    					}
 	    					else if(collidingBranches.size() > 0)
 	        				{
+	    						// !CanOverride branch has a collision, can't spawn.
 		    					canSpawn = false;
-		    					collidedWithParentOrSibling = true;
-
-		        				for(BranchDataItem collidingBranch : collidingBranches)
-		        				{
-		        					// TODO: siblings canOverride children are not taken into account atm! <- Not sure if still relevant?
-		        					// TODO: all canOverride branches are now being ignored, change that?? <- Not sure if still relevant?
-
-	    							//OTG.log(LogMarker.INFO, "collided with: " + collidingObject.BO3Name);
-
-		        					if(
-	        							(
-        									branchDataItem.parent == null ||
-        									collidingBranch.branch != branchDataItem.parent.branch
-    									) &&
-    									!((BO4) collidingBranch.branch.getObject()).getSettings().canOverride
-									)
-		        					{
-		        						boolean siblingFound = false;
-		        						if(branchDataItem.parent != null)
-		        						{
-			        						for(BranchDataItem parentSibling : branchDataItem.parent.getChildren(false, world))
-			        						{
-			        							if(collidingBranch.branch == parentSibling.branch)
-			        							{
-				        							siblingFound = true;
-				        							break;
-			        							}
-			        						}
-		        						}
-		        						if(!siblingFound)
-		        						{
-			        						for(BranchDataItem sibling : branchDataItem.getChildren(false, world))
-			        						{
-			        							if(collidingBranch.branch == sibling.branch)
-			        							{
-				        							siblingFound = true;
-				        							break;
-			        							}
-			        						}
-		        						}
-		        						if(!siblingFound)
-		        						{
-		        							spaceIsOccupied = true;
-		        							collidedWithParentOrSibling = false;
-		        							break;
-		        						}
-		        					}
-		        				}
+		    					spaceIsOccupied = true;	    					
 	        				}
 	        			}
 	        		}
 
+	        		// Spawn the branch, for optional branches, this will immediately try to spawn any required child-branches, which may fail.
+	        		// As usual, if there are optional branches in the same branchgroups as required branches, the required branches won't try to spawn this cycle.
 		        	if(canSpawn)
 		        	{
 		        		if(OTG.getPluginConfig().spawnLog)
@@ -886,14 +917,13 @@ public class BO4CustomStructure extends CustomStructure
 	        	    		childBranchDataItem.doneSpawning = true;
 	        	    	}
 
-	        	    	// Mark any required branches in the same branch group so they wont try to spawn
+	        	    	// Mark any branches in the same branch group so they wont try to spawn
 		        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, world))
 		        		{
 		        			if(
 	        					childBranchDataItem2 != childBranchDataItem &&
 	    						(childBranchDataItem.branch.branchGroup != null && childBranchDataItem.branch.branchGroup.length() >= 0) &&
-	        					childBranchDataItem.branch.branchGroup.equals(childBranchDataItem2.branch.branchGroup) &&
-    							childBranchDataItem2.branch.isRequiredBranch
+	        					childBranchDataItem.branch.branchGroup.equals(childBranchDataItem2.branch.branchGroup)
         					)
 		        			{
 		        				childBranchDataItem2.doneSpawning = true;
@@ -924,6 +954,7 @@ public class BO4CustomStructure extends CustomStructure
 			        		spawningRequiredChildrenForOptionalBranch = false;
 
 			        		// Make sure the branch wasn't rolled back because the required branches couldn't spawn.
+			        		// TODO: Make traverseAndSpawnChildBranches return bool instead?
 			        		boolean bFound = false;
 			        		ArrayList<BranchDataItem> branchDataItemStack = AllBranchesBranchDataByChunk.get(childBranchDataItem.chunkCoordinate);
 			        		if(branchDataItemStack != null)
@@ -961,8 +992,7 @@ public class BO4CustomStructure extends CustomStructure
 		        		if(!childBranchDataItem.doneSpawning && !childBranchDataItem.cannotSpawn)
 		        		{
 		        			// WasntBelowOther branches that cannot spawn get to retry
-		        			// each cycle unless no branch spawned last cycle
-		        			// TODO: Won't this cause problems?
+		        			// each cycle until no branch spawned last cycle
 		        			if(!wasntBelowOther || !spawnedBranchLastCycle)
 		        			{
 				        		childBranchDataItem.doneSpawning = true;
@@ -982,14 +1012,14 @@ public class BO4CustomStructure extends CustomStructure
 			        		{
 			        			branchGroupFailedSpawning = true;
 
-			        	    	// Check if there are any more required branches in this group that haven't tried to spawn yet.
-				        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, world))
+			        	    	// Check if there are any more branches in this group that haven't tried to spawn yet.
+			        			// *At this point, all optional branches should have had a chance to spawn.
+			        			for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, world))
 				        		{
 				        			if(
 			        					childBranchDataItem2 != childBranchDataItem &&
 			    						(childBranchDataItem.branch.branchGroup != null && childBranchDataItem.branch.branchGroup.length() >= 0) &&
 			        					childBranchDataItem.branch.branchGroup.equals(childBranchDataItem2.branch.branchGroup) &&
-		    							childBranchDataItem2.branch.isRequiredBranch &&
 				        				!childBranchDataItem2.doneSpawning &&
 				        				!childBranchDataItem2.cannotSpawn
 		        					)
@@ -1000,10 +1030,12 @@ public class BO4CustomStructure extends CustomStructure
 				        		}
 			        		}
 
-			        		if(!collidedWithParentOrSibling && (!wasntBelowOther || !spawnedBranchLastCycle) && branchGroupFailedSpawning)
+			        		// If the branch group can't spawn, roll back this branch. Otherwise, check if there are other branches
+	        				// with the same spawn requirements and mark them so they won't try to spawn. If no branches in a branch 
+			        		// group can be spawned, roll back this branch.
+			        		if((!wasntBelowOther || !spawnedBranchLastCycle) && branchGroupFailedSpawning)
 			        		{
-			            		// Branch could not spawn
-			            		// abort this branch because it has a branch group that could not be spawned
+			            		// Branch could not spawn, abort this branch because it contains a branch group that could not be spawned.
 
 			            		if(OTG.getPluginConfig().spawnLog)
 			            		{
@@ -1031,7 +1063,7 @@ public class BO4CustomStructure extends CustomStructure
 			        	    			}
 			        	    		}
 
-			        	    		String reason = (branchFrequencyGroupsNotPassed ? "BranchFrequencyGroupNotPassed " : "") + (branchFrequencyNotPassed ? "BranchFrequencyNotPassed " : "") + (collidedWithParentOrSibling ? "CollidedWithParentOrSibling " : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (wasntInsideOther ? "WasntInsideOther " : "") + (cannotSpawnInsideOther ? "CannotSpawnInsideOther " : "") + (wasntOnWater ? "WasntOnWater " : "") + (wasOnWater ? "WasOnWater " : "") + (!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "TerrainIsUnsuitable (StartChunkBlockChecks (height or material) not passed or Y < 0 or Frequency/BO3Group checks not passed or BO3 collided with other CustomStructure or smoothing area collided with other CustomStructure or BO3 not in allowed Biome or Smoothing area not in allowed Biome)" : "");
+			        	    		String reason = (branchFrequencyGroupsNotPassed ? "BranchFrequencyGroupNotPassed " : "") + (branchFrequencyNotPassed ? "BranchFrequencyNotPassed " : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (wasntInsideOther ? "WasntInsideOther " : "") + (cannotSpawnInsideOther ? "CannotSpawnInsideOther " : "") + (wasntOnWater ? "WasntOnWater " : "") + (wasOnWater ? "WasOnWater " : "") + (!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "TerrainIsUnsuitable (StartChunkBlockChecks (height or material) not passed or Y < 0 or Frequency/BO3Group checks not passed or BO3 collided with other CustomStructure or smoothing area collided with other CustomStructure or BO3 not in allowed Biome or Smoothing area not in allowed Biome)" : "");
 			        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.branch.getChunkX() + " Z" + branchDataItem.branch.getChunkZ() + " Y" + branchDataItem.branch.getY() + " " + branchDataItem.branch.bo3Name + ":" + branchDataItem.branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.branch.bo3Name + " couldn't spawn. Reason: " + reason);
 			            		}
 
@@ -1040,6 +1072,7 @@ public class BO4CustomStructure extends CustomStructure
 			        		} else {
 				        		// if this child branch could not spawn then in some cases other child branches won't be able to either
 				        		// mark those child branches so they dont try to spawn and roll back the whole branch if a required branch can't spawn
+			        			// mustBeBelowOther / spawnOnWaterOnly / canSpawnOnWater
 				        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, world))
 				        		{
 				        			if(!wasntBelowOther || !spawnedBranchLastCycle)
@@ -1071,14 +1104,14 @@ public class BO4CustomStructure extends CustomStructure
 							        		{
 							        			branchGroupFailedSpawning = true;
 
-							        	    	// Check if there are any more required branches in this group that haven't tried to spawn yet.
+							        	    	// Check if there are any more branches in this group that haven't tried to spawn yet.
+							        			// *At this point, all optional branches should have had a chance to spawn.
 								        		for(BranchDataItem childBranchDataItem3 : branchDataItem.getChildren(false, world))
 								        		{
 								        			if(
 							        					childBranchDataItem3 != childBranchDataItem2 &&
 							    						(childBranchDataItem2.branch.branchGroup != null && childBranchDataItem2.branch.branchGroup.length() >= 0) &&
 							    						childBranchDataItem2.branch.branchGroup.equals(childBranchDataItem3.branch.branchGroup) &&
-							    						childBranchDataItem3.branch.isRequiredBranch &&
 								        				!childBranchDataItem3.doneSpawning &&
 								        				!childBranchDataItem3.cannotSpawn
 						        					)
@@ -1089,7 +1122,7 @@ public class BO4CustomStructure extends CustomStructure
 								        		}
 							        		}
 
-					        				if(branchGroupFailedSpawning && !collidedWithParentOrSibling)
+					        				if(branchGroupFailedSpawning)
 					        				{
 							            		if(OTG.getPluginConfig().spawnLog)
 							            		{
@@ -1120,7 +1153,6 @@ public class BO4CustomStructure extends CustomStructure
 							        	    		String reason =
 							        	    				(branchFrequencyGroupsNotPassed ? "BranchFrequencyGroupNotPassed " : "") +
 							        	    				(branchFrequencyNotPassed ? "BranchFrequencyNotPassed " : "") +				
-							        	    				(collidedWithParentOrSibling ? "CollidedWithParentOrSibling " : "") +
 							        	    				(wasntBelowOther ? "WasntBelowOther " : "") +
 							        	    				(wasntInsideOther ? "WasntInsideOther " : "") +
 							        	    				(cannotSpawnInsideOther ? "CannotSpawnInsideOther " : "") +
@@ -1152,7 +1184,7 @@ public class BO4CustomStructure extends CustomStructure
 	        }
 
     		// when spawning optional branches spawn them first then traverse any previously spawned required branches
-	        // When calling AddBranches during a rollback to continue spawning a branch group don't traverse already spawned children (otherwise the branch could spawn children more than once per cycle).
+	        // When calling AddBranches during a rollback to continue spawning a branch group, don't traverse already spawned children (otherwise the branch could spawn children more than once per cycle).
 	        if(
         		!traverseOnlySpawnedChildren &&
         		!spawningRequiredBranchesOnly &&
@@ -1834,24 +1866,14 @@ public class BO4CustomStructure extends CustomStructure
 		}
 	}
 
-	// Returns null if the branch cannot spawn in the given biome, if y < 0, or if the given chunk is occupied by another structure
+	// Returns null if the branch cannot spawn in the given biome or if there's another BO4 structure in the chunk, otherwise returns colliding branches. 
+	// CanOverride branches never collide with other branches, but may be unable to spawn if there's not enough space for smoothing areas.
     private Stack<BranchDataItem> checkSpawnRequirementsAndCollisions(BranchDataItem branchData, boolean minimumSize, LocalWorld world)
     {
     	CustomStructureCoordinate coordObject = branchData.branch;
 
     	if(!minimumSize)
     	{
-    		if(!checkYBounds(coordObject))
-    		{
-		    	return null;
-    		}
-    		
-		    // Check if any other structures in world are in this chunk
-		    if((world.isInsidePregeneratedRegion(branchData.chunkCoordinate) || world.getStructureCache().bo4StructureCache.containsKey(branchData.chunkCoordinate)))
-		    {
-		    	return null;
-		    }
-
 		    // Check if the structure can spawn in this biome
 		    if(!isStructureAtSpawn)
 		    {
@@ -1988,7 +2010,6 @@ public class BO4CustomStructure extends CustomStructure
         return startY >= 0;
     }
     
-    // TODO: return list with colliding structures instead of bool?
     private boolean checkCollision(CustomStructureCoordinate branchData1Branch, CustomStructureCoordinate branchData2Branch)
     {
     	if(
