@@ -176,18 +176,21 @@ public class CustomObjectCollection
         return allBO4s;
     }
 
+    public CustomObject getObjectByName(String name, String worldName)
+    {
+    	return getObjectByName(name, worldName, true);
+    }
+    
     /**
      * Gets the object with the given name.
      * 
      * @param name Name of the object.
      * @return The object, or null if not found.
      */
-    public CustomObject getObjectByName(String name, String worldName)
+    public CustomObject getObjectByName(String name, String worldName, boolean searchGlobalObjects)
     {
-        worldName = OTG.getEngine().getPresetName(worldName);
-        // OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ?
-        // worldName :
-        // "");
+        worldName = worldName == null ? null : OTG.getEngine().getPresetName(worldName);
+        // OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ? worldName : "");
 
         CustomObject object = null;
 
@@ -214,14 +217,13 @@ public class CustomObjectCollection
             ArrayList<String> worldObjectsNotFoundByName = objectsNotFoundPerWorld.get(worldName);
             if (worldObjectsNotFoundByName != null && worldObjectsNotFoundByName.contains(name.toLowerCase()))
             {
+            	// TODO: If a user adds a new object while the game is running, it won't be picked up, even when developermode:true.
                 bSearchedWorldObjects = true;
             }
         }
 
-        // Only check the GlobalObjects if the WorldObjects directory has
-        // already been
-        // searched
-        if (object == null && (worldName == null || bSearchedWorldObjects))
+        // Only check the GlobalObjects if the WorldObjects directory has already been searched
+        if (object == null && searchGlobalObjects && (worldName == null || bSearchedWorldObjects))
         {
             object = objectsByNameGlobalObjects.get(name.toLowerCase());
         }
@@ -233,13 +235,11 @@ public class CustomObjectCollection
 
         if (name.equalsIgnoreCase("UseWorld") || name.equalsIgnoreCase("UseWorldAll"))
         {
-            // OTG.log(LogMarker.INFO, "UseWorld is not used by OTG, skipping
-            // it.");
+            // OTG.log(LogMarker.INFO, "UseWorld is not used by OTG, skipping it.");
             return null;
         } else if (name.equalsIgnoreCase("UseBiome") || name.equalsIgnoreCase("UseBiomeAll"))
         {
-            // OTG.log(LogMarker.INFO, "UseBiome is not used by OTG, skipping
-            // it.");
+            // OTG.log(LogMarker.INFO, "UseBiome is not used by OTG, skipping it.");
             return null;
         }
 
@@ -249,10 +249,11 @@ public class CustomObjectCollection
 
         if (objectsNotFoundGlobalObjects != null && objectsNotFoundGlobalObjects.contains(name.toLowerCase()))
         {
+        	// TODO: If a user adds a new object while the game is running, it won't be picked up, even when developermode:true.
             bSearchedGlobalObjects = true;
         }
 
-        if (bSearchedGlobalObjects && (worldName == null || bSearchedWorldObjects))
+        if ((!searchGlobalObjects || bSearchedGlobalObjects) && (worldName == null || bSearchedWorldObjects))
         {
             return null;
         }
@@ -264,9 +265,7 @@ public class CustomObjectCollection
             customObjectFilesGlobalObjects = new HashMap<String, File>();
             if (new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects").exists())
             {
-                indexAllCustomObjectFilesInDir(
-                        new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects"),
-                        customObjectFilesGlobalObjects);
+                indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects"), customObjectFilesGlobalObjects);
             }
 
             // Add vanilla custom objects
@@ -276,7 +275,7 @@ public class CustomObjectCollection
             }
         }
 
-        if (!customObjectFilesPerWorld.containsKey(worldName))
+        if (worldName != null && !customObjectFilesPerWorld.containsKey(worldName))
         {
             HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
             customObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
@@ -334,7 +333,7 @@ public class CustomObjectCollection
 
         // Search GlobalObjects
 
-        if (!bSearchedGlobalObjects)
+        if (searchGlobalObjects && !bSearchedGlobalObjects)
         {
             object = objectsByNameGlobalObjects.get(name.toLowerCase());
 
