@@ -9,7 +9,7 @@ import com.pg85.otg.util.bo3.Rotation;
 class BO4Settings extends Settings
 {
     static final Setting<Boolean>
-            ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false),
+    		ISOTGPLUS = booleanSetting("IsOTGPlus", true),
             REMOVEAIR = booleanSetting("RemoveAir", true),
     		CANOVERRIDE = booleanSetting("CanOverride", false),
 			MUSTBEBELOWOTHER = booleanSetting("MustBeBelowOther", false),
