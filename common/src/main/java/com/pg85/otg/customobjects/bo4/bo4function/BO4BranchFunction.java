@@ -174,7 +174,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
         {
             output.append(',').append(totalChance);
         }
-        if(branchGroup != null)
+        if(branchGroup != null && branchGroup.trim().length() > 0)
         {
         	output.append(',').append(branchGroup);
         }

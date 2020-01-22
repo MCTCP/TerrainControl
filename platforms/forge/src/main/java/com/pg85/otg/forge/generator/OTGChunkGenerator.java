@@ -175,11 +175,11 @@ public class OTGChunkGenerator implements IChunkGenerator
 				// to ProvideChunk() by updateBlocks() on server tick.
 				// TODO: This is causing stackoverflowexceptions
 				chunk = this.world.getWorld().getChunk(chunkX, chunkZ);
-				OTG.log(LogMarker.WARN, "Double population prevented");
+				OTG.log(LogMarker.WARN, "Double population prevented for chunk X" + chunkX + " Z" + chunkZ);
 			}
 			if(chunk != null)
 			{
-				OTG.log(LogMarker.WARN, "Double population prevented");
+				OTG.log(LogMarker.WARN, "Double population prevented for chunk X" + chunkX + " Z" + chunkZ);
 				return chunk;
 			} else {
 				OTG.log(LogMarker.WARN, "Double population could not be prevented for chunk X" + chunkX + " Z" + chunkZ);				

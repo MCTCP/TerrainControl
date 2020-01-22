@@ -268,10 +268,6 @@ public class WorldListener
      */
     private static void createSpawnPosition(ForgeWorld forgeWorld, DimensionConfig dimConfig)
     {
-    	if(forgeWorld == null || forgeWorld.getWorld() == null)
-    	{
-    		String breakpoint = "";
-    	}
 		if(dimConfig.Settings.SpawnPointSet)
 		{
 			BlockPos spawnPosition = new BlockPos(dimConfig.Settings.SpawnPointX, dimConfig.Settings.SpawnPointY, dimConfig.Settings.SpawnPointZ);

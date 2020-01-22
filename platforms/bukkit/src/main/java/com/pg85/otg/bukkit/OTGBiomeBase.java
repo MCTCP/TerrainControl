@@ -138,7 +138,11 @@ public class OTGBiomeBase extends BiomeBase
         	BiomeBase biomeAtId = BiomeBase.REGISTRY_ID.getId(biomeIds.getSavedId());
             if(biomeAtId != null && !isReload)
             {
-            	throw new RuntimeException("Tried to register biome " + biomeKey.toString() + " to a id " + biomeIds.getSavedId() + " but it is occupied by biome: " + biomeAtId.toString() + ". This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+            	throw new RuntimeException(
+        			"Tried to register biome " + biomeKey.toString() + " to a id " + biomeIds.getSavedId() + " but it is occupied by biome: " + biomeAtId.toString() + ". "
+					+ "This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. "
+					+ "This can also happen when migrating a world from OTG v6 or lower to OTG v8 or higher, if the world had biome conflicts in v6."
+					+ "OTG 1.12.2 v8 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
             }
             
         	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();
