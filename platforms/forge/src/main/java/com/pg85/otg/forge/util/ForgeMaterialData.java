@@ -23,7 +23,15 @@ public class ForgeMaterialData implements LocalMaterialData
     private IBlockState blockData;
     private boolean checkFallbacks = false;
     private String rawEntry;
+    private boolean isBlank = false;
 
+    public static ForgeMaterialData getBlank()
+    {
+    	ForgeMaterialData material = new ForgeMaterialData((IBlockState)null);
+    	material.isBlank = true;
+    	return material;
+    }
+    
     private ForgeMaterialData(IBlockState blockData)
     {
         this.blockData = blockData;
@@ -45,7 +53,7 @@ public class ForgeMaterialData implements LocalMaterialData
     	// Used in BO3's as placeholder/detector block.
     	if(input.toLowerCase().equals("blank"))
     	{
-    		return new ForgeMaterialData((IBlockState)null);
+    		return ForgeMaterialData.getBlank();
     	}
 
     	String newInput = input;
@@ -120,6 +128,8 @@ public class ForgeMaterialData implements LocalMaterialData
             	// Some old apps exported schematics/bo3's exported "STAIRS" without metadata (for instance "STAIRS:0").
             	// However, the default rotation has changed so fix this by adding the correct metadata.
 
+                // TODO: Check if the block uses the Facing property instead of checking a list of known blocks?
+                
             	if(
         			blockData == -1 &&
         			(
@@ -264,6 +274,10 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public String getName()
     {
+    	if(isBlank)
+    	{
+    		return "BLANK";
+    	}
     	if(this.blockData == null)
     	{
     		return "Unknown";
@@ -274,6 +288,7 @@ public class ForgeMaterialData implements LocalMaterialData
 
         byte data = getBlockData();
         boolean nonDefaultData = !block.getDefaultState().equals(this.blockData);
+        boolean noData = this.blockData.getPropertyKeys().isEmpty();
         // Note that the above line is not equivalent to data != 0, as for
         // example pumpkins have a default data value of 2
 
@@ -282,17 +297,12 @@ public class ForgeMaterialData implements LocalMaterialData
             // Use Minecraft's name
             if (nonDefaultData)
             {
-                return Block.REGISTRY.getNameForObject(this.blockData.getBlock()) + ":" + data;
+                return Block.REGISTRY.getNameForObject(this.blockData.getBlock()) + (noData ? "" : ":" + data);
             }
             return Block.REGISTRY.getNameForObject(this.blockData.getBlock()).toString();
-        } else
-        {
+        } else {
             // Use our name
-            if (nonDefaultData)
-            {
-                return defaultMaterial.name() + ":" + getBlockData();
-            }
-            return defaultMaterial.name();
+            return defaultMaterial.name() + (noData ? "" : ":" + getBlockData());
         }
     }
 
