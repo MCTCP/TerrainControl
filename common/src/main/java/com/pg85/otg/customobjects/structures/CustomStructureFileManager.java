@@ -36,8 +36,215 @@ import com.pg85.otg.util.bo3.Rotation;
 
 public class CustomStructureFileManager
 {
-	static Map<ChunkCoordinate, CustomStructure> loadStructuresFile(LocalWorld world)
+	static void saveStructuresFile(Map<ChunkCoordinate, CustomStructure> structures, LocalWorld world)
 	{
+		// When loading files we first load all the structure files and put them in worldInfoChunks and structurecache 
+		// (if they are outside the pregenerated region), then from any structures that have ObjectsToSpawn or 
+		// SmoothingAreas to spawn we create structures in the structure cache for each of those (overriding some of 
+		// the structures we added earlier). Then we load all the null chunks and add them to the structurecache (if 
+		// they are outside the pregenerated region), potentially overriding some of the structures we added earlier.
+
+		// So don't worry about saving structure files for structures that have already been spawned, they won't be added to the structure cache when loading
+
+		int dimensionId = world.getDimensionId();
+		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
+    	if(occupiedChunksFile.exists())
+    	{
+    		occupiedChunksFile.delete();
+    	}
+
+    	StringBuilder stringbuilder = new StringBuilder();
+    	if(structures.size() > 0)
+    	{
+	    	stringbuilder.append("[");
+
+			for(Entry<ChunkCoordinate, CustomStructure> entry : structures.entrySet())
+			{
+				ChunkCoordinate chunkCoord = entry.getKey();
+				CustomStructure structure = entry.getValue();
+
+				if(stringbuilder.length() > 1)
+				{
+					stringbuilder.append(" ");
+				}
+
+		    	if(structure.start != null)
+		    	{
+		    		//stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][" + structure.MinY + "," + structure.Start.isSpawned + "," + structure.Start.isBranch + "," + structure.Start.branchDepth + "," + structure.Start.isRequiredBranch + "," + structure.Start.BO3Name + "," + structure.Start.rotation.toString() + "," + structure.Start.getX() + "," + structure.Start.getY() + "," + structure.Start.getZ() + "," + structure.startChunkBlockChecksDone + "]");
+		    		stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][" + structure.start.bo3Name + "," + structure.start.rotation.toString() + "," + structure.start.getX() + "," + structure.start.getY() + "," + structure.start.getZ() + "]");
+		    	} else {
+		    		stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][Null structure]");
+		    	}
+
+				ChunkCoordinate key;
+				Stack<BO4CustomStructureCoordinate> coords;
+
+				// If this is the origin of this structure then save its ObjectsToSpawn and SmoothingAreasToSpawn
+				// All the chunks belonging to this structure will be reconstituted when this file is loaded				
+				stringbuilder.append("[");
+				if(structure instanceof BO4CustomStructure && ((BO4CustomStructure)structure).objectsToSpawn.entrySet().size() > 0 && chunkCoord.getChunkX() == ((BO4CustomStructureCoordinate)structure.start).getChunkX() && chunkCoord.getChunkZ() == ((BO4CustomStructureCoordinate)structure.start).getChunkZ())
+				{
+					boolean added = false;
+					for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectToSpawn : ((BO4CustomStructure)structure).objectsToSpawn.entrySet())
+					{
+						if(added)
+						{
+							stringbuilder.append(";");
+						}
+						key = objectToSpawn.getKey();
+						stringbuilder.append(key.getChunkX() + "," + key.getChunkZ());
+						added = true;
+
+						coords = objectToSpawn.getValue();
+						for(CustomStructureCoordinate coord : coords)
+						{
+							//stringbuilder.append("," + coord.isSpawned + "," + coord.isBranch + "," + coord.branchDepth + "," + coord.isRequiredBranch + "," + coord.BO3Name + "," + coord.rotation.toString() + "," + coord.getX() + "," + coord.getY() + "," + coord.getZ());
+							stringbuilder.append("," + coord.bo3Name + "," + coord.rotation.toString() + "," + coord.getX() + "," + coord.getY() + "," + coord.getZ());
+						}
+					}
+				}
+
+				stringbuilder.append("][");
+
+				if(structure instanceof BO4CustomStructure && ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size() > 0 && chunkCoord.getChunkX() == ((BO4CustomStructureCoordinate)structure.start).getChunkX() && chunkCoord.getChunkZ() == ((BO4CustomStructureCoordinate)structure.start).getChunkZ())
+				{
+					boolean added = false;
+					ArrayList<SmoothingAreaLine> coords2;
+					String append;
+					for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet())
+					{
+						if(added)
+						{
+							stringbuilder.append(";");
+						}
+						key = smoothingAreaToSpawn.getKey();
+						stringbuilder.append(key.getChunkX() + "," + key.getChunkZ());
+						added = true;
+
+						coords2 = smoothingAreaToSpawn.getValue();
+						for(SmoothingAreaLine coord : coords2)
+						{
+							append = ":";
+							
+							append += coord.beginPointX;
+							append += "," + coord.beginPointY;
+							append += "," + coord.beginPointZ;
+
+							append += "," + coord.endPointX;
+							append += "," + coord.endPointY;
+							append += "," + coord.endPointZ;
+
+							append += "," + coord.originPointX;
+							append += "," + coord.originPointY;
+							append += "," + coord.originPointZ;
+
+							append += "," + coord.finalDestinationPointX;
+							append += "," + coord.finalDestinationPointY;
+							append += "," + coord.finalDestinationPointZ;
+							
+							if(coord instanceof SmoothingAreaLineDiagonal)
+							{
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointX; // 12;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineoriginPointY; // 13;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointZ; // 14;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointX; // 15;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointY; // 16;
+								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointZ; // 17;								
+							}
+							
+							stringbuilder.append(append);
+						}
+					}
+				}
+
+				stringbuilder.append("][");
+
+				if(structure.modDataManager.modData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
+				{
+					boolean added = false;
+					for(ModDataFunction<?> modData : structure.modDataManager.modData)
+					{
+						if(added)
+						{
+							stringbuilder.append(":");
+						}
+						stringbuilder.append(modData.x + "," + modData.y + "," + modData.z + "," + modData.modId.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + modData.modData.replace(":", "&#58;").replace(" ", "&nbsp;"));
+						added = true;
+					}
+				}
+
+				stringbuilder.append("][");
+
+				if(structure.spawnerManager.spawnerData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
+				{
+					boolean added = false;
+					for(SpawnerFunction<?> spawnerData : structure.spawnerManager.spawnerData)
+					{
+						if(added)
+						{
+							stringbuilder.append(":");
+						}
+						stringbuilder.append(spawnerData.x + "," + spawnerData.y + "," + spawnerData.z + "," + spawnerData.mobName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.originalnbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.nbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.groupSize + "," + spawnerData.interval + "," + spawnerData.spawnChance + "," + spawnerData.maxCount + "," + spawnerData.despawnTime + "," + spawnerData.velocityX + "," + spawnerData.velocityY + "," + spawnerData.velocityZ + "," + spawnerData.velocityXSet + "," + spawnerData.velocityYSet + "," + spawnerData.velocityZSet + "," + spawnerData.yaw + "," + spawnerData.pitch);
+						added = true;
+					}
+				}
+
+				stringbuilder.append("][");
+
+				if(structure.particlesManager.particleData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
+				{
+					boolean added = false;
+					for(ParticleFunction<?> particleData : structure.particlesManager.particleData)
+					{
+						if(added)
+						{
+							stringbuilder.append(":");
+						}
+						stringbuilder.append(particleData.x + "," + particleData.y + "," + particleData.z + "," + particleData.particleName.replace(":", "&#58;").replace(" ", "&nbsp;")+ "," + particleData.interval + "," + particleData.velocityX + "," + particleData.velocityY + "," + particleData.velocityZ + "," + particleData.velocityXSet + "," + particleData.velocityYSet + "," + particleData.velocityZSet);
+						added = true;
+					}
+				}
+
+				stringbuilder.append("]");
+			}
+
+			stringbuilder.append("]");
+
+			BufferedWriter writer = null;
+	        try
+	        {
+	        	if(occupiedChunksFile.exists())
+	        	{
+	        		occupiedChunksFile.delete();
+	        	}
+	        	occupiedChunksFile.getParentFile().mkdirs();
+	        	writer = new BufferedWriter(new FileWriter(occupiedChunksFile));
+	            writer.write(stringbuilder.toString());
+	        }
+	        catch (IOException e)
+	        {
+	            e.printStackTrace();
+	        }
+	        finally
+	        {
+	            try
+	            {
+	                // Close the writer regardless of what happens...
+	                writer.close();
+	            } catch (Exception e) { }
+	        }
+    	}
+    }
+	
+	static Map<ChunkCoordinate, CustomStructure> loadStructuresFile(LocalWorld world)
+	{		
+		// When loading files we first load all the structure files and put them in worldInfoChunks 
+		// and structurecache (if they are outside the pregenerated region), then from any structures 
+		// that have ObjectsToSpawn or SmoothingAreas to spawn we create structures in the structurecache 
+		// for each of those (overriding some of the structures we added earlier). Then we load all the 
+		// null chunks and add them to the structurecache (if they are outside the pregenerated region), 
+		// potentially overriding some of the structures we added earlier.
+		
 	    Map<ChunkCoordinate, CustomStructure> structuresFile = new HashMap<ChunkCoordinate, CustomStructure>();
 
 		int dimensionId = world.getDimensionId();
@@ -577,202 +784,4 @@ public class CustomStructureFileManager
 		spawnedStructuresByGroup.clear();
 		spawnedStructuresByGroup.putAll(chunksByGroup);
 	}
-	
-	static void saveStructuresFile(Map<ChunkCoordinate, CustomStructure> structures, LocalWorld world)
-	{
-		// When loading files we first load all the structure files and put them in worldInfoChunks and structurecache (if they are outside the pregenerated region),
-		// then from any structures that have ObjectsToSpawn or SmoothingAreas to spawn we create structures in the structure cache for each of those (overriding some of the structures we added earlier)
-		// Then we load all the null chunks and add them to the structurecache (if they are outside the pregenerated region), potentially overriding some of the structures we added earlier.
-
-		// So don't worry about saving structure files for structures that have already been spawned, they won't be added to the structure cache when loading
-
-		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
-    	if(occupiedChunksFile.exists())
-    	{
-    		occupiedChunksFile.delete();
-    	}
-
-    	StringBuilder stringbuilder = new StringBuilder();
-    	if(structures.size() > 0)
-    	{
-	    	stringbuilder.append("[");
-
-			for(Entry<ChunkCoordinate, CustomStructure> entry : structures.entrySet())
-			{
-				ChunkCoordinate chunkCoord = entry.getKey();
-				CustomStructure structure = entry.getValue();
-
-				if(stringbuilder.length() > 1)
-				{
-					stringbuilder.append(" ");
-				}
-
-		    	if(structure.start != null)
-		    	{
-		    		//stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][" + structure.MinY + "," + structure.Start.isSpawned + "," + structure.Start.isBranch + "," + structure.Start.branchDepth + "," + structure.Start.isRequiredBranch + "," + structure.Start.BO3Name + "," + structure.Start.rotation.toString() + "," + structure.Start.getX() + "," + structure.Start.getY() + "," + structure.Start.getZ() + "," + structure.startChunkBlockChecksDone + "]");
-		    		stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][" + structure.start.bo3Name + "," + structure.start.rotation.toString() + "," + structure.start.getX() + "," + structure.start.getY() + "," + structure.start.getZ() + "]");
-		    	} else {
-		    		stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][Null structure]");
-		    	}
-
-				ChunkCoordinate key;
-				Stack<BO4CustomStructureCoordinate> coords;
-
-				// If this is the origin of this structure then save its ObjectsToSpawn and SmoothingAreasToSpawn
-				// All the chunks belonging to this structure will be reconstituted when this file is loaded				
-				stringbuilder.append("[");
-				if(structure instanceof BO4CustomStructure && ((BO4CustomStructure)structure).objectsToSpawn.entrySet().size() > 0 && chunkCoord.getChunkX() == ((BO4CustomStructureCoordinate)structure.start).getChunkX() && chunkCoord.getChunkZ() == ((BO4CustomStructureCoordinate)structure.start).getChunkZ())
-				{
-					boolean added = false;
-					for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectToSpawn : ((BO4CustomStructure)structure).objectsToSpawn.entrySet())
-					{
-						if(added)
-						{
-							stringbuilder.append(";");
-						}
-						key = objectToSpawn.getKey();
-						stringbuilder.append(key.getChunkX() + "," + key.getChunkZ());
-						added = true;
-
-						coords = objectToSpawn.getValue();
-						for(CustomStructureCoordinate coord : coords)
-						{
-							//stringbuilder.append("," + coord.isSpawned + "," + coord.isBranch + "," + coord.branchDepth + "," + coord.isRequiredBranch + "," + coord.BO3Name + "," + coord.rotation.toString() + "," + coord.getX() + "," + coord.getY() + "," + coord.getZ());
-							stringbuilder.append("," + coord.bo3Name + "," + coord.rotation.toString() + "," + coord.getX() + "," + coord.getY() + "," + coord.getZ());
-						}
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure instanceof BO4CustomStructure && ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size() > 0 && chunkCoord.getChunkX() == ((BO4CustomStructureCoordinate)structure.start).getChunkX() && chunkCoord.getChunkZ() == ((BO4CustomStructureCoordinate)structure.start).getChunkZ())
-				{
-					boolean added = false;
-					ArrayList<SmoothingAreaLine> coords2;
-					String append;
-					for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet())
-					{
-						if(added)
-						{
-							stringbuilder.append(";");
-						}
-						key = smoothingAreaToSpawn.getKey();
-						stringbuilder.append(key.getChunkX() + "," + key.getChunkZ());
-						added = true;
-
-						coords2 = smoothingAreaToSpawn.getValue();
-						for(SmoothingAreaLine coord : coords2)
-						{
-							append = ":";
-							
-							append += coord.beginPointX;
-							append += "," + coord.beginPointY;
-							append += "," + coord.beginPointZ;
-
-							append += "," + coord.endPointX;
-							append += "," + coord.endPointY;
-							append += "," + coord.endPointZ;
-
-							append += "," + coord.originPointX;
-							append += "," + coord.originPointY;
-							append += "," + coord.originPointZ;
-
-							append += "," + coord.finalDestinationPointX;
-							append += "," + coord.finalDestinationPointY;
-							append += "," + coord.finalDestinationPointZ;
-							
-							if(coord instanceof SmoothingAreaLineDiagonal)
-							{
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointX; // 12;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineoriginPointY; // 13;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointZ; // 14;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointX; // 15;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointY; // 16;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointZ; // 17;								
-							}
-							
-							stringbuilder.append(append);
-						}
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure.modDataManager.modData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
-				{
-					boolean added = false;
-					for(ModDataFunction<?> modData : structure.modDataManager.modData)
-					{
-						if(added)
-						{
-							stringbuilder.append(":");
-						}
-						stringbuilder.append(modData.x + "," + modData.y + "," + modData.z + "," + modData.modId.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + modData.modData.replace(":", "&#58;").replace(" ", "&nbsp;"));
-						added = true;
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure.spawnerManager.spawnerData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
-				{
-					boolean added = false;
-					for(SpawnerFunction<?> spawnerData : structure.spawnerManager.spawnerData)
-					{
-						if(added)
-						{
-							stringbuilder.append(":");
-						}
-						stringbuilder.append(spawnerData.x + "," + spawnerData.y + "," + spawnerData.z + "," + spawnerData.mobName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.originalnbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.nbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.groupSize + "," + spawnerData.interval + "," + spawnerData.spawnChance + "," + spawnerData.maxCount + "," + spawnerData.despawnTime + "," + spawnerData.velocityX + "," + spawnerData.velocityY + "," + spawnerData.velocityZ + "," + spawnerData.velocityXSet + "," + spawnerData.velocityYSet + "," + spawnerData.velocityZSet + "," + spawnerData.yaw + "," + spawnerData.pitch);
-						added = true;
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure.particlesManager.particleData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
-				{
-					boolean added = false;
-					for(ParticleFunction<?> particleData : structure.particlesManager.particleData)
-					{
-						if(added)
-						{
-							stringbuilder.append(":");
-						}
-						stringbuilder.append(particleData.x + "," + particleData.y + "," + particleData.z + "," + particleData.particleName.replace(":", "&#58;").replace(" ", "&nbsp;")+ "," + particleData.interval + "," + particleData.velocityX + "," + particleData.velocityY + "," + particleData.velocityZ + "," + particleData.velocityXSet + "," + particleData.velocityYSet + "," + particleData.velocityZSet);
-						added = true;
-					}
-				}
-
-				stringbuilder.append("]");
-			}
-
-			stringbuilder.append("]");
-
-			BufferedWriter writer = null;
-	        try
-	        {
-	        	if(occupiedChunksFile.exists())
-	        	{
-	        		occupiedChunksFile.delete();
-	        	}
-	        	occupiedChunksFile.getParentFile().mkdirs();
-	        	writer = new BufferedWriter(new FileWriter(occupiedChunksFile));
-	            writer.write(stringbuilder.toString());
-	        }
-	        catch (IOException e)
-	        {
-	            e.printStackTrace();
-	        }
-	        finally
-	        {
-	            try
-	            {
-	                // Close the writer regardless of what happens...
-	                writer.close();
-	            } catch (Exception e) { }
-	        }
-    	}
-    }
 }

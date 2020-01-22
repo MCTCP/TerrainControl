@@ -531,7 +531,7 @@ public class Pregenerator
 			}
 
 			StringBuilder stringbuilder = new StringBuilder();
-			stringbuilder.append(spawned + "," + left + "," + top + "," + right + "," + bottom + "," + cycle + "," + (System.currentTimeMillis() - startTime) + "," + iTop + "," + iBottom + "," + iLeft + "," + iRight + "," + pregenerationRadius + "," + preGeneratorCenterPoint.getChunkX() + "," + preGeneratorCenterPoint.getChunkZ());
+			stringbuilder.append(spawned + "," + left + "," + top + "," + right + "," + bottom + "," + cycle + "," + (System.currentTimeMillis() - startTime) + "," + iTop + "," + iBottom + "," + iLeft + "," + iRight + "," + pregenerationRadius + "," + (preGeneratorCenterPoint != null ? preGeneratorCenterPoint.getChunkX() : "null") + "," + (preGeneratorCenterPoint != null ? preGeneratorCenterPoint.getChunkZ() : "null"));
 
 			BufferedWriter writer = null;
 	        try
@@ -620,7 +620,12 @@ public class Pregenerator
 
 			pregenerationRadius = Integer.parseInt(pregeneratedChunksFileValues[11]);
 
-			preGeneratorCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(pregeneratedChunksFileValues[12]), Integer.parseInt(pregeneratedChunksFileValues[13]));
+			if(pregeneratedChunksFileValues[12] != null && pregeneratedChunksFileValues[13] != null)
+			{
+				preGeneratorCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(pregeneratedChunksFileValues[12]), Integer.parseInt(pregeneratedChunksFileValues[13]));
+			} else {
+				preGeneratorCenterPoint = null;
+			}
 
 	    	total = (pregenerationRadius * 2 + 1) * (pregenerationRadius * 2 + 1);
 		} else {

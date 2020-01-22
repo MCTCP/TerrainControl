@@ -401,7 +401,7 @@ public class ObjectSpawner
 		{
 			if (
 				(res instanceof OreGen) ||
-				(res instanceof SmallLakeGen) ||
+				(res instanceof SmallLakeGen && !this.world.getStructureCache().isChunkOccupied(chunkCoord)) ||
 				(res instanceof UndergroundLakeGen) || // TODO: look at potential size bug in UnderGroundLakeGen
 				(res instanceof UnderWaterOreGen) || // TODO: This seems to be bugged, generate a plains only world with default settings and no sand appears where it does in TC
 				(res instanceof VeinGen) || // TODO: Test this
@@ -529,30 +529,21 @@ public class ObjectSpawner
 		BO4CustomStructure structureStart = world.getStructureCache().bo4StructureCache.get(chunkCoord);
 		if (structureStart != null && structureStart.start != null)
 		{
-			// SpawnForChunk will call placeComplexSurfaceBlocks for this
-			// chunk (after spawning smooth area but before spawning structure)
 			structureStart.spawnForChunkOTGPlus(chunkCoord, world);
-
-			// All done spawning structures for this chunk, clean up cache
-			if(!world.isInsidePregeneratedRegion(chunkCoord))
-			{
-				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
-			} else {
-				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
-			}
+		} else {
+			// Only trees plotted here			
 		}
-		// Only trees plotted here
-		else if (structureStart != null)
+		
+		// Complex surface blocks
+		// TODO: Reimplement placeComplexSurfaceBlocks?
+		//placeComplexSurfaceBlocks(chunkCoord);
+		
+		// All done spawning structures for this chunk, clean up cache
+		if(!world.isInsidePregeneratedRegion(chunkCoord))
 		{
-			// Complex surface blocks
-			//placeComplexSurfaceBlocks(chunkCoord);
-
-			if(!world.isInsidePregeneratedRegion(chunkCoord))
-			{
-				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
-			} else {
-				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
-			}
+			world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
+		} else {
+			world.getStructureCache().bo4StructureCache.remove(chunkCoord);
 		}
 	}
 }

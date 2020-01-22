@@ -129,7 +129,7 @@ public class ServerTickHandler
                     			// Return modData to sender.
                         		String messageString = "";
 		                    	HashMap<String, ArrayList<ModDataFunction<?>>> modDataInChunk = forgeWorld.getWorldSession().getModDataForChunk(ChunkCoordinate.fromChunkCoords(chunkX, chunkZ));
-		                    	if(modDataInChunk != null)
+		                    	if(modDataInChunk != null && modDataInChunk.entrySet().size() > 0)
 		                    	{
 			                    	for(Entry<String, ArrayList<ModDataFunction<?>>> modNameAndData : modDataInChunk.entrySet())
 			                    	{

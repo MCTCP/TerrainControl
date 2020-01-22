@@ -4,6 +4,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -122,7 +123,19 @@ public class GrassGen extends Resource
             LocalMaterialData id;
 
             // Fix y position
-            while (((id = world.getMaterial(centerX, centerY, centerZ, false)).isAir() || id.isMaterial(DefaultMaterial.LEAVES) || id.isMaterial(DefaultMaterial.LEAVES_2)) && (centerY > 0))
+            while (
+        		(
+    				(centerY >= PluginStandardValues.WORLD_DEPTH && centerY < PluginStandardValues.WORLD_HEIGHT) &&
+					(id = world.getMaterial(centerX, centerY, centerZ, false)) != null &&
+					(
+						id.isAir() || 
+						id.isMaterial(DefaultMaterial.LEAVES) || 
+						id.isMaterial(DefaultMaterial.LEAVES_2)
+    				)
+				) && (
+					centerY > 0
+				)
+    		)
             {
                 centerY--;
             }
