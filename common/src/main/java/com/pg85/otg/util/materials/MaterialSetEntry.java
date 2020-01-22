@@ -36,6 +36,7 @@ public class MaterialSetEntry
     @Override
     public int hashCode()
     {
+        // TODO: Why is this needed, clean up this class and remove all the exceptions for parsing materials!
         if (includesBlockData)
         {
             return material.hashCode();
@@ -54,7 +55,8 @@ public class MaterialSetEntry
     public String toString()
     {
         String output = material.toString();
-        if (includesBlockData && material.getBlockData() == 0)
+        // TODO: Why is this needed, clean up this class and remove all the exceptions for parsing materials!
+        if (includesBlockData && !output.contains(":") && material.getBlockData() == 0)
         {
             // Turn things like "WOOL" back into "WOOL:0" (material.toString
             // never includes "*:0")
