@@ -209,14 +209,18 @@ public class OTGTeleporter
             _this.lastFoodLevel = -1;
             ServerPacketManager.sendParticlesPacket(null, _this); // Clear particles
             
-            // When using /otg tp and teleportToSpawnOnly:true, place the player at the spawn point
-            if(!createPortal && (forgeWorld != null && forgeWorld.getConfigs().getWorldConfig().teleportToSpawnOnly))
+            if(!createPortal && forgeWorld != null)
             {
-            	_this.setPositionAndUpdate(forgeWorld.getSpawnPoint().getX(), forgeWorld.getHighestBlockYAt(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ()) + 1, forgeWorld.getSpawnPoint().getZ());
+            	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
+            	if(dimConfig != null && dimConfig.Settings.TeleportToSpawnOnly)
+            	{
+            		BlockPos spawnPoint = forgeWorld.getWorld().provider.getRandomizedSpawnPoint();
+            		_this.setPositionAndUpdate(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ());
+            	}
             }
             
             return _this;
-        }		
+        }
 
 		/*
 		 * TODO: Re-use this for forcing gamemode / flying per dimension?
@@ -581,16 +585,18 @@ public class OTGTeleporter
     private static void placeInPortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
         if (destinationWorld.provider.getDimensionType().getId() != 1) // If not End
-        {
-        	ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(destinationWorld);
-        	if(forgeWorld != null && forgeWorld.getConfigs().getWorldConfig().teleportToSpawnOnly)
+        {      
+        	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(destinationWorld);
+        	DimensionConfig dimConfig = forgeWorld == null ? null : OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
+        	if(dimConfig != null && dimConfig.Settings.TeleportToSpawnOnly)
         	{
-        		entityIn.posX = forgeWorld.getSpawnPoint().getX();
-        		entityIn.posY = forgeWorld.getHighestBlockYAt(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ());
-        		entityIn.posZ = forgeWorld.getSpawnPoint().getZ();
+	    		BlockPos spawnPos = destinationWorld.provider.getRandomizedSpawnPoint();
+	    		entityIn.posX = spawnPos.getX();
+	    		entityIn.posY = spawnPos.getY();
+	    		entityIn.posZ = spawnPos.getZ();
         	}
             if (!placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this))
-            {            	
+            {
             	makePortal(portalMaterial, destinationWorld, entityIn, _this);
             	placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this);
             }

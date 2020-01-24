@@ -9,10 +9,11 @@ import com.pg85.otg.util.bo3.Rotation;
 class BO4Settings extends Settings
 {
     static final Setting<Boolean>
-            ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false),
+    		ISOTGPLUS = booleanSetting("IsOTGPlus", true),
             REMOVEAIR = booleanSetting("RemoveAir", true),
     		CANOVERRIDE = booleanSetting("CanOverride", false),
 			MUSTBEBELOWOTHER = booleanSetting("MustBeBelowOther", false),
+			MUSTBEINSIDEWORLDBORDERS = booleanSetting("MustBeInsideWorldBorders", false),
 			CANSPAWNONWATER = booleanSetting("CanSpawnOnWater", true),
 			SPAWNONWATERONLY = booleanSetting("SpawnOnWaterOnly", false),
 			SPAWNUNDERWATER = booleanSetting("SpawnUnderWater", false),
@@ -29,8 +30,8 @@ class BO4Settings extends Settings
 
     static final Setting<Integer>
             FREQUENCY = intSetting("Frequency", 0, 0, 9999),
-            MIN_HEIGHT = intSetting("MinHeight", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
-            MAX_HEIGHT = intSetting("MaxHeight", 256, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+            MIN_HEIGHT = intSetting("MinHeight", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
+            MAX_HEIGHT = intSetting("MaxHeight", 256, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
     		BRANCH_FREQUENCY = intSetting("BranchFrequency", 0, 0, 9999),
 			HEIGHT_OFFSET = intSetting("HeightOffset", 0, -255, 255),
 			SMOOTH_HEIGHT_OFFSET = intSetting("SmoothHeightOffset", 0, -255, 255),

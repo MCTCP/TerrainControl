@@ -1,9 +1,12 @@
 package com.pg85.otg.forge.events;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
+import java.util.Random;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
@@ -12,33 +15,110 @@ import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.forge.world.OTGWorldType;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.ChunkCoordinate;
 
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeProvider;
+import net.minecraft.world.gen.feature.WorldGeneratorBonusChest;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldListener
 {
-    @SubscribeEvent(priority = EventPriority.HIGH)
-	public void onWorldLoad(WorldEvent.Load event)
+	@SubscribeEvent
+	@SideOnly(Side.SERVER)
+	public void onWorldLoadServer(WorldEvent.Load event)
 	{
         World world = event.getWorld();
         int dimension = world.provider.getDimension();
 
         //OTG.log(LogMarker.INFO, "WorldEvent.Load - DIM: {}", dimension);
 
-        if (dimension == 0)
+        ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(world);
+    	if(forgeWorld != null)
         {
-        	ForgeWorld overworld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
-        	if(overworld != null)
-        	{
-        		overrideWorldProvider(world);	
-        	}
+            if (dimension == 0)
+            {
+           		overrideWorldProvider(world);
+            }
+
+            // The createworldspawn event was cancelled, since the worldprovider needed to be replaced first for the overworld.
+            // Now that the worldprovider has been replaced, create the spawn point.
+            // For dimensions, the createworldspawn event is never fired, so create the spawn point here as well.
+            // Spawn point/border data for dims is not saved by MC (overworld only), so we recreate the spawn position & borders on each world load.
+            DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
+            createSpawnPosition(forgeWorld, dimConfig);
+            
+           	// Don't create bonus chest on each world load (bit of a hack using preGeneratorCenterPoint).
+	        if(dimConfig.BonusChest && forgeWorld.getWorldSession().getPreGeneratorCenterPoint() == null)
+	        {
+	        	createBonusChest(forgeWorld.getWorld());
+	        }
+            
+        	// Spawn position has been determined, set pregenerator center.
+        	forgeWorld.getWorldSession().setPreGeneratorCenterPoint(ChunkCoordinate.fromBlockCoords(world.getWorldInfo().getSpawnX(), world.getWorldInfo().getSpawnZ()));
+
+            // Spawn position has been determined, create world borders.
+           	world.worldBorder = ((OTGWorldProvider)world.provider).createWorldBorderA(world.worldBorder);
+           	
+    		ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
+    	}
+	}
+	
+	@SubscribeEvent
+	@SideOnly(Side.CLIENT)
+	public void onWorldLoadClient(WorldEvent.Load event)
+	{		
+		// For single player only one world is loaded on the client, but forgeworlds exist for all dims		
+		for(LocalWorld localWorld : ((ForgeEngine)OTG.getEngine()).getAllWorlds())
+		{
+			ForgeWorld forgeWorld = (ForgeWorld)localWorld;
+			if(forgeWorld.getWorld() == null && forgeWorld.clientDimensionId == event.getWorld().provider.getDimension())
+			{
+				forgeWorld.provideClientWorld(event.getWorld());
+			}
+		}
+		
+        World world = event.getWorld();
+        int dimension = world.provider.getDimension();
+
+        //OTG.log(LogMarker.INFO, "WorldEvent.Load - DIM: {}", dimension);
+       
+        ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(world);
+    	if(forgeWorld != null)
+        {
+            if (dimension == 0)
+            {
+           		overrideWorldProvider(world);
+            }
+
+            if(!world.isRemote)
+            {
+	            // The createworldspawn event was cancelled, since the worldprovider needed to be replaced first for the overworld.
+	            // Now that the worldprovider has been replaced, create the spawn point.
+	            // For dimensions, the createworldspawn event is never fired, so create the spawn point here as well.
+	            // Spawn point/border data for dims is not saved by MC (overworld only), so we recreate the spawn position & borders on each world load.
+	            DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
+	            createSpawnPosition(forgeWorld, dimConfig);
+	            
+	           	// Don't create bonus chest on each world load (bit of a hack using preGeneratorCenterPoint).
+		        if(dimConfig.BonusChest && forgeWorld.getWorldSession().getPreGeneratorCenterPoint() == null)
+		        {
+		        	createBonusChest(forgeWorld.getWorld());
+		        }
+	            
+	        	// Spawn position has been determined, set pregenerator center.
+	        	forgeWorld.getWorldSession().setPreGeneratorCenterPoint(ChunkCoordinate.fromBlockCoords(world.getWorldInfo().getSpawnX(), world.getWorldInfo().getSpawnZ()));
+	
+	            // Spawn position has been determined, create world borders.
+	           	world.worldBorder = ((OTGWorldProvider)world.provider).createWorldBorderA(world.worldBorder);
+            }
         }
 	}
 	
@@ -61,7 +141,7 @@ public class WorldListener
                 {                	
                     WorldProvider oldProvider = world.provider;
                     world.provider = newProvider;
-                    ((OTGWorldProvider)world.provider).isSPServerOverworld = !world.isRemote;
+                    ((OTGWorldProvider)world.provider).isSPServerOverworld = !world.isRemote; // TODO: Why is this necessary?
                    	world.provider.setWorld(world);
                     world.provider.setDimension(dim);
                  
@@ -70,12 +150,11 @@ public class WorldListener
                     	// TODO: Bit of a hack, need to override the worldprovider for SP server or gravity won't work properly ><.
                     	// Creating a new biomeprovider causes problems, re-using the existing one seems to work though,
                     	((OTGWorldProvider)world.provider).init(oldProvider.getBiomeProvider());
-                    	world.worldBorder = ((OTGWorldProvider)world.provider).createWorldBorder(); 
                     }
                     
                     //OTG.log(LogMarker.INFO, "WorldUtils.overrideWorldProvider: Overrode the WorldProvider in dimension {} with '{}'", dim, newClassName);
                 }
-                catch (Exception e)
+                catch (Exception e) // TODO: Don't catch all
                 {
                     OTG.log(LogMarker.ERROR, "WorldUtils.overrideWorldProvider: Failed to override the WorldProvider of dimension {}", dim);
                 }
@@ -90,32 +169,6 @@ public class WorldListener
 
         OTG.log(LogMarker.WARN, "WorldUtils.overrideWorldProvider: Failed to create a WorldProvider from name '{}', or it was already that type", newClassName);
     }
-    
-	@SubscribeEvent
-	@SideOnly(Side.SERVER)
-	public void onWorldLoadServer(WorldEvent.Load event)
-	{
-    	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());
-    	if(forgeWorld != null)
-    	{
-    		ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(true, forgeWorld.getName(), event.getWorld().getMinecraftServer());
-    	}
-	}
-	
-	@SubscribeEvent
-	@SideOnly(Side.CLIENT)
-	public void onWorldLoadClient(WorldEvent.Load event)
-	{		
-		// For single player only one world is loaded on the client, but forgeworlds exist for all dims		
-		for(LocalWorld localWorld : ((ForgeEngine)OTG.getEngine()).getAllWorlds())
-		{
-			ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-			if(forgeWorld.getWorld() == null && forgeWorld.clientDimensionId == event.getWorld().provider.getDimension())
-			{
-				forgeWorld.provideClientWorld(event.getWorld());
-			}
-		}
-	}
 	
 	@SubscribeEvent
 	public void onWorldSave(WorldEvent.Save event)
@@ -199,16 +252,90 @@ public class WorldListener
     
     @SubscribeEvent
     public void onCreateWorldSpawn(WorldEvent.CreateSpawnPosition event)
-    {    
-    	// TODO: Make this prettier, this causes players to spawn in oceans.
-    	// Make sure the world spawn doesn't get moved after the first chunks have been spawned  
+    {
     	LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(event.getWorld());
     	if(world != null)
     	{
-	        if(world.getWorldSession().getWorldBorderRadius() > 0 || (world.getConfigs().getWorldConfig().bo3AtSpawn != null && world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0))
-	        {
-	        	event.setCanceled(true);
-	        }        
+    		// The Spawn point is overridden on worldload, since for the overworld the 
+    		// worldprovider hasn't been replaced yet at this point, and for dimensions
+    		// CreateSpawnPosition never gets fired.
+			event.setCanceled(true);
     	}
-    }    
+    }
+
+    /**
+     * creates a spawn position at random within 256 blocks of 0,0
+     */
+    private static void createSpawnPosition(ForgeWorld forgeWorld, DimensionConfig dimConfig)
+    {
+		if(dimConfig.Settings.SpawnPointSet)
+		{
+			BlockPos spawnPosition = new BlockPos(dimConfig.Settings.SpawnPointX, dimConfig.Settings.SpawnPointY, dimConfig.Settings.SpawnPointZ);
+			forgeWorld.getWorld().getWorldInfo().setSpawn(spawnPosition);
+		} else {
+			forgeWorld.getWorld().findingSpawnPoint = true;
+	        BiomeProvider biomeprovider = forgeWorld.getWorld().provider.getBiomeProvider();
+	        List<Biome> list = biomeprovider.getBiomesToSpawnIn();
+	        Random random = new Random(forgeWorld.getSeed());
+	        int range = 1024;
+	        BlockPos blockpos = biomeprovider.findBiomePosition(0, 0, range, list, random);
+	        int i = 8;
+	        int j = forgeWorld.getWorld().provider.getAverageGroundLevel();
+	        int k = 8;
+	
+	        if (blockpos != null)
+	        {
+	            i = blockpos.getX();
+	            k = blockpos.getZ();
+	        } else {
+	            OTG.log(LogMarker.INFO, "Unable to find spawn biome");
+	        }
+	
+	        int l = 0;
+	
+	        while (!forgeWorld.getWorld().provider.canCoordinateBeSpawn(i, k))
+	        {
+	            i += random.nextInt(64) - random.nextInt(64);
+	            k += random.nextInt(64) - random.nextInt(64);
+	            ++l;
+	
+	            if (l == 1000)
+	            {
+	                break;
+	            }
+	        }
+	
+	        forgeWorld.getWorld().getWorldInfo().setSpawn(new BlockPos(i, j, k));
+	        forgeWorld.getWorld().findingSpawnPoint = false;
+	        
+	        // Spawn point is only saved for overworld by MC, 
+	        // so we have to save it ourselves for dimensions.
+	        // Use the dimensionconfig
+	        dimConfig.Settings.SpawnPointSet = true;
+	        dimConfig.Settings.SpawnPointX = i;
+	        dimConfig.Settings.SpawnPointY = j;
+	        dimConfig.Settings.SpawnPointZ = k;
+	        OTG.getDimensionsConfig().save();
+		}
+    }
+    
+    /**
+     * Creates the bonus chest in the world.
+     */
+    protected static void createBonusChest(World world)
+    {
+        WorldGeneratorBonusChest worldgeneratorbonuschest = new WorldGeneratorBonusChest();
+
+        for (int i = 0; i < 10; ++i)
+        {
+            int j = world.getWorldInfo().getSpawnX() + world.rand.nextInt(6) - world.rand.nextInt(6);
+            int k = world.getWorldInfo().getSpawnZ() + world.rand.nextInt(6) - world.rand.nextInt(6);
+            BlockPos blockpos = world.getTopSolidOrLiquidBlock(new BlockPos(j, 0, k)).up();
+
+            if (worldgeneratorbonuschest.generate(world, world.rand, blockpos))
+            {
+                break;
+            }
+        }
+    }
 }

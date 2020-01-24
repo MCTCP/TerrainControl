@@ -320,8 +320,7 @@ public class ForgeWorld implements LocalWorld
     
     public BlockPos getSpawnPoint()
     {
-    	BlockPos spawnPos = world.provider.getSpawnPoint();
-    	return new BlockPos(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+    	return world.provider.getSpawnPoint();
     }
     
     @Override
@@ -401,7 +400,10 @@ public class ForgeWorld implements LocalWorld
     	ArrayList<LocalBiome> biomes = new ArrayList<LocalBiome>();
 		for(LocalBiome biome : this.settings.getBiomeArrayByOTGId())
 		{
-			biomes.add(biome);
+			if(biome != null)
+			{
+				biomes.add(biome);
+			}
 		}
     	return biomes;
     }
@@ -1316,5 +1318,11 @@ public class ForgeWorld implements LocalWorld
 		this.cavesGen.generate(this.world, x, z, primer);
 		
 		return true;
+	}
+
+	@Override
+	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate)
+	{
+		return this.world.getWorldBorder().contains(new BlockPos(chunkCoordinate.getBlockXCenter(), 0, chunkCoordinate.getBlockZCenter()));
 	}
 }

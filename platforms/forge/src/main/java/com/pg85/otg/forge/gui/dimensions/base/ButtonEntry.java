@@ -1,6 +1,5 @@
-package com.pg85.otg.forge.gui.dimensions;
+package com.pg85.otg.forge.gui.dimensions.base;
 
-import com.pg85.otg.forge.gui.IGuiListEntry;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionSettingsList;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
 
@@ -17,7 +16,7 @@ public class ButtonEntry implements IGuiListEntry
     private final GuiButton btnSettingsEntry;
     private final OTGGuiDimensionSettingsList parent;
 
-    ButtonEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, OTGGuiDimensionSettingsList parent, String name)
+    public ButtonEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, OTGGuiDimensionSettingsList parent, String name)
     {
     	this.otgGuiDimensionSettingsList = otgGuiDimensionSettingsList;
 		this.parent = parent;

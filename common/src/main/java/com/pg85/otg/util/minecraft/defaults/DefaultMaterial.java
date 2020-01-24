@@ -397,7 +397,7 @@ public enum DefaultMaterial
      */
     public static DefaultMaterial getMaterial(int id)
     {
-        if (id < 256 && LookupID[id] != null)
+        if (id < 256 && id > -1 && LookupID[id] != null)
         {
             return LookupID[id];
         }

@@ -1,6 +1,5 @@
-package com.pg85.otg.forge.gui.dimensions;
+package com.pg85.otg.forge.gui.dimensions.base;
 
-import com.pg85.otg.forge.gui.IGuiListEntry;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionSettingsList;
 
 import net.minecraftforge.fml.relauncher.Side;
@@ -13,7 +12,7 @@ public class CategoryEntry implements IGuiListEntry
 	private final String labelText;
     private final int labelWidth;
 
-    CategoryEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, String name)
+    public CategoryEntry(OTGGuiDimensionSettingsList otgGuiDimensionSettingsList, String name)
     {
         this.otgGuiDimensionSettingsList = otgGuiDimensionSettingsList;
 		this.labelText = name;

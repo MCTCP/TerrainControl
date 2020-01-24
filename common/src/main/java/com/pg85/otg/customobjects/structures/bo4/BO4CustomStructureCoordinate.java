@@ -32,21 +32,11 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 
     	this.bo3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
 
-		if(object != null && ((BO4)object).getSettings() == null)
-		{
-			throw new RuntimeException(); // TODO: Remove this after testing
-		}
-
         this.object = object;
 
         this.rotation = rotation != null ? rotation : Rotation.NORTH;
         this.x = x;
         this.y = y;
-        if(y >= PluginStandardValues.WORLD_HEIGHT)
-        {
-        	throw new RuntimeException(); // TODO: Remove this after testing
-        }
-
         this.z = z;
         this.branchDepth = branchDepth;
 

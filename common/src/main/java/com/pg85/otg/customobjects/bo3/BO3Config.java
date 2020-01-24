@@ -306,8 +306,7 @@ public class BO3Config extends CustomObjectConfigFile
 		writer.comment("A short description of this BO3 object");
 		writer.setting(BO3Settings.DESCRIPTION, this.description);
 
-		writer.comment(
-				"The BO3 version, don't change this! It can be used by external applications to do a version check.");
+		writer.comment("The BO3 version, don't change this! It can be used by external applications to do a version check.");
 		writer.setting(BO3Settings.VERSION, "3");
 
 		writer.comment("The settings mode, WriteAll, WriteWithoutComments or WriteDisable. See WorldConfig.");

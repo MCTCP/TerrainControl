@@ -32,9 +32,9 @@ public class UndergroundLakeGen extends Resource
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
         minAltitude = readInt(args.get(4), PluginStandardValues.WORLD_DEPTH,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(5), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
     }
 
     @Override

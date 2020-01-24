@@ -19,9 +19,16 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import net.minecraft.launchwrapper.IClassTransformer;
+
 import static org.objectweb.asm.Opcodes.*;
 
-import net.minecraft.launchwrapper.IClassTransformer;
+import java.util.ArrayList;
+
+// TODO: Some of these hacks may interfere with or circumvent other mods' hacks/code.
+
+// TODO: Some methods add lines and update linenumber nodes, they only do it for the method being 
+// edited though, shouldn't line numbers be updated for the rest of the file?
 
 public class OTGClassTransformer implements IClassTransformer
 {
@@ -41,12 +48,19 @@ public class OTGClassTransformer implements IClassTransformer
 		"net.minecraft.entity.item.EntityTNTPrimed", // Gravity
 		"net.minecraft.entity.item.EntityXPOrb", // Gravity
 		"net.minecraftforge.common.DimensionManager", // Dimensions
-		"net.minecraft.entity.Entity", // Log obf name for debugging
-		"net.minecraft.util.math.BlockPos$PooledMutableBlockPos" // Log obf name for debugging
+		"net.minecraft.server.management.PlayerList", // Worldborder per dimension
+		//"net.minecraft.entity.Entity", // Log obf name for debugging
+		//"net.minecraft.util.math.BlockPos$PooledMutableBlockPos", // Log obf name for debugging		
+		//"net.minecraft.world.border.WorldBorder", // Log obf name for debugging
+		//"net.minecraft.world.WorldServer", // Log obf name for debugging		
+		//"net.minecraft.entity.player.EntityPlayerMP" // Log obf name for debugging
 	};
 	
 	String entityObfuscatedClassName = "vg";
-	String pooledMutableBlockPosObfuscatedClassName = "et$b";
+	String pooledMutableBlockPosObfuscatedClassName = "et$b";	
+	String worldBorderObfuscatedClassName = "axn";
+	String worldServerObfuscatedName = "oo";
+	String entityPlayerMPObfuscatedName = "oq";
 	
 	@Override
 	public byte[] transform(String name, String transformedName, byte[] classBeingTransformed)
@@ -121,6 +135,11 @@ public class OTGClassTransformer implements IClassTransformer
 				case 13: // net.minecraftforge.common.DimensionManager.initDimension
 					transformInitDimension(classNode, isObfuscated);
 				break;
+				case 14: // net.minecraft.server.management.PlayerList
+					transformPlayerList(classNode, isObfuscated);
+				break;
+				default:
+					break;
 			}
 
 			ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS | ClassWriter.COMPUTE_FRAMES);
@@ -647,7 +666,7 @@ public class OTGClassTransformer implements IClassTransformer
 							*/
 							
 							// After:
-							// motionY -= isOTGWorld(entity) ? getGravityFactorItem(this) : getItemGravity(this);
+							// this.motionY -= isOTGWorld(entity) ? getGravityFactorItem(this) : getItemGravity(this);
 							/*
 								mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "isOTGWorld", "(Lnet/minecraft/entity/Entity;)Z", false);
 								Label l83 = new Label();
@@ -917,6 +936,7 @@ public class OTGClassTransformer implements IClassTransformer
 							targetNode = instruction;
 						} else {
 							// Inserting 5 new lines before this, so add +5 to all linenumber nodes.
+							// TODO: Shouldn't this be done for everything in the class after this method??
 							((LineNumberNode)instruction).line += 5;
 						}
 					}
@@ -933,6 +953,7 @@ public class OTGClassTransformer implements IClassTransformer
 				{
 					return;
 				}
+				
 				mv.visitVarInsn(ILOAD, 0);
 				mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "InitOTGDimension", "(I)Z", false);
 				Label l4 = new Label();
@@ -970,5 +991,236 @@ public class OTGClassTransformer implements IClassTransformer
 		}
 
 		throw new RuntimeException("OTG is not compatible with this version of Forge.");
+	}
+		
+	// Allow worldborder per dimension
+	private void transformPlayerList(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		System.out.println("OTG-Core transforming PlayerList.transformPlayerListUpdateTimeAndWeather");
+		transformPlayerListUpdateTimeAndWeather(gameDataNode, isObfuscated);
+		System.out.println("OTG-Core transforming PlayerList.setPlayerManager");
+		transformPlayerListSetPlayerManager(gameDataNode, isObfuscated);
+	}
+
+	// net.minecraft.server.management.PlayerList.updateTimeAndWeatherForPlayer
+	private void transformPlayerListUpdateTimeAndWeather(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "b" : "updateTimeAndWeatherForPlayer";
+		String injectSnapShotDescriptor = isObfuscated ? "(L" + this.entityPlayerMPObfuscatedName + ";L" + this.worldServerObfuscatedName + ";)V" : "(Lnet/minecraft/entity/player/EntityPlayerMP;Lnet/minecraft/world/WorldServer;)V";	
+		
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				// Transforming
+				/*
+		            WorldBorder worldborder = this.server.worlds[0].getWorldBorder();
+				
+					Label l0 = new Label();
+					mv.visitLabel(l0);
+					mv.visitLineNumber(1047, l0);
+					mv.visitVarInsn(ALOAD, 0);
+					mv.visitFieldInsn(GETFIELD, "net/minecraft/server/management/PlayerList", "server", "Lnet/minecraft/server/MinecraftServer;");
+					mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "worlds", "[Lnet/minecraft/world/WorldServer;");
+					mv.visitInsn(ICONST_0);
+					mv.visitInsn(AALOAD);
+					mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", "getWorldBorder", "()Lnet/minecraft/world/border/WorldBorder;", false);
+					mv.visitVarInsn(ASTORE, 3);
+				*/
+				
+				// Into
+				/*
+		        	WorldBorder worldborder = OTGHooks.getWorldBorder(this.server.worlds[0].getWorldBorder(), worldIn);
+		        	
+					Label l0 = new Label();
+					mv.visitLabel(l0);
+					mv.visitLineNumber(1047, l0);
+					mv.visitVarInsn(ALOAD, 0);
+					mv.visitFieldInsn(GETFIELD, "net/minecraft/server/management/PlayerList", "server", "Lnet/minecraft/server/MinecraftServer;");
+					mv.visitFieldInsn(GETFIELD, "net/minecraft/server/MinecraftServer", "worlds", "[Lnet/minecraft/world/WorldServer;");
+					mv.visitInsn(ICONST_0);
+					mv.visitInsn(AALOAD);
+					mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", "getWorldBorder", "()Lnet/minecraft/world/border/WorldBorder;", false);
+					mv.visitVarInsn(ALOAD, 2);
+					mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getWorldBorder", "(Lnet/minecraft/world/border/WorldBorder;Lnet/minecraft/world/WorldServer;)Lnet/minecraft/world/border/WorldBorder;", false);
+					mv.visitVarInsn(ASTORE, 3);
+				*/
+				
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					//if(instruction.getOpcode() == LDC && ((LdcInsnNode)instruction).cst instanceof Double && ((Double)((LdcInsnNode)instruction).cst).doubleValue() == 0.029999999329447746D)
+					if(instruction.getOpcode() == INVOKEVIRTUAL)
+					{
+						InsnList toInsert = new InsnList();
+						
+						toInsert.add(new VarInsnNode(ALOAD, 2));
+						toInsert.add(new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "getWorldBorder", isObfuscated ? "(L" + this.worldBorderObfuscatedClassName + ";L" + this.worldServerObfuscatedName +";)L" + this.worldBorderObfuscatedClassName + ";" : "(Lnet/minecraft/world/border/WorldBorder;Lnet/minecraft/world/WorldServer;)Lnet/minecraft/world/border/WorldBorder;", false));
+						method.instructions.insert(instruction, toInsert);
+						break;
+					}
+				}						
+				return;
+			}
+		}
+		System.out.println("OTG-Core could not override net.minecraft.server.management.PlayerList.updateTimeAndWeatherForPlayer, this may cause problems with WorldBorders for OTG dimensions. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
+	}
+
+	// net.minecraft.server.management.PlayerList.setPlayerManager
+	private void transformPlayerListSetPlayerManager(ClassNode gameDataNode, boolean isObfuscated)
+	{
+		String injectSnapShot = isObfuscated ? "a" : "setPlayerManager";
+		String injectSnapShotDescriptor = isObfuscated ? "([L" + this.worldServerObfuscatedName + ";)V" : "([Lnet/minecraft/world/WorldServer;)V";
+		for(MethodNode method : gameDataNode.methods)
+		{
+			if(method.name.equals(injectSnapShot) && method.desc.equals(injectSnapShotDescriptor))
+			{
+				// Transforming
+		    	// From
+		    	/*
+		        this.playerDataManager = worldServers[0].getSaveHandler().getPlayerNBTManager();
+		        worldServers[0].getWorldBorder().addListener(new IBorderListener()
+		        {
+		            public void onSizeChanged(WorldBorder border, double newSize)
+		            {
+		                PlayerList.this.sendPacketToAllPlayers(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_SIZE));
+		            }
+		            public void onTransitionStarted(WorldBorder border, double oldSize, double newSize, long time)
+		            {
+		                PlayerList.this.sendPacketToAllPlayers(new SPacketWorldBorder(border, SPacketWorldBorder.Action.LERP_SIZE));
+		            }
+		            public void onCenterChanged(WorldBorder border, double x, double z)
+		            {
+		                PlayerList.this.sendPacketToAllPlayers(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_CENTER));
+		            }
+		            public void onWarningTimeChanged(WorldBorder border, int newTime)
+		            {
+		                PlayerList.this.sendPacketToAllPlayers(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_TIME));
+		            }
+		            public void onWarningDistanceChanged(WorldBorder border, int newDistance)
+		            {
+		                PlayerList.this.sendPacketToAllPlayers(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_BLOCKS));
+		            }
+		            public void onDamageAmountChanged(WorldBorder border, double newAmount)
+		            {
+		            }
+		            public void onDamageBufferChanged(WorldBorder border, double newSize)
+		            {
+		            }
+		        });
+		 
+		    	mv = cw.visitMethod(ACC_PUBLIC, "setPlayerManager", "([Lnet/minecraft/world/WorldServer;)V", null, null);
+				mv.visitCode();
+				Label l0 = new Label();
+				mv.visitLabel(l0);
+				mv.visitLineNumber(263, l0);
+				mv.visitVarInsn(ALOAD, 0);
+				mv.visitVarInsn(ALOAD, 1);
+				mv.visitInsn(ICONST_0);
+				mv.visitInsn(AALOAD);
+				mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", "getSaveHandler", "()Lnet/minecraft/world/storage/ISaveHandler;", false);
+				mv.visitMethodInsn(INVOKEINTERFACE, "net/minecraft/world/storage/ISaveHandler", "getPlayerNBTManager", "()Lnet/minecraft/world/storage/IPlayerFileData;", true);
+				mv.visitFieldInsn(PUTFIELD, "net/minecraft/server/management/PlayerList", "playerDataManager", "Lnet/minecraft/world/storage/IPlayerFileData;");		
+				Label l1 = new Label();
+				mv.visitLabel(l1);
+				mv.visitLineNumber(264, l1);				
+				mv.visitVarInsn(ALOAD, 1);
+				
+				mv.visitInsn(ICONST_0);
+				mv.visitInsn(AALOAD);
+				mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", "getWorldBorder", "()Lnet/minecraft/world/border/WorldBorder;", false);
+				mv.visitTypeInsn(NEW, "net/minecraft/server/management/PlayerList$1");
+				mv.visitInsn(DUP);
+				mv.visitVarInsn(ALOAD, 0);
+				mv.visitMethodInsn(INVOKESPECIAL, "net/minecraft/server/management/PlayerList$1", "<init>", "(Lnet/minecraft/server/management/PlayerList;)V", false);
+				mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/border/WorldBorder", "addListener", "(Lnet/minecraft/world/border/IBorderListener;)V", false);
+				
+				Label l2 = new Label();
+				mv.visitLabel(l2);
+				mv.visitLineNumber(293, l2);
+				mv.visitInsn(RETURN);
+				Label l3 = new Label();
+				mv.visitLabel(l3);
+				mv.visitLocalVariable("this", "Lnet/minecraft/server/management/PlayerList;", null, l0, l3, 0);
+				mv.visitLocalVariable("worldServers", "[Lnet/minecraft/world/WorldServer;", null, l0, l3, 1);
+				mv.visitMaxs(4, 2);
+				mv.visitEnd();
+		    	*/
+		    	
+		    	// Into
+		    	/*
+		        this.playerDataManager = worldServers[0].getSaveHandler().getPlayerNBTManager();
+		        OTGHooks.setPlayerManager(worldServers);
+		        
+				mv = cw.visitMethod(ACC_PUBLIC, "setPlayerManager", "([Lnet/minecraft/world/WorldServer;)V", null, null);
+				mv.visitCode();
+				Label l0 = new Label();
+				mv.visitLabel(l0);
+				mv.visitLineNumber(261, l0);
+				mv.visitVarInsn(ALOAD, 0);
+				mv.visitVarInsn(ALOAD, 1);
+				mv.visitInsn(ICONST_0);
+				mv.visitInsn(AALOAD);
+				mv.visitMethodInsn(INVOKEVIRTUAL, "net/minecraft/world/WorldServer", "getSaveHandler", "()Lnet/minecraft/world/storage/ISaveHandler;", false);
+				mv.visitMethodInsn(INVOKEINTERFACE, "net/minecraft/world/storage/ISaveHandler", "getPlayerNBTManager", "()Lnet/minecraft/world/storage/IPlayerFileData;", true);
+				mv.visitFieldInsn(PUTFIELD, "com/pg85/otg/forge/asm/OTGHooks", "playerDataManager", "Lnet/minecraft/world/storage/IPlayerFileData;");
+				Label l1 = new Label();
+				mv.visitLabel(l1);
+				mv.visitLineNumber(262, l1);
+				mv.visitVarInsn(ALOAD, 1);
+				
+				mv.visitMethodInsn(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "setPalayerManager", "([Lnet/minecraft/world/WorldServer;)V", false);
+				
+				Label l2 = new Label();
+				mv.visitLabel(l2);
+				mv.visitLineNumber(263, l2);
+				mv.visitInsn(RETURN);
+				Label l3 = new Label();
+				mv.visitLabel(l3);
+				mv.visitLocalVariable("this", "Lcom/pg85/otg/forge/asm/OTGHooks;", null, l0, l3, 0);
+				mv.visitLocalVariable("worldServers", "[Lnet/minecraft/world/WorldServer;", null, l0, l3, 1);
+				mv.visitMaxs(3, 2);
+				mv.visitEnd();
+		    	*/
+				
+				boolean putFieldFound = false;
+				ArrayList<AbstractInsnNode> instructionsToRemove = new ArrayList<AbstractInsnNode>();
+				for(AbstractInsnNode instruction : method.instructions.toArray())
+				{
+					if(instruction.getOpcode() == PUTFIELD)
+					{
+						putFieldFound = true;
+						continue;
+					}
+					if(putFieldFound && instruction.getOpcode() == ICONST_0)
+					{
+						// Remove 8 instructions
+						for(int i = 0; i < 8; i++)
+						{
+							instructionsToRemove.add(instruction);
+							instruction = instruction.getNext();
+						}
+						// Verify that label is next instruction
+						if(!(instruction instanceof LabelNode) || instructionsToRemove.size() == 0 || !(instruction.getNext() instanceof LineNumberNode))
+						{
+							System.out.println("OTG-Core could not override net.minecraft.server.management.PlayerList.setPlayerManager, this may cause problems with WorldBorders for OTG dimensions. Either another mod has edited the code, or OTG-Core is not compatible with this version of Forge.");
+						} else {
+							instruction = instruction.getNext();
+							// Removing 29 lines, adding 1.
+							// TODO: Shouldn't this be done for everything in the class after this method??
+							((LineNumberNode)instruction).line -= 28;
+							
+							for(AbstractInsnNode instructionToRemove : instructionsToRemove)
+							{
+								method.instructions.remove(instructionToRemove);
+							}
+							
+							method.instructions.insertBefore(instruction, new VarInsnNode(ALOAD, 1));						
+							method.instructions.insertBefore(instruction, new MethodInsnNode(INVOKESTATIC, "com/pg85/otg/forge/asm/OTGHooks", "setPlayerManager", isObfuscated ? "([L" + this.worldServerObfuscatedName + ";)V" : "([Lnet/minecraft/world/WorldServer;)V", false));
+						}
+						break;
+					}
+				}
+			}
+		}
 	}
 }

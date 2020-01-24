@@ -53,7 +53,7 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 	{
 		@Override
 		public IMessage handleServerMessage(EntityPlayer player, UpdateDimensionSettingsPacket message, MessageContext ctx)
-		{			
+		{
 			try
 			{
 				int packetType = message.getStream().readInt();
@@ -81,12 +81,17 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 			                	{
 	            					ForgeWorld forgeWorld = null;
 	        						forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld();
-	            					if(forgeWorld.getWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
-	            					{
-		            					forgeWorld.getWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
-		            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.getWorldSession().getPregenerationRadius();
-	            					}
+	        						
+	            					forgeWorld.getWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
+	            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.getWorldSession().getPregenerationRadius();
+	            	    				            					
 			                		OTG.getDimensionsConfig().Overworld = dimConfig;
+			                		
+            						// 0 is disabled, 1 is 1 chunk, 2 is 3 chunks, 3 is 5 chunks etc
+            						double d2 = dimConfig.WorldBorderRadiusInChunks == 0 ? 6.0E7D : dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16;
+            						forgeWorld.getWorld().getWorldBorder().setCenter(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ());
+            						forgeWorld.getWorld().getWorldBorder().setTransition(d2);
+            						
 			                	} else {
 			                		// TODO: Assuming atm that only a single thread is ever 
 			                		// accessing dimensionsconfig, is that true? 
@@ -108,14 +113,16 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 	            					// ForgeWorld might have been deleted, client may have sent outdated worlds list
 	            					if(forgeWorld != null)
 	            					{
-		            					if(forgeWorld.getWorldSession().getPregenerationRadius() != dimConfig.PregeneratorRadiusInChunks)
-		            					{
-			            					forgeWorld.getWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
-			            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.getWorldSession().getPregenerationRadius();
-		            					}
-	
+		            					forgeWorld.getWorldSession().setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
+		            					dimConfig.PregeneratorRadiusInChunks = forgeWorld.getWorldSession().getPregenerationRadius();
+
 				                		OTG.getDimensionsConfig().Dimensions.remove(dimConfigToRemove);
 				                		OTG.getDimensionsConfig().Dimensions.add(dimConfig);
+				                		
+	            						// 0 is disabled, 1 is 1 chunk, 2 is 3 chunks, 3 is 5 chunks etc
+	            						double d2 = dimConfig.WorldBorderRadiusInChunks == 0 ? 6.0E7D : dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16;
+	            						forgeWorld.getWorld().getWorldBorder().setCenter(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ());
+	            						forgeWorld.getWorld().getWorldBorder().setTransition(d2);
 	            					}
 			                	}
 		                	}

@@ -24,13 +24,11 @@ public abstract class WorldSession
 
 	public abstract ArrayList<ParticleFunction<?>> getParticleFunctions();
 
-	public abstract int getWorldBorderRadius();
-	public abstract ChunkCoordinate getWorldBorderCenterPoint();
-
 	public abstract int getPregenerationRadius();
 	public abstract int setPregenerationRadius(int value);
 
 	public abstract ChunkCoordinate getPreGeneratorCenterPoint();
+	public abstract void setPreGeneratorCenterPoint(ChunkCoordinate chunkCoord);
 
 	public abstract int getPregeneratedBorderLeft();
 	public abstract int getPregeneratedBorderRight();
@@ -69,7 +67,6 @@ public abstract class WorldSession
     public HashMap<String,ArrayList<ModDataFunction<?>>> getModDataForChunk(ChunkCoordinate chunkCoord)
     {
     	HashMap<String,ArrayList<ModDataFunction<?>>> result = new HashMap<String,ArrayList<ModDataFunction<?>>>();
-    	boolean bFound = false;
 		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 		{
 			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
@@ -87,15 +84,7 @@ public abstract class WorldSession
     					result.get(modData.modId).add(modData);
     				}
     			}
-	    		bFound = true;
 			}
-    	}
-    	if(!bFound)
-    	{
-    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
-    		{
-    			result = null;
-    		}
     	}
     	return result;
     }
@@ -103,7 +92,6 @@ public abstract class WorldSession
     public ArrayList<SpawnerFunction<?>> getSpawnersForChunk(ChunkCoordinate chunkCoord)
     {
     	ArrayList<SpawnerFunction<?>> result = new ArrayList<SpawnerFunction<?>>();
-    	boolean bFound = false;
 		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 		{
 			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
@@ -118,22 +106,13 @@ public abstract class WorldSession
     				}
     			}
     		}
-    		bFound = true;
 		}
-    	if(!bFound)
-    	{
-    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
-    		{
-    			result = null;
-    		}
-    	}
     	return result;
     }
 
     public ArrayList<ParticleFunction<?>> getParticlesForChunk(ChunkCoordinate chunkCoord)
     {
     	ArrayList<ParticleFunction<?>> result = new ArrayList<ParticleFunction<?>>();
-    	boolean bFound = false;
 		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 		{
 			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
@@ -147,14 +126,6 @@ public abstract class WorldSession
     					result.add(particleData);
     				}
     			}
-    		}
-    		bFound = true;
-    	}
-    	if(!bFound)
-    	{
-    		if(!world.isInsidePregeneratedRegion(chunkCoord) && (!world.getConfigs().getWorldConfig().isOTGPlus || !world.getStructureCache().bo4StructureCache.containsKey(chunkCoord)))
-    		{
-    			result = null;
     		}
     	}
     	return result;

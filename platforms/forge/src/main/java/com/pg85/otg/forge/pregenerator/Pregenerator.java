@@ -99,12 +99,22 @@ public class Pregenerator
 	 */
 	public int setPregenerationRadius(int radius)
 	{
-		if(radius > cycle && radius > 0)
+		if(radius > -1 && radius != pregenerationRadius)
 		{
-			pregenerationRadius = radius;
+			// Cycle points to the current cycle, which could be: 
+			// 2, if pregenerationRadius is 1 and pregeneration is finished.
+			// 0-1, if pregenerationRadius is 1 and pregeneration is not yet finished
+			// If the radius is smaller than the current cycle, set it to the current cycle (cycle - 1 if pregeneration finished).
+			if(cycle != 0 && (radius < (total == spawned ? cycle - 1 : cycle)))
+			{
+				pregenerationRadius = (total == spawned ? cycle - 1 : cycle);
+			} else {
+				pregenerationRadius = radius;
+			}
 		} else {
-			pregenerationRadius = cycle;
+			return pregenerationRadius;
 		}
+		
 		// World can be null when creating new worlds on MP client
 		if(world != null)
 		{
@@ -134,6 +144,16 @@ public class Pregenerator
 	public int getPregenerationBorderBottom()
 	{
 		return bottom;
+	}
+	
+	public void setPreGeneratorCenterPoint(ChunkCoordinate chunkCoord)
+	{
+		// Don't allow moving of the center point if pregeneration has already started
+		if(!pregeneratorIsRunning && spawned == 0)
+		{
+			preGeneratorCenterPoint = chunkCoord;
+			savePregeneratorData(true);
+		}
 	}
 
 	public ChunkCoordinate getPregenerationCenterPoint()
@@ -382,7 +402,6 @@ public class Pregenerator
 		} else {
 			// Pre-generation cycle cannot be completed.
 			// Save progress so we can continue and retry on the next server tick.
-			// cycle -= 1;
 			processing = false;
 		}		
 	}
@@ -512,7 +531,7 @@ public class Pregenerator
 			}
 
 			StringBuilder stringbuilder = new StringBuilder();
-			stringbuilder.append(spawned + "," + left + "," + top + "," + right + "," + bottom + "," + cycle + "," + (System.currentTimeMillis() - startTime) + "," + iTop + "," + iBottom + "," + iLeft + "," + iRight + "," + pregenerationRadius + "," + preGeneratorCenterPoint.getChunkX() + "," + preGeneratorCenterPoint.getChunkZ());
+			stringbuilder.append(spawned + "," + left + "," + top + "," + right + "," + bottom + "," + cycle + "," + (System.currentTimeMillis() - startTime) + "," + iTop + "," + iBottom + "," + iLeft + "," + iRight + "," + pregenerationRadius + "," + (preGeneratorCenterPoint != null ? preGeneratorCenterPoint.getChunkX() : "null") + "," + (preGeneratorCenterPoint != null ? preGeneratorCenterPoint.getChunkZ() : "null"));
 
 			BufferedWriter writer = null;
 	        try
@@ -601,7 +620,12 @@ public class Pregenerator
 
 			pregenerationRadius = Integer.parseInt(pregeneratedChunksFileValues[11]);
 
-			preGeneratorCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(pregeneratedChunksFileValues[12]), Integer.parseInt(pregeneratedChunksFileValues[13]));
+			if(pregeneratedChunksFileValues[12] != null && pregeneratedChunksFileValues[13] != null)
+			{
+				preGeneratorCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(pregeneratedChunksFileValues[12]), Integer.parseInt(pregeneratedChunksFileValues[13]));
+			} else {
+				preGeneratorCenterPoint = null;
+			}
 
 	    	total = (pregenerationRadius * 2 + 1) * (pregenerationRadius * 2 + 1);
 		} else {
@@ -620,7 +644,7 @@ public class Pregenerator
 			iLeft = Integer.MIN_VALUE;
 			iRight = Integer.MIN_VALUE;
 
-			preGeneratorCenterPoint = world.getSpawnChunk();
+			preGeneratorCenterPoint = null; // Will be set after world spawn point has been determined
 
 			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
 			this.setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);

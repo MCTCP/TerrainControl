@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.gui.dimensions;
+package com.pg85.otg.forge.gui.dimensions.base;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -14,7 +14,7 @@ public class SettingEntry<T>
 		String
 	}
 	
-	String name;
+	public String name;
 	ValueType valueType;
 	T value;
 	T defaultValue;
@@ -23,22 +23,22 @@ public class SettingEntry<T>
 	boolean newWorldOnly;
 	boolean overWorldOnly;
 
-	SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly)
+	public SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly)
 	{
 		this(name, value, defaultValue, null, null, newWorldOnly, false);
 	}
 	
-	SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly, boolean overWorldOnly)
+	public SettingEntry(String name, T value, T defaultValue, boolean newWorldOnly, boolean overWorldOnly)
 	{
 		this(name, value, defaultValue, null, null, newWorldOnly, overWorldOnly);
 	}
 	
-	SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly)
+	public SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly)
 	{
 		this(name, value, defaultValue, minValue, maxValue, newWorldOnly, false);
 	}
 	
-	private SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly, boolean overWorldOnly)
+	public SettingEntry(String name, T value, T defaultValue, T minValue, T maxValue, boolean newWorldOnly, boolean overWorldOnly)
 	{
 		this.name = name;
 		this.value = value;

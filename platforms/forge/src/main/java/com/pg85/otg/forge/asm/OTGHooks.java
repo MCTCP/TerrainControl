@@ -11,8 +11,12 @@ import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.network.play.server.SPacketWorldBorder;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.border.IBorderListener;
+import net.minecraft.world.border.WorldBorder;
 import net.minecraftforge.common.DimensionManager;
 
 public class OTGHooks
@@ -239,4 +243,76 @@ public class OTGHooks
 		}
 		return count;
 	}
+
+	public static WorldBorder getWorldBorder(WorldBorder worldBorder, WorldServer worldIn)
+	{
+		if(isOTGInstalled() && worldIn.provider instanceof OTGWorldProvider)
+		{
+			return worldIn.worldBorder;
+		}
+		return worldBorder;
+	}
+    
+    public static void setPlayerManager(WorldServer[] worldServers)
+    {
+        worldServers[0].getWorldBorder().addListener(new IBorderListener()
+        {
+            public void onSizeChanged(WorldBorder border, double newSize)
+            {
+            	for(int dim : DimensionManager.getIDs())
+            	{
+            		if(dim == 0 || !OTGDimensionManager.IsOTGDimension(dim))
+            		{      
+            			worldServers[0].getMinecraftServer().getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_SIZE), dim);            			
+            		}
+            	}
+            }
+            public void onTransitionStarted(WorldBorder border, double oldSize, double newSize, long time)
+            {
+            	for(int dim : DimensionManager.getIDs())
+            	{
+            		if(dim == 0 || !OTGDimensionManager.IsOTGDimension(dim))
+            		{
+            			worldServers[0].getMinecraftServer().getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.LERP_SIZE), dim);            			
+            		}
+            	}
+            }
+            public void onCenterChanged(WorldBorder border, double x, double z)
+            {
+            	for(int dim : DimensionManager.getIDs())
+            	{
+            		if(dim == 0 || !OTGDimensionManager.IsOTGDimension(dim))
+            		{
+            			worldServers[0].getMinecraftServer().getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_CENTER), dim);            			
+            		}
+            	}
+            }
+            public void onWarningTimeChanged(WorldBorder border, int newTime)
+            {
+            	for(int dim : DimensionManager.getIDs())
+            	{
+            		if(dim == 0 || !OTGDimensionManager.IsOTGDimension(dim))
+            		{
+            			worldServers[0].getMinecraftServer().getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_TIME), dim);            			
+            		}
+            	}            	
+            }
+            public void onWarningDistanceChanged(WorldBorder border, int newDistance)
+            {
+            	for(int dim : DimensionManager.getIDs())
+            	{
+            		if(dim == 0 || !OTGDimensionManager.IsOTGDimension(dim))
+            		{
+            			worldServers[0].getMinecraftServer().getPlayerList().sendPacketToAllPlayersInDimension(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_BLOCKS), dim);            			
+            		}
+            	}              	
+            }
+            public void onDamageAmountChanged(WorldBorder border, double newAmount)
+            {
+            }
+            public void onDamageBufferChanged(WorldBorder border, double newSize)
+            {
+            }
+        });
+    }
 }

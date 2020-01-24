@@ -26,9 +26,9 @@ public class LiquidGen extends Resource
         frequency = readInt(args.get(1), 1, 5000);
         rarity = readRarity(args.get(2));
         minAltitude = readInt(args.get(3), PluginStandardValues.WORLD_DEPTH,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(4), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         sourceBlocks = readMaterials(args, 5);
     }
 

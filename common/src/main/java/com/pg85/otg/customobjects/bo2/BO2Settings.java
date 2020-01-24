@@ -25,8 +25,8 @@ class BO2Settings extends Settings
 
     static final Setting<Integer>
             RARITY = intSetting("rarity", 100, 1, 1000000),
-            SPAWN_ELEVATION_MIN = intSetting("spawnElevationMin", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
-            SPAWN_ELEVATION_MAX = intSetting("spawnElevationMax", 128, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT)
+            SPAWN_ELEVATION_MIN = intSetting("spawnElevationMin", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
+            SPAWN_ELEVATION_MAX = intSetting("spawnElevationMax", 128, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1)
     ;
 
     static final Setting<MaterialSet>

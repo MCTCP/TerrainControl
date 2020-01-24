@@ -38,7 +38,7 @@ public class VeinGen extends Resource
         minAltitude = readInt(args.get(7), PluginStandardValues.WORLD_DEPTH,
                 PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(8), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         sourceBlocks = readMaterials(args, 9);
     }
 
