@@ -592,4 +592,18 @@ public class ForgeBiomeRegistryManager
 
         return standardBiomes;
 	}
+
+	public int getAvailableBiomeIdsCount()
+	{
+		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
+		int availableIds = 0;
+    	for(int i = 0; i < biomeRegistryAvailabiltyMap.size(); i++)
+    	{
+    		if(!biomeRegistryAvailabiltyMap.get(i))
+    		{
+    			availableIds++;
+    		}
+    	}
+    	return availableIds;
+	}
 }
