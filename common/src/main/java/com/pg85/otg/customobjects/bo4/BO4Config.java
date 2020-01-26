@@ -24,6 +24,7 @@ import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobjects.bo3.BO3Settings;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
@@ -56,11 +57,11 @@ public class BO4Config extends CustomObjectConfigFile
 {
 	public String author;
     public String description;
-    ConfigMode settingsMode;
+    public ConfigMode settingsMode;
     public int frequency;
     
-    int xSize = 16;
-    int zSize = 16;
+    private final int xSize = 16;
+    private final int zSize = 16;
     public int minHeight;
     public int maxHeight;
 
@@ -182,7 +183,7 @@ public class BO4Config extends CustomObjectConfigFile
      * @param directory    The directory the BO3 is stored in.
      * @param otherObjects All other loaded objects by their name.
      */
-    BO4Config(SettingsReaderOTGPlus reader, boolean init) throws InvalidConfigException
+    public BO4Config(SettingsReaderOTGPlus reader, boolean init) throws InvalidConfigException
     {
         super(reader);
         if(init)
@@ -624,7 +625,14 @@ public class BO4Config extends CustomObjectConfigFile
             			{
 	                    	tempBlocksList.add((BO4BlockFunction)res);
 	                    	block = (BO4BlockFunction)res;
-                    		columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;	
+	                    	try
+	                    	{
+                    		columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
+	                    	}
+	                    	catch(ArrayIndexOutOfBoundsException ex)
+	                    	{
+	                    		String breakpoint = "";
+	                    	}
             			}
             		}
             		
@@ -898,6 +906,11 @@ public class BO4Config extends CustomObjectConfigFile
     		}
     	}
     }
+    
+	public void setBranches(List<BO4BranchFunction> branches)
+	{
+		this.branchesOTGPlus = branches.toArray(new BO4BranchFunction[branches.size()]);
+	}
 
     /**
      * Gets the file this config will be written to. May be null if the config
@@ -912,6 +925,24 @@ public class BO4Config extends CustomObjectConfigFile
     @Override
     protected void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException
     {   	
+    	writeSettings(writer, null, null);
+    }
+    
+    public void writeWithData(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList) throws IOException
+    {
+        writer.setConfigMode(ConfigMode.WriteAll);
+        try
+        {
+            writer.open();
+            writeSettings(writer, blocksList, branchesList);
+        } finally
+        {
+            writer.close();
+        }
+    }
+    
+    private void writeSettings(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList) throws IOException
+    {
         // The object
         writer.bigTitle("BO4 object");
         writer.comment("This is the config file of a custom object.");
@@ -1045,9 +1076,12 @@ public class BO4Config extends CustomObjectConfigFile
         writer.setting(BO4Settings.ISSPAWNPOINT, this.isSpawnPoint);
 
         // Blocks and other things
-        writeResources(writer);
+        writeResources(writer, blocksList, branchesList);
         
-		this.reader.flushCache();
+        if(this.reader != null) // Can be true for BO4Creator?
+        {
+        	this.reader.flushCache();
+        }
     }
 
     @Override
@@ -1204,11 +1238,11 @@ public class BO4Config extends CustomObjectConfigFile
     	// Merge inherited resources
        	loadInheritedBO3();
     }
-
-    private void writeResources(SettingsWriterOTGPlus writer) throws IOException
+   
+    private void writeResources(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList) throws IOException
     {
         writer.bigTitle("Blocks");
-        writer.comment("All the blocks used in the BO3 are listed here. Possible blocks:");
+        writer.comment("All the blocks used in the BO4 are listed here. Possible blocks:");
         writer.comment("Block(x,y,z,id[.data][,nbtfile.nbt)");
         writer.comment("RandomBlock(x,y,z,id[:data][,nbtfile.nbt],chance[,id[:data][,nbtfile.nbt],chance[,...]])");
         writer.comment(" So RandomBlock(0,0,0,CHEST,chest.nbt,50,CHEST,anotherchest.nbt,100) will spawn a chest at");
@@ -1218,54 +1252,59 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment(" Spawns an object in the Mojang NBT structure format. For example, ");
         writer.comment(" MinecraftObject(0,0,0," + DefaultStructurePart.IGLOO_BOTTOM.getPath() + ")");
         writer.comment(" spawns the bottom part of an igloo.");
+
+       	ArrayList<BO4ModDataFunction> modDataList = new ArrayList<BO4ModDataFunction>();
+       	ArrayList<BO4ParticleFunction> particlesList = new ArrayList<BO4ParticleFunction>();
+       	ArrayList<BO4SpawnerFunction> spawnerList = new ArrayList<BO4SpawnerFunction>();
+       	ArrayList<BO4EntityFunction> entitiesList = new ArrayList<BO4EntityFunction>();
         
-        List<BO4BlockFunction> tempBlocksList = new ArrayList<BO4BlockFunction>();
-        List<BO4BranchFunction> tempBranchesList = new ArrayList<BO4BranchFunction>();
-        List<BO4EntityFunction> tempEntitiesList = new ArrayList<BO4EntityFunction>();
-        List<BO4ModDataFunction> tempModDataList = new ArrayList<BO4ModDataFunction>();
-        List<BO4ParticleFunction> tempParticlesList = new ArrayList<BO4ParticleFunction>();
-        List<BO4SpawnerFunction> tempSpawnerList = new ArrayList<BO4SpawnerFunction>();
-      
-        for (CustomObjectConfigFunction<BO4Config> res : reader.getConfigFunctions(this, true))
+        // Re-read the raw data, if no data was supplied. Don't save any loaded data, since it has been processed/transformed.
+        if(blocksList == null || branchesList == null || entitiesList == null)
         {
-            if (res.isValid())
-            {
-        		if(res instanceof BO4RandomBlockFunction)
-        		{
-                	tempBlocksList.add((BO4RandomBlockFunction)res);
-        		}
-        		else if(res instanceof BO4BlockFunction)
-        		{
-                	tempBlocksList.add((BO4BlockFunction)res);
-        		}
-        		else if (res instanceof BO4WeightedBranchFunction)
-                {
-                    tempBranchesList.add((BO4WeightedBranchFunction) res);
-                }
-                else if (res instanceof BO4BranchFunction)
-                {
-                	tempBranchesList.add((BO4BranchFunction) res);
-                }
-                else if (res instanceof BO4ModDataFunction)
-                {
-                    tempModDataList.add((BO4ModDataFunction) res);
-                }
-                else if (res instanceof BO4SpawnerFunction)
-                {
-                	tempSpawnerList.add((BO4SpawnerFunction) res);
-                }
-                else if (res instanceof BO4ParticleFunction)
-                {
-                	tempParticlesList.add((BO4ParticleFunction) res);
-                }
-                else if (res instanceof BO4EntityFunction)
-                {
-                	tempEntitiesList.add((BO4EntityFunction) res);
-                }
-            }
+           	blocksList = new ArrayList<BO4BlockFunction>();
+           	branchesList = new ArrayList<BO4BranchFunction>();
+        	
+	        for (CustomObjectConfigFunction<BO4Config> res : reader.getConfigFunctions(this, true))
+	        {
+	            if (res.isValid())
+	            {
+	        		if(res instanceof BO4RandomBlockFunction)
+	        		{
+	                	blocksList.add((BO4RandomBlockFunction)res);
+	        		}
+	        		else if(res instanceof BO4BlockFunction)
+	        		{
+	                	blocksList.add((BO4BlockFunction)res);
+	        		}
+	        		else if (res instanceof BO4WeightedBranchFunction)
+	                {
+	                    branchesList.add((BO4WeightedBranchFunction) res);
+	                }
+	                else if (res instanceof BO4BranchFunction)
+	                {
+	                	branchesList.add((BO4BranchFunction) res);
+	                }
+	                else if (res instanceof BO4ModDataFunction)
+	                {
+	                    modDataList.add((BO4ModDataFunction) res);
+	                }
+	                else if (res instanceof BO4SpawnerFunction)
+	                {
+	                	spawnerList.add((BO4SpawnerFunction) res);
+	                }
+	                else if (res instanceof BO4ParticleFunction)
+	                {
+	                	particlesList.add((BO4ParticleFunction) res);
+	                }
+	                else if (res instanceof BO4EntityFunction)
+	                {
+	                	entitiesList.add((BO4EntityFunction) res);
+	                }
+	            }
+	        }
         }
                
-		for(BO4BlockFunction block : tempBlocksList)
+		for(BO4BlockFunction block : blocksList)
 		{
         	writer.function(block);
 		}
@@ -1300,7 +1339,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("*Note: isRequiredBranch must be set to false. It is not possible to use isRequiredBranch:true with WeightedBranch() since isRequired:true branches must spawn and automatically have a rarity of 100.0.");
         writer.comment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
         
-        for(BO4BranchFunction func : tempBranchesList)
+        for(BO4BranchFunction func : branchesList)
         {
         	writer.function(func);
         }
@@ -1316,7 +1355,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ");
         writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
 
-        for(BO4EntityFunction func : tempEntitiesList)
+        for(BO4EntityFunction func : entitiesList)
         {
         	writer.function(func);
         }
@@ -1336,7 +1375,7 @@ public class BO4Config extends CustomObjectConfigFile
 		writer.comment("fallingdust, totem, spit.");
 		writer.comment("velocityX,velocityY,velocityZ - Spawn the enemy with the given velocity. If this is not filled in then a small random velocity is applied.");
 
-        for(BO4ParticleFunction func : tempParticlesList)
+        for(BO4ParticleFunction func : particlesList)
         {
         	writer.function(func);
         }
@@ -1360,7 +1399,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("despawnTime - After despawnTime seconds, if there is no player within 32 blocks of the entity it will despawn..");
         writer.comment("velocityX,velocityY,velocityZ,yaw,pitch - Spawn the enemy with the given velocity and angle, handy for making traps and launchers (shooting arrows and fireballs etc).");
 
-        for(BO4SpawnerFunction func : tempSpawnerList)
+        for(BO4SpawnerFunction func : spawnerList)
         {
         	writer.function(func);
         }
@@ -1396,7 +1435,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("ModName: name of the mod, for OTG commands use OTG ");
         writer.comment("Radius (optional): Radius in chunks around the player.");
 
-        for(BO4ModDataFunction func : tempModDataList)
+        for(BO4ModDataFunction func : modDataList)
         {
         	writer.function(func);
         }

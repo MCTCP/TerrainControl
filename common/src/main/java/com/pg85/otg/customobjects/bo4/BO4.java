@@ -62,10 +62,18 @@ public class BO4 implements StructuredCustomObject
      * @param name Name of the BO3.
      * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
      */
-    BO4(String name, File file)
+    public BO4(String name, File file)
     {
         this.name = name;
         this.file = file;
+    }
+    
+    // Used by BO4Creator to export BO4's from WorldEdit selection, prevents instant writing on onEnable.
+    public BO4(String name, File file, BO4Config settings)
+    {
+        this.name = name;
+        this.file = file;
+        this.settings = settings;
     }
     
     @Override

@@ -422,7 +422,7 @@ public final class WorldLoader
         
         // Load all files
         BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(OTG.getPluginConfig().biomeConfigExtension);
-        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(defaultWorldConfig, null, defaultWorldConfig.worldHeightScale, biomeDirs, biomesToLoad);
+        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(defaultWorldConfig, defaultWorldConfig.worldHeightScale, biomeDirs, biomesToLoad);
         
         // Write all biomes
 

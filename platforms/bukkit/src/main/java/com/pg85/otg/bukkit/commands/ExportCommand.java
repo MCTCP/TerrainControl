@@ -23,7 +23,7 @@ public class ExportCommand extends BaseCommand
         super(_plugin);
         name = "export";
         perm = OTGPerm.CMD_EXPORT.node;
-        usage = "export <name> [center_block] [-a include_air] [-t include_tile_entities] [-o override]";
+        usage = "export <name> [center_block] [-a include_air] [-t include_tile_entities] [-o override] [-b use branches]";
         hasWorldedit = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null;
     }
 
@@ -68,7 +68,7 @@ public class ExportCommand extends BaseCommand
         creator.includeTiles(args.contains("-t"));
 
         String block = args.size() > 1 ? args.get(1) : "";
-        boolean branch = selection.getWidth() > 32 || selection.getLength() > 32;
+        boolean branch = args.contains("-b") || selection.getWidth() > 32 || selection.getLength() > 32;
 
         creator.create(selection, block, branch);
 

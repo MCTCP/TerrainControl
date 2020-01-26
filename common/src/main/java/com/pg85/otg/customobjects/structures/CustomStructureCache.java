@@ -3,7 +3,9 @@ package com.pg85.otg.customobjects.structures;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
 import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.customobjects.bofunctions.SpawnerFunction;
@@ -59,6 +61,16 @@ public class CustomStructureCache
     {
     	return this.plotter;
     }
+
+    public ChunkCoordinate plotStructure(BO4 structure, ArrayList<String> biomes, ChunkCoordinate chunkCoord)
+    {
+    	boolean spawned = plotter.plotStructures(structure, biomes, this.world, new Random(), chunkCoord, false, this.bo4StructureCache, this.worldInfoChunks);
+    	if(spawned)
+    	{
+    		return chunkCoord;
+    	}
+    	return null;
+    }
     
     public void plotStructures(Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
     {
@@ -76,7 +88,9 @@ public class CustomStructureCache
     // spawning if a BO4 has spawned in this chunk. 
     public boolean isChunkOccupied(ChunkCoordinate chunkCoord)
     {
-    	if(!this.world.getConfigs().getWorldConfig().isOTGPlus)
+    	// TODO: Get the dimConfig in a faster way?
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
+    	if(!dimConfig.Settings.IsOTGPlus)
     	{
     		return false;
     	} else {
@@ -175,7 +189,8 @@ public class CustomStructureCache
 			}
 		}
 
-		if(world.getConfigs().getWorldConfig().isOTGPlus)
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.world.getName());
+		if(dimConfig.Settings.IsOTGPlus)
 		{
 			compressCache();
 		}
@@ -206,7 +221,8 @@ public class CustomStructureCache
 
 	    CustomStructureFileManager.saveStructuresFile(worldInfoChunksToSave, this.world);
 
-	    if(world.getConfigs().getWorldConfig().isOTGPlus)
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.world.getName());	    
+	    if(dimConfig.Settings.IsOTGPlus)
 	    {
 		    ArrayList<ChunkCoordinate> nullChunks = new ArrayList<ChunkCoordinate>();
 	    	for (Map.Entry<ChunkCoordinate, BO4CustomStructure> cachedChunk : bo4StructureCache.entrySet()) // Save null chunks from structurecache so that when loading we can reconstitute it based on worldInfoChunks, null chunks and the pregenerator border
@@ -239,7 +255,7 @@ public class CustomStructureCache
     	int structuresLoaded = 0;
 
 		Map<ChunkCoordinate, CustomStructure> loadedStructures = CustomStructureFileManager.loadStructuresFile(this.world);
-
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());		
 		for(Map.Entry<ChunkCoordinate, CustomStructure> loadedStructure : loadedStructures.entrySet())
 		{
 			structuresLoaded += 1;
@@ -251,7 +267,7 @@ public class CustomStructureCache
 
 			worldInfoChunks.put(loadedStructure.getKey(), loadedStructure.getValue());
 
-			if(world.getConfigs().getWorldConfig().isOTGPlus)
+			if(dimConfig.Settings.IsOTGPlus)
 			{
 				// Dont override any loaded structures that have been added to the structure cache
 				if(!bo4StructureCache.containsKey(loadedStructure.getKey())) 
@@ -296,7 +312,7 @@ public class CustomStructureCache
 
 		OTG.log(LogMarker.DEBUG, "Loaded " + structuresLoaded + " structure chunks");
 
-		if(world.getConfigs().getWorldConfig().isOTGPlus)
+		if(dimConfig.Settings.IsOTGPlus)
 		{
 			ArrayList<ChunkCoordinate> nullChunks = CustomStructureFileManager.loadChunksFile(WorldStandardValues.NullChunksFileName, this.world);
 			for(ChunkCoordinate chunkCoord : nullChunks)

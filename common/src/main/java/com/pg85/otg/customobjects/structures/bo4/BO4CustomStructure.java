@@ -98,7 +98,7 @@ public class BO4CustomStructure extends CustomStructure
         this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, world.getSeed());
     }
     
-    public BO4CustomStructure(LocalWorld world, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn)
+    public BO4CustomStructure(LocalWorld world, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, ArrayList<String> targetBiomes)
     {
         this.isStructureAtSpawn = isStructureAtSpawn;
 
@@ -121,7 +121,7 @@ public class BO4CustomStructure extends CustomStructure
 		
 		try
 		{
-			calculateBranches(false, world);
+			calculateBranches(false, world, targetBiomes);
 		} catch (InvalidConfigException ex) {
 			OTG.log(LogMarker.FATAL, "An unknown error occurred while calculating branches for BO3 " + this.start.bo3Name + ". This is probably an error in the BO3's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
 			throw new RuntimeException();
@@ -335,7 +335,7 @@ public class BO4CustomStructure extends CustomStructure
     		return returnValue;
     	}
     	
-    	calculateBranches(true, world);
+    	calculateBranches(true, world, null);
 
         // Calculate smoothing areas around the entire branching structure
         // Smooth the terrain in all directions bordering the structure so
@@ -400,7 +400,7 @@ public class BO4CustomStructure extends CustomStructure
     	return returnValue;
     }
 
-    private void calculateBranches(boolean minimumSize, LocalWorld world) throws InvalidConfigException
+    private void calculateBranches(boolean minimumSize, LocalWorld world, ArrayList<String> targetBiomes) throws InvalidConfigException
     {
     	if(OTG.getPluginConfig().spawnLog)
     	{
@@ -437,13 +437,13 @@ public class BO4CustomStructure extends CustomStructure
     			OTG.log(LogMarker.INFO, "---- Cycle " + Cycle + " ----");
     		}
 
-    		traverseAndSpawnChildBranches(branchData, minimumSize, true, world);
+    		traverseAndSpawnChildBranches(branchData, minimumSize, true, world, targetBiomes);
 
 			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.INFO, "All branch groups with required branches only have been processed for cycle " + Cycle + ", plotting branch groups with optional branches.");
 			}
-			traverseAndSpawnChildBranches(branchData, minimumSize, false, world);
+			traverseAndSpawnChildBranches(branchData, minimumSize, false, world, targetBiomes);
 
 			processingDone = true;
             for(BranchDataItem branchDataItem3 : AllBranchesBranchData)
@@ -529,11 +529,11 @@ public class BO4CustomStructure extends CustomStructure
         AllBranchesBranchDataHash.clear();
     }
 
-    private void traverseAndSpawnChildBranches(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world)
+    private void traverseAndSpawnChildBranches(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes)
     {
     	if(!branchData.doneSpawning)
     	{
-    		addBranches(branchData, minimumSize, false, spawningRequiredBranchesOnly, world);
+    		addBranches(branchData, minimumSize, false, spawningRequiredBranchesOnly, world, targetBiomes);
     	} else {
     		if(!branchData.cannotSpawn)
     		{
@@ -543,7 +543,7 @@ public class BO4CustomStructure extends CustomStructure
     				// that tried to spawn but couldnt
     				if(!branchDataItem2.cannotSpawn && branchData.doneSpawning)
     				{
-    					traverseAndSpawnChildBranches(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world);
+    					traverseAndSpawnChildBranches(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
     				}
     			}
     		}
@@ -621,7 +621,7 @@ public class BO4CustomStructure extends CustomStructure
     // *NOTE2: MustSpawnBelow branches retry spawning each cycle during steps 1-3 until no branch was spawned the last cycle. If they still can't spawn, they fail and can cause a rollback.
 
     //  TODO: Don't allow canOverride optional branches in the same branch group as required branches.
-    private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, LocalWorld world)
+    private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes)
     {
     	// CanOverride optional branches are spawned only after the main structure has spawned.
     	// This is useful for adding interiors and knocking out walls between rooms
@@ -880,7 +880,7 @@ public class BO4CustomStructure extends CustomStructure
 	        			{
 	        				// Returns null if the branch cannot spawn in the given biome or if there's another BO4 structure in the chunk, otherwise returns colliding branches. 
 	        				// CanOverride branches never collide with other branches, but may be unable to spawn if there's not enough space for smoothing areas.
-	    					collidingBranches = checkSpawnRequirementsAndCollisions(childBranchDataItem, minimumSize, world);
+	    					collidingBranches = checkSpawnRequirementsAndCollisions(childBranchDataItem, minimumSize, world, targetBiomes);
 	    					if(collidingBranches == null)
 	    					{
 		    					canSpawn = false;
@@ -950,7 +950,7 @@ public class BO4CustomStructure extends CustomStructure
 
 		        			spawningRequiredChildrenForOptionalBranch = true;
         					currentSpawningRequiredChildrenForOptionalBranch = childBranchDataItem;
-			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, world);
+			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, world, targetBiomes);
 			        		spawningRequiredChildrenForOptionalBranch = false;
 
 			        		// Make sure the branch wasn't rolled back because the required branches couldn't spawn.
@@ -983,7 +983,7 @@ public class BO4CustomStructure extends CustomStructure
 	        				childBranchDataItem.branch.isRequiredBranch
         				)
 		        		{
-			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, world);
+			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, world, targetBiomes);
 		        		}
 		        	}
 
@@ -1067,7 +1067,7 @@ public class BO4CustomStructure extends CustomStructure
 			        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.branch.getChunkX() + " Z" + branchDataItem.branch.getChunkZ() + " Y" + branchDataItem.branch.getY() + " " + branchDataItem.branch.bo3Name + ":" + branchDataItem.branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.branch.bo3Name + " couldn't spawn. Reason: " + reason);
 			            		}
 
-		            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world);
+		            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 		            			bBreak = true;
 			        		} else {
 				        		// if this child branch could not spawn then in some cases other child branches won't be able to either
@@ -1162,7 +1162,7 @@ public class BO4CustomStructure extends CustomStructure
 							        	    				(!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "ChunkIsIneligible: Either the chunk is occupied by another structure or a default structure, or the BO3/smoothing area is not allowed in the Biome)" : "");
 							        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.branch.getChunkX() + " Z" + branchDataItem.branch.getChunkZ() + " Y" + branchDataItem.branch.getY() + " " + branchDataItem.branch.bo3Name + ":" + branchDataItem.branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.branch.bo3Name + " couldn't spawn. Reason: " + reason);
 							            		}
-						            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world);
+						            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 						            			bBreak = true;
 						            			break;
 					        				}
@@ -1210,7 +1210,7 @@ public class BO4CustomStructure extends CustomStructure
 							)
 						)
 						{
-							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, world);
+							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 						}
 	        		}
 	        	}
@@ -1229,7 +1229,7 @@ public class BO4CustomStructure extends CustomStructure
 	        		{
 						if(childBranchDataItem.branch.isRequiredBranch)
 						{
-							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, world);
+							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 						}
 	        		}
 	        	}
@@ -1431,7 +1431,7 @@ public class BO4CustomStructure extends CustomStructure
 		return false;
 	}
 
-	private void rollBackBranch(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world)
+	private void rollBackBranch(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes)
     {
     	// When spawning an optional branch its required branches are spawned immediately as well (if there are no optional branches in the same branchGroup)
     	// This can cause a rollback if the required branches cannot spawn. Make sure that the parent branch of the optional branch isn't rolled back since it
@@ -1452,7 +1452,7 @@ public class BO4CustomStructure extends CustomStructure
     	branchData.wasDeleted = true;
 
     	branchData.isBeingRolledBack = true;
-    	deleteBranchChildren(branchData,minimumSize, spawningRequiredBranchesOnly, world);
+    	deleteBranchChildren(branchData,minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 
     	if(AllBranchesBranchDataHash.contains(branchData.branchNumber))
     	{
@@ -1507,7 +1507,7 @@ public class BO4CustomStructure extends CustomStructure
 		    					}
 			    				if(!branchAboveFound)
 			    				{
-			    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world);
+			    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 			    				}
 			    			}
 		    			}
@@ -1555,7 +1555,7 @@ public class BO4CustomStructure extends CustomStructure
 								// Check if the branch can remain spawned without the branch we're rolling back
 	    	    				if(!checkMustBeInside(branchDataItem2, ((BO4)branchDataItem2.branch.getObject())))
 	    	    				{
-	    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world);
+	    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 	    	    				}
 							}
 		    			}
@@ -1570,7 +1570,7 @@ public class BO4CustomStructure extends CustomStructure
     		if(branchData.branch.isRequiredBranch)
     		{
     			//OTG.log(LogMarker.INFO, "RollBackBranch 4: " + branchData.Parent.Branch.BO3Name + " <> " + branchData.Branch.BO3Name);
-    			rollBackBranch(branchData.parent, minimumSize, spawningRequiredBranchesOnly, world);
+    			rollBackBranch(branchData.parent, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
     		} else {
 
     			// Mark for spawning the parent and all other branches in the same branch group that spawn after this branch (unless they have already been spawned successfully)
@@ -1627,7 +1627,7 @@ public class BO4CustomStructure extends CustomStructure
             				// AddBranches should be called for the parent of the branch being rolled back and its parent if a branch group failed to spawn (and so on).
 
                 			// Since we're using SpawningRequiredBranchesOnly AddBranches can traverse all child branches without problems.
-            				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, world);
+            				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, world, targetBiomes);
         				} else {
         					// 2. During the second phase of a cycle branch groups with optional branches are spawned, the optional branches get a chance to spawn first, after that the
         					// required branches try to spawn, if that fails the branch is rolled back.
@@ -1635,7 +1635,7 @@ public class BO4CustomStructure extends CustomStructure
 
                 			// Since we're not using SpawningRequiredBranchesOnly AddBranches should only traverse child branches for any branches that it spawns from the branch group its re-trying.
         					// Otherwise some branches may have the same children traversed multiple times in a single phase.
-            				addBranches(branchData.parent, minimumSize, true, spawningRequiredBranchesOnly, world);
+            				addBranches(branchData.parent, minimumSize, true, spawningRequiredBranchesOnly, world, targetBiomes);
         				}
         			} else {
 
@@ -1651,7 +1651,7 @@ public class BO4CustomStructure extends CustomStructure
 
         				spawningRequiredChildrenForOptionalBranch = false;
             			// Since we're using SpawningRequiredBranchesOnly AddBranches can traverse all child branches without problems.
-        				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, world);
+        				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, world, targetBiomes);
         				spawningRequiredChildrenForOptionalBranch = true;
         			}
     			}
@@ -1661,7 +1661,7 @@ public class BO4CustomStructure extends CustomStructure
     	branchData.isBeingRolledBack = false;
     }
 
-    private void deleteBranchChildren(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world)
+    private void deleteBranchChildren(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes)
     {
     	// Remove all children of this branch from AllBranchesBranchData
     	Stack<BranchDataItem> children = branchData.getChildren(true, world);
@@ -1673,7 +1673,7 @@ public class BO4CustomStructure extends CustomStructure
 
         	if(branchDataItem.getChildren(true, world).size() > 0)
         	{
-    			deleteBranchChildren(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world);
+    			deleteBranchChildren(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
         	}
         	if(AllBranchesBranchDataHash.contains(branchDataItem.branchNumber))
         	{
@@ -1727,7 +1727,7 @@ public class BO4CustomStructure extends CustomStructure
 		    	    					}
 			    	    				if(!branchAboveFound)
 			    	    				{
-			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world);
+			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 			    	    				}
 			    	    			}
 			        			}
@@ -1775,7 +1775,7 @@ public class BO4CustomStructure extends CustomStructure
 										// Check if the branch can remain spawned without the branch we're rolling back
 		    	    					if(!checkMustBeInside(branchDataItem2, ((BO4)branchDataItem2.branch.getObject())))
 			    	    				{
-			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world);
+			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes);
 			    	    				}
 									}
 			        			}
@@ -1868,14 +1868,27 @@ public class BO4CustomStructure extends CustomStructure
 
 	// Returns null if the branch cannot spawn in the given biome or if there's another BO4 structure in the chunk, otherwise returns colliding branches. 
 	// CanOverride branches never collide with other branches, but may be unable to spawn if there's not enough space for smoothing areas.
-    private Stack<BranchDataItem> checkSpawnRequirementsAndCollisions(BranchDataItem branchData, boolean minimumSize, LocalWorld world)
+    private Stack<BranchDataItem> checkSpawnRequirementsAndCollisions(BranchDataItem branchData, boolean minimumSize, LocalWorld world, ArrayList<String> targetBiomes)
     {
     	CustomStructureCoordinate coordObject = branchData.branch;
 
     	if(!minimumSize)
     	{
+    		// If targetbiomes isn't null, then check for targetbiomes
+    		if(targetBiomes != null)
+    		{
+    			// If targetbiomes size is 0, allow all biomes.
+    			if(targetBiomes.size() > 0)
+    			{
+        			LocalBiome biome3 = world.getBiome(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
+        			if(!targetBiomes.contains(biome3.getName()))
+        			{
+        				return null;
+        			}    				
+    			}
+    		}
 		    // Check if the structure can spawn in this biome
-		    if(!isStructureAtSpawn)
+    		else if(!isStructureAtSpawn)
 		    {
 		    	ArrayList<String> biomeStructures;
 
@@ -1932,7 +1945,20 @@ public class BO4CustomStructure extends CustomStructure
 	            				return null;
 	            		    }
 
-	            			if(!isStructureAtSpawn)
+	                		// If targetbiomes isn't null, then check for targetbiomes
+	                		if(targetBiomes != null)
+	                		{
+	                			// If targetbiomes size is 0, allow all biomes.
+	                			if(targetBiomes.size() > 0)
+	                			{
+	                				LocalBiome biome3 = world.getBiome(x * 16 + 8, z * 16 + 7);
+	                    			if(!targetBiomes.contains(biome3.getName()))
+	                    			{
+	                    				return null;
+	                    			}    				
+	                			}
+	                		}
+	                		else if(!isStructureAtSpawn)
 	            			{
 		            		    // Check if the structure can spawn in this biome
 		            			ArrayList<String> biomeStructures;
