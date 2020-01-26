@@ -222,9 +222,9 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        	if(this.mc.isSingleplayer())
 		        	{
 		        		listEntries.add(new CategoryEntry(this, "* Close the OTG menu to apply game rules *"));
-		        	}
-		        	listEntries.add(new CategoryEntry(this, "* Don't use /gamerule, it's overworld only *"));
+		        	}		        
 		        }
+		        listEntries.add(new CategoryEntry(this, "* /gamerule, /time and /weather are overworld only *"));
 	
 		        listEntries.add(new ButtonEntry(this, this, "Back"));
 	        }
@@ -247,7 +247,6 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("SpawnPointY", dimConfig.Settings.SpawnPointY, defaultConfig != null ? defaultConfig.Settings.SpawnPointY : WorldStandardValues.SPAWN_POINT_Y.getDefaultValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Y).getMinValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Y).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("SpawnPointZ", dimConfig.Settings.SpawnPointZ, defaultConfig != null ? defaultConfig.Settings.SpawnPointZ : WorldStandardValues.SPAWN_POINT_Z.getDefaultValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Z).getMinValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Z).getMaxValue(), false), this));
 		        
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("IsOTGPlus", dimConfig.Settings.IsOTGPlus, defaultConfig != null ? defaultConfig.Settings.IsOTGPlus : WorldStandardValues.IS_OTG_PLUS.getDefaultValue(), true), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("TeleportToSpawnOnly", dimConfig.Settings.TeleportToSpawnOnly, defaultConfig != null ? defaultConfig.Settings.TeleportToSpawnOnly : WorldStandardValues.TeleportToSpawnOnly.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("WelcomeMessage", dimConfig.Settings.WelcomeMessage, defaultConfig != null ? defaultConfig.Settings.WelcomeMessage : WorldStandardValues.WelcomeMessage.getDefaultValue(), false), this));	        
 		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("DepartMessage", dimConfig.Settings.DepartMessage, defaultConfig != null ? defaultConfig.Settings.DepartMessage : WorldStandardValues.DepartMessage.getDefaultValue(), false), this));
@@ -294,16 +293,19 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new CategoryEntry(this, "BO4 structures"));
 		        
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("IsOTGPlus", dimConfig.Settings.IsOTGPlus, defaultConfig != null ? defaultConfig.Settings.IsOTGPlus : WorldStandardValues.IS_OTG_PLUS.getDefaultValue(), true), this));
-		        
-		        listEntries.add(new CategoryEntry(this, ""));
-		        listEntries.add(new CategoryEntry(this, "* OTG+ allows the use of BO4 structures with tons of new features *"));
-		        listEntries.add(new CategoryEntry(this, "* and allows them to be spawned via /otg spawn. *"));
-		        listEntries.add(new CategoryEntry(this, "* Make sure your preset is compatible with this setting. *"));
-		        listEntries.add(new CategoryEntry(this, "* Biome Bundle isn't, future presets (like Wildlands) will be. *"));
-		        listEntries.add(new CategoryEntry(this, ""));
-		        listEntries.add(new CategoryEntry(this, "* Want to make your own OTG presets? Join the OTG community on Discord!"));
+
 		        listEntries.add(new CategoryEntry(this, ""));
 		        listEntries.add(new ButtonEntry(this, this, "Back"));
+		        listEntries.add(new CategoryEntry(this, ""));
+		        listEntries.add(new CategoryEntry(this, "* OTG+ uses BO4 structures with tons of new features *"));
+		        listEntries.add(new CategoryEntry(this, "* and allows them to be spawned via /otg spawn. *"));
+		        listEntries.add(new CategoryEntry(this, "* Make sure your preset supports BO4 structures, *"));
+		        listEntries.add(new CategoryEntry(this, "* Biome Bundle doesn't, future presets will. *"));	        
+		        listEntries.add(new CategoryEntry(this, ""));
+		        listEntries.add(new CategoryEntry(this, "* Want to make your own OTG presets? * "));
+		        listEntries.add(new CategoryEntry(this, "* Check out the configs and the docs * "));
+		        listEntries.add(new CategoryEntry(this, "* and join us on the OTG Discord! * "));
+		        listEntries.add(new CategoryEntry(this, ""));
 	        }
     	}
 
