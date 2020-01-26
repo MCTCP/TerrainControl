@@ -2,7 +2,9 @@ package com.pg85.otg.forge.commands;
 
 import java.util.List;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -85,36 +87,33 @@ public class TPCommand extends BaseCommand
                     }
                 }
 
-                if (biomeId != -1)
+                if (biomeId != -1 && biomeId > 0 && biomeId < ForgeWorld.MAX_BIOMES_COUNT && OTG.getBiomeByOTGId(biomeId) != null)
                 {
                     for (int cycle = 1; cycle < maxRadius; cycle++)
                     {
                         for (int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)
                         {
-                            if (x1 == playerX - cycle || x1 == playerX + cycle)
+                            for (int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
                             {
-                                for (int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
+                                if (x1 == playerX - cycle || x1 == playerX + cycle || z1 == playerZ - cycle || z1 == playerZ + cycle)
                                 {
-                                    if (z1 == playerZ - cycle || z1 == playerZ + cycle)
+                                    ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(
+                                            playerChunk.getChunkX() + (x1 - playerX),
+                                            playerChunk.getChunkZ() + (z1 - playerZ));
+
+                                    ForgeBiome biome = (ForgeBiome) world.getBiome(chunkCoord.getBlockXCenter(),
+                                            chunkCoord.getBlockZCenter());
+
+                                    if (biome != null && biome.getIds().getOTGBiomeId() == biomeId)
                                     {
-                                        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(
-                                                playerChunk.getChunkX() + (x1 - playerX),
-                                                playerChunk.getChunkZ() + (z1 - playerZ));
-
-                                        ForgeBiome biome = (ForgeBiome) world.getBiome(chunkCoord.getBlockXCenter(),
+                                        sender.sendMessage(
+                                                new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
+                                        ((Entity) sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(),
+                                                world.getHighestBlockYAt(chunkCoord.getBlockXCenter(),
+                                                        chunkCoord.getBlockZCenter(), true, true, false, false),
                                                 chunkCoord.getBlockZCenter());
-
-                                        if (biome != null && biome.getIds().getOTGBiomeId() == biomeId)
-                                        {
-                                            sender.sendMessage(
-                                                    new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
-                                            ((Entity) sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(),
-                                                    world.getHighestBlockYAt(chunkCoord.getBlockXCenter(),
-                                                            chunkCoord.getBlockZCenter(), true, true, false, false),
-                                                    chunkCoord.getBlockZCenter());
-                                            return true;
-                                        }
-                                    }
+                                        return true;
+                                    }                                    
                                 }
                             }
                         }
