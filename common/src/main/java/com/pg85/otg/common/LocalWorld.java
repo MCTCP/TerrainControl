@@ -108,9 +108,6 @@ public interface LocalWorld
 
     public LocalBiome getBiomeByNameOrNull(String name);
 
-    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes();
-
-
     /**
      * Calculates the biome at the given coordinates. This is usually taken
      * from the biome generator, but this can be changed using the
@@ -175,8 +172,6 @@ public interface LocalWorld
      * @param chunkCoord The chunk to spawn the mobs in.
      */
     public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord);
-
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 
 	void spawnEntity(EntityFunction<?> entityData);
     

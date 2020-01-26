@@ -234,7 +234,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         	ArrayList<String> missingPresets = new ArrayList<String>();
         	if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
         	{
-        		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
+        		WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
         		if(worldConfig == null)
         		{
         			missingPresets.add(dimsConfig.Overworld.PresetName);
@@ -244,7 +244,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         	{
         		for(DimensionConfig dimConfig : dimsConfig.Dimensions)
         		{
-            		WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+            		WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
             		if(worldConfig == null)
             		{
             			missingPresets.add(dimConfig.PresetName);
@@ -331,7 +331,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     			{
     				// If this is a legacy overworld then the world name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), comparator.getFileName());
-    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(worldConfigLocation);
     				if(worldConfig == null)
     				{
     					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);
@@ -342,7 +342,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     			} else {
     				// If this is a legacy dim then the dim name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), dimensionData.dimensionName);
-    				WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(worldConfigLocation);
     				if(worldConfig == null)
     				{
     					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);

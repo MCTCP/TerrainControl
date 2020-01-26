@@ -4,12 +4,17 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.PluginConfig;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
+import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.events.EventHandler;
@@ -18,12 +23,14 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.logging.Logger;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -366,4 +373,9 @@ public abstract class OTGEngine
 
 	public abstract boolean isModLoaded(String mod);
 
+	public abstract boolean areEnoughBiomeIdsAvailableForPresets(ArrayList<String> presetNames);
+
+	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
+
+	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 }

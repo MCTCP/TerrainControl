@@ -89,7 +89,7 @@ import java.util.*;
 // TODO: Move this to com.pg85.otg.forge.world for 1.13. Has to be in com.pg85.otg.forge for Streams 1.12, which depends on it. 
 public class ForgeWorld implements LocalWorld
 {
-    private static final int MAX_BIOMES_COUNT = 4096;
+    public static final int MAX_BIOMES_COUNT = 4096;
     private static final int MAX_SAVED_BIOMES_COUNT = 255;
     public static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
     
@@ -454,12 +454,6 @@ public class ForgeWorld implements LocalWorld
     public int getMaxSavedBiomesCount()
     {
         return MAX_SAVED_BIOMES_COUNT;
-    }
-
-    @Override
-    public Collection<BiomeLoadInstruction> getDefaultBiomes()
-    {
-    	return ForgeBiomeRegistryManager.getDefaultBiomes();
     }
     
     // Chunks
@@ -1002,16 +996,6 @@ public class ForgeWorld implements LocalWorld
 	        WorldEntitySpawner.performWorldGenSpawning(this.getWorld(), ((ForgeBiome) biome).getHandle(), chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), ChunkCoordinate.CHUNK_X_SIZE, ChunkCoordinate.CHUNK_Z_SIZE, random);
         }
     }
-
-    /**
-     * Used by mob inheritance code. Used to inherit default mob spawning settings (including those added by other mods)
-     * @param biomeConfigStub
-     */
-    @Override
-	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
-	{
-    	ForgeBiomeRegistryManager.mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, biomeResourceLocation);
-	}
 
     public List<SpawnListEntry> getPossibleCreatures(EnumCreatureType paramaca, BlockPos blockPos)
     {

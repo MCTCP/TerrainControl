@@ -506,6 +506,12 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 				} catch (IOException e) {
 					e.printStackTrace();
 	        		this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Could not copy directory \"" + presetNameToClone + "\", files may be in use."));
+	        		
+	        		askDeleteSettings = false;
+	        		selectingNewPresetName = false;
+	        		selectingClonePresetName = false;
+	        		ShowingOpenLinkDialogue = false;
+	        		        		
 	        		return;
 				}
 			}
@@ -520,6 +526,12 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 				e.printStackTrace();
 			}
 	        Minecraft.getMinecraft().displayGuiScreen(this);
+	        
+			askDeleteSettings = false;
+			selectingNewPresetName = false;
+			selectingClonePresetName = false;
+			ShowingOpenLinkDialogue = false;
+			 
 			return;
 		}
 		if(ShowingOpenLinkDialogue && !ok)

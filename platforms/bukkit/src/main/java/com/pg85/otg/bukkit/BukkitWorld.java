@@ -132,7 +132,7 @@ public class BukkitWorld implements LocalWorld
 {
     private static final int MAX_BIOMES_COUNT = 4096;
     private static final int MAX_SAVED_BIOMES_COUNT = 256;
-    private static final int STANDARD_WORLD_HEIGHT = 128;
+    public static final int STANDARD_WORLD_HEIGHT = 128;
     
     // Initially false, set to true when enabled once
     private boolean initialized;
@@ -583,22 +583,6 @@ public class BukkitWorld implements LocalWorld
     public LocalBiome getBiomeByNameOrNull(String name)
     {
         return biomeNames.get(name);
-    }
-
-    @Override
-    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes()
-    {
-        // Loop through all default biomes and create the default
-        // settings for them
-        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
-        for (DefaultBiome defaultBiome : DefaultBiome.values())
-        {
-            int id = defaultBiome.Id;
-            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(BukkitMojangSettings.fromId(id), STANDARD_WORLD_HEIGHT);
-            standardBiomes.add(instruction);
-        }
-
-        return standardBiomes;
     }
 
     // Structures / trees
@@ -1201,9 +1185,6 @@ public class BukkitWorld implements LocalWorld
 
 		return null;
 	}
-	
-    @Override
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation) { }
     
 	@Override
 	public void spawnEntity(EntityFunction<?> entityData)
