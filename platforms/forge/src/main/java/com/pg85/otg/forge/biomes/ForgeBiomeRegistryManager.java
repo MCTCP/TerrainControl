@@ -433,11 +433,15 @@ public class ForgeBiomeRegistryManager
         Biome biomeAtId = ids.get(id);
         if(biomeAtId != null)
         {
-        	throw new RuntimeException(
+        	OTG.log(LogMarker.WARN,
     			"Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". "
 				+ "This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. "
 				+ "This can also happen when migrating a world from OTG v6 or lower to OTG v8 or higher, if the world had biome conflicts in v6."
 				+ "OTG 1.12.2 v8 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+        	
+        	// TODO: This could cause problems, but is necessary to support v6 worlds with biome id conflicts
+        	id = biomeRegistryAvailabiltyMap.nextClearBit(0);
+        	OTG.log(LogMarker.WARN, "Substituting id " + id + " for biome " + resourceLocation.toString());
         }
 
         ids.put(id, biome);

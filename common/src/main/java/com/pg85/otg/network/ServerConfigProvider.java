@@ -548,7 +548,7 @@ public final class ServerConfigProvider implements ConfigProvider
         	            	} else {
         	            		// The only time a biomeId can be claimed already is when an 
         	            		// unloaded world is being reloaded.
-        	            		throw new RuntimeException("This shouldn't happen");
+        	            		throw new RuntimeException("Error: OTG Biome id " + biomeIdData.otgBiomeId + " for biome " + biomeConfig.getName() + " was taken by " + OTG.getBiomeByOTGId(biomeIdData.otgBiomeId).getName());       	            		
         	            	}
         	            	
             	        	if(biomeIdData.otgBiomeId > -1 && biomeIdData.otgBiomeId < 256)
