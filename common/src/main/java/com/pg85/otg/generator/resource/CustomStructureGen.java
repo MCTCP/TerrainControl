@@ -4,6 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.structures.CustomStructure;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
@@ -62,7 +63,8 @@ public class CustomStructureGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+    	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
+    	if(dimConfig.Settings.IsOTGPlus)
     	{
     		throw new RuntimeException(); // TODO: Remove after testing
     	} else {

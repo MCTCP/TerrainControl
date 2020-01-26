@@ -14,7 +14,9 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Map.Entry;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
@@ -247,6 +249,7 @@ public class CustomStructureFileManager
 		
 	    Map<ChunkCoordinate, CustomStructure> structuresFile = new HashMap<ChunkCoordinate, CustomStructure>();
 
+	    DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
 		int dimensionId = world.getDimensionId();
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
 
@@ -303,7 +306,7 @@ public class CustomStructureFileManager
 
 		    if(!structureString.equals("Null structure"))
 		    {
-		    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+		    	if(dimConfig.Settings.IsOTGPlus)
 		    	{
 		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 		    	} else {
@@ -430,7 +433,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 5)
 			    	{
 			    		ModDataFunction<?> modDataFunction;
-				    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+				    	if(dimConfig.Settings.IsOTGPlus)
 				    	{
 				    		modDataFunction = new BO4ModDataFunction();
 				    	} else {
@@ -453,7 +456,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 19)
 			    	{
 				    	SpawnerFunction<?> spawnerFunction;
-				    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+				    	if(dimConfig.Settings.IsOTGPlus)
 				    	{
 				    		spawnerFunction = new BO4SpawnerFunction();
 				    	} else {
@@ -491,7 +494,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 11)
 			    	{
 				    	ParticleFunction<?> particleFunction;
-				    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+				    	if(dimConfig.Settings.IsOTGPlus)
 				    	{
 				    		particleFunction = new BO4ParticleFunction();
 				    	} else {
@@ -518,7 +521,7 @@ public class CustomStructureFileManager
 		    }
 
 		    CustomStructure structure;
-		    if(world.getConfigs().getWorldConfig().isOTGPlus)
+		    if(dimConfig.Settings.IsOTGPlus)
 		    {
 		    	structure = new BO4CustomStructure(world, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
 			    ((BO4CustomStructure)structure).startChunkBlockChecksDone = true;

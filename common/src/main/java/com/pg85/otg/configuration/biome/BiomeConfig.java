@@ -433,12 +433,7 @@ public class BiomeConfig extends ConfigFile
                 }
                 if(res instanceof CustomStructureGen)
                 {
-                	// For non-OTG+ worlds, only allow one customstructure per biome.
-                	// For inherited biomes, the child overrides the parent.
-                	if(this.worldConfig.isOTGPlus || this.customStructures.size() == 0)
-                	{
-                		this.customStructures.add((CustomStructureGen)res);
-                	}
+            		this.customStructures.add((CustomStructureGen)res);
                 }
             }
         }

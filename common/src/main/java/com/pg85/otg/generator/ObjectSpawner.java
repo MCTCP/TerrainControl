@@ -6,6 +6,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.ErroredFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
@@ -87,7 +88,8 @@ public class ObjectSpawner
 			saveRequired = true;
 		}
 
-		if(world.getConfigs().getWorldConfig().isOTGPlus)
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
+		if(dimConfig.Settings.IsOTGPlus)
 		{
 			if(!StructurePlottedAtSpawn)
 			{
@@ -100,7 +102,7 @@ public class ObjectSpawner
 		{
 			processing = true;
 
-			if(world.getConfigs().getWorldConfig().isOTGPlus)
+			if(dimConfig.Settings.IsOTGPlus)
 			{
 				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
 				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
@@ -269,7 +271,7 @@ public class ObjectSpawner
 
 			processing = false;
 		} else {
-			if(world.getConfigs().getWorldConfig().isOTGPlus)
+			if(dimConfig.Settings.IsOTGPlus)
 			{
 				// This happens when:
 				// This chunk was populated because of a block being spawned on the

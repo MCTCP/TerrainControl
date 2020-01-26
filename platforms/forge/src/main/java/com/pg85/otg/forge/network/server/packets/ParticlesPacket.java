@@ -13,6 +13,7 @@ import io.netty.buffer.Unpooled;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4ParticleFunction;
@@ -113,7 +114,8 @@ public class ParticlesPacket extends OTGPacket
 		            			{
 		            				//OTG.log(LogMarker.INFO, "Processing Particle packet: " + particleString);
 			            			ParticleFunction<?> particle;
-			            			if(world.getConfigs().getWorldConfig().isOTGPlus)
+			            			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
+			            			if(dimConfig.Settings.IsOTGPlus)
 			            			{
 			            				particle = new BO4ParticleFunction();
 			            			} else {

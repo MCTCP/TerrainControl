@@ -171,6 +171,7 @@ public class ServerTickHandler
 
 				    	        	// Do something with the modData
 		    						ForgeWorld world = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(worldName);
+		    						DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(worldName);
 		    						if(world == null)
 		    						{
 		    							world = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getUnloadedWorld(worldName);
@@ -201,7 +202,7 @@ public class ServerTickHandler
 		    								try
 		    								{
 		    									EntityFunction<?> entityFunc;
-		    									if(world.getConfigs().getWorldConfig().isOTGPlus)
+		    									if(dimConfig.Settings.IsOTGPlus)
 		    									{
 	    											entityFunc = new BO4EntityFunction();		
 		    									} else {

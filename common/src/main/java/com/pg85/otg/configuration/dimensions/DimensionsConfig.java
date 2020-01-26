@@ -14,7 +14,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
 
 public class DimensionsConfig
 {
@@ -22,6 +25,8 @@ public class DimensionsConfig
 	private File worldSavesDir;
 	
 	// Use capitals since we're serialising to yaml and we want to make it look nice
+	public int version = 0; // Only changed when saving, otherwise legacy configs that don't have the version field will get this value.
+	private static int currentVersion = 1; // The current version
 	public String WorldName;
 	public DimensionConfig Overworld;
 	public ArrayList<DimensionConfig> Dimensions = new ArrayList<DimensionConfig>();
@@ -91,6 +96,8 @@ public class DimensionsConfig
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+       	       	
+       	updateConfig(presetsConfig);
        	
        	return presetsConfig;
 	}
@@ -123,7 +130,41 @@ public class DimensionsConfig
 	       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
 		}
        	
+		if(presetsConfig != null)
+		{
+			updateConfig(presetsConfig);
+		}
+		
        	return presetsConfig;
+	}
+	
+	private static void updateConfig(DimensionsConfig dimsConfig)
+	{
+       	// Update the config if necessary
+       	if(dimsConfig.version == 0)
+       	{
+       		// Update the IsOTGPlus field from the worldconfig, added for v1.
+       		if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
+       		{
+       			WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimsConfig.Overworld.PresetName));
+       			if(worldConfig != null)
+       			{
+       				dimsConfig.Overworld.Settings.IsOTGPlus = worldConfig.isOTGPlus;
+       			}
+       		}
+       		if(dimsConfig.Dimensions != null)
+       		{
+       			for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+       			{
+           			WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName));
+           			if(worldConfig != null)
+           			{
+           				dimConfig.Settings.IsOTGPlus = worldConfig.isOTGPlus;
+           			}
+       			}
+       		}
+       		dimsConfig.save();
+       	}
 	}
 	
 	public String toYamlString()
@@ -136,7 +177,7 @@ public class DimensionsConfig
 		}
 		return null;
 	}
-	
+
 	public void save()
 	{
 		// Don't save default configs (loaded via defaultConfigfromFile)
@@ -162,6 +203,7 @@ public class DimensionsConfig
 			try
 			{
 				try {
+					this.version = this.currentVersion;
 					mapper.writeValue(forgeWorldConfigFile, this);
 				} catch (JsonGenerationException e) {
 					e.printStackTrace();

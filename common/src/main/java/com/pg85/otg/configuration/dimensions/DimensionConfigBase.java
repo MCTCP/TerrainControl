@@ -84,6 +84,7 @@ public abstract class DimensionConfigBase
 		this.Settings.SpawnPointX = worldConfig.spawnPointX;
 		this.Settings.SpawnPointY = worldConfig.spawnPointY;
 		this.Settings.SpawnPointZ = worldConfig.spawnPointZ;
+		this.Settings.IsOTGPlus = worldConfig.isOTGPlus;
 		this.Settings.TeleportToSpawnOnly = worldConfig.teleportToSpawnOnly;
 		this.Settings.UseCustomFogColor = worldConfig.useCustomFogColor;
 		this.Settings.VoidFogYFactor = worldConfig.voidFogYFactor;
