@@ -88,8 +88,7 @@ public class ObjectSpawner
 			saveRequired = true;
 		}
 
-		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
-		if(dimConfig.Settings.IsOTGPlus)
+		if(world.isOTGPlus())
 		{
 			if(!StructurePlottedAtSpawn)
 			{
@@ -102,7 +101,7 @@ public class ObjectSpawner
 		{
 			processing = true;
 
-			if(dimConfig.Settings.IsOTGPlus)
+			if(world.isOTGPlus())
 			{
 				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
 				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
@@ -271,7 +270,7 @@ public class ObjectSpawner
 
 			processing = false;
 		} else {
-			if(dimConfig.Settings.IsOTGPlus)
+			if(world.isOTGPlus())
 			{
 				// This happens when:
 				// This chunk was populated because of a block being spawned on the

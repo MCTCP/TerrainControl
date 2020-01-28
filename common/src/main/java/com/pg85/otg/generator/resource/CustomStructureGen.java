@@ -63,8 +63,7 @@ public class CustomStructureGen extends Resource
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-    	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
-    	if(dimConfig.Settings.IsOTGPlus)
+    	if(world.isOTGPlus())
     	{
     		throw new RuntimeException(); // TODO: Remove after testing
     	} else {

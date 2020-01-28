@@ -249,7 +249,6 @@ public class CustomStructureFileManager
 		
 	    Map<ChunkCoordinate, CustomStructure> structuresFile = new HashMap<ChunkCoordinate, CustomStructure>();
 
-	    DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
 		int dimensionId = world.getDimensionId();
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
 
@@ -306,7 +305,7 @@ public class CustomStructureFileManager
 
 		    if(!structureString.equals("Null structure"))
 		    {
-		    	if(dimConfig.Settings.IsOTGPlus)
+		    	if(world.isOTGPlus())
 		    	{
 		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 		    	} else {
@@ -433,7 +432,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 5)
 			    	{
 			    		ModDataFunction<?> modDataFunction;
-				    	if(dimConfig.Settings.IsOTGPlus)
+				    	if(world.isOTGPlus())
 				    	{
 				    		modDataFunction = new BO4ModDataFunction();
 				    	} else {
@@ -456,7 +455,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 19)
 			    	{
 				    	SpawnerFunction<?> spawnerFunction;
-				    	if(dimConfig.Settings.IsOTGPlus)
+				    	if(world.isOTGPlus())
 				    	{
 				    		spawnerFunction = new BO4SpawnerFunction();
 				    	} else {
@@ -494,7 +493,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 11)
 			    	{
 				    	ParticleFunction<?> particleFunction;
-				    	if(dimConfig.Settings.IsOTGPlus)
+				    	if(world.isOTGPlus())
 				    	{
 				    		particleFunction = new BO4ParticleFunction();
 				    	} else {
@@ -521,7 +520,7 @@ public class CustomStructureFileManager
 		    }
 
 		    CustomStructure structure;
-		    if(dimConfig.Settings.IsOTGPlus)
+		    if(world.isOTGPlus())
 		    {
 		    	structure = new BO4CustomStructure(world, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
 			    ((BO4CustomStructure)structure).startChunkBlockChecksDone = true;

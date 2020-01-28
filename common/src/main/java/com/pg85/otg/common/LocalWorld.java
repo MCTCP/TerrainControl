@@ -254,4 +254,6 @@ public interface LocalWorld
 	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer);
 
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
+
+	public boolean isOTGPlus();
 }

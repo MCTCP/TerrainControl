@@ -106,8 +106,7 @@ public class SpawnCommand extends BaseCommand
         
         if(spawnObject instanceof BO4)
         {
-        	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
-        	if(!dimConfig.Settings.IsOTGPlus)
+        	if(!forgeWorld.isOTGPlus())
         	{
         		sender.sendMessage(new TextComponentString(ERROR_COLOR + "Cannot spawn a BO4 structure in an isOTGPlus:false world, use a BO3 instead or recreate the world with IsOTGPlus:true in the worldconfig."));
         		return true;

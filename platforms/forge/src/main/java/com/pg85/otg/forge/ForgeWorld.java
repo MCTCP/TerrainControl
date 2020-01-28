@@ -10,6 +10,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
@@ -1308,5 +1309,16 @@ public class ForgeWorld implements LocalWorld
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate)
 	{
 		return this.world.getWorldBorder().contains(new BlockPos(chunkCoordinate.getBlockXCenter(), 0, chunkCoordinate.getBlockZCenter()));
+	}
+	
+	@Override
+	public boolean isOTGPlus()
+	{
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.getName());
+		if(dimConfig != null && dimConfig.Settings.IsOTGPlus)		
+		{
+			return true;
+		}
+		return false;
 	}
 }

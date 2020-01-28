@@ -114,8 +114,7 @@ public class ParticlesPacket extends OTGPacket
 		            			{
 		            				//OTG.log(LogMarker.INFO, "Processing Particle packet: " + particleString);
 			            			ParticleFunction<?> particle;
-			            			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
-			            			if(dimConfig.Settings.IsOTGPlus)
+			            			if(world.isOTGPlus())
 			            			{
 			            				particle = new BO4ParticleFunction();
 			            			} else {

@@ -1815,4 +1815,10 @@ public class BukkitWorld implements LocalWorld
 	{
 		return true;
 	}
+
+	@Override
+	public boolean isOTGPlus()
+	{
+		return false;
+	}
 }
