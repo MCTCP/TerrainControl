@@ -59,20 +59,32 @@ public class ClientFogHandler {
 			return;
 		}
 	
-		LocalWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(event.getEntity().world);
+		ForgeWorld forgeWorld = ((ForgeEngine) OTG.getEngine()).getWorld(event.getEntity().world);
 
 		// Not an OTG world
-		if (world == null)
+		if (forgeWorld == null)
 		{
 			return;
 		}
 
-		Vec3d fogColor = blendFogColors(event.getEntity().world, (EntityLivingBase) event.getEntity(), event.getRed(),
-				event.getGreen(), event.getBlue(), event.getRenderPartialTicks());
+		int blockX = (int) Math.floor(event.getEntity().posX);
+		int blockZ = (int) Math.floor(event.getEntity().posZ);
 
-		event.setRed((float) fogColor.x);
-		event.setGreen((float) fogColor.y);
-		event.setBlue((float) fogColor.z);
+		boolean hasMoved = event.getEntity().posX != lastX || event.getEntity().posZ != lastZ;
+		
+		BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos(blockX, 0, blockZ);
+		BiomeConfig biomeConfig = getBiomeConfig(forgeWorld, 0, 0, blockPos, hasMoved);
+		if(biomeConfig != null)
+		{
+			Vec3d fogColor = blendFogColors(forgeWorld, biomeConfig, (EntityLivingBase) event.getEntity(), event.getRed(), event.getGreen(), event.getBlue(), event.getRenderPartialTicks());
+	
+			if(fogColor != null)
+			{
+				event.setRed((float) fogColor.x);
+				event.setGreen((float) fogColor.y);
+				event.setBlue((float) fogColor.z);
+			}
+		}
 	}
 
 	// Handle the fog distance blending
@@ -89,14 +101,11 @@ public class ClientFogHandler {
 		}
 
 		Entity entity = event.getEntity();
-		World mcworld = entity.world;
 
 		int blockX = MathHelper.floor(entity.posX);
 		int blockZ = MathHelper.floor(entity.posZ);
 
-		boolean hasMoved = entity.posX != lastX || entity.posZ != lastZ;
-
-		ForgeWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(mcworld);
+		ForgeWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(entity.getEntityWorld());
 
 		if (world == null)
 		{
@@ -106,6 +115,7 @@ public class ClientFogHandler {
 		float biomeFogDistance = 0F;
 		float weightBiomeFog = 0;
 		BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos(0, 0, 0);
+		boolean hasMoved = entity.posX != lastX || entity.posZ != lastZ;
 
 		for (int x = -blendDistance; x <= blendDistance; ++x) {
 			for (int z = -blendDistance; z <= blendDistance; ++z) {
@@ -171,8 +181,7 @@ public class ClientFogHandler {
 	}
 
 	// Blend the fog color
-	private Vec3d blendFogColors(World mcworld, EntityLivingBase entity, float red, float green, float blue,
-			double renderPartialTicks) {
+	private Vec3d blendFogColors(ForgeWorld forgeWorld, BiomeConfig biomeConfig, EntityLivingBase entity, float red, float green, float blue, double renderPartialTicks) {
 
 		GameSettings settings = Minecraft.getMinecraft().gameSettings;
 		int[] ranges = ForgeModContainer.blendRanges;
@@ -183,25 +192,21 @@ public class ClientFogHandler {
 			blendDistance = ranges[settings.renderDistanceChunks];
 		}
 
-		ForgeWorld world = ((ForgeEngine) OTG.getEngine()).getWorld(mcworld);
-		int blockX = (int) Math.floor(entity.posX);
-		int blockZ = (int) Math.floor(entity.posZ);
-
-		boolean hasMoved = entity.posX != lastX || entity.posZ != lastZ;
-
 		double biomeFogRed = 0;
 		double biomeFogGreen = 0;
 		double biomeFogBlue = 0;
 		double biomeFogWeight = 0;
 
+		int blockX = (int) Math.floor(entity.posX);
+		int blockZ = (int) Math.floor(entity.posZ);
 		BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos(blockX, 0, blockZ);
-
-		BiomeConfig biomeConfig = getBiomeConfig(world, 0, 0, blockPos, hasMoved);
-
+		
+		boolean hasMoved = entity.posX != lastX || entity.posZ != lastZ;
+		
 		for (int x = -blendDistance; x <= blendDistance; ++x) {
 			for (int z = -blendDistance; z <= blendDistance; ++z) {
 				blockPos.setPos(blockX + x, 0, blockZ + z);
-				BiomeConfig config = getBiomeConfig(world, x + blendDistance, z + blendDistance, blockPos, hasMoved);
+				BiomeConfig config = getBiomeConfig(forgeWorld, x + blendDistance, z + blendDistance, blockPos, hasMoved);
 				if(config != null)
 				{
 					int fogColour = config.fogColor;
@@ -254,15 +259,15 @@ public class ClientFogHandler {
 		float baseScale = 1f;
 
 		float time = MathHelper.clamp(
-				MathHelper.cos(mcworld.getCelestialAngle((float) renderPartialTicks) * (float) Math.PI * 2.0F) * 2.0F
+				MathHelper.cos(forgeWorld.getWorld().getCelestialAngle((float) renderPartialTicks) * (float) Math.PI * 2.0F) * 2.0F
 						+ 0.5F,
 				0, 1);
 
 		baseScale *= 1 - (1 - time) * biomeConfig.fogTimeWeight;
 
 		// Adjust based on weather
-		float rainStrength = mcworld.getRainStrength((float) renderPartialTicks);
-		float thunderStrength = mcworld.getThunderStrength((float) renderPartialTicks);
+		float rainStrength = forgeWorld.getWorld().getRainStrength((float) renderPartialTicks);
+		float thunderStrength = forgeWorld.getWorld().getThunderStrength((float) renderPartialTicks);
 
 		if (thunderStrength > 0) {
 			baseScale *= Math.min(1 - thunderStrength * biomeConfig.fogThunderWeight,
