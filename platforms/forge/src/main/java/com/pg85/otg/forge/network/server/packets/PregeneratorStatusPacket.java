@@ -55,6 +55,8 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    	StreamHelper.writeStringToStream(stream, pregenerator.pregenerationWorld);
 	    	stream.writeBoolean(pregenerator.getPregeneratorIsRunning());
 	    	stream.writeInt(pregenerator.progressScreenWorldSizeInBlocks);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenCycle);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenRadius);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgress);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgressStatus);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenElapsedTime);
@@ -97,6 +99,8 @@ public class PregeneratorStatusPacket extends OTGPacket
 				    	String pregenerationWorld = StreamHelper.readStringFromStream(message.getStream());
 				    	Boolean pregeneratorIsRunning = message.getStream().readBoolean();
 				    	int progressScreenWorldSizeInBlocks = message.getStream().readInt();
+				    	String progressScreenCycle = StreamHelper.readStringFromStream(message.getStream());
+				    	String progressScreenRadius = StreamHelper.readStringFromStream(message.getStream());
 				    	String preGeneratorProgress = StreamHelper.readStringFromStream(message.getStream());
 				    	String preGeneratorProgressStatus = StreamHelper.readStringFromStream(message.getStream());
 				    	String progressScreenElapsedTime = StreamHelper.readStringFromStream(message.getStream());
@@ -117,6 +121,8 @@ public class PregeneratorStatusPacket extends OTGPacket
 				    		Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator();
 				    		pregenerator.setPregeneratorIsRunning(pregeneratorIsRunning);
 				    		pregenerator.progressScreenWorldSizeInBlocks = progressScreenWorldSizeInBlocks;
+				    		pregenerator.progressScreenCycle = progressScreenCycle;
+				    		pregenerator.progressScreenRadius = progressScreenRadius;				    						    		
 				    		pregenerator.preGeneratorProgress = preGeneratorProgress;
 				    		pregenerator.preGeneratorProgressStatus = preGeneratorProgressStatus;
 				    		pregenerator.progressScreenElapsedTime = progressScreenElapsedTime;

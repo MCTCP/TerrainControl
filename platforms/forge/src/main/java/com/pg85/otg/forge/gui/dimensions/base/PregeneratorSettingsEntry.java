@@ -42,7 +42,7 @@ public class PregeneratorSettingsEntry implements IGuiListEntry
 		
 		lines.add("");
 		lines.add("Pre-generating " + (pregenerator.progressScreenWorldSizeInBlocks > 0 ? pregenerator.progressScreenWorldSizeInBlocks + "x" + pregenerator.progressScreenWorldSizeInBlocks  + " blocks" : ""));
-		lines.add("Progress: " + pregenerator.preGeneratorProgress + "%");
+		lines.add("Progress: " + pregenerator.preGeneratorProgress + "% (" + pregenerator.progressScreenCycle + "/" + pregenerator.progressScreenRadius + ")");
 		lines.add("Chunks: " + pregenerator.preGeneratorProgressStatus);
 		lines.add("Elapsed: " + pregenerator.progressScreenElapsedTime);
 		lines.add("Estimated: " + pregenerator.progressScreenEstimatedTime);

@@ -50,6 +50,8 @@ public class Pregenerator
 	public String pregenerationWorld = "";
 	public String preGeneratorProgressStatus = "";
 	public String preGeneratorProgress = "";
+	public String progressScreenCycle = "";
+	public String progressScreenRadius = "";
 	public String progressScreenElapsedTime = "";
 	public String progressScreenEstimatedTime = "";
 	public int progressScreenWorldSizeInBlocks;
@@ -467,6 +469,8 @@ public class Pregenerator
 			preGeneratorProgress = (int)Math.round(((spawned / (double)(total)) * 100)) + "";
 			progressScreenElapsedTime = sElapsedTime;
 			progressScreenEstimatedTime = estimatedTime;
+			progressScreenCycle = cycle + "";
+			progressScreenRadius = pregenerationRadius + "";
 			if(!dontLog)
 			{
 				OTG.log(LogMarker.INFO, "Pre-generating world \"" + pregenerationWorld + "\". Radius: " + cycle + "/" + pregenerationRadius + " Spawned: " + (int)spawned + "/" + (int)total + " " + (int)Math.round(((spawned / (double)(total)) * 100)) + "% done. Elapsed: " + sElapsedTime + " ETA: " + estimatedTime + memoryUsage);
@@ -484,6 +488,8 @@ public class Pregenerator
 			progressScreenElapsedTime = "";
 			progressScreenEstimatedTime = "";
 			progressScreenWorldSizeInBlocks = 0;
+			progressScreenCycle = pregenerationRadius + "";
+			progressScreenRadius = pregenerationRadius + "";
 			OTG.log(LogMarker.INFO, "Pre-generating chunks done for world " + pregenerationWorld + ", " + ((int)spawned) + " chunks spawned in " + sElapsedTime);		
 		}
 	}
