@@ -1,6 +1,8 @@
 package com.pg85.otg.forge.commands;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
@@ -15,6 +17,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
 
 public class TPCommand extends BaseCommand
@@ -72,52 +75,39 @@ public class TPCommand extends BaseCommand
                 }
             }
 
-            ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
             if (world != null)
             {
-            	// TODO: Use BiomeProvider.findBiomePosition instead?
-                int maxRadius = 1000;
-
+                Biome targetMCBiome = null;
                 if (biomeId == -1)
                 {
                     ForgeBiome targetBiome = (ForgeBiome) world.getBiomeByNameOrNull(biomeOrDimensionName);
                     if (targetBiome != null)
                     {
-                        biomeId = targetBiome.getIds().getOTGBiomeId();
+                    	targetMCBiome = targetBiome.biomeBase;
                     }
+                } else {
+                	ForgeBiome targetBiome = (ForgeBiome) world.getBiomeByOTGIdOrNull(biomeId);
+                	if(targetBiome != null)
+                	{
+                		targetMCBiome = targetBiome.biomeBase;
+                	}
                 }
 
-                if (biomeId != -1 && biomeId > 0 && biomeId < ForgeWorld.MAX_BIOMES_COUNT && OTG.getBiomeByOTGId(biomeId) != null)
+                if(targetMCBiome != null)
                 {
-                    for (int cycle = 1; cycle < maxRadius; cycle++)
-                    {
-                        for (int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)
-                        {
-                            for (int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
-                            {
-                                if (x1 == playerX - cycle || x1 == playerX + cycle || z1 == playerZ - cycle || z1 == playerZ + cycle)
-                                {
-                                    ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(
-                                            playerChunk.getChunkX() + (x1 - playerX),
-                                            playerChunk.getChunkZ() + (z1 - playerZ));
-
-                                    ForgeBiome biome = (ForgeBiome) world.getBiome(chunkCoord.getBlockXCenter(),
-                                            chunkCoord.getBlockZCenter());
-
-                                    if (biome != null && biome.getIds().getOTGBiomeId() == biomeId)
-                                    {
-                                        sender.sendMessage(
-                                                new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
-                                        ((Entity) sender).setPositionAndUpdate(chunkCoord.getBlockXCenter(),
-                                                world.getHighestBlockYAt(chunkCoord.getBlockXCenter(),
-                                                        chunkCoord.getBlockZCenter(), true, true, false, false),
-                                                chunkCoord.getBlockZCenter());
-                                        return true;
-                                    }                                    
-                                }
-                            }
-                        }
-                    }
+	                ArrayList<Biome> biomes = new ArrayList<Biome>();
+	                biomes.add(targetMCBiome);
+	                BlockPos biomePos = ((ForgeWorld)world).getWorld().getBiomeProvider().findBiomePosition(playerX, playerZ, 8000, biomes, new Random());
+	                if(biomePos != null)
+	                {
+		                sender.sendMessage(
+		                        new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
+		                ((Entity) sender).setPositionAndUpdate(biomePos.getX(),
+		                        world.getHighestBlockYAt(biomePos.getX(),
+		                        		biomePos.getZ(), true, true, false, false),
+		                        biomePos.getZ());
+	                	return true;
+	                }
                 }
             }
             sender.sendMessage(
