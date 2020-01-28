@@ -6,6 +6,7 @@ import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.*;
@@ -31,7 +32,10 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     private List<Double> treeChances;
     private List<String> treeNames;
     private List<CustomObject> trees;
-
+    private String worldName;
+    private String biomeName;
+    private boolean treesLoaded = false;
+    
     public SaplingGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
@@ -46,11 +50,12 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         trees = new ArrayList<CustomObject>();
         treeNames = new ArrayList<String>();
         treeChances = new ArrayList<Double>();
-
+        worldName = biomeConfig.worldConfig.getName();
+        biomeName = biomeConfig.getName();
+        
         for (int i = 1; i < args.size() - 1; i += 2)
         {
             String treeName = args.get(i);
-            trees.add(getTreeObject(treeName, biomeConfig.worldConfig.getName()));
             treeNames.add(treeName);
             treeChances.add(readDouble(args.get(i + 1), 1, 100));
         }
@@ -109,6 +114,8 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
      */
     public boolean growSapling(LocalWorld world, Random random, boolean isWideTree, int x, int y, int z)
     {
+    	loadTreeObjects();
+    	
         for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
         {
             if (random.nextInt(100) < treeChances.get(treeNumber))
@@ -136,6 +143,44 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         return false;
     }
 
+    private void loadTreeObjects()
+    {
+    	if(!this.treesLoaded)
+    	{
+    		this.treesLoaded = true;
+    		
+    		for(String treeName : this.treeNames)
+    		{
+    			CustomObject tree;
+				try {
+					tree = getTreeObject(treeName, worldName);
+	    			this.trees.add(tree);
+				} catch (InvalidConfigException e) {
+					this.trees.add(null);
+					OTG.log(LogMarker.WARN, "Could not find Object " + treeName + " for Sapling() resource in biome " + this.biomeName);
+				}
+    		}
+    		
+    		ArrayList<CustomObject> newTrees = new ArrayList<CustomObject>();
+    		ArrayList<String> newTreeNames = new ArrayList<String>();
+    		ArrayList<Double> newTreeChances = new ArrayList<Double>();
+   		
+        	for(int i = 0; i < this.trees.size(); i++)
+        	{
+        		if(this.trees.get(i) != null)
+        		{
+        			newTrees.add(this.trees.get(i));
+        			newTreeNames.add(this.treeNames.get(i));
+        			newTreeChances.add(this.treeChances.get(i));
+        		}
+        	}
+        	
+        	this.trees = newTrees;
+        	this.treeNames = newTreeNames;
+        	this.treeChances = newTreeChances;
+    	}
+    }
+    
     @Override
     public int hashCode()
     {
