@@ -2,12 +2,13 @@ package com.pg85.otg.generator.biome;
 
 import java.util.ArrayList;
 
+// TODO: Is this actually useful? Remove or rewrite this and document it.
 public class ArraysCache
 {
 
-    private final int[][] smallArrays = new int[128][];
+    private int[][] smallArrays = new int[128][];
     private int smallArraysNext = 0;
-    private final ArrayList<int[]> bigArrays = new ArrayList<int[]>();
+    private ArrayList<int[]> bigArrays = new ArrayList<int[]>();
     private int bigArraysNext = 0;
 
     boolean isFree = true;
@@ -25,6 +26,9 @@ public class ArraysCache
         bigArraysNext = 0;
         isFree = true;
         outputType = OutputType.FULL;
+        
+        smallArrays = new int[128][];
+        bigArrays = new ArrayList<int[]>();
     }
 
     public int[] getArray(int size)
