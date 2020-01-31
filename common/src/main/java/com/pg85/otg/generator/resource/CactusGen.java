@@ -5,8 +5,10 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -33,42 +35,67 @@ public class CactusGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
         
         parseMaterials(world, material, sourceBlocks);
-
+        LocalMaterialData worldMaterial;
+        int cactusX;
+        int cactusBaseY;
+        int cactusZ;
+        
         for (int i = 0; i < 10; i++)
         {
-            int cactusX = x + rand.nextInt(8) - rand.nextInt(8);
-            int cactusBaseY = y + rand.nextInt(4) - rand.nextInt(4);
-            int cactusZ = z + rand.nextInt(8) - rand.nextInt(8);
+            cactusX = x + rand.nextInt(8) - rand.nextInt(8);
+            cactusBaseY = y + rand.nextInt(4) - rand.nextInt(4);
+            cactusZ = z + rand.nextInt(8) - rand.nextInt(8);
 
-            // Check position
-            if (!world.isNullOrAir(cactusX, cactusBaseY, cactusZ, false))
-                continue;
-
+            worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ,  chunkBeingPopulated);
+            if(worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            {
+            	continue;
+            }
+            
             // Check foundation
-            LocalMaterialData foundationMaterial = world.getMaterial(cactusX, cactusBaseY - 1, cactusZ, false);
-            if (!sourceBlocks.contains(foundationMaterial))
+            worldMaterial = world.getMaterial(cactusX, cactusBaseY - 1, cactusZ, chunkBeingPopulated);
+            if (worldMaterial == null || !sourceBlocks.contains(worldMaterial))
+            {
                 continue;
+            }
 
             // Check neighbors
-            if (!world.isNullOrAir(cactusX - 1, cactusBaseY, cactusZ, false))
+            worldMaterial = world.getMaterial(cactusX - 1, cactusBaseY, cactusZ, chunkBeingPopulated);
+            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            {
                 continue;
-            if (!world.isNullOrAir(cactusX + 1, cactusBaseY, cactusZ, false))
+            }
+            
+            worldMaterial = world.getMaterial(cactusX + 1, cactusBaseY, cactusZ, chunkBeingPopulated);
+            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            {
                 continue;
-            if (!world.isNullOrAir(cactusX, cactusBaseY, cactusZ + 1, false))
+            }
+            
+            worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ - 1, chunkBeingPopulated);
+            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            {
                 continue;
-            if (!world.isNullOrAir(cactusX, cactusBaseY, cactusZ + 1, false))
+            }
+            
+            worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ + 1, chunkBeingPopulated);
+            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            {
                 continue;
+            }
 
             // Spawn cactus
             int cactusHeight = 1 + rand.nextInt(rand.nextInt(3) + 1);
             for (int dY = 0; dY < cactusHeight; dY++)
             {
-                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material, null, false);
+                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material, null, chunkBeingPopulated);
             }
         }
     }

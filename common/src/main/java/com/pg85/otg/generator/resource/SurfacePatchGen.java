@@ -112,9 +112,11 @@ public class SurfacePatchGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int y = world.getHighestBlockYAt(x, z) - 1;
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
+        int y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated) - 1;
         if (y < minAltitude || y > maxAltitude)
             return;
         
@@ -123,14 +125,14 @@ public class SurfacePatchGen extends Resource
         double yNoise = noiseGen.getYNoise(x * 0.25D, z * 0.25D);
         if (yNoise > 0.0D)
         {
-            LocalMaterialData materialAtLocation = world.getMaterial(x, y, z, false);
+            LocalMaterialData materialAtLocation = world.getMaterial(x, y, z, chunkBeingPopulated);
             if (sourceBlocks.contains(materialAtLocation))
             {
-                world.setBlock(x, y, z, material, null, false);
+                world.setBlock(x, y, z, material, null, chunkBeingPopulated);
 
                 if (yNoise < 0.12D)
                 {
-                    world.setBlock(x, y + 1, z, decorationAboveReplacements, null, false);
+                    world.setBlock(x, y + 1, z, decorationAboveReplacements, null, chunkBeingPopulated);
                 }
             }
         }
@@ -147,7 +149,7 @@ public class SurfacePatchGen extends Resource
             {
                 int x = chunkX + x0;
                 int z = chunkZ + z0;
-                spawn(world, random, false, x, z);
+                spawn(world, random, false, x, z, chunkCoord);
             }
         }
     }

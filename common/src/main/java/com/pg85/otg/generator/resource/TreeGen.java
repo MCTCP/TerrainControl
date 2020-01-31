@@ -99,14 +99,16 @@ public class TreeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        // Left blank, as process() already handles this
+        // Left blank, as spawnInChunk already handles this
     }
     
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {    	   	
+    	// TODO: Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
         for (int i = 0; i < frequency; i++)
         {        	
             for (int treeNumber = 0; treeNumber < treeNames.size(); treeNumber++)
@@ -147,7 +149,7 @@ public class TreeGen extends Resource
     	        			maxHeight = Integer.parseInt(sMaxHeight);
             			} catch(NumberFormatException ex) {  }	        				        			
 
-                		if(tree.spawnAsTree(world, random, x, z, minHeight, maxHeight))
+                		if(tree.spawnAsTree(world, random, x, z, minHeight, maxHeight, chunkCoord))
                 		{
         	                // Success!
         	                break;
@@ -164,7 +166,7 @@ public class TreeGen extends Resource
                     		}
                     		continue;
                         }                        	        		
-                		if(tree.spawnAsTree(world, random, x, z))
+                		if(tree.spawnAsTree(world, random, x, z, -1, -1, chunkCoord))
                 		{
         	                // Success!
         	                break;

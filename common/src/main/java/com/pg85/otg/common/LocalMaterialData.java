@@ -77,8 +77,12 @@ public interface LocalMaterialData
      * performance.
      * @return True if this material is air, false otherwise.
      */
+    boolean isEmptyOrAir();
+    
     boolean isAir();
 
+    boolean isEmpty();
+    
     /**
      * Gets the default material belonging to this material. The block data will
      * be lost. If the material is not one of the vanilla Minecraft materials,

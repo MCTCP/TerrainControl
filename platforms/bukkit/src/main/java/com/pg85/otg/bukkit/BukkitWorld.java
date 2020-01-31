@@ -1187,7 +1187,7 @@ public class BukkitWorld implements LocalWorld
 	}
     
 	@Override
-	public void spawnEntity(EntityFunction<?> entityData)
+	public void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated)
 	{
     	Random rand = new Random();
 
@@ -1558,30 +1558,26 @@ public class BukkitWorld implements LocalWorld
 	}
     
     // Blocks / materials
-    	
-	@Override
-	public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea)
-	{
-    	if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
-    	{
-        	return true;
-    	}
 
+    @Override
+    public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    {
         Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
+        if (chunk == null || y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
         {
-            return true;
+            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
         }
 
-        return chunk.a(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
-	}
-    
+        return BukkitMaterialData.ofMinecraftBlockData(chunk.a(x, y, z));
+    }
+	
+    // TODO: Implement these like Forge, using the boolean params.
     @Override
-    public int getLiquidHeight(int x, int z)
+    public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
+        for (int y = getHighestBlockYAt(x, z, false, true, false, false, chunkBeingPopulated) - 1; y > 0; y--)
         {
-            LocalMaterialData material = getMaterial(x, y, z, false);
+            LocalMaterialData material = getMaterial(x, y, z, chunkBeingPopulated);
             if (material.isLiquid())
             {
                 return y + 1;
@@ -1594,12 +1590,13 @@ public class BukkitWorld implements LocalWorld
         return -1;
     }
 
+    // TODO: Implement these like Forge, using the boolean params.
     @Override
-    public int getSolidHeight(int x, int z)
+    public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
+        for (int y = getHighestBlockYAt(x, z, true, false, true, true, chunkBeingPopulated) - 1; y > 0; y--)
         {
-            LocalMaterialData material = getMaterial(x, y, z, false);
+            LocalMaterialData material = getMaterial(x, y, z, chunkBeingPopulated);
             if (material.isSolid())
             {
                 return y + 1;
@@ -1607,29 +1604,17 @@ public class BukkitWorld implements LocalWorld
         }
         return -1;
     }
-
-    @Override
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
-    {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null || y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-        {
-            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
-        }
-
-        return BukkitMaterialData.ofMinecraftBlockData(chunk.a(x, y, z));
-    }
-
-	@Override
-	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
-	{
-		// TODO Implement this
-		throw new RuntimeException();
-	}
     
     @Override
-    public int getHighestBlockYAt(int x, int z)
+    public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	return getHighestBlockYAt(x, z, true, true, false, true, chunkBeingPopulated);
+    }
+    
+    // TODO: Implement these like Forge, using the boolean params.
+	@Override
+	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, ChunkCoordinate chunkBeingPopulated)
+	{
         Chunk chunk = this.getChunk(x, 0, z);
         if (chunk == null)
         {
@@ -1652,8 +1637,8 @@ public class BukkitWorld implements LocalWorld
         }
 
         return y;
-    }
-
+	}
+    
     /**
      * When a light update hits an unloaded chunk, Minecraft unfortunately
      * attempts to generate this chunk. When this happens, two chunks will be
@@ -1679,26 +1664,21 @@ public class BukkitWorld implements LocalWorld
     }
     
     @Override
-    public int getLightLevel(int x, int y, int z)
+    public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// TODO: Never allow getLightLevel to load unloaded chunks
         return world.j(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
     }
     
-    @Override
-    public boolean isLoaded(int x, int y, int z)
-    {
-        return this.getChunk(x, y, z) != null;
-    }
-    
 	@Override
-	public LocalMaterialData[] getBlockColumn(int x, int z)
+	public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z)
 	{
 		// TODO Implement this
 		throw new RuntimeException();
 	}
     
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
     {
         /*
          * This method usually breaks on every Minecraft update. Always check
@@ -1787,22 +1767,10 @@ public class BukkitWorld implements LocalWorld
         } else {
         	if(OTG.getPluginConfig().spawnLog)
         	{
-        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
+        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}.", nmsTag.getString("id"), x, y, z);
         	}
         }
     }
-
-    @Override
-    public NamedBinaryTag getMetadata(int x, int y, int z)
-    {
-        return NBTHelper.getMetadata(world, x, y, z);
-    }
-
-	@Override
-	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
-	{
-		// TODO: Implement this?
-	}
 
 	@Override
 	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer)

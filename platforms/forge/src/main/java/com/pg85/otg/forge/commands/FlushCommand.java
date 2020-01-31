@@ -23,14 +23,12 @@ public class FlushCommand extends BaseCommand
     {
         ForgeWorld world = (ForgeWorld) this.getWorld(sender, "");
 
-        OTG.log(LogMarker.INFO, "Clearing caches");
-        OTG.log(LogMarker.INFO, "Unloading BO3's");
+        OTG.log(LogMarker.INFO, "Unloading BO2/BO3/BO4 files");
         OTG.getEngine().getCustomObjectManager().reloadCustomObjectFiles();
-        OTG.log(LogMarker.INFO, "BO3's unloaded");
         sender.sendMessage(new TextComponentString("Objects unloaded."));
         OTG.log(LogMarker.INFO, "Clearing chunkgenerator cache");
-        world.getChunkGenerator().clearChunkCache(false);
-        OTG.log(LogMarker.INFO, "Caches cleared");
+        world.getChunkGenerator().clearChunkCache();
+        OTG.log(LogMarker.INFO, "Caches cleared.");
         return true;
     }
 }

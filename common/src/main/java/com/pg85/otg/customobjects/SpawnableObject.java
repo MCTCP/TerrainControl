@@ -1,6 +1,7 @@
 package com.pg85.otg.customobjects;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.Random;

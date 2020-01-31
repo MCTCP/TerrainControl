@@ -6,6 +6,7 @@ import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.minecraft.defaults.DefaultStructurePart;
 
@@ -43,8 +44,9 @@ public abstract class MinecraftObjectFunction<T extends CustomObjectConfigFile> 
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean allowOutsidePopulatingArea)
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// TODO: May cause cascading chunkgen.
         SpawnableObject object = world.getMojangStructurePart(structurePart.getPath());
         object.spawnForced(world, random, rotation, x, y, z);
     }

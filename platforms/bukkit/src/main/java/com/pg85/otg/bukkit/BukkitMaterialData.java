@@ -293,6 +293,16 @@ public final class BukkitMaterialData implements LocalMaterialData
 	}
 
     @Override
+    public boolean isEmptyOrAir() {
+        return combinedBlockId == -1 || combinedBlockId == 0;
+    }
+    
+    @Override
+    public boolean isEmpty() {
+        return combinedBlockId == -1;
+    }
+    
+    @Override
     public boolean isAir() {
         return combinedBlockId == 0;
     }

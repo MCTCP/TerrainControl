@@ -50,7 +50,7 @@ public abstract class WorldSession
 			{
     			if(worldInfoChunk instanceof BO4CustomStructure)
     			{
-        			structureInfo += "-- BO4 Info -- \r\nName: " + ((BO4)worldInfoChunk.start.getObject()).getSettings().getName().replace("Start", "") + "\r\nAuthor: " + ((BO4)worldInfoChunk.start.getObject()).getSettings().author + "\r\nDescription: " + ((BO4)worldInfoChunk.start.getObject()).getSettings().description;
+        			structureInfo += "-- BO4 Info -- \r\nName: " + ((BO4)worldInfoChunk.start.getObject()).getConfig().getName().replace("Start", "") + "\r\nAuthor: " + ((BO4)worldInfoChunk.start.getObject()).getConfig().author + "\r\nDescription: " + ((BO4)worldInfoChunk.start.getObject()).getConfig().description;
 	    			String branchesInChunk = ((BO4CustomStructure)worldInfoChunk).ObjectsToSpawnInfo.get(playerChunk);
 	    			if(branchesInChunk != null && branchesInChunk.length() > 0)
 	    			{

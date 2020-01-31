@@ -85,8 +85,7 @@ public class SpawnCommand extends BaseCommand
         if (spawnObject.spawnForced(bukkitWorld, random, Rotation.NORTH, block.getX(), block.getY(), block.getZ()))
         {
             me.sendMessage(BaseCommand.MESSAGE_COLOR + spawnObject.getName() + " was spawned.");
-        } else
-        {
+        } else {
             me.sendMessage(BaseCommand.ERROR_COLOR + "Object can't be spawned over there.");
         }
 

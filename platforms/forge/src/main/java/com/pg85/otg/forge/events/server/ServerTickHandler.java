@@ -216,7 +216,7 @@ public class ServerTickHandler
 		    									entityFunc.nameTagOrNBTFileName = paramString2.length > 5 ? paramString2[5] : null;
 		    									entityFunc.originalNameTagOrNBTFileName = entityFunc.nameTagOrNBTFileName;
 
-		    									world.spawnEntity(entityFunc);
+		    									world.spawnEntity(entityFunc, null);
 		    								}
 		    								catch(NumberFormatException ex)
 		    								{
@@ -230,7 +230,7 @@ public class ServerTickHandler
 		    							{
 		    								try {
 												LocalMaterialData material = MaterialHelper.readMaterial(paramString2[1]);
-			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, true);
+			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, null);
 											}
 		    								catch (InvalidConfigException e)
 		    								{

@@ -259,16 +259,30 @@ public class ForgeMaterialData implements LocalMaterialData
         return this.withBlockData(block.getMetaFromState(block.getDefaultState()));
     }
     
+    boolean metaIdSet = false;
+    byte metaId;
     @Override
     public byte getBlockData()
     {
-        return this.blockData == null ? 0 : (byte) this.blockData.getBlock().getMetaFromState(this.blockData);
+    	if(!this.metaIdSet)
+    	{
+    		this.metaIdSet = true;
+    		this.metaId = this.blockData == null ? 0 : (byte) this.blockData.getBlock().getMetaFromState(this.blockData);
+    	}
+        return this.metaId;
     }
 
+    boolean materialIdSet = false;
+    int materialId;
     @Override
     public int getBlockId()
     {
-        return this.blockData == null ? 0 : Block.getIdFromBlock(this.blockData.getBlock());
+    	if(!this.materialIdSet)
+    	{
+    		this.materialIdSet = true;
+    		this.materialId = this.blockData == null ? 0 : Block.getIdFromBlock(this.blockData.getBlock());
+    	}
+        return this.materialId;
     }
 
     @Override
@@ -337,9 +351,21 @@ public class ForgeMaterialData implements LocalMaterialData
     }
     
     @Override
+    public boolean isEmptyOrAir()
+    {
+        return this.blockData == null ? true : toDefaultMaterial() == DefaultMaterial.AIR;
+    }
+    
+    @Override
     public boolean isAir()
     {
-        return this.blockData == null ? true : this.blockData.getMaterial() == Material.AIR;
+        return this.blockData != null && toDefaultMaterial() == DefaultMaterial.AIR;
+    }
+    
+    @Override
+    public boolean isEmpty()
+    {
+        return this.blockData == null;
     }
 
     @Override
@@ -449,21 +475,23 @@ public class ForgeMaterialData implements LocalMaterialData
 		if (this.checkFallbacks) {
 			this.checkFallbacks = false;
 			this.blockData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).blockData;
+			this.metaIdSet = false;
+			this.materialIdSet = false;
+			this.rawEntry = null;
 		}
 		return this;
 	}
 
-    
     @Override
     public DefaultMaterial toDefaultMaterial()
     {
     	if(this.blockData == null)
     	{
     		return DefaultMaterial.UNKNOWN_BLOCK;
+    	} else {
+    		return DefaultMaterial.getMaterial(getBlockId());
     	}
-    	return DefaultMaterial.getMaterial(getBlockId());
     }
-    
 
 	@Override
 	public boolean isParsed() {

@@ -153,7 +153,7 @@ public class CustomStructurePlotter
 	            	{
 		            	for(Map.Entry<StructuredCustomObject, Double> bo3AndRarity : structuredCustomObjects.entrySet())
 		            	{
-		            		if(!((BO4)bo3AndRarity.getKey()).isInvalidConfig && ((BO4)bo3AndRarity.getKey()).getSettings().isSpawnPoint)
+		            		if(!((BO4)bo3AndRarity.getKey()).isInvalidConfig && ((BO4)bo3AndRarity.getKey()).getConfig().isSpawnPoint)
 		            		{
 			            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
 			                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
@@ -195,7 +195,7 @@ public class CustomStructurePlotter
 					            		int i = 0;
 					                	for(Object[] entry : BO3sBySize)
 					                	{
-					                		if(((BO4)bo3AndRarity.getKey()).getSettings().timesSpawned < ((BO4)entry[0]).getSettings().timesSpawned || (BO3size > (Double)entry[2] && ((BO4)bo3AndRarity.getKey()).getSettings().timesSpawned == ((BO4)entry[0]).getSettings().timesSpawned))
+					                		if(((BO4)bo3AndRarity.getKey()).getConfig().timesSpawned < ((BO4)entry[0]).getConfig().timesSpawned || (BO3size > (Double)entry[2] && ((BO4)bo3AndRarity.getKey()).getConfig().timesSpawned == ((BO4)entry[0]).getConfig().timesSpawned))
 					                		{
 					                			insertAtIndex = i;
 					                			break;
@@ -244,7 +244,7 @@ public class CustomStructurePlotter
 			            		// Rarity 0 is used to allow spawning of branches but not structure start in biomes.
 			            		// Any value > 0 means spawn in this biome.
 			            		// TODO: Replace rarity with a boolean (but keep it backwards compatible)?
-		        		        if ((int)Math.round((Double)currentStructureSpawning[3]) > 0 || (spawningStructureAtSpawn && ((BO4)currentStructureSpawning[0]).getSettings().isSpawnPoint))
+		        		        if ((int)Math.round((Double)currentStructureSpawning[3]) > 0 || (spawningStructureAtSpawn && ((BO4)currentStructureSpawning[0]).getConfig().isSpawnPoint))
 		        		        {
 				            		left = 0;
 				            		right = 0;
@@ -754,7 +754,7 @@ public class CustomStructurePlotter
 				                		if(isBO4AllowedToSpawnAtByFrequency(spawnChunk, (BO4)currentStructureSpawning[0]))
 				                		{
 						                	structureCoord = new BO4CustomStructureCoordinate(world, ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
-						                	structureStart2 = new BO4CustomStructure(world, structureCoord, spawningStructureAtSpawn, targetBiomes);
+						                	structureStart2 = new BO4CustomStructure(world, structureCoord, spawningStructureAtSpawn, targetBiomes, chunkCoord);
 
 				            	        	if(structureStart2.IsSpawned)
 						                	{
@@ -762,13 +762,13 @@ public class CustomStructurePlotter
 				            	    			this.structuresPerChunk.put(spawnChunk, null);
 				            	    			worldInfoChunks.put(spawnChunk, structureStart2);
 
-						                		((BO4)structureCoord.getObject()).getSettings().timesSpawned += 1;
+						                		((BO4)structureCoord.getObject()).getConfig().timesSpawned += 1;
 						                		if(OTG.getPluginConfig().spawnLog)
 						                		{
 						                			OTG.log(LogMarker.INFO, "Plotted structure " + structureCoord.getObject().getName() + " at chunk X" + spawnCoordX + " Z" + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
 						                		}
 
-						                		if(((BO4)currentStructureSpawning[0]).getSettings().frequency > 0 || ((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.size() > 0)
+						                		if(((BO4)currentStructureSpawning[0]).getConfig().frequency > 0 || ((BO4)currentStructureSpawning[0]).getConfig().bo3Groups.size() > 0)
 						                		{
 						                			String bO3Name = ((BO4)currentStructureSpawning[0]).getName();
 						                			ChunkCoordinate bo4SpawnCoord = ChunkCoordinate.fromChunkCoords(spawnCoordX, spawnCoordZ);
@@ -781,13 +781,13 @@ public class CustomStructurePlotter
 							                		}
 					                				chunkCoords.add(bo4SpawnCoord);
 
-						                			if(((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.size() > 0)
+						                			if(((BO4)currentStructureSpawning[0]).getConfig().bo3Groups.size() > 0)
 						                			{
 									            		int structureCenterX = structureBBInsideAreaX + (int)Math.floor(((rotation == Rotation.NORTH || rotation == Rotation.SOUTH ? structureLeft + structureRight + 1 : structureBottom + structureTop + 1) / 2d));
 									            		int structureCenterZ = structureBBInsideAreaZ + (int)Math.floor(((rotation == Rotation.NORTH || rotation == Rotation.SOUTH ? structureTop + structureBottom + 1 : structureLeft + structureRight + 1) / 2d));
 									                	ChunkCoordinate bo4CenterSpawnCoord = ChunkCoordinate.fromChunkCoords(structureCenterX, structureCenterZ);
 						                				
-						                				for(Entry<String, Integer> entry : ((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.entrySet())
+						                				for(Entry<String, Integer> entry : ((BO4)currentStructureSpawning[0]).getConfig().bo3Groups.entrySet())
 						                				{
 					                						String bo3GroupName = entry.getKey();
 					                						int bo3GroupFrequency = entry.getValue().intValue();
@@ -853,7 +853,7 @@ public class CustomStructurePlotter
     private boolean isBO4AllowedToSpawnAtByFrequency(ChunkCoordinate chunkCoord, BO4 BO3ToSpawn)
     {
         // Check if no other structure of the same type (filename) is within the minimum radius (BO3 frequency)
-		int radius = BO3ToSpawn.getSettings().frequency;
+		int radius = BO3ToSpawn.getConfig().frequency;
 		String bO3Name = BO3ToSpawn.getName();
 		if(radius > 0)
 		{
@@ -877,12 +877,12 @@ public class CustomStructurePlotter
 		}
 		
 		// Check if no other structures that are a member of the same group as this BO3 are within the minimum radius (BO3Group frequency)
-		if(BO3ToSpawn.getSettings().bo3Groups.size() > 0)
+		if(BO3ToSpawn.getConfig().bo3Groups.size() > 0)
 		{
         	float distanceBetweenStructures = 0;
         	int cachedChunkRadius = 0;
         	ChunkCoordinate cachedChunk = null;
-        	for(Entry<String, Integer> entry : BO3ToSpawn.getSettings().bo3Groups.entrySet())
+        	for(Entry<String, Integer> entry : BO3ToSpawn.getConfig().bo3Groups.entrySet())
         	{
         		HashMap<ChunkCoordinate, Integer> spawnedStructure = spawnedStructuresByGroup.get(entry.getKey());
         		if(spawnedStructure != null)

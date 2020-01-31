@@ -2,6 +2,7 @@ package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.util.ChunkCoordinate;
 
 /**
  * Class to get the spawn height of objects part of a structure.
@@ -31,7 +32,7 @@ public interface StructurePartSpawnHeight
     {
 
         @Override
-        public int getCorrectY(LocalWorld world, int x, int y, int z)
+        public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
         {
             return y;
         }
@@ -44,11 +45,10 @@ public interface StructurePartSpawnHeight
     {
 
         @Override
-        public int getCorrectY(LocalWorld world, int x, int y, int z)
+        public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
         {
-            return world.getHighestBlockYAt(x, z);
+            return world.getHighestBlockAboveYAt(x, z, chunkBeingSpawned);
         }
-
     };
 
     /** 
@@ -58,9 +58,9 @@ public interface StructurePartSpawnHeight
     {
 
         @Override
-        public int getCorrectY(LocalWorld world, int x, int y, int z)
+        public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
         {
-            return world.getSolidHeight(x, z);
+            return world.getBlockAboveSolidHeight(x, z, chunkBeingSpawned);
         }
     };
 
@@ -77,5 +77,5 @@ public interface StructurePartSpawnHeight
      * @param z     The z position the object is spawning on.
      * @return The y position the object should spawn on instead.
      */
-    public int getCorrectY(LocalWorld world, int x, int y, int z);
+    public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned);
 }

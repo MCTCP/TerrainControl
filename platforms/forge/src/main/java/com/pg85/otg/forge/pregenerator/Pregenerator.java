@@ -380,7 +380,7 @@ public class Pregenerator
 				cycle += 1;
 			}
 			
-			this.world.getChunkGenerator().clearChunkCache(false);
+			//this.world.getChunkGenerator().clearChunkCache(false);
 			this.world.getStructureCache().compressCache();
 			savePregeneratorData(false);
         }
@@ -398,7 +398,7 @@ public class Pregenerator
 			iTop = Integer.MIN_VALUE;
 			cycle += 1;
 			
-			this.world.getChunkGenerator().clearChunkCache(false);
+			//this.world.getChunkGenerator().clearChunkCache(false);
 			this.world.getStructureCache().compressCache();
 			savePregeneratorData(false);
 		} else {

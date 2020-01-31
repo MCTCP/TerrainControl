@@ -102,10 +102,7 @@ public class TPCommand extends BaseCommand
 	                {
 		                sender.sendMessage(
 		                        new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
-		                ((Entity) sender).setPositionAndUpdate(biomePos.getX(),
-		                        world.getHighestBlockYAt(biomePos.getX(),
-		                        		biomePos.getZ(), true, true, false, false),
-		                        biomePos.getZ());
+		                ((Entity) sender).setPositionAndUpdate(biomePos.getX(), world.getHighestBlockYAt(biomePos.getX(), biomePos.getZ(), true, true, false, false, null), biomePos.getZ());
 	                	return true;
 	                }
                 }

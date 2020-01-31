@@ -57,7 +57,7 @@ public class TPCommand extends BaseCommand
 			Player player = (Player) sender;
 			Location playerLoc = player.getLocation();
 
-    		int maxRadius = 1000;
+    		int maxRadius = 500;
 
     		if(biomeId == -1)
     		{
@@ -87,7 +87,7 @@ public class TPCommand extends BaseCommand
 									biome.getIds().getOTGBiomeId() == biomeId        	        	    										
 								)
         						{
-        							Location loc = new Location(playerLoc.getWorld(), (double)chunkCoord.getBlockXCenter(), (double)world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter()), (double)chunkCoord.getBlockZCenter());
+        							Location loc = new Location(playerLoc.getWorld(), (double)chunkCoord.getBlockXCenter(), (double)world.getHighestBlockAboveYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), null), (double)chunkCoord.getBlockZCenter());
         							sender.sendMessage("Teleporting to \"" + biomeName + "\".");
         							player.teleport(loc);
         							return true;

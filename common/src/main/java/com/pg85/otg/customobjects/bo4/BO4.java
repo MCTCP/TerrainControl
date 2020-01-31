@@ -52,7 +52,7 @@ public class BO4 implements StructuredCustomObject
     public static HashMap<ChunkCoordinate, LocalMaterialData> OriginalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
 	
 	public boolean isInvalidConfig;
-    private BO4Config settings;
+    private BO4Config config;
     private final String name;
     private final File file;
 
@@ -73,7 +73,7 @@ public class BO4 implements StructuredCustomObject
     {
         this.name = name;
         this.file = file;
-        this.settings = settings;
+        this.config = settings;
     }
     
     @Override
@@ -82,9 +82,9 @@ public class BO4 implements StructuredCustomObject
         return name;
     }
 
-    public BO4Config getSettings()
+    public BO4Config getConfig()
     {
-        return settings;
+        return config;
     }
     
     @Override
@@ -92,10 +92,10 @@ public class BO4 implements StructuredCustomObject
     {
     	try
     	{
-    		this.settings = new BO4Config(new FileSettingsReaderOTGPlus(name, file), true);
-    		if(this.settings.settingsMode != ConfigMode.WriteDisable)
+    		this.config = new BO4Config(new FileSettingsReaderOTGPlus(name, file), true);
+    		if(this.config.settingsMode != ConfigMode.WriteDisable)
     		{
-    			FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
+    			FileSettingsWriterOTGPlus.writeToFile(this.config, this.config.settingsMode);
     		}
     	}
     	catch(InvalidConfigException ex)
@@ -105,42 +105,7 @@ public class BO4 implements StructuredCustomObject
     	}
     	
     	return true;
-    }
-    
-    public void generateBO4Data()
-    {
-        //write to disk
-		String filePath = 
-			this.settings.getFile().getAbsolutePath().endsWith(".BO4") ? this.settings.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
-			this.settings.getFile().getAbsolutePath().endsWith(".bo4") ? this.settings.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
-			this.settings.getFile().getAbsolutePath().endsWith(".BO3") ? this.settings.getFile().getAbsolutePath().replace(".BO3", ".BO4Data") :
-			this.settings.getFile().getAbsolutePath().endsWith(".bo3") ? this.settings.getFile().getAbsolutePath().replace(".bo3", ".BO4Data") :
-			this.settings.getFile().getAbsolutePath();
-
-        File file = new File(filePath);
-        if(!file.exists())
-        {
-            try {                
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				DataOutputStream dos = new DataOutputStream(bos);
-				this.settings.writeToStream(dos);
-				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
-				dos.close();
-				FileOutputStream fos = new FileOutputStream(file);
-				DataOutputStream dos2 = new DataOutputStream(fos);
-				dos2.write(compressedBytes, 0, compressedBytes.length);
-				dos2.close();
-            }
-            catch (FileNotFoundException e)
-            {
-                e.printStackTrace();
-            }
-            catch (IOException e)
-            {
-                e.printStackTrace();
-            }
-        }
-    }
+    }   
     
     @Override
     public boolean canSpawnAsTree()
@@ -148,35 +113,24 @@ public class BO4 implements StructuredCustomObject
         return false;
     }
 
-    // Used for saplings
     @Override
     public boolean canRotateRandomly()
     {
     	return false;
-    }
+    }   
+
+	@Override
+	public boolean loadChecks() {
+		return true;
+	}
     
-    // Used to safely spawn this object from a grown sapling
-    // BO4s cannot be spawned from saplings
     @Override
     public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
         return false;
     }
-        
-    // Used for Tree() and CustomObject
-    @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
-    {
-    	return false;
-    }
-    
-    @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
-    {
-    	return false;
-    }
-    
-    // Used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc).
+            
+    // BO4 CustomStructures cannot be force-spawned, only plotted in unloaded chunks and then spawned when the chunk is populated.
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
@@ -184,116 +138,30 @@ public class BO4 implements StructuredCustomObject
     }
     
 	@Override
-	public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
+	public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
 	{
 		return false;
 	}
-	
-	@Override
-	public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
-	{
-		return false;
-	}
-	
-	// This method is only used to spawn CustomObject.
+
+	// TODO: Implement this, move code?
     @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
     	return false;
     }
 
-    @Override
     public Branch[] getBranches()
     {
-        return settings.getbranches();
+        return config.getbranches();
     }
-    
-    @Override
-    public Branch[] getBranches(Rotation rotation)
-    {
-    	return null;
-    }
-
-    @Override
-    public CustomStructureCoordinate makeCustomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-    	return null;
-    }
-
-    @Override
-    public StructurePartSpawnHeight getStructurePartSpawnHeight()
-    {
-        return null;
-    }
-
-    @Override
-    public BoundingBox getBoundingBox(Rotation rotation)
-    {
-        return null;
-    }
-
-    // This used to be in CustomObject?
-    @Override
-    public int getMaxBranchDepth() 
-    {
-        return -1;
-    }
-    
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
-    {
-    	return spawnForcedOTGPlus(world, random, rotation, chunkCoord, x, y, z, replaceAbove, replaceBelow, replaceWithBiomeBlocks, replaceWithSurfaceBlock, replaceWithGroundBlock, spawnUnderWater, waterLevel, isStructureAtSpawn, doReplaceAboveBelowOnly);
-    }
-    
+      
     public boolean isCollidable()
     {
-    	return getSettings().isCollidable();
+    	return getConfig().isCollidable();
     }
     
-    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
-    {
-	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
-	    if(blocksToReplace != null && blocksToReplace.size() > 0)
-	    {
-	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
-	    	if(targetBlock != null)
-	    	{
-	    		material = targetBlock;
-	    	}
-	    }
-	    if(OTG.getPluginConfig().developerMode)
-	    {
-		    DefaultMaterial worldMaterial = world.getMaterial(x, y, z, false).toDefaultMaterial();
-		    if(
-	    		worldMaterial == DefaultMaterial.GOLD_BLOCK ||
-	    		worldMaterial == DefaultMaterial.IRON_BLOCK ||
-	    		worldMaterial == DefaultMaterial.REDSTONE_BLOCK ||
-	    		worldMaterial == DefaultMaterial.DIAMOND_BLOCK ||
-	    		worldMaterial == DefaultMaterial.LAPIS_BLOCK ||
-	    		worldMaterial == DefaultMaterial.COAL_BLOCK ||
-	    		worldMaterial == DefaultMaterial.QUARTZ_BLOCK ||
-	    		worldMaterial == DefaultMaterial.EMERALD_BLOCK
-    		)
-		    {
-		    	if(
-		    		material.toDefaultMaterial() == DefaultMaterial.GOLD_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.IRON_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.REDSTONE_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.DIAMOND_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.LAPIS_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.COAL_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.QUARTZ_BLOCK ||
-					material.toDefaultMaterial() == DefaultMaterial.EMERALD_BLOCK
-    			)
-		    	{
-		    		world.setBlock(x, y, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0), null, true);
-		    	}
-		    	return;
-		    }
-	    }
-	    world.setBlock(x, y, z, material, metaDataTag, true);
-    }
-   
-    private boolean spawnForcedOTGPlus(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
+    // BO4's should always spawn within population bounds, so there is no SpawnForced, only TrySpawnAt
+    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, ChunkCoordinate chunkBeingPopulated)
     {
     	//OTG.log(LogMarker.INFO, "Spawning " + this.getName());
 
@@ -306,7 +174,7 @@ public class BO4 implements StructuredCustomObject
 
     	airMaterial = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
 
-		if(settings == null)
+		if(config == null)
 		{
 			OTG.log(LogMarker.FATAL, "Settings was null for BO3 " + this.getName() + ". This should not be happening, please contact the developer.");
 			throw new RuntimeException("Settings was null for BO3 " + this.getName() + ". This should not be happening, please contact the developer.");
@@ -332,21 +200,21 @@ public class BO4 implements StructuredCustomObject
 		}
 
     	try {
-			replaceBelowMaterial = settings.replaceBelow != null && settings.replaceBelow.toLowerCase().equals("none") ? null : replaceBelow != null && replaceBelow.length() > 0 ? MaterialHelper.readMaterial(replaceBelow) : null;
+			replaceBelowMaterial = config.replaceBelow != null && config.replaceBelow.toLowerCase().equals("none") ? null : replaceBelow != null && replaceBelow.length() > 0 ? MaterialHelper.readMaterial(replaceBelow) : null;
 		} catch (InvalidConfigException e1) {
 			replaceBelowMaterial = MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 0);
 			if(OTG.getPluginConfig().spawnLog)
 			{
-				OTG.log(LogMarker.INFO, "Value " + settings.replaceBelow + " for replaceBelow in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
+				OTG.log(LogMarker.INFO, "Value " + config.replaceBelow + " for replaceBelow in BO3 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
 		}
     	try {
-			replaceAboveMaterial = settings.replaceAbove != null && settings.replaceAbove.toLowerCase().equals("none") ? null : replaceAbove != null && replaceAbove.length() > 0 ? MaterialHelper.readMaterial(replaceAbove) : null;
+			replaceAboveMaterial = config.replaceAbove != null && config.replaceAbove.toLowerCase().equals("none") ? null : replaceAbove != null && replaceAbove.length() > 0 ? MaterialHelper.readMaterial(replaceAbove) : null;
 		} catch (InvalidConfigException e1) {
 			replaceAboveMaterial = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
 			if(OTG.getPluginConfig().spawnLog)
 			{
-				OTG.log(LogMarker.INFO, "Value " + settings.replaceAbove + " for replaceAbove in BO3 " + this.getName() + " was not recognised. Using AIR instead.");
+				OTG.log(LogMarker.INFO, "Value " + config.replaceAbove + " for replaceAbove in BO3 " + this.getName() + " was not recognised. Using AIR instead.");
 			}
 		}
 
@@ -410,7 +278,7 @@ public class BO4 implements StructuredCustomObject
 
         // Spawn
     	long startTime = System.currentTimeMillis();
-        for (BO4BlockFunction block : settings.getBlocks())
+        for (BO4BlockFunction block : config.getBlocks())
         {
         	if(block instanceof BO4RandomBlockFunction)
         	{
@@ -484,8 +352,8 @@ public class BO4 implements StructuredCustomObject
 
 	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z)))
 	        	{
-	        		int highestBlockY = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false);
-	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
+	        		int highestBlockY = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false, chunkBeingPopulated);        		
+	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH) // Can happen for chunks filled with air, or null chunks (TODO: Null chunks shouldn't happen here, confirm they don't.)
 	        		{
 	        			highestBlockY = 1;
 	        		}
@@ -493,7 +361,7 @@ public class BO4 implements StructuredCustomObject
 	        		{
 	        			highestBlockY = 255;
 	        		}
-	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z), world.getMaterial(x + newBlock.x, highestBlockY, z + newBlock.z, true));
+	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z), world.getMaterial(x + newBlock.x, highestBlockY, z + newBlock.z, chunkBeingPopulated));
 	        	}
 
 	        	// TODO: See BlockFunction.Spawn for what should be done with metadata
@@ -514,14 +382,13 @@ public class BO4 implements StructuredCustomObject
 	        		{
 	        			coordsAboveDone.add(new Object[] { x + newBlock.x, z + newBlock.z });
 	        			int blockY = y + newBlock.y + 1; // TODO: This is wrong, should be the lowest block in the BO3 at these x-z coordinates. ReplaceAbove should be done before any blocks in this column are placed
-        				int highestBlockToReplace = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false);
+        				int highestBlockToReplace = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false, chunkBeingPopulated);
 
-	        			// TODO: Use world height constant (dunno what its called and where its at)??
 	        			while(blockY <= highestBlockToReplace && blockY > y + newBlock.y)
 	        			{
                             blockToQueueForSpawn = new BO4BlockFunction();
 
-	        				if(spawnUnderWater && blockY >= waterLevel)// && replaceAboveMaterial.isLiquid())
+	        				if(spawnUnderWater && blockY >= waterLevel)
 			            	{
 	        					blockToQueueForSpawn.material = airMaterial;
 			            	} else {
@@ -537,14 +404,14 @@ public class BO4 implements StructuredCustomObject
     						blockToQueueForSpawn.metaDataName = block.metaDataName;
     						blockToQueueForSpawn.metaDataTag = block.metaDataTag;
 
-    						sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, true);
+    						sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
 
                 			if(!sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
                 			{
             					ChunkCoordinate destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
             					if(chunkCoord.equals(destChunk))
             					{
-        							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn);
+        							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated);
             					} else {
             						outOfBounds = true;
             					}
@@ -554,7 +421,8 @@ public class BO4 implements StructuredCustomObject
 	        			}
 	        		}
 	        	}
-	        	if(replaceBelowMaterial != null && block.y == 0 && !block.material.isAir() && doReplaceAboveBelowOnly)
+	        	
+	        	if(replaceBelowMaterial != null && block.y == 0 && !block.material.isEmptyOrAir() && doReplaceAboveBelowOnly)
 	        	{
 	        		boolean bFound = false;
         			for(Object[] coords : coordsBelowDone)
@@ -586,14 +454,14 @@ public class BO4 implements StructuredCustomObject
 	    						blockToQueueForSpawn.metaDataName = block.metaDataName;
 	    						blockToQueueForSpawn.metaDataTag = block.metaDataTag;
 
-	    						sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, true);
+	    						sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
 
 	                			if(!sourceBlockMaterial.isSolid() && !sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
 	                			{
                 					ChunkCoordinate destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
                 					if(chunkCoord.equals(destChunk))
                 					{
-            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn);
+            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated);
                 					} else {
                 						outOfBounds = true;
                 					}
@@ -608,6 +476,7 @@ public class BO4 implements StructuredCustomObject
 	        			}
         			}
 	        	}
+	        	
 	        	if(y + newBlock.y > 0 && y + newBlock.y < 256 && !doReplaceAboveBelowOnly)
 	        	{
                     blockToQueueForSpawn = new BO4BlockFunction();
@@ -619,7 +488,7 @@ public class BO4 implements StructuredCustomObject
 					blockToQueueForSpawn.metaDataName = block.metaDataName;
 					blockToQueueForSpawn.metaDataTag = block.metaDataTag;
 
-					sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, true);
+					sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
 
     				if(replaceWithBiomeBlocks)
     				{
@@ -659,7 +528,12 @@ public class BO4 implements StructuredCustomObject
     						blockToQueueForSpawn.material = biomeSurfaceBlock;
 
     	        			LocalMaterialData originalSurfaceBlock = OriginalTopBlocks.get(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z));
-    	        			if(originalSurfaceBlock != null && originalSurfaceBlock.toDefaultMaterial() != DefaultMaterial.UNKNOWN_BLOCK && !originalSurfaceBlock.isLiquid() && !originalSurfaceBlock.isAir())
+    	        			if(
+	        					originalSurfaceBlock != null &&
+	        					!originalSurfaceBlock.isLiquid() && 
+	        					!originalSurfaceBlock.isEmptyOrAir() &&
+	        					originalSurfaceBlock.toDefaultMaterial() != DefaultMaterial.UNKNOWN_BLOCK 
+        					)
     	        			{
     	        				blockToQueueForSpawn.material = originalSurfaceBlock;
     	        			}
@@ -701,7 +575,7 @@ public class BO4 implements StructuredCustomObject
     					ChunkCoordinate destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
     					if(chunkCoord.equals(destChunk))
     					{
-							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn);
+							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated);
     					} else {
     						outOfBounds = true;
     					}
@@ -725,10 +599,10 @@ public class BO4 implements StructuredCustomObject
 	        			coordsAboveDone.add(new Object[] { x + block.x, z + block.z });
         				short blockY = (short) (y + block.y + 1); // TODO: This is wrong, should be the lowest block in the BO3 at these x-z coordinates. replaceAbove should be done before any blocks in this column are placed
 
-        				int heighestBlockToReplace = world.getHighestBlockYAt(x + block.x, z + block.z, true, true, false, false);
+        				int highestBlockToReplace = world.getHighestBlockYAt(x + block.x, z + block.z, true, true, false, false, chunkBeingPopulated);
 
 	        			// TODO: Use world height constant (dunno what its called and where its at)??
-	        			while(blockY <= heighestBlockToReplace && blockY > y + block.y)
+	        			while(blockY <= highestBlockToReplace && blockY > y + block.y)
 	        			{
                             blockToQueueForSpawn = new BO4BlockFunction();
 
@@ -746,11 +620,11 @@ public class BO4 implements StructuredCustomObject
     						blockToQueueForSpawn.metaDataName = block.metaDataName;
     						blockToQueueForSpawn.metaDataTag = block.metaDataTag;
 
-                            sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, true);
+                            sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
 
             	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
             	        	{
-            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
+            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, chunkBeingPopulated);
             	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
             	        		{
             	        			highestBlockY = 1;
@@ -759,7 +633,7 @@ public class BO4 implements StructuredCustomObject
             	        		{
             	        			highestBlockY = 255;
             	        		}
-            	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, true));
+            	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, chunkBeingPopulated));
             	        	}
 
                 			if(!sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
@@ -767,7 +641,7 @@ public class BO4 implements StructuredCustomObject
             					ChunkCoordinate destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
             					if(chunkCoord.equals(destChunk))
             					{
-           							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn);
+           							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated);
             					} else {
             						outOfBounds = true;
             					}
@@ -776,7 +650,8 @@ public class BO4 implements StructuredCustomObject
 	        			}
 	        		}
 	        	}
-    			if(replaceBelowMaterial != null && block.y == 0 && !block.material.isAir() && doReplaceAboveBelowOnly)
+    			
+    			if(replaceBelowMaterial != null && block.y == 0 && !block.material.isEmptyOrAir() && doReplaceAboveBelowOnly)
     			{
 	        		boolean bFound = false;
         			for(Object[] coords : coordsBelowDone)
@@ -806,11 +681,11 @@ public class BO4 implements StructuredCustomObject
 	    						blockToQueueForSpawn.metaDataName = block.metaDataName;
 	    						blockToQueueForSpawn.metaDataTag = block.metaDataTag;
 
-	    						sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, true);
+	    						sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
 
 	            	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
 	            	        	{
-	            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
+	            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, chunkBeingPopulated);
 	            	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
 	            	        		{
 	            	        			highestBlockY = 1;
@@ -819,7 +694,7 @@ public class BO4 implements StructuredCustomObject
 	            	        		{
 	            	        			highestBlockY = 255;
 	            	        		}
-	            	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, true));
+	            	        		OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, chunkBeingPopulated));
 	            	        	}
 
 	                			if(!sourceBlockMaterial.isSolid() && !sourceBlockMaterial.toDefaultMaterial().equals(blockToQueueForSpawn.material.toDefaultMaterial()) || sourceBlockMaterial.getBlockData() != blockToQueueForSpawn.material.getBlockData())
@@ -827,7 +702,7 @@ public class BO4 implements StructuredCustomObject
                 					ChunkCoordinate destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
                 					if(chunkCoord.equals(destChunk))
                 					{
-            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn);
+            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated);
                 					} else {
                 						outOfBounds = true;
                 					}
@@ -841,6 +716,7 @@ public class BO4 implements StructuredCustomObject
 	        			}
 	        		}
 	        	}
+    			
     			if(y + block.y > 0 && y + block.y < 256 && !doReplaceAboveBelowOnly)
     			{
                     blockToQueueForSpawn = new BO4BlockFunction();
@@ -852,14 +728,14 @@ public class BO4 implements StructuredCustomObject
 					blockToQueueForSpawn.metaDataName = block.metaDataName;
 					blockToQueueForSpawn.metaDataTag = block.metaDataTag;
 
-					sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, true);
+					sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
 
     	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
     	        	{
-    	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false);
+    	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, chunkBeingPopulated);
     	        		if(highestBlockY > PluginStandardValues.WORLD_DEPTH)
     	        		{
-    	        			OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, true));
+    	        			OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, chunkBeingPopulated));
     	        		} else {
     	        			OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), null);
     	        		}
@@ -903,7 +779,12 @@ public class BO4 implements StructuredCustomObject
     						blockToQueueForSpawn.material = biomeSurfaceBlock;
 
     	        			LocalMaterialData originalSurfaceBlock = OriginalTopBlocks.get(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z));
-    	        			if(originalSurfaceBlock != null && originalSurfaceBlock.toDefaultMaterial() != DefaultMaterial.UNKNOWN_BLOCK && !originalSurfaceBlock.isLiquid() && !originalSurfaceBlock.isAir())
+    	        			if(
+	        					originalSurfaceBlock != null && 
+	        					originalSurfaceBlock.toDefaultMaterial() != DefaultMaterial.UNKNOWN_BLOCK && 
+	        					!originalSurfaceBlock.isLiquid() && 
+	        					!originalSurfaceBlock.isEmptyOrAir()
+        					)
     	        			{
     	        				blockToQueueForSpawn.material = originalSurfaceBlock;
     	        			}
@@ -945,7 +826,7 @@ public class BO4 implements StructuredCustomObject
     					ChunkCoordinate destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
     					if(chunkCoord.equals(destChunk))
     					{
-   							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn);
+   							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated);
     					} else {
     						outOfBounds = true;
     					}
@@ -968,9 +849,48 @@ public class BO4 implements StructuredCustomObject
 
         return true;
     }
-
-	@Override
-	public boolean loadChecks() {
-		return true;
-	}
+    
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated)
+    {
+	    HashMap<DefaultMaterial,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+	    if(blocksToReplace != null && blocksToReplace.size() > 0)
+	    {
+	    	LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+	    	if(targetBlock != null)
+	    	{
+	    		material = targetBlock;
+	    	}
+	    }
+	    if(OTG.getPluginConfig().developerMode)
+	    {
+		    DefaultMaterial worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated).toDefaultMaterial();
+		    if(
+	    		worldMaterial == DefaultMaterial.GOLD_BLOCK ||
+	    		worldMaterial == DefaultMaterial.IRON_BLOCK ||
+	    		worldMaterial == DefaultMaterial.REDSTONE_BLOCK ||
+	    		worldMaterial == DefaultMaterial.DIAMOND_BLOCK ||
+	    		worldMaterial == DefaultMaterial.LAPIS_BLOCK ||
+	    		worldMaterial == DefaultMaterial.COAL_BLOCK ||
+	    		worldMaterial == DefaultMaterial.QUARTZ_BLOCK ||
+	    		worldMaterial == DefaultMaterial.EMERALD_BLOCK
+    		)
+		    {
+		    	if(
+		    		material.toDefaultMaterial() == DefaultMaterial.GOLD_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.IRON_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.REDSTONE_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.DIAMOND_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.LAPIS_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.COAL_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.QUARTZ_BLOCK ||
+					material.toDefaultMaterial() == DefaultMaterial.EMERALD_BLOCK
+    			)
+		    	{
+		    		world.setBlock(x, y, z, MaterialHelper.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0), null, chunkBeingPopulated);
+		    	}
+		    	return;
+		    }
+	    }
+	    world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
+    }
 }

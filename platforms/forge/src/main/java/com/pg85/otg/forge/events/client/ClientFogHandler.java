@@ -315,8 +315,9 @@ public class ClientFogHandler {
                 // Ignored, as biomes from OTG should never throw this
             }
 
-            if (localBiome == null)
+            if (localBiome == null || localBiome.getBiomeConfig() == null)
             {
+            	biomeCache[x][z] = (short) -1;
                 return null;
             }
 

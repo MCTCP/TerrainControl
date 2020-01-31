@@ -22,8 +22,6 @@ import java.util.Random;
 public class TreeObject implements CustomObject
 {
     private TreeType type;
-    public int defaultMinHeight = PluginStandardValues.WORLD_DEPTH;
-    public int defaultMaxHeight = PluginStandardValues.WORLD_HEIGHT - 1;    
     public int minHeight = PluginStandardValues.WORLD_DEPTH;
     public int maxHeight = PluginStandardValues.WORLD_HEIGHT - 1;
 
@@ -49,33 +47,23 @@ public class TreeObject implements CustomObject
     {
         return true;
     }
-
+    
+    // Called during population.
     @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
+        // A tree has no frequency or rarity, so spawn it once in the chunk
+    	// Make sure we stay within population bounds.
+        int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+        int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+                
+        int y = world.getHighestBlockAboveYAt(x, z, chunkCoord);        
         if (y < minHeight || y > maxHeight)
         {
             return false;
         }
         
-        return spawnForced(world, random, rotation, x, y, z);
-    }
-
-    @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
-    {
-    	return false;
-    }
-    
-    @Override
-    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
-    {
-        // A tree has no frequency or rarity, so spawn it once in the chunk
-        int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-        int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-                
-        int y = world.getHighestBlockYAt(x, z);
-        return trySpawnAt(world, random, Rotation.NORTH, x, y, z);
+        return spawnForced(world, random, Rotation.NORTH, x, y, z);
     }
     
     @Override
@@ -89,32 +77,27 @@ public class TreeObject implements CustomObject
     {
         return world.placeTree(type, random, x, y, z);
     }
-
-    @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        int y = world.getHighestBlockYAt(x, z);
-        Rotation rotation = Rotation.getRandomRotation(random);
-
-        if (trySpawnAt(world, random, rotation, x, y, z))
-        {
-        	return true;
-        }   
-        return false;
-    }
     
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
-        int y = world.getHighestBlockYAt(x, z);
+        int y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
         Rotation rotation = Rotation.getRandomRotation(random);
 
-        if (y < minY || y > maxY)
+        if(!(minY == -1 && maxY == -1))
+        {
+	        if (y < minY || y > maxY)
+	        {
+	            return false;
+	        }
+        }
+        
+        if (y < minHeight || y > maxHeight)
         {
             return false;
         }
         
-        return spawnForced(world, random, rotation, x, y, z);        
+        return spawnForced(world, random, rotation, x, y, z);
     }
     
     @Override
@@ -125,7 +108,8 @@ public class TreeObject implements CustomObject
     }
 
 	@Override
-	public boolean loadChecks() {
+	public boolean loadChecks()
+	{
 		return true;
 	}
 }

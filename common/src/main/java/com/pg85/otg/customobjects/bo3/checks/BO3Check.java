@@ -4,6 +4,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Config;
+import com.pg85.otg.util.ChunkCoordinate;
 
 /**
  * Represents a check - something that can prevent the BO3 from spawning if this
@@ -36,7 +37,7 @@ public abstract class BO3Check extends CustomObjectConfigFunction<BO3Config>
      * @param z     The z position
      * @return Whether this check prevents the BO3 from spawning.
      */
-    public abstract boolean preventsSpawn(LocalWorld world, int x, int y, int z);
+    public abstract boolean preventsSpawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 
     /**
      * This implementation of

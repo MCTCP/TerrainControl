@@ -295,17 +295,17 @@ public class BO4Creator extends BOCreator
 						}
                     }
                     
-                    bo4.getSettings().settingsMode = ConfigMode.WriteAll;
+                    bo4.getConfig().settingsMode = ConfigMode.WriteAll;
                     
                     try
                     {
-                        SettingsWriterOTGPlus writer = new FileSettingsWriterOTGPlus(bo4.getSettings().getFile());
-                        bo4.getSettings().writeWithData(writer, (!isStartBO4 || !branch) && blocks != null ? blocks : new ArrayList<BO4BlockFunction>(), branches != null ? branches : new ArrayList<BO4BranchFunction>());
+                        SettingsWriterOTGPlus writer = new FileSettingsWriterOTGPlus(bo4.getConfig().getFile());
+                        bo4.getConfig().writeWithData(writer, (!isStartBO4 || !branch) && blocks != null ? blocks : new ArrayList<BO4BlockFunction>(), branches != null ? branches : new ArrayList<BO4BranchFunction>());
                         OTG.getCustomObjectManager().registerGlobalObject(bo4);
                     }
                     catch (IOException ex)
                     {
-                        OTG.log(LogMarker.ERROR, "Failed to write to file {}", bo4.getSettings().getFile());
+                        OTG.log(LogMarker.ERROR, "Failed to write to file {}", bo4.getConfig().getFile());
                         OTG.printStackTrace(LogMarker.ERROR, ex);
                         return false;
                     }

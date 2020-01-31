@@ -163,7 +163,7 @@ public class OTGWorldProvider extends WorldProviderSurface
             return true;
         } else {
         	ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(this.world);
-            return forgeWorld.getHighestBlockYAt(x, z, true, false, false, true) != -1;
+            return forgeWorld.getBlockAboveSolidHeight(x, z, null) != -1;
         }
     }
 

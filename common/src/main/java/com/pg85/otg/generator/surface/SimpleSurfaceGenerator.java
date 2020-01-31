@@ -96,7 +96,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 
                         // Use blocks for the top of the water instead
                         // when on water
-                        if ((y < currentWaterLevel) && (y > worldConfig.waterLevelMin) && currentSurfaceBlock.isAir())
+                        if (y < currentWaterLevel && y > worldConfig.waterLevelMin && currentSurfaceBlock.isAir())
                         {
                             if (currentTemperature < WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
                             {

@@ -224,7 +224,15 @@ public class CavesGen extends TerrainGenBase
                     	{
                     		material = generatingChunkBuffer.getBlock(local_x, currentDepth, local_z);
                     		materialAbove = generatingChunkBuffer.getBlock(local_x, currentDepth + 1, local_z);
-                    		if((materialAbove.isAir() || materialAbove.isLiquid()) && !(material.isAir() || material.isLiquid() ))
+                    		if(
+                				(
+            						materialAbove.isAir() || 
+            						materialAbove.isLiquid()
+        						) && !(
+    								material.isAir() || 
+    								material.isLiquid()
+								)
+            				)
                     		{
                     			surfaceBlockDepth = currentDepth;
                     			break;

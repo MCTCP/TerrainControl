@@ -13,6 +13,7 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
+import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.events.EventPriority;
 import com.pg85.otg.generator.ChunkBuffer;
@@ -21,7 +22,12 @@ import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -357,4 +363,54 @@ public class OTG
         SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
         return new WorldConfig(worldDir, settingsMap, null, null);
 	}
+	
+    public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
+    {
+        int chunkX = blockX >> 4;
+        int chunkZ = blockZ >> 4;
+        return
+			(
+				chunkX == chunkBeingPopulated.getChunkX() ||
+				chunkX == chunkBeingPopulated.getChunkX() + 1
+			) && (
+				chunkZ == chunkBeingPopulated.getChunkZ() ||
+				chunkZ == chunkBeingPopulated.getChunkZ() + 1
+			)
+		;
+    }
+    
+    public static void generateBO4Data(BO4Config config)
+    {
+        //write to disk
+		String filePath = 
+			config.getFile().getAbsolutePath().endsWith(".BO4") ? config.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".bo4") ? config.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".BO3") ? config.getFile().getAbsolutePath().replace(".BO3", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".bo3") ? config.getFile().getAbsolutePath().replace(".bo3", ".BO4Data") :
+			config.getFile().getAbsolutePath();
+
+        File file = new File(filePath);
+        if(!file.exists())
+        {
+            try {                
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				DataOutputStream dos = new DataOutputStream(bos);
+				config.writeToStream(dos);
+				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
+				dos.close();
+				FileOutputStream fos = new FileOutputStream(file);
+				DataOutputStream dos2 = new DataOutputStream(fos);
+				dos2.write(compressedBytes, 0, compressedBytes.length);
+				dos2.close();
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
 }

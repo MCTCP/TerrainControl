@@ -308,7 +308,7 @@ public class BO4Config extends CustomObjectConfigFile
 	        						{
 	        							continue;
 	        						}
-	        						if(randomMaterial.isSmoothAreaAnchor(start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartWood : this.smoothStartWood, start.getSettings().spawnUnderWater))
+	        						if(randomMaterial.isSmoothAreaAnchor(start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartWood : this.smoothStartWood, start.getConfig().spawnUnderWater))
 	        						{
 	        							isSmoothAreaAnchor = true;
 	        							break;
@@ -321,13 +321,13 @@ public class BO4Config extends CustomObjectConfigFile
 	            					isSmoothAreaAnchor ||
 	        						(
 	    								!isRandomBlock &&
-	    								material.isSmoothAreaAnchor(start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartWood : this.smoothStartWood, start.getSettings().spawnUnderWater)
+	    								material.isSmoothAreaAnchor(start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartWood : this.smoothStartWood, start.getConfig().spawnUnderWater)
 	    							)
 	        					)
 	                			{
 	    	            			if(
-	    	            				(!(start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartTop : this.smoothStartTop) && y == getminY()) ||
-	    		        				((start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartTop : this.smoothStartTop) && (this.heightMap[x][z] == null || y > this.heightMap[x][z].y))
+	    	            				(!(start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartTop : this.smoothStartTop) && y == getminY()) ||
+	    		        				((start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartTop : this.smoothStartTop) && (this.heightMap[x][z] == null || y > this.heightMap[x][z].y))
 	    	    					)
 	    	            			{
 	    	            				BO4BlockFunction blockFunction = null;
@@ -454,14 +454,14 @@ public class BO4Config extends CustomObjectConfigFile
 				
 				this.inheritedBO3Loaded = true;
 
-	    		this.inheritedBO3s.addAll(((BO4)parentBO3).getSettings().getInheritedBO3s());
+	    		this.inheritedBO3s.addAll(((BO4)parentBO3).getConfig().getInheritedBO3s());
 
-	    		this.removeAir = ((BO4)parentBO3).getSettings().removeAir;
-	    		this.replaceAbove = this.replaceAbove == null || this.replaceAbove.length() == 0 ? ((BO4)parentBO3).getSettings().replaceAbove : this.replaceAbove;
-	    		this.replaceBelow = this.replaceBelow == null || this.replaceBelow.length() == 0 ? ((BO4)parentBO3).getSettings().replaceBelow : this.replaceBelow;
+	    		this.removeAir = ((BO4)parentBO3).getConfig().removeAir;
+	    		this.replaceAbove = this.replaceAbove == null || this.replaceAbove.length() == 0 ? ((BO4)parentBO3).getConfig().replaceAbove : this.replaceAbove;
+	    		this.replaceBelow = this.replaceBelow == null || this.replaceBelow.length() == 0 ? ((BO4)parentBO3).getConfig().replaceBelow : this.replaceBelow;
 
-				BO4CustomStructureCoordinate rotatedParentMaxCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getSettings().maxX, ((BO4)parentBO3).getSettings().maxY, ((BO4)parentBO3).getSettings().maxZ, this.inheritBO3Rotation);
-				BO4CustomStructureCoordinate rotatedParentMinCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getSettings().minX, ((BO4)parentBO3).getSettings().minY, ((BO4)parentBO3).getSettings().minZ, this.inheritBO3Rotation);
+				BO4CustomStructureCoordinate rotatedParentMaxCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getConfig().maxX, ((BO4)parentBO3).getConfig().maxY, ((BO4)parentBO3).getConfig().maxZ, this.inheritBO3Rotation);
+				BO4CustomStructureCoordinate rotatedParentMinCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getConfig().minX, ((BO4)parentBO3).getConfig().minY, ((BO4)parentBO3).getConfig().minZ, this.inheritBO3Rotation);
 
 				int parentMaxX = rotatedParentMaxCoords.getX() > rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
 				int parentMinX = rotatedParentMaxCoords.getX() < rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
@@ -497,7 +497,7 @@ public class BO4Config extends CustomObjectConfigFile
 					this.minZ = parentMinZ;
 				}
 
-				BO4BlockFunction[] parentBlocks = ((BO4)parentBO3).getSettings().getBlocks();				
+				BO4BlockFunction[] parentBlocks = ((BO4)parentBO3).getConfig().getBlocks();				
 				ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();				
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(parentBlocks)));
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(blocks)));
@@ -520,7 +520,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newBranches.add(branch);
 					}
 				}
-				for(BO4BranchFunction branch : ((BO4)parentBO3).getSettings().branchesOTGPlus)
+				for(BO4BranchFunction branch : ((BO4)parentBO3).getConfig().branchesOTGPlus)
 				{
 					newBranches.add(branch.rotate(this.inheritBO3Rotation));
 				}
@@ -534,7 +534,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newModData.add(modData);
 					}
 				}
-				for(BO4ModDataFunction modData : ((BO4)parentBO3).getSettings().modDataOTGPlus)
+				for(BO4ModDataFunction modData : ((BO4)parentBO3).getConfig().modDataOTGPlus)
 				{
 					newModData.add(modData.rotate(this.inheritBO3Rotation));
 				}
@@ -548,7 +548,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newSpawnerData.add(spawnerData);
 					}
 				}
-				for(BO4SpawnerFunction spawnerData : ((BO4)parentBO3).getSettings().spawnerDataOTGPlus)
+				for(BO4SpawnerFunction spawnerData : ((BO4)parentBO3).getConfig().spawnerDataOTGPlus)
 				{
 					newSpawnerData.add(spawnerData.rotate(this.inheritBO3Rotation));
 				}
@@ -562,7 +562,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newParticleData.add(particleData);
 					}
 				}
-				for(BO4ParticleFunction particleData : ((BO4)parentBO3).getSettings().particleDataOTGPlus)
+				for(BO4ParticleFunction particleData : ((BO4)parentBO3).getConfig().particleDataOTGPlus)
 				{
 					newParticleData.add(particleData.rotate(this.inheritBO3Rotation));
 				}
@@ -576,13 +576,13 @@ public class BO4Config extends CustomObjectConfigFile
 						newEntityData.add(entityData);
 					}
 				}
-				for(BO4EntityFunction entityData : ((BO4)parentBO3).getSettings().entityDataOTGPlus)
+				for(BO4EntityFunction entityData : ((BO4)parentBO3).getConfig().entityDataOTGPlus)
 				{
 					newEntityData.add(entityData.rotate(this.inheritBO3Rotation));
 				}
 				this.entityDataOTGPlus = newEntityData.toArray(new BO4EntityFunction[newEntityData.size()]);
 	
-				this.inheritedBO3s.addAll(((BO4)parentBO3).getSettings().getInheritedBO3s());
+				this.inheritedBO3s.addAll(((BO4)parentBO3).getConfig().getInheritedBO3s());
 			}
 	    	if(!this.inheritedBO3Loaded)
 	    	{

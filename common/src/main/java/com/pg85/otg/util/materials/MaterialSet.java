@@ -199,11 +199,11 @@ public class MaterialSet
      */
     public boolean contains(LocalMaterialData material)
     {
-        if (material == null)
+        if (material == null || material.isEmpty())
         {
             return false;
         }
-        if (allMaterials && !material.isAir())
+        if (allMaterials)
         {
             return true;
         }

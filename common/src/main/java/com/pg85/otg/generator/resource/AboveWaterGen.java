@@ -1,8 +1,11 @@
 package com.pg85.otg.generator.resource;
 
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -20,9 +23,11 @@ public class AboveWaterGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
-    {
-        int y = world.getLiquidHeight(x, z);
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    {    	
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
+        int y = world.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated);
         if (y == -1)
 		{
             return;
@@ -30,15 +35,34 @@ public class AboveWaterGen extends Resource
 
         parseMaterials(world, material, null);
         
+        int j;
+        int k;
+        int m;
+        LocalMaterialData worldMaterial;
+        LocalMaterialData worldMaterialBeneath;
+        
         for (int i = 0; i < 10; i++)
         {
-            int j = x + rand.nextInt(8) - rand.nextInt(8);
-            int k = y + rand.nextInt(4) - rand.nextInt(4);
-            int m = z + rand.nextInt(8) - rand.nextInt(8);
-            if (!world.isNullOrAir(j, k, m, false) || !world.getMaterial(j, k - 1, m, false).isLiquid())
-                continue;
+            j = x + rand.nextInt(8) - rand.nextInt(8);
+            k = y + rand.nextInt(4) - rand.nextInt(4);
+            m = z + rand.nextInt(8) - rand.nextInt(8);
             
-            world.setBlock(j, k, m, material, null, false);
+            worldMaterial = world.getMaterial(j, k, m, chunkBeingPopulated);
+            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            {
+            	continue;
+            }
+
+            worldMaterialBeneath = world.getMaterial(j, k - 1, m, chunkBeingPopulated);            
+            if (
+        		worldMaterialBeneath != null &&
+				!worldMaterialBeneath.isLiquid()
+    		)
+            {
+                continue;
+            }
+            
+            world.setBlock(j, k, m, material, null, chunkBeingPopulated);
         }
     }
 

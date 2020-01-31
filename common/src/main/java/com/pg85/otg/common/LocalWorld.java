@@ -173,7 +173,7 @@ public interface LocalWorld
      */
     public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord);
 
-	void spawnEntity(EntityFunction<?> entityData);
+	void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated);
     
     // Population start and end
     
@@ -193,34 +193,22 @@ public interface LocalWorld
     public void endPopulation();
 
     // Blocks
+        
+    public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
+
+    public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
+
+    public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
+
+    public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated);
     
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea);
-
-    public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea);
-
-    public NamedBinaryTag getMetadata(int x, int y, int z);
-
-    public int getLiquidHeight(int x, int z);
-
-    /**
-     * @return The y location of the block above the highest solid block.
-     */
-    public int getSolidHeight(int x, int z);
-
-    /**
-     * @return The y location of the block above the highest block.
-     */
-    public int getHighestBlockYAt(int x, int z);
-
-    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow);
+    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, ChunkCoordinate chunkBeingPopulated);
     
-    public int getLightLevel(int x, int y, int z);
+    public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 
-    public boolean isLoaded(int x, int y, int z);   
-
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
-
-	public LocalMaterialData[] getBlockColumn(int x, int z);
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated);
+	
+	public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z);
 	
     /**
      * Executes ReplacedBlocks.
@@ -248,8 +236,6 @@ public interface LocalWorld
 	boolean isInsidePregeneratedRegion(ChunkCoordinate chunk);
 
 	public ChunkCoordinate getSpawnChunk();
-
-	public void setAllowSpawningOutsideBounds(boolean b);
 
 	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer);
 

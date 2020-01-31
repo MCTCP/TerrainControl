@@ -39,7 +39,7 @@ public class FrozenSurfaceHelper
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
-                freezeColumn(blockToFreezeX, blockToFreezeZ);
+                freezeColumn(blockToFreezeX, blockToFreezeZ, chunkCoord);
             }
         }
     }
@@ -49,22 +49,22 @@ public class FrozenSurfaceHelper
      * @param x Location X
      * @param z Location Z
      */
-    private void freezeColumn(int x, int z)
+    private void freezeColumn(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Using the calculated biome id so that ReplaceToBiomeName can't mess up the ids
         LocalBiome biome = world.getBiome(x, z);
         if (biome != null)
         {
-            int blockToFreezeY = world.getHighestBlockYAt(x, z);
+            int blockToFreezeY = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
             float tempAtBlockToFreeze = biome.getTemperatureAt(x, blockToFreezeY, z);
             if (blockToFreezeY > 0 && tempAtBlockToFreeze < WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
             {
                 this.currentPropagationSize = 0;
                 // Start to freeze liquids
-                if (!this.freezeLiquid(x, blockToFreezeY -1, z))
+                if (!this.freezeLiquid(x, blockToFreezeY -1, z, chunkBeingPopulated))
                 {
                     // Snow has to be placed on an empty space on a block that accepts snow in the world
-                    startSnowFall(x, blockToFreezeY, z, biome);
+                    startSnowFall(x, blockToFreezeY, z, biome, chunkBeingPopulated);
                 }
             }
         }
@@ -77,18 +77,18 @@ public class FrozenSurfaceHelper
      * @param z Location Z
      * @return If a liquid was present at the given location (not necessarily successful in freezing)
      */
-    private boolean freezeLiquid(int x, int y, int z)
+    private boolean freezeLiquid(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
         LocalBiome biome = world.getBiome(x, z);
         if (biome != null)
         {
-            LocalMaterialData materialToFreeze = world.getMaterial(x, y, z, false);
+            LocalMaterialData materialToFreeze = world.getMaterial(x, y, z, chunkBeingPopulated);
             if (materialToFreeze.isLiquid())
             {
                 // Water & Stationary Water => IceBlock
-                freezeType(x, y, z, materialToFreeze, biome.getBiomeConfig().iceBlock, DefaultMaterial.WATER, DefaultMaterial.STATIONARY_WATER);
+                freezeType(x, y, z, materialToFreeze, biome.getBiomeConfig().iceBlock, DefaultMaterial.WATER, DefaultMaterial.STATIONARY_WATER, chunkBeingPopulated);
                 // Lava & Stationary Lava => CooledLavaBlock
-                freezeType(x, y, z, materialToFreeze, biome.getBiomeConfig().cooledLavaBlock, DefaultMaterial.LAVA, DefaultMaterial.STATIONARY_LAVA);
+                freezeType(x, y, z, materialToFreeze, biome.getBiomeConfig().cooledLavaBlock, DefaultMaterial.LAVA, DefaultMaterial.STATIONARY_LAVA, chunkBeingPopulated);
                 return true;
             }
         }
@@ -107,15 +107,15 @@ public class FrozenSurfaceHelper
      * @param check1 The first material to check for
      * @param check2 The second meterial to check for
      */
-    private void freezeType(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, DefaultMaterial check1, DefaultMaterial check2)
+    private void freezeType(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, DefaultMaterial check1, DefaultMaterial check2, ChunkCoordinate chunkBeingPopulated)
     {
         if ((thawedMaterial.isMaterial(check1) || thawedMaterial.isMaterial(check2)) && !frozenMaterial.isMaterial(check1) && !frozenMaterial.isMaterial(check2))
         {
-            world.setBlock(x, y, z, frozenMaterial, null, false);
+            world.setBlock(x, y, z, frozenMaterial, null, chunkBeingPopulated);
             if (worldConfig.fullyFreezeLakes && this.currentPropagationSize < this.maxPropagationSize)
             {
                 this.currentPropagationSize++;
-                propagateFreeze(x, y, z);
+                propagateFreeze(x, y, z, chunkBeingPopulated);
             }
         }
 
@@ -129,7 +129,7 @@ public class FrozenSurfaceHelper
      * @param z Location Z
      * @param biome The biome associated with the chunk column
      */
-    private void startSnowFall(int x, int y, int z, LocalBiome biome)
+    private void startSnowFall(int x, int y, int z, LocalBiome biome, ChunkCoordinate chunkBeingPopulated)
     {
         decreaseFactor = 0;
         BiomeConfig biomeConfig = biome.getBiomeConfig();
@@ -137,23 +137,33 @@ public class FrozenSurfaceHelper
         float tempAtBlockToFreeze = biome.getTemperatureAt(x, y, z);
         int snowHeight = biomeConfig.getSnowHeight(tempAtBlockToFreeze);
         // Decreased snow amounts for leaves
-        LocalMaterialData materialToSnowAt = world.getMaterial(x, y, z, false);
-        LocalMaterialData materialToSnowOn = world.getMaterial(x, y - 1, z, false);
-        if (materialToSnowAt != null && materialToSnowAt.isAir() && materialToSnowOn != null && materialToSnowOn.canSnowFallOn())
+        LocalMaterialData materialToSnowAt = world.getMaterial(x, y, z, chunkBeingPopulated);
+        LocalMaterialData materialToSnowOn = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
+        if (
+    		materialToSnowAt != null && 
+    		materialToSnowAt.isAir() && 
+    		materialToSnowOn != null && 
+    		materialToSnowOn.canSnowFallOn()
+		)
         {
-            this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn);
+            this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn, chunkBeingPopulated);
         }
         if (worldConfig.betterSnowFall) {
             do
             {
-                materialToSnowAt = world.getMaterial(x, --y, z, false);
-                materialToSnowOn = world.getMaterial(x, y - 1, z, false);
-                if (materialToSnowAt != null && materialToSnowOn != null && materialToSnowAt.isAir() && materialToSnowOn.canSnowFallOn())
+                materialToSnowAt = world.getMaterial(x, --y, z, chunkBeingPopulated);
+                materialToSnowOn = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
+                if (
+            		materialToSnowAt != null && 
+            		materialToSnowOn != null && 
+            		materialToSnowAt.isAir() && 
+            		materialToSnowOn.canSnowFallOn()
+        		)
                 {
-                    this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn);
+                    this.setSnowFallAtLocation(x, y--, z, snowHeight, materialToSnowOn, chunkBeingPopulated);
                     continue;
                 }
-                if (materialToSnowAt != null && !materialToSnowAt.isAir())
+                if (materialToSnowAt != null && !materialToSnowAt.isEmptyOrAir())
                 {
                     ++decreaseFactor;
                 }
@@ -169,7 +179,7 @@ public class FrozenSurfaceHelper
      * @param baseSnowHeight The base height snow should be
      * @param materialToSnowOn The material that might have snow applied
      */
-    private void setSnowFallAtLocation(int x, int y, int z, int baseSnowHeight, LocalMaterialData materialToSnowOn)
+    private void setSnowFallAtLocation(int x, int y, int z, int baseSnowHeight, LocalMaterialData materialToSnowOn, ChunkCoordinate chunkBeingPopulated)
     {
         int snowHeightOnLeaves = MathHelper.clamp(MathHelper.ceil(MathHelper.sqrt(baseSnowHeight)), 0, baseSnowHeight);
         LocalMaterialData snowMass;
@@ -182,7 +192,7 @@ public class FrozenSurfaceHelper
             // Basic Snow Layer(s)
             snowMass = MaterialHelper.toLocalMaterialData(DefaultMaterial.SNOW, MathHelper.clamp(baseSnowHeight - decreaseFactor, 0, 8));
         }
-        world.setBlock(x, y, z, snowMass, null, false);
+        world.setBlock(x, y, z, snowMass, null, chunkBeingPopulated);
     }
 
     /**
@@ -191,16 +201,16 @@ public class FrozenSurfaceHelper
      * @param y Location Y
      * @param z Location Z
      */
-    private void propagateFreeze(int x, int y, int z)
+    private void propagateFreeze(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        this.propagationHelper(x+1, y, z);
-        this.propagationHelper(x+1, y, z+1);
-        this.propagationHelper(x, y, z+1);
-        this.propagationHelper(x-1, y, z+1);
-        this.propagationHelper(x-1, y, z);
-        this.propagationHelper(x-1, y, z-1);
-        this.propagationHelper(x, y, z-1);
-        this.propagationHelper(x+1, y, z-1);
+        this.propagationHelper(x+1, y, z, chunkBeingPopulated);
+        this.propagationHelper(x+1, y, z+1, chunkBeingPopulated);
+        this.propagationHelper(x, y, z+1, chunkBeingPopulated);
+        this.propagationHelper(x-1, y, z+1, chunkBeingPopulated);
+        this.propagationHelper(x-1, y, z, chunkBeingPopulated);
+        this.propagationHelper(x-1, y, z-1, chunkBeingPopulated);
+        this.propagationHelper(x, y, z-1, chunkBeingPopulated);
+        this.propagationHelper(x+1, y, z-1, chunkBeingPopulated);
     }
 
     /**
@@ -209,11 +219,11 @@ public class FrozenSurfaceHelper
      * @param y Location Y
      * @param z Location Z
      */
-    private void propagationHelper(int x, int y, int z)
+    private void propagationHelper(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        if (world.getHighestBlockYAt(x, z)-1 > y && this.currentPropagationSize < this.maxPropagationSize)
+        if (world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated)-1 > y && this.currentPropagationSize < this.maxPropagationSize)
         {
-            this.freezeLiquid(x, y, z);
+            this.freezeLiquid(x, y, z, chunkBeingPopulated);
         }
     }
 

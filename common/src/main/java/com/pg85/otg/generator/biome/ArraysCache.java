@@ -2,10 +2,9 @@ package com.pg85.otg.generator.biome;
 
 import java.util.ArrayList;
 
-// TODO: Is this actually useful? Remove or rewrite this and document it.
+// Used to prevent creating new arrays during biomegen.
 public class ArraysCache
 {
-
     private int[][] smallArrays = new int[128][];
     private int smallArraysNext = 0;
     private ArrayList<int[]> bigArrays = new ArrayList<int[]>();
@@ -25,8 +24,7 @@ public class ArraysCache
         smallArraysNext = 0;
         bigArraysNext = 0;
         isFree = true;
-        outputType = OutputType.FULL;
-        
+        outputType = OutputType.FULL;       
         smallArrays = new int[128][];
         bigArrays = new ArrayList<int[]>();
     }

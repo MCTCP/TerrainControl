@@ -8,6 +8,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.MaterialHelper;
 
@@ -148,14 +149,14 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
     }    
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean allowOutsidePopulatingArea)
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
         for (int i = 0; i < blockCount; i++)
         {
             if (random.nextInt(100) < blockChances[i])
             {
                 blocks[i].parseForWorld(world);
-                world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
+                world.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated);
                 break;
             }
         }

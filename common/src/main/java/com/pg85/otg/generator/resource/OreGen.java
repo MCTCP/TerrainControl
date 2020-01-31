@@ -4,6 +4,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -76,8 +77,10 @@ public class OreGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
         parseMaterials(world, material, sourceBlocks);
         
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
@@ -125,9 +128,9 @@ public class OreGen extends Resource
                             {
                                 double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);     
                                 
-                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getMaterial(i3, i4, i5, false)))
+                                if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getMaterial(i3, i4, i5, chunkBeingPopulated)))
                                 {
-                                    world.setBlock(i3, i4, i5, material, null, false);
+                                    world.setBlock(i3, i4, i5, material, null, chunkBeingPopulated);
                                 }
                             }
                         }

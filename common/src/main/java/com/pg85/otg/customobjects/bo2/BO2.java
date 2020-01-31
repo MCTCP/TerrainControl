@@ -76,8 +76,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
         for (ObjectCoordinate point : data)
         {
-            DefaultMaterial material = world.getMaterial(x + point.x, y + point.y, z + point.z,
-                    false).toDefaultMaterial();
+            DefaultMaterial material = world.getMaterial(x + point.x, y + point.y, z + point.z, null).toDefaultMaterial();
 
             // Do not spawn if non-tree blocks are in the way
             if (material != DefaultMaterial.AIR && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2)
@@ -90,12 +89,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             {
                 blocksToSpawn.add(point);
             }
-
         }
 
         for (ObjectCoordinate point : blocksToSpawn)
         {
-            setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
+            setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, null);
         }
         return true;
     }
@@ -105,34 +103,26 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     {
         ObjectCoordinate[] data = this.data[rotation.getRotationId()];
 
+        LocalMaterialData worldMaterial;
         // Spawn
         for (ObjectCoordinate point : data)
         {
-            if (world.isNullOrAir(x + point.x, y + point.y, z + point.z, false))
+            if ((worldMaterial = world.getMaterial(x + point.x, y + point.y, z + point.z, null)) != null)
             {
-                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
-            }
-			else if (dig)
-            {
-                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false);
+    			if(worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
+            	{
+    				setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null);
+	            }
+				else if (dig)
+	            {
+	                setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null);
+	            }
             }
         }
         return true;
     }
-
-    @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
-    {
-    	throw new RuntimeException();
-    }
-
-    @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
-    {
-    	throw new RuntimeException();
-    }
-
-    private boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z)
+    
+    private boolean canSpawnAt(LocalWorld world, Rotation rotation, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {    	
         // Basic checks
     	
@@ -146,18 +136,24 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             return false;
         }
 
-        if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z, false)))
+        if (!spawnOnBlockType.contains(world.getMaterial(x, y - 1, z, chunkBeingPopulated)))
         {
             return false;
         }
 
-        if (needsFoundation && world.isNullOrAir(x, y - 5, z, false))
+        LocalMaterialData worldMaterial = world.getMaterial(x, y - 5, z, chunkBeingPopulated);
+        if (needsFoundation && worldMaterial == null || worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
         {
             return false;
         }
 
-        LocalMaterialData checkBlock = !spawnWater || !spawnLava ? world.getMaterial(x, y + 2, z, false) : null;
-        DefaultMaterial checkBlockDefaultMaterial = checkBlock.toDefaultMaterial();
+        LocalMaterialData checkBlock = !spawnWater || !spawnLava ? world.getMaterial(x, y + 2, z, chunkBeingPopulated) : null;
+        DefaultMaterial checkBlockDefaultMaterial = checkBlock != null ? checkBlock.toDefaultMaterial() : null;
+        if(checkBlock == null)
+        {
+        	// Tried to spawn in unloaded chunks when populationBoundsCheck:false.
+        	return false;
+        }
         if (!spawnWater)
         {
             if (checkBlockDefaultMaterial.equals(DefaultMaterial.WATER) || checkBlockDefaultMaterial.equals(DefaultMaterial.STATIONARY_WATER))
@@ -173,7 +169,12 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             }
         }
 
-        int checkLight = !spawnSunlight || !spawnDarkness ? world.getLightLevel(x, y + 2, z) : 0;
+        int checkLight = !spawnSunlight || !spawnDarkness ? world.getLightLevel(x, y + 2, z, chunkBeingPopulated) : 0;
+        if(checkLight == -1)
+        {
+        	// Tried to spawn in unloaded chunk.
+        	return false;
+        }
         if (!spawnSunlight)
         {
             if (checkLight > 8)
@@ -188,12 +189,10 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
                 return false;
             }
         }        
-        
-        ObjectCoordinate[] objData = this.data[rotation.getRotationId()];
 
         HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
-        ChunkCoordinate chunkCoord;        
-
+        ChunkCoordinate chunkCoord;
+        ObjectCoordinate[] objData = this.data[rotation.getRotationId()];
         for (ObjectCoordinate point : objData)
         {
             if (y + point.y < PluginStandardValues.WORLD_DEPTH || y + point.y >= PluginStandardValues.WORLD_HEIGHT)
@@ -204,8 +203,9 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         	chunkCoord = ChunkCoordinate.fromBlockCoords((x + point.x), (z + point.z));
     		
         	if(!loadedChunks.contains(chunkCoord))
-    		{        		
-	            if (!world.isLoaded((x + point.x), (y + point.y), (z + point.z)))
+    		{     
+        		if(chunkBeingPopulated != null && !OTG.IsInAreaBeingPopulated(x + point.x, z + point.z, chunkBeingPopulated))
+	            //if (!world.chunkExists((x + point.x), (y + point.y), (z + point.z)))
 	            {
 	                // Cannot spawn BO2, part of world is not loaded
 	                return false;
@@ -213,23 +213,20 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 	            loadedChunks.add(chunkCoord);
     		}
         }
-
-        if(!((int)collisionPercentage < 100))
-        {
-        	throw new RuntimeException();
-        }
         
-        if (!dig && (int)collisionPercentage < 100)
+        if (!dig && (int)Math.floor(collisionPercentage) < 100)
         {
 	        // Check all blocks
 	        int faultCounter = 0;
 	        int maxBlocksOutsideSourceBlock = (int)Math.ceil(objData.length * (collisionPercentage / 100.0));
+	        LocalMaterialData material;
 	        for (ObjectCoordinate point : objData)
 	        {
-	            if (collisionBlockType.contains(world.getMaterial((x + point.x), (y + point.y), (z + point.z), false)))
+	            if ((material = world.getMaterial((x + point.x), (y + point.y), (z + point.z), chunkBeingPopulated)) == null || collisionBlockType.contains(material))
 	            {
 	                faultCounter++;
-	                if (faultCounter > maxBlocksOutsideSourceBlock)
+	                // Don't spawn if blocks would be cut off.
+	                if (material == null || faultCounter > maxBlocksOutsideSourceBlock)
 	                {
 	                    return false;
 	                }
@@ -248,27 +245,21 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     }    
 
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
-   		return spawn(world, random, x, z, this.spawnElevationMin, this.spawnElevationMax);
-    }
-    
-    @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
-    {
-   		return spawn(world, random, x, z, minY, maxY);
+   		return spawn(world, random, x, z, minY == -1 ? this.spawnElevationMin : minY, maxY == -1 ? this.spawnElevationMax : maxY, chunkBeingPopulated);
     } 
     
-    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY)
+    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
         int y;
         if (spawnAboveGround)
         {
-            y = world.getSolidHeight(x, z);
+            y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
         }
         else if (spawnUnderGround)
         {
-            int solidHeight = world.getSolidHeight(x, z);
+            int solidHeight = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
             if (solidHeight < 1 || solidHeight <= minY)
             {
                 return false;
@@ -279,7 +270,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             }
             y = random.nextInt(solidHeight - minY) + minY;
         } else {
-            y = world.getHighestBlockYAt(x, z);
+            y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
         }
 
         if (y < 0)
@@ -289,19 +280,33 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
         Rotation rotation = randomRotation ? Rotation.getRandomRotation(random) : Rotation.NORTH;
 
-        if (!canSpawnAt(world, rotation, x, y, z))
+        if (!canSpawnAt(world, rotation, x, y, z, chunkBeingPopulated))
         {
             return false;
         }
-
-        boolean objectSpawned = spawnForced(world, random, rotation, x, y, z);
-
-//        if (objectSpawned)
-//            GenerateCustomObjectFromGroup(world, random, x, y, z);
-
-        return objectSpawned;
+        
+        ObjectCoordinate[] data = this.data[rotation.getRotationId()];
+        
+        LocalMaterialData worldMaterial;
+        // Spawn
+        for (ObjectCoordinate point : data)
+        {
+            if ((worldMaterial = world.getMaterial(x + point.x, y + point.y, z + point.z, chunkBeingPopulated)) != null)
+            {
+        		if(worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
+	            {
+	                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated);
+	            }
+				else if (dig)
+	            {
+	                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated);
+	            }
+            }
+        }
+        return true;
     }
 
+    // Called during population.
     @Override
     public boolean process(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
     {
@@ -321,7 +326,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
-            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax);
+            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax, chunkCoord);
         }
 
         return objectSpawned;
@@ -414,7 +419,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
     }
 
-    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn)
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated)
     {
         HashMap<DefaultMaterial, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
         if (blocksToReplace != null && blocksToReplace.size() > 0)
@@ -428,7 +433,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         
         material.parseForWorld(world);
 
-        world.setBlock(x, y, z, material, metaDataTag, false);
+        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
     }
 
     @Override

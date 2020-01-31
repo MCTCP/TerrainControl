@@ -7,16 +7,12 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
-import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
-import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
@@ -26,20 +22,16 @@ import com.pg85.otg.forge.generator.structure.*;
 import com.pg85.otg.forge.util.ForgeMaterialData;
 import com.pg85.otg.forge.util.IOHelper;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
-import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
-import com.pg85.otg.generator.terrain.CavesGen;
-import com.pg85.otg.generator.terrain.TerrainGenBase;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
@@ -60,7 +52,6 @@ import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -276,14 +267,6 @@ public class ForgeWorld implements LocalWorld
     }
         
     @Override
-    public int getLightLevel(int x, int y, int z)
-    {
-        // Actually, this calculates the block and skylight as it were day.
-        return this.world.getLight(new BlockPos(x, y, z));
-    }
-
-    // OTG+ structure cache
-    @Override
     public CustomStructureCache getStructureCache()
     {
         return this.structureCache;
@@ -312,12 +295,6 @@ public class ForgeWorld implements LocalWorld
 	{
 		return getWorld().provider.getDimension();
 	}
-            
-	@Override
-	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
-	{
-		this.getChunkGenerator().setAllowSpawningOutsideBounds(allowSpawningOutsideBounds);
-	}
     
     public BlockPos getSpawnPoint()
     {
@@ -325,16 +302,10 @@ public class ForgeWorld implements LocalWorld
     }
     
     @Override
-    public void startPopulation(ChunkCoordinate chunkCoord)
-    {
-    	// TODO: Only used for Spigot, remove?
-    }
+    public void startPopulation(ChunkCoordinate chunkCoord) { }
 
     @Override
-    public void endPopulation()
-    {
-    	// TODO: Only used for Spigot, remove?
-    }
+    public void endPopulation() { }
     
     // World session
     
@@ -466,17 +437,6 @@ public class ForgeWorld implements LocalWorld
     	return ChunkCoordinate.fromBlockCoords(spawnPos.getX(), spawnPos.getZ());
     }
     
-    public Chunk getChunk(int x, int z, boolean allowOutsidePopulatingArea)
-    {
-    	return this.getChunkGenerator().getChunk(x, z, allowOutsidePopulatingArea);
-    }
-    
-    @Override
-    public boolean isLoaded(int x, int y, int z)
-    {
-        return getChunk(x, z, false) != null;
-    }   
-    
     @Override
 	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
 	{
@@ -484,11 +444,29 @@ public class ForgeWorld implements LocalWorld
 	}
 
     // Blocks
+
+    @Override
+    public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    {   	
+    	// We can't check light without loading the chunk, so never allow getLightLevel to load unloaded chunks.
+    	// TODO: Check if this doesn't cause problems with BO3 LightChecks.
+    	// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+			//|| getChunkGenerator().chunkExists(x, z)
+    		|| (chunkBeingPopulated == null && world.isBlockLoaded(new BlockPos(x,255,z)))
+		)
+    	{
+	        // This calculates the block and skylight as if it were day.
+	        return this.world.getLight(new BlockPos(x, y, z));
+    	}
+		return -1;
+    }
     
     @Override
-    public int getLiquidHeight(int x, int z)
+    public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int highestY = getHighestBlockYAt(x, z, false, true, false, false);
+        int highestY = getHighestBlockYAt(x, z, false, true, false, false, chunkBeingPopulated);
         if(highestY > 0)
         {
         	highestY += 1;
@@ -499,9 +477,9 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public int getSolidHeight(int x, int z)
+    public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int highestY = getHighestBlockYAt(x, z, true, false, true, true);
+        int highestY = getHighestBlockYAt(x, z, true, false, true, true, chunkBeingPopulated);
         if(highestY > 0)
         {
         	highestY += 1;
@@ -509,48 +487,45 @@ public class ForgeWorld implements LocalWorld
         	highestY = -1;
         }
 		return highestY;
-    }
-   
-    // Not used by OTG+
+	}
+
     @Override
-    public int getHighestBlockYAt(int x, int z)
+    public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        Chunk chunk = this.getChunk(x, z, false);
-        if (chunk == null)
-        {
+    	return getHighestBlockYAt(x, z, true, true, false, true, chunkBeingPopulated) + 1;
+    }
+    
+    @Override
+    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, ChunkCoordinate chunkBeingPopulated)
+    {
+        // If the chunk exists or is inside the area being populated, fetch it normally.
+        Chunk chunk = null;
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+			//|| getChunkGenerator().chunkExists(x, z)
+		)
+    	{
+    		chunk = getChunkGenerator().getChunk(x, z);
+    	}
+		// If the chunk doesn't exist and we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if(chunk == null && chunkBeingPopulated == null)
+		{
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(world.isBlockLoaded(new BlockPos(x,255,z)))
+    		{
+    			chunk = getChunkGenerator().getChunk(x, z);
+    		} else {
+    			// Calculate the height without loading the chunk.
+    			return generator.getHighestBlockYInUnloadedChunk(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+    		}
+    	}
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null)
+    	{
             return -1;
-        }
-
-        int y = chunk.getHeightValue(x & 0xf, z & 0xf);
-
-        // Fix for incorrect light map
-        // TODO: Fix this properly?
-        boolean incorrectHeightMap = false;
-        while (y < getHeightCap() && chunk.getBlockState(x, y, z).getMaterial().blocksLight())
-        {
-            y++;
-            incorrectHeightMap = true;
-        }
-        if (incorrectHeightMap)
-        {
-            // Let Minecraft know that it made an error
-            this.world.checkLight(new BlockPos(x, y, z));
-        }
-
-        return y;
-    }
-
-    // Only used by OTG+
-    @Override
-    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
-    {
-        Chunk chunk = this.getChunk(x, z, true);
-        if (chunk == null)
-        {
-        	int y = generator.getHighestBlockYInUnloadedChunk(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
-        	return y;
-        }
-
+    	}
+    	
 		// Get internal coordinates for block in chunk
         z &= 0xF;
         x &= 0xF;
@@ -571,86 +546,84 @@ public class ForgeWorld implements LocalWorld
         		}
             	if((findSolid && isLiquid) || (findLiquid && isSolid))
             	{
+            		// Found an illegal block (liquid when looking for solid, or vice-versa)
             		return -1;
             	}
         	}
         }
 
     	// Can happen if this is a chunk filled with air
-
         return -1;
-    }
-
-    @Override
-    public boolean isNullOrAir(int x, int y, int z, boolean isOTGPlus)
-    {
-    	if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
-    	{
-    		return true;
-    	}
-
-        Chunk chunk = this.getChunk(x, z, isOTGPlus);
-        if (chunk == null)
-        {
-        	return true;
-        }
-
-        return chunk.getBlockState(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
     }
     
     @Override
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
+    public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
         if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
         {
         	return null;
-        	//throw new RuntimeException();
         }
 
-        // TODO: Return null when attempting to fetch/set blocks outside of populating area && !allowOutsidePopulatingArea?
-        Chunk chunk = this.getChunk(x, z, allowOutsidePopulatingArea);
-
-        if(chunk == null && !allowOutsidePopulatingArea)
-        {
-        	return null;
-        }
-
-        // Can happen when requesting a chunk outside the world border
-        // or a chunk that has not yet been populated
-        if (chunk == null)
+        // If the chunk exists or is inside the area being populated, fetch it normally.
+        Chunk chunk = null;
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated)) 
+			//|| getChunkGenerator().chunkExists(x, z)			
+		)
+    	{
+    		chunk = getChunkGenerator().getChunk(x, z);
+    	}
+    	
+		// If the chunk doesn't exist and we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if(chunk == null && chunkBeingPopulated == null)
 		{
-        	return generator.getMaterialInUnloadedChunk(x,y,z);
-        	//throw new RuntimeException();
-		}
-
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(world.isBlockLoaded(new BlockPos(x,255,z)))
+    		{
+    			chunk = getChunkGenerator().getChunk(x, z);
+    		} else {
+    			// Calculate the material without loading the chunk.
+    			return generator.getMaterialInUnloadedChunk(x,y,z);
+    		}
+    	}
+    	
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null)
+    	{
+            return null;
+    	}
+    	
 		// Get internal coordinates for block in chunk
         z &= 0xF;
-        x &= 0xF;
-
-        ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(x, y, z));
-
-        return material;
+        x &= 0xF;	
+        return ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(x, y, z));		               
     }
     
     @Override
-    public LocalMaterialData[] getBlockColumn(int x, int z)
+    public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z)
     {
     	//OTG.log(LogMarker.INFO, "getBlockColumn at X" + x + " Z" + z);
     	return generator.getBlockColumnInUnloadedChunk(x,z);
     }
 
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
     {
-    	this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag, allowOutsidePopulatingArea);
+    	// If no chunk was passed, we're doing something outside of the population cycle.
+    	// If a chunk was passed, only spawn in the area being populated, or existing chunks.
+    	if(
+			chunkBeingPopulated == null || 
+			(
+				OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated) //|| 
+				//getChunkGenerator().chunkExists(x, z)
+			)
+		)
+    	{
+    		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag);
+    	}
     }
 
-    @Override
-    public NamedBinaryTag getMetadata(int x, int y, int z)
-    {
-       return NBTHelper.getMetadata(world, x, y, z);
-    }
-    
     // Structures / trees
 
     @Override
@@ -822,6 +795,7 @@ public class ForgeWorld implements LocalWorld
         BlockPos blockPos = new BlockPos(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter());
         // Allow OTG structures to spawn on top of strongholds
         // Allow OTG structures to spawn on top of mine shafts
+        // TODO: VIllage gen detection doesn't appear to be working too well, fix..
         return 
 		(worldConfig.villagesEnabled && this.villageGen instanceof OTGVillageGen && ((OTGVillageGen)this.villageGen).isInsideStructure(blockPos)) ||
 		(worldConfig.villagesEnabled && !(this.villageGen instanceof OTGVillageGen) && this.villageGen.isInsideStructure(blockPos)) ||
@@ -835,6 +809,7 @@ public class ForgeWorld implements LocalWorld
         ;
 	}
 	
+	// TODO: No clue what this is used for, leads to some MC advancements "test" code. 
     public boolean isInsideStructure(String structureName, BlockPos pos)
     {
         //if (!this.mapFeaturesEnabled)
@@ -921,10 +896,10 @@ public class ForgeWorld implements LocalWorld
             return;
         }
 
-    	replaceBlocks(this.getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ() + 16, false), 0, 0, 16);
-    	replaceBlocks(this.getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ() + 16, false), 0, 0, 16);
-    	replaceBlocks(this.getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ(), false), 0, 0, 16);
-    	replaceBlocks(this.getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ(), false), 0, 0, 16);
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ() + 16), 0, 0, 16);
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ() + 16), 0, 0, 16);
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ()), 0, 0, 16);
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ()), 0, 0, 16);
     }
 
     private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk, int size)
@@ -1036,8 +1011,8 @@ public class ForgeWorld implements LocalWorld
     // Entity spawning
     	
     @Override
-    public void spawnEntity(EntityFunction<?> entityData)
-    {
+    public void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated)
+    { 	
     	if(OTG.getPluginConfig().spawnLog)
     	{
     		OTG.log(LogMarker.DEBUG, "Attempting to spawn BO3 Entity() " + entityData.groupSize + " x " + entityData.mobName + " at " + entityData.x + " " + entityData.y + " " + entityData.z);
@@ -1210,12 +1185,21 @@ public class ForgeWorld implements LocalWorld
 
     					((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
 
-    			    	if(OTG.getPluginConfig().spawnLog)
-    			    	{
-    			    		OTG.log(LogMarker.DEBUG, "Spawned OK");
-    			    	}
-
-    					world.spawnEntity(entityliving);
+    					if(
+							chunkBeingPopulated == null || 
+							(
+								OTG.IsInAreaBeingPopulated((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ), chunkBeingPopulated)// || 
+								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
+							)
+						)
+    					{
+	    			    	if(OTG.getPluginConfig().spawnLog)
+	    			    	{
+	    			    		OTG.log(LogMarker.DEBUG, "Spawned OK");
+	    			    	}
+	
+	    					world.spawnEntity(entityliving);
+    					}
 	            	}
 	            } else {
 	            	for(int r = 0; r < groupSize; r++)
@@ -1284,7 +1268,21 @@ public class ForgeWorld implements LocalWorld
     			    		((EntityItemFrame)entityliving).facingDirection = ((EntityItemFrame)entityliving).facingDirection == null ? EnumFacing.SOUTH : ((EntityItemFrame)entityliving).facingDirection;  
     			    	}
 
-	            		world.spawnEntity(entityliving);
+    					if(
+							chunkBeingPopulated == null || 
+							(
+								OTG.IsInAreaBeingPopulated((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ), chunkBeingPopulated)// || 
+								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
+							)
+						)
+    					{
+	    			    	if(OTG.getPluginConfig().spawnLog)
+	    			    	{
+	    			    		OTG.log(LogMarker.DEBUG, "Spawned OK");
+	    			    	}
+	
+	    					world.spawnEntity(entityliving);
+    					}
 	            	}
 	            }
             }
@@ -1311,14 +1309,20 @@ public class ForgeWorld implements LocalWorld
 		return this.world.getWorldBorder().contains(new BlockPos(chunkCoordinate.getBlockXCenter(), 0, chunkCoordinate.getBlockZCenter()));
 	}
 	
+	private boolean isOTGPlusLoaded = false;
+	private boolean isOTGPlus = false;
 	@Override
 	public boolean isOTGPlus()
 	{
-		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.getName());
-		if(dimConfig != null && dimConfig.Settings.IsOTGPlus)		
+		if(!isOTGPlusLoaded)
 		{
-			return true;
+			isOTGPlusLoaded = true;
+			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.getName());
+			if(dimConfig != null && dimConfig.Settings.IsOTGPlus)		
+			{
+				isOTGPlus = true;
+			}
 		}
-		return false;
+		return isOTGPlus;
 	}
 }
