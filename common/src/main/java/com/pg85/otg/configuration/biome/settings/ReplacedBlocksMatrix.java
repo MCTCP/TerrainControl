@@ -1,10 +1,9 @@
 package com.pg85.otg.configuration.biome.settings;
 
 import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -107,14 +106,7 @@ public class ReplacedBlocksMatrix
      */
     private final int maxHeight;
     private List<ReplacedBlocksInstruction> instructions;
-
-    /**
-     * The compiled ReplacedBlocks instructions. Don't change this variable.
-     * May be null when this biome {@link #hasReplaceSettings() doesn't
-     * replace blocks}.
-     */
-    public LocalMaterialData[][] compiledInstructions;
-
+        
     public ReplacedBlocksMatrix(String setting, int maxHeight) throws InvalidConfigException
     {
         this.maxHeight = maxHeight;
@@ -156,7 +148,7 @@ public class ReplacedBlocksMatrix
      */
     public boolean hasReplaceSettings()
     {
-        return this.compiledInstructions != null;
+        return this.instructions != null && this.instructions.size() > 0;
     }
 
     /**
@@ -182,26 +174,7 @@ public class ReplacedBlocksMatrix
 
         if (this.instructions.size() == 0)
         {
-            this.compiledInstructions = null;
             return;
-        }
-
-        this.compiledInstructions = new LocalMaterialData[PluginStandardValues.SUPPORTED_BLOCK_IDS][];
-        for (ReplacedBlocksInstruction instruction : instructions)
-        {
-            int fromBlockId = instruction.getFrom().getBlockId();
-            int minHeight = instruction.getMinHeight();
-            int maxHeight = instruction.getMaxHeight();
-            LocalMaterialData toBlock = instruction.getTo();
-
-            if (compiledInstructions[fromBlockId] == null)
-            {
-                compiledInstructions[fromBlockId] = new LocalMaterialData[this.maxHeight + 1];
-            }
-            for (int y = minHeight; y <= maxHeight; y++)
-            {
-                compiledInstructions[fromBlockId][y] = toBlock;
-            }
         }
     }
 
