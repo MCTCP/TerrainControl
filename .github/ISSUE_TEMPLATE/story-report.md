@@ -30,4 +30,6 @@ about: An error that happens in OTG mod/plugin (not crash!).
 
 [What did you expect to happen? - Explain what you expected to happen after performing the previously described steps]
 
+[Can you provide a Minimal, Reproducible Example? See here for details: https://stackoverflow.com/help/minimal-reproducible-example]
+
 [And Delete the lines in square brackets!]
