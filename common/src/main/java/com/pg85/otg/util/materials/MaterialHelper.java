@@ -1,12 +1,13 @@
-package com.pg85.otg.util.helpers;
+package com.pg85.otg.util.materials;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.OTGEngine;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.OTGEngine;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+//TODO: Clean up and optimise ForgeMaterialData/BukkitMaterialData/LocalMaterialData/MaterialHelper/OTGEngine.readMaterial
 public class MaterialHelper
 {
     private static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
@@ -39,16 +40,16 @@ public class MaterialHelper
     		name = "SNOW_LAYER";
     	}
     	// Spigot interprets water as FLOWING_WATER and that's how TC has always seen it too so keep it that way (even though minecraft:water is actually stationary water).
-    	if(name.toLowerCase().equals("water"))
+    	else if(name.toLowerCase().equals("water"))
     	{
     		name = "FLOWING_WATER";
     	}
     	// Spigot interprets lava as FLOWING_LAVA and that's how TC has always seen it too so keep it that way (even though minecraft:lava is actually stationary lava).
-    	if(name.toLowerCase().equals("lava"))
+    	else if(name.toLowerCase().equals("lava"))
     	{
     		name = "FLOWING_LAVA";
     	}
-
+    	
     	try
     	{
     		material = OTG.getEngine().readMaterial(name);

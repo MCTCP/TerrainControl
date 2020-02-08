@@ -2,8 +2,8 @@ package com.pg85.otg.forge.generator.structure;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 

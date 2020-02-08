@@ -18,11 +18,11 @@ import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.helpers.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 
@@ -167,7 +167,7 @@ public class BO3Creator extends BOCreator
 
                     ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(block);
 
-                    if (includeAir || !material.isMaterial(DefaultMaterial.AIR))
+                    if (includeAir || !material.isAir())
                     {
                         BO3BlockFunction blockFunction;
 

@@ -10,7 +10,7 @@ import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 
 public class BO3RandomBlockFunction extends BO3BlockFunction
 {

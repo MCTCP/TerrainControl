@@ -2,8 +2,8 @@ package com.pg85.otg;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.OTGEngine;
 import com.pg85.otg.configuration.PluginConfig;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;

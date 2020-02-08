@@ -1,15 +1,10 @@
 package com.pg85.otg.customobjects.structures;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.bo3.BO3;
-import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
-import java.util.Random;
 
 /**
  * Represents an object along with its location in the world.

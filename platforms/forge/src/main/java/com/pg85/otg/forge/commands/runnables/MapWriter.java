@@ -13,7 +13,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.forge.biomes.OTGBiome;
 import com.pg85.otg.forge.commands.BaseCommand;
-import com.pg85.otg.forge.util.WorldHelper;
+import com.pg85.otg.forge.world.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.command.ICommandSender;

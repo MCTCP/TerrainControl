@@ -3,7 +3,7 @@ package com.pg85.otg.forge.commands;
 import java.util.List;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.command.ICommandSender;

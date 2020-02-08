@@ -1,7 +1,7 @@
 package com.pg85.otg.bukkit.generator;
 
 
-import com.pg85.otg.bukkit.BukkitWorld;
+import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.util.ChunkCoordinate;
 

@@ -9,25 +9,23 @@ import java.util.List;
 import java.util.Map;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.OTGEngine;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.OTGEngine;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
-import com.pg85.otg.configuration.io.FileSettingsReader;
-import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.generator.ForgeChunkBuffer;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.ForgeLogger;
-import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.generator.ChunkBuffer;
@@ -63,7 +61,7 @@ public class ForgeEngine extends OTGEngine
     public ForgeBiomeRegistryManager getBiomeRegistryManager()
     {
     	return biomeRegistryManager;
-    }     
+    }
    
     public void onSave(World world)
     {

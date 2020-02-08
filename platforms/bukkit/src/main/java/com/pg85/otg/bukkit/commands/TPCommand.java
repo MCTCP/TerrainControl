@@ -1,8 +1,8 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.bukkit.biomes.BukkitBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.ChunkCoordinate;
 

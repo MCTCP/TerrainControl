@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Random;
 
@@ -32,7 +31,6 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.OTGGuiEnterWorldName;
@@ -41,6 +39,7 @@ import com.pg85.otg.forge.gui.dimensions.base.SettingEntry;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.logging.LogMarker;
 

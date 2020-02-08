@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.minecraft.defaults.MobNames;
 
 import net.minecraft.command.ICommandSender;

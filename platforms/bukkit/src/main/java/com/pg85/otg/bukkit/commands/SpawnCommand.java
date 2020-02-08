@@ -14,7 +14,7 @@ import org.bukkit.util.BlockIterator;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
-import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.bo3.Rotation;

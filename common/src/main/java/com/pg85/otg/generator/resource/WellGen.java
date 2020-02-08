@@ -7,7 +7,6 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -92,7 +91,7 @@ public class WellGen extends Resource
         while (
     		y > minAltitude && 
     		(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
-    		worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR
+    		worldMaterial.isAir()
 		)
         {
             --y;
@@ -116,9 +115,9 @@ public class WellGen extends Resource
             {
                 if (
                 	(worldMaterial = world.getMaterial(x + i, y - 1, z + j, chunkBeingPopulated)) == null ||
-                	worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR ||
+                	worldMaterial.isAir() ||
                 	(worldMaterial = world.getMaterial(x + i, y - 2, z + j, chunkBeingPopulated)) == null ||
-                	worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR
+                	worldMaterial.isAir()
         		)
                 {
                     return;

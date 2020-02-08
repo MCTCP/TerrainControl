@@ -1,4 +1,4 @@
-package com.pg85.otg.bukkit;
+package com.pg85.otg.bukkit.util;
 
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
@@ -8,12 +8,12 @@ import org.apache.logging.log4j.LogManager;
 /**
  * Implementation of {@link Logger} for Bukkit.
  */
-final class BukkitLogger extends Logger
+public class BukkitLogger extends Logger
 {
     private final String logPrefix = "[" + PluginStandardValues.PLUGIN_NAME_SHORT + "] ";
     private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME_SHORT);
 
-    BukkitLogger(java.util.logging.Logger logger)
+    public BukkitLogger(java.util.logging.Logger logger)
     {
 
     }

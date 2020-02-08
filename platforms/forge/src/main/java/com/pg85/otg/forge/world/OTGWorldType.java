@@ -10,7 +10,6 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.biomes.OTGBiomeProvider;
 import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;

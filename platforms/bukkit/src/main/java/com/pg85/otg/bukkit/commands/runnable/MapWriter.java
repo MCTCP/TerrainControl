@@ -2,7 +2,7 @@ package com.pg85.otg.bukkit.commands.runnable;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.commands.BaseCommand;
-import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;

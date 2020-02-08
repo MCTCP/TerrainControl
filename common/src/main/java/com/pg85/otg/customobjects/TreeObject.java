@@ -1,9 +1,6 @@
 package com.pg85.otg.customobjects;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
-import com.pg85.otg.configuration.settingType.Setting;
-import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;

@@ -10,7 +10,6 @@ import java.util.Set;
 
 import com.google.common.collect.BiMap;
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -18,11 +17,11 @@ import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 

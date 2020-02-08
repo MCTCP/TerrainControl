@@ -292,6 +292,11 @@ public enum DefaultMaterial
         this.id = id;
         this.solid = true;
     }
+    
+    public boolean isAir()
+    {
+    	return this == AIR;
+    }
 
     /**
      * Returns true only if this material is flowing or stationary Water

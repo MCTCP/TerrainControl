@@ -1,8 +1,8 @@
 package com.pg85.otg.common;
 
-import com.pg85.otg.OTGEngine;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+//TODO: Clean up ForgeMaterialData/BukkitMaterialData/LocalMaterialData/MaterialHelper/OTGEngine.readMaterial
 /**
  * Represents one of Minecraft's materials. Also includes its data value.
  * Immutable.

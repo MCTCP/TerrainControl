@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 
 public class SettingsEntry
 {

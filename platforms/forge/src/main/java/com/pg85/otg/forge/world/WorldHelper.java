@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.util;
+package com.pg85.otg.forge.world;
 
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;

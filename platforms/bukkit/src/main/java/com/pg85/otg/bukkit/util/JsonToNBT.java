@@ -1,4 +1,4 @@
-package com.pg85.otg.bukkit;
+package com.pg85.otg.bukkit.util;
 
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
@@ -23,7 +23,7 @@ public class JsonToNBT // Taken from net.minecraft.nbt.JsonToNBT
 {
     private static final Pattern INT_ARRAY_MATCHER = Pattern.compile("\\[[-+\\d|,\\s]+\\]");
 
-    static NBTTagCompound getTagFromJson(String jsonString) throws NBTException
+    public static NBTTagCompound getTagFromJson(String jsonString) throws NBTException
     {
         jsonString = jsonString.trim();
 

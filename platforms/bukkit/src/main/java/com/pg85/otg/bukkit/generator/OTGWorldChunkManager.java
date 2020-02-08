@@ -1,7 +1,7 @@
 package com.pg85.otg.bukkit.generator;
 
-import com.pg85.otg.bukkit.BukkitBiome;
-import com.pg85.otg.bukkit.BukkitWorld;
+import com.pg85.otg.bukkit.biomes.BukkitBiome;
+import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;

@@ -9,7 +9,7 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 /**
@@ -98,7 +98,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         // when on water
                         if (y < currentWaterLevel && y > worldConfig.waterLevelMin && currentSurfaceBlock.isAir())
                         {
-                            if (currentTemperature < WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
+                            if (currentTemperature < WorldStandardValues.SNOW_AND_ICE_TEMP)
                             {
                                 currentSurfaceBlock = iceBlock;
                             } else {

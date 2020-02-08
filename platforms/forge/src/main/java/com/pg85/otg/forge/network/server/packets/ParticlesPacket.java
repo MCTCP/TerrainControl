@@ -13,7 +13,6 @@ import io.netty.buffer.Unpooled;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4ParticleFunction;

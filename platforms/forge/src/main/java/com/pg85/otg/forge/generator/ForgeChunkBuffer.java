@@ -1,7 +1,7 @@
 package com.pg85.otg.forge.generator;
 
 import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 

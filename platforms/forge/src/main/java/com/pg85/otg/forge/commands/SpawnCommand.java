@@ -8,24 +8,20 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.biomes.ForgeBiome;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class SpawnCommand extends BaseCommand

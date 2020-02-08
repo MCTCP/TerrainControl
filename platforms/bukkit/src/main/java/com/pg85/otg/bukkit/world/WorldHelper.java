@@ -1,7 +1,7 @@
-package com.pg85.otg.bukkit.util;
+package com.pg85.otg.bukkit.world;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.bukkit.OTGBiomeBase;
+import com.pg85.otg.bukkit.biomes.OTGBiomeBase;
 import com.pg85.otg.common.LocalWorld;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;

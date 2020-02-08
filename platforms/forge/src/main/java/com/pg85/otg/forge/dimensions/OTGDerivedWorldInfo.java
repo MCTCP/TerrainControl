@@ -2,7 +2,6 @@ package com.pg85.otg.forge.dimensions;
 
 import javax.annotation.Nullable;
 
-import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.OTGPlugin;
 
 import net.minecraft.nbt.NBTTagCompound;

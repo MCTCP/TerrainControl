@@ -1,9 +1,9 @@
-package com.pg85.otg.bukkit;
+package com.pg85.otg.bukkit.biomes;
 
-import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.common.BiomeIds;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.util.BiomeIds;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -35,7 +35,7 @@ public class BukkitBiome implements LocalBiome
      * @param biomeIds    Ids of the custom biome.
      * @return The custom biome.
      */
-    static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName, boolean isReload)
+    public static BukkitBiome forCustomBiome(BiomeConfig biomeConfig, BiomeIds biomeIds, String worldName, boolean isReload)
     {
         return new BukkitBiome(biomeConfig, OTGBiomeBase.createInstance(biomeConfig, biomeIds, worldName, isReload));
     }

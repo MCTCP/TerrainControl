@@ -31,7 +31,6 @@ public class ArraysCache
 
     public int[] getArray(int size)
     {
-
         if (size <= 256)
         {
             int[] array = smallArrays[smallArraysNext];
@@ -50,8 +49,7 @@ public class ArraysCache
         {
             array = new int[size];
             bigArrays.add(array);
-        } else
-        {
+        } else {
             array = (int[]) bigArrays.get(bigArraysNext);
             if (array.length < size)
             {
@@ -62,6 +60,5 @@ public class ArraysCache
 
         bigArraysNext++;
         return array;
-
     }
 }

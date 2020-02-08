@@ -15,8 +15,8 @@ import com.pg85.otg.generator.terrain.RavinesGen;
 import com.pg85.otg.generator.terrain.TerrainGenBase;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.MathHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;

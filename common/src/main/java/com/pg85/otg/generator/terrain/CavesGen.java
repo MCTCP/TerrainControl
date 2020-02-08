@@ -1,9 +1,7 @@
 package com.pg85.otg.generator.terrain;
 
-import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -86,7 +84,8 @@ public class CavesGen extends TerrainGenBase
         LocalMaterialData block;
         
     	int surfaceBlockDepth;
-        
+    	LocalMaterialData surfaceBlockMaterial;
+    	
         for (; angle < maxAngle; angle++)
         {
             d3 = 1.5D + MathHelper.sin(angle * 3.141593F / maxAngle) * paramFloat1 * 1.0F;
@@ -216,7 +215,7 @@ public class CavesGen extends TerrainGenBase
                     d10 = (local_z + generatingChunk.getBlockZ() + 0.5D - z) / d3;
 
                     surfaceBlockFound = false;
-                    LocalMaterialData surfaceBlockMaterial = null;
+                    surfaceBlockMaterial = null;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
                     	surfaceBlockDepth = 0;

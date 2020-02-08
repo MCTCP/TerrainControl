@@ -1,15 +1,16 @@
-package com.pg85.otg.bukkit;
+package com.pg85.otg.bukkit.biomes;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.EnumHelper;
 import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
-import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.common.BiomeIds;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.StringHelper;
 import net.minecraft.server.v1_12_R1.BiomeBase;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
@@ -55,7 +56,7 @@ public class OTGBiomeBase extends BiomeBase
             {
                 a(); // disableRain()
             }
-            if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
+            if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_TEMP)
             {
                 b(); // enableSnowfall()
             }

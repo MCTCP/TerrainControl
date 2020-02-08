@@ -4,7 +4,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.structures.CustomStructure;

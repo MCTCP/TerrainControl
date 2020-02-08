@@ -3,7 +3,6 @@ package com.pg85.otg.customobjects.structures;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
