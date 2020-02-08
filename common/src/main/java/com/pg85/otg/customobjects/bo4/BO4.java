@@ -1,10 +1,6 @@
 package com.pg85.otg.customobjects.bo4;
 
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
@@ -18,32 +14,18 @@ import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
-import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobjects.structures.Branch;
-import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 
 public class BO4 implements StructuredCustomObject
 {
@@ -352,7 +334,7 @@ public class BO4 implements StructuredCustomObject
 
 	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(x + newBlock.x, z + newBlock.z)))
 	        	{
-	        		int highestBlockY = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false, chunkBeingPopulated);        		
+	        		int highestBlockY = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false, true, chunkBeingPopulated);        		
 	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH) // Can happen for chunks filled with air, or null chunks (TODO: Null chunks shouldn't happen here, confirm they don't.)
 	        		{
 	        			highestBlockY = 1;
@@ -382,7 +364,7 @@ public class BO4 implements StructuredCustomObject
 	        		{
 	        			coordsAboveDone.add(new Object[] { x + newBlock.x, z + newBlock.z });
 	        			int blockY = y + newBlock.y + 1; // TODO: This is wrong, should be the lowest block in the BO3 at these x-z coordinates. ReplaceAbove should be done before any blocks in this column are placed
-        				int highestBlockToReplace = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false, chunkBeingPopulated);
+        				int highestBlockToReplace = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false, true, chunkBeingPopulated);
 
 	        			while(blockY <= highestBlockToReplace && blockY > y + newBlock.y)
 	        			{
@@ -599,7 +581,7 @@ public class BO4 implements StructuredCustomObject
 	        			coordsAboveDone.add(new Object[] { x + block.x, z + block.z });
         				short blockY = (short) (y + block.y + 1); // TODO: This is wrong, should be the lowest block in the BO3 at these x-z coordinates. replaceAbove should be done before any blocks in this column are placed
 
-        				int highestBlockToReplace = world.getHighestBlockYAt(x + block.x, z + block.z, true, true, false, false, chunkBeingPopulated);
+        				int highestBlockToReplace = world.getHighestBlockYAt(x + block.x, z + block.z, true, true, false, false, true, chunkBeingPopulated);
 
 	        			// TODO: Use world height constant (dunno what its called and where its at)??
 	        			while(blockY <= highestBlockToReplace && blockY > y + block.y)
@@ -624,7 +606,7 @@ public class BO4 implements StructuredCustomObject
 
             	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
             	        	{
-            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, chunkBeingPopulated);
+            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, true, chunkBeingPopulated);
             	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
             	        		{
             	        			highestBlockY = 1;
@@ -685,7 +667,7 @@ public class BO4 implements StructuredCustomObject
 
 	            	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
 	            	        	{
-	            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, chunkBeingPopulated);
+	            	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, true, chunkBeingPopulated);
 	            	        		if(highestBlockY <= PluginStandardValues.WORLD_DEPTH)
 	            	        		{
 	            	        			highestBlockY = 1;
@@ -732,7 +714,7 @@ public class BO4 implements StructuredCustomObject
 
     	        	if(!OriginalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z)))
     	        	{
-    	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, chunkBeingPopulated);
+    	        		int highestBlockY = world.getHighestBlockYAt(blockToQueueForSpawn.x, blockToQueueForSpawn.z, true, true, false, false, true, chunkBeingPopulated);
     	        		if(highestBlockY > PluginStandardValues.WORLD_DEPTH)
     	        		{
     	        			OriginalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z), world.getMaterial(blockToQueueForSpawn.x, highestBlockY, blockToQueueForSpawn.z, chunkBeingPopulated));

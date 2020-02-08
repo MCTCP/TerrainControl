@@ -1,12 +1,12 @@
-package com.pg85.otg.forge;
+package com.pg85.otg.forge.world;
 
 import com.pg85.otg.*;
-import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
@@ -19,21 +19,21 @@ import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.generator.ForgeChunkBuffer;
 import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
-import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.IOHelper;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
-import com.pg85.otg.forge.util.WorldHelper;
-import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
+import com.pg85.otg.generator.terrain.CavesGen;
+import com.pg85.otg.generator.terrain.RavinesGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
@@ -82,7 +82,7 @@ import java.util.*;
 public class ForgeWorld implements LocalWorld
 {
     public static final int MAX_BIOMES_COUNT = 4096;
-    private static final int MAX_SAVED_BIOMES_COUNT = 255;
+    private static final int MAX_SAVED_BIOMES_COUNT = 256;
     public static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
     
 	private ForgeWorldSession worldSession;
@@ -147,7 +147,8 @@ public class ForgeWorld implements LocalWorld
         this.dungeonGen = new WorldGenDungeons();
         this.fossilGen = new WorldGenFossils();
         this.netherFortressGen = new OTGNetherFortressGen(this);
-        this.cavesGen = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new MapGenCaves(), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.CAVE);
+        
+        this.cavesGen = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(null, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.CAVE);
         this.strongholdGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGStrongholdGen(configs, world), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
         this.villageGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGVillageGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
         this.mineshaftGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGMineshaftGen(this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);        
@@ -448,6 +449,11 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {   	
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return -1;
+    	}
+    	
     	// We can't check light without loading the chunk, so never allow getLightLevel to load unloaded chunks.
     	// TODO: Check if this doesn't cause problems with BO3 LightChecks.
     	// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
@@ -466,7 +472,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int highestY = getHighestBlockYAt(x, z, false, true, false, false, chunkBeingPopulated);
+        int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingPopulated);
         if(highestY > 0)
         {
         	highestY += 1;
@@ -479,7 +485,7 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int highestY = getHighestBlockYAt(x, z, true, false, true, true, chunkBeingPopulated);
+        int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingPopulated);
         if(highestY > 0)
         {
         	highestY += 1;
@@ -492,11 +498,11 @@ public class ForgeWorld implements LocalWorld
     @Override
     public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-    	return getHighestBlockYAt(x, z, true, true, false, true, chunkBeingPopulated) + 1;
+    	return getHighestBlockYAt(x, z, true, true, false, false, false, chunkBeingPopulated) + 1;
     }
     
     @Override
-    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, ChunkCoordinate chunkBeingPopulated)
+    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingPopulated)
     {
         // If the chunk exists or is inside the area being populated, fetch it normally.
         Chunk chunk = null;
@@ -527,18 +533,52 @@ public class ForgeWorld implements LocalWorld
     	}
     	
 		// Get internal coordinates for block in chunk
-        z &= 0xF;
-        x &= 0xF;
+        int internalX = x & 0xF;
+        int internalZ = z & 0xF;
 
-        // TODO: Get highest block from heightmap?
-    	for(int i = 255; i > -1; i--)
+        int heightMapy = chunk.getHeightValue(internalX, internalZ);
+
+        // Fix for incorrect light map
+        // TODO: Fix this properly?
+        boolean incorrectHeightMap = false;
+        while (heightMapy < getHeightCap() && chunk.getBlockState(internalX, heightMapy, internalZ).getMaterial().blocksLight())
         {
-    		ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(x, i, z));
-        	if(material == null) throw new RuntimeException();
-        	DefaultMaterial defaultMaterial = material.toDefaultMaterial();
-        	boolean isLiquid = material.isLiquid();
-        	boolean isSolid = (material.isSolid() && !defaultMaterial.equals(DefaultMaterial.LEAVES) && !defaultMaterial.equals(DefaultMaterial.LEAVES_2)) || (!ignoreSnow && defaultMaterial.equals(DefaultMaterial.SNOW));
-        	if(!(isLiquid && ignoreLiquid))
+        	heightMapy++;
+            incorrectHeightMap = true;
+        }
+        if (incorrectHeightMap)
+        {
+            // Let Minecraft know that it made an error
+            this.world.checkLight(new BlockPos(x, heightMapy, z));
+        }
+         
+        ForgeMaterialData material;
+        boolean isSolid;
+        boolean isLiquid;
+        IBlockState blockState;
+        Block block;
+        
+        for(int i = heightMapy; i >= 0; i--)
+        {
+        	blockState = chunk.getBlockState(internalX, i, internalZ);
+        	block = blockState.getBlock();
+    		material = ForgeMaterialData.ofMinecraftBlockState(blockState);
+        	isLiquid = material.isLiquid();
+        	isSolid =
+			(
+    			material.isSolid() ||
+    			(
+					!ignoreLeaves && 
+					(
+						block == Blocks.LEAVES || 
+						block == Blocks.LEAVES2
+					)
+				) || (						
+					!ignoreSnow && 
+					block == Blocks.SNOW_LAYER
+				)
+			);
+        	if(!(ignoreLiquid && isLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))
         		{
@@ -551,10 +591,66 @@ public class ForgeWorld implements LocalWorld
             	}
         	}
         }
-
+        
     	// Can happen if this is a chunk filled with air
         return -1;
     }
+    
+    // Faster than getHighestBlockYAt, but offers less precision. Used for resources
+    // like oregen that need to find a starting point at the surface very often.
+	@Override
+	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
+	{
+        // If the chunk exists or is inside the area being populated, fetch it normally.
+        Chunk chunk = null;
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+			//|| getChunkGenerator().chunkExists(x, z)
+		)
+    	{
+    		chunk = getChunkGenerator().getChunk(x, z);
+    	}
+		// If the chunk doesn't exist and we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if(chunk == null && chunkBeingPopulated == null)
+		{
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(world.isBlockLoaded(new BlockPos(x,255,z)))
+    		{
+    			chunk = getChunkGenerator().getChunk(x, z);
+    		} else {
+    			// Calculate the height without loading the chunk.
+    			//return generator.getHighestBlockYInUnloadedChunk(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+    		}
+    	}
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null)
+    	{
+            return -1;
+    	}
+    	
+		// Get internal coordinates for block in chunk
+        int internalX = x & 0xF;    	
+        int internalZ = z & 0xF;
+
+        int heightMapy = chunk.getHeightValue(internalX, internalZ);
+
+        // Fix for incorrect light map
+        // TODO: Fix this properly?
+        boolean incorrectHeightMap = false;
+        while (heightMapy < getHeightCap() && chunk.getBlockState(internalX, heightMapy, internalZ).getMaterial().blocksLight())
+        {
+        	heightMapy++;
+            incorrectHeightMap = true;
+        }
+        if (incorrectHeightMap)
+        {
+            // Let Minecraft know that it made an error
+            this.world.checkLight(new BlockPos(x, heightMapy, z));
+        }
+        
+        return heightMapy;
+	}
     
     @Override
     public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
@@ -595,21 +691,26 @@ public class ForgeWorld implements LocalWorld
     	}
     	
 		// Get internal coordinates for block in chunk
-        z &= 0xF;
-        x &= 0xF;	
-        return ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(x, y, z));		               
+        int internalX = x & 0xF;
+        int internalZ = z & 0xF;
+        return ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(internalX, y, internalZ));		               
     }
     
     @Override
     public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z)
     {
-    	//OTG.log(LogMarker.INFO, "getBlockColumn at X" + x + " Z" + z);
-    	return generator.getBlockColumnInUnloadedChunk(x,z);
+   		//OTG.log(LogMarker.INFO, "getBlockColumn at X" + x + " Z" + z);
+		return generator.getBlockColumnInUnloadedChunk(x,z);
     }
 
     @Override
     public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
     {
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return;
+    	}
+    	
     	// If no chunk was passed, we're doing something outside of the population cycle.
     	// If a chunk was passed, only spawn in the area being populated, or existing chunks.
     	if(
@@ -629,7 +730,12 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean placeDungeon(Random rand, int x, int y, int z)
     {
-        return this.dungeonGen.generate(this.world, rand, new BlockPos(x, y, z));
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return false;
+    	}
+    	
+   		return this.dungeonGen.generate(this.world, rand, new BlockPos(x, y, z));
     }
 
     @Override
@@ -641,6 +747,10 @@ public class ForgeWorld implements LocalWorld
     @Override
     public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
     {
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return false;
+    	}
         BlockPos blockPos = new BlockPos(x, y, z);
         switch (type)
         {
@@ -896,27 +1006,26 @@ public class ForgeWorld implements LocalWorld
             return;
         }
 
-    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ() + 16), 0, 0, 16);
-    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ() + 16), 0, 0, 16);
-    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ()), 0, 0, 16);
-    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ()), 0, 0, 16);
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ() + 16));
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ() + 16));
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ()));
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ()));
     }
 
-    private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk, int size)
+    private void replaceBlocks(Chunk rawChunk)
     {
-        int endXInChunk = startXInChunk + size;
-        int endZInChunk = startZInChunk + size;
         int worldStartX = rawChunk.x * 16;
         int worldStartZ = rawChunk.z * 16;
 
         ExtendedBlockStorage[] sectionsArray = rawChunk.getBlockStorageArray();
-
+        ReplacedBlocksInstruction[] replaceArray;
         IBlockState block;
-        int blockId;
-        int y;
-        ForgeMaterialData replaceTo;
-        LocalBiome biome;
-        LocalMaterialData[][] replaceArray;
+        int blockId = 0;
+    	int minHeight;
+    	int maxHeight;
+    	LocalBiome biome;
+    	int y;
+    	ReplacedBlocksInstruction[][][] replaceInstructionsCache = new ReplacedBlocksInstruction[16][16][];
         
         for (ExtendedBlockStorage section : sectionsArray)
         {
@@ -925,36 +1034,66 @@ public class ForgeWorld implements LocalWorld
                 continue;
             }
 
-            for (int sectionX = startXInChunk; sectionX < endXInChunk; sectionX++)
+            for (int sectionX = 0; sectionX < 16; sectionX++)
             {
-                for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
+                for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                 {
-                    biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
-                    if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
+                	replaceArray = replaceInstructionsCache[sectionX][sectionZ];
+                    if(replaceArray == null)
                     {
-                        replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
+                    	biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
+                    	if (biome == null || !biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
+                    	{
+                    		replaceArray = new ReplacedBlocksInstruction[0];
+                    	} else {
+                    		replaceArray = new ReplacedBlocksInstruction[biome.getBiomeConfig().replacedBlocks.getInstructions().size()];
+                    		replaceArray = (ReplacedBlocksInstruction[])biome.getBiomeConfig().replacedBlocks.getInstructions().toArray(replaceArray);
+                    	}
+                    	replaceInstructionsCache[sectionX][sectionZ] = replaceArray;
+                    }
+                    if (replaceArray != null && replaceArray.length > 0)
+                    {
+                    	minHeight = PluginStandardValues.WORLD_HEIGHT;
+                    	maxHeight = PluginStandardValues.WORLD_DEPTH;
+                        for(ReplacedBlocksInstruction instruction : replaceArray)
+                        {
+                        	if(instruction.getFrom() != null && instruction.getTo() != null)
+                        	{
+	                        	if(instruction.getMinHeight() < minHeight)
+	                        	{
+	                        		minHeight = instruction.getMinHeight();
+	                        	}
+	                        	if(instruction.getMaxHeight() > maxHeight)
+	                        	{
+	                        		maxHeight = instruction.getMaxHeight();
+	                    		}
+                        	}
+                        }
                         for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
-                            block = section.getData().get(sectionX, sectionY, sectionZ);
-                            blockId = Block.getIdFromBlock(block.getBlock());
-                            if (replaceArray[blockId] == null)
-                            {
-                                continue;
-                            }
-
-                            y = section.getYLocation() + sectionY;
-                            if (y >= replaceArray[blockId].length)
-                            {
-                                break;
-                            }
-
-                            replaceTo = (ForgeMaterialData) replaceArray[blockId][y];
-                            if (replaceTo == null || replaceTo.getBlockId() == blockId)
-                            {
-                                continue;
-                            }
-
-                            section.set(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
+                        	block = null;
+                        	y = section.getYLocation() + sectionY;                    
+                        	if(y >= minHeight && y < maxHeight)
+                        	{
+	                            for(ReplacedBlocksInstruction instruction : replaceArray)
+	                            {
+	                            	if(instruction.getFrom() != null && instruction.getTo() != null)
+	                            	{
+	                            		if(y >= instruction.getMinHeight() && y < instruction.getMaxHeight())
+	                            		{
+	                            			if(block == null)
+	                            			{
+		                                    	block = section.getData().get(sectionX, sectionY, sectionZ);
+		                                    	blockId = Block.getIdFromBlock(block.getBlock());
+	                            			}
+			                            	if(instruction.getFrom().getBlockId() == blockId)
+			                            	{	                            		
+			                                    section.set(sectionX, sectionY, sectionZ, ((ForgeMaterialData)instruction.getTo()).internalBlock());                            		
+			                            	}
+	                            		}
+	                            	}
+	                            }
+                        	}
                         }
                     }
                 }

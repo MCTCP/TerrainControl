@@ -1,9 +1,13 @@
 package com.pg85.otg.bukkit;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.OTGEngine;
+import com.pg85.otg.bukkit.biomes.BukkitMojangSettings;
+import com.pg85.otg.bukkit.materials.BukkitMaterialData;
+import com.pg85.otg.bukkit.util.BukkitLogger;
+import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.OTGEngine;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -56,78 +60,7 @@ public class BukkitEngine extends OTGEngine
     @Override
     public LocalMaterialData readMaterial(String input) throws InvalidConfigException
     {
-        // Try parsing as an internal Minecraft name
-        // This is so that things like "minecraft:stone" aren't parsed
-        // as the block "minecraft" with data "stone", but instead as the
-        // block "minecraft:stone" with no block data.
-        Block block = Block.getByName(input);
-        if (block != null)
-        {
-            return BukkitMaterialData.ofMinecraftBlock(block);
-        }
-
-        try
-        {
-            // Try block(:data) syntax
-            return getMaterial0(input);
-        } catch (NumberFormatException e)
-        {
-            throw new InvalidConfigException("Unknown material: " + input);
-        }    
-    }
-
-    @SuppressWarnings("deprecation")
-    private LocalMaterialData getMaterial0(String input) throws NumberFormatException
-    {
-        String blockName = input;
-        int blockData = -1;
-
-        // When there is a . or a : in the name, extract block data
-        int splitIndex = input.lastIndexOf(":");
-        if (splitIndex == -1)
-        {
-            splitIndex = input.lastIndexOf(".");
-        }
-        if (splitIndex != -1)
-        {
-            blockName = input.substring(0, splitIndex);
-            blockData = Integer.parseInt(input.substring(splitIndex + 1));
-        }
-
-        // Parse block name
-        Block block = Block.getByName(blockName);
-        if (block == null)
-        {
-            DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
-            if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
-            {
-                block = Block.getById(defaultMaterial.id);
-            }
-        }
-
-        // Get the block
-        if (block != null)
-        {
-            if (blockData == -1)
-            {
-                // Use default
-                return BukkitMaterialData.ofMinecraftBlock(block);
-            } else
-            {
-                // Use specified data
-                try
-                {
-                    return BukkitMaterialData.ofMinecraftBlockData(block.fromLegacyData(blockData));
-                } catch (IllegalArgumentException e)
-                {
-                	OTG.log(LogMarker.WARN, "Illegal block data for the block type, cannot use " + input);
-                    return null;
-                }
-            }
-        }
-
-        // Failed
-        return BukkitMaterialData.ofString(input);
+    	return BukkitMaterialData.ofString(input);
     }
 
     @Override

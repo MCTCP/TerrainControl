@@ -251,9 +251,9 @@ public class BO4CustomStructure extends CustomStructure
 
 					if(!((BO4)this.start.getObject()).getConfig().spawnUnderWater)
 					{
-						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, null);
+						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true, null);
 					} else {
-						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, false, true, true, null);
+						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, false, true, true, true, null);
 					}
 
 					if(highestBlock < 1)
@@ -292,7 +292,7 @@ public class BO4CustomStructure extends CustomStructure
 
 			if(!((BO4)this.start.getObject()).getConfig().canSpawnOnWater)
 			{
-				if(world.getMaterial(this.start.getX() + 8, world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, null), this.start.getZ() + 7, null).isLiquid())
+				if(world.getMaterial(this.start.getX() + 8, world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true, null), this.start.getZ() + 7, null).isLiquid())
 				{
 					return false;
 				}
@@ -302,10 +302,10 @@ public class BO4CustomStructure extends CustomStructure
 			{
 				if(
 					!(
-						world.getMaterial(this.start.getX(), world.getHighestBlockYAt(this.start.getX(), this.start.getZ(), true, true, false, true, null), this.start.getZ(), null).isLiquid() &&
-						world.getMaterial(this.start.getX(), world.getHighestBlockYAt(this.start.getX(), this.start.getZ() + 15, true, true, false, true, null), this.start.getZ() + 15, null).isLiquid() &&
-						world.getMaterial(this.start.getX() + 15, world.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ(), true, true, false, true, null), this.start.getZ(), null).isLiquid() &&
-						world.getMaterial(this.start.getX() + 15, world.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ() + 15, true, true, false, true, null), this.start.getZ() + 15, null).isLiquid()
+						world.getMaterial(this.start.getX(), world.getHighestBlockYAt(this.start.getX(), this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
+						world.getMaterial(this.start.getX(), world.getHighestBlockYAt(this.start.getX(), this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid() &&
+						world.getMaterial(this.start.getX() + 15, world.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
+						world.getMaterial(this.start.getX() + 15, world.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid()
 					)
 				)
 				{
@@ -797,10 +797,10 @@ public class BO4CustomStructure extends CustomStructure
 		    			{
 		    				if(
 		    					!(
-	    							world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
-		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid() &&
-		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
-		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid()
+	    							world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
+		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid() &&
+		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
+		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid()
 		    					)
 		    				)
 		    				{
@@ -811,7 +811,7 @@ public class BO4CustomStructure extends CustomStructure
 		        		
 		        		if(canSpawn && !minimumSize && !bo3.getConfig().canSpawnOnWater)
 		    			{
-		    				if(world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 8, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 8, childBranchDataItem.chunkCoordinate.getBlockZ() + 7, true, true, false, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 7, null).isLiquid())
+		    				if(world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 8, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 8, childBranchDataItem.chunkCoordinate.getBlockZ() + 7, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 7, null).isLiquid())
 		    				{
 		    					wasOnWater = true;
 		    					canSpawn = false;

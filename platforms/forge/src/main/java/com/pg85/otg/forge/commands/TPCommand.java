@@ -4,13 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
-import com.pg85.otg.util.ChunkCoordinate;
-
+import com.pg85.otg.forge.world.ForgeWorld;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -102,7 +99,7 @@ public class TPCommand extends BaseCommand
 	                {
 		                sender.sendMessage(
 		                        new TextComponentTranslation(MESSAGE_COLOR + "Teleporting to \"" + VALUE_COLOR + biomeOrDimensionName + MESSAGE_COLOR + "\"."));
-		                ((Entity) sender).setPositionAndUpdate(biomePos.getX(), world.getHighestBlockYAt(biomePos.getX(), biomePos.getZ(), true, true, false, false, null), biomePos.getZ());
+		                ((Entity) sender).setPositionAndUpdate(biomePos.getX(), world.getHighestBlockYAt(biomePos.getX(), biomePos.getZ(), true, true, false, false, false, null), biomePos.getZ());
 	                	return true;
 	                }
                 }
