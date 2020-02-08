@@ -14,9 +14,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Map.Entry;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
@@ -652,7 +650,7 @@ public class CustomStructureFileManager
 				}
 				for(ChunkCoordinate chunkCoord : entry.getValue())
 				{
-					stringbuilder.append("," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ() + ",");
+					stringbuilder.append("," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ());
 				}
 			}
 			
@@ -722,7 +720,7 @@ public class CustomStructureFileManager
 				    }
 				    if(stringbuilder.length() > 0)
 				    {
-				    	String[] allData = stringbuilder.toString().split("|");
+				    	String[] allData = stringbuilder.toString().split("\\|");				    	
 				    	occupiedChunksByName = allData[0].split("/");
 				    	if(allData.length > 1) // Legacy files may not have occupiedChunksByGroup
 				    	{
@@ -747,6 +745,7 @@ public class CustomStructureFileManager
 		String[] occupiedChunkByNameCoords = {};
 		for(String entry : occupiedChunksByName)
 		{
+			entry = entry.replace(",,", ","); // Legacy configs could have ,, in them.
 			occupiedChunkByNameCoords = entry.split(",");
 			String key = occupiedChunkByNameCoords[0].replace("\\", ",");
 			ArrayList<ChunkCoordinate> value = new ArrayList<ChunkCoordinate>();
@@ -768,6 +767,7 @@ public class CustomStructureFileManager
 		String[] occupiedChunkByGroupCoords = {};
 		for(String entry : occupiedChunksByGroup)
 		{
+			entry = entry.replace(",,", ","); // Legacy configs could have ,, in them.
 			occupiedChunkByGroupCoords = entry.split(",");
 			String key = occupiedChunkByGroupCoords[0].replace("\\", ",");
 			HashMap<ChunkCoordinate, Integer> value = new HashMap<ChunkCoordinate, Integer>();
