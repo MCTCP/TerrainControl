@@ -23,34 +23,25 @@ import com.pg85.otg.customobjects.bo4.bo4function.BO4WeightedBranchFunction;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobjects.bo3.BO3Settings;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StreamHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultStructurePart;
 
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.DataFormatException;
 
 public class BO4Config extends CustomObjectConfigFile
@@ -175,6 +166,7 @@ public class BO4Config extends CustomObjectConfigFile
     private BO4EntityFunction[] entityDataOTGPlus;
        
     private boolean isCollidable = false;
+    private boolean isBO4Data = false;
        
     /**
      * Creates a BO3Config from a file.
@@ -214,7 +206,7 @@ public class BO4Config extends CustomObjectConfigFile
         	//OTG.log(LogMarker.INFO, ".BO4 loaded in: " + timeTaken + " " + this.getName() + ".BO4");
         } else {
         	//long startTime = System.currentTimeMillis();
-        	this.readFromBO4DataFile();
+        	this.readFromBO4DataFile(false);
         	//BO4BlocksLoadedFromBO4Data++;
         	//long timeTaken = (System.currentTimeMillis() - startTime);
         	//accumulatedTime2 += timeTaken;        	
@@ -277,8 +269,34 @@ public class BO4Config extends CustomObjectConfigFile
 
     public BO4BlockFunction[][] getSmoothingHeightMap(BO4 start)
     {
+    	return getSmoothingHeightMap(start, true);
+    }
+    
+    private BO4BlockFunction[][] getSmoothingHeightMap(BO4 start, boolean fromFile)
+    {
+    	// TODO: Caching the heightmap will mean this BO4 can only be used with 1 master BO4,
+    	// it won't pick up smoothing area settings if it is also used in another structure.
     	if(this.heightMap == null)
     	{
+    		if(this.isBO4Data && fromFile)
+    		{
+    			BO4Config bo4Config = null;
+				try
+				{
+					bo4Config = new BO4Config(this.reader, false);
+				}
+				catch (InvalidConfigException e)
+				{
+					e.printStackTrace();
+				}
+				if(bo4Config != null)
+				{
+					bo4Config.readFromBO4DataFile(true);
+					this.heightMap = bo4Config.getSmoothingHeightMap(start, false);
+					return this.heightMap;
+    			}
+    		}
+    		
     		this.heightMap = new BO4BlockFunction[16][16];
 
 	        // make heightmap containing the highest or lowest blocks in this chunk
@@ -364,6 +382,29 @@ public class BO4Config extends CustomObjectConfigFile
 
     public BO4BlockFunction[] getBlocks()
     {
+    	return getBlocks(true);
+    }
+    
+    private BO4BlockFunction[] getBlocks(boolean fromFile)
+    {
+    	if(fromFile && this.isBO4Data)
+    	{
+			BO4Config bo4Config = null;
+			try
+			{
+				bo4Config = new BO4Config(this.reader, false);
+			}
+			catch (InvalidConfigException e)
+			{
+				e.printStackTrace();
+			}
+			if(bo4Config != null)
+			{
+				bo4Config.readFromBO4DataFile(true);
+				return bo4Config.getBlocks(false);
+			}
+    	}
+    	
     	BO4BlockFunction[] blocksOTGPlus = new BO4BlockFunction[this.blocksMaterial.length];
     	
     	BO4BlockFunction block;
@@ -621,13 +662,13 @@ public class BO4Config extends CustomObjectConfigFile
                     	tempBlocksList.add((BO4RandomBlockFunction)res);
                     	columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
             		} else {
-            			if(!this.removeAir || !((BO4BlockFunction)res).material.toDefaultMaterial().equals(DefaultMaterial.AIR))
+            			if(!this.removeAir || !((BO4BlockFunction)res).material.isAir())
             			{
 	                    	tempBlocksList.add((BO4BlockFunction)res);
 	                    	block = (BO4BlockFunction)res;
 	                    	try
 	                    	{
-                    		columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
+	                    		columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
 	                    	}
 	                    	catch(ArrayIndexOutOfBoundsException ex)
 	                    	{
@@ -1665,7 +1706,7 @@ public class BO4Config extends CustomObjectConfigFile
         }
     }
 
-    public BO4Config readFromBO4DataFile()
+    public BO4Config readFromBO4DataFile(boolean getBlocks)
     {
     	FileInputStream fis;
 		try {			
@@ -1687,6 +1728,7 @@ public class BO4Config extends CustomObjectConfigFile
 				//buffer.get(data, 0, remaining);
 				// do something with data
 		      
+				this.isBO4Data = true;
 	        	this.inheritedBO3Loaded = true;
 	        	int bo4DataVersion = buffer.getInt();
 	        	this.minimumSizeTop = buffer.getInt();
@@ -1928,7 +1970,10 @@ public class BO4Config extends CustomObjectConfigFile
 				newBlocks.addAll(nonRandomBlocks);
 				newBlocks.addAll(randomBlocks);
 				
-				loadBlockArrays(newBlocks, columnSizes);
+				if(getBlocks)
+				{
+					loadBlockArrays(newBlocks, columnSizes);
+				}
 								
 		        int branchesOTGPlusLength = buffer.getInt();
 		        boolean branchType;
