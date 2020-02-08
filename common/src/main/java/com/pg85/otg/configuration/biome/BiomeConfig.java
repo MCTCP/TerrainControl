@@ -19,9 +19,9 @@ import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
-import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -256,27 +256,27 @@ public class BiomeConfig extends ConfigFile
      */
     public int getSnowHeight(float temp)
     {
-    	// TODO: Reimplement this
-    	/*
-        if (this.worldConfig.useTemperatureForSnowHeight)
-        {
-            if (temp <= -.75)
-                return 7;
-            if (temp <= -.7)
-                return 6;
-            if (temp <= -.65)
-                return 5;
-            if (temp <= -.575)
-                return 4;
-            if (temp <= -.55)
-                return 3;
-            if (temp <= -.525)
-                return 2;
-            if (temp <= -.5)
-                return 1;
-        }
-        */
-        return 0;
+    	// OTG biome temperature is between 0.0 and 2.0.
+    	// Judging by WorldStandardValues.SNOW_AND_ICE_MAX_TEMP, snow should appear below 0.15.
+    	// According to the configs, snow and ice should appear between 0.2 (at y > 90) and 0.1 (entire biome covered in ice).
+    	// Let's make sure that at 0.2, snow layers start with thickness 0 at y 90 and thickness 7 around y 255.
+    	// In a 0.2 temp biome, y90 temp is 0.156, y255 temp is -0.12
+    	   	
+    	float snowTemp = WorldStandardValues.SNOW_AND_ICE_TEMP;
+    	if(temp <= snowTemp)
+    	{
+        	float maxColdTemp = WorldStandardValues.SNOW_AND_ICE_MAX_TEMP;
+        	float maxThickness = 7.0f;
+        	if(temp < maxColdTemp)
+        	{
+        		return (int)maxThickness;
+        	}
+        	float range = Math.abs(maxColdTemp - snowTemp);
+        	float fraction = Math.abs(maxColdTemp - temp);
+    		return (int)Math.floor((1.0f - (fraction / range)) * maxThickness);
+    	}
+
+    	return  0;
     }
 
     public SaplingGen getSaplingGen(SaplingType type)
