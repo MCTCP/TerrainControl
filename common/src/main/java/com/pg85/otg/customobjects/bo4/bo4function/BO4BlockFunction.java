@@ -1,21 +1,19 @@
 package com.pg85.otg.customobjects.bo4.bo4function;
 
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
+import java.util.Random;
 
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.bofunctions.BlockFunction;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.helpers.MaterialHelper;
-import com.pg85.otg.util.helpers.StreamHelper;
 
 /**
  * Represents a block in a BO3.
@@ -28,7 +26,13 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
     {
     	this.holder = holder;
     }
-	
+    	
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    {
+        material.parseForWorld(world);
+        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
+    }
+    
     public BO4BlockFunction rotate(Rotation rotation)
     {
         BO4BlockFunction rotatedBlock = new BO4BlockFunction(this.getHolder());

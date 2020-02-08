@@ -9,7 +9,7 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
 import com.pg85.otg.generator.noise.NoiseGeneratorPerlinMesaBlocks;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class MesaSurfaceGenerator implements SurfaceGenerator
@@ -183,7 +183,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         {
             this.generateBands(worldSeed);
         }
-    	              
+
         if (this.pillarNoise == null || this.pillarRoofNoise == null || this.worldSeed != worldSeed)
         {
             Random random = new Random(this.worldSeed);
@@ -242,10 +242,12 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         int maxHeight = generatingChunk.heightCap - 1;
         
         int minHeight = 0;
-
+        LocalMaterialData worldMaterial;
+        
         for (int y = maxHeight; y >= minHeight; y--)
         {
-            if (chunkBuffer.getBlock(x, y, z).isAir() && y < (int) bryceHeight)
+        	worldMaterial = chunkBuffer.getBlock(x, y, z);
+            if (y < (int) bryceHeight && worldMaterial.isAir())
             {
                 chunkBuffer.setBlock(x, y, z, stoneBlock);
             }
@@ -256,16 +258,14 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
             }
             else if (i1 < 15 || this.brycePillars)
             {
-                LocalMaterialData blockAtPosition = chunkBuffer.getBlock(x, y, z);
+            	worldMaterial = chunkBuffer.getBlock(x, y, z);
 
-                if (blockAtPosition.isAir())
+                if (worldMaterial.isEmptyOrAir())
                 {
                     k1 = -1;
                 }
-                else if (blockAtPosition.isSolid())
+                else if (worldMaterial.isSolid())
                 {
-                    LocalMaterialData iblockdata3;
-
                     if (k1 == -1)
                     {
                         belowSand = false;
@@ -280,7 +280,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                             currentGroundBlock = groundBlock;
                         }
 
-                        if (y < waterLevel && (currentSurfaceBlock == null || currentSurfaceBlock.isAir()))
+                        if (y < waterLevel && (currentSurfaceBlock == null || currentSurfaceBlock.isEmptyOrAir()))
                         {
                             currentSurfaceBlock = waterBlock;
                         }
@@ -303,15 +303,15 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                                 {
                                     if (cosNoiseIsLargerThanZero)
                                     {
-                                        iblockdata3 = this.hardenedClay;
+                                    	worldMaterial = this.hardenedClay;
                                     } else {
-                                        iblockdata3 = this.getBand(xInWorld, y, zInWorld);
+                                    	worldMaterial = this.getBand(xInWorld, y, zInWorld);
                                     }
                                 } else {
-                                    iblockdata3 = this.orangeStainedClay;
+                                	worldMaterial = this.orangeStainedClay;
                                 }
 
-                                chunkBuffer.setBlock(x, y, z, iblockdata3);
+                                chunkBuffer.setBlock(x, y, z, worldMaterial);
                             } else {
                                 chunkBuffer.setBlock(x, y, z, redSand);
                                 belowSand = true;
@@ -331,8 +331,8 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         {
                             chunkBuffer.setBlock(x, y, z, this.orangeStainedClay);
                         } else {
-                            iblockdata3 = this.getBand(xInWorld, y, zInWorld);
-                            chunkBuffer.setBlock(x, y, z, iblockdata3);
+                        	worldMaterial = this.getBand(xInWorld, y, zInWorld);
+                            chunkBuffer.setBlock(x, y, z, worldMaterial);
                         }
                     }
                     

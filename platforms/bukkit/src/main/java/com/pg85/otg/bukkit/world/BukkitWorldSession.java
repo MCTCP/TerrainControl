@@ -1,4 +1,4 @@
-package com.pg85.otg.bukkit;
+package com.pg85.otg.bukkit.world;
 
 import java.util.ArrayList;
 

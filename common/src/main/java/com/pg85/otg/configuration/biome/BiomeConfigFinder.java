@@ -1,7 +1,6 @@
 package com.pg85.otg.configuration.biome;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.SettingsMap;
@@ -48,7 +47,7 @@ public final class BiomeConfigFinder
      *
      * @return A map of biome name --> location on disk.
      */
-    public Map<String, BiomeConfigStub> findBiomes(WorldConfig worldConfig, LocalWorld world, int worldHeightScale, Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
+    public Map<String, BiomeConfigStub> findBiomes(WorldConfig worldConfig, int worldHeightScale, Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
     {
         Map<String, BiomeConfigStub> biomeConfigsStore = new HashMap<String, BiomeConfigStub>();
 
@@ -65,7 +64,7 @@ public final class BiomeConfigFinder
             // Account for the possibility that folder creation failed
             if (directory.exists())
             {
-                loadBiomesFromDirectory(worldConfig, world, worldHeightScale, biomeConfigsStore, directory, remainingBiomes);
+                loadBiomesFromDirectory(worldConfig, worldHeightScale, biomeConfigsStore, directory, remainingBiomes);
             }
         }
         
@@ -90,14 +89,14 @@ public final class BiomeConfigFinder
      * @param remainingBiomes   The biomes that should still be loaded. When a
      *                          biome is found, it is removed from this map.
      */
-    private void loadBiomesFromDirectory(WorldConfig worldConfig, LocalWorld world, int worldHeightScale, Map<String, BiomeConfigStub> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes)
+    private void loadBiomesFromDirectory(WorldConfig worldConfig, int worldHeightScale, Map<String, BiomeConfigStub> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes)
     {
         for (File file : directory.listFiles())
         {
             // Search recursively
             if (file.isDirectory())
             {
-                loadBiomesFromDirectory(worldConfig, world, worldHeightScale, biomeConfigsStore, file, remainingBiomes);
+                loadBiomesFromDirectory(worldConfig, worldHeightScale, biomeConfigsStore, file, remainingBiomes);
                 continue;
             }
 
@@ -126,7 +125,7 @@ public final class BiomeConfigFinder
             	String replaceToBiomeName = preloadedBiomeConfigStub.settings.getSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME, "");
             	if(replaceToBiomeName != null && replaceToBiomeName.length() > 0)
             	{
-	            	Collection<? extends BiomeLoadInstruction> defaultBiomes = world.getDefaultBiomes();
+	            	Collection<? extends BiomeLoadInstruction> defaultBiomes = OTG.getEngine().getDefaultBiomes();
 	                for (BiomeLoadInstruction defaultBiome : defaultBiomes)
 	                {
 	                	if(biomeName.equals(defaultBiome.getBiomeName()) && replaceToBiomeName.equals(BiomeRegistryNames.getRegistryNameForDefaultBiome(defaultBiome.getBiomeName())))
@@ -141,7 +140,7 @@ public final class BiomeConfigFinder
             	// assume it is a legacy config
         		else if(!worldConfig.worldBiomes.contains(biomeName)) 
     			{
-	            	Collection<? extends BiomeLoadInstruction> defaultBiomes = world.getDefaultBiomes();
+	            	Collection<? extends BiomeLoadInstruction> defaultBiomes = OTG.getEngine().getDefaultBiomes();
 	                for (BiomeLoadInstruction defaultBiome : defaultBiomes)
 	                {
 	                	if(biomeName.equals(defaultBiome.getBiomeName()))

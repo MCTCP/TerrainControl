@@ -1,10 +1,8 @@
-package com.pg85.otg.bukkit;
+package com.pg85.otg.bukkit.world;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -35,6 +33,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.bukkit.biomes.BukkitBiome;
 import com.pg85.otg.bukkit.generator.BukkitVanillaBiomeGenerator;
 import com.pg85.otg.bukkit.generator.OTGChunkGenerator;
 import com.pg85.otg.bukkit.generator.OTGInternalChunkGenerator;
@@ -48,31 +47,31 @@ import com.pg85.otg.bukkit.generator.structures.OTGOceanMonumentGen;
 import com.pg85.otg.bukkit.generator.structures.OTGRareBuildingGen;
 import com.pg85.otg.bukkit.generator.structures.OTGStrongholdGen;
 import com.pg85.otg.bukkit.generator.structures.OTGVillageGen;
-import com.pg85.otg.bukkit.util.NBTHelper;
-import com.pg85.otg.bukkit.util.WorldHelper;
-import com.pg85.otg.common.BiomeIds;
+import com.pg85.otg.bukkit.materials.BukkitMaterialData;
+import com.pg85.otg.bukkit.util.JsonToNBT;
+import com.pg85.otg.bukkit.util.NBTException;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.WorldSession;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
-import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix.ReplacedBlocksInstruction;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
+
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.network.ServerConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
@@ -88,9 +87,6 @@ import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
 import net.minecraft.server.v1_12_R1.ChunkGenerator;
 import net.minecraft.server.v1_12_R1.ChunkProviderServer;
 import net.minecraft.server.v1_12_R1.ChunkSection;
-import net.minecraft.server.v1_12_R1.DataConverter;
-import net.minecraft.server.v1_12_R1.DataConverterRegistry;
-import net.minecraft.server.v1_12_R1.DataConverterTypes;
 import net.minecraft.server.v1_12_R1.DefinedStructure;
 import net.minecraft.server.v1_12_R1.DefinedStructureManager;
 import net.minecraft.server.v1_12_R1.DimensionManager;
@@ -103,13 +99,10 @@ import net.minecraft.server.v1_12_R1.EntityTippedArrow;
 import net.minecraft.server.v1_12_R1.EnumCreatureType;
 import net.minecraft.server.v1_12_R1.EnumDirection;
 import net.minecraft.server.v1_12_R1.IBlockData;
-import net.minecraft.server.v1_12_R1.ITileEntity;
-import net.minecraft.server.v1_12_R1.Material;
 import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.NBTBase;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.SpawnerCreature;
-import net.minecraft.server.v1_12_R1.TileEntity;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldChunkManager;
 import net.minecraft.server.v1_12_R1.WorldGenAcaciaTree;
@@ -132,7 +125,7 @@ public class BukkitWorld implements LocalWorld
 {
     private static final int MAX_BIOMES_COUNT = 4096;
     private static final int MAX_SAVED_BIOMES_COUNT = 256;
-    private static final int STANDARD_WORLD_HEIGHT = 128;
+    public static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
     
     // Initially false, set to true when enabled once
     private boolean initialized;
@@ -143,7 +136,6 @@ public class BukkitWorld implements LocalWorld
     private CustomStructureCache structureCache;
     private String name;
     private BiomeGenerator biomeGenerator;
-    private DataConverter dataConverter;
 
     private final Map<String, LocalBiome> biomeNames = new HashMap<String, LocalBiome>();
 
@@ -175,10 +167,9 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
 
-    private Chunk[] chunkCache;
 	private BukkitWorldSession worldSession;
 
-    BukkitWorld(String _name)
+    public BukkitWorld(String _name)
     {
         this.name = _name;
         this.worldSession = new BukkitWorldSession(this);
@@ -313,7 +304,7 @@ public class BukkitWorld implements LocalWorld
      *
      * @param world The world that needs to be enabled.
      */
-    void enable(org.bukkit.World world)
+    public void enable(org.bukkit.World world)
     {
         WorldServer mcWorld = ((CraftWorld) world).getHandle();
 
@@ -342,8 +333,7 @@ public class BukkitWorld implements LocalWorld
             // Things that need to be done only when enabling
             // for the first time
             this.structureCache = new CustomStructureCache(this);
-            this.dataConverter = DataConverterRegistry.a();
-
+            
             switch (this.settings.getWorldConfig().modeTerrain)
             {
                 case Normal:
@@ -399,8 +389,7 @@ public class BukkitWorld implements LocalWorld
             this.groundBush = new WorldGenGroundBush(jungleLog, oakLeaves);
 
             this.initialized = true;
-        } else
-        {
+        } else {
             // Things that need to be done only on reloading
             this.structureCache.reload(this);
         }
@@ -409,7 +398,7 @@ public class BukkitWorld implements LocalWorld
     /**
      * Cleans up references of itself in Minecraft's native code.
      */
-    void disable()
+    public void disable()
     {
         // Restore old world provider if replaced
         if (world.worldProvider instanceof OTGWorldProvider)
@@ -443,36 +432,17 @@ public class BukkitWorld implements LocalWorld
         	ReflectionHelper.setValueInFieldOfType(chunkProvider, ChunkGenerator.class, chunkGenerator);
         }
     }
-
     
     @Override
     public void startPopulation(ChunkCoordinate chunkCoord)
     {
-        if (this.chunkCache != null && settings.getWorldConfig().populationBoundsCheck)
-        {
-            throw new IllegalStateException("Chunk is already being populated."
-                    + " This may be a bug in " + PluginStandardValues.PLUGIN_NAME + ", but it may also be"
-                    + " another mod that is poking in unloaded chunks.\nSet"
-                    + " PopulationBoundsCheck to false in the WorldConfig to"
-                    + " disable this error.");
-        }
-
-        // Initialize cache
-        this.chunkCache = loadFourChunks(chunkCoord);
+    	this.getChunkGenerator().startPopulation(chunkCoord);
     }
 
     @Override
     public void endPopulation()
     {
-        if (this.chunkCache == null && settings.getWorldConfig().populationBoundsCheck)
-        {
-            throw new IllegalStateException("Chunk is not being populated."
-                    + " This may be a bug in Open Terrain Generator, but it may also be"
-                    + " another mod that is poking in unloaded chunks. Set"
-                    + " PopulationBoundsCheck to false in the WorldConfig to"
-                    + " disable this error.");
-        }
-        this.chunkCache = null;
+    	this.getChunkGenerator().endPopulation();
     }
     
     // Biomes
@@ -585,22 +555,6 @@ public class BukkitWorld implements LocalWorld
         return biomeNames.get(name);
     }
 
-    @Override
-    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes()
-    {
-        // Loop through all default biomes and create the default
-        // settings for them
-        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
-        for (DefaultBiome defaultBiome : DefaultBiome.values())
-        {
-            int id = defaultBiome.Id;
-            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(BukkitMojangSettings.fromId(id), STANDARD_WORLD_HEIGHT);
-            standardBiomes.add(instruction);
-        }
-
-        return standardBiomes;
-    }
-
     // Structures / trees
     
     @Override
@@ -641,6 +595,11 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean placeDungeon(Random rand, int x, int y, int z)
     {
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return false;
+    	}
+    	
         return dungeon.generate(world, rand, new BlockPosition(x, y, z));
     }
 
@@ -653,6 +612,11 @@ public class BukkitWorld implements LocalWorld
     @Override
     public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
     {
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return false;
+    	}
+    	
         BlockPosition blockPos = new BlockPosition(x, y, z);
         switch (type)
         {
@@ -703,9 +667,24 @@ public class BukkitWorld implements LocalWorld
     }
 
 	@Override
-	public boolean chunkHasDefaultStructure(Random random, ChunkCoordinate chunk) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean chunkHasDefaultStructure(Random random, ChunkCoordinate chunk)
+	{
+        WorldConfig worldConfig = this.settings.getWorldConfig();
+        BlockPosition blockPos = new BlockPosition(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter());
+        // Allow OTG structures to spawn on top of strongholds
+        // Allow OTG structures to spawn on top of mine shafts
+        // TODO: VIllage gen detection doesn't appear to be working too well, fix..
+        return 
+		(worldConfig.villagesEnabled && this.villageGen instanceof OTGVillageGen && ((OTGVillageGen)this.villageGen).b(blockPos)) ||
+		(worldConfig.villagesEnabled && !(this.villageGen instanceof OTGVillageGen) && this.villageGen.b(blockPos)) ||
+        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen instanceof OTGRareBuildingGen && ((OTGRareBuildingGen)this.rareBuildingGen).b(blockPos)) ||
+        (worldConfig.rareBuildingsEnabled && !(this.rareBuildingGen instanceof OTGRareBuildingGen) && this.rareBuildingGen.b(blockPos)) ||
+        (worldConfig.netherFortressesEnabled && this.netherFortressGen.b(blockPos)) ||
+        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen instanceof OTGOceanMonumentGen && ((OTGOceanMonumentGen)this.oceanMonumentGen).b(blockPos)) ||
+        (worldConfig.oceanMonumentsEnabled && !(this.oceanMonumentGen instanceof OTGOceanMonumentGen) && this.oceanMonumentGen.b(blockPos)) ||
+        (worldConfig.woodLandMansionsEnabled && this.mansionGen instanceof OTGMansionGen && ((OTGMansionGen)this.mansionGen).b(blockPos)) ||
+        (worldConfig.woodLandMansionsEnabled && !(this.mansionGen instanceof OTGMansionGen) && this.mansionGen.b(blockPos))
+        ;
 	}
     
     @Override
@@ -757,53 +736,94 @@ public class BukkitWorld implements LocalWorld
             return;
         }
 
-        // Get cache
-        Chunk[] cache = getChunkCache(chunkCoord);
-
-        // Replace the blocks
-        for(int i = 0; i < 4; i++) {
-            replaceBlocks(cache[i], 0, 0, 16);
-        }
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ() + 16));
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ() + 16));
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ()));
+    	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ()));
     }
 
-    private void replaceBlocks(Chunk rawChunk, int startXInChunk, int startZInChunk, int size)
+    private void replaceBlocks(Chunk rawChunk)
     {
-        int endXInChunk = startXInChunk + size;
-        int endZInChunk = startZInChunk + size;
         int worldStartX = rawChunk.locX * 16;
         int worldStartZ = rawChunk.locZ * 16;
 
         ChunkSection[] sectionsArray = rawChunk.getSections();
-
+        ReplacedBlocksInstruction[] replaceArray;
+        IBlockData block;
+        int blockId = 0;
+        int minHeight;
+    	int maxHeight;
+    	LocalBiome biome;
+    	int y;
+    	ReplacedBlocksInstruction[][][] replaceInstructionsCache = new ReplacedBlocksInstruction[16][16][];
+    	
         for (ChunkSection section : sectionsArray)
         {
             if (section == null)
-                continue;
-
-            for (int sectionX = startXInChunk; sectionX < endXInChunk; sectionX++)
             {
-                for (int sectionZ = startZInChunk; sectionZ < endZInChunk; sectionZ++)
+                continue;
+            }
+
+            for (int sectionX = 0; sectionX < 16; sectionX++)
+            {
+                for (int sectionZ = 0; sectionZ < 16; sectionZ++)
                 {
-                    LocalBiome biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
-                    if (biome != null && biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
+                	replaceArray = replaceInstructionsCache[sectionX][sectionZ];
+                    if(replaceArray == null)
                     {
-                        LocalMaterialData[][] replaceArray = biome.getBiomeConfig().replacedBlocks.compiledInstructions;
+                    	biome = this.getBiome(worldStartX + sectionX, worldStartZ + sectionZ);
+                    	if (biome == null || !biome.getBiomeConfig().replacedBlocks.hasReplaceSettings())
+                    	{
+                    		replaceArray = new ReplacedBlocksInstruction[0];
+                    	} else {
+                    		replaceArray = new ReplacedBlocksInstruction[biome.getBiomeConfig().replacedBlocks.getInstructions().size()];
+                    		replaceArray = (ReplacedBlocksInstruction[])biome.getBiomeConfig().replacedBlocks.getInstructions().toArray(replaceArray);
+                    	}
+                    	replaceInstructionsCache[sectionX][sectionZ] = replaceArray;
+                    }
+                    if (replaceArray != null && replaceArray.length > 0)
+                    {
+                    	minHeight = PluginStandardValues.WORLD_HEIGHT;
+                    	maxHeight = PluginStandardValues.WORLD_DEPTH;
+                        for(ReplacedBlocksInstruction instruction : replaceArray)
+                        {
+                        	if(instruction.getFrom() != null && instruction.getTo() != null)
+                        	{
+	                        	if(instruction.getMinHeight() < minHeight)
+	                        	{
+	                        		minHeight = instruction.getMinHeight();
+	                        	}
+	                        	if(instruction.getMaxHeight() > maxHeight)
+	                        	{
+	                        		maxHeight = instruction.getMaxHeight();
+	                    		}
+                        	}
+                        }
                         for (int sectionY = 0; sectionY < 16; sectionY++)
                         {
-                            IBlockData block = section.getType(sectionX, sectionY, sectionZ);
-                            int blockId = Block.getId(block.getBlock());
-                            if (replaceArray[blockId] == null)
-                                continue;
-
-                            int y = section.getYPosition() + sectionY;
-                            if (y >= replaceArray[blockId].length)
-                                break;
-
-                            BukkitMaterialData replaceTo = (BukkitMaterialData) replaceArray[blockId][y];
-                            if (replaceTo == null || replaceTo.getBlockId() == blockId)
-                                continue;
-
-                            section.setType(sectionX, sectionY, sectionZ, replaceTo.internalBlock());
+                        	block = null;
+                        	y = section.getYPosition() + sectionY;                    
+                        	if(y >= minHeight && y < maxHeight)
+                        	{
+	                            for(ReplacedBlocksInstruction instruction : replaceArray)
+	                            {
+	                            	if(instruction.getFrom() != null && instruction.getTo() != null)
+	                            	{
+	                            		if(y >= instruction.getMinHeight() && y < instruction.getMaxHeight())
+	                            		{
+	                            			if(block == null)
+	                            			{
+		                                    	block = section.getType(sectionX, sectionY, sectionZ);
+		                                    	blockId = Block.getId(block.getBlock());
+	                            			}
+			                            	if(instruction.getFrom().getBlockId() == blockId)
+			                            	{
+			                                    section.setType(sectionX, sectionY, sectionZ, ((BukkitMaterialData)instruction.getTo()).internalBlock());                            		
+			                            	}
+	                            		}
+	                            	}
+	                            }
+                        	}
                         }
                     }
                 }
@@ -1201,12 +1221,9 @@ public class BukkitWorld implements LocalWorld
 
 		return null;
 	}
-	
-    @Override
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation) { }
     
 	@Override
-	public void spawnEntity(EntityFunction<?> entityData)
+	public void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated)
 	{
     	Random rand = new Random();
 
@@ -1391,45 +1408,64 @@ public class BukkitWorld implements LocalWorld
 	            {
 	            	for(int r = 0; r < groupSize; r++)
 	            	{
-            			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
+    					if(
+							chunkBeingPopulated == null || 
+							(
+								OTG.IsInAreaBeingPopulated((int)Math.floor(f), (int)Math.floor(f2), chunkBeingPopulated)// || 
+								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
+							)
+						)
+    					{
+	            			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
 
-	            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-	           			{
-	           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
-	           			}
-
-	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
-	            		{
-	            			if(nameTag != null && nameTag.length() > 0)
-	        				{
-	            				entity.setCustomName(nameTag);
-	        				}
-	            		}
-
-	            		if(entity instanceof CraftLivingEntity)
-	            		{
-	            			((CraftLivingEntity) entity).setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
-	            		}
-	            	}
-	            } else {
-	            	for(int r = 0; r < groupSize; r++)
-	            	{
-	            		try
-	            		{
-		            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());	            		
 		            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
 		           			{
 		           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
 		           			}
-	            		}
-	            		catch(IllegalArgumentException ex)
-	            		{
-	            			if(OTG.getPluginConfig().spawnLog)
-	            			{
-	            				OTG.log(LogMarker.WARN, "Could not spawn entity " + entityData.mobName + " in world. Please note that hanging entities such as item frames may cause problems, this will be fixed in a future update. Exception: ");
-	            				ex.printStackTrace();
-	            			}
-	            		}
+
+		            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+		            		{
+		            			if(nameTag != null && nameTag.length() > 0)
+		        				{
+		            				entity.setCustomName(nameTag);
+		        				}
+		            		}
+
+		            		if(entity instanceof CraftLivingEntity)
+		            		{
+		            			((CraftLivingEntity) entity).setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
+		            		}
+    					}	            	
+	            	}
+	            } else {
+	            	for(int r = 0; r < groupSize; r++)
+	            	{
+    					if(
+							chunkBeingPopulated == null || 
+							(
+								OTG.IsInAreaBeingPopulated((int)Math.floor(f), (int)Math.floor(f2), chunkBeingPopulated)// || 
+								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
+							)
+						)
+    					{
+		            		try
+		            		{
+			            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());	            		
+			            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
+			           			{
+			           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
+			           			}
+		            		}
+		            		catch(IllegalArgumentException ex)
+		            		{
+		            			if(OTG.getPluginConfig().spawnLog)
+		            			{
+		            				OTG.log(LogMarker.WARN, "Could not spawn entity " + entityData.mobName + " in world. Please note that hanging entities such as item frames may cause problems, this will be fixed in a future update. Exception: ");
+		            				ex.printStackTrace();
+		            			}
+		            		}
+	    			    	
+    					}
 	            	}
 	            }
             }
@@ -1488,79 +1524,7 @@ public class BukkitWorld implements LocalWorld
 	}
 	
     // Chunks
-    
-    private Chunk getChunk(int x, int y, int z)
-    {
-        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-            return null;
-
-        int chunkX = x >> 4;
-        int chunkZ = z >> 4;
-
-        if (this.chunkCache == null)
-        {
-            // Blocks requested outside population step
-            // (Tree growing, /otg spawn, etc.)
-           return world.getChunkAt(chunkX, chunkZ);
-        }
-
-        // Restrict to chunks we are currently populating
-        Chunk topLeftCachedChunk = this.chunkCache[0];
-        int indexX = (chunkX - topLeftCachedChunk.locX);
-        int indexZ = (chunkZ - topLeftCachedChunk.locZ);
-        if ((indexX == 0 || indexX == 1) && (indexZ == 0 || indexZ == 1))
-        {
-            return this.chunkCache[indexX | (indexZ << 1)];
-        } else
-        {
-            // Outside area
-            if (this.settings.getWorldConfig().populationBoundsCheck)
-            {
-                return null;
-            }
-            if (world.getChunkProviderServer().isLoaded(chunkX, chunkZ))
-            {
-                return world.getChunkAt(chunkX, chunkZ);
-            }
-            return null;
-        }
-    }
-    
-    private Chunk[] getChunkCache(ChunkCoordinate topLeft)
-    {
-        if (this.chunkCache == null || !topLeft.coordsMatch(this.chunkCache[0].locX, this.chunkCache[0].locZ))
-        {
-            // Cache is invalid, most likely because two chunks are being populated at once
-            if (this.settings.getWorldConfig().populationBoundsCheck)
-            {
-                // ... but this can never happen, as startPopulation() checks for this if populationBoundsCheck is set
-                // to true. So we must have a bug.
-                throw new IllegalStateException("chunkCache is null! You've got a bug!");
-            } else
-            {
-                // Use a temporary cache, best we can do
-                return this.loadFourChunks(topLeft);
-            }
-        }
-        return this.chunkCache;
-    }
-
-    private Chunk[] loadFourChunks(ChunkCoordinate topLeft)
-    {
-        Chunk[] chunkCache = new Chunk[4];
-        for (int indexX = 0; indexX <= 1; indexX++)
-        {
-            for (int indexZ = 0; indexZ <= 1; indexZ++)
-            {
-                chunkCache[indexX | (indexZ << 1)] = world.getChunkAt(
-                        topLeft.getChunkX() + indexX,
-                        topLeft.getChunkZ() + indexZ
-                );
-            }
-        }
-        return chunkCache;
-    }
-    
+        
     @Override
     public ChunkCoordinate getSpawnChunk()
     {
@@ -1572,256 +1536,296 @@ public class BukkitWorld implements LocalWorld
 	@Override
 	public boolean isInsidePregeneratedRegion(ChunkCoordinate chunk)
 	{
-		// TODO Implement this
 		return false;
 	}
     
     // Blocks / materials
-    	
-	@Override
-	public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea)
-	{
-    	if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
+
+    @Override
+    public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    {
+        if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
+        {
+        	return null;
+        }
+
+        // If the chunk exists or is inside the area being populated, fetch it normally.
+        Chunk chunk = null;
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated)) 
+			//|| getChunkGenerator().chunkExists(x, z)			
+		)
     	{
-        	return true;
+    		chunk = getChunkGenerator().getChunk(x, z);
     	}
-
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null)
+    	
+		// If the chunk doesn't exist and we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if(chunk == null && chunkBeingPopulated == null)
+		{
+			ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(world.getChunkProviderServer().isLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
+    		{
+    			chunk = getChunkGenerator().getChunk(x, z);
+    		} else {
+    			// Calculate the material without loading the chunk.
+    			return getChunkGenerator().getMaterialInUnloadedChunk(x,y,z);
+    		}
+    	}
+    	
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null)
+    	{
+            return null;
+    	}
+    	
+		// Get internal coordinates for block in chunk
+        int internalX = x & 0xF;
+        int internalZ = z & 0xF;
+        return BukkitMaterialData.ofMinecraftBlockData(chunk.a(internalX, y, internalZ));
+    }
+	
+    @Override
+    public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
+    {
+        int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingPopulated);
+        if(highestY > 0)
         {
-            return true;
+        	highestY += 1;
+        } else {
+        	highestY = -1;
         }
+		return highestY;
+    }
 
-        return chunk.a(x & 0xF, y, z & 0xF).getMaterial().equals(Material.AIR);
-	}
+    @Override
+    public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
+    {
+        int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingPopulated);
+        if(highestY > 0)
+        {
+        	highestY += 1;
+        } else {
+        	highestY = -1;
+        }
+		return highestY;
+    }
     
     @Override
-    public int getLiquidHeight(int x, int z)
+    public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
-        {
-            LocalMaterialData material = getMaterial(x, y, z, false);
-            if (material.isLiquid())
-            {
-                return y + 1;
-            } else if (material.isSolid())
-            {
-                // Failed to find a liquid
-                return -1;
-            }
-        }
-        return -1;
+    	return getHighestBlockYAt(x, z, true, true, false, true, false, chunkBeingPopulated) + 1;
     }
-
-    @Override
-    public int getSolidHeight(int x, int z)
-    {
-        for (int y = getHighestBlockYAt(x, z) - 1; y > 0; y--)
-        {
-            LocalMaterialData material = getMaterial(x, y, z, false);
-            if (material.isSolid())
-            {
-                return y + 1;
-            }
-        }
-        return -1;
-    }
-
-    @Override
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea)
-    {
-        Chunk chunk = this.getChunk(x, y, z);
-        if (chunk == null || y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-        {
-            return BukkitMaterialData.ofMinecraftBlock(Blocks.AIR);
-        }
-
-        return BukkitMaterialData.ofMinecraftBlockData(chunk.a(x, y, z));
-    }
-
+    
 	@Override
-	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingPopulated)
 	{
-		// TODO Implement this
-		throw new RuntimeException();
-	}
-    
-    @Override
-    public int getHighestBlockYAt(int x, int z)
-    {
-        Chunk chunk = this.getChunk(x, 0, z);
-        if (chunk == null)
-        {
+        // If the chunk exists or is inside the area being populated, fetch it normally.
+        Chunk chunk = null;
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated)) 
+			//|| getChunkGenerator().chunkExists(x, z)			
+		)
+    	{
+    		chunk = getChunkGenerator().getChunk(x, z);
+    	}
+    	
+		// If the chunk doesn't exist and we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if(chunk == null && chunkBeingPopulated == null)
+		{
+			ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(world.getChunkProviderServer().isLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
+    		{
+    			chunk = getChunkGenerator().getChunk(x, z);
+    		} else {
+    			// Calculate the height without loading the chunk.
+    			return getChunkGenerator().getHighestBlockYInUnloadedChunk(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+    		}
+    	}
+    	
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null)
+    	{
             return -1;
-        }
+    	}
+    	
+		// Get internal coordinates for block in chunk
+        int internalX = x & 0xF;
+        int internalZ = z & 0xF;
 
-        int y = chunk.b(x & 0xf, z & 0xf);
-
+        int heightMapy = chunk.b(internalX, internalZ);
+        
         // Fix for incorrect light map
+        // TODO: Fix this properly?
         boolean incorrectHeightMap = false;
-        while (y < getHeightCap() && chunk.a(x, y, z).getMaterial().blocksLight())
+        while (heightMapy < getHeightCap() && chunk.a(internalX, heightMapy, internalZ).getMaterial().blocksLight())
         {
-            y++;
+        	heightMapy++;
             incorrectHeightMap = true;
         }
-        if (incorrectHeightMap && isSafeForLightUpdates(chunk, x, z))
+        if (incorrectHeightMap)// && isSafeForLightUpdates(chunk, x, z))
         {
             // Let Minecraft know that it made an error
-            world.w(new BlockPosition(x, y, z)); // world.relight
+            world.w(new BlockPosition(x, heightMapy, z)); // world.relight
         }
 
-        return y;
-    }
-
-    /**
-     * When a light update hits an unloaded chunk, Minecraft unfortunately
-     * attempts to generate this chunk. When this happens, two chunks will be
-     * populated at the same time, which crashes the server. We must prevent
-     * this by checking beforehand whether a light update will touch unloaded
-     * chunks. If this is the case, the light update must be skipped.
-     * @param currentChunk Current chunk (contains the following x and z)
-     * @param x Block x in the world.
-     * @param z Block z in the world.
-     * @return True if it is safe to perform a light update at this location.
-     */
-    private boolean isSafeForLightUpdates(Chunk currentChunk, int x, int z)
-    {
-        int xInChunk = x & 0xf;
-        int zInChunk = z & 0xf;
-        if (xInChunk == 0 || xInChunk == 15 || zInChunk == 0 || zInChunk == 15)
+		BukkitMaterialData material;
+    	boolean isLiquid;
+    	boolean isSolid;
+    	IBlockData blockData;
+    	Block block;
+    	
+    	for(int i = heightMapy; i >= 0; i--)
         {
-            // We're at the edge of a chunk
-            // Ensure a larger region is loaded
-            return currentChunk.areNeighborsLoaded(2);
-        }
-        return currentChunk.areNeighborsLoaded(1);
-    }
-    
-    @Override
-    public int getLightLevel(int x, int y, int z)
-    {
-        return world.j(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
-    }
-    
-    @Override
-    public boolean isLoaded(int x, int y, int z)
-    {
-        return this.getChunk(x, y, z) != null;
-    }
-    
-	@Override
-	public LocalMaterialData[] getBlockColumn(int x, int z)
-	{
-		// TODO Implement this
-		throw new RuntimeException();
-	}
-    
-    @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean allowOutsidePopulatingArea)
-    {
-        /*
-         * This method usually breaks on every Minecraft update. Always check
-         * whether the names are still correct. Often, you'll also need to
-         * rewrite parts of this method for newer block place logic.
-         */
-
-        try
-        {
-            if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
-            {
-                return;
-            }
-
-            IBlockData blockData = ((BukkitMaterialData) material).internalBlock();
-
-            // Get chunk from (faster) custom cache
-            Chunk chunk = this.getChunk(x, y, z);
-
-            if (chunk == null)
-            {
-                // Chunk is unloaded
-                return;
-            }
-
-            BlockPosition blockPos = new BlockPosition(x, y, z);
-
-            // Disable nearby block physics (except for tile entities) and set block
-            boolean oldCaptureBlockStates = this.world.captureBlockStates;
-            this.world.captureBlockStates = !(blockData.getBlock() instanceof ITileEntity);
-            IBlockData oldBlockData = chunk.a(blockPos, blockData);
-            this.world.captureBlockStates = oldCaptureBlockStates;
-
-            if (oldBlockData == null)
-            {
-                return;
-            }
-
-            if (blockData.c() != oldBlockData.c() || blockData.d() != oldBlockData.d())
-            {
-                if (isSafeForLightUpdates(chunk, x, z))
-                {
-                    // Relight
-                    world.methodProfiler.a("checkLight");
-                    world.w(blockPos);
-                    world.methodProfiler.b();
-                }
-            }
-
-    	    if (metaDataTag != null)
-    	    {
-    	    	attachMetadata(x, y, z, metaDataTag);
-    	    }
-
-            // Notify world: (2 | 16) == update client, don't update observers
-            world.notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
-        } catch (Throwable t)
-        {
-            String populatingChunkInfo = this.chunkCache == null? "(no chunk)" :
-                    this.chunkCache[0].locX + "," + this.chunkCache[0].locZ;
-            // Add location info to error
-            RuntimeException runtimeException = new RuntimeException("Error setting "
-                    + material + " block at " + x + "," + y + "," + z
-                    + " while populating chunk " + populatingChunkInfo, t);
-            runtimeException.setStackTrace(new StackTraceElement[0]);
-            throw runtimeException;
-        }
-    }    
-    
-    private void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
-    {
-        // Convert NamedBinaryTag to a native nms tag
-        NBTTagCompound nmsTag = NBTHelper.getNMSFromNBTTagCompound(tag);
-        // Add the x, y and z position to it
-        nmsTag.setInt("x", x);
-        nmsTag.setInt("y", y);
-        nmsTag.setInt("z", z);
-        // Update to current Minecraft format (maybe we want to do this at
-        // server startup instead, and then save the result?)
-        nmsTag = this.dataConverter.a(DataConverterTypes.BLOCK_ENTITY, nmsTag, -1);
-        // Add that data to the current tile entity in the world
-        TileEntity tileEntity = world.getTileEntity(new BlockPosition(x, y, z));
-        if (tileEntity != null)
-        {
-            tileEntity.load(nmsTag);
-        } else {
-        	if(OTG.getPluginConfig().spawnLog)
+    		blockData = chunk.getBlockData(new BlockPosition(internalX, i, internalZ));
+    		block = blockData.getBlock();
+    		material = BukkitMaterialData.ofMinecraftBlockData(blockData);
+        	isLiquid = material.isLiquid();
+        	isSolid =
+			(
+    			material.isSolid() ||
+    			(
+					!ignoreLeaves && 
+					(
+						block == Blocks.LEAVES || 
+						block == Blocks.LEAVES2
+					)
+				) || (						
+					!ignoreSnow && 
+					block == Blocks.SNOW_LAYER
+				)
+			);
+        	if(!(ignoreLiquid && isLiquid))
         	{
-        		OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{} on id {}", nmsTag.getString("id"), x, y, z, getMaterial(x, y, z, false));
+            	if((findSolid && isSolid) || (findLiquid && isLiquid))
+        		{
+            		return i;
+        		}
+            	if((findSolid && isLiquid) || (findLiquid && isSolid))
+            	{
+            		// Found an illegal block (liquid when looking for solid, or vice-versa)
+            		return -1;
+            	}
         	}
         }
-    }
 
-    @Override
-    public NamedBinaryTag getMetadata(int x, int y, int z)
-    {
-        return NBTHelper.getMetadata(world, x, y, z);
-    }
-
-	@Override
-	public void setAllowSpawningOutsideBounds(boolean allowSpawningOutsideBounds)
-	{
-		// TODO: Implement this?
+    	// Can happen if this is a chunk filled with air
+        return -1;
 	}
+	
+    // Faster than getHighestBlockYAt, but offers less precision. Used for resources
+    // like oregen that need to find a starting point at the surface very often.
+	@Override
+	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
+	{
+        // If the chunk exists or is inside the area being populated, fetch it normally.
+        Chunk chunk = null;
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+			//|| getChunkGenerator().chunkExists(x, z)
+		)
+    	{
+    		chunk = getChunkGenerator().getChunk(x, z);
+    	}
+		// If the chunk doesn't exist and we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if(chunk == null && chunkBeingPopulated == null)
+		{
+    		// If the chunk has already been loaded, no need to use fake chunks.
+			ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(world.getChunkProviderServer().isLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()))    		
+    		{
+    			chunk = getChunkGenerator().getChunk(x, z);
+    		} else {
+    			// Calculate the height without loading the chunk.
+    			//return generator.getHighestBlockYInUnloadedChunk(x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+    		}
+    	}
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null)
+    	{
+            return -1;
+    	}
+    	
+		// Get internal coordinates for block in chunk
+        int internalX = x & 0xF;
+        int internalZ = z & 0xF;
+
+        int heightMapy = chunk.b(internalX, internalZ);
+        
+        // Fix for incorrect light map
+        // TODO: Fix this properly?
+        boolean incorrectHeightMap = false;
+        while (heightMapy < getHeightCap() && chunk.a(internalX, heightMapy, internalZ).getMaterial().blocksLight())
+        {
+        	heightMapy++;
+            incorrectHeightMap = true;
+        }
+        if (incorrectHeightMap)// && isSafeForLightUpdates(chunk, x, z))
+        {
+            // Let Minecraft know that it made an error
+            world.w(new BlockPosition(x, heightMapy, z)); // world.relight
+        }
+        
+        return heightMapy;
+	}
+        
+    @Override
+    public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    {
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return -1;
+    	}
+    	
+    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    	// We can't check light without loading the chunk, so never allow getLightLevel to load unloaded chunks.
+    	// TODO: Check if this doesn't cause problems with BO3 LightChecks.
+    	// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
+    	if(
+			(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+			//|| getChunkGenerator().chunkExists(x, z)
+    		|| (chunkBeingPopulated == null && world.getChunkProviderServer().isLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
+		)
+    	{
+	        // This calculates the block and skylight as if it were day.
+	        return world.j(new BlockPosition(x, y, z)); // world.getBlockAndSkyLightAsItWereDay
+    	}
+		return -1;
+    }
+    
+	@Override
+	public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z)
+	{
+    	//OTG.log(LogMarker.INFO, "getBlockColumn at X" + x + " Z" + z);
+    	return generator.getBlockColumnInUnloadedChunk(x,z);
+	}
+    
+    @Override
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
+    {
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return;
+    	}
+    	
+    	// If no chunk was passed, we're doing something outside of the population cycle.
+    	// If a chunk was passed, only spawn in the area being populated, or existing chunks.
+    	if(
+			chunkBeingPopulated == null || 
+			(
+				OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated) //|| 
+				//getChunkGenerator().chunkExists(x, z)
+			)
+		)
+    	{
+    		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag);
+    	}
+    }   
 
 	@Override
 	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer)
@@ -1833,5 +1837,11 @@ public class BukkitWorld implements LocalWorld
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate)
 	{
 		return true;
+	}
+
+	@Override
+	public boolean isOTGPlus()
+	{
+		return this.getConfigs().getWorldConfig().isOTGPlus;
 	}
 }

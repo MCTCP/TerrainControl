@@ -7,7 +7,8 @@ import java.util.TreeMap;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -149,15 +150,15 @@ public class PlantType
      * @param y Y position of the lowest block of the plant.
      * @param z Z position of the plant.
      */
-    void spawn(LocalWorld world, int x, int y, int z)
+    void spawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {      
         parseMaterials(world, bottomBlock, null);
         
-        world.setBlock(x, y, z, bottomBlock, null, false);
+        world.setBlock(x, y, z, bottomBlock, null, chunkBeingPopulated);
         if (topBlock != null)
         {
             parseMaterials(world, topBlock, null);
-            world.setBlock(x, y + 1, z, topBlock, null, false);
+            world.setBlock(x, y + 1, z, topBlock, null, chunkBeingPopulated);
         }
     }
     

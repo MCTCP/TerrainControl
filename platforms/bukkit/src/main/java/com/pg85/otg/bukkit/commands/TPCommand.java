@@ -1,8 +1,8 @@
 package com.pg85.otg.bukkit.commands;
 
-import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.bukkit.biomes.BukkitBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.ChunkCoordinate;
 
@@ -57,7 +57,7 @@ public class TPCommand extends BaseCommand
 			Player player = (Player) sender;
 			Location playerLoc = player.getLocation();
 
-    		int maxRadius = 1000;
+    		int maxRadius = 500;
 
     		if(biomeId == -1)
     		{
@@ -74,29 +74,26 @@ public class TPCommand extends BaseCommand
         		{
             		for(int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)
             		{
-        				if(x1 == playerX - cycle || x1 == playerX + cycle)
-        				{
-                			for(int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
-                			{
-            					if(z1 == playerZ - cycle || z1 == playerZ + cycle)
-            					{
-            						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(playerChunk.getChunkX() + (x1 - playerX), playerChunk.getChunkZ() + (z1 - playerZ));	        	
-            						
-            						BukkitBiome biome = (BukkitBiome)world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
+            			for(int z1 = playerZ - cycle; z1 <= playerZ + cycle; z1++)
+            			{
+        					if(x1 == playerX - cycle || x1 == playerX + cycle || z1 == playerZ - cycle || z1 == playerZ + cycle)
+        					{
+        						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(playerChunk.getChunkX() + (x1 - playerX), playerChunk.getChunkZ() + (z1 - playerZ));	        	
+        						
+        						BukkitBiome biome = (BukkitBiome)world.getBiome(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter());
 
-            						if(
-        								biome != null &&
-										biome.getIds().getOTGBiomeId() == biomeId        	        	    										
-    								)
-            						{
-            							Location loc = new Location(playerLoc.getWorld(), (double)chunkCoord.getBlockXCenter(), (double)world.getHighestBlockYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter()), (double)chunkCoord.getBlockZCenter());
-            							sender.sendMessage("Teleporting to \"" + biomeName + "\".");
-            							player.teleport(loc);
-            							return true;
-            						}
-            					}
-                			}
-        				}
+        						if(
+    								biome != null &&
+									biome.getIds().getOTGBiomeId() == biomeId        	        	    										
+								)
+        						{
+        							Location loc = new Location(playerLoc.getWorld(), (double)chunkCoord.getBlockXCenter(), (double)world.getHighestBlockAboveYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), null), (double)chunkCoord.getBlockZCenter());
+        							sender.sendMessage("Teleporting to \"" + biomeName + "\".");
+        							player.teleport(loc);
+        							return true;
+        						}
+        					}
+            			}
             		}
         		}
     		}

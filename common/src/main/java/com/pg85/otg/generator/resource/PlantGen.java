@@ -1,9 +1,11 @@
 package com.pg85.otg.generator.resource;
 
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 
@@ -80,23 +82,35 @@ public class PlantGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
     	sourceBlocks.parseForWorld(world);
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
+        int j;
+        int k;
+        int m;
+        LocalMaterialData worldMaterial;
+        LocalMaterialData worldMaterialBelow;
+        
         for (int i = 0; i < 64; i++)
         {
-            int j = x + rand.nextInt(8) - rand.nextInt(8);
-            int k = y + rand.nextInt(4) - rand.nextInt(4);
-            int m = z + rand.nextInt(8) - rand.nextInt(8);            
-            if ((!world.isNullOrAir(j, k, m, false)) || (!sourceBlocks.contains(world.getMaterial(j, k - 1, m, false))))
+            j = x + rand.nextInt(8) - rand.nextInt(8);
+            k = y + rand.nextInt(4) - rand.nextInt(4);
+            m = z + rand.nextInt(8) - rand.nextInt(8);
+            worldMaterial = world.getMaterial(j, k , m, chunkBeingPopulated);
+            worldMaterialBelow = world.getMaterial(j, k - 1, m, chunkBeingPopulated);
+            if (
+        		(worldMaterial == null || !worldMaterial.isAir()) ||
+        		(worldMaterialBelow == null || !sourceBlocks.contains(worldMaterialBelow))
+    		)
             {
                 continue;
             }
 
-            plant.spawn(world, j, k, m);
+            plant.spawn(world, j, k, m, chunkBeingPopulated);
         }
     }
-
 }

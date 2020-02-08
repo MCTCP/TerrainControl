@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.forge.util.WorldHelper;
+import com.pg85.otg.forge.world.WorldHelper;
 
 public class BlockTracker
 {

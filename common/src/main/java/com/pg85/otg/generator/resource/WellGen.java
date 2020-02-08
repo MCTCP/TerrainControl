@@ -5,6 +5,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -80,20 +81,27 @@ public class WellGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
         int y = random.nextInt(maxAltitude - minAltitude) + minAltitude;
 
-        while (world.isNullOrAir(x, y, z, false) && y > minAltitude)
+        LocalMaterialData worldMaterial;
+        while (
+    		y > minAltitude && 
+    		(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
+    		worldMaterial.isAir()
+		)
         {
             --y;
         }
         
         parseMaterials(world, material, sourceBlocks);
 
-        LocalMaterialData sourceBlock = world.getMaterial(x, y, z, false);
+        worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated);
 
-        if (!sourceBlocks.contains(sourceBlock))
+        if (worldMaterial == null || !sourceBlocks.contains(worldMaterial))
         {
             return;
         }
@@ -105,7 +113,12 @@ public class WellGen extends Resource
         {
             for (j = -2; j <= 2; ++j)
             {
-                if (world.isNullOrAir(x + i, y - 1, z + j, false) && world.isNullOrAir(x + i, y - 2, z + j, false))
+                if (
+                	(worldMaterial = world.getMaterial(x + i, y - 1, z + j, chunkBeingPopulated)) == null ||
+                	worldMaterial.isAir() ||
+                	(worldMaterial = world.getMaterial(x + i, y - 2, z + j, chunkBeingPopulated)) == null ||
+                	worldMaterial.isAir()
+        		)
                 {
                     return;
                 }
@@ -118,16 +131,16 @@ public class WellGen extends Resource
             {
                 for (int var9 = -2; var9 <= 2; ++var9)
                 {
-                    world.setBlock(x + j, y + i, z + var9, material, null, false);
+                    world.setBlock(x + j, y + i, z + var9, material, null, chunkBeingPopulated);
                 }
             }
         }
 
-        world.setBlock(x, y, z, water, null, false);
-        world.setBlock(x - 1, y, z, water, null, false);
-        world.setBlock(x + 1, y, z, water, null, false);
-        world.setBlock(x, y, z - 1, water, null, false);
-        world.setBlock(x, y, z + 1, water, null, false);
+        world.setBlock(x, y, z, water, null, chunkBeingPopulated);
+        world.setBlock(x - 1, y, z, water, null, chunkBeingPopulated);
+        world.setBlock(x + 1, y, z, water, null, chunkBeingPopulated);
+        world.setBlock(x, y, z - 1, water, null, chunkBeingPopulated);
+        world.setBlock(x, y, z + 1, water, null, chunkBeingPopulated);
 
         for (i = -2; i <= 2; ++i)
         {
@@ -135,15 +148,15 @@ public class WellGen extends Resource
             {
                 if (i == -2 || i == 2 || j == -2 || j == 2)
                 {
-                    world.setBlock(x + i, y + 1, z + j, material, null, false);
+                    world.setBlock(x + i, y + 1, z + j, material, null, chunkBeingPopulated);
                 }
             }
         }
 
-        world.setBlock(x + 2, y + 1, z, slab, null, false);
-        world.setBlock(x - 2, y + 1, z, slab, null, false);
-        world.setBlock(x, y + 1, z + 2, slab, null, false);
-        world.setBlock(x, y + 1, z - 2, slab, null, false);
+        world.setBlock(x + 2, y + 1, z, slab, null, chunkBeingPopulated);
+        world.setBlock(x - 2, y + 1, z, slab, null, chunkBeingPopulated);
+        world.setBlock(x, y + 1, z + 2, slab, null, chunkBeingPopulated);
+        world.setBlock(x, y + 1, z - 2, slab, null, chunkBeingPopulated);
 
         for (i = -1; i <= 1; ++i)
         {
@@ -151,20 +164,20 @@ public class WellGen extends Resource
             {
                 if (i == 0 && j == 0)
                 {
-                    world.setBlock(x + i, y + 4, z + j, material, null, false);
+                    world.setBlock(x + i, y + 4, z + j, material, null, chunkBeingPopulated);
                 } else
                 {
-                    world.setBlock(x + i, y + 4, z + j, slab, null, false);
+                    world.setBlock(x + i, y + 4, z + j, slab, null, chunkBeingPopulated);
                 }
             }
         }
 
         for (i = 1; i <= 3; ++i)
         {
-            world.setBlock(x - 1, y + i, z - 1, material, null, false);
-            world.setBlock(x - 1, y + i, z + 1, material, null, false);
-            world.setBlock(x + 1, y + i, z - 1, material, null, false);
-            world.setBlock(x + 1, y + i, z + 1, material, null, false);
+            world.setBlock(x - 1, y + i, z - 1, material, null, chunkBeingPopulated);
+            world.setBlock(x - 1, y + i, z + 1, material, null, chunkBeingPopulated);
+            world.setBlock(x + 1, y + i, z - 1, material, null, chunkBeingPopulated);
+            world.setBlock(x + 1, y + i, z + 1, material, null, chunkBeingPopulated);
         }
     }
 }

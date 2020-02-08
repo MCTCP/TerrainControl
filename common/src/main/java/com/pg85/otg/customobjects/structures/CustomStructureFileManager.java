@@ -303,7 +303,7 @@ public class CustomStructureFileManager
 
 		    if(!structureString.equals("Null structure"))
 		    {
-		    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+		    	if(world.isOTGPlus())
 		    	{
 		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 		    	} else {
@@ -430,7 +430,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 5)
 			    	{
 			    		ModDataFunction<?> modDataFunction;
-				    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+				    	if(world.isOTGPlus())
 				    	{
 				    		modDataFunction = new BO4ModDataFunction();
 				    	} else {
@@ -453,7 +453,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 19)
 			    	{
 				    	SpawnerFunction<?> spawnerFunction;
-				    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+				    	if(world.isOTGPlus())
 				    	{
 				    		spawnerFunction = new BO4SpawnerFunction();
 				    	} else {
@@ -491,7 +491,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 11)
 			    	{
 				    	ParticleFunction<?> particleFunction;
-				    	if(world.getConfigs().getWorldConfig().isOTGPlus)
+				    	if(world.isOTGPlus())
 				    	{
 				    		particleFunction = new BO4ParticleFunction();
 				    	} else {
@@ -518,7 +518,7 @@ public class CustomStructureFileManager
 		    }
 
 		    CustomStructure structure;
-		    if(world.getConfigs().getWorldConfig().isOTGPlus)
+		    if(world.isOTGPlus())
 		    {
 		    	structure = new BO4CustomStructure(world, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
 			    ((BO4CustomStructure)structure).startChunkBlockChecksDone = true;
@@ -650,7 +650,7 @@ public class CustomStructureFileManager
 				}
 				for(ChunkCoordinate chunkCoord : entry.getValue())
 				{
-					stringbuilder.append("," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ() + ",");
+					stringbuilder.append("," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ());
 				}
 			}
 			
@@ -720,7 +720,7 @@ public class CustomStructureFileManager
 				    }
 				    if(stringbuilder.length() > 0)
 				    {
-				    	String[] allData = stringbuilder.toString().split("|");
+				    	String[] allData = stringbuilder.toString().split("\\|");				    	
 				    	occupiedChunksByName = allData[0].split("/");
 				    	if(allData.length > 1) // Legacy files may not have occupiedChunksByGroup
 				    	{
@@ -745,6 +745,7 @@ public class CustomStructureFileManager
 		String[] occupiedChunkByNameCoords = {};
 		for(String entry : occupiedChunksByName)
 		{
+			entry = entry.replace(",,", ","); // Legacy configs could have ,, in them.
 			occupiedChunkByNameCoords = entry.split(",");
 			String key = occupiedChunkByNameCoords[0].replace("\\", ",");
 			ArrayList<ChunkCoordinate> value = new ArrayList<ChunkCoordinate>();
@@ -766,6 +767,7 @@ public class CustomStructureFileManager
 		String[] occupiedChunkByGroupCoords = {};
 		for(String entry : occupiedChunksByGroup)
 		{
+			entry = entry.replace(",,", ","); // Legacy configs could have ,, in them.
 			occupiedChunkByGroupCoords = entry.split(",");
 			String key = occupiedChunkByGroupCoords[0].replace("\\", ",");
 			HashMap<ChunkCoordinate, Integer> value = new HashMap<ChunkCoordinate, Integer>();

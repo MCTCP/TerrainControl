@@ -60,12 +60,7 @@ public class EntitiesManager
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
 
-        		world.spawnEntity(newEntityData);
-
-        		if(!ChunkCoordinate.fromBlockCoords(newEntityData.x, newEntityData.z).equals(chunkCoordinate))
-        		{
-        			throw new RuntimeException(); // TODO: Remove after testing
-        		}
+        		world.spawnEntity(newEntityData, chunkCoordinate);
         	} else {
 
             	newEntityData.y = coordObject.getY() + entityDataInObject[i].y;
@@ -77,12 +72,7 @@ public class EntitiesManager
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
 
-        		world.spawnEntity(newEntityData);
-
-        		if(!ChunkCoordinate.fromBlockCoords(newEntityData.x, newEntityData.z).equals(chunkCoordinate))
-        		{
-        			throw new RuntimeException(); // TODO: Remove after testing
-        		}
+        		world.spawnEntity(newEntityData, chunkCoordinate);
         	}
     	}
     }

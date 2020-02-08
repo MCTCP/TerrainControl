@@ -8,7 +8,7 @@ import com.pg85.otg.util.helpers.StringHelper;
  *
  * <p>Numbers are limited to the given min and max values.
  */
-class FloatSetting extends Setting<Float>
+public class FloatSetting extends Setting<Float>
 {
     private final float defaultValue;
     private final float minValue;

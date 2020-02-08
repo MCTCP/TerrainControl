@@ -1,6 +1,7 @@
 package com.pg85.otg.bukkit.generator;
 
-import com.pg85.otg.bukkit.BukkitWorld;
+import com.pg85.otg.bukkit.world.BukkitWorld;
+
 import net.minecraft.server.v1_12_R1.WorldProvider;
 import net.minecraft.server.v1_12_R1.WorldProviderNormal;
 

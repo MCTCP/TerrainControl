@@ -4,7 +4,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 
 import java.util.Arrays;
@@ -17,6 +16,9 @@ import java.util.Set;
  * this set, and as such, this set can't be iterated over and its size remains
  * unknown.
  */
+// TODO: This seems really inefficient and riddiculously overcomplicated, burn with fire.
+// Looks like this is optimised mainly for use with blockchecks and BOfunctions, resources like oregen also use it though,
+// they shouldn't need any other functionality than containing a list of materials.
 public class MaterialSet
 {
     /**
@@ -42,7 +44,7 @@ public class MaterialSet
     private boolean allNonSolidMaterials = false;
 
     private int[] materialIntSet = new int[0];
-    private Set<MaterialSetEntry> materials = new LinkedHashSet<MaterialSetEntry>();
+    public Set<MaterialSetEntry> materials = new LinkedHashSet<MaterialSetEntry>();
     private boolean intSetUpToDate = true;
     private boolean parsed = false;
 
@@ -199,11 +201,11 @@ public class MaterialSet
      */
     public boolean contains(LocalMaterialData material)
     {
-        if (material == null)
+        if (material == null || material.isEmpty())
         {
             return false;
         }
-        if (allMaterials && !material.isAir())
+        if (allMaterials)
         {
             return true;
         }

@@ -1,4 +1,4 @@
-package com.pg85.otg.common;
+package com.pg85.otg.util;
 
 /**
  * Immutable class to hold the biome ids of a biome.

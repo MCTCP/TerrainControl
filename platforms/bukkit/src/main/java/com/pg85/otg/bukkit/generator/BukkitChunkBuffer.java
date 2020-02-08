@@ -1,6 +1,6 @@
 package com.pg85.otg.bukkit.generator;
 
-import com.pg85.otg.bukkit.BukkitMaterialData;
+import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;

@@ -3,9 +3,12 @@ package com.pg85.otg.util.materials;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 
+//TODO: This seems really inefficient and riddiculously overcomplicated, burn with fire.
+//Looks like this is optimised mainly for use with blockchecks and BOfunctions, resources like oregen also use it though,
+//they shouldn't need any other functionality than containing a list of materials.
 public class MaterialSetEntry
 {
-    private LocalMaterialData material;
+    public LocalMaterialData material;
     private final boolean includesBlockData;
 
     MaterialSetEntry(LocalMaterialData material, boolean includesBlockData)

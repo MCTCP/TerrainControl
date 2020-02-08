@@ -5,6 +5,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -32,9 +33,11 @@ public class BoulderGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int y = world.getHighestBlockYAt(x, z);
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
+    	int y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
         if (y < this.minAltitude || y > this.maxAltitude) {
             return;
         }
@@ -43,7 +46,7 @@ public class BoulderGen extends Resource
 
         while (y > 3)
         {
-            LocalMaterialData material = world.getMaterial(x, y - 1, z, false);
+            LocalMaterialData material = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
             if (sourceBlocks.contains(material)) {
                 break;
             }
@@ -73,7 +76,7 @@ public class BoulderGen extends Resource
                         float f4 = i3 - y;
                         if (f2 * f2 + f3 * f3 + f4 * f4 <= f1 * f1)
                         {
-                            world.setBlock(i1, i3, i2, this.material, null, false);
+                            world.setBlock(i1, i3, i2, this.material, null, chunkBeingPopulated);
                         }
                     }
                 }

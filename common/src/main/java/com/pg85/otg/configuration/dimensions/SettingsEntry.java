@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 
 public class SettingsEntry
 {
@@ -27,6 +27,7 @@ public class SettingsEntry
     	return portalMaterials;
 	}	
 	
+	public boolean IsOTGPlus = WorldStandardValues.IS_OTG_PLUS.getDefaultValue();
 	public String DimensionBelow = WorldStandardValues.DIMENSIONBELOW.getDefaultValue();
 	public String DimensionAbove = WorldStandardValues.DIMENSIONABOVE.getDefaultValue();
 	public int DimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue();
@@ -107,6 +108,7 @@ public class SettingsEntry
 		clone.SpawnPointX = this.SpawnPointX;
 		clone.SpawnPointY = this.SpawnPointY;
 		clone.SpawnPointZ = this.SpawnPointZ;
+		clone.IsOTGPlus = this.IsOTGPlus;
 		clone.TeleportToSpawnOnly = this.TeleportToSpawnOnly;
 		clone.UseCustomFogColor = this.UseCustomFogColor;
 		clone.VoidFogYFactor = this.VoidFogYFactor;

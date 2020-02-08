@@ -38,7 +38,7 @@ public final class ForgeLogger extends Logger
                 this.logger.info(message, params);
                 break;
             case DEBUG:
-            	// DEBUG only shows up in debug logs, also doesn't show up in Eclipse console.
+            	// DEBUG only shows up in debug logs
                 this.logger.info("DEBUG: " + message, params);
                 break;
             case TRACE:

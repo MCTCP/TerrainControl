@@ -13,14 +13,12 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
-import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;
+import com.pg85.otg.forge.biomes.ForgeMojangSettings;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
-import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.helpers.FileHelper;
@@ -422,7 +420,7 @@ public final class WorldLoader
         
         // Load all files
         BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(OTG.getPluginConfig().biomeConfigExtension);
-        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(defaultWorldConfig, null, defaultWorldConfig.worldHeightScale, biomeDirs, biomesToLoad);
+        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(defaultWorldConfig, defaultWorldConfig.worldHeightScale, biomeDirs, biomesToLoad);
         
         // Write all biomes
 

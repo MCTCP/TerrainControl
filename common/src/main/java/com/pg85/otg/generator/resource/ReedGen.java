@@ -5,6 +5,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -73,13 +74,15 @@ public class ReedGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int y = world.getHighestBlockYAt(x, z);
-        LocalMaterialData materialA = world.getMaterial(x - 1, y - 1, z, false);
-        LocalMaterialData materialB = world.getMaterial(x + 1, y - 1, z, false);
-        LocalMaterialData materialC = world.getMaterial(x, y - 1, z - 1, false);
-        LocalMaterialData materialD = world.getMaterial(x, y - 1, z + 1, false);
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
+        int y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+        LocalMaterialData materialA = world.getMaterial(x - 1, y - 1, z, chunkBeingPopulated);
+        LocalMaterialData materialB = world.getMaterial(x + 1, y - 1, z, chunkBeingPopulated);
+        LocalMaterialData materialC = world.getMaterial(x, y - 1, z - 1, chunkBeingPopulated);
+        LocalMaterialData materialD = world.getMaterial(x, y - 1, z + 1, chunkBeingPopulated);
         if (
     		y > this.maxAltitude || 
     		y < this.minAltitude || 
@@ -96,7 +99,7 @@ public class ReedGen extends Resource
         
         parseMaterials(world, material, sourceBlocks);
         
-        LocalMaterialData worldMaterial = world.getMaterial(x, y - 1, z, false);        
+        LocalMaterialData worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated);        
         if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
         {
             return;
@@ -105,7 +108,7 @@ public class ReedGen extends Resource
         int n = 1 + rand.nextInt(2);
         for (int i1 = 0; i1 < n; i1++)
         {
-            world.setBlock(x, y + i1, z, this.material, null, false);
+            world.setBlock(x, y + i1, z, this.material, null, chunkBeingPopulated);
         }
     }
     

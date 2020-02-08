@@ -24,7 +24,7 @@ import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
@@ -175,7 +175,7 @@ public class BO3Creator
                     Block block = world.getBlockAt(x, y, z);
                     LocalMaterialData material = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
 
-                    if (includeAir || !material.isMaterial(DefaultMaterial.AIR))
+                    if (includeAir || !material.isAir())
                     {
                         BO3BlockFunction blockFunction;
 

@@ -59,31 +59,7 @@ public interface CustomObject extends SpawnableObject
      * @return Whether the attempt was successful. (It should never fail, but you never know.)
      */
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
-
-    /**
-     * Returns whether the location would theoretically allow the object to
-     * spawn there. Frequency/rarity is ignored.
-     *
-     * @param world The world to check.
-     * @param x     X coord of the object origin.
-     * @param y     Y coord of the object origin.
-     * @param z     Z coord of the object origin.
-     * @return Whether the location allows for this object.
-     */
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
-    
-    /**
-     * Returns whether the location would theoretically allow the object to
-     * spawn there. Frequency/rarity is ignored.
-     *
-     * @param world The world to check.
-     * @param x     X coord of the object origin.
-     * @param y     Y coord of the object origin.
-     * @param z     Z coord of the object origin.
-     * @return Whether the location allows for this object.
-     */
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY);
-    
+        
     /**
      * Spawns the object at the given position. It should search a suitable y
      * location by itself. If the object isn't a tree, it shouldn't spawn and it
@@ -94,19 +70,7 @@ public interface CustomObject extends SpawnableObject
      * @param z
      * @return Whether the attempt was successful.
      */
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z);
-
-    /**
-     * Spawns the object at the given position. It should search a suitable y
-     * location by itself. If the object isn't a tree, it shouldn't spawn and it
-     * should return false.
-     *
-     * @param world
-     * @param x
-     * @param z
-     * @return Whether the attempt was successful.
-     */
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY);
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated);
     
     /**
      * Spawns the object one or more times in a chunk. The object can search a good y position by

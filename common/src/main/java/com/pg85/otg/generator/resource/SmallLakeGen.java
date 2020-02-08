@@ -5,8 +5,9 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Arrays;
@@ -74,8 +75,10 @@ public class SmallLakeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
         if (villageInChunk)
         {
             // Lakes and villages don't like each other.
@@ -88,7 +91,8 @@ public class SmallLakeGen extends Resource
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         // Search any free space
-        while ((y > 5) && (world.isNullOrAir(x, y, z, false)))
+        LocalMaterialData worldMaterial;
+        while (y > 5 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             y--;
         }
@@ -103,20 +107,34 @@ public class SmallLakeGen extends Resource
         
         parseMaterials(world, material, null);
 
+        // TODO: Why on earth would this be necessary or useful?
         synchronized (BooleanBuffer)
         {
+        	LocalMaterialData localMaterialData;
+        	LocalMaterialData localMaterialData2;
             LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
             boolean[] BooleanBuffer = new boolean[2048];
             int i = rand.nextInt(4) + 4;
+            double d1;
+            double d2;
+            double d3;
+            double d4;
+            double d5;
+            double d6;
+            double d7;
+            double d8;
+            double d9;
+            double d10;
+            boolean flag;
             for (int j = 0; j < i; j++)
             {
-                double d1 = rand.nextDouble() * 6.0D + 3.0D;
-                double d2 = rand.nextDouble() * 4.0D + 2.0D;
-                double d3 = rand.nextDouble() * 6.0D + 3.0D;
+                d1 = rand.nextDouble() * 6.0D + 3.0D;
+                d2 = rand.nextDouble() * 4.0D + 2.0D;
+                d3 = rand.nextDouble() * 6.0D + 3.0D;
 
-                double d4 = rand.nextDouble() * (16.0D - d1 - 2.0D) + 1.0D + d1 / 2.0D;
-                double d5 = rand.nextDouble() * (8.0D - d2 - 4.0D) + 2.0D + d2 / 2.0D;
-                double d6 = rand.nextDouble() * (16.0D - d3 - 2.0D) + 1.0D + d3 / 2.0D;
+                d4 = rand.nextDouble() * (16.0D - d1 - 2.0D) + 1.0D + d1 / 2.0D;
+                d5 = rand.nextDouble() * (8.0D - d2 - 4.0D) + 2.0D + d2 / 2.0D;
+                d6 = rand.nextDouble() * (16.0D - d3 - 2.0D) + 1.0D + d3 / 2.0D;
 
                 for (int k = 1; k < 15; k++)
                 {
@@ -124,10 +142,10 @@ public class SmallLakeGen extends Resource
                     {
                         for (int n = 1; n < 7; n++)
                         {
-                            double d7 = (k - d4) / (d1 / 2.0D);
-                            double d8 = (n - d5) / (d2 / 2.0D);
-                            double d9 = (m - d6) / (d3 / 2.0D);
-                            double d10 = d7 * d7 + d8 * d8 + d9 * d9;
+                            d7 = (k - d4) / (d1 / 2.0D);
+                            d8 = (n - d5) / (d2 / 2.0D);
+                            d9 = (m - d6) / (d3 / 2.0D);
+                            d10 = d7 * d7 + d8 * d8 + d9 * d9;
                             if (d10 >= 1.0D)
                             {
                                 continue;
@@ -145,16 +163,17 @@ public class SmallLakeGen extends Resource
                 {
                     for (i2 = 0; i2 < 8; i2++)
                     {
-                        boolean flag = (!BooleanBuffer[((j * 16 + i1) * 8 + i2)]) && (((j < 15) && (BooleanBuffer[(((j + 1) * 16 + i1) * 8 + i2)])) || ((j > 0) && (BooleanBuffer[(((j - 1) * 16 + i1) * 8 + i2)])) || ((i1 < 15) && (BooleanBuffer[((j * 16 + (i1 + 1)) * 8 + i2)])) || ((i1 > 0) && (BooleanBuffer[((j * 16 + (i1 - 1)) * 8 + i2)])) || ((i2 < 7) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 + 1))])) || ((i2 > 0) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 - 1))])));
+                        flag = (!BooleanBuffer[((j * 16 + i1) * 8 + i2)]) && (((j < 15) && (BooleanBuffer[(((j + 1) * 16 + i1) * 8 + i2)])) || ((j > 0) && (BooleanBuffer[(((j - 1) * 16 + i1) * 8 + i2)])) || ((i1 < 15) && (BooleanBuffer[((j * 16 + (i1 + 1)) * 8 + i2)])) || ((i1 > 0) && (BooleanBuffer[((j * 16 + (i1 - 1)) * 8 + i2)])) || ((i2 < 7) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 + 1))])) || ((i2 > 0) && (BooleanBuffer[((j * 16 + i1) * 8 + (i2 - 1))])));
 
                         if (flag)
                         {
-                            LocalMaterialData localMaterialData = world.getMaterial(x + j, y + i2, z + i1, false);
-                            if ((i2 >= 4) && (localMaterialData.isLiquid()))
+                            localMaterialData = world.getMaterial(x + j, y + i2, z + i1, chunkBeingPopulated);
+                            if ((i2 >= 4) && (localMaterialData == null || localMaterialData.isLiquid()))
                             {
                                 return;
                             }
-                            if ((i2 < 4) && (!localMaterialData.isSolid()) && !world.getMaterial(x + j, y + i2, z + i1, false).equals(material))
+                            localMaterialData2 = world.getMaterial(x + j, y + i2, z + i1, chunkBeingPopulated);
+                            if ((i2 < 4) && (localMaterialData == null || !localMaterialData.isSolid()) && (localMaterialData2 == null || !localMaterialData2.equals(material)))
                             {
                                 return;
                             }
@@ -171,7 +190,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, material, null, false);
+                            world.setBlock(x + j, y + i2, z + i1, material, null, chunkBeingPopulated);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -179,7 +198,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, air, null, false);
+                            world.setBlock(x + j, y + i2, z + i1, air, null, chunkBeingPopulated);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }

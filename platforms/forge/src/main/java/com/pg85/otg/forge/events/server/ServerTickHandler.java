@@ -19,15 +19,15 @@ import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.customobjects.bofunctions.SpawnerFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
-import com.pg85.otg.forge.util.WorldHelper;
+import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.world.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityCreature;
@@ -201,7 +201,7 @@ public class ServerTickHandler
 		    								try
 		    								{
 		    									EntityFunction<?> entityFunc;
-		    									if(world.getConfigs().getWorldConfig().isOTGPlus)
+		    									if(world.isOTGPlus())
 		    									{
 	    											entityFunc = new BO4EntityFunction();		
 		    									} else {
@@ -216,7 +216,7 @@ public class ServerTickHandler
 		    									entityFunc.nameTagOrNBTFileName = paramString2.length > 5 ? paramString2[5] : null;
 		    									entityFunc.originalNameTagOrNBTFileName = entityFunc.nameTagOrNBTFileName;
 
-		    									world.spawnEntity(entityFunc);
+		    									world.spawnEntity(entityFunc, null);
 		    								}
 		    								catch(NumberFormatException ex)
 		    								{
@@ -230,7 +230,7 @@ public class ServerTickHandler
 		    							{
 		    								try {
 												LocalMaterialData material = MaterialHelper.readMaterial(paramString2[1]);
-			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, true);
+			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, null);
 											}
 		    								catch (InvalidConfigException e)
 		    								{

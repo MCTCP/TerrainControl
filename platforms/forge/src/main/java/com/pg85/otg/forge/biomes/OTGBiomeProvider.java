@@ -4,16 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.google.common.collect.Lists;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.generator.structure.OTGVillageGen;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
-import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
-
-import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;

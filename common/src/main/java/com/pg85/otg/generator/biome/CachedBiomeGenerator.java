@@ -4,11 +4,6 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-
 /**
  * Wraps uncached biome generators.
  * @see BiomeModeManager#createCached(Class, LocalWorld)

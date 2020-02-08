@@ -1,14 +1,10 @@
 package com.pg85.otg.customobjects.structures;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.bo3.BO3;
-import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
-import java.util.Random;
 
 /**
  * Represents an object along with its location in the world.
@@ -25,9 +21,7 @@ public abstract class CustomStructureCoordinate
     public int z;
 	
     protected CustomStructureCoordinate() { } 
-        
-    public abstract boolean spawnWithChecks(CustomStructure structure, LocalWorld world, StructurePartSpawnHeight height, Random random);
-    
+            
     public int getX()
     {
         return x;
@@ -67,11 +61,6 @@ public abstract class CustomStructureCoordinate
     {
     	if(object == null)
     	{
-    		if(worldName == null)
-    		{
-    			throw new RuntimeException(); // TODO: Remove this after testing
-    		}
-
     		CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(bo3Name, worldName);
 
     		if(object == null || !(object instanceof StructuredCustomObject))
@@ -83,11 +72,6 @@ public abstract class CustomStructureCoordinate
     			}
     		}
 			bo3Name = object != null ? object.getName() : bo3Name;
-
-    		if(object != null && ((BO3)object).getSettings() == null)
-    		{
-    			throw new RuntimeException(); // TODO: Remove this after testing
-    		}
 
     		this.object = (StructuredCustomObject)object;
     		return this.object;

@@ -36,7 +36,12 @@ public class WorldStandardValues extends Settings
      * Temperatures below this temperature will cause the biome to be covered
      * by snow.
      */
-    public static final float SNOW_AND_ICE_MAX_TEMP = 0.15F;
+	// OTG biome temperature is between 0.0 and 2.0, snow should appear below 0.15.
+	// According to the configs, snow and ice should appear between 0.2 (at y > 90) and 0.1 (entire biome covered in ice).
+	// Make sure that at 0.2, snow layers start with thickness 0 at y 90 and thickness 7 around y255.
+	// In a 0.2 temp biome, y90 temp is 0.156, y255 temp is -0.12
+    public static final float SNOW_AND_ICE_TEMP = 0.15F;
+    public static final float SNOW_AND_ICE_MAX_TEMP = -0.115f;
     public static final float ICE_GROUP_MAX_TEMP = 0.33F;
 
     public static class BiomeGroupNames
@@ -146,7 +151,6 @@ public class WorldStandardValues extends Settings
         RANDOM_RIVERS = booleanSetting("RandomRivers", false),
         IMPROVED_RIVERS = booleanSetting("ImprovedRivers", false),
         FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
-        USE_TEMPERATURE_FOR_SNOW_HEIGHT = booleanSetting("UseTemperatureForSnowHeight", false),
         BETTER_SNOW_FALL = booleanSetting("BetterSnowFall", false),
         FULLY_FREEZE_LAKES = booleanSetting("FullyFreezeLakes", false),
         EVEN_CAVE_DISTRIBUTION = booleanSetting("EvenCaveDistrubution", false),

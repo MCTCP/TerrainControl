@@ -1,35 +1,43 @@
-package com.pg85.otg.forge.util;
+package com.pg85.otg.forge.materials;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.BlockHelper;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
+//TODO: Clean up and optimise ForgeMaterialData/BukkitMaterialData/LocalMaterialData/MaterialHelper/OTGEngine.readMaterial
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
  *
  */
 public class ForgeMaterialData implements LocalMaterialData
 {
+	DefaultMaterial defaultMaterial;
     private IBlockState blockData;
     private boolean checkFallbacks = false;
     private String rawEntry;
     private boolean isBlank = false;
-
-    public static ForgeMaterialData getBlank()
+    boolean metaIdSet = false;
+    byte metaId;
+    boolean materialIdSet = false;
+    int materialId;
+    private String name;
+    
+    private ForgeMaterialData(IBlockState blockData, int blockId, int blockMetaData)
     {
-    	ForgeMaterialData material = new ForgeMaterialData((IBlockState)null);
-    	material.isBlank = true;
-    	return material;
+        this.blockData = blockData;
+        this.materialIdSet = true;
+        this.materialId = blockId;
+        this.metaIdSet = true;
+        this.metaId = (byte)blockMetaData;
     }
     
     private ForgeMaterialData(IBlockState blockData)
@@ -37,10 +45,19 @@ public class ForgeMaterialData implements LocalMaterialData
         this.blockData = blockData;
     }
     
-    private ForgeMaterialData(String raw) {
+    private ForgeMaterialData(String raw)
+    {
     	this.blockData = null;
     	this.rawEntry = raw;
     	this.checkFallbacks = true;
+    }
+    
+    public static ForgeMaterialData getBlank()
+    {
+    	ForgeMaterialData material = new ForgeMaterialData((IBlockState)null);
+    	material.isBlank = true;
+    	material.checkFallbacks = false;
+    	return material;
     }
 
     public static ForgeMaterialData ofString(String input) throws InvalidConfigException
@@ -50,7 +67,7 @@ public class ForgeMaterialData implements LocalMaterialData
         // as the block "minecraft" with data "stone", but instead as the
         // block "minecraft:stone" with no block data.
 
-    	// Used in BO3's as placeholder/detector block.
+    	// Used in BO4's as placeholder/detector block.
     	if(input.toLowerCase().equals("blank"))
     	{
     		return ForgeMaterialData.getBlank();
@@ -129,7 +146,6 @@ public class ForgeMaterialData implements LocalMaterialData
             	// However, the default rotation has changed so fix this by adding the correct metadata.
 
                 // TODO: Check if the block uses the Facing property instead of checking a list of known blocks?
-                
             	if(
         			blockData == -1 &&
         			(
@@ -196,7 +212,7 @@ public class ForgeMaterialData implements LocalMaterialData
     {
         Block block = Block.getBlockById(id);
         IBlockState blockData = block.getStateFromMeta(data);
-        return ofMinecraftBlockState(blockData);
+        return new ForgeMaterialData(blockData, id, data);
     }
 
     /**
@@ -262,48 +278,63 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public byte getBlockData()
     {
-        return this.blockData == null ? 0 : (byte) this.blockData.getBlock().getMetaFromState(this.blockData);
+    	if(!this.metaIdSet)
+    	{
+    		this.metaIdSet = true;
+    		this.metaId = this.blockData == null ? 0 : (byte) this.blockData.getBlock().getMetaFromState(this.blockData);
+    	}
+        return this.metaId;
     }
 
     @Override
     public int getBlockId()
     {
-        return this.blockData == null ? 0 : Block.getIdFromBlock(this.blockData.getBlock());
+    	if(!this.materialIdSet)
+    	{
+    		this.materialIdSet = true;
+    		this.materialId = this.blockData == null ? 0 : Block.getIdFromBlock(this.blockData.getBlock());
+    	}
+        return this.materialId;
     }
 
     @Override
     public String getName()
     {
-    	if(isBlank)
+    	if(this.name == null)
     	{
-    		return "BLANK";
+	    	if(isBlank)
+	    	{
+	    		this.name = "BLANK";
+	    	}
+	    	else if(this.blockData == null)
+	    	{
+	    		this.name = "Unknown";
+	    	} else {
+		        Block block = this.blockData.getBlock();
+		        DefaultMaterial defaultMaterial = toDefaultMaterial();
+		
+		        byte data = getBlockData();
+		        boolean nonDefaultData = !block.getDefaultState().equals(this.blockData);
+		        boolean noData = this.blockData.getPropertyKeys().isEmpty();
+		        // Note that the above line is not equivalent to data != 0, as for
+		        // example pumpkins have a default data value of 2
+		
+		        if (defaultMaterial == DefaultMaterial.UNKNOWN_BLOCK)
+		        {
+		            // Use Minecraft's name
+		            if (nonDefaultData)
+		            {
+		            	this.name = Block.REGISTRY.getNameForObject(block) + (noData ? "" : ":" + data);
+		            } else {
+		            	this.name = Block.REGISTRY.getNameForObject(block).toString();
+		            }
+		        } else {
+		            // Use our name
+		        	this.name = defaultMaterial.name() + (noData ? "" : ":" + data);
+		        }
+	    	}
     	}
-    	if(this.blockData == null)
-    	{
-    		return "Unknown";
-    	}
-
-        Block block = this.blockData.getBlock();
-        DefaultMaterial defaultMaterial = toDefaultMaterial();
-
-        byte data = getBlockData();
-        boolean nonDefaultData = !block.getDefaultState().equals(this.blockData);
-        boolean noData = this.blockData.getPropertyKeys().isEmpty();
-        // Note that the above line is not equivalent to data != 0, as for
-        // example pumpkins have a default data value of 2
-
-        if (defaultMaterial == DefaultMaterial.UNKNOWN_BLOCK)
-        {
-            // Use Minecraft's name
-            if (nonDefaultData)
-            {
-                return Block.REGISTRY.getNameForObject(this.blockData.getBlock()) + (noData ? "" : ":" + data);
-            }
-            return Block.REGISTRY.getNameForObject(this.blockData.getBlock()).toString();
-        } else {
-            // Use our name
-            return defaultMaterial.name() + (noData ? "" : ":" + getBlockData());
-        }
+    	return this.name;
     }
 
     public IBlockState internalBlock()
@@ -320,12 +351,22 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isLiquid()
     {
+    	// For some reason, .isLiquid() appears to be 
+    	// really slow, so use defaultMaterial instead.
+    	
+        // Let us override whether materials are solid
+        DefaultMaterial defaultMaterial = toDefaultMaterial();
+        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        {
+            return defaultMaterial.isLiquid();
+        }
+        
         return this.blockData == null ? false : this.blockData.getMaterial().isLiquid();
     }
 
     @Override
     public boolean isSolid()
-    {
+    {   	
         // Let us override whether materials are solid
         DefaultMaterial defaultMaterial = toDefaultMaterial();
         if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
@@ -337,9 +378,21 @@ public class ForgeMaterialData implements LocalMaterialData
     }
     
     @Override
+    public boolean isEmptyOrAir()
+    {
+        return this.blockData == null ? true : this.blockData.getBlock() == Blocks.AIR;
+    }
+    
+    @Override
     public boolean isAir()
     {
-        return this.blockData == null ? true : this.blockData.getMaterial() == Material.AIR;
+        return this.blockData != null && this.blockData.getBlock() == Blocks.AIR;
+    }
+    
+    @Override
+    public boolean isEmpty()
+    {
+        return this.blockData == null;
     }
 
     @Override
@@ -363,7 +416,7 @@ public class ForgeMaterialData implements LocalMaterialData
     @Override
     public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
     {
-    	DefaultMaterial defaultMaterial = this.toDefaultMaterial();
+    	DefaultMaterial defaultMaterial = toDefaultMaterial();
     	return
     		(
 				defaultMaterial.equals(DefaultMaterial.ICE) ||
@@ -402,7 +455,7 @@ public class ForgeMaterialData implements LocalMaterialData
             	// and shouldn't need to edit them, so they can be re-used. TODO: Make sure this won't cause problems.
             	try
             	{
-					return MaterialHelper.readMaterial(Block.REGISTRY.getNameForObject(this.blockData.getBlock()).toString() + ":" + newData);
+					return MaterialHelper.readMaterial(defaultMaterial.name() + ":" + newData);
 				}
             	catch (InvalidConfigException e)
             	{
@@ -441,32 +494,46 @@ public class ForgeMaterialData implements LocalMaterialData
 
         // No changes, return object itself
         return this;
-    }
-    
+    }    
 
 	@Override
-	public LocalMaterialData parseForWorld(LocalWorld world) {
-		if (this.checkFallbacks) {
+	public LocalMaterialData parseForWorld(LocalWorld world)
+	{
+		if (this.checkFallbacks)
+		{
 			this.checkFallbacks = false;
-			this.blockData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).blockData;
+			IBlockState newBlockData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).blockData;
+			if(newBlockData != null && !newBlockData.equals(this.blockData))
+			{
+				this.blockData = newBlockData;
+				this.metaIdSet = false;
+				this.materialIdSet = false;
+				this.rawEntry = null;
+				this.defaultMaterial = null;
+				this.name = null;
+			}
 		}
 		return this;
 	}
 
-    
     @Override
     public DefaultMaterial toDefaultMaterial()
     {
-    	if(this.blockData == null)
+    	if(this.defaultMaterial == null)
     	{
-    		return DefaultMaterial.UNKNOWN_BLOCK;
+        	if(this.blockData == null)
+        	{
+        		this.defaultMaterial = DefaultMaterial.UNKNOWN_BLOCK;
+        	} else {
+        		this.defaultMaterial = DefaultMaterial.getMaterial(getBlockId());
+        	}
     	}
-    	return DefaultMaterial.getMaterial(getBlockId());
+    	return defaultMaterial;
     }
-    
 
 	@Override
-	public boolean isParsed() {
+	public boolean isParsed()
+	{
 		return !checkFallbacks;
 	}
     
@@ -474,7 +541,7 @@ public class ForgeMaterialData implements LocalMaterialData
     public int hashCode()
     {
         // From 4096 to 69632 when there are 4096 block ids
-        return PluginStandardValues.SUPPORTED_BLOCK_IDS + getBlockId() * 16 + getBlockData();
+        return PluginStandardValues.SUPPORTED_BLOCK_IDS + (getBlockId() * 16) + getBlockData();
     }
 
     @Override
@@ -496,11 +563,7 @@ public class ForgeMaterialData implements LocalMaterialData
             return false;
         }
         ForgeMaterialData other = (ForgeMaterialData) obj;
-        if (!this.blockData.equals(other.blockData))
-        {
-            return false;
-        }
-        return true;
+        return this.blockData.equals(other.blockData);
     }
     
     @Override

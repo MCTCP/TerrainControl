@@ -49,7 +49,7 @@ class BranchDataItem
 		branchNumber = BranchDataItem.BranchDataItemCounter;
 	}	
 	
-	Stack<BranchDataItem> getChildren(boolean dontSpawn, LocalWorld world)
+	Stack<BranchDataItem> getChildren(boolean dontSpawn, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
 	{
 		if(world == null)
 		{
@@ -58,7 +58,7 @@ class BranchDataItem
 
     	if(!dontSpawn && this.children.size() == 0)
     	{
-	        Branch[] branches = this.branch.getStructuredObject().getBranches();
+	        Branch[] branches = ((BO4)this.branch.getStructuredObject()).getBranches();
 	        for (Branch branch1 : branches)
 	        {
 		    	BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(world, this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name);
@@ -75,11 +75,11 @@ class BranchDataItem
 		    		// they are most commonly spawned on top of those BO3's to add randomised parts.
 		    		// For instance interiors for rooms, doors, BO3's that knock out walls or ceilings between rooms etc.
 		    		// "interior" BO3's failing to spawn cannot cause the "fundament" BO3's to be rolled back.
-		    		// this is enforced by makign sure that canOverride optional branches cannot be in a branch group with other branches.
+		    		// this is enforced by making sure that canOverride optional branches cannot be in a branch group with other branches.
 		    		if(
 	    				childCoordObject.branchGroup != null &&
 	    				childCoordObject.branchGroup.trim().length() > 0 &&
-	    				childBO3.getSettings().canOverride &&
+	    				childBO3.getConfig().canOverride &&
 	    				!childCoordObject.isRequiredBranch
     				)
 		    		{
@@ -90,18 +90,18 @@ class BranchDataItem
 		    			continue;
 		    		}
 
-		    		if(childBO3.getSettings().overrideParentHeight)
+		    		if(childBO3.getConfig().overrideParentHeight)
 		    		{
-    		    		if(childBO3.getSettings().spawnHeight == SpawnHeightEnum.highestBlock || childBO3.getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock || childBO3.getSettings().spawnAtWaterLevel)
+    		    		if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestBlock || childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel)
     		    		{
-    		    			childCoordObject.y = (short) world.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getSettings().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getSettings().spawnAtWaterLevel, childBO3.getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getSettings().spawnAtWaterLevel, true);
+    		    			childCoordObject.y = (short) world.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getConfig().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel, childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getConfig().spawnAtWaterLevel, true, true, null);
     		    		}
-    		    		else if(childBO3.getSettings().spawnHeight == SpawnHeightEnum.randomY)
+    		    		else if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.randomY)
     		    		{
-    		    			childCoordObject.y = (short) RandomHelper.numberInRange(this.random, childBO3.getSettings().minHeight, childBO3.getSettings().maxHeight);
+    		    			childCoordObject.y = (short) RandomHelper.numberInRange(this.random, childBO3.getConfig().minHeight, childBO3.getConfig().maxHeight);
     		    		}
 		    		}
-		    		childCoordObject.y += childBO3.getSettings().heightOffset;
+		    		childCoordObject.y += childBO3.getConfig().heightOffset;
 		    		//if(childCoordObject.y < childBO3.settings.minHeight || childCoordObject.y > childBO3.settings.maxHeight)
 		    		{
 		    			//continue; // TODO: Don't do this for required branches? instead do rollback?
@@ -134,7 +134,7 @@ class BranchDataItem
 
 	public boolean getHasOptionalBranches(LocalWorld world)
 	{
-        Branch[] branches = this.branch.getStructuredObject().getBranches();
+        Branch[] branches = ((BO4)this.branch.getStructuredObject()).getBranches();
         for (Branch branch1 : branches)
         {
         	BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(world, this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name);

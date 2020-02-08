@@ -21,16 +21,19 @@ public final class FossilGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        return;
+        // Left blank, as spawnInChunk already handles this.
     }
 
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         if (random.nextDouble() * 100.0 > rarity)
+        {
             return;
+        }
+        
         // Unfortunately, Minecraft ignores the passed random instance, and
         // creates one based on the chunk coords and world seed. This means
         // that spawning the object multiple times in a chunk will just

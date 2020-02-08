@@ -1,10 +1,13 @@
 package com.pg85.otg.configuration.customobjects;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
+import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
 
 import java.io.*;
 
@@ -69,6 +72,16 @@ public abstract class CustomObjectConfigFile
         } finally
         {
             writer.close();
+        }
+        
+        if(writer.getFile().getName().toLowerCase().trim().endsWith(".bo3") && this instanceof BO4Config)
+        {
+	        // Rename BO3 to BO4
+	        File newFile = new File(writer.getFile().getParentFile(), this.getName() + ".BO4");
+	        if (!writer.getFile().renameTo(newFile))
+	        {
+	        	OTG.log(LogMarker.INFO, "Could not rename file " + newFile.getName() + " to BO4, the file may be in use.");
+	        }
         }
     }
 

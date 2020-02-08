@@ -2,7 +2,7 @@ package com.pg85.otg.bukkit.commands;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPlugin;
-import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.common.LocalWorld;
 
 import org.bukkit.Bukkit;

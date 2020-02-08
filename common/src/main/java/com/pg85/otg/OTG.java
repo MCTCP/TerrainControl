@@ -2,13 +2,18 @@ package com.pg85.otg;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.OTGEngine;
 import com.pg85.otg.configuration.PluginConfig;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.io.FileSettingsReader;
+import com.pg85.otg.configuration.io.SettingsMap;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
+import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.events.EventPriority;
 import com.pg85.otg.generator.ChunkBuffer;
@@ -16,6 +21,13 @@ import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -320,5 +332,85 @@ public class OTG
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
         Engine.getLogger().log(level, stringWriter.toString());
+    }
+    
+    public static String correctOldBiomeConfigFolder(File settingsDir)
+    {
+        // Rename the old folder
+        String biomeFolderName = WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME;
+        File oldBiomeConfigs = new File(settingsDir, "BiomeConfigs");
+        if (oldBiomeConfigs.exists())
+        {
+            if (!oldBiomeConfigs.renameTo(new File(settingsDir, biomeFolderName)))
+            {
+                OTG.log(LogMarker.WARN, "========================");
+                OTG.log(LogMarker.WARN, "Found old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName, "`!");
+                OTG.log(LogMarker.WARN, "Please rename the folder manually.");
+                OTG.log(LogMarker.WARN, "========================");
+                biomeFolderName = "BiomeConfigs";
+            }
+        }
+        return biomeFolderName;
+    }
+        
+	public static WorldConfig loadWorldConfigFromDisk(File worldDir)
+	{
+        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+        if(!worldConfigFile.exists())
+        {
+        	return null;
+        }
+        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
+        return new WorldConfig(worldDir, settingsMap, null, null);
+	}
+	
+    public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
+    {
+        int chunkX = blockX >> 4;
+        int chunkZ = blockZ >> 4;
+        return
+			(
+				chunkX == chunkBeingPopulated.getChunkX() ||
+				chunkX == chunkBeingPopulated.getChunkX() + 1
+			) && (
+				chunkZ == chunkBeingPopulated.getChunkZ() ||
+				chunkZ == chunkBeingPopulated.getChunkZ() + 1
+			)
+		;
+    }
+    
+    public static void generateBO4Data(BO4Config config)
+    {
+        //write to disk
+		String filePath = 
+			config.getFile().getAbsolutePath().endsWith(".BO4") ? config.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".bo4") ? config.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".BO3") ? config.getFile().getAbsolutePath().replace(".BO3", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".bo3") ? config.getFile().getAbsolutePath().replace(".bo3", ".BO4Data") :
+			config.getFile().getAbsolutePath();
+
+        File file = new File(filePath);
+        if(!file.exists())
+        {
+            try {                
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				DataOutputStream dos = new DataOutputStream(bos);
+				config.writeToStream(dos);
+				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
+				dos.close();
+				FileOutputStream fos = new FileOutputStream(file);
+				DataOutputStream dos2 = new DataOutputStream(fos);
+				dos2.write(compressedBytes, 0, compressedBytes.length);
+				dos2.close();
+            }
+            catch (FileNotFoundException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
     }
 }

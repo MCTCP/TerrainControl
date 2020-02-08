@@ -14,10 +14,10 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StreamHelper;
@@ -55,6 +55,8 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    	StreamHelper.writeStringToStream(stream, pregenerator.pregenerationWorld);
 	    	stream.writeBoolean(pregenerator.getPregeneratorIsRunning());
 	    	stream.writeInt(pregenerator.progressScreenWorldSizeInBlocks);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenCycle);
+	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenRadius);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgress);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.preGeneratorProgressStatus);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenElapsedTime);
@@ -97,6 +99,8 @@ public class PregeneratorStatusPacket extends OTGPacket
 				    	String pregenerationWorld = StreamHelper.readStringFromStream(message.getStream());
 				    	Boolean pregeneratorIsRunning = message.getStream().readBoolean();
 				    	int progressScreenWorldSizeInBlocks = message.getStream().readInt();
+				    	String progressScreenCycle = StreamHelper.readStringFromStream(message.getStream());
+				    	String progressScreenRadius = StreamHelper.readStringFromStream(message.getStream());
 				    	String preGeneratorProgress = StreamHelper.readStringFromStream(message.getStream());
 				    	String preGeneratorProgressStatus = StreamHelper.readStringFromStream(message.getStream());
 				    	String progressScreenElapsedTime = StreamHelper.readStringFromStream(message.getStream());
@@ -117,6 +121,8 @@ public class PregeneratorStatusPacket extends OTGPacket
 				    		Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator();
 				    		pregenerator.setPregeneratorIsRunning(pregeneratorIsRunning);
 				    		pregenerator.progressScreenWorldSizeInBlocks = progressScreenWorldSizeInBlocks;
+				    		pregenerator.progressScreenCycle = progressScreenCycle;
+				    		pregenerator.progressScreenRadius = progressScreenRadius;				    						    		
 				    		pregenerator.preGeneratorProgress = preGeneratorProgress;
 				    		pregenerator.preGeneratorProgressStatus = preGeneratorProgressStatus;
 				    		pregenerator.progressScreenElapsedTime = progressScreenElapsedTime;

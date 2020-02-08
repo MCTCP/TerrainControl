@@ -2,18 +2,11 @@ package com.pg85.otg.customobjects.structures.bo4;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
-import com.pg85.otg.customobjects.bo4.BO4;
-import com.pg85.otg.customobjects.structures.CustomStructure;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
-
-import java.util.Random;
 
 /**
  * Represents an object along with its location in the world.
@@ -29,17 +22,13 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     public BO4CustomStructureCoordinate(LocalWorld world, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
     {
     	this.worldName = world != null ? world.getName() : null;
-
     	this.bo3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
-
         this.object = object;
-
         this.rotation = rotation != null ? rotation : Rotation.NORTH;
         this.x = x;
         this.y = y;
         this.z = z;
         this.branchDepth = branchDepth;
-
         this.isRequiredBranch = isRequiredBranch;
         this.isWeightedBranch = isWeightedBranch;
         this.branchGroup = branchGroup;
@@ -54,11 +43,6 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     {
     	if(this.object == null)
     	{
-    		if(this.worldName == null)
-    		{
-    			throw new RuntimeException(); // TODO: Remove this after testing
-    		}
-
     		CustomObject object = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.bo3Name, this.worldName);
 
     		if(object == null || !(object instanceof StructuredCustomObject))
@@ -70,11 +54,6 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     			}
     		}
     		this.bo3Name = object != null ? object.getName() : this.bo3Name;
-
-    		if(object != null && ((BO4)object).getSettings() == null)
-    		{
-    			throw new RuntimeException(); // TODO: Remove this after testing
-    		}
 
     		this.object = (StructuredCustomObject)object;
     		return this.object;
@@ -94,7 +73,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     {
     	return (StructuredCustomObject)getObject();
     }
-    
+        
     @Override
     public int hashCode()
     {
@@ -143,11 +122,6 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     public static BO4CustomStructureCoordinate getRotatedBO3CoordsJustified(int x, int y, int z, Rotation newRotation)
     {
     	int rotations = newRotation.getRotationId();
-    	if(rotations < 0)
-    	{
-    		throw new RuntimeException(); // TODO: Remove this after testing
-    		//rotations += 4;
-    	}
 
     	int rotatedX = x;
     	int rotatedZ = z;
@@ -170,11 +144,6 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     public static BO4CustomStructureCoordinate getRotatedCoord(int x, int y, int z, Rotation newRotation)
     {
     	int rotations = newRotation.getRotationId();
-    	if(rotations < 0)
-    	{
-    		throw new RuntimeException(); // TODO: Remove this after testing
-    		//rotations += 4;
-    	}
 
     	int rotatedX = x;
     	int rotatedZ = z;
@@ -191,27 +160,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 
     	return new BO4CustomStructureCoordinate(null, null, null, newRotation, rotatedX, (short)y, rotatedZ, 0, false, false, null);
     }    
-    
-    @Override
-    public boolean spawnWithChecks(CustomStructure structure, LocalWorld world, StructurePartSpawnHeight height, Random random)
-    {
-        return false;
-    }
-
-    boolean spawnWithChecks(ChunkCoordinate chunkCoord, LocalWorld world, Random random, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly)
-    {
-    	if(getObject() == null)
-    	{
-    		throw new RuntimeException(); // TODO: Remove this after testing
-    	}
-        if(getObject() instanceof BO4)
-        {
-        	return ((BO4)getObject()).trySpawnAt(world, random, rotation, chunkCoord, x, y, z, replaceAbove, replaceBelow, replaceWithBiomeBlocks, replaceWithSurfaceBlock, replaceWithGroundBlock, spawnUnderWater, waterLevel, isStructureAtSpawn, doReplaceAboveBelowOnly);
-        } else {
-        	throw new RuntimeException(); // TODO: Remove this after testing
-        }
-    }
-    
+        
     /**
      * Rotates a coordinate around its center, assumes the center is at 0,0.
      * Should only be used for resouces that like Block() that spawn in BO3's and have a -1z offset.
@@ -220,12 +169,6 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     public static BO4CustomStructureCoordinate getRotatedBO3Coords(int x, int y, int z, Rotation newRotation)
     {
     	int rotations = newRotation.getRotationId();
-    	if(rotations < 0)
-    	{
-    		throw new RuntimeException(); // TODO: Remove this after testing
-    		//rotations += 4;
-    	}
-
     	int rotatedX = x;
     	int rotatedZ = z;
 

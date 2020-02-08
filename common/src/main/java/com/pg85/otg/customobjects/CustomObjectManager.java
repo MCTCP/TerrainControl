@@ -1,10 +1,11 @@
 package com.pg85.otg.customobjects;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.customobjects.bo2.BO2Loader;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Loader;
-import com.pg85.otg.util.minecraft.defaults.TreeType;
-
+import com.pg85.otg.logging.LogMarker;
+import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,11 +56,25 @@ public class CustomObjectManager
         registerCustomObjectLoader("bo4data", new BO4Loader());
 
         this.globalCustomObjects = new CustomObjectCollection();
-        
-        // Put some default CustomObjects
-        for (TreeType type : TreeType.values())
+               
+        if(!OTG.getPluginConfig().developerMode)
         {
-            registerGlobalObject(new TreeObject(type));
+	        new Thread() { 
+	    		public void run()
+	    		{
+	    			globalCustomObjects.indexGlobalObjectsFolder();
+	    			
+	    		    for(File file : OTG.getEngine().getWorldsDirectory().listFiles())
+	    		    {
+	    		    	if(file.isDirectory())
+	    		    	{
+	    		    		String worldName = file.getName();
+	    		    		globalCustomObjects.indexWorldObjectsFolder(worldName);
+	    		    	}
+	    		    }
+	    		    OTG.log(LogMarker.INFO, "All CustomObject files indexed.");
+	    		}
+	        }.start();
         }
     }
     

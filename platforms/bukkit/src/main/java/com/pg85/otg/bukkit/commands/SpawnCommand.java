@@ -14,7 +14,7 @@ import org.bukkit.util.BlockIterator;
 import com.pg85.otg.OTG;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
-import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.bo3.Rotation;
@@ -85,8 +85,7 @@ public class SpawnCommand extends BaseCommand
         if (spawnObject.spawnForced(bukkitWorld, random, Rotation.NORTH, block.getX(), block.getY(), block.getZ()))
         {
             me.sendMessage(BaseCommand.MESSAGE_COLOR + spawnObject.getName() + " was spawned.");
-        } else
-        {
+        } else {
             me.sendMessage(BaseCommand.ERROR_COLOR + "Object can't be spawned over there.");
         }
 

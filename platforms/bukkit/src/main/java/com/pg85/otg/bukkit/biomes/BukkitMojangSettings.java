@@ -1,12 +1,12 @@
-package com.pg85.otg.forge.configuration.standard;
+package com.pg85.otg.bukkit.biomes;
 
+import com.pg85.otg.bukkit.materials.BukkitMaterialData;
+import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.configuration.standard.MojangSettings;
-import com.pg85.otg.forge.util.ForgeMaterialData;
-import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 
-import net.minecraft.world.biome.Biome;
+import net.minecraft.server.v1_12_R1.BiomeBase;
 
 import java.util.List;
 
@@ -16,9 +16,9 @@ import java.util.List;
  *
  * @see MojangSettings
  */
-public final class ForgeMojangSettings implements MojangSettings
+public final class BukkitMojangSettings implements MojangSettings
 {
-    private final Biome biomeBase;
+    private final BiomeBase biomeBase;
 
     /**
      * Creates an instance that provides access to the default settings of the
@@ -29,12 +29,7 @@ public final class ForgeMojangSettings implements MojangSettings
      */
     public static MojangSettings fromId(int biomeId)
     {
-    	Biome baseBiome = Biome.getBiome(biomeId);
-    	if(baseBiome != null)
-    	{
-    		return fromBiomeBase(baseBiome);
-    	}
-    	throw new RuntimeException("This should not happen."); // TODO: Remove after testing
+        return fromBiomeBase(BiomeBase.getBiome(biomeId));
     }
 
     /**
@@ -44,12 +39,12 @@ public final class ForgeMojangSettings implements MojangSettings
      * @param biomeBase The biome.
      * @return The settings.
      */
-    private static MojangSettings fromBiomeBase(Biome biomeBase)
+    private static MojangSettings fromBiomeBase(BiomeBase biomeBase)
     {
-        return new ForgeMojangSettings(biomeBase);
+        return new BukkitMojangSettings(biomeBase);
     }
 
-    private ForgeMojangSettings(Biome biomeBase)
+    private BukkitMojangSettings(BiomeBase biomeBase)
     {
         this.biomeBase = biomeBase;
     }
@@ -57,43 +52,43 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public float getTemperature()
     {
-        return this.biomeBase.getDefaultTemperature();
+        return biomeBase.getTemperature();
     }
 
     @Override
     public float getWetness()
     {
-        return this.biomeBase.getRainfall();
+        return biomeBase.getHumidity();
     }
 
     @Override
     public float getSurfaceHeight()
     {
-    	return this.biomeBase.getBaseHeight();
+        return biomeBase.j();
     }
 
     @Override
     public float getSurfaceVolatility()
     {
-        return this.biomeBase.getHeightVariation();
+        return biomeBase.m();
     }
 
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.topBlock);
+        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.q);
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.fillerBlock);
+        return BukkitMaterialData.ofMinecraftBlockData(biomeBase.r);
     }
 
     @Override
-    public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory entityCategory)
+    public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory mobType)
     {
-        return MobSpawnGroupHelper.getListFromMinecraftBiome(this.biomeBase, entityCategory);
+        return MobSpawnGroupHelper.getListFromMinecraftBiome(biomeBase, mobType);
     }
 
 }

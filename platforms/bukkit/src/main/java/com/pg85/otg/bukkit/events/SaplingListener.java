@@ -1,6 +1,6 @@
 package com.pg85.otg.bukkit.events;
 
-import com.pg85.otg.bukkit.util.WorldHelper;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;

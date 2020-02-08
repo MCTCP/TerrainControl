@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -29,6 +28,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.FileHelper;
 import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
@@ -139,7 +139,7 @@ public final class ServerConfigProvider implements ConfigProvider
      */
     private void loadSettings(File worldSaveFolder, boolean isReload)
     {   	
-        SettingsMap worldConfigSettings = loadWorldConfig();
+        SettingsMap worldConfigSettings = loadAndInitWorldConfig();
         loadFallbacks();
         loadBiomes(worldConfigSettings, worldSaveFolder, isReload);
 
@@ -158,7 +158,7 @@ public final class ServerConfigProvider implements ConfigProvider
        FileSettingsWriter.writeToFile(fallbacks.getSettingsAsMap(), fallbackFile, OTG.getPluginConfig().settingsMode);
     }
 
-    private SettingsMap loadWorldConfig()
+    private SettingsMap loadAndInitWorldConfig()
     {
         File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), worldConfigFile);
@@ -197,7 +197,7 @@ public final class ServerConfigProvider implements ConfigProvider
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
         // OpenTerrainGenerator/Presets/<WorldName>/<WorldBiomes/
-        biomeDirs.add(new File(settingsDir, correctOldBiomeConfigFolder(settingsDir)));
+        biomeDirs.add(new File(settingsDir, OTG.correctOldBiomeConfigFolder(settingsDir)));
         // OpenTerrainGenerator/GlobalBiomes/
         biomeDirs.add(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.BiomeConfigDirectoryName));
 
@@ -209,27 +209,27 @@ public final class ServerConfigProvider implements ConfigProvider
         // If we're creating a new world with new configs then add the default biomes
         if(worldConfigSettings.isNewConfig())
         {
-        	Collection<? extends BiomeLoadInstruction> defaultBiomes = world.getDefaultBiomes();
+        	Collection<? extends BiomeLoadInstruction> defaultBiomes = OTG.getEngine().getDefaultBiomes();
             for (BiomeLoadInstruction defaultBiome : defaultBiomes)
             {
-        		worldConfig.worldBiomes.add(defaultBiome.getBiomeName());
+            	this.worldConfig.worldBiomes.add(defaultBiome.getBiomeName());
         		biomesToLoad.add(new BiomeLoadInstruction(defaultBiome.getBiomeName(), defaultBiome.getBiomeTemplate()));
             }
         }
         
         // Load all files
         BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(OTG.getPluginConfig().biomeConfigExtension);
-        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(worldConfig, world, worldConfig.worldHeightScale, biomeDirs, biomesToLoad);
+        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(this.worldConfig, this.worldConfig.worldHeightScale, biomeDirs, biomesToLoad);
         
         // Read all settings
-        Map<String, BiomeConfig> loadedBiomes = readAndWriteSettings(worldConfigSettings, biomeConfigStubs);
-
+        Map<String, BiomeConfig> loadedBiomes = readAndWriteSettings(this.worldConfig, biomeConfigStubs, true);
+        
         // Index all necessary settings
-        String loadedBiomeNames = indexSettings(worldConfig.customBiomeGenerationIds, worldConfigSettings.isNewConfig(), loadedBiomes, worldSaveFolder, isReload);
+        String loadedBiomeNames = indexSettings(this.worldConfig.customBiomeGenerationIds, worldConfigSettings.isNewConfig(), loadedBiomes, worldSaveFolder, isReload);
 
         OTG.log(LogMarker.DEBUG, "{} biomes Loaded", biomesCount);
         OTG.log(LogMarker.DEBUG, "{}", loadedBiomeNames);
-    }
+    }    
 
     @Override
     public void reload()
@@ -242,7 +242,7 @@ public final class ServerConfigProvider implements ConfigProvider
         loadSettings(this.world.getWorldSaveDir(), true);
     }
 
-    private Map<String, BiomeConfig> readAndWriteSettings(SettingsMap worldConfigSettings, Map<String, BiomeConfigStub> biomeConfigStubs)
+    public static Map<String, BiomeConfig> readAndWriteSettings(WorldConfig worldConfig, Map<String, BiomeConfigStub> biomeConfigStubs, boolean write)
     {
         Map<String, BiomeConfig> loadedBiomes = new HashMap<String, BiomeConfig>();
 
@@ -260,15 +260,131 @@ public final class ServerConfigProvider implements ConfigProvider
             loadedBiomes.put(biomeConfigStub.getBiomeName(), biomeConfig);
 
             // Settings writing
-            File writeFile = biomeConfigStub.getFile();
-            if (!biomeConfig.biomeExtends.isEmpty())
+            if(write)
             {
-                writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
+	            File writeFile = biomeConfigStub.getFile();
+	            if (!biomeConfig.biomeExtends.isEmpty())
+	            {
+	                writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
+	            }
+	            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.settingsMode);
             }
-            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.settingsMode);
         }
 
         return loadedBiomes;
+    }
+    
+    private static void processInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
+    {
+        if (biomeConfigStub.biomeExtendsProcessed)
+        {
+            // Already processed
+            return;
+        }
+
+        String extendedBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.BIOME_EXTENDS);
+        if (extendedBiomeName.isEmpty())
+        {
+            // Not extending anything
+            biomeConfigStub.biomeExtendsProcessed = true;
+            return;
+        }
+
+        // This biome extends another biome
+        BiomeConfigStub extendedBiomeConfig = biomeConfigStubs.get(extendedBiomeName);
+        if (extendedBiomeConfig == null)
+        {
+            OTG.log(LogMarker.WARN, "The biome {} tried to extend the biome {}, but that biome doesn't exist.", biomeConfigStub.getBiomeName(), extendedBiomeName);
+            return;
+        }
+
+        // Check for too much recursion
+        if (currentDepth > MAX_INHERITANCE_DEPTH)
+        {
+            OTG.log(LogMarker.FATAL,
+                    "The biome {} cannot extend the biome {} - too much configs processed already! Cyclical inheritance?",
+                    biomeConfigStub.getBiomeName(), extendedBiomeConfig.getBiomeName());
+        }
+
+        if (!extendedBiomeConfig.biomeExtendsProcessed)
+        {
+            // This biome has not been processed yet, do that first
+            processInheritance(biomeConfigStubs, extendedBiomeConfig, currentDepth + 1);
+        }
+
+        // Merge the two
+        biomeConfigStub.getSettings().setFallback(extendedBiomeConfig.getSettings());
+
+        // Done
+        biomeConfigStub.biomeExtendsProcessed = true;
+    }
+
+    private static void processMobInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
+    {
+        if (biomeConfigStub.inheritMobsBiomeNameProcessed)
+        {
+            // Already processed
+            return;
+        }
+
+        String stubInheritMobsBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, biomeConfigStub.getLoadInstructions().getBiomeTemplate().defaultInheritMobsBiomeName);
+
+        if(stubInheritMobsBiomeName != null && stubInheritMobsBiomeName.length() > 0)
+        {
+            String[] inheritMobsBiomeNames = stubInheritMobsBiomeName.split(",");
+	        for(String inheritMobsBiomeName : inheritMobsBiomeNames)
+	        {
+	            if (inheritMobsBiomeName.isEmpty())
+	            {
+	                // Not extending anything
+	                continue;
+	            }
+
+		        // This biome inherits mobs from another biome
+		        BiomeConfigStub inheritMobsBiomeConfig = biomeConfigStubs.get(inheritMobsBiomeName);
+
+		        if (inheritMobsBiomeConfig == null || inheritMobsBiomeConfig == biomeConfigStub) // Most likely a legacy config that is not using resourcelocation yet, for instance: Plains instead of minecraft:plains. Try to convert.
+		        {
+		        	String vanillaBiomeName = BiomeRegistryNames.getRegistryNameForDefaultBiome(inheritMobsBiomeName);
+		        	if(vanillaBiomeName != null)
+		        	{
+		        		inheritMobsBiomeConfig = null;
+		        		inheritMobsBiomeName = vanillaBiomeName;
+		        	}
+		        	else if(inheritMobsBiomeConfig == biomeConfigStub)
+		        	{
+			            OTG.log(LogMarker.WARN, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
+			            continue;
+		        	}
+		        }
+		        
+		        // Check for too much recursion
+		        if (currentDepth > MAX_INHERITANCE_DEPTH)
+		        {
+		            OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getFile().getName(), inheritMobsBiomeConfig.getFile().getName()});
+		        }
+
+		        if(inheritMobsBiomeConfig != null)
+		        {
+			        if (!inheritMobsBiomeConfig.inheritMobsBiomeNameProcessed)
+			        {
+			            // This biome has not been processed yet, do that first
+			            processMobInheritance(biomeConfigStubs, inheritMobsBiomeConfig, currentDepth + 1);
+			        }
+
+			        // Merge the two
+			        biomeConfigStub.mergeMobs(inheritMobsBiomeConfig);
+		        } else {
+
+		        	// This is a vanilla biome or a biome added by another mod.
+		        	OTG.getEngine().mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, inheritMobsBiomeName);
+			        continue;
+		        }
+	        }
+
+	        // Done
+	        biomeConfigStub.inheritMobsBiomeNameProcessed = true;
+        }
     }
     
     // TODO: This sorts, updates and registers biomes, saves biome id data and creates OTG biomes. 
@@ -397,7 +513,7 @@ public final class ServerConfigProvider implements ConfigProvider
         	// Add the default biomes (they were automatically included with every world pre-v7).
         	if(!hasWorldData && !OTG.IsNewWorldBeingCreated)
         	{
-	        	Collection<? extends BiomeLoadInstruction> defaultBiomes = world.getDefaultBiomes();
+	        	Collection<? extends BiomeLoadInstruction> defaultBiomes = OTG.getEngine().getDefaultBiomes();
 	            for (BiomeLoadInstruction defaultBiome : defaultBiomes)
 	            {
 	            	for(BiomeConfig biomeConfig : loadedBiomeList)
@@ -432,7 +548,7 @@ public final class ServerConfigProvider implements ConfigProvider
         	            	} else {
         	            		// The only time a biomeId can be claimed already is when an 
         	            		// unloaded world is being reloaded.
-        	            		throw new RuntimeException("This shouldn't happen");
+        	            		throw new RuntimeException("Error: OTG Biome id " + biomeIdData.otgBiomeId + " for biome " + biomeConfig.getName() + " was taken by " + OTG.getBiomeByOTGId(biomeIdData.otgBiomeId).getName());       	            		
         	            	}
         	            	
             	        	if(biomeIdData.otgBiomeId > -1 && biomeIdData.otgBiomeId < 256)
@@ -676,140 +792,7 @@ public final class ServerConfigProvider implements ConfigProvider
             int color = biomeConfig.biomeColor;
             this.worldConfig.biomeColorMap.put(color, biome.getIds().getOTGBiomeId());
         }
-    }
-
-    private void processInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
-    {
-        if (biomeConfigStub.biomeExtendsProcessed)
-        {
-            // Already processed
-            return;
-        }
-
-        String extendedBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.BIOME_EXTENDS);
-        if (extendedBiomeName.isEmpty())
-        {
-            // Not extending anything
-            biomeConfigStub.biomeExtendsProcessed = true;
-            return;
-        }
-
-        // This biome extends another biome
-        BiomeConfigStub extendedBiomeConfig = biomeConfigStubs.get(extendedBiomeName);
-        if (extendedBiomeConfig == null)
-        {
-            OTG.log(LogMarker.WARN, "The biome {} tried to extend the biome {}, but that biome doesn't exist.", biomeConfigStub.getBiomeName(), extendedBiomeName);
-            return;
-        }
-
-        // Check for too much recursion
-        if (currentDepth > MAX_INHERITANCE_DEPTH)
-        {
-            OTG.log(LogMarker.FATAL,
-                    "The biome {} cannot extend the biome {} - too much configs processed already! Cyclical inheritance?",
-                    biomeConfigStub.getBiomeName(), extendedBiomeConfig.getBiomeName());
-        }
-
-        if (!extendedBiomeConfig.biomeExtendsProcessed)
-        {
-            // This biome has not been processed yet, do that first
-            processInheritance(biomeConfigStubs, extendedBiomeConfig, currentDepth + 1);
-        }
-
-        // Merge the two
-        biomeConfigStub.getSettings().setFallback(extendedBiomeConfig.getSettings());
-
-        // Done
-        biomeConfigStub.biomeExtendsProcessed = true;
-    }
-
-    private void processMobInheritance(Map<String, BiomeConfigStub> biomeConfigStubs, BiomeConfigStub biomeConfigStub, int currentDepth)
-    {
-        if (biomeConfigStub.inheritMobsBiomeNameProcessed)
-        {
-            // Already processed
-            return;
-        }
-
-        String stubInheritMobsBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, biomeConfigStub.getLoadInstructions().getBiomeTemplate().defaultInheritMobsBiomeName);
-
-        if(stubInheritMobsBiomeName != null && stubInheritMobsBiomeName.length() > 0)
-        {
-            String[] inheritMobsBiomeNames = stubInheritMobsBiomeName.split(",");
-	        for(String inheritMobsBiomeName : inheritMobsBiomeNames)
-	        {
-	            if (inheritMobsBiomeName.isEmpty())
-	            {
-	                // Not extending anything
-	                continue;
-	            }
-
-		        // This biome inherits mobs from another biome
-		        BiomeConfigStub inheritMobsBiomeConfig = biomeConfigStubs.get(inheritMobsBiomeName);
-
-		        if (inheritMobsBiomeConfig == null || inheritMobsBiomeConfig == biomeConfigStub) // Most likely a legacy config that is not using resourcelocation yet, for instance: Plains instead of minecraft:plains. Try to convert.
-		        {
-		        	String vanillaBiomeName = BiomeRegistryNames.getRegistryNameForDefaultBiome(inheritMobsBiomeName);
-		        	if(vanillaBiomeName != null)
-		        	{
-		        		inheritMobsBiomeConfig = null;
-		        		inheritMobsBiomeName = vanillaBiomeName;
-		        	}
-		        	else if(inheritMobsBiomeConfig == biomeConfigStub)
-		        	{
-			            OTG.log(LogMarker.WARN, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
-			            continue;
-		        	}
-		        }
-		        
-		        // Check for too much recursion
-		        if (currentDepth > MAX_INHERITANCE_DEPTH)
-		        {
-		            OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getFile().getName(), inheritMobsBiomeConfig.getFile().getName()});
-		        }
-
-		        if(inheritMobsBiomeConfig != null)
-		        {
-			        if (!inheritMobsBiomeConfig.inheritMobsBiomeNameProcessed)
-			        {
-			            // This biome has not been processed yet, do that first
-			            processMobInheritance(biomeConfigStubs, inheritMobsBiomeConfig, currentDepth + 1);
-			        }
-
-			        // Merge the two
-			        biomeConfigStub.mergeMobs(inheritMobsBiomeConfig);
-		        } else {
-
-		        	// This is a vanilla biome or a biome added by another mod.
-		        	world.mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, inheritMobsBiomeName);
-			        continue;
-		        }
-	        }
-
-	        // Done
-	        biomeConfigStub.inheritMobsBiomeNameProcessed = true;
-        }
-    }
-
-    private String correctOldBiomeConfigFolder(File settingsDir)
-    {
-        // Rename the old folder
-        String biomeFolderName = WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME;
-        File oldBiomeConfigs = new File(settingsDir, "BiomeConfigs");
-        if (oldBiomeConfigs.exists())
-        {
-            if (!oldBiomeConfigs.renameTo(new File(settingsDir, biomeFolderName)))
-            {
-                OTG.log(LogMarker.WARN, "========================");
-                OTG.log(LogMarker.WARN, "Found old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName, "`!");
-                OTG.log(LogMarker.WARN, "Please rename the folder manually.");
-                OTG.log(LogMarker.WARN, "========================");
-                biomeFolderName = "BiomeConfigs";
-            }
-        }
-        return biomeFolderName;
-    }
-    
+    }   
     
 	@Override
 	public List<LocalBiome> getBiomeArrayLegacy()

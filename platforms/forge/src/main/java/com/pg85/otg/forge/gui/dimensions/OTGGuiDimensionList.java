@@ -12,6 +12,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiConfirmOpenLink;
+import net.minecraft.client.gui.GuiErrorScreen;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.GuiYesNoCallback;
 import net.minecraft.util.text.TextFormatting;
@@ -30,7 +31,6 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.OTGGuiEnterWorldName;
@@ -39,6 +39,7 @@ import com.pg85.otg.forge.gui.dimensions.base.SettingEntry;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.logging.LogMarker;
 
@@ -441,23 +442,44 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 	// If world is not null then we're ingame
                 	if(this.mc.world == null)
                 	{
-                		this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, this.dimensions.get(0).PresetName));
+                		// SP world creation menu
+                		
+                		// Create worlds for any newly created dims
+	                	ArrayList<String> presetNames = new ArrayList<String>();
+            			for(DimensionConfig dimConfig : this.dimensions)
+            			{
+   		                	presetNames.add(dimConfig.PresetName);
+            			}
+    					if(OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
+    					{
+    						this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, this.dimensions.get(0).PresetName));	
+    					} else {
+    						this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Not enough biome id's available to add all dimensions."));
+    					}
                 	} else {
                 		        
                         if(this.mc.isSingleplayer())
                         {
 	                		// Apply game rules and save
-	                		applyGameRules();                		
+	                		applyGameRules();
 	                			                		
 	                		// Create worlds for any newly created dims                			
                 			for(DimensionConfig dimConfig : this.dimensions)
                 			{
                 				if(dimConfig.isNewConfig)
                 				{
-                					dimConfig.isNewConfig = false;
-                			        OTG.IsNewWorldBeingCreated = true;
-                        			OTGDimensionManager.createNewDimensionSP(dimConfig, this.mc.getIntegratedServer());
-                        			OTG.IsNewWorldBeingCreated = false;
+        		                	ArrayList<String> presetNames = new ArrayList<String>();
+        		                	presetNames.add(dimConfig.PresetName);               					
+                					if(OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
+                					{
+	                					dimConfig.isNewConfig = false;
+	                			        OTG.IsNewWorldBeingCreated = true;
+	                        			OTGDimensionManager.createNewDimensionSP(dimConfig, this.mc.getIntegratedServer());
+	                        			OTG.IsNewWorldBeingCreated = false;
+                					} else {
+                						this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Not enough biome id's available to add all dimensions."));
+                						break;
+                					}
                 				}
                 			}
                 			this.dimensionSettingsList.refreshData();
@@ -600,7 +622,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     public void confirmClicked(boolean ok, int worldId)
     {
 		if(!ShowingOpenLinkDialogue && ok)
-		{
+		{	
             long i = (new Random()).nextLong();
             String s = this.dimensions.get(0).Seed;
 

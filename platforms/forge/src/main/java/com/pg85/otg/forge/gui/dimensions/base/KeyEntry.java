@@ -2,10 +2,10 @@ package com.pg85.otg.forge.gui.dimensions.base;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionSettingsList;
 import com.pg85.otg.forge.gui.dimensions.base.SettingEntry.ValueType;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.ChunkCoordinate;
 
 import net.minecraft.client.Minecraft;

@@ -23,44 +23,36 @@ import com.pg85.otg.customobjects.bo4.bo4function.BO4WeightedBranchFunction;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobjects.bo3.BO3Settings;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3RandomBlockFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StreamHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultStructurePart;
 
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.DataFormatException;
 
 public class BO4Config extends CustomObjectConfigFile
 {
 	public String author;
     public String description;
-    ConfigMode settingsMode;
+    public ConfigMode settingsMode;
     public int frequency;
     
-    int xSize = 16;
-    int zSize = 16;
+    private final int xSize = 16;
+    private final int zSize = 16;
     public int minHeight;
     public int maxHeight;
 
@@ -174,6 +166,7 @@ public class BO4Config extends CustomObjectConfigFile
     private BO4EntityFunction[] entityDataOTGPlus;
        
     private boolean isCollidable = false;
+    private boolean isBO4Data = false;
        
     /**
      * Creates a BO3Config from a file.
@@ -182,7 +175,7 @@ public class BO4Config extends CustomObjectConfigFile
      * @param directory    The directory the BO3 is stored in.
      * @param otherObjects All other loaded objects by their name.
      */
-    BO4Config(SettingsReaderOTGPlus reader, boolean init) throws InvalidConfigException
+    public BO4Config(SettingsReaderOTGPlus reader, boolean init) throws InvalidConfigException
     {
         super(reader);
         if(init)
@@ -213,7 +206,7 @@ public class BO4Config extends CustomObjectConfigFile
         	//OTG.log(LogMarker.INFO, ".BO4 loaded in: " + timeTaken + " " + this.getName() + ".BO4");
         } else {
         	//long startTime = System.currentTimeMillis();
-        	this.readFromBO4DataFile();
+        	this.readFromBO4DataFile(false);
         	//BO4BlocksLoadedFromBO4Data++;
         	//long timeTaken = (System.currentTimeMillis() - startTime);
         	//accumulatedTime2 += timeTaken;        	
@@ -276,8 +269,34 @@ public class BO4Config extends CustomObjectConfigFile
 
     public BO4BlockFunction[][] getSmoothingHeightMap(BO4 start)
     {
+    	return getSmoothingHeightMap(start, true);
+    }
+    
+    private BO4BlockFunction[][] getSmoothingHeightMap(BO4 start, boolean fromFile)
+    {
+    	// TODO: Caching the heightmap will mean this BO4 can only be used with 1 master BO4,
+    	// it won't pick up smoothing area settings if it is also used in another structure.
     	if(this.heightMap == null)
     	{
+    		if(this.isBO4Data && fromFile)
+    		{
+    			BO4Config bo4Config = null;
+				try
+				{
+					bo4Config = new BO4Config(this.reader, false);
+				}
+				catch (InvalidConfigException e)
+				{
+					e.printStackTrace();
+				}
+				if(bo4Config != null)
+				{
+					bo4Config.readFromBO4DataFile(true);
+					this.heightMap = bo4Config.getSmoothingHeightMap(start, false);
+					return this.heightMap;
+    			}
+    		}
+    		
     		this.heightMap = new BO4BlockFunction[16][16];
 
 	        // make heightmap containing the highest or lowest blocks in this chunk
@@ -307,7 +326,7 @@ public class BO4Config extends CustomObjectConfigFile
 	        						{
 	        							continue;
 	        						}
-	        						if(randomMaterial.isSmoothAreaAnchor(start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartWood : this.smoothStartWood, start.getSettings().spawnUnderWater))
+	        						if(randomMaterial.isSmoothAreaAnchor(start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartWood : this.smoothStartWood, start.getConfig().spawnUnderWater))
 	        						{
 	        							isSmoothAreaAnchor = true;
 	        							break;
@@ -320,13 +339,13 @@ public class BO4Config extends CustomObjectConfigFile
 	            					isSmoothAreaAnchor ||
 	        						(
 	    								!isRandomBlock &&
-	    								material.isSmoothAreaAnchor(start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartWood : this.smoothStartWood, start.getSettings().spawnUnderWater)
+	    								material.isSmoothAreaAnchor(start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartWood : this.smoothStartWood, start.getConfig().spawnUnderWater)
 	    							)
 	        					)
 	                			{
 	    	            			if(
-	    	            				(!(start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartTop : this.smoothStartTop) && y == getminY()) ||
-	    		        				((start.getSettings().overrideChildSettings && this.overrideChildSettings ? start.getSettings().smoothStartTop : this.smoothStartTop) && (this.heightMap[x][z] == null || y > this.heightMap[x][z].y))
+	    	            				(!(start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartTop : this.smoothStartTop) && y == getminY()) ||
+	    		        				((start.getConfig().overrideChildSettings && this.overrideChildSettings ? start.getConfig().smoothStartTop : this.smoothStartTop) && (this.heightMap[x][z] == null || y > this.heightMap[x][z].y))
 	    	    					)
 	    	            			{
 	    	            				BO4BlockFunction blockFunction = null;
@@ -363,6 +382,29 @@ public class BO4Config extends CustomObjectConfigFile
 
     public BO4BlockFunction[] getBlocks()
     {
+    	return getBlocks(true);
+    }
+    
+    private BO4BlockFunction[] getBlocks(boolean fromFile)
+    {
+    	if(fromFile && this.isBO4Data)
+    	{
+			BO4Config bo4Config = null;
+			try
+			{
+				bo4Config = new BO4Config(this.reader, false);
+			}
+			catch (InvalidConfigException e)
+			{
+				e.printStackTrace();
+			}
+			if(bo4Config != null)
+			{
+				bo4Config.readFromBO4DataFile(true);
+				return bo4Config.getBlocks(false);
+			}
+    	}
+    	
     	BO4BlockFunction[] blocksOTGPlus = new BO4BlockFunction[this.blocksMaterial.length];
     	
     	BO4BlockFunction block;
@@ -453,14 +495,14 @@ public class BO4Config extends CustomObjectConfigFile
 				
 				this.inheritedBO3Loaded = true;
 
-	    		this.inheritedBO3s.addAll(((BO4)parentBO3).getSettings().getInheritedBO3s());
+	    		this.inheritedBO3s.addAll(((BO4)parentBO3).getConfig().getInheritedBO3s());
 
-	    		this.removeAir = ((BO4)parentBO3).getSettings().removeAir;
-	    		this.replaceAbove = this.replaceAbove == null || this.replaceAbove.length() == 0 ? ((BO4)parentBO3).getSettings().replaceAbove : this.replaceAbove;
-	    		this.replaceBelow = this.replaceBelow == null || this.replaceBelow.length() == 0 ? ((BO4)parentBO3).getSettings().replaceBelow : this.replaceBelow;
+	    		this.removeAir = ((BO4)parentBO3).getConfig().removeAir;
+	    		this.replaceAbove = this.replaceAbove == null || this.replaceAbove.length() == 0 ? ((BO4)parentBO3).getConfig().replaceAbove : this.replaceAbove;
+	    		this.replaceBelow = this.replaceBelow == null || this.replaceBelow.length() == 0 ? ((BO4)parentBO3).getConfig().replaceBelow : this.replaceBelow;
 
-				BO4CustomStructureCoordinate rotatedParentMaxCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getSettings().maxX, ((BO4)parentBO3).getSettings().maxY, ((BO4)parentBO3).getSettings().maxZ, this.inheritBO3Rotation);
-				BO4CustomStructureCoordinate rotatedParentMinCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getSettings().minX, ((BO4)parentBO3).getSettings().minY, ((BO4)parentBO3).getSettings().minZ, this.inheritBO3Rotation);
+				BO4CustomStructureCoordinate rotatedParentMaxCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getConfig().maxX, ((BO4)parentBO3).getConfig().maxY, ((BO4)parentBO3).getConfig().maxZ, this.inheritBO3Rotation);
+				BO4CustomStructureCoordinate rotatedParentMinCoords = BO4CustomStructureCoordinate.getRotatedBO3Coords(((BO4)parentBO3).getConfig().minX, ((BO4)parentBO3).getConfig().minY, ((BO4)parentBO3).getConfig().minZ, this.inheritBO3Rotation);
 
 				int parentMaxX = rotatedParentMaxCoords.getX() > rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
 				int parentMinX = rotatedParentMaxCoords.getX() < rotatedParentMinCoords.getX() ? rotatedParentMaxCoords.getX() : rotatedParentMinCoords.getX();
@@ -496,7 +538,7 @@ public class BO4Config extends CustomObjectConfigFile
 					this.minZ = parentMinZ;
 				}
 
-				BO4BlockFunction[] parentBlocks = ((BO4)parentBO3).getSettings().getBlocks();				
+				BO4BlockFunction[] parentBlocks = ((BO4)parentBO3).getConfig().getBlocks();				
 				ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();				
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(parentBlocks)));
 				newBlocks.addAll(new ArrayList<BO4BlockFunction>(Arrays.asList(blocks)));
@@ -519,7 +561,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newBranches.add(branch);
 					}
 				}
-				for(BO4BranchFunction branch : ((BO4)parentBO3).getSettings().branchesOTGPlus)
+				for(BO4BranchFunction branch : ((BO4)parentBO3).getConfig().branchesOTGPlus)
 				{
 					newBranches.add(branch.rotate(this.inheritBO3Rotation));
 				}
@@ -533,7 +575,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newModData.add(modData);
 					}
 				}
-				for(BO4ModDataFunction modData : ((BO4)parentBO3).getSettings().modDataOTGPlus)
+				for(BO4ModDataFunction modData : ((BO4)parentBO3).getConfig().modDataOTGPlus)
 				{
 					newModData.add(modData.rotate(this.inheritBO3Rotation));
 				}
@@ -547,7 +589,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newSpawnerData.add(spawnerData);
 					}
 				}
-				for(BO4SpawnerFunction spawnerData : ((BO4)parentBO3).getSettings().spawnerDataOTGPlus)
+				for(BO4SpawnerFunction spawnerData : ((BO4)parentBO3).getConfig().spawnerDataOTGPlus)
 				{
 					newSpawnerData.add(spawnerData.rotate(this.inheritBO3Rotation));
 				}
@@ -561,7 +603,7 @@ public class BO4Config extends CustomObjectConfigFile
 						newParticleData.add(particleData);
 					}
 				}
-				for(BO4ParticleFunction particleData : ((BO4)parentBO3).getSettings().particleDataOTGPlus)
+				for(BO4ParticleFunction particleData : ((BO4)parentBO3).getConfig().particleDataOTGPlus)
 				{
 					newParticleData.add(particleData.rotate(this.inheritBO3Rotation));
 				}
@@ -575,13 +617,13 @@ public class BO4Config extends CustomObjectConfigFile
 						newEntityData.add(entityData);
 					}
 				}
-				for(BO4EntityFunction entityData : ((BO4)parentBO3).getSettings().entityDataOTGPlus)
+				for(BO4EntityFunction entityData : ((BO4)parentBO3).getConfig().entityDataOTGPlus)
 				{
 					newEntityData.add(entityData.rotate(this.inheritBO3Rotation));
 				}
 				this.entityDataOTGPlus = newEntityData.toArray(new BO4EntityFunction[newEntityData.size()]);
 	
-				this.inheritedBO3s.addAll(((BO4)parentBO3).getSettings().getInheritedBO3s());
+				this.inheritedBO3s.addAll(((BO4)parentBO3).getConfig().getInheritedBO3s());
 			}
 	    	if(!this.inheritedBO3Loaded)
 	    	{
@@ -620,11 +662,18 @@ public class BO4Config extends CustomObjectConfigFile
                     	tempBlocksList.add((BO4RandomBlockFunction)res);
                     	columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
             		} else {
-            			if(!this.removeAir || !((BO4BlockFunction)res).material.toDefaultMaterial().equals(DefaultMaterial.AIR))
+            			if(!this.removeAir || !((BO4BlockFunction)res).material.isAir())
             			{
 	                    	tempBlocksList.add((BO4BlockFunction)res);
 	                    	block = (BO4BlockFunction)res;
-                    		columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;	
+	                    	try
+	                    	{
+	                    		columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
+	                    	}
+	                    	catch(ArrayIndexOutOfBoundsException ex)
+	                    	{
+	                    		String breakpoint = "";
+	                    	}
             			}
             		}
             		
@@ -898,6 +947,11 @@ public class BO4Config extends CustomObjectConfigFile
     		}
     	}
     }
+    
+	public void setBranches(List<BO4BranchFunction> branches)
+	{
+		this.branchesOTGPlus = branches.toArray(new BO4BranchFunction[branches.size()]);
+	}
 
     /**
      * Gets the file this config will be written to. May be null if the config
@@ -912,6 +966,24 @@ public class BO4Config extends CustomObjectConfigFile
     @Override
     protected void writeConfigSettings(SettingsWriterOTGPlus writer) throws IOException
     {   	
+    	writeSettings(writer, null, null);
+    }
+    
+    public void writeWithData(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList) throws IOException
+    {
+        writer.setConfigMode(ConfigMode.WriteAll);
+        try
+        {
+            writer.open();
+            writeSettings(writer, blocksList, branchesList);
+        } finally
+        {
+            writer.close();
+        }
+    }
+    
+    private void writeSettings(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList) throws IOException
+    {
         // The object
         writer.bigTitle("BO4 object");
         writer.comment("This is the config file of a custom object.");
@@ -1045,9 +1117,12 @@ public class BO4Config extends CustomObjectConfigFile
         writer.setting(BO4Settings.ISSPAWNPOINT, this.isSpawnPoint);
 
         // Blocks and other things
-        writeResources(writer);
+        writeResources(writer, blocksList, branchesList);
         
-		this.reader.flushCache();
+        if(this.reader != null) // Can be true for BO4Creator?
+        {
+        	this.reader.flushCache();
+        }
     }
 
     @Override
@@ -1204,11 +1279,11 @@ public class BO4Config extends CustomObjectConfigFile
     	// Merge inherited resources
        	loadInheritedBO3();
     }
-
-    private void writeResources(SettingsWriterOTGPlus writer) throws IOException
+   
+    private void writeResources(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList) throws IOException
     {
         writer.bigTitle("Blocks");
-        writer.comment("All the blocks used in the BO3 are listed here. Possible blocks:");
+        writer.comment("All the blocks used in the BO4 are listed here. Possible blocks:");
         writer.comment("Block(x,y,z,id[.data][,nbtfile.nbt)");
         writer.comment("RandomBlock(x,y,z,id[:data][,nbtfile.nbt],chance[,id[:data][,nbtfile.nbt],chance[,...]])");
         writer.comment(" So RandomBlock(0,0,0,CHEST,chest.nbt,50,CHEST,anotherchest.nbt,100) will spawn a chest at");
@@ -1218,54 +1293,59 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment(" Spawns an object in the Mojang NBT structure format. For example, ");
         writer.comment(" MinecraftObject(0,0,0," + DefaultStructurePart.IGLOO_BOTTOM.getPath() + ")");
         writer.comment(" spawns the bottom part of an igloo.");
+
+       	ArrayList<BO4ModDataFunction> modDataList = new ArrayList<BO4ModDataFunction>();
+       	ArrayList<BO4ParticleFunction> particlesList = new ArrayList<BO4ParticleFunction>();
+       	ArrayList<BO4SpawnerFunction> spawnerList = new ArrayList<BO4SpawnerFunction>();
+       	ArrayList<BO4EntityFunction> entitiesList = new ArrayList<BO4EntityFunction>();
         
-        List<BO4BlockFunction> tempBlocksList = new ArrayList<BO4BlockFunction>();
-        List<BO4BranchFunction> tempBranchesList = new ArrayList<BO4BranchFunction>();
-        List<BO4EntityFunction> tempEntitiesList = new ArrayList<BO4EntityFunction>();
-        List<BO4ModDataFunction> tempModDataList = new ArrayList<BO4ModDataFunction>();
-        List<BO4ParticleFunction> tempParticlesList = new ArrayList<BO4ParticleFunction>();
-        List<BO4SpawnerFunction> tempSpawnerList = new ArrayList<BO4SpawnerFunction>();
-      
-        for (CustomObjectConfigFunction<BO4Config> res : reader.getConfigFunctions(this, true))
+        // Re-read the raw data, if no data was supplied. Don't save any loaded data, since it has been processed/transformed.
+        if(blocksList == null || branchesList == null || entitiesList == null)
         {
-            if (res.isValid())
-            {
-        		if(res instanceof BO4RandomBlockFunction)
-        		{
-                	tempBlocksList.add((BO4RandomBlockFunction)res);
-        		}
-        		else if(res instanceof BO4BlockFunction)
-        		{
-                	tempBlocksList.add((BO4BlockFunction)res);
-        		}
-        		else if (res instanceof BO4WeightedBranchFunction)
-                {
-                    tempBranchesList.add((BO4WeightedBranchFunction) res);
-                }
-                else if (res instanceof BO4BranchFunction)
-                {
-                	tempBranchesList.add((BO4BranchFunction) res);
-                }
-                else if (res instanceof BO4ModDataFunction)
-                {
-                    tempModDataList.add((BO4ModDataFunction) res);
-                }
-                else if (res instanceof BO4SpawnerFunction)
-                {
-                	tempSpawnerList.add((BO4SpawnerFunction) res);
-                }
-                else if (res instanceof BO4ParticleFunction)
-                {
-                	tempParticlesList.add((BO4ParticleFunction) res);
-                }
-                else if (res instanceof BO4EntityFunction)
-                {
-                	tempEntitiesList.add((BO4EntityFunction) res);
-                }
-            }
+           	blocksList = new ArrayList<BO4BlockFunction>();
+           	branchesList = new ArrayList<BO4BranchFunction>();
+        	
+	        for (CustomObjectConfigFunction<BO4Config> res : reader.getConfigFunctions(this, true))
+	        {
+	            if (res.isValid())
+	            {
+	        		if(res instanceof BO4RandomBlockFunction)
+	        		{
+	                	blocksList.add((BO4RandomBlockFunction)res);
+	        		}
+	        		else if(res instanceof BO4BlockFunction)
+	        		{
+	                	blocksList.add((BO4BlockFunction)res);
+	        		}
+	        		else if (res instanceof BO4WeightedBranchFunction)
+	                {
+	                    branchesList.add((BO4WeightedBranchFunction) res);
+	                }
+	                else if (res instanceof BO4BranchFunction)
+	                {
+	                	branchesList.add((BO4BranchFunction) res);
+	                }
+	                else if (res instanceof BO4ModDataFunction)
+	                {
+	                    modDataList.add((BO4ModDataFunction) res);
+	                }
+	                else if (res instanceof BO4SpawnerFunction)
+	                {
+	                	spawnerList.add((BO4SpawnerFunction) res);
+	                }
+	                else if (res instanceof BO4ParticleFunction)
+	                {
+	                	particlesList.add((BO4ParticleFunction) res);
+	                }
+	                else if (res instanceof BO4EntityFunction)
+	                {
+	                	entitiesList.add((BO4EntityFunction) res);
+	                }
+	            }
+	        }
         }
                
-		for(BO4BlockFunction block : tempBlocksList)
+		for(BO4BlockFunction block : blocksList)
 		{
         	writer.function(block);
 		}
@@ -1300,7 +1380,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("*Note: isRequiredBranch must be set to false. It is not possible to use isRequiredBranch:true with WeightedBranch() since isRequired:true branches must spawn and automatically have a rarity of 100.0.");
         writer.comment("MaxChanceOutOf - The chance all branches have to spawn out of, assumed to be 100 when left blank");
         
-        for(BO4BranchFunction func : tempBranchesList)
+        for(BO4BranchFunction func : branchesList)
         {
         	writer.function(func);
         }
@@ -1316,7 +1396,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("entity and give it custom attributes etc. You can copy the DATA part of a summon command including surrounding ");
         writer.comment("curly braces to a .txt file, for instance for: \"/summon Skeleton x y z {DATA}\"");
 
-        for(BO4EntityFunction func : tempEntitiesList)
+        for(BO4EntityFunction func : entitiesList)
         {
         	writer.function(func);
         }
@@ -1336,7 +1416,7 @@ public class BO4Config extends CustomObjectConfigFile
 		writer.comment("fallingdust, totem, spit.");
 		writer.comment("velocityX,velocityY,velocityZ - Spawn the enemy with the given velocity. If this is not filled in then a small random velocity is applied.");
 
-        for(BO4ParticleFunction func : tempParticlesList)
+        for(BO4ParticleFunction func : particlesList)
         {
         	writer.function(func);
         }
@@ -1360,7 +1440,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("despawnTime - After despawnTime seconds, if there is no player within 32 blocks of the entity it will despawn..");
         writer.comment("velocityX,velocityY,velocityZ,yaw,pitch - Spawn the enemy with the given velocity and angle, handy for making traps and launchers (shooting arrows and fireballs etc).");
 
-        for(BO4SpawnerFunction func : tempSpawnerList)
+        for(BO4SpawnerFunction func : spawnerList)
         {
         	writer.function(func);
         }
@@ -1396,7 +1476,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("ModName: name of the mod, for OTG commands use OTG ");
         writer.comment("Radius (optional): Radius in chunks around the player.");
 
-        for(BO4ModDataFunction func : tempModDataList)
+        for(BO4ModDataFunction func : modDataList)
         {
         	writer.function(func);
         }
@@ -1626,7 +1706,7 @@ public class BO4Config extends CustomObjectConfigFile
         }
     }
 
-    public BO4Config readFromBO4DataFile()
+    public BO4Config readFromBO4DataFile(boolean getBlocks)
     {
     	FileInputStream fis;
 		try {			
@@ -1648,6 +1728,7 @@ public class BO4Config extends CustomObjectConfigFile
 				//buffer.get(data, 0, remaining);
 				// do something with data
 		      
+				this.isBO4Data = true;
 	        	this.inheritedBO3Loaded = true;
 	        	int bo4DataVersion = buffer.getInt();
 	        	this.minimumSizeTop = buffer.getInt();
@@ -1889,7 +1970,10 @@ public class BO4Config extends CustomObjectConfigFile
 				newBlocks.addAll(nonRandomBlocks);
 				newBlocks.addAll(randomBlocks);
 				
-				loadBlockArrays(newBlocks, columnSizes);
+				if(getBlocks)
+				{
+					loadBlockArrays(newBlocks, columnSizes);
+				}
 								
 		        int branchesOTGPlusLength = buffer.getInt();
 		        boolean branchType;
