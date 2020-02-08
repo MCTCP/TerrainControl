@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Map.Entry;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -19,11 +18,10 @@ import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class SmoothingAreaGenerator
@@ -1520,14 +1518,15 @@ public class SmoothingAreaGenerator
             boolean goingUp;
             boolean secondPass;
             LocalMaterialData sourceBlockMaterial;
-            DefaultMaterial sourceBlockMaterialAbove;
+            LocalMaterialData customBlockData;            
+            LocalMaterialData sourceBlockMaterialAbove;
             DefaultMaterial materialToSet = null;
             Byte blockDataToSet = 0;
             boolean bBreak;
             short yStart;
             short yEnd;
+            int highestBlockY;
             SmoothingAreaBlock blockToQueueForSpawn = new SmoothingAreaBlock();
-
 
             HashMap<ChunkCoordinate, LocalMaterialData> originalTopBlocks = new HashMap<ChunkCoordinate, LocalMaterialData>();
 
@@ -1546,7 +1545,7 @@ public class SmoothingAreaGenerator
 
             	if(!originalTopBlocks.containsKey(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z)))
             	{
-        			int highestBlockY = world.getHighestBlockYAt(blockToSpawn.x, blockToSpawn.z, true, true, false, false, chunkBeingPopulated);
+        			highestBlockY = world.getHighestBlockYAt(blockToSpawn.x, blockToSpawn.z, true, true, false, false, true, chunkBeingPopulated);
         			if(highestBlockY > PluginStandardValues.WORLD_DEPTH)
         			{
         				originalTopBlocks.put(ChunkCoordinate.fromChunkCoords(blockToSpawn.x, blockToSpawn.z), world.getMaterial(blockToSpawn.x, highestBlockY, blockToSpawn.z, chunkBeingPopulated));
@@ -1629,8 +1628,8 @@ public class SmoothingAreaGenerator
 
 	                    if(y == blockToSpawn.y)
 	                    {
-	                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated).toDefaultMaterial();
-	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
+	                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated);
+	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove.isAir())
 	                		{
 	                			materialToSet = surfaceBlockMaterial;
 	                			blockDataToSet = surfaceBlockMaterialBlockData;
@@ -1675,7 +1674,7 @@ public class SmoothingAreaGenerator
 							)
 						)
                         {
-        		        	LocalMaterialData customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+        		        	customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
         		        	if(customBlockData != null)
         		        	{
         		        		blockToQueueForSpawn.material = customBlockData;
@@ -1705,14 +1704,13 @@ public class SmoothingAreaGenerator
 						continue;
 					}
 
-					yStart = (short) world.getHighestBlockYAt(blockToSpawn.x,blockToSpawn.z, true, true, false, false, chunkBeingPopulated);
+					yStart = (short) world.getHighestBlockYAt(blockToSpawn.x,blockToSpawn.z, true, true, false, false, true, chunkBeingPopulated);
 					yEnd = 0;
 					for(short y = yStart; y >= yEnd; y--)
 					{
 						if(y >= 255){ continue;}
 
 						sourceBlockMaterial = world.getMaterial(blockToSpawn.x, y, blockToSpawn.z, chunkBeingPopulated);
-						DefaultMaterial sourceBlockDefaultMaterial = sourceBlockMaterial.toDefaultMaterial();
 
                     	materialToSet = replaceAboveMaterial;
                     	blockDataToSet = replaceAboveMaterialBlockData;
@@ -1728,8 +1726,8 @@ public class SmoothingAreaGenerator
 	                    		materialToSet = replaceAboveMaterial; // Replace liquid with replaceAboveMaterial
 	                    		blockDataToSet = replaceAboveMaterialBlockData;
 	                    	} else {
-	                    		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated).toDefaultMaterial();
-		                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
+	                    		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated);
+		                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove.isAir())
 		                		{
 		                			materialToSet = surfaceBlockMaterial;
 		                			blockDataToSet = surfaceBlockMaterialBlockData;
@@ -1744,11 +1742,11 @@ public class SmoothingAreaGenerator
 	                    {
 	                    	if(sourceBlockMaterial.isSolid() || (!secondPass && sourceBlockMaterial.isLiquid() && !((BO4)start.getObject()).getConfig().spawnUnderWater))
 	                    	{
-		                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated).toDefaultMaterial();
-		                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
+		                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated);
+		                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove.isAir())
 		                		{
-			                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated).toDefaultMaterial();
-			                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
+			                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated);
+			                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove.isAir())
 			                		{
 			                			materialToSet = surfaceBlockMaterial;
 			                			blockDataToSet = surfaceBlockMaterialBlockData;
@@ -1767,10 +1765,10 @@ public class SmoothingAreaGenerator
 		                    		blockDataToSet = replaceAboveMaterialBlockData;
 	                    		} else {
 	                    			// After removing layers of blocks replace the heighest block left with the surfaceBlockMaterial
-	                    			if(!sourceBlockMaterial.isLiquid() && !sourceBlockDefaultMaterial.equals(DefaultMaterial.AIR))
+	                    			if(!sourceBlockMaterial.isLiquid() && !sourceBlockMaterial.isAir())
 	                    			{
-	        	                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated).toDefaultMaterial();
-	        	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove == DefaultMaterial.AIR)
+	        	                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated);
+	        	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove.isAir())
 	        	                		{
 	        	                			materialToSet = DefaultMaterial.AIR; // Make sure that canyons/caves etc aren't covered
         		                			blockDataToSet = surfaceBlockMaterialBlockData;
@@ -1822,7 +1820,7 @@ public class SmoothingAreaGenerator
 							)
 						)
                         {
-        		        	LocalMaterialData customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+        		        	customBlockData = biomeConfig.surfaceAndGroundControl.getCustomBlockData(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
         		        	if(customBlockData != null)
         		        	{
         		        		blockToQueueForSpawn.material = customBlockData;
@@ -1908,6 +1906,8 @@ public class SmoothingAreaGenerator
         int prevDiagonalLineFinalDestinationPointX = 0;
         int prevDiagonalLineFinalDestinationPointZ = 0;
         boolean isInitialised = false;
+        ArrayList<SmoothingAreaLine> smoothingAreasForLine;
+        ArrayList<SmoothingAreaLineDiagonal> smoothingAreasToSpawnPerLineDestination;
 
         // Check if all smooth areas have been finalized (endpoint y set) for this chunk
         // if so then merge them down to a single smooth area. Otherwise queue them and
@@ -2000,7 +2000,7 @@ public class SmoothingAreaGenerator
 	        	if(diagonalLineFinalDestinationPointY == -1)
 	        	{
 	        		// TODO: Could this be the cause of the mystery bug that places smoothing areas at y 0?
-	        		//OTG.log(LogMarker.INFO, "A smoothing area tried to spawn at Y -1 for structure " + Start.BO3Name + ". If you are creating empty chunks intentionally (for a sky-world for instance) you may wish to disable smoothing areas in your BO3s!");
+	        		//OTG.log(LogMarker.INFO, "A smoothing area tried to spawn at Y -1 for structure " + Start.BO3Name + ". If you are creating empty chunks intentionally (for a sky-world for instance) you may wish to disable smoothing areas in your BO4s!");
 	        		// Something is wrong!
 	        		//throw new RuntimeException();
 	        		diagonalLineFinalDestinationPointY = 0;
@@ -2019,7 +2019,7 @@ public class SmoothingAreaGenerator
         		}
 
                 // Set diagonal-y-endpoint for all other smoothing area lines that are children of this diagonal line.
-                ArrayList<SmoothingAreaLineDiagonal> smoothingAreasToSpawnPerLineDestination = this.smoothingAreasToSpawnPerDiagonalLineDestination.get(ChunkCoordinate.fromChunkCoords(diagonalLineFinalDestinationPointX, diagonalLineFinalDestinationPointZ));
+                smoothingAreasToSpawnPerLineDestination = this.smoothingAreasToSpawnPerDiagonalLineDestination.get(ChunkCoordinate.fromChunkCoords(diagonalLineFinalDestinationPointX, diagonalLineFinalDestinationPointZ));
                 if(smoothingAreasToSpawnPerLineDestination != null)
                 {
 	                for(SmoothingAreaLineDiagonal smoothingBeginAndEndPoints2 : smoothingAreasToSpawnPerLineDestination)
@@ -2077,7 +2077,7 @@ public class SmoothingAreaGenerator
 
     	                // Set y-endpoint for all other smoothing area line-parts that are part of this line
 
-            			ArrayList<SmoothingAreaLine> smoothingAreasForLine = smoothingAreasToSpawnPerLineOrigin.get(ChunkCoordinate.fromChunkCoords(originPointX, originPointZ));
+            			smoothingAreasForLine = smoothingAreasToSpawnPerLineOrigin.get(ChunkCoordinate.fromChunkCoords(originPointX, originPointZ));
             			if(smoothingAreasForLine != null)
             			{
 		                	for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreasForLine)
@@ -2087,7 +2087,7 @@ public class SmoothingAreaGenerator
 
 			            		if(finalDestinationPointX == finalDestinationPointX2 && finalDestinationPointZ == finalDestinationPointZ2)
 			            		{
-		            				smoothingBeginAndEndPoints2.finalDestinationPointY = finalDestinationPointY; // - 1; // <-- -1 is a hack because the spawning area endpoints would always spawn 1 block too high
+		            				smoothingBeginAndEndPoints2.finalDestinationPointY = finalDestinationPointY;
 			            		}
 	    	                }
             			}
@@ -2097,7 +2097,7 @@ public class SmoothingAreaGenerator
         	}
 
         	// this should no longer be necessary since ForgeWorld has been changed to force chunk
-        	// population when height is requested for a block in an unpopulated chunk. TODO: will that work for bukkit too?
+        	// population when height is requested for a block in an unpopulated chunk. TODO: Remove and test
             if(finalDestinationPointY == -1)
             {
             	finalDestinationPointY = 0;
@@ -2135,6 +2135,18 @@ public class SmoothingAreaGenerator
         		smoothingBeginAndEndPoints.originPointY = originPointY;
             }
         }
+        
+        short highestBlock;
+        LocalMaterialData materialAbove;
+        int repeats;
+        boolean abort;
+        int distanceFromOrigin;
+        short firstSolidBlock;
+    	int originPointX2;
+    	int originPointZ2;
+    	double surfaceBlockHeight2;
+        double adjustedOriginPointY;
+        double originPointY2;
 
         for(SmoothingAreaLine smoothingBeginAndEndPoints : smoothingAreas)
         {
@@ -2190,7 +2202,7 @@ public class SmoothingAreaGenerator
         		}
             }
 
-            short highestBlock = -1;
+            highestBlock = -1;
 
             // TODO: Check if this is still necessary
             // finalDestinationPointY may have been found so the chunk is loaded, however it might still be the wrong coordinate
@@ -2247,8 +2259,8 @@ public class SmoothingAreaGenerator
                 goingUp = false;
                 goingDown = true;
 
-                int distanceFromOrigin = -1;
-                short firstSolidBlock = -1;
+                distanceFromOrigin = -1;
+                firstSolidBlock = -1;
 
                 // Since this is the second pass and the first pass went up we'll have to detect
                 // the closest suitable block to smooth to without using getHighestBlock()
@@ -2267,7 +2279,7 @@ public class SmoothingAreaGenerator
                 {
                 	block = blockColumn[i];
                     distanceFromOrigin = Math.abs(originPointY - i);
-                    LocalMaterialData materialAbove = blockColumn[i + 1];
+                    materialAbove = blockColumn[i + 1];
                     material = blockColumn[i];
                     if(
                         firstSolidBlock == -1 &&
@@ -2306,7 +2318,7 @@ public class SmoothingAreaGenerator
     		}
 
             // TODO: Make checks for situations where we can predict that a second pass won't be needed?
-            int repeats = 1;
+            repeats = 1;
 
             // Do two passes, one up and one down, for each smoothing begin and endpoint
             // to make both an evenly sloped hole above and a hill below the BO3
@@ -2325,8 +2337,8 @@ public class SmoothingAreaGenerator
                     }
                     else if(diagonalLinegoingUp)// && !goingUp)
                     {
-                        int distanceFromOrigin = -1;
-                        short firstSolidBlock = -1;
+                        distanceFromOrigin = -1;
+                        firstSolidBlock = -1;
                         // Since this is the second pass and the first pass went up we'll have to detect
                         // the closest suitable block to smooth to without using getHighestBlock()
                         // this means we might accidentally detect a cave beneath the surface as the
@@ -2352,7 +2364,7 @@ public class SmoothingAreaGenerator
                         {
         	            	block = blockColumn2[i];
                             distanceFromOrigin = Math.abs(diagonalLineoriginPointY - i);
-                            LocalMaterialData materialAbove = blockColumn2[i + 1];
+                            materialAbove = blockColumn2[i + 1];
                             material = block;
                             if(
                                 firstSolidBlock == -1 &&
@@ -2434,7 +2446,7 @@ public class SmoothingAreaGenerator
 	        		// Line has been switched so really this line is going up
 	        		else if(diagonalLinegoingDown)
 	        		{
-	        			finalDestinationPointY = (short) world.getHighestBlockYAt(finalDestinationPointX, finalDestinationPointZ, true, true, false, true, null);
+	        			finalDestinationPointY = (short) world.getHighestBlockYAt(finalDestinationPointX, finalDestinationPointZ, true, true, false, true, true, null);
                     	if(finalDestinationPointY < diagonalLineoriginPointY)
                     	{
 		        			finalDestinationPointY = (short) (diagonalLineoriginPointY + 75 < 256 ? diagonalLineoriginPointY + 75 : 255);
@@ -2459,8 +2471,8 @@ public class SmoothingAreaGenerator
                         goingUp = false;
                         goingDown = true;
 
-                        int distanceFromOrigin = -1;
-                        short firstSolidBlock = -1;
+                        distanceFromOrigin = -1;
+                        firstSolidBlock = -1;
                         // Since this is the second pass and the first pass went up we'll have to detect
                         // the closest suitable block to smooth to without using getHeighestBlock()
                         // this means we might accidentally detect a cave beneath the surface as the
@@ -2478,7 +2490,7 @@ public class SmoothingAreaGenerator
                         {
                         	block = blockColumn[i];
                             distanceFromOrigin = Math.abs(originPointY - i);
-                            LocalMaterialData materialAbove = blockColumn[i + 1];
+                            materialAbove = blockColumn[i + 1];
                             material = block;
                             if(
                                 firstSolidBlock == -1 &&
@@ -2529,10 +2541,10 @@ public class SmoothingAreaGenerator
 
                 if(originPointX != finalDestinationPointX && originPointZ == finalDestinationPointZ)
                 {
-                	double adjustedOriginPointY = 0;
+                	adjustedOriginPointY = 0;
                 	if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
                 	{
-	            		double originPointY2 =
+	            		originPointY2 =
                         (
                             (double)Math.abs(diagonalLineoriginPointY - diagonalLineFinalDestinationPointY)
                             *
@@ -2577,7 +2589,7 @@ public class SmoothingAreaGenerator
     	    	            //X difference
     	    	            distanceFromStart = Math.abs(beginPoint.x - diagonalLineOriginPointX) + i;
 
-	                        double surfaceBlockHeight2 =
+	                        surfaceBlockHeight2 =
                             (
                                 (double)Math.abs(adjustedOriginPointY - finalDestinationPointY)
                                 *
@@ -2630,7 +2642,7 @@ public class SmoothingAreaGenerator
                         // and abort spawning for this line of blocks
                         // this is done to make sure that smoothing-areas going down can cover lower-lying smooth areas
                         // but lower-lying smooth-areas going up do not replace higher smoothing areas going down
-                        boolean abort = false;
+                        abort = false;
                         // get smoothing blocks
                         for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreas)
                         {
@@ -2638,8 +2650,8 @@ public class SmoothingAreaGenerator
                         	// diagonal line index 0, it shouldnt!
                         	if(!(smoothingBeginAndEndPoints2 instanceof SmoothingAreaLineDiagonal))
                         	{
-	                        	int originPointX2 = smoothingBeginAndEndPoints2.originPointX;
-	                        	int originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
+	                        	originPointX2 = smoothingBeginAndEndPoints2.originPointX;
+	                        	originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
 
 	                            if((originPointX2 != filler.x || originPointZ2 != filler.z) || (originPointX == originPointX2 && originPointZ == originPointZ2))
 	                            {
@@ -2750,10 +2762,10 @@ public class SmoothingAreaGenerator
                 }
                 if(originPointX == finalDestinationPointX && originPointZ != finalDestinationPointZ)
                 {
-                	double adjustedOriginPointY = 0;
+                	adjustedOriginPointY = 0;
                 	if(smoothingBeginAndEndPoints instanceof SmoothingAreaLineDiagonal)
                 	{
-	            		double originPointY2 =
+	            		originPointY2 =
                         (
                             (double)Math.abs(diagonalLineoriginPointY - diagonalLineFinalDestinationPointY)
                             *
@@ -2798,7 +2810,7 @@ public class SmoothingAreaGenerator
     	    	            //Z difference
     	    	            distanceFromStart = Math.abs(beginPoint.z - diagonalLineOriginPointZ) + i;
 
-	                        double surfaceBlockHeight2 =
+	                        surfaceBlockHeight2 =
                             (
                                 (double)Math.abs(adjustedOriginPointY - finalDestinationPointY)
                                 *
@@ -2850,7 +2862,7 @@ public class SmoothingAreaGenerator
                         // and abort spawning for this line of blocks
                         // this is done to make sure that smoothing-areas going down can cover lower-lying smooth areas
                         // but lower-lying smooth-areas going up do not replace higher smoothing areas going down
-                        boolean abort = false;
+                        abort = false;
                         // get smoothing blocks
                         for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreas)
                         {
@@ -2860,8 +2872,8 @@ public class SmoothingAreaGenerator
                         	{
 	                        	// TODO: Even diagonal block child line smooth origin points are included
 	                        	// here, find out if that doesn't cause bugs..
-	                        	int originPointX2 = smoothingBeginAndEndPoints2.originPointX;
-	                        	int originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
+	                        	originPointX2 = smoothingBeginAndEndPoints2.originPointX;
+	                        	originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
 
 	                            if((originPointX2 != filler.x || originPointZ2 != filler.z) || (originPointX == originPointX2 && originPointZ == originPointZ2))
 	                            {
@@ -2987,7 +2999,7 @@ public class SmoothingAreaGenerator
                     // and abort spawning for this line of blocks
                     // this is done to make sure that smoothing-areas going down can cover lower-lying smooth areas
                     // but lower-lying smooth-areas going up do not replace higher smoothing areas going down
-                    boolean abort = false;
+                    abort = false;
                     // get smoothing blocks
                     for(SmoothingAreaLine smoothingBeginAndEndPoints2 : smoothingAreas)
                     {
@@ -2995,8 +3007,8 @@ public class SmoothingAreaGenerator
                     	// diagonal line index 0, it shouldnt!
                     	if(!(smoothingBeginAndEndPoints2 instanceof SmoothingAreaLineDiagonal))
                     	{
-                        	int originPointX2 = smoothingBeginAndEndPoints2.originPointX;
-                        	int originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
+                        	originPointX2 = smoothingBeginAndEndPoints2.originPointX;
+                        	originPointZ2 = smoothingBeginAndEndPoints2.originPointZ;
 
                             if((originPointX2 != filler.x || originPointZ2 != filler.z) || (originPointX == originPointX2 && originPointZ == originPointZ2))
                             {

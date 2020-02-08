@@ -150,7 +150,7 @@ public class GrassGen extends Resource
     				(centerY >= PluginStandardValues.WORLD_DEPTH && centerY < PluginStandardValues.WORLD_HEIGHT) &&
 					(worldMaterial = world.getMaterial(centerX, centerY, centerZ, chunkBeingPopulated)) != null &&
 					(
-						worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR || 
+						worldMaterial.isAir() || 
 						worldMaterial.isMaterial(DefaultMaterial.LEAVES) || 
 						worldMaterial.isMaterial(DefaultMaterial.LEAVES_2)
 					) &&
@@ -177,7 +177,7 @@ public class GrassGen extends Resource
                 z = centerZ + random.nextInt(8) - random.nextInt(8);
                 if (
     				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
-    				worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR &&
+    				worldMaterial.isAir() &&
     				(
         				(worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null && 
         				this.sourceBlocks.contains(worldMaterial)
@@ -217,7 +217,7 @@ public class GrassGen extends Resource
         		(
     				((worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
     				(
-	    				worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR) || 
+	    				worldMaterial.isAir()) || 
 						worldMaterial.isMaterial(DefaultMaterial.LEAVES) || 
 						worldMaterial.isMaterial(DefaultMaterial.LEAVES_2)
 					) &&
@@ -232,7 +232,7 @@ public class GrassGen extends Resource
             if (            		
         		(
     				(worldMaterial = world.getMaterial(x, y + 1, z, chunkBeingPopulated)) == null ||
-					worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR
+					!worldMaterial.isAir()
 				) || (
 					(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) == null ||
 					!sourceBlocks.contains(worldMaterial)

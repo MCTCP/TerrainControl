@@ -8,7 +8,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -97,7 +96,7 @@ public class LiquidGen extends Resource
         }
 
         worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated);
-        if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR || !sourceBlocks.contains(worldMaterial))
+        if (worldMaterial == null || !worldMaterial.isAir() || !sourceBlocks.contains(worldMaterial))
         {
             return;
         }

@@ -1,8 +1,6 @@
 package com.pg85.otg.common;
 
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
-import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
@@ -11,13 +9,13 @@ import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 public interface LocalWorld
@@ -202,7 +200,9 @@ public interface LocalWorld
 
     public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated);
     
-    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, ChunkCoordinate chunkBeingPopulated);
+    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingPopulated);
+
+	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
     
     public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 

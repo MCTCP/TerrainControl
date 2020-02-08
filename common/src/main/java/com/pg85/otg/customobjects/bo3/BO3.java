@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
@@ -115,22 +116,25 @@ public class BO3 implements StructuredCustomObject
         ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
+        LocalMaterialData localMaterial;
+        DefaultMaterial material;
         for (BO3BlockFunction block : blocks)
         {
-            DefaultMaterial material = world.getMaterial(x + block.x, y + block.y, z + block.z, null).toDefaultMaterial();
+        	localMaterial = world.getMaterial(x + block.x, y + block.y, z + block.z, null);
+            material = localMaterial.toDefaultMaterial();
             
             // Ignore blocks in the ground when checking spawn conditions
             if (block.y >= 0)
             {
                 // Do not spawn if non-tree blocks are in the way
-                if (material != DefaultMaterial.AIR && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2 && material != DefaultMaterial.SAPLING)
+                if (!localMaterial.isAir() && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2 && material != DefaultMaterial.SAPLING)
                 {
                     return false;
                 }
             }
             
             // Only overwrite air
-            if (material == DefaultMaterial.AIR)
+            if (localMaterial.isAir())
             {
                 chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
                 blocksToSpawn.add(block);

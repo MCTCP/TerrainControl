@@ -15,7 +15,6 @@ import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
@@ -79,13 +78,13 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             DefaultMaterial material = world.getMaterial(x + point.x, y + point.y, z + point.z, null).toDefaultMaterial();
 
             // Do not spawn if non-tree blocks are in the way
-            if (material != DefaultMaterial.AIR && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2)
+            if (!material.isAir() && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2)
             {
                 return false;
             }
 
             // Only overwrite air
-            if (material == DefaultMaterial.AIR)
+            if (material.isAir())
             {
                 blocksToSpawn.add(point);
             }
@@ -109,7 +108,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         {
             if ((worldMaterial = world.getMaterial(x + point.x, y + point.y, z + point.z, null)) != null)
             {
-    			if(worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
+    			if(worldMaterial.isAir())
             	{
     				setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null);
 	            }
@@ -142,7 +141,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
 
         LocalMaterialData worldMaterial = world.getMaterial(x, y - 5, z, chunkBeingPopulated);
-        if (needsFoundation && worldMaterial == null || worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
+        if (needsFoundation && worldMaterial == null || worldMaterial.isAir())
         {
             return false;
         }
@@ -293,7 +292,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         {
             if ((worldMaterial = world.getMaterial(x + point.x, y + point.y, z + point.z, chunkBeingPopulated)) != null)
             {
-        		if(worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
+        		if(worldMaterial.isAir())
 	            {
 	                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated);
 	            }

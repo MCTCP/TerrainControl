@@ -10,7 +10,6 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -99,7 +98,7 @@ public class IceSpikeGen extends Resource
         int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 
         LocalMaterialData worldMaterial;
-        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
+        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             y--;
         }
@@ -141,7 +140,7 @@ public class IceSpikeGen extends Resource
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
         LocalMaterialData worldMaterial;
-        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR)
+        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             --y;
         }
@@ -186,7 +185,7 @@ public class IceSpikeGen extends Resource
                     {
                         if (
                     		(worldMaterial = world.getMaterial(x + var11, y + var8, z + var13, chunkBeingPopulated)) != null && 
-                    		(worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR || sourceBlocks.contains(worldMaterial)))
+                    		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                         {
                             world.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingPopulated);
                         }
@@ -195,7 +194,7 @@ public class IceSpikeGen extends Resource
                         {
                             if (
                         		(worldMaterial = world.getMaterial(x + var11, y - var8, z + var13, chunkBeingPopulated)) != null && 
-                        		(worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR || sourceBlocks.contains(worldMaterial)))
+                        		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                             {
                                 world.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingPopulated);
                             }                        	
@@ -237,7 +236,7 @@ public class IceSpikeGen extends Resource
                     	if(
                 			(worldMaterial = world.getMaterial(x + var16, var11, z + var10, chunkBeingPopulated)) != null &&
         					(
-    							worldMaterial.toDefaultMaterial() == DefaultMaterial.AIR || 
+    							worldMaterial.isAir() || 
     							sourceBlocks.contains(worldMaterial) || 
     							worldMaterial.equals(this.material)
 							)

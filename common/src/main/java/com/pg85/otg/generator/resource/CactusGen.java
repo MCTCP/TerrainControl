@@ -8,7 +8,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -54,7 +53,7 @@ public class CactusGen extends Resource
             cactusZ = z + rand.nextInt(8) - rand.nextInt(8);
 
             worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ,  chunkBeingPopulated);
-            if(worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            if(worldMaterial == null || !worldMaterial.isAir())
             {
             	continue;
             }
@@ -68,25 +67,25 @@ public class CactusGen extends Resource
 
             // Check neighbors
             worldMaterial = world.getMaterial(cactusX - 1, cactusBaseY, cactusZ, chunkBeingPopulated);
-            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
             }
             
             worldMaterial = world.getMaterial(cactusX + 1, cactusBaseY, cactusZ, chunkBeingPopulated);
-            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
             }
             
             worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ - 1, chunkBeingPopulated);
-            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
             }
             
             worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ + 1, chunkBeingPopulated);
-            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
             }

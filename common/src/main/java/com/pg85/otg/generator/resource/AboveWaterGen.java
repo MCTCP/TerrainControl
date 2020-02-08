@@ -5,7 +5,6 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -48,7 +47,7 @@ public class AboveWaterGen extends Resource
             m = z + rand.nextInt(8) - rand.nextInt(8);
             
             worldMaterial = world.getMaterial(j, k, m, chunkBeingPopulated);
-            if (worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR)
+            if (worldMaterial == null || !worldMaterial.isAir())
             {
             	continue;
             }

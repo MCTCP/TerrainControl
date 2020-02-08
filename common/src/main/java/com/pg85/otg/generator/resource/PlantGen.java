@@ -8,7 +8,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -104,7 +103,7 @@ public class PlantGen extends Resource
             worldMaterial = world.getMaterial(j, k , m, chunkBeingPopulated);
             worldMaterialBelow = world.getMaterial(j, k - 1, m, chunkBeingPopulated);
             if (
-        		(worldMaterial == null || worldMaterial.toDefaultMaterial() != DefaultMaterial.AIR) ||
+        		(worldMaterial == null || !worldMaterial.isAir()) ||
         		(worldMaterialBelow == null || !sourceBlocks.contains(worldMaterialBelow))
     		)
             {
