@@ -9,7 +9,6 @@ public class NoiseGeneratorPerlin
     private double yCoord;
     private double zCoord;
 
-
     NoiseGeneratorPerlin(Random random)
     {
         permutations = new int[512];

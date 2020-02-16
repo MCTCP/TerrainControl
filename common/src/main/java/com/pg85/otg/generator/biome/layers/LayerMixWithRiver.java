@@ -20,15 +20,17 @@ public class LayerMixWithRiver extends Layer
         this.configs = configs;
         this.riverLayer = riverLayer;
         this.riverBiomes = new int[world.getMaxBiomesCount()];
-
+        LocalBiome biome;
+        LocalBiome riverBiome;
+        
         for (int id = 0; id < this.riverBiomes.length; id++)
         {
-            LocalBiome biome = configs.getBiomeByOTGIdOrNull(id);
+            biome = configs.getBiomeByOTGIdOrNull(id);
 
             this.riverBiomes[id] = -1;
             if (biome != null && !biome.getBiomeConfig().riverBiome.isEmpty())
             {
-            	LocalBiome riverBiome = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome);
+            	riverBiome = world.getBiomeByNameOrNull(biome.getBiomeConfig().riverBiome);
             	if(riverBiome != null)
             	{
             		this.riverBiomes[id] = riverBiome.getIds().getOTGBiomeId();

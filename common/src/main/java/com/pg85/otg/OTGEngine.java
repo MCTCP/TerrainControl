@@ -1,6 +1,7 @@
-package com.pg85.otg.common;
+package com.pg85.otg;
 
-import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.PluginConfig;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;

@@ -58,7 +58,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 	private FifoMap<ChunkCoordinate, Chunk> lastUsedChunks;
     ForgeChunkBuffer chunkBuffer;
     Object chunkBufferLock = new Object();
-    //     
+    //
 
     private	DataFixer dataFixer = DataFixesManager.createFixer();
     
@@ -225,13 +225,13 @@ public class OTGChunkGenerator implements IChunkGenerator
         byte[] chunkBiomeArray = chunk.getBiomeArray();
         ConfigProvider configProvider = this.world.getConfigs();
         int[] biomeShortArray = this.world.getBiomeGenerator().getBiomes(null, chunk.x * CHUNK_X_SIZE, chunk.z * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
-
+        int generationId;
+        LocalBiome biome;
+        
         for (int i = 0; i < chunkBiomeArray.length; i++)
         {
-            int generationId = biomeShortArray[i];
-
-            LocalBiome biome = configProvider.getBiomeByOTGIdOrNull(generationId);
-
+            generationId = biomeShortArray[i];
+            biome = configProvider.getBiomeByOTGIdOrNull(generationId);
         	chunkBiomeArray[i] = (byte) biome.getIds().getSavedId();
         }
     }
@@ -278,9 +278,10 @@ public class OTGChunkGenerator implements IChunkGenerator
 		cachedColumn = new LocalMaterialData[256];
 
     	LocalMaterialData[] blocksInColumn = new LocalMaterialData[256];
-        for(short y = 0; y < 256; y++)
+    	IBlockState blockInChunk;
+    	for(short y = 0; y < 256; y++)
         {
-        	IBlockState blockInChunk = chunk.getBlockState(new BlockPos(blockX, y, blockZ));
+        	blockInChunk = chunk.getBlockState(new BlockPos(blockX, y, blockZ));
         	if(blockInChunk != null)
         	{
 	        	blocksInColumn[y] = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
@@ -304,12 +305,15 @@ public class OTGChunkGenerator implements IChunkGenerator
     	int height = -1;
 
     	LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(x,z);
-
+    	ForgeMaterialData material;
+    	boolean isLiquid;
+    	boolean isSolid;
+    	
         for(int y = 255; y > -1; y--)
         {
-        	ForgeMaterialData material = (ForgeMaterialData) blockColumn[y];
-        	boolean isLiquid = material.isLiquid();
-        	boolean isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
+        	material = (ForgeMaterialData) blockColumn[y];
+        	isLiquid = material.isLiquid();
+        	isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
         	if(!(isLiquid && ignoreLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))
@@ -555,9 +559,10 @@ public class OTGChunkGenerator implements IChunkGenerator
     // Only called during generate by woodlandmansion. Don't call this anywhere else, chunkBuffer is not thread-safe and may be in use.
     public int getHighestBlockInCurrentlyPopulatingChunk(int x, int z)
     {
+    	LocalMaterialData material;
     	for(int i = PluginStandardValues.WORLD_HEIGHT - 1; i > PluginStandardValues.WORLD_DEPTH; i--)
     	{
-    		LocalMaterialData material = chunkBuffer.getBlock(x, i, z);
+    		material = chunkBuffer.getBlock(x, i, z);
     		if(material != null && !material.isEmptyOrAir())
 			{
     			return i;

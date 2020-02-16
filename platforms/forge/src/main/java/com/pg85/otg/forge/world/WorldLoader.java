@@ -154,7 +154,7 @@ public final class WorldLoader
     	
     	return null;
     }
-    
+
     public ForgeWorld getWorldByDimId(int dimensionId)
     {
     	ForgeWorld forgeWorld;
@@ -167,7 +167,7 @@ public final class WorldLoader
     	}
     	return forgeWorld;
     }
-       
+
     public ForgeWorld getUnloadedWorld(String name)
     {
     	ForgeWorld forgeWorld = null;
@@ -177,7 +177,7 @@ public final class WorldLoader
         }
         return forgeWorld;
     }
-    
+
     public ForgeWorld getUnloadedWorldByDimId(int dimensionId)
     {
     	ForgeWorld forgeWorld;

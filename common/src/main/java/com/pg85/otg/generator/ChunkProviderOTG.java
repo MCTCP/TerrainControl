@@ -76,7 +76,7 @@ public class ChunkProviderOTG
     private BiomeConfig[] biomes = new BiomeConfig[1024];
     
     public ChunkProviderOTG(ConfigProvider configs, LocalWorld world)
-    {
+    {    	
         this.configProvider = configs;
         this.localWorld = world;
         this.heightCap = world.getHeightCap();

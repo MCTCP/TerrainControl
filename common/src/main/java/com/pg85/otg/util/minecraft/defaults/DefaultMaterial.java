@@ -306,7 +306,7 @@ public enum DefaultMaterial
      */
     public boolean isLiquid()
     {
-        return this == WATER || this == STATIONARY_WATER || this == LAVA | this == STATIONARY_LAVA;
+        return this == WATER || this == STATIONARY_WATER || this == LAVA || this == STATIONARY_LAVA;
     }
 
     /**

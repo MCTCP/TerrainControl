@@ -138,13 +138,16 @@ public final class LayerFactory
 
         LocalBiome[][] normalBiomeMap = new LocalBiome[worldConfig.generationDepth + 1][];
         LocalBiome[][] iceBiomeMap = new LocalBiome[worldConfig.generationDepth + 1][];
-
+        List<LocalBiome> normalBiomes;
+        List<LocalBiome> iceBiomes;        
+        List<LocalBiome> biomes;
+        BiomeConfig biomeConfig;
         for (int i = 0; i < worldConfig.generationDepth + 1; i++)
         {
-            List<LocalBiome> normalBiomes = new ArrayList<LocalBiome>();
-            List<LocalBiome> iceBiomes = new ArrayList<LocalBiome>();
+            normalBiomes = new ArrayList<LocalBiome>();
+            iceBiomes = new ArrayList<LocalBiome>();
             
-            List<LocalBiome> biomes = configs.getBiomeArrayLegacy();
+            biomes = configs.getBiomeArrayLegacy();
             for (LocalBiome biome : biomes)
             {
                 if (biome == null)
@@ -152,7 +155,7 @@ public final class LayerFactory
                     continue;
                 }
 
-                BiomeConfig biomeConfig = biome.getBiomeConfig();
+                biomeConfig = biome.getBiomeConfig();
 
                 if (biomeConfig.biomeSize != i)
                 {
@@ -199,6 +202,18 @@ public final class LayerFactory
         Layer RiverLayer = new LayerEmpty(1L, defaultOceanId);
         boolean riversStarted = false;
 
+        LayerBiomeBorder layerBiomeBorder;
+        LayerBiomeInBiome layerBiomeIsle;
+        boolean haveBorder;
+        boolean haveIsle;
+        
+        boolean[] biomeCanSpawnIn;
+        boolean inOcean;
+        LocalBiome islandInBiome;
+        int chance;
+        LocalBiome replaceFromBiome;
+        int replaceFrom;
+        
         for (int depth = 0; depth <= worldConfig.generationDepth; depth++)
         {
 
@@ -250,12 +265,12 @@ public final class LayerFactory
                 }
             }
 
-            LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world, defaultOceanId);
-            LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed(), defaultOceanId);
-            boolean haveBorder = false;
-            boolean haveIsle = false;
+            layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world, defaultOceanId);
+            layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed(), defaultOceanId);
+            haveBorder = false;
+            haveIsle = false;           
             
-            List<LocalBiome> biomes = configs.getBiomeArrayLegacy();
+            biomes = configs.getBiomeArrayLegacy();
             for (LocalBiome biome : biomes)            
             {
                 if (biome == null)
@@ -263,7 +278,7 @@ public final class LayerFactory
                     continue;
                 }
 
-                BiomeConfig biomeConfig = biome.getBiomeConfig();
+                biomeConfig = biome.getBiomeConfig();
 
                 if (
             		biomeConfig.biomeSize == depth
@@ -272,11 +287,11 @@ public final class LayerFactory
                 )
                 {
                     haveIsle = true;
-                    boolean[] biomeCanSpawnIn = new boolean[1024];
-                    boolean inOcean = false;
+                    biomeCanSpawnIn = new boolean[1024];
+                    inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                    	LocalBiome islandInBiome = world.getBiomeByNameOrNull(islandInName);
+                    	islandInBiome = world.getBiomeByNameOrNull(islandInName);
 
                         if (islandInBiome.getName().equals(worldConfig.defaultOceanBiome))
                         {
@@ -285,7 +300,7 @@ public final class LayerFactory
                         	biomeCanSpawnIn[islandInBiome.getIds().getOTGBiomeId()] = true;
                         }
                     }
-                    int chance = (worldConfig.biomeRarityScale + 1) - biomeConfig.biomeRarity;
+                    chance = (worldConfig.biomeRarityScale + 1) - biomeConfig.biomeRarity;
                     layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn, inOcean);
                 }
 
@@ -298,10 +313,10 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                    	int replaceFrom = 0;
+                    	replaceFrom = 0;
 
                     	// TODO: this works for forge but not for bukkit, does that make sense?...
-                    	LocalBiome replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+                    	replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
             			replaceFrom = replaceFromBiome.getIds().getOTGBiomeId();
 
                         //int replaceFrom = world.getBiomeByName(replaceFromName).getIds().getGenerationId();
@@ -386,6 +401,19 @@ public final class LayerFactory
         Layer RiverLayer = new LayerEmpty(1L, defaultOceanId);
 
         boolean riversStarted = false;
+        LayerBiomeBorder layerBiomeBorder;
+        LayerBiomeInBiome layerBiomeIsle;
+        boolean haveBorder;
+        boolean haveIsle;
+                    
+        List<LocalBiome> biomes = configs.getBiomeArrayLegacy();
+        BiomeConfig biomeConfig;
+        boolean[] biomeCanSpawnIn;
+        boolean inOcean;
+        LocalBiome islandInBiome;
+        int chance;
+    	int replaceFrom;
+    	LocalBiome replaceFromBiome;
 
         for (int depth = 0; depth <= worldConfig.generationDepth; depth++)
         {
@@ -443,12 +471,12 @@ public final class LayerFactory
                 }
             }
 
-            LayerBiomeBorder layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world, defaultOceanId);
-            LayerBiomeInBiome layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed(), defaultOceanId);
-            boolean haveBorder = false;
-            boolean haveIsle = false;
+            layerBiomeBorder = new LayerBiomeBorder(3000 + depth, world, defaultOceanId);
+            layerBiomeIsle = new LayerBiomeInBiome(mainLayer, world.getSeed(), defaultOceanId);
+            haveBorder = false;
+            haveIsle = false;
                         
-            List<LocalBiome> biomes = configs.getBiomeArrayLegacy();
+            biomes = configs.getBiomeArrayLegacy();
             for (LocalBiome biome : biomes)
             {
                 if (biome == null)
@@ -456,7 +484,7 @@ public final class LayerFactory
                     continue;
                 }
 
-                BiomeConfig biomeConfig = biome.getBiomeConfig();
+                biomeConfig = biome.getBiomeConfig();
 
                 if (
             		biomeConfig.biomeSizeWhenIsle == depth
@@ -465,11 +493,11 @@ public final class LayerFactory
                 )
                 {
                     haveIsle = true;
-                    boolean[] biomeCanSpawnIn = new boolean[1024];
-                    boolean inOcean = false;
+                    biomeCanSpawnIn = new boolean[1024];
+                    inOcean = false;
                     for (String islandInName : biomeConfig.isleInBiome)
                     {
-                    	LocalBiome islandInBiome = world.getBiomeByNameOrNull(islandInName);
+                    	islandInBiome = world.getBiomeByNameOrNull(islandInName);
 
                         if (islandInBiome.getName().equals(worldConfig.defaultOceanBiome))
                         {
@@ -479,7 +507,7 @@ public final class LayerFactory
                         }
                     }
 
-                    int chance = (worldConfig.biomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
+                    chance = (worldConfig.biomeRarityScale + 1) - biomeConfig.biomeRarityWhenIsle;
                     layerBiomeIsle.addIsle(biome, chance, biomeCanSpawnIn, inOcean);
                 }
 
@@ -492,9 +520,9 @@ public final class LayerFactory
                     haveBorder = true;
                     for (String replaceFromName : biomeConfig.biomeIsBorder)
                     {
-                    	int replaceFrom = 0;
+                    	replaceFrom = 0;
 
-                    	LocalBiome replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
+                    	replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);
                     	if(replaceFromBiome == null)
                     	{
                     		replaceFromBiome = world.getBiomeByNameOrNull(replaceFromName);

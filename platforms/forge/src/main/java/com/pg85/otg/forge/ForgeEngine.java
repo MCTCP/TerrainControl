@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.OTGEngine;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.OTGEngine;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;

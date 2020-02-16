@@ -1,13 +1,13 @@
 package com.pg85.otg.bukkit;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.OTGEngine;
 import com.pg85.otg.bukkit.biomes.BukkitMojangSettings;
 import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.BukkitLogger;
 import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.OTGEngine;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.standard.PluginStandardValues;

@@ -40,6 +40,7 @@ public class LayerBiomeBorder extends Layer
         int eastCheck;
         int westCheck;
         boolean[] biomeFrom;
+        int biomeId;
         for (int zi = 0; zi < zSize; zi++)
         {
             for (int xi = 0; xi < xSize; xi++)
@@ -47,7 +48,7 @@ public class LayerBiomeBorder extends Layer
                 initChunkSeed(xi + x, zi + z);
                 selection = childInts[(xi + 1 + (zi + 1) * (xSize + 2))];
 
-                int biomeId = getBiomeFromLayer(selection);
+                biomeId = getBiomeFromLayer(selection);
                 if (bordersFrom[biomeId] != null)
                 {
                     northCheck = getBiomeFromLayer(childInts[(xi + 1 + (zi) * (xSize + 2))]);
