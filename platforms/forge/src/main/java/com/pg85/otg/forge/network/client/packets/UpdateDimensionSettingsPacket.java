@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -56,6 +57,10 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 		{
 			try
 			{
+				if (!player.canUseCommand(2, "openterraingenerator.ui.update")) {
+					player.sendMessage(new TextComponentString("Could not update settings: Missing permission '"+"openterraingenerator.ui.update"+"'"));
+					return null;
+				}
 				int packetType = message.getStream().readInt();
 				if(packetType == 0) // Normal packet
 				{

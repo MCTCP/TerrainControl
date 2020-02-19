@@ -15,6 +15,7 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.IThreadListener;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
@@ -48,6 +49,10 @@ public class TeleportPlayerPacket extends OTGPacket
 		{			
 			try
 			{
+				if (!player.canUseCommand(2, "openterraingenerator.ui.teleport")) {
+					player.sendMessage(new TextComponentString("Could not teleport: Missing permission '"+"openterraingenerator.ui.teleport"+"'"));
+					return null;
+				}
 				int packetType = message.getStream().readInt();
 				if(packetType == 0) // Normal packet
 				{

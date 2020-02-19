@@ -39,7 +39,7 @@ public final class OTGCommandHandler implements ICommand
                 arg.remove(0);
             }
 
-            if (!sender.canUseCommand(2, this.getName()) && cmd.needsOp)
+            if (!sender.canUseCommand(2, "openterraingenerator.command."+cmd.name) && cmd.needsOp)
             {
                 sender.sendMessage(
                         new TextComponentString(BaseCommand.ERROR_COLOR + "You do not have permission to use that command."));
@@ -69,6 +69,8 @@ public final class OTGCommandHandler implements ICommand
         this.addCommand(new BlocksCommand());
         this.addCommand(new EntitiesCommand());
         this.addCommand(new ModDataCommand());
+        this.addCommand(new TimeCommand());
+        this.addCommand(new WeatherCommand());
     }
 
     private void addCommand(BaseCommand command)

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import net.minecraft.util.text.TextComponentString;
 import org.apache.commons.lang3.StringUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -65,6 +66,10 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		{
 			try
 			{
+				if (!player.canUseCommand(2, "openterraingenerator.ui.create")) {
+					player.sendMessage(new TextComponentString("Could not process: Missing permission '"+"openterraingenerator.ui.create"+"'"));
+					return null;
+				}
 				int packetType = message.getStream().readInt();
 				if(packetType == 0) // Create dimension
 				{
