@@ -69,6 +69,8 @@ public final class OTGCommandHandler implements ICommand
         this.addCommand(new BlocksCommand());
         this.addCommand(new EntitiesCommand());
         this.addCommand(new ModDataCommand());
+        this.addCommand(new TimeCommand());
+        this.addCommand(new WeatherCommand());
     }
 
     private void addCommand(BaseCommand command)
