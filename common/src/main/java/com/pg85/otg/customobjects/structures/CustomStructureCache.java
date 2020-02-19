@@ -15,6 +15,7 @@ import com.pg85.otg.customobjects.structures.bo4.CustomStructurePlotter;
 import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.helpers.RandomHelper;
 
 import java.util.ArrayList;
@@ -38,7 +39,7 @@ public class CustomStructureCache
 
 	// WorldInfo holds info on all BO3's ever spawned for this world, structurecache only holds those outside the pregenerated area and sets spawned chunks to null.
 	
-	private Map<ChunkCoordinate, BO3CustomStructure> bo3StructureCache;
+	private FifoMap<ChunkCoordinate, BO3CustomStructure> bo3StructureCache;
     public Map<ChunkCoordinate, BO4CustomStructure> bo4StructureCache;
     
 	// Used for the /otg BO3 command, stores information about every BO3 that has been spawned so that author and description information can be requested by chunk.
@@ -52,7 +53,6 @@ public class CustomStructureCache
     {
         this.world = world;
         this.plotter = new CustomStructurePlotter();
-        
         loadStructureCache();
     }
     
@@ -80,7 +80,7 @@ public class CustomStructureCache
     {
     	// Only used for Bukkit?
         this.world = world;
-        bo3StructureCache.clear();
+        this.bo3StructureCache.clear();
     }
 
     // Only used by other resources like lakes to cancel 
@@ -98,34 +98,34 @@ public class CustomStructureCache
     // Only used for non-OTG+ Customstructure
     public CustomStructure getStructureStart(Random worldRandom, int chunkX, int chunkZ)
     {
-        ChunkCoordinate coord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-        BO3CustomStructure structureStart = bo3StructureCache.get(coord);
-
-        // Clear cache if needed
-        if (bo3StructureCache.size() > 400)
-        {
-        	bo3StructureCache.clear();
-        }
+        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+        BO3CustomStructure structureStart = bo3StructureCache.get(chunkCoord);
 
         if (structureStart != null)
         {
+            if(structureStart.start == null)
+            {
+            	return null;
+            }
             return structureStart;
         }
+        
         // No structure found, create one
         Random random = RandomHelper.getRandomForCoords(chunkX ^ 2, (chunkZ + 1) * 2, world.getSeed());
-        BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
-        CustomStructureGen structureGen = biomeConfig.structureGen;
+       	BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
+       	CustomStructureGen structureGen = biomeConfig.structureGen;
+        
         if (structureGen != null)
         {
             BO3CustomStructureCoordinate customObject = structureGen.getRandomObjectCoordinate(world, random, chunkX, chunkZ);
             if (customObject != null)
             {
                 structureStart = new BO3CustomStructure(world, customObject);
-                bo3StructureCache.put(coord, structureStart);
+                bo3StructureCache.put(chunkCoord, structureStart);
                 return structureStart;
-            }	        
+            }
         }
-
+        bo3StructureCache.put(chunkCoord, new BO3CustomStructure(null));
         return null;
     }
 
@@ -243,9 +243,9 @@ public class CustomStructureCache
 	{
 		OTG.log(LogMarker.DEBUG, "Loading structures and pre-generator data");
 
-        this.bo3StructureCache = new HashMap<ChunkCoordinate, BO3CustomStructure>();
+        this.bo3StructureCache = new FifoMap<ChunkCoordinate, BO3CustomStructure>(400);
         this.bo4StructureCache = new HashMap<ChunkCoordinate, BO4CustomStructure>();
-        this.worldInfoChunks = new HashMap<ChunkCoordinate, CustomStructure>();        
+        this.worldInfoChunks = new HashMap<ChunkCoordinate, CustomStructure>();
 		
     	int structuresLoaded = 0;
 

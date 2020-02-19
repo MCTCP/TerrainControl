@@ -357,14 +357,17 @@ public class ForgeWorld implements LocalWorld
     
 	public Biome getBiomeFromChunk(int blockX, int blockZ)
 	{
-		Chunk chunk = this.getWorld().getChunk(new BlockPos(blockX, 0, blockZ));
-		if(chunk != null && !(chunk instanceof EmptyChunk))
+		if(this.getWorld().isBlockLoaded(new BlockPos(blockX,255,blockZ)))
 		{
-			byte[] blockBiomeArray = chunk.getBiomeArray();
-	        int i = blockX & 15;
-	        int j = blockZ & 15;
-	        int biomeId = blockBiomeArray[j << 4 | i] & 255;
-	        return Biome.getBiome(biomeId);			
+			Chunk chunk = this.getWorld().getChunk(new BlockPos(blockX, 0, blockZ));
+			if(chunk != null && !(chunk instanceof EmptyChunk))
+			{
+				byte[] blockBiomeArray = chunk.getBiomeArray();
+		        int i = blockX & 15;
+		        int j = blockZ & 15;
+		        int biomeId = blockBiomeArray[j << 4 | i] & 255;
+		        return Biome.getBiome(biomeId);			
+			}
 		}
 		return null;
 	}
