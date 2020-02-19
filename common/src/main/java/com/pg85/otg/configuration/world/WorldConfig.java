@@ -21,6 +21,7 @@ import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.fallbacks.BlockFallback;
 import com.pg85.otg.configuration.fallbacks.FallbackConfig;
+import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
 import com.pg85.otg.configuration.settingType.Setting;
@@ -1579,4 +1580,15 @@ public class WorldConfig extends ConfigFile
                 "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome."
 				);
     }
+    
+	public static WorldConfig loadWorldConfigFromDisk(File worldDir)
+	{
+        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+        if(!worldConfigFile.exists())
+        {
+        	return null;
+        }
+        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
+        return new WorldConfig(worldDir, settingsMap, null, null);
+	}
 }

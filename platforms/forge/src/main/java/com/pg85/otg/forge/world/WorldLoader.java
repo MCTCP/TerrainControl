@@ -335,16 +335,16 @@ public final class WorldLoader
 	}
 
     @Nullable ForgeWorld getOrCreateForgeWorld(World mcWorld)
-    {   	
+    {
     	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
-    	{	
+    	{
     		throw new RuntimeException("Error: OTG tried to load a world that is missing OTG information. Was this world created via OTG? For Forge Single Player, be sure to use the OTG world creation screen.");
     	}
 
     	String worldName = WorldHelper.getName(mcWorld);
     	File worldConfigsFolder = null;
-    	
-    	worldConfigsFolder = this.getWorldDir(OTG.getDimensionsConfig().getDimensionConfig(worldName).PresetName);    	    	
+
+    	worldConfigsFolder = this.getWorldDir(OTG.getDimensionsConfig().getDimensionConfig(worldName).PresetName);
         if (worldConfigsFolder == null || !worldConfigsFolder.exists())
         {
             // OpenTerrainGenerator is not enabled for this world

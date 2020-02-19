@@ -369,7 +369,7 @@ public class OTGDimensionManager
             }        	
         }
         
-        WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+        WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
         
 		long seedIn = seed == -1 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : seed;
 		GameType gameType = dimConfig.GameType.equals("Creative") ? GameType.CREATIVE : GameType.SURVIVAL;
@@ -702,12 +702,12 @@ public class OTGDimensionManager
 						{
 							// No DimensionConfig exists for this dimension
 							// Must be a legacy dimension, create a config for it based on the worldconfig
-							WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
 							if(worldConfig == null)
 							{
 								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
 							}
-							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig);
+							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig, true);
 							dimsConfig.Dimensions.add(new DimensionConfig(dimConfig));
 						}
 					} else {
@@ -715,12 +715,12 @@ public class OTGDimensionManager
 						{
 							// No DimensionConfig exists for the overworld
 							// Must be a legacy world, create a config for it based on the worldconfig
-							WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
 							if(worldConfig == null)
 							{
 								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
 							}
-							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig);
+							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig, true);
 							dimsConfig.Overworld = new DimensionConfig(dimConfig);
 						}
 					}

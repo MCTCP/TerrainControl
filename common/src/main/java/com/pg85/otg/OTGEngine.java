@@ -9,6 +9,7 @@ import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.dimensions.ModPackConfigManager;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -42,24 +43,18 @@ public abstract class OTGEngine
     private List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>(5);
     private PluginConfig pluginConfig;
     private DimensionsConfig dimensionsConfig = null;
+    private ModPackConfigManager modPackConfigManager;
     private Logger logger;
 
     public OTGEngine(Logger logger)
     {
         this.logger = logger;
-    }    
+    }
     
     public void onShutdown()
     {
         // Shutdown all loaders
         customObjectManager.shutdown();
-
-        // Null out values to help the garbage collector
-        customObjectManager = null;
-        biomeResourcesManager = null;
-        customObjectResourcesManager = null;
-        biomeManagers = null;
-        pluginConfig = null;
         cancelableEventHandlers.clear();
         monitoringEventHandlers.clear();
         cancelableEventHandlers = null;
@@ -96,6 +91,8 @@ public abstract class OTGEngine
         {
       		worldsDir.mkdirs();
         }
+
+        modPackConfigManager = new ModPackConfigManager(getOTGRootFolder());
         
         // Fire start event
         for (EventHandler handler : cancelableEventHandlers)
@@ -135,8 +132,7 @@ public abstract class OTGEngine
         if (priority == EventPriority.CANCELABLE)
         {
             cancelableEventHandlers.add(handler);
-        } else
-        {
+        } else {
             monitoringEventHandlers.add(handler);
         }
     }
@@ -252,6 +248,11 @@ public abstract class OTGEngine
         return customObjectManager;
     }
 
+	public ModPackConfigManager getModPackConfigManager()
+	{
+		return this.modPackConfigManager;
+	}
+    
     // Plugin dirs
  
     public abstract File getOTGRootFolder();

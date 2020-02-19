@@ -350,18 +350,7 @@ public class OTG
             }
         }
         return biomeFolderName;
-    }
-        
-	public static WorldConfig loadWorldConfigFromDisk(File worldDir)
-	{
-        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-        if(!worldConfigFile.exists())
-        {
-        	return null;
-        }
-        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
-        return new WorldConfig(worldDir, settingsMap, null, null);
-	}
+    }       
 	
     public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
     {
