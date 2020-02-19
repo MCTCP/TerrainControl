@@ -13,6 +13,7 @@ import com.pg85.otg.configuration.settingType.DoubleSetting;
 import com.pg85.otg.configuration.settingType.IntSetting;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.gui.dimensions.base.ButtonEntry;
 import com.pg85.otg.forge.gui.dimensions.base.CategoryEntry;
 import com.pg85.otg.forge.gui.dimensions.base.IGuiListEntry;
@@ -115,12 +116,12 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
     		if(this.mc.isSingleplayer())
     		{
 		        // If this.mc.world is not null then we're ingame
-		        DimensionsConfig defaultConfigs = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.controlsScreen.previousMenu.selectedPreset.getSecond().PresetName);
+		        DimensionsConfig defaultConfigs = OTG.getEngine().getModPackConfigManager().getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.controlsScreen.previousMenu.selectedPreset.getSecond().PresetName);
 		        defaultConfig = defaultConfigs != null ? defaultConfigs.getDimensionConfig(this.controlsScreen.selectedDimension.PresetName) : null;        
 		        if(defaultConfig == null)
 		        {
 		        	// Get the default values from the world config, stored in presets
-	        		defaultConfig = new DimensionConfig(ForgeEngine.Presets.get(this.controlsScreen.selectedDimension.PresetName));
+	        		defaultConfig = new DimensionConfig(GuiHandler.GuiPresets.get(this.controlsScreen.selectedDimension.PresetName));
 		        }
     		}
         	// TODO: Use const strings instead of hardcoding the same string in multiple places

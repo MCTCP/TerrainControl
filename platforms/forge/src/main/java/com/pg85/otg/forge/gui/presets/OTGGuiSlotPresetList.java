@@ -1,10 +1,14 @@
 package com.pg85.otg.forge.gui.presets;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.dimensions.base.OTGGuiScrollingList;
 
@@ -13,6 +17,7 @@ import net.minecraft.client.renderer.Tessellator;
 
 class OTGGuiSlotPresetList extends OTGGuiScrollingList
 {   
+	// TODO: Why do we need 2?
 	private final OTGGuiPresetList otgGuiPresetList;
 	private OTGGuiPresetList parent;
 
@@ -46,7 +51,15 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
 	@Override
     protected int getSize()
     {
-        return ForgeEngine.Presets.size();
+    	// Get all presetNames for presets that should be shown
+    	List<String> presets = GuiHandler.GuiPresets
+			.entrySet()
+			.stream()
+			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.map(Entry::getKey)
+			.collect(Collectors.toList()
+		);
+        return presets.size();
     }
 
     @Override
@@ -81,7 +94,15 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
     @Override
     protected void drawSlot(int idx, int right, int top, int height, Tessellator tess)
     {
-    	ArrayList<String> presets = new ArrayList<String>(ForgeEngine.Presets.keySet());
+    	// Get all presetNames for presets that should be shown
+    	List<String> presets = GuiHandler.GuiPresets
+			.entrySet()
+			.stream()
+			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.map(Entry::getKey)
+			.collect(Collectors.toList()
+		);
+    	
     	// Can't add a preset multiple times for the same world, make name gray and unselectable if it's already present in the world.
     	boolean bFound = false;
     	if(this.parent.previousMenu instanceof OTGGuiDimensionList)

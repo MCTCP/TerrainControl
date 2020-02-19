@@ -76,7 +76,7 @@ public class OTGGuiEnterWorldName extends GuiScreen
         } 
         else if(sender instanceof OTGGuiPresetList)
         {
-            for(Entry<String, DimensionConfigGui> world : ForgeEngine.Presets.entrySet())
+            for(Entry<String, DimensionConfigGui> world : GuiHandler.GuiPresets.entrySet())
             {
             	if(world.getKey().toLowerCase().trim().equals(this.worldName.toLowerCase().trim()))
             	{
@@ -157,11 +157,11 @@ public class OTGGuiEnterWorldName extends GuiScreen
         } 
         else if(sender instanceof OTGGuiPresetList)
         {
-            for(Entry<String, DimensionConfigGui> world : ForgeEngine.Presets.entrySet())
+            for(Entry<String, DimensionConfigGui> world : GuiHandler.GuiPresets.entrySet())
             {
             	if(world.getKey().toLowerCase().trim().equals(this.worldName.toLowerCase().trim()))
             	{
-            		bExists = ForgeEngine.Presets.containsKey(this.worldName.trim());
+            		bExists = GuiHandler.GuiPresets.containsKey(this.worldName.trim());
             		break;            		
             	}
             }

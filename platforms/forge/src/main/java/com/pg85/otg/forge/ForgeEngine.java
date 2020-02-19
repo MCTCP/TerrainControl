@@ -39,8 +39,6 @@ import net.minecraftforge.fml.common.Loader;
 
 public class ForgeEngine extends OTGEngine
 {
-	public static LinkedHashMap<String, DimensionConfigGui> Presets = new LinkedHashMap<String, DimensionConfigGui>();
-
 	private ForgeBiomeRegistryManager biomeRegistryManager;
 	private WorldLoader worldLoader;
     private long lastPregeneratorStatusUpdateTime = System.currentTimeMillis();   
@@ -167,33 +165,6 @@ public class ForgeEngine extends OTGEngine
     		// If this is an OTG dim other than the overworld then the world name will always match the preset name
     		return worldName;
     	}
-	}
-
-	public static void loadPresets()
-	{
-		Presets.clear();
-		
-	    ArrayList<String> worldNames = new ArrayList<String>();
-	    File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName);
-	    if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
-	    {
-	    	for(File worldDir : OTGWorldsDirectory.listFiles())
-	    	{
-	    		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().trim().startsWith("dim-"))
-	    		{
-	    			for(File file : worldDir.listFiles())
-	    			{
-	    				if(file.getName().equals("WorldConfig.ini"))
-	    				{
-			    			worldNames.add(worldDir.getName());
-			    			WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(worldDir);
-					        Presets.put(worldDir.getName(), new DimensionConfigGui(worldDir.getName(), worldConfig));
-					        break;
-	    				}
-	    			}
-	    		}
-	    	}
-		}
 	}	
 	
 	// Material
@@ -250,7 +221,7 @@ public class ForgeEngine extends OTGEngine
 	
     public int getBiomeIdsRequiredCount(File settingsDir)
     {
-    	WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(settingsDir);
+    	WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(settingsDir);
     	
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);

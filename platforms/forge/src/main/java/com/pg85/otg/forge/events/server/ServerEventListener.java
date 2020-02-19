@@ -17,6 +17,7 @@ import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.commands.OTGCommandHandler;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.world.OTGWorldType;
 import com.pg85.otg.logging.LogMarker;
 
@@ -31,7 +32,7 @@ public class ServerEventListener
     	// for SP client where data is kept when leaving the game.
  
     	((ForgeEngine)OTG.getEngine()).getWorldLoader().unloadAndUnregisterAllWorlds();
-    	ForgeEngine.loadPresets();
+    	GuiHandler.loadGuiPresets();
     }
 
     public static void serverLoad(FMLServerStartingEvent event)
@@ -60,7 +61,7 @@ public class ServerEventListener
 		    if(OTG.getDimensionsConfig() == null) // Only happens when creating a new world?
 		    {
 				// Check if there is a dimensionsConfig saved for this world
-				DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(overWorld.getSaveHandler().getWorldDirectory());
+				DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(overWorld.getSaveHandler().getWorldDirectory(), OTG.getEngine().getOTGRootFolder());
 				if(dimsConfig == null)
 				{
 					// If there is no DimensionsConfig saved for this world, create one
@@ -73,7 +74,7 @@ public class ServerEventListener
 						dimsConfig.Overworld = new DimensionConfig();
 						// Check if there is a modpack config for vanilla worlds, 
 						// since we didn't get a chance to check via the OTG world creation UI
-						DimensionsConfig modPackConfig = DimensionsConfig.getModPackConfig(null);
+						DimensionsConfig modPackConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(null);
 						if(modPackConfig != null)
 						{
 							dimsConfig.Overworld = modPackConfig.Overworld;

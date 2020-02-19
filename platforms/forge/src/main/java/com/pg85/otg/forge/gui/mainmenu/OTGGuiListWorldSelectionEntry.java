@@ -47,6 +47,7 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.client.gui.GuiListExtended;;
@@ -225,16 +226,16 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 		// If world is null then we're not ingame
     	if(this.client.world == null || Minecraft.getMinecraft().isSingleplayer())
     	{
-    		ForgeEngine.loadPresets(); // Load all WorldConfigs for the ingame UI
+    		GuiHandler.loadGuiPresets(); // Load all WorldConfigs for the ingame UI
     	}
     	
-        DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(new File(Minecraft.getMinecraft().gameDir + File.separator + "saves" + File.separator + this.getSelectedWorldName()));
+        DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(new File(Minecraft.getMinecraft().gameDir + File.separator + "saves" + File.separator + this.getSelectedWorldName()), OTG.getEngine().getOTGRootFolder());
         if(dimsConfig != null)
         {
         	ArrayList<String> missingPresets = new ArrayList<String>();
         	if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
         	{
-        		WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
+        		WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
         		if(worldConfig == null)
         		{
         			missingPresets.add(dimsConfig.Overworld.PresetName);
@@ -244,7 +245,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         	{
         		for(DimensionConfig dimConfig : dimsConfig.Dimensions)
         		{
-            		WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+            		WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
             		if(worldConfig == null)
             		{
             			missingPresets.add(dimConfig.PresetName);
@@ -321,7 +322,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     	// If this world has OTG overworld/dimensions then check if it has a DimensionsConfig
     	// If this is a legacy world then we'll need to create a new one.
     	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + File.separator + this.worldSummary.getFileName()));
-    	DimensionsConfig dimensionsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+    	DimensionsConfig dimensionsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()), OTG.getEngine().getOTGRootFolder());
     	if(dimensionsConfig == null && dimensionDatas.size() > 0)
     	{
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
@@ -331,7 +332,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     			{
     				// If this is a legacy overworld then the world name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), comparator.getFileName());
-    				WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(worldConfigLocation);
     				if(worldConfig == null)
     				{
     					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);
@@ -342,7 +343,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     			} else {
     				// If this is a legacy dim then the dim name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), dimensionData.dimensionName);
-    				WorldConfig worldConfig = OTG.loadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(worldConfigLocation);
     				if(worldConfig == null)
     				{
     					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);
@@ -361,7 +362,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 			// Create a dummy overworld config
     		dimensionsConfig.Overworld = new DimensionConfig();
 			// Check if there is a modpack config for vanilla worlds, 
-			DimensionsConfig modPackConfig = DimensionsConfig.getModPackConfig(null);
+			DimensionsConfig modPackConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(null);
 			if(modPackConfig != null)
 			{
 				dimensionsConfig.Overworld = modPackConfig.Overworld;
