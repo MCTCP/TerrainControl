@@ -215,9 +215,9 @@ public class GrassGen extends Resource
             
             while (
         		(
-    				((worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
+    				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
     				(
-	    				worldMaterial.isAir()) || 
+	    				worldMaterial.isAir() || 
 						worldMaterial.isMaterial(DefaultMaterial.LEAVES) || 
 						worldMaterial.isMaterial(DefaultMaterial.LEAVES_2)
 					) &&
