@@ -91,7 +91,7 @@ public class CustomStructureGen extends Resource
             if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
             {
             	StructuredCustomObject object = getObjects(world.getName()).get(objectNumber);
-            	if(object != null)
+            	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
             	{
             		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomObjectCoordinate(world, random, chunkX, chunkZ);
             	} else {
