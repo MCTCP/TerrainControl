@@ -15,6 +15,7 @@ import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
+import com.pg85.otg.forge.biomes.OTGBiome;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.generator.ForgeChunkBuffer;
 import com.pg85.otg.forge.generator.OTGChunkGenerator;
@@ -45,6 +46,7 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.monster.EntityGuardian;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
@@ -61,6 +63,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.feature.*;
@@ -294,6 +297,26 @@ public class ForgeWorld implements LocalWorld
 		return getWorld().provider.getDimension();
 	}
     
+	@Override
+	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated)
+	{		
+        // Spawn point is only saved for overworld by MC, 
+        // so we have to save it ourselves for dimensions.
+        // Use the dimensionconfig
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.getName());
+		if(!dimConfig.Settings.SpawnPointSet)
+		{
+			BlockPos spawnPos = this.getSpawnPoint();
+			int highestY = this.getHighestBlockAboveYAt(spawnPos.getX(), spawnPos.getZ(), chunkBeingPopulated);
+			this.world.getWorldInfo().setSpawn(new BlockPos(spawnPos.getX(), highestY, spawnPos.getZ()));
+	        dimConfig.Settings.SpawnPointSet = true; // TODO: This breaks getrandomisedspawnpoint and spawns the player at the exact same coords each time.
+	        dimConfig.Settings.SpawnPointX = spawnPos.getX();
+	        dimConfig.Settings.SpawnPointY = highestY;
+	        dimConfig.Settings.SpawnPointZ = spawnPos.getZ();
+	        OTG.getDimensionsConfig().save();
+		}
+	}
+	
     public BlockPos getSpawnPoint()
     {
     	return world.provider.getSpawnPoint();
@@ -332,6 +355,20 @@ public class ForgeWorld implements LocalWorld
     
     // Biomes
     
+	public Biome getBiomeFromChunk(int blockX, int blockZ)
+	{
+		Chunk chunk = this.getWorld().getChunk(new BlockPos(blockX, 0, blockZ));
+		if(chunk != null && !(chunk instanceof EmptyChunk))
+		{
+			byte[] blockBiomeArray = chunk.getBiomeArray();
+	        int i = blockX & 15;
+	        int j = blockZ & 15;
+	        int biomeId = blockBiomeArray[j << 4 | i] & 255;
+	        return Biome.getBiome(biomeId);			
+		}
+		return null;
+	}
+	
     @Override
     public LocalBiome getCalculatedBiome(int x, int z)
     {
@@ -749,52 +786,65 @@ public class ForgeWorld implements LocalWorld
     		return false;
     	}
         BlockPos blockPos = new BlockPos(x, y, z);
-        switch (type)
+        try
         {
-            case Tree:
-                return this.tree.generate(this.world, rand, blockPos);
-            case BigTree:
-                return this.bigTree.generate(this.world, rand, blockPos);
-            case Forest:
-            case Birch:
-                return this.birchTree.generate(this.world, rand, blockPos);
-            case TallBirch:
-                return this.longBirchTree.generate(this.world, rand, blockPos);
-            case HugeMushroom:
-                if (rand.nextBoolean())
-                {
-                    return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
-                } else {
-                    return this.hugeRedMushroom.generate(this.world, rand, blockPos);
-                }
-            case HugeRedMushroom:
-                return this.hugeRedMushroom.generate(this.world, rand, blockPos);
-            case HugeBrownMushroom:
-                return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
-            case SwampTree:
-                return this.swampTree.generate(this.world, rand, blockPos);
-            case Taiga1:
-                return this.taigaTree1.generate(this.world, rand, blockPos);
-            case Taiga2:
-                return this.taigaTree2.generate(this.world, rand, blockPos);
-            case JungleTree:
-                return this.jungleTree.generate(this.world, rand, blockPos);
-            case GroundBush:
-                return this.groundBush.generate(this.world, rand, blockPos);
-            case CocoaTree:
-                return this.cocoaTree.generate(this.world, rand, blockPos);
-            case Acacia:
-                return this.acaciaTree.generate(this.world, rand, blockPos);
-            case DarkOak:
-                return this.darkOakTree.generate(this.world, rand, blockPos);
-            case HugeTaiga1:
-                return this.hugeTaigaTree1.generate(this.world, rand, blockPos);
-            case HugeTaiga2:
-                return this.hugeTaigaTree2.generate(this.world, rand, blockPos);
-            default:
-                throw new RuntimeException("Failed to handle tree of type " + type.toString());
+	        switch (type)
+	        {
+	            case Tree:
+	                return this.tree.generate(this.world, rand, blockPos);
+	            case BigTree:
+	                return this.bigTree.generate(this.world, rand, blockPos);
+	            case Forest:
+	            case Birch:
+	                return this.birchTree.generate(this.world, rand, blockPos);
+	            case TallBirch:
+	                return this.longBirchTree.generate(this.world, rand, blockPos);
+	            case HugeMushroom:
+	                if (rand.nextBoolean())
+	                {
+	                    return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
+	                } else {
+	                    return this.hugeRedMushroom.generate(this.world, rand, blockPos);
+	                }
+	            case HugeRedMushroom:
+	                return this.hugeRedMushroom.generate(this.world, rand, blockPos);
+	            case HugeBrownMushroom:
+	                return this.hugeBrownMushroom.generate(this.world, rand, blockPos);
+	            case SwampTree:
+	                return this.swampTree.generate(this.world, rand, blockPos);
+	            case Taiga1:
+	                return this.taigaTree1.generate(this.world, rand, blockPos);
+	            case Taiga2:
+	                return this.taigaTree2.generate(this.world, rand, blockPos);
+	            case JungleTree:
+	                return this.jungleTree.generate(this.world, rand, blockPos);
+	            case GroundBush:
+	                return this.groundBush.generate(this.world, rand, blockPos);
+	            case CocoaTree:
+	                return this.cocoaTree.generate(this.world, rand, blockPos);
+	            case Acacia:
+	                return this.acaciaTree.generate(this.world, rand, blockPos);
+	            case DarkOak:
+	                return this.darkOakTree.generate(this.world, rand, blockPos);
+	            case HugeTaiga1:
+	                return this.hugeTaigaTree1.generate(this.world, rand, blockPos);
+	            case HugeTaiga2:
+	                return this.hugeTaigaTree2.generate(this.world, rand, blockPos);
+	            default:
+	                throw new RuntimeException("Failed to handle tree of type " + type.toString());
+	        }
         }
-    }    
+        catch(NullPointerException ex)
+        {
+        	// Have only seen this happen once while flying backwards, tree spawning causes cascading chunkgen, 
+        	// nullreference when trying to query world for blockstate at pos.
+        	OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception, likely due to cascading chunkgen: ");
+        	ex.printStackTrace();
+        	return true; // Return true to prevent further attempts.
+        	// TODO: Fix this properly, somewhere either coords are outside of bounds or we're making an 
+        	// incorrect assumption about which chunks are available.
+        }
+    }
     
     @Override
     public void prepareDefaultStructures(int chunkX, int chunkZ, boolean dry)
@@ -1070,13 +1120,13 @@ public class ForgeWorld implements LocalWorld
                         {
                         	block = null;
                         	y = section.getYLocation() + sectionY;                    
-                        	if(y >= minHeight && y < maxHeight)
+                        	if(y >= minHeight && y <= maxHeight)
                         	{
 	                            for(ReplacedBlocksInstruction instruction : replaceArray)
 	                            {
 	                            	if(instruction.getFrom() != null && instruction.getTo() != null)
 	                            	{
-	                            		if(y >= instruction.getMinHeight() && y < instruction.getMaxHeight())
+	                            		if(y >= instruction.getMinHeight() && y <= instruction.getMaxHeight())
 	                            		{
 	                            			if(block == null)
 	                            			{
