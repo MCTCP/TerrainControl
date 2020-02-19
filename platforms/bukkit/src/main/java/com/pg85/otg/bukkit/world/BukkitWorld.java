@@ -803,13 +803,13 @@ public class BukkitWorld implements LocalWorld
                         {
                         	block = null;
                         	y = section.getYPosition() + sectionY;                    
-                        	if(y >= minHeight && y < maxHeight)
+                        	if(y >= minHeight && y <= maxHeight)
                         	{
 	                            for(ReplacedBlocksInstruction instruction : replaceArray)
 	                            {
 	                            	if(instruction.getFrom() != null && instruction.getTo() != null)
 	                            	{
-	                            		if(y >= instruction.getMinHeight() && y < instruction.getMaxHeight())
+	                            		if(y >= instruction.getMinHeight() && y <= instruction.getMaxHeight())
 	                            		{
 	                            			if(block == null)
 	                            			{
@@ -1843,5 +1843,12 @@ public class BukkitWorld implements LocalWorld
 	public boolean isOTGPlus()
 	{
 		return this.getConfigs().getWorldConfig().isOTGPlus;
+	}
+
+	// Forge only atm, used to update the spawn point after populating the spawn chunk.
+	@Override
+	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated)
+	{
+		// TODO: Implement this for spigot.
 	}
 }

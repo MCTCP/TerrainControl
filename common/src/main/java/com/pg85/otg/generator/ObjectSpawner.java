@@ -135,6 +135,11 @@ public class ObjectSpawner
 			}
 		}
 
+		if(chunkCoord.equals(this.world.getSpawnChunk()))
+		{
+			this.world.updateSpawnPointY(chunkCoord);
+		}
+		
 		//OTG.log(LogMarker.INFO, "ObjectSpawner DONE populating X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
     }
     
@@ -174,7 +179,8 @@ public class ObjectSpawner
 	        			}
 
 	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
-	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockXCenter(), y, spawnChunk.getBlockZCenter());
+	        			// TODO: This may spawn the structure across chunk borders if its larger than 16 in any direction from its center.
+	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockX() + 15, y, spawnChunk.getBlockZ() + 15);
 	        		}
 	        	}
 	        } else {
@@ -259,7 +265,8 @@ public class ObjectSpawner
 	        			}
 
 	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
-	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockXCenter(), y, spawnChunk.getBlockZCenter());
+	        			// TODO: This may spawn the structure across chunk borders if its larger than 16 in any direction from its center.
+	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockX() + 15, y, spawnChunk.getBlockZ() + 15);
 	        		}
 	        	}
 	        } else {

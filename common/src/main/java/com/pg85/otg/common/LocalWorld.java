@@ -242,4 +242,6 @@ public interface LocalWorld
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 
 	public boolean isOTGPlus();
+	
+	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated);
 }
