@@ -2,12 +2,12 @@ package com.pg85.otg.generator.biome;
 
 import java.util.ArrayList;
 
+// Used to prevent creating new arrays during biomegen.
 public class ArraysCache
 {
-
-    private final int[][] smallArrays = new int[128][];
+    private int[][] smallArrays = new int[128][];
     private int smallArraysNext = 0;
-    private final ArrayList<int[]> bigArrays = new ArrayList<int[]>();
+    private ArrayList<int[]> bigArrays = new ArrayList<int[]>();
     private int bigArraysNext = 0;
 
     boolean isFree = true;
@@ -24,12 +24,13 @@ public class ArraysCache
         smallArraysNext = 0;
         bigArraysNext = 0;
         isFree = true;
-        outputType = OutputType.FULL;
+        outputType = OutputType.FULL;       
+        smallArrays = new int[128][];
+        bigArrays = new ArrayList<int[]>();
     }
 
     public int[] getArray(int size)
     {
-
         if (size <= 256)
         {
             int[] array = smallArrays[smallArraysNext];
@@ -48,8 +49,7 @@ public class ArraysCache
         {
             array = new int[size];
             bigArrays.add(array);
-        } else
-        {
+        } else {
             array = (int[]) bigArrays.get(bigArraysNext);
             if (array.length < size)
             {
@@ -60,6 +60,5 @@ public class ArraysCache
 
         bigArraysNext++;
         return array;
-
     }
 }

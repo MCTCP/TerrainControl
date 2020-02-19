@@ -5,7 +5,8 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
@@ -33,12 +34,12 @@ public class VinesGen extends Resource
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
         minAltitude = readInt(args.get(2), PluginStandardValues.WORLD_DEPTH,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(3), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
     }
     
-    private boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4)
+    private boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4, ChunkCoordinate chunkBeingPopulated)
     {
         LocalMaterialData sourceBlock;
         switch (paramInt4)
@@ -46,22 +47,22 @@ public class VinesGen extends Resource
             default:
                 return false;
             case 1:
-                sourceBlock = world.getMaterial(x, y + 1, z, false);
+                sourceBlock = world.getMaterial(x, y + 1, z, chunkBeingPopulated);
                 break;
             case 2:
-                sourceBlock = world.getMaterial(x, y, z + 1, false);
+                sourceBlock = world.getMaterial(x, y, z + 1, chunkBeingPopulated);
                 break;
             case 3:
-                sourceBlock = world.getMaterial(x, y, z - 1, false);
+                sourceBlock = world.getMaterial(x, y, z - 1, chunkBeingPopulated);
                 break;
             case 5:
-                sourceBlock = world.getMaterial(x - 1, y, z, false);
+                sourceBlock = world.getMaterial(x - 1, y, z, chunkBeingPopulated);
                 break;
             case 4:
-                sourceBlock = world.getMaterial(x + 1, y, z, false);
+                sourceBlock = world.getMaterial(x + 1, y, z, chunkBeingPopulated);
                 break;
         }
-        return sourceBlock.isSolid();
+        return sourceBlock != null && sourceBlock.isSolid();
     }
     
     @Override
@@ -103,29 +104,33 @@ public class VinesGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int _x = x;
         int _z = z;
         int y = minAltitude;
 
+        LocalMaterialData worldMaterial;
+        
         while (y <= maxAltitude)
         {
-            if (world.isNullOrAir(_x, y, _z, false))
+        	worldMaterial = world.getMaterial(_x, y, _z, chunkBeingPopulated);
+            if (worldMaterial != null && worldMaterial.isAir())
             {
                 for (int direction = 2; direction <= 5; direction++)
-                    if (canPlace(world, _x, y, _z, direction))
+                {
+                    if (canPlace(world, _x, y, _z, direction, chunkBeingPopulated))
                     {
-                        world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, false);
+                        world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, chunkBeingPopulated);
                         break;
                     }
-            } else
-            {
+                }
+            } else {
                 _x = x + rand.nextInt(4) - rand.nextInt(4);
                 _z = z + rand.nextInt(4) - rand.nextInt(4);
             }
             y++;
         }
-
     }
 }

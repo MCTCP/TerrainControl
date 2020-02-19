@@ -2,7 +2,7 @@ package com.pg85.otg.bukkit.generator.structures;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.pg85.otg.bukkit.BukkitBiome;
+import com.pg85.otg.bukkit.biomes.BukkitBiome;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.helpers.ReflectionHelper;

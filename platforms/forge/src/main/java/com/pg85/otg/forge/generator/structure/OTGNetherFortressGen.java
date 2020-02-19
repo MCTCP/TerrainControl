@@ -15,7 +15,7 @@ import net.minecraft.world.gen.structure.MapGenNetherBridge;
 import net.minecraft.world.gen.structure.StructureStart;
 
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import java.util.ArrayList;

@@ -4,6 +4,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -13,10 +14,10 @@ public class BlockCheck extends BO3Check
     MaterialSet toCheck;
 
     @Override
-    public boolean preventsSpawn(LocalWorld world, int x, int y, int z)
+    public boolean preventsSpawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
         toCheck.parseForWorld(world);
-        return y > PluginStandardValues.WORLD_DEPTH && y < PluginStandardValues.WORLD_HEIGHT && !toCheck.contains(world.getMaterial(x, y, z, false));
+        return y > PluginStandardValues.WORLD_DEPTH && y < PluginStandardValues.WORLD_HEIGHT && !toCheck.contains(world.getMaterial(x, y, z, chunkBeingPopulated));
     }
 
     @Override

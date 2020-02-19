@@ -4,6 +4,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -65,10 +66,12 @@ public class UnderWaterOreGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int firstSolidBlock = world.getSolidHeight(x, z) - 1;
-        if (world.getLiquidHeight(x, z) < firstSolidBlock || firstSolidBlock == -1)
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
+        int firstSolidBlock = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated) - 1;
+        if (world.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated) < firstSolidBlock || firstSolidBlock == -1)
         {
             return;
         }
@@ -77,25 +80,27 @@ public class UnderWaterOreGen extends Resource
 
         int currentSize = rand.nextInt(size);
         int two = 2;
+        int deltaX;
+        int deltaZ;
+        LocalMaterialData sourceBlock;
         for (int currentX = x - currentSize; currentX <= x + currentSize; currentX++)
         {
             for (int currentZ = z - currentSize; currentZ <= z + currentSize; currentZ++)
             {
-                int deltaX = currentX - x;
-                int deltaZ = currentZ - z;
+                deltaX = currentX - x;
+                deltaZ = currentZ - z;
                 if (deltaX * deltaX + deltaZ * deltaZ <= currentSize * currentSize)
                 {
                     for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
                     {
-                        LocalMaterialData sourceBlock = world.getMaterial(currentX, y, currentZ, false);
+                        sourceBlock = world.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
                         if (sourceBlocks.contains(sourceBlock))
                         {
-                            world.setBlock(currentX, y, currentZ, material, null, false);
+                            world.setBlock(currentX, y, currentZ, material, null, chunkBeingPopulated);
                         }
                     }
                 }
             }
         }
     }
-
 }

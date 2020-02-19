@@ -5,6 +5,7 @@ import javax.annotation.Nullable;
 import com.pg85.otg.forge.OTGPlugin;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.EnumDifficulty;
@@ -32,9 +33,56 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public NBTTagCompound cloneNBTCompound(@Nullable NBTTagCompound nbt)
     {
-        return this.delegate.cloneNBTCompound(nbt);
+    	// Inherit NBT data from overworld, then override dimension-specific data.
+    	NBTTagCompound nbttagcompound = this.delegate.cloneNBTCompound(nbt);
+        updateTagCompound(nbttagcompound);
+        return nbttagcompound;
     }
 
+    private void updateTagCompound(NBTTagCompound nbt)
+    {    	
+        nbt.setLong("RandomSeed", this.getSeed());
+        nbt.setString("generatorName", this.getTerrainType().getName());
+        nbt.setInteger("generatorVersion", this.getTerrainType().getVersion());
+        nbt.setString("generatorOptions", this.getGeneratorOptions());
+        nbt.setInteger("GameType", this.getGameType().getID());
+        nbt.setBoolean("MapFeatures", this.isMapFeaturesEnabled());
+        nbt.setInteger("SpawnX", this.getSpawnX());
+        nbt.setInteger("SpawnY", this.getSpawnY());
+        nbt.setInteger("SpawnZ", this.getSpawnZ());
+        nbt.setLong("Time", this.getWorldTotalTime());
+        nbt.setLong("DayTime", this.getWorldTime());
+        nbt.setLong("SizeOnDisk", this.getSizeOnDisk());
+        nbt.setLong("LastPlayed", MinecraftServer.getCurrentTimeMillis());
+        nbt.setString("LevelName", this.getWorldName());
+        nbt.setInteger("version", this.getSaveVersion());
+        nbt.setInteger("clearWeatherTime", this.getCleanWeatherTime());
+        nbt.setInteger("rainTime", this.getRainTime());
+        nbt.setBoolean("raining", this.isRaining());
+        nbt.setInteger("thunderTime", this.getThunderTime());
+        nbt.setBoolean("thundering", this.isThundering());
+        nbt.setBoolean("hardcore", this.isHardcoreModeEnabled());
+        nbt.setBoolean("allowCommands", this.areCommandsAllowed());
+        nbt.setBoolean("initialized", this.isInitialized());
+        nbt.setDouble("BorderCenterX", this.getBorderCenterX());
+        nbt.setDouble("BorderCenterZ", this.getBorderCenterZ());
+        nbt.setDouble("BorderSize", this.getBorderSize());
+        nbt.setLong("BorderSizeLerpTime", this.getBorderLerpTime());
+        nbt.setDouble("BorderSafeZone", this.getBorderSafeZone());
+        nbt.setDouble("BorderDamagePerBlock", this.getBorderDamagePerBlock());
+        nbt.setDouble("BorderSizeLerpTarget", this.getBorderLerpTarget());
+        nbt.setDouble("BorderWarningBlocks", (double)this.getBorderWarningDistance());
+        nbt.setDouble("BorderWarningTime", (double)this.getBorderWarningTime());
+
+        if (this.getDifficulty() != null)
+        {
+            nbt.setByte("Difficulty", (byte)this.getDifficulty().getId());
+        }
+
+        nbt.setBoolean("DifficultyLocked", this.isDifficultyLocked());
+        nbt.setTag("GameRules", this.getGameRulesInstance().writeToNBT());
+    }
+    
     /**
      * Returns the seed of current world.
      */
@@ -69,7 +117,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
 
     public long getWorldTotalTime()
     {
-        return this.delegate.getWorldTotalTime();
+        return this.otgDimWorldInfo.getWorldTotalTime();
     }
 
     /**
@@ -77,7 +125,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public long getWorldTime()
     {
-        return this.delegate.getWorldTime();
+        return this.otgDimWorldInfo.getWorldTime();
     }
 
     @SideOnly(Side.CLIENT)
@@ -124,7 +172,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public boolean isThundering()
     {
-        return this.delegate.isThundering();
+        return this.otgDimWorldInfo.isThundering();
     }
 
     /**
@@ -132,7 +180,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public int getThunderTime()
     {
-        return this.delegate.getThunderTime();
+        return this.otgDimWorldInfo.getThunderTime();
     }
 
     /**
@@ -140,7 +188,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public boolean isRaining()
     {
-        return this.delegate.isRaining();
+        return this.otgDimWorldInfo.isRaining();
     }
 
     /**
@@ -148,7 +196,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public int getRainTime()
     {
-        return this.delegate.getRainTime();
+        return this.otgDimWorldInfo.getRainTime();
     }
 
     /**
@@ -165,7 +213,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
     @SideOnly(Side.CLIENT)
     public void setSpawnX(int x)
     {
-    	
+    	this.otgDimWorldInfo.setSpawnX(x);
     }
 
     /**
@@ -174,12 +222,12 @@ public class OTGDerivedWorldInfo extends WorldInfo
     @SideOnly(Side.CLIENT)
     public void setSpawnY(int y)
     {
-    	
+    	this.otgDimWorldInfo.setSpawnY(y);
     }
 
     public void setWorldTotalTime(long time)
     {
-    	
+    	this.otgDimWorldInfo.setWorldTotalTime(time);
     }
 
     /**
@@ -188,7 +236,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
     @SideOnly(Side.CLIENT)
     public void setSpawnZ(int z)
     {
-    	
+    	this.otgDimWorldInfo.setSpawnZ(z);
     }
 
     /**
@@ -196,17 +244,17 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public void setWorldTime(long time)
     {
-    	
+    	this.otgDimWorldInfo.setWorldTime(time);
     }
 
     public void setSpawn(BlockPos spawnPoint)
     {
-    	
+    	this.otgDimWorldInfo.setSpawn(spawnPoint);
     }
 
     public void setWorldName(String worldName)
     {
-    	
+    	this.otgDimWorldInfo.setWorldName(worldName);
     }
 
     /**
@@ -214,7 +262,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public void setSaveVersion(int version)
     {
-    	
+    	this.delegate.setSaveVersion(version); // TODO: Is this necessary?
     }
 
     /**
@@ -222,7 +270,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public void setThundering(boolean thunderingIn)
     {
-    	
+    	this.otgDimWorldInfo.setThundering(thunderingIn);
     }
 
     /**
@@ -230,7 +278,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public void setThunderTime(int time)
     {
-    	
+    	this.otgDimWorldInfo.setThunderTime(time);
     }
 
     /**
@@ -238,7 +286,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public void setRaining(boolean isRaining)
     {
-    	
+    	this.otgDimWorldInfo.setRaining(isRaining);
     }
 
     /**
@@ -246,7 +294,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public void setRainTime(int time)
     {
-    	
+    	this.otgDimWorldInfo.setRainTime(time);
     }
 
     /**
@@ -293,7 +341,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
 
     public void setAllowCommands(boolean allow)
     {
-    	
+    	this.otgDimWorldInfo.setAllowCommands(allow);
     }
 
     /**
@@ -309,7 +357,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
      */
     public void setServerInitialized(boolean initializedIn)
     {
-    	
+    	this.delegate.setServerInitialized(initializedIn);
     }
 
     /**
@@ -327,7 +375,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
 
     public void setDifficulty(EnumDifficulty newDifficulty)
     {
-    	
+    	this.otgDimWorldInfo.setDifficulty(newDifficulty);
     }
 
     public boolean isDifficultyLocked()
@@ -337,7 +385,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
 
     public void setDifficultyLocked(boolean locked)
     {
-    	
+    	this.otgDimWorldInfo.setDifficultyLocked(locked);
     }
 
     @Deprecated

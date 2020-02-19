@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.util.BO3Creator;
+import com.pg85.otg.forge.util.BO4Creator;
+import com.pg85.otg.forge.util.BOCreator;
 import com.sk89q.worldedit.LocalSession;
 import com.sk89q.worldedit.forge.ForgeWorldEdit;
 import com.sk89q.worldedit.regions.Region;
@@ -22,7 +24,7 @@ public class ExportCommand extends BaseCommand
     {
         super();
         name = "export";
-        usage = "export <name> [center_block] [-a include_air] [-t include_tile_entities] [-o override]";
+        usage = "export <name> [center_block] [-a include_air] [-t include_tile_entities] [-o override] [-bo4] [-b use branches]";
         hasWorldedit = Loader.isModLoaded("worldedit");
     }
 
@@ -41,13 +43,16 @@ public class ExportCommand extends BaseCommand
             sender.sendMessage(new TextComponentString(ERROR_COLOR + "You must enter a name for the object."));
             return true;
         }
+        
         EntityPlayerMP player = (EntityPlayerMP) sender;
         LocalSession session = ForgeWorldEdit.inst.getSession(player);
+        
         Region selection;
         try
         {
             selection = session.getSelection(session.getSelectionWorld());
-        } catch (Exception e)
+        }
+        catch (Exception e)
         {
             selection = null;
         }
@@ -68,23 +73,30 @@ public class ExportCommand extends BaseCommand
             return true;
         }
 
-        BO3Creator creator = new BO3Creator(bo3Name);
-
+        BOCreator creator;
+        if(args.contains("-bo4"))
+        {        
+        	creator = new BO4Creator(bo3Name);
+        } else {
+        	creator = new BO3Creator(bo3Name);
+        }
         creator.includeAir(args.contains("-a"));
         creator.includeTiles(args.contains("-t"));
 
         String block = args.size() > 1 ? args.get(1) : "";
-        boolean branch = selection.getWidth() > 32 || selection.getLength() > 32;
+        boolean branch = args.contains("-b") || selection.getWidth() > 32 || selection.getLength() > 32;
 
         creator.create(selection, sender.getEntityWorld(), block, branch);
 
         sender.sendMessage(new TextComponentString(String.format(
-                "%sBO3 %s%s %2$s(%dx%dx%d) %1$shas been saved to GlobalObjects.", MESSAGE_COLOR, VALUE_COLOR, bo3Name,
+                "%sBO%s %s%s %2$s(%dx%dx%d) %1$shas been saved to GlobalObjects.", MESSAGE_COLOR, args.contains("-bo4") ? "4" : "3", VALUE_COLOR, bo3Name,
                 selection.getWidth(), selection.getHeight(), selection.getLength())));
 
         if (branch)
+        {
             sender.sendMessage(
                     new TextComponentString(MESSAGE_COLOR + "BO3 was larger than 32x32 so it has been split into branches."));
+        }
 
         return true;
     }

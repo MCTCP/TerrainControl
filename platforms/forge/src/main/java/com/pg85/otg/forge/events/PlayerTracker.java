@@ -8,9 +8,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -243,7 +243,7 @@ public class PlayerTracker
 				}
 				for(int i = 0; i < params.size(); i+= 4)
 				{
-					giveItemToPlayer(player, params.get(i + 0), params.get(i + 1), params.get(i + 2), params.get(i + 3));
+					giveItemToPlayer(player, params.size() <= i + 0 ? null : params.get(i + 0), params.size() <= i + 1 ? null : params.get(i + 1), params.size() <= i + 2 ? null : params.get(i + 2), params.size() <= i + 3 ? null : params.get(i + 3));
 	    			//GiveItemToPlayer(player, "diamond_sword", "1", "0", "{ench:[{id:16,lvl:5}]}");
 					itemsAdded = true;
 				}
@@ -377,7 +377,7 @@ public class PlayerTracker
 				}
 				for(int i = 0; i < params.size(); i+= 4)
 				{
-					removeItemFromPlayer(player, params.get(i + 0), params.get(i + 1), params.get(i + 2), params.get(i + 3));
+					removeItemFromPlayer(player, params.size() <= i + 0 ? null : params.get(i + 0), params.size() <= i + 1 ? null : params.get(i + 1), params.size() <= i + 2 ? null : params.get(i + 2), params.size() <= i + 3 ? null : params.get(i + 3));
 	    			//RemoveItemFromPlayer(player, "diamond_sword", "1", "0", "{ench:[{id:16,lvl:5}]}");
 	                itemsRemoved = true;
 				}

@@ -4,6 +4,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -106,23 +107,58 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        // Handled by spawnInChunk().
+        // Left blank, as spawnInChunk already handles this.
     }
 
-    private void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    @Override
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated)
     {
+        sourceBlocks.parseForWorld(world);
+        switch (groupOption)
+        {
+            case Grouped:
+                spawnGrouped(world, random, chunkBeingPopulated);
+                break;
+            case NotGrouped:
+                spawnNotGrouped(world, random, chunkBeingPopulated);
+                break;
+        }
+    }
+    
+    private void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkBeingPopulated)
+    {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         if (random.nextDouble() * 100.0 <= this.rarity)
         {
             // Passed Rarity test, place about Frequency grass in this chunk
-            int centerX = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int centerZ = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            int centerY = world.getHighestBlockYAt(centerX, centerZ);
-            LocalMaterialData id;
+            int centerX = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            int centerZ = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            int centerY = world.getHighestBlockAboveYAt(centerX, centerZ, chunkBeingPopulated);
+            
+            if(centerY < PluginStandardValues.WORLD_DEPTH)
+            {
+            	return;
+            }
+            
+            LocalMaterialData worldMaterial;
 
             // Fix y position
-            while (((id = world.getMaterial(centerX, centerY, centerZ, false)).isAir() || id.isMaterial(DefaultMaterial.LEAVES) || id.isMaterial(DefaultMaterial.LEAVES_2)) && (centerY > 0))
+            while (
+        		(
+    				(centerY >= PluginStandardValues.WORLD_DEPTH && centerY < PluginStandardValues.WORLD_HEIGHT) &&
+					(worldMaterial = world.getMaterial(centerX, centerY, centerZ, chunkBeingPopulated)) != null &&
+					(
+						worldMaterial.isAir() || 
+						worldMaterial.isMaterial(DefaultMaterial.LEAVES) || 
+						worldMaterial.isMaterial(DefaultMaterial.LEAVES_2)
+					) &&
+    				(worldMaterial = world.getMaterial(centerX, centerY - 1, centerZ, chunkBeingPopulated)) != null
+				) && (
+					centerY > 0
+				)
+    		)
             {
                 centerY--;
             }
@@ -131,37 +167,36 @@ public class GrassGen extends Resource
             // Try to place grass
             // Because of the changed y position, only one in four attempts
             // will have success
+            int x;
+            int y;
+            int z;
             for (int i = 0; i < frequency * 4; i++)
             {
-                int x = centerX + random.nextInt(8) - random.nextInt(8);
-                int y = centerY + random.nextInt(4) - random.nextInt(4);
-                int z = centerZ + random.nextInt(8) - random.nextInt(8);
-                if (world.isNullOrAir(x, y, z, false) && this.sourceBlocks.contains(world.getMaterial(x, y - 1, z, false)))
+                x = centerX + random.nextInt(8) - random.nextInt(8);
+                y = centerY + random.nextInt(4) - random.nextInt(4);
+                z = centerZ + random.nextInt(8) - random.nextInt(8);
+                if (
+    				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
+    				worldMaterial.isAir() &&
+    				(
+        				(worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null && 
+        				this.sourceBlocks.contains(worldMaterial)
+    				)
+				)
                 {
-                    plant.spawn(world, x, y, z);
+                    plant.spawn(world, x, y, z, chunkBeingPopulated);
                 }
-
             }
         }
     }
 
-    @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    private void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkBeingPopulated)
     {
-        sourceBlocks.parseForWorld(world);
-        switch (groupOption)
-        {
-            case Grouped:
-                spawnGrouped(world, random, chunkCoord);
-                break;
-            case NotGrouped:
-                spawnNotGrouped(world, random, chunkCoord);
-                break;
-        }
-    }
-
-    private void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
-    {
+        LocalMaterialData worldMaterial;
+        int x;
+        int z;
+        int y;
+    	// Make sure we stay within population bounds, anything outside won't be spawned.
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextInt(100) >= rarity)
@@ -169,19 +204,24 @@ public class GrassGen extends Resource
                 continue;
             }
             
-            int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            int y = world.getHighestBlockYAt(x, z);
+            x = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            z = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
 
-            LocalMaterialData material;
+            if(y < PluginStandardValues.WORLD_DEPTH)
+            {
+            	return;
+            }
+            
             while (
         		(
-    				((material = world.getMaterial(x, y, z, false)) == null ||
+    				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
     				(
-	    				material.isAir()) || 
-						material.isMaterial(DefaultMaterial.LEAVES) || 
-						material.isMaterial(DefaultMaterial.LEAVES_2)
-					)
+	    				worldMaterial.isAir() || 
+						worldMaterial.isMaterial(DefaultMaterial.LEAVES) || 
+						worldMaterial.isMaterial(DefaultMaterial.LEAVES_2)
+					) &&
+    				(worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null
 				) && 
         		y > 0
     		)
@@ -189,12 +229,19 @@ public class GrassGen extends Resource
                 y--;
             }
 
-            if ((!world.isNullOrAir(x, y + 1, z, false)) || (!sourceBlocks.contains(world.getMaterial(x, y, z, false))))
+            if (            		
+        		(
+    				(worldMaterial = world.getMaterial(x, y + 1, z, chunkBeingPopulated)) == null ||
+					!worldMaterial.isAir()
+				) || (
+					(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) == null ||
+					!sourceBlocks.contains(worldMaterial)
+				)
+    		)
             {
                 continue;
             }
-            plant.spawn(world, x, y + 1, z);
+            plant.spawn(world, x, y + 1, z, chunkBeingPopulated);
         }
     }
-
 }

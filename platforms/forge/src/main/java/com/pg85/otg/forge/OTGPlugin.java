@@ -43,7 +43,7 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v8.3", dependencies="required-after:otgcore@[1.12.2 - v8.3]")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v9.0_r7", dependencies="required-after:otgcore@[1.12.2 - v9.0_r7]")
 public class OTGPlugin
 {	
 	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
@@ -53,6 +53,7 @@ public class OTGPlugin
     public static OTGPlugin Instance;
 
     public static OTGWorldType OtgWorldType;
+    public static BiomeColorsListener BiomeColorsListener;
         
     @EventHandler
     public void load(FMLInitializationEvent event)
@@ -102,7 +103,8 @@ public class OTGPlugin
         MinecraftForge.EVENT_BUS.register(new UnloadServerHandler());
 
         // Register biome colors listener, which listens to color events to apply custom colors.
-        MinecraftForge.EVENT_BUS.register(new BiomeColorsListener());
+        BiomeColorsListener = new BiomeColorsListener();
+        MinecraftForge.EVENT_BUS.register(BiomeColorsListener);
 
         // Register server tick handler which is used for the pre-generator, dimAbove/dimBelow, mob/entity spawning etc.
         MinecraftForge.EVENT_BUS.register(new ServerTickHandler());

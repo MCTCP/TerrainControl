@@ -2,8 +2,10 @@ package com.pg85.otg.forge.network.client.packets;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Random;
 
+import net.minecraft.util.text.TextComponentString;
 import org.apache.commons.lang3.StringUtils;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,11 +18,11 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StreamHelper;
 
@@ -64,6 +66,10 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		{
 			try
 			{
+				if (!player.canUseCommand(2, "openterraingenerator.ui.create")) {
+					player.sendMessage(new TextComponentString("Could not process: Missing permission '"+"openterraingenerator.ui.create"+"'"));
+					return null;
+				}
 				int packetType = message.getStream().readInt();
 				if(packetType == 0) // Create dimension
 				{
@@ -84,6 +90,17 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		                			return;
 		                		}
 		                	}
+		                	
+		                	ArrayList<String> presetNames = new ArrayList<String>();
+		                	presetNames.add(dimConfig.PresetName);
+        					if(!OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
+        					{
+        						// Update the UI on the client
+        						ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
+        						OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but not enough biome id's are available.");
+        						return;
+        					}
+		                	
 							OTG.getDimensionsConfig().Dimensions.add(dimConfig);
 							
             				long seed = (new Random()).nextLong();		            				

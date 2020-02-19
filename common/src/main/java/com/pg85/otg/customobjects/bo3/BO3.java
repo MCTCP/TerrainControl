@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
@@ -91,23 +92,22 @@ public class BO3 implements StructuredCustomObject
     {
         return settings.rotateRandomly;
     }
-
-    // Used for Tree() and CustomObject
-    @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
-    {
-        return trySpawnAt(false, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
-    }
-
-    @Override
-    public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
-    {
-        return trySpawnAt(false, null, world, random, rotation, x, y, z, minY, maxY);
-    }
+    
+	@Override
+	public boolean loadChecks()
+	{
+		return settings == null ? false : this.settings.parseModChecks();
+	}
 
     // Used to safely spawn this object from a grown sapling
     @Override
     public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+    	return spawnForced(world, random, rotation, x, y, z);
+    }
+
+    @Override
+    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
         BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
 
@@ -116,23 +116,25 @@ public class BO3 implements StructuredCustomObject
         ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
+        LocalMaterialData localMaterial;
+        DefaultMaterial material;
         for (BO3BlockFunction block : blocks)
         {
-            DefaultMaterial material = world.getMaterial(x + block.x, y + block.y, z + block.z,
-                    false).toDefaultMaterial();
+        	localMaterial = world.getMaterial(x + block.x, y + block.y, z + block.z, null);
+            material = localMaterial.toDefaultMaterial();
             
             // Ignore blocks in the ground when checking spawn conditions
             if (block.y >= 0)
             {
                 // Do not spawn if non-tree blocks are in the way
-                if (material != DefaultMaterial.AIR && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2 && material != DefaultMaterial.SAPLING)
+                if (!localMaterial.isAir() && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2 && material != DefaultMaterial.SAPLING)
                 {
                     return false;
                 }
             }
             
             // Only overwrite air
-            if (material == DefaultMaterial.AIR)
+            if (localMaterial.isAir())
             {
                 chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
                 blocksToSpawn.add(block);
@@ -149,24 +151,17 @@ public class BO3 implements StructuredCustomObject
 
         for (BO3BlockFunction block : blocksToSpawn)
         {
-            block.spawn(world, random, x + block.x, y + block.y, z + block.z, true);
+            block.spawn(world, random, x + block.x, y + block.y, z + block.z, null);
         }
 
-        oeh.extrude(world, random, x, y, z);
-        handleBO3Functions(null, world, random, rotation, x, y, z, chunks);
+        oeh.extrude(world, random, x, y, z, null);
+        handleBO3Functions(null, world, random, rotation, x, y, z, chunks, null);
 
         return true;
     }
 
-    // Used for spawning saplings and customobjects without doing checks (for
-    // growing saplings, /spawn command, StructureAtSpawn etc).
-    @Override
-    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
-    {
-        return trySpawnAt(true, null, world, random, rotation, x, y, z, settings.minHeight, settings.maxHeight);
-    }
-
     // This method is only used to spawn CustomObject.
+    // Called during population.
     @Override
     public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
     {
@@ -181,7 +176,7 @@ public class BO3 implements StructuredCustomObject
                 int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
                 int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
-                if (spawn(world, random, x, z, settings.minHeight, settings.maxHeight))
+                if (spawn(world, random, x, z, settings.minHeight, settings.maxHeight, chunkCoord))
                 {
                     atLeastOneObjectHasSpawned = true;
                 }
@@ -191,86 +186,24 @@ public class BO3 implements StructuredCustomObject
         return atLeastOneObjectHasSpawned;
     }
 
+    // Used for trees during population
     @Override
-    public Branch[] getBranches()
+    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
-        return null;
+    	// A bit ugly, but avoids having to create and implement another spawnAsTree method.
+    	if(minY == -1)
+    	{
+    		minY = this.getSettings().minHeight;
+    	}
+    	if(maxY == -1)
+    	{
+    		maxY = this.getSettings().maxHeight;
+    	}
+        return spawn(world, random, x, z, minY, maxY, chunkBeingPopulated);
     }
 
-    @Override
-    public Branch[] getBranches(Rotation rotation)
-    {
-        return settings.branches[rotation.getRotationId()];
-    }
-
-    @Override
-    public CustomStructureCoordinate makeCustomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        if (settings.rarity > random.nextDouble() * 100.0)
-        {
-            Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-            int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
-            return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
-        }
-        return null;
-    }
-
-    @Override
-    public StructurePartSpawnHeight getStructurePartSpawnHeight()
-    {
-        return this.settings.spawnHeight.toStructurePartSpawnHeight();
-    }
-
-    // TODO: Reimplement this?
-    @Override
-    public BoundingBox getBoundingBox(Rotation rotation)
-    {
-        return this.settings.boundingBoxes[rotation.getRotationId()];
-    }
-
-    @Override
-    public int getMaxBranchDepth() // This used to be in CustomObject?
-    {
-        return settings.maxBranchDepth;
-    }
-
-    /**
-     * Computes the offset and variance for spawning a bo3
-     *
-     * @param random   Random number generator.
-     * @param offset   Base spawn offset.
-     * @param variance Max variance from this offset.
-     *
-     * @return The sum of the offset and variance.
-     */
-    private int getOffsetAndVariance(Random random, int offset, int variance)
-    {
-        if (variance == 0)
-        {
-            return offset;
-        } else if (variance < 0)
-        {
-            variance = -random.nextInt(MathHelper.abs(variance) + 1);
-        } else {
-            variance = random.nextInt(variance + 1);
-        }
-        return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-    }
-
-    @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z)
-    {
-        return spawn(world, random, x, z, this.getSettings().minHeight, this.getSettings().maxHeight);
-    }
-
-    @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY)
-    {
-        return spawn(world, random, x, z, minY, maxY);
-    }
-
-    // Used for customobject and trees
-    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY)
+    // Used for customobject and trees during population
+    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
@@ -280,71 +213,64 @@ public class BO3 implements StructuredCustomObject
         }
         if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
-            y = world.getHighestBlockYAt(x, z);
+            y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
         }
         if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
-            y = world.getSolidHeight(x, z);
+            y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
         }
         // Offset by static and random settings values
         y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
-        return trySpawnAt(world, random, rotation, x, y, z, minY, maxY);
+        return trySpawnAt(null, world, random, rotation, x, y, z, minY, maxY, chunkBeingPopulated);
     }
-
-    // Used for saplings, trees, customobjects and customstructures
-    // SkipChecks is used for spawning saplings and customobjects without doing checks (for growing saplings, /spawn command, StructureAtSpawn etc). TODO: Split this into 2 methods?
-    public boolean trySpawnAt(boolean skipChecks, CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY)
+    
+    // Used for trees, customobjects and customstructures during population.
+    public boolean trySpawnAt(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
-    	if(!skipChecks)
-    	{
-	        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT) // Isn't this already done before this method is called?
-	        {
-	            return false;
-	        }
+        if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT) // Isn't this already done before this method is called?
+        {
+            return false;
+        }
 
-	        // Height check
-	        if (y < minY || y > maxY)
-	        {
-	            return false;
-	        }
+        // Height check
+        if (y < minY || y > maxY)
+        {
+            return false;
+        }
+        
+        BO3Check[] checks = settings.bo3Checks[rotation.getRotationId()];
 
-	        BO3Check[] checks = settings.bo3Checks[rotation.getRotationId()];
-
-	        // Check for spawning
-	        for (BO3Check check : checks)
-	        {
-	            if (check.preventsSpawn(world, x + check.x, y + check.y, z + check.z))
-	            {
-	                // A check failed
-	                return false;
-	            }
-	        }
+        // Check for spawning
+        for (BO3Check check : checks)
+        {
+            if (check.preventsSpawn(world, x + check.x, y + check.y, z + check.z, chunkBeingPopulated))
+            {
+                // A check failed
+                return false;
+            }
     	}
 
-    	// TODO: Optimise this! Should we really have to check for each block if the world is loaded? ><
-        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());       
-        if(!skipChecks)
+        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
+        HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
+        ChunkCoordinate chunkCoord;
+        for (BO3BlockFunction block : blocks)
         {
-            HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
-            ChunkCoordinate chunkCoord;
-	        for (BO3BlockFunction block : blocks)
-	        {
-	            if (y + block.y < PluginStandardValues.WORLD_DEPTH || y + block.y >= PluginStandardValues.WORLD_HEIGHT)
+            if (y + block.y < PluginStandardValues.WORLD_DEPTH || y + block.y >= PluginStandardValues.WORLD_HEIGHT)
+            {
+                return false;
+            }
+
+           	chunkCoord = ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z);
+        	if(!loadedChunks.contains(chunkCoord))
+    		{
+        		if(chunkBeingPopulated != null && !OTG.IsInAreaBeingPopulated(x + block.x, z + block.z, chunkBeingPopulated))
+        		//if(!world.chunkExists(x + block.x, y + block.y, z + block.z)) 
 	            {
+                    // Cannot spawn BO3, part of world is not loaded
 	                return false;
 	            }
-
-	           	chunkCoord = ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z);
-	        	if(!loadedChunks.contains(chunkCoord))
-	    		{
-	        		if(!world.isLoaded(x + block.x, y + block.y, z + block.z)) 
-		            {
-	                    // Cannot spawn BO3, part of world is not loaded TODO: Is this really necessary / should this be necessary? Aren't invalid BO3 customstructures detected when loading branches? Branches shouldn't be able to spawn outside of bounds.
-		                return false;
-		            }
-		            loadedChunks.add(chunkCoord);
-	    		}
-	        }
+	            loadedChunks.add(chunkCoord);
+    		}
         }
 
         ArrayList<BO3BlockFunction> blocksToSpawn = new ArrayList<BO3BlockFunction>();
@@ -357,8 +283,16 @@ public class BO3 implements StructuredCustomObject
                 blocks.length * (settings.maxPercentageOutsideSourceBlock / 100.0));
         for (BO3BlockFunction block : blocks)
         {
-            if (!skipChecks && ((settings.maxPercentageOutsideSourceBlock < 100 && blocksOutsideSourceBlock <= maxBlocksOutsideSourceBlock) || settings.outsideSourceBlock == OutsideSourceBlock.dontPlace) && !settings.sourceBlocks.contains(
-                    world.getMaterial(x + block.x, y + block.y, z + block.z, false)))
+            if (
+        		(
+    				(
+						settings.maxPercentageOutsideSourceBlock < 100 && 
+						blocksOutsideSourceBlock <= maxBlocksOutsideSourceBlock
+					) || 
+    				settings.outsideSourceBlock == OutsideSourceBlock.dontPlace
+				) && 
+    			!settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z, chunkBeingPopulated))
+    		)
             {
                 blocksOutsideSourceBlock++;
                 if (blocksOutsideSourceBlock > maxBlocksOutsideSourceBlock)
@@ -383,7 +317,7 @@ public class BO3 implements StructuredCustomObject
         }
 
         // Call event
-        if (!skipChecks && !OTG.fireCanCustomObjectSpawnEvent(this, world, x, y, z))
+        if (!OTG.fireCanCustomObjectSpawnEvent(this, world, x, y, z))
         {
             // Cancelled
             return false;
@@ -393,16 +327,16 @@ public class BO3 implements StructuredCustomObject
 
         for (BO3BlockFunction block : blocksToSpawn)
         {
-            block.spawn(world, random, x + block.x, y + block.y, z + block.z, true);
+            block.spawn(world, random, x + block.x, y + block.y, z + block.z, chunkBeingPopulated);
         }
 
-        oeh.extrude(world, random, x, y, z);
-        handleBO3Functions(structure, world, random, rotation, x, y, z, chunks);
+        oeh.extrude(world, random, x, y, z, chunkBeingPopulated);
+        handleBO3Functions(structure, world, random, rotation, x, y, z, chunks, chunkBeingPopulated);
 
         return true;
     }
 
-    public void handleBO3Functions(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, HashSet<ChunkCoordinate> chunks)
+    public void handleBO3Functions(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, HashSet<ChunkCoordinate> chunks, ChunkCoordinate chunkBeingPopulated)
     {
         HashSet<ChunkCoordinate> chunksCustomObject = new HashSet<ChunkCoordinate>();
 
@@ -538,14 +472,63 @@ public class BO3 implements StructuredCustomObject
             newEntityData.groupSize = entity.groupSize;
             newEntityData.nameTagOrNBTFileName = entity.nameTagOrNBTFileName;
             newEntityData.originalNameTagOrNBTFileName = entity.originalNameTagOrNBTFileName;
-
-            world.spawnEntity(newEntityData);
+            
+           	world.spawnEntity(newEntityData, chunkBeingPopulated);
         }
     }
 
-	@Override
-	public boolean loadChecks()
-	{
-		return settings == null ? false : this.settings.parseModChecks();
-	}
+    public Branch[] getBranches(Rotation rotation)
+    {
+        return settings.branches[rotation.getRotationId()];
+    }
+    
+    public StructurePartSpawnHeight getStructurePartSpawnHeight()
+    {
+        return this.settings.spawnHeight.toStructurePartSpawnHeight();
+    }
+
+    // TODO: Use BoundingBox for BO4's?
+    public BoundingBox getBoundingBox(Rotation rotation)
+    {
+        return this.settings.boundingBoxes[rotation.getRotationId()];
+    }
+
+    public int getMaxBranchDepth() // This used to be in CustomObject?
+    {
+        return settings.maxBranchDepth;
+    }
+
+    /**
+     * Computes the offset and variance for spawning a bo3
+     *
+     * @param random   Random number generator.
+     * @param offset   Base spawn offset.
+     * @param variance Max variance from this offset.
+     *
+     * @return The sum of the offset and variance.
+     */
+    private int getOffsetAndVariance(Random random, int offset, int variance)
+    {
+        if (variance == 0)
+        {
+            return offset;
+        } else if (variance < 0)
+        {
+            variance = -random.nextInt(MathHelper.abs(variance) + 1);
+        } else {
+            variance = random.nextInt(variance + 1);
+        }
+        return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
+    }
+    
+    public CustomStructureCoordinate makeCustomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
+        if (settings.rarity > random.nextDouble() * 100.0)
+        {
+            Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+            int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
+            return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
+        }
+        return null;
+    }    
 }

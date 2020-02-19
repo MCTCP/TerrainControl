@@ -50,9 +50,9 @@ public class CustomObjectGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        // Left blank, as process(..) already handles this.
+        // Left blank, as spawnInChunk already handles this.
     }
 
     @Override

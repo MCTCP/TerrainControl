@@ -35,7 +35,7 @@ public class ExportDataCommand extends BaseCommand
         {
             i++;
             OTG.log(LogMarker.INFO, "Exporting .BO4Data " + i + "/" + bo4s.size() + " \"" + bo4.getName() + "\"");
-            bo4.generateBO4Data();
+            OTG.generateBO4Data(bo4.getConfig());
         }
         sender.sendMessage(new TextComponentString(MESSAGE_COLOR + ".BO4Data export complete."));
         return true;

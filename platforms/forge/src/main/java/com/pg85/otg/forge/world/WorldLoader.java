@@ -13,14 +13,12 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
-import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;
+import com.pg85.otg.forge.biomes.ForgeMojangSettings;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
-import com.pg85.otg.forge.util.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.helpers.FileHelper;
@@ -156,7 +154,7 @@ public final class WorldLoader
     	
     	return null;
     }
-    
+
     public ForgeWorld getWorldByDimId(int dimensionId)
     {
     	ForgeWorld forgeWorld;
@@ -169,7 +167,7 @@ public final class WorldLoader
     	}
     	return forgeWorld;
     }
-       
+
     public ForgeWorld getUnloadedWorld(String name)
     {
     	ForgeWorld forgeWorld = null;
@@ -179,7 +177,7 @@ public final class WorldLoader
         }
         return forgeWorld;
     }
-    
+
     public ForgeWorld getUnloadedWorldByDimId(int dimensionId)
     {
     	ForgeWorld forgeWorld;
@@ -337,16 +335,16 @@ public final class WorldLoader
 	}
 
     @Nullable ForgeWorld getOrCreateForgeWorld(World mcWorld)
-    {   	
+    {
     	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
-    	{	
+    	{
     		throw new RuntimeException("Error: OTG tried to load a world that is missing OTG information. Was this world created via OTG? For Forge Single Player, be sure to use the OTG world creation screen.");
     	}
 
     	String worldName = WorldHelper.getName(mcWorld);
     	File worldConfigsFolder = null;
-    	
-    	worldConfigsFolder = this.getWorldDir(OTG.getDimensionsConfig().getDimensionConfig(worldName).PresetName);    	    	
+
+    	worldConfigsFolder = this.getWorldDir(OTG.getDimensionsConfig().getDimensionConfig(worldName).PresetName);
         if (worldConfigsFolder == null || !worldConfigsFolder.exists())
         {
             // OpenTerrainGenerator is not enabled for this world
@@ -422,7 +420,7 @@ public final class WorldLoader
         
         // Load all files
         BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(OTG.getPluginConfig().biomeConfigExtension);
-        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(defaultWorldConfig, null, defaultWorldConfig.worldHeightScale, biomeDirs, biomesToLoad);
+        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(defaultWorldConfig, defaultWorldConfig.worldHeightScale, biomeDirs, biomesToLoad);
         
         // Write all biomes
 

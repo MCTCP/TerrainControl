@@ -5,6 +5,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.structures.CustomStructure;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructure;
@@ -19,7 +20,6 @@ import java.util.Random;
 
 public class CustomStructureGen extends Resource
 {
-	//TODO: Clean up OTG+/non-OTG+
     private List<StructuredCustomObject> objects;
     public List<Double> objectChances;
     public List<String> objectNames;
@@ -53,38 +53,59 @@ public class CustomStructureGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        // Left blank, as spawnInChunk(..) already handles this.
+        // Left blank, as spawnInChunk already handles this.
     }
 
-    // Only used for OTG CustomStructure
+    // Only used for BO3 CustomStructure
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-    	if(world.getConfigs().getWorldConfig().isOTGPlus)
-    	{
-    		throw new RuntimeException(); // TODO: Remove after testing
-    	} else {
-	        // Find all structures that reach this chunk, and spawn them
-	        int searchRadius = world.getConfigs().getWorldConfig().maximumCustomStructureRadius;
-	
-	        int currentChunkX = chunkCoord.getChunkX();
-	        int currentChunkZ = chunkCoord.getChunkZ();
-	        for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
-	        {
-	            for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
-	            {
-	                CustomStructure structureStart = world.getStructureCache().getStructureStart(random, searchChunkX, searchChunkZ);
-	                if (structureStart != null)
-	                {
-	                	((BO3CustomStructure)structureStart).spawnForChunk(chunkCoord, world);
-	                }
-	            }
-	        }
-    	}
+        // Find all structures that reach this chunk, and spawn them
+        int searchRadius = world.getConfigs().getWorldConfig().maximumCustomStructureRadius;
+
+        int currentChunkX = chunkCoord.getChunkX();
+        int currentChunkZ = chunkCoord.getChunkZ();
+        for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
+        {
+            for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
+            {
+                CustomStructure structureStart = world.getStructureCache().getStructureStart(random, searchChunkX, searchChunkZ);
+                if (structureStart != null)
+                {
+                	((BO3CustomStructure)structureStart).spawnInChunk(chunkCoord, world);
+                }
+            }
+        }
     }
 
+    public BO3CustomStructureCoordinate getRandomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
+    {
+        if (objectNames.isEmpty())
+        {
+            return null;
+        }        
+        for (int objectNumber = 0; objectNumber < getObjects(world.getName()).size(); objectNumber++)
+        {
+            if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
+            {
+            	StructuredCustomObject object = getObjects(world.getName()).get(objectNumber);
+            	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
+            	{
+            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomObjectCoordinate(world, random, chunkX, chunkZ);
+            	} else {
+            		if(OTG.getPluginConfig().spawnLog)
+            		{
+            			BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
+            			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + objectNames.get(objectNumber));
+            		}
+            	}
+            }
+        }
+        return null;
+    }
+    
     @Override
     public String toString()
     {
@@ -98,33 +119,6 @@ public class CustomStructureGen extends Resource
             output += "," + objectNames.get(i) + "," + objectChances.get(i);
         }
         return output + ")";
-    }
-
-    // Only used for OTG Customstructure
-    public BO3CustomStructureCoordinate getRandomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
-    {
-        if (objectNames.isEmpty())
-        {
-            return null;
-        }        
-        for (int objectNumber = 0; objectNumber < getObjects(world.getName()).size(); objectNumber++)
-        {
-            if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
-            {
-            	StructuredCustomObject object = getObjects(world.getName()).get(objectNumber);
-            	if(object != null)
-            	{
-            		return (BO3CustomStructureCoordinate)object.makeCustomObjectCoordinate(world, random, chunkX, chunkZ);
-            	} else {
-            		if(OTG.getPluginConfig().spawnLog)
-            		{
-            			BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
-            			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + objectNames.get(objectNumber));
-            		}
-            	}
-            }
-        }
-        return null;
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.pg85.otg.customobjects.bo3.bo3function;
 
+import java.util.Random;
+
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.BO3Config;
-import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.bofunctions.BlockFunction;
+import com.pg85.otg.util.ChunkCoordinate;
 
 /**
  * Represents a block in a BO3.
@@ -29,6 +32,13 @@ public class BO3BlockFunction extends BlockFunction<BO3Config>
         return rotatedBlock;
     }
 
+    @Override
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    {
+        material.parseForWorld(world);
+        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
+    }
+    
     @Override
     public Class<BO3Config> getHolderType()
     {

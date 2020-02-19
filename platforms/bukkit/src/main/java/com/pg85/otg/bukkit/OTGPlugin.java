@@ -8,6 +8,7 @@ import com.pg85.otg.bukkit.generator.OTGChunkGenerator;
 import com.pg85.otg.bukkit.generator.structures.RareBuildingStart;
 import com.pg85.otg.bukkit.generator.structures.VillageStart;
 import com.pg85.otg.bukkit.metrics.BukkitMetricsHelper;
+import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -116,7 +117,7 @@ public class OTGPlugin extends JavaPlugin
         if (worldName.isEmpty())
         {
             OTG.log(LogMarker.WARN, "Ignoring empty world name. Is some generator plugin checking if \"OpenTerrainGenerator\" is a valid world name?");
-            return new OTGChunkGenerator(this);
+            return new OTGChunkGenerator(this, null);
         }
 
         // Check if not already enabled
@@ -163,7 +164,7 @@ public class OTGPlugin extends JavaPlugin
             case TerrainTest:
             //case OldGenerator:
             case NotGenerate:
-                generator = new OTGChunkGenerator(this);
+                generator = new OTGChunkGenerator(this, localWorld);
                 break;
             //case Default:
                 //break;

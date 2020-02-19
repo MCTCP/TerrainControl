@@ -57,7 +57,7 @@ public enum DefaultMaterial
     GOLD_BLOCK(41),
     IRON_BLOCK(42),
     DOUBLE_STEP(43),
-    STEP(44, false),
+    STEP(44, false), // What is this?
     BRICK(45),
     TNT(46),
     BOOKSHELF(47),
@@ -65,22 +65,22 @@ public enum DefaultMaterial
     OBSIDIAN(49),
     TORCH(50, false),
     FIRE(51, false),
-    MOB_SPAWNER(52, false),
-    WOOD_STAIRS(53, false),
+    MOB_SPAWNER(52),
+    WOOD_STAIRS(53),
     CHEST(54, false),
     REDSTONE_WIRE(55, false),
     DIAMOND_ORE(56),
     DIAMOND_BLOCK(57),
-    WORKBENCH(58, false),
+    WORKBENCH(58),
     CROPS(59, false),
-    SOIL(60, false),
+    SOIL(60),
     FURNACE(61),
     BURNING_FURNACE(62),
     SIGN_POST(63, false),
     WOODEN_DOOR(64, false),
     LADDER(65, false),
     RAILS(66, false),
-    COBBLESTONE_STAIRS(67, false),
+    COBBLESTONE_STAIRS(67),
     WALL_SIGN(68, false),
     LEVER(69, false),
     STONE_PLATE(70, false),
@@ -92,11 +92,11 @@ public enum DefaultMaterial
     REDSTONE_TORCH_ON(76, false),
     STONE_BUTTON(77, false),
     SNOW(78, false),
-    ICE(79, false),
+    ICE(79),
     SNOW_BLOCK(80),
     CACTUS(81),
     CLAY(82),
-    SUGAR_CANE_BLOCK(83, false),
+    SUGAR_CANE_BLOCK(83),
     JUKEBOX(84, false),
     FENCE(85, false),
     PUMPKIN(86),
@@ -121,23 +121,23 @@ public enum DefaultMaterial
     MELON_STEM(105, false),
     VINE(106, false),
     FENCE_GATE(107, false),
-    BRICK_STAIRS(108, false),
-    SMOOTH_STAIRS(109, false),
-    MYCEL(110, false),
+    BRICK_STAIRS(108),
+    SMOOTH_STAIRS(109),
+    MYCEL(110, true),
     WATER_LILY(111, false),
     NETHER_BRICK(112),
     NETHER_FENCE(113, false),
-    NETHER_BRICK_STAIRS(114, false),
+    NETHER_BRICK_STAIRS(114),
     NETHER_WARTS(115, false),
     ENCHANTMENT_TABLE(116, false),
     BREWING_STAND(117, false),
-    CAULDRON(118, false),
+    CAULDRON(118),
     ENDER_PORTAL(119, false),
     ENDER_PORTAL_FRAME(120, false),
     ENDER_STONE(121),
     DRAGON_EGG(122),
-    REDSTONE_LAMP_OFF(123, false),
-    REDSTONE_LAMP_ON(124, false),
+    REDSTONE_LAMP_OFF(123),
+    REDSTONE_LAMP_ON(124),
     WOOD_DOUBLE_STEP(125),
     WOOD_STEP(126),
     COCOA(127, false),
@@ -176,8 +176,8 @@ public enum DefaultMaterial
     STAINED_GLASS_PANE(160, false),
     LEAVES_2(161, false),
     LOG_2(162),
-    ACACIA_STAIRS(163, false),
-    DARK_OAK_STAIRS(164, false),
+    ACACIA_STAIRS(163),
+    DARK_OAK_STAIRS(164),
     SLIME_BLOCK(165),
     BARRIER(166),
     IRON_TRAPDOOR(167, false),
@@ -187,13 +187,13 @@ public enum DefaultMaterial
     CARPET(171, false),
     HARD_CLAY(172),
     COAL_BLOCK(173),
-    PACKED_ICE(174, false),
+    PACKED_ICE(174),
     DOUBLE_PLANT(175, false),
     STANDING_BANNER(176, false),
     WALL_BANNER(177, false),
     DAYLIGHT_DETECTOR_INVERTED(178, false),
     RED_SANDSTONE(179),
-    RED_SANDSTONE_STAIRS(180, false),
+    RED_SANDSTONE_STAIRS(180),
     DOUBLE_STONE_SLAB2(181),
     STONE_SLAB2(182, false),
     SPRUCE_FENCE_GATE(183, false),
@@ -216,7 +216,7 @@ public enum DefaultMaterial
     CHORUS_FLOWER(200, false),
     PURPUR_BLOCK(201),
     PURPUR_PILLAR(202),
-    PURPUR_STAIRS(203, false),
+    PURPUR_STAIRS(203),
     PURPUR_DOUBLE_SLAB(204),
     PURPUR_SLAB(205, false),
     END_BRICKS(206),
@@ -227,7 +227,7 @@ public enum DefaultMaterial
     COMMAND_CHAIN(211),
     FROSTED_ICE(212),
     MAGMA(213),
-    NETHER_WART_BLOCK(214, false),
+    NETHER_WART_BLOCK(214),
     RED_NETHER_BRICK(215),
     BONE_BLOCK(216),
     STRUCTURE_VOID(217, false),
@@ -292,6 +292,11 @@ public enum DefaultMaterial
         this.id = id;
         this.solid = true;
     }
+    
+    public boolean isAir()
+    {
+    	return this == AIR;
+    }
 
     /**
      * Returns true only if this material is flowing or stationary Water
@@ -301,7 +306,7 @@ public enum DefaultMaterial
      */
     public boolean isLiquid()
     {
-        return this == WATER || this == STATIONARY_WATER || this == LAVA | this == STATIONARY_LAVA;
+        return this == WATER || this == STATIONARY_WATER || this == LAVA || this == STATIONARY_LAVA;
     }
 
     /**
@@ -397,7 +402,7 @@ public enum DefaultMaterial
      */
     public static DefaultMaterial getMaterial(int id)
     {
-        if (id < 256 && LookupID[id] != null)
+        if (id < 256 && id > -1 && LookupID[id] != null)
         {
             return LookupID[id];
         }

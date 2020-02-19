@@ -9,7 +9,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.resource.SaplingGen;
 import com.pg85.otg.generator.resource.SaplingType;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
@@ -35,7 +35,7 @@ public class SaplingListener
         private SaplingGrower(LocalWorld world, BlockPos blockPos)
         {
             this.world = world;
-            this.material = world.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ(), true);
+            this.material = world.getMaterial(blockPos.getX(), blockPos.getY(), blockPos.getZ(), null);
             this.blockPos = blockPos;
 
             // Check whether block is a sapling
@@ -76,10 +76,10 @@ public class SaplingListener
             {
                 for (int treeOffsetZ = 0; treeOffsetZ >= -1; --treeOffsetZ)
                 {
-                    if (isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ, false))
-                            && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ, false))
-                            && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ + 1, false))
-                            && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ + 1, false)))
+                    if (isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ, null))
+                        && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ, null))
+                        && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX, y, z + treeOffsetZ + 1, null))
+                        && isSameSapling(this.material, this.world.getMaterial(x + treeOffsetX + 1, y, z + treeOffsetZ + 1, null)))
                     {
                         // Found! Adjust internal position
                         this.blockPos = this.blockPos.add(treeOffsetX, 0, treeOffsetZ);
@@ -200,8 +200,7 @@ public class SaplingListener
             world.setBlockState(saplingGrower.blockPos.add(1, 0, 0), air);
             world.setBlockState(saplingGrower.blockPos.add(0, 0, 1), air);
             world.setBlockState(saplingGrower.blockPos.add(1, 0, 1), air);
-        } else
-        {
+        } else {
             world.setBlockState(saplingGrower.blockPos, air);
         }
 
@@ -210,8 +209,7 @@ public class SaplingListener
         Random random = new Random();
         for (int i = 0; i < 10; i++)
         {
-            if (saplingGen.growSapling(localWorld, random, wideTrunk, saplingGrower.blockPos.getX(),
-                    saplingGrower.blockPos.getY(), saplingGrower.blockPos.getZ()))
+            if (saplingGen.growSapling(localWorld, random, wideTrunk, saplingGrower.blockPos.getX(), saplingGrower.blockPos.getY(), saplingGrower.blockPos.getZ()))
             {
                 saplingGrown = true;
                 break;
@@ -226,12 +224,12 @@ public class SaplingListener
             int saplingZ = saplingGrower.blockPos.getZ();
             if (saplingGrower.saplingType.requiresFourSaplings())
             {
-                localWorld.setBlock(saplingX, saplingY, saplingZ, saplingGrower.material, null, false);
-                localWorld.setBlock(saplingX + 1, saplingY, saplingZ, saplingGrower.material, null, false);
-                localWorld.setBlock(saplingX, saplingY, saplingZ + 1, saplingGrower.material, null, false);
-                localWorld.setBlock(saplingX + 1, saplingY, saplingZ + 1, saplingGrower.material, null, false);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, saplingGrower.material, null, null);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ, saplingGrower.material, null, null);
+                localWorld.setBlock(saplingX, saplingY, saplingZ + 1, saplingGrower.material, null, null);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ + 1, saplingGrower.material, null, null);
             } else {
-                localWorld.setBlock(saplingX, saplingY, saplingZ, saplingGrower.material, null, false);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, saplingGrower.material, null, null);
             }
         }
 

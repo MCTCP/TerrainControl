@@ -10,7 +10,6 @@ import java.util.Set;
 
 import com.google.common.collect.BiMap;
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.BiomeIds;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -18,11 +17,11 @@ import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.configuration.standard.ForgeMojangSettings;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
@@ -433,7 +432,15 @@ public class ForgeBiomeRegistryManager
         Biome biomeAtId = ids.get(id);
         if(biomeAtId != null)
         {
-        	throw new RuntimeException("Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+        	OTG.log(LogMarker.WARN,
+    			"Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". "
+				+ "This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. "
+				+ "This can also happen when migrating a world from OTG v6 or lower to OTG v8 or higher, if the world had biome conflicts in v6."
+				+ "OTG 1.12.2 v8 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+        	
+        	// TODO: This could cause problems, but is necessary to support v6 worlds with biome id conflicts
+        	id = biomeRegistryAvailabiltyMap.nextClearBit(0);
+        	OTG.log(LogMarker.WARN, "Substituting id " + id + " for biome " + resourceLocation.toString());
         }
 
         ids.put(id, biome);
@@ -587,5 +594,19 @@ public class ForgeBiomeRegistryManager
         }
 
         return standardBiomes;
+	}
+
+	public int getAvailableBiomeIdsCount()
+	{
+		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
+		int availableIds = 0;
+    	for(int i = 0; i < biomeRegistryAvailabiltyMap.size(); i++)
+    	{
+    		if(!biomeRegistryAvailabiltyMap.get(i))
+    		{
+    			availableIds++;
+    		}
+    	}
+    	return availableIds;
 	}
 }

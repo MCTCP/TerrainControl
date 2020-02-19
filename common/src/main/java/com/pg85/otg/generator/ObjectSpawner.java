@@ -64,10 +64,13 @@ public class ObjectSpawner
         this.world = localWorld;
     }
 
+    //int currentlyPopulatingIndex = 0;
     public void populate(ChunkCoordinate chunkCoord)
     {
+    	//int myPopulatingIndex;
     	//OTG.log(LogMarker.INFO, "ObjectSpawner populate X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
 
+    	boolean unlockWhenDone = false;
 		// Wait for another thread running SaveToDisk, then place a lock.
 		while(true)
 		{
@@ -77,7 +80,14 @@ public class ObjectSpawner
 			{
 				if(!saving)
 				{
-					populating = true;
+					// If populating then this method is being called recursively (indicating cascading chunk-gen).
+					// This method can be called recursively, but should never be called by two threads at once.
+					// TODO: Make sure that's the case.
+					if(!populating)
+					{
+						populating = true;
+						unlockWhenDone = true;
+					}
 					break;
 				}
 			}
@@ -87,7 +97,7 @@ public class ObjectSpawner
 			saveRequired = true;
 		}
 
-		if(world.getConfigs().getWorldConfig().isOTGPlus)
+		if(world.isOTGPlus())
 		{
 			if(!StructurePlottedAtSpawn)
 			{
@@ -100,272 +110,197 @@ public class ObjectSpawner
 		{
 			processing = true;
 
-			if(world.getConfigs().getWorldConfig().isOTGPlus)
-			{
-				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
-				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
-				world.getStructureCache().plotStructures(rand, chunkCoord, false);
-
-		        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
-
-		        boolean hasVillage = false;
-
-		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
-		        {
-		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
-		        	if(customObject != null)
-		        	{
-		        		if(customObject instanceof BO3)
-		        		{
-		        			int y = 1;
-
-		        			if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestBlock)
-		        			{
-		        				 y = this.world.getHighestBlockYAt(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter()) - 1;
-		        			}
-		        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock)
-		        			{
-		        				y = this.world.getSolidHeight(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter()) - 1;
-		        			}
-		        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.randomY)
-		        			{
-		        				y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
-		        			}
-
-		        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
-
-		        			boolean populationBoundsCheck = world.getConfigs().getWorldConfig().populationBoundsCheck;
-		        			world.getConfigs().getWorldConfig().populationBoundsCheck = false;
-		        			world.setAllowSpawningOutsideBounds(true);
-		        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockXCenter(), y, spawnChunk.getBlockZCenter());
-		        			world.setAllowSpawningOutsideBounds(false);
-		        			world.getConfigs().getWorldConfig().populationBoundsCheck = populationBoundsCheck;
-		        		}
-		        	}
-		        } else {
-			        // Generate structures
-			        hasVillage = world.placeDefaultStructures(rand, chunkCoord);
-		        }
-
-				// Get the random generator
-				WorldConfig worldConfig = configProvider.getWorldConfig();
-				long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
-				this.rand.setSeed(resourcesSeed);
-				long l1 = this.rand.nextLong() / 2L * 2L + 1L;
-				long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-				this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
-
-				// Mark population started
-				OTG.firePopulationStartEvent(world, rand, hasVillage, chunkCoord);
-
-				processResourcesPhase2(chunkCoord);
-
-				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()));
-				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
-				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
-				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
-
-				// Generate structures
-
-				processResourcesPhase3(chunkCoord, hasVillage);
-
-				// Mark population ended
-				OTG.firePopulationEndEvent(world, rand, hasVillage, chunkCoord);
-
-			} else {
-
-		        // Get the corner block coords
-		        int x = chunkCoord.getChunkX() * 16;
-		        int z = chunkCoord.getChunkZ() * 16;
-
-		        LocalBiome biome = world.getBiome(x + 15, z + 15);
-
-		        // Null check
-		        if (biome == null)
-		        {
-		            OTG.log(LogMarker.WARN, "Unknown biome at {},{}  (chunk {}). Could not populate chunk.", x + 15, z + 15, chunkCoord);
-		            return;
-		        }
-
-		        BiomeConfig biomeConfig = biome.getBiomeConfig();
-
-		        // Get the random generator
-		        WorldConfig worldConfig = configProvider.getWorldConfig();
-		        long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
-		        this.rand.setSeed(resourcesSeed);
-		        long l1 = this.rand.nextLong() / 2L * 2L + 1L;
-		        long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-		        this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
-
-		        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
-
-		        boolean hasVillage = false;
-
-		        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
-		        {
-		        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
-		        	if(customObject != null)
-		        	{
-		        		if(customObject instanceof BO3)
-		        		{
-		        			int y = 1;
-
-		        			if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestBlock)
-		        			{
-		        				 y = this.world.getHighestBlockYAt(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter()) - 1;
-		        			}
-		        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock)
-		        			{
-		        				y = this.world.getSolidHeight(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter()) - 1;
-		        			}
-		        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.randomY)
-		        			{
-		        				y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
-		        			}
-
-		        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
-
-		        			boolean populationBoundsCheck = world.getConfigs().getWorldConfig().populationBoundsCheck;
-		        			world.getConfigs().getWorldConfig().populationBoundsCheck = false;
-		        			world.setAllowSpawningOutsideBounds(true);
-		        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockXCenter(), y, spawnChunk.getBlockZCenter());
-		        			world.setAllowSpawningOutsideBounds(false);
-		        			world.getConfigs().getWorldConfig().populationBoundsCheck = populationBoundsCheck;
-		        		}
-		        	}
-		        } else {
-			        // Generate structures
-			        hasVillage = world.placeDefaultStructures(rand, chunkCoord);
-		        }
-
-		        // Mark population started
-		        world.startPopulation(chunkCoord);
-		        OTG.firePopulationStartEvent(world, rand, hasVillage, chunkCoord);
-
-		        // Resource sequence
-		        for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
-		        {
-		            if (res instanceof Resource)
-		            {
-		                ((Resource)res).process(world, rand, hasVillage, chunkCoord);
-		            }
-		        }
-
-		        // Animals
-		        world.placePopulationMobs(biome, rand, chunkCoord);
-
-		        // Snow and ice
-				// TODO: Fire PopulateChunkEvent.Populate.EventType.ICE for Forge
-		        new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
-
-		        // Replace blocks
-		        world.replaceBlocks(chunkCoord);
-
-		        // Mark population ended
-		        OTG.firePopulationEndEvent(world, rand, hasVillage, chunkCoord);
-		        world.endPopulation();
-			}
-
+			doPopulate(chunkCoord);
+			
 			processing = false;
 		} else {
-			if(world.getConfigs().getWorldConfig().isOTGPlus)
-			{
-				// This happens when:
-				// This chunk was populated because of a block being spawned on the
-				// other side of the edge of this chunk,
-				// the block performed a block check inside this chunk upon being
-				// placed (like a torch looking for a wall to stick to)
-				// This means that we must place any BO3 queued for this chunk
-				// because the block being spawned might need to interact with it
-				// (spawn the wall for the torch to stick to).
-				// Unfortunately this means that this chunk will not get a call to
-				// populate() via the usual population
-				// mechanics where we populate 4 BO3's at once in a 2x2 chunks area
-				// and then spawn resources (ore, trees, lakes)
-				// on top of that. Hopefully the neighbouring chunks do get spawned
-				// normally and cover the 2x2 areas this chunk is part of
-				// with enough resources that noone notices some are missing...
-
-				// This can also happen when the server decides to provide and/or
-				// populate a chunk that has already been provided/populated before,
-				// which seems like a bug.
-
-				world.getStructureCache().plotStructures(rand, chunkCoord, false);
-
-				spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()));
-
-				// Get the random generator
-				WorldConfig worldConfig = configProvider.getWorldConfig();
-				long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
-				this.rand.setSeed(resourcesSeed);
-				long l1 = this.rand.nextLong() / 2L * 2L + 1L;
-				long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-				this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
-
-		        // Mark population started
-		        world.startPopulation(chunkCoord);
-		        OTG.firePopulationStartEvent(world, rand, false, chunkCoord);
-
-				// Get the corner block coords
-				int x = chunkCoord.getChunkX() * 16;
-				int z = chunkCoord.getChunkZ() * 16;
-
-				LocalBiome biome = world.getBiome(x + 8, z + 8);
-
-				// Default structures can cause a bigger cascade but we have to spawn them to prevent holes in villages etc
-				boolean hasVillage = world.placeDefaultStructures(rand, chunkCoord);
-
-				// TODO: Reimplement this
-				//if(!worldConfig.improvedMobSpawning)
-				{
-					world.placePopulationMobs(biome, rand, chunkCoord);
-				}
-
-				// Snow and ice
-				//freezeChunk(chunkCoord);
-
-				// Replace blocks
-				//world.replaceBlocks(chunkCoord); // <-- causes nullreference exception when getChunk returns null
-
-		        // Mark population ended
-		        OTG.firePopulationEndEvent(world, rand, false, chunkCoord);
-		        world.endPopulation();
-
-				OTG.log(LogMarker.WARN,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks and can cause lag as well as missing trees, ores and other TC/OTG resources. Please try to find out which mod causes this, disable the feature causing it and alert the mod creator. Set the log level to TRACE in mods/OpenTerrainGenerator/OTG.ini file for a stack trace.");
-				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
-			} else {
-				OTG.log(LogMarker.WARN,"Error, minecraft engine attempted to populate two chunks at once. Chunk X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + ". This is probably caused by a mod spawning blocks in unloaded chunks. Set the log level to Trace in mods/OpenTerrainGenerator/OTG.ini file for a stack trace. Update: Using OTG multi-dimension features may cause this log message occasionally, still need to investigate.");
-				OTG.log(LogMarker.TRACE, Arrays.toString(Thread.currentThread().getStackTrace()));
-
-				// Get the random generator
-				WorldConfig worldConfig = configProvider.getWorldConfig();
-				long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
-				this.rand.setSeed(resourcesSeed);
-				long l1 = this.rand.nextLong() / 2L * 2L + 1L;
-				long l2 = this.rand.nextLong() / 2L * 2L + 1L;
-				this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
-
-		        // Mark population started
-		        world.startPopulation(chunkCoord);
-		        OTG.firePopulationStartEvent(world, rand, false, chunkCoord);
-
-				// Default structures can cause a bigger cascade but we have to spawn them to prevent holes in villages etc
-				boolean hasVillage = world.placeDefaultStructures(rand, chunkCoord);
-
-		        // Mark population ended
-		        OTG.firePopulationEndEvent(world, rand, false, chunkCoord);
-		        world.endPopulation();
+			
+			doPopulate(chunkCoord);
+			
+			OTG.log(LogMarker.INFO, "Cascading chunk generation detected.");
+			if(OTG.getPluginConfig().developerMode)
+			{			
+				OTG.log(LogMarker.INFO, Arrays.toString(Thread.currentThread().getStackTrace()));
 			}
 		}
 
 		// Release the lock
 		synchronized(lockingObject)
 		{
-			populating = false;
+			// This assumes that this method can only be called alone or recursively, never by 2 threads at once.
+			// TODO: Make sure that's the case.
+			if(unlockWhenDone)
+			{
+				populating = false;
+			}
 		}
 
+		if(chunkCoord.equals(this.world.getSpawnChunk()))
+		{
+			this.world.updateSpawnPointY(chunkCoord);
+		}
+		
 		//OTG.log(LogMarker.INFO, "ObjectSpawner DONE populating X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
+    }
+    
+    private void doPopulate(ChunkCoordinate chunkCoord)
+    {
+		if(world.isOTGPlus())
+		{
+			world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
+			world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
+			world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
+			world.getStructureCache().plotStructures(rand, chunkCoord, false);
+
+	        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
+
+	        boolean hasVillage = false;
+
+	        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
+	        {
+	        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
+	        	if(customObject != null)
+	        	{
+	        		if(customObject instanceof BO3)
+	        		{
+	        			int y = 1;
+
+	        			if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestBlock)
+	        			{
+	        				 y = this.world.getHighestBlockAboveYAt(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter(), chunkCoord) - 1;
+	        			}
+	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock)
+	        			{
+	        				y = this.world.getBlockAboveSolidHeight(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter(), chunkCoord) - 1;
+	        			}
+	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.randomY)
+	        			{
+	        				y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
+	        			}
+
+	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
+	        			// TODO: This may spawn the structure across chunk borders if its larger than 16 in any direction from its center.
+	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockX() + 15, y, spawnChunk.getBlockZ() + 15);
+	        		}
+	        	}
+	        } else {
+		        // Generate structures
+		        hasVillage = world.placeDefaultStructures(rand, chunkCoord);
+	        }
+
+			// Get the random generator
+			WorldConfig worldConfig = configProvider.getWorldConfig();
+			long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
+			this.rand.setSeed(resourcesSeed);
+			long l1 = this.rand.nextLong() / 2L * 2L + 1L;
+			long l2 = this.rand.nextLong() / 2L * 2L + 1L;
+			this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
+
+			// Mark population started
+			OTG.firePopulationStartEvent(world, rand, hasVillage, chunkCoord);
+
+			processResourcesPhase2(chunkCoord);
+
+			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), chunkCoord);
+			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), chunkCoord);
+			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), chunkCoord);
+			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord);
+
+			// Generate structures
+
+			processResourcesPhase3(chunkCoord, hasVillage);
+
+			// Mark population ended
+			OTG.firePopulationEndEvent(world, rand, hasVillage, chunkCoord);
+
+		} else {
+
+	        // Get the corner block coords
+	        int x = chunkCoord.getChunkX() * 16;
+	        int z = chunkCoord.getChunkZ() * 16;
+
+	        LocalBiome biome = world.getBiome(x + 15, z + 15);
+
+	        // Null check
+	        if (biome == null)
+	        {
+	            OTG.log(LogMarker.WARN, "Unknown biome at {},{}  (chunk {}). Could not populate chunk.", x + 15, z + 15, chunkCoord);
+	            return;
+	        }
+
+	        BiomeConfig biomeConfig = biome.getBiomeConfig();
+
+	        // Get the random generator
+	        WorldConfig worldConfig = configProvider.getWorldConfig();
+	        long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
+	        this.rand.setSeed(resourcesSeed);
+	        long l1 = this.rand.nextLong() / 2L * 2L + 1L;
+	        long l2 = this.rand.nextLong() / 2L * 2L + 1L;
+	        this.rand.setSeed(chunkCoord.getChunkX() * l1 + chunkCoord.getChunkZ() * l2 ^ resourcesSeed);
+
+	        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
+
+	        boolean hasVillage = false;
+
+	        if(spawnChunk.equals(chunkCoord) && this.world.getConfigs().getWorldConfig().bo3AtSpawn != null && this.world.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
+	        {
+	        	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(this.world.getConfigs().getWorldConfig().bo3AtSpawn, this.world.getConfigs().getWorldConfig().getName());
+	        	if(customObject != null)
+	        	{
+	        		if(customObject instanceof BO3)
+	        		{
+	        			int y = 1;
+
+	        			if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestBlock)
+	        			{
+	        				 y = this.world.getHighestBlockAboveYAt(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter(), chunkCoord) - 1;
+	        			}
+	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.highestSolidBlock)
+	        			{
+	        				y = this.world.getBlockAboveSolidHeight(spawnChunk.getBlockXCenter(), spawnChunk.getBlockZCenter(), chunkCoord) - 1;
+	        			}
+	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.randomY)
+	        			{
+	        				y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
+	        			}
+
+	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
+	        			// TODO: This may spawn the structure across chunk borders if its larger than 16 in any direction from its center.
+	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockX() + 15, y, spawnChunk.getBlockZ() + 15);
+	        		}
+	        	}
+	        } else {
+		        // Generate structures
+		        hasVillage = world.placeDefaultStructures(rand, chunkCoord);
+	        }
+
+	        // Mark population started
+	        world.startPopulation(chunkCoord);
+	        OTG.firePopulationStartEvent(world, rand, hasVillage, chunkCoord);
+
+	        // Resource sequence
+	        for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
+	        {
+	            if (res instanceof Resource)
+	            {
+	                ((Resource)res).process(world, rand, hasVillage, chunkCoord);
+	            }
+	        }
+
+	        // Animals
+	        world.placePopulationMobs(biome, rand, chunkCoord);
+
+	        // Snow and ice
+			// TODO: Fire PopulateChunkEvent.Populate.EventType.ICE for Forge
+	        new FrozenSurfaceHelper(world).freezeChunk(chunkCoord);
+
+	        // Replace blocks
+	        world.replaceBlocks(chunkCoord);
+
+	        // Mark population ended
+	        OTG.firePopulationEndEvent(world, rand, hasVillage, chunkCoord);
+	        world.endPopulation();
+		}
     }
 
 	private void processResourcesPhase2(ChunkCoordinate chunkCoord)
@@ -401,7 +336,7 @@ public class ObjectSpawner
 		{
 			if (
 				(res instanceof OreGen) ||
-				(res instanceof SmallLakeGen) ||
+				(res instanceof SmallLakeGen && !this.world.getStructureCache().isChunkOccupied(chunkCoord)) ||
 				(res instanceof UndergroundLakeGen) || // TODO: look at potential size bug in UnderGroundLakeGen
 				(res instanceof UnderWaterOreGen) || // TODO: This seems to be bugged, generate a plains only world with default settings and no sand appears where it does in TC
 				(res instanceof VeinGen) || // TODO: Test this
@@ -507,7 +442,7 @@ public class ObjectSpawner
 		world.replaceBlocks(chunkCoord);
 	}
 
-	private void spawnBO3s(ChunkCoordinate chunkCoord)
+	private void spawnBO3s(ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated)
 	{
 		// Get the corner block coords
 		int x = chunkCoord.getChunkX() * 16;
@@ -529,30 +464,21 @@ public class ObjectSpawner
 		BO4CustomStructure structureStart = world.getStructureCache().bo4StructureCache.get(chunkCoord);
 		if (structureStart != null && structureStart.start != null)
 		{
-			// SpawnForChunk will call placeComplexSurfaceBlocks for this
-			// chunk (after spawning smooth area but before spawning structure)
-			structureStart.spawnForChunkOTGPlus(chunkCoord, world);
-
-			// All done spawning structures for this chunk, clean up cache
-			if(!world.isInsidePregeneratedRegion(chunkCoord))
-			{
-				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
-			} else {
-				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
-			}
+			structureStart.spawnInChunk(chunkCoord, world, chunkBeingPopulated);
+		} else {
+			// Only trees plotted here			
 		}
-		// Only trees plotted here
-		else if (structureStart != null)
+		
+		// Complex surface blocks
+		// TODO: Reimplement placeComplexSurfaceBlocks?
+		//placeComplexSurfaceBlocks(chunkCoord);
+		
+		// All done spawning structures for this chunk, clean up cache
+		if(!world.isInsidePregeneratedRegion(chunkCoord))
 		{
-			// Complex surface blocks
-			//placeComplexSurfaceBlocks(chunkCoord);
-
-			if(!world.isInsidePregeneratedRegion(chunkCoord))
-			{
-				world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
-			} else {
-				world.getStructureCache().bo4StructureCache.remove(chunkCoord);
-			}
+			world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
+		} else {
+			world.getStructureCache().bo4StructureCache.remove(chunkCoord);
 		}
 	}
 }

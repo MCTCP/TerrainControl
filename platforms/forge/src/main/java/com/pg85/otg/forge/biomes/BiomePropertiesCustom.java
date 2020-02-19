@@ -29,7 +29,7 @@ class BiomePropertiesCustom extends BiomeProperties
         {
             this.setRainDisabled();
         }
-        if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_MAX_TEMP)
+        if (biomeConfig.biomeTemperature <= WorldStandardValues.SNOW_AND_ICE_TEMP)
         {
             this.setSnowEnabled();
         }

@@ -13,26 +13,33 @@ import com.pg85.otg.configuration.settingType.DoubleSetting;
 import com.pg85.otg.configuration.settingType.IntSetting;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
-import com.pg85.otg.forge.gui.IGuiListEntry;
+import com.pg85.otg.forge.gui.GuiHandler;
+import com.pg85.otg.forge.gui.dimensions.base.ButtonEntry;
+import com.pg85.otg.forge.gui.dimensions.base.CategoryEntry;
+import com.pg85.otg.forge.gui.dimensions.base.IGuiListEntry;
+import com.pg85.otg.forge.gui.dimensions.base.KeyEntry;
+import com.pg85.otg.forge.gui.dimensions.base.OTGGuiListExtended;
+import com.pg85.otg.forge.gui.dimensions.base.PregeneratorSettingsEntry;
+import com.pg85.otg.forge.gui.dimensions.base.SettingEntry;
 import com.pg85.otg.forge.pregenerator.Pregenerator;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.util.helpers.StringHelper;
 
 @SideOnly(Side.CLIENT)
 public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 {	
-	final Minecraft mc;
+	public final Minecraft mc;
     private final ArrayList<IGuiListEntry> listEntries;
     private int maxListLabelWidth;
 
-    final OTGGuiDimensionList controlsScreen;
+    public final OTGGuiDimensionList controlsScreen;
     public boolean mainMenu = true;
     public boolean gameRulesMenu = false;
     public boolean advancedSettingsMenu = false;
-	boolean showingPregeneratorStatus;
+	public boolean showingPregeneratorStatus;
     
-	OTGGuiDimensionSettingsList(OTGGuiDimensionList controls, int top, int height, int left, int width, Minecraft mcIn)
+	public OTGGuiDimensionSettingsList(OTGGuiDimensionList controls, int top, int height, int left, int width, Minecraft mcIn)
     {
         super(mcIn, left, width, height, top, height, 24);
         this.controlsScreen = controls;
@@ -42,7 +49,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         refreshData(true, false, false);
     }
     
-    void resize(int topIn, int height, int left, int width)
+    public void resize(int topIn, int height, int left, int width)
     {
         this.width = width;
         this.height = height;
@@ -52,12 +59,12 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         this.right = left + width;
     }
     
-    void refreshData()
+    public void refreshData()
     {
     	refreshData(this.mainMenu, this.gameRulesMenu, this.advancedSettingsMenu);
     }
 
-    void refreshData(boolean mainMenu, boolean gameRulesMenu, boolean advancedSettingsMenu)
+    public void refreshData(boolean mainMenu, boolean gameRulesMenu, boolean advancedSettingsMenu)
     {
     	this.showingPregeneratorStatus = false;
     	this.mainMenu = mainMenu;
@@ -109,12 +116,12 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
     		if(this.mc.isSingleplayer())
     		{
 		        // If this.mc.world is not null then we're ingame
-		        DimensionsConfig defaultConfigs = DimensionsConfig.getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.controlsScreen.previousMenu.selectedPreset.getSecond().PresetName);
+		        DimensionsConfig defaultConfigs = OTG.getEngine().getModPackConfigManager().getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.controlsScreen.previousMenu.selectedPreset.getSecond().PresetName);
 		        defaultConfig = defaultConfigs != null ? defaultConfigs.getDimensionConfig(this.controlsScreen.selectedDimension.PresetName) : null;        
 		        if(defaultConfig == null)
 		        {
 		        	// Get the default values from the world config, stored in presets
-	        		defaultConfig = new DimensionConfig(ForgeEngine.Presets.get(this.controlsScreen.selectedDimension.PresetName));
+	        		defaultConfig = new DimensionConfig(GuiHandler.GuiPresets.get(this.controlsScreen.selectedDimension.PresetName));
 		        }
     		}
         	// TODO: Use const strings instead of hardcoding the same string in multiple places
@@ -129,7 +136,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("Allow cheats", dimConfig.AllowCheats, false, true, true), this, !dimConfig.GameType.equals("Hardcore")));
 		        listEntries.add(new CategoryEntry(this, "OTG settings"));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Pregenerator radius", dimConfig.PregeneratorRadiusInChunks, defaultConfig != null ? defaultConfig.PregeneratorRadiusInChunks : WorldStandardValues.PREGENERATION_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.PREGENERATION_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.PREGENERATION_RADIUS).getMaxValue(), false), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("World border radius", dimConfig.WorldBorderRadiusInChunks, defaultConfig != null ? defaultConfig.WorldBorderRadiusInChunks : WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMaxValue(), true), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("World border radius", dimConfig.WorldBorderRadiusInChunks, defaultConfig != null ? defaultConfig.WorldBorderRadiusInChunks : WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal materials", StringHelper.join(dimConfig.Settings.DimensionPortalMaterials, ", "), defaultConfig != null ? StringHelper.join(defaultConfig.Settings.DimensionPortalMaterials, ", ") : "DIRT", false), this)); // TODO: Fetch default value from worldstandarvalues
 		        
 		        // If world is not null then we're ingame
@@ -186,7 +193,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	        {
 	        	this.controlsScreen.btnCancel.displayString = "Back";
 		        listEntries.add(new CategoryEntry(this, "Game rules"));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("CommandBlockOutput", dimConfig.GameRules.CommandBlockOutput, defaultConfig != null ? defaultConfig.GameRules.CommandBlockOutput : WorldStandardValues.CommandBlockOutput.getDefaultValue(), false), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("CommandBlockOutput", dimConfig.GameRules.CommandBlockOutput, defaultConfig != null ? defaultConfig.GameRules.CommandBlockOutput : WorldStandardValues.CommandBlockOutput.getDefaultValue(), false, true), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("DisableElytraMovementCheck", dimConfig.GameRules.DisableElytraMovementCheck, defaultConfig != null ? defaultConfig.GameRules.DisableElytraMovementCheck : WorldStandardValues.DisableElytraMovementCheck.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("DoDaylightCycle", dimConfig.GameRules.DoDaylightCycle, defaultConfig != null ? defaultConfig.GameRules.DoDaylightCycle : WorldStandardValues.DoDaylightCycle.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("DoEntityDrops", dimConfig.GameRules.DoEntityDrops, defaultConfig != null ? defaultConfig.GameRules.DoEntityDrops : WorldStandardValues.DoEntityDrops.getDefaultValue(), false), this));
@@ -196,16 +203,16 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("DoMobSpawning", dimConfig.GameRules.DoMobSpawning, defaultConfig != null ? defaultConfig.GameRules.DoMobSpawning : WorldStandardValues.DoMobSpawning.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("DoTileDrops", dimConfig.GameRules.DoTileDrops, defaultConfig != null ? defaultConfig.GameRules.DoTileDrops : WorldStandardValues.DoTileDrops.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("DoWeatherCycle", dimConfig.GameRules.DoWeatherCycle, defaultConfig != null ? defaultConfig.GameRules.DoWeatherCycle : WorldStandardValues.DoWeatherCycle.getDefaultValue(), false), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("GameLoopFunction", dimConfig.GameRules.GameLoopFunction, defaultConfig != null ? defaultConfig.GameRules.GameLoopFunction : WorldStandardValues.GameLoopFunction.getDefaultValue(), false), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("GameLoopFunction", dimConfig.GameRules.GameLoopFunction, defaultConfig != null ? defaultConfig.GameRules.GameLoopFunction : WorldStandardValues.GameLoopFunction.getDefaultValue(), false, true), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("KeepInventory", dimConfig.GameRules.KeepInventory, defaultConfig != null ? defaultConfig.GameRules.KeepInventory : WorldStandardValues.KeepInventory.getDefaultValue(), false), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("LogAdminCommands", dimConfig.GameRules.LogAdminCommands, defaultConfig != null ? defaultConfig.GameRules.LogAdminCommands : WorldStandardValues.LogAdminCommands.getDefaultValue(), false), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("MaxCommandChainLength", dimConfig.GameRules.MaxCommandChainLength , defaultConfig != null ? defaultConfig.GameRules.MaxCommandChainLength : WorldStandardValues.MaxCommandChainLength.getDefaultValue(), ((IntSetting)WorldStandardValues.MaxCommandChainLength).getMinValue(), ((IntSetting)WorldStandardValues.MaxCommandChainLength).getMaxValue(), false), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("LogAdminCommands", dimConfig.GameRules.LogAdminCommands, defaultConfig != null ? defaultConfig.GameRules.LogAdminCommands : WorldStandardValues.LogAdminCommands.getDefaultValue(), false, true), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("MaxCommandChainLength", dimConfig.GameRules.MaxCommandChainLength , defaultConfig != null ? defaultConfig.GameRules.MaxCommandChainLength : WorldStandardValues.MaxCommandChainLength.getDefaultValue(), ((IntSetting)WorldStandardValues.MaxCommandChainLength).getMinValue(), ((IntSetting)WorldStandardValues.MaxCommandChainLength).getMaxValue(), false, true), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("MaxEntityCramming", dimConfig.GameRules.MaxEntityCramming, defaultConfig != null ? defaultConfig.GameRules.MaxEntityCramming : WorldStandardValues.MaxEntityCramming.getDefaultValue(), ((IntSetting)WorldStandardValues.MaxEntityCramming).getMinValue(), ((IntSetting)WorldStandardValues.MaxEntityCramming).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("MobGriefing", dimConfig.GameRules.MobGriefing, defaultConfig != null ? defaultConfig.GameRules.MobGriefing : WorldStandardValues.MobGriefing.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("NaturalRegeneration", dimConfig.GameRules.NaturalRegeneration, defaultConfig != null ? defaultConfig.GameRules.NaturalRegeneration : WorldStandardValues.NaturalRegeneration.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("RandomTickSpeed", dimConfig.GameRules.RandomTickSpeed, defaultConfig != null ? defaultConfig.GameRules.RandomTickSpeed : WorldStandardValues.RandomTickSpeed.getDefaultValue(), ((IntSetting)WorldStandardValues.RandomTickSpeed).getMinValue(), ((IntSetting)WorldStandardValues.RandomTickSpeed).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("ReducedDebugInfo", dimConfig.GameRules.ReducedDebugInfo, defaultConfig != null ? defaultConfig.GameRules.ReducedDebugInfo : WorldStandardValues.ReducedDebugInfo.getDefaultValue(), false), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("SendCommandFeedback", dimConfig.GameRules.SendCommandFeedback, defaultConfig != null ? defaultConfig.GameRules.SendCommandFeedback : WorldStandardValues.SendCommandFeedback.getDefaultValue(), false), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("SendCommandFeedback", dimConfig.GameRules.SendCommandFeedback, defaultConfig != null ? defaultConfig.GameRules.SendCommandFeedback : WorldStandardValues.SendCommandFeedback.getDefaultValue(), false, true), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("ShowDeathMessages", dimConfig.GameRules.ShowDeathMessages, defaultConfig != null ? defaultConfig.GameRules.ShowDeathMessages : WorldStandardValues.ShowDeathMessages.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("SpawnRadius", dimConfig.GameRules.SpawnRadius, defaultConfig != null ? defaultConfig.GameRules.SpawnRadius : WorldStandardValues.SpawnRadius.getDefaultValue(), ((IntSetting)WorldStandardValues.SpawnRadius).getMinValue(), ((IntSetting)WorldStandardValues.SpawnRadius).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("SpectatorsGenerateChunks", dimConfig.GameRules.SpectatorsGenerateChunks, defaultConfig != null ? defaultConfig.GameRules.SpectatorsGenerateChunks : WorldStandardValues.SpectatorsGenerateChunks.getDefaultValue(), false), this));
@@ -216,9 +223,9 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        	if(this.mc.isSingleplayer())
 		        	{
 		        		listEntries.add(new CategoryEntry(this, "* Close the OTG menu to apply game rules *"));
-		        	}
-		        	listEntries.add(new CategoryEntry(this, "* Don't use /gamerule, it's overworld only *"));
+		        	}		        
 		        }
+		        listEntries.add(new CategoryEntry(this, "* /gamerule, /time and /weather are overworld only *"));
 	
 		        listEntries.add(new ButtonEntry(this, this, "Back"));
 	        }
@@ -240,6 +247,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("SpawnPointX", dimConfig.Settings.SpawnPointX, defaultConfig != null ? defaultConfig.Settings.SpawnPointX : WorldStandardValues.SPAWN_POINT_X.getDefaultValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_X).getMinValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_X).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("SpawnPointY", dimConfig.Settings.SpawnPointY, defaultConfig != null ? defaultConfig.Settings.SpawnPointY : WorldStandardValues.SPAWN_POINT_Y.getDefaultValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Y).getMinValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Y).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("SpawnPointZ", dimConfig.Settings.SpawnPointZ, defaultConfig != null ? defaultConfig.Settings.SpawnPointZ : WorldStandardValues.SPAWN_POINT_Z.getDefaultValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Z).getMinValue(), ((IntSetting)WorldStandardValues.SPAWN_POINT_Z).getMaxValue(), false), this));
+		        
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("TeleportToSpawnOnly", dimConfig.Settings.TeleportToSpawnOnly, defaultConfig != null ? defaultConfig.Settings.TeleportToSpawnOnly : WorldStandardValues.TeleportToSpawnOnly.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("WelcomeMessage", dimConfig.Settings.WelcomeMessage, defaultConfig != null ? defaultConfig.Settings.WelcomeMessage : WorldStandardValues.WelcomeMessage.getDefaultValue(), false), this));	        
 		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("DepartMessage", dimConfig.Settings.DepartMessage, defaultConfig != null ? defaultConfig.Settings.DepartMessage : WorldStandardValues.DepartMessage.getDefaultValue(), false), this));
@@ -283,8 +291,22 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("DimensionBelow", dimConfig.Settings.DimensionBelow, defaultConfig != null ? defaultConfig.Settings.DimensionBelow : WorldStandardValues.DIMENSIONBELOW.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("DimensionBelowHeight", dimConfig.Settings.DimensionBelowHeight, defaultConfig != null ? defaultConfig.Settings.DimensionBelowHeight : WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue(), ((IntSetting)WorldStandardValues.DIMENSIONBELOWHEIGHT).getMinValue(), ((IntSetting)WorldStandardValues.DIMENSIONBELOWHEIGHT).getMaxValue(), false), this));
 		        
+		        listEntries.add(new CategoryEntry(this, "BO4 structures"));
+		        
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("IsOTGPlus", dimConfig.Settings.IsOTGPlus, defaultConfig != null ? defaultConfig.Settings.IsOTGPlus : WorldStandardValues.IS_OTG_PLUS.getDefaultValue(), true), this));
+
 		        listEntries.add(new CategoryEntry(this, ""));
 		        listEntries.add(new ButtonEntry(this, this, "Back"));
+		        listEntries.add(new CategoryEntry(this, ""));
+		        listEntries.add(new CategoryEntry(this, "* OTG+ uses BO4 structures with tons of new features *"));
+		        listEntries.add(new CategoryEntry(this, "* and allows them to be spawned via /otg spawn. *"));
+		        listEntries.add(new CategoryEntry(this, "* Make sure your preset supports BO4 structures, *"));
+		        listEntries.add(new CategoryEntry(this, "* Biome Bundle doesn't, future presets will. *"));	        
+		        listEntries.add(new CategoryEntry(this, ""));
+		        listEntries.add(new CategoryEntry(this, "* Want to make your own OTG presets? * "));
+		        listEntries.add(new CategoryEntry(this, "* Check out the configs and the docs * "));
+		        listEntries.add(new CategoryEntry(this, "* and join us on the OTG Discord! * "));
+		        listEntries.add(new CategoryEntry(this, ""));
 	        }
     	}
 
@@ -299,7 +321,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         }
     }
     
-    void applySettings()
+    public void applySettings()
     {
         DimensionConfig dimConfig = this.controlsScreen.selectedDimension;
     	    	
@@ -524,6 +546,9 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	            			break;
 	            		case "SpawnPointZ":
 	            			dimConfig.Settings.SpawnPointZ = Integer.parseInt(entry.getDisplayText());
+	            			break;	            			
+	            		case "IsOTGPlus":
+	            			dimConfig.Settings.IsOTGPlus = entry.getDisplayText().equals("On");
 	            			break;
 	            		case "TeleportToSpawnOnly":
 	            			dimConfig.Settings.TeleportToSpawnOnly = entry.getDisplayText().equals("On");

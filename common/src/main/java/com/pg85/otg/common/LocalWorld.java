@@ -1,8 +1,6 @@
 package com.pg85.otg.common;
 
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
-import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
@@ -11,13 +9,13 @@ import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
+import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Random;
 
 public interface LocalWorld
@@ -108,9 +106,6 @@ public interface LocalWorld
 
     public LocalBiome getBiomeByNameOrNull(String name);
 
-    public Collection<? extends BiomeLoadInstruction> getDefaultBiomes();
-
-
     /**
      * Calculates the biome at the given coordinates. This is usually taken
      * from the biome generator, but this can be changed using the
@@ -176,9 +171,7 @@ public interface LocalWorld
      */
     public void placePopulationMobs(LocalBiome biome, Random random, ChunkCoordinate chunkCoord);
 
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
-
-	void spawnEntity(EntityFunction<?> entityData);
+	void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated);
     
     // Population start and end
     
@@ -198,34 +191,24 @@ public interface LocalWorld
     public void endPopulation();
 
     // Blocks
+        
+    public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
+
+    public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
+
+    public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
+
+    public int getHighestBlockAboveYAt(int x, int z, ChunkCoordinate chunkBeingPopulated);
     
-    public LocalMaterialData getMaterial(int x, int y, int z, boolean allowOutsidePopulatingArea);
+    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingPopulated);
 
-    public boolean isNullOrAir(int x, int y, int z, boolean allowOutsidePopulatingArea);
-
-    public NamedBinaryTag getMetadata(int x, int y, int z);
-
-    public int getLiquidHeight(int x, int z);
-
-    /**
-     * @return The y location of the block above the highest solid block.
-     */
-    public int getSolidHeight(int x, int z);
-
-    /**
-     * @return The y location of the block above the highest block.
-     */
-    public int getHighestBlockYAt(int x, int z);
-
-    public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow);
+	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated);
     
-    public int getLightLevel(int x, int y, int z);
+    public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 
-    public boolean isLoaded(int x, int y, int z);   
-
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isOTPLus);
-
-	public LocalMaterialData[] getBlockColumn(int x, int z);
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated);
+	
+	public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z);
 	
     /**
      * Executes ReplacedBlocks.
@@ -254,7 +237,11 @@ public interface LocalWorld
 
 	public ChunkCoordinate getSpawnChunk();
 
-	public void setAllowSpawningOutsideBounds(boolean b);
-
 	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer);
+
+	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
+
+	public boolean isOTGPlus();
+	
+	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated);
 }

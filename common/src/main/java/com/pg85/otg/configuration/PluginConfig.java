@@ -21,18 +21,18 @@ public final class PluginConfig extends ConfigFile
 	/**
 	 * Shows detailed information about mob and BO3 spawning that is useful for TC world devs.
 	 */
-	public boolean spawnLog = false;    
+	public boolean spawnLog = PluginStandardValues.SPAWN_LOG.getDefaultValue();    
 
 	/**
 	 * Having developermode enabled means BO3's are reloaded when rejoining an SP world. 
 	 */
-    public boolean developerMode = false;
+    public boolean developerMode = PluginStandardValues.DEVELOPER_MODE.getDefaultValue();
     
 	/**
 	 * Forge only: This is the number of chunks the pre-generator generates each server tick.
 	 * Higher values make pre-generation faster but can cause lag and increased memory usage.
 	 */
-	public int pregeneratorMaxChunksPerTick = 1;
+	public int pregeneratorMaxChunksPerTick = PluginStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK.getDefaultValue();
     
     public enum LogLevels
     {

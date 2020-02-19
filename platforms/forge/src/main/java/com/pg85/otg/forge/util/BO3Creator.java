@@ -18,11 +18,11 @@ import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.helpers.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.sk89q.worldedit.Vector;
 import com.sk89q.worldedit.regions.Region;
 
@@ -30,12 +30,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BO3Creator
+public class BO3Creator extends BOCreator
 {
-    private String name;
-    private boolean includeAir = false;
-    private boolean includeTiles = false;
-
     public BO3Creator(String name)
     {
         this.name = name;
@@ -171,7 +167,7 @@ public class BO3Creator
 
                     ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(block);
 
-                    if (includeAir || !material.isMaterial(DefaultMaterial.AIR))
+                    if (includeAir || !material.isAir())
                     {
                         BO3BlockFunction blockFunction;
 
@@ -179,7 +175,7 @@ public class BO3Creator
                         {
                             blockFunction = (BO3BlockFunction) CustomObjectConfigFunction.create(null,
                                     BO3BlockFunction.class,
-                                    x - ((chunkCoordinates.getBlockX() * 16) + start.getBlockX()) - 8, y - centerPointY,
+                                    x - ((chunkCoordinates.getChunkX() * 16) + start.getBlockX()) - 8, y - centerPointY,
                                     z - ((chunkCoordinates.getChunkZ() * 16) + start.getBlockZ()) - 7, material);
                         } else {
                             blockFunction = (BO3BlockFunction) CustomObjectConfigFunction.create(null,
@@ -278,10 +274,14 @@ public class BO3Creator
                     bo3.onEnable();
 
                     if (!isStartBO3 || !branch)
+                    {
                         bo3.getSettings().extractBlocks(blocks);
+                    }
 
                     if (!branches.isEmpty())
+                    {
                         bo3.getSettings().setBranches(branches);
+                    }
 
                     bo3.getSettings().rotateBlocksAndChecks();
 
@@ -311,28 +311,5 @@ public class BO3Creator
             }
         }
         return true;
-
-    }
-
-    private String getTileEntityName(NamedBinaryTag tag)
-    {
-        NamedBinaryTag idTag = tag.getTag("id");
-        if (idTag != null)
-        {
-            String name = (String) idTag.getValue();
-
-            return name.replace("minecraft:", "").replace(':', '_');
-        }
-        return "Unknown";
-    }
-
-    public void includeAir(boolean include)
-    {
-        this.includeAir = include;
-    }
-
-    public void includeTiles(boolean include)
-    {
-        this.includeTiles = include;
     }
 }

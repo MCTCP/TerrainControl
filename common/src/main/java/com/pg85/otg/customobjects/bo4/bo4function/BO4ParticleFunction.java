@@ -1,11 +1,8 @@
 package com.pg85.otg.customobjects.bo4.bo4function;
 
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;

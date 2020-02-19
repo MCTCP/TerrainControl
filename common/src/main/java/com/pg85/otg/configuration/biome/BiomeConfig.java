@@ -19,9 +19,9 @@ import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
-import com.pg85.otg.util.helpers.MaterialHelper;
 import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -90,8 +90,10 @@ public class BiomeConfig extends ConfigFile
     public int waterColor;
 
     public int grassColor;
+    public int grassColor2;
     public boolean grassColorIsMultiplier;
     public int foliageColor;
+    public int foliageColor2;
     public boolean foliageColorIsMultiplier;
     
     public int fogColor;
@@ -256,27 +258,27 @@ public class BiomeConfig extends ConfigFile
      */
     public int getSnowHeight(float temp)
     {
-    	// TODO: Reimplement this
-    	/*
-        if (this.worldConfig.useTemperatureForSnowHeight)
-        {
-            if (temp <= -.75)
-                return 7;
-            if (temp <= -.7)
-                return 6;
-            if (temp <= -.65)
-                return 5;
-            if (temp <= -.575)
-                return 4;
-            if (temp <= -.55)
-                return 3;
-            if (temp <= -.525)
-                return 2;
-            if (temp <= -.5)
-                return 1;
-        }
-        */
-        return 0;
+    	// OTG biome temperature is between 0.0 and 2.0.
+    	// Judging by WorldStandardValues.SNOW_AND_ICE_MAX_TEMP, snow should appear below 0.15.
+    	// According to the configs, snow and ice should appear between 0.2 (at y > 90) and 0.1 (entire biome covered in ice).
+    	// Let's make sure that at 0.2, snow layers start with thickness 0 at y 90 and thickness 7 around y 255.
+    	// In a 0.2 temp biome, y90 temp is 0.156, y255 temp is -0.12
+    	   	
+    	float snowTemp = WorldStandardValues.SNOW_AND_ICE_TEMP;
+    	if(temp <= snowTemp)
+    	{
+        	float maxColdTemp = WorldStandardValues.SNOW_AND_ICE_MAX_TEMP;
+        	float maxThickness = 7.0f;
+        	if(temp < maxColdTemp)
+        	{
+        		return (int)maxThickness;
+        	}
+        	float range = Math.abs(maxColdTemp - snowTemp);
+        	float fraction = Math.abs(maxColdTemp - temp);
+    		return (int)Math.floor((1.0f - (fraction / range)) * maxThickness);
+    	}
+
+    	return  0;
     }
 
     public SaplingGen getSaplingGen(SaplingType type)
@@ -336,8 +338,10 @@ public class BiomeConfig extends ConfigFile
         this.skyColor = settings.getSetting(BiomeStandardValues.SKY_COLOR);
         this.waterColor = settings.getSetting(BiomeStandardValues.WATER_COLOR, defaultSettings.defaultWaterColorMultiplier);
         this.grassColor = settings.getSetting(BiomeStandardValues.GRASS_COLOR, defaultSettings.defaultGrassColor);
+        this.grassColor2 = settings.getSetting(BiomeStandardValues.GRASS_COLOR_2, defaultSettings.defaultGrassColor);
         this.grassColorIsMultiplier = settings.getSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER);
         this.foliageColor = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR, defaultSettings.defaultFoliageColor);
+        this.foliageColor2 = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR_2, defaultSettings.defaultFoliageColor);
         this.foliageColorIsMultiplier = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER);
         this.fogColor = settings.getSetting(BiomeStandardValues.FOG_COLOR);
         this.fogDensity = settings.getSetting(BiomeStandardValues.FOG_DENSITY);
@@ -433,12 +437,7 @@ public class BiomeConfig extends ConfigFile
                 }
                 if(res instanceof CustomStructureGen)
                 {
-                	// For non-OTG+ worlds, only allow one customstructure per biome.
-                	// For inherited biomes, the child overrides the parent.
-                	if(this.worldConfig.isOTGPlus || this.customStructures.size() == 0)
-                	{
-                		this.customStructures.add((CustomStructureGen)res);
-                	}
+            		this.customStructures.add((CustomStructureGen)res);
                 }
             }
         }
@@ -694,10 +693,15 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.WATER_COLOR, this.waterColor,
                 "Biome water color multiplier.");
-
+        
         writer.putSetting(BiomeStandardValues.GRASS_COLOR, this.grassColor,
                 "Biome grass color.");
 
+        writer.putSetting(BiomeStandardValues.GRASS_COLOR_2, this.grassColor2,
+                "Biome grass color 2, used to create a gradient like vanilla swamps," +
+                "only works when " + BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER.getName() + " is set to false." +
+                "Forge only atm.");
+        
         writer.putSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER, this.grassColorIsMultiplier,
                 "Whether the grass color is a multiplier.",
                 "If you set it to true, the color will be based on this value, the BiomeTemperature and the BiomeWetness.",
@@ -705,6 +709,11 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR, this.foliageColor,
                 "Biome foliage color.");
+        
+        writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_2, this.foliageColor2,
+                "Biome foliage color 2, used to create a gradient like vanilla swamp grass," +
+                "only works when " + BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER.getName() + " is set to false." +
+                "Forge only atm.");
              
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, this.foliageColorIsMultiplier,
                 "Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
@@ -1114,17 +1123,25 @@ public class BiomeConfig extends ConfigFile
         settings.putSetting(mobSetting, groups);
     }
 
+    // See ClientConfigProvider for reading
     public void writeToStream(DataOutput stream, boolean isSinglePlayer) throws IOException
     {
         StreamHelper.writeStringToStream(stream, getName());
 
         stream.writeFloat(this.biomeTemperature);
         stream.writeFloat(this.biomeWetness);
+        stream.writeInt(this.fogColor);
+        stream.writeFloat(this.fogDensity);
+        stream.writeFloat(this.fogRainWeight);
+        stream.writeFloat(this.fogThunderWeight);
+        stream.writeFloat(this.fogTimeWeight);        
         stream.writeInt(this.skyColor);
         stream.writeInt(this.waterColor);
         stream.writeInt(this.grassColor);
+        stream.writeInt(this.grassColor2);
         stream.writeBoolean(this.grassColorIsMultiplier);
         stream.writeInt(this.foliageColor);
+        stream.writeInt(this.foliageColor2);
         stream.writeBoolean(this.foliageColorIsMultiplier);
 
         StreamHelper.writeStringToStream(stream, this.replaceToBiomeName);        

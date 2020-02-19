@@ -21,6 +21,7 @@ import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.fallbacks.BlockFallback;
 import com.pg85.otg.configuration.fallbacks.FallbackConfig;
+import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.io.SimpleSettingsMap;
 import com.pg85.otg.configuration.settingType.Setting;
@@ -30,7 +31,7 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -177,7 +178,6 @@ public class WorldConfig extends ConfigFile
     public LocalMaterialData cooledLavaBlock;
     public boolean betterSnowFall;
     public boolean fullyFreezeLakes;
-    //public boolean useTemperatureForSnowHeight;
 
     public double fractureHorizontal;
     public double fractureVertical;
@@ -430,7 +430,7 @@ public class WorldConfig extends ConfigFile
                 }
             }
         }
-        return OTG.getEngine().toLocalMaterialData(DefaultMaterial.AIR, 0);
+        return null;
     }
     
     public double getFractureHorizontal()
@@ -606,8 +606,7 @@ public class WorldConfig extends ConfigFile
     	this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME);
     	
         // Freeze & Snow Settings
-        //this.useTemperatureForSnowHeight = reader.getSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT);
-        this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL);
+    	this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL);
         this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES);
 
         // Rivers
@@ -1115,55 +1114,49 @@ public class WorldConfig extends ConfigFile
         if (this.populateUsingSavedBiomes)
         {
             writer.putSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, this.populateUsingSavedBiomes,
-            		"Update: Broken since 1.12.2 v7, still need to update this to work with changes.",
-                    "Advanced setting, only written to this file when set to true.",
-                    "If it is set to true the biome populator will use the biome ids present in the",
-                    "chunk data, ignoring the biome generator. This is useful if you have a premade",
-                    "map made with for example WorldPainter, but still want to populate it using "
-                            + PluginStandardValues.PLUGIN_NAME + ".",
-                    "Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome",
-                    "specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
-                            + " to populate the chunk, instead of the biome itself.");
+        		"Update: Broken since 1.12.2 v7, still need to update this to work with changes.",
+                "Advanced setting, only written to this file when set to true.",
+                "If it is set to true the biome populator will use the biome ids present in the",
+                "chunk data, ignoring the biome generator. This is useful if you have a premade",
+                "map made with for example WorldPainter, but still want to populate it using "
+                        + PluginStandardValues.PLUGIN_NAME + ".",
+                "Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome",
+                "specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
+                        + " to populate the chunk, instead of the biome itself.");
         }
 
         writer.smallTitle("Water / Lava & Frozen States");
 
         writer.putSetting(WorldStandardValues.WATER_LEVEL_MAX, this.waterLevelMax,
-                "Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
+            "Set water level. Every empty block under this level will be fill water or another block from WaterBlock ");
         writer.putSetting(WorldStandardValues.WATER_LEVEL_MIN, this.waterLevelMin);
 
         writer.putSetting(WorldStandardValues.WATER_BLOCK, this.waterBlock,
-                "Block used as water in WaterLevel.");
+            "Block used as water in WaterLevel.");
 
         writer.putSetting(WorldStandardValues.ICE_BLOCK, this.iceBlock,
-                "Block used as ice.");
+            "Block used as ice.");
 
         writer.putSetting(WorldStandardValues.COOLED_LAVA_BLOCK, this.cooledLavaBlock,
-                "Block used as cooled or frozen lava.",
-                "Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
+            "Block used as cooled or frozen lava.",
+            "Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
 
         writer.smallTitle("World only");
 
         writer.putSetting(WorldStandardValues.FULLY_FREEZE_LAKES, this.fullyFreezeLakes,
-                "By Default in cold biomes, lakes freeze but only water exposed to sky is frozen.",
-                "Setting this to true causes any lake in a cold biome with at least one block exposed to sky to completely freeze");
-
-        /*
-        writer.putSetting(WorldStandardValues.USE_TEMPERATURE_FOR_SNOW_HEIGHT, this.useTemperatureForSnowHeight,
-                "By Default, all snow is 1 layer high. When this setting is set to true, snow height is",
-                "determined by biome temperature and therefore height.",
-                "For now: A block temp > -.5 yields a single snow layer. A block temp < -.75 yields max snow layers.",
-                "All values in the range -.75 < temp < -.5 are evenly distributed.");
-        */
+            "By Default in cold biomes, lakes freeze but only water exposed to sky is frozen.",
+            "Setting this to true causes any lake in a cold biome with at least one block exposed to sky to completely freeze");
 
         writer.putSetting(WorldStandardValues.BETTER_SNOW_FALL, this.betterSnowFall,
-                "By Default, snow falls on the highest block only.",
-                "Setting this to true will cause snow to fall through leaves but leave a little snow on the way");
-
+            "By Default, 1 layer of snow falls on the highest block only.",
+            "Set this to true to make the amount of layers (1-8) dependent on biome temperatur.",
+            "Higher altitudes have lower temperatures, so snow is more thick high up in the mountains.",        
+    		"Also causes snow to fall through leaves, leaves can carry 3 layers, the rest falls through.");
+        
         writer.bigTitle("Resources");
 
         writer.putSetting(WorldStandardValues.RESOURCES_SEED, this.resourcesSeed,
-                "Seed used for the resource generation. Can only be numeric. Set to 0 to use the world seed.");
+            "Seed used for the resource generation. Can only be numeric. Set to 0 to use the world seed.");
 
         if (objectSpawnRatio != 1)
         {
@@ -1183,84 +1176,84 @@ public class WorldConfig extends ConfigFile
 
         // Structures
         writer.bigTitle("Structures",
-                "Generate-structures in the server.properties file is ignored by Open Terrain Generator. Use these settings instead.",
-                "");
+            "Generate-structures in the server.properties file is ignored by Open Terrain Generator. Use these settings instead.",
+            "");
 
         // Strongholds
         writer.smallTitle("Strongholds");
 
         writer.putSetting(WorldStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled,
-                "Set this to false to prevent the stronghold generator from doing anything.");
+            "Set this to false to prevent the stronghold generator from doing anything.");
 
         writer.putSetting(WorldStandardValues.STRONGHOLD_COUNT, this.strongholdCount,
-                "The number of strongholds in the world.");
+            "The number of strongholds in the world.");
 
         writer.putSetting(WorldStandardValues.STRONGHOLD_DISTANCE, this.strongholdDistance,
-                "How far strongholds are from the spawn and other strongholds (minimum is 1.0, default is 32.0).");
+            "How far strongholds are from the spawn and other strongholds (minimum is 1.0, default is 32.0).");
 
         writer.putSetting(WorldStandardValues.STRONGHOLD_SPREAD, this.strongholdSpread,
-                "How concentrated strongholds are around the spawn (minimum is 1, default is 3). Lower number, lower concentration.");
+            "How concentrated strongholds are around the spawn (minimum is 1, default is 3). Lower number, lower concentration.");
 
         // Villages
         writer.smallTitle("Villages");
 
         writer.putSetting(WorldStandardValues.VILLAGES_ENABLED, this.villagesEnabled,
-                "Whether the villages are enabled or not.");
+            "Whether the villages are enabled or not.");
 
         writer.putSetting(WorldStandardValues.VILLAGE_SIZE, this.villageSize,
-                "The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
+            "The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
 
         writer.putSetting(WorldStandardValues.VILLAGE_DISTANCE, this.villageDistance,
-                "The minimum distance between the village centers in chunks. Minimum value is 9.");
+            "The minimum distance between the village centers in chunks. Minimum value is 9.");
 
         // Rare buildings
         writer.smallTitle("Rare buildings",
-                "Rare buildings are either desert pyramids, jungle temples or swamp huts.");
+            "Rare buildings are either desert pyramids, jungle temples or swamp huts.");
 
         writer.putSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, this.rareBuildingsEnabled,
-                "Whether rare buildings are enabled.");
+            "Whether rare buildings are enabled.");
 
         writer.putSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.minimumDistanceBetweenRareBuildings,
-                "The minimum distance between rare buildings in chunks.");
+            "The minimum distance between rare buildings in chunks.");
 
         writer.putSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings,
-                "The maximum distance between rare buildings in chunks.");
+            "The maximum distance between rare buildings in chunks.");
 
         // Woodland Mansions
         writer.smallTitle("Woodland Mansions");
 
         writer.putSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, this.woodLandMansionsEnabled,
-                "Whether woodland mansions are enabled.");
+            "Whether woodland mansions are enabled.");
 
         // Ocean monuments
         writer.smallTitle("Ocean monuments");
 
         writer.putSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled,
-                "Whether ocean monuments are enabled.");
+            "Whether ocean monuments are enabled.");
 
         writer.putSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, this.oceanMonumentGridSize,
-                "Ocean monuments are placed on the corners of a grid, with a random offset added to each corner.",
-                "The first variable is the size of the grid in chunks.",
-                "Setting this to 8 will give a grid with cells of 8x8 chunks.");
+            "Ocean monuments are placed on the corners of a grid, with a random offset added to each corner.",
+            "The first variable is the size of the grid in chunks.",
+            "Setting this to 8 will give a grid with cells of 8x8 chunks.");
 
         writer.putSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, this.oceanMonumentRandomOffset,
-                "Random offset from each corner in chunks, on both the x and z axis.",
-                "May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
+            "Random offset from each corner in chunks, on both the x and z axis.",
+            "May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
 
         // Custom structures
         writer.smallTitle("Custom structures and objects");
 
         writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.isOTGPlus,
-                "Set this to true to use BO4's for CustomStructure().",
-                "BO4's allow for collision detection, fine control over structure distribution, advanced branching mechanics for",
-                "procedurally generated structures, smoothing areas, extremely large structures, settings for blending structures",
-                "with surrounding terrain, etc."
+            "Set this to true to use BO4's for CustomStructure().",
+            "BO4's allow for collision detection, fine control over structure distribution, advanced branching mechanics for",
+            "procedurally generated structures, smoothing areas, extremely large structures, settings for blending structures",
+            "with surrounding terrain, etc."
 		);
 
         writer.putSetting(WorldStandardValues.REPLACE_BLOCKS_LIST, this.replaceBlocksList,
-        "A list of blocks that will be replaced in all BO2's/BO3's",
-        "For instance: [{\"BEACON\":\"AIR\"},{\"DIAMOND_BLOCK\":\"AIR\"}]",
-        "Defaults to: []"
+	        "A list of blocks that will be replaced in all BO2's/BO3's",
+	        "For instance: [{\"BEACON\":\"AIR\"},{\"DIAMOND_BLOCK\":\"AIR\"}]",
+	        "Defaults to: []"
 		);
 
         //
@@ -1485,27 +1478,32 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION, this.itemsToAddOnJoinDimension,
         		"Similar to the /give command, gives players items when they enter a dimension/world.",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (single): { \"flint_and_steel\", \"1\" }",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",
         		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
         		"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION, this.itemsToRemoveOnJoinDimension,
         		"The opposite of the /give command, removes items from players inventories when they enter a dimension/world.",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (single): { \"flint_and_steel\", \"1\" }",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
         		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
         		"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION, this.itemsToAddOnLeaveDimension,
         		"Similar to the /give command, gives players items when they leave a dimension/world.",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (single): { \"flint_and_steel\", \"1\" }",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
         		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
     			"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION, this.itemsToRemoveOnLeaveDimension,
         		"The opposite of the /give command, removes items from players inventories when they leave a dimension/world.",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (single): { \"flint_and_steel\", \"1\" }",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
         		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
     			"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN, this.itemsToAddOnRespawn,
         		"Similar to the /give command, gives players items when they respawn in a dimension/world.",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }",
+        		"Example (single): { \"flint_and_steel\", \"1\" }",
+        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",
         		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
     			"Use -1 as amount to remove all matching items.");
 
@@ -1582,4 +1580,15 @@ public class WorldConfig extends ConfigFile
                 "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome."
 				);
     }
+    
+	public static WorldConfig loadWorldConfigFromDisk(File worldDir)
+	{
+        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+        if(!worldConfigFile.exists())
+        {
+        	return null;
+        }
+        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
+        return new WorldConfig(worldDir, settingsMap, null, null);
+	}
 }

@@ -6,7 +6,6 @@ import java.io.EOFException;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 public class StreamHelper

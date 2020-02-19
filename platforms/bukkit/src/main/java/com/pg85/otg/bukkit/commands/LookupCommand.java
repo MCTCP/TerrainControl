@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.bukkit.command.CommandSender;
 
-import com.pg85.otg.bukkit.BukkitBiome;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.bukkit.biomes.BukkitBiome;
 import com.pg85.otg.common.LocalWorld;
 
 public class LookupCommand extends BaseCommand

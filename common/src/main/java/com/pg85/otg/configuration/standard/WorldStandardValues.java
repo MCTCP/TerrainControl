@@ -36,7 +36,12 @@ public class WorldStandardValues extends Settings
      * Temperatures below this temperature will cause the biome to be covered
      * by snow.
      */
-    public static final float SNOW_AND_ICE_MAX_TEMP = 0.15F;
+	// OTG biome temperature is between 0.0 and 2.0, snow should appear below 0.15.
+	// According to the configs, snow and ice should appear between 0.2 (at y > 90) and 0.1 (entire biome covered in ice).
+	// Make sure that at 0.2, snow layers start with thickness 0 at y 90 and thickness 7 around y255.
+	// In a 0.2 temp biome, y90 temp is 0.156, y255 temp is -0.12
+    public static final float SNOW_AND_ICE_TEMP = 0.15F;
+    public static final float SNOW_AND_ICE_MAX_TEMP = -0.115f;
     public static final float ICE_GROUP_MAX_TEMP = 0.33F;
 
     public static class BiomeGroupNames
@@ -92,22 +97,22 @@ public class WorldStandardValues extends Settings
         ICE_SIZE = intSetting("IceSize", 3, 0, 20),
         RIVER_RARITY = intSetting("RiverRarity", 4, 0, 20),
         RIVER_SIZE = intSetting("RiverSize", 0, 0, 20),
-        WATER_LEVEL_MAX = intSetting("WaterLevelMax", 63, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
-        WATER_LEVEL_MIN = intSetting("WaterLevelMin", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+        WATER_LEVEL_MAX = intSetting("WaterLevelMax", 63, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
+        WATER_LEVEL_MIN = intSetting("WaterLevelMin", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
         IMAGE_X_OFFSET = intSetting("ImageXOffset", 0, Integer.MIN_VALUE, Integer.MAX_VALUE),
         IMAGE_Z_OFFSET = intSetting("ImageZOffset", 0, Integer.MIN_VALUE, Integer.MAX_VALUE),
         CAVE_RARITY = intSetting("CaveRarity", 7, 0, 100),
         CAVE_FREQUENCY = intSetting("CaveFrequency", 40, 0, 200),
-        CAVE_MIN_ALTITUDE = intSetting("CaveMinAltitude", 8, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
-        CAVE_MAX_ALTITUDE = intSetting("CaveMaxAltitude", 127, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+        CAVE_MIN_ALTITUDE = intSetting("CaveMinAltitude", 8, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
+        CAVE_MAX_ALTITUDE = intSetting("CaveMaxAltitude", 127, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
         INDIVIDUAL_CAVE_RARITY = intSetting("IndividualCaveRarity", 25, 0, 100),
         CAVE_SYSTEM_FREQUENCY = intSetting("CaveSystemFrequency", 1, 0, 200),
         CAVE_SYSTEM_POCKET_CHANCE = intSetting("CaveSystemPocketChance", 0, 0, 100),
         CAVE_SYSTEM_POCKET_MIN_SIZE = intSetting("CaveSystemPocketMinSize", 0, 0, 100),
         CAVE_SYSTEM_POCKET_MAX_SIZE = intSetting("CaveSystemPocketMaxSize", 3, 0, 100),
         RAVINE_RARITY = intSetting("RavineRarity", 2, 0, 100),
-        RAVINE_MIN_ALTITUDE = intSetting("RavineMinAltitude", 20, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
-        RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 67, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+        RAVINE_MIN_ALTITUDE = intSetting("RavineMinAltitude", 20, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
+        RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 67, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
         RAVINE_MIN_LENGTH = intSetting("RavineMinLength", 84, 1, 500),
         RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
         OBJECT_SPAWN_RATIO = intSetting("ObjectSpawnRatio", 1, 1, 1000),
@@ -146,7 +151,6 @@ public class WorldStandardValues extends Settings
         RANDOM_RIVERS = booleanSetting("RandomRivers", false),
         IMPROVED_RIVERS = booleanSetting("ImprovedRivers", false),
         FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
-        USE_TEMPERATURE_FOR_SNOW_HEIGHT = booleanSetting("UseTemperatureForSnowHeight", false),
         BETTER_SNOW_FALL = booleanSetting("BetterSnowFall", false),
         FULLY_FREEZE_LAKES = booleanSetting("FullyFreezeLakes", false),
         EVEN_CAVE_DISTRIBUTION = booleanSetting("EvenCaveDistrubution", false),

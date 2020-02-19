@@ -1,5 +1,6 @@
 package com.pg85.otg.generator.biome;
 
+// TODO: Is this actually useful? Remove or rewrite this and document it.
 public class ArraysCacheManager
 {
 

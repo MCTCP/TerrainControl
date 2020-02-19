@@ -10,6 +10,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.imageio.ImageIO;
 
@@ -36,9 +37,10 @@ import org.lwjgl.input.Mouse;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.gui.OTGGuiEnterWorldName;
-import com.pg85.otg.forge.gui.OTGGuiScrollingList;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
+import com.pg85.otg.forge.gui.dimensions.base.OTGGuiScrollingList;
 import com.pg85.otg.forge.gui.mainmenu.OTGGuiWorldSelection;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
@@ -84,7 +86,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     private int wikiBtnHeight;
     private int wikiBtnRight;
     private int wikiBtnBottom;
-    private boolean selectingPresetForDimension;
+    boolean selectingPresetForDimension;
     
     public OTGGuiPresetList(GuiScreen previousMenu)
     {
@@ -116,12 +118,20 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     
     void selectPresetIndex(int index)
     {
-    	if(index >= ForgeEngine.Presets.size())
+    	// Get all configs for presets that should be shown
+    	List<Entry<String, DimensionConfigGui>> presets = GuiHandler.GuiPresets
+			.entrySet()
+			.stream()
+			.filter(a -> this.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.collect(Collectors.toList())
+		;
+    	
+    	if(index >= presets.size())
     	{
     		return;
     	}
         this.selected = index;
-        Entry<String, DimensionConfigGui> entry = index >= 0 ? new ArrayList<Entry<String, DimensionConfigGui>>(ForgeEngine.Presets.entrySet()).get(selected) : null;
+        Entry<String, DimensionConfigGui> entry = index >= 0 ? presets.get(selected) : null;
         this.selectedPreset = entry != null ? new Tuple<String, DimensionConfigGui>(entry.getKey(), entry.getValue()) : null;
     	
         updateCache();
@@ -142,11 +152,19 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         	this.presetInfo = new OTGGuiScrollingListInfo(this, null, null, null);           	
             return;
         }
-        
-    	ArrayList<String> presets = new ArrayList<String>(ForgeEngine.Presets.keySet());
+                
     	// When using the O menu ingame, can't delete a preset that's currently in use. 
     	if(this.previousMenu instanceof OTGGuiDimensionList)
     	{
+        	// Get all presetNames for presets that should be shown
+        	List<String> presets = GuiHandler.GuiPresets
+    			.entrySet()
+    			.stream()
+    			.filter(a -> this.selectingPresetForDimension || a.getValue().shouldDisplay)
+    			.map(Entry::getKey)
+    			.collect(Collectors.toList()
+    		);
+    		
     		boolean bFound = false;
         	for(DimensionConfig dimConfig : ((OTGGuiDimensionList)this.previousMenu).dimensions)
         	{
@@ -243,7 +261,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         	for(int i = 0; i < this.selectedPreset.getSecond().dimensions.size(); i++)
         	{
         		String dimName = this.selectedPreset.getSecond().dimensions.get(i);
-        		boolean bFound = ForgeEngine.Presets.containsKey(dimName);
+        		boolean bFound = GuiHandler.GuiPresets.containsKey(dimName);
         		if(bFound)
         		{
         			dimsString += dimName + (i == this.selectedPreset.getSecond().dimensions.size() - 1 ? "" : ", ");
@@ -287,17 +305,24 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     	// For MP the server sends the presets
     	if(this.mc.world == null || Minecraft.getMinecraft().isSingleplayer())
     	{    	
-    		ForgeEngine.loadPresets(); // Worldpacker may not have be done unpacking presets on app start, so fetch world configs here (also done when joining world via the world selection screen)
+    		GuiHandler.loadGuiPresets(); // Worldpacker may not have be done unpacking presets on app start, so fetch world configs here (also done when joining world via the world selection screen)
     	}
-        if(ForgeEngine.Presets.size() > 0)
+    	
+    	// Get all configs for presets that should be shown
+    	List<Entry<String, DimensionConfigGui>> presets = GuiHandler.GuiPresets
+			.entrySet()
+			.stream()
+			.filter(a -> this.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.collect(Collectors.toList())
+		;
+    	
+        if(presets.size() > 0)
         {
-        	ArrayList<String> presets = new ArrayList<String>(ForgeEngine.Presets.keySet());
-        	int selectPreset = 0;
-        	
+        	int selectPreset = 0;        	
             this.selected = selectPreset;
             if(selectPreset > -1)
             {
-	            Entry<String, DimensionConfigGui> entry = new ArrayList<Entry<String, DimensionConfigGui>>(ForgeEngine.Presets.entrySet()).get(selectPreset);
+	            Entry<String, DimensionConfigGui> entry = presets.get(selectPreset);
 	            this.selectedPreset = new Tuple<String, DimensionConfigGui>(entry.getKey(), entry.getValue());
             } else {
             	this.selectedPreset = null;
@@ -466,7 +491,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 		            	}
 		        	}
 	
-	                ForgeEngine.loadPresets();
+		            GuiHandler.loadGuiPresets();
 	
 	                if(this.presetsList.getSize() == 0)
 	                {
@@ -487,7 +512,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 			if(ok)
 			{
 				((ForgeEngine)OTG.getEngine()).getWorldLoader().createDefaultOTGWorld(this.newPresetName);
-				ForgeEngine.loadPresets();
+				GuiHandler.loadGuiPresets();
 			}
 		}
 		else if(selectingClonePresetName)
@@ -506,6 +531,12 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 				} catch (IOException e) {
 					e.printStackTrace();
 	        		this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Could not copy directory \"" + presetNameToClone + "\", files may be in use."));
+	        		
+	        		askDeleteSettings = false;
+	        		selectingNewPresetName = false;
+	        		selectingClonePresetName = false;
+	        		ShowingOpenLinkDialogue = false;
+	        		        		
 	        		return;
 				}
 			}
@@ -520,6 +551,12 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
 				e.printStackTrace();
 			}
 	        Minecraft.getMinecraft().displayGuiScreen(this);
+	        
+			askDeleteSettings = false;
+			selectingNewPresetName = false;
+			selectingClonePresetName = false;
+			ShowingOpenLinkDialogue = false;
+			 
 			return;
 		}
 		if(ShowingOpenLinkDialogue && !ok)

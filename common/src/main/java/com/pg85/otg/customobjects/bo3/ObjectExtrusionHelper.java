@@ -2,6 +2,7 @@ package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.ArrayList;
@@ -75,7 +76,7 @@ class ObjectExtrusionHelper
     }
 
     /**
-     * This method takes that blocks that have been added to this and extrudes them individually until a block outside
+     * This method takes the blocks that have been added to this and extrudes them individually until a block outside
      * of the extrudeThroughBlocks has been hit
      *
      * @param world  The LocalWorld to extrude block in
@@ -84,25 +85,25 @@ class ObjectExtrusionHelper
      * @param y      The BO3 base Y spawn location
      * @param z      The BO3 base Z spawn location
      */
-    void extrude(LocalWorld world, Random random, int x, int y, int z)
+    void extrude(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
         for (BO3BlockFunction block : blocksToExtrude)
         {
             if (extrudeMode == BO3Settings.ExtrudeMode.BottomDown)
             {
                 for (int yi = y + block.y - 1;
-                     yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, false));
+                     yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
                      --yi)
                 {
-                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, false);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, chunkBeingPopulated);
                 }
             } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp)
             {
                 for (int yi = y + block.y + 1;
-                     yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, false));
+                     yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
                      ++yi)
                 {
-                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, false);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, chunkBeingPopulated);
                 }
             }
         }

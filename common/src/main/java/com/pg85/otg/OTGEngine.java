@@ -4,9 +4,12 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.PluginConfig;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.dimensions.ModPackConfigManager;
 import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -24,6 +27,7 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -39,37 +43,27 @@ public abstract class OTGEngine
     private List<EventHandler> monitoringEventHandlers = new ArrayList<EventHandler>(5);
     private PluginConfig pluginConfig;
     private DimensionsConfig dimensionsConfig = null;
+    private ModPackConfigManager modPackConfigManager;
     private Logger logger;
 
     public OTGEngine(Logger logger)
     {
         this.logger = logger;
-    }    
+    }
     
-    void onShutdown()
+    public void onShutdown()
     {
         // Shutdown all loaders
         customObjectManager.shutdown();
-
-        // Null out values to help the garbage collector
-        customObjectManager = null;
-        biomeResourcesManager = null;
-        customObjectResourcesManager = null;
-        biomeManagers = null;
-        pluginConfig = null;
         cancelableEventHandlers.clear();
         monitoringEventHandlers.clear();
         cancelableEventHandlers = null;
         monitoringEventHandlers = null;
     }
 
-    void onStart()
+    public void onStart()
     {
         // Start the engine
-        biomeResourcesManager = new BiomeResourcesManager();
-        customObjectResourcesManager = new CustomObjectResourcesManager();
-        customObjectManager = new CustomObjectManager();
-        biomeManagers = new BiomeModeManager();
 
         // Do pluginConfig loading and then log anything that happened
         File pluginConfigFile = new File(getOTGRootFolder(), PluginStandardValues.PluginConfigFilename);
@@ -77,6 +71,11 @@ public abstract class OTGEngine
         FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.settingsMode);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 
+        biomeResourcesManager = new BiomeResourcesManager();
+        customObjectResourcesManager = new CustomObjectResourcesManager();
+        biomeManagers = new BiomeModeManager();
+        customObjectManager = new CustomObjectManager();
+        
         File globalObjectsDir = new File(getOTGRootFolder(), PluginStandardValues.BO_DirectoryName);
         if(!globalObjectsDir.exists())
         {
@@ -92,6 +91,8 @@ public abstract class OTGEngine
         {
       		worldsDir.mkdirs();
         }
+
+        modPackConfigManager = new ModPackConfigManager(getOTGRootFolder());
         
         // Fire start event
         for (EventHandler handler : cancelableEventHandlers)
@@ -131,8 +132,7 @@ public abstract class OTGEngine
         if (priority == EventPriority.CANCELABLE)
         {
             cancelableEventHandlers.add(handler);
-        } else
-        {
+        } else {
             monitoringEventHandlers.add(handler);
         }
     }
@@ -150,7 +150,7 @@ public abstract class OTGEngine
      * @return True if the event handlers allow that the object is spawned,
      *         false otherwise.
      */
-    boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
+    public boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
     {
         boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
@@ -172,7 +172,7 @@ public abstract class OTGEngine
      * <p>
      * @see EventHandler#onPopulateEnd(LocalWorld, Random, boolean, int, int)
      */
-    void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    public void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (EventHandler handler : cancelableEventHandlers)
             handler.onPopulateEnd(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
@@ -186,7 +186,7 @@ public abstract class OTGEngine
      * @see EventHandler#onPopulateStart(LocalWorld, Random, boolean, int,
      * int)
      */
-    void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    public void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         for (EventHandler handler : cancelableEventHandlers)
             handler.onPopulateStart(world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ());
@@ -202,7 +202,7 @@ public abstract class OTGEngine
      * @return True if the event handlers allow that the resource is spawned,
      *         false otherwise.
      */
-    boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
+    public boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
             int chunkZ)
     {    	
         boolean success = true;
@@ -248,6 +248,11 @@ public abstract class OTGEngine
         return customObjectManager;
     }
 
+	public ModPackConfigManager getModPackConfigManager()
+	{
+		return this.modPackConfigManager;
+	}
+    
     // Plugin dirs
  
     public abstract File getOTGRootFolder();
@@ -366,4 +371,9 @@ public abstract class OTGEngine
 
 	public abstract boolean isModLoaded(String mod);
 
+	public abstract boolean areEnoughBiomeIdsAvailableForPresets(ArrayList<String> presetNames);
+
+	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
+
+	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 }

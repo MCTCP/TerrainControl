@@ -5,9 +5,10 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
@@ -32,9 +33,9 @@ public class UndergroundLakeGen extends Resource
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
         minAltitude = readInt(args.get(4), PluginStandardValues.WORLD_DEPTH,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(5), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
     }
 
     @Override
@@ -80,12 +81,15 @@ public class UndergroundLakeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
-
-        if (y >= world.getHighestBlockYAt(x, z))
+        if (y >= world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated))
+        {
             return;
+        }
         
         int size = RandomHelper.numberInRange(rand, minSize, maxSize);
 
@@ -116,8 +120,8 @@ public class UndergroundLakeGen extends Resource
                 {
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
-                        LocalMaterialData material = world.getMaterial(xLake, yLake, zLake, false);
-                        if (material == null || material.isAir() || material.isMaterial(DefaultMaterial.BEDROCK))
+                        LocalMaterialData material = world.getMaterial(xLake, yLake, zLake, chunkBeingPopulated);
+                        if (material == null || material.isEmptyOrAir() || material.isMaterial(DefaultMaterial.BEDROCK))
                         {
                             // Don't replace air or bedrock
                             continue;
@@ -130,14 +134,14 @@ public class UndergroundLakeGen extends Resource
                         {
                             continue;
                         }
-                        LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake, false);
+                        LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake, chunkBeingPopulated);
                         if (materialBelow != null && materialBelow.isAir())
                         {
                             // Air block, also set position above to air
-                            world.setBlock(xLake, yLake, zLake, materialBelow, null, false);
+                            world.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingPopulated);
                         } else {
                             // Not air, set position above to water
-                            world.setBlock(xLake, yLake, zLake, material, null, false);
+                            world.setBlock(xLake, yLake, zLake, material, null, chunkBeingPopulated);
                         }
                     }
                 }

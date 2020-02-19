@@ -1,7 +1,5 @@
 package com.pg85.otg.util.helpers;
 
-import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class BlockHelper
@@ -97,22 +95,22 @@ public class BlockHelper
             case PURPUR_STAIRS:
                 switch (data)
                 {
-                    case 2:
-                        return 0;
-                    case 3:
-                        return 1;
-                    case 1:
-                        return 2;
-                    case 0:
-                        return 3;
-                    case 6:
-                        return 4;
                     case 7:
                         return 5;
+                    case 6:
+                        return 4;
                     case 5:
                         return 6;
                     case 4:
                         return 7;
+	                case 3:
+	                    return 1;
+                    case 2:
+                        return 0;
+                    case 1:
+                        return 2;
+                    case 0:
+                        return 3;                        
                 }
                 break;
 

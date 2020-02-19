@@ -5,6 +5,7 @@ import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 
 import java.util.List;
@@ -23,8 +24,8 @@ public class DungeonGen extends Resource
 
         frequency = readInt(args.get(0), 1, 100);
         rarity = readRarity(args.get(1));
-        minAltitude = readInt(args.get(2), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(3), minAltitude, PluginStandardValues.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(2), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
+        maxAltitude = readInt(args.get(3), minAltitude, PluginStandardValues.WORLD_HEIGHT - 1);
     }
 
     @Override
@@ -72,8 +73,9 @@ public class DungeonGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// TOOO: Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
         world.placeDungeon(random, x, y, z);
     }

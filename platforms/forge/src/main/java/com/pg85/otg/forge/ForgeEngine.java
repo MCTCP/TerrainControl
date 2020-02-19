@@ -2,26 +2,34 @@ package com.pg85.otg.forge;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder;
+import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
-import com.pg85.otg.configuration.io.FileSettingsReader;
-import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.generator.ForgeChunkBuffer;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.ForgeLogger;
-import com.pg85.otg.forge.util.ForgeMaterialData;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
 import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.generator.ChunkBuffer;
+import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.world.World;
@@ -31,8 +39,6 @@ import net.minecraftforge.fml.common.Loader;
 
 public class ForgeEngine extends OTGEngine
 {
-	public static LinkedHashMap<String, DimensionConfigGui> Presets = new LinkedHashMap<String, DimensionConfigGui>();
-
 	private ForgeBiomeRegistryManager biomeRegistryManager;
 	private WorldLoader worldLoader;
     private long lastPregeneratorStatusUpdateTime = System.currentTimeMillis();   
@@ -53,7 +59,7 @@ public class ForgeEngine extends OTGEngine
     public ForgeBiomeRegistryManager getBiomeRegistryManager()
     {
     	return biomeRegistryManager;
-    }     
+    }
    
     public void onSave(World world)
     {
@@ -64,19 +70,6 @@ public class ForgeEngine extends OTGEngine
     		forgeWorld.getStructureCache().saveToDisk();
     	}
     }
-    
-    // Configs
-    
-	public WorldConfig loadWorldConfigFromDisk(File worldDir)
-	{
-        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-        if(!worldConfigFile.exists())
-        {
-        	return null;
-        }
-        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
-        return new WorldConfig(worldDir, settingsMap, null, null);
-	}
 	
     // Pregenerator
     
@@ -172,33 +165,6 @@ public class ForgeEngine extends OTGEngine
     		// If this is an OTG dim other than the overworld then the world name will always match the preset name
     		return worldName;
     	}
-	}
-
-	public static void loadPresets()
-	{
-		Presets.clear();
-		
-	    ArrayList<String> worldNames = new ArrayList<String>();
-	    File OTGWorldsDirectory = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName);
-	    if(OTGWorldsDirectory.exists() && OTGWorldsDirectory.isDirectory())
-	    {
-	    	for(File worldDir : OTGWorldsDirectory.listFiles())
-	    	{
-	    		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().trim().startsWith("dim-"))
-	    		{
-	    			for(File file : worldDir.listFiles())
-	    			{
-	    				if(file.getName().equals("WorldConfig.ini"))
-	    				{
-			    			worldNames.add(worldDir.getName());
-			    			WorldConfig worldConfig = ((ForgeEngine)OTG.getEngine()).loadWorldConfigFromDisk(worldDir);
-					        Presets.put(worldDir.getName(), new DimensionConfigGui(worldDir.getName(), worldConfig));
-					        break;
-	    				}
-	    			}
-	    		}
-	    	}
-		}
 	}	
 	
 	// Material
@@ -225,7 +191,82 @@ public class ForgeEngine extends OTGEngine
 	}
 
 	@Override
-	public boolean isModLoaded(String mod) {
+	public boolean isModLoaded(String mod)
+	{
 		return Loader.isModLoaded(mod);
+	}
+
+	@Override
+	public boolean areEnoughBiomeIdsAvailableForPresets(ArrayList<String> presetNames)
+	{
+		if(presetNames == null)
+		{
+			return true;
+		}
+		int requiredBiomesCount = 0;
+		for(String presetName : presetNames)
+		{
+			if(OTG.getDimensionsConfig() == null || OTG.getDimensionsConfig().getDimensionConfig(presetName) == null)
+			{
+				File settingsDir = new File(OTG.getEngine().getWorldsDirectory() + File.separator + presetName);
+				requiredBiomesCount += getBiomeIdsRequiredCount(settingsDir);
+			}
+		}
+		if(requiredBiomesCount > getBiomeRegistryManager().getAvailableBiomeIdsCount())
+		{
+			return false;
+		}
+		return true;
+	}
+	
+    public int getBiomeIdsRequiredCount(File settingsDir)
+    {
+    	WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(settingsDir);
+    	
+        // Establish folders
+        List<File> biomeDirs = new ArrayList<File>(2);
+        // OpenTerrainGenerator/Presets/<WorldName>/<WorldBiomes/
+        biomeDirs.add(new File(settingsDir, OTG.correctOldBiomeConfigFolder(settingsDir)));
+        // OpenTerrainGenerator/GlobalBiomes/
+        biomeDirs.add(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.BiomeConfigDirectoryName));
+
+        // Build a set of all biomes to load
+        Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();
+
+        // Load all files
+        BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder(OTG.getPluginConfig().biomeConfigExtension);
+        Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(worldConfig, worldConfig.worldHeightScale, biomeDirs, biomesToLoad);
+        
+        // Read all settings
+        Map<String, BiomeConfig> loadedBiomes = ServerConfigProvider.readAndWriteSettings(worldConfig, biomeConfigStubs, false);
+    	
+        // Get the amount of biome ids required for this world
+    	int customBiomeIdsRequired = 0;
+    	for(BiomeConfig biomeConfig : loadedBiomes.values())
+    	{
+    		if(biomeConfig.replaceToBiomeName == null || biomeConfig.replaceToBiomeName.trim().length() == 0)
+    		{
+    			// This is a custom biome, not a virtual biome.
+    			customBiomeIdsRequired++;
+    		}
+    	}
+    	return customBiomeIdsRequired;
+    }
+	
+    @Override
+    public Collection<BiomeLoadInstruction> getDefaultBiomes()
+    {
+    	return ForgeBiomeRegistryManager.getDefaultBiomes();
+    }
+    
+
+    /**
+     * Used by mob inheritance code. Used to inherit default mob spawning settings (including those added by other mods)
+     * @param biomeConfigStub
+     */
+    @Override
+	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
+	{
+    	ForgeBiomeRegistryManager.mergeVanillaBiomeMobSpawnSettings(biomeConfigStub, biomeResourceLocation);
 	}
 }

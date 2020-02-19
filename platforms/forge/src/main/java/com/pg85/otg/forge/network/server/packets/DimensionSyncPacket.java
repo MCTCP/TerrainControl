@@ -15,13 +15,14 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionInfo;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.client.AbstractClientMessageHandler;
 import com.pg85.otg.forge.network.client.ClientPacketManager;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ClientConfigProvider;
 import com.pg85.otg.network.ConfigToNetworkSender;
@@ -55,8 +56,8 @@ public class DimensionSyncPacket extends OTGPacket
 		LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
 		
 		// Send presets for client GUI
-		stream.writeInt(ForgeEngine.Presets.size());
-		for(DimensionConfigGui dimConfig : ForgeEngine.Presets.values())
+		stream.writeInt(GuiHandler.GuiPresets.size());
+		for(DimensionConfigGui dimConfig : GuiHandler.GuiPresets.values())
 		{
 			StreamHelper.writeStringToStream(stream, dimConfig.toYamlString());
 		}

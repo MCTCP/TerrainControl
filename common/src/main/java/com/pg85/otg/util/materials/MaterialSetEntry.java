@@ -3,9 +3,12 @@ package com.pg85.otg.util.materials;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 
+//TODO: This seems really inefficient and riddiculously overcomplicated, burn with fire.
+//Looks like this is optimised mainly for use with blockchecks and BOfunctions, resources like oregen also use it though,
+//they shouldn't need any other functionality than containing a list of materials.
 public class MaterialSetEntry
 {
-    private LocalMaterialData material;
+    public LocalMaterialData material;
     private final boolean includesBlockData;
 
     MaterialSetEntry(LocalMaterialData material, boolean includesBlockData)
@@ -36,6 +39,7 @@ public class MaterialSetEntry
     @Override
     public int hashCode()
     {
+        // TODO: Why is this needed, clean up this class and remove all the exceptions for parsing materials!
         if (includesBlockData)
         {
             return material.hashCode();
@@ -54,7 +58,8 @@ public class MaterialSetEntry
     public String toString()
     {
         String output = material.toString();
-        if (includesBlockData && material.getBlockData() == 0)
+        // TODO: Why is this needed, clean up this class and remove all the exceptions for parsing materials!
+        if (includesBlockData && !output.contains(":") && material.getBlockData() == 0)
         {
             // Turn things like "WOOL" back into "WOOL:0" (material.toString
             // never includes "*:0")

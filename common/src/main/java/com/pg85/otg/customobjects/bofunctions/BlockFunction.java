@@ -9,6 +9,7 @@ import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 
 /**
@@ -34,7 +35,12 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
         z = readInt(args.get(2), -100, 100);
 
         material = readMaterial(args.get(3));
-
+       
+        if(material == null)
+        {
+        	throw new InvalidConfigException("Material \"" + args.get(3) + "\" could not be read.");
+        }
+        
         if (args.size() == 5)
         {
             metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().getFile());
@@ -69,12 +75,8 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
      * @param z      The absolute z to spawn. The z-position in this object is
      *               ignored.
      */
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean isOTGPlus)
-    {
-        material.parseForWorld(world);
-        world.setBlock(x, y, z, material, metaDataTag, isOTGPlus);
-    }
-
+    public abstract void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
+    
     @Override
     public boolean isAnalogousTo(CustomObjectConfigFunction<T> other)
     {

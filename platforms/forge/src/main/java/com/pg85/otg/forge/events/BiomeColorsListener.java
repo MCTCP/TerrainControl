@@ -1,10 +1,10 @@
 package com.pg85.otg.forge.events;
 
-import com.google.common.base.Function;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.BiomeNotFoundException;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.biome.Biome;
@@ -17,53 +17,26 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
  */
 public final class BiomeColorsListener
 {
-    private final Function<Biome, BiomeConfig> getBiomeConfig;
     private ResourceLocation lastBiome = null;
     private BiomeConfig lastBiomeConfig;
-    
-    public BiomeColorsListener()
-    {
-        // Register colorizer, for biome colors
-        this.getBiomeConfig = new Function<Biome, BiomeConfig>()
-        {
-            @Override
-            public BiomeConfig apply(Biome input)
-            {
-                LocalBiome biome = null;
-                try
-                {
-                	// Get world name from resourcelocation
-                	// TODO: Get world name from somewhere sensical...
-                	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getPath().split("_")[0]);
-                }
-                catch (BiomeNotFoundException e)
-                {
-                    // Ignored, try in next world
-                }
-                catch (NoSuchMethodError e)
-                {
-                    // Thrown when a mod biome doesn't have the method getBiomeName, making it fail to get the biomeconfig
-                    // Ignored, as biomes from OTG should never throw this
-                }
-
-                if (biome == null)
-                {
-                    return null;
-                }
-
-                return biome.getBiomeConfig();
-            }
-        };
-    }
+       
+    public BiomeColorsListener() { }
     
     @SubscribeEvent
     public void grassColor(BiomeEvent.GetGrassColor grassColorEvent)
     {
-    	BiomeConfig biomeConfig = lastBiomeConfig;
-    	
-    	if(lastBiome == null || !grassColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	// This is also called on empty chunks that don't have OTG biome information yet,
+    	// so they'll call this on vanilla biomes, even though those don't exist in the world.
+    	// Unfortunately, we can't get the coords to get the proper biome..
+    	if(grassColorEvent.getBiome().getRegistryName().getNamespace().equals("minecraft"))
     	{
-            biomeConfig = this.getBiomeConfig.apply(grassColorEvent.getBiome());	
+    		return;
+    	}
+   	
+    	BiomeConfig biomeConfig = lastBiomeConfig;    
+    	if(lastBiome == null || lastBiomeConfig == null || !grassColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	{
+            biomeConfig = getBiomeConfig(grassColorEvent.getBiome());	
     	}
     	
     	lastBiome = grassColorEvent.getBiome().getRegistryName();
@@ -74,26 +47,32 @@ public final class BiomeColorsListener
         	return;
         }
         
+    	if (biomeConfig.grassColor == 0xffffff)
+    	{
+    		return;
+    	}
+    	
         if (biomeConfig.grassColorIsMultiplier)
         {
-            if (biomeConfig.grassColor != 0xffffff)
-            {
-                // ^ This ignores the default grass color
-                grassColorEvent.setNewColor((grassColorEvent.getOriginalColor() + biomeConfig.grassColor) / 2);
-            }
-        } else {
-            grassColorEvent.setNewColor(biomeConfig.grassColor);
+        	grassColorEvent.setNewColor((grassColorEvent.getOriginalColor() + biomeConfig.grassColor) / 2);
         }
     }
 
     @SubscribeEvent
     public void foliageColor(BiomeEvent.GetFoliageColor foliageColorEvent)
     {
-    	BiomeConfig biomeConfig = lastBiomeConfig;
-    	
-    	if(lastBiome == null || !foliageColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	// This is also called on empty chunks that don't have OTG biome information yet,
+    	// so they'll call this on vanilla biomes, even though those don't exist in the world.
+    	// Unfortunately, we can't get the coords to get the proper biome..
+    	if(foliageColorEvent.getBiome().getRegistryName().getNamespace().equals("minecraft"))
     	{
-            biomeConfig = this.getBiomeConfig.apply(foliageColorEvent.getBiome());	
+    		return;
+    	}
+    	
+    	BiomeConfig biomeConfig = lastBiomeConfig;    	
+    	if(lastBiome == null || lastBiomeConfig == null || !foliageColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	{
+            biomeConfig = getBiomeConfig(foliageColorEvent.getBiome());	
     	}
     	
     	lastBiome = foliageColorEvent.getBiome().getRegistryName();
@@ -112,19 +91,24 @@ public final class BiomeColorsListener
         if (biomeConfig.foliageColorIsMultiplier)
         {
             foliageColorEvent.setNewColor((foliageColorEvent.getOriginalColor() + biomeConfig.foliageColor) / 2);
-        } else {
-            foliageColorEvent.setNewColor(biomeConfig.foliageColor);
         }
     }
 
     @SubscribeEvent
     public void waterColor(BiomeEvent.GetWaterColor waterColorEvent)
     {
-    	BiomeConfig biomeConfig = lastBiomeConfig;
-    	
-    	if(lastBiome == null || !waterColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	// This is also called on empty chunks that don't have OTG biome information yet,
+    	// so they'll call this on vanilla biomes, even though those don't exist in the world.
+    	// Unfortunately, we can't get the coords to get the proper biome..
+    	if(waterColorEvent.getBiome().getRegistryName().getNamespace().equals("minecraft"))
     	{
-            biomeConfig = this.getBiomeConfig.apply(waterColorEvent.getBiome());	
+    		return;
+    	}
+    	
+    	BiomeConfig biomeConfig = lastBiomeConfig;    	
+    	if(lastBiome == null || lastBiomeConfig == null || !waterColorEvent.getBiome().getRegistryName().equals(lastBiome))
+    	{
+            biomeConfig = getBiomeConfig(waterColorEvent.getBiome());	
     	}
     	
     	lastBiome = waterColorEvent.getBiome().getRegistryName();
@@ -134,7 +118,47 @@ public final class BiomeColorsListener
         {
         	return;
         }
-        	
+        
+        // Base watercolor is applied by OTG when the biome is created if !waterColorIsMultiplier.
+        if (biomeConfig.waterColor == 0xffffff)
+        {
+        	return;
+        }
+        
         waterColorEvent.setNewColor(biomeConfig.waterColor);
+    }
+    
+    public BiomeConfig getBiomeConfig(Biome input)
+    {
+        LocalBiome biome = null;
+        try
+        {
+        	// Get world name from resourcelocation
+        	// TODO: Get world name from somewhere sensical...
+        	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getPath().split("_")[0]);
+        	if(biome == null)
+        	{
+        		OTG.log(LogMarker.INFO, "Could not find biome " + input.getBiomeName() + " - " + input.getRegistryName().toString());
+        		return null;
+        	}
+        }
+        catch (BiomeNotFoundException e)
+        {
+            // Ignored, try in next world
+            return null;
+        }
+        catch (NoSuchMethodError e)
+        {
+            // Thrown when a mod biome doesn't have the method getBiomeName, making it fail to get the biomeconfig
+            // Ignored, as biomes from OTG should never throw this
+            return null;
+        }
+
+        return biome.getBiomeConfig();
+    }
+    
+    public void reload()
+    {
+    	lastBiomeConfig = null;	
     }
 }

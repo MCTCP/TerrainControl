@@ -4,7 +4,6 @@ import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
 import java.util.List;
 import java.util.Random;
 
@@ -14,9 +13,10 @@ import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.helpers.MaterialHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 
 public class BO4RandomBlockFunction extends BO4BlockFunction
 {
@@ -163,14 +163,14 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, boolean allowOutsidePopulatingArea)
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
         for (int i = 0; i < blockCount; i++)
         {
             if (random.nextInt(100) < blockChances[i])
             {
             	blocks[i].parseForWorld(world);
-                world.setBlock(x, y, z, blocks[i], metaDataTags[i], allowOutsidePopulatingArea);
+                world.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated);
                 break;
             }
         }
@@ -280,12 +280,6 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
     	rbf.z = z;
 
     	byte blocksLength = buffer.get();
-    	
-    	if(blocksLength < 0)
-		{
-    		String breakpoint = "";
-		}
-    				
     	
     	rbf.blockCount = blocksLength;
     	rbf.blocks = new LocalMaterialData[blocksLength];

@@ -1,16 +1,15 @@
 package com.pg85.otg.forge.biomes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import com.google.common.collect.Lists;
-import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.common.LocalBiome;
+import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.generator.structure.OTGVillageGen;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
-import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
-
-import net.minecraft.init.Biomes;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
@@ -22,9 +21,7 @@ import net.minecraft.world.gen.structure.MapGenVillage;
  * allowing us to use custom biome generators.
  */
 public class OTGBiomeProvider extends BiomeProvider
-{
-    private static List<Biome> ForbiddenBiomes = Lists.newArrayList(Biomes.HELL, Biomes.SKY, Biomes.VOID);
-    
+{   
     private final BiomeGenerator biomeGenerator;
     private final ForgeWorld localWorld;
     
@@ -119,7 +116,7 @@ public class OTGBiomeProvider extends BiomeProvider
     }
     
     @Override
-    public BlockPos findBiomePosition(int x, int z, int range, List<Biome> biomes, Random random)
+    public BlockPos findBiomePosition(int x, int z, int range, List<Biome> allowedBiomes, Random random)
     {       	
         int i = x - range >> 2;
         int j = z - range >> 2;
@@ -134,17 +131,16 @@ public class OTGBiomeProvider extends BiomeProvider
         
         for (int i3 = 0; i3 < arrayOfInt.length; i3++)
         {
-            if (arrayOfInt[i3] >= DefaultBiome.values().length)
-            {
-                continue;
-            }
-            
-            int i4 = i + i3 % n << 2;
+        	ForgeBiome biome = this.localWorld.getBiomeByOTGIdOrNull(arrayOfInt[i3]);
+        	int i4 = i + i3 % n << 2;
             int i5 = j + i3 / n << 2;
-            Biome localBiomeBase = Biome.getBiome(arrayOfInt[i3]);            
+            Biome localBiomeBase = biome.biomeBase;            
             if (
-        		!ForbiddenBiomes.contains(localBiomeBase) && 
-        		!(blockPos != null && random.nextInt(i2 + 1) != 0))
+        		allowedBiomes.contains(localBiomeBase) && 
+        		!(
+    				blockPos != null && 
+    				random.nextInt(i2 + 1) != 0)
+        		)
             {
                 blockPos = new BlockPos(i4, 0, i5);
                 i2++;
@@ -158,5 +154,68 @@ public class OTGBiomeProvider extends BiomeProvider
     public void cleanupCache()
     {
         this.biomeGenerator.cleanupCache();
+    }
+   
+    /**
+     * Gets the list of valid biomes for the player to spawn in.
+     */
+    public List<Biome> getBiomesToSpawnIn()
+    {
+    	// TODO: Disallowing any inner biomes for defaultocean/defaultfrozenocean as spawn atm, this includes things like beaches and mushroomisland.
+    	// Will add an "allowedBiomes" setting to the worldconfig later that overrides the default behaviour.
+    	WorldConfig worldConfig = this.localWorld.getConfigs().getWorldConfig();
+    	List<Biome> biomesToSpawnIn = new ArrayList<Biome>();
+    	List<LocalBiome> disallowedBiomes = new ArrayList<LocalBiome>();
+    	disallowedBiomes.add(this.localWorld.getBiomeByNameOrNull(worldConfig.defaultOceanBiome));
+    	disallowedBiomes.add(this.localWorld.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome));
+    	getAllInnerBiomes(this.localWorld.getBiomeByNameOrNull(worldConfig.defaultOceanBiome), disallowedBiomes);
+    	getAllInnerBiomes(this.localWorld.getBiomeByNameOrNull(worldConfig.defaultFrozenOceanBiome), disallowedBiomes);
+    	for(LocalBiome biome : this.localWorld.getAllBiomes())
+    	{
+    		if(!disallowedBiomes.contains(biome))
+    		{
+    			biomesToSpawnIn.add(((ForgeBiome)biome).biomeBase);
+    		}
+    	}
+        return biomesToSpawnIn;
+    }
+    
+    private void getAllInnerBiomes(LocalBiome targetBiome, List<LocalBiome> foundBiomes)
+    {    	
+    	for(LocalBiome allBiomesBiome : this.localWorld.getAllBiomes())
+    	{
+    		if(!foundBiomes.contains(allBiomesBiome))
+    		{
+	    		if(allBiomesBiome.getBiomeConfig().isleInBiome != null && allBiomesBiome.getBiomeConfig().isleInBiome.size() > 0)
+	    		{
+	    			for(String isleinBiomeName : allBiomesBiome.getBiomeConfig().isleInBiome)
+	    			{
+	    				LocalBiome isleInBiome = this.localWorld.getBiomeByNameOrNull(isleinBiomeName);
+	    				if(targetBiome == isleInBiome)
+	    				{
+	    					foundBiomes.add(allBiomesBiome);
+	    					getAllInnerBiomes(allBiomesBiome, foundBiomes);
+	    					break;
+	    				}
+	    			}
+	    		}
+    		}
+    		if(!foundBiomes.contains(allBiomesBiome))
+    		{
+	    		if(allBiomesBiome.getBiomeConfig().biomeIsBorder != null && allBiomesBiome.getBiomeConfig().biomeIsBorder.size() > 0)
+	    		{
+	    			for(String borderBiomeName : allBiomesBiome.getBiomeConfig().biomeIsBorder)
+	    			{
+	    				LocalBiome borderBiome = this.localWorld.getBiomeByNameOrNull(borderBiomeName);
+	    				if(targetBiome == borderBiome)
+	    				{
+	    					foundBiomes.add(allBiomesBiome);
+	    					getAllInnerBiomes(allBiomesBiome, foundBiomes);
+	    					break;
+	    				}
+	    			}
+	    		}
+    		}
+    	}    	
     }
 }

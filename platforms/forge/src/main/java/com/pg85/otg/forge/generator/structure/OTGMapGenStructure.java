@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.generator.structure;
 
-import com.pg85.otg.forge.ForgeWorld;
+import com.pg85.otg.forge.world.ForgeWorld;
 
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;

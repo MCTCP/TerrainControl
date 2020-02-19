@@ -3,6 +3,7 @@ package com.pg85.otg.common;
 import com.pg85.otg.OTGEngine;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+//TODO: Clean up ForgeMaterialData/BukkitMaterialData/LocalMaterialData/MaterialHelper/OTGEngine.readMaterial
 /**
  * Represents one of Minecraft's materials. Also includes its data value.
  * Immutable.
@@ -77,8 +78,12 @@ public interface LocalMaterialData
      * performance.
      * @return True if this material is air, false otherwise.
      */
+    boolean isEmptyOrAir();
+    
     boolean isAir();
 
+    boolean isEmpty();
+    
     /**
      * Gets the default material belonging to this material. The block data will
      * be lost. If the material is not one of the vanilla Minecraft materials,

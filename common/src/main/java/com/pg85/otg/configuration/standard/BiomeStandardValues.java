@@ -25,7 +25,7 @@ public class BiomeStandardValues extends Settings
 
     public static final Setting<Boolean>
             RESOURCE_INHERITANCE = booleanSetting("ResourceInheritance", true),
-            USE_WORLD_WATER_LEVEL = booleanSetting("UseWorldWaterLevel", true),
+            USE_WORLD_WATER_LEVEL = booleanSetting("UseWorldWaterLevel", true),         
             GRASS_COLOR_IS_MULTIPLIER = booleanSetting("GrassColorIsMultiplier", true),
             FOLIAGE_COLOR_IS_MULTIPLIER = booleanSetting("FoliageColorIsMultiplier", true),
             DISABLE_BIOME_HEIGHT = booleanSetting("DisableBiomeHeight", false),
@@ -50,16 +50,18 @@ public class BiomeStandardValues extends Settings
             BIOME_RARITY = intSetting("BiomeRarity", 100, 0, Integer.MAX_VALUE),
             BIOME_RARITY_WHEN_ISLE = intSetting("BiomeRarityWhenIsle", 100, 0, Integer.MAX_VALUE),
             SMOOTH_RADIUS = intSetting("SmoothRadius", 2, 0, 32),
-            RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+            RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
             WATER_LEVEL_MAX = WorldStandardValues.WATER_LEVEL_MAX,
             WATER_LEVEL_MIN = WorldStandardValues.WATER_LEVEL_MIN;
 
     public static final Setting<Integer>
-            BIOME_COLOR = colorSetting("BiomeColor", "#ffffff"),
+            BIOME_COLOR = colorSetting("BiomeColor", "#FFFFFF"),
             SKY_COLOR = colorSetting("SkyColor", "#7BA5FF"),
             WATER_COLOR = colorSetting("WaterColor", "#FFFFFF"),
-            GRASS_COLOR = colorSetting("GrassColor", "#000000"),
-            FOLIAGE_COLOR = colorSetting("FoliageColor", "#000000"), 
+            GRASS_COLOR = colorSetting("GrassColor", "#FFFFFF"),
+    		GRASS_COLOR_2 = colorSetting("GrassColor2", "#FFFFFF"),
+            FOLIAGE_COLOR = colorSetting("FoliageColor", "#FFFFFF"),
+    		FOLIAGE_COLOR_2 = colorSetting("FoliageColor2", "#FFFFFF"),
             FOG_COLOR = colorSetting("FogColor", "#000000");
 
     public static final Setting<List<String>>

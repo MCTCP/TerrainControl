@@ -38,7 +38,7 @@ public class VeinGen extends Resource
         minAltitude = readInt(args.get(7), PluginStandardValues.WORLD_DEPTH,
                 PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(8), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT);
+                PluginStandardValues.WORLD_HEIGHT - 1);
         sourceBlocks = readMaterials(args, 9);
     }
 
@@ -123,20 +123,23 @@ public class VeinGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+        // Left blank, as spawnInChunk already handles this.
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
         // Find all veins that reach this chunk, and spawn them
         int searchRadius = (this.maxRadius + 15) / 16;
         
         parseMaterials(world, material, sourceBlocks);
 
-        int currentChunkX = chunkCoord.getChunkX();
-        int currentChunkZ = chunkCoord.getChunkZ();
+        int currentChunkX = chunkBeingPopulated.getChunkX();
+        int currentChunkZ = chunkBeingPopulated.getChunkZ();
         for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
@@ -144,7 +147,7 @@ public class VeinGen extends Resource
                 Vein vein = getVeinStartInChunk(world, searchChunkX, searchChunkZ);
                 if (vein != null && vein.reachesChunk(currentChunkX, currentChunkZ))
                 {
-                    vein.spawn(world, random, chunkCoord, this);
+                    vein.spawn(world, random, chunkBeingPopulated, this);
                 }
             }
         }

@@ -20,18 +20,20 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.Rotation;
 
 public class CustomStructurePlotter
 {
+	private Object processingLock = new Object();
     private boolean processing = false;
-	private HashMap<ChunkCoordinate, ArrayList<String>> structuresPerChunk; // Used as a cache by the plotting code
+	private FifoMap<ChunkCoordinate, ArrayList<String>> structuresPerChunk; // Used as a cache by the plotting code
 	private HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
 	private HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
 	
 	public CustomStructurePlotter()
 	{
-		this.structuresPerChunk = new HashMap<ChunkCoordinate, ArrayList<String>>();
+		this.structuresPerChunk = new FifoMap<ChunkCoordinate, ArrayList<String>>(2048);
         this.spawnedStructuresByName = new HashMap<String, ArrayList<ChunkCoordinate>>();
         this.spawnedStructuresByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();
 	}
@@ -51,37 +53,74 @@ public class CustomStructurePlotter
 		CustomStructureFileManager.loadChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
 	}
 	
-	public void addToStructuresPerChunkCache(ChunkCoordinate chunkCoord, ArrayList<String> BO3Names)
+	public void invalidateChunkInStructuresPerChunkCache(ChunkCoordinate chunkCoord)
 	{
-		this.structuresPerChunk.put(chunkCoord, BO3Names);
+		this.structuresPerChunk.put(chunkCoord, null);
 	}
 		
-    public void plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, BO4CustomStructure> structureCache, Map<ChunkCoordinate, CustomStructure> worldInfoChunks)
+	public void plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, BO4CustomStructure> structureCache, Map<ChunkCoordinate, CustomStructure> worldInfoChunks)
+	{
+		plotStructures(null, null, world, rand, chunkCoord, spawningStructureAtSpawn, structureCache, worldInfoChunks);
+	}
+	
+    public boolean plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, BO4CustomStructure> structureCache, Map<ChunkCoordinate, CustomStructure> worldInfoChunks)
     {
-    	if(!processing)
+    	// This method can be called by /otg spawn and during chunkgeneration.
+    	// When called during chunkgeneration, the chunk must be filled or invalidated before returning, so never cancel.
+    	// When called by /otg spawn, skip this attempt to spawn and let chunk generation complete first.
+    	// This method should never be called recursively.
+    	// TODO: Make sure this never gets stuck, or abort and log a warning.
+    	// TODO: Can this thread be paused without issues, or for how long?
+    	while(true)
     	{
-	    	processing = true;
-	        if (!world.isInsidePregeneratedRegion(chunkCoord) && !structureCache.containsKey(chunkCoord))
-	        {
-	            LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 7);
-	            BiomeConfig biomeConfig = biome.getBiomeConfig();
-	            ArrayList<CustomStructureGen> customStructureGens = new ArrayList<CustomStructureGen>();
-
-	        	if(!world.chunkHasDefaultStructure(rand, chunkCoord))
-	        	{
-		            // Get Bo3's for this biome
-	                for (CustomStructureGen res : biomeConfig.getCustomStructures())
-	                {
-	                	//TODO: Check for res.error?
-	                	customStructureGens.add(res);
-	                }
-	        	}
-
-	            if(customStructureGens.size() > 0)
-	            {
-	            	Random random = new Random();
-
-	            	Map<StructuredCustomObject, Double> structuredCustomObjects = new HashMap<StructuredCustomObject, Double>();
+        	synchronized(processingLock)
+        	{
+        		if(!processing)
+        		{
+        			processing = true;
+        			break;
+        		}        		
+        		else if(targetStructure != null)
+    	    	{
+    	    		return false;
+    	    	}
+        	}  		
+			try {
+				Thread.sleep(20);
+			}
+    		catch (InterruptedException e)
+    		{
+				e.printStackTrace();
+				throw new RuntimeException("This shouldn't happen, please contact the OTG developers about this crash.");
+			}
+    	}
+    	
+    	// Try to spawn a structure that has a branch in this chunk.
+        if (!world.isInsidePregeneratedRegion(chunkCoord) && !structureCache.containsKey(chunkCoord))
+        {
+            LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 7);
+            BiomeConfig biomeConfig = biome.getBiomeConfig();
+            
+            ArrayList<CustomStructureGen> customStructureGens = new ArrayList<CustomStructureGen>();
+        	if(targetStructure == null && !world.chunkHasDefaultStructure(rand, chunkCoord))
+        	{
+	            // Get Bo3's for this biome
+                for (CustomStructureGen res : biomeConfig.getCustomStructures())
+                {
+                	//TODO: Check for res.error?
+                	customStructureGens.add(res);
+                }
+        	}
+            if(targetStructure != null || customStructureGens.size() > 0)
+            {
+            	Map<StructuredCustomObject, Double> structuredCustomObjects = new HashMap<StructuredCustomObject, Double>();
+            	if(targetStructure != null)
+            	{
+            		if(targetBiomes.size() == 0 || targetBiomes.contains(biome.getName()))
+            		{
+            			structuredCustomObjects.put(targetStructure, 100.0);
+            		}
+            	} else {
 	        		for(CustomStructureGen structureGen : customStructureGens)
 	        		{
 	        			int i = 0;
@@ -99,109 +138,113 @@ public class CustomStructurePlotter
 	        				}
 	        			}
 	        		}
+            	}
 
-	        		if(structuredCustomObjects.size() > 0)
-	        		{
-		            	Object[] topLeftAndLowerRightChunkCoordinates = null;
-		            	BO4CustomStructureCoordinate structureCoord = null;
-		            	BO4CustomStructure structureStart2 = null;
+        		if(structuredCustomObjects.size() > 0)
+        		{
+	            	BO4CustomStructureCoordinate structureCoord = null;
+	            	BO4CustomStructure structureStart2 = null;
 
-		            	ArrayList<Object[]> BO3sBySize = new ArrayList<Object[]>();
-		            	ArrayList<String> structuresToSpawn1 = new ArrayList<String>();
+	            	ArrayList<Object[]> BO3sBySize = new ArrayList<Object[]>();
+	            	ArrayList<String> structuresToSpawn1 = new ArrayList<String>();
 
-		            	// Get list of BO3's that should spawn at the spawn point
-		            	if(spawningStructureAtSpawn)
+	            	// Get list of BO3's that should spawn at the spawn point
+	            	if(targetStructure == null && spawningStructureAtSpawn)
+	            	{
+		            	for(Map.Entry<StructuredCustomObject, Double> bo3AndRarity : structuredCustomObjects.entrySet())
 		            	{
-			            	for(Map.Entry<StructuredCustomObject, Double> bo3AndRarity : structuredCustomObjects.entrySet())
-			            	{
-			            		if(!((BO4)bo3AndRarity.getKey()).isInvalidConfig && ((BO4)bo3AndRarity.getKey()).getSettings().isSpawnPoint)
-			            		{
+		            		if(!((BO4)bo3AndRarity.getKey()).isInvalidConfig && ((BO4)bo3AndRarity.getKey()).getConfig().isSpawnPoint)
+		            		{
+			            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
+			                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
+			                	structureStart2 = new BO4CustomStructure(world, structureCoord);
+			                	// Get minimum size (size if spawned with branchDepth 0)
+
+			                	try {
+			                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
+				                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
+			                		BO3sBySize.add(new Object[]{ bo3AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo3AndRarity.getValue() });
+								}
+			                	catch (InvalidConfigException e)
+			                	{
+									((BO4)bo3AndRarity.getKey()).isInvalidConfig = true;
+								}
+		            		}
+		            	}
+	            	}
+	            	if(!spawningStructureAtSpawn || BO3sBySize.size() == 0)
+	            	{
+		            	// Get list of BO3's able to spawn in this chunk
+		            	for(Map.Entry<StructuredCustomObject, Double> bo3AndRarity : structuredCustomObjects.entrySet())
+		            	{
+		            		if(!((BO4)bo3AndRarity.getKey()).isInvalidConfig && (int)Math.round(bo3AndRarity.getValue()) > 0)
+		            		{
+		            			// TODO: avoid calling IsBO3AllowedToSpawnAt so much, cache and reuse any nearest group members found
+
+		            			if(isBO4AllowedToSpawnAtByFrequency(chunkCoord, ((BO4)bo3AndRarity.getKey())))
+		            			{
 				            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
 				                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
-				                	structureStart2 = new BO4CustomStructure(world, structureCoord, false, false);
+				                	structureStart2 = new BO4CustomStructure(world, structureCoord);
 				                	// Get minimum size (size if spawned with branchDepth 0)
 
 				                	try {
-										topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
+				                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
 					                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
-				                		BO3sBySize.add(new Object[]{ bo3AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo3AndRarity.getValue() });
+					            		int insertAtIndex = BO3sBySize.size();
+					            		int i = 0;
+					                	for(Object[] entry : BO3sBySize)
+					                	{
+					                		if(((BO4)bo3AndRarity.getKey()).getConfig().timesSpawned < ((BO4)entry[0]).getConfig().timesSpawned || (BO3size > (Double)entry[2] && ((BO4)bo3AndRarity.getKey()).getConfig().timesSpawned == ((BO4)entry[0]).getConfig().timesSpawned))
+					                		{
+					                			insertAtIndex = i;
+					                			break;
+					                		}
+					                		i += 1;
+					                	}
+				                		BO3sBySize.add(insertAtIndex, new Object[]{ bo3AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo3AndRarity.getValue() });
 									}
 				                	catch (InvalidConfigException e)
 				                	{
 										((BO4)bo3AndRarity.getKey()).isInvalidConfig = true;
 									}
-			            		}
-			            	}
+		            			}
+		            		}
 		            	}
-		            	if(!spawningStructureAtSpawn || BO3sBySize.size() == 0)
-		            	{
-			            	// Get list of BO3's able to spawn in this chunk
-			            	for(Map.Entry<StructuredCustomObject, Double> bo3AndRarity : structuredCustomObjects.entrySet())
-			            	{
-			            		if(!((BO4)bo3AndRarity.getKey()).isInvalidConfig && (int)Math.round(bo3AndRarity.getValue()) > 0)
-			            		{
-			            			// TODO: avoid calling IsBO3AllowedToSpawnAt so much, cache and reuse any nearest group members found
+	            	}
 
-			            			if(isBO3AllowedToSpawnAt(chunkCoord, ((BO4)bo3AndRarity.getKey())))
-			            			{
-					            		structuresToSpawn1.add(bo3AndRarity.getKey().getName());
-					                	structureCoord = new BO4CustomStructureCoordinate(world, bo3AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
-					                	structureStart2 = new BO4CustomStructure(world, structureCoord, false, false);
-					                	// Get minimum size (size if spawned with branchDepth 0)
-
-					                	try {
-											topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
-						                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
-						            		int insertAtIndex = BO3sBySize.size();
-						            		int i = 0;
-						                	for(Object[] entry : BO3sBySize)
-						                	{
-						                		if(((BO4)bo3AndRarity.getKey()).getSettings().timesSpawned < ((BO4)entry[0]).getSettings().timesSpawned || (BO3size > (Double)entry[2] && ((BO4)bo3AndRarity.getKey()).getSettings().timesSpawned == ((BO4)entry[0]).getSettings().timesSpawned))
-						                		{
-						                			insertAtIndex = i;
-						                			break;
-						                		}
-						                		i += 1;
-						                	}
-					                		BO3sBySize.add(insertAtIndex, new Object[]{ bo3AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo3AndRarity.getValue() });
-										}
-					                	catch (InvalidConfigException e)
-					                	{
-											((BO4)bo3AndRarity.getKey()).isInvalidConfig = true;
-										}
-			            			}
-			            		}
-			            	}
-		            	}
-
-		            	if(BO3sBySize.size() > 0)
-		            	{
-			            	int pass = 1;
-			            	Object[] currentStructureSpawning = BO3sBySize.size() > 0 ? (spawningStructureAtSpawn ? BO3sBySize.get(random.nextInt(BO3sBySize.size()))  : BO3sBySize.get(0)) : null;
+	            	if(BO3sBySize.size() > 0)
+	            	{
+		            	// Go over the list and try to spawn each structure, from largest to smallest.
+		        		for(Object[] currentStructureSpawning : BO3sBySize)
+		        		{
+			            	int pass = 0;
 
 		            		int left = 0;
 		            		int right = 0;
 		            		int top = 0;
 		            		int bottom = 0;
 
-		        			int areaSizeX = 0;
-		        			int areaSizeZ = 0;
-
-		            		int structureSizeX = 0;
-		            		int structureSizeZ = 0;
-
-		        			int maxPass = 4;
-		        			boolean spawned;
-
-			        		while(pass <= maxPass && currentStructureSpawning != null)
+		        			int areaLength = 0;
+		        			int areaWidth = 0;
+		        			
+		        			Object[] topLeftAndLowerRightChunkCoordinates = (Object[])currentStructureSpawning[1];
+		            		int structureLength = (Integer)topLeftAndLowerRightChunkCoordinates[1] + (Integer)topLeftAndLowerRightChunkCoordinates[3] + 1;
+		            		int structureWidth = (Integer)topLeftAndLowerRightChunkCoordinates[0] + (Integer)topLeftAndLowerRightChunkCoordinates[2] + 1;
+		                	int structureTop = (Integer)topLeftAndLowerRightChunkCoordinates[0];
+		            		int structureRight = (Integer)topLeftAndLowerRightChunkCoordinates[1];
+		            		int structureBottom = (Integer)topLeftAndLowerRightChunkCoordinates[2];
+		            		int structureLeft = (Integer)topLeftAndLowerRightChunkCoordinates[3];
+		            		
+		        			while(pass <= 4)
 			        		{
-			        			spawned = false;
+			        			pass++;
 
-			            		topLeftAndLowerRightChunkCoordinates = (Object[])currentStructureSpawning[1];
-			            		structureSizeX = (Integer)topLeftAndLowerRightChunkCoordinates[1] + (Integer)topLeftAndLowerRightChunkCoordinates[3] + 1;
-			            		structureSizeZ = (Integer)topLeftAndLowerRightChunkCoordinates[0] + (Integer)topLeftAndLowerRightChunkCoordinates[2] + 1;
-
-		        		        if ((int)Math.round((Double)currentStructureSpawning[3]) > 0 || (spawningStructureAtSpawn && ((BO4)currentStructureSpawning[0]).getSettings().isSpawnPoint))// && (Double)currentStructureSpawning[3] >= random.nextDouble() * 100.0) <-- disabled rarity because it was basically meaningless (now rarity 0 means never, anything else means always)
+			            		// Disabled rarity because it was basically meaningless, 
+			            		// Rarity 0 is used to allow spawning of branches but not structure start in biomes.
+			            		// Any value > 0 means spawn in this biome.
+			            		// TODO: Replace rarity with a boolean (but keep it backwards compatible)?
+		        		        if ((int)Math.round((Double)currentStructureSpawning[3]) > 0 || (spawningStructureAtSpawn && ((BO4)currentStructureSpawning[0]).getConfig().isSpawnPoint))
 		        		        {
 				            		left = 0;
 				            		right = 0;
@@ -246,18 +289,22 @@ public class CustomStructurePlotter
 			            			ArrayList<String> structuresToSpawn;
 			            			boolean canSpawnHere;
 
-				        			boolean passHandled = false;
-				            		int j = 0;
-
+				            		int scanDistance = 0;
+				            		
 				            		if(!spawningStructureAtSpawn)
 				            		{
 						            	while(!(leftEdgeFound && rightEdgeFound && topEdgeFound && bottomEdgeFound))
 						            	{
-						            		j += 1;
+						            		scanDistance += 1;
 
-						            		if(right >= structureSizeX - 1 || left >= structureSizeX - 1 || right + left + 1 >= structureSizeX)
+						            		if(!rightEdgeFound)
 						            		{
-						            			rightEdgeFound = true;
+						            			// Find more free chunks until both height and width fit, just in case
+						            			// we can't fit length or width in the y direction.
+							            		if(right + left + 1 >= structureLength && right + left + 1 >= structureWidth)
+							            		{
+							            			rightEdgeFound = true; // leftEdgeFound is already true, since left and right will never spawn in the same pass.
+							            		}
 						            		}
 						            		if(!rightEdgeFound)
 						            		{
@@ -265,53 +312,71 @@ public class CustomStructurePlotter
 						            			for(int i = -top; i <= bottom; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + j, chunkCoord.getChunkZ() + i)))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + scanDistance, chunkCoord.getChunkZ() + i)))
 			            							{
-							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + j), (chunkCoord.getChunkZ() + i)));
+					            						if(targetStructure != null)
+					            						{
+					            							if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+					            							{
+					            								if(targetBiomes.size() == 0)
+					            								{
+					            									canSpawnHere = true;
+					            								} else {
+					            									biome3 = world.getBiome((chunkCoord.getChunkX() + scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+					            									if(targetBiomes.contains(biome3.getName()))
+					            									{
+					            										canSpawnHere = true;
+					            									}
+					            								}
+					            							}
+					            						} else {
+					            							biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)));
+								        	                
+					            							// StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
+								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
+								            				if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i))))
+								        	            	{
+							            						if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+							            						{
+									            					biome3 = world.getBiome((chunkCoord.getChunkX() + scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+									            					// Get cached data if available
+									            					if(!biome3.getName().equals(biome.getName()))
+										            				{
+											        	                biomeConfig3 = biome3.getBiomeConfig();
+											        	                structuresToSpawn = new ArrayList<String>();
 
-							        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
-
-							        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-							            				if(biomeStructures == null)
-							        	            	{
-						            						if(!world.chunkHasDefaultStructure(rand, chunkCoord))
-						            						{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() + j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
-								            					// Get cached data if available
-								            					if(!biome3.getName().equals(biome.getName()))
-									            				{
-										        	                biomeConfig3 = biome3.getBiomeConfig();
-										        	                structuresToSpawn = new ArrayList<String>();
-
-										        	                // Get Bo3's for this biome
-										        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
-										        	                {
-									        	                		for(String bo3Name : res.objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-										        	                }
-
-										        	                biomeStructures = structuresToSpawn;
-									            				} else {
-									        	            		canSpawnHere = true;
-									        	            		biomeStructures = structuresToSpawn1;
-									        	            	}
-						            						} else {
-						            							biomeStructures = new ArrayList<String>(); // Don't spawn anything here, there is a default structure.
-						            						}
-							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + j), (chunkCoord.getChunkZ() + i)),biomeStructures);
+											        	                // Get Bo3's for this biome
+											        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
+											        	                {
+										        	                		for(String bo3Name : res.objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+											        	                }											        	                
+											        	                biomeStructures = structuresToSpawn;
+										            				} else {
+										        	            		canSpawnHere = true;
+										        	            		biomeStructures = structuresToSpawn1;
+										        	            	}
+							            						} else {
+							            							biomeStructures = new ArrayList<String>(); // Don't spawn anything here, there is a default structure.
+							            						}
+						            							structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)),biomeStructures);
+								        	            	}
+								            				if(biomeStructures != null)
+								            				{
+									        	                for(String structureToSpawn : biomeStructures)
+									        	                {
+									        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
+									        	                	{
+									        	                		canSpawnHere = true;
+									        	                		break;
+									        	                	}
+									        	                }
+								            				}
 						            					}
-							        	                for(String structureToSpawn : biomeStructures)
-							        	                {
-							        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
-							        	                	{
-							        	                		canSpawnHere = true;
-							        	                		break;
-							        	                	}
-							        	                }
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + j), (chunkCoord.getChunkZ() + i)));
+						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -324,9 +389,14 @@ public class CustomStructurePlotter
 						            			}
 						            		}
 
-						            		if(right >= structureSizeX - 1 || left >= structureSizeX - 1 || right + left + 1 >= structureSizeX)
+						            		if(!leftEdgeFound)
 						            		{
-						            			leftEdgeFound = true;
+						            			// Find more free chunks until both height and width fit, just in case
+						            			// we can't fit length or width in the y direction.
+							            		if(right + left + 1 >= structureLength && right + left + 1 >= structureWidth)
+							            		{
+							            			leftEdgeFound = true; // rightEdgeFound is already true, since left and right will never spawn in the same pass.
+							            		}
 						            		}
 						            		if(!leftEdgeFound)
 						            		{
@@ -334,51 +404,69 @@ public class CustomStructurePlotter
 						            			for(int i = -top; i <= bottom; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() - j, chunkCoord.getChunkZ() + i)))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() - scanDistance, chunkCoord.getChunkZ() + i)))
 					            					{
-							        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
+					            						if(targetStructure != null)
+					            						{
+					            							if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+					            							{
+					            								if(targetBiomes.size() == 0)
+					            								{
+					            									canSpawnHere = true;
+					            								} else {
+					            									biome3 = world.getBiome((chunkCoord.getChunkX() - scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+					            									if(targetBiomes.contains(biome3.getName()))
+					            									{
+					            										canSpawnHere = true;
+					            									}
+					            								}
+					            							}
+					            						} else {
+								        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
+								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
+								        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)));
+							            					if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i))))
+								        	            	{
+								            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+								            					{
+									            					biome3 = world.getBiome((chunkCoord.getChunkX() - scanDistance) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
+									            					if(!biome3.getName().equals(biome.getName()))
+										            				{
+											        	                biomeConfig3 = biome3.getBiomeConfig();
+											        	                structuresToSpawn = new ArrayList<String>();
 
-							        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - j), (chunkCoord.getChunkZ() + i)));
-							            				if(biomeStructures == null)
-							        	            	{
-							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
-							            					{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() - j) * 16 + 8, (chunkCoord.getChunkZ() + i) * 16 + 7);
-								            					if(!biome3.getName().equals(biome.getName()))
-									            				{
-										        	                biomeConfig3 = biome3.getBiomeConfig();
-										        	                structuresToSpawn = new ArrayList<String>();
-
-										        	                // Get Bo3's for this biome
-										        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
-										        	                {
-									        	                		for(String bo3Name : res.objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-										        	                }
-
-										        	                biomeStructures = structuresToSpawn;
-									            				} else {
-									        	            		canSpawnHere = true;
-									        	            		biomeStructures = structuresToSpawn1;
-									        	            	}
-							            					} else {
-							            						biomeStructures = new ArrayList<String>();
+											        	                // Get Bo3's for this biome
+											        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
+											        	                {
+										        	                		for(String bo3Name : res.objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+											        	                }											        	                
+											        	                biomeStructures = structuresToSpawn;
+										            				} else {
+										        	            		canSpawnHere = true;
+										        	            		biomeStructures = structuresToSpawn1;
+										        	            	}
+								            					} else {
+								            						biomeStructures = new ArrayList<String>();
+								            					}
+								            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)),biomeStructures);
 							            					}
-							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - j), (chunkCoord.getChunkZ() + i)),biomeStructures);
-						            					}
-							        	                for(String structureToSpawn : biomeStructures)
-							        	                {
-							        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
-							        	                	{
-							        	                		canSpawnHere = true;
-							        	                		break;
-							        	                	}
-							        	                }
+							            					if(biomeStructures != null)
+							            					{
+									        	                for(String structureToSpawn : biomeStructures)
+									        	                {
+									        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
+									        	                	{
+									        	                		canSpawnHere = true;
+									        	                		break;
+									        	                	}
+									        	                }
+							            					}
+					            						}
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - j), (chunkCoord.getChunkZ() + i)));
+						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -391,9 +479,14 @@ public class CustomStructurePlotter
 						            			}
 						            		}
 
-						            		if(bottom >= structureSizeZ - 1 || top >= structureSizeZ - 1 || bottom + top + 1 >= structureSizeZ)
+						            		if(!bottomEdgeFound)
 						            		{
-						            			bottomEdgeFound = true;
+						            			// Find more free chunks until both height and width fit, just in case
+						            			// we can't fit length or width in the x direction.
+							            		if(bottom + top + 1 >= structureLength && bottom + top + 1 >= structureWidth)
+							            		{
+							            			bottomEdgeFound = true; // topEdgeFound is already true, since left and right will never spawn in the same pass.
+							            		}
 						            		}
 						            		if(!bottomEdgeFound)
 						            		{
@@ -401,51 +494,70 @@ public class CustomStructurePlotter
 						            			for(int i = -left; i <= right; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() + j)))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() + scanDistance)))
 					            					{
-							        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
+					            						if(targetStructure != null)
+					            						{
+					            							if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+					            							{
+					            								if(targetBiomes.size() == 0)
+					            								{
+					            									canSpawnHere = true;
+					            								} else {
+					            									biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + scanDistance) * 16 + 7);
+					            									if(targetBiomes.contains(biome3.getName()))
+					            									{
+					            										canSpawnHere = true;
+					            									}
+					            								}
+					            							}
+					            						} else {
+								        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
+								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
+								        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)));
+							            					if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance))))
+								        	            	{
+								            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+								            					{
+									            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + scanDistance) * 16 + 7);
+									            					if(!biome3.getName().equals(biome.getName()))
+										            				{
+											        	                biomeConfig3 = biome3.getBiomeConfig();
+											        	                structuresToSpawn = new ArrayList<String>();
 
-							        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + j)));
-							            				if(biomeStructures == null)
-							        	            	{
-							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
-							            					{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() + j) * 16 + 7);
-								            					if(!biome3.getName().equals(biome.getName()))
-									            				{
-										        	                biomeConfig3 = biome3.getBiomeConfig();
-										        	                structuresToSpawn = new ArrayList<String>();
+											        	                // Get Bo3's for this biome
+											        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
+											        	                {
+										        	                		for(String bo3Name : res.objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+											        	                }
 
-										        	                // Get Bo3's for this biome
-										        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
-										        	                {
-									        	                		for(String bo3Name : res.objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-										        	                }										        	                
-
-										        	                biomeStructures = structuresToSpawn;
-									            				} else {
-									        	            		canSpawnHere = true;
-									        	            		biomeStructures = structuresToSpawn1;
-									        	            	}
-							            					} else {
-							            						biomeStructures = new ArrayList<String>();
+											        	                biomeStructures = structuresToSpawn;
+										            				} else {
+										        	            		canSpawnHere = true;
+										        	            		biomeStructures = structuresToSpawn1;
+										        	            	}
+								            					} else {
+								            						biomeStructures = new ArrayList<String>();
+								            					}
+								            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)),biomeStructures);
 							            					}
-							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + j)),biomeStructures);
-						            					}
-							        	                for(String structureToSpawn : biomeStructures)
-							        	                {
-							        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
-							        	                	{
-							        	                		canSpawnHere = true;
-							        	                		break;
-							        	                	}
-							        	                }
+							            					if(biomeStructures != null)
+							            					{
+									        	                for(String structureToSpawn : biomeStructures)
+									        	                {
+									        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
+									        	                	{
+									        	                		canSpawnHere = true;
+									        	                		break;
+									        	                	}
+									        	                }
+							            					}
+					            						}
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + j)));
+						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -458,9 +570,14 @@ public class CustomStructurePlotter
 						            			}
 						            		}
 
-						            		if(top >= structureSizeZ - 1 || bottom >= structureSizeZ - 1 || bottom + top >= structureSizeZ + 1)
+						            		if(!topEdgeFound)
 						            		{
-						            			topEdgeFound = true;
+						            			// Find more free chunks until both height and width fit, just in case
+						            			// we can't fit length or width in the x direction.
+							            		if(bottom + top + 1 >= structureLength && bottom + top + 1 >= structureWidth)
+							            		{
+							            			topEdgeFound = true; // bottomEdgeFound is already true, since left and right will never spawn in the same pass.
+							            		}
 						            		}
 						            		if(!topEdgeFound)
 						            		{
@@ -468,51 +585,69 @@ public class CustomStructurePlotter
 						            			for(int i = -left; i <= right; i++)
 						            			{
 						        	                canSpawnHere = false;
-					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() - j)))
+					            					if(!world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + i, chunkCoord.getChunkZ() - scanDistance)))
 					            					{
-							        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
+					            						if(targetStructure != null)
+					            						{
+					            							if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+					            							{
+					            								if(targetBiomes.size() == 0)
+					            								{
+					            									canSpawnHere = true;
+					            								} else {
+					            									biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - scanDistance) * 16 + 7);
+					            									if(targetBiomes.contains(biome3.getName()))
+					            									{
+					            										canSpawnHere = true;
+					            									}
+					            								}
+					            							}
+					            						} else {
+								        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
+								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
+								        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)));
+							            					if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance))))
+								        	            	{
+								            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
+								            					{
+									            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - scanDistance) * 16 + 7);
+									            					if(!biome3.getName().equals(biome.getName()))
+										            				{
+											        	                biomeConfig3 = biome3.getBiomeConfig();
+											        	                structuresToSpawn = new ArrayList<String>();
 
-							        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-							        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - j)));
-							            				if(biomeStructures == null)
-							        	            	{
-							            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
-							            					{
-								            					biome3 = world.getBiome((chunkCoord.getChunkX() + i) * 16 + 8, (chunkCoord.getChunkZ() - j) * 16 + 7);
-								            					if(!biome3.getName().equals(biome.getName()))
-									            				{
-										        	                biomeConfig3 = biome3.getBiomeConfig();
-										        	                structuresToSpawn = new ArrayList<String>();
-
-										        	                // Get Bo3's for this biome
-										        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
-										        	                {
-									        	                		for(String bo3Name : res.objectNames)
-									        	                		{
-									        	                			structuresToSpawn.add(bo3Name);
-									        	                		}
-										        	                }
-										        	                
-										        	                biomeStructures = structuresToSpawn;
-									            				} else {
-									        	            		canSpawnHere = true;
-									        	            		biomeStructures = structuresToSpawn1;
-									        	            	}
-							            					} else {
-							            						biomeStructures = new ArrayList<String>();
+											        	                // Get Bo3's for this biome
+											        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
+											        	                {
+										        	                		for(String bo3Name : res.objectNames)
+										        	                		{
+										        	                			structuresToSpawn.add(bo3Name);
+										        	                		}
+											        	                }												        	                
+											        	                biomeStructures = structuresToSpawn;
+										            				} else {
+										        	            		canSpawnHere = true;
+										        	            		biomeStructures = structuresToSpawn1;
+										        	            	}
+								            					} else {
+								            						biomeStructures = new ArrayList<String>();
+								            					}
+								            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)),biomeStructures);
 							            					}
-							            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - j)),biomeStructures);
-						            					}
-							        	                for(String structureToSpawn : biomeStructures)
-							        	                {
-							        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
-							        	                	{
-							        	                		canSpawnHere = true;
-							        	                		break;
-							        	                	}
-							        	                }
+							            					if(biomeStructures != null)
+							            					{
+									        	                for(String structureToSpawn : biomeStructures)
+									        	                {
+									        	                	if(structureToSpawn.equals(((BO4)currentStructureSpawning[0]).getName()))
+									        	                	{
+									        	                		canSpawnHere = true;
+									        	                		break;
+									        	                	}
+									        	                }
+							            					}
+					            						}
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - j)));
+						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -524,139 +659,116 @@ public class CustomStructurePlotter
 						            				top += 1;
 						            			}
 						            		}
-
-						            		if(!passHandled)
-						            		{
-							            		// Pass 1 expands to left and bottom first, right and top second
-							            		if(pass == 1 && bottomEdgeFound && leftEdgeFound)
-							            		{
-							            			passHandled = true;
-							            			j = 0;
-							            			topEdgeFound = false;
-							            			rightEdgeFound = false;
-							            		}
-							            		// Pass 2 expands to right and bottom first, left and top second
-							            		if(pass == 2 && bottomEdgeFound && rightEdgeFound)
-							            		{
-							            			passHandled = true;
-							            			j = 0;
-							            			topEdgeFound = false;
-							            			leftEdgeFound = false;
-							            		}
-							            		// Pass 3 expands to left and top first, right and bottom second
-							            		if(pass == 3 && topEdgeFound && leftEdgeFound)
-							            		{
-							            			passHandled = true;
-							            			j = 0;
-							            			bottomEdgeFound = false;
-							            			rightEdgeFound = false;
-							            		}
-							            		// Pass 4 expands to right and top first, left and bottom second
-							            		if(pass == 4 && topEdgeFound && rightEdgeFound)
-							            		{
-							            			passHandled = true;
-							            			j = 0;
-							            			bottomEdgeFound = false;
-							            			leftEdgeFound = false;
-							            		}
-						            		}
 						            	}
 				            		} else {
+				            			// When spawning structure at spawn, spawn the structure centered around the spawn point, all chunks should be available.
+				            			// TODO: Shouldn't it just put the start BO4 at the spawn point? 
+				            			// TODO: Does the spawn structure ignore biome checks completely (it should)?
 				            			left = (int) Math.ceil(((Integer)topLeftAndLowerRightChunkCoordinates[3] + (Integer)topLeftAndLowerRightChunkCoordinates[1]) / 2d);
 				            			right = (int) Math.floor(((Integer)topLeftAndLowerRightChunkCoordinates[3] + (Integer)topLeftAndLowerRightChunkCoordinates[1]) / 2d);
 				            			top = (int) Math.ceil(((Integer)topLeftAndLowerRightChunkCoordinates[0] + (Integer)topLeftAndLowerRightChunkCoordinates[2]) / 2d);
 				            			bottom = (int) Math.floor(((Integer)topLeftAndLowerRightChunkCoordinates[0] + (Integer)topLeftAndLowerRightChunkCoordinates[2]) / 2d);
-
-				            			if(
-			            					world.getWorldSession().getWorldBorderRadius() > 0 &&
-			            					(
-		            							world.getWorldSession().getWorldBorderRadius() < left ||
-		            							world.getWorldSession().getWorldBorderRadius() < right ||
-		            							world.getWorldSession().getWorldBorderRadius() < top ||
-		            							world.getWorldSession().getWorldBorderRadius() < bottom
-			            					)
-		            					)
-				            			{
-				            				left = 0;
-				            				right = 0;
-				            				top = 0;
-				            				bottom = 0;
-				            			}
 				            		}
 
-				        			areaSizeX = left + right + 1;
-				        			areaSizeZ = top + bottom + 1;
+				        			areaLength = left + right + 1;
+				        			areaWidth = top + bottom + 1;
 
 					            	// See if the structure will fit
 					            	if(
-				            			structureSizeX <= areaSizeX &&
-				    					structureSizeZ <= areaSizeZ
+				            			(structureLength <= areaLength && structureWidth <= areaWidth) ||
+				            			(structureLength <= areaWidth && structureWidth <= areaLength)
 				        			)
 					            	{
-					            		int spawnCoordX = 0;
-					            		int spawnCoordZ = 0;
-
-					            		// Always spawn in the opposite corner for each pass to make optimal use of detected area
-					            		// TODO: Is this still necessary? Will the "found" area dimensions ever be larger than the structure?
-
-					            		// Make sure to always spawn on the chunk that called this method! (area length/width may be larger than structure length/width if the structure has uneven length/width)
-
-					            		// Pass 1 expands to left and bottom first, right and top second
-					            		if(pass == 1)
+					            		// Determine the coordinates of the start BO4 and spawn the structure.
+					            		// Make sure the current chunk is inside the structure's bounding box
+					            		// and take into account rotation. Center the structure in the available 
+					            		// area as much as possible, this should give structures with randomised 
+					            		// branches room to expand in all directions. Hopefully this won't cause 
+					            		// large structures to spawn less frequently because of space (placing one 
+					            		// structure in the middle of an area vs spawning two structures side by side). 
+					            		// This won't guarantee that the structure will spawn a branch in this chunk,
+					            		// so we may have to try to spawn more structures.
+					            		
+					            		// Get rotated width/length and start chunk.
+					            		
+					            		boolean canSpawnUnrotated = false;
+					            		boolean canSpawnRotated = false;
+					            		if(structureLength <= areaLength && structureWidth <= areaWidth)
 					            		{
-					            			// Spawn on left border of available area
-						            		spawnCoordX = chunkCoord.getChunkX() - (left > 0 && left - (Integer)topLeftAndLowerRightChunkCoordinates[3] > (Integer)topLeftAndLowerRightChunkCoordinates[1] ? (structureSizeX - 1) : left) + (Integer)topLeftAndLowerRightChunkCoordinates[3]; // left + (Integer)topLeftAndLowerRightChunkCoordinates[3];
-						            		// Spawn on bottom border of available area
-						            		spawnCoordZ = chunkCoord.getChunkZ() + (bottom > 0 && bottom - (Integer)topLeftAndLowerRightChunkCoordinates[2] > (Integer)topLeftAndLowerRightChunkCoordinates[0] ? (structureSizeZ - 1) : bottom) - (Integer)topLeftAndLowerRightChunkCoordinates[2]; // bottom - (Integer)topLeftAndLowerRightChunkCoordinates[2];
+					            			canSpawnUnrotated = true;
 					            		}
-					            		// Pass 2 expands to right and bottom first, left and top second
-					            		if(pass == 2)
+					            		if(structureLength <= areaWidth && structureWidth <= areaLength)
 					            		{
-					            			// Spawn on right border of available area
-						            		spawnCoordX = chunkCoord.getChunkX() + (right > 0 && right - (Integer)topLeftAndLowerRightChunkCoordinates[1] > (Integer)topLeftAndLowerRightChunkCoordinates[3] ? (structureSizeX - 1) : right) - (Integer)topLeftAndLowerRightChunkCoordinates[1]; // right - (Integer)topLeftAndLowerRightChunkCoordinates[1];
-						            		// Spawn on bottom border of available area
-						            		spawnCoordZ = chunkCoord.getChunkZ() + (bottom > 0 && bottom - (Integer)topLeftAndLowerRightChunkCoordinates[2] > (Integer)topLeftAndLowerRightChunkCoordinates[0] ? (structureSizeZ - 1) : bottom) - (Integer)topLeftAndLowerRightChunkCoordinates[2]; // bottom - (Integer)topLeftAndLowerRightChunkCoordinates[2];
+					            			canSpawnRotated = true;	
 					            		}
-					            		// Pass 3 expands to left and top first, right and bottom second
-					            		if(pass == 3)
+					            							            		
+					            		Rotation rotation = rand.nextBoolean() ? Rotation.NORTH : Rotation.SOUTH;
+					            		if(canSpawnUnrotated && canSpawnRotated)
 					            		{
-					            			// Spawn on left border of available area
-						            		spawnCoordX = chunkCoord.getChunkX() - (left > 0 && left - (Integer)topLeftAndLowerRightChunkCoordinates[3] > (Integer)topLeftAndLowerRightChunkCoordinates[1] ?  (structureSizeX - 1) : left) + (Integer)topLeftAndLowerRightChunkCoordinates[3];// left + (Integer)topLeftAndLowerRightChunkCoordinates[3];
-						            		// Spawn on top border of available area
-						            		spawnCoordZ = chunkCoord.getChunkZ() - (top > 0 && top - (Integer)topLeftAndLowerRightChunkCoordinates[0] > (Integer)topLeftAndLowerRightChunkCoordinates[2] ? (structureSizeZ - 1) : top) + (Integer)topLeftAndLowerRightChunkCoordinates[0]; // top + (Integer)topLeftAndLowerRightChunkCoordinates[0];
+					            			rotation = Rotation.getRandomRotation(rand);
 					            		}
-					            		// Pass 4 expands to right and top first, left and bottom second
-					            		if(pass == 4)
+					            		else if(canSpawnRotated)
 					            		{
-					            			// Spawn on right border of available area
-						            		spawnCoordX = chunkCoord.getChunkX() + (right > 0 && right - (Integer)topLeftAndLowerRightChunkCoordinates[1] > (Integer)topLeftAndLowerRightChunkCoordinates[3] ?  (structureSizeX - 1) : right) - (Integer)topLeftAndLowerRightChunkCoordinates[1]; //right - (Integer)topLeftAndLowerRightChunkCoordinates[1];
-						            		// Spawn on top border of available area
-						            		spawnCoordZ = chunkCoord.getChunkZ() - (top > 0 && top - (Integer)topLeftAndLowerRightChunkCoordinates[0] > (Integer)topLeftAndLowerRightChunkCoordinates[2] ?  (structureSizeZ - 1) : top) + (Integer)topLeftAndLowerRightChunkCoordinates[0]; //top + (Integer)topLeftAndLowerRightChunkCoordinates[0];
+					            			rotation = rand.nextBoolean() ? Rotation.EAST : Rotation.WEST;
+					            		}
+					            		
+					            		int structureLengthRotated = 0;
+					            		int structureWidthRotated = 0;						            		
+					            		if(rotation == Rotation.NORTH || rotation == Rotation.SOUTH)
+					            		{
+					            			structureLengthRotated = structureLength;
+					            			structureWidthRotated = structureWidth;
+					            		} else {
+					            			structureLengthRotated = structureWidth;
+					            			structureWidthRotated = structureLength;
+					            		}
+					            		
+					            		// Fit the bounding box of the structure in the center of the available area (as much as possible),
+					            		// making sure that the current chunk is inside the structure
+
+					            		int structureBBInsideAreaX = (int)Math.floor(chunkCoord.getChunkX() - left + ((left + right + 1) / 2d) - (structureLengthRotated / 2d));
+					            		if(structureBBInsideAreaX > chunkCoord.getChunkX())
+					            		{
+					            			structureBBInsideAreaX = chunkCoord.getChunkX();
+					            		}
+					            		else if(structureBBInsideAreaX + structureLengthRotated < chunkCoord.getChunkX())
+					            		{
+					            			structureBBInsideAreaX = chunkCoord.getChunkX() - structureLengthRotated + 1;
+					            		}
+					            		
+					            		int structureBBInsideAreaZ = (int)Math.floor(chunkCoord.getChunkZ() - top + ((top + bottom + 1) / 2d) - (structureWidthRotated / 2d));
+					            		if(structureBBInsideAreaZ > chunkCoord.getChunkZ())
+					            		{
+					            			structureBBInsideAreaZ = chunkCoord.getChunkZ();
+					            		}
+					            		else if(structureBBInsideAreaZ + structureWidthRotated < chunkCoord.getChunkZ())
+					            		{
+					            			structureBBInsideAreaZ = chunkCoord.getChunkZ() - structureWidthRotated + 1;
 					            		}
 
-				                		if(isBO3AllowedToSpawnAt(ChunkCoordinate.fromChunkCoords((int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)), (int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))), (BO4)currentStructureSpawning[0]))
+					            		// Find the world coords of the structure start inside the rotated bounding box.						            		
+					            		int spawnCoordX = structureBBInsideAreaX + (rotation == Rotation.NORTH ? structureLeft : rotation == Rotation.EAST ? structureBottom : rotation == Rotation.SOUTH ? structureRight : structureTop);
+					            		int spawnCoordZ = structureBBInsideAreaZ + (rotation == Rotation.NORTH ? structureTop : rotation == Rotation.EAST ? structureLeft : rotation == Rotation.SOUTH ? structureBottom : structureRight);
+					                	ChunkCoordinate spawnChunk = ChunkCoordinate.fromChunkCoords(spawnCoordX, spawnCoordZ);
+					                							                	
+				                		if(isBO4AllowedToSpawnAtByFrequency(spawnChunk, (BO4)currentStructureSpawning[0]))
 				                		{
-						                	structureCoord = new BO4CustomStructureCoordinate(world, ((BO4)currentStructureSpawning[0]), null, Rotation.NORTH, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
-						                	structureStart2 = new BO4CustomStructure(world, structureCoord, true, spawningStructureAtSpawn);
+						                	structureCoord = new BO4CustomStructureCoordinate(world, ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
+						                	structureStart2 = new BO4CustomStructure(world, structureCoord, spawningStructureAtSpawn, targetBiomes, chunkCoord);
 
 				            	        	if(structureStart2.IsSpawned)
 						                	{
-				            	    			// Always add the Start chunk to the structureCache etc even if it doesnt have any blocks. 
-				            	        		// This is done to make sure that Start will get saved correctly when the server saves to disk.
-				            	    			// TODO: This means that the start chunk can be empty and cannot be populated by another structure :(. It will also show /otg BO3Info in the apparently empty chunk
+				            	        		structureCache.put(spawnChunk, structureStart2);
+				            	    			this.structuresPerChunk.put(spawnChunk, null);
+				            	    			worldInfoChunks.put(spawnChunk, structureStart2);
 
-				            	        		structureCache.put(chunkCoord, structureStart2);
-				            	    			this.structuresPerChunk.put(chunkCoord, new ArrayList<String>());
-				            	    			worldInfoChunks.put(chunkCoord, structureStart2);
-
-						                		((BO4)structureCoord.getObject()).getSettings().timesSpawned += 1;
-							                	//biome3 = world.getBiome(spawnCoordX * 16 + 8, spawnCoordZ * 16 + 7);
+						                		((BO4)structureCoord.getObject()).getConfig().timesSpawned += 1;
 						                		if(OTG.getPluginConfig().spawnLog)
 						                		{
 						                			OTG.log(LogMarker.INFO, "Plotted structure " + structureCoord.getObject().getName() + " at chunk X" + spawnCoordX + " Z" + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
 						                		}
 
-						                		if(((BO4)currentStructureSpawning[0]).getSettings().frequency > 0 || ((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.size() > 0)
+						                		if(((BO4)currentStructureSpawning[0]).getConfig().frequency > 0 || ((BO4)currentStructureSpawning[0]).getConfig().bo3Groups.size() > 0)
 						                		{
 						                			String bO3Name = ((BO4)currentStructureSpawning[0]).getName();
 						                			ChunkCoordinate bo4SpawnCoord = ChunkCoordinate.fromChunkCoords(spawnCoordX, spawnCoordZ);
@@ -669,14 +781,13 @@ public class CustomStructurePlotter
 							                		}
 					                				chunkCoords.add(bo4SpawnCoord);
 
-						                			if(((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.size() > 0)
+						                			if(((BO4)currentStructureSpawning[0]).getConfig().bo3Groups.size() > 0)
 						                			{
-							                			ChunkCoordinate bo4CenterSpawnCoord = ChunkCoordinate.fromChunkCoords(
-				                							(int)Math.round(spawnCoordX - ((Integer)topLeftAndLowerRightChunkCoordinates[3] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[1] / 2d)),
-				                							(int)Math.round(spawnCoordZ - ((Integer)topLeftAndLowerRightChunkCoordinates[0] / 2d) + ((Integer)topLeftAndLowerRightChunkCoordinates[2] / 2d))
-			                							);
+									            		int structureCenterX = structureBBInsideAreaX + (int)Math.floor(((rotation == Rotation.NORTH || rotation == Rotation.SOUTH ? structureLeft + structureRight + 1 : structureBottom + structureTop + 1) / 2d));
+									            		int structureCenterZ = structureBBInsideAreaZ + (int)Math.floor(((rotation == Rotation.NORTH || rotation == Rotation.SOUTH ? structureTop + structureBottom + 1 : structureLeft + structureRight + 1) / 2d));
+									                	ChunkCoordinate bo4CenterSpawnCoord = ChunkCoordinate.fromChunkCoords(structureCenterX, structureCenterZ);
 						                				
-						                				for(Entry<String, Integer> entry : ((BO4)currentStructureSpawning[0]).getSettings().bo3Groups.entrySet())
+						                				for(Entry<String, Integer> entry : ((BO4)currentStructureSpawning[0]).getConfig().bo3Groups.entrySet())
 						                				{
 					                						String bo3GroupName = entry.getKey();
 					                						int bo3GroupFrequency = entry.getValue().intValue();
@@ -705,111 +816,44 @@ public class CustomStructurePlotter
 						                			}
 						                		}
 
-						                		spawned = true;
-						                		// If the structure has spawned then get its actual size, don't use its minimum size
-					                			random = new Random();
+						                		// Even though we made sure the structure's bounding box contained the current chunk,
+						                		// the structure may not have spawned a branch on the current chunk. If so, try to 
+						                		// spawn more structures.
+						                		// If we're plotting a target structure via /otg spawn, then the chunk isn't being populated
+						                		// so it's okay if the structure didn't get plotted on this chunk.
+						                		if(structureCache.containsKey(chunkCoord) || targetStructure != null)
+						                		{
+						                	        processing = false;
+						                			return true;
+						                		}
+					                			break;
 					                		}
-
-				            	        	// if the target chunk had a part of the branching structure spawned on it // <-- this should always be the case when spawned == true
-			                				if(spawned)
-				                			{
-				                				break;
-				                			}
 				                		}
+				                		// We've found an area big enough and tried to spawn the structure, so stop 
+				                		// scanning regardless of whether the structure actually spawned.
+				                		break;
 					            	}
-		        		        } else {
-		        		        	pass = maxPass;
 		        		        }
-
-			                	if(!spawned)
-			                	{
-			                		//OTG.log(LogMarker.INFO, "Cannot spawn pass" + pass + " size" + BO3sBySize.size());
-			                		pass += 1;
-
-			                		// Tried spawning this structure 4 times, move on to next structure
-				                	if(pass > maxPass)
-				                	{
-				                		// If we've tried 4 passes for all structures then give up
-				                		if(BO3sBySize.size() == 1)
-				                		{
-			                        		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
-				                		} else {
-				                			// Try 4 passes for next structure
-				                			// Find next structure
-				                			boolean bFound = false;
-				                			int i = 0;
-				                			for(Object[] nextStructure : BO3sBySize)
-				                			{
-				                				if(bFound)
-				                				{
-				                					BO3sBySize.remove(currentStructureSpawning);
-				                					currentStructureSpawning = nextStructure;
-				                					break;
-				                				}
-				                				if(nextStructure == currentStructureSpawning)
-				                				{
-				                					if(i == BO3sBySize.size() - 1)
-				                					{
-				                						BO3sBySize.remove(currentStructureSpawning);
-				                						currentStructureSpawning = BO3sBySize.get(0);
-				                						break;
-				                					}
-				                					bFound = true;
-				                				}
-				                				i += 1;
-				                			}
-				                			pass = 1;
-				                		}
-				                	}
-			                	} else {
-		                			// Try 4 passes for next structure
-		                			// Find next structure
-		                			boolean bFound = false;
-		                			int i = 0;
-		                			for(Object[] nextStructure : BO3sBySize)
-		                			{
-		                				if(bFound)
-		                				{
-		                					currentStructureSpawning = nextStructure;
-		                					break;
-		                				}
-		                				if(nextStructure == currentStructureSpawning)
-		                				{
-		                					if(i == BO3sBySize.size() - 1)
-		                					{
-		                						currentStructureSpawning = BO3sBySize.get(0);
-		                						break;
-		                					}
-		                					bFound = true;
-		                				}
-		                				i += 1;
-		                			}
-	                				pass = 1;
-		                		}
 			        		}
-		            	} else {
-		            		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
-		            	}
-		            } else {
-	            		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
-		            }
-	            } else {
-            		structureCache.put(chunkCoord, new BO4CustomStructure(world, null, false, false));
+		        		}
+	            	}
 	            }
-	    	}
-	        processing = false;
-
-    		structuresPerChunk.put(chunkCoord, new ArrayList<String>());
-    	} else {
-    		OTG.log(LogMarker.FATAL, "Illegal double spawn detected, aborting...");
-    		throw new RuntimeException("Illegal double spawn detected, aborting...");
+            }
     	}
+        if(!structureCache.containsKey(chunkCoord))
+        {
+        	structureCache.put(chunkCoord, null);
+        }
+		structuresPerChunk.put(chunkCoord, null);
+		processing = false;
+		
+    	return false;
     }
 
-    private boolean isBO3AllowedToSpawnAt(ChunkCoordinate chunkCoord, BO4 BO3ToSpawn)
+    private boolean isBO4AllowedToSpawnAtByFrequency(ChunkCoordinate chunkCoord, BO4 BO3ToSpawn)
     {
         // Check if no other structure of the same type (filename) is within the minimum radius (BO3 frequency)
-		int radius = BO3ToSpawn.getSettings().frequency;
+		int radius = BO3ToSpawn.getConfig().frequency;
 		String bO3Name = BO3ToSpawn.getName();
 		if(radius > 0)
 		{
@@ -833,12 +877,12 @@ public class CustomStructurePlotter
 		}
 		
 		// Check if no other structures that are a member of the same group as this BO3 are within the minimum radius (BO3Group frequency)
-		if(BO3ToSpawn.getSettings().bo3Groups.size() > 0)
+		if(BO3ToSpawn.getConfig().bo3Groups.size() > 0)
 		{
         	float distanceBetweenStructures = 0;
         	int cachedChunkRadius = 0;
         	ChunkCoordinate cachedChunk = null;
-        	for(Entry<String, Integer> entry : BO3ToSpawn.getSettings().bo3Groups.entrySet())
+        	for(Entry<String, Integer> entry : BO3ToSpawn.getConfig().bo3Groups.entrySet())
         	{
         		HashMap<ChunkCoordinate, Integer> spawnedStructure = spawnedStructuresByGroup.get(entry.getKey());
         		if(spawnedStructure != null)

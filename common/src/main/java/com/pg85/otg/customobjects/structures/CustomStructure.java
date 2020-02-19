@@ -24,5 +24,5 @@ public abstract class CustomStructure
     protected Map<ChunkCoordinate, Set<CustomStructureCoordinate>> objectsToSpawn;
     protected Random random;
     
-    protected CustomStructure() { }    
+    protected CustomStructure() { }
 }

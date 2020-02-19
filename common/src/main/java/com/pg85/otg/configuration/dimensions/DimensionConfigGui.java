@@ -12,6 +12,7 @@ import com.pg85.otg.configuration.world.WorldConfig;
 
 public class DimensionConfigGui extends DimensionConfigBase
 {
+	public boolean shouldDisplay = true;
 	public List<String> dimensions = new ArrayList<String>();
 	public String author = null;
 	public String description = null;
@@ -21,13 +22,8 @@ public class DimensionConfigGui extends DimensionConfigBase
 	{
 		super();
 	}
-	
-	public DimensionConfigGui(String presetName)
-	{
-		super(presetName);
-	}
-	
-	public DimensionConfigGui(String presetName, WorldConfig worldConfig)
+		
+	public DimensionConfigGui(String presetName, WorldConfig worldConfig, boolean shouldDisplay)
 	{	
 		super(presetName, worldConfig);
 		
@@ -35,7 +31,8 @@ public class DimensionConfigGui extends DimensionConfigBase
 		this.author = worldConfig.author;
 		this.description = worldConfig.description;
 		this.worldPackerModName = worldConfig.worldPackerModName;
-	}	
+		this.shouldDisplay = shouldDisplay;
+	}
 	
 	@Override
 	public DimensionConfigGui clone()

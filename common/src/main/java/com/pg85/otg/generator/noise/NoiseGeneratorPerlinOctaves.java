@@ -26,8 +26,7 @@ public class NoiseGeneratorPerlinOctaves
         if (doubleArray == null)
         {
             doubleArray = new double[xSize * ySize * zSize];
-        } else
-        {
+        } else {
             for (int k1 = 0; k1 < doubleArray.length; ++k1)
             {
                 doubleArray[k1] = 0.0D;

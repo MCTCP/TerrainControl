@@ -42,6 +42,9 @@ public class DimensionConfig extends DimensionConfigBase
 		clone.Seed = this.Seed;
 		clone.WorldBorderRadiusInChunks = this.WorldBorderRadiusInChunks;
 		clone.PregeneratorRadiusInChunks = this.PregeneratorRadiusInChunks;
+		clone.AllowCheats = this.AllowCheats;
+		clone.BonusChest = this.BonusChest;
+		clone.GameType = this.GameType;
 		
 		clone.Settings = this.Settings.clone();
 		clone.GameRules = this.GameRules.clone();

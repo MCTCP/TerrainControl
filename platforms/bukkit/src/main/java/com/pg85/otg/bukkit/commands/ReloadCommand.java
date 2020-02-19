@@ -1,9 +1,9 @@
 package com.pg85.otg.bukkit.commands;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.bukkit.BukkitWorld;
 import com.pg85.otg.bukkit.OTGPerm;
 import com.pg85.otg.bukkit.OTGPlugin;
+import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.logging.LogMarker;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

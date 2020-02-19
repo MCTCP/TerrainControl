@@ -20,8 +20,8 @@ public class BO3Settings extends Settings
 
     static final Setting<Integer>
             FREQUENCY = intSetting("Frequency", 0, 0, 9999),
-            MIN_HEIGHT = intSetting("MinHeight", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
-            MAX_HEIGHT = intSetting("MaxHeight", 256, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT),
+            MIN_HEIGHT = intSetting("MinHeight", 0, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
+            MAX_HEIGHT = intSetting("MaxHeight", 256, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
             MAX_BRANCH_DEPTH = intSetting("MaxBranchDepth", 10, 1, 100),
             MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK = intSetting("MaxPercentageOutsideSourceBlock", 100, 0, 100),
             SPAWN_HEIGHT_OFFSET = intSetting("SpawnHeightOffset", 0, -255, 255),
@@ -69,8 +69,8 @@ public class BO3Settings extends Settings
     public static enum ExtrudeMode
     {
         None(-1, -1),
-        BottomDown(PluginStandardValues.WORLD_HEIGHT, PluginStandardValues.WORLD_DEPTH),
-        TopUp(PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
+        BottomDown(PluginStandardValues.WORLD_HEIGHT - 1, PluginStandardValues.WORLD_DEPTH),
+        TopUp(PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
 
         /**
          * Defines where calculation should begin

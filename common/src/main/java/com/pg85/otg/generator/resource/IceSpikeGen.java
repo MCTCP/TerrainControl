@@ -6,6 +6,7 @@ import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -50,8 +51,8 @@ public class IceSpikeGen extends Resource
 
         frequency = readInt(args.get(2), 1, 30);
         rarity = readRarity(args.get(3));
-        minAltitude = readInt(args.get(4), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT);
-        maxAltitude = readInt(args.get(5), minAltitude, PluginStandardValues.WORLD_HEIGHT);
+        minAltitude = readInt(args.get(4), PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
+        maxAltitude = readInt(args.get(5), minAltitude, PluginStandardValues.WORLD_HEIGHT - 1);
 
         sourceBlocks = readMaterials(args, 6);
     }
@@ -76,53 +77,57 @@ public class IceSpikeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z)
+    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         switch(type) {
             case Basement:
-                spawnBasement(world, random, x, z);
+                spawnBasement(world, random, x, z, chunkBeingPopulated);
                 break;
             case HugeSpike:
-                spawnSpike(world, random, x, z, true);
+                spawnSpike(world, random, x, z, true, chunkBeingPopulated);
                 break;
             case SmallSpike:
-                spawnSpike(world, random, x, z, false);
+                spawnSpike(world, random, x, z, false, chunkBeingPopulated);
                 break;
         }
     }
 
-    private void spawnBasement(LocalWorld world, Random random,int x, int z)
+    private void spawnBasement(LocalWorld world, Random random,int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 
-        while ((world.isNullOrAir(x, y, z, false)) && (y > 2))
+        LocalMaterialData worldMaterial;
+        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             y--;
         }
         
         parseMaterials(world, material, sourceBlocks);
         
-        if (!this.sourceBlocks.contains(world.getMaterial(x, y, z, false)))
+        if ((worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) == null || !this.sourceBlocks.contains(worldMaterial))
         {
             return;
         }
         
         int radius = random.nextInt(2) + 2;
         int one = 1;
+        int deltaX;
+        int deltaZ;
         for (int actualX = x - radius; actualX <= x + radius; actualX++)
         {
             for (int actualZ = z - radius; actualZ <= z + radius; actualZ++)
             {
-                int deltaX = actualX - x;
-                int deltaZ = actualZ - z;
+                deltaX = actualX - x;
+                deltaZ = actualZ - z;
                 if (deltaX * deltaX + deltaZ * deltaZ <= radius * radius)
                 {
                     for (int deltaY = y - one; deltaY <= y + one; deltaY++)
                     {
-                        LocalMaterialData localBlock = world.getMaterial(actualX, deltaY, actualZ, false);
-                        if (this.sourceBlocks.contains(localBlock))
+                    	worldMaterial = world.getMaterial(actualX, deltaY, actualZ, chunkBeingPopulated);
+                        if (worldMaterial != null && this.sourceBlocks.contains(worldMaterial))
                         {
-                            world.setBlock(actualX, deltaY, actualZ, this.material, null, false);
+                            world.setBlock(actualX, deltaY, actualZ, this.material, null, chunkBeingPopulated);
                         }
                     }
                 }
@@ -130,17 +135,19 @@ public class IceSpikeGen extends Resource
         }
     }
 
-    private void spawnSpike(LocalWorld par1World, Random random, int x, int z, boolean hugeSpike)
+    private void spawnSpike(LocalWorld world, Random random, int x, int z, boolean hugeSpike, ChunkCoordinate chunkBeingPopulated)
     {
+    	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
-        while (par1World.isNullOrAir(x, y, z, false) && y > 2)
+        LocalMaterialData worldMaterial;
+        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             --y;
         }
         
-        parseMaterials(par1World, material, sourceBlocks);
+        parseMaterials(world, material, sourceBlocks);
 
-        if (!sourceBlocks.contains(par1World.getMaterial(x, y, z, false)))
+        if ((worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) == null || !sourceBlocks.contains(worldMaterial))
         {
             return;
         }
@@ -155,39 +162,42 @@ public class IceSpikeGen extends Resource
         }
 
         int var8;
+        float var9;
         int var10;
         int var11;
-
+        float var12;
+        float var14;
+        
         for (var8 = 0; var8 < var6; ++var8)
         {
-            float var9 = (1.0F - (float) var8 / (float) var6) * var7;
+            var9 = (1.0F - (float) var8 / (float) var6) * var7;
             var10 = MathHelper.ceil(var9);
 
             for (var11 = -var10; var11 <= var10; ++var11)
             {
-                float var12 = MathHelper.abs(var11) - 0.25F;
+                var12 = MathHelper.abs(var11) - 0.25F;
 
                 for (int var13 = -var10; var13 <= var10; ++var13)
                 {
-                    float var14 = MathHelper.abs(var13) - 0.25F;
+                    var14 = MathHelper.abs(var13) - 0.25F;
 
                     if ((var11 == 0 && var13 == 0 || var12 * var12 + var14 * var14 <= var9 * var9) && (var11 != -var10 && var11 != var10 && var13 != -var10 && var13 != var10 || random.nextFloat() <= 0.75F))
                     {
-                        LocalMaterialData sourceBlock = par1World.getMaterial(x + var11, y + var8, z + var13, false);
-
-                        if (sourceBlock.isAir() || sourceBlocks.contains(sourceBlock))
+                        if (
+                    		(worldMaterial = world.getMaterial(x + var11, y + var8, z + var13, chunkBeingPopulated)) != null && 
+                    		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                         {
-                            par1World.setBlock(x + var11, y + var8, z + var13, this.material, null, false);
+                            world.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingPopulated);
                         }
 
                         if (var8 != 0 && var10 > 1)
                         {
-                            sourceBlock = par1World.getMaterial(x + var11, y - var8, z + var13, false);
-
-                            if (sourceBlock.isAir() || sourceBlocks.contains(sourceBlock))
+                            if (
+                        		(worldMaterial = world.getMaterial(x + var11, y - var8, z + var13, chunkBeingPopulated)) != null && 
+                        		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                             {
-                                par1World.setBlock(x + var11, y - var8, z + var13, this.material, null, false);
-                            }
+                                world.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingPopulated);
+                            }                        	
                         }
                     }
                 }
@@ -204,6 +214,7 @@ public class IceSpikeGen extends Resource
             var8 = 1;
         }
 
+        int var17;
         for (int var16 = -var8; var16 <= var8; ++var16)
         {
             var10 = -var8;
@@ -211,7 +222,7 @@ public class IceSpikeGen extends Resource
             while (var10 <= var8)
             {
                 var11 = y - 1;
-                int var17 = 50;
+                var17 = 50;
 
                 if (Math.abs(var16) == 1 && Math.abs(var10) == 1)
                 {
@@ -222,11 +233,16 @@ public class IceSpikeGen extends Resource
                 {
                     if (var11 > 50)
                     {
-                        LocalMaterialData var18 = par1World.getMaterial(x + var16, var11, z + var10, false);
-
-                        if (var18.isAir() || sourceBlocks.contains(var18) || var18.equals(this.material))
-                        {
-                            par1World.setBlock(x + var16, var11, z + var10, this.material, null, false);
+                    	if(
+                			(worldMaterial = world.getMaterial(x + var16, var11, z + var10, chunkBeingPopulated)) != null &&
+        					(
+    							worldMaterial.isAir() || 
+    							sourceBlocks.contains(worldMaterial) || 
+    							worldMaterial.equals(this.material)
+							)
+            			)
+                    	{
+                            world.setBlock(x + var16, var11, z + var10, this.material, null, chunkBeingPopulated);
                             --var11;
                             --var17;
 
@@ -237,7 +253,7 @@ public class IceSpikeGen extends Resource
                             }
 
                             continue;
-                        }
+                    	}
                     }
 
                     ++var10;
@@ -246,5 +262,4 @@ public class IceSpikeGen extends Resource
             }
         }
     }
-
 }

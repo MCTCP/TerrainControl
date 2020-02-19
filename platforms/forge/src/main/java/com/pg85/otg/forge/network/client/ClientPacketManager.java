@@ -11,14 +11,15 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.ForgeWorld;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
 import com.pg85.otg.forge.network.PacketDispatcher;
 import com.pg85.otg.forge.network.client.packets.CreateDeleteDimensionPacket;
 import com.pg85.otg.forge.network.client.packets.UpdateDimensionSettingsPacket;
+import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.WorldLoader;
 import com.pg85.otg.forge.network.client.packets.TeleportPlayerPacket;
 import com.pg85.otg.network.ClientConfigProvider;
@@ -144,12 +145,12 @@ public class ClientPacketManager
 		DimensionsConfig dimsConfig = DimensionsConfig.fromYamlString(StreamHelper.readStringFromStream(wrappedStream)); 
 		OTG.setDimensionsConfig(dimsConfig);
 		
-		ForgeEngine.Presets.clear();
+		GuiHandler.GuiPresets.clear();
 		int presetCount = wrappedStream.readInt();
 		for(int i = 0; i < presetCount; i++)
 		{
 			DimensionConfigGui dimConfig = DimensionConfigGui.fromYamlString(StreamHelper.readStringFromStream(wrappedStream));
-			ForgeEngine.Presets.put(dimConfig.PresetName, dimConfig);
+			GuiHandler.GuiPresets.put(dimConfig.PresetName, dimConfig);
 		}
 		
 		int worldCount = wrappedStream.readInt();

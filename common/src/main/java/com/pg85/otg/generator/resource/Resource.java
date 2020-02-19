@@ -175,7 +175,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
      * @param x              The block x.
      * @param z              The block z.
      */
-    public abstract void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z);
+    public abstract void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated);
 
     /**
      * Places the resource in a chunk. The default implementation simply calls
@@ -192,6 +192,9 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
     {
         int chunkX = chunkCoord.getBlockXCenter();
         int chunkZ = chunkCoord.getBlockZCenter();
+        
+        createCache();
+        
         for (int t = 0; t < frequency; t++)
         {
             if (random.nextDouble() * 100.0 > rarity)
@@ -200,7 +203,19 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
             }
             int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
-            spawn(world, random, false, x, z);
+            spawn(world, random, false, x, z, chunkCoord);
         }
+        
+        clearCache();
+    }
+    
+    protected void createCache()
+    {
+    	
+    }
+    
+    protected void clearCache()
+    {
+    	
     }
 }

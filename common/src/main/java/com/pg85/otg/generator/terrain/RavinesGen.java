@@ -51,16 +51,45 @@ public class RavinesGen extends TerrainGenBase
             this.a[j] = (f3 * f3);
         }
 
+        double d3;
+        double d4;
+        float f4;
+        float f5;
+        double d5;
+        double d6;
+        double d7;
+        double d8;
+        double d9;
+        int k;
+        int m;
+        int maxDepth;
+        int minDepth;
+        int i2;
+        int i3;
+        int i4;
+        DefaultMaterial materialAtPosition;
+        
+        LocalBiome biome;
+        BiomeConfig biomeConfig;
+        DefaultMaterial surfaceblockDefaultMaterial;
+        double d10;
+        boolean surfaceBlockFound;
+        LocalMaterialData surfaceBlockMaterial;
+        
+    	LocalMaterialData material;
+        DefaultMaterial defaultMaterial;
+        DefaultMaterial block;
+        
         for (int stepCount = 0; stepCount < size; stepCount++)
         {
-            double d3 = 1.5D + MathHelper.sin(stepCount * 3.141593F / size) * paramFloat1 * 1.0F;
-            double d4 = d3 * paramDouble4;
+            d3 = 1.5D + MathHelper.sin(stepCount * 3.141593F / size) * paramFloat1 * 1.0F;
+            d4 = d3 * paramDouble4;
 
             d3 *= (localRandom.nextFloat() * 0.25D + 0.75D);
             d4 *= (localRandom.nextFloat() * 0.25D + 0.75D);
 
-            float f4 = MathHelper.cos(paramFloat3);
-            float f5 = MathHelper.sin(paramFloat3);
+            f4 = MathHelper.cos(paramFloat3);
+            f5 = MathHelper.sin(paramFloat3);
             paramDouble1 += MathHelper.cos(paramFloat2) * f4;
             paramDouble2 += f5;
             paramDouble3 += MathHelper.sin(paramFloat2) * f4;
@@ -79,10 +108,10 @@ public class RavinesGen extends TerrainGenBase
             {
                 continue;
             }
-            double d5 = paramDouble1 - d1;
-            double d6 = paramDouble3 - d2;
-            double d7 = size - stepCount;
-            double d8 = paramFloat1 + 2.0F + 16.0F;
+            d5 = paramDouble1 - d1;
+            d6 = paramDouble3 - d2;
+            d7 = size - stepCount;
+            d8 = paramFloat1 + 2.0F + 16.0F;
             if (d5 * d5 + d6 * d6 - d7 * d7 > d8 * d8)
             {
                 return;
@@ -92,14 +121,14 @@ public class RavinesGen extends TerrainGenBase
             {
                 continue;
             }
-            int k = MathHelper.floor(paramDouble1 - d3) - generatingChunk.getBlockX() - 1;
-            int m = MathHelper.floor(paramDouble1 + d3) - generatingChunk.getBlockX() + 1;
+            k = MathHelper.floor(paramDouble1 - d3) - generatingChunk.getBlockX() - 1;
+            m = MathHelper.floor(paramDouble1 + d3) - generatingChunk.getBlockX() + 1;
 
-            int maxDepth = MathHelper.floor(paramDouble2 - d4) - 1;
-            int minDepth = MathHelper.floor(paramDouble2 + d4) + 1;
+            maxDepth = MathHelper.floor(paramDouble2 - d4) - 1;
+            minDepth = MathHelper.floor(paramDouble2 + d4) + 1;
 
-            int i2 = MathHelper.floor(paramDouble3 - d3) - generatingChunk.getBlockZ() - 1;
-            int i3 = MathHelper.floor(paramDouble3 + d3) - generatingChunk.getBlockZ() + 1;
+            i2 = MathHelper.floor(paramDouble3 - d3) - generatingChunk.getBlockZ() - 1;
+            i3 = MathHelper.floor(paramDouble3 + d3) - generatingChunk.getBlockZ() + 1;
 
             if (k < 0)
             {
@@ -127,7 +156,7 @@ public class RavinesGen extends TerrainGenBase
                 i3 = 16;
             }
 
-            int i4 = 0;
+            i4 = 0;
             for (int localX = k; (i4 == 0) && (localX < m); localX++)
             {
                 for (int localZ = i2; (i4 == 0) && (localZ < i3); localZ++)
@@ -140,7 +169,7 @@ public class RavinesGen extends TerrainGenBase
                         }
                         if (localY < worldSettings.worldHeightCap)
                         {
-                            DefaultMaterial materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ).toDefaultMaterial();
+                            materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ).toDefaultMaterial();
                             if (
                         		materialAtPosition == DefaultMaterial.WATER || 
                         		materialAtPosition == DefaultMaterial.STATIONARY_WATER
@@ -162,15 +191,15 @@ public class RavinesGen extends TerrainGenBase
             }
             for (int localX = k; localX < m; localX++)
             {
-                double d9 = (localX + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
+                d9 = (localX + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
                 for (int localZ = i2; localZ < i3; localZ++)
                 {
-                    LocalBiome biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
-                    BiomeConfig biomeConfig = biome.getBiomeConfig();
-                    DefaultMaterial surfaceblockDefaultMaterial = biomeConfig.surfaceBlock.toDefaultMaterial();
-                    double d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
-                    boolean surfaceBlockFound = false;
-                    LocalMaterialData surfaceBlockMaterial = null;
+                    biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
+                    biomeConfig = biome.getBiomeConfig();
+                    surfaceblockDefaultMaterial = biomeConfig.surfaceBlock.toDefaultMaterial();
+                    d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
+                    surfaceBlockFound = false;
+                    surfaceBlockMaterial = null;
                     if (d9 * d9 + d10 * d10 < 1.0D)
                     {
                     	// If surfaceBlock is found then replace the bottom block with surfaceblock
@@ -179,8 +208,8 @@ public class RavinesGen extends TerrainGenBase
                             double d11 = ((currentDepth - 1) + 0.5D - paramDouble2) / d4;
                             if ((d9 * d9 + d10 * d10) * this.a[currentDepth - 1] + d11 * d11 / 6.0D < 1.0D)
                             {
-                            	LocalMaterialData material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ);
-                                DefaultMaterial defaultMaterial = material.toDefaultMaterial();
+                            	material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ);
+                                defaultMaterial = material.toDefaultMaterial();
                                 
                                 if (!surfaceBlockFound && defaultMaterial == surfaceblockDefaultMaterial)
                                 {
@@ -190,13 +219,13 @@ public class RavinesGen extends TerrainGenBase
                                 
                                 if (
                             		defaultMaterial != DefaultMaterial.BEDROCK &&
-                    				defaultMaterial != DefaultMaterial.AIR
+                    				!defaultMaterial.isAir()
                         		)
                                 {                               	
                                     generatingChunkBuffer.setBlock(localX, currentDepth, localZ, air);
                                 }
                                 
-                                DefaultMaterial block = generatingChunkBuffer.getBlock(localX, currentDepth - 1, localZ).toDefaultMaterial();
+                                block = generatingChunkBuffer.getBlock(localX, currentDepth - 1, localZ).toDefaultMaterial();
                                 if (
                             		surfaceBlockFound &&
                             		(
@@ -206,7 +235,7 @@ public class RavinesGen extends TerrainGenBase
 										block != DefaultMaterial.LAVA &&
 										block != DefaultMaterial.STATIONARY_LAVA &&
 										block != DefaultMaterial.MAGMA &&
-										block != DefaultMaterial.AIR
+										!block.isAir()
                     				)
                                 )
                                 {
