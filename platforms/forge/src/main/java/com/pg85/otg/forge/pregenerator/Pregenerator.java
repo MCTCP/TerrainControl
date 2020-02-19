@@ -90,6 +90,7 @@ public class Pregenerator
 		this.pregeneratorIsRunning = pregeneratorIsRunning;
 	}
 
+	// This should never be called asynchronously.
 	/**
 	 * Sets the pre-generation radius (in chunks) for the world.
 	 * Radius cannot be smaller than currently pre-generated area.
@@ -98,7 +99,7 @@ public class Pregenerator
 	 * @return The radius value that was set for the pregenerator.
 	 */
 	public int setPregenerationRadius(int radius)
-	{
+	{		
 		if(radius > -1 && radius != this.pregenerationRadius)
 		{
 			// Cycle points to the current cycle, which could be: 
@@ -634,9 +635,13 @@ public class Pregenerator
 			this.right = Integer.parseInt(pregeneratedChunksFileValues[3]);
 			this.bottom = Integer.parseInt(pregeneratedChunksFileValues[4]);
 
-			//cycle = Integer.parseInt(pregeneratedChunksFileValues[5]);
-			// This should hopefully fix corrupted pregendata saves for > v6 < v8.3_r4
-			this.cycle = Math.min(Math.min(Math.min(this.left, this.top), this.right), this.bottom) + 1;
+			if(this.spawned > 0)
+			{
+				// This should hopefully fix corrupted pregendata saves for > v6 < v8.3_r4
+				this.cycle = Math.min(Math.min(Math.min(this.left, this.top), this.right), this.bottom) + 1;
+			} else {
+				this.cycle = 0;
+			}
 			
 			this.timeTaken = Long.parseLong(pregeneratedChunksFileValues[6]); // Elapsed time
 			
