@@ -66,11 +66,18 @@ public final class ClientConfigProvider implements ConfigProvider
             SettingsMap biomeReader = new SimpleSettingsMap(biomeName, false);
             biomeReader.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, stream.readFloat());
             biomeReader.putSetting(BiomeStandardValues.BIOME_WETNESS, stream.readFloat());
+            biomeReader.putSetting(BiomeStandardValues.FOG_COLOR, stream.readInt());
+            biomeReader.putSetting(BiomeStandardValues.FOG_DENSITY, stream.readFloat());
+            biomeReader.putSetting(BiomeStandardValues.FOG_RAIN_WEIGHT, stream.readFloat());
+            biomeReader.putSetting(BiomeStandardValues.FOG_THUNDER_WEIGHT, stream.readFloat());
+            biomeReader.putSetting(BiomeStandardValues.FOG_TIME_WEIGHT, stream.readFloat());
             biomeReader.putSetting(BiomeStandardValues.SKY_COLOR, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.WATER_COLOR, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR, stream.readInt());
+            biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR_2, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER, stream.readBoolean());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR, stream.readInt());
+            biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_2, stream.readInt());
             biomeReader.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, stream.readBoolean());
 
             String replaceToBiomeName = StreamHelper.readStringFromStream(stream);

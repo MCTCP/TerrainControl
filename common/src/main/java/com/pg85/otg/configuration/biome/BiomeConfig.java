@@ -90,8 +90,10 @@ public class BiomeConfig extends ConfigFile
     public int waterColor;
 
     public int grassColor;
+    public int grassColor2;
     public boolean grassColorIsMultiplier;
     public int foliageColor;
+    public int foliageColor2;
     public boolean foliageColorIsMultiplier;
     
     public int fogColor;
@@ -336,8 +338,10 @@ public class BiomeConfig extends ConfigFile
         this.skyColor = settings.getSetting(BiomeStandardValues.SKY_COLOR);
         this.waterColor = settings.getSetting(BiomeStandardValues.WATER_COLOR, defaultSettings.defaultWaterColorMultiplier);
         this.grassColor = settings.getSetting(BiomeStandardValues.GRASS_COLOR, defaultSettings.defaultGrassColor);
+        this.grassColor2 = settings.getSetting(BiomeStandardValues.GRASS_COLOR_2, defaultSettings.defaultGrassColor);
         this.grassColorIsMultiplier = settings.getSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER);
         this.foliageColor = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR, defaultSettings.defaultFoliageColor);
+        this.foliageColor2 = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR_2, defaultSettings.defaultFoliageColor);
         this.foliageColorIsMultiplier = settings.getSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER);
         this.fogColor = settings.getSetting(BiomeStandardValues.FOG_COLOR);
         this.fogDensity = settings.getSetting(BiomeStandardValues.FOG_DENSITY);
@@ -689,10 +693,15 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.WATER_COLOR, this.waterColor,
                 "Biome water color multiplier.");
-
+        
         writer.putSetting(BiomeStandardValues.GRASS_COLOR, this.grassColor,
                 "Biome grass color.");
 
+        writer.putSetting(BiomeStandardValues.GRASS_COLOR_2, this.grassColor2,
+                "Biome grass color 2, used to create a gradient like vanilla swamps," +
+                "only works when " + BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER.getName() + " is set to false." +
+                "Forge only atm.");
+        
         writer.putSetting(BiomeStandardValues.GRASS_COLOR_IS_MULTIPLIER, this.grassColorIsMultiplier,
                 "Whether the grass color is a multiplier.",
                 "If you set it to true, the color will be based on this value, the BiomeTemperature and the BiomeWetness.",
@@ -700,6 +709,11 @@ public class BiomeConfig extends ConfigFile
 
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR, this.foliageColor,
                 "Biome foliage color.");
+        
+        writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_2, this.foliageColor2,
+                "Biome foliage color 2, used to create a gradient like vanilla swamp grass," +
+                "only works when " + BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER.getName() + " is set to false." +
+                "Forge only atm.");
              
         writer.putSetting(BiomeStandardValues.FOLIAGE_COLOR_IS_MULTIPLIER, this.foliageColorIsMultiplier,
                 "Whether the foliage color is a multiplier. See GrassColorIsMultiplier for details.");
@@ -1109,17 +1123,25 @@ public class BiomeConfig extends ConfigFile
         settings.putSetting(mobSetting, groups);
     }
 
+    // See ClientConfigProvider for reading
     public void writeToStream(DataOutput stream, boolean isSinglePlayer) throws IOException
     {
         StreamHelper.writeStringToStream(stream, getName());
 
         stream.writeFloat(this.biomeTemperature);
         stream.writeFloat(this.biomeWetness);
+        stream.writeInt(this.fogColor);
+        stream.writeFloat(this.fogDensity);
+        stream.writeFloat(this.fogRainWeight);
+        stream.writeFloat(this.fogThunderWeight);
+        stream.writeFloat(this.fogTimeWeight);        
         stream.writeInt(this.skyColor);
         stream.writeInt(this.waterColor);
         stream.writeInt(this.grassColor);
+        stream.writeInt(this.grassColor2);
         stream.writeBoolean(this.grassColorIsMultiplier);
         stream.writeInt(this.foliageColor);
+        stream.writeInt(this.foliageColor2);
         stream.writeBoolean(this.foliageColorIsMultiplier);
 
         StreamHelper.writeStringToStream(stream, this.replaceToBiomeName);        

@@ -8,8 +8,10 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
+import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.forge.world.ForgeWorldSession;
@@ -31,10 +33,18 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class WorldListener
 {
+	private void initOnWorldLoad()
+	{
+		GuiHandler.IsInMainMenu = false;
+		OTGPlugin.BiomeColorsListener.reload();		
+	}
+	
 	@SubscribeEvent
 	@SideOnly(Side.SERVER)
 	public void onWorldLoadServer(WorldEvent.Load event)
 	{
+		initOnWorldLoad();
+		
         World world = event.getWorld();
         int dimension = world.provider.getDimension();
 
@@ -74,7 +84,9 @@ public class WorldListener
 	@SubscribeEvent
 	@SideOnly(Side.CLIENT)
 	public void onWorldLoadClient(WorldEvent.Load event)
-	{		
+	{	
+		initOnWorldLoad();
+		
 		// For single player only one world is loaded on the client, but forgeworlds exist for all dims		
 		for(LocalWorld localWorld : ((ForgeEngine)OTG.getEngine()).getAllWorlds())
 		{
@@ -305,13 +317,20 @@ public class WorldListener
 	            }
 	        }
 	
+	        ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(i, k);
+	        // When using a BO3 a spawn, set the spawn point in the center of the 32x32 area being populated, to hopefully put it above the BO3's blocks.
+	        if(forgeWorld.getConfigs().getWorldConfig().bo3AtSpawn != null && forgeWorld.getConfigs().getWorldConfig().bo3AtSpawn.trim().length() > 0)
+	        {
+	        	i = chunkCoord.getBlockX() + 15;
+	        	k = chunkCoord.getBlockZ() + 15;
+	        }
+	        
 	        forgeWorld.getWorld().getWorldInfo().setSpawn(new BlockPos(i, j, k));
 	        forgeWorld.getWorld().findingSpawnPoint = false;
 	        
 	        // Spawn point is only saved for overworld by MC, 
 	        // so we have to save it ourselves for dimensions.
 	        // Use the dimensionconfig
-	        dimConfig.Settings.SpawnPointSet = true;
 	        dimConfig.Settings.SpawnPointX = i;
 	        dimConfig.Settings.SpawnPointY = j;
 	        dimConfig.Settings.SpawnPointZ = k;
