@@ -166,7 +166,7 @@ public class BO4Config extends CustomObjectConfigFile
     private BO4EntityFunction[] entityDataOTGPlus;
        
     private boolean isCollidable = false;
-    private boolean isBO4Data = false;
+    public boolean isBO4Data = false;
        
     /**
      * Creates a BO3Config from a file.

@@ -75,7 +75,7 @@ public class BO4 implements StructuredCustomObject
     	try
     	{
     		this.config = new BO4Config(new FileSettingsReaderOTGPlus(name, file), true);
-    		if(this.config.settingsMode != ConfigMode.WriteDisable)
+    		if(this.config.settingsMode != ConfigMode.WriteDisable && !this.config.isBO4Data)
     		{
     			FileSettingsWriterOTGPlus.writeToFile(this.config, this.config.settingsMode);
     		}
@@ -87,7 +87,7 @@ public class BO4 implements StructuredCustomObject
     	}
     	
     	return true;
-    }   
+    }
     
     @Override
     public boolean canSpawnAsTree()
