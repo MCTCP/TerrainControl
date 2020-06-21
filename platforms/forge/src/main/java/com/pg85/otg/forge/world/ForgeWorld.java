@@ -66,6 +66,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.EmptyChunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.MapGenBase;
+import net.minecraft.world.gen.MapGenCaves;
 import net.minecraft.world.gen.feature.*;
 import net.minecraft.world.gen.structure.MapGenScatteredFeature;
 import net.minecraft.world.gen.structure.MapGenStructure;
@@ -148,7 +149,7 @@ public class ForgeWorld implements LocalWorld
         this.fossilGen = new WorldGenFossils();
         this.netherFortressGen = new OTGNetherFortressGen(this);
         
-        this.cavesGen = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(null, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.CAVE);
+        this.cavesGen = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new MapGenCaves(), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.CAVE);
         this.strongholdGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGStrongholdGen(configs, world), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.STRONGHOLD);
         this.villageGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGVillageGen(configs, this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.VILLAGE);
         this.mineshaftGen = (MapGenStructure)net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(new OTGMineshaftGen(this), net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.MINESHAFT);        
@@ -1481,9 +1482,9 @@ public class ForgeWorld implements LocalWorld
 	@Override
 	public boolean generateModdedCaveGen(int x, int z, ChunkBuffer chunkBuffer)
 	{
-		if(this.cavesGen == null)
+		if(this.cavesGen == null || this.cavesGen.getClass() == MapGenCaves.class)
 		{
-			return false;	
+			return false;
 		}
 
 		ChunkPrimer primer = ((ForgeChunkBuffer)chunkBuffer).getChunkPrimer();
