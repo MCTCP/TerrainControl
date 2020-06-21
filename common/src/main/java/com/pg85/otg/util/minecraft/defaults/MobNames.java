@@ -34,6 +34,7 @@ public enum MobNames
     MULE("mule", "mule"),
     MOOSHROOM("mooshroom", "mushroomcow", "mooshroom"),
     OCELOT("ocelot", "ozelot", "ocelot"),
+    PARROT("parrot", "parrot"),
     PIG("pig", "pig"),
     POLAR_BEAR("polar_bear", "polarbear"),
     RABBIT("rabbit", "rabbit"),
