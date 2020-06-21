@@ -49,6 +49,9 @@ public class WorldConfig extends ConfigFile
     public List<String> isleBiomes = new ArrayList<String>();
     public List<String> borderBiomes = new ArrayList<String>();
 
+    public boolean improvedBiomeBorders;
+    public boolean improvedBiomeGroups;
+    
     // Dimensions
     public List<String> dimensions = new ArrayList<String>();
 
@@ -624,6 +627,9 @@ public class WorldConfig extends ConfigFile
         this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
         readCustomBiomes(reader);
 
+        this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS);
+        this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS);
+        
         // Images
         this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE);
         this.imageFile = reader.getSetting(WorldStandardValues.IMAGE_FILE);
@@ -984,6 +990,12 @@ public class WorldConfig extends ConfigFile
                 "Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
 
         writer.putSetting(WorldStandardValues.BORDER_BIOMES, this.borderBiomes);
+
+        writer.putSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS, this.improvedBiomeBorders,
+        		"Spawns more precise borders that never spill over into neighbouring biomes. Disabled by default for legacy worlds.");
+
+        writer.putSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS, this.improvedBiomeGroups,
+        		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");        
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 
@@ -1470,7 +1482,7 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.ShouldMapSpin, this.shouldMapSpin,
         		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
         writer.putSetting(WorldStandardValues.CanDropChunk, this.canDropChunk,
-        		"Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.");
+        		"Used for dimensions, when set to false, no chunks are ever unloaded in the dimension. Used for The End.");
         writer.putSetting(WorldStandardValues.RESPAWN_DIMENSION, this.respawnDimension,
         		"Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.");
         writer.putSetting(WorldStandardValues.MOVEMENT_FACTOR, this.movementFactor,

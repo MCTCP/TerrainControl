@@ -115,6 +115,9 @@ public class OTGPlugin
         // Register fog event handler for biome-specific fog color
         MinecraftForge.EVENT_BUS.register(new ClientFogHandler());
 
+        // Register fog event handler for biome-specific fog color
+        MinecraftForge.EVENT_BUS.register(new ChunkListener());
+        
         // Register gui handler for replacing MC's gui with OTG's
         MinecraftForge.EVENT_BUS.register(new GuiHandler());
 

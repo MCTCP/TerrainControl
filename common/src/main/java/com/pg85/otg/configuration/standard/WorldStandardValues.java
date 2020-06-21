@@ -167,6 +167,8 @@ public class WorldStandardValues extends Settings
         OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),
 		WOODLAND_MANSIONS_ENABLED = booleanSetting("WoodLandMansionsEnabled", true),
         POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
+		IMPROVED_BIOME_BORDERS = booleanSetting("ImprovedBiomeBorders", false),
+		IMPROVED_BIOME_GROUPS = booleanSetting("ImprovedBiomeGroups", false),
 
 		TeleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
 		CommandBlockOutput = booleanSetting("CommandBlockOutput", true),
@@ -198,7 +200,7 @@ public class WorldStandardValues extends Settings
 		CanDoRainSnowIce = booleanSetting("CanDoRainSnowIce", true),
 		IsNightWorld = booleanSetting("IsNightWorld", false),
 		ShouldMapSpin = booleanSetting("ShouldMapSpin", false),
-		CanDropChunk = booleanSetting("CanDropChunk", false),
+		CanDropChunk = booleanSetting("CanDropChunk", true),
 		UseCustomFogColor = booleanSetting("UseCustomFogColor", false),
 		IS_OTG_PLUS = booleanSetting("IsOTGPlus", false),
 

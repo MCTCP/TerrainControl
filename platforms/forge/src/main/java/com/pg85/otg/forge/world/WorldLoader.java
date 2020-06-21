@@ -205,9 +205,9 @@ public final class WorldLoader
     	return isUnloaded;
     }
     
-    public ArrayList<LocalWorld> getAllLoadedWorlds()
+    public ArrayList<ForgeWorld> getAllLoadedWorlds()
     {
-    	ArrayList<LocalWorld> allWorlds = new ArrayList<LocalWorld>();
+    	ArrayList<ForgeWorld> allWorlds = new ArrayList<ForgeWorld>();
     	synchronized(worlds)
     	{
 			allWorlds.addAll(worlds.values());
@@ -267,6 +267,8 @@ public final class WorldLoader
             	ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(false, world.getName(), loadedWorld.getWorld().getMinecraftServer());
             }
         }
+        
+        OTG.log(LogMarker.INFO, "World unloaded");
     }
     
     public void removeLoadedWorld(String worldName)

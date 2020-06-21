@@ -41,8 +41,9 @@ public class LayerBiomeBorder extends Layer
         int westCheck;
         boolean[] biomeFrom;
         int biomeId;
+        boolean improvedBiomeBorders = world.getConfigs().getWorldConfig().improvedBiomeBorders;
         for (int zi = 0; zi < zSize; zi++)
-        {
+        {       	
             for (int xi = 0; xi < xSize; xi++)
             {
                 initChunkSeed(xi + x, zi + z);
@@ -51,6 +52,7 @@ public class LayerBiomeBorder extends Layer
                 biomeId = getBiomeFromLayer(selection);
                 if (bordersFrom[biomeId] != null)
                 {
+                    // check in a plus formation to see if the tile is suitable for an edge biome                	
                     northCheck = getBiomeFromLayer(childInts[(xi + 1 + (zi) * (xSize + 2))]);
                     southCheck = getBiomeFromLayer(childInts[(xi + 1 + (zi + 2) * (xSize + 2))]);
                     eastCheck = getBiomeFromLayer(childInts[(xi + 2 + (zi + 1) * (xSize + 2))]);
@@ -61,16 +63,31 @@ public class LayerBiomeBorder extends Layer
                     {
                         if ((northCheck != biomeId) || (eastCheck != biomeId) || (westCheck != biomeId) || (southCheck != biomeId))
                         {
+                            // if it is suitable, set the edge biome
                             selection = (selection & (IslandBit | RiverBits | IceBit)) | LandBit | bordersTo[biomeId] | BiomeBitsAreSetBit;
                         }
+                        else if(improvedBiomeBorders)
+                        {
+                            // if it's not suitable, try again but sample in an X formation to make sure we didn't miss any potential edge
+                            int nwCheck = getBiomeFromLayer(childInts[(xi + 0 + (zi) * (xSize + 2))]);
+                            int neCheck = getBiomeFromLayer(childInts[(xi + 2 + (zi) * (xSize + 2))]);
+                            int swCheck = getBiomeFromLayer(childInts[(xi + 0 + (zi + 2) * (xSize + 2))]);
+                            int seCheck = getBiomeFromLayer(childInts[(xi + 2 + (zi + 2) * (xSize + 2))]);
+                            if (biomeFrom[nwCheck] && biomeFrom[neCheck] && biomeFrom[swCheck] && biomeFrom[seCheck])
+                            {
+                                if ((nwCheck != biomeId) || (neCheck != biomeId) || (swCheck != biomeId) || (seCheck != biomeId))
+                                {
+                                    // if the second test is suitable, set the edge biome
+                                    selection = (selection & (IslandBit | RiverBits | IceBit)) | LandBit | bordersTo[biomeId] | BiomeBitsAreSetBit;
+                                }
+                                // if the selection isn't suitable at this point, we can be almost certain that it's not an edge
+                            }
+                        }                        
                     }
                 }
-
                 thisInts[(xi + zi * xSize)] = selection;
-
             }
         }
-
         return thisInts;
     }
 }

@@ -53,7 +53,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     public ObjectSpawner spawner;
 
     // Caches
-	private FifoMap<BlockPos2D, LocalMaterialData[]> blockColumnsCache;
+	private FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
 	private FifoMap<ChunkCoordinate, Chunk> unloadedChunksCache;
 	private FifoMap<ChunkCoordinate, Chunk> lastUsedChunks;
     ForgeChunkBuffer chunkBuffer;
@@ -72,7 +72,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
         // TODO: Add a setting to the worldconfig for the size of these caches. 
         // Worlds with lots of BO4's and large smoothing areas may want to increase this. 
-        this.blockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
+        this.unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
         this.unloadedChunksCache = new FifoMap<ChunkCoordinate, Chunk>(128);
         this.lastUsedChunks = new FifoMap<ChunkCoordinate, Chunk>(4);
     }
@@ -83,8 +83,13 @@ public class OTGChunkGenerator implements IChunkGenerator
     public void clearChunkCache()
     {
     	this.lastUsedChunks.clear();
-   		this.blockColumnsCache.clear();
+   		this.unloadedBlockColumnsCache.clear();
    		this.unloadedChunksCache.clear();
+    }
+    
+    public void clearChunkFromCache(ChunkCoordinate chunkCoordinate)
+    {
+    	this.lastUsedChunks.remove(chunkCoordinate);
     }
 
     @Override
@@ -247,7 +252,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     	byte blockX = (byte)(x &= 0xF);
     	byte blockZ = (byte)(z &= 0xF);
 
-    	LocalMaterialData[] cachedColumn = this.blockColumnsCache.get(blockPos);
+    	LocalMaterialData[] cachedColumn = this.unloadedBlockColumnsCache.get(blockPos);
 
     	if(cachedColumn != null)
     	{
@@ -289,7 +294,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         		break;
         	}
         }
-		blockColumnsCache.put(blockPos, cachedColumn);
+		unloadedBlockColumnsCache.put(blockPos, cachedColumn);
 		
         return blocksInColumn;
     }

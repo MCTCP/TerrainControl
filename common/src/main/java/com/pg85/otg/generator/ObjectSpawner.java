@@ -68,7 +68,7 @@ public class ObjectSpawner
     public void populate(ChunkCoordinate chunkCoord)
     {
     	//int myPopulatingIndex;
-    	//OTG.log(LogMarker.INFO, "ObjectSpawner populate X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ());
+    	//OTG.log(LogMarker.INFO, "ObjectSpawner populate X" + chunkCoord.getChunkX() + " Z" + chunkCoord.getChunkZ() + " " + world.getName());
 
     	boolean unlockWhenDone = false;
 		// Wait for another thread running SaveToDisk, then place a lock.
