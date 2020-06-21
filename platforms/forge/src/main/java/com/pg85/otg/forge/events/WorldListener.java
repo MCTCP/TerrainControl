@@ -65,8 +65,8 @@ public class WorldListener
             DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
             createSpawnPosition(forgeWorld, dimConfig);
             
-           	// Don't create bonus chest on each world load (bit of a hack using preGeneratorCenterPoint).
-	        if(dimConfig.BonusChest && forgeWorld.getWorldSession().getPreGeneratorCenterPoint() == null)
+           	// Don't create bonus chest on each world load (bit of a hack using getPreGeneratorIsInitialised).
+	        if(dimConfig.BonusChest && !forgeWorld.getWorldSession().getPreGeneratorIsInitialised())
 	        {
 	        	createBonusChest(forgeWorld.getWorld());
 	        }
@@ -119,8 +119,8 @@ public class WorldListener
 	            DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
 	            createSpawnPosition(forgeWorld, dimConfig);
 	            
-	           	// Don't create bonus chest on each world load (bit of a hack using preGeneratorCenterPoint).
-		        if(dimConfig.BonusChest && forgeWorld.getWorldSession().getPreGeneratorCenterPoint() == null)
+	           	// Don't create bonus chest on each world load (bit of a hack using getPreGeneratorIsInitialised).
+		        if(dimConfig.BonusChest && !forgeWorld.getWorldSession().getPreGeneratorIsInitialised())
 		        {
 		        	createBonusChest(forgeWorld.getWorld());
 		        }
@@ -206,11 +206,11 @@ public class WorldListener
 	        {
 	        	mcServer = getClientServer();
 	        }
-	        
+
 	        boolean serverStopping = !mcServer.isServerRunning();
-	        
+
 	        if(event.getWorld().getWorldType() instanceof OTGWorldType)
-	        {	
+	        {
 	        	int dimId = event.getWorld().provider.getDimension();
 	        	
 		        ForgeWorld forgeWorld = (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(mcWorld);

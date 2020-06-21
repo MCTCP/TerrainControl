@@ -154,7 +154,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 					{
 						Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator();
 			
-						if(pregenerator.getPregeneratorIsRunning() && !pregenerator.preGeneratorProgressStatus.equals("Done"))
+						if(pregenerator.isRunning() && !pregenerator.preGeneratorProgressStatus.equals("Done"))
 				    	{	
 							this.showingPregeneratorStatus = true;
 					        listEntries.add(new PregeneratorSettingsEntry(this, this));
@@ -226,6 +226,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        	}		        
 		        }
 		        listEntries.add(new CategoryEntry(this, "* /gamerule, /time and /weather are overworld only *"));
+		        listEntries.add(new CategoryEntry(this, "* Use /otg time and /otg weather for OTG dimensions. *"));
 	
 		        listEntries.add(new ButtonEntry(this, this, "Back"));
 	        }
@@ -277,7 +278,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        
 		        listEntries.add(new CategoryEntry(this, "Miscellaneous"));
 		        
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("CanUnload", dimConfig.Settings.CanDropChunk, defaultConfig != null ? defaultConfig.Settings.CanDropChunk : WorldStandardValues.CanDropChunk.getDefaultValue(), false), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("CanUnload", dimConfig.Settings.CanDropChunk, defaultConfig != null ? defaultConfig.Settings.CanDropChunk : WorldStandardValues.CanDropChunk.getDefaultValue(), true), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("IsSurfaceWorld", dimConfig.Settings.IsSurfaceWorld, defaultConfig != null ? defaultConfig.Settings.IsSurfaceWorld : WorldStandardValues.IsSurfaceWorld.getDefaultValue(), true), this));                
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("DoesWaterVaporize", dimConfig.Settings.DoesWaterVaporize, defaultConfig != null ? defaultConfig.Settings.DoesWaterVaporize : WorldStandardValues.DoesWaterVaporize.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Double>("GravityFactor", dimConfig.Settings.GravityFactor, defaultConfig != null ? defaultConfig.Settings.GravityFactor : WorldStandardValues.GravityFactor.getDefaultValue(), ((DoubleSetting)WorldStandardValues.GravityFactor).getMinValue(), ((DoubleSetting)WorldStandardValues.GravityFactor).getMaxValue(), false), this));

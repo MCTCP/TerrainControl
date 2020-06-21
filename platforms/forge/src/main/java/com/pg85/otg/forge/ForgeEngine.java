@@ -32,7 +32,13 @@ import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+import net.minecraft.crash.CrashReport;
+import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.WorldSettings;
+import net.minecraft.world.WorldType;
+import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -72,12 +78,15 @@ public class ForgeEngine extends OTGEngine
     }
 	
     // Pregenerator
-    
+
     public void processPregeneratorTick()
     {
-    	for(LocalWorld world : getAllWorlds())
+    	for(LocalWorld world : this.getAllWorlds())
     	{
-    		((ForgeWorldSession)world.getWorldSession()).getPregenerator().processTick();
+    		if(world.getWorldSession().getPreGeneratorIsInitialised())
+    		{
+    			((ForgeWorldSession)world.getWorldSession()).getPregenerator().processTick();
+    		}
     	}
     	
     	if(System.currentTimeMillis() - lastPregeneratorStatusUpdateTime  > 1000l)
@@ -131,44 +140,44 @@ public class ForgeEngine extends OTGEngine
     {
     	return this.worldLoader.getAllWorlds();
     }
-    
+
     public ForgeWorld getOverWorld()
     {
     	return this.worldLoader.getOverWorld();
     }
-    
+
     public ForgeWorld getWorld(World world)
     {
     	return this.worldLoader.getWorld(world);
     }
-    
+
     public ForgeWorld getWorldByDimId(int dimensionId)
     {
     	return this.worldLoader.getWorldByDimId(dimensionId);
     }
-    
+
     public ForgeWorld getUnloadedWorldByDimId(int dimensionId)
     {
     	return this.worldLoader.getUnloadedWorldByDimId(dimensionId);
     }
-    
+
 	// Presets
-	
+
 	@Override
 	public String getPresetName(String worldName)
 	{
 		// If this dim's name is the same as the preset worldname then this is an OTG overworld
 		if(worldName.equals("overworld") || worldName.equals(OTG.getDimensionsConfig().WorldName))
     	{
-    		return OTG.getDimensionsConfig().Overworld.PresetName;	
+    		return OTG.getDimensionsConfig().Overworld.PresetName;
     	} else {
     		// If this is an OTG dim other than the overworld then the world name will always match the preset name
     		return worldName;
     	}
-	}	
-	
+	}
+
 	// Material
-	
+
     @Override
     public LocalMaterialData readMaterial(String input) throws InvalidConfigException
     {
@@ -179,13 +188,12 @@ public class ForgeEngine extends OTGEngine
     public LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
         return ForgeMaterialData.ofDefaultMaterial(defaultMaterial, blockData);
-    }	
-	
+    }
+
 	// Events
-	
+
 	@Override
-	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer,
-			LocalWorld localWorld)
+	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer, LocalWorld localWorld)
 	{
         return ForgeEventFactory.onReplaceBiomeBlocks(((ForgeWorld)localWorld).getChunkGenerator(), x, z, ((ForgeChunkBuffer)chunkBuffer).getChunkPrimer(), ((ForgeWorld)localWorld).getWorld());
 	}

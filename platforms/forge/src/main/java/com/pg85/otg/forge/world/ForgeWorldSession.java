@@ -81,6 +81,12 @@ public class ForgeWorldSession extends WorldSession
 	@Override
 	public boolean getPreGeneratorIsRunning()
 	{
-		return pregenerator.getPregeneratorIsRunning();
+		return pregenerator.isRunning();
+	}
+	
+	@Override
+	public boolean getPreGeneratorIsInitialised()
+	{
+		return pregenerator.isInitialised();
 	}
 }

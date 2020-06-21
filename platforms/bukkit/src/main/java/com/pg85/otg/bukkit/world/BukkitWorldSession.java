@@ -72,4 +72,10 @@ public class BukkitWorldSession extends WorldSession
 	{
 		return false;
 	}
+
+	@Override
+	public boolean getPreGeneratorIsInitialised()
+	{
+		return true;
+	}
 }

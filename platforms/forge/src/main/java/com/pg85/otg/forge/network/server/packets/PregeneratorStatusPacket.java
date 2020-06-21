@@ -53,7 +53,7 @@ public class PregeneratorStatusPacket extends OTGPacket
 	    for(Pregenerator pregenerator : pregenerators)
 	    {
 	    	StreamHelper.writeStringToStream(stream, pregenerator.pregenerationWorld);
-	    	stream.writeBoolean(pregenerator.getPregeneratorIsRunning());
+	    	stream.writeBoolean(pregenerator.isRunning());
 	    	stream.writeInt(pregenerator.progressScreenWorldSizeInBlocks);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenCycle);
 	    	StreamHelper.writeStringToStream(stream, pregenerator.progressScreenRadius);

@@ -7,14 +7,18 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.NoSuchElementException;
 
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraftforge.common.DimensionManager;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -41,7 +45,8 @@ public class Pregenerator
 	private int spawnedThisTick = 0;
 	private int lastSpawnedWhenSaved = 0;
 	private int compressCustomStructureCacheThreshHold = 1000;
-	private boolean pregeneratorIsRunning;
+	private boolean pregeneratorIsRunning = false;
+	private boolean pregeneratorIsInitialised = false;
 	private int maxSpawnPerTick;
 
 	// In-game UI
@@ -154,6 +159,7 @@ public class Pregenerator
 		{
 			this.preGeneratorCenterPoint = chunkCoord;
 			savePregeneratorData(true);
+			this.pregeneratorIsInitialised = true;
 		}
 	}
 
@@ -162,9 +168,14 @@ public class Pregenerator
 		return this.preGeneratorCenterPoint;
 	}
 
-	public boolean getPregeneratorIsRunning()
+	public boolean isRunning()
 	{
 		return this.pregeneratorIsRunning;
+	}
+	
+	public boolean isInitialised()
+	{
+		return this.pregeneratorIsInitialised;
 	}
 
 	public void processTick()
@@ -172,11 +183,32 @@ public class Pregenerator
 		if(!this.processing)
 		{
 			this.processing = true;
-
-			pregenerate();
+			if(this.spawned < this.total && this.pregenerationRadius > 0)
+			{
+				// If this is a dimension, not the overworld, it may be unloaded.
+				// We can't pregenerate chunks when the world is unloaded, since the
+				// world isn't ticked and the ChunkIO doesn't work properly, so the
+				// chunks aren't flushed to disk properly. Force dimensions to remain
+				// loaded during pregeneration.
+				int dimId = this.world.getWorld().provider.getDimension();
+				if(dimId != 0)
+				{
+					// TODO: Assuming this won't cause concurrency problems with
+					// net.minecraftforge.server.command.ChunkGenWorker, which
+					// also uses keepDimensionLoaded
+					DimensionManager.keepDimensionLoaded(dimId, true);
+					if(
+						((ForgeEngine)OTG.getEngine()).getWorldLoader().isWorldUnloaded(this.world.getName())
+					)
+					{
+						OTGDimensionManager.initDimension(dimId);
+					}
+				}
+				pregenerate();
+			}
 
 			this.processing = false;
-		}		
+		}
 	}
 
 	private void pregenerate()
@@ -194,12 +226,12 @@ public class Pregenerator
     			this.pregeneratorIsRunning = false;
     			return;
     		}
-        	    	
+
     		if(!this.pregeneratorIsRunning)
     		{
     			this.startTime = System.currentTimeMillis();
     		}
-    		
+
     		this.pregeneratorIsRunning = true;
     		
    			this.currentX = -this.pregenerationRadius;
@@ -384,13 +416,39 @@ public class Pregenerator
 	    		this.cycle += 1;
 			}
 			
-			//this.world.getChunkGenerator().clearChunkCache(false);
-			this.world.getStructureCache().compressCache();
+    		// Pregeneration complete
+    		
+    		flushChunksToDisk();
+    		
 			long timeNow = System.currentTimeMillis();
 			this.timeTaken += (timeNow - this.startTime);
 			savePregeneratorData(false);
+			
+			// Allow dimensions to be unloaded when pregeneration is complete.
+			int dimId = this.world.getWorld().provider.getDimension();
+			if(dimId != 0)
+			{
+				// "keepDimensionsLoaded" shouldn't interfere with canDropChunks/CanUnload, except that we're using it to disallow
+				// unloading of dims while they're being pregenerated.
+				// TODO: Assuming here that only OTG ever changes keepDimensionLoaded for OTG dims, and we set it to true earlier.
+				DimensionManager.keepDimensionLoaded(dimId, false);
+			}
         }
         this.pregeneratorIsRunning = false;
+	}
+
+	private void flushChunksToDisk()
+	{
+		((ChunkProviderServer) this.world.getWorld().getChunkProvider()).queueUnloadAll();
+		try
+		{
+			((ChunkProviderServer) this.world.getWorld().getChunkProvider()).flushToDisk();
+		}
+		catch(NoSuchElementException ex)
+		{
+			// TODO: Find a thread-safe way to do this..
+		}
+		this.world.getStructureCache().compressCache();
 	}
 
 	private void pause()
@@ -398,7 +456,7 @@ public class Pregenerator
 		long timeNow = System.currentTimeMillis();
 		this.timeTaken += timeNow - this.startTime;
 		this.startTime = timeNow;
-		if(this.spawned == this.total) // Done spawning
+		if(this.spawned == this.total) // Pregeneration complete
 		{
     		// Cycle completed, reset cycle progress
 			this.iLeft = Integer.MIN_VALUE;
@@ -407,9 +465,20 @@ public class Pregenerator
 			this.iTop = Integer.MIN_VALUE;
 			this.cycle += 1;
 			
-			//this.world.getChunkGenerator().clearChunkCache(false);
-			this.world.getStructureCache().compressCache();
+			flushChunksToDisk();
+			
 			savePregeneratorData(false);
+			
+			// Allow dimensions to be unloaded when pregeneration is complete.
+			int dimId = this.world.getWorld().provider.getDimension();
+			if(dimId != 0)
+			{
+				// "keepDimensionsLoaded" shouldn't interfere with canDropChunks/CanUnload, except that we're using it to disallow
+				// unloading of dims while they're being pregenerated.
+				// TODO: Assuming here that only OTG ever changes keepDimensionLoaded for OTG dims, and we set it to true earlier.
+				DimensionManager.keepDimensionLoaded(dimId, false); 
+			}
+			
 		} else {
 			// Pre-generation cycle cannot be completed.
 			// Save progress so we can continue and retry on the next server tick.
@@ -440,13 +509,13 @@ public class Pregenerator
     		{
     			chunkProvider.provideChunk(currentX + 1, currentZ + 1);
     		}
-    		chunkProvider.provideChunk(currentX, currentZ);
+    		chunk1 = chunkProvider.provideChunk(currentX, currentZ);
     	}
 		
 		if(this.spawned - this.lastSpawnedWhenSaved > this.compressCustomStructureCacheThreshHold)
 		{
 			this.lastSpawnedWhenSaved = this.spawned;
-			this.world.getStructureCache().compressCache();
+			flushChunksToDisk();
 		}
 		
 		long timeNow = System.currentTimeMillis();
@@ -655,6 +724,7 @@ public class Pregenerator
 			if(pregeneratedChunksFileValues[12] != null && pregeneratedChunksFileValues[13] != null)
 			{
 				this.preGeneratorCenterPoint = ChunkCoordinate.fromChunkCoords(Integer.parseInt(pregeneratedChunksFileValues[12]), Integer.parseInt(pregeneratedChunksFileValues[13]));
+				this.pregeneratorIsInitialised = true;
 			} else {
 				this.preGeneratorCenterPoint = null;
 			}
@@ -678,7 +748,7 @@ public class Pregenerator
 			this.iRight = Integer.MIN_VALUE;
 
 			this.preGeneratorCenterPoint = null; // Will be set after world spawn point has been determined
-
+			
 			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.world.getName());
 			this.setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
 

@@ -166,4 +166,6 @@ public abstract class WorldSession
 			)
 		;
 	}
+
+	public abstract boolean getPreGeneratorIsInitialised();
 }

@@ -379,7 +379,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     				if(forgeWorld.getWorldSession() != null)
     				{
 	    				Pregenerator pregenerator = ((ForgeWorldSession)forgeWorld.getWorldSession()).getPregenerator();   				
-	    				if(pregenerator.getPregeneratorIsRunning() && pregenerator.preGeneratorProgressStatus != "Done")
+	    				if(pregenerator.isRunning() && pregenerator.preGeneratorProgressStatus != "Done")
 		    			{
 		    				if(!this.dimensionSettingsList.showingPregeneratorStatus)
 		    				{
