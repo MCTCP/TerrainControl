@@ -1,14 +1,12 @@
 package com.pg85.otg.forge.commands;
 
-import com.pg85.otg.OTG;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.text.TextComponentString;
 
-import java.text.ParseException;
 import java.util.List;
 
-public class TimeCommand extends BaseCommand {
-
+public class TimeCommand extends BaseCommand
+{
     TimeCommand()
     {
         name = "time";
@@ -24,14 +22,23 @@ public class TimeCommand extends BaseCommand {
         {
             return false;
         }
-        try
+        if(args.get(1).toLowerCase().equals("day"))
         {
-            newTime = Integer.parseInt(args.get(1));
+        	newTime = 1000;
         }
-        catch (NumberFormatException e)
+        else if(args.get(1).toLowerCase().equals("night"))
         {
-            sender.sendMessage(new TextComponentString(args.get(1)+" is not a number"));
-            return true;
+        	newTime = 13000;
+        } else {
+	        try
+	        {
+	            newTime = Integer.parseInt(args.get(1));
+	        }
+	        catch (NumberFormatException e)
+	        {
+	            sender.sendMessage(new TextComponentString(args.get(1)+" is not a number"));
+	            return true;
+	        }
         }
         if (args.get(0).equalsIgnoreCase("add"))
         {

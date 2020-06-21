@@ -299,7 +299,9 @@ public class OTGWorldProvider extends WorldProviderSurface
     		DimensionConfig dimConfig = getDimensionConfig();
 	        return dimConfig != null ? dimConfig.Settings.CanDropChunk : WorldStandardValues.CanDropChunk.getDefaultValue();
     	} else {
-    		return !this.world.isSpawnChunk(x, z) || !this.world.provider.getDimensionType().shouldLoadSpawn();
+    		return
+				!this.world.isSpawnChunk(x, z) ||
+				!this.world.provider.getDimensionType().shouldLoadSpawn();
     	}
     }
 

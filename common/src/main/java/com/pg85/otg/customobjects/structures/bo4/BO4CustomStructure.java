@@ -875,7 +875,12 @@ public class BO4CustomStructure extends CustomStructure
 	        		    if(!minimumSize && canSpawn)
 	        		    {
 	        			    // Check if any other structures in the world are in this chunk
-	        			    if((world.isInsidePregeneratedRegion(childBranchDataItem.chunkCoordinate) || world.getStructureCache().bo4StructureCache.containsKey(childBranchDataItem.chunkCoordinate)))
+	        			    if(
+        			    		(
+    			    				world.isInsidePregeneratedRegion(childBranchDataItem.chunkCoordinate) || 
+    			    				world.getStructureCache().bo4StructureCache.containsKey(childBranchDataItem.chunkCoordinate)
+			    				)
+    			    		)
 	        			    {
 		    					canSpawn = false;
         						chunkIsIneligible = true;

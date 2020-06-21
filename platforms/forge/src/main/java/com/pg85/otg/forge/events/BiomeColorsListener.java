@@ -3,7 +3,9 @@ package com.pg85.otg.forge.events;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.BiomeNotFoundException;
+import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.util.ResourceLocation;
@@ -28,7 +30,7 @@ public final class BiomeColorsListener
     	// This is also called on empty chunks that don't have OTG biome information yet,
     	// so they'll call this on vanilla biomes, even though those don't exist in the world.
     	// Unfortunately, we can't get the coords to get the proper biome..
-    	if(grassColorEvent.getBiome().getRegistryName().getNamespace().equals("minecraft"))
+		if(!grassColorEvent.getBiome().getRegistryName().getNamespace().equals(PluginStandardValues.MOD_ID))
     	{
     		return;
     	}
@@ -64,7 +66,7 @@ public final class BiomeColorsListener
     	// This is also called on empty chunks that don't have OTG biome information yet,
     	// so they'll call this on vanilla biomes, even though those don't exist in the world.
     	// Unfortunately, we can't get the coords to get the proper biome..
-    	if(foliageColorEvent.getBiome().getRegistryName().getNamespace().equals("minecraft"))
+		if(!foliageColorEvent.getBiome().getRegistryName().getNamespace().equals(PluginStandardValues.MOD_ID))
     	{
     		return;
     	}
@@ -100,15 +102,15 @@ public final class BiomeColorsListener
     	// This is also called on empty chunks that don't have OTG biome information yet,
     	// so they'll call this on vanilla biomes, even though those don't exist in the world.
     	// Unfortunately, we can't get the coords to get the proper biome..
-    	if(waterColorEvent.getBiome().getRegistryName().getNamespace().equals("minecraft"))
+    	if(!waterColorEvent.getBiome().getRegistryName().getNamespace().equals(PluginStandardValues.MOD_ID))
     	{
     		return;
     	}
     	
-    	BiomeConfig biomeConfig = lastBiomeConfig;    	
+    	BiomeConfig biomeConfig = lastBiomeConfig;
     	if(lastBiome == null || lastBiomeConfig == null || !waterColorEvent.getBiome().getRegistryName().equals(lastBiome))
     	{
-            biomeConfig = getBiomeConfig(waterColorEvent.getBiome());	
+            biomeConfig = getBiomeConfig(waterColorEvent.getBiome());
     	}
     	
     	lastBiome = waterColorEvent.getBiome().getRegistryName();

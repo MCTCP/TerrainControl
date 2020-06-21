@@ -385,7 +385,7 @@ public class OTGDimensionManager
         world.addEventListener(new ServerWorldEventHandler(mcServer, world));
         MinecraftForge.EVENT_BUS.post(new WorldEvent.Load(world));
 
-        // Save seed to world config TODO: Remove this
+        // Save seed to dimension config
         ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dim);
         if(forgeWorld == null)
         {

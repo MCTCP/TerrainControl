@@ -502,10 +502,10 @@ public class ForgeMaterialData implements LocalMaterialData
 		if (this.checkFallbacks)
 		{
 			this.checkFallbacks = false;
-			IBlockState newBlockData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).blockData;
-			if(newBlockData != null && !newBlockData.equals(this.blockData))
+			ForgeMaterialData newMaterialData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)); 
+			if(newMaterialData != null && newMaterialData.blockData != null && !newMaterialData.blockData.equals(this.blockData))
 			{
-				this.blockData = newBlockData;
+				this.blockData = newMaterialData.blockData;
 				this.metaIdSet = false;
 				this.materialIdSet = false;
 				this.rawEntry = null;

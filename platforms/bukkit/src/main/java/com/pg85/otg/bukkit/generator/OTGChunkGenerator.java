@@ -39,7 +39,7 @@ public class OTGChunkGenerator extends ChunkGenerator
 {
     private DataConverter dataConverter;
     //private Chunk[] chunkCache;
-    private ChunkProviderOTG chunkProviderTC;
+    private ChunkProviderOTG chunkProviderOTG;
     // Why does the chunk generator require multiple block populators, each with their own ObjectSpawner instance? For multiple dims?
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
     private boolean NotGenerate = false;
@@ -81,7 +81,7 @@ public class OTGChunkGenerator extends ChunkGenerator
      */
     private void makeSureWorldIsInitialized(World world)
     {
-        if (this.chunkProviderTC == null)
+        if (this.chunkProviderOTG == null)
         {
             // Not yet initialized, do it now
             this.plugin.onWorldInit(world);
@@ -96,7 +96,7 @@ public class OTGChunkGenerator extends ChunkGenerator
      */
     public void onInitialize(BukkitWorld _world)
     {
-        this.chunkProviderTC = new ChunkProviderOTG(_world.getConfigs(), _world);
+        this.chunkProviderOTG = new ChunkProviderOTG(_world.getConfigs(), _world);
 
         WorldConfig.TerrainMode mode = _world.getConfigs().getWorldConfig().modeTerrain;
 
@@ -113,7 +113,7 @@ public class OTGChunkGenerator extends ChunkGenerator
 
     public ObjectSpawner getObjectSpawner()
     {
-    	if (this.chunkProviderTC == null)
+    	if (this.chunkProviderOTG == null)
     	{
     		throw new RuntimeException();
     	}
@@ -155,7 +155,7 @@ public class OTGChunkGenerator extends ChunkGenerator
 
             ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
             BukkitChunkBuffer chunkBuffer = new BukkitChunkBuffer(chunkCoord, chunkData);
-            this.chunkProviderTC.generate(chunkBuffer);
+            this.chunkProviderOTG.generate(chunkBuffer);
             
     	}
     	return chunkData;    	

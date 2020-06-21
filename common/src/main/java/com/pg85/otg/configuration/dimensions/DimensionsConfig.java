@@ -12,9 +12,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.logging.LogMarker;
 
 public class DimensionsConfig
 {	
@@ -162,15 +164,17 @@ public class DimensionsConfig
         
        	try {
 			presetsConfig = mapper.readValue(file, DimensionsConfig.class);
-		} catch (JsonParseException e) {
-			e.printStackTrace();
-		} catch (JsonMappingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
+		}
+       	catch (IOException e)
+       	{
+			OTG.log(LogMarker.WARN, "Modpack Config " + file.getName() + " could not be read.");
 			e.printStackTrace();
 		}
        	       	
-       	updateConfig(presetsConfig, otgRootFolder);
+       	if(presetsConfig != null)
+       	{
+       		updateConfig(presetsConfig, otgRootFolder);
+       	}
        	
        	return presetsConfig;
 	}

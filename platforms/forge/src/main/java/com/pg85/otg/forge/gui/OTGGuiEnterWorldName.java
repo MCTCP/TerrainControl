@@ -51,6 +51,7 @@ public class OTGGuiEnterWorldName extends GuiScreen
     
     // Init / drawing
         
+    String worldNameRegex = "^[\\(\\)a-zA-Z0-9 _-]+$";
     public void initGui()
     {
         Keyboard.enableRepeatEvents(true);
@@ -64,7 +65,7 @@ public class OTGGuiEnterWorldName extends GuiScreen
         this.newWorldNameTextField.setText(worldName != null ? worldName : "");
         
         bIsIllegal = false;
-        if(worldName.toLowerCase().equals("overworld"))
+        if(worldName.toLowerCase().equals("overworld") || !worldName.matches(worldNameRegex))
         {
         	bIsIllegal = true;
         }
@@ -145,7 +146,7 @@ public class OTGGuiEnterWorldName extends GuiScreen
         this.worldName = this.newWorldNameTextField.getText().trim();	        	     
         	        
         bIsIllegal = false;
-        if(worldName.toLowerCase().equals("overworld"))
+        if(worldName.toLowerCase().equals("overworld") || !worldName.matches(worldNameRegex))
         {
         	bIsIllegal = true;
         }

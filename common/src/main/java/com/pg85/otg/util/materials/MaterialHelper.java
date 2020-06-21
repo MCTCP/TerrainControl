@@ -37,7 +37,11 @@ public class MaterialHelper
     	// Spigot interprets snow as SNOW_LAYER and that's how TC has always seen it too so keep it that way (even though minecraft:snow is actually a snow block).
     	if(name.toLowerCase().equals("snow"))
     	{
-    		name = "SNOW_LAYER";
+    		name = "SNOW_LAYER:0";
+    	}
+    	if(name.toLowerCase().startsWith("snow:"))
+    	{
+    		name = name.toUpperCase().replace("SNOW:", "SNOW_LAYER:");
     	}
     	// Spigot interprets water as FLOWING_WATER and that's how TC has always seen it too so keep it that way (even though minecraft:water is actually stationary water).
     	else if(name.toLowerCase().equals("water"))
