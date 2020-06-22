@@ -153,6 +153,7 @@ public class ObjectSpawner
 			world.getStructureCache().plotStructures(rand, chunkCoord, false);
 
 	        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
+			WorldConfig worldConfig = configProvider.getWorldConfig();
 
 	        boolean hasVillage = false;
 
@@ -175,7 +176,11 @@ public class ObjectSpawner
 	        			}
 	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.randomY)
 	        			{
-	        				y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
+							if (worldConfig.spawnPointSet)
+							{
+								y = worldConfig.spawnPointY;
+							}
+							else y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
 	        			}
 
 	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
@@ -189,7 +194,7 @@ public class ObjectSpawner
 	        }
 
 			// Get the random generator
-			WorldConfig worldConfig = configProvider.getWorldConfig();
+
 			long resourcesSeed = worldConfig.resourcesSeed != 0L ? worldConfig.resourcesSeed : world.getSeed();
 			this.rand.setSeed(resourcesSeed);
 			long l1 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -261,12 +266,20 @@ public class ObjectSpawner
 	        			}
 	        			else if(((BO3)customObject).getSettings().spawnHeight == SpawnHeightEnum.randomY)
 	        			{
-	        				y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
+							if (worldConfig.spawnPointSet)
+							{
+								y = worldConfig.spawnPointY;
+							}
+							else y = (int) (((BO3)customObject).getSettings().minHeight + (Math.random() * (((BO3)customObject).getSettings().maxHeight - ((BO3)customObject).getSettings().minHeight)));
 	        			}
 
 	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
 	        			// TODO: This may spawn the structure across chunk borders if its larger than 16 in any direction from its center.
-	        			((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockX() + 15, y, spawnChunk.getBlockZ() + 15);
+	        			boolean ret = ((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockX() + 15, y, spawnChunk.getBlockZ() + 15);
+	        			if (!ret)
+	        			{
+	        				OTG.log(LogMarker.ERROR, "Failed to spawn bo3AtSpawn object");
+						}
 	        		}
 	        	}
 	        } else {
