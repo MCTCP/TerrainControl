@@ -276,9 +276,9 @@ public class ObjectSpawner
 	        			y += ((BO3)customObject).getSettings().spawnHeightOffset;
 	        			// TODO: This may spawn the structure across chunk borders if its larger than 16 in any direction from its center.
 	        			boolean ret = ((BO3)customObject).spawnForced(this.world, this.rand, Rotation.NORTH, spawnChunk.getBlockX() + 15, y, spawnChunk.getBlockZ() + 15);
-	        			if (!ret)
+	        			if (!ret && OTG.getPluginConfig().spawnLog)
 	        			{
-	        				OTG.log(LogMarker.ERROR, "Failed to spawn bo3AtSpawn object");
+	        				OTG.log(LogMarker.WARN, "Failed to spawn bo3AtSpawn object");
 						}
 	        		}
 	        	}

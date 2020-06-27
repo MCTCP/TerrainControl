@@ -239,7 +239,8 @@ public class OTGChunkGenerator extends ChunkGenerator
     	    }
 
             // Notify world: (2 | 16) == update client, don't update observers
-    	    notifyAndUpdatePhysics(this.world.getWorld(), blockPos, chunk, oldBlockData, blockData, 2 | 16);
+    	    //notifyAndUpdatePhysics(this.world.getWorld(), blockPos, chunk, oldBlockData, blockData, 2 | 16); TODO: Is this no longer needed?
+    	    world.getWorld().notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
         } catch (Throwable t) {
         	// TODO: What is this? remove?
         	/*
