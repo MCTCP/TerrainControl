@@ -83,7 +83,7 @@ import java.util.*;
 public class ForgeWorld implements LocalWorld
 {
     public static final int MAX_BIOMES_COUNT = 4096;
-    private static final int MAX_SAVED_BIOMES_COUNT = 256;
+    public static final int MAX_SAVED_BIOMES_COUNT = 256;
     public static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
     
 	private ForgeWorldSession worldSession;

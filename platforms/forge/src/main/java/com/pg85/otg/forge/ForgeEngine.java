@@ -214,11 +214,8 @@ public class ForgeEngine extends OTGEngine
 		int requiredBiomesCount = 0;
 		for(String presetName : presetNames)
 		{
-			if(OTG.getDimensionsConfig() == null || OTG.getDimensionsConfig().getDimensionConfig(presetName) == null)
-			{
-				File settingsDir = new File(OTG.getEngine().getWorldsDirectory() + File.separator + presetName);
-				requiredBiomesCount += getBiomeIdsRequiredCount(settingsDir);
-			}
+			File settingsDir = new File(OTG.getEngine().getWorldsDirectory() + File.separator + presetName);
+			requiredBiomesCount += getBiomeIdsRequiredCount(settingsDir);
 		}
 		if(requiredBiomesCount > getBiomeRegistryManager().getAvailableBiomeIdsCount())
 		{

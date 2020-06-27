@@ -50,18 +50,30 @@ public class BiomeIdData
         {
     		for(BiomeIdData biomeIdData : loadedBiomeIdData)
     		{
-    			if(!biomeIdData.biomeName.startsWith(world.getName() + "_"))
-    			{
-    				stringbuilder.append((stringbuilder.length() == 0 ? "" : ",") + biomeIdData.biomeName + "," + biomeIdData.savedBiomeId + "," + biomeIdData.otgBiomeId);
-    			}
+    			stringbuilder.append((stringbuilder.length() == 0 ? "" : ",") + biomeIdData.biomeName + "," + biomeIdData.savedBiomeId + "," + biomeIdData.otgBiomeId);
 			}
         }
 
+        boolean bFound = false;
 		for(LocalBiome biome : serverConfigProvider.getBiomeArrayByOTGId())
 		{
 			if(biome != null)
 			{
-				stringbuilder.append((stringbuilder.length() == 0 ? "" : ",") + world.getName() + "_" + biome.getName() + "," + biome.getIds().getSavedId() + "," + biome.getIds().getOTGBiomeId());
+				bFound = false;
+				if(loadedBiomeIdData != null)
+				{
+					for(BiomeIdData biomeIdData : loadedBiomeIdData)
+					{
+						if(biomeIdData.biomeName.equals(world.getName() + "_" + biome.getName()))
+						{
+							bFound = true;
+						}
+					}
+				}
+				if(!bFound)
+				{
+					stringbuilder.append((stringbuilder.length() == 0 ? "" : ",") + world.getName() + "_" + biome.getName() + "," + biome.getIds().getSavedId() + "," + biome.getIds().getOTGBiomeId());
+				}
 			}			 
 		}
 

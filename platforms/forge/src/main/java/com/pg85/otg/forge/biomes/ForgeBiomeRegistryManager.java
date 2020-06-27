@@ -135,7 +135,7 @@ public class ForgeBiomeRegistryManager
 	        	customBiome.savedId = newId;       	        
 	        }
 	        
-	    	OTG.log(LogMarker.DEBUG, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
+	    	OTG.log(LogMarker.DEBUG, "{}: {}, {}, {}, {}", biomeIds.isVirtual() ? "Virtual " : "Custom ", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
 	
 	        biome = customBiome;
 	    }
@@ -368,7 +368,7 @@ public class ForgeBiomeRegistryManager
     	OTG.log(LogMarker.DEBUG, "Registering biome " + resourceLocation.toString() + " " + id);
 
 		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
-    	
+
     	// Get the next free id
     	if(id == -1)
     	{
@@ -600,9 +600,9 @@ public class ForgeBiomeRegistryManager
 	{
 		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
 		int availableIds = 0;
-    	for(int i = 0; i < biomeRegistryAvailabiltyMap.size(); i++)
+    	for(int i = 0; i < ForgeWorld.MAX_SAVED_BIOMES_COUNT; i++)
     	{
-    		if(!biomeRegistryAvailabiltyMap.get(i))
+     		if(i >= biomeRegistryAvailabiltyMap.size() || !biomeRegistryAvailabiltyMap.get(i))
     		{
     			availableIds++;
     		}

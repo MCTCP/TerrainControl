@@ -137,6 +137,7 @@ public final class BiomeColorsListener
         {
         	// Get world name from resourcelocation
         	// TODO: Get world name from somewhere sensical...
+        	// TODO: This forbids worldnames with an underscore
         	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getPath().split("_")[0]);
         	if(biome == null)
         	{
