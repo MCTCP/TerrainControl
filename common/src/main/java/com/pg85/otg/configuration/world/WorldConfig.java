@@ -52,6 +52,7 @@ public class WorldConfig extends ConfigFile
     public boolean improvedBiomeBorders;
     public boolean improvedBiomeGroups;
     public boolean customHeightControlSmoothing;
+    public boolean improvedSmoothing;
 
     // Dimensions
     public List<String> dimensions = new ArrayList<String>();
@@ -629,8 +630,9 @@ public class WorldConfig extends ConfigFile
         readCustomBiomes(reader);
 
         this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS);
-        this.customHeightControlSmoothing = reader.getSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING);
         this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS);
+        this.customHeightControlSmoothing = reader.getSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING);
+        this.improvedSmoothing = reader.getSetting(WorldStandardValues.IMPROVED_SMOOTHING);
         
         // Images
         this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE);
@@ -1001,6 +1003,9 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING, this.customHeightControlSmoothing,
                 "Smooths biome CustomHeightControl data. Disabled by default for legacy worlds.");
+
+        writer.putSetting(WorldStandardValues.IMPROVED_SMOOTHING, this.improvedSmoothing,
+                "Smooths volatility and max average data. Disabled by default for legacy worlds.");
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 

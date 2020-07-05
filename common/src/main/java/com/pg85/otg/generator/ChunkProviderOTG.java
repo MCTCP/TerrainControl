@@ -351,6 +351,25 @@ public class ChunkProviderOTG
 
                 BiomeConfig biomeConfig = toBiomeConfig(biomeId);
 
+                // Data used for noise generation
+                double volatility1 = biomeConfig.volatility1;
+                double volatility2 = biomeConfig.volatility2;
+                double volatilityWeight1 = biomeConfig.volatilityWeight1;
+                double volatilityWeight2 = biomeConfig.volatilityWeight2;
+                double maxAverageDepth = biomeConfig.maxAverageDepth;
+                double maxAverageHeight = biomeConfig.maxAverageHeight;
+
+                if (worldConfig.improvedSmoothing)
+                {
+                    double[] data = smoothRemainingData(x, z, biomeArray);
+                    volatility1 = data[0];
+                    volatility2 = data[1];
+                    volatilityWeight1 = data[2];
+                    volatilityWeight2 = data[3];
+                    maxAverageDepth = data[4];
+                    maxAverageHeight = data[5];
+                }
+
                 double noiseHeight = this.noiseHeightNoise[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
                 {
@@ -365,16 +384,17 @@ public class ChunkProviderOTG
                     {
                         noiseHeight = -1.0D;
                     }
-                    noiseHeight -= biomeConfig.maxAverageDepth;
+                    noiseHeight -= maxAverageDepth;
                     noiseHeight /= 1.4D;
                     noiseHeight /= 2.0D;
-                } else
+                }
+                else
                 {
                     if (noiseHeight > 1.0D)
                     {
                         noiseHeight = 1.0D;
                     }
-                    noiseHeight += biomeConfig.maxAverageHeight;
+                    noiseHeight += maxAverageHeight;
                     noiseHeight /= 8.0D;
                 }
 
@@ -384,7 +404,8 @@ public class ChunkProviderOTG
                     if (worldConfig.improvedRivers)
                     {
                         this.biomeFactorWithRivers(x, z, usedYSections, noiseHeight, biomeArray, riverArray);
-                    } else
+                    }
+                    else
                     {
                         this.biomeFactor(x, z, usedYSections, noiseHeight, biomeArray);
                     }
@@ -433,15 +454,15 @@ public class ChunkProviderOTG
                         columnHeight *= 4.0D;
                     }
 
-                    final double vol1 = this.vol1Noise[i3D] / 512.0D * biomeConfig.volatility1;
-                    final double vol2 = this.vol2Noise[i3D] / 512.0D * biomeConfig.volatility2;
+                    final double vol1 = this.vol1Noise[i3D] / 512.0D * volatility1;
+                    final double vol2 = this.vol2Noise[i3D] / 512.0D * volatility2;
 
                     final double noise = (this.volNoise[i3D] / 10.0D + 1.0D) / 2.0D;
-                    if (noise < biomeConfig.volatilityWeight1)
+                    if (noise < volatilityWeight1)
                     {
                         output = vol1;
                     }
-                    else if (noise > biomeConfig.volatilityWeight2)
+                    else if (noise > volatilityWeight2)
                     {
                         output = vol2;
                     } else
@@ -653,6 +674,53 @@ public class ChunkProviderOTG
             chcData[y] = chcData[y] / weightSum;
             riverData[y] = riverData[y] / weightSum;
         }
+    }
+
+    private double[] smoothRemainingData(int x, int z, int[] biomeArray) {
+        float weightSum = 0.0F;
+
+        double vol1Sum = 0;
+        double vol2Sum = 0;
+        double vol1WeightSum = 0;
+        double vol2WeightSum = 0;
+        double maxAverageDepthSum = 0;
+        double maxAverageHeightSum = 0;
+
+        // Gather center data
+        final BiomeConfig centerBiomeConfig = toBiomeConfig(biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+        final int lookRadius = centerBiomeConfig.smoothRadius;
+
+        // Iterate through and add the values
+        for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
+        {
+            for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
+            {
+                // Add weight
+                weightSum += 1;
+
+                // Get biome
+                final BiomeConfig nextBiomeConfig = toBiomeConfig(biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+
+                // Add other data
+                vol1Sum += nextBiomeConfig.volatility1;
+                vol2Sum += nextBiomeConfig.volatility2;
+                vol1WeightSum += nextBiomeConfig.volatilityWeight1;
+                vol2WeightSum += nextBiomeConfig.volatilityWeight2;
+                maxAverageDepthSum += nextBiomeConfig.maxAverageDepth;
+                maxAverageHeightSum += nextBiomeConfig.maxAverageHeight;
+            }
+        }
+
+        // Divide by weight to get the final data
+        vol1Sum /= weightSum;
+        vol2Sum /= weightSum;
+        vol1WeightSum /= weightSum;
+        vol2WeightSum /= weightSum;
+        maxAverageDepthSum /= weightSum;
+        maxAverageHeightSum /= weightSum;
+
+        // Return everything in a double array to avoid extraneous fields in the class
+        return new double[]{vol1Sum, vol2Sum, vol1WeightSum, vol2WeightSum, maxAverageDepthSum, maxAverageHeightSum};
     }
 
     /**
