@@ -51,7 +51,8 @@ public class WorldConfig extends ConfigFile
 
     public boolean improvedBiomeBorders;
     public boolean improvedBiomeGroups;
-    
+    public boolean customHeightControlSmoothing;
+
     // Dimensions
     public List<String> dimensions = new ArrayList<String>();
 
@@ -628,6 +629,7 @@ public class WorldConfig extends ConfigFile
         readCustomBiomes(reader);
 
         this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS);
+        this.customHeightControlSmoothing = reader.getSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING);
         this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS);
         
         // Images
@@ -995,7 +997,10 @@ public class WorldConfig extends ConfigFile
         		"Spawns more precise borders that never spill over into neighbouring biomes. Disabled by default for legacy worlds.");
 
         writer.putSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS, this.improvedBiomeGroups,
-        		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");        
+        		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");
+
+        writer.putSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING, this.customHeightControlSmoothing,
+                "Smooths biome CustomHeightControl data. Disabled by default for legacy worlds.");
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 
