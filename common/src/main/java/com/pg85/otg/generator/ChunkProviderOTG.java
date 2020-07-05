@@ -632,6 +632,9 @@ public class ChunkProviderOTG
         {
             for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
             {
+                // Weight is done on a 2d scale, so add that outside of the loop
+                weightSum += 1;
+
                 // Compute the data for each column
                 for (int y = 0; y < maxYSections; y++)
                 {
@@ -641,7 +644,6 @@ public class ChunkProviderOTG
                     // Add the custom height for both river and normal CHC
                     riverData[y] += nextBiomeConfig.riverHeightMatrix[Math.min(nextBiomeConfig.riverHeightMatrix.length - 1, y)];
                     chcData[y] += nextBiomeConfig.heightMatrix[Math.min(nextBiomeConfig.heightMatrix.length - 1, y)];
-                    weightSum += 1;
                 }
             }
         }
