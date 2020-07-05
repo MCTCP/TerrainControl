@@ -58,6 +58,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 	private FifoMap<ChunkCoordinate, Chunk> lastUsedChunks;
     ForgeChunkBuffer chunkBuffer;
     Object chunkBufferLock = new Object();
+    Object chunkCacheLock = new Object();
     //
 
     private	DataFixer dataFixer = DataFixesManager.createFixer();
@@ -77,19 +78,27 @@ public class OTGChunkGenerator implements IChunkGenerator
         this.lastUsedChunks = new FifoMap<ChunkCoordinate, Chunk>(4);
     }
     
+    
+    
 	// Chunks
 	
 	// Called by /otg flush command to clear memory.
     public void clearChunkCache()
     {
-    	this.lastUsedChunks.clear();
-   		this.unloadedBlockColumnsCache.clear();
-   		this.unloadedChunksCache.clear();
+    	synchronized(this.chunkCacheLock)
+    	{
+	    	this.lastUsedChunks.clear();
+	   		this.unloadedBlockColumnsCache.clear();
+	   		this.unloadedChunksCache.clear();
+    	}
     }
     
     public void clearChunkFromCache(ChunkCoordinate chunkCoordinate)
     {
-    	this.lastUsedChunks.remove(chunkCoordinate);
+    	synchronized(this.chunkCacheLock)
+    	{
+    		this.lastUsedChunks.remove(chunkCoordinate);
+    	}
     }
 
     @Override
@@ -169,7 +178,11 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
         
-        Chunk chunk = this.lastUsedChunks.get(chunkCoord);
+        Chunk chunk;
+    	synchronized(this.chunkCacheLock)
+    	{
+    		chunk = this.lastUsedChunks.get(chunkCoord);
+    	}
         if(chunk == null)
         {
         	// Try to fetch the chunk without populating it.
@@ -181,7 +194,10 @@ public class OTGChunkGenerator implements IChunkGenerator
 	        }
 	        if(chunk != null)
 	        {
-	        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        	synchronized(this.chunkCacheLock)
+	        	{
+		        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        	}
 	        }
         }
     	return chunk;

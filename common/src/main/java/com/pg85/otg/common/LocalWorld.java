@@ -228,6 +228,8 @@ public interface LocalWorld
      * @see ChunkCoordinate#getPopulatingChunk(int, int) Explanation about the
      * population offset.
      * @param chunkCoord The top left chunk for ReplacedBlocks.
+     * 
+     * Update: This comment is no longer accurate, all 4 chunks are replaceblock'd for each chunk populated.
      */
     public void replaceBlocks(ChunkCoordinate chunkCoord);
 	
