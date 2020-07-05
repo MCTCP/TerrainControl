@@ -331,7 +331,7 @@ public enum DefaultMaterial
         // Exceptions for nonsolid leaves
         // IF we get much more exceptions, we may want to make this a
         // parameter in the constructor instead.
-        return this == LEAVES || this == LEAVES_2 || this.solid;
+        return this == LEAVES || this == LEAVES_2 || (this.solid && this != ICE);
     }
 
     /**
