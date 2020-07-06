@@ -232,13 +232,13 @@ public class DimensionsConfig
 				e.printStackTrace();
 			}
 
-	       	if (presetsConfig == null)
+	       	if (presetsConfig != null)
 	       	{
-	       		OTG.log(LogMarker.FATAL, "Failed to load config.yml, aborting");
-	       		throw new RuntimeException("Failed to load config.yml, aborting");
+		       	presetsConfig.WorldName = mcWorldSaveDir.getName();
+		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
+			} else {
+	       		OTG.log(LogMarker.FATAL, "Failed to load " + mcWorldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsConfigFileName + ", aborting");
 			}
-	       	presetsConfig.WorldName = mcWorldSaveDir.getName();
-	       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
 		}
        	
 		if(presetsConfig != null)
