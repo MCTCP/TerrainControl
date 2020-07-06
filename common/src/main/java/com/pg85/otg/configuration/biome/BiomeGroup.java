@@ -97,12 +97,13 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
 
             LocalBiome localBiome = world.getBiomeByNameOrNull(biomeName);
             entry.setValue(localBiome);
-            
+
             if(localBiome == null)
             {
-            	localBiome = world.getBiomeByNameOrNull(biomeName);
+            	OTG.log(LogMarker.FATAL, "Could not find biome with name '"+ biomeName +"' from biome group "+ this.name);
+            	throw new RuntimeException("Could not find biome with name '"+ biomeName +"' from biome group "+ this.name);
             }
-            
+
             BiomeConfig biomeConfig = localBiome.getBiomeConfig();
             totalTemp += biomeConfig.biomeTemperature;
             this.totalGroupRarity += biomeConfig.biomeRarity;

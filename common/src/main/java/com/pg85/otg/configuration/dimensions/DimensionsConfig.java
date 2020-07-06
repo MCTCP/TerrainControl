@@ -231,7 +231,12 @@ public class DimensionsConfig
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-	       	
+
+	       	if (presetsConfig == null)
+	       	{
+	       		OTG.log(LogMarker.FATAL, "Failed to load config.yml, aborting");
+	       		throw new RuntimeException("Failed to load config.yml, aborting");
+			}
 	       	presetsConfig.WorldName = mcWorldSaveDir.getName();
 	       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
 		}

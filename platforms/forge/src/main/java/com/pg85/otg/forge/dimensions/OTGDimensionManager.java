@@ -554,53 +554,8 @@ public class OTGDimensionManager
 
 	public static OTGDimensionInfo LoadOrderedDimensionData()
 	{
-		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsDataFileName);
-		String[] dimensionDataFileValues = {};
-		if(dimensionDataFile.exists())
-		{
-			try {
-				StringBuilder stringbuilder = new StringBuilder();
-				BufferedReader reader = new BufferedReader(new FileReader(dimensionDataFile));
-				try {
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        line = reader.readLine();
-				    }
-				    if(stringbuilder.length() > 0)
-				    {
-				    	dimensionDataFileValues = stringbuilder.toString().split(",");
-				    }
-				    OTG.log(LogMarker.DEBUG, "Custom dimension data loaded");
-				} finally {
-					reader.close();
-				}
-
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}
-
-		ArrayList<DimensionData> dimensionData = new ArrayList<DimensionData>();
-		if(dimensionDataFileValues.length > 0)
-		{
-			for(int i = 0; i < dimensionDataFileValues.length; i += 5)
-			{
-				DimensionData dimData = new DimensionData();
-				dimData.dimensionId = Integer.parseInt(dimensionDataFileValues[i]);
-				dimData.dimensionName = dimensionDataFileValues[i + 1];
-				dimData.keepLoaded = Boolean.parseBoolean(dimensionDataFileValues[i + 2]);
-				dimData.seed = Long.parseLong(dimensionDataFileValues[i + 3]);
-				dimData.dimensionOrder = Integer.parseInt(dimensionDataFileValues[i + 4]);
-				dimensionData.add(dimData);
-			}
-		}
+		// Fetch the dimension data using the appropriate method to avoid duplicate lines
+		ArrayList<DimensionData> dimensionData = GetDimensionData(DimensionManager.getWorld(0).getSaveHandler().getWorldDirectory());
 
 		// Store the order in which dimensions were added
 		orderedDimensions = new HashMap<Integer, Integer>();
@@ -659,13 +614,21 @@ public class OTGDimensionManager
 		{
 			for(int i = 0; i < dimensionDataFileValues.length; i += 5)
 			{
-				DimensionData dimData = new DimensionData();
-				dimData.dimensionId = Integer.parseInt(dimensionDataFileValues[i]);
-				dimData.dimensionName = dimensionDataFileValues[i + 1];
-				dimData.keepLoaded = Boolean.parseBoolean(dimensionDataFileValues[i + 2]);
-				dimData.seed = Long.parseLong(dimensionDataFileValues[i + 3]);
-				dimData.dimensionOrder = Integer.parseInt(dimensionDataFileValues[i + 4]);
-				dimensionData.add(dimData);
+				try
+				{
+					DimensionData dimData = new DimensionData();
+					dimData.dimensionId = Integer.parseInt(dimensionDataFileValues[i]);
+					dimData.dimensionName = dimensionDataFileValues[i + 1];
+					dimData.keepLoaded = Boolean.parseBoolean(dimensionDataFileValues[i + 2]);
+					dimData.seed = Long.parseLong(dimensionDataFileValues[i + 3]);
+					dimData.dimensionOrder = Integer.parseInt(dimensionDataFileValues[i + 4]);
+					dimensionData.add(dimData);
+				}
+				catch (NumberFormatException e)
+				{
+					OTG.log(LogMarker.FATAL,"Faulty Dimensions.txt, failed to read dim ID, seed, or dim order for dimension "+i/5);
+					throw new RuntimeException("Faulty Dimensions.txt, failed to read dim ID, seed, or dim order for dimension "+i/5);
+				}
 			}
 		}
 		
@@ -730,7 +693,6 @@ public class OTGDimensionManager
 				}
 			}
 		}
-		
 		dimsConfig.save();
 	}
 	
