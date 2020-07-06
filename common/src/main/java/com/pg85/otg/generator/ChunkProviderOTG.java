@@ -351,6 +351,25 @@ public class ChunkProviderOTG
 
                 BiomeConfig biomeConfig = toBiomeConfig(biomeId);
 
+                // Data used for noise generation
+                double volatility1 = biomeConfig.volatility1;
+                double volatility2 = biomeConfig.volatility2;
+                double volatilityWeight1 = biomeConfig.volatilityWeight1;
+                double volatilityWeight2 = biomeConfig.volatilityWeight2;
+                double maxAverageDepth = biomeConfig.maxAverageDepth;
+                double maxAverageHeight = biomeConfig.maxAverageHeight;
+
+                if (worldConfig.improvedSmoothing)
+                {
+                    double[] data = smoothRemainingData(x, z, biomeArray);
+                    volatility1 = data[0];
+                    volatility2 = data[1];
+                    volatilityWeight1 = data[2];
+                    volatilityWeight2 = data[3];
+                    maxAverageDepth = data[4];
+                    maxAverageHeight = data[5];
+                }
+
                 double noiseHeight = this.noiseHeightNoise[i2D] / 8000.0D;
                 if (noiseHeight < 0.0D)
                 {
@@ -365,67 +384,95 @@ public class ChunkProviderOTG
                     {
                         noiseHeight = -1.0D;
                     }
-                    noiseHeight -= biomeConfig.maxAverageDepth;
+                    noiseHeight -= maxAverageDepth;
                     noiseHeight /= 1.4D;
                     noiseHeight /= 2.0D;
-                } else {
+                }
+                else
+                {
                     if (noiseHeight > 1.0D)
                     {
                         noiseHeight = 1.0D;
                     }
-                    noiseHeight += biomeConfig.maxAverageHeight;
+                    noiseHeight += maxAverageHeight;
                     noiseHeight /= 8.0D;
                 }
 
+                // Compute biome height and volatility for this column
                 if (!worldConfig.oldTerrainGenerator)
                 {
                     if (worldConfig.improvedRivers)
                     {
                         this.biomeFactorWithRivers(x, z, usedYSections, noiseHeight, biomeArray, riverArray);
-                    } else {
+                    }
+                    else
+                    {
                         this.biomeFactor(x, z, usedYSections, noiseHeight, biomeArray);
                     }
-                } else {
+                }
+                else
+                {
                     this.oldBiomeFactor(x, z, i2D, usedYSections, noiseHeight, biomeArray);
             	}
 
                 i2D++;
 
+                // Initialize both CHC for this column
+                double[] CHC = new double[biomeConfig.heightMatrix.length];
+                double[] riverCHC = new double[biomeConfig.riverHeightMatrix.length];
+
+                // If CHC smoothing is enabled, smooth based on the biome at this column's smoothing radius
+                if (worldConfig.customHeightControlSmoothing)
+                {
+                    // This function modifies the arrays directly, no need to set
+                    smoothCHC(CHC, riverCHC, x, z, maxYSections, biomeArray);
+                }
+                else {
+                    // If smoothing is not enabled, revert to the original CHC data
+                    CHC = biomeConfig.heightMatrix;
+                    riverCHC = biomeConfig.riverHeightMatrix;
+                }
+
+                // Compute and store the noise value for each section
                 for (int y = 0; y < maxYSections; y++)
                 {
                     double output;
-                    double d8;
+                    double columnHeight;
 
+                    // If there's a river here, use the river height and volatility instead
                     if (this.riverFound)
                     {
-                        d8 = (this.riverHeight - y) * 12.0D * 128.0D / this.heightCap / this.riverVol;
-                    } else {
-                        d8 = (this.heightFactor - y) * 12.0D * 128.0D / this.heightCap / this.volatilityFactor;
-                    }
-
-                    if (d8 > 0.0D)
+                        columnHeight = (this.riverHeight - y) * 12.0D * 128.0D / this.heightCap / this.riverVol;
+                    } else
                     {
-                        d8 *= 4.0D;
+                        columnHeight = (this.heightFactor - y) * 12.0D * 128.0D / this.heightCap / this.volatilityFactor;
                     }
 
-                    final double vol1 = this.vol1Noise[i3D] / 512.0D * biomeConfig.volatility1;
-                    final double vol2 = this.vol2Noise[i3D] / 512.0D * biomeConfig.volatility2;
+                    // Multiply the height value of this column by 4 if it's above 0
+                    if (columnHeight > 0.0D)
+                    {
+                        columnHeight *= 4.0D;
+                    }
+
+                    final double vol1 = this.vol1Noise[i3D] / 512.0D * volatility1;
+                    final double vol2 = this.vol2Noise[i3D] / 512.0D * volatility2;
 
                     final double noise = (this.volNoise[i3D] / 10.0D + 1.0D) / 2.0D;
-                    if (noise < biomeConfig.volatilityWeight1)
+                    if (noise < volatilityWeight1)
                     {
                         output = vol1;
                     }
-                    else if (noise > biomeConfig.volatilityWeight2)
+                    else if (noise > volatilityWeight2)
                     {
                         output = vol2;
-                    } else {
+                    } else
+                    {
                         output = vol1 + (vol2 - vol1) * noise;
                     }
 
                     if (!biomeConfig.disableNotchHeightControl)
                     {
-                        output += d8;
+                        output += columnHeight;
 
                         if (y > maxYSections - 4)
                         {
@@ -436,9 +483,10 @@ public class ChunkProviderOTG
                     }
                     if (this.riverFound)
                     {
-                    	output += biomeConfig.riverHeightMatrix[Math.min(biomeConfig.riverHeightMatrix.length - 1, y)];
-                    } else {
-                    	output += biomeConfig.heightMatrix[Math.min(biomeConfig.heightMatrix.length - 1, y)];
+                    	output += riverCHC[Math.min(biomeConfig.riverHeightMatrix.length - 1, y)];
+                    } else
+                    {
+                    	output += CHC[Math.min(biomeConfig.heightMatrix.length - 1, y)];
                     }
 
                     rawTerrain[i3D] = output;
@@ -446,6 +494,7 @@ public class ChunkProviderOTG
                 }
             }
         }
+
         return rawTerrain;
     }
 
@@ -589,6 +638,89 @@ public class ChunkProviderOTG
 
         this.riverVol = riverVolatilitySum;
         this.riverHeight = ySections * (2.0D + riverHeightSum + noiseHeight * 0.2D) / 4.0D;
+    }
+
+    private void smoothCHC(double[] chcData, double[] riverData, int x, int z, int maxYSections, int[] biomeArray)
+    {
+        float weightSum = 0.0F;
+
+        // Gather center data
+        final BiomeConfig centerBiomeConfig = toBiomeConfig(biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+        final int lookRadius = centerBiomeConfig.smoothRadius;
+
+        // Iterate through and add the chc
+        for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
+        {
+            for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
+            {
+                // Weight is done on a 2d scale, so add that outside of the loop
+                weightSum += 1;
+
+                // Compute the data for each column
+                for (int y = 0; y < maxYSections; y++)
+                {
+                    // Get the biome config at this position
+                    final BiomeConfig nextBiomeConfig = toBiomeConfig(biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+
+                    // Add the custom height for both river and normal CHC
+                    riverData[y] += nextBiomeConfig.riverHeightMatrix[Math.min(nextBiomeConfig.riverHeightMatrix.length - 1, y)];
+                    chcData[y] += nextBiomeConfig.heightMatrix[Math.min(nextBiomeConfig.heightMatrix.length - 1, y)];
+                }
+            }
+        }
+
+        // average the custom height for each column for both arrays
+        for (int y = 0; y < chcData.length; y++) {
+            chcData[y] = chcData[y] / weightSum;
+            riverData[y] = riverData[y] / weightSum;
+        }
+    }
+
+    private double[] smoothRemainingData(int x, int z, int[] biomeArray) {
+        float weightSum = 0.0F;
+
+        double vol1Sum = 0;
+        double vol2Sum = 0;
+        double vol1WeightSum = 0;
+        double vol2WeightSum = 0;
+        double maxAverageDepthSum = 0;
+        double maxAverageHeightSum = 0;
+
+        // Gather center data
+        final BiomeConfig centerBiomeConfig = toBiomeConfig(biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+        final int lookRadius = centerBiomeConfig.smoothRadius;
+
+        // Iterate through and add the values
+        for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)
+        {
+            for (int nextZ = -lookRadius; nextZ <= lookRadius; nextZ++)
+            {
+                // Add weight
+                weightSum += 1;
+
+                // Get biome
+                final BiomeConfig nextBiomeConfig = toBiomeConfig(biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
+
+                // Add other data
+                vol1Sum += nextBiomeConfig.volatility1;
+                vol2Sum += nextBiomeConfig.volatility2;
+                vol1WeightSum += nextBiomeConfig.volatilityWeight1;
+                vol2WeightSum += nextBiomeConfig.volatilityWeight2;
+                maxAverageDepthSum += nextBiomeConfig.maxAverageDepth;
+                maxAverageHeightSum += nextBiomeConfig.maxAverageHeight;
+            }
+        }
+
+        // Divide by weight to get the final data
+        vol1Sum /= weightSum;
+        vol2Sum /= weightSum;
+        vol1WeightSum /= weightSum;
+        vol2WeightSum /= weightSum;
+        maxAverageDepthSum /= weightSum;
+        maxAverageHeightSum /= weightSum;
+
+        // Return everything in a double array to avoid extraneous fields in the class
+        return new double[]{vol1Sum, vol2Sum, vol1WeightSum, vol2WeightSum, maxAverageDepthSum, maxAverageHeightSum};
     }
 
     /**
