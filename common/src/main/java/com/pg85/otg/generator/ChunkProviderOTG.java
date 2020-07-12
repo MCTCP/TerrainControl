@@ -646,7 +646,7 @@ public class ChunkProviderOTG
 
         // Gather center data
         final BiomeConfig centerBiomeConfig = toBiomeConfig(biomeArray[(x + this.maxSmoothRadius + (z + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
-        final int lookRadius = centerBiomeConfig.smoothRadius;
+        final int lookRadius = centerBiomeConfig.CHCSmoothRadius;
 
         // Iterate through and add the chc
         for (int nextX = -lookRadius; nextX <= lookRadius; nextX++)

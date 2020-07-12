@@ -781,6 +781,11 @@ public final class ServerConfigProvider implements ConfigProvider
             this.worldConfig.maxSmoothRadius = biomeConfig.smoothRadius;
         }
 
+		if (this.worldConfig.maxSmoothRadius < biomeConfig.CHCSmoothRadius)
+		{
+			this.worldConfig.maxSmoothRadius = biomeConfig.CHCSmoothRadius;
+		}
+
         // Indexing BiomeColor
         if (this.worldConfig.biomeMode == OTG.getBiomeModeManager().FROM_IMAGE)
         {

@@ -50,6 +50,7 @@ public class BiomeStandardValues extends Settings
             BIOME_RARITY = intSetting("BiomeRarity", 100, 0, Integer.MAX_VALUE),
             BIOME_RARITY_WHEN_ISLE = intSetting("BiomeRarityWhenIsle", 100, 0, Integer.MAX_VALUE),
             SMOOTH_RADIUS = intSetting("SmoothRadius", 2, 0, 32),
+            CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS = intSetting("CustomHeightControlSmoothRadius", 2, 0, 32),
             RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1),
             WATER_LEVEL_MAX = WorldStandardValues.WATER_LEVEL_MAX,
             WATER_LEVEL_MIN = WorldStandardValues.WATER_LEVEL_MIN;
