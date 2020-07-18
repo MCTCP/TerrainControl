@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -60,63 +63,68 @@ public class DimensionsConfig
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?
 		if(worldSavesDir != null)
 		{
-			File forgeWorldConfigFile = new File(worldSavesDir.getAbsolutePath() + File.separator + WorldName + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsConfigFileName);
-			if(!forgeWorldConfigFile.exists())
-			{
-				forgeWorldConfigFile.getParentFile().mkdirs();
-				try {
-					forgeWorldConfigFile.createNewFile();
-				} catch (IOException e) {
-					e.printStackTrace();
-					throw new RuntimeException("OTG encountered a critical error, exiting.");
-				}
-			}
-			
+			File dimensionsConfigFile = new File(worldSavesDir.getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigFileName);
+			File dimensionsConfigBackupFile = new File(worldSavesDir.getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
+		
 			// Create an ObjectMapper mapper for YAML
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-	
-			// Write object as YAML file
+
+			// Write Yaml file
 			try
 			{
-				try {
-					this.version = this.currentVersion;
-					mapper.writeValue(forgeWorldConfigFile, this);
-				} catch (JsonGenerationException e) {
-					e.printStackTrace();
-					throw new RuntimeException("OTG encountered a critical error, exiting.");
-				} catch (JsonMappingException e) {
-					e.printStackTrace();
-					throw new RuntimeException("OTG encountered a critical error, exiting.");
+				if(!dimensionsConfigFile.exists())
+				{
+					dimensionsConfigFile.getParentFile().mkdirs();
+					try {
+						dimensionsConfigFile.createNewFile();
+					} catch (IOException e) {
+						e.printStackTrace();
+						throw new RuntimeException("Could not create " + dimensionsConfigFile.getAbsolutePath() + ", exiting.");
+					}
+				} else {
+					Files.move(dimensionsConfigFile.toPath(), dimensionsConfigBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				}
 				
-				// Add a comment to the top of the file (since jackson can't add comments...)
-				
-				BufferedReader read = new BufferedReader(new FileReader(forgeWorldConfigFile));
+				this.version = this.currentVersion;
+				mapper.writeValue(dimensionsConfigFile, this);
+
 				ArrayList<String> list = new ArrayList<String>();
+
+				// Add a comment to the top of the file (since jackson can't add comments...)				
+				BufferedReader read = new BufferedReader(new FileReader(dimensionsConfigFile));
 	
 				String dataRow = read.readLine(); 
-				while (dataRow != null){
+				while (dataRow != null)
+				{
 				    list.add(dataRow);
 				    dataRow = read.readLine(); 
 				}
 				read.close();
 				
-				FileWriter writer = new FileWriter(forgeWorldConfigFile);
+				// Write the Yaml file with comment
+				FileWriter writer = new FileWriter(dimensionsConfigFile);
 				String headerComments = "#TODO: Provide instructions for modpack devs.";
 				writer.append(headerComments);
 	
-				for (int i = 0; i < list.size(); i++){
+				for (int i = 0; i < list.size(); i++)
+				{
 				    writer.append(System.getProperty("line.separator"));
 				    writer.append(list.get(i));
 				}
 				writer.flush();
-				writer.close();	
+				writer.close();					
 			}
 			catch(IOException e)
 			{
 				e.printStackTrace();
-				throw new RuntimeException("OTG encountered a critical error, exiting.");
-			}
+				throw new RuntimeException(
+					"OTG encountered a critical error writing " + dimensionsConfigFile.getAbsolutePath() + ", exiting. "
+					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "
+					+ "If your world's " + WorldStandardValues.DimensionsConfigFileName + " and its backup have been corrupted, you can "
+					+ "replace it with your own backup or create a new world with the same dimensions and copy its " 
+					+ WorldStandardValues.DimensionsConfigFileName + " (edit the WorldName node if necessary)."
+				);
+			}		
 		}
 	}
 
@@ -215,37 +223,76 @@ public class DimensionsConfig
 	 */
 	public static DimensionsConfig loadFromFile(File mcWorldSaveDir, File otgRootFolder)
 	{
-		File forgeWorldConfigFile = new File(mcWorldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsConfigFileName);
-        DimensionsConfig presetsConfig = null;
+		File dimensionsConfigFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigFileName);		
+		File dimensionsConfigBackupFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
         
-		if(forgeWorldConfigFile.exists())
+		if(!dimensionsConfigFile.exists() && !dimensionsConfigBackupFile.exists())
 		{
+			return null;
+		}
+		
+		if(dimensionsConfigFile.exists())
+		{
+			DimensionsConfig presetsConfig = null;        
 	        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
 	        
 	       	try {
-				presetsConfig = mapper.readValue(forgeWorldConfigFile, DimensionsConfig.class);
-			} catch (JsonParseException e) {
-				e.printStackTrace();
-			} catch (JsonMappingException e) {
-				e.printStackTrace();
+				presetsConfig = mapper.readValue(dimensionsConfigFile, DimensionsConfig.class);
 			} catch (IOException e) {
 				e.printStackTrace();
+				OTG.log(LogMarker.WARN, "Failed to load " + dimensionsConfigFile.getAbsolutePath() + ", trying to load backup.");
 			}
 
 	       	if (presetsConfig != null)
 	       	{
 		       	presetsConfig.WorldName = mcWorldSaveDir.getName();
 		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
-			} else {
-	       		OTG.log(LogMarker.FATAL, "Failed to load " + mcWorldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsConfigFileName + ", aborting");
+		       	try
+		       	{
+			       	updateConfig(presetsConfig, otgRootFolder);
+					return presetsConfig;
+		       	}
+		       	catch(Exception ex)
+		       	{
+		       		ex.printStackTrace();
+		       		OTG.log(LogMarker.WARN, "Failed to load " + dimensionsConfigFile.getAbsolutePath() + ", trying to load backup.");
+		       	}
 			}
 		}
-       	
-		if(presetsConfig != null)
+		
+		if(dimensionsConfigBackupFile.exists())
 		{
-			updateConfig(presetsConfig, otgRootFolder);
+			DimensionsConfig presetsConfig = null;        
+	        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+	        
+	       	try {
+				presetsConfig = mapper.readValue(dimensionsConfigBackupFile, DimensionsConfig.class);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+	       	
+	       	if (presetsConfig != null)
+	       	{
+		       	presetsConfig.WorldName = mcWorldSaveDir.getName();
+		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
+		       	try
+		       	{
+			       	updateConfig(presetsConfig, otgRootFolder);
+					return presetsConfig;
+		       	}
+		       	catch(Exception ex)
+		       	{
+		       		ex.printStackTrace();
+		       	}
+			}
 		}
 		
-       	return presetsConfig;
+		throw new RuntimeException(
+			"OTG encountered a critical error loading " + dimensionsConfigFile.getAbsolutePath() + " and could not load a backup, exiting."
+			+ "OTG automatically backs up files before writing and tries to use the backup when loading. "
+			+ "If your world's " + WorldStandardValues.DimensionsConfigFileName + " and its backup have been corrupted, you can "
+			+ "replace it with your own backup or create a new world with the same dimensions and copy its " 
+			+ WorldStandardValues.DimensionsConfigFileName + " (edit the WorldName node if necessary)."
+		);
 	}
 }

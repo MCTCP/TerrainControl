@@ -23,14 +23,23 @@ public class WorldStandardValues extends Settings
     public static final String WORLD_BIOMES_DIRECTORY_NAME = "WorldBiomes";
     public static final String WORLD_OBJECTS_DIRECTORY_NAME = "WorldObjects";
 
-	// Modpack config name    
 	public static String DimensionsConfigFileName = "Config.yaml";
+	public static String DimensionsConfigBackupFileName = "Config-backup.yaml";
+	public static String BiomeIdDataFileName = "BiomeIds.txt";
+	public static String BiomeIdDataBackupFileName = "BiomeIds-backup.txt";
 	public static String DimensionsDataFileName = "Dimensions.txt";
+	public static String DimensionsDataBackupFileName = "Dimensions-backup.txt";
 	public static String StructureDataFileName = "StructureData.txt";
+	public static String StructureDataBackupFileName = "StructureData-backup.txt";
 	public static String NullChunksFileName = "NullChunks.txt";
+	public static String NullChunksBackupFileName = "NullChunks-backup.txt";
 	public static String SpawnedStructuresFileName = "SpawnedStructures.txt";
+	public static String SpawnedStructuresBackupFileName = "SpawnedStructures-backup.txt";
 	public static String ChunkProviderPopulatedChunksFileName = "ChunkProviderPopulatedChunks.txt";
 	public static String PregeneratedChunksFileName = "PregeneratedChunks.txt";
+	public static String PregeneratedChunksBackupFileName = "PregeneratedChunks-backup.txt";
+	public static String WorldSaveDataFileName = "WorldSave.txt";
+	public static String WorldSaveDataBackupFileName = "WorldSave-backup.txt";
     
     /**
      * Temperatures below this temperature will cause the biome to be covered

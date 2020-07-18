@@ -323,7 +323,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     	// If this is a legacy world then we'll need to create a new one.
     	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + File.separator + this.worldSummary.getFileName()));
     	DimensionsConfig dimensionsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()), OTG.getEngine().getOTGRootFolder());
-    	if(dimensionsConfig == null && dimensionDatas.size() > 0)
+    	if(dimensionsConfig == null && dimensionDatas != null && dimensionDatas.size() > 0)
     	{
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
     		for(DimensionData dimensionData : dimensionDatas)
@@ -355,7 +355,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     		}
     		dimensionsConfig.save();
     	}
-    	else if(dimensionsConfig == null && dimensionDatas.size() == 0)
+    	else if(dimensionsConfig == null && (dimensionDatas == null || dimensionDatas.size() == 0))
     	{
     		// This is a vanilla world without dims, save a config without overworld / dims
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));

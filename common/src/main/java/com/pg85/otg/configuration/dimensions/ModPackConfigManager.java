@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+
 public class ModPackConfigManager
 {
 	private HashMap<String, DimensionsConfig> defaultConfigs = new HashMap<String, DimensionsConfig>();
@@ -16,7 +18,7 @@ public class ModPackConfigManager
 	private void indexModPackConfigs(File otgRootFolder)
 	{
 		// TODO: Doesn't Forge provide a better way of getting the config dir?
-		File configDir = new File(otgRootFolder.getParentFile().getParentFile() + File.separator + "config" + File.separator + "OpenTerrainGenerator" + File.separator);
+		File configDir = new File(otgRootFolder.getParentFile().getParentFile() + File.separator + "config" + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator);
 		if(configDir.exists())
 		{
 			for(File f : configDir.listFiles())

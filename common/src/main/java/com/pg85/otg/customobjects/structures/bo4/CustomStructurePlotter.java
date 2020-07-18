@@ -45,12 +45,12 @@ public class CustomStructurePlotter
 	
 	public void saveSpawnedStructures(LocalWorld world)
 	{
-		CustomStructureFileManager.saveChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, spawnedStructuresByGroup);
+		CustomStructureFileManager.saveChunksMapFile(world, this.spawnedStructuresByName, spawnedStructuresByGroup);
 	}
 	
 	public void loadSpawnedStructures(LocalWorld world)
 	{		
-		CustomStructureFileManager.loadChunksMapFile(WorldStandardValues.SpawnedStructuresFileName, world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
+		CustomStructureFileManager.loadChunksMapFile(world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
 	}
 	
 	public void invalidateChunkInStructuresPerChunkCache(ChunkCoordinate chunkCoord)
@@ -91,7 +91,7 @@ public class CustomStructurePlotter
     		catch (InterruptedException e)
     		{
 				e.printStackTrace();
-				throw new RuntimeException("This shouldn't happen, please contact the OTG developers about this crash.");
+				throw new RuntimeException("This shouldn't happen, please ask for help on the OTG Discord or file an issue on the OTG github.");
 			}
     	}
     	
