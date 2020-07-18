@@ -1,17 +1,28 @@
 package com.pg85.otg.forge.util;
 
+import java.util.Map;
+import java.util.Map.Entry;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 
-import net.minecraft.nbt.*;
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagByte;
+import net.minecraft.nbt.NBTTagByteArray;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagDouble;
+import net.minecraft.nbt.NBTTagFloat;
+import net.minecraft.nbt.NBTTagInt;
+import net.minecraft.nbt.NBTTagIntArray;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagLong;
+import net.minecraft.nbt.NBTTagShort;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.Map.Entry;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 
 public class NBTHelper
 {
@@ -27,33 +38,12 @@ public class NBTHelper
      * @param nmsTag The Minecraft tag.
      * @return The converted tag.
      */
-    @SuppressWarnings("unchecked")
-    // ^ We know that NBTTagCompound.map is a Map<String, NBTBase>
-    // So it is safe to suppress this warning
     public static NamedBinaryTag getNBTFromNMSTagCompound(String name, NBTTagCompound nmsTag)
     {
         NamedBinaryTag compoundTag = new NamedBinaryTag(NamedBinaryTag.Type.TAG_Compound, name, new NamedBinaryTag[] {new NamedBinaryTag(NamedBinaryTag.Type.TAG_End, null, null)});
 
         // Get the child tags using some reflection magic
-        Field mapField;
-        Map<String, NBTBase> nmsChildTags = null;
-        
-        try
-        {
-            // TODO better implementation
-            mapField = NBTTagCompound.class.getDeclaredField("tagMap"); // The field name was changed in newer forge versions
-            mapField.setAccessible(true);
-            nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
-        } catch (Exception e) {
-            try
-            {
-                mapField = NBTTagCompound.class.getDeclaredField("map");
-                mapField.setAccessible(true);
-                nmsChildTags = (Map<String, NBTBase>) mapField.get(nmsTag);
-            } catch (Exception e2) {
-                OTG.printStackTrace(LogMarker.FATAL, e2);
-            }
-        }
+        Map<String, NBTBase> nmsChildTags = ObfuscationReflectionHelper.getPrivateValue(NBTTagCompound.class, nmsTag, "field_74784_a");
 
         if (nmsChildTags == null)
         {
