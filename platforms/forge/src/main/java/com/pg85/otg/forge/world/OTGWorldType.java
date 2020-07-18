@@ -138,7 +138,7 @@ public class OTGWorldType extends WorldType
         if(!mcWorld.getMinecraftServer().isSinglePlayer())
         {
 	        WorldSettings worldSettings = new WorldSettings(mcWorld.getWorldInfo().getSeed(), mcWorld.getWorldInfo().getGameType(), mcWorld.getWorldInfo().isMapFeaturesEnabled(), mcWorld.getWorldInfo().isHardcoreModeEnabled(), OTGPlugin.OtgWorldType);
-	        worldSettings.setGeneratorOptions("OpenTerrainGenerator");
+	        worldSettings.setGeneratorOptions(PluginStandardValues.PLUGIN_NAME);
 	        mcWorld.getWorldInfo().setAllowCommands(mcWorld.getWorldInfo().areCommandsAllowed());
 	        mcWorld.getWorldInfo().populateFromWorldSettings(worldSettings);
     	}

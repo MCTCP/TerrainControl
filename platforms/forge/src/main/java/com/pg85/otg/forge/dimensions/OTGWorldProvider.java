@@ -5,6 +5,7 @@ import java.util.Random;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
@@ -56,7 +57,7 @@ public class OTGWorldProvider extends WorldProviderSurface
    @Override
    public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()
    {
-	   return OTGPlugin.OtgWorldType.getChunkGenerator(world, "OpenTerrainGenerator");
+	   return OTGPlugin.OtgWorldType.getChunkGenerator(world, PluginStandardValues.PLUGIN_NAME);
    }
    
 	@Override

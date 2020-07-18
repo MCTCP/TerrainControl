@@ -11,6 +11,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3EntityFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4EntityFunction;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
@@ -748,9 +749,9 @@ public class ServerTickHandler
     			(
     				(
 						worldServer.getWorldInfo() instanceof DerivedWorldInfo &&
-    					((DerivedWorldInfo)worldServer.getWorldInfo()).delegate.getGeneratorOptions().equals("OpenTerrainGenerator")
+    					((DerivedWorldInfo)worldServer.getWorldInfo()).delegate.getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME)
     				) || (
-    						worldServer.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator")
+    						worldServer.getWorldInfo().getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME)
     				)
     			)
     		)

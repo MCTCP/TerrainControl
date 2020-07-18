@@ -53,7 +53,7 @@ public class ForgeEngine extends OTGEngine
     {
         super(new ForgeLogger());
         
-        this.worldLoader = new WorldLoader(new File(Loader.instance().getConfigDir(), "OpenTerrainGenerator"));      
+        this.worldLoader = new WorldLoader(new File(Loader.instance().getConfigDir(), PluginStandardValues.PLUGIN_NAME));      
         this.biomeRegistryManager = new ForgeBiomeRegistryManager();
     }
 

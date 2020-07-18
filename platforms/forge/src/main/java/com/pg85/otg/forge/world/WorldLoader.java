@@ -70,10 +70,10 @@ public final class WorldLoader
         {
             Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
             minecraftDir.setAccessible(true);
-            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + "OpenTerrainGenerator");
+            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + PluginStandardValues.PLUGIN_NAME);
         } catch (Throwable e)
         {
-            dataFolder = new File("mods" + File.separator + "OpenTerrainGenerator");
+            dataFolder = new File("mods" + File.separator + PluginStandardValues.PLUGIN_NAME);
             System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
             OTG.printStackTrace(LogMarker.FATAL, e);
         }
@@ -338,7 +338,7 @@ public final class WorldLoader
 
     @Nullable ForgeWorld getOrCreateForgeWorld(World mcWorld)
     {
-    	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+    	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME))
     	{
     		throw new RuntimeException("Error: OTG tried to load a world that is missing OTG information. Was this world created via OTG? For Forge Single Player, be sure to use the OTG world creation screen.");
     	}
@@ -482,7 +482,7 @@ public final class WorldLoader
     		String resourceDomain = biome.getKey().getNamespace();
 
     		if(
-				!resourceDomain.equals("openterraingenerator") &&
+				!resourceDomain.equals(PluginStandardValues.PLUGIN_NAME) &&
 				!resourceDomain.equals("terraincontrol")
 			)
     		{
