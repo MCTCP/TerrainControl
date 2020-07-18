@@ -77,10 +77,12 @@ public class OTGBiomeBase extends BiomeBase
         this.r = ((BukkitMaterialData) biomeConfig.groundBlock).internalBlock();
 
         // Mob spawning
-        addMobs(this.t, biomeConfig.spawnMonsters);
-        addMobs(this.u, biomeConfig.spawnCreatures);
-        addMobs(this.v, biomeConfig.spawnWaterCreatures);
-        addMobs(this.w, biomeConfig.spawnAmbientCreatures);
+        // We add the merged lists and not the default lists
+        // Merged list = default list + inherited mobs
+        addMobs(this.t, biomeConfig.spawnMonstersMerged);
+        addMobs(this.u, biomeConfig.spawnCreaturesMerged);
+        addMobs(this.v, biomeConfig.spawnWaterCreaturesMerged);
+        addMobs(this.w, biomeConfig.spawnAmbientCreaturesMerged);
     }
 
     // Adds the mobs to the internal list.
