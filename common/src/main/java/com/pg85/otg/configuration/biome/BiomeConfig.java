@@ -58,6 +58,7 @@ public class BiomeConfig extends ConfigFile
     public float biomeHeight;
     public float biomeVolatility;
     public int smoothRadius;
+    public int CHCSmoothRadius;
 
     public float biomeTemperature;
     public float biomeWetness;
@@ -319,6 +320,7 @@ public class BiomeConfig extends ConfigFile
         this.biomeHeight = settings.getSetting(BiomeStandardValues.BIOME_HEIGHT, defaultSettings.defaultBiomeSurface);
         this.biomeVolatility = settings.getSetting(BiomeStandardValues.BIOME_VOLATILITY, defaultSettings.defaultBiomeVolatility);
         this.smoothRadius = settings.getSetting(BiomeStandardValues.SMOOTH_RADIUS);
+        this.CHCSmoothRadius = settings.getSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS);
 
         this.stoneBlock = settings.getSetting(BiomeStandardValues.STONE_BLOCK);
         this.surfaceBlock = settings.getSetting(BiomeStandardValues.SURFACE_BLOCK,
@@ -565,6 +567,10 @@ public class BiomeConfig extends ConfigFile
                 "smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .",
                 "So if two biomes next to each other have both a smooth radius of 2, the",
                 "resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.");
+
+        writer.putSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS, this.CHCSmoothRadius,
+                "Works the same way as SmoothRadius but only works on CustomHeightControl. Must be between 0 and 32, inclusive.",
+                "Does nothing if Custom Height Control smoothing is not enabled in the world config.");
 
         writer.putSetting(BiomeStandardValues.MAX_AVERAGE_HEIGHT, this.maxAverageHeight,
                 "If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.",
