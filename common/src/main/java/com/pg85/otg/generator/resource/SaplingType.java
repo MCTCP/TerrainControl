@@ -25,7 +25,9 @@ public enum SaplingType
     BrownMushroom,
     Acacia,
     DarkOak,
-    HugeRedwood;
+    HugeRedwood,
+    Custom;
+    // Custom represents any non-vanilla tree species, used in Forge.
 
     // Case insensitive index
     private static Map<String, SaplingType> BY_NAME = new HashMap<String, SaplingType>();

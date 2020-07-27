@@ -1,6 +1,7 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -8,6 +9,7 @@ import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialHelper;
 
 import java.util.*;
 
@@ -29,6 +31,9 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     }
 
     public SaplingType saplingType;
+    // wideTrunk and saplingMaterial are used by custom saplings only
+    public LocalMaterialData saplingMaterial;
+    public boolean wideTrunk;
     private List<Double> treeChances;
     private List<String> treeNames;
     private List<CustomObject> trees;
@@ -42,7 +47,17 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         assureSize(3, args);
 
         saplingType = SaplingType.get(args.get(0));
-        if (saplingType == null)
+
+        if (saplingType == SaplingType.Custom)
+        {
+            try {
+                saplingMaterial = MaterialHelper.readMaterial(args.get(1));
+            } catch (InvalidConfigException e) {
+                OTG.log(LogMarker.ERROR, "Invalid custom sapling configuration! Syntax: Sapling(Custom, material, widetrunk, TreeName, TreeChance, ...)");
+            }
+            OTG.log(LogMarker.INFO, "Adding sapling "+args.get(1)+" "+saplingMaterial.getName()+" to biome "+biomeConfig.getName());
+        }
+        if (saplingType == null && saplingMaterial == null)
         {
             throw new InvalidConfigException("Unknown sapling type " + args.get(0));
         }
@@ -52,8 +67,25 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         treeChances = new ArrayList<Double>();
         worldName = biomeConfig.worldConfig.getName();
         biomeName = biomeConfig.getName();
-        
-        for (int i = 1; i < args.size() - 1; i += 2)
+        int ind = 1;
+        if (saplingType == SaplingType.Custom)
+        {
+            ind = 3;
+            if (args.get(2).equalsIgnoreCase("true"))
+            {
+                wideTrunk = true;
+            }
+            else if (args.get(2).equalsIgnoreCase("false"))
+            {
+                wideTrunk = false;
+            }
+            else
+            {
+                wideTrunk = false;
+                ind = 2;
+            }
+        }
+        for (int i = ind; i < args.size() - 1; i += 2)
         {
             String treeName = args.get(i);
             treeNames.add(treeName);
@@ -202,6 +234,11 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
     public String toString()
     {
         StringBuilder sb = new StringBuilder("Sapling(").append(saplingType);
+
+        if (saplingType == SaplingType.Custom)
+        {
+            sb.append(",").append(saplingMaterial.getName()).append(",").append(wideTrunk);
+        }
 
         for (int i = 0; i < treeNames.size(); i++)
         {
