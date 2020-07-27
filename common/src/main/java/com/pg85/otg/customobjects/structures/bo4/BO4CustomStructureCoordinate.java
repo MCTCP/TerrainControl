@@ -50,7 +50,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     			object = null;
     			if(OTG.getPluginConfig().spawnLog)
     			{
-    				OTG.log(LogMarker.WARN, "Could not find BO2/BO3 " + this.bo3Name + " in GlobalObjects or WorldObjects directory.");
+    				OTG.log(LogMarker.WARN, "Could not find BO3/BO4 " + this.bo3Name + " in GlobalObjects or WorldObjects directory.");
     			}
     		}
     		this.bo3Name = object != null ? object.getName() : this.bo3Name;

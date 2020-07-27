@@ -68,7 +68,7 @@ public abstract class CustomStructureCoordinate
     			object = null;
     			if(OTG.getPluginConfig().spawnLog)
     			{
-    				OTG.log(LogMarker.WARN, "Could not find BO2/BO3 " + bo3Name + " in GlobalObjects or WorldObjects directory.");
+    				OTG.log(LogMarker.WARN, "Could not find BO3/BO4 " + bo3Name + " in GlobalObjects or WorldObjects directory.");
     			}
     		}
 			bo3Name = object != null ? object.getName() : bo3Name;
