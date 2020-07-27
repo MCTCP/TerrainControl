@@ -16,6 +16,7 @@ import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.biomes.ForgeMojangSettings;
+import com.pg85.otg.forge.blocks.BlockPortalOTG;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;
@@ -239,32 +240,30 @@ public final class WorldLoader
     	return allWorlds;
     }
     
+    // Only called server-side?
     public void unloadWorld(World world, boolean unRegisterBiomes)
     {
-    	unloadWorld(this.getWorld(world), unRegisterBiomes);
-    }
-
-    private void unloadWorld(ForgeWorld world, boolean unRegisterBiomes)
-    {
+    	ForgeWorld forgeWorld = this.getWorld(world);
+    	
     	// Used when dimensions are unloaded.
 
-        OTG.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-
-        ForgeWorld loadedWorld = this.worlds.get(world.getName());
+        OTG.log(LogMarker.INFO, "Unloading world \"{}\"...", forgeWorld.getName());
+        
+        ForgeWorld loadedWorld = this.worlds.get(forgeWorld.getName());
         if(loadedWorld != null) // For some reason Forge MP server unloads overworld twice on shutdown(?)
         {
         	synchronized(this.worlds)
         	{
         		synchronized(this.unloadedWorlds)
         		{
-        			this.unloadedWorlds.put(world.getName(), this.worlds.get(world.getName()));
-            		this.worlds.remove(world.getName());
+        			this.unloadedWorlds.put(forgeWorld.getName(), this.worlds.get(forgeWorld.getName()));
+            		this.worlds.remove(forgeWorld.getName());
         		}
         	}
         	
             if(!loadedWorld.getWorld().isRemote)
             {
-            	ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(false, world.getName(), loadedWorld.getWorld().getMinecraftServer());
+            	ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(false, forgeWorld.getName(), loadedWorld.getWorld().getMinecraftServer());
             }
         }
         

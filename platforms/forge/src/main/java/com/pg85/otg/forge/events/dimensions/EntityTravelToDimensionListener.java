@@ -7,6 +7,9 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.blocks.BlockPortalOTG;
+import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.forge.dimensions.OTGBlockPortal;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -40,7 +43,7 @@ public class EntityTravelToDimensionListener
 				{
 					for(int y = -2; y < 4; y++)
 					{
-						if(ForgeMaterialData.ofMinecraftBlockState(entityWorld.getBlockState(new BlockPos(entityPos.getX() + x, entityPos.getY() + y, entityPos.getZ() + z))).toDefaultMaterial().equals(DefaultMaterial.PORTAL))
+						if(entityWorld.getBlockState(new BlockPos(entityPos.getX() + x, entityPos.getY() + y, entityPos.getZ() + z)).getBlock() instanceof BlockPortalOTG) // TODO: avoid using instanceof so much?
 						{
 							if(closestPortalPos == null || Math.abs(entityPos.getX() + x) + Math.abs(entityPos.getY() + y) + Math.abs(entityPos.getZ() + z) < Math.abs(entityPos.getX() - closestPortalPos.getX()) + Math.abs(entityPos.getY() - closestPortalPos.getY()) + Math.abs(entityPos.getZ() - closestPortalPos.getZ()))
 							{
@@ -60,7 +63,7 @@ public class EntityTravelToDimensionListener
 			// Find portal material
 			BlockPos playerPortalMaterialBlockPos = new BlockPos(closestPortalPos);
 			IBlockState blockState = entityWorld.getBlockState(playerPortalMaterialBlockPos);
-			while(ForgeMaterialData.ofMinecraftBlockState(blockState).toDefaultMaterial() == DefaultMaterial.PORTAL && playerPortalMaterialBlockPos.getY() > 0)
+			while(blockState.getBlock() instanceof BlockPortalOTG && playerPortalMaterialBlockPos.getY() > 0) // TODO: Don't use instanceof so much?
 			{
 				playerPortalMaterialBlockPos = new BlockPos(playerPortalMaterialBlockPos.getX(), playerPortalMaterialBlockPos.getY() - 1, playerPortalMaterialBlockPos.getZ());
 				blockState = entityWorld.getBlockState(playerPortalMaterialBlockPos);

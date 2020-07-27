@@ -55,7 +55,7 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
     	List<String> presets = GuiHandler.GuiPresets
 			.entrySet()
 			.stream()
-			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().ShowInWorldCreationGUI)
 			.map(Entry::getKey)
 			.collect(Collectors.toList()
 		);
@@ -98,7 +98,7 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
     	List<String> presets = GuiHandler.GuiPresets
 			.entrySet()
 			.stream()
-			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().ShowInWorldCreationGUI)
 			.map(Entry::getKey)
 			.collect(Collectors.toList()
 		);

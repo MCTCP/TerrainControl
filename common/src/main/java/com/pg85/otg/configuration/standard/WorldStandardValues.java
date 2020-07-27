@@ -91,7 +91,11 @@ public class WorldStandardValues extends Settings
 		ITEMS_TO_ADD_ON_RESPAWN = stringSetting("ItemsToAddOnRespawn", ""),
 		
     	DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
-    	DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean")
+    	DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean"),
+    	
+    	PORTAL_COLOR = stringSetting("PortalColor", "Default"),
+    	PORTAL_PARTICLE_TYPE = stringSetting("PortalParticleType", "portal"),
+    	PORTAL_MOB_TYPE = stringSetting("PortalMobType", "zombie_pigman");
 	;
 
     public static final Setting<Integer>
@@ -151,9 +155,11 @@ public class WorldStandardValues extends Settings
 
 		SPAWN_POINT_X = intSetting("SpawnPointX", 0, -999999, 999999),
 		SPAWN_POINT_Y = intSetting("SpawnPointY", 0, -999999, 999999),
-		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, -999999, 999999)
+		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, -999999, 999999),
+		
+		PORTAL_MOB_SPAWN_CHANCE = intSetting("PortalMobSpawnChance", 2000, 0, 999999);
     ;
-
+    
     public static final Setting<Boolean>
         RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
         GROUP_FREEZE_ENABLED = booleanSetting("FreezeAllBiomesInColdGroup", false),

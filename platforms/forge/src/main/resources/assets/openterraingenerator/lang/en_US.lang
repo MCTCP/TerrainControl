@@ -1,2 +1,13 @@
 generator.OpenTerrainGenerator=Open Terrain Generator
+tile.portalotg.name=Default OTG portal block
+tile.portalotg_black.name=Black OTG portal block
+tile.portalotg_blue.name=Blue OTG portal block
+tile.portalotg_gold.name=Gold OTG portal block
+tile.portalotg_green.name=Green OTG portal block
+tile.portalotg_lightblue.name=Light blue OTG portal block
+tile.portalotg_lightgreen.name=Light green OTG portal block
+tile.portalotg_orange.name=Orange OTG portal block
+tile.portalotg_pink.name=Pink OTG portal block
+tile.portalotg_red.name=Red OTG portal block
+tile.portalotg_white.name=White OTG portal block
 generator.OTG.info=Don't use this, use the OTG menu instead.

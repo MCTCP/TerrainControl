@@ -9,6 +9,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.blocks.BlockPortalOTG;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.GuiHandler;
@@ -198,6 +199,10 @@ public class WorldListener
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event)
     {
+        // TODO: Put all world/dim specific caches in one place to unload them easily.
+        // TODO: This only clears the cache on the server
+        BlockPortalOTG.clearCacheOnWorldUnload(event.getWorld().provider.getDimension());
+    	
 		if(!event.getWorld().isRemote) // Server side only
 		{			
 	        World mcWorld = event.getWorld();
@@ -218,7 +223,7 @@ public class WorldListener
 		        {
 		        	// Can happen if this is dim -1 or 1 (or some other mod's dim?)
 		        	return;
-		        }		        	     		        			
+		        }		        	     		        			        
 		        		        
 				if(dimId != -1 && dimId != 1)
 		    	{		    		

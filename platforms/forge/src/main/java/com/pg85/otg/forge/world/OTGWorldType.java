@@ -82,24 +82,24 @@ public class OTGWorldType extends WorldType
         	        	OTG.getDimensionsConfig().save();
         	        } else {
         	        	// Create dimensionsconfig from the preset's worldconfig, only works if worldname is the same as preset name (which is the case for OTG overworlds on MP servers)
-        	        	WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
+        	        	WorldConfig worldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
         	        	if(worldConfig == null)
         	        	{
         	        		// The world dir / world config is missing, this can be either an error or an MP server being started and creating an OTG overworld, in which case default configs should be generated.
         	        		// Create a new world dir with default configs.
         					((ForgeEngine)OTG.getEngine()).getWorldLoader().createDefaultOTGWorld(mcWorld.getSaveHandler().getWorldDirectory().getName()); // For MP servers, world name == preset name.
         					GuiHandler.loadGuiPresets();
-        					worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
+        					worldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + mcWorld.getSaveHandler().getWorldDirectory().getName()));
         	        	}
         	        	
     	        		DimensionsConfig dimsConfig = new DimensionsConfig(mcWorld.getSaveHandler().getWorldDirectory());
-    	        		dimsConfig.Overworld = new DimensionConfig(mcWorld.getSaveHandler().getWorldDirectory().getName(), worldConfig);
+    	        		dimsConfig.Overworld = new DimensionConfig(mcWorld.getSaveHandler().getWorldDirectory().getName(), 0, true, worldConfig);
     	        		for(String dimToAdd : worldConfig.dimensions)
     	        		{
-    	        			WorldConfig dimWorldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimToAdd));
+    	        			WorldConfig dimWorldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimToAdd));
     	        			if(dimWorldConfig != null)
     	        			{
-    	        				dimsConfig.Dimensions.add(new DimensionConfig(dimToAdd, dimWorldConfig));
+    	        				dimsConfig.Dimensions.add(new DimensionConfig(dimToAdd, 0, true, dimWorldConfig));
     	        			}
     	        		}
     	        		OTG.setDimensionsConfig(dimsConfig);

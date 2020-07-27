@@ -10,12 +10,16 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.blocks.BlockPortalOTG;
+import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
@@ -316,18 +320,21 @@ public class OTGTeleporter
 
                 ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
                 portalMaterials.add(MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 0));
+                BlockPortalOTG portalBlock = null;
                 if(lastDimension == 0 && (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld() == null) // This is a vanilla overworld
                 {
                 	portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+                	portalBlock = ModBlocks.BlockPortalOTG;
                 }
                 else if(forgeWorld != null)
                 {
                 	portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+                	portalBlock = ModBlocks.getPortalBlockByColor(OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.PortalColor);
                 }
                 
                 if(createPortal)
                 {
-                	placeInPortal((ForgeMaterialData)portalMaterials.get(0), toWorldIn, entityIn, f, teleporter);
+                	placeInPortal((ForgeMaterialData)portalMaterials.get(0), portalBlock, toWorldIn, entityIn, f, teleporter);
                 } else {
             		if(entityPosY < 0) // Falling down into another dimension
             		{
@@ -494,9 +501,9 @@ public class OTGTeleporter
                 {
                     blockpos2 = blockpos1.down();
 
-                    if (destinationWorld.getBlockState(blockpos1).getBlock() == Blocks.PORTAL)
+                    if (destinationWorld.getBlockState(blockpos1).getBlock() instanceof BlockPortalOTG) // TODO: avoid using instanceof so much?
                     {
-                        for (blockpos2 = blockpos1.down(); destinationWorld.getBlockState(blockpos2).getBlock() == Blocks.PORTAL; blockpos2 = blockpos2.down())
+                        for (blockpos2 = blockpos1.down(); destinationWorld.getBlockState(blockpos2).getBlock() instanceof BlockPortalOTG; blockpos2 = blockpos2.down())  // TODO: avoid using instanceof so much?
                         {
                             blockpos1 = blockpos2;
                         }
@@ -582,7 +589,7 @@ public class OTGTeleporter
         }
     }
 
-    private static void placeInPortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
+    private static void placeInPortal(ForgeMaterialData portalMaterial, Block portalBlock, WorldServer destinationWorld, Entity entityIn, float rotationYaw, Teleporter _this)
     {
         if (destinationWorld.provider.getDimensionType().getId() != 1) // If not End
         {      
@@ -597,7 +604,7 @@ public class OTGTeleporter
         	}
             if (!placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this))
             {
-            	makePortal(portalMaterial, destinationWorld, entityIn, _this);
+            	makePortal(portalMaterial, portalBlock, destinationWorld, entityIn, _this);
             	placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this);
             }
         } else {
@@ -605,7 +612,7 @@ public class OTGTeleporter
         }
     }
 
-    private static boolean makePortal(ForgeMaterialData portalMaterial, WorldServer destinationWorld, Entity entityIn, Teleporter _this)
+    private static boolean makePortal(ForgeMaterialData portalMaterial, Block portalBlock, WorldServer destinationWorld, Entity entityIn, Teleporter _this)
     {
         double d0 = -1.0D;
         int j = MathHelper.floor(entityIn.posX);
@@ -775,7 +782,7 @@ public class OTGTeleporter
             }
         }
 
-        IBlockState iblockstate = Blocks.PORTAL.getDefaultState().withProperty(BlockPortal.AXIS, l6 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
+        IBlockState iblockstate = portalBlock.getDefaultState().withProperty(BlockPortal.AXIS, l6 == 0 ? EnumFacing.Axis.Z : EnumFacing.Axis.X);
 
         for (int i8 = 0; i8 < 4; ++i8)
         {

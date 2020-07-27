@@ -12,9 +12,9 @@ public class DimensionConfig extends DimensionConfigBase
 {
 	public DimensionConfig() { }
 	
-	public DimensionConfig(String presetName)
+	public DimensionConfig(String presetName, int dimensionId, boolean showInWorldCreationGUI)
 	{
-		super(presetName);
+		super(presetName, dimensionId, showInWorldCreationGUI);
 	}
 
 	public DimensionConfig(DimensionConfigGui dimConfig)
@@ -28,9 +28,9 @@ public class DimensionConfig extends DimensionConfigBase
 		this.GameRules = dimConfig.GameRules.clone();
 	}
 	
-	public DimensionConfig(String presetName, WorldConfig worldConfig)
+	public DimensionConfig(String presetName, int dimensionId, boolean showInWorldCreationGUI, WorldConfig worldConfig)
 	{	
-		super(presetName, worldConfig);
+		super(presetName, dimensionId, showInWorldCreationGUI, worldConfig);
 	}
 	
 	@Override
@@ -40,6 +40,8 @@ public class DimensionConfig extends DimensionConfigBase
 		
 		clone.PresetName = this.PresetName;
 		clone.Seed = this.Seed;
+		clone.DimensionId = this.DimensionId;
+		clone.ShowInWorldCreationGUI = this.ShowInWorldCreationGUI;
 		clone.WorldBorderRadiusInChunks = this.WorldBorderRadiusInChunks;
 		clone.PregeneratorRadiusInChunks = this.PregeneratorRadiusInChunks;
 		clone.AllowCheats = this.AllowCheats;

@@ -32,6 +32,7 @@ import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.blocks.BlockPortalOTG;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.GuiHandler;
@@ -457,7 +458,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                         {
 	                		// Apply game rules and save
 	                		applyGameRules();
-	                			                		
+	                		BlockPortalOTG.clearCache(); // TODO: create a proper "apply" method and put this stuff in there?
+	                		
 	                		// Create worlds for any newly created dims                			
                 			for(DimensionConfig dimConfig : this.dimensions)
                 			{
@@ -469,7 +471,10 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 					{
 	                					dimConfig.isNewConfig = false;
 	                			        OTG.IsNewWorldBeingCreated = true;
-	                        			OTGDimensionManager.createNewDimensionSP(dimConfig, this.mc.getIntegratedServer());
+	                			        if(!OTGDimensionManager.createNewDimensionSP(dimConfig, this.mc.getIntegratedServer()))
+	                			        {
+	                			        	this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Dimension id " + dimConfig.DimensionId + " was taken."));
+	                			        }
 	                        			OTG.IsNewWorldBeingCreated = false;
                 					} else {
                 						this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Not enough biome id's available to add all dimensions."));
@@ -536,6 +541,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 		{
 	                		// Apply game rules and save
 	                		applyGameRules();
+	                		BlockPortalOTG.clearCache(); // TODO: create a proper "apply" method and put this stuff in there?
 	                		
 	            			// Cancelling, remove any newly created dims, don't create worlds for them.
 	                		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();                	

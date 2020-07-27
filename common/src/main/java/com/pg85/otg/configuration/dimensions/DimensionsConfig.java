@@ -195,7 +195,7 @@ public class DimensionsConfig
        		// Update the IsOTGPlus field from the worldconfig, added for v1.
        		if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
        		{
-       			WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(otgRootFolder, PluginStandardValues.PresetsDirectoryName + File.separator + dimsConfig.Overworld.PresetName));
+       			WorldConfig worldConfig = WorldConfig.fromDisk(new File(otgRootFolder, PluginStandardValues.PresetsDirectoryName + File.separator + dimsConfig.Overworld.PresetName));
        			if(worldConfig != null)
        			{
        				dimsConfig.Overworld.Settings.IsOTGPlus = worldConfig.isOTGPlus;
@@ -205,7 +205,7 @@ public class DimensionsConfig
        		{
        			for(DimensionConfig dimConfig : dimsConfig.Dimensions)
        			{
-           			WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(otgRootFolder, PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName));
+           			WorldConfig worldConfig = WorldConfig.fromDisk(new File(otgRootFolder, PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName));
            			if(worldConfig != null)
            			{
            				dimConfig.Settings.IsOTGPlus = worldConfig.isOTGPlus;

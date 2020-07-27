@@ -100,8 +100,7 @@ public class ServerEventListener
 			}
 	
 		    // Load any saved dimensions.
-		    OTGDimensionManager.LoadCustomDimensionData();
-	
+		    OTGDimensionManager.LoadCustomDimensionData();	
 		    for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
 		    {
 		    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
@@ -112,7 +111,10 @@ public class ServerEventListener
 		    			OTG.log(LogMarker.WARN, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
 		    		} else {
 		    			OTG.IsNewWorldBeingCreated = true;
-		    			OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);
+		    			if(!OTGDimensionManager.createDimension(dimConfig, false))
+		    			{
+		    				OTG.log(LogMarker.WARN, "Could not create dimension \"" + dimConfig.PresetName + "\" at id " + dimConfig.DimensionId + ", the id is already taken.");	
+		    			}
 		    			OTG.IsNewWorldBeingCreated = false;
 		    		}
 	    		}

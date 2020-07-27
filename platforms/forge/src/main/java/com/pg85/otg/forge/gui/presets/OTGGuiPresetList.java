@@ -122,7 +122,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     	List<Entry<String, DimensionConfigGui>> presets = GuiHandler.GuiPresets
 			.entrySet()
 			.stream()
-			.filter(a -> this.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.filter(a -> this.selectingPresetForDimension || a.getValue().ShowInWorldCreationGUI)
 			.collect(Collectors.toList())
 		;
     	
@@ -152,7 +152,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         	this.presetInfo = new OTGGuiScrollingListInfo(this, null, null, null);           	
             return;
         }
-                
+
     	// When using the O menu ingame, can't delete a preset that's currently in use. 
     	if(this.previousMenu instanceof OTGGuiDimensionList)
     	{
@@ -160,7 +160,7 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
         	List<String> presets = GuiHandler.GuiPresets
     			.entrySet()
     			.stream()
-    			.filter(a -> this.selectingPresetForDimension || a.getValue().shouldDisplay)
+    			.filter(a -> this.selectingPresetForDimension || a.getValue().ShowInWorldCreationGUI)
     			.map(Entry::getKey)
     			.collect(Collectors.toList()
     		);
@@ -305,14 +305,14 @@ public class OTGGuiPresetList extends GuiScreen implements GuiYesNoCallback
     	// For MP the server sends the presets
     	if(this.mc.world == null || Minecraft.getMinecraft().isSingleplayer())
     	{    	
-    		GuiHandler.loadGuiPresets(); // Worldpacker may not have be done unpacking presets on app start, so fetch world configs here (also done when joining world via the world selection screen)
+    		GuiHandler.loadGuiPresets(); // Worldpacker may not be done unpacking presets on app start, so fetch world configs here (also done when joining world via the world selection screen)
     	}
-    	
+
     	// Get all configs for presets that should be shown
     	List<Entry<String, DimensionConfigGui>> presets = GuiHandler.GuiPresets
 			.entrySet()
 			.stream()
-			.filter(a -> this.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.filter(a -> this.selectingPresetForDimension || a.getValue().ShowInWorldCreationGUI)
 			.collect(Collectors.toList())
 		;
     	

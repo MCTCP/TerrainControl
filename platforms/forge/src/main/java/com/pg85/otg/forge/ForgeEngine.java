@@ -226,7 +226,7 @@ public class ForgeEngine extends OTGEngine
 	
     public int getBiomeIdsRequiredCount(File settingsDir)
     {
-    	WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(settingsDir);
+    	WorldConfig worldConfig = WorldConfig.fromDisk(settingsDir);
     	
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);
