@@ -156,7 +156,7 @@ public class SaplingListener
             int saplingX = blockPos.getX();
             int saplingY = blockPos.getY();
             int saplingZ = blockPos.getZ();
-            if (saplingType.requiresFourSaplings())
+            if (wideTrunk)
             {
                 localWorld.setBlock
                         (saplingX, saplingY, saplingZ, material, null, null);
