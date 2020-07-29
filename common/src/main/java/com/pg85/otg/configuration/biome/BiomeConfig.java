@@ -1,5 +1,6 @@
 package com.pg85.otg.configuration.biome;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
@@ -19,6 +20,7 @@ import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
@@ -435,11 +437,17 @@ public class BiomeConfig extends ConfigFile
                     SaplingGen sapling = (SaplingGen) res;
                     if (sapling.saplingType == SaplingType.Custom)
                     {
-                        // Puts big custom saplings in the big list and small in the small list
-                        if (sapling.wideTrunk)
-                            customBigSaplingGrowers.put(sapling.saplingMaterial, sapling);
-                        else
-                            customSaplingGrowers.put(sapling.saplingMaterial, sapling);
+                        try
+                        {// Puts big custom saplings in the big list and small in the small list
+                            if (sapling.wideTrunk)
+                                customBigSaplingGrowers.put(sapling.saplingMaterial, sapling);
+                            else
+                                customSaplingGrowers.put(sapling.saplingMaterial, sapling);
+                        }
+                        catch (NullPointerException e)
+                        {
+                            OTG.log(LogMarker.WARN, "Unrecognized sapling type in biome "+this.getName());
+                        }
                     }
                     else
                     {

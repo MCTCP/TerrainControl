@@ -55,7 +55,6 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
             } catch (InvalidConfigException e) {
                 OTG.log(LogMarker.ERROR, "Invalid custom sapling configuration! Syntax: Sapling(Custom, material, widetrunk, TreeName, TreeChance, ...)");
             }
-            OTG.log(LogMarker.INFO, "Adding sapling "+args.get(1)+" "+saplingMaterial.getName()+" to biome "+biomeConfig.getName());
         }
         if (saplingType == null && saplingMaterial == null)
         {
