@@ -346,7 +346,7 @@ public class ForgeWorld implements LocalWorld
 		if(getWorld() != null)
 		{
 			int dimensionId = getWorld().provider.getDimension();
-			File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : ""));
+			File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : ""));
 			if(worldDataDir.exists())
 			{
 				IOHelper.deleteRecursive(worldDataDir);

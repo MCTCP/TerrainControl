@@ -348,12 +348,21 @@ public class KeyEntry implements IGuiListEntry
                 	this.btnSettingEntry.displayString = this.settingEntry.getValueString();
             		for(IGuiListEntry entry : this.parent.getAllListEntries())
             		{
+            			if(entry.getLabelText().equals("Bonus chest"))
+        				{
+            				((KeyEntry)entry).settingEntry.value = false;
+            			}
+            			if(entry.getLabelText().equals("Allow cheats"))
+        				{
+            				((KeyEntry)entry).settingEntry.value = true;
+            			}            			
             			if(
         					entry.getLabelText().equals("Allow cheats") ||
         					entry.getLabelText().equals("Bonus chest")
     					)
         				{
-            				((KeyEntry)entry).btnSettingEntry.enabled = true;
+            				((KeyEntry)entry).btnSettingEntry.enabled = false;            				
+            				((KeyEntry)entry).btnSettingEntry.displayString = ((KeyEntry)entry).settingEntry.getValueString();
             			}
             		}	                	
             	}
@@ -476,12 +485,29 @@ public class KeyEntry implements IGuiListEntry
     					entry.getLabelText().equals("Bonus chest")
 					)
     				{
+        				((KeyEntry)entry).btnSettingEntry.enabled = true;
+        				
                     	if(((String)this.settingEntry.value).equals("Hardcore"))
                     	{
             				((KeyEntry)entry).btnSettingEntry.enabled = false;
             				((KeyEntry)entry).settingEntry.value = false;
-                    	} else {
-            				((KeyEntry)entry).btnSettingEntry.enabled = true;
+                    	}
+        			}
+        			if(entry.getLabelText().equals("Allow cheats"))
+    				{
+                    	if(((String)this.settingEntry.value).equals("Creative"))
+                    	{
+            				((KeyEntry)entry).btnSettingEntry.enabled = false;
+            				((KeyEntry)entry).settingEntry.value = true;
+                    	}
+                    	((KeyEntry)entry).btnSettingEntry.displayString = ((KeyEntry)entry).settingEntry.getValueString();
+        			}
+        			if(entry.getLabelText().equals("Bonus chest"))
+    				{
+                    	if(((String)this.settingEntry.value).equals("Creative"))
+                    	{
+            				((KeyEntry)entry).btnSettingEntry.enabled = false;
+            				((KeyEntry)entry).settingEntry.value = false;
                     	}
                     	((KeyEntry)entry).btnSettingEntry.displayString = ((KeyEntry)entry).settingEntry.getValueString();
         			}

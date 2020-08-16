@@ -11,6 +11,11 @@ public class SettingsEntry
 {
 	// Capital letters since we'll be serialising to yaml (and we want to make it look nice)
 	public String[] DimensionPortalMaterials = new String[] { "DIRT" }; // WorldStandardValues.DIMENSION_PORTAL_MATERIALS.getDefaultValue(); // TODO: Fetch from worldstandardvalues
+	public String PortalColor = WorldStandardValues.PORTAL_COLOR.getDefaultValue();
+	public String PortalParticleType = WorldStandardValues.PORTAL_PARTICLE_TYPE.getDefaultValue(); 
+	public String PortalMobType = WorldStandardValues.PORTAL_MOB_TYPE.getDefaultValue();
+	public int PortalMobSpawnChance = WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE.getDefaultValue();
+	
 	public ArrayList<LocalMaterialData> GetDimensionPortalMaterials()
 	{
         ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();                
@@ -83,6 +88,10 @@ public class SettingsEntry
 		clone.DimensionBelow = this.DimensionBelow;
 		clone.DimensionBelowHeight = this.DimensionBelowHeight;
 		clone.DimensionPortalMaterials = this.DimensionPortalMaterials;
+		clone.PortalColor = this.PortalColor;
+		clone.PortalParticleType = this.PortalParticleType; 
+		clone.PortalMobType = this.PortalMobType;
+		clone.PortalMobSpawnChance = this.PortalMobSpawnChance;		
 		clone.DoesWaterVaporize = this.DoesWaterVaporize;
 		clone.DoesXZShowFog = this.DoesXZShowFog;
 		clone.ExplosionsCanBreakBlocks = this.ExplosionsCanBreakBlocks;

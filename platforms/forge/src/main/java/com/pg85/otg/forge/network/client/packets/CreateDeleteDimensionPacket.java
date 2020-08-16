@@ -74,7 +74,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 				if(packetType == 0) // Create dimension
 				{
 					String dimConfigYaml = StreamHelper.readStringFromStream(message.getStream());
-					DimensionConfig dimConfig = DimensionConfig.fromYamlString(dimConfigYaml);       			
+					DimensionConfig dimConfig = DimensionConfig.fromYamlString(dimConfigYaml);
 					
 		            IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
 		            mainThread.addScheduledTask(new Runnable()
@@ -100,9 +100,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
         						OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but not enough biome id's are available.");
         						return;
         					}
-		                	
-							OTG.getDimensionsConfig().Dimensions.add(dimConfig);
-							
+		                								
             				long seed = (new Random()).nextLong();		            				
             	            String sSeed = dimConfig.Seed;
             	            if (sSeed != null && !StringUtils.isEmpty(sSeed))
@@ -120,11 +118,19 @@ public class CreateDeleteDimensionPacket extends OTGPacket
             	                {
             	                	seed = (long)sSeed.hashCode();
             	                }
-            	            }						
+            	            }
 			                
 			                OTG.IsNewWorldBeingCreated = true;
-							OTGDimensionManager.createDimension(seed, dimConfig.PresetName, false, true, true);
+							if(!OTGDimensionManager.createDimension(dimConfig, seed, true))
+							{
+        						OTG.IsNewWorldBeingCreated = false;
+        						// Update the UI on the client
+        						ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
+        						OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but the dimension id " + dimConfig.DimensionId + " + is not available.");
+        						return;
+							}
 							OTG.IsNewWorldBeingCreated = false;
+							
 							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimConfig.PresetName);
 							
 							if(dimConfig.Settings.CanDropChunk)

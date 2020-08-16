@@ -221,9 +221,13 @@ public class WorldConfig extends ConfigFile
     public String worldSeed;
 
     public ArrayList<LocalMaterialData> dimensionPortalMaterials;
+    public String portalColor;
+    public String portalParticleType; 
+    public String portalMobType;
+    public int portalMobSpawnChance;
+    
     public String dimensionBelow;
     public String dimensionAbove;
-
     public int dimensionBelowHeight;
     public int dimensionAboveHeight;
 
@@ -736,6 +740,11 @@ public class WorldConfig extends ConfigFile
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
         this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
         this.dimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
+
+        this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR);
+        this.portalParticleType = reader.getSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE);
+        this.portalMobType = reader.getSetting(WorldStandardValues.PORTAL_MOB_TYPE);
+        this.portalMobSpawnChance = reader.getSetting(WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE);
 
         // Dimensions
         this.dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
@@ -1397,6 +1406,16 @@ public class WorldConfig extends ConfigFile
                 "For blocks that have rotation such as QUARTZ_STAIRS, \"QUARTZ_STAIRS\" is the same as \"QUARTZ_STAIRS:3\"."
         		);
 
+        writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
+        		"The color of OTG portal blocks, \"" + WorldStandardValues.PORTAL_COLOR + "\" by default." + 
+        		"Colors: black, blue, gold, green, lightblue, lightgreen, orange, pink, red, white, default.");         
+        writer.putSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE, this.portalParticleType,
+        		"The type of particles spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_PARTICLE_TYPE + "\" by default. For a list of particles, use /otg particles"); 
+        writer.putSetting(WorldStandardValues.PORTAL_MOB_TYPE, this.portalMobType,        		
+        		"The type of mobs spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_TYPE + "\" by default. For a list of mobs, use /otg entities");
+        writer.putSetting(WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE, this.portalMobSpawnChance,        		
+        		"The mob spawn chance for OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE + "\" by default, lower value means higher chance. Mob spawn chance also depends on difficulty level.");        
+
         writer.putSetting(WorldStandardValues.TeleportToSpawnOnly, this.teleportToSpawnOnly,
         		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
 
@@ -1603,7 +1622,7 @@ public class WorldConfig extends ConfigFile
 				);
     }
     
-	public static WorldConfig loadWorldConfigFromDisk(File worldDir)
+	public static WorldConfig fromDisk(File worldDir)
 	{
         File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         if(!worldConfigFile.exists())

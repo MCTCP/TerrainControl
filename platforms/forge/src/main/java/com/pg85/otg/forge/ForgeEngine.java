@@ -53,7 +53,7 @@ public class ForgeEngine extends OTGEngine
     {
         super(new ForgeLogger());
         
-        this.worldLoader = new WorldLoader(new File(Loader.instance().getConfigDir(), "OpenTerrainGenerator"));      
+        this.worldLoader = new WorldLoader(new File(Loader.instance().getConfigDir(), PluginStandardValues.PLUGIN_NAME));      
         this.biomeRegistryManager = new ForgeBiomeRegistryManager();
     }
 
@@ -226,7 +226,7 @@ public class ForgeEngine extends OTGEngine
 	
     public int getBiomeIdsRequiredCount(File settingsDir)
     {
-    	WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(settingsDir);
+    	WorldConfig worldConfig = WorldConfig.fromDisk(settingsDir);
     	
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);

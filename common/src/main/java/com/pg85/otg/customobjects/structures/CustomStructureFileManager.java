@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +16,9 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Map.Entry;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
@@ -31,6 +35,7 @@ import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.SmoothingAreaLine;
 import com.pg85.otg.customobjects.structures.bo4.SmoothingAreaLineDiagonal;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 
@@ -47,11 +52,8 @@ public class CustomStructureFileManager
 		// So don't worry about saving structure files for structures that have already been spawned, they won't be added to the structure cache when loading
 
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
-    	if(occupiedChunksFile.exists())
-    	{
-    		occupiedChunksFile.delete();
-    	}
+		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
+		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataBackupFileName);
 
     	StringBuilder stringbuilder = new StringBuilder();
     	if(structures.size() > 0)
@@ -213,17 +215,24 @@ public class CustomStructureFileManager
 			BufferedWriter writer = null;
 	        try
 	        {
-	        	if(occupiedChunksFile.exists())
-	        	{
-	        		occupiedChunksFile.delete();
-	        	}
-	        	occupiedChunksFile.getParentFile().mkdirs();
+	    		if(!occupiedChunksFile.exists())
+	    		{
+	    			occupiedChunksFile.getParentFile().mkdirs();
+	    		} else {
+	    			Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	    		}
+
 	        	writer = new BufferedWriter(new FileWriter(occupiedChunksFile));
 	            writer.write(stringbuilder.toString());
 	        }
 	        catch (IOException e)
 	        {
-	            e.printStackTrace();
+				e.printStackTrace();
+				throw new RuntimeException(
+					"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
+					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+					+ "If your dimension's " + WorldStandardValues.StructureDataFileName + " and its backup have been corrupted, "
+					+ "you can replace it with your own backup.");
 	        }
 	        finally
 	        {
@@ -245,14 +254,19 @@ public class CustomStructureFileManager
 		// null chunks and add them to the structurecache (if they are outside the pregenerated region), 
 		// potentially overriding some of the structures we added earlier.
 		
-	    Map<ChunkCoordinate, CustomStructure> structuresFile = new HashMap<ChunkCoordinate, CustomStructure>();
-
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
+		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
+		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataBackupFileName);
 
-		StringBuilder stringbuilder = new StringBuilder();
+	    if(!occupiedChunksFile.exists() && !occupiedChunksBackupFile.exists())
+	    {
+	    	return null;
+	    }
+				
 	    if(occupiedChunksFile.exists())
 	    {
+	    	StringBuilder stringbuilder = new StringBuilder();
+			boolean bSuccess = false;
 			try
 			{
 				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksFile));
@@ -265,24 +279,83 @@ public class CustomStructureFileManager
 				    	stringbuilder.append(line);
 				        line = reader.readLine();
 				    }
+			    	bSuccess = true;
 				} finally {
 					reader.close();
 				}
 			}
-			catch (FileNotFoundException e1)
+			catch (IOException e)
 			{
-				e1.printStackTrace();
+				e.printStackTrace();
+				OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
 			}
-			catch (IOException e1)
-			{
-				e1.printStackTrace();
-			}
-	    } else {
-	    	return structuresFile;
+			
+		    if(bSuccess)
+		    {
+		    	try
+		    	{
+		    		String[] structuresString = stringbuilder.toString().substring(1, stringbuilder.length() - 1).split(" ");	    
+			    	return parseStructuresFile(structuresString, world);
+		    	}
+			    catch(Exception ex)
+				{
+			    	ex.printStackTrace();
+			    	OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
+				}
+		    }			
 	    }
+	    
+	    if(occupiedChunksBackupFile.exists())
+	    {
+	    	StringBuilder stringbuilder = new StringBuilder();
+			boolean bSuccess = false;
+			try
+			{
+				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksBackupFile));
+				try
+				{
+					String line = reader.readLine();
 
-	    String[] structuresString = stringbuilder.toString().substring(1, stringbuilder.length() - 1).split(" ");
-
+				    while (line != null)
+				    {
+				    	stringbuilder.append(line);
+				        line = reader.readLine();
+				    }
+			    	bSuccess = true;
+				} finally {
+					reader.close();
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			
+		    if(bSuccess)
+		    {
+		    	try
+		    	{
+		    		String[] structuresString = stringbuilder.toString().substring(1, stringbuilder.length() - 1).split(" ");	    
+			    	return parseStructuresFile(structuresString, world);
+		    	}
+			    catch(Exception ex)
+				{
+			    	ex.printStackTrace();
+				}
+		    }
+	    }
+	    
+		throw new RuntimeException(
+			"OTG encountered a critical error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
+			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+			+ "If your dimension's " + WorldStandardValues.StructureDataFileName + " and its backup have been corrupted, you can "
+			+ "replace it with a backup."
+		);
+	}
+	
+	private static Map<ChunkCoordinate, CustomStructure> parseStructuresFile(String[] structuresString, LocalWorld world)
+	{
+	    Map<ChunkCoordinate, CustomStructure> structuresFile = new HashMap<ChunkCoordinate, CustomStructure>();
 	    for(int i = 0; i < structuresString.length; i++)
 	    {
 	    	String[] structureStringArray = structuresString[i].substring(1, structuresString[i].length() - 1).split("\\]\\[");
@@ -310,7 +383,6 @@ public class CustomStructureFileManager
 		    		structureStart = new BO3CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0);
 		    	}
 
-			    stringbuilder = null;
 			    String[] structureStartString = structureStringArray[1].split(",");
 			    String[] objectsToSpawnString = {};
 			    if(structureStringArray.length > 2 && !structureStringArray[2].equals(""))
@@ -530,18 +602,15 @@ public class CustomStructureFileManager
 		    structure.particlesManager.particleData = particleData;
 
 		    structuresFile.put(chunkCoord, structure);
-	    }
+	    }    
 	    return structuresFile;
 	}
 
-	static void saveChunksFile(ArrayList<ChunkCoordinate> chunks, String fileName, LocalWorld world)
+	static void saveNullChunksFile(ArrayList<ChunkCoordinate> chunks, LocalWorld world)
 	{
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + fileName);
-		if(occupiedChunksFile.exists())
-		{
-			occupiedChunksFile.delete();
-		}
+		File nullChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksFileName);
+		File nullChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksBackupFileName);
 
 		if(chunks.size() > 0)
 		{
@@ -559,13 +628,24 @@ public class CustomStructureFileManager
 			BufferedWriter writer = null;
 	        try
 	        {
-	        	occupiedChunksFile.getParentFile().mkdirs();
-	        	writer = new BufferedWriter(new FileWriter(occupiedChunksFile));
+	    		if(!nullChunksFile.exists())
+	    		{
+	    			nullChunksFile.getParentFile().mkdirs();
+	    		} else {
+	    			Files.move(nullChunksFile.toPath(), nullChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	    		}
+	    		
+	        	writer = new BufferedWriter(new FileWriter(nullChunksFile));
 	            writer.write(stringbuilder.toString());
 	        }
 	        catch (IOException e)
 	        {
-	            e.printStackTrace();
+				e.printStackTrace();
+				throw new RuntimeException(
+					"OTG encountered a critical error writing " + nullChunksFile.getAbsolutePath() + ", exiting. "
+					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+					+ "If your dimension's " + WorldStandardValues.NullChunksFileName + " and its backup have been corrupted, "
+					+ "you can replace it with your own backup.");
 	        }
 	        finally
 	        {
@@ -579,17 +659,24 @@ public class CustomStructureFileManager
 		}
 	}
 
-	static ArrayList<ChunkCoordinate> loadChunksFile(String fileName, LocalWorld world)
+	static ArrayList<ChunkCoordinate> loadNullChunksFile(LocalWorld world)
 	{
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + fileName);
+		File nullChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksFileName);
+		File nullChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksBackupFileName);
 
-		StringBuilder stringbuilder = new StringBuilder();
-		String[] occupiedChunkCoords = {};
-		if(occupiedChunksFile.exists())
+		if(!nullChunksFile.exists() && !nullChunksBackupFile.exists())
 		{
+			return null;
+		}
+		
+		if(nullChunksFile.exists())
+		{
+			StringBuilder stringbuilder = new StringBuilder();
+			String[] nullChunkCoords = {};
+			boolean bSuccess = false;			
 			try {
-				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksFile));
+				BufferedReader reader = new BufferedReader(new FileReader(nullChunksFile));
 				try {
 					String line = reader.readLine();
 
@@ -600,42 +687,100 @@ public class CustomStructureFileManager
 				    }
 				    if(stringbuilder.length() > 0)
 				    {
-				    	occupiedChunkCoords = stringbuilder.toString().split(",");
+				    	nullChunkCoords = stringbuilder.toString().split(",");
+				    }
+				    bSuccess = true;				    
+				} finally {
+					reader.close();
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				OTG.log(LogMarker.WARN, "Failed to load " + nullChunksFile.getAbsolutePath() + ", trying to load backup.");
+			}
+			
+			if(bSuccess)
+			{
+				try
+				{
+					return parseNullChunks(nullChunkCoords);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+					OTG.log(LogMarker.WARN, "Failed to load " + nullChunksFile.getAbsolutePath() + ", trying to load backup.");
+				}
+			}
+		}
+		
+		if(nullChunksBackupFile.exists())
+		{
+			StringBuilder stringbuilder = new StringBuilder();
+			String[] nullChunkCoords = {};
+			boolean bSuccess = false;			
+			try {
+				BufferedReader reader = new BufferedReader(new FileReader(nullChunksBackupFile));
+				try {
+					String line = reader.readLine();
+
+				    while (line != null)
+				    {
+				    	stringbuilder.append(line);
+				        line = reader.readLine();
+				    }
+				    if(stringbuilder.length() > 0)
+				    {
+				    	nullChunkCoords = stringbuilder.toString().split(",");
+					    bSuccess = true;
 				    }
 				} finally {
 					reader.close();
 				}
 			}
-			catch (FileNotFoundException e1)
+			catch (IOException e)
 			{
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
-			catch (IOException e1)
+			
+			if(bSuccess)
 			{
-				e1.printStackTrace();
-			}
+				try
+				{
+					return parseNullChunks(nullChunkCoords);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}			
 		}
-
+		
+		throw new RuntimeException(
+			"OTG encountered a critical error loading " + nullChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
+			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+			+ "If your dimension's " + WorldStandardValues.NullChunksFileName + " and its backup have been corrupted, you can "
+			+ "replace it with a backup.");
+	}
+	
+	private static ArrayList<ChunkCoordinate> parseNullChunks(String[] nullChunkCoords)
+	{
 		ArrayList<ChunkCoordinate> chunks = new ArrayList<ChunkCoordinate>();
-		if(occupiedChunkCoords.length > 0)
+		if(nullChunkCoords.length > 0)
 		{
-			for(int i = 0; i < occupiedChunkCoords.length; i += 2)
+			for(int i = 0; i < nullChunkCoords.length; i += 2)
 			{
-				chunks.add(ChunkCoordinate.fromChunkCoords(Integer.parseInt(occupiedChunkCoords[i]),Integer.parseInt(occupiedChunkCoords[i + 1])));
+				chunks.add(ChunkCoordinate.fromChunkCoords(Integer.parseInt(nullChunkCoords[i]),Integer.parseInt(nullChunkCoords[i + 1])));
 			}
 		}
 		return chunks;
 	}
 
-	public static void saveChunksMapFile(String fileName, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
+	public static void saveChunksMapFile(LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
 	{
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + fileName);
-
-		if(occupiedChunksFile.exists())
-		{
-			occupiedChunksFile.delete();
-		}
+		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
+		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
 
 		if(spawnedStructuresByName.size() > 0)
 		{
@@ -673,13 +818,24 @@ public class CustomStructureFileManager
 			BufferedWriter writer = null;
 	        try
 	        {
-	        	occupiedChunksFile.getParentFile().mkdirs();
+	    		if(!occupiedChunksFile.exists())
+	    		{
+	    			occupiedChunksFile.getParentFile().mkdirs();
+	    		} else {
+	    			Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	    		}
+	    		
 	        	writer = new BufferedWriter(new FileWriter(occupiedChunksFile));
 	            writer.write(stringbuilder.toString());
 	        }
 	        catch (IOException e)
 	        {
-	            e.printStackTrace();
+				e.printStackTrace();
+				throw new RuntimeException(
+					"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
+					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+					+ "If your dimension's " + WorldStandardValues.SpawnedStructuresFileName + " and its backup have been corrupted, "
+					+ "you can replace it with your own backup.");
 	        }
 	        finally
 	        {
@@ -692,19 +848,77 @@ public class CustomStructureFileManager
 		}
 	}
 
-	public static void loadChunksMapFile(String fileName, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
+	public static void loadChunksMapFile(LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
 	{
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + fileName);
+		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
+		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
 
-		HashMap<String, ArrayList<ChunkCoordinate>> chunksByName = new HashMap<String, ArrayList<ChunkCoordinate>>();
-		HashMap<String, HashMap<ChunkCoordinate, Integer>> chunksByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();
+		if(!occupiedChunksFile.exists() && !occupiedChunksBackupFile.exists())
+		{
+			return;
+		}	
 
-		StringBuilder stringbuilder = new StringBuilder();
-		String[] occupiedChunksByName = {};
-		String[] occupiedChunksByGroup = {};
 		if(occupiedChunksFile.exists())
 		{
+			StringBuilder stringbuilder = new StringBuilder();
+			String[] occupiedChunksByName = {};
+			String[] occupiedChunksByGroup = {};
+			boolean bSuccess = false;			
+			try
+			{
+				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksFile));
+				try
+				{
+					String line = reader.readLine();
+
+				    while (line != null)
+				    {
+				    	stringbuilder.append(line);
+				        //sb.append(System.lineSeparator());
+				        line = reader.readLine();
+				    }
+				    if(stringbuilder.length() > 0)
+				    {
+				    	String[] allData = stringbuilder.toString().split("\\|");				    	
+				    	occupiedChunksByName = allData[0].split("/");
+				    	if(allData.length > 1) // Legacy files may not have occupiedChunksByGroup
+				    	{
+				    		occupiedChunksByGroup = allData[1].split("/");
+				    	}					    
+				    }
+				    bSuccess = true;				    
+				} finally {
+					reader.close();
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
+			}
+			
+			if(bSuccess)
+			{
+				try
+				{
+					parseChunksMapFile(occupiedChunksByName, occupiedChunksByGroup, spawnedStructuresByName, spawnedStructuresByGroup);
+					return;
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+					OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
+				}
+			}
+		}
+		
+		if(occupiedChunksBackupFile.exists())
+		{
+			StringBuilder stringbuilder = new StringBuilder();
+			String[] occupiedChunksByName = {};
+			String[] occupiedChunksByGroup = {};
+			boolean bSuccess = false;			
 			try
 			{
 				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksFile));
@@ -727,21 +941,42 @@ public class CustomStructureFileManager
 				    		occupiedChunksByGroup = allData[1].split("/");
 				    	}
 				    }
+				    bSuccess = true;				    
 				} finally {
 					reader.close();
 				}
-
 			}
-			catch (FileNotFoundException e1)
+			catch (IOException e)
 			{
-				e1.printStackTrace();
+				e.printStackTrace();
 			}
-			catch (IOException e1)
+			
+			if(bSuccess)
 			{
-				e1.printStackTrace();
-			}
+				try
+				{
+					parseChunksMapFile(occupiedChunksByName, occupiedChunksByGroup, spawnedStructuresByName, spawnedStructuresByGroup);
+					return;
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}			
 		}
-
+		
+		throw new RuntimeException(
+			"OTG encountered a critical error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
+			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+			+ "If your dimension's " + WorldStandardValues.SpawnedStructuresFileName + " and its backup have been corrupted, you can "
+			+ "replace it with a backup.");
+	}
+	
+	private static void parseChunksMapFile(String[] occupiedChunksByName, String[] occupiedChunksByGroup, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
+	{
+		HashMap<String, ArrayList<ChunkCoordinate>> chunksByName = new HashMap<String, ArrayList<ChunkCoordinate>>();
+		HashMap<String, HashMap<ChunkCoordinate, Integer>> chunksByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();		
+		
 		String[] occupiedChunkByNameCoords = {};
 		for(String entry : occupiedChunksByName)
 		{
@@ -760,10 +995,7 @@ public class CustomStructureFileManager
 
 			chunksByName.put(key, value);
 		}
-		
-		spawnedStructuresByName.clear();
-		spawnedStructuresByName.putAll(chunksByName);
-		
+				
 		String[] occupiedChunkByGroupCoords = {};
 		for(String entry : occupiedChunksByGroup)
 		{
@@ -782,6 +1014,9 @@ public class CustomStructureFileManager
 
 			chunksByGroup.put(key, value);
 		}
+		
+		spawnedStructuresByName.clear();
+		spawnedStructuresByName.putAll(chunksByName);
 		
 		spawnedStructuresByGroup.clear();
 		spawnedStructuresByGroup.putAll(chunksByGroup);

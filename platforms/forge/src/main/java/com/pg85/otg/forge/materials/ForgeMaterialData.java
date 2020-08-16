@@ -4,6 +4,9 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.blocks.BlockPortalOTG;
+import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.util.helpers.BlockHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
@@ -526,6 +529,13 @@ public class ForgeMaterialData implements LocalMaterialData
         		this.defaultMaterial = DefaultMaterial.UNKNOWN_BLOCK;
         	} else {
         		this.defaultMaterial = DefaultMaterial.getMaterial(getBlockId());
+        		if(this.defaultMaterial == DefaultMaterial.UNKNOWN_BLOCK)
+        		{
+            		if(this.blockData.getBlock() instanceof BlockPortalOTG) // TODO: avoid using instanceof so much?
+            		{
+        				this.defaultMaterial = DefaultMaterial.PORTAL;
+            		}
+        		}
         	}
     	}
     	return defaultMaterial;

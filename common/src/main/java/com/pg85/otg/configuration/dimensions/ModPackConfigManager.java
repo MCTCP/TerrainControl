@@ -4,6 +4,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.pg85.otg.OTG;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+
 public class ModPackConfigManager
 {
 	private HashMap<String, DimensionsConfig> defaultConfigs = new HashMap<String, DimensionsConfig>();
@@ -16,7 +19,7 @@ public class ModPackConfigManager
 	private void indexModPackConfigs(File otgRootFolder)
 	{
 		// TODO: Doesn't Forge provide a better way of getting the config dir?
-		File configDir = new File(otgRootFolder.getParentFile().getParentFile() + File.separator + "config" + File.separator + "OpenTerrainGenerator" + File.separator);
+		File configDir = new File(otgRootFolder.getParentFile().getParentFile() + File.separator + "config" + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator);
 		if(configDir.exists())
 		{
 			for(File f : configDir.listFiles())
@@ -43,5 +46,27 @@ public class ModPackConfigManager
 	public ArrayList<DimensionsConfig> getAllModPackConfigs()
 	{
 		return new ArrayList<DimensionsConfig>(this.defaultConfigs.values());
+	}
+
+	public HashMap<Integer, String> getReservedDimIds()
+	{
+		new HashMap<Integer, String>();
+		HashMap<Integer, String> reservedIds = new HashMap<Integer, String>();
+		for(DimensionsConfig dimsConfig : this.defaultConfigs.values())
+		{
+			for(DimensionConfig dimConfig1 : dimsConfig.Dimensions)
+			{
+				// The modpack config has reserved this id for one of its dimensions.
+				if(dimConfig1.DimensionId != 0)
+				{
+					// If there's multiple modpacks reserving a dim id for the same preset, only use the first.
+					if(!reservedIds.containsKey(Integer.valueOf(dimConfig1.DimensionId)))
+					{
+						reservedIds.put(Integer.valueOf(dimConfig1.DimensionId), dimConfig1.PresetName);
+					}
+				}
+			}
+		}
+		return reservedIds;
 	}
 }

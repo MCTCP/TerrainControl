@@ -1,5 +1,7 @@
 package com.pg85.otg.forge.world;
 
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 
@@ -16,9 +18,9 @@ public abstract class WorldHelper
 			//(
 				//(
 					//world.getWorldInfo() instanceof DerivedWorldInfo &&
-					//((DerivedWorldInfo)world.getWorldInfo()).delegate.getGeneratorOptions().equals("OpenTerrainGenerator")
+					//((DerivedWorldInfo)world.getWorldInfo()).delegate.getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME)
 				//) || (
-					world.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator")
+					world.getWorldInfo().getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME)
 				//)
 			//)
 		)
