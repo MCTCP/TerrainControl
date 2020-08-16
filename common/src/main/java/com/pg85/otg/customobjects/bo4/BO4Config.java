@@ -1414,6 +1414,7 @@ public class BO4Config extends CustomObjectConfigFile
 		writer.comment("snowballpoof,  snowshovel, slime, heart, barrier, iconcrack, blockcrack, blockdust");
 		writer.comment("droplet, take, mobappearance, dragonbreath, endRod, damageIndicator, sweepAttack");
 		writer.comment("fallingdust, totem, spit.");
+		writer.comment("Use /otg particles (forge only) to show a list of particles.");
 		writer.comment("velocityX,velocityY,velocityZ - Spawn the enemy with the given velocity. If this is not filled in then a small random velocity is applied.");
 
         for(BO4ParticleFunction func : particlesList)

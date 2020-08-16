@@ -7,6 +7,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.NoSuchElementException;
 
 import net.minecraft.world.chunk.Chunk;
@@ -16,6 +18,7 @@ import net.minecraftforge.common.DimensionManager;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
@@ -614,18 +617,14 @@ public class Pregenerator
     		savePregeneratorData(false);
     	}
     }
-    
+
 	private void savePregeneratorData(boolean forceSave)
 	{
 		if(this.pregeneratorIsRunning || forceSave)
 		{
 			int dimensionId = this.world.getDimensionId();
-			File pregeneratedChunksFile = new File(this.world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksFileName);
-
-			if(pregeneratedChunksFile.exists())
-			{
-				pregeneratedChunksFile.delete();
-			}
+			File pregeneratedChunksFile = new File(this.world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksFileName);
+			File pregeneratedChunksBackupFile = new File(this.world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksBackupFileName);
 
 			StringBuilder stringbuilder = new StringBuilder();
 			stringbuilder.append(this.spawned + "," + this.left + "," + this.top + "," + this.right + "," + this.bottom + "," + this.cycle + "," + this.timeTaken + "," + this.iTop + "," + this.iBottom + "," + this.iLeft + "," + this.iRight + "," + this.pregenerationRadius + "," + (this.preGeneratorCenterPoint != null ? this.preGeneratorCenterPoint.getChunkX() : "null") + "," + (this.preGeneratorCenterPoint != null ? this.preGeneratorCenterPoint.getChunkZ() : "null"));
@@ -633,15 +632,25 @@ public class Pregenerator
 			BufferedWriter writer = null;
 	        try
 	        {
-	        	pregeneratedChunksFile.getParentFile().mkdirs();
+	    		if(!pregeneratedChunksFile.exists())
+	    		{
+	    			pregeneratedChunksFile.getParentFile().mkdirs();
+	    		} else {
+	    			Files.move(pregeneratedChunksFile.toPath(), pregeneratedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+	    		}
+	    		
 	        	writer = new BufferedWriter(new FileWriter(pregeneratedChunksFile));
 	            writer.write(stringbuilder.toString());
 	            OTG.log(LogMarker.DEBUG, "Pre-generator data saved");
 	        }
 	        catch (IOException e)
 	        {
-	        	OTG.log(LogMarker.ERROR, "Could not save pre-generator data.");
-	            e.printStackTrace();
+				e.printStackTrace();
+				throw new RuntimeException(
+					"OTG encountered a critical error writing " + pregeneratedChunksFile.getAbsolutePath() + ", exiting. "
+					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+					+ "If your world's " + WorldStandardValues.PregeneratedChunksFileName + " and its backup have been corrupted, you can "
+					+ "replace it with a backup.");
 	        }
 	        finally
 	        {
@@ -656,11 +665,19 @@ public class Pregenerator
 	private void loadPregeneratorData()
 	{
 		int dimensionId = this.world.getDimensionId();
-		File pregeneratedChunksFile = new File(this.world.getWorldSaveDir().getAbsolutePath() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksFileName);
+		File pregeneratedChunksFile = new File(this.world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksFileName);
+		File pregeneratedChunksBackupFile = new File(this.world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.PregeneratedChunksBackupFileName);
 
-		String[] pregeneratedChunksFileValues = {};
+		if(!pregeneratedChunksFile.exists() && !pregeneratedChunksBackupFile.exists())
+		{
+			saveDefaults();
+			return;
+		}
+		
 		if(pregeneratedChunksFile.exists())
 		{
+			String[] pregeneratedChunksFileValues = {};
+			boolean bSuccess = false;			
 			try
 			{
 				StringBuilder stringbuilder = new StringBuilder();
@@ -668,7 +685,6 @@ public class Pregenerator
 				try
 				{
 					String line = reader.readLine();
-
 				    while (line != null)
 				    {
 				    	stringbuilder.append(line);
@@ -677,23 +693,89 @@ public class Pregenerator
 				    if(stringbuilder.length() > 0)
 				    {
 				    	pregeneratedChunksFileValues = stringbuilder.toString().split(",");
+					    bSuccess = true;
+					    OTG.log(LogMarker.DEBUG, "Pre-generator data loaded");				    	
 				    }
-				    OTG.log(LogMarker.DEBUG, "Pre-generator data loaded");
 				} finally {
 					reader.close();
 				}
 
 			}
-			catch (FileNotFoundException e1)
+			catch (IOException e)
 			{
-				e1.printStackTrace();
+				e.printStackTrace();
+				OTG.log(LogMarker.WARN, "Failed to load " + pregeneratedChunksFile.getAbsolutePath() + ", trying to load backup.");
 			}
-			catch (IOException e1)
+			
+			if(bSuccess)
 			{
-				e1.printStackTrace();
+				try
+				{
+					parsePregeneratorData(pregeneratedChunksFileValues);
+					return;
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+					OTG.log(LogMarker.WARN, "Failed to load " + pregeneratedChunksFile.getAbsolutePath() + ", trying to load backup.");
+				}
+			}			
+		}
+		
+		if(pregeneratedChunksBackupFile.exists())
+		{
+			String[] pregeneratedChunksFileValues = {};
+			boolean bSuccess = false;			
+			try
+			{
+				StringBuilder stringbuilder = new StringBuilder();
+				BufferedReader reader = new BufferedReader(new FileReader(pregeneratedChunksBackupFile));
+				try
+				{
+					String line = reader.readLine();
+				    while (line != null)
+				    {
+				    	stringbuilder.append(line);
+				        line = reader.readLine();
+				    }
+				    if(stringbuilder.length() > 0)
+				    {
+				    	pregeneratedChunksFileValues = stringbuilder.toString().split(",");
+					    bSuccess = true;
+					    OTG.log(LogMarker.DEBUG, "Pre-generator data loaded");				    	
+				    }
+				} finally {
+					reader.close();
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			
+			if(bSuccess)
+			{
+				try
+				{
+					parsePregeneratorData(pregeneratedChunksFileValues);
+					return;
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
 			}
 		}
 
+		throw new RuntimeException(
+			"OTG encountered a critical error loading " + pregeneratedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
+			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "
+			+ "If your dimension's " + WorldStandardValues.PregeneratedChunksFileName + " and its backup have been corrupted, you can "
+			+ "replace it with a backup.");
+	}
+	
+	private void parsePregeneratorData(String[] pregeneratedChunksFileValues)
+	{
 		if(pregeneratedChunksFileValues.length > 0)
 		{
 			this.spawned = Integer.parseInt(pregeneratedChunksFileValues[0]);
@@ -729,30 +811,34 @@ public class Pregenerator
 				this.preGeneratorCenterPoint = null;
 			}
 
-			this.total = (this.pregenerationRadius * 2 + 1) * (this.pregenerationRadius * 2 + 1);
-	    	
+			this.total = (this.pregenerationRadius * 2 + 1) * (this.pregenerationRadius * 2 + 1);	    	
 		} else {
-			this.spawned = 0;
-
-			this.left = 0;
-			this.top = 0;
-			this.right = 0;
-			this.bottom = 0;
-
-			this.cycle = 0;
-			this.timeTaken = 0;
-
-			this.iTop = Integer.MIN_VALUE;
-			this.iBottom = Integer.MIN_VALUE;
-			this.iLeft = Integer.MIN_VALUE;
-			this.iRight = Integer.MIN_VALUE;
-
-			this.preGeneratorCenterPoint = null; // Will be set after world spawn point has been determined
-			
-			DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.world.getName());
-			this.setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
-
-			savePregeneratorData(false);
+			saveDefaults();
 		}
+	}
+	
+	private void saveDefaults()
+	{
+		this.spawned = 0;
+
+		this.left = 0;
+		this.top = 0;
+		this.right = 0;
+		this.bottom = 0;
+
+		this.cycle = 0;
+		this.timeTaken = 0;
+
+		this.iTop = Integer.MIN_VALUE;
+		this.iBottom = Integer.MIN_VALUE;
+		this.iLeft = Integer.MIN_VALUE;
+		this.iRight = Integer.MIN_VALUE;
+
+		this.preGeneratorCenterPoint = null; // Will be set after world spawn point has been determined
+		
+		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(this.world.getName());
+		this.setPregenerationRadius(dimConfig.PregeneratorRadiusInChunks);
+
+		savePregeneratorData(false);
 	}
 }

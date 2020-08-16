@@ -2,6 +2,7 @@ package com.pg85.otg.forge.dimensions;
 
 import javax.annotation.Nullable;
 
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.OTGPlugin;
 
 import net.minecraft.nbt.NBTTagCompound;
@@ -328,7 +329,7 @@ public class OTGDerivedWorldInfo extends WorldInfo
     
     public String getGeneratorOptions()
     {
-        return "OpenTerrainGenerator";
+        return PluginStandardValues.PLUGIN_NAME;
     }
 
     /**

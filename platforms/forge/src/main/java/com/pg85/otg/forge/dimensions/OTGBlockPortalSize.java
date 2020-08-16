@@ -6,6 +6,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.blocks.BlockPortalOTG;
+import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.materials.MaterialHelper;
@@ -26,10 +29,11 @@ public class OTGBlockPortalSize
     private final EnumFacing.Axis axis;
     final EnumFacing rightDir;
     private final EnumFacing leftDir;
-    int portalBlockCount;
+    public int portalBlockCount;
     BlockPos bottomLeft;
-    private int height;
-    private int width;
+    public int height;
+    public int width;
+    private Block portalBlock;
     
     // Used for checking for portals in the destination world
     OTGBlockPortalSize(World sourceWorld, World destinationWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
@@ -67,7 +71,7 @@ public class OTGBlockPortalSize
     }
     
     // Used when creating portals in the source world
-    OTGBlockPortalSize(World sourceWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
+    public OTGBlockPortalSize(World sourceWorld, BlockPos spawnPos, EnumFacing.Axis p_i45694_3_)
     {
         this.world = sourceWorld;
         this.axis = p_i45694_3_;
@@ -85,11 +89,13 @@ public class OTGBlockPortalSize
         {
             ;
         }
-       
-        // Try portal materials for each world. Also try nether if no world uses obsidian.
-		boolean worldUsesObsidian = false;
-		ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
+        
 		ForgeWorld overworld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
+		ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
+		
+        /* TODO: May still need this, remove after testing (make sure mc loads/unloads nether at the proper times now that we've switched to OTG portal blocks).
+        // Try portal materials for each world. Also try nether if no world uses obsidian.
+		boolean worldUsesObsidian = false;		
 		if(overworld == null) // This is a vanilla overworld
 		{
 			ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
@@ -134,12 +140,15 @@ public class OTGBlockPortalSize
 				return;
 			}
 		}
+		*/
 		
 		if(overworld == null && sourceWorld.provider.getDimension() != 0) // This is a vanilla overworld, player is not in overworld so may want to portal to it
-		{ // TODO: Does this still happen?
+		{ 
+			// TODO: Does this still happen?
 			ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
+			this.portalBlock = ModBlocks.getPortalBlockByColor(OTG.getDimensionsConfig().Overworld.Settings.PortalColor);
 			if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
-			{
+			{				
 				return;
 			}
 		}
@@ -147,11 +156,12 @@ public class OTGBlockPortalSize
 		{
 			ForgeWorld forgeWorld = (ForgeWorld)localWorld;
 			ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
+			this.portalBlock = ModBlocks.getPortalBlockByColor(OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.PortalColor);
 			
 			if(forgeWorld.getDimensionId() != sourceWorld.provider.getDimension())
 			{
 				if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
-				{
+				{					
 					return;
 				}
 			}
@@ -255,7 +265,7 @@ public class OTGBlockPortalSize
                     break label24;
                 }
 
-                if (block == Blocks.PORTAL)
+                if (block instanceof BlockPortalOTG) // TODO: avoid using instanceof so much?
                 {
                     ++this.portalBlockCount;
                 }
@@ -337,7 +347,7 @@ public class OTGBlockPortalSize
 
     private boolean isEmptyBlock(Block blockIn)
     {
-        return blockIn.getMaterial(null) == Material.AIR || blockIn == Blocks.FIRE || blockIn == Blocks.PORTAL;
+        return blockIn.getMaterial(null) == Material.AIR || blockIn == Blocks.FIRE || blockIn == Blocks.PORTAL || blockIn instanceof BlockPortalOTG;  // TODO: avoid using instanceof so much?
     }
 
     public boolean isValid()
@@ -345,7 +355,7 @@ public class OTGBlockPortalSize
         return this.bottomLeft != null && this.width >= 2 && this.width <= 21 && this.height >= 3 && this.height <= 21;
     }
 
-    void placePortalBlocks()
+    public void placePortalBlocks()
     {
         for (int i = 0; i < this.width; ++i)
         {
@@ -353,7 +363,7 @@ public class OTGBlockPortalSize
 
             for (int j = 0; j < this.height; ++j)
             {
-                this.world.setBlockState(blockpos.up(j), Blocks.PORTAL.getDefaultState().withProperty(BlockPortal.AXIS, this.axis), 2);
+                this.world.setBlockState(blockpos.up(j), this.portalBlock.getDefaultState().withProperty(BlockPortal.AXIS, this.axis), 2);
             }
         }
     }

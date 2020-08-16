@@ -41,7 +41,7 @@ public class ServerEventListener
 
         World overWorld = DimensionManager.getWorld(0);
 
-        if(overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator") && !(overWorld.getWorldInfo().getTerrainType() instanceof OTGWorldType))
+        if(overWorld.getWorldInfo().getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME) && !(overWorld.getWorldInfo().getTerrainType() instanceof OTGWorldType))
         {
             ISaveHandler isavehandler = overWorld.getSaveHandler();
             WorldInfo worldInfo = isavehandler.loadWorldInfo();
@@ -68,7 +68,7 @@ public class ServerEventListener
 					// LoadCustomDimensionData will add dimensions if any were saved
 					dimsConfig = new DimensionsConfig(overWorld.getSaveHandler().getWorldDirectory());
 					// If this is a vanilla overworld then we can be sure no dimensions were saved,
-					if(!overWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+					if(!overWorld.getWorldInfo().getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME))
 					{
 						// Create a dummy overworld config
 						dimsConfig.Overworld = new DimensionConfig();
@@ -100,8 +100,7 @@ public class ServerEventListener
 			}
 	
 		    // Load any saved dimensions.
-		    OTGDimensionManager.LoadCustomDimensionData();
-	
+		    OTGDimensionManager.LoadCustomDimensionData();	
 		    for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
 		    {
 		    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
@@ -112,7 +111,10 @@ public class ServerEventListener
 		    			OTG.log(LogMarker.WARN, "Could not create dimension \"" + dimConfig.PresetName + "\", OTG preset " + dimConfig.PresetName + " could not be found or does not contain a WorldConfig.ini file.");
 		    		} else {
 		    			OTG.IsNewWorldBeingCreated = true;
-		    			OTGDimensionManager.createDimension(dimConfig.PresetName, false, true, false);
+		    			if(!OTGDimensionManager.createDimension(dimConfig, false))
+		    			{
+		    				OTG.log(LogMarker.WARN, "Could not create dimension \"" + dimConfig.PresetName + "\" at id " + dimConfig.DimensionId + ", the id is already taken.");	
+		    			}
 		    			OTG.IsNewWorldBeingCreated = false;
 		    		}
 	    		}

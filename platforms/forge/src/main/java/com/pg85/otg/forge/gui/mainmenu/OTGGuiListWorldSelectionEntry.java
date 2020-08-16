@@ -228,14 +228,14 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     	{
     		GuiHandler.loadGuiPresets(); // Load all WorldConfigs for the ingame UI
     	}
-    	
+
         DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(new File(Minecraft.getMinecraft().gameDir + File.separator + "saves" + File.separator + this.getSelectedWorldName()), OTG.getEngine().getOTGRootFolder());
         if(dimsConfig != null)
         {
         	ArrayList<String> missingPresets = new ArrayList<String>();
         	if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
         	{
-        		WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
+        		WorldConfig worldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimsConfig.Overworld.PresetName));
         		if(worldConfig == null)
         		{
         			missingPresets.add(dimsConfig.Overworld.PresetName);
@@ -245,7 +245,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
         	{
         		for(DimensionConfig dimConfig : dimsConfig.Dimensions)
         		{
-            		WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+            		WorldConfig worldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
             		if(worldConfig == null)
             		{
             			missingPresets.add(dimConfig.PresetName);
@@ -323,7 +323,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     	// If this is a legacy world then we'll need to create a new one.
     	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + File.separator + this.worldSummary.getFileName()));
     	DimensionsConfig dimensionsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()), OTG.getEngine().getOTGRootFolder());
-    	if(dimensionsConfig == null && dimensionDatas.size() > 0)
+    	if(dimensionsConfig == null && dimensionDatas != null && dimensionDatas.size() > 0)
     	{
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
     		for(DimensionData dimensionData : dimensionDatas)
@@ -332,30 +332,30 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     			{
     				// If this is a legacy overworld then the world name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), comparator.getFileName());
-    				WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = WorldConfig.fromDisk(worldConfigLocation);
     				if(worldConfig == null)
     				{
     					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);
     					return;
     				}
-    				DimensionConfig overWorld = new DimensionConfig(comparator.getFileName(), worldConfig);
+    				DimensionConfig overWorld = new DimensionConfig(comparator.getFileName(), 0, true, worldConfig);
     				dimensionsConfig.Overworld = overWorld;
     			} else {
     				// If this is a legacy dim then the dim name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), dimensionData.dimensionName);
-    				WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(worldConfigLocation);
+    				WorldConfig worldConfig = WorldConfig.fromDisk(worldConfigLocation);
     				if(worldConfig == null)
     				{
     					OTG.log(LogMarker.ERROR, "Could not load world. Preset not found: " + worldConfigLocation);
     					return;
-    				}    				
-    				DimensionConfig dimension = new DimensionConfig(dimensionData.dimensionName, worldConfig);
+    				}
+    				DimensionConfig dimension = new DimensionConfig(dimensionData.dimensionName, dimensionData.dimensionId, true, worldConfig);
     				dimensionsConfig.Dimensions.add(dimension);
     			}
     		}
     		dimensionsConfig.save();
     	}
-    	else if(dimensionsConfig == null && dimensionDatas.size() == 0)
+    	else if(dimensionsConfig == null && (dimensionDatas == null || dimensionDatas.size() == 0))
     	{
     		// This is a vanilla world without dims, save a config without overworld / dims
     		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));

@@ -99,8 +99,21 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         }
         else if(this.controlsScreen.selectedDimension.PresetName == null) // If preset is null then this is a vanilla overworld
     	{
-    		listEntries.add(new CategoryEntry(this, "OTG settings"));
-    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal materials", StringHelper.join(dimConfig.Settings.DimensionPortalMaterials, ", "), "DIRT", false), this)); // TODO: Fetch default value from worldstandarvalues
+    		// If a modder has added default values for this preset then use those, otherwise use the worldconfig
+    		DimensionConfig defaultConfig = null;
+    		if(this.mc.isSingleplayer())
+    		{
+		        // If this.mc.world is not null then we're ingame
+		        DimensionsConfig defaultConfigs = OTG.getEngine().getModPackConfigManager().getModPackConfig(null); // TODO: Does this correctly return the modpackconfig for a vanilla overworld?
+		        defaultConfig = defaultConfigs != null ? defaultConfigs.Overworld : null;        
+    		}
+        	
+    		listEntries.add(new CategoryEntry(this, "OTG settings"));   		
+    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal materials", StringHelper.join(dimConfig.Settings.DimensionPortalMaterials, ", "), defaultConfig != null ? StringHelper.join(defaultConfig.Settings.DimensionPortalMaterials, ", ") : "DIRT", false), this)); // TODO: Fetch default value from worldstandarvalues
+    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal color", dimConfig.Settings.PortalColor, defaultConfig != null ? defaultConfig.Settings.PortalColor : WorldStandardValues.PORTAL_COLOR.getDefaultValue(), false), this));
+    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal particle", dimConfig.Settings.PortalParticleType, defaultConfig != null ? defaultConfig.Settings.PortalParticleType : WorldStandardValues.PORTAL_PARTICLE_TYPE.getDefaultValue(), false), this));
+    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal mob", dimConfig.Settings.PortalMobType, defaultConfig != null ? defaultConfig.Settings.PortalMobType : WorldStandardValues.PORTAL_MOB_TYPE.getDefaultValue(), false), this));
+    		listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Portal mob chance", dimConfig.Settings.PortalMobSpawnChance, defaultConfig != null ? defaultConfig.Settings.PortalMobSpawnChance : WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE.getDefaultValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMinValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMaxValue(), false), this));
 	        listEntries.add(new CategoryEntry(this, ""));
 	        
 	        // If world is not null then were ingame
@@ -130,14 +143,22 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	        	this.controlsScreen.btnCancel.displayString = this.mc.world == null || !this.mc.isSingleplayer() ? "Cancel" : "Back to game"; // If world is not null then we're ingame
 		        listEntries.add(new CategoryEntry(this, "World settings"));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("Preset", dimConfig.PresetName, defaultConfig != null ? defaultConfig.PresetName : null, true), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("Seed", dimConfig.Seed, "", true), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("Game type", dimConfig.GameType, "Survival", true, true), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("Bonus chest", dimConfig.BonusChest, false, true, true), this, !dimConfig.GameType.equals("Hardcore")));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("Allow cheats", dimConfig.AllowCheats, false, true, true), this, !dimConfig.GameType.equals("Hardcore")));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("Seed", dimConfig.Seed, defaultConfig != null ? defaultConfig.Seed : "", true), this));
+		        if(this.controlsScreen.selectedDimensionIndex != 0) // Don't show dimension id for overworld
+		        {
+		        	listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Dimension ID", dimConfig.DimensionId, defaultConfig != null ? defaultConfig.DimensionId : 0, -1024, 1024, true), this));
+		        }
+	        	listEntries.add(new KeyEntry(this, new SettingEntry<String>("Game type", dimConfig.GameType, defaultConfig != null ? defaultConfig.GameType : "Survival", true, true), this));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("Bonus chest", dimConfig.BonusChest, defaultConfig != null ? defaultConfig.BonusChest : false, true, true), this, !dimConfig.GameType.equals("Hardcore") && !dimConfig.GameType.equals("Creative")));
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("Allow cheats", dimConfig.AllowCheats, defaultConfig != null ? defaultConfig.AllowCheats : false, true, true), this, !dimConfig.GameType.equals("Hardcore") && !dimConfig.GameType.equals("Creative")));
 		        listEntries.add(new CategoryEntry(this, "OTG settings"));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Pregenerator radius", dimConfig.PregeneratorRadiusInChunks, defaultConfig != null ? defaultConfig.PregeneratorRadiusInChunks : WorldStandardValues.PREGENERATION_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.PREGENERATION_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.PREGENERATION_RADIUS).getMaxValue(), false), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("World border radius", dimConfig.WorldBorderRadiusInChunks, defaultConfig != null ? defaultConfig.WorldBorderRadiusInChunks : WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMaxValue(), false), this));
-		        listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal materials", StringHelper.join(dimConfig.Settings.DimensionPortalMaterials, ", "), defaultConfig != null ? StringHelper.join(defaultConfig.Settings.DimensionPortalMaterials, ", ") : "DIRT", false), this)); // TODO: Fetch default value from worldstandarvalues
+		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("World border radius", dimConfig.WorldBorderRadiusInChunks, defaultConfig != null ? defaultConfig.WorldBorderRadiusInChunks : WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMaxValue(), false), this));		        
+	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal materials", StringHelper.join(dimConfig.Settings.DimensionPortalMaterials, ", "), defaultConfig != null ? StringHelper.join(defaultConfig.Settings.DimensionPortalMaterials, ", ") : "DIRT", false), this)); // TODO: Fetch default value from worldstandarvalues
+	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal color", dimConfig.Settings.PortalColor, defaultConfig != null ? defaultConfig.Settings.PortalColor : WorldStandardValues.PORTAL_COLOR.getDefaultValue(), false), this));	    		
+	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal particle", dimConfig.Settings.PortalParticleType, defaultConfig != null ? defaultConfig.Settings.PortalParticleType : WorldStandardValues.PORTAL_PARTICLE_TYPE.getDefaultValue(), false), this));
+	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal mob", dimConfig.Settings.PortalMobType, defaultConfig != null ? defaultConfig.Settings.PortalMobType : WorldStandardValues.PORTAL_MOB_TYPE.getDefaultValue(), false), this));
+	    		listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Portal mob chance", dimConfig.Settings.PortalMobSpawnChance, defaultConfig != null ? defaultConfig.Settings.PortalMobSpawnChance : WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE.getDefaultValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMinValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMaxValue(), false), this));		       	    	
 		        
 		        // If world is not null then we're ingame
 		        if(this.mc.world != null)
@@ -341,6 +362,9 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	            		case "Seed":
 	            			dimConfig.Seed = entry.getDisplayText();
 	            			break;
+	            		case "Dimension ID":
+	            			dimConfig.DimensionId = Integer.parseInt(entry.getDisplayText()); 
+	            			break;	            			
 	            		case "Game type":
 	            			dimConfig.GameType = entry.getDisplayText();
 	            			break;
@@ -358,6 +382,18 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	            			break;
 	            		case "Portal materials":
 	            			dimConfig.Settings.DimensionPortalMaterials = entry.getDisplayText().replace(" ", "").split(",");
+	            			break;
+	            		case "Portal color":
+	            			dimConfig.Settings.PortalColor = entry.getDisplayText();
+	            			break;	            			
+	            		case "Portal particle":
+	            			dimConfig.Settings.PortalParticleType = entry.getDisplayText();
+	            			break;
+	            		case "Portal mob":
+	            			dimConfig.Settings.PortalMobType = entry.getDisplayText();
+	            			break;
+	            		case "Portal mob chance":
+	            			dimConfig.Settings.PortalMobSpawnChance = Integer.parseInt(entry.getDisplayText());
 	            			break;
 	            	}
 	            }
