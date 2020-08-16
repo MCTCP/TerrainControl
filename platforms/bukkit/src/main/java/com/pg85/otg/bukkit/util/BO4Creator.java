@@ -1,5 +1,27 @@
 package com.pg85.otg.bukkit.util;
 
+import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
+import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
+import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
+import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.customobjects.bo4.BO4;
+import com.pg85.otg.customobjects.bo4.BO4Config;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
+import com.pg85.otg.customobjects.bo4.bo4function.BO4BranchFunction;
+import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.materials.MaterialHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.sk89q.worldedit.bukkit.selections.Selection;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,36 +30,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-
-import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
-import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
-import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
-import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
-import com.pg85.otg.customobjects.bo3.BO3;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
-import com.pg85.otg.customobjects.bo3.bo3function.BO3BranchFunction;
-import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-import com.sk89q.worldedit.bukkit.selections.Selection;
-
-import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
-
-public class BO3Creator extends BOCreator
+public class BO4Creator extends BOCreator
 {
-    public BO3Creator(String name)
+    public BO4Creator(String name)
     {
         this.name = name;
     }
 
-    @SuppressWarnings("deprecation")
     public boolean create(Selection selection, String blockName, boolean branch)
     {
         int tileEntityCount = 1;
@@ -53,21 +52,17 @@ public class BO3Creator extends BOCreator
 
         Location start = selection.getMinimumPoint();
         Location end = selection.getMaximumPoint();
-
         LocalMaterialData centerBlock = null;
         if (!blockName.isEmpty())
         {
             try {
                 centerBlock = MaterialHelper.readMaterial(blockName);
-            }
-			catch (InvalidConfigException e1)
-			{
+            } catch (InvalidConfigException e1) {
                 centerBlock = null;
             }
         }
-        
-        if(centerBlock != null && !centerBlock.isParsed())
-		{
+
+        if(centerBlock != null && !centerBlock.isParsed()) {
             centerBlock = null;
         }
 
@@ -87,15 +82,21 @@ public class BO3Creator extends BOCreator
         int centerPointY = 0;
         int centerPointZ = 0;
 
+        LocalMaterialData data;
+        Block block;
+
+        ArrayList<BO4BlockFunction> blocksInChunk = new ArrayList<BO4BlockFunction>();
+        ChunkCoordinate chunkCoordinates;
+
         for (int x = 0; x < width; ++x)
         {
             for (int y = 0; y < height; ++y)
             {
                 for (int z = 0; z < length; ++z)
                 {
-                    Block block = world.getBlockAt(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ());
+                    block = world.getBlockAt(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ());
 
-                    LocalMaterialData data = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
+                    data = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
 
                     if (centerBlock != null && centerBlock.equals(data))
                     {
@@ -142,7 +143,13 @@ public class BO3Creator extends BOCreator
             centerPointZ = (int) Math.floor((start.getBlockZ() + end.getBlockZ()) / 2d);
         }
 
-        Map<ChunkCoordIntPair, List<BO3BlockFunction>> blocksPerChunkArr = new HashMap<ChunkCoordIntPair, List<BO3BlockFunction>>();
+        Map<ChunkCoordinate, ArrayList<BO4BlockFunction>> blocksPerChunkArr = new HashMap<ChunkCoordinate, ArrayList<BO4BlockFunction>>();
+        LocalMaterialData material;
+        BO4BlockFunction blockFunction;
+        NamedBinaryTag tag;
+        String tileEntityName;
+        File tileEntityFile;
+        FileOutputStream fos;
 
         for (int x = start.getBlockX(); x <= end.getBlockX(); x++)
         {
@@ -150,15 +157,15 @@ public class BO3Creator extends BOCreator
             {
                 for (int z = start.getBlockZ(); z <= end.getBlockZ(); z++)
                 {
-                    List<BO3BlockFunction> blocksInChunk = new ArrayList<BO3BlockFunction>();
-                    ChunkCoordIntPair chunkCoordinates;
+                    blocksInChunk = new ArrayList<BO4BlockFunction>();
 
                     if (branch)
                     {
-                        chunkCoordinates = new ChunkCoordIntPair((int) Math.floor(
-                                (x - start.getBlockX()) / 16), (int) Math.floor((z - start.getBlockZ()) / 16));
+                        chunkCoordinates = ChunkCoordinate.fromChunkCoords(
+                                (int) Math.floor((x - start.getBlockX()) / 16),
+                                (int) Math.floor((z - start.getBlockZ()) / 16));
                     } else {
-                        chunkCoordinates = new ChunkCoordIntPair(0, 0);
+                        chunkCoordinates = ChunkCoordinate.fromChunkCoords(0, 0);
                     }
 
                     if (blocksPerChunkArr.get(chunkCoordinates) == null)
@@ -168,47 +175,44 @@ public class BO3Creator extends BOCreator
                         blocksInChunk = blocksPerChunkArr.get(chunkCoordinates);
                     }
 
-                    Block block = world.getBlockAt(x, y, z);
-                    LocalMaterialData material = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
+                    block = world.getBlockAt(x, y, z);
+
+                    material = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
 
                     if (includeAir || !material.isAir())
                     {
-                        BO3BlockFunction blockFunction;
-
                         if (branch)
                         {
-                            blockFunction = (BO3BlockFunction) CustomObjectConfigFunction.create(null,
-                                    BO3BlockFunction.class, x - ((chunkCoordinates.x * 16) + start.getBlockX()) - 8,
-                                    y - centerPointY, z - ((chunkCoordinates.z * 16) + start.getBlockZ()) - 7,
-                                    material);
+                            blockFunction = (BO4BlockFunction) CustomObjectConfigFunction.create(null,
+                                    BO4BlockFunction.class,
+                                    x - ((chunkCoordinates.getChunkX() * 16) + start.getBlockX()) - 8, y - centerPointY,
+                                    z - ((chunkCoordinates.getChunkZ() * 16) + start.getBlockZ()) - 7, material);
                         } else {
-                            blockFunction = (BO3BlockFunction) CustomObjectConfigFunction.create(null,
-                                    BO3BlockFunction.class, x - centerPointX, y - centerPointY, z - centerPointZ,
+                            blockFunction = (BO4BlockFunction) CustomObjectConfigFunction.create(null,
+                                    BO4BlockFunction.class, x - centerPointX, y - centerPointY, z - centerPointZ,
                                     material);
                         }
 
                         if (includeTiles)
                         {
                             // Look for tile entities
-                            NamedBinaryTag tag = NBTHelper.getMetadata(world, x, y, z);
+                            tag = NBTHelper.getMetadata(world, x, y, z);
                             if (tag != null)
                             {
-                                String tileEntityName;
-
                                 if (branch)
                                 {
                                     tileEntityName = tileEntityCount + "-" + getTileEntityName(
-                                            tag) + "C" + chunkCoordinates.x + "R" + chunkCoordinates.z + ".nbt";
+                                            tag) + "C" + chunkCoordinates.getBlockX() + "R" + chunkCoordinates.getBlockZ() + ".nbt";
                                 } else {
                                     tileEntityName = tileEntityCount + "-" + getTileEntityName(tag) + ".nbt";
                                 }
 
-                                File tileEntityFile = new File(tileEntitiesFolder, tileEntityName);
+                                tileEntityFile = new File(tileEntitiesFolder, tileEntityName);
 
                                 tileEntityCount++;
                                 try {
                                     tileEntityFile.createNewFile();
-                                    FileOutputStream fos = new FileOutputStream(tileEntityFile);
+                                    fos = new FileOutputStream(tileEntityFile);
                                     tag.writeTo(fos);
                                     fos.flush();
                                     fos.close();
@@ -226,84 +230,98 @@ public class BO3Creator extends BOCreator
             }
         }
 
-        BO3 bo3 = null;
-        boolean isStartBO3 = true;
+        BO4 bo4 = null;
+        boolean isStartBO4 = true;
+        ArrayList<BO4BlockFunction> blocks;
+        List<BO4BranchFunction> branches;
+        File file;
+        BO4Config config;
+        SettingsWriterOTGPlus writer;
 
         for (int x1 = 0; x1 <= Math.abs(widthMin - widthMax); x1++)
         {
             for (int z1 = 0; z1 <= Math.abs(lengthMin - lengthMax); z1++)
             {
-                List<BO3BlockFunction> blocks = blocksPerChunkArr.get(new ChunkCoordIntPair(x1, z1));
+                blocks = blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1, z1));
 
                 if (blocks == null || blocks.isEmpty())
+                {
                     continue;
+                }
 
                 for (int i = 0; i < 1; i++)
                 {
-
-                    List<BO3BranchFunction> branches = new ArrayList<BO3BranchFunction>();
+                    branches = new ArrayList<BO4BranchFunction>();
 
                     if (branch)
                     {
-
-                        if (isStartBO3)
+                        if (isStartBO4)
                         {
-                            branches.add((BO3BranchFunction) CustomObjectConfigFunction.create(null,
-                                    BO3BranchFunction.class, 0, 0, 0, (name + "C0R0"), "NORTH", 100));
+                            branches.add((BO4BranchFunction) CustomObjectConfigFunction.create(null,
+                                    BO4BranchFunction.class, 0, 0, 0, true, (name + "C0R0"), "NORTH", 100, 0));
                         }
 
-                        if (!isStartBO3 && blocksPerChunkArr.get(new ChunkCoordIntPair(x1 + 1, z1)) != null)
+                        if (!isStartBO4 && blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1 + 1, z1)) != null)
                         {
                             branches.add(
-                                    (BO3BranchFunction) CustomObjectConfigFunction.create(null, BO3BranchFunction.class,
-                                            16, 0, 0, (name + "C" + (x1 + 1) + "R" + z1), "NORTH", 100));
+                                    (BO4BranchFunction) CustomObjectConfigFunction.create(null, BO4BranchFunction.class,
+                                            16, 0, 0, true, (name + "C" + (x1 + 1) + "R" + z1), "NORTH", 100, 0));
                         }
 
-                        if (!isStartBO3 && x1 == 0)
+                        if (!isStartBO4 && x1 == 0)
                         {
-                            if (blocksPerChunkArr.get(new ChunkCoordIntPair(x1, z1 + 1)) != null)
+                            if (blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1, z1 + 1)) != null)
                             {
-                                branches.add((BO3BranchFunction) CustomObjectConfigFunction.create(null,
-                                        BO3BranchFunction.class, 0, 0, 16, (name + "C" + x1 + "R" + (z1 + 1)), "NORTH",
-                                        100));
+                                branches.add((BO4BranchFunction) CustomObjectConfigFunction.create(null,
+                                        BO4BranchFunction.class, 0, 0, 16, true, (name + "C" + x1 + "R" + (z1 + 1)), "NORTH",
+                                        100, 0));
                             }
                         }
                     }
 
-                    if (isStartBO3)
+                    if (isStartBO4)
                     {
-                        bo3 = new BO3(name, new File(OTG.getEngine().getGlobalObjectsDirectory(), name + ".bo3"));
-                    } else
-                    {
-                        bo3 = new BO3(name, new File(OTG.getEngine().getGlobalObjectsDirectory(), name + "C" + x1 + "R" + z1 + ".bo3"));
+                        file = new File(OTG.getEngine().getGlobalObjectsDirectory(), name + ".BO4");
+                        try {
+                            config = new BO4Config(new FileSettingsReaderOTGPlus(name, file), true);
+                            bo4 = new BO4(name, file, config);
+                        }
+                        catch (InvalidConfigException e)
+                        {
+                            OTG.log(LogMarker.ERROR, "Could not export BO4 file, there was an error in the BO4Config: " + e.getMessage());
+                            return false;
+                        }
+                    } else {
+                        file = new File(OTG.getEngine().getGlobalObjectsDirectory(), name + "C" + x1 + "R" + z1 + ".BO4");
+                        try {
+                            config = new BO4Config(new FileSettingsReaderOTGPlus(name, file), true);
+                            bo4 = new BO4(name, file, config);
+                        }
+                        catch (InvalidConfigException e)
+                        {
+                            OTG.log(LogMarker.ERROR, "Could not export BO4 file, there was an error in the BO4Config: " + e.getMessage());
+                            return false;
+                        }
                     }
 
-                    bo3.onEnable();
+                    bo4.getConfig().settingsMode = WorldConfig.ConfigMode.WriteAll;
 
-                    if (!isStartBO3 || !branch)
-                        bo3.getSettings().extractBlocks(blocks);
-
-                    if (!branches.isEmpty())
-                        bo3.getSettings().setBranches(branches);
-
-                    bo3.getSettings().rotateBlocksAndChecks();
-
-                    OTG.getCustomObjectManager().registerGlobalObject(bo3);
-
-                    bo3.getSettings().settingsMode = ConfigMode.WriteAll;
-
-                    try {
-                        SettingsWriterOTGPlus writer = new FileSettingsWriterOTGPlus(bo3.getSettings().getFile());
-                        bo3.getSettings().write(writer, ConfigMode.WriteAll);
-                    } catch (IOException ex)  {
-                        OTG.log(LogMarker.ERROR, "Failed to write to file {}", bo3.getSettings().getFile());
+                    try
+                    {
+                        writer = new FileSettingsWriterOTGPlus(bo4.getConfig().getFile());
+                        bo4.getConfig().writeWithData(writer, (!isStartBO4 || !branch) && blocks != null ? blocks : new ArrayList<BO4BlockFunction>(), branches != null ? branches : new ArrayList<BO4BranchFunction>());
+                        OTG.getCustomObjectManager().registerGlobalObject(bo4);
+                    }
+                    catch (IOException ex)
+                    {
+                        OTG.log(LogMarker.ERROR, "Failed to write to file {}", bo4.getConfig().getFile());
                         OTG.printStackTrace(LogMarker.ERROR, ex);
                         return false;
                     }
 
-                    if (isStartBO3)
+                    if (isStartBO4)
                     {
-                        isStartBO3 = false;
+                        isStartBO4 = false;
                         if (branch)
                         {
                             i--;
@@ -316,3 +334,4 @@ public class BO3Creator extends BOCreator
         return true;
     }
 }
+
