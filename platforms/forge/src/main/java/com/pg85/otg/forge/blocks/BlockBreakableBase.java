@@ -1,14 +1,9 @@
 package com.pg85.otg.forge.blocks;
 
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.OTGPlugin;
-
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockBreakable;
 import net.minecraft.block.material.Material;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 
 public class BlockBreakableBase extends BlockBreakable implements IHasModel 

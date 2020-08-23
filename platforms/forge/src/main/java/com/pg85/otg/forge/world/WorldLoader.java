@@ -16,7 +16,6 @@ import com.pg85.otg.configuration.world.WorldConfig.DefaulWorldData;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
 import com.pg85.otg.forge.biomes.ForgeMojangSettings;
-import com.pg85.otg.forge.blocks.BlockPortalOTG;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.network.server.packets.DimensionSyncPacket;

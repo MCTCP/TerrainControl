@@ -26,5 +26,5 @@ public class ClientProxy extends CommonProxy
 	public EntityPlayer getPlayerEntity(MessageContext ctx)
 	{
 		return (ctx.side.isClient() ? Minecraft.getMinecraft().player : super.getPlayerEntity(ctx));
-	}
+	}	
 }

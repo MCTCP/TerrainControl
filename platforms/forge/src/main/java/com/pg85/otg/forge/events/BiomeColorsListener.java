@@ -5,7 +5,6 @@ import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.BiomeNotFoundException;
-import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.util.ResourceLocation;

@@ -158,8 +158,8 @@ public class BO4 implements StructuredCustomObject
 
 		if(config == null)
 		{
-			OTG.log(LogMarker.FATAL, "Settings was null for BO3 " + this.getName() + ". This should not be happening, please contact the developer.");
-			throw new RuntimeException("Settings was null for BO3 " + this.getName() + ". This should not be happening, please contact the developer.");
+			OTG.log(LogMarker.FATAL, "Settings was null for BO4 " + this.getName() + ". This should not be happening, please contact the developer.");
+			throw new RuntimeException("Settings was null for BO4 " + this.getName() + ". This should not be happening, please contact the developer.");
 		}
 
     	try {
@@ -363,7 +363,7 @@ public class BO4 implements StructuredCustomObject
 	        		if(!bFound)
 	        		{
 	        			coordsAboveDone.add(new Object[] { x + newBlock.x, z + newBlock.z });
-	        			int blockY = y + newBlock.y + 1; // TODO: This is wrong, should be the lowest block in the BO3 at these x-z coordinates. ReplaceAbove should be done before any blocks in this column are placed
+	        			int blockY = y + newBlock.y + 1; // TODO: This is wrong, should be the lowest block in the BO4 at these x-z coordinates. ReplaceAbove should be done before any blocks in this column are placed
         				int highestBlockToReplace = world.getHighestBlockYAt(x + newBlock.x, z + newBlock.z, true, true, false, false, true, chunkBeingPopulated);
 
 	        			while(blockY <= highestBlockToReplace && blockY > y + newBlock.y)
@@ -583,7 +583,6 @@ public class BO4 implements StructuredCustomObject
 
         				int highestBlockToReplace = world.getHighestBlockYAt(x + block.x, z + block.z, true, true, false, false, true, chunkBeingPopulated);
 
-	        			// TODO: Use world height constant (dunno what its called and where its at)??
 	        			while(blockY <= highestBlockToReplace && blockY > y + block.y)
 	        			{
                             blockToQueueForSpawn = new BO4BlockFunction();
@@ -820,7 +819,7 @@ public class BO4 implements StructuredCustomObject
         {
         	if(OTG.getPluginConfig().spawnLog)
         	{
-        		OTG.log(LogMarker.WARN, "BO3 " + this.getName() + " tried to spawn blocks outside of the chunk being populated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO3's used as CustomStructures() should be designed, BO3 creators have to design their BO3's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO3 creator to do it.");
+        		OTG.log(LogMarker.WARN, "BO4 " + this.getName() + " tried to spawn blocks outside of the chunk being populated, the blocks have been ignored. This can happen if a BO3 is not sliced into 16x16 pieces or has branches positioned in such a way that they cross a chunk border. OTG is more strict than TC in how branching BO4's used as CustomStructures() should be designed, BO4 creators have to design their BO4's and position their branches so that they fit neatly into a 16x16 grid. Hopefully in a future release OTG can be made to automatically slice branching structures instead of forcing the BO4 creator to do it.");
         	}
         }
 

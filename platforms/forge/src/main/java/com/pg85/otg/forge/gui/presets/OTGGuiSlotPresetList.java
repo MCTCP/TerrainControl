@@ -1,13 +1,11 @@
 package com.pg85.otg.forge.gui.presets;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.dimensions.base.OTGGuiScrollingList;

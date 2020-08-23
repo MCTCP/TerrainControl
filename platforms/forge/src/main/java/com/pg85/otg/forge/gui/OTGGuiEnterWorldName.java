@@ -13,7 +13,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
-import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;
 

@@ -10,7 +10,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.structures.CustomStructure;
 import com.pg85.otg.customobjects.structures.CustomStructureFileManager;

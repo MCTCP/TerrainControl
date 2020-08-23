@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.blocks;
+package com.pg85.otg.forge.blocks.portal;
 
 import javax.annotation.concurrent.Immutable;
 import net.minecraft.nbt.NBTTagCompound;

@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.blocks;
+package com.pg85.otg.forge.blocks.portal;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;

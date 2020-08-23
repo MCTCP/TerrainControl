@@ -1,6 +1,9 @@
 package com.pg85.otg.forge.blocks;
 
 import java.util.ArrayList;
+
+import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
+
 import net.minecraft.block.Block;
 
 public class ModBlocks

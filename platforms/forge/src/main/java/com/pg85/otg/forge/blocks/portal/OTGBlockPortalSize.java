@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.dimensions;
+package com.pg85.otg.forge.blocks.portal;
 
 import java.util.ArrayList;
 
@@ -6,14 +6,9 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.OTGPlugin;
-import com.pg85.otg.forge.blocks.BlockPortalOTG;
 import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPortal;
 import net.minecraft.block.material.Material;

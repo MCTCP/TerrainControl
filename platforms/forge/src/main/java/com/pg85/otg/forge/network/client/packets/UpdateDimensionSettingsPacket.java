@@ -15,7 +15,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.blocks.BlockPortalOTG;
+import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.server.ServerPacketManager;

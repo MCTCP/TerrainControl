@@ -46,8 +46,8 @@ public class OTGHooks
 	}
 	
 	// Make sure that OTG dimensions get initialised by OTGDimensionManager.initDimension
-	// TODO: Isn't OTGDimensionManager.initDimension called in all cases already, does this really need to be core-modded?
-	// Causes problems for Sponge apparently.	
+	// Used when a player joins the server and spawns in an unloaded dim.
+	// Causes problems for Sponge apparently. <- initOTGDimension should be used only on server load now, hopefully fixes things?
 	public static boolean initOTGDimension(int i)
 	{
 		if(isOTGInstalled() && DimensionManager.isDimensionRegistered(i))
@@ -209,6 +209,9 @@ public class OTGHooks
 		}
 	}
 
+	// When registering dimensions during a session, a client may not have the required biomes registered when trying to load a dimension.
+	// TODO: Is that the only time this is needed? Check if Forge also throws the missing registries error when clients are connecting, 
+	// the server should be able to send all the biome data itself at that point, since everything should be registered.
 	public static int countMissingRegistryEntries(LinkedHashMap<ResourceLocation, Map<ResourceLocation, Integer>> missing)
 	{
 		// Exclude OTG Biomes.

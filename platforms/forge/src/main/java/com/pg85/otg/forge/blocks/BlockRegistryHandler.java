@@ -1,9 +1,9 @@
 package com.pg85.otg.forge.blocks;
 
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.forge.blocks.portal.TileEntityPortal;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;

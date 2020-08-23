@@ -910,34 +910,34 @@ public class BO4Config extends CustomObjectConfigFile
 		{
 			if(illegalBlock)
 			{
-				OTG.log(LogMarker.WARN, "Warning: BO3 contains Blocks or RandomBlocks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+				OTG.log(LogMarker.WARN, "Warning: BO4 contains Blocks or RandomBlocks that are placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalModData)
 			{
-				OTG.log(LogMarker.WARN, "Warning: BO3 contains ModData that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+				OTG.log(LogMarker.WARN, "Warning: BO4 contains ModData that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalSpawnerData)
 			{
-				OTG.log(LogMarker.WARN, "Warning: BO3 contains a Spawner() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+				OTG.log(LogMarker.WARN, "Warning: BO4 contains a Spawner() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalParticleData)
 			{
-				OTG.log(LogMarker.WARN, "Warning: BO3 contains a Particle() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+				OTG.log(LogMarker.WARN, "Warning: BO4 contains a Particle() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 			if(illegalEntityData)
 			{
-				OTG.log(LogMarker.WARN, "Warning: BO3 contains an Entity() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO3: " + this.getName());
+				OTG.log(LogMarker.WARN, "Warning: BO4 contains an Entity() that may be placed outside the chunk(s) that the BO3 will be placed in. This can slow down world generation. BO4: " + this.getName());
 			}
 		}
 
 		this.branchesOTGPlus = tempBranchesList.toArray(new BO4BranchFunction[tempBranchesList.size()]);
 
-    	if(this.branchesOTGPlus.length > 0) // If this BO3 has branches then it must be max 16x16
+    	if(this.branchesOTGPlus.length > 0) // If this BO4 has branches then it must be max 16x16
     	{
     		if(Math.abs(this.minX - this.maxX) > 15 || Math.abs(this.minZ - this.maxZ) > 15)
     		{
-    			OTG.log(LogMarker.INFO, "BO3 " + this.getName() + " was too large, branching BO3's can be max 16x16 blocks.");
-    			throw new InvalidConfigException("BO3 " + this.getName() + " was too large, branching BO3's can be max 16x16 blocks.");
+    			OTG.log(LogMarker.INFO, "BO3 " + this.getName() + " was too large, branching BO4's can be max 16x16 blocks.");
+    			throw new InvalidConfigException("BO3 " + this.getName() + " was too large, branching BO4's can be max 16x16 blocks.");
     		}
     	} else {
     		if(Math.abs(this.minX - this.maxX) > 15 || Math.abs(this.minZ - this.maxZ) > 15) // If this BO3 is larger than 16x16 then it can only be used as a customObject
@@ -2053,7 +2053,7 @@ public class BO4Config extends CustomObjectConfigFile
         
     private void loadBlockArrays(ArrayList<BO4BlockFunction> newBlocks, short[][] columnSizes)
     {
-        // Store blocks in arrays instead of as BO4BlockFunctions,
+        // Store blocks in arrays instead of BO4BlockFunctions,
         // since that gives way too much overhead memory wise.
         // We may have tens of millions of blocks, java doesn't handle lots of small classes well.
 		this.blocks = new short[xSize][zSize][];

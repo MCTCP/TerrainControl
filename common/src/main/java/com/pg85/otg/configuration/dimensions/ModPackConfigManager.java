@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 
 public class ModPackConfigManager

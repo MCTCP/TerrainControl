@@ -44,7 +44,6 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.gui.GuiHandler;
