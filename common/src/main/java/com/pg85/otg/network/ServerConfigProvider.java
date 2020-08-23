@@ -483,8 +483,8 @@ public final class ServerConfigProvider implements ConfigProvider
         // This is a legacy (pre-v7) world if its not being created and either has no worldsavedata or worldsavedata version 6. 
         // If this world has biome data but not worldsavedata, it's v7.
         // This ignores legacy worlds updated by v7 and earlier v8 versions unfortunately (though very few ppl should be affected).
-        //boolean isLegacyWorld = !OTG.IsNewWorldBeingCreated && (!hasWorldData || (worldSaveData != null && worldSaveData.version == 6));        
-        boolean isLegacyWorld = (!hasWorldData || (worldSaveData != null && worldSaveData.version == 6));
+        boolean isLegacyWorld = !OTG.IsNewWorldBeingCreated && (!hasWorldData || (worldSaveData != null && worldSaveData.version == 6));        
+        //boolean isLegacyWorld = (!hasWorldData || (worldSaveData != null && worldSaveData.version == 6));
         if(worldSaveData == null)
         {
         	worldSaveData = new WorldSaveData(isLegacyWorld ? 6 : 8);
