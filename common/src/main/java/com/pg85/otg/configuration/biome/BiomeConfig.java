@@ -1,5 +1,6 @@
 package com.pg85.otg.configuration.biome;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
@@ -19,6 +20,7 @@ import com.pg85.otg.generator.resource.*;
 import com.pg85.otg.generator.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.generator.terrain.TerrainShapeBase;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
@@ -108,6 +110,8 @@ public class BiomeConfig extends ConfigFile
     
     public boolean inheritSaplingResource;
     private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
+    private Map<LocalMaterialData, SaplingGen> customSaplingGrowers = new HashMap<>();
+    private Map<LocalMaterialData, SaplingGen> customBigSaplingGrowers = new HashMap<>();
 
     public CustomStructureGen structureGen;
     private ArrayList<String> biomeObjectStrings;
@@ -292,6 +296,13 @@ public class BiomeConfig extends ConfigFile
         return gen;
     }
 
+    public SaplingGen getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk) {
+        if (wideTrunk) {
+            return customBigSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
+        }
+        return customSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
+    }
+
     @Override
     protected void readConfigSettings(SettingsMap settings)
     {
@@ -424,7 +435,24 @@ public class BiomeConfig extends ConfigFile
                 if (res instanceof SaplingGen)
                 {
                     SaplingGen sapling = (SaplingGen) res;
-                    this.saplingGrowers.put(sapling.saplingType, sapling);
+                    if (sapling.saplingType == SaplingType.Custom)
+                    {
+                        try
+                        {// Puts big custom saplings in the big list and small in the small list
+                            if (sapling.wideTrunk)
+                                customBigSaplingGrowers.put(sapling.saplingMaterial, sapling);
+                            else
+                                customSaplingGrowers.put(sapling.saplingMaterial, sapling);
+                        }
+                        catch (NullPointerException e)
+                        {
+                            OTG.log(LogMarker.WARN, "Unrecognized sapling type in biome "+this.getName());
+                        }
+                    }
+                    else
+                    {
+                        this.saplingGrowers.put(sapling.saplingType, sapling);
+                    }
                 }
             }
         }
@@ -813,6 +841,9 @@ public class BiomeConfig extends ConfigFile
                 "",
                 "The syntax is: Sapling(SaplingType,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])",
                 "Works like Tree resource instead first parameter.",
+                "For custom saplings (Forge only); Sapling(Custom,SaplingMaterial,WideTrunk,TreeType,TreeType_Chance.....)",
+                "SaplingMaterial is a material name from a mod.",
+                "WideTrunk is 'true' or 'false', whether or not it requires 4 saplings.",
                 "",
                 "Sapling types: " + StringHelper.join(SaplingType.values(), ", "),
                 "All - will make the tree spawn from all saplings, but not from mushrooms.",
@@ -823,6 +854,8 @@ public class BiomeConfig extends ConfigFile
                 "");        
         
         writer.addConfigFunctions(this.saplingGrowers.values());
+        writer.addConfigFunctions(this.customSaplingGrowers.values());
+        writer.addConfigFunctions(this.customBigSaplingGrowers.values());
         
         writer.putSetting(BiomeStandardValues.INHERIT_SAPLING_RESOURCE, this.inheritSaplingResource,
                 "For virtual (replaceToBiomeName) biomes: Inherit all Sapling() resources from the",
