@@ -25,7 +25,6 @@ import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.forge.world.ForgeWorld;
-import com.pg85.otg.forge.world.WorldHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialHelper;
@@ -768,8 +767,8 @@ public class ServerTickHandler
 	private void tryTeleportPlayer(EntityPlayer player)
 	{
 		ForgeWorld playerWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(player.world);
-		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(playerWorld.getName());
-			
+		DimensionConfig dimConfig = playerWorld != null ? OTG.getDimensionsConfig().getDimensionConfig(playerWorld.getName()) : null;
+
 		// DimensionBelow
 		if(playerWorld != null && dimConfig.Settings.DimensionBelow != null && dimConfig.Settings.DimensionBelow.trim().length() > 0)
 		{

@@ -1,61 +1,49 @@
-package com.pg85.otg.forge.blocks;
+package com.pg85.otg.forge.blocks.portal;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Maps;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.dimensions.OTGBlockPortalSize;
+import com.pg85.otg.forge.blocks.BlockBreakableBase;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.util.FifoMap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-
 import javax.annotation.Nullable;
-import javax.annotation.concurrent.Immutable;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockPlanks;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.properties.PropertyInteger;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.monster.EntityPigZombie;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
-import net.minecraft.item.EnumDyeColor;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.LockCode;
 import net.minecraft.world.World;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -178,6 +166,42 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
 		// No custom OTG dimensions exists with this material.
 		return null;
     }
+
+    public static boolean trySpawnPortal(World worldIn, BlockPos pos)
+    {
+    	// Only create a portal when a OTG custom dimension exists
+    	boolean bFound = false;
+    	for(int i : OTGDimensionManager.GetOTGDimensions())
+    	{
+			if(DimensionManager.isDimensionRegistered(i))
+			{
+				bFound = true;
+				break;
+			}
+		}	
+		if(!bFound)
+		{
+			return false;
+		}
+    	
+        OTGBlockPortalSize blockportal$size = new OTGBlockPortalSize(worldIn, pos, EnumFacing.Axis.X);
+
+        if (blockportal$size.isValid() && blockportal$size.portalBlockCount == 0)
+        {
+            blockportal$size.placePortalBlocks();
+            return true;
+        } else {
+            OTGBlockPortalSize blockportal$size1 = new OTGBlockPortalSize(worldIn, pos, EnumFacing.Axis.Z);
+
+            if (blockportal$size1.isValid() && blockportal$size1.portalBlockCount == 0)
+            {
+                blockportal$size1.placePortalBlocks();
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }    
     
     /**
      * Returns a new instance of a block's tile entity class. Called on placing the block.
@@ -361,10 +385,40 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
     // Called When an Entity Collided with the Block
     public void onEntityCollision(World worldIn, BlockPos pos, IBlockState state, Entity entityIn)
     {
-        if (!entityIn.isRiding() && !entityIn.isBeingRidden() && entityIn.isNonBoss())
+    	if (!entityIn.isBeingRidden() && entityIn.isNonBoss())
         {
-        	// TODO: Override this, uses default portal detection?
-            entityIn.setPortal(pos);
+    		if(entityIn.isRiding())
+    		{
+    			// Not dismounting doesn't seem to be a problem, player auto-dismounts when cart is teleported?
+    			Entity entityRiding = entityIn.getRidingEntity();
+    			setPortal(pos, entityRiding);
+    		}
+    		setPortal(pos, entityIn);
+        }
+    }
+    
+    /**
+     * Marks the entity as being inside a portal, activating teleportation logic in onEntityUpdate() in the following
+     * tick(s).
+     */
+    public void setPortal(BlockPos pos, Entity _this)
+    {
+        if (_this.timeUntilPortal > 0)
+        {
+        	_this.timeUntilPortal = _this.getPortalCooldown();
+        } else {
+            if (!_this.world.isRemote && !pos.equals(_this.lastPortalPos))
+            {
+            	_this.lastPortalPos = new BlockPos(pos);
+            	BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPatternHelper.createPatternHelper(_this.world, _this.lastPortalPos != null ? _this.lastPortalPos : _this.getPosition());
+                double d0 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
+                double d1 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? _this.posZ : _this.posX;
+                d1 = Math.abs(MathHelper.pct(d1 - (double)(blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - (double)blockpattern$patternhelper.getWidth()));
+                double d2 = MathHelper.pct(_this.posY - 1.0D, (double)blockpattern$patternhelper.getFrontTopLeft().getY(), (double)(blockpattern$patternhelper.getFrontTopLeft().getY() - blockpattern$patternhelper.getHeight()));
+                _this.lastPortalVec = new Vec3d(d1, d2, 0.0D);
+                _this.teleportDirection = blockpattern$patternhelper.getForwards();
+            }
+            _this.inPortal = true;
         }
     }
 

@@ -7,15 +7,10 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.OTGPlugin;
-import com.pg85.otg.forge.blocks.BlockPortalOTG;
-import com.pg85.otg.forge.blocks.ModBlocks;
-import com.pg85.otg.forge.dimensions.OTGBlockPortal;
+import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
 import com.pg85.otg.forge.dimensions.OTGTeleporter;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
@@ -144,7 +139,6 @@ public class EntityTravelToDimensionListener
 			{
 				e.setCanceled(true); // Don't tp to nether
 
-				int originDimension = e.getEntity().dimension;
 				int newDimension = destinationDim;
 
 				if(newDimension == 0 && e.getEntity().dimension == 0)
@@ -153,9 +147,6 @@ public class EntityTravelToDimensionListener
 					entityWorld.setBlockToAir(entityPos);
 					return;
 				}
-
-				// Register the portal to the world's portals list
-		    	OTGBlockPortal.placeInExistingPortal(originDimension, entityPos);
 
 				if(e.getEntity() instanceof EntityPlayerMP)
 				{

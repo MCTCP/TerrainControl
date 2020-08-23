@@ -4,18 +4,21 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+import com.google.common.base.Predicate;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.OTGPlugin;
-import com.pg85.otg.forge.blocks.BlockPortalOTG;
 import com.pg85.otg.forge.blocks.ModBlocks;
+import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
+import com.pg85.otg.forge.blocks.portal.OTGBlockPatternHelper;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
 import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.forge.world.WorldHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -25,10 +28,10 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.state.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.entity.item.EntityMinecart;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketChangeGameState;
 import net.minecraft.network.play.server.SPacketEffect;
 import net.minecraft.network.play.server.SPacketEntityEffect;
 import net.minecraft.network.play.server.SPacketPlayerAbilities;
@@ -37,13 +40,13 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.Teleporter;
+import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.util.ITeleporter;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 public class OTGTeleporter
@@ -53,27 +56,45 @@ public class OTGTeleporter
 	// TODO: Dont use worldserver getspawnpoint / getheight etc, use ForgeWorld
     public static Entity changeDimension(int dimensionIn, Entity _this)
     {
-    	ITeleporter teleporter = _this.getServer().getWorld(dimensionIn).getDefaultTeleporter();
         if (!_this.world.isRemote && !_this.isDead)
         {
-            if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(_this, dimensionIn)) return null;
+            //if (!net.minecraftforge.common.ForgeHooks.onTravelToDimension(_this, dimensionIn)) return null;
             _this.world.profiler.startSection("changeDimension");
             MinecraftServer minecraftserver = _this.getServer();
             int i = _this.dimension;
-            WorldServer worldserver = minecraftserver.getWorld(i);                        
-            WorldServer worldserver1 = net.minecraftforge.common.DimensionManager.getWorld(dimensionIn);
-            if(worldserver1 == null)
-            {
-            	OTGDimensionManager.initDimension(dimensionIn);
-            }
-            worldserver1 = net.minecraftforge.common.DimensionManager.getWorld(dimensionIn);            
+            
+            // Avoid calling DimensionManager.initDimension
+    		ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(i);    		
+    		if(forgeWorld == null && ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(i) != null)
+    		{		
+    			OTGDimensionManager.initDimension(i);			
+    			forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(i);
+    		}    		
+    		WorldServer worldserver;
+    		if(forgeWorld != null)
+    		{
+    			worldserver = (WorldServer) forgeWorld.getWorld();
+    		} else {
+    			worldserver = minecraftserver.getWorld(i);
+    		}
+    		
+    		ForgeWorld forgeWorld1 = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);    		
+    		if(forgeWorld1 == null && ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dimensionIn) != null)
+    		{		
+    			OTGDimensionManager.initDimension(dimensionIn);			
+    			forgeWorld1 = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
+    		}
+    		WorldServer worldserver1;
+    		if(forgeWorld1 != null)
+    		{
+    			worldserver1 = (WorldServer) forgeWorld1.getWorld();
+    		} else {
+    			worldserver1 = net.minecraftforge.common.DimensionManager.getWorld(dimensionIn);
+    		}
+    		
             _this.dimension = dimensionIn;
             
-            if (i == 1 && dimensionIn == 1 && teleporter.isVanilla())
-            {
-                worldserver1 = minecraftserver.getWorld(0);
-                _this.dimension = 0;
-            }
+        	Teleporter teleporter = worldserver1.getDefaultTeleporter();
 
             _this.world.removeEntity(_this);
             _this.isDead = false;
@@ -81,21 +102,17 @@ public class OTGTeleporter
 
             BlockPos blockpos;
 
-            if (dimensionIn == 1 && teleporter.isVanilla())
-            {
-                blockpos = worldserver1.getSpawnCoordinate();
-            } else {
-                double moveFactor = worldserver.provider.getMovementFactor() / worldserver1.provider.getMovementFactor();
-                double d0 = MathHelper.clamp(_this.posX * moveFactor, worldserver1.getWorldBorder().minX() + 16.0D, worldserver1.getWorldBorder().maxX() - 16.0D);
-                double d1 = MathHelper.clamp(_this.posZ * moveFactor, worldserver1.getWorldBorder().minZ() + 16.0D, worldserver1.getWorldBorder().maxZ() - 16.0D);
+            double moveFactor = worldserver.provider.getMovementFactor() / worldserver1.provider.getMovementFactor();
+            double d0 = MathHelper.clamp(_this.posX * moveFactor, worldserver1.getWorldBorder().minX() + 16.0D, worldserver1.getWorldBorder().maxX() - 16.0D);
+            double d1 = MathHelper.clamp(_this.posZ * moveFactor, worldserver1.getWorldBorder().minZ() + 16.0D, worldserver1.getWorldBorder().maxZ() - 16.0D);
 
-                d0 = (double)MathHelper.clamp((int)d0, -29999872, 29999872);
-                d1 = (double)MathHelper.clamp((int)d1, -29999872, 29999872);
-                float f = _this.rotationYaw;
-                _this.setLocationAndAngles(d0, _this.posY, d1, 90.0F, 0.0F);
-                teleporter.placeEntity(worldserver1, _this, f);
-                blockpos = new BlockPos(_this);
-            }            
+            d0 = (double)MathHelper.clamp((int)d0, -29999872, 29999872);
+            d1 = (double)MathHelper.clamp((int)d1, -29999872, 29999872);
+            float f = _this.rotationYaw;
+            _this.setLocationAndAngles(d0, _this.posY, d1, 90.0F, 0.0F);
+            placeInExistingPortal(worldserver1, _this, f, teleporter);
+            
+            blockpos = new BlockPos(_this);            
             
             worldserver.updateEntityWithOptionalForce(_this, false);
             _this.world.profiler.endStartSection("reloading");
@@ -111,15 +128,24 @@ public class OTGTeleporter
                     entity.moveToBlockPosAndAngles(blockpos1, entity.rotationYaw, entity.rotationPitch);
                 } else {
                     entity.moveToBlockPosAndAngles(blockpos, entity.rotationYaw, entity.rotationPitch);
-                }                
+                }
                 
                 boolean flag = entity.forceSpawn;
-                entity.forceSpawn = true;
-
+                entity.forceSpawn = true;            
+                
                 worldserver1.spawnEntity(entity);
 
                 entity.forceSpawn = flag;
                 worldserver1.updateEntityWithOptionalForce(entity, false);
+                
+                if(forgeWorld1 != null && _this instanceof EntityMinecart)
+                {
+                	List<EntityPlayerMP> players = findNearbyEntity(forgeWorld1.getWorld(), _this.getPosition(), EntityPlayerMP.class);
+        	        if(players.size() > 0 && !players.get(0).isRiding())
+        	        {
+        	        	players.get(0).startRiding(_this);
+        	        }
+                }
             }
 
             _this.isDead = true;
@@ -132,7 +158,7 @@ public class OTGTeleporter
             return null;
         }
     }
-
+    
     private static void copyDataFromOld(Entity entityIn, Entity _this)
     {       
         NBTTagCompound nbttagcompound = entityIn.writeToNBT(new NBTTagCompound());
@@ -155,76 +181,45 @@ public class OTGTeleporter
 			OTGDimensionManager.initDimension(dimensionIn);			
 			forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
 		}
-       
-		// Entity.setPortal has updated the entity's lastPortalVec incorrectly, 
-		// because Blocks.Portal.createPatternHelper can't detect OTG portals, 
-		// detect portals and update lastPortalVec again.
 		
-        if (!_this.world.isRemote)
-        {
-            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(_this.world, _this.lastPortalPos != null ? _this.lastPortalPos : _this.getPosition());
-            double d0 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
-            double d1 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? _this.posZ : _this.posX;
-            d1 = Math.abs(MathHelper.pct(d1 - (double)(blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE ? 1 : 0), d0, d0 - (double)blockpattern$patternhelper.getWidth()));
-            double d2 = MathHelper.pct(_this.posY - 1.0D, (double)blockpattern$patternhelper.getFrontTopLeft().getY(), (double)(blockpattern$patternhelper.getFrontTopLeft().getY() - blockpattern$patternhelper.getHeight()));
-            _this.lastPortalVec = new Vec3d(d1, d2, 0.0D);
-            _this.teleportDirection = blockpattern$patternhelper.getForwards();
-        }
+		WorldServer world = forgeWorld == null ? DimensionManager.getWorld(dimensionIn) : (WorldServer)forgeWorld.getWorld();
         
         // We're overriding the flow from EntityPlayerMP.changeDimension from here on.
         // We have to because the normal flow can't detect OTG portals and tp's players/entities
         // to the wrong coordinates when going through a portal.
 		
-		Teleporter teleporter = _this.getServer().getWorld(dimensionIn).getDefaultTeleporter();
+		Teleporter teleporter = world.getDefaultTeleporter();
         _this.invulnerableDimensionChange = true;
 
-        if (_this.dimension == 0 && dimensionIn == -1)
+        _this.enteredNetherPosition = null;
+        
+        transferPlayerToDimension(_this, dimensionIn, teleporter, _this.getServer().getPlayerList(), createPortal, false);
+        _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
+        _this.lastExperience = -1;
+        _this.lastHealth = -1.0F;
+        _this.lastFoodLevel = -1;
+        ServerPacketManager.sendParticlesPacket(null, _this); // Clear particles
+        
+        if(!createPortal && world != null)
         {
-        	_this.enteredNetherPosition = new Vec3d(_this.posX, _this.posY, _this.posZ);
+        	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(world));
+        	if(dimConfig != null && dimConfig.Settings.TeleportToSpawnOnly)
+        	{
+        		BlockPos spawnPoint = world.provider.getRandomizedSpawnPoint();
+        		_this.setPositionAndUpdate(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ());
+        	}
         }
-        else if (_this.dimension != -1 && dimensionIn != 0)
-        {
-        	_this.enteredNetherPosition = null;
+        
+        if(world != null)
+        {	   
+        	List<EntityMinecart> minecarts = findNearbyEntity(world, _this.getPosition(), EntityMinecart.class);
+	        if(minecarts.size() > 0)
+	        {
+	        	_this.startRiding(minecarts.get(0));
+	        }
         }
-
-        if (_this.dimension == 1 && dimensionIn == 1 && teleporter.isVanilla())
-        {
-        	_this.world.removeEntity(_this);
-
-            if (!_this.queuedEndExit)
-            {
-            	_this.queuedEndExit = true;
-            	_this.connection.sendPacket(new SPacketChangeGameState(4, _this.seenCredits ? 0.0F : 1.0F));
-            	_this.seenCredits = true;
-            }
-            ServerPacketManager.sendParticlesPacket(null, _this); // Clear particles
-            return _this;
-        } else {
-            if (_this.dimension == 0 && dimensionIn == 1)
-            {
-                dimensionIn = 1;
-            }
-            
-            //_this.mcServer.getPlayerList().transferPlayerToDimension(_this, dimensionIn, teleporter);
-            transferPlayerToDimension(_this, dimensionIn, teleporter, _this.getServer().getPlayerList(), createPortal, false);
-            _this.connection.sendPacket(new SPacketEffect(1032, BlockPos.ORIGIN, 0, false));
-            _this.lastExperience = -1;
-            _this.lastHealth = -1.0F;
-            _this.lastFoodLevel = -1;
-            ServerPacketManager.sendParticlesPacket(null, _this); // Clear particles
-            
-            if(!createPortal && forgeWorld != null)
-            {
-            	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
-            	if(dimConfig != null && dimConfig.Settings.TeleportToSpawnOnly)
-            	{
-            		BlockPos spawnPoint = forgeWorld.getWorld().provider.getRandomizedSpawnPoint();
-            		_this.setPositionAndUpdate(spawnPoint.getX(), spawnPoint.getY(), spawnPoint.getZ());
-            	}
-            }
-            
-            return _this;
-        }
+        
+        return _this;
 
 		/*
 		 * TODO: Re-use this for forcing gamemode / flying per dimension?
@@ -240,13 +235,49 @@ public class OTGTeleporter
 		}
 	    */
     }
+	
+    protected static <T extends Entity> List<T> findNearbyEntity(World worldIn, BlockPos pos, Class<T> clazz)
+    {
+        AxisAlignedBB axisalignedbb = new AxisAlignedBB((double)((float)pos.getX()), (double)pos.getY(), (double)((float)pos.getZ()), (double)((float)(pos.getX() + 1)), (double)((float)(pos.getY() + 1)), (double)((float)(pos.getZ() + 1)));
+        return worldIn.getEntitiesWithinAABB(clazz, axisalignedbb);
+    }
+
 
     private static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
     {
         int i = player.dimension;
-        WorldServer worldserver = _this.getServerInstance().getWorld(player.dimension);
+        
+        // Avoid calling DimensionManager.initDimension                   
+		ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(i);    		
+		if(forgeWorld == null && ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(i) != null)
+		{		
+			OTGDimensionManager.initDimension(i);			
+			forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(i);
+		}    		
+		WorldServer worldserver;
+		if(forgeWorld != null)
+		{
+			worldserver = (WorldServer) forgeWorld.getWorld();
+		} else {
+			worldserver = _this.getServerInstance().getWorld(i);
+		}
+		
+		ForgeWorld forgeWorld1 = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);    		
+		if(forgeWorld1 == null && ((ForgeEngine)OTG.getEngine()).getUnloadedWorldByDimId(dimensionIn) != null)
+		{		
+			OTGDimensionManager.initDimension(dimensionIn);			
+			forgeWorld1 = ((ForgeEngine)OTG.getEngine()).getWorldByDimId(dimensionIn);
+		}
+		WorldServer worldserver1;
+		if(forgeWorld1 != null)
+		{
+			worldserver1 = (WorldServer) forgeWorld1.getWorld();
+		} else {
+			worldserver1 = net.minecraftforge.common.DimensionManager.getWorld(dimensionIn);
+		}
+        
         player.dimension = dimensionIn;
-        WorldServer worldserver1 = _this.getServerInstance().getWorld(player.dimension);
+
         player.connection.sendPacket(new SPacketRespawn(player.dimension, worldserver1.getDifficulty(), worldserver1.getWorldInfo().getTerrainType(), player.interactionManager.getGameType()));
         _this.updatePermissionLevel(player);
         worldserver.removeEntityDangerously(player);
@@ -512,7 +543,7 @@ public class OTGTeleporter
 
                         if (d0 < 0.0D || d1 < d0)
                         {
-                            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(entityIn.getEntityWorld(), destinationWorld, blockpos1);
+                            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPatternHelper.createPatternHelper(entityIn.getEntityWorld(), destinationWorld, blockpos1);
                             if(blockpattern$patternhelper.getHeight() >= 3 && blockpattern$patternhelper.getWidth() >= 2)
                             {
                                 d0 = d1;
@@ -528,7 +559,7 @@ public class OTGTeleporter
         {
             double d5 = (double)blockpos.getX() + 0.5D;
             double d7 = (double)blockpos.getZ() + 0.5D;
-            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPortal.createPatternHelper(entityIn.getEntityWorld(), destinationWorld, blockpos);
+            BlockPattern.PatternHelper blockpattern$patternhelper = OTGBlockPatternHelper.createPatternHelper(entityIn.getEntityWorld(), destinationWorld, blockpos);
             boolean flag1 = blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;            
                       
             double d2 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double)blockpattern$patternhelper.getFrontTopLeft().getZ() : (double)blockpattern$patternhelper.getFrontTopLeft().getX();
