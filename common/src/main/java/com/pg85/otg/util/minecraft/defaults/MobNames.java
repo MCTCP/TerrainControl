@@ -83,7 +83,11 @@ public enum MobNames
     {
     	for(String key : MobAliases.keySet())
     	{
-    		if(key.toLowerCase().trim().replace("entity","").replace("_","").equals(alias.toLowerCase().trim().replace("entity","").replace("_","")))
+    		if(
+				key.toLowerCase().trim().replace("minecraft:","").replace("entity","").trim().replace("_","").equals(
+					alias.toLowerCase().trim().replace("minecraft:","").replace("entity","").trim().replace("_","")
+				)
+			)
     		{
     			return MobAliases.get(key);
     		}
@@ -102,7 +106,7 @@ public enum MobNames
     {
         for (String alias : aliases)
         {
-            MobAliases.put(alias, internalMinecraftName);
+            MobAliases.put("minecraft:" + alias, "minecraft:" + internalMinecraftName);
         }
     }
 
@@ -122,6 +126,6 @@ public enum MobNames
      */
     public String getInternalName()
     {
-        return this.internalMinecraftName;
+        return "minecraft:" + this.internalMinecraftName;
     }
 }

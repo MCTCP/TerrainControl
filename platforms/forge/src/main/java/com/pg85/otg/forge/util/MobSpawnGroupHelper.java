@@ -207,7 +207,7 @@ public final class MobSpawnGroupHelper
     	ResourceLocation mobName = EntityList.getKey(entityClass);
     	if(mobName != null)
     	{
-    		return mobName.getPath();
+    		return mobName.toString();
     	}
 
     	if(OTG.getPluginConfig().spawnLog)
