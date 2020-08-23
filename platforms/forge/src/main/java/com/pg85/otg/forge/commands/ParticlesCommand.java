@@ -6,10 +6,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextComponentString;
 
 public class ParticlesCommand extends BaseCommand
@@ -28,9 +25,9 @@ public class ParticlesCommand extends BaseCommand
         OTG.log(LogMarker.INFO, "-- Particles List --");
         sender.sendMessage(new TextComponentString("-- Particles List --"));
         sender.sendMessage(new TextComponentString(""));
-        for (ResourceLocation entry : EntityList.getEntityNameList())
+        for (String entry : EnumParticleTypes.getParticleNames())
         {
-            String msg = entry.getNamespace() + ":" + entry.getPath();
+            String msg = entry;
             OTG.log(LogMarker.INFO, msg.replace("§2", "").replace("§", "").replace("§a", ""));
             sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "- " + msg));
         }
