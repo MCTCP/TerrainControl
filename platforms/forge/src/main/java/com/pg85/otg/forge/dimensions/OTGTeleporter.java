@@ -140,7 +140,7 @@ public class OTGTeleporter
                 
                 if(forgeWorld1 != null && _this instanceof EntityMinecart)
                 {
-                	List<EntityPlayerMP> players = findNearbyEntity(forgeWorld1.getWorld(), _this.getPosition(), EntityPlayerMP.class);
+                	List<EntityPlayerMP> players = findNearbyPlayer(forgeWorld1.getWorld(), _this.getPosition());
         	        if(players.size() > 0 && !players.get(0).isRiding())
         	        {
         	        	players.get(0).startRiding(_this);
@@ -212,7 +212,7 @@ public class OTGTeleporter
         
         if(world != null)
         {	   
-        	List<EntityMinecart> minecarts = findNearbyEntity(world, _this.getPosition(), EntityMinecart.class);
+        	List<EntityMinecart> minecarts = findNearbyMinecart(world, _this.getPosition());
 	        if(minecarts.size() > 0)
 	        {
 	        	_this.startRiding(minecarts.get(0));
@@ -235,13 +235,22 @@ public class OTGTeleporter
 		}
 	    */
     }
+
+	protected static List<EntityPlayerMP> findNearbyPlayer(World worldIn, BlockPos pos)
+	{
+		return findNearbyEntity(worldIn, pos, EntityPlayerMP.class, 1.0d);
+	}
 	
-    protected static <T extends Entity> List<T> findNearbyEntity(World worldIn, BlockPos pos, Class<T> clazz)
+	protected static List<EntityMinecart> findNearbyMinecart(World worldIn, BlockPos pos)
+	{
+		return findNearbyEntity(worldIn, pos, EntityMinecart.class, 1.0d);
+	}
+	
+    protected static <T extends Entity> List<T> findNearbyEntity(World worldIn, BlockPos pos, Class<T> clazz, double radius)
     {
-        AxisAlignedBB axisalignedbb = new AxisAlignedBB((double)((float)pos.getX()), (double)pos.getY(), (double)((float)pos.getZ()), (double)((float)(pos.getX() + 1)), (double)((float)(pos.getY() + 1)), (double)((float)(pos.getZ() + 1)));
+        AxisAlignedBB axisalignedbb = new AxisAlignedBB((double)((float)pos.getX() - radius), (double)pos.getY() - radius, (double)((float)pos.getZ() - radius), (double)((float)(pos.getX() + radius)), (double)((float)(pos.getY() + radius)), (double)((float)(pos.getZ() + radius)));
         return worldIn.getEntitiesWithinAABB(clazz, axisalignedbb);
     }
-
 
     private static void transferPlayerToDimension(EntityPlayerMP player, int dimensionIn, net.minecraft.world.Teleporter teleporter, PlayerList _this, boolean createPortal, boolean placeOnHighestBlock)
     {
