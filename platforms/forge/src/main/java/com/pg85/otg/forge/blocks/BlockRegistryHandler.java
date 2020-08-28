@@ -1,7 +1,6 @@
 package com.pg85.otg.forge.blocks;
 
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.blocks.portal.TileEntityPortal;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.ResourceLocation;
@@ -18,7 +17,6 @@ public class BlockRegistryHandler
 	public static void onBlockRegister(RegistryEvent.Register<Block> event)
 	{
 		event.getRegistry().registerAll(ModBlocks.Blocks.toArray(new Block[0]));
-		GameRegistry.registerTileEntity(TileEntityPortal.class, new ResourceLocation(PluginStandardValues.MOD_ID, "tile_entity_portal"));
 	}
 	
 	@SubscribeEvent

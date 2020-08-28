@@ -1,22 +1,16 @@
 package com.pg85.otg.forge.blocks.portal;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.blocks.BlockBreakableBase;
+import com.pg85.otg.forge.blocks.ModBlocks;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
-import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.forge.world.ForgeWorld;
-import com.pg85.otg.util.FifoMap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 import javax.annotation.Nullable;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
@@ -30,7 +24,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumParticleTypes;
@@ -47,7 +40,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityProvider
+public class BlockPortalOTG extends BlockBreakableBase
 {
     public static final PropertyEnum<EnumFacing.Axis> AXIS = PropertyEnum.<EnumFacing.Axis>create("axis", EnumFacing.Axis.class, EnumFacing.Axis.X, EnumFacing.Axis.Z);
     protected static final AxisAlignedBB X_AABB = new AxisAlignedBB(0.0D, 0.0D, 0.375D, 1.0D, 1.0D, 0.625D);
@@ -63,108 +56,6 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
 		this.setHardness(-1.0F);
 		this.setSoundType(SoundType.GLASS);
 		this.setLightLevel(0.75F);
-    }
-    
-    // Tile entity for saving portal data
-    
-    // TODO: Put all caches in a per-dim/world session class, so they can be disposed easily on dim/world unload.
-    private static HashMap<Integer, FifoMap<BlockPos, OTGPortalData>> portalDataCache = new HashMap<Integer, FifoMap<BlockPos, OTGPortalData>>(1024); 
-    
-    public static void clearCacheOnWorldUnload(int dimensionId)
-    {
-   		portalDataCache.remove(dimensionId);
-    }
-
-    public static void clearCache()
-    {
-    	portalDataCache.clear();
-    }
-    
-    private OTGPortalData getPortalData(World worldIn, BlockPos pos)
-    {
-    	FifoMap<BlockPos, OTGPortalData> portalDataByWorld = portalDataCache.get(new Integer(worldIn.provider.getDimension()));
-    	if(portalDataByWorld == null)
-    	{
-    		portalDataByWorld = new FifoMap<BlockPos, OTGPortalData>(1024);
-    	}
-    	OTGPortalData portalData = portalDataByWorld.get(pos);
-
-    	if(portalData == null)
-    	{
-    		TileEntity entity = worldIn.getTileEntity(pos);
-    		if(entity != null && entity instanceof TileEntityPortal)
-    		{
-	    		if(((TileEntityPortal)entity).otgPortalData != OTGPortalData.EMPTY_DATA)
-	    		{
-	    			portalData = ((TileEntityPortal)entity).otgPortalData;
-	    			portalDataByWorld.put(pos, portalData);
-	    			portalDataCache.put(new Integer(worldIn.provider.getDimension()), portalDataByWorld);
-	    			return portalData;
-	    		} else {
-	    			DimensionConfig dimConfig = findPortalAtPos(worldIn, pos, worldIn.provider.getDimension());    			
-	    			portalData = new OTGPortalData(dimConfig.Settings.PortalParticleType, dimConfig.Settings.PortalMobType, dimConfig.Settings.PortalMobSpawnChance);	    			
-	    			entity = new TileEntityPortal(portalData);
-	    			worldIn.setTileEntity(pos, entity);
-	    			portalDataByWorld.put(pos, portalData);
-	    			portalDataCache.put(new Integer(worldIn.provider.getDimension()), portalDataByWorld);	    			
-	    			return portalData;
-	    		}
-    		}
-    	} else {
-    		return portalData;
-    	}
-    	return null;
-    }
-    
-    private DimensionConfig findPortalAtPos(World entityWorld, BlockPos closestPortalPos, int dimId)
-    {
-		// Find portal material
-		BlockPos playerPortalMaterialBlockPos = new BlockPos(closestPortalPos);
-		IBlockState blockState = entityWorld.getBlockState(playerPortalMaterialBlockPos);
-		while(blockState.getBlock() instanceof BlockPortalOTG && playerPortalMaterialBlockPos.getY() > 0) // TODO: Don't use instanceof so much?
-		{
-			playerPortalMaterialBlockPos = new BlockPos(playerPortalMaterialBlockPos.getX(), playerPortalMaterialBlockPos.getY() - 1, playerPortalMaterialBlockPos.getZ());
-			blockState = entityWorld.getBlockState(playerPortalMaterialBlockPos);			
-		}
-		
-		// Find portal material for OTG dimensions and see if they match
-		ArrayList<LocalWorld> forgeWorlds = ((ForgeEngine)OTG.getEngine()).getAllWorlds();
-		ForgeMaterialData playerPortalMaterial = ForgeMaterialData.ofMinecraftBlockState(blockState);
-		ForgeWorld overWorld = ((ForgeEngine)OTG.getEngine()).getOverWorld();
-		
-		boolean bFound = false;
-		if(overWorld == null) // If overworld is null then it's a vanilla overworld
-		{
-			DimensionConfig dimConfig = OTG.getDimensionsConfig().Overworld;
-			ArrayList<LocalMaterialData> portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
-
-			for(LocalMaterialData portalMaterial : portalMaterials)
-			{
-				if(playerPortalMaterial.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && playerPortalMaterial.getBlockData() == portalMaterial.getBlockData())
-				{
-					return dimConfig;
-				}
-			}
-		}
-		if(!bFound)
-		{
-			for(LocalWorld localWorld : forgeWorlds)
-			{
-				ForgeWorld forgeWorld = (ForgeWorld)localWorld;
-				DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName());
-				ArrayList<LocalMaterialData> portalMaterials = dimConfig.Settings.GetDimensionPortalMaterials();
-				for(LocalMaterialData portalMaterial : portalMaterials)
-				{
-					if(playerPortalMaterial.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && playerPortalMaterial.getBlockData() == portalMaterial.getBlockData())
-					{
-						return dimConfig;
-					}
-				}
-			}
-		}
-
-		// No custom OTG dimensions exists with this material.
-		return null;
     }
 
     public static boolean trySpawnPortal(World worldIn, BlockPos pos)
@@ -203,14 +94,6 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
         }
     }    
     
-    /**
-     * Returns a new instance of a block's tile entity class. Called on placing the block.
-     */
-    public TileEntity createNewTileEntity(World worldIn, int meta)
-    {
-        return new TileEntityPortal();
-    }
-    
     //
         
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
@@ -227,16 +110,33 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
         }
     }
 
-
     public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand)
     {
         super.updateTick(worldIn, pos, state, rand);
 
-        OTGPortalData portalData = getPortalData(worldIn, new BlockPos(pos.getX(), pos.getY(), pos.getZ()));
-    	String mobName = portalData.getMobType();        	
-    	ResourceLocation entityType = new ResourceLocation(mobName);
-    	
-        if (worldIn.provider.isSurfaceWorld() && worldIn.getGameRules().getBoolean("doMobSpawning") && rand.nextInt(portalData.getMobSpawnChance()) < worldIn.getDifficulty().getId())
+        String portalColor = PortalColors.getPortalColorByPortalBlock(this);        
+        DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+        DimensionConfig dimConfig = null;
+        if(dimsConfig.Overworld.Settings.PortalColor.equals(portalColor))
+        {
+        	dimConfig = dimsConfig.Overworld;
+        } else {
+	        if(dimsConfig.Dimensions != null)
+	        {
+	        	for(DimensionConfig dimConfig2 : dimsConfig.Dimensions)
+	        	{
+	        		if(portalColor.equals(dimConfig2.Settings.PortalColor.toLowerCase()))
+	        		{
+	        			dimConfig = dimConfig2;
+	        			break;
+	        		}
+	        	}
+	        }
+        }
+        
+    	ResourceLocation entityType = dimConfig == null ? new ResourceLocation("zombie_pigman") : new ResourceLocation(dimConfig.Settings.PortalMobType);
+
+        if (worldIn.provider.isSurfaceWorld() && worldIn.getGameRules().getBoolean("doMobSpawning") && rand.nextInt(dimConfig == null ? 2000 : dimConfig.Settings.PortalMobSpawnChance) < worldIn.getDifficulty().getId())
         {
             int i = pos.getY();
             BlockPos blockpos;
@@ -293,11 +193,6 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
     {
         super.breakBlock(worldIn, pos, state);
-    	FifoMap<BlockPos, OTGPortalData> portalDataByWorld = portalDataCache.get(new Integer(worldIn.provider.getDimension()));
-    	if(portalDataByWorld != null)
-    	{
-    		portalDataByWorld.remove(pos);
-    	}
     }
 
     // Called when a neighboring block was changed and marks that this state should perform any checks during a neighbor
@@ -445,11 +340,7 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
         {
             worldIn.playSound((double)pos.getX() + 0.5D, (double)pos.getY() + 0.5D, (double)pos.getZ() + 0.5D, SoundEvents.BLOCK_PORTAL_AMBIENT, SoundCategory.BLOCKS, 0.5F, rand.nextFloat() * 0.4F + 0.8F, false);
         }
-        
-        OTGPortalData portalData;
-        String particleName;
-        EnumParticleTypes particleType;
-        
+               
         double d0;
         double d1;
         double d2;
@@ -457,10 +348,28 @@ public class BlockPortalOTG extends BlockBreakableBase implements ITileEntityPro
         double d4;
         double d5;
         int j;
-        
-    	portalData = getPortalData(worldIn, new BlockPos(pos.getX(), pos.getY(), pos.getZ()));
-    	particleName = portalData.getParticleType();
-    	particleType = EnumParticleTypes.getByName(particleName);
+
+        String portalColor = PortalColors.getPortalColorByPortalBlock(this);        
+        DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+        DimensionConfig dimConfig = null;
+        if(dimsConfig.Overworld.Settings.PortalColor.equals(portalColor))
+        {
+        	dimConfig = dimsConfig.Overworld;
+        } else {
+	        if(dimsConfig.Dimensions != null)
+	        {
+	        	for(DimensionConfig dimConfig2 : dimsConfig.Dimensions)
+	        	{
+	        		if(portalColor.equals(dimConfig2.Settings.PortalColor.toLowerCase()))
+	        		{
+	        			dimConfig = dimConfig2;
+	        			break;
+	        		}
+	        	}
+	        }
+        }        
+
+        EnumParticleTypes particleType = dimConfig == null ? EnumParticleTypes.PORTAL : EnumParticleTypes.getByName(dimConfig.Settings.PortalParticleType);
         
     	if(particleType != null)
     	{

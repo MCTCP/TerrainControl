@@ -199,10 +199,6 @@ public class WorldListener
     @SubscribeEvent
     public void onWorldUnload(WorldEvent.Unload event)
     {
-        // TODO: Put all world/dim specific caches in one place to unload them easily.
-        // TODO: This only clears the cache on the server
-        BlockPortalOTG.clearCacheOnWorldUnload(event.getWorld().provider.getDimension());
-    	
 		if(!event.getWorld().isRemote) // Server side only
 		{			
 	        World mcWorld = event.getWorld();
