@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.world;
 
 import java.io.File;
+import java.util.List;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
@@ -81,12 +82,7 @@ public class OTGWorldType extends WorldType
         	        	for(DimensionConfig dimConfig : dimsConfig.Dimensions)
     	        		{
 			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions()))
-		                	{
-		                		// Change the portal material
-		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions(), false);
-		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-		                	}
+        	        		PortalColors.correctPortalColor(dimConfig, dimsConfig.getAllDimensions());
 		                	dimsConfig.Dimensions.add(dimConfig);
     	        		}
         	        	OTG.setDimensionsConfig(dimsConfig);
@@ -112,12 +108,7 @@ public class OTGWorldType extends WorldType
     	        			{
     	        				DimensionConfig dimConfig = new DimensionConfig(dimToAdd, 0, true, dimWorldConfig);
     			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-    		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions()))
-    		                	{
-    		                		// Change the portal material
-    		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions(), false);
-    		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-    		                	}    	        				
+    	        				PortalColors.correctPortalColor(dimConfig, dimsConfig.getAllDimensions());
     	        				dimsConfig.Dimensions.add(dimConfig);
     	        			}
     	        		}

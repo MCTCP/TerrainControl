@@ -106,14 +106,9 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		                		}
 		                	}
 
-	                		// Check if the portal color is available
-		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, OTG.getDimensionsConfig().getAllDimensions()))
-		                	{
-		                		// Change the portal material
-		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, OTG.getDimensionsConfig().getAllDimensions(), false);
-		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-		                	}
-		                	
+			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+	        				PortalColors.correctPortalColor(dimConfig, OTG.getDimensionsConfig().getAllDimensions());
+
 		                	ArrayList<String> presetNames = new ArrayList<String>();
 		                	presetNames.add(dimConfig.PresetName);
         					if(!OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))

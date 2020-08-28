@@ -87,12 +87,7 @@ public class ServerEventListener
 						    		if(worldConfigFile.exists())
 						    		{
 						    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-					                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions()))
-					                	{
-					                		// Change the portal material
-					                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions(), false);
-					                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-					                	}
+						    			PortalColors.correctPortalColor(dimConfig, dimsConfig.getAllDimensions());
 					                	dimsConfig.Dimensions.add(dimConfig);
 						    		}
 					    		}

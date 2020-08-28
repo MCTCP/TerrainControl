@@ -3,8 +3,11 @@ package com.pg85.otg.forge.blocks;
 import java.util.Arrays;
 import java.util.List;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
+import com.pg85.otg.logging.LogMarker;
 
 public class PortalColors
 {	
@@ -171,9 +174,20 @@ public class PortalColors
 			}
 		}
 		return portalColors.get(0);
+	}
+	
+	public static void correctPortalColor(DimensionConfig dimConfig, List<DimensionConfig> dimensions)
+	{	
+        // Ensure the portal color is unique (not already in use), otherwise correct it.
+    	if(!isPortalColorFree(dimConfig.Settings.PortalColor, dimensions))
+    	{
+    		// Change the portal material
+    		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimensions, false);
+    		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
+    	}
 	}	
-		
-	public static boolean isPortalColorFree(String currentColor, List<DimensionConfig> dimensions)
+	
+	private static boolean isPortalColorFree(String currentColor, List<DimensionConfig> dimensions)
 	{
 		for (DimensionConfig dimConfig1 : dimensions)
 		{

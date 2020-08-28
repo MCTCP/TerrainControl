@@ -138,12 +138,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
 		        	{
 		    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-	                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, this.dimensions))
-	                	{
-	                		// Change the portal material
-	                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, this.dimensions, false);
-	                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-	                	}
+        				PortalColors.correctPortalColor(dimConfig, this.dimensions);
 		        		this.dimensions.add(dimConfig.clone());	        		
 		        	}
 		        }
@@ -163,12 +158,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        		{
 		        			DimensionConfig dimConfig = new DimensionConfig(preset.getValue());
 			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, this.dimensions))
-		                	{
-		                		// Change the portal material
-		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, this.dimensions, false);
-		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-		                	}
+	        				PortalColors.correctPortalColor(dimConfig, this.dimensions);
 		        			this.dimensions.add(dimConfig);
 		        			break;
 		        		}
@@ -274,14 +264,9 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		    	        			// If world is not null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
 		    	        			newConfig.isNewConfig = this.mc.world != null;
 		    	        			
-		    		    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-		    	                	if(!PortalColors.isPortalColorFree(newConfig.Settings.PortalColor, this.dimensions))
-		    	                	{
-		    	                		// Change the portal material
-		    	                		newConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(newConfig.Settings.PortalColor, this.dimensions, false);
-		    	                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-		    	                	}
-		    	        			
+	    			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+	    	        				PortalColors.correctPortalColor(dimConfig, this.dimensions);
+		    	        					    	        			
 		    	        			this.dimensions.add(newConfig);
 		    	        			bFoundDefaultSettigForDim = true;
 		    	        			break;
@@ -297,13 +282,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	        			newConfig.isNewConfig = this.mc.world != null;
 	        			
 		    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-	                	if(!PortalColors.isPortalColorFree(newConfig.Settings.PortalColor, this.dimensions))
-	                	{
-	                		// Change the portal material
-	                		newConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(newConfig.Settings.PortalColor, this.dimensions, false);
-	                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
-	                	}
-	        			
+        				PortalColors.correctPortalColor(newConfig, this.dimensions);        				
 	    		        this.dimensions.add(newConfig);
 	    	        }
 	    	        
