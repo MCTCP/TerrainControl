@@ -44,6 +44,7 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.dimensions.DimensionData;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.gui.GuiHandler;
@@ -321,10 +322,10 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     	// If this world has OTG overworld/dimensions then check if it has a DimensionsConfig
     	// If this is a legacy world then we'll need to create a new one.
     	ArrayList<DimensionData> dimensionDatas = OTGDimensionManager.GetDimensionData(new File(clientHandler.getSavesDir() + File.separator + this.worldSummary.getFileName()));
-    	DimensionsConfig dimensionsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()), OTG.getEngine().getOTGRootFolder());
-    	if(dimensionsConfig == null && dimensionDatas != null && dimensionDatas.size() > 0)
+    	DimensionsConfig dimsConfig = DimensionsConfig.loadFromFile(new File(clientHandler.getSavesDir(), comparator.getFileName()), OTG.getEngine().getOTGRootFolder());
+    	if(dimsConfig == null && dimensionDatas != null && dimensionDatas.size() > 0)
     	{
-    		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+    		dimsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
     		for(DimensionData dimensionData : dimensionDatas)
     		{
     			if(dimensionData.dimensionId == 0)
@@ -338,7 +339,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     					return;
     				}
     				DimensionConfig overWorld = new DimensionConfig(comparator.getFileName(), 0, true, worldConfig);
-    				dimensionsConfig.Overworld = overWorld;
+    				dimsConfig.Overworld = overWorld;
     			} else {
     				// If this is a legacy dim then the dim name must be the same as the preset name
     				File worldConfigLocation = new File(OTG.getEngine().getWorldsDirectory(), dimensionData.dimensionName);
@@ -349,23 +350,22 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
     					return;
     				}
     				DimensionConfig dimension = new DimensionConfig(dimensionData.dimensionName, dimensionData.dimensionId, true, worldConfig);
-    				dimensionsConfig.Dimensions.add(dimension);
+    				dimsConfig.Dimensions.add(dimension);
     			}
     		}
-    		dimensionsConfig.save();
+    		dimsConfig.save();
     	}
-    	else if(dimensionsConfig == null && (dimensionDatas == null || dimensionDatas.size() == 0))
+    	else if(dimsConfig == null && (dimensionDatas == null || dimensionDatas.size() == 0))
     	{
     		// This is a vanilla world without dims, save a config without overworld / dims
-    		dimensionsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
+    		dimsConfig = new DimensionsConfig(new File(clientHandler.getSavesDir(), comparator.getFileName()));
 			// Create a dummy overworld config
-    		dimensionsConfig.Overworld = new DimensionConfig();
+    		dimsConfig.Overworld = new DimensionConfig();
 			// Check if there is a modpack config for vanilla worlds, 
 			DimensionsConfig modPackConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(null);
 			if(modPackConfig != null)
 			{
-				dimensionsConfig.Overworld = modPackConfig.Overworld;
-				ArrayList<DimensionConfig> newDimensions = new ArrayList<DimensionConfig>();
+				dimsConfig.Overworld = modPackConfig.Overworld;
 				for(DimensionConfig dimConfig : modPackConfig.Dimensions)
 				{
 			    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
@@ -373,16 +373,22 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 			    		File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName + File.separator + "WorldConfig.ini");
 			    		if(worldConfigFile.exists())
 			    		{
-			    			newDimensions.add(dimConfig);
+			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions()))
+		                	{
+		                		// Change the portal material
+		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions(), false);
+		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
+		                	}			    			
+		                	dimsConfig.Dimensions.add(dimConfig);
 			    		}
 		    		}
-				}				
-				dimensionsConfig.Dimensions = newDimensions;
+				}
 			}   		
-    		dimensionsConfig.save();
+    		dimsConfig.save();
     	}
 
-		OTG.setDimensionsConfig(dimensionsConfig);		 	
+		OTG.setDimensionsConfig(dimsConfig);		 	
     	
         File dir = new File(clientHandler.getSavesDir(), comparator.getFileName());
         NBTTagCompound leveldat;

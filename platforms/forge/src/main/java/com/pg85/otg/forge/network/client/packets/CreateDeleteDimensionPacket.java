@@ -3,6 +3,7 @@ package com.pg85.otg.forge.network.client.packets;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.util.text.TextComponentString;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
@@ -58,7 +60,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
     	
     	StreamHelper.writeStringToStream(stream, dimensionName);
 	}
-	
+		
 	public static class Handler extends AbstractServerMessageHandler<CreateDeleteDimensionPacket>
 	{
 		@Override
@@ -83,12 +85,33 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		                public void run()
 	                	{
 		                	// Check if the world doesn't already exist
+		                	if(OTG.getDimensionsConfig().Dimensions.size() + 1 > PortalColors.portalColors.size())
+		                	{
+		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but all portal colors are in use.");
+        						// Update the UI on the client
+        						ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
+		                		return;
+		                	}
+	                		if(OTG.getDimensionsConfig().Overworld.PresetName != null && OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.PresetName))
+	                		{
+	                			// Preset is in use
+	                			return;
+	                		}
 		                	for(DimensionConfig existingDimConfig : OTG.getDimensionsConfig().Dimensions)
 		                	{
 		                		if(existingDimConfig.PresetName.equals(dimConfig.PresetName))
 		                		{
+		                			// Preset is in use
 		                			return;
 		                		}
+		                	}
+
+	                		// Check if the portal color is available
+		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, OTG.getDimensionsConfig().getAllDimensions()))
+		                	{
+		                		// Change the portal material
+		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, OTG.getDimensionsConfig().getAllDimensions(), false);
+		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
 		                	}
 		                	
 		                	ArrayList<String> presetNames = new ArrayList<String>();

@@ -12,6 +12,7 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.biomes.OTGBiomeProvider;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
 import com.pg85.otg.forge.gui.GuiHandler;
@@ -76,8 +77,18 @@ public class OTGWorldType extends WorldType
         	        if(modPackConfig != null)
         	        {
         	        	DimensionsConfig dimsConfig = new DimensionsConfig(mcWorld.getSaveHandler().getWorldDirectory());
-        	        	dimsConfig.Overworld = modPackConfig.Overworld;
-        	        	dimsConfig.Dimensions = modPackConfig.Dimensions;
+        	        	dimsConfig.Overworld = modPackConfig.Overworld;        	        	
+        	        	for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+    	        		{
+			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions()))
+		                	{
+		                		// Change the portal material
+		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions(), false);
+		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
+		                	}
+		                	dimsConfig.Dimensions.add(dimConfig);
+    	        		}
         	        	OTG.setDimensionsConfig(dimsConfig);
         	        	OTG.getDimensionsConfig().save();
         	        } else {
@@ -99,7 +110,15 @@ public class OTGWorldType extends WorldType
     	        			WorldConfig dimWorldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName + File.separator + dimToAdd));
     	        			if(dimWorldConfig != null)
     	        			{
-    	        				dimsConfig.Dimensions.add(new DimensionConfig(dimToAdd, 0, true, dimWorldConfig));
+    	        				DimensionConfig dimConfig = new DimensionConfig(dimToAdd, 0, true, dimWorldConfig);
+    			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+    		                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions()))
+    		                	{
+    		                		// Change the portal material
+    		                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions(), false);
+    		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
+    		                	}    	        				
+    	        				dimsConfig.Dimensions.add(dimConfig);
     	        			}
     	        		}
     	        		OTG.setDimensionsConfig(dimsConfig);

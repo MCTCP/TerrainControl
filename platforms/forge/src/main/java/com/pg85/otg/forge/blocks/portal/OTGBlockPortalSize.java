@@ -7,6 +7,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.blocks.ModBlocks;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
 import net.minecraft.block.Block;
@@ -141,7 +142,7 @@ public class OTGBlockPortalSize
 		{ 
 			// TODO: Does this still happen?
 			ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().Overworld.Settings.GetDimensionPortalMaterials();
-			this.portalBlock = ModBlocks.getPortalBlockByColor(OTG.getDimensionsConfig().Overworld.Settings.PortalColor);
+			this.portalBlock = PortalColors.getPortalBlockByColor(OTG.getDimensionsConfig().Overworld.Settings.PortalColor);
 			if(getDistanceUntilEdgeForPortalMaterials(portalMaterials, spawnPos))
 			{				
 				return;
@@ -151,7 +152,7 @@ public class OTGBlockPortalSize
 		{
 			ForgeWorld forgeWorld = (ForgeWorld)localWorld;
 			ArrayList<LocalMaterialData> portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
-			this.portalBlock = ModBlocks.getPortalBlockByColor(OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.PortalColor);
+			this.portalBlock = PortalColors.getPortalBlockByColor(OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.PortalColor);
 			
 			if(forgeWorld.getDimensionId() != sourceWorld.provider.getDimension())
 			{

@@ -15,6 +15,7 @@ import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.commands.OTGCommandHandler;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.gui.GuiHandler;
@@ -78,7 +79,6 @@ public class ServerEventListener
 						if(modPackConfig != null)
 						{
 							dimsConfig.Overworld = modPackConfig.Overworld;
-							ArrayList<DimensionConfig> newDimensions = new ArrayList<DimensionConfig>();
 							for(DimensionConfig dimConfig : modPackConfig.Dimensions)
 							{
 						    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
@@ -86,12 +86,17 @@ public class ServerEventListener
 						    		File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName + File.separator + "WorldConfig.ini");
 						    		if(worldConfigFile.exists())
 						    		{
-						    			newDimensions.add(dimConfig);
+						    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+					                	if(!PortalColors.isPortalColorFree(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions()))
+					                	{
+					                		// Change the portal material
+					                		dimConfig.Settings.PortalColor = PortalColors.getNextFreePortalColor(dimConfig.Settings.PortalColor, dimsConfig.getAllDimensions(), false);
+					                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but portal color is already in use, changed portal color.");
+					                	}
+					                	dimsConfig.Dimensions.add(dimConfig);
 						    		}
 					    		}
 							}
-							
-							dimsConfig.Dimensions = newDimensions;
 						}
 					}
 					dimsConfig.save();

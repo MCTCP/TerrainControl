@@ -13,6 +13,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.blocks.ModBlocks;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
 import com.pg85.otg.forge.blocks.portal.OTGBlockPatternHelper;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -369,7 +370,7 @@ public class OTGTeleporter
                 else if(forgeWorld != null)
                 {
                 	portalMaterials = OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.GetDimensionPortalMaterials();
-                	portalBlock = ModBlocks.getPortalBlockByColor(OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.PortalColor);
+                	portalBlock = PortalColors.getPortalBlockByColor(OTG.getDimensionsConfig().getDimensionConfig(forgeWorld.getName()).Settings.PortalColor);
                 }
                 
                 if(createPortal)

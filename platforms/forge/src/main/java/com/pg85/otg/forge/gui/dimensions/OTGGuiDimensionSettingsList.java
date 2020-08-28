@@ -101,7 +101,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
     	{
     		// If a modder has added default values for this preset then use those, otherwise use the worldconfig
     		DimensionConfig defaultConfig = null;
-    		if(this.mc.isSingleplayer())
+    		//if(this.mc.isSingleplayer())
     		{
 		        // If this.mc.world is not null then we're ingame
 		        DimensionsConfig defaultConfigs = OTG.getEngine().getModPackConfigManager().getModPackConfig(null); // TODO: Does this correctly return the modpackconfig for a vanilla overworld?
@@ -110,7 +110,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
         	
     		listEntries.add(new CategoryEntry(this, "OTG settings"));   		
     		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal materials", StringHelper.join(dimConfig.Settings.DimensionPortalMaterials, ", "), defaultConfig != null ? StringHelper.join(defaultConfig.Settings.DimensionPortalMaterials, ", ") : "DIRT", false), this)); // TODO: Fetch default value from worldstandarvalues
-    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal color", dimConfig.Settings.PortalColor, defaultConfig != null ? defaultConfig.Settings.PortalColor : WorldStandardValues.PORTAL_COLOR.getDefaultValue(), false), this));
+    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal color", dimConfig.Settings.PortalColor, null, false), this));
     		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal particle", dimConfig.Settings.PortalParticleType, defaultConfig != null ? defaultConfig.Settings.PortalParticleType : WorldStandardValues.PORTAL_PARTICLE_TYPE.getDefaultValue(), false), this));
     		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal mob", dimConfig.Settings.PortalMobType, defaultConfig != null ? defaultConfig.Settings.PortalMobType : WorldStandardValues.PORTAL_MOB_TYPE.getDefaultValue(), false), this));
     		listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Portal mob chance", dimConfig.Settings.PortalMobSpawnChance, defaultConfig != null ? defaultConfig.Settings.PortalMobSpawnChance : WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE.getDefaultValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMinValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMaxValue(), false), this));
@@ -126,7 +126,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	        
     		// If a modder has added default values for this preset then use those, otherwise use the worldconfig
     		DimensionConfig defaultConfig = null;
-    		if(this.mc.isSingleplayer())
+    		//if(this.mc.isSingleplayer())
     		{
 		        // If this.mc.world is not null then we're ingame
 		        DimensionsConfig defaultConfigs = OTG.getEngine().getModPackConfigManager().getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.controlsScreen.previousMenu.selectedPreset.getSecond().PresetName);
@@ -155,7 +155,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Pregenerator radius", dimConfig.PregeneratorRadiusInChunks, defaultConfig != null ? defaultConfig.PregeneratorRadiusInChunks : WorldStandardValues.PREGENERATION_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.PREGENERATION_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.PREGENERATION_RADIUS).getMaxValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("World border radius", dimConfig.WorldBorderRadiusInChunks, defaultConfig != null ? defaultConfig.WorldBorderRadiusInChunks : WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMinValue(), ((IntSetting)WorldStandardValues.WORLD_BORDER_RADIUS).getMaxValue(), false), this));		        
 	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal materials", StringHelper.join(dimConfig.Settings.DimensionPortalMaterials, ", "), defaultConfig != null ? StringHelper.join(defaultConfig.Settings.DimensionPortalMaterials, ", ") : "DIRT", false), this)); // TODO: Fetch default value from worldstandarvalues
-	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal color", dimConfig.Settings.PortalColor, defaultConfig != null ? defaultConfig.Settings.PortalColor : WorldStandardValues.PORTAL_COLOR.getDefaultValue(), false), this));	    		
+	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal color", dimConfig.Settings.PortalColor, null, false), this));	    		
 	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal particle", dimConfig.Settings.PortalParticleType, defaultConfig != null ? defaultConfig.Settings.PortalParticleType : WorldStandardValues.PORTAL_PARTICLE_TYPE.getDefaultValue(), false), this));
 	    		listEntries.add(new KeyEntry(this, new SettingEntry<String>("Portal mob", dimConfig.Settings.PortalMobType, defaultConfig != null ? defaultConfig.Settings.PortalMobType : WorldStandardValues.PORTAL_MOB_TYPE.getDefaultValue(), false), this));
 	    		listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("Portal mob chance", dimConfig.Settings.PortalMobSpawnChance, defaultConfig != null ? defaultConfig.Settings.PortalMobSpawnChance : WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE.getDefaultValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMinValue(), ((IntSetting)WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE).getMaxValue(), false), this));		       	    	
