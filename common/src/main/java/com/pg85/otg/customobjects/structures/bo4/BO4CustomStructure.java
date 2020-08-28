@@ -256,7 +256,7 @@ public class BO4CustomStructure extends CustomStructure
 						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, false, true, true, true, null);
 					}
 
-					if(highestBlock < 1)
+					if(highestBlock < 0)
 					{
 						//OTG.log(LogMarker.INFO, "Structure " + Start.BO3Name + " could not be plotted at Y < 1. If you are creating empty chunks intentionally (for a sky world for instance) then make sure you don't use the highestBlock setting for your BO3's");
 						if(((BO4)this.start.getObject()).getConfig().heightOffset > 0) // Allow floating structures that use highestblock + heightoffset

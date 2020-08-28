@@ -95,7 +95,8 @@ public class WeightedMobSpawnGroup
         for (String option : groupParts)
         {
             String[] optionParts = option.split(":");
-            if (optionParts.length != 2)
+            // Mob name can use resourcelocation: "Mob" : "minecraft:creeper" or path only: "Mob" : "creeper"
+            if (optionParts.length != 2 && optionParts.length != 3)  
             {
                 throw new InvalidConfigException("Invalid JSON structure near " + option);
             }
@@ -104,6 +105,8 @@ public class WeightedMobSpawnGroup
 
             if (key.equalsIgnoreCase("\"mob\""))
             {
+                // Mob name can use resourcelocation: "Mob" : "minecraft:creeper" or path only: "Mob" : "creeper"
+            	value = optionParts[1].trim() + (optionParts.length > 2 ? ":" + optionParts[2].trim() : "");
                 // Remove the quotes from the mob name
                 mobName = removeFirstAndLastChar(value);
             }
