@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 
 public class ModPackConfigManager
@@ -36,12 +37,26 @@ public class ModPackConfigManager
 			}
 		}
 	}
-		
+
 	public DimensionsConfig getModPackConfig(String presetName)
 	{
 		return this.defaultConfigs.get(presetName);
 	}
 
+	public void setAllModPackConfigs(ArrayList<DimensionsConfig> modPackConfigs)
+	{
+		this.defaultConfigs = new HashMap<String, DimensionsConfig>();
+		for(DimensionsConfig forgeWorldConfig : modPackConfigs)
+		{
+			// If there's multiple configs targeting the same preset for their overworld,
+			// only add the first.
+			if(!this.defaultConfigs.containsKey(forgeWorldConfig.Overworld.PresetName))
+			{
+				this.defaultConfigs.put(forgeWorldConfig.Overworld.PresetName, forgeWorldConfig);
+			}
+		}	
+	}
+	
 	public ArrayList<DimensionsConfig> getAllModPackConfigs()
 	{
 		return new ArrayList<DimensionsConfig>(this.defaultConfigs.values());
@@ -49,17 +64,16 @@ public class ModPackConfigManager
 
 	public HashMap<Integer, String> getReservedDimIds()
 	{
-		new HashMap<Integer, String>();
 		HashMap<Integer, String> reservedIds = new HashMap<Integer, String>();
+		String overworldPresetName = OTG.getDimensionsConfig().Overworld.PresetName;
 		for(DimensionsConfig dimsConfig : this.defaultConfigs.values())
 		{
-			for(DimensionConfig dimConfig1 : dimsConfig.Dimensions)
+			if((overworldPresetName == null && dimsConfig.Overworld.PresetName == null) || (overworldPresetName != null && overworldPresetName.equals(dimsConfig.Overworld.PresetName)))
 			{
-				// The modpack config has reserved this id for one of its dimensions.
-				if(dimConfig1.DimensionId != 0)
+				for(DimensionConfig dimConfig1 : dimsConfig.Dimensions)
 				{
-					// If there's multiple modpacks reserving a dim id for the same preset, only use the first.
-					if(!reservedIds.containsKey(Integer.valueOf(dimConfig1.DimensionId)))
+					// The modpack config has reserved this id for one of its dimensions.
+					if(dimConfig1.DimensionId != 0)
 					{
 						reservedIds.put(Integer.valueOf(dimConfig1.DimensionId), dimConfig1.PresetName);
 					}

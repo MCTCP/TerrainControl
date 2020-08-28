@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -42,6 +44,17 @@ public class DimensionsConfig
 	{
 		this.worldSavesDir = mcWorldSavesDir;
 		this.WorldName = worldDir;
+	}
+	
+	public List<DimensionConfig> getAllDimensions()
+	{
+		List<DimensionConfig> dimensions = new ArrayList<DimensionConfig>();
+		if(Overworld != null)
+		{
+			dimensions.add(Overworld);
+		}
+		dimensions.addAll(Dimensions);
+		return dimensions;
 	}
 	
 	public String toYamlString()

@@ -57,7 +57,7 @@ public class GuiHandler implements IGuiHandler
 			    				
 			    				if(shouldShow)
 			    				{
-				    				if(modPackConfig.Overworld.PresetName != null && modPackConfig.Dimensions != null)
+				    				if(modPackConfig.Dimensions != null)
 				    				{
 				    					for(DimensionConfig dimConfig : modPackConfig.Dimensions)
 				    					{

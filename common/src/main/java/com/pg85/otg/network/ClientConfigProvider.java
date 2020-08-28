@@ -41,7 +41,7 @@ public final class ClientConfigProvider implements ConfigProvider
     private LocalBiome[] biomesByOTGId; // For the server, OTGBiomeIds are used, for the client only non-virtual biomes are known and saved Id's are used
     private LocalBiome[] biomesBySavedId; // For the server, OTGBiomeIds are used, for the client only non-virtual biomes are known and saved Id's are used    
 
-    public ClientConfigProvider(DataInputStream stream, LocalWorld world, boolean isSinglePlayer) throws IOException
+    public ClientConfigProvider(DataInputStream stream, LocalWorld world) throws IOException
     {
         // Create WorldConfig
         SettingsMap worldSettingsReader = new SimpleSettingsMap(world.getName(), false);

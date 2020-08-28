@@ -13,6 +13,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.DimensionData;
@@ -89,14 +90,23 @@ public class DimensionSyncPacket extends OTGPacket
 		        }
 			}
 		}
+		
+		// Send modpack configs for client GUI (default settings when creating new dim)
+		// TODO: Should only have to do this once per session per client, the modpack configs shouldn't change during a session. 
+		// Serialising/sending/receiving/deserialising large Yaml strings for every packet may slow things down.		
+		stream.writeInt(OTG.getEngine().getModPackConfigManager().getAllModPackConfigs().size());
+		for(DimensionsConfig dimsConfig : OTG.getEngine().getModPackConfigManager().getAllModPackConfigs())
+		{
+			StreamHelper.writeStringToStream(stream, dimsConfig.toYamlString());
+		}
 	}
-	
+
 	public static ForgeWorld registerClientWorldBukkit(WorldClient mcWorld, DataInputStream wrappedStream, HashMap<String, ForgeWorld> worlds, HashMap<String, ForgeWorld> unloadedWorlds) throws IOException
 	{
 		// TODO: Test this and fix this if necessary.
 		//((ForgeEngine)OTG.getEngine()).UnloadAndUnregisterAllWorlds(); // TODO: Is this necessary for Bukkit?
 	    ForgeWorld world = new ForgeWorld(StreamHelper.readStringFromStream(wrappedStream));
-	    ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world, Minecraft.getMinecraft().isSingleplayer());
+	    ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world);
 	    world.provideClientConfigsBukkit(mcWorld, configs);
 	    return world;
 	}
