@@ -93,7 +93,7 @@ public class WorldStandardValues extends Settings
     	DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
     	DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean"),
     	
-    	PORTAL_COLOR = stringSetting("PortalColor", "Default"),
+    	PORTAL_COLOR = stringSetting("PortalColor", "default"),
     	PORTAL_PARTICLE_TYPE = stringSetting("PortalParticleType", "portal"),
     	PORTAL_MOB_TYPE = stringSetting("PortalMobType", "zombie_pigman");
 	;

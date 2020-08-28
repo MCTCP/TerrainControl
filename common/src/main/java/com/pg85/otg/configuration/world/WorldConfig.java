@@ -1408,7 +1408,8 @@ public class WorldConfig extends ConfigFile
 
         writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
         		"The color of OTG portal blocks, \"" + WorldStandardValues.PORTAL_COLOR + "\" by default." + 
-        		"Colors: black, blue, gold, green, lightblue, lightgreen, orange, pink, red, white, default.");         
+        		"Colors: beige, black, blue, crystalblue, darkblue, darkgreen, darkred, emerald, flame," +
+				"gold, green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default.");         
         writer.putSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE, this.portalParticleType,
         		"The type of particles spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_PARTICLE_TYPE + "\" by default. For a list of particles, use /otg particles"); 
         writer.putSetting(WorldStandardValues.PORTAL_MOB_TYPE, this.portalMobType,        		
