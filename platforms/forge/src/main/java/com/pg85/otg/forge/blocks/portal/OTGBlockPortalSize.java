@@ -204,13 +204,16 @@ public class OTGBlockPortalSize
             Block block = this.world.getBlockState(blockpos).getBlock();
             IBlockState blockStateDown = this.world.getBlockState(blockpos.down());
 
-			ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockStateDown);
 			boolean isPortalMaterial = false;
-			for(LocalMaterialData portalMaterial : portalMaterials)
+			ForgeMaterialData material = ForgeMaterialData.ofMinecraftBlockState(blockStateDown);
+			if(material != null)
 			{
-				if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+				for(LocalMaterialData portalMaterial : portalMaterials)
 				{
-					isPortalMaterial = true;
+					if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+					{
+						isPortalMaterial = true;
+					}
 				}
 			}
             

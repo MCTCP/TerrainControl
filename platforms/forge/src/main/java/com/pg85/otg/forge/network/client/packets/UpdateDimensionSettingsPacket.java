@@ -16,6 +16,7 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
+import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
 import com.pg85.otg.forge.network.server.ServerPacketManager;
@@ -97,6 +98,8 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
             						double d2 = dimConfig.WorldBorderRadiusInChunks == 0 ? 6.0E7D : dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16;
             						forgeWorld.getWorld().getWorldBorder().setCenter(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ());
             						forgeWorld.getWorld().getWorldBorder().setTransition(d2);
+            						
+            						OTGDimensionManager.ApplyGameRulesToWorld(forgeWorld.getWorld(), dimConfig);
 			                	} else {
 			                		// TODO: Assuming atm that only a single thread is ever 
 			                		// accessing dimensionsconfig, is that true? 
@@ -128,13 +131,15 @@ public class UpdateDimensionSettingsPacket extends OTGPacket
 	            						double d2 = dimConfig.WorldBorderRadiusInChunks == 0 ? 6.0E7D : dimConfig.WorldBorderRadiusInChunks == 1 ? 16 : ((dimConfig.WorldBorderRadiusInChunks - 1) * 2 + 1) * 16;
 	            						forgeWorld.getWorld().getWorldBorder().setCenter(forgeWorld.getSpawnPoint().getX(), forgeWorld.getSpawnPoint().getZ());
 	            						forgeWorld.getWorld().getWorldBorder().setTransition(d2);
+	            						
+	            						OTGDimensionManager.ApplyGameRulesToWorld(forgeWorld.getWorld(), dimConfig);
 	            					}
 			                	}
 		                	}
 	                		ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
 	                	}
 		            });
-		            return null;					
+		            return null;
 				} else {
 					throw new RuntimeException();
 				}

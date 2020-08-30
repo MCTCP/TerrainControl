@@ -78,12 +78,13 @@ public class OTGWorldType extends WorldType
         	        if(modPackConfig != null)
         	        {
         	        	DimensionsConfig dimsConfig = new DimensionsConfig(mcWorld.getSaveHandler().getWorldDirectory());
-        	        	dimsConfig.Overworld = modPackConfig.Overworld;        	        	
-        	        	for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+        	        	dimsConfig.Overworld = modPackConfig.Overworld.clone();
+        	        	for(DimensionConfig dimConfig : modPackConfig.Dimensions)
     	        		{
+        	        		DimensionConfig newConfig = dimConfig.clone();
 			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-        	        		PortalColors.correctPortalColor(dimConfig, dimsConfig.getAllDimensions());
-		                	dimsConfig.Dimensions.add(dimConfig);
+        	        		PortalColors.correctPortalColor(newConfig, dimsConfig.getAllDimensions());
+		                	dimsConfig.Dimensions.add(newConfig);
     	        		}
         	        	OTG.setDimensionsConfig(dimsConfig);
         	        	OTG.getDimensionsConfig().save();

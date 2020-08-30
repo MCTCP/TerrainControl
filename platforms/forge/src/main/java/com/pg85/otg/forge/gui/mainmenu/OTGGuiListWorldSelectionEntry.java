@@ -365,7 +365,7 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 			DimensionsConfig modPackConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(null);
 			if(modPackConfig != null)
 			{
-				dimsConfig.Overworld = modPackConfig.Overworld;
+				dimsConfig.Overworld = modPackConfig.Overworld.clone();
 				for(DimensionConfig dimConfig : modPackConfig.Dimensions)
 				{
 			    	if(!OTGDimensionManager.isDimensionNameRegistered(dimConfig.PresetName))
@@ -373,9 +373,10 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 			    		File worldConfigFile = new File(OTG.getEngine().getOTGRootFolder().getAbsolutePath() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + dimConfig.PresetName + File.separator + "WorldConfig.ini");
 			    		if(worldConfigFile.exists())
 			    		{
+			    			DimensionConfig newConfig = dimConfig.clone();
 			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-			    			PortalColors.correctPortalColor(dimConfig, dimsConfig.getAllDimensions());
-		                	dimsConfig.Dimensions.add(dimConfig);
+			    			PortalColors.correctPortalColor(newConfig, dimsConfig.getAllDimensions());
+		                	dimsConfig.Dimensions.add(newConfig);
 			    		}
 		    		}
 				}

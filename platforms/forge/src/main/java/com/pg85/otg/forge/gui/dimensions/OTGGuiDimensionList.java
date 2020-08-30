@@ -137,9 +137,10 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        	this.dimensions.add(defaultConfig.Overworld.clone());
 		        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
 		        	{
+		        		DimensionConfig newConfig = dimConfig.clone();
 		    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-        				PortalColors.correctPortalColor(dimConfig, this.dimensions);
-		        		this.dimensions.add(dimConfig.clone());	        		
+        				PortalColors.correctPortalColor(newConfig, this.dimensions);
+		        		this.dimensions.add(newConfig);	        		
 		        	}
 		        }
 	        }
@@ -265,7 +266,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		    	        			newConfig.isNewConfig = this.mc.world != null;
 		    	        			
 	    			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
-	    	        				PortalColors.correctPortalColor(dimConfig, this.dimensions);
+	    	        				PortalColors.correctPortalColor(newConfig, this.dimensions);
 		    	        					    	        			
 		    	        			this.dimensions.add(newConfig);
 		    	        			bFoundDefaultSettigForDim = true;
