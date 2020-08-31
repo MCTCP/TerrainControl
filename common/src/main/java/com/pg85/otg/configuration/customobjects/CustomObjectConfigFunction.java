@@ -13,6 +13,9 @@ import java.util.List;
 
 public abstract class CustomObjectConfigFunction<T>
 {
+    public int x;
+    public int z;
+	
     protected T holder;
 	
     /**

@@ -18,9 +18,7 @@ import com.pg85.otg.util.bo3.NamedBinaryTag;
 public abstract class BlockFunction<T extends CustomObjectConfigFile> extends CustomObjectConfigFunction<T>
 {
     public LocalMaterialData material;
-    public int x;
     public short y;
-    public int z;
     public NamedBinaryTag metaDataTag;
     public String metaDataName;
 

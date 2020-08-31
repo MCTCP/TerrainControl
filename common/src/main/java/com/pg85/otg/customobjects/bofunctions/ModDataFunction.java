@@ -10,9 +10,7 @@ import java.util.List;
  */
 public abstract class ModDataFunction<T extends CustomObjectConfigFile> extends CustomObjectConfigFunction<T>
 {
-    public int x;
     public int y;
-    public int z;
     public String modId;
     public String modData;
 

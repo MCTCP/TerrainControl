@@ -13,17 +13,9 @@ import com.pg85.otg.util.ChunkCoordinate;
 public abstract class BO3Check extends CustomObjectConfigFunction<BO3Config>
 {
     /**
-     * X position relative to the object origin.
-     */
-    public int x;
-    /**
      * Y position relative to the object origin.
      */
     public int y;
-    /**
-     * Z position relative to the object origin.
-     */
-    public int z;
 
     /**
      * Returns whether this check would prevent spawning at the given position.

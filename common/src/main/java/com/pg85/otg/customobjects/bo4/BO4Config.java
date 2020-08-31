@@ -4,6 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.configuration.customobjects.CustomObjectErroredFunction;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -20,6 +21,7 @@ import com.pg85.otg.customobjects.bo4.bo4function.BO4ParticleFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4SpawnerFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4WeightedBranchFunction;
+import com.pg85.otg.customobjects.bofunctions.BranchFunction;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobjects.bo3.BO3Settings;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
@@ -646,87 +648,149 @@ public class BO4Config extends CustomObjectConfigFile
         List<BO4SpawnerFunction> tempSpawnerList = new ArrayList<BO4SpawnerFunction>();
 
         short[][] columnSizes = new short[xSize][zSize];
-        BO4BlockFunction block;
         
+        ArrayList<CustomObjectConfigFunction<BO4Config>> resources = new ArrayList<CustomObjectConfigFunction<BO4Config>>();
+        int minX = 0;
+        int maxX = 0;
+        int minZ = 0;
+        int maxZ = 0;
         for (CustomObjectConfigFunction<BO4Config> res : reader.getConfigFunctions(this, true))
         {
             if (res.isValid())
             {
-                if (res instanceof BO4BlockFunction)
+            	resources.add(res);
+            	if( // TODO: Add interface instead?
+            		!(res instanceof BranchFunction) &&
+            		!(res instanceof CustomObjectErroredFunction)
+    			)
+            	{
+	        		if(res.x < minX)
+	        		{
+	        			minX = res.x;
+	        		}
+	        		if(res.x > maxX)
+	        		{
+	        			maxX = res.x;
+	        		}
+	        		if(res.z < minZ)
+	        		{
+	        			minZ = res.z;
+	        		}
+	        		if(res.z > maxZ)
+	        		{
+	        			maxZ = res.z;
+	        		}
+            	}
+            }
+        }
+        
+        int xSize = Math.abs(minX - maxX);
+        int zSize = Math.abs(minZ - maxZ);
+		if(xSize > 15 || zSize > 15)
+		{
+			if(OTG.getPluginConfig().spawnLog)
+			{
+				OTG.log(LogMarker.INFO, "BO4 " + this.getName() + " was too large (" + xSize + "x" + zSize + "), BO4's can be max 16x16 blocks.");
+			}
+			throw new InvalidConfigException("BO4 " + this.getName() + " was too large, BO4's can be max 16x16 blocks.");
+		}
+		
+		int xOffset = 0;
+		int zOffset = 0;
+		
+		if(minX < -8)
+		{
+			xOffset = -minX - 8;
+		}
+		if(maxX > 7)
+		{
+			xOffset = -(maxX - 7);
+		}
+		if(minZ < -7)
+		{
+			zOffset = -minZ - 7;
+		}
+		if(maxZ > 8)
+		{
+			zOffset = -(maxZ - 8);
+		}		
+		
+        for (CustomObjectConfigFunction<BO4Config> res : resources)
+        {
+        	if( // TODO: Add interface instead?
+            		!(res instanceof BranchFunction) &&
+            		!(res instanceof CustomObjectErroredFunction)
+    			)
+        	{
+	        	res.x += xOffset;
+	        	res.z += zOffset;
+        	}
+        	
+            if (res instanceof BO4BlockFunction)
+            {                	
+            	this.isCollidable = true;
+            	
+        		if(res instanceof BO4RandomBlockFunction)
+        		{
+                	tempBlocksList.add((BO4RandomBlockFunction)res);
+                	columnSizes[res.x + (this.xSize / 2)][res.z + (this.zSize / 2) - 1]++;
+        		} else {
+        			if(!this.removeAir || !((BO4BlockFunction)res).material.isAir())
+        			{
+                    	tempBlocksList.add((BO4BlockFunction)res);
+                		columnSizes[res.x + (this.xSize / 2)][res.z + (this.zSize / 2) - 1]++;
+        			}
+        		}
+        		
+            	// Get the real size of this BO3
+            	if(res.x < this.minX)
+            	{
+            		this.minX = res.x;
+            	}
+            	if(res.x > this.maxX)
+            	{
+            		this.maxX = res.x;
+            	}
+            	if(((BO4BlockFunction)res).y < this.minY)
+            	{
+            		this.minY = ((BO4BlockFunction)res).y;
+            	}
+            	if(((BO4BlockFunction)res).y > this.maxY)
+            	{
+            		this.maxY = ((BO4BlockFunction)res).y;
+            	}
+            	if(res.z < this.minZ)
+            	{
+            		this.minZ = res.z;
+            	}
+            	if(res.z > this.maxZ)
+            	{
+            		this.maxZ = res.z;
+            	}                	
+            } else {
+                if (res instanceof BO4WeightedBranchFunction)
                 {
-                	this.isCollidable = true;
-                	
-            		if(res instanceof BO4RandomBlockFunction)
-            		{
-            			block = (BO4RandomBlockFunction)res;
-                    	tempBlocksList.add((BO4RandomBlockFunction)res);
-                    	columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
-            		} else {
-            			if(!this.removeAir || !((BO4BlockFunction)res).material.isAir())
-            			{
-	                    	tempBlocksList.add((BO4BlockFunction)res);
-	                    	block = (BO4BlockFunction)res;
-	                    	try
-	                    	{
-	                    		columnSizes[block.x + (xSize / 2)][block.z + (zSize / 2) - 1]++;
-	                    	}
-	                    	catch(ArrayIndexOutOfBoundsException ex)
-	                    	{
-	                    		String breakpoint = "";
-	                    	}
-            			}
-            		}
-            		
-                	// Get the real size of this BO3
-                	if(((BO4BlockFunction)res).x < this.minX)
-                	{
-                		this.minX = ((BO4BlockFunction)res).x;
-                	}
-                	if(((BO4BlockFunction)res).x > this.maxX)
-                	{
-                		this.maxX = ((BO4BlockFunction)res).x;
-                	}
-                	if(((BO4BlockFunction)res).y < this.minY)
-                	{
-                		this.minY = ((BO4BlockFunction)res).y;
-                	}
-                	if(((BO4BlockFunction)res).y > this.maxY)
-                	{
-                		this.maxY = ((BO4BlockFunction)res).y;
-                	}
-                	if(((BO4BlockFunction)res).z < this.minZ)
-                	{
-                		this.minZ = ((BO4BlockFunction)res).z;
-                	}
-                	if(((BO4BlockFunction)res).z > this.maxZ)
-                	{
-                		this.maxZ = ((BO4BlockFunction)res).z;
-                	}                	
-                } else {
-	                if (res instanceof BO4WeightedBranchFunction)
-	                {
-	                    tempBranchesList.add((BO4WeightedBranchFunction) res);
-	                }
-	                else if (res instanceof BO4BranchFunction)
-	                {
-	                	tempBranchesList.add((BO4BranchFunction) res);
-	                }
-	                else if (res instanceof BO4ModDataFunction)
-	                {
-	                    tempModDataList.add((BO4ModDataFunction) res);
-	                }
-	                else if (res instanceof BO4SpawnerFunction)
-	                {
-	                	tempSpawnerList.add((BO4SpawnerFunction) res);
-	                }
-	                else if (res instanceof BO4ParticleFunction)
-	                {
-	                	tempParticlesList.add((BO4ParticleFunction) res);
-	                }
-	                else if (res instanceof BO4EntityFunction)
-	                {
-	                	tempEntitiesList.add((BO4EntityFunction) res);
-	                }
+                    tempBranchesList.add((BO4WeightedBranchFunction) res);
+                }
+                else if (res instanceof BO4BranchFunction)
+                {
+                	tempBranchesList.add((BO4BranchFunction) res);
+                }
+                else if (res instanceof BO4ModDataFunction)
+                {
+                    tempModDataList.add((BO4ModDataFunction) res);
+                }
+                else if (res instanceof BO4SpawnerFunction)
+                {
+                	tempSpawnerList.add((BO4SpawnerFunction) res);
+                }
+                else if (res instanceof BO4ParticleFunction)
+                {
+                	tempParticlesList.add((BO4ParticleFunction) res);
+                }
+                else if (res instanceof BO4EntityFunction)
+                {
+                	tempEntitiesList.add((BO4EntityFunction) res);
                 }
             }
         }
@@ -756,14 +820,6 @@ public class BO4Config extends CustomObjectConfigFile
         	this.maxZ = -7;
         }
         
-        if(Math.abs(this.minX - this.maxX) >= 16 || Math.abs(this.minZ - this.maxZ) >= 16)
-        {
-        	if(OTG.getPluginConfig().spawnLog)
-        	{
-        		OTG.log(LogMarker.WARN, "BO4 was too large to spawn (> 16x16) " + this.getName() + " XSize " + (Math.abs(this.minX - this.maxX) + 1) + " ZSize " + (Math.abs(this.minZ - this.maxZ) + 1) + ". Use branches instead.");
-        	}
-        }
-        
         // TODO: OTG+ Doesn't do CustomObject BO3's, only check for 16x16, not 32x32?
         boolean illegalBlock = false;
         for(BO4BlockFunction block1 : tempBlocksList)
@@ -782,7 +838,7 @@ public class BO4Config extends CustomObjectConfigFile
     		}	    		
         }
         
-        this.blocks = new short[xSize][zSize][];
+        this.blocks = new short[this.xSize][this.zSize][];
     	this.blocksMaterial = new LocalMaterialData[tempBlocksList.size()];
     	this.blocksMetaDataName = new String[tempBlocksList.size()];
     	this.blocksMetaDataTag = new NamedBinaryTag[tempBlocksList.size()];
@@ -793,12 +849,12 @@ public class BO4Config extends CustomObjectConfigFile
         this.randomBlocksMetaDataTags = new NamedBinaryTag[tempBlocksList.size()][];
         this.randomBlocksBlockCount = new byte[tempBlocksList.size()]; 
         
-        short[][] columnBlockIndex = new short[xSize][zSize];
+        short[][] columnBlockIndex = new short[this.xSize][this.zSize];
         BO4BlockFunction[] blocksSorted = new BO4BlockFunction[tempBlocksList.size()];
         int blocksSortedIndex = 0;
-        for(int x = 0; x < xSize; x++)
+        for(int x = 0; x < this.xSize; x++)
         {
-        	for(int z = 0; z < zSize; z++)
+        	for(int z = 0; z < this.zSize; z++)
         	{
         		for(int h = 0; h < tempBlocksList.size(); h++)
         		{
@@ -810,14 +866,15 @@ public class BO4Config extends CustomObjectConfigFile
         		}
         	}
         }
+        BO4BlockFunction block;
         for(int blockIndex = 0; blockIndex < blocksSorted.length; blockIndex++)
         {
         	block = blocksSorted[blockIndex];
         	if(this.blocks[block.x][block.z] == null)
         	{
         		this.blocks[block.x][block.z] = new short[columnSizes[block.x][block.z]];
-        	}        	
-        	this.blocks[block.x][block.z][columnBlockIndex[block.x][block.z]] = (short) block.y;
+        	}
+       		this.blocks[block.x][block.z][columnBlockIndex[block.x][block.z]] = (short) block.y;
         	
         	this.blocksMaterial[blockIndex] = block.material;
         	this.blocksMetaDataName[blockIndex] = block.metaDataName;
@@ -931,21 +988,6 @@ public class BO4Config extends CustomObjectConfigFile
 		}
 
 		this.branchesOTGPlus = tempBranchesList.toArray(new BO4BranchFunction[tempBranchesList.size()]);
-
-    	if(this.branchesOTGPlus.length > 0) // If this BO4 has branches then it must be max 16x16
-    	{
-    		if(Math.abs(this.minX - this.maxX) > 15 || Math.abs(this.minZ - this.maxZ) > 15)
-    		{
-    			OTG.log(LogMarker.INFO, "BO3 " + this.getName() + " was too large, branching BO4's can be max 16x16 blocks.");
-    			throw new InvalidConfigException("BO3 " + this.getName() + " was too large, branching BO4's can be max 16x16 blocks.");
-    		}
-    	} else {
-    		if(Math.abs(this.minX - this.maxX) > 15 || Math.abs(this.minZ - this.maxZ) > 15) // If this BO3 is larger than 16x16 then it can only be used as a customObject
-    		{
-    			OTG.log(LogMarker.INFO, "BO4 " + this.getName() + " was too large, BO4's used as CustomStructure() can be max 16x16 blocks.");
-    			throw new InvalidConfigException("BO4 " + this.getName() + " was too large, BO4's used as CustomStructure() can be max 16x16 blocks.");
-    		}
-    	}
     }
     
 	public void setBranches(List<BO4BranchFunction> branches)
