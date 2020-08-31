@@ -170,7 +170,7 @@ public class OTGChunkGenerator extends ChunkGenerator
         {
 	        // Hopefully this is equal to ChunkProviderServer.getLoadedChunk
         	// So it won't try to populate the chunk.
-        	chunk = this.world.getWorld().getChunkProvider().getLoadedChunkAt(x, z);
+        	chunk = this.world.getWorld().getChunkProvider().getLoadedChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 	        if(chunk == null)
 	        {
 	        	// Request the chunk with a risk of it being populated..
