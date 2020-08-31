@@ -9,7 +9,8 @@ public enum OTGPerm
     CMD_LIST("cmd.list"),
     CMD_MAP("cmd.map"),
     CMD_RELOAD("cmd.reload"),
-    CMD_SPAWN("cmd.spawn"), 
+    CMD_SPAWN("cmd.spawn"),
+    CMD_STRUCTURE("cmd.structure"),
     CMD_LOOKUP("cmd.lookup"), 
     CMD_EXPORT("cmd.export");
 
