@@ -145,7 +145,7 @@ public class BO4 implements StructuredCustomObject
     // BO4's should always spawn within population bounds, so there is no SpawnForced, only TrySpawnAt
     public boolean trySpawnAt(LocalWorld world, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, ChunkCoordinate chunkBeingPopulated)
     {
-    	//OTG.log(LogMarker.INFO, "Spawning " + this.getName());
+   		//OTG.log(LogMarker.INFO, "Spawning " + this.getName() + " in Chunk X" + chunkCoord.getChunkX() + "Z" + chunkCoord.getChunkZ() + " at pos " + x + " " + y + " " + z);
 
     	LocalMaterialData replaceBelowMaterial = null;
     	LocalMaterialData replaceAboveMaterial = null;

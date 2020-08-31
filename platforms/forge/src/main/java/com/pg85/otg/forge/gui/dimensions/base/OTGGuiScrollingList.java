@@ -260,7 +260,7 @@ public abstract class OTGGuiScrollingList
                 this.drawSlot(slotIdx, entryRight, slotTop, slotBuffer, tess);
             }
         }
-
+        
         GlStateManager.disableDepth();
 
         int extraHeight = (this.getContentHeight() + border) - viewHeight;

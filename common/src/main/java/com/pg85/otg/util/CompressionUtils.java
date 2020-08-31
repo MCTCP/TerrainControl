@@ -45,12 +45,9 @@ public class CompressionUtils
 			outputStream.write(buffer, 0, count);  
 		}  
 		outputStream.close();  
-		byte[] output = outputStream.toByteArray();  
-		if(OTG.getPluginConfig().spawnLog)
-		{
-			OTG.log(LogMarker.INFO, "Original: " + data.length);  
-			OTG.log(LogMarker.INFO, "Decompressed: " + output.length);
-		}
+		byte[] output = outputStream.toByteArray();
+		//OTG.log(LogMarker.INFO, "Original: " + data.length);  
+		//OTG.log(LogMarker.INFO, "Decompressed: " + output.length);
 		return output;  
 	}
 }

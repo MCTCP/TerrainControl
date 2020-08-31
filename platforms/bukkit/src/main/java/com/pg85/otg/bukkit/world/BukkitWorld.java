@@ -72,6 +72,7 @@ import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
@@ -1812,7 +1813,7 @@ public class BukkitWorld implements LocalWorld
     	{
     		return;
     	}
-    	
+
     	// If no chunk was passed, we're doing something outside of the population cycle.
     	// If a chunk was passed, only spawn in the area being populated, or existing chunks.
     	if(
