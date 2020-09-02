@@ -432,6 +432,7 @@ public class ForgeMaterialData extends LocalMaterialData
 			ForgeMaterialData newMaterialData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)); 
 			if(newMaterialData != null && newMaterialData.blockData != null)
 			{
+				// TODO: Should blockData be a clone?
 				this.blockData = newMaterialData.blockData;
 				this.metaIdSet = newMaterialData.metaIdSet;
 				this.materialIdSet = newMaterialData.materialIdSet;

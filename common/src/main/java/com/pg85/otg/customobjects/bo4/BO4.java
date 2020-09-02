@@ -875,6 +875,7 @@ public class BO4 implements StructuredCustomObject
 		    	return;
 		    }
 	    }
+	    material.parseForWorld(world);
 	    world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
     }
 }

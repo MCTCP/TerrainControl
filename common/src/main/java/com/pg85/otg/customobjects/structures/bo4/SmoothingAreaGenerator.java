@@ -1785,6 +1785,7 @@ public class SmoothingAreaGenerator
 	    		material = targetBlock;
 	    	}
 	    }
+	    material.parseForWorld(world);
 	    world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
     }
 
