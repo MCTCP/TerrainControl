@@ -210,7 +210,7 @@ public class OTGBlockPortalSize
 			{
 				for(LocalMaterialData portalMaterial : portalMaterials)
 				{
-					if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+					if(material.equals(portalMaterial))
 					{
 						isPortalMaterial = true;
 					}
@@ -229,7 +229,7 @@ public class OTGBlockPortalSize
 		boolean isPortalMaterial = false;
 		for(LocalMaterialData portalMaterial : portalMaterials)
 		{
-			if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+			if(material.equals(portalMaterial))
 			{
 				isPortalMaterial = true;
 			}
@@ -278,7 +278,7 @@ public class OTGBlockPortalSize
     				boolean isPortalMaterial = false;
     				for(LocalMaterialData portalMaterial : portalMaterials)
     				{
-    					if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+    					if(material.equals(portalMaterial))
     					{
     						isPortalMaterial = true;
     					}
@@ -298,7 +298,7 @@ public class OTGBlockPortalSize
     				boolean isPortalMaterial = false;
     				for(LocalMaterialData portalMaterial : portalMaterials)
     				{
-    					if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+    					if(material.equals(portalMaterial))
     					{
     						isPortalMaterial = true;
     					}
@@ -320,7 +320,7 @@ public class OTGBlockPortalSize
 			boolean isPortalMaterial = false;
 			for(LocalMaterialData portalMaterial : portalMaterials)
 			{
-				if(material.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && material.getBlockData() == portalMaterial.getBlockData())
+				if(material.equals(portalMaterial))
 				{
 					isPortalMaterial = true;
 				}

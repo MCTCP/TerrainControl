@@ -18,10 +18,6 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
  */
 public class SimpleSurfaceGenerator implements SurfaceGenerator
 {
-    private final LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
-    private final LocalMaterialData sandstone = MaterialHelper.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
-    private final LocalMaterialData red_sandstone = MaterialHelper.toLocalMaterialData(DefaultMaterial.RED_SANDSTONE, 0);
-
     @Override
     public LocalMaterialData getCustomBlockData(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
     {
@@ -85,7 +81,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         // Set when variable was reset
                         if (surfaceBlocksNoise <= 0 && !worldConfig.removeSurfaceStone)
                         {
-                            currentSurfaceBlock = air;
+                            currentSurfaceBlock = MaterialHelper.AIR;
                             currentGroundBlock = stoneBlock;
                         }
                         else if ((y >= currentWaterLevel - 4) && (y <= currentWaterLevel + 1))
@@ -125,7 +121,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         if ((surfaceBlocksCount == 0) && (currentGroundBlock.isMaterial(DefaultMaterial.SAND)) && surfaceBlocksNoise > 1)
                         {
                             surfaceBlocksCount = generatingChunk.random.nextInt(4) + Math.max(0, y - generatingChunk.getWaterLevel(x, z));
-                            currentGroundBlock = currentGroundBlock.getBlockData() == 1 ? red_sandstone : sandstone;
+                            currentGroundBlock = currentGroundBlock.getBlockData() == 1 ? MaterialHelper.RED_SANDSTONE : MaterialHelper.SANDSTONE;
                         }
                     }
                 }

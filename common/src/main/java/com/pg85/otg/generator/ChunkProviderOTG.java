@@ -17,7 +17,6 @@ import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
@@ -29,8 +28,6 @@ public class ChunkProviderOTG
     // Several constants describing the chunk size of Minecraft
     private static final int NOISE_MAX_X = CHUNK_X_SIZE / 4 + 1;
     private static final int NOISE_MAX_Z = CHUNK_Z_SIZE / 4 + 1;
-
-    private final LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
 
     private final Random random;
     private final NoiseGeneratorPerlinOctaves vol1NoiseGen;
@@ -244,7 +241,7 @@ public class ChunkProviderOTG
                             {
                                 final BiomeConfig biomeConfig = toBiomeConfig(biomeArray[(z1 * 4 + piece_z) * 16 + (piece_x + x1 * 4)]);
                                 final int waterLevelMax = waterLevel[(z1 * 4 + piece_z) * 16 + (piece_x + x1 * 4)] & 0xFF;
-                                LocalMaterialData block = air;
+                                LocalMaterialData block = MaterialHelper.AIR;
                                 if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > biomeConfig.waterLevelMin)
                                 {
                                     block = biomeConfig.waterBlock;

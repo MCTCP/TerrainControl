@@ -112,7 +112,7 @@ public class SmallLakeGen extends Resource
         {
         	LocalMaterialData localMaterialData;
         	LocalMaterialData localMaterialData2;
-            LocalMaterialData air = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
+            LocalMaterialData air = MaterialHelper.AIR;
             boolean[] BooleanBuffer = new boolean[2048];
             int i = rand.nextInt(4) + 4;
             double d1;

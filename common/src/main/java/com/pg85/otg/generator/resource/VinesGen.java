@@ -28,7 +28,7 @@ public class VinesGen extends Resource
     public VinesGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        material = MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 0);
+        material = MaterialHelper.VINE;
 
         assureSize(4, args);
         frequency = readInt(args.get(0), 1, 100);

@@ -81,7 +81,7 @@ public class EntityTravelToDimensionListener
 				boolean bIsPortalMaterial = false;
 				for(LocalMaterialData portalMaterial : portalMaterials)
 				{
-					if(playerPortalMaterial.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && playerPortalMaterial.getBlockData() == portalMaterial.getBlockData())
+					if(playerPortalMaterial.equals(portalMaterial))
 					{
 						bIsPortalMaterial = true;
 						bOTGPortalFound = true;
@@ -111,7 +111,7 @@ public class EntityTravelToDimensionListener
 					boolean bIsPortalMaterial = false;
 					for(LocalMaterialData portalMaterial : portalMaterials)
 					{
-						if(playerPortalMaterial.toDefaultMaterial().equals(portalMaterial.toDefaultMaterial()) && playerPortalMaterial.getBlockData() == portalMaterial.getBlockData())
+						if(playerPortalMaterial.equals(portalMaterial))
 						{
 							bIsPortalMaterial = true;
 							bOTGPortalFound = true;

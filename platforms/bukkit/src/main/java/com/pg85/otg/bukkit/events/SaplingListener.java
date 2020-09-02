@@ -165,9 +165,9 @@ class SaplingListener
     {
         if (sapling1 == null || sapling2 == null)
             return false;
-        return sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8
-                && sapling1.toDefaultMaterial() == sapling2.toDefaultMaterial();
-
+        return 
+    		sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8 &&
+        	sapling1.getBlockId() == sapling2.getBlockId();
     }
 
     /**

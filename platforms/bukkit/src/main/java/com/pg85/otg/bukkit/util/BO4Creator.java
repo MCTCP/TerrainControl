@@ -1,6 +1,7 @@
 package com.pg85.otg.bukkit.util;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
@@ -16,7 +17,6 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -62,10 +62,6 @@ public class BO4Creator extends BOCreator
             }
         }
 
-        if(centerBlock != null && !centerBlock.isParsed()) {
-            centerBlock = null;
-        }
-
         int width = selection.getWidth();
         int length = selection.getLength();
         int height = selection.getHeight();
@@ -95,9 +91,8 @@ public class BO4Creator extends BOCreator
                 for (int z = 0; z < length; ++z)
                 {
                     block = world.getBlockAt(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ());
-
-                    data = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
-
+                    data = BukkitMaterialData.ofBukkitBlock(block);
+                    
                     if (centerBlock != null && centerBlock.equals(data))
                     {
                         centerPointX = x + start.getBlockX();
@@ -176,8 +171,7 @@ public class BO4Creator extends BOCreator
                     }
 
                     block = world.getBlockAt(x, y, z);
-
-                    material = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
+                    material = BukkitMaterialData.ofBukkitBlock(block);
 
                     if (includeAir || !material.isAir())
                     {
@@ -328,7 +322,6 @@ public class BO4Creator extends BOCreator
                         }
                     }
                 }
-
             }
         }
         return true;

@@ -360,7 +360,7 @@ public class OTGTeleporter
                 ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(DimensionManager.getWorld(lastDimension));
 
                 ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();
-                portalMaterials.add(MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 0));
+                portalMaterials.add(MaterialHelper.DIRT);
                 BlockPortalOTG portalBlock = null;
                 if(lastDimension == 0 && (ForgeWorld)((ForgeEngine)OTG.getEngine()).getOverWorld() == null) // This is a vanilla overworld
                 {

@@ -111,17 +111,22 @@ public class BO3 implements StructuredCustomObject
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
         LocalMaterialData localMaterial;
-        DefaultMaterial material;
         for (BO3BlockFunction block : blocks)
         {
             localMaterial = world.getMaterial(x + block.x, y + block.y, z + block.z, null);
-            material = localMaterial.toDefaultMaterial();
 
             // Ignore blocks in the ground when checking spawn conditions
             if (block.y >= 0)
             {
                 // Do not spawn if non-tree blocks are in the way
-                if (!localMaterial.isAir() && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2 && material != DefaultMaterial.SAPLING)
+                if (
+            		!localMaterial.isAir() && 
+            		!localMaterial.isMaterial(DefaultMaterial.LOG) && 
+            		!localMaterial.isMaterial(DefaultMaterial.LOG_2) && 
+            		!localMaterial.isMaterial(DefaultMaterial.LEAVES) && 
+            		!localMaterial.isMaterial(DefaultMaterial.LEAVES_2) && 
+            		!localMaterial.isMaterial(DefaultMaterial.SAPLING)
+        		)
                 {
                     return false;
                 }

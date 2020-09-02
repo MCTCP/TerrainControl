@@ -27,6 +27,7 @@ import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.BlockGravel;
@@ -334,7 +335,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         {
         	material = (ForgeMaterialData) blockColumn[y];
         	isLiquid = material.isLiquid();
-        	isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
+        	isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(DefaultMaterial.SNOW));
         	if(!(isLiquid && ignoreLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))
@@ -370,7 +371,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         }
 
         IBlockState newState = ((ForgeMaterialData) material).internalBlock();
-
+        
         BlockPos pos = new BlockPos(x, y, z);
 
         // Get chunk from (faster) custom cache
@@ -385,7 +386,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         
         // Disable nearby block physics (except for tile entities) and set block
         boolean oldCaptureBlockStates = this.world.getWorld().captureBlockSnapshots;
-        this.world.getWorld().captureBlockSnapshots = !(newState.getBlock().hasTileEntity(newState));
+    	this.world.getWorld().captureBlockSnapshots = !(newState.getBlock().hasTileEntity(newState));    	
         //this.world.getWorld().captureBlockSnapshots = true;
         IBlockState iblockstate = chunk.setBlockState(pos, newState);
         this.world.getWorld().captureBlockSnapshots = oldCaptureBlockStates;

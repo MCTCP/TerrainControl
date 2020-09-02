@@ -11,6 +11,27 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 public class MaterialHelper
 {
     private static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
+    
+    public static final LocalMaterialData AIR = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
+    public static final LocalMaterialData SANDSTONE = MaterialHelper.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
+    public static final LocalMaterialData RED_SANDSTONE = MaterialHelper.toLocalMaterialData(DefaultMaterial.RED_SANDSTONE, 0);    
+    public static final LocalMaterialData LAVA = MaterialHelper.toLocalMaterialData(DefaultMaterial.STATIONARY_LAVA, 0);
+    public static final LocalMaterialData WATER = MaterialHelper.toLocalMaterialData(DefaultMaterial.STATIONARY_WATER, 0);
+    public static final LocalMaterialData HARDENED_CLAY = MaterialHelper.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0);
+    public static final LocalMaterialData RED_SAND = MaterialHelper.toLocalMaterialData(DefaultMaterial.SAND, 1);
+    public static final LocalMaterialData COARSE_DIRT = MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 1);
+    public static final LocalMaterialData WHITE_STAINED_CLAY = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
+    public static final LocalMaterialData ORANGE_STAINED_CLAY = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 1);
+    public static final LocalMaterialData YELLOW_STAINED_CLAY = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 4);
+    public static final LocalMaterialData BROWN_STAINED_CLAY = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 12);
+    public static final LocalMaterialData RED_STAINED_CLAY = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 14);
+    public static final LocalMaterialData SILVER_STAINED_CLAY = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 8);
+    public static final LocalMaterialData GLOWSTONE = MaterialHelper.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0);
+    public static final LocalMaterialData GRASS = MaterialHelper.toLocalMaterialData(DefaultMaterial.GRASS, 0);
+    public static final LocalMaterialData DIRT = MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 0);
+    public static final LocalMaterialData SNOW_BLOCK = MaterialHelper.toLocalMaterialData(DefaultMaterial.SNOW_BLOCK, 0);
+    public static final LocalMaterialData VINE = MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 0);
+    
     /**
      * @throws InvalidConfigException 
      * @see OTGEngine#readMaterial(String)
@@ -21,6 +42,7 @@ public class MaterialHelper
     	{
     		return null;
     	}
+    	
     	// TODO: Make sure it won't cause problems to return the same material object multiple times, is it not changed anywhere?
     	LocalMaterialData material = CachedMaterials.get(name);
     	if(material != null)
@@ -60,7 +82,8 @@ public class MaterialHelper
     	}
     	catch(InvalidConfigException ex)
     	{
-    		//TODO this shouldn't happen anymore
+    		// Happens when a non existing block name is used.
+    		String breakpoint = "";
     	}
 
     	CachedMaterials.put(originalName, material);

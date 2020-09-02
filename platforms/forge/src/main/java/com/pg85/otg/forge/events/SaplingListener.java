@@ -51,7 +51,8 @@ public class SaplingListener
 
         // Check whether block is a sapling. If not, assume custom sapling block.
         SaplingType saplingType = null;
-        if (material.toDefaultMaterial() != DefaultMaterial.SAPLING) {
+        if (!material.isMaterial(DefaultMaterial.SAPLING))
+        {
             saplingType = SaplingType.Custom;
         }
         boolean wideTrunk;
@@ -308,9 +309,9 @@ public class SaplingListener
     {
         if (sapling1 == null || sapling2 == null)
             return false;
-        return sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8
-                && sapling1.toDefaultMaterial() == sapling2.toDefaultMaterial();
-
+        return 
+    		sapling1.getBlockData() % 8 == sapling2.getBlockData() % 8 &&
+        	sapling1.getBlockId() == sapling2.getBlockId();
     }
     /**
      * Gets whether the saplings are placed in a 2x2 pattern. If successful,

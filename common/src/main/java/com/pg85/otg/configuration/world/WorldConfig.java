@@ -62,7 +62,7 @@ public class WorldConfig extends ConfigFile
 	
 	// Replace blocks
 	private List<ReplaceBlocks> replaceBlocksList = null;
-    private HashMap<DefaultMaterial,LocalMaterialData> replaceBlocksDict = null;
+    private HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
     private FallbackConfig fallbacks;
     private Map<String, LocalMaterialData> fallbackCache = new HashMap<String, LocalMaterialData>();
 
@@ -427,11 +427,15 @@ public class WorldConfig extends ConfigFile
                     try
                     {
                         material = MaterialHelper.readMaterial(replacement);
-                    } catch (InvalidConfigException e)
-                    {
-                        e.printStackTrace();
                     }
-                    if (material != null && material.isParsed())
+                    catch (InvalidConfigException e)
+                    {
+                    	if(OTG.getPluginConfig().spawnLog)
+                    	{
+                    		OTG.log(LogMarker.WARN, "Fallback material could not be parsed: " + replacement);
+                    	}
+                    }
+                    if (material != null)
 					{
                         fallbackCache.put(raw, material);
                         return material;
@@ -452,7 +456,7 @@ public class WorldConfig extends ConfigFile
         return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
     }
     
-    public HashMap<DefaultMaterial,LocalMaterialData> getReplaceBlocksDict()
+    public HashMap<LocalMaterialData,LocalMaterialData> getReplaceBlocksDict()
     {
     	if(replaceBlocksDict != null)
     	{
@@ -460,13 +464,13 @@ public class WorldConfig extends ConfigFile
     	}
     	if(replaceBlocksDict == null && replaceBlocksList != null)
     	{
-    		replaceBlocksDict = new HashMap<DefaultMaterial,LocalMaterialData>();
+    		replaceBlocksDict = new HashMap<LocalMaterialData,LocalMaterialData>();
     		for(ReplaceBlocks blockNames : replaceBlocksList)
     		{
     			try {
     				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
     				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-					replaceBlocksDict.put(MaterialHelper.readMaterial(blockNames.getSourceBlock()).toDefaultMaterial(), MaterialHelper.readMaterial(blockNames.getTargetBlock()));
+					replaceBlocksDict.put(MaterialHelper.readMaterial(blockNames.getSourceBlock()), MaterialHelper.readMaterial(blockNames.getTargetBlock()));
 				} catch (InvalidConfigException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

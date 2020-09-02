@@ -18,6 +18,7 @@ import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -75,10 +76,16 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
         for (ObjectCoordinate point : data)
         {
-            DefaultMaterial material = world.getMaterial(x + point.x, y + point.y, z + point.z, null).toDefaultMaterial();
+            LocalMaterialData material = world.getMaterial(x + point.x, y + point.y, z + point.z, null);
 
             // Do not spawn if non-tree blocks are in the way
-            if (!material.isAir() && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2)
+            if (
+        		!material.isAir() && 
+        		!material.isMaterial(DefaultMaterial.LOG) && 
+        		!material.isMaterial(DefaultMaterial.LOG_2) && 
+        		!material.isMaterial(DefaultMaterial.LEAVES) && 
+				!material.isMaterial(DefaultMaterial.LEAVES_2)
+    		)
             {
                 return false;
             }
@@ -147,7 +154,6 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
 
         LocalMaterialData checkBlock = !spawnWater || !spawnLava ? world.getMaterial(x, y + 2, z, chunkBeingPopulated) : null;
-        DefaultMaterial checkBlockDefaultMaterial = checkBlock != null ? checkBlock.toDefaultMaterial() : null;
         if(checkBlock == null)
         {
         	// Tried to spawn in unloaded chunks when populationBoundsCheck:false.
@@ -155,14 +161,20 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
         if (!spawnWater)
         {
-            if (checkBlockDefaultMaterial.equals(DefaultMaterial.WATER) || checkBlockDefaultMaterial.equals(DefaultMaterial.STATIONARY_WATER))
+            if (
+        		checkBlock.isMaterial(DefaultMaterial.WATER) || 
+        		checkBlock.isMaterial(DefaultMaterial.STATIONARY_WATER)
+			)
             {
                 return false;
             }
         }
         if (!spawnLava)
         {
-            if (checkBlockDefaultMaterial.equals(DefaultMaterial.LAVA) || checkBlockDefaultMaterial.equals(DefaultMaterial.STATIONARY_LAVA))
+            if (
+        		checkBlock.isMaterial(DefaultMaterial.LAVA) || 
+        		checkBlock.isMaterial(DefaultMaterial.STATIONARY_LAVA)
+    		)
             {
                 return false;
             }
@@ -194,7 +206,10 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         ObjectCoordinate[] objData = this.data[rotation.getRotationId()];
         for (ObjectCoordinate point : objData)
         {
-            if (y + point.y < PluginStandardValues.WORLD_DEPTH || y + point.y >= PluginStandardValues.WORLD_HEIGHT)
+            if (
+        		y + point.y < PluginStandardValues.WORLD_DEPTH || 
+        		y + point.y >= PluginStandardValues.WORLD_HEIGHT
+    		)
             {
                 return false;
             }
@@ -221,7 +236,10 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 	        LocalMaterialData material;
 	        for (ObjectCoordinate point : objData)
 	        {
-	            if ((material = world.getMaterial((x + point.x), (y + point.y), (z + point.z), chunkBeingPopulated)) == null || collisionBlockType.contains(material))
+	            if (
+            		(material = world.getMaterial((x + point.x), (y + point.y), (z + point.z), chunkBeingPopulated)) == null || 
+    				collisionBlockType.contains(material)
+				)
 	            {
 	                faultCounter++;
 	                // Don't spawn if blocks would be cut off.
@@ -420,18 +438,16 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
     private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated)
     {
-        HashMap<DefaultMaterial, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
+        HashMap<LocalMaterialData, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
         if (blocksToReplace != null && blocksToReplace.size() > 0)
         {
-            LocalMaterialData targetBlock = blocksToReplace.get(material.toDefaultMaterial());
+            LocalMaterialData targetBlock = blocksToReplace.get(material);
             if (targetBlock != null)
             {
                 material = targetBlock;
             }
         }
-        
         material.parseForWorld(world);
-
         world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
     }
 

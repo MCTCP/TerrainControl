@@ -4,8 +4,6 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.helpers.BlockHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.Block;
@@ -13,12 +11,11 @@ import net.minecraft.server.v1_12_R1.BlockFalling;
 import net.minecraft.server.v1_12_R1.Blocks;
 import net.minecraft.server.v1_12_R1.IBlockData;
 
-//TODO: Clean up and optimise ForgeMaterialData/BukkitMaterialData/LocalMaterialData/MaterialHelper/OTGEngine.readMaterial
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
  * 
  */
-public class BukkitMaterialData implements LocalMaterialData
+public class BukkitMaterialData extends LocalMaterialData
 {
     /**
      * Block id and data, calculated as {@code blockId << 4 | blockData}, or
@@ -28,12 +25,7 @@ public class BukkitMaterialData implements LocalMaterialData
      * least in Minecraft 1.8). However, Minecraft's ChunkSection uses the same
      * format as this field.
      */	
-	DefaultMaterial defaultMaterial;
 	private int combinedBlockId;
-	private String rawEntry;
-	private boolean isBlank = false;
-	private boolean checkFallbacks;
-	private String name;
 	
     private BukkitMaterialData(int blockId, int blockData)
     {
@@ -44,14 +36,12 @@ public class BukkitMaterialData implements LocalMaterialData
     {
 		this.combinedBlockId = -1;
 		this.rawEntry = input;
-		this.checkFallbacks = true;
 	}
-	      
+
     public static BukkitMaterialData getBlank()
     {
     	BukkitMaterialData material = new BukkitMaterialData(null);
     	material.isBlank = true;
-    	material.checkFallbacks = false;
     	return material;
     }
 
@@ -134,7 +124,7 @@ public class BukkitMaterialData implements LocalMaterialData
         if (block == null)
         {
             DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
-            if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+            if (defaultMaterial != null)
             {
                 block = Block.getById(defaultMaterial.id);
                 
@@ -209,18 +199,24 @@ public class BukkitMaterialData implements LocalMaterialData
     {
         return new BukkitMaterialData(id, data);
     }
-
+    
     /**
      * Gets a {@code BukkitMaterialData} of the given material and data.
      * @param material The material.
      * @param data     The block data.
      * @return The {@code BukkitMateialData} instance.
-     */
+     */    
     public static BukkitMaterialData ofDefaultMaterial(DefaultMaterial material, int data)
     {
         return ofIds(material.id, data);
     }
 
+    @Override
+    protected BukkitMaterialData ofDefaultMaterialPrivate(DefaultMaterial material, int data)
+    {
+    	return ofDefaultMaterial(material, data);
+    }
+    
     /**
      * Gets a {@code BukkitMaterialData} of the given Minecraft block. The
      * default block data (usually 0) will be used.
@@ -232,6 +228,11 @@ public class BukkitMaterialData implements LocalMaterialData
         return ofIds(Block.getId(block), block.toLegacyData(block.getBlockData()));
     }
 
+    public static BukkitMaterialData ofBukkitBlock(org.bukkit.block.Block block)
+    {
+        return ofIds(block.getType().getId(), block.getData());
+    }
+    
     /**
      * Gets a {@code BukkitMaterialData} of the given Minecraft blockData.
      * @param blockData The material an data.
@@ -279,40 +280,42 @@ public class BukkitMaterialData implements LocalMaterialData
     @Override
     public String getName()
     {
-    	if(this.name == null)
+    	if(isBlank)
     	{
-	    	if(isBlank)
-	    	{
-	    		this.name = "BLANK";
-	    	}
-	    	else if(this.combinedBlockId == -1)
-	    	{
-	    		this.name = "Unknown";
-	    	} else { 	
-		        Block block = Block.getById(getBlockId());
-		        DefaultMaterial defaultMaterial = toDefaultMaterial();
-		
-		        byte data = getBlockData();
-		        boolean nonDefaultData = block.toLegacyData(block.getBlockData()) != data;
-		        boolean noData = block.getBlockData().s().isEmpty(); //s == getPropertyKeys
-		        // Note that the above line is not equivalent to data != 0, as for
-		        // example pumpkins have a default data value of 2
-		
-		        if (defaultMaterial == DefaultMaterial.UNKNOWN_BLOCK)
-		        {
-		            // Use Minecraft's name
-		            if (nonDefaultData)
-		            {
-		            	this.name = Block.REGISTRY.b(block) + (noData ? "" : ":" + data);
-		            }
-		            this.name = Block.REGISTRY.b(block).toString();
-		        } else {
-		        	this.name = defaultMaterial.name() + (noData ? "" : ":" + data);
-		        }
-	    	}
+    		return "BLANK";
     	}
-    	return this.name;
-    }
+    	else if(this.combinedBlockId == -1)
+    	{
+    		if(this.rawEntry != null)
+    		{
+    			return this.rawEntry;
+    		} else {
+    			return "Unknown";
+    		}
+    	} else { 	
+	        Block block = Block.getById(getBlockId());	
+	        byte data = getBlockData();
+	        boolean noData = block.getBlockData().s().isEmpty(); //s == getPropertyKeys
+	        // Note that the above line is not equivalent to data != 0, as for
+	        // example pumpkins have a default data value of 2
+	
+	        DefaultMaterial defaultMaterial = toDefaultMaterial();
+	        if (defaultMaterial == null)
+	        {
+		        boolean nonDefaultData = block.toLegacyData(block.getBlockData()) != data;
+		        
+	            // Use Minecraft's name
+	            if (nonDefaultData)
+	            {
+	            	return Block.REGISTRY.b(block) + (noData ? "" : ":" + data);
+	            } else {
+	            	return Block.REGISTRY.b(block).toString();
+	            }
+	        } else {
+	        	return defaultMaterial.name() + (noData ? "" : ":" + data);
+	        }
+    	}
+    }   
     
     @SuppressWarnings("deprecation")
 	public IBlockData internalBlock()
@@ -333,7 +336,7 @@ public class BukkitMaterialData implements LocalMaterialData
     	// really slow, so use defaultMaterial instead.
     	
         DefaultMaterial defaultMaterial = toDefaultMaterial();
-        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        if (defaultMaterial != null)
         {
             return defaultMaterial.isLiquid();
         }
@@ -346,7 +349,7 @@ public class BukkitMaterialData implements LocalMaterialData
     {
         // Let us override whether materials are solid
         DefaultMaterial defaultMaterial = toDefaultMaterial();
-        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        if (defaultMaterial != null)
         {
             return defaultMaterial.isSolid();
         }
@@ -382,146 +385,51 @@ public class BukkitMaterialData implements LocalMaterialData
     public boolean canSnowFallOn()
     {
         DefaultMaterial defaultMaterial = toDefaultMaterial();
-        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
+        if (defaultMaterial != null)
         {
             return defaultMaterial.canSnowFallOn();
         }
 
         return this.internalBlock().getMaterial().isSolid();
-    }
-
-    @Override
-    public boolean isSmoothAreaAnchor(boolean allowWood, boolean ignoreWater)
-    {
-    	DefaultMaterial defaultMaterial = this.toDefaultMaterial();
-    	return
-    		(
-				defaultMaterial.equals(DefaultMaterial.ICE) ||
-				defaultMaterial.equals(DefaultMaterial.PACKED_ICE) ||
-				defaultMaterial.equals(DefaultMaterial.FROSTED_ICE) ||
-				(
-					isSolid() || 
-					(
-						!ignoreWater && isLiquid()
-					)
-				)
-			) &&
-			(
-				allowWood || 
-				!(
-					defaultMaterial.equals(DefaultMaterial.LOG) || 
-					defaultMaterial.equals(DefaultMaterial.LOG_2)
-				)
-			) &&
-			!defaultMaterial.equals(DefaultMaterial.WATER_LILY);
-    }
-	    
-    @Override
-    public LocalMaterialData rotate()
-    {
-        // Try to rotate
-        DefaultMaterial defaultMaterial = toDefaultMaterial();
-        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
-        {
-            // We only know how to rotate vanilla blocks
-            byte blockDataByte = getBlockData();
-            int newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);
-            if (newData != blockDataByte)
-            {
-            	// Don't return a copy, return a cached object. OTG should only use forgematerialdata for BO2's/BO3's/BO4's and materialset,
-            	// and shouldn't need to edit them, so they can be re-used. TODO: Make sure this won't cause problems.
-            	try
-            	{
-					return MaterialHelper.readMaterial(defaultMaterial.name() + ":" + newData);
-				}
-            	catch (InvalidConfigException e)
-            	{
-					e.printStackTrace();
-					return null;
-				}
-                //return ofDefaultMaterial(defaultMaterial, newData);
-            }
-        }
-
-        // No changes, return object itself
-        return this;
-    }
-    
-    @Override
-    public LocalMaterialData rotate(int rotateTimes)
-    {
-        // Try to rotate
-        DefaultMaterial defaultMaterial = toDefaultMaterial();
-        if (defaultMaterial != DefaultMaterial.UNKNOWN_BLOCK)
-        {
-            // We only know how to rotate vanilla blocks
-        	byte blockDataByte = 0;
-            int newData = 0;
-            for(int i = 0; i < rotateTimes; i++)
-            {
-            	blockDataByte = getBlockData();
-            	newData = BlockHelper.rotateData(defaultMaterial, blockDataByte);	
-            }
-            if (newData != blockDataByte)
-            {
-            	return ofDefaultMaterial(defaultMaterial, newData);
-            }
-        }
-
-        // No changes, return object itself
-        return this;
-    }
-    
+    }	    
+        
 	@Override
 	public LocalMaterialData parseForWorld(LocalWorld world)
 	{
-		if (this.checkFallbacks)
+		if (!this.checkedFallbacks)
 		{
-			this.checkFallbacks = false;
+			this.checkedFallbacks = true;
 			int newId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;
 			if(newId != this.combinedBlockId)
 			{
 				this.combinedBlockId = newId;
 				this.defaultMaterial = null;
-				this.name = null;
 			}
 		}
 		return this;
 	}
-	   
+
     @Override
     public DefaultMaterial toDefaultMaterial()
     {
-    	if(this.defaultMaterial == null)
+    	if(this.defaultMaterial == null && !parsedDefaultMaterial)
     	{
+    		parsedDefaultMaterial = true;
         	if(this.combinedBlockId == -1)
         	{
-        		this.defaultMaterial = DefaultMaterial.UNKNOWN_BLOCK;
+        		this.defaultMaterial = null;
         	} else {
         		this.defaultMaterial = DefaultMaterial.getMaterial(getBlockId());
         	}
     	}
     	return defaultMaterial;
     }
-
-	@Override
-	public boolean isParsed()
-	{
-		return !checkFallbacks;
-	}
 	
     @Override
     public int hashCode()
     {
         // From 4096 to 69632 when there are 4096 block ids
         return PluginStandardValues.SUPPORTED_BLOCK_IDS + combinedBlockId;
-    }
-
-    @Override
-    public int hashCodeWithoutBlockData()
-    {
-        // From 0 to 4095 when there are 4096 block ids
-        return getBlockId();
     }
 	
     @Override
@@ -541,11 +449,5 @@ public class BukkitMaterialData implements LocalMaterialData
             return false;
         }
         return true;
-    }
-	
-    @Override
-    public String toString()
-    {
-        return getName();
-    }
+    }	
 }

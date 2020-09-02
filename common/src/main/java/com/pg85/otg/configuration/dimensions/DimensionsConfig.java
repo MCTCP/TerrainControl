@@ -96,7 +96,7 @@ public class DimensionsConfig
 					Files.move(dimensionsConfigFile.toPath(), dimensionsConfigBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				}
 				
-				this.version = this.currentVersion;
+				this.version = DimensionsConfig.currentVersion;
 				mapper.writeValue(dimensionsConfigFile, this);
 
 				ArrayList<String> list = new ArrayList<String>();

@@ -15,6 +15,7 @@ import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -395,7 +396,7 @@ public class OTGChunkGenerator extends ChunkGenerator
         {
         	BukkitMaterialData material = (BukkitMaterialData) blockColumn[y];
         	boolean isLiquid = material.isLiquid();
-        	boolean isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
+        	boolean isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(DefaultMaterial.SNOW));
         	if(!(isLiquid && ignoreLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))

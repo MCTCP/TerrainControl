@@ -121,7 +121,7 @@ public class ForgeWorld implements LocalWorld
     private WorldGenSwamp swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
-    
+
     public ForgeWorld(String _name)
     {
 		OTG.log(LogMarker.INFO, "Creating world \"" + _name + "\"");
@@ -744,6 +744,13 @@ public class ForgeWorld implements LocalWorld
     {
     	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
     	{
+    		return;
+    	}
+    	
+    	if(material.isEmpty())
+    	{
+    		// Happens when configs contain blocks that don't exist.
+    		// TODO: Catch this earlier up the chain, avoid doing work?
     		return;
     	}
     	
@@ -1496,7 +1503,7 @@ public class ForgeWorld implements LocalWorld
 	{
 		return this.world.getWorldBorder().contains(new BlockPos(chunkCoordinate.getBlockXCenter(), 0, chunkCoordinate.getBlockZCenter()));
 	}
-	
+
 	private boolean isOTGPlusLoaded = false;
 	private boolean isOTGPlus = false;
 	@Override
