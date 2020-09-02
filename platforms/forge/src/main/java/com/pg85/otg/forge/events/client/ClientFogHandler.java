@@ -8,7 +8,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.world.ForgeWorld;
 

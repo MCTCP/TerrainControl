@@ -30,7 +30,9 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.dimensions.OTGWorldProvider;
 import com.pg85.otg.forge.gui.GuiHandler;
@@ -127,7 +129,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	        
 	        // If a modpack creator has added a default config, use that, otherwise use world config.
         	DimensionsConfig defaultConfig = null;
-        	if(GuiHandler.IsInMainMenu)
+        	//if(GuiHandler.IsInMainMenu)
         	{
 		        defaultConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(previousMenu.selectedPreset.getFirst());
 		        if(defaultConfig != null)
@@ -135,11 +137,15 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        	this.dimensions.add(defaultConfig.Overworld.clone());
 		        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
 		        	{
-		        		this.dimensions.add(dimConfig.clone());	        		
+		        		DimensionConfig newConfig = dimConfig.clone();
+		    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+        				PortalColors.correctPortalColor(newConfig, this.dimensions);
+		        		this.dimensions.add(newConfig);	        		
 		        	}
 		        }
 	        }
-        	if(!GuiHandler.IsInMainMenu || defaultConfig == null)
+        	//if(!GuiHandler.IsInMainMenu || defaultConfig == null)
+        	if(defaultConfig == null)
         	{
 	        	// Add overworld
 		        this.dimensions.add(new DimensionConfig(previousMenu.selectedPreset.getSecond()));
@@ -151,7 +157,10 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        	{
 		        		if(dimName.equals(preset.getKey()))
 		        		{
-		        			this.dimensions.add(new DimensionConfig(preset.getValue()));
+		        			DimensionConfig dimConfig = new DimensionConfig(preset.getValue());
+			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+	        				PortalColors.correctPortalColor(dimConfig, this.dimensions);
+		        			this.dimensions.add(dimConfig);
 		        			break;
 		        		}
 		        	}
@@ -219,8 +228,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     public boolean doesGuiPauseGame()
     {
         return false;
-    }    
-
+    }  
+    
 	// Init / drawing
     
     /**
@@ -241,18 +250,24 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    			// Creating a new dim, create config with the chosen preset
 	    	        // If a modpack creator has included a default config for the chosen preset in the overworld's preset, use that, otherwise use the preset's world config.
     				boolean bFoundDefaultSettigForDim = false;
-    				if(GuiHandler.IsInMainMenu)
+    				//if(GuiHandler.IsInMainMenu)
+    				//if(this.mc.isSingleplayer())
     				{
 		    	        DimensionsConfig defaultConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(this.mc.world != null ? OTG.getDimensionsConfig().Overworld.PresetName : this.previousMenu.selectedPreset.getFirst());
 		    	        if(defaultConfig != null)
 		    	        {
+		    				DimensionConfig newConfig = null;
 		    	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
 		    	        	{
 		    	        		if(dimConfig.PresetName.equals(this.selectPresetForDimensionMenu.selectedPreset.getFirst()))
 	    	        			{
-		    	        			DimensionConfig newConfig = dimConfig.clone();
+		    	        			newConfig = dimConfig.clone();
 		    	        			// If world is not null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
 		    	        			newConfig.isNewConfig = this.mc.world != null;
+		    	        			
+	    			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+	    	        				PortalColors.correctPortalColor(newConfig, this.dimensions);
+		    	        					    	        			
 		    	        			this.dimensions.add(newConfig);
 		    	        			bFoundDefaultSettigForDim = true;
 		    	        			break;
@@ -264,10 +279,14 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	    	        {
 	    	        	// Add only the overworld for the chosen preset, don't add dimensions.
 	    	        	DimensionConfig newConfig = new DimensionConfig(this.selectPresetForDimensionMenu.selectedPreset.getSecond());
-	        			// If world is nnot null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
+	        			// If world is not null then were ingame and we're creating a config for which a world will be created when clicking continue/apply
 	        			newConfig.isNewConfig = this.mc.world != null;
+	        			
+		    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+        				PortalColors.correctPortalColor(newConfig, this.dimensions);        				
 	    		        this.dimensions.add(newConfig);
 	    	        }
+	    	        
 	    			this.selectedDimension = this.dimensions.get(this.dimensions.size() - 1);
 	    			this.dimensionsList.selectedIndex = this.dimensions.size() - 1;
 	    			this.dimensionsList.lastClickTime = System.currentTimeMillis();
@@ -303,7 +322,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         	}
         }
 		this.btnDelete.enabled = this.selectedDimensionIndex != 0 && (isNewDim || !isLoaded); // Overworld and unloaded dims can't be deleted
-                
+
         int maxBtnWidth = 330; // Buttons show visual artifacts when they get too wide        
         int btnWidth = OTGGuiDimensionList.this.width - OTGGuiDimensionList.this.listWidth - OTGGuiDimensionList.this.margin - OTGGuiDimensionList.this.rightMargin;
         btnWidth = btnWidth > maxBtnWidth ? maxBtnWidth : btnWidth; 
@@ -332,8 +351,6 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 	        	this.btnCancel.displayString = "Back";
 	        	this.btnContinue.enabled = false;
         	}
-    		
-        	
         }
         
         if(this.dimensionSettingsList == null)
@@ -440,15 +457,27 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 		
                 		// Create worlds for any newly created dims
 	                	ArrayList<String> presetNames = new ArrayList<String>();
-            			for(DimensionConfig dimConfig : this.dimensions)
-            			{
-   		                	presetNames.add(dimConfig.PresetName);
-            			}
-    					if(OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
+	                	boolean bPortalColorsUnique = true;
+	                	for(DimensionConfig dimConfig : this.dimensions)
+	                	{
+	                		presetNames.add(dimConfig.PresetName);
+	                		for(DimensionConfig dimConfig2 : this.dimensions)
+	                		{
+	                			if(dimConfig2 != dimConfig && dimConfig.Settings.PortalColor.toLowerCase().equals(dimConfig2.Settings.PortalColor.toLowerCase()))
+	                			{
+	                				bPortalColorsUnique = false;
+	                			}
+	                		}
+	                	}
+	                	if(!bPortalColorsUnique)
+	                	{
+	                		this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Multiple dimensions are using the same portal color, each dimension's portal color must be unique."));
+	                	}
+	                	else if(!OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
     					{
-    						this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, this.dimensions.get(0).PresetName));	
+	                		this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Not enough biome id's available to add all dimensions."));
     					} else {
-    						this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Not enough biome id's available to add all dimensions."));
+    						this.mc.displayGuiScreen(new OTGGuiEnterWorldName(this, this.dimensions.get(0).PresetName));    						
     					}
                 	} else {
                 		        
@@ -456,32 +485,52 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                         {
 	                		// Apply game rules and save
 	                		applyGameRules();
-	                			                		
-	                		// Create worlds for any newly created dims                			
-                			for(DimensionConfig dimConfig : this.dimensions)
-                			{
-                				if(dimConfig.isNewConfig)
-                				{
-        		                	ArrayList<String> presetNames = new ArrayList<String>();
-        		                	presetNames.add(dimConfig.PresetName);               					
-                					if(OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
-                					{
-	                					dimConfig.isNewConfig = false;
-	                			        OTG.IsNewWorldBeingCreated = true;
-	                        			OTGDimensionManager.createNewDimensionSP(dimConfig, this.mc.getIntegratedServer());
-	                        			OTG.IsNewWorldBeingCreated = false;
-                					} else {
-                						this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Not enough biome id's available to add all dimensions."));
-                						break;
-                					}
-                				}
-                			}
+	                		
+	                		// Create worlds for any newly created dims
+		                	boolean bPortalColorsUnique = true;
+		                	for(DimensionConfig dimConfig : this.dimensions)
+		                	{
+		                		for(DimensionConfig dimConfig2 : this.dimensions)
+		                		{
+		                			if(dimConfig2 != dimConfig && dimConfig.Settings.PortalColor.toLowerCase().equals(dimConfig2.Settings.PortalColor.toLowerCase()))
+		                			{
+		                				bPortalColorsUnique = false;
+		                			}
+		                		}
+		                	}
+		                	if(!bPortalColorsUnique)
+		                	{
+		                		this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Multiple dimensions are using the same portal color, each dimension's portal color must be unique."));
+		                	} else {
+		                		// Create worlds for any newly created dims                			
+	                			for(DimensionConfig dimConfig : this.dimensions)
+	                			{
+	                				if(dimConfig.isNewConfig)
+	                				{
+	        		                	ArrayList<String> presetNames = new ArrayList<String>();
+	        		                	presetNames.add(dimConfig.PresetName);               					
+	                					if(OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
+	                					{
+		                					dimConfig.isNewConfig = false;
+		                			        OTG.IsNewWorldBeingCreated = true;
+		                			        if(!OTGDimensionManager.createNewDimensionSP(dimConfig, this.mc.getIntegratedServer()))
+		                			        {
+		                			        	this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Dimension id " + dimConfig.DimensionId + " was taken."));
+		                			        }
+		                        			OTG.IsNewWorldBeingCreated = false;
+	                					} else {
+	                						this.mc.displayGuiScreen(new GuiErrorScreen("Error", "Not enough biome id's available to add all dimensions."));
+	                						break;
+	                					}
+	                				}
+	                			}
+		                	}
                 			this.dimensionSettingsList.refreshData();
                 			btnContinue.enabled = false;
-                        } else {
-                        	
+                        } else {                        	
                         	ArrayList<DimensionConfig> applyDimSettings = (ArrayList<DimensionConfig>) this.dimensions.clone();
 	                		// Create worlds for any newly created dims
+                        	// TODO: send all data in a single packet, to avoid race conditions.
                         	ArrayList<DimensionConfig> dimensionConfigsToUpdate = new ArrayList<DimensionConfig>();
                         	boolean isOverWorldIncluded = false;
                 			for(int i = 0; i < applyDimSettings.size(); i++)
@@ -530,24 +579,28 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
                 		this.dimensionSettingsList.refreshData(true, false, false);
                 		this.dimensionSettingsList.scrollBy(Int.MinValue());
                 	} else {
-                		
-                		if(this.mc.world != null) // If world is not null then we're ingame
+                		// When cancelling, for SP we're using the actual configs, so need to roll back.
+                		// For MP we're using clones, that will be recreated from the originals when the screen is (re-)opened.
+                		if(this.mc.isSingleplayer())
                 		{
-	                		// Apply game rules and save
-	                		applyGameRules();
-	                		
-	            			// Cancelling, remove any newly created dims, don't create worlds for them.
-	                		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();                	
-	            			ArrayList<DimensionConfig> dims = new ArrayList<DimensionConfig>();
-	            			for(DimensionConfig dimConfig : dimsConfig.Dimensions)
-	            			{
-	            				if(!dimConfig.isNewConfig)
-	            				{
-	            					dims.add(dimConfig);
-	            				}
-	            			}
-	            			dimsConfig.Dimensions = dims;
-	            			OTG.getDimensionsConfig().save();
+	                		if(this.mc.world != null) // If world is not null then we're ingame
+	                		{
+		                		// Apply game rules and save
+		                		applyGameRules();
+		                		
+		            			// Cancelling, remove any newly created dims, don't create worlds for them.
+		                		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();                	
+		            			ArrayList<DimensionConfig> dims = new ArrayList<DimensionConfig>();
+		            			for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+		            			{
+		            				if(!dimConfig.isNewConfig)
+		            				{
+		            					dims.add(dimConfig);
+		            				}
+		            			}
+		            			dimsConfig.Dimensions = dims;
+		            			OTG.getDimensionsConfig().save();
+	                		}
                 		}
                 		this.mc.displayGuiScreen(this.previousMenu);
                 	}
@@ -639,7 +692,7 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 
             GameType gametype = this.dimensions.get(0).GameType.equals("Hardcore") ? GameType.SURVIVAL : GameType.getByName(this.dimensions.get(0).GameType.toLowerCase());
             WorldSettings worldsettings = new WorldSettings(i, gametype, true, this.dimensions.get(0).GameType.equals("Hardcore"), WorldType.byName("OTG"));
-            worldsettings.setGeneratorOptions("OpenTerrainGenerator");
+            worldsettings.setGeneratorOptions(PluginStandardValues.PLUGIN_NAME);
 
             if(this.dimensions.get(0).BonusChest)
             {

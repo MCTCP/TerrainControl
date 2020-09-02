@@ -8,7 +8,9 @@ import javax.annotation.Nullable;
 
 import org.lwjgl.opengl.GL11;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.forge.gui.dimensions.base.OTGGuiScrollingList;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.client.gui.GuiUtilRenderComponents;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -104,11 +106,29 @@ class OTGGuiScrollingListInfo extends OTGGuiScrollingList
     @Override
     protected void drawHeader(int entryRight, int relativeY, Tessellator tess, float zLevel)
     {
-        int top = relativeY;
-
+    	// TODO: Have to draw header logo after text, for some reason when OTGGuiSlotPresetList.drawSlot
+    	// draws multiple texts with dark text color it affects the header texture as well and darkens it.
+    	// Drawing these strings with white text color first seems to fix it (fontRenderer doesn't have a 
+    	// color setting tho, not sure what's going on, need more gl/rendering knowledge :/).
+    	
+        int top = logoPath != null ? relativeY + logoDims.height + 10 : relativeY;
+        
+        for (ITextComponent line : lines)
+        {
+            if (line != null)
+            {
+                GlStateManager.enableBlend();
+                this.otgGuiPresetList.getFontRenderer().drawStringWithShadow(line.getFormattedText(), this.left + 4, top, 0xFFFFFF);
+                GlStateManager.disableAlpha();
+                GlStateManager.disableBlend();
+            }
+            top += 10;
+        }
+        
+        top = relativeY;
         if (logoPath != null)
         {
-            GlStateManager.enableBlend();
+            GlStateManager.enableBlend();            
             this.otgGuiPresetList.mc.renderEngine.bindTexture(logoPath);
             BufferBuilder wr = tess.getBuffer();
             int offset = (this.left + this.listWidth/2) - (logoDims.width / 2);
@@ -121,18 +141,6 @@ class OTGGuiScrollingListInfo extends OTGGuiScrollingList
             GlStateManager.disableBlend();
             top += logoDims.height + 10;
         }
-
-        for (ITextComponent line : lines)
-        {
-            if (line != null)
-            {
-                GlStateManager.enableBlend();
-                this.otgGuiPresetList.getFontRenderer().drawStringWithShadow(line.getFormattedText(), this.left + 4, top, 0xFFFFFF);
-                GlStateManager.disableAlpha();
-                GlStateManager.disableBlend();
-            }
-            top += 10;
-        }
     }
 
     @Override
@@ -141,7 +149,7 @@ class OTGGuiScrollingListInfo extends OTGGuiScrollingList
         int offset = y;
         if (logoPath != null)
         {
-          offset -= logoDims.height + 10;
+        	offset -= logoDims.height + 10;
         }
         if (offset <= 0)
         {

@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.events.dimensions;
 
-import com.pg85.otg.forge.dimensions.OTGBlockPortal;
+import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 
 import net.minecraft.item.ItemFlintAndSteel;
@@ -52,13 +52,11 @@ public class RightClickListener
 					blockInFront = new BlockPos(event.getPos().getX() - 1, event.getPos().getY(), event.getPos().getZ());
 				}
 	
-				if(OTGBlockPortal.trySpawnPortal(event.getWorld(), blockInFront))
+				if(BlockPortalOTG.trySpawnPortal(event.getWorld(), blockInFront))
 				{
 					event.setCanceled(true);
-					// Register the portal to the world's portals list
-			    	OTGBlockPortal.placeInExistingPortal(event.getEntity().dimension, blockInFront);
 				}
 			}
 		}
-	}	
+	}
 }

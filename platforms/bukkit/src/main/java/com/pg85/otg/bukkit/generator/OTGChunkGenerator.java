@@ -15,6 +15,7 @@ import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -170,7 +171,7 @@ public class OTGChunkGenerator extends ChunkGenerator
         {
 	        // Hopefully this is equal to ChunkProviderServer.getLoadedChunk
         	// So it won't try to populate the chunk.
-        	chunk = this.world.getWorld().getChunkProvider().getLoadedChunkAt(x, z);
+        	chunk = this.world.getWorld().getChunkProvider().getLoadedChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 	        if(chunk == null)
 	        {
 	        	// Request the chunk with a risk of it being populated..
@@ -239,7 +240,8 @@ public class OTGChunkGenerator extends ChunkGenerator
     	    }
 
             // Notify world: (2 | 16) == update client, don't update observers
-    	    notifyAndUpdatePhysics(this.world.getWorld(), blockPos, chunk, oldBlockData, blockData, 2 | 16);
+    	    //notifyAndUpdatePhysics(this.world.getWorld(), blockPos, chunk, oldBlockData, blockData, 2 | 16); TODO: Is this no longer needed?
+    	    world.getWorld().notifyAndUpdatePhysics(blockPos, chunk, oldBlockData, blockData, 2 | 16);
         } catch (Throwable t) {
         	// TODO: What is this? remove?
         	/*
@@ -394,7 +396,7 @@ public class OTGChunkGenerator extends ChunkGenerator
         {
         	BukkitMaterialData material = (BukkitMaterialData) blockColumn[y];
         	boolean isLiquid = material.isLiquid();
-        	boolean isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
+        	boolean isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(DefaultMaterial.SNOW));
         	if(!(isLiquid && ignoreLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))

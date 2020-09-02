@@ -25,7 +25,7 @@ public class GuiHandler implements IGuiHandler
 {
 	public static LinkedHashMap<String, DimensionConfigGui> GuiPresets = new LinkedHashMap<String, DimensionConfigGui>();
 	public static boolean IsInMainMenu = false;
-	
+
 	public static void loadGuiPresets()
 	{
 		GuiPresets.clear();
@@ -38,7 +38,7 @@ public class GuiHandler implements IGuiHandler
 	    {
 	    	for(File worldDir : OTGWorldsDirectory.listFiles())
 	    	{
-	    		if(worldDir.isDirectory() && !worldDir.getName().toLowerCase().trim().startsWith("dim-"))
+	    		if(worldDir.isDirectory())
 	    		{
 	    			for(File file : worldDir.listFiles())
 	    			{
@@ -48,28 +48,30 @@ public class GuiHandler implements IGuiHandler
 			    			boolean shouldShow = true;
 			    			for(DimensionsConfig modPackConfig : modPackConfigs)
 			    			{
-			    				if(modPackConfig.Overworld.PresetName != null && modPackConfig.Dimensions != null)
-			    				{
-			    					for(DimensionConfig dimConfig : modPackConfig.Dimensions)
-			    					{
-			    						if(dimConfig.PresetName.equals(worldDir.getName()))
-			    						{
-						    				// If the preset is a dimension for any modpackconfig, hide it in the GUI,
-			    							// unless it's also the overworld for another modpackconfig.
-			    							shouldShow = false;
-			    							break;
-			    						}
-			    					}
-			    				}
 			    				// If the preset is an overworld for any modpackconfig, don't hide it in the GUI.
 			    				if(modPackConfig.Overworld.PresetName != null && modPackConfig.Overworld.PresetName.equals(worldDir.getName()))
 			    				{
 			    					shouldShow = true;
 			    					break;
 			    				}
+			    				
+			    				if(shouldShow)
+			    				{
+				    				if(modPackConfig.Dimensions != null)
+				    				{
+				    					for(DimensionConfig dimConfig : modPackConfig.Dimensions)
+				    					{
+				    						if(dimConfig.PresetName.equals(worldDir.getName()) && !dimConfig.ShowInWorldCreationGUI)
+				    						{
+				    							// If a modpack config has set this preset to invisible, hide it.
+				    							shouldShow = false;
+				    						}
+				    					}
+				    				}
+			    				}
 			    			}
-			    			WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(worldDir);
-					        GuiPresets.put(worldDir.getName(), new DimensionConfigGui(worldDir.getName(), worldConfig, shouldShow));
+			    			WorldConfig worldConfig = WorldConfig.fromDisk(worldDir);
+					        GuiPresets.put(worldDir.getName(), new DimensionConfigGui(worldDir.getName(), 0, shouldShow, worldConfig));
 					        break;
 	    				}
 	    			}

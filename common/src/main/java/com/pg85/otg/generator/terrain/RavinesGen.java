@@ -9,6 +9,7 @@ import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Random;
@@ -67,18 +68,17 @@ public class RavinesGen extends TerrainGenBase
         int i2;
         int i3;
         int i4;
-        DefaultMaterial materialAtPosition;
+        LocalMaterialData materialAtPosition;
         
         LocalBiome biome;
         BiomeConfig biomeConfig;
-        DefaultMaterial surfaceblockDefaultMaterial;
+        LocalMaterialData surfaceblockDefaultMaterial;
         double d10;
         boolean surfaceBlockFound;
         LocalMaterialData surfaceBlockMaterial;
         
     	LocalMaterialData material;
-        DefaultMaterial defaultMaterial;
-        DefaultMaterial block;
+        LocalMaterialData block;
         
         for (int stepCount = 0; stepCount < size; stepCount++)
         {
@@ -169,10 +169,10 @@ public class RavinesGen extends TerrainGenBase
                         }
                         if (localY < worldSettings.worldHeightCap)
                         {
-                            materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ).toDefaultMaterial();
+                            materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ);
                             if (
-                        		materialAtPosition == DefaultMaterial.WATER || 
-                        		materialAtPosition == DefaultMaterial.STATIONARY_WATER
+                        		materialAtPosition.isMaterial(DefaultMaterial.WATER) || 
+                        		materialAtPosition.isMaterial(DefaultMaterial.STATIONARY_WATER)
                     		)
                             {
                                 i4 = 1;
@@ -196,7 +196,7 @@ public class RavinesGen extends TerrainGenBase
                 {
                     biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
                     biomeConfig = biome.getBiomeConfig();
-                    surfaceblockDefaultMaterial = biomeConfig.surfaceBlock.toDefaultMaterial();
+                    surfaceblockDefaultMaterial = biomeConfig.surfaceBlock;
                     d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
                     surfaceBlockFound = false;
                     surfaceBlockMaterial = null;
@@ -209,32 +209,31 @@ public class RavinesGen extends TerrainGenBase
                             if ((d9 * d9 + d10 * d10) * this.a[currentDepth - 1] + d11 * d11 / 6.0D < 1.0D)
                             {
                             	material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ);
-                                defaultMaterial = material.toDefaultMaterial();
                                 
-                                if (!surfaceBlockFound && defaultMaterial == surfaceblockDefaultMaterial)
+                                if (!surfaceBlockFound && material.equals(surfaceblockDefaultMaterial))
                                 {
                                 	surfaceBlockFound = true;
                                 	surfaceBlockMaterial = material;
                                 }
                                 
                                 if (
-                            		defaultMaterial != DefaultMaterial.BEDROCK &&
-                    				!defaultMaterial.isAir()
+                            		!material.isMaterial(DefaultMaterial.BEDROCK) &&
+                    				!material.isAir()
                         		)
                                 {                               	
-                                    generatingChunkBuffer.setBlock(localX, currentDepth, localZ, air);
+                                    generatingChunkBuffer.setBlock(localX, currentDepth, localZ, MaterialHelper.AIR);
                                 }
                                 
-                                block = generatingChunkBuffer.getBlock(localX, currentDepth - 1, localZ).toDefaultMaterial();
+                                block = generatingChunkBuffer.getBlock(localX, currentDepth - 1, localZ);
                                 if (
                             		surfaceBlockFound &&
                             		(
-	                                	block != DefaultMaterial.BEDROCK &&
-										block != DefaultMaterial.WATER &&
-										block != DefaultMaterial.STATIONARY_WATER &&
-										block != DefaultMaterial.LAVA &&
-										block != DefaultMaterial.STATIONARY_LAVA &&
-										block != DefaultMaterial.MAGMA &&
+	                                	!block.isMaterial(DefaultMaterial.BEDROCK) &&
+										!block.isMaterial(DefaultMaterial.WATER) &&
+										!block.isMaterial(DefaultMaterial.STATIONARY_WATER) &&
+										!block.isMaterial(DefaultMaterial.LAVA) &&
+										!block.isMaterial(DefaultMaterial.STATIONARY_LAVA) &&
+										!block.isMaterial(DefaultMaterial.MAGMA) &&
 										!block.isAir()
                     				)
                                 )

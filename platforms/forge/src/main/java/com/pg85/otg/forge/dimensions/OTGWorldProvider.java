@@ -5,6 +5,7 @@ import java.util.Random;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
@@ -56,7 +57,7 @@ public class OTGWorldProvider extends WorldProviderSurface
    @Override
    public net.minecraft.world.gen.IChunkGenerator createChunkGenerator()
    {
-	   return OTGPlugin.OtgWorldType.getChunkGenerator(world, "OpenTerrainGenerator");
+	   return OTGPlugin.OtgWorldType.getChunkGenerator(world, PluginStandardValues.PLUGIN_NAME);
    }
    
 	@Override
@@ -166,12 +167,16 @@ public class OTGWorldProvider extends WorldProviderSurface
     	DimensionConfig dimConfig = getDimensionConfig();   	
     	if(dimConfig != null && dimConfig.Settings.SpawnPointSet)
     	{
+    	    int randX = 0, randZ = 0;
 			// Calculate random spawn position within a circular radius around the spawn coords
-			Random rand = new Random();	    			
-			int randX = -dimConfig.GameRules.SpawnRadius + rand.nextInt(dimConfig.GameRules.SpawnRadius * 2);
-			// MaxZ = sqrt(spawnradius^2 - randX^2)
-			int maxZ =  (int)Math.floor(Math.sqrt((dimConfig.GameRules.SpawnRadius * dimConfig.GameRules.SpawnRadius) - (randX * randX)));
-			int randZ = maxZ == 0 ? 0 : -maxZ + rand.nextInt(maxZ * 2);
+            if (dimConfig.GameRules.SpawnRadius != 0)
+            {
+                Random rand = new Random();
+                randX = -dimConfig.GameRules.SpawnRadius + rand.nextInt(dimConfig.GameRules.SpawnRadius * 2);
+                // MaxZ = sqrt(spawnradius^2 - randX^2)
+                int maxZ =  (int)Math.floor(Math.sqrt((dimConfig.GameRules.SpawnRadius * dimConfig.GameRules.SpawnRadius) - (randX * randX)));
+                randZ = maxZ == 0 ? 0 : -maxZ + rand.nextInt(maxZ * 2);
+            }
 
 			return new BlockPos(this.world.getWorldInfo().getSpawnX() + randX, this.world.getWorldInfo().getSpawnY(), this.world.getWorldInfo().getSpawnZ() + randZ);
     	} else {

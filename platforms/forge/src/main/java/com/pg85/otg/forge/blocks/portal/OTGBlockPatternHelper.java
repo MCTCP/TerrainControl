@@ -1,105 +1,19 @@
-package com.pg85.otg.forge.dimensions;
-
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-
-import java.lang.reflect.Field;
+package com.pg85.otg.forge.blocks.portal;
 
 import com.google.common.cache.LoadingCache;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockWorldState;
 import net.minecraft.block.state.pattern.BlockPattern;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
-public class OTGBlockPortal
-{
-    public static boolean trySpawnPortal(World worldIn, BlockPos pos)
-    {
-    	// Only create a portal when a OTG custom dimension exists
-    	boolean bFound = false;
-    	for(int i : OTGDimensionManager.GetOTGDimensions())
-    	{
-			if(DimensionManager.isDimensionRegistered(i))
-			{
-				bFound = true;
-				break;
-			}
-		}	
-		if(!bFound)
-		{
-			return false;
-		}
-    	
-        OTGBlockPortalSize blockportal$size = new OTGBlockPortalSize(worldIn, pos, EnumFacing.Axis.X);
-
-        if (blockportal$size.isValid() && blockportal$size.portalBlockCount == 0)
-        {
-            blockportal$size.placePortalBlocks();
-            return true;
-        } else {
-            OTGBlockPortalSize blockportal$size1 = new OTGBlockPortalSize(worldIn, pos, EnumFacing.Axis.Z);
-
-            if (blockportal$size1.isValid() && blockportal$size1.portalBlockCount == 0)
-            {
-                blockportal$size1.placePortalBlocks();
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-    
-    public static void placeInExistingPortal(int dimensionId, BlockPos pos)
-    {    
-    	MinecraftServer mcServer = FMLCommonHandler.instance().getMinecraftServerInstance();
-    	WorldServer worldServerInstance = mcServer.getWorld(dimensionId);
-    	Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache = null;
-    	Teleporter _this = worldServerInstance.getDefaultTeleporter();
-		try {
-			Field[] fields = _this.getClass().getDeclaredFields();
-			for(Field field : fields)
-			{
-				Class<?> fieldClass = field.getType();
-				if(fieldClass.equals(Long2ObjectMap.class))
-				{
-					field.setAccessible(true);
-					destinationCoordinateCache = (Long2ObjectMap<Teleporter.PortalPosition>) field.get(_this);
-			        break;
-				}
-			}
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		}
-    	
-        int j = MathHelper.floor(pos.getX());
-        int k = MathHelper.floor(pos.getZ());
-        long l = ChunkPos.asLong(j, k);
-        
-        if (destinationCoordinateCache.containsKey(l))
-        {
-            Teleporter.PortalPosition teleporter$portalposition = (Teleporter.PortalPosition)destinationCoordinateCache.get(l);
-            teleporter$portalposition.lastUpdateTime = worldServerInstance.getTotalWorldTime();
-        } else {
-        	destinationCoordinateCache.put(l, _this.new PortalPosition(pos, worldServerInstance.getTotalWorldTime()));
-        }
-    }
-    
+public class OTGBlockPatternHelper
+{   
     // Used to check if a portal exists in the destination world at the given coordinates,
     // portal must be made of the source world's portal materials.
-    static BlockPattern.PatternHelper createPatternHelper(World sourceWorld, World destinationWorld, BlockPos p_181089_2_)
+    public static BlockPattern.PatternHelper createPatternHelper(World sourceWorld, World destinationWorld, BlockPos p_181089_2_)
     {
         EnumFacing.Axis enumfacing$axis = EnumFacing.Axis.Z;
         OTGBlockPortalSize blockportal$size = new OTGBlockPortalSize(sourceWorld, destinationWorld, p_181089_2_, EnumFacing.Axis.X);
@@ -129,7 +43,10 @@ public class OTGBlockPortal
                     {
                         BlockWorldState blockworldstate = blockpattern$patternhelper.translateOffset(i, j, 1);
 
-                        if (blockworldstate.getBlockState() != null && blockworldstate.getBlockState().getMaterial() != Material.AIR)
+                        if (
+                    		blockworldstate.getBlockState() != null &&
+               				blockworldstate.getBlockState().getMaterial() != Material.AIR
+                		)
                         {
                             ++aint[enumfacing$axisdirection.ordinal()];
                         }
@@ -152,7 +69,7 @@ public class OTGBlockPortal
     }    
     
     // Used to check if any portal exists in the given world at the given coordinates
-    static BlockPattern.PatternHelper createPatternHelper(World worldIn, BlockPos p_181089_2_)
+    public static BlockPattern.PatternHelper createPatternHelper(World worldIn, BlockPos p_181089_2_)
     {
         EnumFacing.Axis enumfacing$axis = EnumFacing.Axis.Z;
         OTGBlockPortalSize blockportal$size = new OTGBlockPortalSize(worldIn, p_181089_2_, EnumFacing.Axis.X);
@@ -182,10 +99,12 @@ public class OTGBlockPortal
                     {
                         BlockWorldState blockworldstate = blockpattern$patternhelper.translateOffset(i, j, 1);
 
-                        if (blockworldstate.getBlockState() != null && blockworldstate.getBlockState().getMaterial() != Material.AIR)
+                        if (
+                    		blockworldstate.getBlockState() != null &&
+                			blockworldstate.getBlockState().getMaterial() != Material.AIR)
                         {
                             ++aint[enumfacing$axisdirection.ordinal()];
-                        }
+                        }                        
                     }
                 }
             }

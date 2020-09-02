@@ -13,6 +13,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
@@ -30,12 +31,8 @@ import com.sk89q.worldedit.bukkit.selections.Selection;
 
 import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
 
-public class BO3Creator
+public class BO3Creator extends BOCreator
 {
-    private String name;
-    private boolean includeAir = false;
-    private boolean includeTiles = false;
-
     public BO3Creator(String name)
     {
         this.name = name;
@@ -70,11 +67,6 @@ public class BO3Creator
             }
         }
         
-        if(centerBlock != null && !centerBlock.isParsed())
-		{
-            centerBlock = null;
-        }
-
         int width = selection.getWidth();
         int length = selection.getLength();
         int height = selection.getHeight();
@@ -90,6 +82,9 @@ public class BO3Creator
         int centerPointX = 0;
         int centerPointY = 0;
         int centerPointZ = 0;
+        
+        Block block;
+        LocalMaterialData data;
 
         for (int x = 0; x < width; ++x)
         {
@@ -97,9 +92,8 @@ public class BO3Creator
             {
                 for (int z = 0; z < length; ++z)
                 {
-                    Block block = world.getBlockAt(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ());
-
-                    LocalMaterialData data = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
+                    block = world.getBlockAt(x + start.getBlockX(), y + start.getBlockY(), z + start.getBlockZ());
+                    data = BukkitMaterialData.ofBukkitBlock(block);
 
                     if (centerBlock != null && centerBlock.equals(data))
                     {
@@ -147,15 +141,23 @@ public class BO3Creator
         }
 
         Map<ChunkCoordIntPair, List<BO3BlockFunction>> blocksPerChunkArr = new HashMap<ChunkCoordIntPair, List<BO3BlockFunction>>();
-
+        List<BO3BlockFunction> blocksInChunk;
+        ChunkCoordIntPair chunkCoordinates;
+        LocalMaterialData material;
+        BO3BlockFunction blockFunction;
+        NamedBinaryTag tag;
+        String tileEntityName;
+        File tileEntityFile;
+        FileOutputStream fos;
+        
         for (int x = start.getBlockX(); x <= end.getBlockX(); x++)
         {
             for (int y = start.getBlockY(); y <= end.getBlockY(); y++)
             {
                 for (int z = start.getBlockZ(); z <= end.getBlockZ(); z++)
                 {
-                    List<BO3BlockFunction> blocksInChunk = new ArrayList<BO3BlockFunction>();
-                    ChunkCoordIntPair chunkCoordinates;
+                    blocksInChunk = new ArrayList<BO3BlockFunction>();
+                    chunkCoordinates = null;
 
                     if (branch)
                     {
@@ -172,12 +174,12 @@ public class BO3Creator
                         blocksInChunk = blocksPerChunkArr.get(chunkCoordinates);
                     }
 
-                    Block block = world.getBlockAt(x, y, z);
-                    LocalMaterialData material = MaterialHelper.toLocalMaterialData(DefaultMaterial.getMaterial(block.getType().toString()), block.getData());
+                    block = world.getBlockAt(x, y, z);
+                    material = BukkitMaterialData.ofBukkitBlock(block);
 
                     if (includeAir || !material.isAir())
                     {
-                        BO3BlockFunction blockFunction;
+                        blockFunction = null;
 
                         if (branch)
                         {
@@ -194,10 +196,10 @@ public class BO3Creator
                         if (includeTiles)
                         {
                             // Look for tile entities
-                            NamedBinaryTag tag = NBTHelper.getMetadata(world, x, y, z);
+                            tag = NBTHelper.getMetadata(world, x, y, z);
                             if (tag != null)
                             {
-                                String tileEntityName;
+                                tileEntityName = null;
 
                                 if (branch)
                                 {
@@ -207,12 +209,12 @@ public class BO3Creator
                                     tileEntityName = tileEntityCount + "-" + getTileEntityName(tag) + ".nbt";
                                 }
 
-                                File tileEntityFile = new File(tileEntitiesFolder, tileEntityName);
+                                tileEntityFile = new File(tileEntitiesFolder, tileEntityName);
 
                                 tileEntityCount++;
                                 try {
                                     tileEntityFile.createNewFile();
-                                    FileOutputStream fos = new FileOutputStream(tileEntityFile);
+                                    fos = new FileOutputStream(tileEntityFile);
                                     tag.writeTo(fos);
                                     fos.flush();
                                     fos.close();
@@ -232,20 +234,24 @@ public class BO3Creator
 
         BO3 bo3 = null;
         boolean isStartBO3 = true;
-
+        List<BO3BlockFunction> blocks;
+        List<BO3BranchFunction> branches;
+        SettingsWriterOTGPlus writer;
+        
         for (int x1 = 0; x1 <= Math.abs(widthMin - widthMax); x1++)
         {
             for (int z1 = 0; z1 <= Math.abs(lengthMin - lengthMax); z1++)
             {
-                List<BO3BlockFunction> blocks = blocksPerChunkArr.get(new ChunkCoordIntPair(x1, z1));
+                blocks = blocksPerChunkArr.get(new ChunkCoordIntPair(x1, z1));
 
                 if (blocks == null || blocks.isEmpty())
+                {
                     continue;
+                }
 
                 for (int i = 0; i < 1; i++)
                 {
-
-                    List<BO3BranchFunction> branches = new ArrayList<BO3BranchFunction>();
+                    branches = new ArrayList<BO3BranchFunction>();
 
                     if (branch)
                     {
@@ -285,10 +291,14 @@ public class BO3Creator
                     bo3.onEnable();
 
                     if (!isStartBO3 || !branch)
+                    {
                         bo3.getSettings().extractBlocks(blocks);
+                    }
 
                     if (!branches.isEmpty())
+                    {
                         bo3.getSettings().setBranches(branches);
+                    }
 
                     bo3.getSettings().rotateBlocksAndChecks();
 
@@ -297,7 +307,7 @@ public class BO3Creator
                     bo3.getSettings().settingsMode = ConfigMode.WriteAll;
 
                     try {
-                        SettingsWriterOTGPlus writer = new FileSettingsWriterOTGPlus(bo3.getSettings().getFile());
+                        writer = new FileSettingsWriterOTGPlus(bo3.getSettings().getFile());
                         bo3.getSettings().write(writer, ConfigMode.WriteAll);
                     } catch (IOException ex)  {
                         OTG.log(LogMarker.ERROR, "Failed to write to file {}", bo3.getSettings().getFile());
@@ -318,28 +328,5 @@ public class BO3Creator
             }
         }
         return true;
-
-    }
-
-    private String getTileEntityName(NamedBinaryTag tag)
-    {
-        NamedBinaryTag idTag = tag.getTag("id");
-        if (idTag != null)
-        {
-            String name = (String) idTag.getValue();
-
-            return name.replace("minecraft:", "").replace(':', '_');
-        }
-        return "Unknown";
-    }
-
-    public void includeAir(boolean include)
-    {
-        this.includeAir = include;
-    }
-
-    public void includeTiles(boolean include)
-    {
-        this.includeTiles = include;
     }
 }

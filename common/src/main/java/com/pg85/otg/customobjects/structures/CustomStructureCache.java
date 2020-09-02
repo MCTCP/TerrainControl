@@ -3,7 +3,6 @@ package com.pg85.otg.customobjects.structures;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
 import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
@@ -231,7 +230,7 @@ public class CustomStructureCache
 	    		}
 	    	}
 
-	    	CustomStructureFileManager.saveChunksFile(nullChunks, WorldStandardValues.NullChunksFileName, this.world);
+	    	CustomStructureFileManager.saveNullChunksFile(nullChunks, this.world);
 
 	    	this.plotter.saveSpawnedStructures(this.world);
 	    }
@@ -250,57 +249,60 @@ public class CustomStructureCache
     	int structuresLoaded = 0;
 
 		Map<ChunkCoordinate, CustomStructure> loadedStructures = CustomStructureFileManager.loadStructuresFile(this.world);
-		for(Map.Entry<ChunkCoordinate, CustomStructure> loadedStructure : loadedStructures.entrySet())
+		if(loadedStructures != null)
 		{
-			structuresLoaded += 1;
-
-			if(loadedStructure == null)
+			for(Map.Entry<ChunkCoordinate, CustomStructure> loadedStructure : loadedStructures.entrySet())
 			{
-				throw new RuntimeException();
-			}
-
-			worldInfoChunks.put(loadedStructure.getKey(), loadedStructure.getValue());
-
-			if(world.isOTGPlus())
-			{
-				// Dont override any loaded structures that have been added to the structure cache
-				if(!bo4StructureCache.containsKey(loadedStructure.getKey())) 
+				structuresLoaded += 1;
+	
+				if(loadedStructure == null)
 				{
-					// This chunk is either
-					// A. outside the border and has no objects to spawn (empty chunk) but has not yet been populated.
-					// B. Part of but not the starting point of a branching structure, therefore the structure's ObjectsToSpawn and SmoothingAreasToSpawn were not saved with this file.
-					// This is used for the other caches
-					bo4StructureCache.put(loadedStructure.getKey(), (BO4CustomStructure)loadedStructure.getValue());
-				} else {
-					//throw new RuntimeException();
+					throw new RuntimeException("This shouldn't happen, please ask for help on the OTG Discord and/or file an issue on the OTG github.");
 				}
-
-				// The starting structure in a branching structure is saved with the ObjectsToSpawn, SmoothingAreasToSpawn & modData of all its branches.
-				// All branches are saved as individual structures but without any ObjectsToSpawn/SmoothingAreasToSpawn/modData (only essential data for structure placement remains).
-				// The starting structure overrides any empty branches that were added as structures here if it has any ObjectsToSpawn/SmoothingAreasToSpawn/modData in their chunks.
-				for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).objectsToSpawn.keySet())
+	
+				worldInfoChunks.put(loadedStructure.getKey(), loadedStructure.getValue());
+	
+				if(world.isOTGPlus())
 				{
-					bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has BO3 blocks that need to be spawned
+					// Dont override any loaded structures that have been added to the structure cache
+					if(!bo4StructureCache.containsKey(loadedStructure.getKey())) 
+					{
+						// This chunk is either
+						// A. outside the border and has no objects to spawn (empty chunk) but has not yet been populated.
+						// B. Part of but not the starting point of a branching structure, therefore the structure's ObjectsToSpawn and SmoothingAreasToSpawn were not saved with this file.
+						// This is used for the other caches
+						bo4StructureCache.put(loadedStructure.getKey(), (BO4CustomStructure)loadedStructure.getValue());
+					} else {
+						//throw new RuntimeException();
+					}
+	
+					// The starting structure in a branching structure is saved with the ObjectsToSpawn, SmoothingAreasToSpawn & modData of all its branches.
+					// All branches are saved as individual structures but without any ObjectsToSpawn/SmoothingAreasToSpawn/modData (only essential data for structure placement remains).
+					// The starting structure overrides any empty branches that were added as structures here if it has any ObjectsToSpawn/SmoothingAreasToSpawn/modData in their chunks.
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).objectsToSpawn.keySet())
+					{
+						bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has BO3 blocks that need to be spawned
+					}
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).smoothingAreasToSpawn.keySet())
+					{
+						bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has smoothing area blocks that need to be spawned
+					}
 				}
-				for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).smoothingAreasToSpawn.keySet())
+	
+				for(ModDataFunction<?> modDataFunc : loadedStructure.getValue().modDataManager.modData)
 				{
-					bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has smoothing area blocks that need to be spawned
+					worldInfoChunks.put(ChunkCoordinate.fromBlockCoords(modDataFunc.x, modDataFunc.z), loadedStructure.getValue());
 				}
-			}
-
-			for(ModDataFunction<?> modDataFunc : loadedStructure.getValue().modDataManager.modData)
-			{
-				worldInfoChunks.put(ChunkCoordinate.fromBlockCoords(modDataFunc.x, modDataFunc.z), loadedStructure.getValue());
-			}
-
-			for(SpawnerFunction<?> spawnerFunc : loadedStructure.getValue().spawnerManager.spawnerData)
-			{
-				worldInfoChunks.put(ChunkCoordinate.fromBlockCoords(spawnerFunc.x, spawnerFunc.z), loadedStructure.getValue());
-			}
-
-			for(ParticleFunction<?> particleFunc : loadedStructure.getValue().particlesManager.particleData)
-			{
-				worldInfoChunks.put(ChunkCoordinate.fromBlockCoords(particleFunc.x, particleFunc.z), loadedStructure.getValue());
+	
+				for(SpawnerFunction<?> spawnerFunc : loadedStructure.getValue().spawnerManager.spawnerData)
+				{
+					worldInfoChunks.put(ChunkCoordinate.fromBlockCoords(spawnerFunc.x, spawnerFunc.z), loadedStructure.getValue());
+				}
+	
+				for(ParticleFunction<?> particleFunc : loadedStructure.getValue().particlesManager.particleData)
+				{
+					worldInfoChunks.put(ChunkCoordinate.fromBlockCoords(particleFunc.x, particleFunc.z), loadedStructure.getValue());
+				}
 			}
 		}
 
@@ -308,10 +310,13 @@ public class CustomStructureCache
 
 		if(world.isOTGPlus())
 		{
-			ArrayList<ChunkCoordinate> nullChunks = CustomStructureFileManager.loadChunksFile(WorldStandardValues.NullChunksFileName, this.world);
-			for(ChunkCoordinate chunkCoord : nullChunks)
+			ArrayList<ChunkCoordinate> nullChunks = CustomStructureFileManager.loadNullChunksFile(this.world);
+			if(nullChunks != null)
 			{
-				bo4StructureCache.put(chunkCoord, null); // This chunk has been completely populated and spawned
+				for(ChunkCoordinate chunkCoord : nullChunks)
+				{
+					bo4StructureCache.put(chunkCoord, null); // This chunk has been completely populated and spawned
+				}
 			}
 
 			plotter.loadSpawnedStructures(this.world);
@@ -321,7 +326,7 @@ public class CustomStructureCache
 				plotter.invalidateChunkInStructuresPerChunkCache(chunkCoord); // This is an optimisation so that PlotStructures knows not to plot anything in this chunk
 			}
 
-			if(loadedStructures.size() > 0 || nullChunks.size() > 0 || plotter.getStructureCount() > 0)
+			if((loadedStructures != null && loadedStructures.size() > 0) || (nullChunks != null && nullChunks.size() > 0) || plotter.getStructureCount() > 0)
 			{
 				world.getObjectSpawner().StructurePlottedAtSpawn = true;
 			}

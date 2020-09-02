@@ -17,9 +17,7 @@ import java.util.List;
  */
 public abstract class SpawnerFunction<T extends CustomObjectConfigFile> extends CustomObjectConfigFunction<T>
 {
-    public int x;
     public int y;
-    public int z;
 
     public Boolean firstSpawn = true;
     public String mobName = "";

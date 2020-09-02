@@ -250,8 +250,8 @@ public enum DefaultMaterial
     BLACK_SHULKER_BOX(234),
     CONCRETE(251),
     CONCRETE_POWDER(252),
-    STRUCTURE_BLOCK(255, false),
-    UNKNOWN_BLOCK(254);
+    UNKNOWN_BLOCK(254),
+    STRUCTURE_BLOCK(255, false);
 	
     /**
      * A DefaultMaterial lookup table with the material ID as the index
@@ -331,7 +331,7 @@ public enum DefaultMaterial
         // Exceptions for nonsolid leaves
         // IF we get much more exceptions, we may want to make this a
         // parameter in the constructor instead.
-        return this == LEAVES || this == LEAVES_2 || this.solid;
+        return this == LEAVES || this == LEAVES_2 || (this.solid && this != PACKED_ICE && this != ICE);
     }
 
     /**
@@ -362,6 +362,11 @@ public enum DefaultMaterial
      */
     public static DefaultMaterial getMaterial(String blockName)
     {
+    	if(blockName == null)
+    	{
+    		return null;
+    	}
+    	
         DefaultMaterial defaultMaterial = lookupName.get(blockName);
         if (defaultMaterial != null)
         {
@@ -371,11 +376,15 @@ public enum DefaultMaterial
         // Try parsing it as id
         try
         {
-            return getMaterial(Integer.parseInt(blockName));
-        } catch (NumberFormatException e)
-        {
-            return UNKNOWN_BLOCK;
+        	defaultMaterial = getMaterial(Integer.parseInt(blockName));
         }
+        catch (NumberFormatException e)
+        {
+            return null;
+        }
+        
+    	lookupName.put(blockName, defaultMaterial);
+        return defaultMaterial;
     }
 
     /**
@@ -406,7 +415,8 @@ public enum DefaultMaterial
         {
             return LookupID[id];
         }
-        return UNKNOWN_BLOCK;
+        
+        return null;
     }
 
     /**

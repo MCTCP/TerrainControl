@@ -7,6 +7,7 @@ import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Random;
@@ -253,7 +254,7 @@ public class CavesGen extends TerrainGenBase
                                 }
                                 if (this.isSuitableBlock(material, materialAbove))//, biome.getBiomeConfig()))
                                 {
-                                    generatingChunkBuffer.setBlock(local_x, currentDepth, local_z, air);
+                                    generatingChunkBuffer.setBlock(local_x, currentDepth, local_z, MaterialHelper.AIR);
                                     block = generatingChunkBuffer.getBlock(local_x, currentDepth - 1, local_z);
 
                                     // If a surface block was just deleted, try to move it down

@@ -15,7 +15,6 @@ import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.biomes.ForgeBiomeRegistryManager;
-import com.pg85.otg.forge.biomes.OTGBiome;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.generator.ForgeChunkBuffer;
 import com.pg85.otg.forge.generator.OTGChunkGenerator;
@@ -46,7 +45,6 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.monster.EntityGuardian;
-import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTBase;
@@ -83,7 +81,7 @@ import java.util.*;
 public class ForgeWorld implements LocalWorld
 {
     public static final int MAX_BIOMES_COUNT = 4096;
-    private static final int MAX_SAVED_BIOMES_COUNT = 256;
+    public static final int MAX_SAVED_BIOMES_COUNT = 256;
     public static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
     
 	private ForgeWorldSession worldSession;
@@ -123,7 +121,7 @@ public class ForgeWorld implements LocalWorld
     private WorldGenSwamp swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
-    
+
     public ForgeWorld(String _name)
     {
 		OTG.log(LogMarker.INFO, "Creating world \"" + _name + "\"");
@@ -346,7 +344,7 @@ public class ForgeWorld implements LocalWorld
 		if(getWorld() != null)
 		{
 			int dimensionId = getWorld().provider.getDimension();
-			File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : ""));
+			File worldDataDir = new File(getWorld().getSaveHandler().getWorldDirectory() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : ""));
 			if(worldDataDir.exists())
 			{
 				IOHelper.deleteRecursive(worldDataDir);
@@ -746,6 +744,13 @@ public class ForgeWorld implements LocalWorld
     {
     	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
     	{
+    		return;
+    	}
+    	
+    	if(material.isEmpty())
+    	{
+    		// Happens when configs contain blocks that don't exist.
+    		// TODO: Catch this earlier up the chain, avoid doing work?
     		return;
     	}
     	
@@ -1498,7 +1503,7 @@ public class ForgeWorld implements LocalWorld
 	{
 		return this.world.getWorldBorder().contains(new BlockPos(chunkCoordinate.getBlockXCenter(), 0, chunkCoordinate.getBlockZCenter()));
 	}
-	
+
 	private boolean isOTGPlusLoaded = false;
 	private boolean isOTGPlus = false;
 	@Override

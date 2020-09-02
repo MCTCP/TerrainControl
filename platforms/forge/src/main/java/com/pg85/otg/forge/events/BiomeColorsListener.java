@@ -5,7 +5,6 @@ import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.BiomeNotFoundException;
-import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.util.ResourceLocation;
@@ -137,6 +136,7 @@ public final class BiomeColorsListener
         {
         	// Get world name from resourcelocation
         	// TODO: Get world name from somewhere sensical...
+        	// TODO: This forbids worldnames with an underscore
         	biome = OTG.getBiome(input.getBiomeName(), input.getRegistryName().getPath().split("_")[0]);
         	if(biome == null)
         	{

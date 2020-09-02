@@ -3,6 +3,7 @@ package com.pg85.otg.forge.network.client.packets;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.util.text.TextComponentString;
@@ -18,6 +19,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;
@@ -58,7 +60,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
     	
     	StreamHelper.writeStringToStream(stream, dimensionName);
 	}
-	
+		
 	public static class Handler extends AbstractServerMessageHandler<CreateDeleteDimensionPacket>
 	{
 		@Override
@@ -74,7 +76,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 				if(packetType == 0) // Create dimension
 				{
 					String dimConfigYaml = StreamHelper.readStringFromStream(message.getStream());
-					DimensionConfig dimConfig = DimensionConfig.fromYamlString(dimConfigYaml);       			
+					DimensionConfig dimConfig = DimensionConfig.fromYamlString(dimConfigYaml);
 					
 		            IThreadListener mainThread = (WorldServer) ctx.getServerHandler().player.world;
 		            mainThread.addScheduledTask(new Runnable()
@@ -83,14 +85,30 @@ public class CreateDeleteDimensionPacket extends OTGPacket
 		                public void run()
 	                	{
 		                	// Check if the world doesn't already exist
+		                	if(OTG.getDimensionsConfig().Dimensions.size() + 1 > PortalColors.portalColors.size())
+		                	{
+		                		OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but all portal colors are in use.");
+        						// Update the UI on the client
+        						ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
+		                		return;
+		                	}
+	                		if(OTG.getDimensionsConfig().Overworld.PresetName != null && OTG.getDimensionsConfig().Overworld.PresetName.equals(dimConfig.PresetName))
+	                		{
+	                			// Preset is in use
+	                			return;
+	                		}
 		                	for(DimensionConfig existingDimConfig : OTG.getDimensionsConfig().Dimensions)
 		                	{
 		                		if(existingDimConfig.PresetName.equals(dimConfig.PresetName))
 		                		{
+		                			// Preset is in use
 		                			return;
 		                		}
 		                	}
-		                	
+
+			    	        // Ensure the portal color is unique (not already in use), otherwise correct it.
+	        				PortalColors.correctPortalColor(dimConfig, OTG.getDimensionsConfig().getAllDimensions());
+
 		                	ArrayList<String> presetNames = new ArrayList<String>();
 		                	presetNames.add(dimConfig.PresetName);
         					if(!OTG.getEngine().areEnoughBiomeIdsAvailableForPresets(presetNames))
@@ -100,9 +118,7 @@ public class CreateDeleteDimensionPacket extends OTGPacket
         						OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but not enough biome id's are available.");
         						return;
         					}
-		                	
-							OTG.getDimensionsConfig().Dimensions.add(dimConfig);
-							
+		                								
             				long seed = (new Random()).nextLong();		            				
             	            String sSeed = dimConfig.Seed;
             	            if (sSeed != null && !StringUtils.isEmpty(sSeed))
@@ -120,11 +136,19 @@ public class CreateDeleteDimensionPacket extends OTGPacket
             	                {
             	                	seed = (long)sSeed.hashCode();
             	                }
-            	            }						
+            	            }
 			                
 			                OTG.IsNewWorldBeingCreated = true;
-							OTGDimensionManager.createDimension(seed, dimConfig.PresetName, false, true, true);
+							if(!OTGDimensionManager.createDimension(dimConfig, seed, true))
+							{
+        						OTG.IsNewWorldBeingCreated = false;
+        						// Update the UI on the client
+        						ServerPacketManager.sendDimensionSynchPacketToAllPlayers(player.getServer());
+        						OTG.log(LogMarker.INFO, "Warning: Client tried to create a dimension, but the dimension id " + dimConfig.DimensionId + " + is not available.");
+        						return;
+							}
 							OTG.IsNewWorldBeingCreated = false;
+							
 							ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimConfig.PresetName);
 							
 							if(dimConfig.Settings.CanDropChunk)

@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +15,6 @@ import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
-import com.pg85.otg.configuration.dimensions.DimensionConfigGui;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -32,13 +30,7 @@ import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
-import net.minecraft.crash.CrashReport;
-import net.minecraft.util.ReportedException;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.WorldSettings;
-import net.minecraft.world.WorldType;
-import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Loader;
@@ -53,7 +45,7 @@ public class ForgeEngine extends OTGEngine
     {
         super(new ForgeLogger());
         
-        this.worldLoader = new WorldLoader(new File(Loader.instance().getConfigDir(), "OpenTerrainGenerator"));      
+        this.worldLoader = new WorldLoader(new File(Loader.instance().getConfigDir(), PluginStandardValues.PLUGIN_NAME));      
         this.biomeRegistryManager = new ForgeBiomeRegistryManager();
     }
 
@@ -214,11 +206,8 @@ public class ForgeEngine extends OTGEngine
 		int requiredBiomesCount = 0;
 		for(String presetName : presetNames)
 		{
-			if(OTG.getDimensionsConfig() == null || OTG.getDimensionsConfig().getDimensionConfig(presetName) == null)
-			{
-				File settingsDir = new File(OTG.getEngine().getWorldsDirectory() + File.separator + presetName);
-				requiredBiomesCount += getBiomeIdsRequiredCount(settingsDir);
-			}
+			File settingsDir = new File(OTG.getEngine().getWorldsDirectory() + File.separator + presetName);
+			requiredBiomesCount += getBiomeIdsRequiredCount(settingsDir);
 		}
 		if(requiredBiomesCount > getBiomeRegistryManager().getAvailableBiomeIdsCount())
 		{
@@ -229,7 +218,7 @@ public class ForgeEngine extends OTGEngine
 	
     public int getBiomeIdsRequiredCount(File settingsDir)
     {
-    	WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(settingsDir);
+    	WorldConfig worldConfig = WorldConfig.fromDisk(settingsDir);
     	
         // Establish folders
         List<File> biomeDirs = new ArrayList<File>(2);

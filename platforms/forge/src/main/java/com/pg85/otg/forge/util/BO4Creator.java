@@ -62,10 +62,6 @@ public class BO4Creator extends BOCreator
             }
         }
         
-        if(centerBlock != null && !centerBlock.isParsed()) {
-            centerBlock = null;
-        }
-
         int width = selection.getWidth();
         int length = selection.getLength();
         int height = selection.getHeight();

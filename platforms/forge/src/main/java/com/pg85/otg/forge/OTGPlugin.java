@@ -43,7 +43,7 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v9.0_r8", dependencies="required-after:otgcore@[1.12.2 - v9.0_r8]")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v9.0_r11", dependencies="required-after:otgcore@[1.12.2 - v9.0_r11]")
 public class OTGPlugin
 {	
 	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
@@ -54,7 +54,7 @@ public class OTGPlugin
 
     public static OTGWorldType OtgWorldType;
     public static BiomeColorsListener BiomeColorsListener;
-        
+
     @EventHandler
     public void load(FMLInitializationEvent event)
     {    	       
@@ -135,7 +135,7 @@ public class OTGPlugin
 
         // Register ClientConnectionEventListener for detecting disconnects on the client side and unloading worlds. 
         MinecraftForge.EVENT_BUS.register(new ClientConnectionEventListener());
-
+        
         // Fix lava as light source not working when spawning lava as resource
         // TODO: This is a hack fix, lighting still needs to be fixed properly..
         Blocks.LAVA.setLightOpacity(255);

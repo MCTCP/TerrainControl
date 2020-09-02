@@ -103,12 +103,6 @@ public class BO3 implements StructuredCustomObject
     @Override
     public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-    	return spawnForced(world, random, rotation, x, y, z);
-    }
-
-    @Override
-    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
-    {
         BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
 
         ArrayList<BO3BlockFunction> blocksToSpawn = new ArrayList<BO3BlockFunction>();
@@ -117,22 +111,27 @@ public class BO3 implements StructuredCustomObject
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
         LocalMaterialData localMaterial;
-        DefaultMaterial material;
         for (BO3BlockFunction block : blocks)
         {
-        	localMaterial = world.getMaterial(x + block.x, y + block.y, z + block.z, null);
-            material = localMaterial.toDefaultMaterial();
-            
+            localMaterial = world.getMaterial(x + block.x, y + block.y, z + block.z, null);
+
             // Ignore blocks in the ground when checking spawn conditions
             if (block.y >= 0)
             {
                 // Do not spawn if non-tree blocks are in the way
-                if (!localMaterial.isAir() && material != DefaultMaterial.LOG && material != DefaultMaterial.LOG_2 && material != DefaultMaterial.LEAVES && material != DefaultMaterial.LEAVES_2 && material != DefaultMaterial.SAPLING)
+                if (
+            		!localMaterial.isAir() && 
+            		!localMaterial.isMaterial(DefaultMaterial.LOG) && 
+            		!localMaterial.isMaterial(DefaultMaterial.LOG_2) && 
+            		!localMaterial.isMaterial(DefaultMaterial.LEAVES) && 
+            		!localMaterial.isMaterial(DefaultMaterial.LEAVES_2) && 
+            		!localMaterial.isMaterial(DefaultMaterial.SAPLING)
+        		)
                 {
                     return false;
                 }
             }
-            
+
             // Only overwrite air
             if (localMaterial.isAir())
             {
@@ -140,18 +139,36 @@ public class BO3 implements StructuredCustomObject
                 blocksToSpawn.add(block);
             }
 
-            if (block instanceof BO3BlockFunction)
-            {
-                oeh.addBlock((BO3BlockFunction) block);
-            }
-
+            oeh.addBlock((BO3BlockFunction) block);
         }
-
-        // Spawn
-
-        for (BO3BlockFunction block : blocksToSpawn)
-        {
+        for (BO3BlockFunction block : blocksToSpawn) {
             block.spawn(world, random, x + block.x, y + block.y, z + block.z, null);
+        }
+        oeh.extrude(world, random, x, y, z, null);
+        handleBO3Functions(null, world, random, rotation, x, y, z, chunks, null);
+
+        return true;
+    }
+
+    // Force spawns a BO3 object. Used by /otg spawn and bo3AtSpawn.
+    // This method ignores the maxPercentageOutsideBlock setting
+    @Override
+    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    {
+        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
+        HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
+
+        for (BO3BlockFunction block : blocks)
+        {
+            // Places if BO3 is in placeAnyway mode, or if target block is a source block
+            if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway
+                    || settings.sourceBlocks.contains(block.material))
+            {
+                block.spawn(world, random, x + block.x, y + block.y, z + block.z, null);
+                oeh.addBlock(block);
+                chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
+            }
         }
 
         oeh.extrude(world, random, x, y, z, null);

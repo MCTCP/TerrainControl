@@ -13,17 +13,9 @@ import java.util.*;
 public abstract class BranchFunction<T extends CustomObjectConfigFile> extends CustomObjectConfigFunction<T> implements Branch
 {
     /**
-     * The base X coordinate where this branch is expected to spawn
-     */
-    protected int x;
-    /**
      * The base Y coordinate where this branch is expected to spawn
      */
     protected int y;
-    /**
-     * The base Z coordinate where this branch is expected to spawn
-     */
-    protected int z;
     /**
      * holds each CustomObject, its spawn chance and its rotation as a node
      */

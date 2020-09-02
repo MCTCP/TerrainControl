@@ -26,30 +26,10 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private NoiseGeneratorPerlinMesaBlocks pillarRoofNoise;
     private NoiseGeneratorPerlinMesaBlocks clayBandsOffsetNoise;
 
-    private final LocalMaterialData hardenedClay;
-    private final LocalMaterialData redSand;
-    private final LocalMaterialData whiteStainedClay;
-    private final LocalMaterialData orangeStainedClay;
-    private final LocalMaterialData yellowStainedClay;
-    private final LocalMaterialData brownStainedClay;
-    private final LocalMaterialData redStainedClay;
-    private final LocalMaterialData silverStainedClay;
-    private final LocalMaterialData coarseDirt;
-
     private MesaSurfaceGenerator(boolean mountainMesa, boolean forestMesa)
     {
         this.brycePillars = mountainMesa;
         this.hasForest = forestMesa;
-
-        this.hardenedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.HARD_CLAY, 0);
-        this.redSand = MaterialHelper.toLocalMaterialData(DefaultMaterial.SAND, 1);
-        this.coarseDirt = MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 1);
-        this.whiteStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 0);
-        this.orangeStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 1);
-        this.yellowStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 4);
-        this.brownStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 12);
-        this.redStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 14);
-        this.silverStainedClay = MaterialHelper.toLocalMaterialData(DefaultMaterial.STAINED_CLAY, 8);
     }
 
     /**
@@ -87,7 +67,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private void generateBands(long p_150619_1_)
     {
         this.clayBands = new LocalMaterialData[64];
-        Arrays.fill(this.clayBands, this.hardenedClay);
+        Arrays.fill(this.clayBands, MaterialHelper.HARDENED_CLAY);
         Random random = new Random(p_150619_1_);
 
         this.clayBandsOffsetNoise = new NoiseGeneratorPerlinMesaBlocks(random, 1);
@@ -98,7 +78,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
             if (l1 < 64)
             {
-                this.clayBands[l1] = this.orangeStainedClay;
+                this.clayBands[l1] = MaterialHelper.ORANGE_STAINED_CLAY;
             }
         }
 
@@ -111,7 +91,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
             for (int l = 0; k + l < 64 && l < j; ++l)
             {
-                this.clayBands[k + l] = this.yellowStainedClay;
+                this.clayBands[k + l] = MaterialHelper.YELLOW_STAINED_CLAY;
             }
         }
 
@@ -124,7 +104,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
             for (int i1 = 0; l3 + i1 < 64 && i1 < i3; ++i1)
             {
-                this.clayBands[l3 + i1] = this.brownStainedClay;
+                this.clayBands[l3 + i1] = MaterialHelper.BROWN_STAINED_CLAY;
             }
         }
 
@@ -137,7 +117,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
             for (int j1 = 0; k4 + j1 < 64 && j1 < i4; ++j1)
             {
-                this.clayBands[k4 + j1] = this.redStainedClay;
+                this.clayBands[k4 + j1] = MaterialHelper.RED_STAINED_CLAY;
             }
         }
 
@@ -151,16 +131,16 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
 
             for (int k1 = 0; j4 + k1 < 64 && k1 < 1; ++k1)
             {
-                this.clayBands[j4 + k1] = this.whiteStainedClay;
+                this.clayBands[j4 + k1] = MaterialHelper.WHITE_STAINED_CLAY;
 
                 if (j4 + k1 > 1 && random.nextBoolean())
                 {
-                    this.clayBands[j4 + k1 - 1] = this.silverStainedClay;
+                    this.clayBands[j4 + k1 - 1] = MaterialHelper.SILVER_STAINED_CLAY;
                 }
 
                 if (j4 + k1 < 63 && random.nextBoolean())
                 {
-                    this.clayBands[j4 + k1 + 1] = this.silverStainedClay;
+                    this.clayBands[j4 + k1 + 1] = MaterialHelper.SILVER_STAINED_CLAY;
                 }
             }
         }
@@ -222,8 +202,8 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         
         int waterLevel = generatingChunk.getWaterLevel(x, z);
         
-        LocalMaterialData currentSurfaceBlock = whiteStainedClay;
-        LocalMaterialData currentGroundBlock = whiteStainedClay;
+        LocalMaterialData currentSurfaceBlock = MaterialHelper.WHITE_STAINED_CLAY;
+        LocalMaterialData currentGroundBlock = MaterialHelper.WHITE_STAINED_CLAY;
         
         LocalMaterialData surfaceBlock = biomeConfig.surfaceBlock.parseForWorld(world);
         LocalMaterialData groundBlock = biomeConfig.groundBlock.parseForWorld(world);
@@ -276,7 +256,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         }
                         else if (y >= waterLevel - 4 && y <= waterLevel + 1)
                         {
-                            currentSurfaceBlock = this.whiteStainedClay;
+                            currentSurfaceBlock = MaterialHelper.WHITE_STAINED_CLAY;
                             currentGroundBlock = groundBlock;
                         }
 
@@ -292,7 +272,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                             {
                                 if (cosNoiseIsLargerThanZero)
                                 {
-                                    chunkBuffer.setBlock(x, y, z, this.coarseDirt);
+                                    chunkBuffer.setBlock(x, y, z, MaterialHelper.COARSE_DIRT);
                                 } else {
                                     chunkBuffer.setBlock(x, y, z, surfaceBlock);
                                 }
@@ -303,24 +283,24 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                                 {
                                     if (cosNoiseIsLargerThanZero)
                                     {
-                                    	worldMaterial = this.hardenedClay;
+                                    	worldMaterial = MaterialHelper.HARDENED_CLAY;
                                     } else {
                                     	worldMaterial = this.getBand(xInWorld, y, zInWorld);
                                     }
                                 } else {
-                                	worldMaterial = this.orangeStainedClay;
+                                	worldMaterial = MaterialHelper.ORANGE_STAINED_CLAY;
                                 }
 
                                 chunkBuffer.setBlock(x, y, z, worldMaterial);
                             } else {
-                                chunkBuffer.setBlock(x, y, z, redSand);
+                                chunkBuffer.setBlock(x, y, z, MaterialHelper.RED_SAND);
                                 belowSand = true;
                             }
                         } else {
                             chunkBuffer.setBlock(x, y, z, currentGroundBlock);
                             if (currentGroundBlock.isMaterial(DefaultMaterial.STAINED_CLAY))
                             {
-                                chunkBuffer.setBlock(x, y, z, this.orangeStainedClay);
+                                chunkBuffer.setBlock(x, y, z, MaterialHelper.ORANGE_STAINED_CLAY);
                             }
                         }
                     }
@@ -329,7 +309,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
                         --k1;
                         if (belowSand)
                         {
-                            chunkBuffer.setBlock(x, y, z, this.orangeStainedClay);
+                            chunkBuffer.setBlock(x, y, z, MaterialHelper.ORANGE_STAINED_CLAY);
                         } else {
                         	worldMaterial = this.getBand(xInWorld, y, zInWorld);
                             chunkBuffer.setBlock(x, y, z, worldMaterial);

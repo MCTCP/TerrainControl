@@ -156,7 +156,6 @@ public class ClientPacketManager
 		int worldCount = wrappedStream.readInt();
 		
 		HashMap<Integer, String> dimsToRemove = OTGDimensionManager.getAllOTGDimensions(); // TODO: use String[] instead?
-		boolean isSinglePlayer = Minecraft.getMinecraft().isSingleplayer();
 		
 		for(int i = 0; i < worldCount; i++)
 		{
@@ -191,14 +190,14 @@ public class ClientPacketManager
 				ForgeWorld world = new ForgeWorld(worldName);
 				world.isLoadedOnServer = worldIsLoaded;
 				world.clientDimensionId = dimensionId;
-	            ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world, isSinglePlayer);
+	            ClientConfigProvider configs = new ClientConfigProvider(wrappedStream, world);
 	            
 	            world.provideClientConfigs(configs);
 	            worldLoader.LoadClientWorldFromPacket(world);
 			} else {
 	
 				// World already exists, read the data from the stream but don't create a world.
-				new ClientConfigProvider(wrappedStream, new ForgeWorld(worldName), isSinglePlayer);
+				new ClientConfigProvider(wrappedStream, new ForgeWorld(worldName));
 			}
 		}
 	
@@ -217,6 +216,17 @@ public class ClientPacketManager
 			}
 		}
 		
+		// Send modpack configs for client GUI (default settings when creating new dim)
+		// TODO: Should only have to do this once per session per client, the modpack configs shouldn't change during a session. 
+		// Serialising/sending/receiving/deserialising large Yaml strings for every packet may slow things down. 
+		int modPackConfigsCount = wrappedStream.readInt();
+		ArrayList<DimensionsConfig> modPackConfigs = new ArrayList<DimensionsConfig>();
+		for(int i = 0; i < modPackConfigsCount; i++)
+		{
+			modPackConfigs.add(DimensionsConfig.fromYamlString(StreamHelper.readStringFromStream(wrappedStream)));
+		}
+		OTG.getEngine().getModPackConfigManager().setAllModPackConfigs(modPackConfigs);
+
 		if(
 			Minecraft.getMinecraft().currentScreen != null
 			&& (

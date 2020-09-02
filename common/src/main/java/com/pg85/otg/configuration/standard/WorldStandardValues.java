@@ -23,14 +23,23 @@ public class WorldStandardValues extends Settings
     public static final String WORLD_BIOMES_DIRECTORY_NAME = "WorldBiomes";
     public static final String WORLD_OBJECTS_DIRECTORY_NAME = "WorldObjects";
 
-	// Modpack config name    
 	public static String DimensionsConfigFileName = "Config.yaml";
+	public static String DimensionsConfigBackupFileName = "Config-backup.yaml";
+	public static String BiomeIdDataFileName = "BiomeIds.txt";
+	public static String BiomeIdDataBackupFileName = "BiomeIds-backup.txt";
 	public static String DimensionsDataFileName = "Dimensions.txt";
+	public static String DimensionsDataBackupFileName = "Dimensions-backup.txt";
 	public static String StructureDataFileName = "StructureData.txt";
+	public static String StructureDataBackupFileName = "StructureData-backup.txt";
 	public static String NullChunksFileName = "NullChunks.txt";
+	public static String NullChunksBackupFileName = "NullChunks-backup.txt";
 	public static String SpawnedStructuresFileName = "SpawnedStructures.txt";
+	public static String SpawnedStructuresBackupFileName = "SpawnedStructures-backup.txt";
 	public static String ChunkProviderPopulatedChunksFileName = "ChunkProviderPopulatedChunks.txt";
 	public static String PregeneratedChunksFileName = "PregeneratedChunks.txt";
+	public static String PregeneratedChunksBackupFileName = "PregeneratedChunks-backup.txt";
+	public static String WorldSaveDataFileName = "WorldSave.txt";
+	public static String WorldSaveDataBackupFileName = "WorldSave-backup.txt";
     
     /**
      * Temperatures below this temperature will cause the biome to be covered
@@ -82,7 +91,11 @@ public class WorldStandardValues extends Settings
 		ITEMS_TO_ADD_ON_RESPAWN = stringSetting("ItemsToAddOnRespawn", ""),
 		
     	DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
-    	DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean")
+    	DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean"),
+    	
+    	PORTAL_COLOR = stringSetting("PortalColor", "default"),
+    	PORTAL_PARTICLE_TYPE = stringSetting("PortalParticleType", "portal"),
+    	PORTAL_MOB_TYPE = stringSetting("PortalMobType", "zombie_pigman");
 	;
 
     public static final Setting<Integer>
@@ -142,9 +155,11 @@ public class WorldStandardValues extends Settings
 
 		SPAWN_POINT_X = intSetting("SpawnPointX", 0, -999999, 999999),
 		SPAWN_POINT_Y = intSetting("SpawnPointY", 0, -999999, 999999),
-		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, -999999, 999999)
+		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, -999999, 999999),
+		
+		PORTAL_MOB_SPAWN_CHANCE = intSetting("PortalMobSpawnChance", 2000, 0, 999999);
     ;
-
+    
     public static final Setting<Boolean>
         RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
         GROUP_FREEZE_ENABLED = booleanSetting("FreezeAllBiomesInColdGroup", false),
@@ -169,6 +184,8 @@ public class WorldStandardValues extends Settings
         POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
 		IMPROVED_BIOME_BORDERS = booleanSetting("ImprovedBiomeBorders", false),
 		IMPROVED_BIOME_GROUPS = booleanSetting("ImprovedBiomeGroups", false),
+		CUSTOM_HEIGHT_CONTROL_SMOOTHING = booleanSetting("CustomHeightControlSmoothing", false),
+		IMPROVED_SMOOTHING = booleanSetting("ImprovedSmoothing", false),
 
 		TeleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
 		CommandBlockOutput = booleanSetting("CommandBlockOutput", true),

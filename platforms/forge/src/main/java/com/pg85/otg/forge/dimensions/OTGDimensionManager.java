@@ -3,12 +3,13 @@ package com.pg85.otg.forge.dimensions;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -75,9 +76,9 @@ public class OTGDimensionManager
 		return false;
 	}
 
-	public static void registerDimension(int id, DimensionType type)
-	{
-		DimensionManager.registerDimension(id, type);
+	public static void registerDimension(int dimId, DimensionType type)
+	{		
+		DimensionManager.registerDimension(dimId, type);
 
 		int maxOrder = -1;
 		for(Integer dimOrder : orderedDimensions.values())
@@ -87,10 +88,10 @@ public class OTGDimensionManager
 				maxOrder = dimOrder;
 			}
 		}
-		orderedDimensions.put(id, maxOrder + 1);
+		orderedDimensions.put(dimId, maxOrder + 1);
 		
         NBTTagCompound compound = new NBTTagCompound();
-        compound.setInteger("dimensionID", id);
+        compound.setInteger("dimensionID", dimId);
         ArrayList<String> types = new ArrayList<String>();
         types.add("OPEN_TERRAIN_GENERATOR");
         writeNBTStrings("types", types, compound);
@@ -145,35 +146,80 @@ public class OTGDimensionManager
 		return false;
 	}
 
-	static ArrayList<Integer> GetOTGDimensions()
+	public static ArrayList<Integer> GetOTGDimensions()
 	{
 		return new ArrayList<Integer>(orderedDimensions.keySet());
 	}
 	
-	public static int createDimension(String dimensionName, boolean keepLoaded, boolean initDimension, boolean saveDimensionData)
+	public static boolean createDimension(DimensionConfig dimConfig, boolean saveDimensionData)
 	{
-		return createDimension(-1l, dimensionName, keepLoaded, initDimension, saveDimensionData);
+		return createDimension(dimConfig, -1l, saveDimensionData);
 	}
 	
-	public static int createDimension(long seed, String dimensionName, boolean keepLoaded, boolean initDimension, boolean saveDimensionData)
+	private static int getNextFreeDimId(String presetName)
 	{
-		int newDimId = DimensionManager.getNextFreeDimId();
-
-		registerDimension(newDimId, DimensionType.register(dimensionName, "OTG", newDimId, OTGWorldProvider.class, keepLoaded));
-		
-		if(initDimension)
+		HashMap<Integer, String> reservedIds = OTG.getEngine().getModPackConfigManager().getReservedDimIds();
+		for(int i = 3; i <= 1024; i++)
 		{
-			initDimension(newDimId, seed);
+			String presetReservingId = reservedIds.get(Integer.valueOf(i)); 
+			if(presetReservingId == null || presetReservingId.equals(presetName))
+			{
+				if(!DimensionManager.isDimensionRegistered(i))
+				{
+					return i;
+				}
+			}
 		}
+		return 0;
+	}
+
+	private static int checkDimIdReserved(int dimId, String presetName)
+	{
+		HashMap<Integer, String> reservedIds = OTG.getEngine().getModPackConfigManager().getReservedDimIds();
+		String presetReservingId = reservedIds.get(Integer.valueOf(dimId)); 
+		if(presetReservingId == null || presetReservingId.equals(presetName))
+		{
+			if(!DimensionManager.isDimensionRegistered(dimId))
+			{
+				return dimId;
+			}
+		}
+		return 0;
+	}
+
+	public static boolean createDimension(DimensionConfig dimConfig, long seed, boolean saveDimensionData)
+	{			
+		int newDimId = dimConfig.DimensionId == 0 ? getNextFreeDimId(dimConfig.PresetName) : checkDimIdReserved(dimConfig.DimensionId, dimConfig.PresetName);
+		
+		if(newDimId == 0)
+		{
+			return false;
+		}
+
+		dimConfig.DimensionId = newDimId;
+		
+		if(!OTG.getDimensionsConfig().Dimensions.contains(dimConfig))
+		{
+			OTG.getDimensionsConfig().Dimensions.add(dimConfig);
+		} else {
+			// Should only happen when loading existing dims on server start.
+			String breakpoint = "";
+		}
+
+		// TODO: Don't use presetname == dimname, allow presets to be used across dimensions (need to fix biomes first).
+		registerDimension(newDimId, DimensionType.register(dimConfig.PresetName, "OTG", newDimId, OTGWorldProvider.class, false));
+		
+		initDimension(newDimId, seed);
 
 		if(saveDimensionData)
 		{
 			SaveDimensionData();
 		}
 
-		return newDimId;
+		return true;
 	}
 
+	// TODO: Getting "world may have leaked log messages from DimensionManager. Make sure world/weakworlds/dimensions are all properly cleared when deleting dims?
 	private static void removeFromUsedIds(int dimensionId)
 	{
 		// Forge 1.12.2-14.23.5.2768 uses BitSet dimensionMap
@@ -369,7 +415,7 @@ public class OTGDimensionManager
             }        	
         }
         
-        WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
+        WorldConfig worldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimConfig.PresetName));
         
 		long seedIn = seed == -1 ? (long) Math.floor((Math.random() * Long.MAX_VALUE)) : seed;
 		GameType gameType = dimConfig.GameType.equals("Creative") ? GameType.CREATIVE : GameType.SURVIVAL;
@@ -377,7 +423,7 @@ public class OTGDimensionManager
 		boolean hardcoreMode = dimConfig.GameType.equals("Hardcore");
 
 		WorldSettings settings = new WorldSettings(seedIn, gameType, enableMapFeatures, hardcoreMode, OTGPlugin.OtgWorldType);
-		settings.setGeneratorOptions("OpenTerrainGenerator");
+		settings.setGeneratorOptions(PluginStandardValues.PLUGIN_NAME);
 		
 		WorldInfo worldInfo = new WorldInfo(settings, dimensionName);
         WorldServer world = (WorldServer)(new OTGWorldServerMulti(mcServer, savehandler, dim, overworld, mcServer.profiler, worldInfo).init());       
@@ -450,14 +496,10 @@ public class OTGDimensionManager
 	public static void SaveDimensionData()
 	{
 		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsDataFileName);
-		if(dimensionDataFile.exists())
-		{
-			dimensionDataFile.delete();
-		}
-
+		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsDataFileName);
+		File dimensionDataBackupFile = new File(world.getSaveHandler().getWorldDirectory() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsDataBackupFileName);
+		
 		StringBuilder stringbuilder = new StringBuilder();
-
 		for(int i = 0; i < Long.SIZE << 4; i++)
 		{
 			if(i == 1)
@@ -490,23 +532,249 @@ public class OTGDimensionManager
 		BufferedWriter writer = null;
         try
         {
-        	dimensionDataFile.getParentFile().mkdirs();
+    		if(!dimensionDataFile.exists())
+    		{
+    			dimensionDataFile.getParentFile().mkdirs();
+    		} else {
+    			Files.move(dimensionDataFile.toPath(), dimensionDataBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+    		}
+        	
         	writer = new BufferedWriter(new FileWriter(dimensionDataFile));
             writer.write(stringbuilder.toString());
             OTG.log(LogMarker.DEBUG, "Custom dimension data saved");
         }
         catch (IOException e)
         {
-        	OTG.log(LogMarker.ERROR, "Could not save custom dimension data.");
-            e.printStackTrace();
+			e.printStackTrace();
+			throw new RuntimeException(
+				"OTG encountered a critical error writing " + dimensionDataFile.getAbsolutePath() + ", exiting. "
+				+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+				+ "If your world's " + WorldStandardValues.DimensionsDataFileName + " and its backup have been corrupted, "
+				+ "you can replace it with a backup or create a new world with the same dimensions and copy its " 
+				+ WorldStandardValues.DimensionsDataFileName + ".");
         }
         finally
         {
             try
             {
                 writer.close();
-            } catch (Exception e) { }
+            }
+            catch (Exception e)
+            {
+            	String breakpoint = "";
+            }
         }
+	}
+
+	public static OTGDimensionInfo LoadOrderedDimensionData()
+	{
+		// Fetch the dimension data using the appropriate method to avoid duplicate lines
+		ArrayList<DimensionData> dimensionData = GetDimensionData(DimensionManager.getWorld(0).getSaveHandler().getWorldDirectory());
+
+		// Store the order in which dimensions were added
+		// TODO: Should this still even matter? Biome id's are saved once generated, dim id's are used when loading dims?
+		orderedDimensions = new HashMap<Integer, Integer>();
+		orderedDimensions.put(0,0);
+		HashMap<Integer, DimensionData> orderedDimensions1 = new HashMap<Integer, DimensionData>();
+		int highestOrder = 0;
+		if(dimensionData != null)
+		{
+			for(DimensionData dimData : dimensionData)
+			{
+				orderedDimensions.put(dimData.dimensionId, dimData.dimensionOrder);
+				orderedDimensions1.put(dimData.dimensionOrder, dimData);
+				if(dimData.dimensionOrder > highestOrder)
+				{
+					highestOrder = dimData.dimensionOrder;
+				}
+			}
+		}
+
+		return new OTGDimensionInfo(highestOrder, orderedDimensions1);
+	}
+		
+	public static void LoadCustomDimensionData()
+	{
+		OTGDimensionInfo otgDimData = LoadOrderedDimensionData();
+		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+		
+		// Recreate dimensions in the correct order
+		for(int i = 0; i <= otgDimData.highestOrder; i++)
+		{
+			if(otgDimData.orderedDimensions.containsKey(i))
+			{
+				DimensionData dimData = otgDimData.orderedDimensions.get(i);
+
+				if(!DimensionManager.isDimensionRegistered(dimData.dimensionId))
+				{
+					if(dimData.dimensionId != 0)
+					{
+						boolean bFound = false;
+						for(DimensionConfig dimConfig : dimsConfig.Dimensions)
+						{
+							if(dimConfig.PresetName.equals(dimData.dimensionName))
+							{
+								bFound = true;
+								break;
+							}
+						}
+						if(!bFound)
+						{
+							// No DimensionConfig exists for this dimension
+							// Must be a legacy dimension, create a config for it based on the worldconfig
+							WorldConfig worldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							if(worldConfig == null)
+							{
+								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
+							}
+							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, dimData.dimensionId, true, worldConfig);
+							dimsConfig.Dimensions.add(new DimensionConfig(dimConfig));
+						}
+					} else {
+						if(dimsConfig.Overworld == null)
+						{
+							// No DimensionConfig exists for the overworld
+							// Must be a legacy world, create a config for it based on the worldconfig
+							WorldConfig worldConfig = WorldConfig.fromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
+							if(worldConfig == null)
+							{
+								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
+							}
+							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, 0, true, worldConfig);
+							dimsConfig.Overworld = new DimensionConfig(dimConfig);
+						}
+					}
+					
+					OTGDimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, OTGWorldProvider.class, dimData.keepLoaded));
+					OTGDimensionManager.initDimension(dimData.dimensionId);
+				}
+			}
+		}
+		dimsConfig.save();
+	}
+
+	public static ArrayList<DimensionData> GetDimensionData(File worldSaveDir)
+	{
+		File dimensionDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsDataFileName);
+		File dimensionDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsDataBackupFileName);		
+		
+		if(!dimensionDataFile.exists() && !dimensionDataBackupFile.exists())
+		{
+			return null;
+		}		
+
+		if(dimensionDataFile.exists())
+		{
+			String[] dimensionDataFileValues = {};
+			boolean bSuccess = false;
+			try {
+				StringBuilder stringbuilder = new StringBuilder();
+				BufferedReader reader = new BufferedReader(new FileReader(dimensionDataFile));
+				try {
+					String line = reader.readLine();
+
+				    while (line != null)
+				    {
+				    	stringbuilder.append(line);
+				        line = reader.readLine();
+				    }
+				    if(stringbuilder.length() > 0)
+				    {
+				    	dimensionDataFileValues = stringbuilder.toString().split(",");
+				    }
+				    bSuccess = true;				    
+				} finally {
+					reader.close();
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+				OTG.log(LogMarker.WARN, "Failed to load " + dimensionDataFile.getAbsolutePath() + ", trying to load backup.");
+			}
+			
+			if(bSuccess)
+			{
+				try
+				{
+					return parseDimensionDataValues(dimensionDataFileValues);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+					OTG.log(LogMarker.WARN, "Failed to load " + dimensionDataFile.getAbsolutePath() + ", trying to load backup.");
+				}
+			}
+		}
+		
+		if(dimensionDataBackupFile.exists())
+		{
+			String[] dimensionDataFileValues = {};
+			boolean bSuccess = false;
+			try {
+				StringBuilder stringbuilder = new StringBuilder();
+				BufferedReader reader = new BufferedReader(new FileReader(dimensionDataBackupFile));
+				try {
+					String line = reader.readLine();
+
+				    while (line != null)
+				    {
+				    	stringbuilder.append(line);
+				        line = reader.readLine();
+				    }
+				    if(stringbuilder.length() > 0)
+				    {
+				    	dimensionDataFileValues = stringbuilder.toString().split(",");
+				    }
+			    	bSuccess = true;				    
+				} finally {
+					reader.close();
+				}
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+			
+			if(bSuccess)
+			{
+				try
+				{
+					return parseDimensionDataValues(dimensionDataFileValues);
+				}
+				catch(Exception ex)
+				{
+					ex.printStackTrace();
+				}
+			}
+		}
+		
+		throw new RuntimeException(
+			"OTG encountered a critical error loading " + dimensionDataFile.getAbsolutePath() + " and could not load a backup, exiting. "
+			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+			+ "If your world's " + WorldStandardValues.DimensionsDataFileName + " and its backup have been corrupted, "
+			+ "you can replace it with a backup or create a new world with the same dimensions and copy its " 
+			+ WorldStandardValues.DimensionsDataFileName + ".");			
+	}
+	
+	private static ArrayList<DimensionData> parseDimensionDataValues(String[] dimensionDataFileValues)
+	{
+		ArrayList<DimensionData> dimensionData = new ArrayList<DimensionData>();
+		if(dimensionDataFileValues.length > 0)
+		{
+			for(int i = 0; i < dimensionDataFileValues.length; i += 5)
+			{
+				DimensionData dimData = new DimensionData();
+				dimData.dimensionId = Integer.parseInt(dimensionDataFileValues[i]);
+				dimData.dimensionName = dimensionDataFileValues[i + 1];
+				dimData.keepLoaded = Boolean.parseBoolean(dimensionDataFileValues[i + 2]);
+				dimData.seed = Long.parseLong(dimensionDataFileValues[i + 3]);
+				dimData.dimensionOrder = Integer.parseInt(dimensionDataFileValues[i + 4]);
+				dimensionData.add(dimData);
+			}
+		    OTG.log(LogMarker.DEBUG, "Custom dimension data loaded");
+		}
+		return dimensionData;
 	}
 
 	public static void UnloadAllCustomDimensionData()
@@ -552,188 +820,6 @@ public class OTGDimensionManager
 		}
 	}
 
-	public static OTGDimensionInfo LoadOrderedDimensionData()
-	{
-		World world = DimensionManager.getWorld(0);
-		File dimensionDataFile = new File(world.getSaveHandler().getWorldDirectory() + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsDataFileName);
-		String[] dimensionDataFileValues = {};
-		if(dimensionDataFile.exists())
-		{
-			try {
-				StringBuilder stringbuilder = new StringBuilder();
-				BufferedReader reader = new BufferedReader(new FileReader(dimensionDataFile));
-				try {
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        line = reader.readLine();
-				    }
-				    if(stringbuilder.length() > 0)
-				    {
-				    	dimensionDataFileValues = stringbuilder.toString().split(",");
-				    }
-				    OTG.log(LogMarker.DEBUG, "Custom dimension data loaded");
-				} finally {
-					reader.close();
-				}
-
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}
-
-		ArrayList<DimensionData> dimensionData = new ArrayList<DimensionData>();
-		if(dimensionDataFileValues.length > 0)
-		{
-			for(int i = 0; i < dimensionDataFileValues.length; i += 5)
-			{
-				DimensionData dimData = new DimensionData();
-				dimData.dimensionId = Integer.parseInt(dimensionDataFileValues[i]);
-				dimData.dimensionName = dimensionDataFileValues[i + 1];
-				dimData.keepLoaded = Boolean.parseBoolean(dimensionDataFileValues[i + 2]);
-				dimData.seed = Long.parseLong(dimensionDataFileValues[i + 3]);
-				dimData.dimensionOrder = Integer.parseInt(dimensionDataFileValues[i + 4]);
-				dimensionData.add(dimData);
-			}
-		}
-
-		// Store the order in which dimensions were added
-		orderedDimensions = new HashMap<Integer, Integer>();
-		orderedDimensions.put(0,0);
-		HashMap<Integer, DimensionData> orderedDimensions1 = new HashMap<Integer, DimensionData>();
-		int highestOrder = 0;
-		for(DimensionData dimData : dimensionData)
-		{
-			orderedDimensions.put(dimData.dimensionId, dimData.dimensionOrder);
-			orderedDimensions1.put(dimData.dimensionOrder, dimData);
-			if(dimData.dimensionOrder > highestOrder)
-			{
-				highestOrder = dimData.dimensionOrder;
-			}
-		}
-
-		return new OTGDimensionInfo(highestOrder, orderedDimensions1);
-	}
-
-	public static ArrayList<DimensionData> GetDimensionData(File worldSaveDir)
-	{
-		File dimensionDataFile = new File(worldSaveDir + File.separator + "OpenTerrainGenerator" + File.separator + WorldStandardValues.DimensionsDataFileName);
-		String[] dimensionDataFileValues = {};
-		if(dimensionDataFile.exists())
-		{
-			try {
-				StringBuilder stringbuilder = new StringBuilder();
-				BufferedReader reader = new BufferedReader(new FileReader(dimensionDataFile));
-				try {
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        line = reader.readLine();
-				    }
-				    if(stringbuilder.length() > 0)
-				    {
-				    	dimensionDataFileValues = stringbuilder.toString().split(",");
-				    }
-				    OTG.log(LogMarker.DEBUG, "Custom dimension data loaded");
-				} finally {
-					reader.close();
-				}
-
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			}
-			catch (IOException e1) {
-				e1.printStackTrace();
-			}
-		}
-
-		ArrayList<DimensionData> dimensionData = new ArrayList<DimensionData>();
-		if(dimensionDataFileValues.length > 0)
-		{
-			for(int i = 0; i < dimensionDataFileValues.length; i += 5)
-			{
-				DimensionData dimData = new DimensionData();
-				dimData.dimensionId = Integer.parseInt(dimensionDataFileValues[i]);
-				dimData.dimensionName = dimensionDataFileValues[i + 1];
-				dimData.keepLoaded = Boolean.parseBoolean(dimensionDataFileValues[i + 2]);
-				dimData.seed = Long.parseLong(dimensionDataFileValues[i + 3]);
-				dimData.dimensionOrder = Integer.parseInt(dimensionDataFileValues[i + 4]);
-				dimensionData.add(dimData);
-			}
-		}
-		
-		return dimensionData;
-	}
-	
-	public static void LoadCustomDimensionData()
-	{
-		OTGDimensionInfo otgDimData = LoadOrderedDimensionData();
-
-		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
-		
-		// Recreate dimensions in the correct order
-		for(int i = 0; i <= otgDimData.highestOrder; i++)
-		{
-			if(otgDimData.orderedDimensions.containsKey(i))
-			{
-				DimensionData dimData = otgDimData.orderedDimensions.get(i);
-
-				if(!DimensionManager.isDimensionRegistered(dimData.dimensionId))
-				{
-					if(dimData.dimensionId != 0)
-					{
-						boolean bFound = false;
-						for(DimensionConfig dimConfig : dimsConfig.Dimensions)
-						{
-							if(dimConfig.PresetName.equals(dimData.dimensionName))
-							{
-								bFound = true;
-								break;
-							}
-						}
-						if(!bFound)
-						{
-							// No DimensionConfig exists for this dimension
-							// Must be a legacy dimension, create a config for it based on the worldconfig
-							WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
-							if(worldConfig == null)
-							{
-								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
-							}
-							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig, true);
-							dimsConfig.Dimensions.add(new DimensionConfig(dimConfig));
-						}
-					} else {
-						if(dimsConfig.Overworld == null)
-						{
-							// No DimensionConfig exists for the overworld
-							// Must be a legacy world, create a config for it based on the worldconfig
-							WorldConfig worldConfig = WorldConfig.loadWorldConfigFromDisk(new File(OTG.getEngine().getWorldsDirectory(), dimData.dimensionName));
-							if(worldConfig == null)
-							{
-								throw new RuntimeException("Could not initialise dimension " + dimData.dimensionId + "\", OTG preset \"" + dimData.dimensionName + "\" is not installed.");
-							}
-							DimensionConfigGui dimConfig = new DimensionConfigGui(dimData.dimensionName, worldConfig, true);
-							dimsConfig.Overworld = new DimensionConfig(dimConfig);
-						}
-					}
-					
-					OTGDimensionManager.registerDimension(dimData.dimensionId, DimensionType.register(dimData.dimensionName, "OTG", dimData.dimensionId, OTGWorldProvider.class, dimData.keepLoaded));
-					OTGDimensionManager.initDimension(dimData.dimensionId);
-				}
-			}
-		}
-		
-		dimsConfig.save();
-	}
-	
 	public static HashMap<Integer, String> getAllOTGDimensions()
 	{
 		HashMap<Integer, String> otgDims = new HashMap<Integer, String>();
@@ -750,12 +836,8 @@ public class OTGDimensionManager
 		return otgDims;
 	}
 
-	public static void createNewDimensionSP(DimensionConfig dimensionConfig, MinecraftServer server)
-	{
-		DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
-		dimensionConfig.isNewConfig = false;
-		dimsConfig.Dimensions.add(dimensionConfig);
-		
+	public static boolean createNewDimensionSP(DimensionConfig dimensionConfig, MinecraftServer server)
+	{		
 		// Create new world
 		long seed = (long) Math.floor((Math.random() * Long.MAX_VALUE));   	        				
 		try
@@ -767,7 +849,10 @@ public class OTGDimensionManager
 			// TODO
 		}
 		
-		OTGDimensionManager.createDimension(seed, dimensionConfig.PresetName, false, true, true);
+		if(!OTGDimensionManager.createDimension(dimensionConfig, seed, true))
+		{
+			return false;
+		}
 		ForgeWorld createdWorld = (ForgeWorld) OTG.getWorld(dimensionConfig.PresetName);
 		if(createdWorld == null)
 		{
@@ -779,5 +864,6 @@ public class OTGDimensionManager
 		}
 
 		OTG.getDimensionsConfig().save();
+		return true;
 	}
 }

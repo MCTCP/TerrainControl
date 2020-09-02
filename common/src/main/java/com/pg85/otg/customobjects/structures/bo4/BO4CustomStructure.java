@@ -256,7 +256,7 @@ public class BO4CustomStructure extends CustomStructure
 						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, false, true, true, true, null);
 					}
 
-					if(highestBlock < 1)
+					if(highestBlock < 0)
 					{
 						//OTG.log(LogMarker.INFO, "Structure " + Start.BO3Name + " could not be plotted at Y < 1. If you are creating empty chunks intentionally (for a sky world for instance) then make sure you don't use the highestBlock setting for your BO3's");
 						if(((BO4)this.start.getObject()).getConfig().heightOffset > 0) // Allow floating structures that use highestblock + heightoffset
@@ -2124,13 +2124,13 @@ public class BO4CustomStructure extends CustomStructure
     */
     public void spawnInChunk(ChunkCoordinate chunkCoordinate, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
     {
-    	//OTG.log(LogMarker.INFO, "SpawnForChunk X" + chunkCoordinate.getChunkX() + " Z" + chunkCoordinate.getChunkZ() + " " + Start.BO3Name);
-
+    	//OTG.log(LogMarker.INFO, "SpawnForChunk X" + chunkCoordinate.getChunkX() + " Z" + chunkCoordinate.getChunkZ() + " " + this.start.bo3Name);
+    	   	
     	if ((!objectsToSpawn.containsKey(chunkCoordinate) && !smoothingAreasToSpawn.containsKey(chunkCoordinate)))
         {
             return;
         }
-
+    	
         // Get all BO3's that should spawn in the given chunk, if any
         // Note: The given chunk may not necessarily be the chunkCoordinate of this.Start
         Stack<BO4CustomStructureCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
@@ -2191,7 +2191,7 @@ public class BO4CustomStructure extends CustomStructure
             // Spawn smooth areas in this chunk if any exist
         	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, smoothingAreasToSpawn, this.start, world, chunkBeingPopulated);
 
-        	// Spawn blocks modData/spawners/particles/entities.
+        	// Spawn blocks/modData/spawners/particles/entities.
             for (BO4CustomStructureCoordinate coordObject : objectsInChunk)
             {
                 if (coordObject.isSpawned)

@@ -19,6 +19,8 @@ public abstract class DimensionConfigBase
 	
 	// Capital letters since we'll be serialising to yaml (and we want to make it look nice)
 	public String PresetName;
+	public int DimensionId;
+	public boolean ShowInWorldCreationGUI = true;
 	public String Seed = WorldStandardValues.WORLD_SEED.getDefaultValue();
     public String GameType = "Survival";
     public boolean BonusChest = false;
@@ -30,14 +32,18 @@ public abstract class DimensionConfigBase
 	
 	public DimensionConfigBase() { }
 	
-	DimensionConfigBase(String presetName)
+	DimensionConfigBase(String presetName, int dimensionId, boolean showInWorldCreationGUI)
 	{
 		this.PresetName = presetName;
+		this.DimensionId = dimensionId;
+		this.ShowInWorldCreationGUI = showInWorldCreationGUI;
 	}
 	
-	DimensionConfigBase(String presetName, WorldConfig worldConfig)
+	DimensionConfigBase(String presetName, int dimensionId, boolean showInWorldCreationGUI, WorldConfig worldConfig)
 	{
 		this.PresetName = presetName;
+		this.DimensionId = dimensionId;
+		this.ShowInWorldCreationGUI = showInWorldCreationGUI;
 		this.Seed = worldConfig.worldSeed;
 		this.WorldBorderRadiusInChunks = worldConfig.worldBorderRadius;
 		this.PregeneratorRadiusInChunks = worldConfig.preGenerationRadius;
@@ -59,6 +65,10 @@ public abstract class DimensionConfigBase
 			portalMaterials.add(mat.getName().toUpperCase());
 		}
 		this.Settings.DimensionPortalMaterials = portalMaterials.toArray(new String[0]);
+		this.Settings.PortalColor = worldConfig.portalColor;
+		this.Settings.PortalParticleType = worldConfig.portalParticleType; 
+		this.Settings.PortalMobType = worldConfig.portalMobType;
+		this.Settings.PortalMobSpawnChance = worldConfig.portalMobSpawnChance;		
 		this.Settings.DoesWaterVaporize = worldConfig.doesWaterVaporize;
 		this.Settings.DoesXZShowFog = worldConfig.doesXZShowFog;
 		this.Settings.ExplosionsCanBreakBlocks = worldConfig.explosionsCanBreakBlocks;

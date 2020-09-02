@@ -51,7 +51,9 @@ public class WorldConfig extends ConfigFile
 
     public boolean improvedBiomeBorders;
     public boolean improvedBiomeGroups;
-    
+    public boolean customHeightControlSmoothing;
+    public boolean improvedSmoothing;
+
     // Dimensions
     public List<String> dimensions = new ArrayList<String>();
 
@@ -60,7 +62,7 @@ public class WorldConfig extends ConfigFile
 	
 	// Replace blocks
 	private List<ReplaceBlocks> replaceBlocksList = null;
-    private HashMap<DefaultMaterial,LocalMaterialData> replaceBlocksDict = null;
+    private HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
     private FallbackConfig fallbacks;
     private Map<String, LocalMaterialData> fallbackCache = new HashMap<String, LocalMaterialData>();
 
@@ -219,9 +221,13 @@ public class WorldConfig extends ConfigFile
     public String worldSeed;
 
     public ArrayList<LocalMaterialData> dimensionPortalMaterials;
+    public String portalColor;
+    public String portalParticleType; 
+    public String portalMobType;
+    public int portalMobSpawnChance;
+    
     public String dimensionBelow;
     public String dimensionAbove;
-
     public int dimensionBelowHeight;
     public int dimensionAboveHeight;
 
@@ -421,11 +427,15 @@ public class WorldConfig extends ConfigFile
                     try
                     {
                         material = MaterialHelper.readMaterial(replacement);
-                    } catch (InvalidConfigException e)
-                    {
-                        e.printStackTrace();
                     }
-                    if (material != null && material.isParsed())
+                    catch (InvalidConfigException e)
+                    {
+                    	if(OTG.getPluginConfig().spawnLog)
+                    	{
+                    		OTG.log(LogMarker.WARN, "Fallback material could not be parsed: " + replacement);
+                    	}
+                    }
+                    if (material != null)
 					{
                         fallbackCache.put(raw, material);
                         return material;
@@ -446,7 +456,7 @@ public class WorldConfig extends ConfigFile
         return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
     }
     
-    public HashMap<DefaultMaterial,LocalMaterialData> getReplaceBlocksDict()
+    public HashMap<LocalMaterialData,LocalMaterialData> getReplaceBlocksDict()
     {
     	if(replaceBlocksDict != null)
     	{
@@ -454,13 +464,13 @@ public class WorldConfig extends ConfigFile
     	}
     	if(replaceBlocksDict == null && replaceBlocksList != null)
     	{
-    		replaceBlocksDict = new HashMap<DefaultMaterial,LocalMaterialData>();
+    		replaceBlocksDict = new HashMap<LocalMaterialData,LocalMaterialData>();
     		for(ReplaceBlocks blockNames : replaceBlocksList)
     		{
     			try {
     				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
     				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-					replaceBlocksDict.put(MaterialHelper.readMaterial(blockNames.getSourceBlock()).toDefaultMaterial(), MaterialHelper.readMaterial(blockNames.getTargetBlock()));
+					replaceBlocksDict.put(MaterialHelper.readMaterial(blockNames.getSourceBlock()), MaterialHelper.readMaterial(blockNames.getTargetBlock()));
 				} catch (InvalidConfigException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -629,6 +639,8 @@ public class WorldConfig extends ConfigFile
 
         this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS);
         this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS);
+        this.customHeightControlSmoothing = reader.getSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING);
+        this.improvedSmoothing = reader.getSetting(WorldStandardValues.IMPROVED_SMOOTHING);
         
         // Images
         this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE);
@@ -732,6 +744,11 @@ public class WorldConfig extends ConfigFile
         this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
         this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
         this.dimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
+
+        this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR);
+        this.portalParticleType = reader.getSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE);
+        this.portalMobType = reader.getSetting(WorldStandardValues.PORTAL_MOB_TYPE);
+        this.portalMobSpawnChance = reader.getSetting(WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE);
 
         // Dimensions
         this.dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
@@ -995,7 +1012,13 @@ public class WorldConfig extends ConfigFile
         		"Spawns more precise borders that never spill over into neighbouring biomes. Disabled by default for legacy worlds.");
 
         writer.putSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS, this.improvedBiomeGroups,
-        		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");        
+        		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");
+
+        writer.putSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING, this.customHeightControlSmoothing,
+                "Smooths biome CustomHeightControl data. Disabled by default for legacy worlds.");
+
+        writer.putSetting(WorldStandardValues.IMPROVED_SMOOTHING, this.improvedSmoothing,
+                "Smooths volatility and max average data. Disabled by default for legacy worlds.");
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 
@@ -1387,6 +1410,17 @@ public class WorldConfig extends ConfigFile
                 "For blocks that have rotation such as QUARTZ_STAIRS, \"QUARTZ_STAIRS\" is the same as \"QUARTZ_STAIRS:3\"."
         		);
 
+        writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
+        		"The color of OTG portal blocks, \"" + WorldStandardValues.PORTAL_COLOR + "\" by default." + 
+        		"Colors: beige, black, blue, crystalblue, darkblue, darkgreen, darkred, emerald, flame," +
+				"gold, green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default.");         
+        writer.putSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE, this.portalParticleType,
+        		"The type of particles spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_PARTICLE_TYPE + "\" by default. For a list of particles, use /otg particles"); 
+        writer.putSetting(WorldStandardValues.PORTAL_MOB_TYPE, this.portalMobType,        		
+        		"The type of mobs spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_TYPE + "\" by default. For a list of mobs, use /otg entities");
+        writer.putSetting(WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE, this.portalMobSpawnChance,        		
+        		"The mob spawn chance for OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE + "\" by default, lower value means higher chance. Mob spawn chance also depends on difficulty level.");        
+
         writer.putSetting(WorldStandardValues.TeleportToSpawnOnly, this.teleportToSpawnOnly,
         		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
 
@@ -1593,7 +1627,7 @@ public class WorldConfig extends ConfigFile
 				);
     }
     
-	public static WorldConfig loadWorldConfigFromDisk(File worldDir)
+	public static WorldConfig fromDisk(File worldDir)
 	{
         File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         if(!worldConfigFile.exists())

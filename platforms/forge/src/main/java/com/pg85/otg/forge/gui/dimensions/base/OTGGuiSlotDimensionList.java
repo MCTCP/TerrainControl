@@ -104,8 +104,7 @@ public class OTGGuiSlotDimensionList extends OTGGuiScrollingList
             // If world isn't null then we're ingame
         	if(this.parent.mc.world == null || this.parent.mc.isSingleplayer())
         	{            		
-	            ForgeWorld forgeWorld = this.parent.mc.world != null && idx != 0 ? (ForgeWorld) ((ForgeEngine)OTG.getEngine()).getWorld(dimensions.get(idx).PresetName) : null;
-	            isLoaded = idx == 0 || forgeWorld != null;
+	            isLoaded = idx == 0 || (this.parent.mc.world != null && idx != 0 ? ((ForgeEngine)OTG.getEngine()).getWorld(dimensions.get(idx).PresetName) : null) != null;
         	} else {
         		// For MP get the loaded status from the ForgeWorld, set by a packet from the server.
 	            ForgeWorld forgeWorld = (ForgeWorld)((ForgeEngine)OTG.getEngine()).getWorld(dimensions.get(idx).PresetName);
@@ -117,7 +116,6 @@ public class OTGGuiSlotDimensionList extends OTGGuiScrollingList
 	            isLoaded = idx == 0 || (forgeWorld != null && forgeWorld.isLoadedOnServer); // ForgeWorld can be null after sending a create world packet from the client
         	}
         }
-        
         font.drawString(font.trimStringToWidth(name + (isBeingCreatedOnServer ? TextFormatting.GRAY + " (creating)" + TextFormatting.RESET : (this.parent.mc.world != null ? (isLoaded ? TextFormatting.GREEN + " (loaded)" + TextFormatting.RESET : isNewDim ?  TextFormatting.GOLD + " (new)" + TextFormatting.RESET : TextFormatting.DARK_GREEN + " (unloaded)" + TextFormatting.RESET) : "")), listWidth - 10), this.left + 3 , top +  2, 0xFFFFFF);
     }
 }

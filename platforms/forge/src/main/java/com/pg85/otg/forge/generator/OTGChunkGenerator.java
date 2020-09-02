@@ -27,6 +27,7 @@ import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.BlockGravel;
@@ -58,6 +59,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 	private FifoMap<ChunkCoordinate, Chunk> lastUsedChunks;
     ForgeChunkBuffer chunkBuffer;
     Object chunkBufferLock = new Object();
+    Object chunkCacheLock = new Object();
     //
 
     private	DataFixer dataFixer = DataFixesManager.createFixer();
@@ -77,19 +79,27 @@ public class OTGChunkGenerator implements IChunkGenerator
         this.lastUsedChunks = new FifoMap<ChunkCoordinate, Chunk>(4);
     }
     
+    
+    
 	// Chunks
 	
 	// Called by /otg flush command to clear memory.
     public void clearChunkCache()
     {
-    	this.lastUsedChunks.clear();
-   		this.unloadedBlockColumnsCache.clear();
-   		this.unloadedChunksCache.clear();
+    	synchronized(this.chunkCacheLock)
+    	{
+	    	this.lastUsedChunks.clear();
+	   		this.unloadedBlockColumnsCache.clear();
+	   		this.unloadedChunksCache.clear();
+    	}
     }
     
     public void clearChunkFromCache(ChunkCoordinate chunkCoordinate)
     {
-    	this.lastUsedChunks.remove(chunkCoordinate);
+    	synchronized(this.chunkCacheLock)
+    	{
+    		this.lastUsedChunks.remove(chunkCoordinate);
+    	}
     }
 
     @Override
@@ -169,7 +179,11 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
         
-        Chunk chunk = this.lastUsedChunks.get(chunkCoord);
+        Chunk chunk;
+    	synchronized(this.chunkCacheLock)
+    	{
+    		chunk = this.lastUsedChunks.get(chunkCoord);
+    	}
         if(chunk == null)
         {
         	// Try to fetch the chunk without populating it.
@@ -181,7 +195,10 @@ public class OTGChunkGenerator implements IChunkGenerator
 	        }
 	        if(chunk != null)
 	        {
-	        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        	synchronized(this.chunkCacheLock)
+	        	{
+		        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        	}
 	        }
         }
     	return chunk;
@@ -318,7 +335,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         {
         	material = (ForgeMaterialData) blockColumn[y];
         	isLiquid = material.isLiquid();
-        	isSolid = material.isSolid() || (!ignoreSnow && material.toDefaultMaterial().equals(DefaultMaterial.SNOW));
+        	isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(DefaultMaterial.SNOW));
         	if(!(isLiquid && ignoreLiquid))
         	{
             	if((findSolid && isSolid) || (findLiquid && isLiquid))
@@ -354,7 +371,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         }
 
         IBlockState newState = ((ForgeMaterialData) material).internalBlock();
-
+        
         BlockPos pos = new BlockPos(x, y, z);
 
         // Get chunk from (faster) custom cache
@@ -369,7 +386,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         
         // Disable nearby block physics (except for tile entities) and set block
         boolean oldCaptureBlockStates = this.world.getWorld().captureBlockSnapshots;
-        this.world.getWorld().captureBlockSnapshots = !(newState.getBlock().hasTileEntity(newState));
+    	this.world.getWorld().captureBlockSnapshots = !(newState.getBlock().hasTileEntity(newState));    	
         //this.world.getWorld().captureBlockSnapshots = true;
         IBlockState iblockstate = chunk.setBlockState(pos, newState);
         this.world.getWorld().captureBlockSnapshots = oldCaptureBlockStates;

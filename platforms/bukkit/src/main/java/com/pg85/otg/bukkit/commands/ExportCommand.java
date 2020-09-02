@@ -3,6 +3,8 @@ package com.pg85.otg.bukkit.commands;
 import java.io.File;
 import java.util.List;
 
+import com.pg85.otg.bukkit.util.BO4Creator;
+import com.pg85.otg.bukkit.util.BOCreator;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -23,7 +25,7 @@ public class ExportCommand extends BaseCommand
         super(_plugin);
         name = "export";
         perm = OTGPerm.CMD_EXPORT.node;
-        usage = "export <name> [center_block] [-a include_air] [-t include_tile_entities] [-o override] [-b use branches]";
+        usage = "export <name> [center_block] [-a include_air] [-t include_tile_entities] [-o override] [-b use branches] [-bo4]";
         hasWorldedit = Bukkit.getServer().getPluginManager().getPlugin("WorldEdit") != null;
     }
 
@@ -39,6 +41,7 @@ public class ExportCommand extends BaseCommand
         if (args.isEmpty())
         {
             sender.sendMessage(ERROR_COLOR + "You must enter a name for the object.");
+            sender.sendMessage(MESSAGE_COLOR + usage);
             return true;
         }
 
@@ -54,31 +57,47 @@ public class ExportCommand extends BaseCommand
         }
 
         String bo3Name = args.get(0);
-        File target = new File(OTG.getEngine().getGlobalObjectsDirectory(), bo3Name + ".bo3");
+        File target = new File(OTG.getEngine().getGlobalObjectsDirectory(), bo3Name + (args.contains("-bo4") ? ".BO4" : ".bo3"));
 
         if (target.exists() && !args.contains("-o"))
         {
-            sender.sendMessage(ERROR_COLOR + "A BO3 with that name already exists, use -o to override.");
+            sender.sendMessage(ERROR_COLOR + "A "+ (args.contains("-bo4") ? "BO4" : "BO3") +" with that name already exists, use -o to override.");
             return true;
         }
 
-        BO3Creator creator = new BO3Creator(bo3Name);
+        BOCreator creator;
+        if(args.contains("-bo4"))
+        {
+            creator = new BO4Creator(bo3Name);
+        } else {
+            creator = new BO3Creator(bo3Name);
+        }
 
         creator.includeAir(args.contains("-a"));
         creator.includeTiles(args.contains("-t"));
 
         String block = args.size() > 1 ? args.get(1) : "";
-        boolean branch = args.contains("-b") || selection.getWidth() > 32 || selection.getLength() > 32;
+
+        boolean branch;
+        if (args.contains("-bo4"))
+            branch = args.contains("-b") || selection.getWidth() > 16 || selection.getLength() > 16;
+        else
+            branch = args.contains("-b") || selection.getWidth() > 32 || selection.getLength() > 32;
 
         creator.create(selection, block, branch);
 
-        sender.sendMessage(String.format("%sBO3 %s%s %2$s(%dx%dx%d) %1%shas been saved to GlobalObjects.",
-                MESSAGE_COLOR, VALUE_COLOR, name, selection.getWidth(), selection.getHeight(), selection.getLength()));
+        sender.sendMessage(String.format(
+                "%sBO%s %s%s (%dx%dx%d) %1$shas been saved to GlobalObjects.", MESSAGE_COLOR, args.contains("-bo4") ? "4" : "3", VALUE_COLOR, bo3Name,
+                selection.getWidth(), selection.getHeight(), selection.getLength()));
 
         if (branch)
-		{
-            sender.sendMessage(MESSAGE_COLOR + "BO3 was larger than 32x32 so it has been split into branches.");
-		}
+        {
+            if (args.contains("-bo4")) {
+                sender.sendMessage(MESSAGE_COLOR+"BO4 is larger than 16x16 so it has been split into branches.");
+            } else {
+                sender.sendMessage(MESSAGE_COLOR+"BO3 is larger than 32x32 so it has been split into branches.");
+            }
+        }
 
         return true;
     }

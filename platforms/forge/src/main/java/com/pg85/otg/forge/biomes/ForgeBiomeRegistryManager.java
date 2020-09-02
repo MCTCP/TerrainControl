@@ -135,7 +135,7 @@ public class ForgeBiomeRegistryManager
 	        	customBiome.savedId = newId;       	        
 	        }
 	        
-	    	OTG.log(LogMarker.DEBUG, "{}, {}, {}, {}", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
+	    	OTG.log(LogMarker.DEBUG, "{}: {}, {}, {}, {}", biomeIds.isVirtual() ? "Virtual " : "Custom ", biomeConfig.getName(), biomeIds.getSavedId(), biomeIds.getOTGBiomeId(), registryKey.toString());
 	
 	        biome = customBiome;
 	    }
@@ -213,7 +213,7 @@ public class ForgeBiomeRegistryManager
 				typeString = typeString.trim();
 		        try
 		        {
-		        	type = Type.getType(typeString, null);
+		        	type = Type.getType(typeString, (Type)null);
 		        }
 		        catch(Exception ex)
 		        {
@@ -368,7 +368,7 @@ public class ForgeBiomeRegistryManager
     	OTG.log(LogMarker.DEBUG, "Registering biome " + resourceLocation.toString() + " " + id);
 
 		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
-    	
+
     	// Get the next free id
     	if(id == -1)
     	{
@@ -434,10 +434,9 @@ public class ForgeBiomeRegistryManager
         {
         	OTG.log(LogMarker.WARN,
     			"Tried to register biome " + resourceLocation.toString() + " to a id " + id + " but it is occupied by biome: " + biomeAtId.getRegistryName().toString() + ". "
-				+ "This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. "
-				+ "This can also happen when migrating a world from OTG v6 or lower to OTG v8 or higher, if the world had biome conflicts in v6."
-				+ "OTG 1.12.2 v8 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
-        	
+				+ "This can happen when changing mods setup for existing worlds, which causes the biome registry to change. "
+				+ "This can also happen when migrating a world from OTG v6 or lower to OTG v8 or higher, if the world had biome conflicts in v6.");        	
+
         	// TODO: This could cause problems, but is necessary to support v6 worlds with biome id conflicts
         	id = biomeRegistryAvailabiltyMap.nextClearBit(0);
         	OTG.log(LogMarker.WARN, "Substituting id " + id + " for biome " + resourceLocation.toString());
@@ -600,9 +599,9 @@ public class ForgeBiomeRegistryManager
 	{
 		BitSet biomeRegistryAvailabiltyMap = getBiomeRegistryAvailabiltyMap();
 		int availableIds = 0;
-    	for(int i = 0; i < biomeRegistryAvailabiltyMap.size(); i++)
+    	for(int i = 0; i < ForgeWorld.MAX_SAVED_BIOMES_COUNT; i++)
     	{
-    		if(!biomeRegistryAvailabiltyMap.get(i))
+     		if(i >= biomeRegistryAvailabiltyMap.size() || !biomeRegistryAvailabiltyMap.get(i))
     		{
     			availableIds++;
     		}

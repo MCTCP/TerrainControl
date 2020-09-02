@@ -5,18 +5,21 @@ import com.pg85.otg.OTGEngine;
 import com.pg85.otg.bukkit.biomes.BukkitMojangSettings;
 import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.BukkitLogger;
+import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
 import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
+import com.pg85.otg.configuration.standard.MojangSettings;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
-import net.minecraft.server.v1_12_R1.Block;
+import net.minecraft.server.v1_12_R1.BiomeBase;
+import net.minecraft.server.v1_12_R1.MinecraftKey;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -117,5 +120,22 @@ public class BukkitEngine extends OTGEngine
 	}
 
     @Override
-    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation) { }
+    public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
+    {
+        BiomeBase biome = BiomeBase.REGISTRY_ID.get(new MinecraftKey(biomeResourceLocation));
+        if(biome != null)
+        {
+            // Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
+            // Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
+            // We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
+            biomeConfigStub.spawnMonstersMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnMonstersMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, MojangSettings.EntityCategory.MONSTER));
+            biomeConfigStub.spawnCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, MojangSettings.EntityCategory.CREATURE));
+            biomeConfigStub.spawnAmbientCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnAmbientCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, MojangSettings.EntityCategory.AMBIENT_CREATURE));
+            biomeConfigStub.spawnWaterCreaturesMerged = biomeConfigStub.mergeMobs(biomeConfigStub.spawnWaterCreaturesMerged, MobSpawnGroupHelper.getListFromMinecraftBiome(biome, MojangSettings.EntityCategory.WATER_CREATURE));
+        }
+        else
+        {
+            OTG.log(LogMarker.WARN, "Biome " + biomeResourceLocation + " not found for InheritMobsFromBiomeName in " + biomeConfigStub.getBiomeName() + ".bc");
+        }
+    }
 }

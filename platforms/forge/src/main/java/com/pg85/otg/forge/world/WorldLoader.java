@@ -70,10 +70,10 @@ public final class WorldLoader
         {
             Field minecraftDir = Loader.class.getDeclaredField("minecraftDir");
             minecraftDir.setAccessible(true);
-            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + "OpenTerrainGenerator");
+            dataFolder = new File((File) minecraftDir.get(null), "mods" + File.separator + PluginStandardValues.PLUGIN_NAME);
         } catch (Throwable e)
         {
-            dataFolder = new File("mods" + File.separator + "OpenTerrainGenerator");
+            dataFolder = new File("mods" + File.separator + PluginStandardValues.PLUGIN_NAME);
             System.out.println("Could not reflect the Minecraft directory, save location may be unpredicatble.");
             OTG.printStackTrace(LogMarker.FATAL, e);
         }
@@ -239,32 +239,30 @@ public final class WorldLoader
     	return allWorlds;
     }
     
+    // Only called server-side?
     public void unloadWorld(World world, boolean unRegisterBiomes)
     {
-    	unloadWorld(this.getWorld(world), unRegisterBiomes);
-    }
-
-    private void unloadWorld(ForgeWorld world, boolean unRegisterBiomes)
-    {
+    	ForgeWorld forgeWorld = this.getWorld(world);
+    	
     	// Used when dimensions are unloaded.
 
-        OTG.log(LogMarker.INFO, "Unloading world \"{}\"...", world.getName());
-
-        ForgeWorld loadedWorld = this.worlds.get(world.getName());
+        OTG.log(LogMarker.INFO, "Unloading world \"{}\"...", forgeWorld.getName());
+        
+        ForgeWorld loadedWorld = this.worlds.get(forgeWorld.getName());
         if(loadedWorld != null) // For some reason Forge MP server unloads overworld twice on shutdown(?)
         {
         	synchronized(this.worlds)
         	{
         		synchronized(this.unloadedWorlds)
         		{
-        			this.unloadedWorlds.put(world.getName(), this.worlds.get(world.getName()));
-            		this.worlds.remove(world.getName());
+        			this.unloadedWorlds.put(forgeWorld.getName(), this.worlds.get(forgeWorld.getName()));
+            		this.worlds.remove(forgeWorld.getName());
         		}
         	}
         	
             if(!loadedWorld.getWorld().isRemote)
             {
-            	ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(false, world.getName(), loadedWorld.getWorld().getMinecraftServer());
+            	ServerPacketManager.sendDimensionLoadUnloadPacketToAllPlayers(false, forgeWorld.getName(), loadedWorld.getWorld().getMinecraftServer());
             }
         }
         
@@ -338,7 +336,7 @@ public final class WorldLoader
 
     @Nullable ForgeWorld getOrCreateForgeWorld(World mcWorld)
     {
-    	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals("OpenTerrainGenerator"))
+    	if(!mcWorld.getWorldInfo().getGeneratorOptions().equals(PluginStandardValues.PLUGIN_NAME))
     	{
     		throw new RuntimeException("Error: OTG tried to load a world that is missing OTG information. Was this world created via OTG? For Forge Single Player, be sure to use the OTG world creation screen.");
     	}
@@ -482,7 +480,7 @@ public final class WorldLoader
     		String resourceDomain = biome.getKey().getNamespace();
 
     		if(
-				!resourceDomain.equals("openterraingenerator") &&
+				!resourceDomain.equals(PluginStandardValues.PLUGIN_NAME) &&
 				!resourceDomain.equals("terraincontrol")
 			)
     		{

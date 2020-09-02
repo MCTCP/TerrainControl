@@ -54,6 +54,7 @@ public class OTGCommandExecutor implements CommandExecutor
         this.addCommand(new LookupCommand(plugin));
         this.addCommand(new ExportCommand(plugin));
         this.addCommand(new MapCommand(plugin));
+        this.addCommand(new StructureCommand(plugin));
         this.addCommand(this.helpCommand);
     }
 

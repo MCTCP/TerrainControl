@@ -14,7 +14,7 @@ public class ChunkListener
 	public void onChunkUnload(ChunkEvent.Unload unloadEvent)
 	{
 		ForgeWorld forgeWorld = ((ForgeEngine)OTG.getEngine()).getWorld(unloadEvent.getWorld());
-		if(forgeWorld != null)
+		if(forgeWorld != null && forgeWorld.getChunkGenerator() != null && unloadEvent.getChunk() != null && unloadEvent.getChunk().getPos() != null)
 		{
 			forgeWorld.getChunkGenerator().clearChunkFromCache(ChunkCoordinate.fromChunkCoords(unloadEvent.getChunk().getPos().x, unloadEvent.getChunk().getPos().z));
 		}

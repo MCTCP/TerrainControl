@@ -77,10 +77,12 @@ public class OTGBiomeBase extends BiomeBase
         this.r = ((BukkitMaterialData) biomeConfig.groundBlock).internalBlock();
 
         // Mob spawning
-        addMobs(this.t, biomeConfig.spawnMonsters);
-        addMobs(this.u, biomeConfig.spawnCreatures);
-        addMobs(this.v, biomeConfig.spawnWaterCreatures);
-        addMobs(this.w, biomeConfig.spawnAmbientCreatures);
+        // We add the merged lists and not the default lists
+        // Merged list = default list + inherited mobs
+        addMobs(this.t, biomeConfig.spawnMonstersMerged);
+        addMobs(this.u, biomeConfig.spawnCreaturesMerged);
+        addMobs(this.v, biomeConfig.spawnWaterCreaturesMerged);
+        addMobs(this.w, biomeConfig.spawnAmbientCreaturesMerged);
     }
 
     // Adds the mobs to the internal list.
@@ -141,9 +143,8 @@ public class OTGBiomeBase extends BiomeBase
             {
             	throw new RuntimeException(
         			"Tried to register biome " + biomeKey.toString() + " to a id " + biomeIds.getSavedId() + " but it is occupied by biome: " + biomeAtId.toString() + ". "
-					+ "This can happen when using the CustomBiomes setting in the world config or when changing mod/biome configurations for previously created worlds. "
-					+ "This can also happen when migrating a world from OTG v6 or lower to OTG v8 or higher, if the world had biome conflicts in v6."
-					+ "OTG 1.12.2 v8 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+					+ "This can happen when changing mods setup for existing worlds, which causes the biome registry to change. "
+					+ "This can also happen when migrating a world from OTG v6 or lower to OTG v8 or higher, if the world had biome conflicts in v6.");
             }
             
         	customBiome.otgBiomeId = biomeIds.getOTGBiomeId();

@@ -1,16 +1,15 @@
 package com.pg85.otg.forge.gui.presets;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.dimensions.base.OTGGuiScrollingList;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
@@ -55,7 +54,7 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
     	List<String> presets = GuiHandler.GuiPresets
 			.entrySet()
 			.stream()
-			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().ShowInWorldCreationGUI)
 			.map(Entry::getKey)
 			.collect(Collectors.toList()
 		);
@@ -93,12 +92,14 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
 
     @Override
     protected void drawSlot(int idx, int right, int top, int height, Tessellator tess)
-    {
+    {   	
+    	// TODO: Don't do this each draw?
+    	
     	// Get all presetNames for presets that should be shown
     	List<String> presets = GuiHandler.GuiPresets
 			.entrySet()
 			.stream()
-			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().shouldDisplay)
+			.filter(a -> this.parent.selectingPresetForDimension || a.getValue().ShowInWorldCreationGUI)
 			.map(Entry::getKey)
 			.collect(Collectors.toList()
 		);
@@ -121,7 +122,7 @@ class OTGGuiSlotPresetList extends OTGGuiScrollingList
     	}
         String       name     = net.minecraft.util.StringUtils.stripControlCodes(presets.get(idx));
         FontRenderer font     = this.parent.getFontRenderer();
-
-        font.drawString(font.trimStringToWidth(name,    listWidth - 10), this.left + 3 , top +  2, bFound ? 0x666666 : 0xFFFFFF);
+        
+        font.drawString(font.trimStringToWidth(name,    listWidth - 10), this.left + 3, top +  2, bFound ? 0x666666 : 0xFFFFFF);
     }
 }
