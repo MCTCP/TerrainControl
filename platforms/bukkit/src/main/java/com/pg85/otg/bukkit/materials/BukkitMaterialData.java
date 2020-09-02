@@ -396,7 +396,7 @@ public class BukkitMaterialData extends LocalMaterialData
 	@Override
 	public LocalMaterialData parseForWorld(LocalWorld world)
 	{
-		if (!this.checkedFallbacks)
+        if (!this.checkedFallbacks && this.isEmpty() && this.rawEntry != null)
 		{
 			this.checkedFallbacks = true;
 			int newId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;
