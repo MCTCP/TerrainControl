@@ -451,10 +451,16 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
     }
 
+    boolean isEnabled = false;
+    
     @Override
     public boolean onEnable()
     {
-        enable();
+    	if(!isEnabled)
+    	{
+    		isEnabled = true;
+            enable();
+    	}
         return true;
     }
 

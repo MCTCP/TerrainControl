@@ -20,14 +20,12 @@ import java.util.Random;
 
 public class CustomStructureGen extends Resource
 {
-    private List<StructuredCustomObject> objects;
     public List<Double> objectChances;
     public List<String> objectNames;
 
     public CustomStructureGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        objects = new ArrayList<StructuredCustomObject>();
         objectNames = new ArrayList<String>();
         objectChances = new ArrayList<Double>();
         for (int i = 0; i < args.size() - 1; i += 2)
@@ -41,7 +39,8 @@ public class CustomStructureGen extends Resource
     
     public List<StructuredCustomObject> getObjects(String worldName)
     {
-    	if(objects.isEmpty() && !objectNames.isEmpty())
+    	List<StructuredCustomObject> objects = new ArrayList<StructuredCustomObject>();
+    	if(!objectNames.isEmpty())
     	{
             for (int i = 0; i < objectNames.size(); i ++)
             {
@@ -142,7 +141,6 @@ public class CustomStructureGen extends Resource
     {
         int hash = 7;
         hash = 61 * hash + super.hashCode();
-        hash = 61 * hash + (this.objects != null ? this.objects.hashCode() : 0);
         hash = 61 * hash + (this.objectChances != null ? this.objectChances.hashCode() : 0);
         hash = 61 * hash + (this.objectNames != null ? this.objectNames.hashCode() : 0);
         return hash;
@@ -160,9 +158,7 @@ public class CustomStructureGen extends Resource
         if (getClass() != other.getClass())
             return false;
         final CustomStructureGen compare = (CustomStructureGen) other;
-        return (this.objects == null ? this.objects == compare.objects
-                : this.objects.equals(compare.objects))
-               && (this.objectChances == null ? this.objectChances == compare.objectChances
+        return (this.objectChances == null ? this.objectChances == compare.objectChances
                    : this.objectChances.equals(compare.objectChances))
                && (this.objectNames == null ? this.objectNames == compare.objectNames
                    : this.objectNames.equals(compare.objectNames));
