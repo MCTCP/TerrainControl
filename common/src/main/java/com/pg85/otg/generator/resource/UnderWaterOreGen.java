@@ -5,6 +5,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -76,9 +77,17 @@ public class UnderWaterOreGen extends Resource
             return;
         }
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(world, this.material, this.sourceBlocks);
 
-        int currentSize = rand.nextInt(size);
+        if(world.getConfigs().getWorldConfig().disableOreGen)
+        {
+        	if(MaterialHelper.isOre(this.material))
+        	{
+        		return;
+        	}
+        }
+        
+        int currentSize = rand.nextInt(this.size);
         int two = 2;
         int deltaX;
         int deltaZ;
@@ -94,9 +103,9 @@ public class UnderWaterOreGen extends Resource
                     for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
                     {
                         sourceBlock = world.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
-                        if (sourceBlocks.contains(sourceBlock))
+                        if (this.sourceBlocks.contains(sourceBlock))
                         {
-                            world.setBlock(currentX, y, currentZ, material, null, chunkBeingPopulated);
+                            world.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated);
                         }
                     }
                 }

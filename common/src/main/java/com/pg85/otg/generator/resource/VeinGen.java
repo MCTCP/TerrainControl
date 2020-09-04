@@ -6,6 +6,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -136,8 +137,16 @@ public class VeinGen extends Resource
         // Find all veins that reach this chunk, and spawn them
         int searchRadius = (this.maxRadius + 15) / 16;
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(world, this.material, this.sourceBlocks);
 
+        if(world.getConfigs().getWorldConfig().disableOreGen)
+        {
+        	if(MaterialHelper.isOre(this.material))
+        	{
+        		return;
+        	}
+        }
+        
         int currentChunkX = chunkBeingPopulated.getChunkX();
         int currentChunkZ = chunkBeingPopulated.getChunkZ();
         for (int searchChunkX = currentChunkX - searchRadius; searchChunkX < currentChunkX + searchRadius; searchChunkX++)

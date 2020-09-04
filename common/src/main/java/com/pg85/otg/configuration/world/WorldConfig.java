@@ -33,7 +33,6 @@ import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class WorldConfig extends ConfigFile
 {
@@ -211,6 +210,8 @@ public class WorldConfig extends ConfigFile
     public long resourcesSeed;
     public int maximumCustomStructureRadius;
 
+    public boolean disableOreGen;
+    
     // Settings for console commands
     public String author;
     public String description;
@@ -731,7 +732,8 @@ public class WorldConfig extends ConfigFile
         this.resourcesSeed = reader.getSetting(WorldStandardValues.RESOURCES_SEED);
         this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK);
         this.populateUsingSavedBiomes = reader.getSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES);
-
+        this.disableOreGen = reader.getSetting(WorldStandardValues.DISABLE_OREGEN);
+        
         this.oldTerrainGenerator = false; //this.modeTerrain == TerrainMode.OldGenerator;
 
         this.author = reader.getSetting(WorldStandardValues.AUTHOR);
@@ -1209,6 +1211,10 @@ public class WorldConfig extends ConfigFile
                     "This setting doesn't affect growing saplings anymore.");
         }
 
+        // OreGen
+        writer.putSetting(WorldStandardValues.DISABLE_OREGEN, this.disableOreGen,
+                "Disables Ore(), UnderWaterOre() and Vein() biome resources that use any type of ore block.");
+        
         // Structures
         writer.bigTitle("Structures",
             "Generate-structures in the server.properties file is ignored by Open Terrain Generator. Use these settings instead.",
