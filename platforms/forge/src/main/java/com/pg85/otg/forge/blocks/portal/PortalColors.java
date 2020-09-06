@@ -1,4 +1,4 @@
-package com.pg85.otg.forge.blocks;
+package com.pg85.otg.forge.blocks.portal;
 
 import java.util.Arrays;
 import java.util.List;
@@ -6,11 +6,11 @@ import java.util.List;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
-import com.pg85.otg.forge.blocks.portal.BlockPortalOTG;
+import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.logging.LogMarker;
 
 public class PortalColors
-{	
+{
 	public static final String PortalColorBeige = "beige";
 	public static final String PortalColorBlack = "black";
 	public static final String PortalColorBlue = "blue";	
@@ -30,7 +30,28 @@ public class PortalColors
 	public static final String PortalColorRed = "red";
 	public static final String PortalColorWhite = "white";
 	public static final String PortalColorYellow = "yellow";
-	public static final String PortalColorDefault = "default";
+	public static final String PortalColorDefault = "default";	
+	
+	public static final String BlockPortalOTGBeigeName = "portalotg_beige";
+	public static final String BlockPortalOTGBlackName = "portalotg_black";
+	public static final String BlockPortalOTGBlueName = "portalotg_blue";	
+	public static final String BlockPortalOTGCrystalBlueName = "portalotg_crystalblue";
+	public static final String BlockPortalOTGDarkBlueName = "portalotg_darkblue";
+	public static final String BlockPortalOTGDarkGreenName = "portalotg_darkgreen";
+	public static final String BlockPortalOTGDarkRedName = "portalotg_darkred";
+	public static final String BlockPortalOTGEmeraldName = "portalotg_emerald";
+	public static final String BlockPortalOTGFlameName = "portalotg_flame";
+	public static final String BlockPortalOTGGoldName = "portalotg_gold";
+	public static final String BlockPortalOTGGreenName = "portalotg_green";
+	public static final String BlockPortalOTGGreyName = "portalotg_grey";	
+	public static final String BlockPortalOTGLightBlueName = "portalotg_lightblue";
+	public static final String BlockPortalOTGLightGreenName = "portalotg_lightgreen";
+	public static final String BlockPortalOTGOrangeName = "portalotg_orange";
+	public static final String BlockPortalOTGPinkName = "portalotg_pink";
+	public static final String BlockPortalOTGRedName = "portalotg_red";
+	public static final String BlockPortalOTGWhiteName = "portalotg_white";
+	public static final String BlockPortalOTGYellowName = "portalotg_yellow";
+	public static final String BlockPortalOTGDefaultName = "portalotg";	
 	
 	public static List<String> portalColors = Arrays.asList(
 		PortalColorDefault,			
@@ -116,45 +137,45 @@ public class PortalColors
 		
 		switch(block.getRegistryName().getPath())
 		{
-			case ModBlocks.BlockPortalOTGBeigeName:
+			case BlockPortalOTGBeigeName:
 				return PortalColorBeige;
-			case ModBlocks.BlockPortalOTGBlackName:
+			case BlockPortalOTGBlackName:
 				return PortalColorBlack;
-			case ModBlocks.BlockPortalOTGBlueName:
+			case BlockPortalOTGBlueName:
 				return PortalColorBlue;
-			case ModBlocks.BlockPortalOTGCrystalBlueName:
+			case BlockPortalOTGCrystalBlueName:
 				return PortalColorCrystalBlue;
-			case ModBlocks.BlockPortalOTGDarkBlueName:
+			case BlockPortalOTGDarkBlueName:
 				return PortalColorDarkBlue;
-			case ModBlocks.BlockPortalOTGDarkGreenName:
+			case BlockPortalOTGDarkGreenName:
 				return PortalColorDarkGreen;
-			case ModBlocks.BlockPortalOTGDarkRedName:
+			case BlockPortalOTGDarkRedName:
 				return PortalColorDarkRed;
-			case ModBlocks.BlockPortalOTGEmeraldName:
+			case BlockPortalOTGEmeraldName:
 				return PortalColorEmerald;
-			case ModBlocks.BlockPortalOTGFlameName:
+			case BlockPortalOTGFlameName:
 				return PortalColorFlame;
-			case ModBlocks.BlockPortalOTGGoldName:
+			case BlockPortalOTGGoldName:
 				return PortalColorGold;
-			case ModBlocks.BlockPortalOTGGreenName:
+			case BlockPortalOTGGreenName:
 				return PortalColorGreen;
-			case ModBlocks.BlockPortalOTGGreyName:
+			case BlockPortalOTGGreyName:
 				return PortalColorGrey;
-			case ModBlocks.BlockPortalOTGLightBlueName:
+			case BlockPortalOTGLightBlueName:
 				return PortalColorLightBlue;
-			case ModBlocks.BlockPortalOTGLightGreenName:
+			case BlockPortalOTGLightGreenName:
 				return PortalColorLightGreen;
-			case ModBlocks.BlockPortalOTGOrangeName:
+			case BlockPortalOTGOrangeName:
 				return PortalColorOrange;
-			case ModBlocks.BlockPortalOTGPinkName:
+			case BlockPortalOTGPinkName:
 				return PortalColorPink;
-			case ModBlocks.BlockPortalOTGRedName:
+			case BlockPortalOTGRedName:
 				return PortalColorRed;
-			case ModBlocks.BlockPortalOTGWhiteName:
+			case BlockPortalOTGWhiteName:
 				return PortalColorWhite;
-			case ModBlocks.BlockPortalOTGYellowName:
+			case BlockPortalOTGYellowName:
 				return PortalColorYellow;				
-			case ModBlocks.BlockPortalOTGDefaultName:
+			case BlockPortalOTGDefaultName:
 				return PortalColorDefault;
 			default:
 				return null;

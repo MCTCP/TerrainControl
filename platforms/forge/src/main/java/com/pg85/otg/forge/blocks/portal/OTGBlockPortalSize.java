@@ -7,7 +7,6 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.blocks.ModBlocks;
-import com.pg85.otg.forge.blocks.PortalColors;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.world.ForgeWorld;
 import net.minecraft.block.Block;

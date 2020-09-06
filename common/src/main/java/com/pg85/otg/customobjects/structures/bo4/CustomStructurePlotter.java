@@ -103,7 +103,7 @@ public class CustomStructurePlotter
             ArrayList<CustomStructureGen> customStructureGens = new ArrayList<CustomStructureGen>();
         	if(targetStructure == null && !world.chunkHasDefaultStructure(rand, chunkCoord))
         	{
-	            // Get Bo3's for this biome
+	            // Get Bo4's for this biome
                 for (CustomStructureGen res : biomeConfig.getCustomStructures())
                 {
                 	//TODO: Check for res.error?

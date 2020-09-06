@@ -1,6 +1,8 @@
 package com.pg85.otg.bukkit.world;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +49,8 @@ import com.pg85.otg.bukkit.generator.structures.OTGOceanMonumentGen;
 import com.pg85.otg.bukkit.generator.structures.OTGRareBuildingGen;
 import com.pg85.otg.bukkit.generator.structures.OTGStrongholdGen;
 import com.pg85.otg.bukkit.generator.structures.OTGVillageGen;
+import com.pg85.otg.bukkit.generator.structures.RareBuildingStart;
+import com.pg85.otg.bukkit.generator.structures.VillageStart;
 import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.JsonToNBT;
 import com.pg85.otg.bukkit.util.NBTException;
@@ -73,6 +77,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+import com.pg85.otg.util.minecraft.defaults.StructureNames;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
@@ -104,11 +109,13 @@ import net.minecraft.server.v1_12_R1.MinecraftKey;
 import net.minecraft.server.v1_12_R1.NBTBase;
 import net.minecraft.server.v1_12_R1.NBTTagCompound;
 import net.minecraft.server.v1_12_R1.SpawnerCreature;
+import net.minecraft.server.v1_12_R1.StructureGenerator;
 import net.minecraft.server.v1_12_R1.World;
 import net.minecraft.server.v1_12_R1.WorldChunkManager;
 import net.minecraft.server.v1_12_R1.WorldGenAcaciaTree;
 import net.minecraft.server.v1_12_R1.WorldGenBigTree;
 import net.minecraft.server.v1_12_R1.WorldGenDungeons;
+import net.minecraft.server.v1_12_R1.WorldGenFactory;
 import net.minecraft.server.v1_12_R1.WorldGenForest;
 import net.minecraft.server.v1_12_R1.WorldGenForestTree;
 import net.minecraft.server.v1_12_R1.WorldGenFossils;
@@ -146,7 +153,7 @@ public class BukkitWorld implements LocalWorld
     public OTGRareBuildingGen rareBuildingGen;
     public OTGNetherFortressGen netherFortressGen;
     public OTGOceanMonumentGen oceanMonumentGen;
-    public OTGMansionGen mansionGen;
+    public OTGMansionGen woodLandMansionGen;
 
     private WorldGenDungeons dungeon;
     private WorldGenFossils fossil;
@@ -345,7 +352,7 @@ public class BukkitWorld implements LocalWorld
                     this.villageGen = new OTGVillageGen(settings);
                     this.mineshaftGen = new OTGMineshaftGen();
                     this.rareBuildingGen = new OTGRareBuildingGen(settings);
-                    this.mansionGen = new OTGMansionGen(settings);
+                    this.woodLandMansionGen = new OTGMansionGen(settings);
                     this.netherFortressGen = new OTGNetherFortressGen();
                     this.oceanMonumentGen = new OTGOceanMonumentGen(settings);
 
@@ -589,7 +596,7 @@ public class BukkitWorld implements LocalWorld
         }
         if (worldConfig.woodLandMansionsEnabled)
         {
-        	this.mansionGen.a(this.world, chunkX, chunkZ, null);
+        	this.woodLandMansionGen.a(this.world, chunkX, chunkZ, null);
         }
     }
 
@@ -666,27 +673,70 @@ public class BukkitWorld implements LocalWorld
                 throw new RuntimeException("Failed to handle tree of type " + type.toString());
         }
     }
-
+	
+	// Used to make sure OTG+ structures don't spawn on top of default structures
 	@Override
-	public boolean chunkHasDefaultStructure(Random random, ChunkCoordinate chunk)
+	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunkCoord)
 	{
         WorldConfig worldConfig = this.settings.getWorldConfig();
-        BlockPosition blockPos = new BlockPosition(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter());
         // Allow OTG structures to spawn on top of strongholds
         // Allow OTG structures to spawn on top of mine shafts
-        // TODO: VIllage gen detection doesn't appear to be working too well, fix..
-        return 
-		(worldConfig.villagesEnabled && this.villageGen instanceof OTGVillageGen && ((OTGVillageGen)this.villageGen).b(blockPos)) ||
-		(worldConfig.villagesEnabled && !(this.villageGen instanceof OTGVillageGen) && this.villageGen.b(blockPos)) ||
-        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen instanceof OTGRareBuildingGen && ((OTGRareBuildingGen)this.rareBuildingGen).b(blockPos)) ||
-        (worldConfig.rareBuildingsEnabled && !(this.rareBuildingGen instanceof OTGRareBuildingGen) && this.rareBuildingGen.b(blockPos)) ||
-        (worldConfig.netherFortressesEnabled && this.netherFortressGen.b(blockPos)) ||
-        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen instanceof OTGOceanMonumentGen && ((OTGOceanMonumentGen)this.oceanMonumentGen).b(blockPos)) ||
-        (worldConfig.oceanMonumentsEnabled && !(this.oceanMonumentGen instanceof OTGOceanMonumentGen) && this.oceanMonumentGen.b(blockPos)) ||
-        (worldConfig.woodLandMansionsEnabled && this.mansionGen instanceof OTGMansionGen && ((OTGMansionGen)this.mansionGen).b(blockPos)) ||
-        (worldConfig.woodLandMansionsEnabled && !(this.mansionGen instanceof OTGMansionGen) && this.mansionGen.b(blockPos))
-        ;
+        // isInsideStructure only detects structures that have structure starts saved to world, using custom method ><.
+        return         		
+    		(worldConfig.villagesEnabled && isStructureInRadius(chunkCoord, this.villageGen, 4)) || // TODO: Extra large villages aren't working?
+    		(worldConfig.rareBuildingsEnabled && isStructureInRadius(chunkCoord, this.rareBuildingGen, 4)) ||
+    		(worldConfig.netherFortressesEnabled && isStructureInRadius(chunkCoord, this.netherFortressGen, 4)) ||
+    		(worldConfig.oceanMonumentsEnabled && isStructureInRadius(chunkCoord, this.oceanMonumentGen, 4)) ||
+    		(worldConfig.woodLandMansionsEnabled && isStructureInRadius(chunkCoord, this.woodLandMansionGen, 4))
+		;
 	}
+	
+	static Method canSpawnStructureAtCoordsMethod;
+    public boolean isStructureInRadius(ChunkCoordinate startChunk, StructureGenerator structure, int radiusInChunks)
+    {    	
+        if(canSpawnStructureAtCoordsMethod == null)
+        {
+	        try
+	        {
+	        	canSpawnStructureAtCoordsMethod = StructureGenerator.class.getDeclaredMethod("a", int.class, int.class);
+	        	canSpawnStructureAtCoordsMethod.setAccessible(true);
+	        } catch (NoSuchMethodException | SecurityException e) {
+	        	OTG.log(LogMarker.ERROR, "Error, could not reflect canSpawnStructureAtCoords, BO4's may not be able to detect default/modded structures. OTG may not fully support your Spigot/Bukkit version.");
+	        	e.printStackTrace();
+	        }
+        }
+    	    	
+        int chunkX = startChunk.getChunkX();
+        int chunkZ = startChunk.getChunkZ();        
+        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+        {
+            for (int xRadius = -cycle; xRadius <= cycle; ++xRadius)
+            {
+                for (int zRadius = -cycle; zRadius <= cycle; ++zRadius)
+                {
+                    int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX-chunkX + xRadius, 2) + Math.pow (chunkZ-chunkZ + zRadius, 2)));                    
+                    if (distance == cycle)
+                    {
+                    	boolean canSpawnStructureAtCoords = false;
+						try
+						{
+							canSpawnStructureAtCoords = (boolean) canSpawnStructureAtCoordsMethod.invoke(structure, chunkX + xRadius, chunkZ + zRadius);
+						}
+						catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+						{
+							OTG.log(LogMarker.ERROR, "Error, could not reflect canSpawnStructureAtCoords, BO4's may not be able to detect default/modded structures. OTG may not fully support your Spigot/Bukkit version.");
+							e.printStackTrace();
+						}
+                    	if(canSpawnStructureAtCoords)
+                    	{
+                    		return true;
+                    	}
+                    }
+                }
+            }
+        }
+        return false;
+    }
     
     @Override
     public boolean placeDefaultStructures(Random random, ChunkCoordinate chunkCoord)
@@ -708,7 +758,7 @@ public class BukkitWorld implements LocalWorld
         if (worldConfig.oceanMonumentsEnabled)
             this.oceanMonumentGen.a(this.world, random, chunkIntPair);
         if (worldConfig.woodLandMansionsEnabled)
-        	this.mansionGen.a(this.world, random, chunkIntPair);
+        	this.woodLandMansionGen.a(this.world, random, chunkIntPair);
 
         return villageGenerated;
     }

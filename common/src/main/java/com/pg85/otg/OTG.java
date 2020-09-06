@@ -364,6 +364,19 @@ public class OTG
 		;
     }
     
+    public static boolean bo4DataExists(BO4Config config)
+    {
+		String filePath = 
+			config.getFile().getAbsolutePath().endsWith(".BO4") ? config.getFile().getAbsolutePath().replace(".BO4", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".bo4") ? config.getFile().getAbsolutePath().replace(".bo4", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".BO3") ? config.getFile().getAbsolutePath().replace(".BO3", ".BO4Data") :
+			config.getFile().getAbsolutePath().endsWith(".bo3") ? config.getFile().getAbsolutePath().replace(".bo3", ".BO4Data") :
+			config.getFile().getAbsolutePath();
+
+        File file = new File(filePath);
+        return file.exists();
+    }
+    
     public static void generateBO4Data(BO4Config config)
     {
         //write to disk
@@ -377,7 +390,7 @@ public class OTG
         File file = new File(filePath);
         if(!file.exists())
         {
-            try {                
+            try {
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				DataOutputStream dos = new DataOutputStream(bos);
 				config.writeToStream(dos);

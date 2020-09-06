@@ -28,6 +28,7 @@ public class OTGVillageStart extends StructureStart
         // Required by Minecraft's structure loading code
     }
     
+    // TODO: Extra large villages aren't working?
     OTGVillageStart(World world, Random random, int chunkX, int chunkZ, int size)
     {
         List<PieceWeight> villagePieces = StructureVillagePieces.getStructureVillageWeightedPieceList(random, size);

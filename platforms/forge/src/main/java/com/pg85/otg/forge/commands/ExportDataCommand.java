@@ -1,12 +1,26 @@
 package com.pg85.otg.forge.commands;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo4.BO4;
+import com.pg85.otg.customobjects.structures.StructuredCustomObject;
+import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
+import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
+import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.common.LocalBiome;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.text.TextComponentString;
@@ -24,20 +38,72 @@ public class ExportDataCommand extends BaseCommand
     public boolean onCommand(ICommandSender sender, List<String> args)
     {
         LocalWorld world = this.getWorld(sender, "");
-
-        sender.sendMessage(
-                new TextComponentString(MESSAGE_COLOR + "Exporting .BO4Data files for world, this may take a while."));
-        ArrayList<BO4> bo4s = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBO4sForWorld(
-                world.getName());
-
-        int i = 0;
-        for (BO4 bo4 : bo4s)
+        if(world.getConfigs().getWorldConfig().isOTGPlus)
         {
-            i++;
-            OTG.log(LogMarker.INFO, "Exporting .BO4Data " + i + "/" + bo4s.size() + " \"" + bo4.getName() + "\"");
-            OTG.generateBO4Data(bo4.getConfig());
+	        sender.sendMessage(
+	                new TextComponentString(MESSAGE_COLOR + "Exporting .BO4Data files for world, this may take a while."));
+	        
+            OTG.log(LogMarker.INFO, "Initializing and exporting structure starts");
+	        
+            DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(world.getName());
+            
+	        // Make sure all structure starts in the world have been initialised
+	        // so that getMinimumSize has been done and its data can be saved with the BO4Data.
+	        for(LocalBiome biome : world.getAllBiomes())
+	        {
+	        	for(ConfigFunction<BiomeConfig> res : biome.getBiomeConfig().resourceSequence)
+	        	{
+	        		if(res instanceof CustomStructureGen)
+	        		{
+	        			for(StructuredCustomObject structure : ((CustomStructureGen)res).getObjects(dimConfig.PresetName))
+	        			{
+	        				if(structure != null) // Structure was in resource list but file could not be found.
+	        				{
+	        					if(structure instanceof BO4)
+	        					{
+	        						if(!OTG.bo4DataExists(((BO4)structure).getConfig()))
+	        						{
+		        	        			BO4CustomStructureCoordinate structureCoord = new BO4CustomStructureCoordinate(world, structure, null, Rotation.NORTH, 0, (short)0, 0, 0, false, false, null);
+		        	        			BO4CustomStructure structureStart = new BO4CustomStructure(world, structureCoord);
+		        	        			
+		        	                	// Get minimum size (size if spawned with branchDepth 0)
+		        	                	try {
+		        	                		structureStart.getMinimumSize(world);
+		        						}
+		        	                	catch (InvalidConfigException e)
+		        	                	{
+		        							((BO4)structure).isInvalidConfig = true;
+		        						}
+		        	                	
+		        	                	OTG.log(LogMarker.INFO, "Exporting .BO4Data for structure start " + ((BO4)structure).getName());
+		        	    	            OTG.generateBO4Data(((BO4)structure).getConfig());
+		        	    	            OTG.getEngine().getCustomObjectManager().getGlobalObjects().unloadCustomObjectFiles();
+	        						}
+	        					}
+	        				}
+	        			}
+	        		}
+	        	}
+	        }
+	        
+	        ArrayList<String> boNames = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForWorld(dimConfig.PresetName);
+	        
+	        int i = 0;
+	        for (String boName : boNames)
+	        {
+	            i++;
+	        	CustomObject bo = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(boName, dimConfig.PresetName);
+	        	if(bo != null && bo instanceof BO4 && !OTG.bo4DataExists(((BO4)bo).getConfig()))
+	        	{
+		            OTG.log(LogMarker.INFO, "Exporting .BO4Data " + i + "/" + boNames.size() + " " + boName);
+		            OTG.generateBO4Data(((BO4)bo).getConfig());
+		            OTG.getEngine().getCustomObjectManager().getGlobalObjects().unloadCustomObjectFiles();
+	        	}
+	        }
+	        sender.sendMessage(new TextComponentString(MESSAGE_COLOR + ".BO4Data export complete."));
+        } else {
+        	sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "The ExportBO4Data command is only available for IsOTGPlus:true worlds."));
         }
-        sender.sendMessage(new TextComponentString(MESSAGE_COLOR + ".BO4Data export complete."));
         return true;
     }
 }

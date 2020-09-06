@@ -108,11 +108,21 @@ public class CustomObjectCollection
 	        return object;
     	}
     }
-       
+          
     private void removeLoadedObject(String worldName, CustomObject object)
     {
         if (worldName != null)
         {
+            HashMap<String, CustomObject> worldObjectsByName = objectsByNamePerWorld.get(worldName);
+            if(worldObjectsByName != null)
+            {
+	            worldObjectsByName.remove(object.getName().toLowerCase());
+	            if (worldObjectsByName.size() == 0)
+	            {
+	            	objectsByNamePerWorld.remove(worldName, worldObjectsByName);
+	            }
+            }
+            
             ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
             worldObjects.remove(object);
             if (worldObjects.size() == 0)
@@ -143,6 +153,20 @@ public class CustomObjectCollection
     	}
     }
 
+    public void unloadCustomObjectFiles()
+    {
+    	synchronized(indexingFilesLock)
+    	{
+	        objectsGlobalObjects.clear();
+	        objectsByNameGlobalObjects.clear();
+	        objectsNotFoundGlobalObjects.clear();
+    		
+	        objectsPerWorld.clear();
+	        objectsByNamePerWorld.clear();
+	        objectsNotFoundPerWorld.clear();	
+    	}
+    }
+    
     public void reloadCustomObjectFiles()
     {
     	synchronized(indexingFilesLock)
@@ -160,36 +184,12 @@ public class CustomObjectCollection
     	}
     }
 
-    public ArrayList<BO4> getAllBO4sForWorld(String worldName)
+    public ArrayList<String> getAllBONamesForWorld(String worldName)
     {
-    	synchronized(indexingFilesLock)
-    	{
-	        ArrayList<BO4> allBO4s = new ArrayList<BO4>();
-	
-	        if (worldName != null)
-	        {
-	            if (worldName.equals("overworld"))
-	            {
-	                worldName = OTG.getEngine().getPresetName("overworld");
-	            }
-	
-	            HashMap<String, File> worldObjectFilesByName = customObjectFilesPerWorld.get(worldName);
-	            if (worldObjectFilesByName != null)
-	            {
-	                for (Entry<String, File> entry : worldObjectFilesByName.entrySet())
-	                {
-	                    CustomObject object = getObjectByName(entry.getKey(), worldName);
-	                    if (object instanceof BO4)
-	                    {
-	                        allBO4s.add((BO4) object);
-	                    }
-	                }
-	            }
-	        }
-	        return allBO4s;
-    	}
+    	HashMap<String, File> files = customObjectFilesPerWorld.get(worldName);
+    	return files == null ? null : new ArrayList<String>(files.keySet());
     }
-
+    
     public CustomObject getObjectByName(String name, String worldName)
     {
     	synchronized(indexingFilesLock)

@@ -72,6 +72,15 @@ public class BO4 implements StructuredCustomObject
     @Override
     public boolean onEnable()
     {
+    	if(isInvalidConfig)
+    	{
+    		return false;
+    	}
+    	if(this.config != null)
+    	{
+    		return true;
+    	}
+    	
     	try
     	{
     		this.config = new BO4Config(new FileSettingsReaderOTGPlus(name, file), true);
@@ -85,10 +94,9 @@ public class BO4 implements StructuredCustomObject
     		isInvalidConfig = true;
     		return false;
     	}
-    	
     	return true;
     }
-    
+
     @Override
     public boolean canSpawnAsTree()
     {

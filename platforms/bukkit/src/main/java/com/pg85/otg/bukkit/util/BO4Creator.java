@@ -238,7 +238,7 @@ public class BO4Creator extends BOCreator
             {
                 blocks = blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1, z1));
 
-                if (blocks == null || blocks.isEmpty())
+                if (blocks == null ) // || blocks.isEmpty())
                 {
                     continue;
                 }
@@ -255,7 +255,11 @@ public class BO4Creator extends BOCreator
                                     BO4BranchFunction.class, 0, 0, 0, true, (name + "C0R0"), "NORTH", 100, 0));
                         }
 
-                        if (!isStartBO4 && blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1 + 1, z1)) != null)
+                        //TODO: Right now it exports a full rectangle of branches, which is unnecessary
+                        // Should be possible to have it ignore empty chunks and still function properly?
+
+                        // Check disabled because empty branches are needed for structure, should improve
+                        if (!isStartBO4 )//&& blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1 + 1, z1)) != null)
                         {
                             branches.add(
                                     (BO4BranchFunction) CustomObjectConfigFunction.create(null, BO4BranchFunction.class,
@@ -264,12 +268,12 @@ public class BO4Creator extends BOCreator
 
                         if (!isStartBO4 && x1 == 0)
                         {
-                            if (blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1, z1 + 1)) != null)
-                            {
+                            //if (blocksPerChunkArr.get(ChunkCoordinate.fromChunkCoords(x1, z1 + 1)) != null)
+                            //{
                                 branches.add((BO4BranchFunction) CustomObjectConfigFunction.create(null,
                                         BO4BranchFunction.class, 0, 0, 16, true, (name + "C" + x1 + "R" + (z1 + 1)), "NORTH",
                                         100, 0));
-                            }
+                            //}
                         }
                     }
 

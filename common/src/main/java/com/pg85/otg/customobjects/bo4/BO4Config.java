@@ -718,8 +718,8 @@ public class BO4Config extends CustomObjectConfigFile
         for (CustomObjectConfigFunction<BO4Config> res : resources)
         {
         	if( // TODO: Add interface instead?
-            		!(res instanceof BranchFunction) &&
-            		!(res instanceof CustomObjectErroredFunction)
+        		!(res instanceof BranchFunction) &&
+        		!(res instanceof CustomObjectErroredFunction)
     			)
         	{
 	        	res.x += xOffset;
@@ -2092,7 +2092,7 @@ public class BO4Config extends CustomObjectConfigFile
                
     	return this;
     }
-        
+           
     private void loadBlockArrays(ArrayList<BO4BlockFunction> newBlocks, short[][] columnSizes)
     {
         // Store blocks in arrays instead of BO4BlockFunctions,

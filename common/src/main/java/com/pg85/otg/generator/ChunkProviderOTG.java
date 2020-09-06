@@ -535,10 +535,8 @@ public class ChunkProviderOTG
                 final BiomeConfig nextBiomeConfig = toBiomeConfig(biomeArray[(x + nextX + this.maxSmoothRadius + (z + nextZ + this.maxSmoothRadius) * (NOISE_MAX_X + this.maxSmoothDiameter))]);
 
                 nextBiomeHeight = nextBiomeConfig.biomeHeight;
-
-                // TODO: Potential divide by zero, not sure what the outcome or the proper solution would be. Uses floats so won't necessarily cause exceptions.
                 biomeWeight = this.nearBiomeWeightArray[(nextX + this.maxSmoothRadius + (nextZ + this.maxSmoothRadius) * this.maxSmoothDiameter)] / (nextBiomeHeight + 2.0F);
-                biomeWeight = Math.abs(biomeWeight);
+                biomeWeight = Math.abs(biomeWeight); // Shouldnt be necessary, should always be positive?
                 volatilitySum += nextBiomeConfig.biomeVolatility * biomeWeight;
                 heightSum += nextBiomeHeight * biomeWeight;
                 biomeWeightSum += biomeWeight;

@@ -98,4 +98,19 @@ public class MaterialHelper
     {
         return OTG.getEngine().toLocalMaterialData(defaultMaterial, blockData);
     }
+
+	public static boolean isOre(LocalMaterialData material)
+	{
+    	return
+			material.isMaterial(DefaultMaterial.COAL_ORE) ||
+			material.isMaterial(DefaultMaterial.DIAMOND_ORE) ||
+			material.isMaterial(DefaultMaterial.EMERALD_ORE) ||
+			material.isMaterial(DefaultMaterial.GLOWING_REDSTONE_ORE) ||
+			material.isMaterial(DefaultMaterial.GOLD_ORE) ||
+			material.isMaterial(DefaultMaterial.IRON_ORE) ||
+			material.isMaterial(DefaultMaterial.LAPIS_ORE) ||
+			material.isMaterial(DefaultMaterial.QUARTZ_ORE) ||
+			material.isMaterial(DefaultMaterial.REDSTONE_ORE)
+		;
+	}
 }

@@ -8,8 +8,10 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.materials.MaterialSetEntry;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -96,6 +98,14 @@ public class OreGen extends Resource
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
         parseMaterials(world, this.material, this.sourceBlocks);
+        
+        if(world.getConfigs().getWorldConfig().disableOreGen)
+        {
+        	if(MaterialHelper.isOre(this.material))
+        	{
+        		return;
+        	}
+        }
         
         int y = RandomHelper.numberInRange(rand, this.minAltitude, this.maxAltitude);
        

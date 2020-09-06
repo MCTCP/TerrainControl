@@ -21,3 +21,4 @@ tile.portalotg_white.name=White OTG portal block
 tile.portalotg_yellow.name=Yellow OTG portal block
 generator.OTG.info=Don't use this, use the OTG menu instead
 key.otghud.desc=OTG in-game menu
+key.otg.category=OpenTerrainGenerator

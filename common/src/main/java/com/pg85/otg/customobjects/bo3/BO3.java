@@ -39,6 +39,7 @@ public class BO3 implements StructuredCustomObject
     private BO3Config settings;
     private final String name;
     private final File file;
+    public boolean isInvalidConfig;
 
     /**
      * Creates a BO3 from a file.
@@ -66,6 +67,14 @@ public class BO3 implements StructuredCustomObject
     @Override
     public boolean onEnable()
     {
+    	if(isInvalidConfig)
+    	{
+    		return false;
+    	}
+    	if(this.settings != null)
+    	{
+    		return true;
+    	}
         try
         {
             this.settings = new BO3Config(new FileSettingsReaderOTGPlus(name, file));
@@ -73,8 +82,10 @@ public class BO3 implements StructuredCustomObject
             {
                 FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
             }
-        } catch (InvalidConfigException ex)
+        }
+        catch (InvalidConfigException ex)
         {
+        	isInvalidConfig = true;
             return false;
         }
         return true;

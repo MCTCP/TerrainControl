@@ -116,7 +116,14 @@ public class BukkitMaterialData extends LocalMaterialData
         if (splitIndex != -1)
         {
             blockName = input.substring(0, splitIndex);
-            blockData = Integer.parseInt(input.substring(splitIndex + 1));
+            try
+            {
+            	blockData = Integer.parseInt(input.substring(splitIndex + 1));            
+            }
+            catch (NumberFormatException e)
+            {
+            	blockName = input;
+            }
         }
 
         // Parse block name
@@ -396,7 +403,7 @@ public class BukkitMaterialData extends LocalMaterialData
 	@Override
 	public LocalMaterialData parseForWorld(LocalWorld world)
 	{
-		if (!this.checkedFallbacks)
+        if (!this.checkedFallbacks && this.isEmpty() && this.rawEntry != null)
 		{
 			this.checkedFallbacks = true;
 			int newId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;

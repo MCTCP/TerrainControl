@@ -426,7 +426,7 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public LocalMaterialData parseForWorld(LocalWorld world)
 	{
-		if (!this.checkedFallbacks && this.blockData == null && this.rawEntry != null)
+        if (!this.checkedFallbacks && this.isEmpty() && this.rawEntry != null)
 		{
 			this.checkedFallbacks = true;
 			ForgeMaterialData newMaterialData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)); 
