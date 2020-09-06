@@ -15,7 +15,7 @@ import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
-import com.pg85.otg.forge.blocks.PortalColors;
+import com.pg85.otg.forge.blocks.portal.PortalColors;
 import com.pg85.otg.forge.commands.OTGCommandHandler;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.gui.GuiHandler;

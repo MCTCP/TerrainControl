@@ -2,7 +2,7 @@ package com.pg85.otg.forge.gui.dimensions.base;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.forge.ForgeEngine;
-import com.pg85.otg.forge.blocks.PortalColors;
+import com.pg85.otg.forge.blocks.portal.PortalColors;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionSettingsList;
 import com.pg85.otg.forge.gui.dimensions.base.SettingEntry.ValueType;
 import com.pg85.otg.forge.gui.presets.OTGGuiPresetList;

@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.forge.blocks.PortalColors;
+import com.pg85.otg.forge.blocks.portal.PortalColors;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 import com.pg85.otg.forge.network.AbstractServerMessageHandler;
 import com.pg85.otg.forge.network.OTGPacket;

@@ -13,7 +13,7 @@ import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.OTGPlugin;
 import com.pg85.otg.forge.biomes.OTGBiomeProvider;
-import com.pg85.otg.forge.blocks.PortalColors;
+import com.pg85.otg.forge.blocks.portal.PortalColors;
 import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
 import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
 import com.pg85.otg.forge.gui.GuiHandler;
