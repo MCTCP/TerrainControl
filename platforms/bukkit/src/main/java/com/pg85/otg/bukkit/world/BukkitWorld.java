@@ -700,8 +700,8 @@ public class BukkitWorld implements LocalWorld
 	        {
 	        	canSpawnStructureAtCoordsMethod = StructureGenerator.class.getDeclaredMethod("a", int.class, int.class);
 	        	canSpawnStructureAtCoordsMethod.setAccessible(true);
-	        } catch (Exception e) {
-	        	OTG.log(LogMarker.ERROR, "Error, could not reflect canSpawnStructureAtCoords, BO4's may not be able to detect default/modded structures. OTG may not fully support your Forge version.");
+	        } catch (NoSuchMethodException | SecurityException e) {
+	        	OTG.log(LogMarker.ERROR, "Error, could not reflect canSpawnStructureAtCoords, BO4's may not be able to detect default/modded structures. OTG may not fully support your Spigot/Bukkit version.");
 	        	e.printStackTrace();
 	        }
         }
@@ -724,7 +724,7 @@ public class BukkitWorld implements LocalWorld
 						}
 						catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
 						{
-							OTG.log(LogMarker.ERROR, "Error, could not reflect canSpawnStructureAtCoords, BO4's may not be able to detect default/modded structures. OTG may not fully support your Spigot version.");
+							OTG.log(LogMarker.ERROR, "Error, could not reflect canSpawnStructureAtCoords, BO4's may not be able to detect default/modded structures. OTG may not fully support your Spigot/Bukkit version.");
 							e.printStackTrace();
 						}
                     	if(canSpawnStructureAtCoords)
