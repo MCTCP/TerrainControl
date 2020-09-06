@@ -116,7 +116,14 @@ public class BukkitMaterialData extends LocalMaterialData
         if (splitIndex != -1)
         {
             blockName = input.substring(0, splitIndex);
-            blockData = Integer.parseInt(input.substring(splitIndex + 1));
+            try
+            {
+            	blockData = Integer.parseInt(input.substring(splitIndex + 1));            
+            }
+            catch (NumberFormatException e)
+            {
+            	blockName = input;
+            }
         }
 
         // Parse block name
