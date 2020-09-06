@@ -71,10 +71,14 @@ import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 // TODO: Move this to com.pg85.otg.forge.world for 1.13. Has to be in com.pg85.otg.forge for Streams 1.12, which depends on it. 
@@ -955,25 +959,55 @@ public class ForgeWorld implements LocalWorld
     
 	// Used to make sure OTG+ structures don't spawn on top of default structures
 	@Override
-	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunk)
+	public boolean chunkHasDefaultStructure(Random rand, ChunkCoordinate chunkCoord)
 	{
         WorldConfig worldConfig = this.settings.getWorldConfig();
-        BlockPos blockPos = new BlockPos(chunk.getBlockXCenter(), 0, chunk.getBlockZCenter());
         // Allow OTG structures to spawn on top of strongholds
         // Allow OTG structures to spawn on top of mine shafts
-        // TODO: VIllage gen detection doesn't appear to be working too well, fix..
-        return 
-		(worldConfig.villagesEnabled && this.villageGen instanceof OTGVillageGen && ((OTGVillageGen)this.villageGen).isInsideStructure(blockPos)) ||
-		(worldConfig.villagesEnabled && !(this.villageGen instanceof OTGVillageGen) && this.villageGen.isInsideStructure(blockPos)) ||
-        (worldConfig.rareBuildingsEnabled && this.rareBuildingGen instanceof OTGRareBuildingGen && ((OTGRareBuildingGen)this.rareBuildingGen).isInsideStructure(blockPos)) ||
-        (worldConfig.rareBuildingsEnabled && !(this.rareBuildingGen instanceof OTGRareBuildingGen) && this.rareBuildingGen.isInsideStructure(blockPos)) ||
-        (worldConfig.netherFortressesEnabled && this.netherFortressGen.isInsideStructure(blockPos)) ||
-        (worldConfig.oceanMonumentsEnabled && this.oceanMonumentGen instanceof OTGOceanMonumentGen && ((OTGOceanMonumentGen)this.oceanMonumentGen).isInsideStructure(blockPos)) ||
-        (worldConfig.oceanMonumentsEnabled && !(this.oceanMonumentGen instanceof OTGOceanMonumentGen) && this.oceanMonumentGen.isInsideStructure(blockPos)) ||
-        (worldConfig.woodLandMansionsEnabled && this.woodLandMansionGen instanceof OTGWoodLandMansionGen && ((OTGWoodLandMansionGen)this.woodLandMansionGen).isInsideStructure(blockPos)) ||
-        (worldConfig.woodLandMansionsEnabled && !(this.woodLandMansionGen instanceof OTGWoodLandMansionGen) && this.woodLandMansionGen.isInsideStructure(blockPos))
-        ;
+        // isInsideStructure only detects structures that have structure starts saved to world, using custom method ><.
+        return         		
+    		(worldConfig.villagesEnabled && isStructureInRadius(chunkCoord, this.villageGen, 4)) || // TODO: Extra large villages aren't working?
+    		(worldConfig.rareBuildingsEnabled && isStructureInRadius(chunkCoord, this.rareBuildingGen, 4)) ||
+    		(worldConfig.netherFortressesEnabled && isStructureInRadius(chunkCoord, this.netherFortressGen, 4)) ||
+    		(worldConfig.oceanMonumentsEnabled && isStructureInRadius(chunkCoord, this.oceanMonumentGen, 4)) ||
+    		(worldConfig.woodLandMansionsEnabled && isStructureInRadius(chunkCoord, this.woodLandMansionGen, 4))
+		;
 	}
+	
+	static Method canSpawnStructureAtCoordsMethod = ObfuscationReflectionHelper.findMethod(MapGenStructure.class, "func_75047_a", boolean.class, int.class, int.class);
+    public boolean isStructureInRadius(ChunkCoordinate startChunk, MapGenStructure structure, int radiusInChunks)
+    {    	
+        int chunkX = startChunk.getChunkX();
+        int chunkZ = startChunk.getChunkZ();        
+        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+        {
+            for (int xRadius = -cycle; xRadius <= cycle; ++xRadius)
+            {
+                for (int zRadius = -cycle; zRadius <= cycle; ++zRadius)
+                {
+                    int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX-chunkX + xRadius, 2) + Math.pow (chunkZ-chunkZ + zRadius, 2)));                    
+                    if (distance == cycle)
+                    {
+                    	boolean canSpawnStructureAtCoords = false;
+						try
+						{
+							canSpawnStructureAtCoords = (boolean) canSpawnStructureAtCoordsMethod.invoke(structure, chunkX + xRadius, chunkZ + zRadius);
+						}
+						catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e)
+						{
+							OTG.log(LogMarker.ERROR, "Error, could not reflect canSpawnStructureAtCoords, BO4's may not be able to detect default/modded structures. OTG may not fully support your Forge version.");
+							e.printStackTrace();
+						}
+                    	if(canSpawnStructureAtCoords)
+                    	{
+                    		return true;
+                    	}
+                    }
+                }
+            }
+        }
+        return false;
+    }
 	
 	// TODO: No clue what this is used for, leads to some MC advancements "test" code. 
     public boolean isInsideStructure(String structureName, BlockPos pos)
@@ -1013,10 +1047,15 @@ public class ForgeWorld implements LocalWorld
         	// TODO: Override and implement isInsideStructure?
             return this.rareBuildingGen.isInsideStructure(pos);
         }
+        else if (((StructureNames.NETHER_FORTRESS.equals(structureName))|| ("Fortress".equals(structureName))) && (this.netherFortressGen != null))
+        {
+        	// TODO: Override and implement isInsideStructure?
+            return this.netherFortressGen.isInsideStructure(pos);
+        }
 
     	return false;
     }
-
+    
     public BlockPos getNearestStructurePos(String structureName, BlockPos blockPos, boolean p_180513_4_)
     {
     	//if(!this.mapFeaturesEnabled == null)
@@ -1045,6 +1084,10 @@ public class ForgeWorld implements LocalWorld
 	        if (((StructureNames.RARE_BUILDING.equals(structureName))|| ("Temple".equals(structureName))) && (this.rareBuildingGen != null))
 	        {
 	            return this.rareBuildingGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
+	        }
+	        if (((StructureNames.NETHER_FORTRESS.equals(structureName))|| ("Fortress".equals(structureName))) && (this.netherFortressGen != null))
+	        {
+	            return this.netherFortressGen.getNearestStructurePos(this.getWorld(), blockPos, p_180513_4_);
 	        }
     	}
 

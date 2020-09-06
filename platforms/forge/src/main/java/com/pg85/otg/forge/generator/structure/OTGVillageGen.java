@@ -1,21 +1,26 @@
 package com.pg85.otg.forge.generator.structure;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.world.ForgeWorld;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
+import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.MapGenBase;
+import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-//TODO: This should inherit from MapGenVillage, or other mods may trip on it when Forge fires a spawn event.
+//TODO: This should inherit from MapGenVillage, or other mods may trip over it when Forge fires a spawn event.
 public class OTGVillageGen extends OTGMapGenStructure
 {
     /**
@@ -26,13 +31,14 @@ public class OTGVillageGen extends OTGMapGenStructure
     /**
      * Village size, 0 for normal, 1 for flat map
      */
-    private int size;
+    public int size;
     private int distance;
     private int minimumDistance;
 
     public OTGVillageGen(ServerConfigProvider configs, ForgeWorld world)
     {
     	super(world);
+    	 // TODO: Extra large villages aren't working?
         this.size = configs.getWorldConfig().villageSize;
         this.distance = configs.getWorldConfig().villageDistance;
         this.minimumDistance = 8;
@@ -86,7 +92,7 @@ public class OTGVillageGen extends OTGMapGenStructure
 
         return false;
     }
-
+    
     @Override
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
@@ -103,6 +109,6 @@ public class OTGVillageGen extends OTGMapGenStructure
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {
         this.world = worldIn;
-        return findNearestStructurePosBySpacing(worldIn, this, pos, this.distance, 8, 10387312, false, 100, p_180706_3_);
+        return findNearestStructurePosBySpacing(worldIn, this, pos, this.distance, this.minimumDistance, 10387312, false, 100, p_180706_3_);        
     }
 }

@@ -138,6 +138,6 @@ public class OTGRareBuildingGen extends OTGMapGenStructure
     public BlockPos getNearestStructurePos(World worldIn, BlockPos pos, boolean p_180706_3_)
     {
         this.world = worldIn;
-        return findNearestStructurePosBySpacing(worldIn, this, pos, this.maxDistanceBetweenScatteredFeatures, 8, 14357617, false, 100, p_180706_3_);
+        return findNearestStructurePosBySpacing(worldIn, this, pos, this.maxDistanceBetweenScatteredFeatures, this.minDistanceBetweenScatteredFeatures, 14357617, false, 100, p_180706_3_);
     }
 }
