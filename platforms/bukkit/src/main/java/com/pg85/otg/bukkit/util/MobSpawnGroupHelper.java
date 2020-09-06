@@ -76,7 +76,7 @@ public final class MobSpawnGroupHelper
      * @param biomeMeta The mob spawn entry.
      * @return The weight of the mob spawn entry.
      */
-    private static int getWeight(BiomeMeta biomeMeta)
+    public static int getWeight(BiomeMeta biomeMeta)
     {
         try
         {
