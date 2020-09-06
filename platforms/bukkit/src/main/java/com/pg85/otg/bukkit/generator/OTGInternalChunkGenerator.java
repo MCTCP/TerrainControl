@@ -52,7 +52,7 @@ public class OTGInternalChunkGenerator extends CustomChunkGenerator
         {
             if (worldConfig.woodLandMansionsEnabled)
             {
-                return localWorld.mansionGen.getNearestGeneratedFeature(mcWorld, position, bool);
+                return localWorld.woodLandMansionGen.getNearestGeneratedFeature(mcWorld, position, bool);
             }
         }
         else if (type.equals(StructureNames.MINESHAFT))
