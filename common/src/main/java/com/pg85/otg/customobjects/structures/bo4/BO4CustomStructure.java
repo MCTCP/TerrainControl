@@ -237,7 +237,10 @@ public class BO4CustomStructure extends CustomStructure
 
 	    	short startY = 0;
 	    		    	
-			if(((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestBlock || ((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock)
+			if(
+				((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestBlock || 
+				((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock
+			)
 			{
 				if(((BO4)this.start.getObject()).getConfig().spawnAtWaterLevel)
 				{

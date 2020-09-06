@@ -339,17 +339,7 @@ public class WorldConfig extends ConfigFile
         WriteDisable,
         WriteWithoutComments
     }
-    
-    /**
-     * Creates a WorldConfig from the WorldConfig.ini file found in the given
-     * directory.
-     *
-     * @param settingsDir    The directory the WorldConfig is in.
-     * @param settingsReader The raw settings of the WorldConfig.
-     * @param world          The LocalWorld instance of the world.
-     * @param customObjects  The customs objects of the world.
-     */
-    
+       
     public static class DefaulWorldData
     {
     	public WorldConfig worldConfig;

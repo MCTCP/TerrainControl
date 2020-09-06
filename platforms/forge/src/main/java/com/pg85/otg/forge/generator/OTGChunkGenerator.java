@@ -27,7 +27,6 @@ import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.block.BlockGravel;
@@ -78,8 +77,6 @@ public class OTGChunkGenerator implements IChunkGenerator
         this.unloadedChunksCache = new FifoMap<ChunkCoordinate, Chunk>(128);
         this.lastUsedChunks = new FifoMap<ChunkCoordinate, Chunk>(4);
     }
-    
-    
     
 	// Chunks
 	
@@ -358,18 +355,6 @@ public class OTGChunkGenerator implements IChunkGenerator
             return;
         }
 
-        //DefaultMaterial defaultMaterial = material.toDefaultMaterial();
-
-        // TODO: Fix this
-        //if(defaultMaterial.equals(DefaultMaterial.DIODE_BLOCK_ON))
-        {
-        	//material = ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.DIODE_BLOCK_OFF, material.getBlockData());
-        }
-        //else if(defaultMaterial.equals(DefaultMaterial.REDSTONE_COMPARATOR_ON))
-        {
-        	//material = ForgeMaterialData.ofDefaultMaterial(DefaultMaterial.REDSTONE_COMPARATOR_OFF, material.getBlockData());
-        }
-
         IBlockState newState = ((ForgeMaterialData) material).internalBlock();
         
         BlockPos pos = new BlockPos(x, y, z);
@@ -403,126 +388,8 @@ public class OTGChunkGenerator implements IChunkGenerator
 
 	    // Notify world: (2 | 16) == update client, don't update observers
     	this.world.getWorld().markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
-    }
-    
-    //TODO: Remove this after testing captureBlockSnapshots
-    /*
-    private IBlockState setBlockState(Chunk _this, BlockPos pos, IBlockState state)
-    {
-        int i = pos.getX() & 15;
-        int j = pos.getY();
-        int k = pos.getZ() & 15;
-        int l = k << 4 | i;
-
-        if (j >= _this.precipitationHeightMap[l] - 1)
-        {
-        	_this.precipitationHeightMap[l] = -999;
-        }
-
-        int i1 = _this.getHeightMap()[l];
-        IBlockState iblockstate = _this.getBlockState(pos);
-
-        if (iblockstate == state)
-        {
-            return null;
-        } else {
-            Block block = state.getBlock();
-            Block block1 = iblockstate.getBlock();
-            int k1 = iblockstate.getLightOpacity(_this.getWorld(), pos); // Relocate old light value lookup here, so that it is called before TE is removed.
-            ExtendedBlockStorage extendedblockstorage = _this.getBlockStorageArray()[j >> 4];
-            boolean flag = false;
-
-            if (extendedblockstorage == Chunk.NULL_BLOCK_STORAGE)
-            {
-                if (block == Blocks.AIR)
-                {
-                    return null;
-                }
-
-                extendedblockstorage = new ExtendedBlockStorage(j >> 4 << 4, _this.getWorld().provider.hasSkyLight());
-                _this.getBlockStorageArray()[j >> 4] = extendedblockstorage;
-                flag = j >= i1;
-            }
-
-            extendedblockstorage.set(i, j & 15, k, state);
-
-            //if (block1 != block)
-            {
-                if (!_this.getWorld().isRemote)
-                {
-                    if (block1 != block) //Only fire block breaks when the block changes.
-                    block1.breakBlock(_this.getWorld(), pos, iblockstate);
-                    TileEntity te = _this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-                    if (te != null && te.shouldRefresh(_this.getWorld(), pos, iblockstate, state)) _this.getWorld().removeTileEntity(pos);
-                }
-                else if (block1.hasTileEntity(iblockstate))
-                {
-                    TileEntity te = _this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-                    if (te != null && te.shouldRefresh(_this.getWorld(), pos, iblockstate, state))
-                    _this.getWorld().removeTileEntity(pos);
-                }
-            }
-
-            if (extendedblockstorage.get(i, j & 15, k).getBlock() != block)
-            {
-                return null;
-            } else {
-                if (flag)
-                {
-                    _this.generateSkylightMap();
-                }
-                else
-                {
-                    int j1 = state.getLightOpacity(_this.getWorld(), pos);
-
-                    if (j1 > 0)
-                    {
-                        if (j >= i1)
-                        {
-                            _this.relightBlock(i, j + 1, k);
-                        }
-                    }
-                    else if (j == i1 - 1)
-                    {
-                    	_this.relightBlock(i, j, k);
-                    }
-
-                    if (j1 != k1 && (j1 < k1 || _this.getLightFor(EnumSkyBlock.SKY, pos) > 0 || _this.getLightFor(EnumSkyBlock.BLOCK, pos) > 0))
-                    {
-                        _this.propagateSkylightOcclusion(i, k);
-                    }
-                }
-
-                // If capturing blocks, only run block physics for TE's. Non-TE's are handled in ForgeHooks.onPlaceItemIntoWorld
-                //if (!_this.getWorld().isRemote && block1 != block && (!_this.getWorld().captureBlockSnapshots || block.hasTileEntity(state)))
-                {
-                	// Don't do this when spawning resources and BO2's/BO3's, they are considered to be in their intended updated state when spawned
-               		//block.onBlockAdded(_this.getWorld(), pos, state);
-                }
-
-                if (block.hasTileEntity(state))
-                {
-                    TileEntity tileentity1 = _this.getTileEntity(pos, Chunk.EnumCreateEntityType.CHECK);
-
-                    if (tileentity1 == null)
-                    {
-                        tileentity1 = block.createTileEntity(_this.getWorld(), state);
-                        _this.getWorld().setTileEntity(pos, tileentity1);
-                    }
-
-                    if (tileentity1 != null)
-                    {
-                        tileentity1.updateContainingBlockInfo();
-                    }
-                }
-
-                _this.markDirty();
-                return iblockstate;
-            }
-        }
     }   
-    */    
-    
+
     private void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {
         // Convert Tag to a native nms tag
