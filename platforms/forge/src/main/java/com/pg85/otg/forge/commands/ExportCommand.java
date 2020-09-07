@@ -84,12 +84,15 @@ public class ExportCommand extends BaseCommand
         creator.includeAir(args.contains("-a"));
         creator.includeTiles(args.contains("-t"));
 
-        String block = args.size() > 1 ? args.get(1) : "";
+        String block = args.size() > 1 && (args.get(1).charAt(0) != '-') ? args.get(1) : "";
+
         boolean branch;
         if (args.contains("-bo4"))
             branch = args.contains("-b") || selection.getWidth() > 16 || selection.getLength() > 16;
         else
             branch = args.contains("-b") || selection.getWidth() > 32 || selection.getLength() > 32;
+
+        creator.author(sender.getName());
 
         creator.create(selection, sender.getEntityWorld(), block, branch);
 

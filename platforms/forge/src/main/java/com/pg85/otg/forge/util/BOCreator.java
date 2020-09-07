@@ -10,6 +10,7 @@ public abstract class BOCreator
 	protected String name;
     protected boolean includeAir = false;
     protected boolean includeTiles = false;
+    protected String author;
 
     public abstract boolean create(Region selection, World world, String blockName, boolean branch);
     
@@ -33,5 +34,9 @@ public abstract class BOCreator
     public void includeTiles(boolean include)
     {
         this.includeTiles = include;
+    }
+
+    public void author(String name) {
+        author = name;
     }
 }
