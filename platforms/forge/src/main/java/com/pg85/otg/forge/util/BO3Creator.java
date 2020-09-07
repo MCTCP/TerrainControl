@@ -285,6 +285,8 @@ public class BO3Creator extends BOCreator
 
                     bo3.getSettings().settingsMode = ConfigMode.WriteAll;
 
+                    bo3.getSettings().author = author;
+
                     try {
                         SettingsWriterOTGPlus writer = new FileSettingsWriterOTGPlus(bo3.getSettings().getFile());
                         bo3.getSettings().write(writer, ConfigMode.WriteAll);
