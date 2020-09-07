@@ -53,7 +53,6 @@ level.dat_old
 session.lock
 *.dat
 *.mca
-*.json
 /platforms/bukkit/logs
 /platforms/forge/banned-players.txt
 /platforms/forge/banned-ips.txt

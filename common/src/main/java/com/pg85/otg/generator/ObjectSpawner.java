@@ -29,6 +29,7 @@ import com.pg85.otg.generator.resource.SmallLakeGen;
 import com.pg85.otg.generator.resource.SurfacePatchGen;
 import com.pg85.otg.generator.resource.TreeGen;
 import com.pg85.otg.generator.resource.UnderWaterOreGen;
+import com.pg85.otg.generator.resource.UnderWaterPlantGen;
 import com.pg85.otg.generator.resource.UndergroundLakeGen;
 import com.pg85.otg.generator.resource.VeinGen;
 import com.pg85.otg.generator.resource.VinesGen;
@@ -425,6 +426,7 @@ public class ObjectSpawner
 				(res instanceof DungeonGen) ||
 				(res instanceof AboveWaterGen) ||
 				(res instanceof PlantGen) ||
+				(res instanceof UnderWaterPlantGen) ||
 				(res instanceof GrassGen) ||
 				(res instanceof TreeGen) ||
 				(res instanceof ReedGen) ||

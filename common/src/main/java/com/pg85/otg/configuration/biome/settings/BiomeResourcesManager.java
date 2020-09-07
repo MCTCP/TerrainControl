@@ -41,6 +41,7 @@ public class BiomeResourcesManager
         registerConfigFunction("Liquid", LiquidGen.class);
         registerConfigFunction("Ore", OreGen.class);
         registerConfigFunction("Plant", PlantGen.class);
+        registerConfigFunction("UnderWaterPlant", UnderWaterPlantGen.class);
         registerConfigFunction("Reed", ReedGen.class);
         registerConfigFunction("Sapling", SaplingGen.class);
         registerConfigFunction("SmallLake", SmallLakeGen.class);
@@ -86,17 +87,21 @@ public class BiomeResourcesManager
             Constructor<? extends ConfigFunction<?>> constructor = clazz.getConstructor(
                     holder.getClass(), List.class);
             return (ConfigFunction<T>) constructor.newInstance(holder, args);
-        } catch (NoSuchMethodException e1)
+        }
+        catch (NoSuchMethodException e1)
         {
             // Probably uses another holder type
             return null;
-        } catch (InstantiationException e)
+        }
+        catch (InstantiationException e)
         {
             throw new RuntimeException(e);
-        } catch (IllegalAccessException e)
+        }
+        catch (IllegalAccessException e)
         {
             throw new RuntimeException(e);
-        } catch (InvocationTargetException e)
+        }
+        catch (InvocationTargetException e)
         {
             Throwable cause = e.getCause();
             if (cause instanceof InvalidConfigException)
