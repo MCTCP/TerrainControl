@@ -1,0 +1,6 @@
+{
+	"variants": {
+        "axis=z": { "model": "openterraingenerator:portalotg_pink_ew" },
+        "axis=x": { "model": "openterraingenerator:portalotg_pink_ns" }
+    }
+}
