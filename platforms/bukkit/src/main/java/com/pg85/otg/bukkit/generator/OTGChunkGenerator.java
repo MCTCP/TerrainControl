@@ -15,7 +15,6 @@ import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.BlockPosition;
@@ -48,9 +47,10 @@ public class OTGChunkGenerator extends ChunkGenerator
     private BukkitWorld world;
     
     // Caches
-	private FifoMap<BlockPos2D, LocalMaterialData[]> blockColumnsCache;
+	private FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
 	private FifoMap<ChunkCoordinate, ChunkData> unloadedChunksCache;
 	private FifoMap<ChunkCoordinate, Chunk> lastUsedChunks;
+	Object chunkCacheLock = new Object();
     //
 
     
@@ -61,19 +61,31 @@ public class OTGChunkGenerator extends ChunkGenerator
         this.dataConverter = DataConverterRegistry.a();
         // TODO: Add a setting to the worldconfig for the size of these caches. 
         // Worlds with lots of BO4's and large smoothing areas may want to increase this. 
-        this.blockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
+        this.unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
         this.unloadedChunksCache = new FifoMap<ChunkCoordinate, ChunkData>(128);
         this.lastUsedChunks = new FifoMap<ChunkCoordinate, Chunk>(4);
     }
     
 	// Called by /otg flush command to clear memory.
+    // TODO: Implement /otg flush for spigot.
     public void clearChunkCache()
     {
-    	this.lastUsedChunks.clear();
-   		this.blockColumnsCache.clear();
-   		this.unloadedChunksCache.clear();
+    	synchronized(this.chunkCacheLock)
+    	{
+	    	this.lastUsedChunks.clear();
+	   		this.unloadedBlockColumnsCache.clear();
+	   		this.unloadedChunksCache.clear();
+    	}
     }
 
+    public void clearChunkFromCache(ChunkCoordinate chunkCoordinate)
+    {
+    	synchronized(this.chunkCacheLock)
+    	{
+    		this.lastUsedChunks.remove(chunkCoordinate);
+    	}
+    }
+    
     /**
      * Initializes the world if it hasn't already been initialized.
      * 
@@ -166,7 +178,11 @@ public class OTGChunkGenerator extends ChunkGenerator
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
         
-        Chunk chunk = this.lastUsedChunks.get(chunkCoord);
+        Chunk chunk;
+    	synchronized(this.chunkCacheLock)
+    	{
+    		chunk = this.lastUsedChunks.get(chunkCoord);
+    	}
         if(chunk == null)
         {
 	        // Hopefully this is equal to ChunkProviderServer.getLoadedChunk
@@ -179,7 +195,10 @@ public class OTGChunkGenerator extends ChunkGenerator
 	        }
 	        if(chunk != null)
 	        {
-	        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        	synchronized(this.chunkCacheLock)
+	        	{
+		        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        	}
 	        }
         }
 
@@ -334,13 +353,13 @@ public class OTGChunkGenerator extends ChunkGenerator
     	byte blockX = (byte)(x &= 0xF);
     	byte blockZ = (byte)(z &= 0xF);
 
-    	LocalMaterialData[] cachedColumn = this.blockColumnsCache.get(blockPos);
+    	LocalMaterialData[] cachedColumn = this.unloadedBlockColumnsCache.get(blockPos);
 
     	if(cachedColumn != null)
     	{
     		return cachedColumn;
     	}
-    	
+    	   	
 		cachedColumn = new LocalMaterialData[256];
     	LocalMaterialData[] blocksInColumn = new LocalMaterialData[256];
 		
@@ -376,7 +395,7 @@ public class OTGChunkGenerator extends ChunkGenerator
 	        	}
 	        }    		
     	}    	
-        blockColumnsCache.put(blockPos, cachedColumn);		
+        unloadedBlockColumnsCache.put(blockPos, cachedColumn);		
         return blocksInColumn;
     }
     

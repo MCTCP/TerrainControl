@@ -7,6 +7,7 @@ import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.BukkitLogger;
 import com.pg85.otg.bukkit.util.MobSpawnGroupHelper;
 import com.pg85.otg.bukkit.world.BukkitWorld;
+import com.pg85.otg.bukkit.world.WorldHelper;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
@@ -137,5 +138,20 @@ public class BukkitEngine extends OTGEngine
         {
             OTG.log(LogMarker.WARN, "Biome " + biomeResourceLocation + " not found for InheritMobsFromBiomeName in " + biomeConfigStub.getBiomeName() + ".bc");
         }
+    }
+    
+    public void onSave(BukkitWorld bukkitWorld)
+    {
+    	if(bukkitWorld != null && bukkitWorld.getObjectSpawner().saveRequired && !bukkitWorld.getWorldSession().getPreGeneratorIsRunning())
+    	{
+    		bukkitWorld.getStructureCache().saveToDisk();
+    	}
+    }
+    
+    // TODO: WorldSave and WorldUnload events don't appear to be working for spigot (see OTGListener)?
+    public void onSave(org.bukkit.World world)
+    {
+    	//OTG.log(LogMarker.INFO, "BukkitEngine onSave");
+    	onSave((BukkitWorld)WorldHelper.toLocalWorld(world));
     }
 }

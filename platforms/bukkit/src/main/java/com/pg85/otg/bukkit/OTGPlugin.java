@@ -48,6 +48,12 @@ public class OTGPlugin extends JavaPlugin
     @Override
     public void onDisable()
     {
+        // Cleanup worlds
+        for (BukkitWorld world : worlds.values())
+        {
+        	((BukkitEngine)OTG.getEngine()).onSave(world);
+        }
+    	
         if (cleanupOnDisable)
         {
             // Cleanup worlds
