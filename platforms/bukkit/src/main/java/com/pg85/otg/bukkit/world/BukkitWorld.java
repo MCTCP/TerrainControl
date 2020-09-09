@@ -49,8 +49,6 @@ import com.pg85.otg.bukkit.generator.structures.OTGOceanMonumentGen;
 import com.pg85.otg.bukkit.generator.structures.OTGRareBuildingGen;
 import com.pg85.otg.bukkit.generator.structures.OTGStrongholdGen;
 import com.pg85.otg.bukkit.generator.structures.OTGVillageGen;
-import com.pg85.otg.bukkit.generator.structures.RareBuildingStart;
-import com.pg85.otg.bukkit.generator.structures.VillageStart;
 import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.JsonToNBT;
 import com.pg85.otg.bukkit.util.NBTException;
@@ -76,8 +74,6 @@ import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-import com.pg85.otg.util.minecraft.defaults.StructureNames;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import net.minecraft.server.v1_12_R1.BiomeBase;
@@ -115,7 +111,6 @@ import net.minecraft.server.v1_12_R1.WorldChunkManager;
 import net.minecraft.server.v1_12_R1.WorldGenAcaciaTree;
 import net.minecraft.server.v1_12_R1.WorldGenBigTree;
 import net.minecraft.server.v1_12_R1.WorldGenDungeons;
-import net.minecraft.server.v1_12_R1.WorldGenFactory;
 import net.minecraft.server.v1_12_R1.WorldGenForest;
 import net.minecraft.server.v1_12_R1.WorldGenForestTree;
 import net.minecraft.server.v1_12_R1.WorldGenFossils;
@@ -261,7 +256,6 @@ public class BukkitWorld implements LocalWorld
     @Override
 	public WorldSession getWorldSession()
 	{
-    	// TODO Implement this properly (for particles)
 		return worldSession;
 	}
     	
@@ -291,7 +285,7 @@ public class BukkitWorld implements LocalWorld
 		// TODO Implement this (for spawners and particles)
 		throw new RuntimeException();
 	}
-   
+
     @Override
     public int getHeightCap()
     {

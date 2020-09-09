@@ -50,7 +50,6 @@ public class ObjectSpawner
     public boolean processing = false;
 	public boolean saving;
 	public boolean saveRequired;
-    public boolean StructurePlottedAtSpawn = false;
 	public int populatingX = 0;
 	public int populatingZ = 0;
     private final ConfigProvider configProvider;
@@ -100,12 +99,12 @@ public class ObjectSpawner
 
 		if(world.isOTGPlus())
 		{
-			if(!StructurePlottedAtSpawn)
+			if(!world.getStructureCache().StructurePlottedAtSpawn)
 			{
 				world.getStructureCache().plotStructures(rand, world.getSpawnChunk(), true);
 			}
 		}
-		StructurePlottedAtSpawn = true;
+		world.getStructureCache().StructurePlottedAtSpawn = true;
 
 		if (!processing)
 		{

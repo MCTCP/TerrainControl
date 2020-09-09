@@ -27,7 +27,8 @@ import java.util.Random;
  *
  */
 public class CustomStructureCache
-{
+{	
+	public boolean StructurePlottedAtSpawn;
 	// Key is present == occupied/finalised.
 	
 	// Key not present in structurecache == was never populated or plotted
@@ -328,7 +329,7 @@ public class CustomStructureCache
 
 			if((loadedStructures != null && loadedStructures.size() > 0) || (nullChunks != null && nullChunks.size() > 0) || plotter.getStructureCount() > 0)
 			{
-				world.getObjectSpawner().StructurePlottedAtSpawn = true;
+				StructurePlottedAtSpawn = true;
 			}
 		}
 
