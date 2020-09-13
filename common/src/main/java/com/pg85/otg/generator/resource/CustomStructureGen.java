@@ -92,7 +92,7 @@ public class CustomStructureGen extends Resource
             	StructuredCustomObject object = getObjects(world.getName()).get(objectNumber);
             	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
             	{
-            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomObjectCoordinate(world, random, chunkX, chunkZ);
+            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(world, random, chunkX, chunkZ);
             	} else {
             		if(OTG.getPluginConfig().spawnLog)
             		{
