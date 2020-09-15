@@ -127,9 +127,13 @@ public class BO3Creator extends BOCreator
 
         if (centerBlock == null || !centerBlockFound)
         {
-            centerPointX = (int) Math.floor((start.getBlockX() + end.getBlockX()) / 2d);
+            centerPointX = (start.getBlockX() + end.getBlockX()) >> 1;
             centerPointY = start.getBlockY();
-            centerPointZ = (int) Math.floor((start.getBlockZ() + end.getBlockZ()) / 2d);
+            int z = (start.getBlockZ() + end.getBlockZ()) >> 1;
+            // For 16x16 objects, z should be 7 to place correctly as a BO4
+            if (width == 16)
+                z--;
+            centerPointZ = z;
         }
 
         Map<ChunkCoordinate, List<BO3BlockFunction>> blocksPerChunkArr = new HashMap<ChunkCoordinate, List<BO3BlockFunction>>();

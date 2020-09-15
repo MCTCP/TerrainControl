@@ -106,7 +106,11 @@ public class BO4Creator extends BOCreator
         {
             centerPointX = (start.getBlockX() + end.getBlockX()) >> 1;
             centerPointY = start.getBlockY();
-            centerPointZ = (start.getBlockZ() + end.getBlockZ()) >> 1;
+            int z = (start.getBlockZ() + end.getBlockZ()) >> 1;
+            // For 16x16 objects, z should be 7 to place correctly as a BO4
+            if (width == 16)
+                z--;
+            centerPointZ = z;
         }
 
         Map<ChunkCoordinate, ArrayList<BO4BlockFunction>> blocksPerChunkArr = new HashMap<ChunkCoordinate, ArrayList<BO4BlockFunction>>();
