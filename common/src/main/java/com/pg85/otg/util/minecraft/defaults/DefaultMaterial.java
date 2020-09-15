@@ -57,7 +57,7 @@ public enum DefaultMaterial
     GOLD_BLOCK(41),
     IRON_BLOCK(42),
     DOUBLE_STEP(43),
-    STEP(44, false), // What is this?
+    STEP(44, false), // stone_slab
     BRICK(45),
     TNT(46),
     BOOKSHELF(47),

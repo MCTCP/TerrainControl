@@ -29,6 +29,7 @@ public class MaterialHelper
     public static final LocalMaterialData GLOWSTONE = MaterialHelper.toLocalMaterialData(DefaultMaterial.GLOWSTONE, 0);
     public static final LocalMaterialData GRASS = MaterialHelper.toLocalMaterialData(DefaultMaterial.GRASS, 0);
     public static final LocalMaterialData DIRT = MaterialHelper.toLocalMaterialData(DefaultMaterial.DIRT, 0);
+    public static final LocalMaterialData STONE = MaterialHelper.toLocalMaterialData(DefaultMaterial.STONE, 0);
     public static final LocalMaterialData SNOW_BLOCK = MaterialHelper.toLocalMaterialData(DefaultMaterial.SNOW_BLOCK, 0);
     public static final LocalMaterialData VINE = MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 0);
     

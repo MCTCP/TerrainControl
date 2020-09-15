@@ -18,7 +18,7 @@ public class BiomesCommand extends BaseCommand
     {
         name = "biomes";
         usage = "biomes";
-        description = "View a list of registerd biomes.";
+        description = "View a list of registered biomes.";
     }
 
     @Override

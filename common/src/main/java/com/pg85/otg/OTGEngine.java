@@ -67,7 +67,7 @@ public abstract class OTGEngine
 
         // Do pluginConfig loading and then log anything that happened
         File pluginConfigFile = new File(getOTGRootFolder(), PluginStandardValues.PluginConfigFilename);
-        pluginConfig = new PluginConfig(FileSettingsReader.read("PluginConfig", pluginConfigFile));
+        pluginConfig = new PluginConfig(FileSettingsReader.read(PluginStandardValues.PluginConfigFilename, pluginConfigFile));
         FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.settingsMode);
         logger.setLevel(pluginConfig.getLogLevel().getLevel());
 

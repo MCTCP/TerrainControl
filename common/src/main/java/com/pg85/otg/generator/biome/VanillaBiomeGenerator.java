@@ -12,6 +12,7 @@ import com.pg85.otg.common.LocalWorld;
  * {@link #GENERATOR_NAME}.
  *
  */
+// TODO: Not used for forge, still used for bukkit? If not, remove.
 public abstract class VanillaBiomeGenerator extends BiomeGenerator {
 
     /**

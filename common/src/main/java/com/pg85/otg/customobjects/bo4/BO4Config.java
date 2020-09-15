@@ -105,6 +105,8 @@ public class BO4Config extends CustomObjectConfigFile
     public String replaceWithGroundBlock;
     // Replaces all the blocks of the given material in the BO3 with the SurfaceBlock configured for the biome it spawns in
     public String replaceWithSurfaceBlock;
+    // Replaces all the blocks of the given material in the BO3 with the StoneBlock configured for the biome it spawns in
+    public String replaceWithStoneBlock;
     // Define a group that this BO3 belongs to and a range in chunks that members of this group should have to each other
     private String bo3Group;
     public HashMap<String, Integer> bo3Groups;
@@ -1128,12 +1130,15 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("Defaults to true. If set to true then every block in the BO4 of the materials defined in ReplaceWithGroundBlock or ReplaceWithSurfaceBlock will be replaced by the GroundBlock or SurfaceBlock materials configured for the biome the block is spawned in.");
         writer.setting(BO4Settings.REPLACEWITHBIOMEBLOCKS, this.replaceWithBiomeBlocks);
 
+        writer.comment("Defaults to GRASS, Replaces all the blocks of the given material in the BO4 with the SurfaceBlock configured for the biome it spawns in.");
+        writer.setting(BO4Settings.REPLACEWITHSURFACEBLOCK, this.replaceWithSurfaceBlock);        
+        
         writer.comment("Defaults to DIRT, Replaces all the blocks of the given material in the BO4 with the GroundBlock configured for the biome it spawns in.");
         writer.setting(BO4Settings.REPLACEWITHGROUNDBLOCK, this.replaceWithGroundBlock);
 
-        writer.comment("Defaults to GRASS, Replaces all the blocks of the given material in the BO4 with the SurfaceBlock configured for the biome it spawns in.");
-        writer.setting(BO4Settings.REPLACEWITHSURFACEBLOCK, this.replaceWithSurfaceBlock);
-
+        writer.comment("Defaults to STONE, Replaces all the blocks of the given material in the BO4 with the StoneBlock configured for the biome it spawns in.");
+        writer.setting(BO4Settings.REPLACEWITHSTONEBLOCK, this.replaceWithStoneBlock);
+        
         writer.comment("Makes the terrain around the BO4 slope evenly towards the edges of the BO4. The given value is the distance in blocks around the BO4 from where the slope should start and can be any positive number.");
         writer.setting(BO4Settings.SMOOTHRADIUS, this.smoothRadius);
 
@@ -1200,6 +1205,7 @@ public class BO4Config extends CustomObjectConfigFile
         this.replaceWithBiomeBlocks = readSettings(BO4Settings.REPLACEWITHBIOMEBLOCKS);
         this.replaceWithGroundBlock = readSettings(BO4Settings.REPLACEWITHGROUNDBLOCK);
         this.replaceWithSurfaceBlock = readSettings(BO4Settings.REPLACEWITHSURFACEBLOCK);
+        this.replaceWithStoneBlock = readSettings(BO4Settings.REPLACEWITHSTONEBLOCK);
         
         this.bo3Group = readSettings(BO4Settings.BO3GROUP);
         this.bo3Groups = new HashMap<String, Integer>();
@@ -1571,8 +1577,9 @@ public class BO4Config extends CustomObjectConfigFile
         StreamHelper.writeStringToStream(stream, this.replaceAbove);
         StreamHelper.writeStringToStream(stream, this.replaceBelow);
         stream.writeBoolean(this.replaceWithBiomeBlocks);
-        StreamHelper.writeStringToStream(stream, this.replaceWithGroundBlock);
         StreamHelper.writeStringToStream(stream, this.replaceWithSurfaceBlock);
+        StreamHelper.writeStringToStream(stream, this.replaceWithGroundBlock);
+        StreamHelper.writeStringToStream(stream, this.replaceWithStoneBlock);
         stream.writeInt(this.smoothRadius);
         stream.writeInt(this.smoothHeightOffset);
         stream.writeBoolean(this.smoothStartTop);
@@ -1820,8 +1827,9 @@ public class BO4Config extends CustomObjectConfigFile
 				this.replaceAbove = StreamHelper.readStringFromBuffer(buffer);
 				this.replaceBelow = StreamHelper.readStringFromBuffer(buffer);
 				this.replaceWithBiomeBlocks = buffer.get() != 0;
+				this.replaceWithSurfaceBlock = StreamHelper.readStringFromBuffer(buffer);				
 				this.replaceWithGroundBlock = StreamHelper.readStringFromBuffer(buffer);
-				this.replaceWithSurfaceBlock = StreamHelper.readStringFromBuffer(buffer);
+				this.replaceWithStoneBlock = StreamHelper.readStringFromBuffer(buffer);
 				this.smoothRadius = buffer.getInt();
 				this.smoothHeightOffset = buffer.getInt();
 				this.smoothStartTop = buffer.get() != 0;
@@ -1831,7 +1839,7 @@ public class BO4Config extends CustomObjectConfigFile
 				this.bo3Group = StreamHelper.readStringFromBuffer(buffer);
 				this.isSpawnPoint = buffer.get() != 0;        
 				this.isCollidable = buffer.get() != 0;
-		   			
+
 	            this.branchFrequencyGroups = new HashMap<String, Integer>();
 	            if(this.branchFrequencyGroup != null && this.branchFrequencyGroup.trim().length() > 0)
 	            {
