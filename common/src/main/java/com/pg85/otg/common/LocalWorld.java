@@ -232,7 +232,7 @@ public interface LocalWorld
      * Update: This comment is no longer accurate, all 4 chunks are replaceblock'd for each chunk populated.
      */
     public void replaceBlocks(ChunkCoordinate chunkCoord);
-	
+    	
 	// Chunks
 	
 	boolean isInsidePregeneratedRegion(ChunkCoordinate chunk);
@@ -243,7 +243,7 @@ public interface LocalWorld
 
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 
-	public boolean isOTGPlus();
+	public boolean isBO4Enabled();
 	
 	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated);
 }

@@ -393,7 +393,7 @@ public class BukkitWorld implements LocalWorld
             this.initialized = true;
         } else {
             // Things that need to be done only on reloading
-            this.structureCache.reload(this);
+            this.structureCache.reloadBo3StructureCache(this);
         }
     }
     
@@ -1885,7 +1885,7 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	@Override
-	public boolean isOTGPlus()
+	public boolean isBO4Enabled()
 	{
 		return this.getConfigs().getWorldConfig().isOTGPlus;
 	}

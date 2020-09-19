@@ -72,7 +72,6 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -406,7 +405,7 @@ public class ForgeWorld implements LocalWorld
      	   return biomeConfig.replaceToBiomeName;
         }
     }
-    
+
     @Override
     public ArrayList<LocalBiome> getAllBiomes()
     {
@@ -1110,7 +1109,7 @@ public class ForgeWorld implements LocalWorld
     	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ()));
     	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ()));
     }
-
+    
     private void replaceBlocks(Chunk rawChunk)
     {
         int worldStartX = rawChunk.x * 16;
@@ -1550,7 +1549,7 @@ public class ForgeWorld implements LocalWorld
 	private boolean isOTGPlusLoaded = false;
 	private boolean isOTGPlus = false;
 	@Override
-	public boolean isOTGPlus()
+	public boolean isBO4Enabled()
 	{
 		if(!isOTGPlusLoaded)
 		{
