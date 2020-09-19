@@ -68,7 +68,7 @@ public class ServerTickHandler
 	@SubscribeEvent
 	public void onServerTick(ServerTickEvent event)
 	{
-		if(event.phase == Phase.END)
+		if(event.phase == Phase.START)
 		{
 			((ForgeEngine)OTG.getEngine()).processPregeneratorTick();
 
