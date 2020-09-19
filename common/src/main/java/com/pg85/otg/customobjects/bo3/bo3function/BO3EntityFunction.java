@@ -14,7 +14,8 @@ public class BO3EntityFunction extends EntityFunction<BO3Config>
         rotatedBlock.x = z - 1;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
-        rotatedBlock.mobName = mobName;
+        rotatedBlock.name = name;
+        rotatedBlock.resourceLocation = resourceLocation;
         rotatedBlock.groupSize = groupSize;
         rotatedBlock.originalNameTagOrNBTFileName = originalNameTagOrNBTFileName;
         rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;

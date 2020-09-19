@@ -9,7 +9,7 @@ import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.util.BiomeIds;
-import com.pg85.otg.util.minecraft.defaults.MobNames;
+import com.pg85.otg.util.minecraft.defaults.EntityNames;
 
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.EnumCreatureType;
@@ -127,7 +127,7 @@ public class BiomeCommand extends BaseCommand
                         for (SpawnListEntry spawnListEntry : creatureList)
                         {
                             sender.sendMessage(
-                                    new TextComponentTranslation(VALUE_COLOR + "{\"mob\": \"" + MobNames.toInternalName(
+                                    new TextComponentTranslation(VALUE_COLOR + "{\"mob\": \"" + EntityNames.toInternalName(
                                             spawnListEntry.entityClass.getSimpleName()) + "\", \"weight\": " + spawnListEntry.itemWeight + ", \"min\": " + spawnListEntry.minGroupCount + ", \"max\": " + spawnListEntry.maxGroupCount + "}"));
                         }
                     }

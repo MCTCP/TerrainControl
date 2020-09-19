@@ -211,7 +211,7 @@ public class ServerTickHandler
 		    									entityFunc.y = modDataBlockY;
 		    									entityFunc.z = modDataBlockZ;
 
-		    									entityFunc.mobName = paramString2[1];
+		    									entityFunc.processEntityName(paramString2[1]);
 		    									entityFunc.groupSize = paramString2.length > 2 ? Integer.parseInt(paramString2[2]) : 1;
 		    									entityFunc.nameTagOrNBTFileName = paramString2.length > 5 ? paramString2[5] : null;
 		    									entityFunc.originalNameTagOrNBTFileName = entityFunc.nameTagOrNBTFileName;

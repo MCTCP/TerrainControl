@@ -11,7 +11,7 @@ import com.pg85.otg.exception.BiomeNotFoundException;
 import net.minecraft.server.v1_12_R1.BiomeBase.BiomeMeta;
 import net.minecraft.server.v1_12_R1.EnumCreatureType;
 import com.pg85.otg.util.BiomeIds;
-import com.pg85.otg.util.minecraft.defaults.MobNames;
+import com.pg85.otg.util.minecraft.defaults.EntityNames;
 
 import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
@@ -75,7 +75,7 @@ public class BiomeCommand extends BaseCommand
                         for (BiomeMeta spawnListEntry : creatureList)
                         {
                             sender.sendMessage(
-                        		VALUE_COLOR + "{\"mob\": \"" + MobNames.toInternalName(spawnListEntry.b.getSimpleName()) + 
+                        		VALUE_COLOR + "{\"mob\": \"" + EntityNames.toInternalName(spawnListEntry.b.getSimpleName()) + 
                         		"\", \"weight\": " + MobSpawnGroupHelper.getWeight(spawnListEntry) + 
                         		", \"min\": " + spawnListEntry.c + 
                         		", \"max\": " + spawnListEntry.d + "}"
