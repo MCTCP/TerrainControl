@@ -97,11 +97,11 @@ public class ObjectSpawner
 			saveRequired = true;
 		}
 
-		if(world.isOTGPlus())
+		if(world.isBO4Enabled())
 		{
 			if(!world.getStructureCache().StructurePlottedAtSpawn)
 			{
-				world.getStructureCache().plotStructures(rand, world.getSpawnChunk(), true);
+				world.getStructureCache().plotBo4Structures(rand, world.getSpawnChunk(), true);
 			}
 		}
 		world.getStructureCache().StructurePlottedAtSpawn = true;
@@ -145,12 +145,12 @@ public class ObjectSpawner
     
     private void doPopulate(ChunkCoordinate chunkCoord)
     {
-		if(world.isOTGPlus())
+		if(world.isBO4Enabled())
 		{
-			world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
-			world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
-			world.getStructureCache().plotStructures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
-			world.getStructureCache().plotStructures(rand, chunkCoord, false);
+			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
+			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
+			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
+			world.getStructureCache().plotBo4Structures(rand, chunkCoord, false);
 
 	        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
 			WorldConfig worldConfig = configProvider.getWorldConfig();
@@ -206,10 +206,10 @@ public class ObjectSpawner
 
 			processResourcesPhase2(chunkCoord);
 
-			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), chunkCoord);
-			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), chunkCoord);
-			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), chunkCoord);
-			spawnBO3s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord);
+			spawnBO4s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), chunkCoord);
+			spawnBO4s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), chunkCoord);
+			spawnBO4s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), chunkCoord);
+			spawnBO4s(ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord);
 
 			// Generate structures
 
@@ -349,7 +349,7 @@ public class ObjectSpawner
 		{
 			if (
 				(res instanceof OreGen) ||
-				(res instanceof SmallLakeGen && !this.world.getStructureCache().isChunkOccupied(chunkCoord)) ||
+				(res instanceof SmallLakeGen && !this.world.getStructureCache().isBo4ChunkOccupied(chunkCoord)) ||
 				(res instanceof UndergroundLakeGen) || // TODO: look at potential size bug in UnderGroundLakeGen
 				(res instanceof UnderWaterOreGen) || // TODO: This seems to be bugged, generate a plains only world with default settings and no sand appears where it does in TC
 				(res instanceof VeinGen) || // TODO: Test this
@@ -456,7 +456,7 @@ public class ObjectSpawner
 		world.replaceBlocks(chunkCoord);
 	}
 
-	private void spawnBO3s(ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated)
+	private void spawnBO4s(ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated)
 	{
 		// Get the corner block coords
 		int x = chunkCoord.getChunkX() * 16;
@@ -475,11 +475,16 @@ public class ObjectSpawner
 			return;
 		}
 
-		BO4CustomStructure structureStart = world.getStructureCache().bo4StructureCache.get(chunkCoord);
+		BO4CustomStructure structureStart = world.getStructureCache().getBo4FromStructureCache(chunkCoord);
 		if (structureStart != null && structureStart.start != null)
 		{
 			structureStart.spawnInChunk(chunkCoord, world, chunkBeingPopulated);
 		} else {
+			// TODO: When can structure.start be null? Should only be possible for bo3 structures?
+			if(structureStart != null && structureStart.start == null)
+			{
+				String breakpoint = "";
+			}
 			// Only trees plotted here			
 		}
 		
@@ -487,12 +492,6 @@ public class ObjectSpawner
 		// TODO: Reimplement placeComplexSurfaceBlocks?
 		//placeComplexSurfaceBlocks(chunkCoord);
 		
-		// All done spawning structures for this chunk, clean up cache
-		if(!world.isInsidePregeneratedRegion(chunkCoord))
-		{
-			world.getStructureCache().bo4StructureCache.put(chunkCoord, null);
-		} else {
-			world.getStructureCache().bo4StructureCache.remove(chunkCoord);
-		}
+		world.getStructureCache().finaliseBo4Chunk(chunkCoord);
 	}
 }

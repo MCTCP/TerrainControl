@@ -27,8 +27,12 @@ public class CustomStructurePlotter
 	private Object processingLock = new Object();
     private boolean processing = false;
 	private FifoMap<ChunkCoordinate, ArrayList<String>> structuresPerChunk; // Used as a cache by the plotting code
-	private HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
-	private HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup; // Used to find distance between structures and structure groups, only stores 1 chunk per structure in the calculated center of the structure. Does not clean itself when used with the pre-generator and will become slower as it fills up, use as little as possible! (can't clean itself because max radius for BO3 groups cannot be known)
+	
+	// Used to find distance between structures and structure groups, only stores 1 chunk per structure in the 
+	// calculated center of the structure. Does not clean itself when used with the pre-generator and will become 
+	// slower as it fills up, use as little as possible! (can't clean itself because max radius for BO4 groups cannot be known)	
+	private HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName;  // group name -> start chunk coords
+	private HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup; // group name -> chunkCoord, radius 
 	
 	public CustomStructurePlotter()
 	{
@@ -39,7 +43,7 @@ public class CustomStructurePlotter
 	
 	public int getStructureCount()
 	{
-		return spawnedStructuresByName.entrySet().size();	
+		return spawnedStructuresByName.entrySet().size();
 	}
 	
 	public void saveSpawnedStructures(LocalWorld world)
@@ -55,8 +59,8 @@ public class CustomStructurePlotter
 	public void invalidateChunkInStructuresPerChunkCache(ChunkCoordinate chunkCoord)
 	{
 		this.structuresPerChunk.put(chunkCoord, null);
-	}
-		
+	}	
+	
 	public void plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, BO4CustomStructure> structureCache, Map<ChunkCoordinate, CustomStructure> worldInfoChunks)
 	{
 		plotStructures(null, null, world, rand, chunkCoord, spawningStructureAtSpawn, structureCache, worldInfoChunks);

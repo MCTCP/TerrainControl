@@ -246,12 +246,11 @@ public class CustomStructureFileManager
 	
 	static Map<ChunkCoordinate, CustomStructure> loadStructuresFile(LocalWorld world)
 	{		
-		// When loading files we first load all the structure files and put them in worldInfoChunks 
-		// and structurecache (if they are outside the pregenerated region), then from any structures 
-		// that have ObjectsToSpawn or SmoothingAreas to spawn we create structures in the structurecache 
-		// for each of those (overriding some of the structures we added earlier). Then we load all the 
-		// null chunks and add them to the structurecache (if they are outside the pregenerated region), 
-		// potentially overriding some of the structures we added earlier.
+		// When loading files 
+		// 1. Load all the structure files and put them in worldInfoChunks and structurecache (if they are outside the pregenerated region), 
+		// 2. For any structures that have ObjectsToSpawn or SmoothingAreas we create structures in the structurecache 
+		// 3. Then we load all the null chunks and add them to the structurecache (if they are outside the pregenerated region
+		// Step 2 and 3 may override structures added by the previous steps.
 		
 		int dimensionId = world.getDimensionId();
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
@@ -375,7 +374,7 @@ public class CustomStructureFileManager
 
 		    if(!structureString.equals("Null structure"))
 		    {
-		    	if(world.isOTGPlus())
+		    	if(world.isBO4Enabled())
 		    	{
 		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 		    	} else {
@@ -501,7 +500,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 5)
 			    	{
 			    		ModDataFunction<?> modDataFunction;
-				    	if(world.isOTGPlus())
+				    	if(world.isBO4Enabled())
 				    	{
 				    		modDataFunction = new BO4ModDataFunction();
 				    	} else {
@@ -524,7 +523,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 19)
 			    	{
 				    	SpawnerFunction<?> spawnerFunction;
-				    	if(world.isOTGPlus())
+				    	if(world.isBO4Enabled())
 				    	{
 				    		spawnerFunction = new BO4SpawnerFunction();
 				    	} else {
@@ -562,7 +561,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 11)
 			    	{
 				    	ParticleFunction<?> particleFunction;
-				    	if(world.isOTGPlus())
+				    	if(world.isBO4Enabled())
 				    	{
 				    		particleFunction = new BO4ParticleFunction();
 				    	} else {
@@ -589,7 +588,7 @@ public class CustomStructureFileManager
 		    }
 
 		    CustomStructure structure;
-		    if(world.isOTGPlus())
+		    if(world.isBO4Enabled())
 		    {
 		    	structure = new BO4CustomStructure(world, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
 			    ((BO4CustomStructure)structure).startChunkBlockChecksDone = true;

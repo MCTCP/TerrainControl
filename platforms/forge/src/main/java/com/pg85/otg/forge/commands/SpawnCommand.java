@@ -102,7 +102,7 @@ public class SpawnCommand extends BaseCommand
         
         if(spawnObject instanceof BO4)
         {
-        	if(!forgeWorld.isOTGPlus())
+        	if(!forgeWorld.isBO4Enabled())
         	{
         		sender.sendMessage(new TextComponentString(ERROR_COLOR + "Cannot spawn a BO4 structure in an isOTGPlus:false world, use a BO3 instead or recreate the world with IsOTGPlus:true in the worldconfig."));
         		return true;
@@ -128,7 +128,7 @@ public class SpawnCommand extends BaseCommand
 
                             if(!sender.getEntityWorld().isChunkGeneratedAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter()))
                             {
-                            	ChunkCoordinate chunkCoordSpawned = forgeWorld.getStructureCache().plotStructure((BO4)spawnObject, targetBiomes, chunkCoord);
+                            	ChunkCoordinate chunkCoordSpawned = forgeWorld.getStructureCache().plotBo4Structure((BO4)spawnObject, targetBiomes, chunkCoord);
                             	if(chunkCoordSpawned != null)
                             	{
                             		sender.sendMessage(new TextComponentString(BaseCommand.MESSAGE_COLOR + spawnObject.getName() + " was spawned at X " + chunkCoordSpawned.getBlockXCenter() + " Z " + chunkCoordSpawned.getBlockZCenter()));

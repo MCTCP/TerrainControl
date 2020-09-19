@@ -113,7 +113,7 @@ public class ParticlesPacket extends OTGPacket
 		            			{
 		            				//OTG.log(LogMarker.INFO, "Processing Particle packet: " + particleString);
 			            			ParticleFunction<?> particle;
-			            			if(world.isOTGPlus())
+			            			if(world.isBO4Enabled())
 			            			{
 			            				particle = new BO4ParticleFunction();
 			            			} else {

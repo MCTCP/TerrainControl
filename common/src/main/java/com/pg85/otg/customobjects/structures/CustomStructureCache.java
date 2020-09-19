@@ -27,76 +27,52 @@ import java.util.Random;
  *
  */
 public class CustomStructureCache
-{	
-	public boolean StructurePlottedAtSpawn;
-	// Key is present == occupied/finalised.
-	
-	// Key not present in structurecache == was never populated or plotted
-	// Key is present and Value is CustomObjectStructure with non-null as Start == plotted with BO3
-	// Key is present and Value is null == plotted and spawned or plotted as empty chunk (this chunk was populated but no BO3 was plotted on it so only add trees, lakes, ores etc)
-	// If a chunk of a CustomObjectStructure has been spawned then the CustomObjectStructure's SmoothingAreasToSpawn and ObjectsToSpawn entries for that chunk
-	// have been removed (cleans up cache and makes sure nothing is ever spawned twice, although a second spawn call should never be made in the first place ofc ><).
-
-	// WorldInfo holds info on all BO3's ever spawned for this world, structurecache only holds those outside the pregenerated area and sets spawned chunks to null.
+{	    
+	// BO3	
 	
 	private FifoMap<ChunkCoordinate, BO3CustomStructure> bo3StructureCache;
-    public Map<ChunkCoordinate, BO4CustomStructure> bo4StructureCache;
-    
-	// Used for the /otg BO3 command, stores information about every BO3 that has been spawned so that author and description information can be requested by chunk.
-    // Also used to store location of spawners/particles/moddata.
+	
+	// BO4
+       
+	public boolean StructurePlottedAtSpawn;
+	
+    private CustomStructurePlotter plotter;
+	
+	// WorldInfo holds info on all structures ever spawned for this world, used for for finding distance, /otg structure and spawners/particles/moddata.
+	// Also used to make sure other resources like lakes don't spawn on top of structures.
 	public Map<ChunkCoordinate, CustomStructure> worldInfoChunks;
 	
+	// Structurecache only holds structures outside the pregenerated area and sets spawned chunks to null.
+	// Key is present in structurecache == plotted or populated.	
+	// Key not present in structurecache == was never plotted or populated
+	// Key is present and value is CustomStructure with non-null as Start == plotted with BO4
+	// *Key is present and value is CustomStructure with null as Start == shouldn't happen, can only happen for bo3structurecache?
+	// Key is present and value is null == plotted and populated or plotted as empty chunk
+	// If a chunk of a CustomStructure is spawned then the CustomObjectStructure's SmoothingAreasToSpawn 
+	// and ObjectsToSpawn entries for that chunk are removed.	
+    private Map<ChunkCoordinate, BO4CustomStructure> bo4StructureCache;
+
+    // Common
+    
     private LocalWorld world;
-    private CustomStructurePlotter plotter;
     
     public CustomStructureCache(LocalWorld world)
     {
         this.world = world;
         this.plotter = new CustomStructurePlotter();
         loadStructureCache();
-    }
+    }    
     
-    public CustomStructurePlotter getPlotter()
-    {
-    	return this.plotter;
-    }
-
-    public ChunkCoordinate plotStructure(BO4 structure, ArrayList<String> biomes, ChunkCoordinate chunkCoord)
-    {
-    	boolean spawned = plotter.plotStructures(structure, biomes, this.world, new Random(), chunkCoord, false, this.bo4StructureCache, this.worldInfoChunks);
-    	if(spawned)
-    	{
-    		return chunkCoord;
-    	}
-    	return null;
-    }
+    // BO3 methods
     
-    public void plotStructures(Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
-    {
-    	plotter.plotStructures(this.world, rand, chunkCoord, spawningStructureAtSpawn, this.bo4StructureCache, this.worldInfoChunks);
-    }
-
-    public void reload(LocalWorld world)
+    public void reloadBo3StructureCache(LocalWorld world)
     {
     	// Only used for Bukkit?
         this.world = world;
         this.bo3StructureCache.clear();
     }
-
-    // Only used by other resources like lakes to cancel 
-    // spawning if a BO4 has spawned in this chunk. 
-    public boolean isChunkOccupied(ChunkCoordinate chunkCoord)
-    {
-    	if(!world.isOTGPlus())
-    	{
-    		return false;
-    	} else {
-    		return this.worldInfoChunks.containsKey(chunkCoord);
-    	}
-    }
     
-    // Only used for non-OTG+ Customstructure
-    public CustomStructure getStructureStart(Random worldRandom, int chunkX, int chunkZ)
+    public BO3CustomStructure getBO3StructureStart(Random worldRandom, int chunkX, int chunkZ)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
         BO3CustomStructure structureStart = bo3StructureCache.get(chunkCoord);
@@ -127,9 +103,80 @@ public class CustomStructureCache
         }
         bo3StructureCache.put(chunkCoord, new BO3CustomStructure(null));
         return null;
+    }    
+    
+    // BO4 methods
+    
+    public CustomStructurePlotter getPlotter()
+    {
+    	return this.plotter;
     }
 
-    // persistence
+    public ChunkCoordinate plotBo4Structure(BO4 structure, ArrayList<String> biomes, ChunkCoordinate chunkCoord)
+    {
+    	boolean spawned = plotter.plotStructures(structure, biomes, this.world, new Random(), chunkCoord, false, this.bo4StructureCache, this.worldInfoChunks);
+    	if(spawned)
+    	{
+    		return chunkCoord;
+    	}
+    	return null;
+    }
+    
+    public void plotBo4Structures(Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
+    {
+    	plotter.plotStructures(this.world, rand, chunkCoord, spawningStructureAtSpawn, this.bo4StructureCache, this.worldInfoChunks);
+    }    
+
+    // Only used by other resources like lakes to cancel 
+    // spawning if a BO4 has spawned in this chunk. 
+    public boolean isBo4ChunkOccupied(ChunkCoordinate chunkCoord)
+    {
+    	if(!world.isBO4Enabled())
+    	{
+    		return false;
+    	} else {
+    		return this.worldInfoChunks.containsKey(chunkCoord);
+    	}
+    }
+
+	public boolean isBo4ChunkPlotted(LocalWorld world, ChunkCoordinate chunkCoordinate)
+	{
+	    // Check if any other structures in world are in this chunk
+		return
+			world.isInsidePregeneratedRegion(chunkCoordinate) || 
+			world.getStructureCache().bo4StructureCache.containsKey(chunkCoordinate)
+		;
+	}    
+
+	public void finaliseBo4Chunk(ChunkCoordinate chunkCoord)
+	{
+		// All done spawning structures for this chunk, clean up cache
+		// TODO: How would a chunk currently being spawned be inside the pregenerated region? xD
+		if(!world.isInsidePregeneratedRegion(chunkCoord))
+		{
+			this.bo4StructureCache.put(chunkCoord, null);
+		} else {
+			this.bo4StructureCache.remove(chunkCoord);
+		}
+
+		// Let plotter know the chunk is taken
+		this.plotter.invalidateChunkInStructuresPerChunkCache(chunkCoord);
+	}
+
+	public void addBo4ToStructureCache(ChunkCoordinate chunkCoord, BO4CustomStructure structure)
+	{
+		this.bo4StructureCache.put(chunkCoord, structure);
+		
+		// Let plotter know the chunk is taken
+		this.plotter.invalidateChunkInStructuresPerChunkCache(chunkCoord);
+	}
+
+	public BO4CustomStructure getBo4FromStructureCache(ChunkCoordinate chunkCoord)
+	{
+		return this.bo4StructureCache.get(chunkCoord);
+	}
+
+    // BO4 Persistence
 
     public void compressCache()
     {
@@ -186,7 +233,7 @@ public class CustomStructureCache
 			}
 		}
 
-		if(world.isOTGPlus())
+		if(world.isBO4Enabled())
 		{
 			compressCache();
 		}
@@ -217,7 +264,7 @@ public class CustomStructureCache
 
 	    CustomStructureFileManager.saveStructuresFile(worldInfoChunksToSave, this.world);
 	    
-	    if(this.world.isOTGPlus())
+	    if(this.world.isBO4Enabled())
 	    {
 		    ArrayList<ChunkCoordinate> nullChunks = new ArrayList<ChunkCoordinate>();
 	    	for (Map.Entry<ChunkCoordinate, BO4CustomStructure> cachedChunk : bo4StructureCache.entrySet()) // Save null chunks from structurecache so that when loading we can reconstitute it based on worldInfoChunks, null chunks and the pregenerator border
@@ -263,7 +310,7 @@ public class CustomStructureCache
 	
 				worldInfoChunks.put(loadedStructure.getKey(), loadedStructure.getValue());
 	
-				if(world.isOTGPlus())
+				if(world.isBO4Enabled())
 				{
 					// Dont override any loaded structures that have been added to the structure cache
 					if(!bo4StructureCache.containsKey(loadedStructure.getKey())) 
@@ -282,7 +329,7 @@ public class CustomStructureCache
 					// The starting structure overrides any empty branches that were added as structures here if it has any ObjectsToSpawn/SmoothingAreasToSpawn/modData in their chunks.
 					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).objectsToSpawn.keySet())
 					{
-						bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has BO3 blocks that need to be spawned
+						bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has blocks that need to be spawned
 					}
 					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).smoothingAreasToSpawn.keySet())
 					{
@@ -309,7 +356,7 @@ public class CustomStructureCache
 
 		OTG.log(LogMarker.DEBUG, "Loaded " + structuresLoaded + " structure chunks");
 
-		if(world.isOTGPlus())
+		if(world.isBO4Enabled())
 		{
 			ArrayList<ChunkCoordinate> nullChunks = CustomStructureFileManager.loadNullChunksFile(this.world);
 			if(nullChunks != null)

@@ -176,8 +176,10 @@ public class BO4CustomStructure extends CustomStructure
 		
 		for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
 		{
-			world.getStructureCache().bo4StructureCache.put(chunkCoord, this);
-			world.getStructureCache().getPlotter().invalidateChunkInStructuresPerChunkCache(chunkCoord);
+			// Add the structure to the structure caches
+			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);
+			
+			// Add Structure to worldInfoChunks for /otg structure and spawners/particles/moddata
 			// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
 			if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 			{
@@ -191,8 +193,9 @@ public class BO4CustomStructure extends CustomStructure
 
 		for(ChunkCoordinate chunkCoord : smoothingAreasToSpawn.keySet())
 		{
-			world.getStructureCache().bo4StructureCache.put(chunkCoord, this);
-			world.getStructureCache().getPlotter().invalidateChunkInStructuresPerChunkCache(chunkCoord);
+			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);
+			
+			// Add Structure to worldInfoChunks for /otg structure and spawners/particles/moddata
 			// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
 			if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
 			{
@@ -878,12 +881,7 @@ public class BO4CustomStructure extends CustomStructure
 	        		    if(!minimumSize && canSpawn)
 	        		    {
 	        			    // Check if any other structures in the world are in this chunk
-	        			    if(
-        			    		(
-    			    				world.isInsidePregeneratedRegion(childBranchDataItem.chunkCoordinate) || 
-    			    				world.getStructureCache().bo4StructureCache.containsKey(childBranchDataItem.chunkCoordinate)
-			    				)
-    			    		)
+	        			    if(world.getStructureCache().isBo4ChunkPlotted(world, childBranchDataItem.chunkCoordinate))
 	        			    {
 		    					canSpawn = false;
         						chunkIsIneligible = true;
@@ -1953,7 +1951,7 @@ public class BO4CustomStructure extends CustomStructure
 	            		if(distanceBetweenStructures <= radiusInChunks)
 	            		{
 	            		    // Check if any other structures in world are in this chunk
-	            			if(world.isInsidePregeneratedRegion(ChunkCoordinate.fromChunkCoords(x,z)) || world.getStructureCache().bo4StructureCache.containsKey(ChunkCoordinate.fromChunkCoords(x,z)))
+	            			if(world.getStructureCache().isBo4ChunkPlotted(world, ChunkCoordinate.fromChunkCoords(x,z)))
 	            		    {
 	            		        // Structures' bounding boxes are overlapping, don't add this branch.
 	            				return null;
