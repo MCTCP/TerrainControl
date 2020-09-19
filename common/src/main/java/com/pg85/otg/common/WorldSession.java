@@ -42,9 +42,9 @@ public abstract class WorldSession
     	String structureInfo = "";
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)x, (int)z);
 		// if the player is in range
-		if(world.getStructureCache().worldInfoChunks.containsKey(playerChunk))
+		if(world.getStructureCache().chunkHasData(playerChunk))
 		{
-			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(playerChunk);
+			CustomStructure worldInfoChunk = world.getStructureCache().getChunkData(playerChunk);
 
 			if(worldInfoChunk != null)
 			{
@@ -67,9 +67,9 @@ public abstract class WorldSession
     public HashMap<String,ArrayList<ModDataFunction<?>>> getModDataForChunk(ChunkCoordinate chunkCoord)
     {
     	HashMap<String,ArrayList<ModDataFunction<?>>> result = new HashMap<String,ArrayList<ModDataFunction<?>>>();
-		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+		if(world.getStructureCache().chunkHasData(chunkCoord))
 		{
-			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+			CustomStructure worldInfoChunk = world.getStructureCache().getChunkData(chunkCoord);
 
 			if(worldInfoChunk != null)
     		{
@@ -92,9 +92,9 @@ public abstract class WorldSession
     public ArrayList<SpawnerFunction<?>> getSpawnersForChunk(ChunkCoordinate chunkCoord)
     {
     	ArrayList<SpawnerFunction<?>> result = new ArrayList<SpawnerFunction<?>>();
-		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+		if(world.getStructureCache().chunkHasData(chunkCoord))
 		{
-			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+			CustomStructure worldInfoChunk = world.getStructureCache().getChunkData(chunkCoord);
 
 			if(worldInfoChunk != null)
     		{
@@ -113,9 +113,9 @@ public abstract class WorldSession
     public ArrayList<ParticleFunction<?>> getParticlesForChunk(ChunkCoordinate chunkCoord)
     {
     	ArrayList<ParticleFunction<?>> result = new ArrayList<ParticleFunction<?>>();
-		if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
+		if(world.getStructureCache().chunkHasData(chunkCoord))
 		{
-			CustomStructure worldInfoChunk = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+			CustomStructure worldInfoChunk = world.getStructureCache().getChunkData(chunkCoord);
 
     		if(worldInfoChunk != null)
     		{
@@ -133,7 +133,7 @@ public abstract class WorldSession
 
     public void removeParticles(ChunkCoordinate chunkCoord, ParticleFunction<?> particle)
     {
-		CustomStructure customObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
+		CustomStructure customObject = world.getStructureCache().getChunkData(chunkCoord);
 		if(customObject != null && customObject.particlesManager.particleData.contains(particle))
 		{
 			customObject.particlesManager.particleData.remove(particle);

@@ -97,15 +97,6 @@ public class ObjectSpawner
 			saveRequired = true;
 		}
 
-		if(world.isBO4Enabled())
-		{
-			if(!world.getStructureCache().StructurePlottedAtSpawn)
-			{
-				world.getStructureCache().plotBo4Structures(rand, world.getSpawnChunk(), true);
-			}
-		}
-		world.getStructureCache().StructurePlottedAtSpawn = true;
-
 		if (!processing)
 		{
 			processing = true;
@@ -145,12 +136,12 @@ public class ObjectSpawner
     
     private void doPopulate(ChunkCoordinate chunkCoord)
     {
-		if(world.isBO4Enabled())
+		if(world.isBo4Enabled())
 		{
-			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), false);
-			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), false);
-			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), false);
-			world.getStructureCache().plotBo4Structures(rand, chunkCoord, false);
+			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()));
+			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
+			world.getStructureCache().plotBo4Structures(rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
+			world.getStructureCache().plotBo4Structures(rand, chunkCoord);
 
 	        ChunkCoordinate spawnChunk = this.world.getSpawnChunk();
 			WorldConfig worldConfig = configProvider.getWorldConfig();
@@ -475,23 +466,10 @@ public class ObjectSpawner
 			return;
 		}
 
-		BO4CustomStructure structureStart = world.getStructureCache().getBo4FromStructureCache(chunkCoord);
-		if (structureStart != null && structureStart.start != null)
-		{
-			structureStart.spawnInChunk(chunkCoord, world, chunkBeingPopulated);
-		} else {
-			// TODO: When can structure.start be null? Should only be possible for bo3 structures?
-			if(structureStart != null && structureStart.start == null)
-			{
-				String breakpoint = "";
-			}
-			// Only trees plotted here			
-		}
+		world.getStructureCache().spawnBo4Chunk(chunkCoord, chunkBeingPopulated);
 		
 		// Complex surface blocks
 		// TODO: Reimplement placeComplexSurfaceBlocks?
-		//placeComplexSurfaceBlocks(chunkCoord);
-		
-		world.getStructureCache().finaliseBo4Chunk(chunkCoord);
+		//placeComplexSurfaceBlocks(chunkCoord);		
 	}
 }

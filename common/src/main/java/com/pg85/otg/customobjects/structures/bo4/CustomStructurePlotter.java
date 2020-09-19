@@ -23,16 +23,27 @@ import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.Rotation;
 
 public class CustomStructurePlotter
-{
-	private Object processingLock = new Object();
-    private boolean processing = false;
-	private FifoMap<ChunkCoordinate, ArrayList<String>> structuresPerChunk; // Used as a cache by the plotting code
-	
+{	
+	// Structurecache only holds structures outside the pregenerated area and sets spawned chunks to null.
+	// Key is present in structurecache == plotted or populated.	
+	// Key not present in structurecache == was never plotted or populated
+	// Key is present and value is CustomStructure with non-null as Start == plotted with BO4
+	// *Key is present and value is CustomStructure with null as Start == shouldn't happen, can only happen for bo3structurecache?
+	// Key is present and value is null == plotted and populated or plotted as empty chunk
+	// If a chunk of a CustomStructure is spawned then the CustomObjectStructure's SmoothingAreasToSpawn 
+	// and ObjectsToSpawn entries for that chunk are removed.	
+    private Map<ChunkCoordinate, BO4CustomStructure> bo4StructureCache; // Saved to disk.
+
 	// Used to find distance between structures and structure groups, only stores 1 chunk per structure in the 
 	// calculated center of the structure. Does not clean itself when used with the pre-generator and will become 
 	// slower as it fills up, use as little as possible! (can't clean itself because max radius for BO4 groups cannot be known)	
-	private HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName;  // group name -> start chunk coords
-	private HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup; // group name -> chunkCoord, radius 
+	private HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName;  // group name -> start chunk coords. Saved to disk.
+	private HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup; // group name -> chunkCoord, radius. Saved to disk.    
+    
+	private Object processingLock = new Object();
+    private boolean processing = false;
+	private FifoMap<ChunkCoordinate, ArrayList<String>> structuresPerChunk; // Used as a cache by the plotting code, not saved to disk.	 
+	private boolean structurePlottedAtSpawn; // Used by ObjectSpawner to make sure the structureatspawn is plotted first.
 	
 	public CustomStructurePlotter()
 	{
@@ -41,33 +52,85 @@ public class CustomStructurePlotter
         this.spawnedStructuresByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();
 	}
 	
-	public int getStructureCount()
+    public boolean isBo4ChunkPlotted(LocalWorld world, ChunkCoordinate chunkCoordinate)
 	{
-		return spawnedStructuresByName.entrySet().size();
+	    // Check if any other structures in world are in this chunk
+		return
+			world.isInsidePregeneratedRegion(chunkCoordinate) || 
+			this.bo4StructureCache.containsKey(chunkCoordinate)
+		;
+	}
+
+	public void addBo4ToStructureCache(ChunkCoordinate chunkCoord, BO4CustomStructure structure)
+	{
+		this.bo4StructureCache.put(chunkCoord, structure);
+		
+		// Let plotter know the chunk is taken
+		invalidateChunkInStructuresPerChunkCache(chunkCoord);
+	}
+
+	// Only used when spawning bo4's, never for plotting checks.
+	public void spawnBO4Chunk(ChunkCoordinate chunkCoord, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
+	{
+		BO4CustomStructure structureStart = this.bo4StructureCache.get(chunkCoord);
+		if (structureStart != null && structureStart.start != null)
+		{
+			structureStart.spawnInChunk(chunkCoord, world, chunkBeingPopulated);
+		} else {
+			// TODO: When can structure.start be null? Should only be possible for bo3 structures?
+			if(structureStart != null && structureStart.start == null)
+			{
+				String breakpoint = "";
+			}
+			// Only trees plotted here
+		}
+		
+		// All done spawning structures for this chunk, clean up cache
+		// TODO: How would a chunk currently being spawned be inside the pregenerated region? xD
+		if(!world.isInsidePregeneratedRegion(chunkCoord))
+		{
+			this.bo4StructureCache.put(chunkCoord, null);
+		} else {
+			this.bo4StructureCache.remove(chunkCoord);
+		}
+
+		// Let plotter know the chunk is taken
+		invalidateChunkInStructuresPerChunkCache(chunkCoord);
 	}
 	
-	public void saveSpawnedStructures(LocalWorld world)
+	public BO4CustomStructure plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
 	{
-		CustomStructureFileManager.saveChunksMapFile(world, this.spawnedStructuresByName, spawnedStructuresByGroup);
+		return plotStructures(null, null, world, rand, chunkCoord);
 	}
 	
-	public void loadSpawnedStructures(LocalWorld world)
-	{		
-		CustomStructureFileManager.loadChunksMapFile(world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
-	}
-	
-	public void invalidateChunkInStructuresPerChunkCache(ChunkCoordinate chunkCoord)
+	public BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
 	{
-		this.structuresPerChunk.put(chunkCoord, null);
+		return plotStructures(targetStructure, targetBiomes, world, rand, chunkCoord, false);
 	}	
 	
-	public void plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, BO4CustomStructure> structureCache, Map<ChunkCoordinate, CustomStructure> worldInfoChunks)
+	private int getStructureCount()
 	{
-		plotStructures(null, null, world, rand, chunkCoord, spawningStructureAtSpawn, structureCache, worldInfoChunks);
+		return spawnedStructuresByName.entrySet().size();
+	}	
+	
+	private void invalidateChunkInStructuresPerChunkCache(ChunkCoordinate chunkCoord)
+	{
+		this.structuresPerChunk.put(chunkCoord, null);
 	}
 	
-    public boolean plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Map<ChunkCoordinate, BO4CustomStructure> structureCache, Map<ChunkCoordinate, CustomStructure> worldInfoChunks)
-    {
+	private BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
+    {		
+		// Make sure the BO4 at spawn is plotted before anything else
+		// This isn't thread-safe so there's a race condition, shouldn't cause problems though due to the lock later on.
+		if(!this.structurePlottedAtSpawn) 
+		{
+			this.structurePlottedAtSpawn = true;
+			if(!chunkCoord.equals(world.getSpawnChunk()))
+			{
+				plotStructures(targetStructure, targetBiomes, world, rand, world.getSpawnChunk(), true);
+			}
+		}
+
     	// This method can be called by /otg spawn and during chunkgeneration.
     	// When called during chunkgeneration, the chunk must be filled or invalidated before returning, so never cancel.
     	// When called by /otg spawn, skip this attempt to spawn and let chunk generation complete first.
@@ -76,16 +139,16 @@ public class CustomStructurePlotter
     	// TODO: Can this thread be paused without issues, or for how long?
     	while(true)
     	{
-        	synchronized(processingLock)
+        	synchronized(this.processingLock)
         	{
-        		if(!processing)
-        		{
-        			processing = true;
+        		if(!this.processing)
+        		{        		
+        			this.processing = true;
         			break;
         		}        		
         		else if(targetStructure != null)
     	    	{
-    	    		return false;
+    	    		return null;
     	    	}
         	}  		
 			try {
@@ -96,10 +159,10 @@ public class CustomStructurePlotter
 				e.printStackTrace();
 				throw new RuntimeException("This shouldn't happen, please ask for help on the OTG Discord or file an issue on the OTG github.");
 			}
-    	}
+    	}        	
     	
     	// Try to spawn a structure that has a branch in this chunk.
-        if (!world.isInsidePregeneratedRegion(chunkCoord) && !structureCache.containsKey(chunkCoord))
+        if (!world.isInsidePregeneratedRegion(chunkCoord) && !this.bo4StructureCache.containsKey(chunkCoord))
         {
             LocalBiome biome = world.getBiome(chunkCoord.getBlockX() + 8, chunkCoord.getBlockZ() + 7);
             BiomeConfig biomeConfig = biome.getBiomeConfig();
@@ -333,11 +396,11 @@ public class CustomStructurePlotter
 					            								}
 					            							}
 					            						} else {
-					            							biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)));
+					            							biomeStructures = this.structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)));
 								        	                
 					            							// StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
 								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-								            				if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i))))
+								            				if(biomeStructures == null && !this.structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i))))
 								        	            	{
 							            						if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 							            						{
@@ -364,7 +427,7 @@ public class CustomStructurePlotter
 							            						} else {
 							            							biomeStructures = new ArrayList<String>(); // Don't spawn anything here, there is a default structure.
 							            						}
-						            							structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)),biomeStructures);
+							            						this.structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)),biomeStructures);
 								        	            	}
 								            				if(biomeStructures != null)
 								            				{
@@ -379,7 +442,7 @@ public class CustomStructurePlotter
 								            				}
 						            					}
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)));
+						        	            		this.structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + scanDistance), (chunkCoord.getChunkZ() + i)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -427,8 +490,8 @@ public class CustomStructurePlotter
 					            						} else {
 								        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
 								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-								        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)));
-							            					if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i))))
+								        	                biomeStructures = this.structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)));
+							            					if(biomeStructures == null && !this.structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i))))
 								        	            	{
 								            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 								            					{
@@ -454,7 +517,7 @@ public class CustomStructurePlotter
 								            					} else {
 								            						biomeStructures = new ArrayList<String>();
 								            					}
-								            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)),biomeStructures);
+								            					this.structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)),biomeStructures);
 							            					}
 							            					if(biomeStructures != null)
 							            					{
@@ -469,7 +532,7 @@ public class CustomStructurePlotter
 							            					}
 					            						}
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)));
+						        	            		this.structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() - scanDistance), (chunkCoord.getChunkZ() + i)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -517,8 +580,8 @@ public class CustomStructurePlotter
 					            						} else {
 								        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
 								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-								        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)));
-							            					if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance))))
+								        	                biomeStructures = this.structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)));
+							            					if(biomeStructures == null && !this.structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance))))
 								        	            	{
 								            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 								            					{
@@ -545,7 +608,7 @@ public class CustomStructurePlotter
 								            					} else {
 								            						biomeStructures = new ArrayList<String>();
 								            					}
-								            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)),biomeStructures);
+								            					this.structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)),biomeStructures);
 							            					}
 							            					if(biomeStructures != null)
 							            					{
@@ -560,7 +623,7 @@ public class CustomStructurePlotter
 							            					}
 					            						}
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)));
+						        	            		this.structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() + scanDistance)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -608,8 +671,8 @@ public class CustomStructurePlotter
 					            						} else {
 								        	                // StructureCache.put's also add an empty list to biomestructures so don't need to check structurecache here
 								        	                // When we get biomestructures here we can check, size() == 0 means the chunk is in structurecache, null means it hasnt yet been cached at all
-								        	                biomeStructures = structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)));
-							            					if(biomeStructures == null && !structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance))))
+								        	                biomeStructures = this.structuresPerChunk.get(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)));
+							            					if(biomeStructures == null && !this.structuresPerChunk.containsKey(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance))))
 								        	            	{
 								            					if(!world.chunkHasDefaultStructure(rand, chunkCoord))
 								            					{
@@ -635,7 +698,7 @@ public class CustomStructurePlotter
 								            					} else {
 								            						biomeStructures = new ArrayList<String>();
 								            					}
-								            					structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)),biomeStructures);
+								            					this.structuresPerChunk.put(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)),biomeStructures);
 							            					}
 							            					if(biomeStructures != null)
 							            					{
@@ -650,7 +713,7 @@ public class CustomStructurePlotter
 							            					}
 					            						}
 						        	            	} else {
-						        	            		structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)));
+						        	            		this.structuresPerChunk.remove(ChunkCoordinate.fromChunkCoords((chunkCoord.getChunkX() + i), (chunkCoord.getChunkZ() - scanDistance)));
 						        	            	}
 						        	                if(!canSpawnHere)
 						            				{
@@ -761,9 +824,8 @@ public class CustomStructurePlotter
 
 				            	        	if(structureStart2.IsSpawned)
 						                	{
-				            	        		structureCache.put(spawnChunk, structureStart2);
+				            	        		this.bo4StructureCache.put(spawnChunk, structureStart2);
 				            	    			this.structuresPerChunk.put(spawnChunk, null);
-				            	    			worldInfoChunks.put(spawnChunk, structureStart2);
 
 						                		((BO4)structureCoord.getObject()).getConfig().timesSpawned += 1;
 						                		if(OTG.getPluginConfig().spawnLog)
@@ -780,7 +842,7 @@ public class CustomStructurePlotter
 					                				if(chunkCoords == null)
 							                		{
 							                			chunkCoords = new ArrayList<ChunkCoordinate>();
-							                			spawnedStructuresByName.put(bO3Name, chunkCoords);
+							                			this.spawnedStructuresByName.put(bO3Name, chunkCoords);
 							                		}
 					                				chunkCoords.add(bo4SpawnCoord);
 
@@ -824,10 +886,10 @@ public class CustomStructurePlotter
 						                		// spawn more structures.
 						                		// If we're plotting a target structure via /otg spawn, then the chunk isn't being populated
 						                		// so it's okay if the structure didn't get plotted on this chunk.
-						                		if(structureCache.containsKey(chunkCoord) || targetStructure != null)
+						                		if(this.bo4StructureCache.containsKey(chunkCoord) || targetStructure != null)
 						                		{
-						                	        processing = false;
-						                			return true;
+						                			this.processing = false;
+						                			return structureStart2;
 						                		}
 					                			break;
 					                		}
@@ -843,14 +905,14 @@ public class CustomStructurePlotter
 	            }
             }
     	}
-        if(!structureCache.containsKey(chunkCoord))
+        if(!this.bo4StructureCache.containsKey(chunkCoord))
         {
-        	structureCache.put(chunkCoord, null);
+        	this.bo4StructureCache.put(chunkCoord, null);
         }
-		structuresPerChunk.put(chunkCoord, null);
-		processing = false;
+        this.structuresPerChunk.put(chunkCoord, null);
+        this.processing = false;
 		
-    	return false;
+    	return null;
     }
 
     private boolean isBO4AllowedToSpawnAtByFrequency(ChunkCoordinate chunkCoord, BO4 BO3ToSpawn)
@@ -909,4 +971,137 @@ public class CustomStructurePlotter
 
 		return true;
     }
+    
+    // Persistence
+
+	public void compressCache(LocalWorld world)
+    {
+    	OTG.log(LogMarker.INFO, "Compressing structure-cache and pre-generator data");
+
+    	// If a chunk in the structurecache is inside the outermost ring of
+    	// chunks in the pre-generated area then it can be safely removed
+
+    	int structuresRemoved = 0;
+    	
+    	// Fill a new structureCache based on the  existing one, remove all the chunks inside the pregenerated region that we know will no longer be used
+    	HashMap<ChunkCoordinate, BO4CustomStructure> newStructureCache = new HashMap<ChunkCoordinate, BO4CustomStructure>();
+    	for (Map.Entry<ChunkCoordinate, BO4CustomStructure> cachedChunk : this.bo4StructureCache.entrySet())
+    	{
+			if(!world.isInsidePregeneratedRegion(cachedChunk.getKey()))
+			{
+				newStructureCache.put(cachedChunk.getKey(), cachedChunk.getValue());
+			} else {
+				// If this structure is not done spawning or on/outside the border of the pre-generated area then keep it
+				structuresRemoved += 1;
+			}
+    	}
+
+    	this.bo4StructureCache = newStructureCache;
+
+    	OTG.log(LogMarker.INFO, "Removed " + structuresRemoved + " cached chunks");
+    }
+
+	public void saveSpawnedStructures(LocalWorld world)
+	{
+		CustomStructureFileManager.saveChunksMapFile(world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);
+	}
+	
+	public void loadSpawnedStructures(LocalWorld world)
+	{		
+		CustomStructureFileManager.loadChunksMapFile(world, this.spawnedStructuresByName, this.spawnedStructuresByGroup);		
+	}	
+	
+    public void saveStructureCache(LocalWorld world)
+    {	    
+	    if(world.isBo4Enabled())
+	    {
+		    ArrayList<ChunkCoordinate> nullChunks = new ArrayList<ChunkCoordinate>();
+		    // Save null chunks from structurecache so that when loading we can reconstitute it based on worldInfoChunks, null chunks and the pregenerator border
+	    	for (Map.Entry<ChunkCoordinate, BO4CustomStructure> cachedChunk : this.bo4StructureCache.entrySet()) 
+	    	{
+	    		if(cachedChunk.getValue() == null)
+	    		{
+	    			if(!world.isInsidePregeneratedRegion(cachedChunk.getKey()))
+	    			{
+	    				nullChunks.add(cachedChunk.getKey());
+					}
+	    		}
+	    	}
+
+	    	CustomStructureFileManager.saveNullChunksFile(nullChunks, world);
+	    	saveSpawnedStructures(world);
+	    }
+    }
+
+	public void loadStructureCache(LocalWorld world, Map<ChunkCoordinate, CustomStructure> loadedStructures)
+	{
+        this.bo4StructureCache = new HashMap<ChunkCoordinate, BO4CustomStructure>();
+
+		if(world.isBo4Enabled())
+		{
+			if(loadedStructures != null)
+			{
+				for(Map.Entry<ChunkCoordinate, CustomStructure> loadedStructure : loadedStructures.entrySet())
+				{	
+					if(loadedStructure == null)
+					{
+						throw new RuntimeException("This shouldn't happen, please ask for help on the OTG Discord and/or file an issue on the OTG github.");
+					}
+		
+					// Dont override any loaded structures that have been added to the structure cache
+					if(!this.bo4StructureCache.containsKey(loadedStructure.getKey())) 
+					{
+						// This chunk is either
+						// A. outside the border and has no objects to spawn (empty chunk) but has not yet been populated.
+						// B. Part of but not the starting point of a branching structure, therefore the structure's ObjectsToSpawn and SmoothingAreasToSpawn were not saved with this file.
+						// This is used for the other caches
+						this.bo4StructureCache.put(loadedStructure.getKey(), (BO4CustomStructure)loadedStructure.getValue());
+					} else {
+						//throw new RuntimeException();
+					}
+	
+					// The starting structure in a branching structure is saved with the ObjectsToSpawn, SmoothingAreasToSpawn & modData of all its branches.
+					// All branches are saved as individual structures but without any ObjectsToSpawn/SmoothingAreasToSpawn/modData (only essential data for structure placement remains).
+					// The starting structure overrides any empty branches that were added as structures here if it has any ObjectsToSpawn/SmoothingAreasToSpawn/modData in their chunks.
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).objectsToSpawn.keySet())
+					{
+						this.bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has blocks that need to be spawned
+					}
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getValue()).smoothingAreasToSpawn.keySet())
+					{
+						this.bo4StructureCache.put(chunkCoord, (BO4CustomStructure)loadedStructure.getValue()); // This structure has smoothing area blocks that need to be spawned
+					}
+				}
+			}
+			
+			ArrayList<ChunkCoordinate> nullChunks = CustomStructureFileManager.loadNullChunksFile(world);
+			if(nullChunks != null)
+			{
+				for(ChunkCoordinate chunkCoord : nullChunks)
+				{
+					this.bo4StructureCache.put(chunkCoord, null); // This chunk has been completely populated and spawned
+				}
+			}
+
+			loadSpawnedStructures(world);
+
+			for(ChunkCoordinate chunkCoord : this.bo4StructureCache.keySet())
+			{
+				// This is an optimisation so that PlotStructures knows not to plot anything in this chunk
+				// TODO: This could easily exceed the capacity of the StructuresPerChunkCache, mostly defeating the point?
+				invalidateChunkInStructuresPerChunkCache(chunkCoord);
+			}
+
+			// If any structure plotting/spawning has occurred, we can assume the spawn chunks have been handled.
+			if(
+				(loadedStructures != null && loadedStructures.size() > 0) || 
+				(nullChunks != null && nullChunks.size() > 0) || 
+				getStructureCount() > 0
+			)
+			{
+				this.structurePlottedAtSpawn = true;
+			}
+		}
+		OTG.log(LogMarker.DEBUG, "Loading done");
+	}    
 }

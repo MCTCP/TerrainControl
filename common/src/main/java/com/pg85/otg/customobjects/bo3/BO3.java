@@ -457,14 +457,7 @@ public class BO3 implements StructuredCustomObject
 
             for (ChunkCoordinate structureCoord : chunks)
             {
-                if (world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
-                {
-                    CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
-                    structure.modDataManager.modData.addAll(existingObject.modDataManager.modData);
-                    structure.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
-                    structure.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
-                }
-                world.getStructureCache().worldInfoChunks.put(structureCoord, structure);
+            	world.getStructureCache().addBo3ToStructureCache(structureCoord, structure, true);
             }
         } else {
             CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(world, this, this.getName(), Rotation.NORTH, x, (short) 0, z));
@@ -474,16 +467,7 @@ public class BO3 implements StructuredCustomObject
 
             for (ChunkCoordinate structureCoord : chunksCustomObject)
             {
-                if (world.getStructureCache().worldInfoChunks.containsKey(structureCoord))
-                {
-                    CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(structureCoord);
-                    existingObject.modDataManager.modData.addAll(placeHolderStructure.modDataManager.modData);
-                    existingObject.particlesManager.particleData.addAll(
-                            placeHolderStructure.particlesManager.particleData);
-                    existingObject.spawnerManager.spawnerData.addAll(placeHolderStructure.spawnerManager.spawnerData);
-                } else {
-                    world.getStructureCache().worldInfoChunks.put(structureCoord, placeHolderStructure);
-                }
+            	world.getStructureCache().addBo3ToStructureCache(structureCoord, placeHolderStructure, false);            
             }
         }
 

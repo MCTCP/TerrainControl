@@ -102,7 +102,7 @@ public class SpawnCommand extends BaseCommand
         
         if(spawnObject instanceof BO4)
         {
-        	if(!forgeWorld.isBO4Enabled())
+        	if(!forgeWorld.isBo4Enabled())
         	{
         		sender.sendMessage(new TextComponentString(ERROR_COLOR + "Cannot spawn a BO4 structure in an isOTGPlus:false world, use a BO3 instead or recreate the world with IsOTGPlus:true in the worldconfig."));
         		return true;

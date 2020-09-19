@@ -177,34 +177,12 @@ public class BO4CustomStructure extends CustomStructure
 		for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
 		{
 			// Add the structure to the structure caches
-			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);
-			
-			// Add Structure to worldInfoChunks for /otg structure and spawners/particles/moddata
-			// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
-			if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-			{
-				CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
-				this.modDataManager.modData.addAll(existingObject.modDataManager.modData);
-				this.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
-				this.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
-			}
-			world.getStructureCache().worldInfoChunks.put(chunkCoord, this);
+			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);		
 		}
 
 		for(ChunkCoordinate chunkCoord : smoothingAreasToSpawn.keySet())
 		{
 			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);
-			
-			// Add Structure to worldInfoChunks for /otg structure and spawners/particles/moddata
-			// Make sure not to override any ModData/Spawner/Particle data added by CustomObjects
-			if(world.getStructureCache().worldInfoChunks.containsKey(chunkCoord))
-			{
-				CustomStructure existingObject = world.getStructureCache().worldInfoChunks.get(chunkCoord);
-				this.modDataManager.modData.addAll(existingObject.modDataManager.modData);
-				this.particlesManager.particleData.addAll(existingObject.particlesManager.particleData);
-				this.spawnerManager.spawnerData.addAll(existingObject.spawnerManager.spawnerData);
-			}
-			world.getStructureCache().worldInfoChunks.put(chunkCoord, this);
 		}
 
 		if(objectsToSpawn.size() > 0)

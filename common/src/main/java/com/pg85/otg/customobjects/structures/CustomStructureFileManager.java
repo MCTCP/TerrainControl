@@ -244,7 +244,7 @@ public class CustomStructureFileManager
     	}
     }
 	
-	static Map<ChunkCoordinate, CustomStructure> loadStructuresFile(LocalWorld world)
+	public static Map<ChunkCoordinate, CustomStructure> loadStructuresFile(LocalWorld world)
 	{		
 		// When loading files 
 		// 1. Load all the structure files and put them in worldInfoChunks and structurecache (if they are outside the pregenerated region), 
@@ -374,7 +374,7 @@ public class CustomStructureFileManager
 
 		    if(!structureString.equals("Null structure"))
 		    {
-		    	if(world.isBO4Enabled())
+		    	if(world.isBo4Enabled())
 		    	{
 		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
 		    	} else {
@@ -500,7 +500,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 5)
 			    	{
 			    		ModDataFunction<?> modDataFunction;
-				    	if(world.isBO4Enabled())
+				    	if(world.isBo4Enabled())
 				    	{
 				    		modDataFunction = new BO4ModDataFunction();
 				    	} else {
@@ -523,7 +523,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 19)
 			    	{
 				    	SpawnerFunction<?> spawnerFunction;
-				    	if(world.isBO4Enabled())
+				    	if(world.isBo4Enabled())
 				    	{
 				    		spawnerFunction = new BO4SpawnerFunction();
 				    	} else {
@@ -561,7 +561,7 @@ public class CustomStructureFileManager
 			    	for(int j = 0; j < objectAsString.length; j += 11)
 			    	{
 				    	ParticleFunction<?> particleFunction;
-				    	if(world.isBO4Enabled())
+				    	if(world.isBo4Enabled())
 				    	{
 				    		particleFunction = new BO4ParticleFunction();
 				    	} else {
@@ -588,7 +588,7 @@ public class CustomStructureFileManager
 		    }
 
 		    CustomStructure structure;
-		    if(world.isBO4Enabled())
+		    if(world.isBo4Enabled())
 		    {
 		    	structure = new BO4CustomStructure(world, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
 			    ((BO4CustomStructure)structure).startChunkBlockChecksDone = true;
@@ -604,7 +604,7 @@ public class CustomStructureFileManager
 	    return structuresFile;
 	}
 
-	static void saveNullChunksFile(ArrayList<ChunkCoordinate> chunks, LocalWorld world)
+	public static void saveNullChunksFile(ArrayList<ChunkCoordinate> chunks, LocalWorld world)
 	{
 		int dimensionId = world.getDimensionId();
 		File nullChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksFileName);
@@ -657,7 +657,7 @@ public class CustomStructureFileManager
 		}
 	}
 
-	static ArrayList<ChunkCoordinate> loadNullChunksFile(LocalWorld world)
+	public static ArrayList<ChunkCoordinate> loadNullChunksFile(LocalWorld world)
 	{
 		int dimensionId = world.getDimensionId();
 		File nullChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksFileName);

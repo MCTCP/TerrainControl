@@ -70,7 +70,7 @@ public class CustomStructureGen extends Resource
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
             {
-            	BO3CustomStructure structureStart = world.getStructureCache().getBO3StructureStart(random, searchChunkX, searchChunkZ);
+            	BO3CustomStructure structureStart = world.getStructureCache().getBo3StructureStart(random, searchChunkX, searchChunkZ);
                 if (structureStart != null)
                 {
                 	structureStart.spawnInChunk(chunkCoord, world);

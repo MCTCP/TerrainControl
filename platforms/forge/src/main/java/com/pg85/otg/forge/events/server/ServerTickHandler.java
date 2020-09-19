@@ -201,7 +201,7 @@ public class ServerTickHandler
 		    								try
 		    								{
 		    									EntityFunction<?> entityFunc;
-		    									if(world.isBO4Enabled())
+		    									if(world.isBo4Enabled())
 		    									{
 	    											entityFunc = new BO4EntityFunction();		
 		    									} else {
