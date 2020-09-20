@@ -221,7 +221,7 @@ public class OTGChunkGenerator extends ChunkGenerator
     		}
     		else if(lastUsedChunk4 != null && lastUsedChunk4.getKey().equals(chunkCoord))
     		{
-    			chunk = lastUsedChunk1.getValue();
+    			chunk = lastUsedChunk4.getValue();
     		}
     	}
         if(chunk == null)
