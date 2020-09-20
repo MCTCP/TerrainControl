@@ -52,6 +52,7 @@ public class CustomStructurePlotter
         this.spawnedStructuresByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();
 	}
 	
+	// Used while calculating branches
     public boolean isBo4ChunkPlotted(LocalWorld world, ChunkCoordinate chunkCoordinate)
 	{
 	    // Check if any other structures in world are in this chunk
@@ -61,15 +62,16 @@ public class CustomStructurePlotter
 		;
 	}
 
+    // Called for each ObjectToSpawn/SmoothingArea chunk after branches have been calculated
 	public void addBo4ToStructureCache(ChunkCoordinate chunkCoord, BO4CustomStructure structure)
 	{
 		this.bo4StructureCache.put(chunkCoord, structure);
 		
 		// Let plotter know the chunk is taken
-		invalidateChunkInStructuresPerChunkCache(chunkCoord);
+		setChunkOccupied(chunkCoord);
 	}
 
-	// Only used when spawning bo4's, never for plotting checks.
+    // Only used by ObjectSpawner
 	public void spawnBO4Chunk(ChunkCoordinate chunkCoord, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
 	{
 		BO4CustomStructure structureStart = this.bo4StructureCache.get(chunkCoord);
@@ -86,7 +88,7 @@ public class CustomStructurePlotter
 		}
 		
 		// All done spawning structures for this chunk, clean up cache
-		// TODO: How would a chunk currently being spawned be inside the pregenerated region? xD
+		// TODO: How would a chunk currently being spawned be inside the pregenerated region?
 		if(!world.isInsidePregeneratedRegion(chunkCoord))
 		{
 			this.bo4StructureCache.put(chunkCoord, null);
@@ -95,14 +97,16 @@ public class CustomStructurePlotter
 		}
 
 		// Let plotter know the chunk is taken
-		invalidateChunkInStructuresPerChunkCache(chunkCoord);
+		setChunkOccupied(chunkCoord);
 	}
-	
+
+    // Only used by ObjectSpawner
 	public BO4CustomStructure plotStructures(LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
 	{
 		return plotStructures(null, null, world, rand, chunkCoord);
 	}
 	
+	// Used by ObjectSpawner and /otg spawn, targetStructure and targetBiomes only used for /spawn.	
 	public BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, LocalWorld world, Random rand, ChunkCoordinate chunkCoord)
 	{
 		return plotStructures(targetStructure, targetBiomes, world, rand, chunkCoord, false);
@@ -113,7 +117,7 @@ public class CustomStructurePlotter
 		return spawnedStructuresByName.entrySet().size();
 	}	
 	
-	private void invalidateChunkInStructuresPerChunkCache(ChunkCoordinate chunkCoord)
+	private void setChunkOccupied(ChunkCoordinate chunkCoord)
 	{
 		this.structuresPerChunk.put(chunkCoord, null);
 	}
@@ -1089,7 +1093,7 @@ public class CustomStructurePlotter
 			{
 				// This is an optimisation so that PlotStructures knows not to plot anything in this chunk
 				// TODO: This could easily exceed the capacity of the StructuresPerChunkCache, mostly defeating the point?
-				invalidateChunkInStructuresPerChunkCache(chunkCoord);
+				setChunkOccupied(chunkCoord);
 			}
 
 			// If any structure plotting/spawning has occurred, we can assume the spawn chunks have been handled.

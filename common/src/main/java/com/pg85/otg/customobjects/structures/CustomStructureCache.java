@@ -38,10 +38,9 @@ public class CustomStructureCache
 
     private LocalWorld world;
 
-	// WorldInfo holds info on all structures ever spawned for this world
-    // BO3: Used for /otg structure and spawners/particles/moddata (also used or Bo3 customobjects).
-    // BO4: Used for finding distance, /otg structure and spawners/particles/moddata.
-	// Also used to make sure other resources like lakes don't spawn on top of structures.
+	// WorldInfo holds info on all structures ever spawned for this world. 
+    // Used for /otg structure and spawners/particles/moddata for BO structures and objects
+    // For BO4's this is also used used to avoid resources like lakes spawning on structures.
     private Map<ChunkCoordinate, CustomStructure> worldInfoChunks;
 
     public CustomStructureCache(LocalWorld world)
@@ -72,7 +71,7 @@ public class CustomStructureCache
 			}
 		} else {
 			this.worldInfoChunks.put(chunkCoord, structure);	
-		}		
+		}
     }
     
     public boolean chunkHasData(ChunkCoordinate chunkCoord)
@@ -142,8 +141,8 @@ public class CustomStructureCache
 	{
 		return this.plotter.isBo4ChunkPlotted(world, chunkCoordinate);
 	}
-	
-	// Called when branches have been calculated
+
+    // Called for each ObjectToSpawn/SmoothingArea chunk after branches have been calculated
 	public void addBo4ToStructureCache(ChunkCoordinate chunkCoord, BO4CustomStructure structure)
 	{
 		this.plotter.addBo4ToStructureCache(chunkCoord, structure);		
@@ -153,12 +152,11 @@ public class CustomStructureCache
     // Only used by other resources like lakes 
     public boolean isBo4ChunkOccupied(ChunkCoordinate chunkCoord)
     {
-    	if(!world.isBo4Enabled())
+    	if(world.isBo4Enabled())
     	{
-    		return false;
-    	} else {
     		return this.worldInfoChunks.containsKey(chunkCoord);
     	}
+    	return false;
     }
     
     // Only used by ObjectSpawner
