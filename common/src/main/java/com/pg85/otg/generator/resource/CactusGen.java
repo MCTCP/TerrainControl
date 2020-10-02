@@ -94,7 +94,7 @@ public class CactusGen extends Resource
             int cactusHeight = 1 + rand.nextInt(rand.nextInt(3) + 1);
             for (int dY = 0; dY < cactusHeight; dY++)
             {
-                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material, null, chunkBeingPopulated);
+                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material, null, chunkBeingPopulated, false);
             }
         }
     }

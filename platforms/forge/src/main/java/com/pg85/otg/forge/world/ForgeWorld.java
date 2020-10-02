@@ -23,6 +23,7 @@ import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.IOHelper;
 import com.pg85.otg.forge.util.MobSpawnGroupHelper;
 import com.pg85.otg.generator.ChunkBuffer;
+import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
@@ -80,7 +81,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
-// TODO: Move this to com.pg85.otg.forge.world for 1.13. Has to be in com.pg85.otg.forge for Streams 1.12, which depends on it. 
+// TODO: Change localworld into abstract class and implement common logic there 
 public class ForgeWorld implements LocalWorld
 {
     public static final int MAX_BIOMES_COUNT = 4096;
@@ -124,6 +125,10 @@ public class ForgeWorld implements LocalWorld
     private WorldGenSwamp swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
+    
+    // 32x32 biomes cache for fast lookups during population
+    private LocalBiome[][] cachedBiomes;
+    private boolean cacheIsValid;
 
     public ForgeWorld(String _name)
     {
@@ -208,7 +213,7 @@ public class ForgeWorld implements LocalWorld
         this.world = world;
         this.seed = world.getSeed();
     }
-
+    
     /**
      * Call this method when the configs are loaded.
      * @param configs The configs.
@@ -323,13 +328,7 @@ public class ForgeWorld implements LocalWorld
     {
     	return world.provider.getSpawnPoint();
     }
-    
-    @Override
-    public void startPopulation(ChunkCoordinate chunkCoord) { }
-
-    @Override
-    public void endPopulation() { }
-    
+        
     // World session
     
     @Override
@@ -357,6 +356,8 @@ public class ForgeWorld implements LocalWorld
     
     // Biomes
     
+	// TODO: Chunk only contains the replacetobiome id?
+	// Only used for fog
 	public Biome getBiomeFromChunk(int blockX, int blockZ)
 	{
 		if(this.getWorld().isBlockLoaded(new BlockPos(blockX,255,blockZ)))
@@ -368,7 +369,7 @@ public class ForgeWorld implements LocalWorld
 		        int i = blockX & 15;
 		        int j = blockZ & 15;
 		        int biomeId = blockBiomeArray[j << 4 | i] & 255;
-		        return Biome.getBiome(biomeId);			
+		        return Biome.getBiome(biomeId);
 			}
 		}
 		return null;
@@ -391,6 +392,36 @@ public class ForgeWorld implements LocalWorld
         	return getCalculatedBiome(x, z);
         //}
     }
+    
+    @Override
+    public LocalBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    {
+    	// Cache is invalidated when cascading chunkgen happens.
+    	return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomes[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+    }
+
+	@Override
+	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
+	{
+		this.cachedBiomes = new LocalBiome[32][32];
+		
+		int areaSize = 32; 
+		for(int x = 0; x < areaSize; x++)
+		{
+			for(int z = 0; z < areaSize; z++)
+			{
+				this.cachedBiomes[x][z] = getBiome(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+			}
+		}
+		this.cacheIsValid = true;
+	}
+	
+	// Population biome cache is invalidated when cascading chunkgen happens
+	@Override
+	public void invalidatePopulationBiomeCache()
+	{
+		this.cacheIsValid = false;
+	}
 
     @Override
     public String getSavedBiomeName(int x, int z)
@@ -743,7 +774,14 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+    {
+    	setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, null, replaceBlocks);
+    }   
+    
+    // Only called directly by any resources spawning blocks that fetch the biomeconfig for each xz column anyway (bo4's and smoothing areas)
+    @Override
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean replaceBlocks)
     {
     	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
     	{
@@ -767,6 +805,19 @@ public class ForgeWorld implements LocalWorld
 			)
 		)
     	{
+    		if(replaceBlocks)
+    		{
+        		if(biomeConfig == null)
+        		{
+        			if(chunkBeingPopulated == null)
+        			{
+        				biomeConfig = this.getBiome(x, z).getBiomeConfig();
+        			} else {
+        				biomeConfig = this.getBiomeForPopulation(x, z, chunkBeingPopulated).getBiomeConfig();
+        			}
+        		}
+    			material = material.parseWithBiomeAndHeight(this, biomeConfig, y);
+    		}
     		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag);
     	}
     }
@@ -1092,12 +1143,22 @@ public class ForgeWorld implements LocalWorld
 
         return null;
     }	
-    
-    // Replace blocks
 
+    // Replace blocks / CHC
+
+	@Override
+	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld) 
+	{
+		return this.getChunkGenerator().getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+	}
+
+	// TODO: No longer needed, we're replacing blocks when placing them now.
+	// Remove this after doing some profiling to compare performance.
     @Override
     public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
+    	if(1 == 1) { return; }
+    	
         if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
         {
             // Don't waste time here, ReplacedBlocks is empty everywhere
@@ -1109,7 +1170,7 @@ public class ForgeWorld implements LocalWorld
     	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ()));
     	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ()));
     }
-    
+
     private void replaceBlocks(Chunk rawChunk)
     {
         int worldStartX = rawChunk.x * 16;
@@ -1144,6 +1205,7 @@ public class ForgeWorld implements LocalWorld
                     	{
                     		replaceArray = new ReplacedBlocksInstruction[0];
                     	} else {
+                    		biome.getBiomeConfig().replacedBlocks.parseForWorld(this);
                     		replaceArray = new ReplacedBlocksInstruction[biome.getBiomeConfig().replacedBlocks.getInstructions().size()];
                     		replaceArray = (ReplacedBlocksInstruction[])biome.getBiomeConfig().replacedBlocks.getInstructions().toArray(replaceArray);
                     	}
@@ -1549,7 +1611,7 @@ public class ForgeWorld implements LocalWorld
 	private boolean isOTGPlusLoaded = false;
 	private boolean isOTGPlus = false;
 	@Override
-	public boolean isBO4Enabled()
+	public boolean isBo4Enabled()
 	{
 		if(!isOTGPlusLoaded)
 		{

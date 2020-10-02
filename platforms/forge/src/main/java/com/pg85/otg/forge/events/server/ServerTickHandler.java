@@ -230,7 +230,7 @@ public class ServerTickHandler
 		    							{
 		    								try {
 												LocalMaterialData material = MaterialHelper.readMaterial(paramString2[1]);
-			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, null);
+			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, null, false);
 											}
 		    								catch (InvalidConfigException e)
 		    								{

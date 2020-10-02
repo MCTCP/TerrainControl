@@ -61,7 +61,7 @@ public class AboveWaterGen extends Resource
                 continue;
             }
             
-            world.setBlock(j, k, m, material, null, chunkBeingPopulated);
+            world.setBlock(j, k, m, material, null, chunkBeingPopulated, false);
         }
     }
 

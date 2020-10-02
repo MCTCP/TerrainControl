@@ -63,4 +63,28 @@ public class MathHelper
     {
         return check > max ? max : (check < min ? min : check);
     }
+    
+    /*
+     * Modulus, rather than java's modulo (%)
+     * which does a remainder operation.
+     */
+    public static int mod(int x, int y)
+    {
+        int result = x % y;
+        if (result < 0)
+        {
+            result += y;
+        }
+        return result;
+    }
+    
+    public static boolean tryParseInt(String value)
+    {  
+        try {  
+            Integer.parseInt(value);  
+            return true;  
+         } catch (NumberFormatException e) {  
+            return false;  
+         }  
+   }
 }

@@ -122,7 +122,7 @@ public class VinesGen extends Resource
                 {
                     if (canPlace(world, _x, y, _z, direction, chunkBeingPopulated))
                     {
-                        world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, chunkBeingPopulated);
+                        world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, chunkBeingPopulated, false);
                         break;
                     }
                 }

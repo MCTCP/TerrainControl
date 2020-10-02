@@ -1,6 +1,7 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -85,7 +86,7 @@ class ObjectExtrusionHelper
      * @param y      The BO3 base Y spawn location
      * @param z      The BO3 base Z spawn location
      */
-    void extrude(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    void extrude(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
         for (BO3BlockFunction block : blocksToExtrude)
         {
@@ -95,7 +96,7 @@ class ObjectExtrusionHelper
                      yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
                      --yi)
                 {
-                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, chunkBeingPopulated);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, chunkBeingPopulated, replaceBlock);
                 }
             } else if (extrudeMode == BO3Settings.ExtrudeMode.TopUp)
             {
@@ -103,7 +104,7 @@ class ObjectExtrusionHelper
                      yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(world.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
                      ++yi)
                 {
-                	world.setBlock(x + block.x, yi, z + block.z, block.material.parseForWorld(world), block.metaDataTag, chunkBeingPopulated);
+                	world.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, chunkBeingPopulated, replaceBlock);
                 }
             }
         }

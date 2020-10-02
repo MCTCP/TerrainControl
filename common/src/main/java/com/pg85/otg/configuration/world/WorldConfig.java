@@ -16,6 +16,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeGroup;
 import com.pg85.otg.configuration.biome.BiomeGroupManager;
 import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
@@ -189,7 +190,7 @@ public class WorldConfig extends ConfigFile
     public boolean disableBedrock;
     public boolean flatBedrock;
     public boolean ceilingBedrock;
-    public LocalMaterialData bedrockBlock;
+    private LocalMaterialData bedrockBlock;
     public boolean populationBoundsCheck;
     public boolean populateUsingSavedBiomes;
     public boolean removeSurfaceStone;
@@ -1632,5 +1633,19 @@ public class WorldConfig extends ConfigFile
         }
         SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
         return new WorldConfig(worldDir, settingsMap, null, null);
+	}
+	
+	public LocalMaterialData getDefaultBedrockBlock()
+	{
+		return this.bedrockBlock;
+	}
+
+	public LocalMaterialData getBedrockBlockReplaced(LocalWorld localWorld, BiomeConfig biomeConfig, int y)
+	{		
+		if(biomeConfig.replacedBlocks.replacesBedrock)
+		{
+			return this.bedrockBlock.parseWithBiomeAndHeight(localWorld, biomeConfig, y);
+		}
+		return this.bedrockBlock;
 	}
 }

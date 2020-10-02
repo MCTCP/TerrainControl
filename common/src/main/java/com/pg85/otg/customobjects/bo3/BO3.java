@@ -8,6 +8,7 @@ import java.util.Random;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -153,9 +154,9 @@ public class BO3 implements StructuredCustomObject
             oeh.addBlock((BO3BlockFunction) block);
         }
         for (BO3BlockFunction block : blocksToSpawn) {
-            block.spawn(world, random, x + block.x, y + block.y, z + block.z, null);
+            block.spawn(world, random, x + block.x, y + block.y, z + block.z, null, false);
         }
-        oeh.extrude(world, random, x, y, z, null);
+        oeh.extrude(world, random, x, y, z, null, false);
         handleBO3Functions(null, world, random, rotation, x, y, z, chunks, null);
 
         return true;
@@ -176,13 +177,13 @@ public class BO3 implements StructuredCustomObject
             if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway
                     || settings.sourceBlocks.contains(block.material))
             {
-                block.spawn(world, random, x + block.x, y + block.y, z + block.z, null);
+                block.spawn(world, random, x + block.x, y + block.y, z + block.z, null, true);
                 oeh.addBlock(block);
                 chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
             }
         }
 
-        oeh.extrude(world, random, x, y, z, null);
+        oeh.extrude(world, random, x, y, z, null, true);
         handleBO3Functions(null, world, random, rotation, x, y, z, chunks, null);
 
         return true;
@@ -204,7 +205,7 @@ public class BO3 implements StructuredCustomObject
                 int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
                 int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
-                if (spawn(world, random, x, z, settings.minHeight, settings.maxHeight, chunkCoord))
+                if (spawn(world, random, x, z, settings.minHeight, settings.maxHeight, chunkCoord, !settings.tree))
                 {
                     atLeastOneObjectHasSpawned = true;
                 }
@@ -227,11 +228,11 @@ public class BO3 implements StructuredCustomObject
     	{
     		maxY = this.getSettings().maxHeight;
     	}
-        return spawn(world, random, x, z, minY, maxY, chunkBeingPopulated);
+        return spawn(world, random, x, z, minY, maxY, chunkBeingPopulated, false);
     }
 
     // Used for customobject and trees during population
-    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
+    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int y = 0;
@@ -249,11 +250,11 @@ public class BO3 implements StructuredCustomObject
         }
         // Offset by static and random settings values
         y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
-        return trySpawnAt(null, world, random, rotation, x, y, z, minY, maxY, chunkBeingPopulated);
+        return trySpawnAt(null, world, random, rotation, x, y, z, minY, maxY, chunkBeingPopulated, replaceBlocks);
     }
     
     // Used for trees, customobjects and customstructures during population.
-    public boolean trySpawnAt(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
+    public boolean trySpawnAt(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
         if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT) // Isn't this already done before this method is called?
         {
@@ -355,10 +356,10 @@ public class BO3 implements StructuredCustomObject
 
         for (BO3BlockFunction block : blocksToSpawn)
         {
-            block.spawn(world, random, x + block.x, y + block.y, z + block.z, chunkBeingPopulated);
+            block.spawn(world, random, x + block.x, y + block.y, z + block.z, chunkBeingPopulated, replaceBlocks);
         }
 
-        oeh.extrude(world, random, x, y, z, chunkBeingPopulated);
+        oeh.extrude(world, random, x, y, z, chunkBeingPopulated, replaceBlocks);
         handleBO3Functions(structure, world, random, rotation, x, y, z, chunks, chunkBeingPopulated);
 
         return true;

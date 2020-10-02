@@ -6,6 +6,7 @@ import java.util.TreeMap;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialHelper;
@@ -151,24 +152,11 @@ public class PlantType
      * @param z Z position of the plant.
      */
     void spawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
-    {      
-        parseMaterials(world, bottomBlock, null);
-        
-        world.setBlock(x, y, z, bottomBlock, null, chunkBeingPopulated);
+    {        
+        world.setBlock(x, y, z, bottomBlock, null, chunkBeingPopulated, false);
         if (topBlock != null)
         {
-            parseMaterials(world, topBlock, null);
-            world.setBlock(x, y + 1, z, topBlock, null, chunkBeingPopulated);
-        }
-    }
-    
-    private void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
-    {
-    	material.parseForWorld(world);
-
-        if (sourceBlocks != null)
-        {
-            sourceBlocks.parseForWorld(world);
+            world.setBlock(x, y + 1, z, topBlock, null, chunkBeingPopulated, false);
         }
     }
 

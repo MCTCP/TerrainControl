@@ -12,6 +12,7 @@ import java.util.Map.Entry;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
@@ -50,9 +51,9 @@ public class OTGChunkGenerator implements IChunkGenerator
 {
     private boolean testMode = false;
     private ForgeWorld world;
-    private ChunkProviderOTG generator;
+    private ChunkProviderOTG chunkProviderOTG;
     public ObjectSpawner spawner;
-
+    
     // Caches
 	private FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
 	private FifoMap<ChunkCoordinate, Chunk> unloadedChunksCache;
@@ -73,7 +74,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
         this.testMode = this.world.getConfigs().getWorldConfig().modeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
-        this.generator = new ChunkProviderOTG(this.world.getConfigs(), this.world);
+        this.chunkProviderOTG = new ChunkProviderOTG(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
         // TODO: Add a setting to the worldconfig for the size of these caches. 
         // Worlds with lots of BO4's and large smoothing areas may want to increase this. 
@@ -257,7 +258,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     		synchronized(chunkBufferLock)
     		{
 	    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-	    		this.generator.generate(chunkBuffer);
+	    		this.chunkProviderOTG.generate(chunkBuffer);
 	    		chunk = chunkBuffer.toChunk(this.world.getWorld());
 		        chunkBuffer = null;
     		}
@@ -330,7 +331,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 	    	synchronized(chunkBufferLock)
 	    	{
 				chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-				this.generator.generate(chunkBuffer);
+				this.chunkProviderOTG.generate(chunkBuffer);
 				chunk = chunkBuffer.toChunk(this.world.getWorld());
 				chunkBuffer = null;
 	    	}
@@ -354,6 +355,11 @@ public class OTGChunkGenerator implements IChunkGenerator
 		unloadedBlockColumnsCache.put(blockPos, cachedColumn);
 		
         return blocksInColumn;
+    }
+    
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	return this.chunkProviderOTG.getBiomeBlocksNoiseValue(blockX, blockZ);
     }
     
     public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
@@ -397,7 +403,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         {
             return;
         }
-
+        
         IBlockState newState = ((ForgeMaterialData) material).internalBlock();
         
         BlockPos pos = new BlockPos(x, y, z);

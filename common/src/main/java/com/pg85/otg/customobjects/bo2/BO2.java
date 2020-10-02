@@ -2,7 +2,6 @@ package com.pg85.otg.customobjects.bo2;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -18,7 +17,6 @@ import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
@@ -99,7 +97,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
         for (ObjectCoordinate point : blocksToSpawn)
         {
-            setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, null);
+            setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, null, false);
         }
         return true;
     }
@@ -117,11 +115,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             {
     			if(worldMaterial.isAir())
             	{
-    				setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null);
+    				setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null, false);
 	            }
 				else if (dig)
 	            {
-	                setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null);
+	                setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null, false);
 	            }
             }
         }
@@ -264,10 +262,10 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     @Override
     public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
-   		return spawn(world, random, x, z, minY == -1 ? this.spawnElevationMin : minY, maxY == -1 ? this.spawnElevationMax : maxY, chunkBeingPopulated);
+   		return spawn(world, random, x, z, minY == -1 ? this.spawnElevationMin : minY, maxY == -1 ? this.spawnElevationMax : maxY, chunkBeingPopulated, false);
     } 
     
-    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
+    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
         int y;
         if (spawnAboveGround)
@@ -312,11 +310,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             {
         		if(worldMaterial.isAir())
 	            {
-	                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated);
+	                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated, replaceBlocks);
 	            }
 				else if (dig)
 	            {
-	                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated);
+	                setBlock(world, (x + point.x), y + point.y, z + point.z, point.material, null, false, chunkBeingPopulated, replaceBlocks);
 	            }
             }
         }
@@ -343,7 +341,8 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
             int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
 
-            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax, chunkCoord);
+            // TODO: Are BO2/BO3 trees ever spawned via this method? If so, then don't replace blocks.
+            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax, chunkCoord, !this.tree);
         }
 
         return objectSpawned;
@@ -436,8 +435,9 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
 
     }
 
-    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated)
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
+    	/* TODO: Don't think anyone actually uses this? Remove if noone complains about missing it..
         HashMap<LocalMaterialData, LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
         if (blocksToReplace != null && blocksToReplace.size() > 0)
         {
@@ -447,8 +447,8 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
                 material = targetBlock;
             }
         }
-        material.parseForWorld(world);
-        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
+        */
+        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlocks);
     }
 
     boolean isEnabled = false;

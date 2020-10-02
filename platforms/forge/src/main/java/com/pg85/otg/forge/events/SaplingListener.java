@@ -98,9 +98,7 @@ public class SaplingListener
         if (saplingType == SaplingType.Custom)
         {
             sapling = biomeConfig.getCustomSaplingGen(material, wideTrunk);
-        }
-        else
-        {
+        } else {
             sapling = biomeConfig.getSaplingGen(saplingType);
         }
         // Check inheritance
@@ -159,17 +157,12 @@ public class SaplingListener
             int saplingZ = blockPos.getZ();
             if (wideTrunk)
             {
-                localWorld.setBlock
-                        (saplingX, saplingY, saplingZ, material, null, null);
-                localWorld.setBlock
-                        (saplingX + 1, saplingY, saplingZ, material, null, null);
-                localWorld.setBlock
-                        (saplingX, saplingY, saplingZ + 1, material, null, null);
-                localWorld.setBlock
-                        (saplingX + 1, saplingY, saplingZ + 1, material, null, null);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, material, null, null, false);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ, material, null, null, false);
+                localWorld.setBlock(saplingX, saplingY, saplingZ + 1, material, null, null, false);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ + 1, material, null, null, false);
             } else {
-                localWorld.setBlock
-                        (saplingX, saplingY, saplingZ, material, null, null);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, material, null, null, false);
             }
         }
     }

@@ -49,7 +49,7 @@ class MaterialSetSetting extends Setting<MaterialSet>
         } catch (InvalidConfigException e)
         {
             throw new AssertionError(e);
-        }        
+        }
     }
 
     @Override
@@ -64,5 +64,4 @@ class MaterialSetSetting extends Setting<MaterialSet>
 
         return blocks;
     }
-
 }

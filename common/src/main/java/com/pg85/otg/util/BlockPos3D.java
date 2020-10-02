@@ -1,13 +1,15 @@
 package com.pg85.otg.util;
 
-public class BlockPos2D
+public class BlockPos3D
 {
 	final int x;
+	final int y;
 	final int z;
 	
-	public BlockPos2D(int x, int z)
+	public BlockPos3D(int x, int y, int z)
 	{
 		this.x = x;
+		this.y = y;
 		this.z = z;
 	}
 	
@@ -17,9 +19,9 @@ public class BlockPos2D
 		{
 			return true;
 		}
-		if(other instanceof BlockPos2D)
+		if(other instanceof BlockPos3D)
 		{
-			if(((BlockPos2D)other).x == this.x && ((BlockPos2D)other).z == this.z)
+			if(((BlockPos3D)other).x == this.x && ((BlockPos3D)other).z == this.z)
 			{
 				return true;
 			}

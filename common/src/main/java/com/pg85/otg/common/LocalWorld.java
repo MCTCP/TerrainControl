@@ -120,6 +120,11 @@ public interface LocalWorld
      */
     public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException;
 
+	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord);
+	public void invalidatePopulationBiomeCache();	
+	
+	LocalBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated);
+    
     /**
      * Gets the (stored) biome at the given coordinates.
      *
@@ -173,23 +178,6 @@ public interface LocalWorld
 
 	void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated);
     
-    // Population start and end
-    
-    /**
-     * Marks the given chunks as being populated. No new chunks may be created. Implementations may cache the chunk.
-     * @param chunkCoord The chunk being populated.
-     * @throws IllegalStateException If another chunks is being populated. Call {@link #endPopulation()} first.
-     * @see #endPopulation()
-     */
-    public void startPopulation(ChunkCoordinate chunkCoord);
-
-    /**
-     * Stops the population step. New chunks may be created again. Implementations may cache the chunk.
-     * @throws IllegalStateException If no chunk was being populated.
-     * @see #startPopulation(ChunkCoordinate)
-     */
-    public void endPopulation();
-
     // Blocks
         
     public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
@@ -206,33 +194,16 @@ public interface LocalWorld
     
     public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated);
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean replaceBlocks);
+    
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks);
 	
 	public LocalMaterialData[] getBlockColumnInUnloadedChunk(int x, int z);
 	
-    /**
-     * Executes ReplacedBlocks.
-     *
-     * <p>
-     * During terrain population, four chunks are guaranteed to be loaded:
-     * (chunkX, chunkZ), (chunkX + 1, chunkZ), (chunkX, chunkZ + 1) and
-     * (chunkX + 1, chunkZ + 1). All populators use an 8-block offset from the
-     * top left chunk, and populate an area of 16x16 blocks from there. This
-     * allows them to extend 8 blocks from their population area without
-     * hitting potentially unloaded chunks.
-     *
-     * <p>
-     * Populators may place blocks in already populated chunks, which would
-     * cause those blocks to be never replaced. ReplacedBlocks uses the same
-     * 8-block offset to minimize this risk.
-     * @see ChunkCoordinate#getPopulatingChunk(int, int) Explanation about the
-     * population offset.
-     * @param chunkCoord The top left chunk for ReplacedBlocks.
-     * 
-     * Update: This comment is no longer accurate, all 4 chunks are replaceblock'd for each chunk populated.
-     */
+	// TODO: No longer needed, we're replacing blocks when placing them now.
+	// Remove this after doing some profiling to compare performance.
     public void replaceBlocks(ChunkCoordinate chunkCoord);
-    	
+
 	// Chunks
 	
 	boolean isInsidePregeneratedRegion(ChunkCoordinate chunk);
@@ -243,7 +214,11 @@ public interface LocalWorld
 
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 
-	public boolean isBO4Enabled();
+	public boolean isBo4Enabled();
 	
 	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated);
+
+    // Used when setting blocks during population that should 
+	// use the same chc settings as the base terrain.
+	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);
 }

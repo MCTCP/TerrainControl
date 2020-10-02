@@ -122,7 +122,7 @@ public class LiquidGen extends Resource
 
         if ((i == 3) && (j == 1))
         {
-            world.setBlock(x, y, z, material, null, chunkBeingPopulated);
+            world.setBlock(x, y, z, material, null, chunkBeingPopulated, false);
         }
     }
 

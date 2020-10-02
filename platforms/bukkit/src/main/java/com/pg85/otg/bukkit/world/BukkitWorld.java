@@ -124,6 +124,7 @@ import net.minecraft.server.v1_12_R1.WorldGenTaiga2;
 import net.minecraft.server.v1_12_R1.WorldGenTrees;
 import net.minecraft.server.v1_12_R1.WorldServer;
 
+// TODO: Change localworld into abstract class and implement common logic there 
 public class BukkitWorld implements LocalWorld
 {
     private static final int MAX_BIOMES_COUNT = 4096;
@@ -172,6 +173,10 @@ public class BukkitWorld implements LocalWorld
 
 	private BukkitWorldSession worldSession;
 
+    // 32x32 biomes cache for fast lookups during population
+	private LocalBiome[][] cachedBiomes;
+    private boolean cacheIsValid;
+	
     public BukkitWorld(String _name)
     {
         this.name = _name;
@@ -435,18 +440,6 @@ public class BukkitWorld implements LocalWorld
         }
     }
     
-    @Override
-    public void startPopulation(ChunkCoordinate chunkCoord)
-    {
-    	this.getChunkGenerator().startPopulation(chunkCoord);
-    }
-
-    @Override
-    public void endPopulation()
-    {
-    	this.getChunkGenerator().endPopulation();
-    }
-    
     // Biomes
     
     @Override
@@ -494,6 +487,36 @@ public class BukkitWorld implements LocalWorld
             return getCalculatedBiome(x, z);
         //}
     }
+    
+    @Override
+    public LocalBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    {
+    	// Cache is invalidated when cascading chunkgen happens.
+    	return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomes[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+    }   
+    
+	@Override
+	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
+	{
+		this.cachedBiomes = new LocalBiome[32][32];
+		
+		int areaSize = 32; 
+		for(int x = 0; x < areaSize; x++)
+		{
+			for(int z = 0; z < areaSize; z++)
+			{
+				this.cachedBiomes[x][z] = getBiome(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+			}
+		}
+		this.cacheIsValid = true;
+	}
+
+	// Population biome cache is invalidated when cascading chunkgen happens
+	@Override
+	public void invalidatePopulationBiomeCache()
+	{
+		this.cacheIsValid = false;
+	}  
 
     @Override
     public String getSavedBiomeName(int x, int z)
@@ -770,11 +793,21 @@ public class BukkitWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
     
-    // Replace blocks
+    // Replace blocks / chc
+    
+	@Override
+	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld) 
+	{
+		return this.getChunkGenerator().getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+	}
 
+	// TODO: No longer needed, we're replacing blocks when placing them now.
+	// Remove this after doing some profiling to compare performance.
     @Override
     public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
+    	if(1 == 1) { return; }
+    	
         if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
         {
             // Don't waste time here, ReplacedBlocks is empty everywhere
@@ -786,7 +819,7 @@ public class BukkitWorld implements LocalWorld
     	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX() + 16, chunkCoord.getBlockZ()));
     	replaceBlocks(getChunkGenerator().getChunk(chunkCoord.getBlockX(), chunkCoord.getBlockZ()));
     }
-
+    
     private void replaceBlocks(Chunk rawChunk)
     {
         int worldStartX = rawChunk.locX * 16;
@@ -821,6 +854,7 @@ public class BukkitWorld implements LocalWorld
                     	{
                     		replaceArray = new ReplacedBlocksInstruction[0];
                     	} else {
+                    		biome.getBiomeConfig().replacedBlocks.parseForWorld(this);
                     		replaceArray = new ReplacedBlocksInstruction[biome.getBiomeConfig().replacedBlocks.getInstructions().size()];
                     		replaceArray = (ReplacedBlocksInstruction[])biome.getBiomeConfig().replacedBlocks.getInstructions().toArray(replaceArray);
                     	}
@@ -1851,10 +1885,23 @@ public class BukkitWorld implements LocalWorld
 	}
     
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
+    	setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, null, replaceBlocks);
+    }
+    
+    @Override
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean replaceBlocks)
+    {	
     	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
     	{
+    		return;
+    	}    	
+    	
+    	if(material.isEmpty())
+    	{
+    		// Happens when configs contain blocks that don't exist.
+    		// TODO: Catch this earlier up the chain, avoid doing work?
     		return;
     	}
 
@@ -1868,7 +1915,20 @@ public class BukkitWorld implements LocalWorld
 			)
 		)
     	{
-    		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag);
+    		if(replaceBlocks)
+    		{
+        		if(biomeConfig == null)
+        		{
+        			if(chunkBeingPopulated == null)
+        			{
+        				biomeConfig = this.getBiome(x, z).getBiomeConfig();
+        			} else {
+        				biomeConfig = this.getBiomeForPopulation(x, z, chunkBeingPopulated).getBiomeConfig();
+        			}
+        		}
+    			material = material.parseWithBiomeAndHeight(this, biomeConfig, y);
+    		}
+    		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag, biomeConfig);
     	}
     }   
 
@@ -1885,7 +1945,7 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	@Override
-	public boolean isBO4Enabled()
+	public boolean isBo4Enabled()
 	{
 		return this.getConfigs().getWorldConfig().isOTGPlus;
 	}

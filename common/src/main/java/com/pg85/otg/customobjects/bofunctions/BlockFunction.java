@@ -5,6 +5,7 @@ import java.util.Random;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
@@ -73,7 +74,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
      * @param z      The absolute z to spawn. The z-position in this object is
      *               ignored.
      */
-    public abstract void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
+    public abstract void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock);
     
     @Override
     public boolean isAnalogousTo(CustomObjectConfigFunction<T> other)

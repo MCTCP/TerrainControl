@@ -17,6 +17,7 @@ import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
@@ -185,6 +186,34 @@ public class ChunkProviderOTG
         final double oneEight = 0.125D;
         final double oneFourth = 0.25D;
 
+        double waterLevel_x0z0;
+        double waterLevel_x0z1;
+        double waterLevel_x1z0;
+        double waterLevel_x1z1;
+        double waterLevelForArray;
+        double d17_1;
+        
+        double x0z0;
+        double x0z1;
+        double x1z0;
+        double x1z1;
+
+        double x0z0y1;
+        double x0z1y1;
+        double x1z0y1;
+        double x1z1y1;
+
+		double d11;
+		double d12;
+		double d13;
+		double d14;
+		double d16;
+		double d17;
+		BiomeConfig biomeConfig;
+		int waterLevelMax;
+		LocalMaterialData block;
+		int newY;
+        
         for (int x1 = 0; x1 < four; x1++)
         {
             for (int z1 = 0; z1 < four; z1++)
@@ -192,15 +221,15 @@ public class ChunkProviderOTG
                 // Water level (fill final array based on smaller,
                 // non-smoothed
                 // array)
-                double waterLevel_x0z0 = this.waterLevelRaw[(x1 + 0) * NOISE_MAX_X + (z1 + 0)] & 0xFF;
-                double waterLevel_x0z1 = this.waterLevelRaw[(x1 + 0) * NOISE_MAX_X + (z1 + 1)] & 0xFF;
-                final double waterLevel_x1z0 = ((this.waterLevelRaw[(x1 + 1) * NOISE_MAX_X + (z1 + 0)] & 0xFF) - waterLevel_x0z0) * oneFourth;
-                final double waterLevel_x1z1 = ((this.waterLevelRaw[(x1 + 1) * NOISE_MAX_X + (z1 + 1)] & 0xFF) - waterLevel_x0z1) * oneFourth;
+                waterLevel_x0z0 = this.waterLevelRaw[(x1 + 0) * NOISE_MAX_X + (z1 + 0)] & 0xFF;
+                waterLevel_x0z1 = this.waterLevelRaw[(x1 + 0) * NOISE_MAX_X + (z1 + 1)] & 0xFF;
+                waterLevel_x1z0 = ((this.waterLevelRaw[(x1 + 1) * NOISE_MAX_X + (z1 + 0)] & 0xFF) - waterLevel_x0z0) * oneFourth;
+                waterLevel_x1z1 = ((this.waterLevelRaw[(x1 + 1) * NOISE_MAX_X + (z1 + 1)] & 0xFF) - waterLevel_x0z1) * oneFourth;
 
                 for (int piece_x = 0; piece_x < 4; piece_x++)
                 {
-                    double waterLevelForArray = waterLevel_x0z0;
-                    final double d17_1 = (waterLevel_x0z1 - waterLevel_x0z0) * oneFourth;
+                    waterLevelForArray = waterLevel_x0z0;
+                    d17_1 = (waterLevel_x0z1 - waterLevel_x0z0) * oneFourth;
 
                     for (int piece_z = 0; piece_z < 4; piece_z++)
                     {
@@ -210,49 +239,49 @@ public class ChunkProviderOTG
                     }
                     waterLevel_x0z0 += waterLevel_x1z0;
                     waterLevel_x0z1 += waterLevel_x1z1;
-
                 }
 
                 // Terrain noise
                 for (int y = 0; y < oneEightOfHeight; y++)
                 {
-                    double x0z0 = rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 0))];
-                    double x0z1 = rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 0))];
-                    double x1z0 = rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 0))];
-                    double x1z1 = rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 0))];
+                    x0z0 = rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 0))];
+                    x0z1 = rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 0))];
+                    x1z0 = rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 0))];
+                    x1z1 = rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 0))];
 
-                    final double x0z0y1 = (rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 1))] - x0z0) * oneEight;
-                    final double x0z1y1 = (rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 1))] - x0z1) * oneEight;
-                    final double x1z0y1 = (rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 1))] - x1z0) * oneEight;
-                    final double x1z1y1 = (rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 1))] - x1z1) * oneEight;
+                    x0z0y1 = (rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 1))] - x0z0) * oneEight;
+                    x0z1y1 = (rawTerrain[(((x1 + 0) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 1))] - x0z1) * oneEight;
+                    x1z0y1 = (rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 0)) * maxYSections + (y + 1))] - x1z0) * oneEight;
+                    x1z1y1 = (rawTerrain[(((x1 + 1) * NOISE_MAX_Z + (z1 + 1)) * maxYSections + (y + 1))] - x1z1) * oneEight;
 
                     for (int piece_y = 0; piece_y < 8; piece_y++)
                     {
-                        double d11 = x0z0;
-                        double d12 = x0z1;
-                        final double d13 = (x1z0 - x0z0) * oneFourth;
-                        final double d14 = (x1z1 - x0z1) * oneFourth;
+                        d11 = x0z0;
+                        d12 = x0z1;
+                        d13 = (x1z0 - x0z0) * oneFourth;
+                        d14 = (x1z1 - x0z1) * oneFourth;
 
                         for (int piece_x = 0; piece_x < 4; piece_x++)
                         {
-                            double d16 = d11;
-                            final double d17 = (d12 - d11) * oneFourth;
+                            d16 = d11;
+                            d17 = (d12 - d11) * oneFourth;
                             for (int piece_z = 0; piece_z < 4; piece_z++)
                             {
-                                final BiomeConfig biomeConfig = toBiomeConfig(biomeArray[(z1 * 4 + piece_z) * 16 + (piece_x + x1 * 4)]);
-                                final int waterLevelMax = waterLevel[(z1 * 4 + piece_z) * 16 + (piece_x + x1 * 4)] & 0xFF;
-                                LocalMaterialData block = MaterialHelper.AIR;
-                                if (y * 8 + piece_y < waterLevelMax && y * 8 + piece_y > biomeConfig.waterLevelMin)
+                                biomeConfig = toBiomeConfig(biomeArray[(z1 * 4 + piece_z) * 16 + (piece_x + x1 * 4)]);
+                                waterLevelMax = waterLevel[(z1 * 4 + piece_z) * 16 + (piece_x + x1 * 4)] & 0xFF;
+                                block = MaterialHelper.AIR;
+                                newY = y * 8 + piece_y;
+                                if (newY < waterLevelMax && newY > biomeConfig.waterLevelMin)
                                 {
-                                    block = biomeConfig.waterBlock;
+                                	block = biomeConfig.getWaterBlockReplaced(this.localWorld, newY);
                                 }
 
                                 if (d16 > 0.0D)
                                 {
-                                    block = biomeConfig.stoneBlock;
+                                	block = biomeConfig.getStoneBlockReplaced(this.localWorld, newY);
                                 }
-
-                                chunkBuffer.setBlock(piece_x + x1 * 4, y * 8 + piece_y, z1 * 4 + piece_z, block);
+                                
+                                chunkBuffer.setBlock(piece_x + x1 * 4, newY, z1 * 4 + piece_z, block);                                
                                 d16 += d17;
                             }
                             d11 += d13;
@@ -276,6 +305,23 @@ public class ChunkProviderOTG
         return dry;
     }
 
+    private int lastX = Integer.MAX_VALUE;
+    private int lastZ = Integer.MAX_VALUE;
+    private double lastNoise = 0;   
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	double noise = this.lastNoise;
+    	if(this.lastX != blockX || this.lastZ != blockZ)
+    	{
+        	final double d1 = 0.03125D;
+        	noise = this.biomeBlocksNoiseGen.getRegion(new double[1], blockX, blockZ, 1, 1, d1 * 2.0D, d1 * 2.0D, 1.0D)[0];
+        	this.lastX = blockX;
+        	this.lastZ = blockZ;
+        	this.lastNoise = noise;
+    	}
+    	return noise;
+    }
+    
     /**
      * Adds the biome blocks like grass, dirt, sand and sandstone. Also adds
      * bedrock at the bottom of the map.
@@ -306,8 +352,10 @@ public class ChunkProviderOTG
 
                 biomeConfig.surfaceAndGroundControl.spawn(localWorld, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
-                // Count water blocks
-                if (chunkBuffer.getBlock(x, biomeConfig.waterLevelMax, z).equals(biomeConfig.waterBlock))
+                // Count liquid blocks
+                if (
+            		chunkBuffer.getBlock(x, biomeConfig.waterLevelMax, z).isLiquid()                	
+            	)
                 {
                     dryBlocksOnSurface--;
                 }

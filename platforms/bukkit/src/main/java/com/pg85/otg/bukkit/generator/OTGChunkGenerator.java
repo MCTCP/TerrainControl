@@ -6,6 +6,7 @@ import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.NBTHelper;
 import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkProviderOTG;
@@ -40,7 +41,6 @@ import java.util.Random;
 public class OTGChunkGenerator extends ChunkGenerator
 {
     private DataConverter dataConverter;
-    //private Chunk[] chunkCache;
     private ChunkProviderOTG chunkProviderOTG;
     // Why does the chunk generator require multiple block populators, each with their own ObjectSpawner instance? For multiple dims?
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
@@ -57,7 +57,6 @@ public class OTGChunkGenerator extends ChunkGenerator
 	private Entry<ChunkCoordinate, Chunk> lastUsedChunk4;
 	Object chunkCacheLock = new Object();
     //
-
     
     public OTGChunkGenerator(OTGPlugin _plugin, BukkitWorld world)
     {
@@ -246,18 +245,14 @@ public class OTGChunkGenerator extends ChunkGenerator
 	        }
         }
     	return chunk;    
-    }
-   
-    public void startPopulation(ChunkCoordinate chunkCoord) { }
-
-    public void endPopulation() { }
+    }   
     
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, BiomeConfig biomeConfig)
     {
         if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
         {
             return;
-        }
+        }     
     	
         try
         {
@@ -441,6 +436,11 @@ public class OTGChunkGenerator extends ChunkGenerator
         unloadedBlockColumnsCache.put(blockPos, cachedColumn);		
         return blocksInColumn;
     }
+    
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	return this.chunkProviderOTG.getBiomeBlocksNoiseValue(blockX, blockZ);
+    }    
     
     public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
     {
