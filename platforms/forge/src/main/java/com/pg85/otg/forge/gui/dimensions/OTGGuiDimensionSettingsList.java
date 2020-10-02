@@ -181,6 +181,12 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 					        listEntries.add(new PregeneratorSettingsEntry(this, this));
 					        listEntries.add(new CategoryEntry(this, ""));
 					        listEntries.add(new CategoryEntry(this, ""));
+					        listEntries.add(new CategoryEntry(this, ""));
+					        listEntries.add(new CategoryEntry(this, "* Configure Pregenerator speed via OTG.ini. *"));
+					        if(pregenerator.getPregenerationRadius() >= 400)
+					        {
+					        	listEntries.add(new CategoryEntry(this, "* 4GB+ memory is recommended for large pregeneration. *"));
+					        }
 				    	}
 					}
 		        }
