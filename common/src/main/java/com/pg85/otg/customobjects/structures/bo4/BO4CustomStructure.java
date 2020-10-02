@@ -36,12 +36,13 @@ public class BO4CustomStructure extends CustomStructure
 	
     // Stores all the branches of this branching structure that should spawn along with the chunkcoordinates they should spawn in
     public Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
+    // TODO: Make sure this never becomes an issue for memory usage. 
     public Map<ChunkCoordinate, String> ObjectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();
-   
+
     boolean IsSpawned;
     private boolean isStructureAtSpawn = false;
 
-    private int minY;
+    public int minY;
 
     // A smoothing area is drawn around all outer blocks (or blocks neighbouring air) on the lowest layer of blocks in each BO3 of this branching structure that has a SmoothRadius set greater than 0.
     public Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
@@ -129,41 +130,47 @@ public class BO4CustomStructure extends CustomStructure
 
 		for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : objectsToSpawn.entrySet())
 		{
-			String structureInfo = "";
-			for(CustomStructureCoordinate customObjectCoord : chunkCoordSet.getValue())
+			if(chunkCoordSet.getValue() != null)
 			{
-				structureInfo += customObjectCoord.getObject().getName() + ":" + customObjectCoord.getRotation() + ", ";
-			}
-			if(structureInfo.length() > 0)
-			{
-				structureInfo = structureInfo.substring(0,  structureInfo.length() - 2);
-				ObjectsToSpawnInfo.put(chunkCoordSet.getKey(), "Branches in chunk X" + chunkCoordSet.getKey().getChunkX() + " Z" + chunkCoordSet.getKey().getChunkZ() + " : " + structureInfo);
+				String structureInfo = "";
+				for(CustomStructureCoordinate customObjectCoord : chunkCoordSet.getValue())
+				{
+					structureInfo += customObjectCoord.getObject().getName() + ":" + customObjectCoord.getRotation() + ", ";
+				}
+				if(structureInfo.length() > 0)
+				{
+					structureInfo = structureInfo.substring(0,  structureInfo.length() - 2);
+					ObjectsToSpawnInfo.put(chunkCoordSet.getKey(), "Branches in chunk X" + chunkCoordSet.getKey().getChunkX() + " Z" + chunkCoordSet.getKey().getChunkZ() + " : " + structureInfo);
+				}
 			}
 		}
 		
 		for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> chunkCoordSet : objectsToSpawn.entrySet())
 		{
-        	// Don't spawn BO3's that have been overriden because of replacesBO3
-        	for (CustomStructureCoordinate coordObject : chunkCoordSet.getValue())
-        	{
-        		BO4Config objectConfig = ((BO4)coordObject.getObject()).getConfig();
-        		if(objectConfig.replacesBO3Branches.size() > 0)
-        		{
-        			for(String BO3ToReplace : objectConfig.replacesBO3Branches)
-        			{
-        				for (BO4CustomStructureCoordinate coordObjectToReplace : chunkCoordSet.getValue())
-        				{
-        					if(((BO4)coordObjectToReplace.getObject()).getName().equals(BO3ToReplace))
-        					{
-        						if(checkCollision(coordObject, coordObjectToReplace))
-        						{
-        							coordObjectToReplace.isSpawned = true;
-        						}
-        					}
-        				}
-        			}
-        		}
-        	}
+			if(chunkCoordSet.getValue() != null)
+			{
+	        	// Don't spawn BO3's that have been overriden because of replacesBO3
+	        	for (CustomStructureCoordinate coordObject : chunkCoordSet.getValue())
+	        	{
+	        		BO4Config objectConfig = ((BO4)coordObject.getObject()).getConfig();
+	        		if(objectConfig.replacesBO3Branches.size() > 0)
+	        		{
+	        			for(String BO3ToReplace : objectConfig.replacesBO3Branches)
+	        			{
+	        				for (BO4CustomStructureCoordinate coordObjectToReplace : chunkCoordSet.getValue())
+	        				{
+	        					if(((BO4)coordObjectToReplace.getObject()).getName().equals(BO3ToReplace))
+	        					{
+	        						if(checkCollision(coordObject, coordObjectToReplace))
+	        						{
+	        							coordObjectToReplace.isSpawned = true;
+	        						}
+	        					}
+	        				}
+	        			}
+	        		}
+	        	}
+			}
 		}
 
         // Calculate smoothing areas around the entire branching structure
@@ -174,9 +181,10 @@ public class BO4CustomStructure extends CustomStructure
 		smoothingAreasToSpawn = smoothingAreaManager.calculateSmoothingAreas(objectsToSpawn, (BO4CustomStructureCoordinate)this.start, world);
 		smoothingAreaManager.customObjectStructureSpawn(smoothingAreasToSpawn);
 		
+		// Add the structure to the structure caches
+		
 		for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
 		{
-			// Add the structure to the structure caches
 			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);		
 		}
 
@@ -229,7 +237,7 @@ public class BO4CustomStructure extends CustomStructure
 					startY = (short) (biome.getBiomeConfig().useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biome.getBiomeConfig().waterLevelMax);
 				} else {
 					// OTG.log(LogMarker.INFO, "Request height for chunk X" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkX() + " Z" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkZ());
-					// If this chunk has not yet been populated then this will cause it to be! (ObjectSpawner.Populate() is called)
+					// Passing null for chunk being populated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
 
 					int highestBlock = 0;
 
@@ -859,7 +867,7 @@ public class BO4CustomStructure extends CustomStructure
 	        		    if(!minimumSize && canSpawn)
 	        		    {
 	        			    // Check if any other structures in the world are in this chunk
-	        			    if(world.getStructureCache().isBo4ChunkPlotted(world, childBranchDataItem.chunkCoordinate))
+	        			    if(world.getStructureCache().isChunkOccupied(world, childBranchDataItem.chunkCoordinate))
 	        			    {
 		    					canSpawn = false;
         						chunkIsIneligible = true;
@@ -1929,7 +1937,7 @@ public class BO4CustomStructure extends CustomStructure
 	            		if(distanceBetweenStructures <= radiusInChunks)
 	            		{
 	            		    // Check if any other structures in world are in this chunk
-	            			if(world.getStructureCache().isBo4ChunkPlotted(world, ChunkCoordinate.fromChunkCoords(x,z)))
+	            			if(world.getStructureCache().isChunkOccupied(world, ChunkCoordinate.fromChunkCoords(x,z)))
 	            		    {
 	            		        // Structures' bounding boxes are overlapping, don't add this branch.
 	            				return null;
@@ -2105,7 +2113,10 @@ public class BO4CustomStructure extends CustomStructure
     {
     	//OTG.log(LogMarker.INFO, "SpawnForChunk X" + chunkCoordinate.getChunkX() + " Z" + chunkCoordinate.getChunkZ() + " " + this.start.bo3Name);
     	   	
-    	if ((!objectsToSpawn.containsKey(chunkCoordinate) && !smoothingAreasToSpawn.containsKey(chunkCoordinate)))
+    	if (
+			!objectsToSpawn.containsKey(chunkCoordinate) && 
+			!smoothingAreasToSpawn.containsKey(chunkCoordinate)
+		)
         {
             return;
         }
@@ -2120,7 +2131,7 @@ public class BO4CustomStructure extends CustomStructure
             BiomeConfig biomeConfig = null;
             if(config.spawnUnderWater)
         	{
-            	biome = world.getBiome(this.start.getX() + 8, this.start.getZ() + 7);
+            	biome = world.getBiome(this.start.getX() + 8, this.start.getZ() + 8);
             	biomeConfig = biome.getBiomeConfig();
         	}
 
@@ -2163,7 +2174,6 @@ public class BO4CustomStructure extends CustomStructure
                 	}
             		objectsToSpawn.remove(chunkCoordinate);
             		smoothingAreasToSpawn.remove(chunkCoordinate);	
-            		BO4.OriginalTopBlocks.clear();
                 	return;
                 }
             }
@@ -2210,8 +2220,7 @@ public class BO4CustomStructure extends CustomStructure
                 		OTG.log(LogMarker.WARN, "Could not spawn chunk " + coordObject.bo3Name + " for structure " + this.start.getObject().getName());
                 	}
             		objectsToSpawn.remove(chunkCoordinate);
-            		smoothingAreasToSpawn.remove(chunkCoordinate);	
-            		BO4.OriginalTopBlocks.clear();
+            		smoothingAreasToSpawn.remove(chunkCoordinate);
                 	return;
                 } else {
                 	this.modDataManager.spawnModData(objectConfig.getModData(), coordObject, chunkCoordinate);
@@ -2227,7 +2236,6 @@ public class BO4CustomStructure extends CustomStructure
         }
 
 		objectsToSpawn.remove(chunkCoordinate);
-		smoothingAreasToSpawn.remove(chunkCoordinate);	
-		BO4.OriginalTopBlocks.clear();
+		smoothingAreasToSpawn.remove(chunkCoordinate);
     }
 }
