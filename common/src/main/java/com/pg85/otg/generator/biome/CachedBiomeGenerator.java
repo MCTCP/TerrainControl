@@ -44,7 +44,7 @@ class CachedBiomeGenerator extends BiomeGenerator
     /**
      * The map of cached BiomeCacheBlocks.
      */
-    private FifoMap<ChunkCoordinate, CachedBiomeGenerator.Chunk> cacheMap = new FifoMap<ChunkCoordinate, Chunk>(4096);
+    private FifoMap<ChunkCoordinate, CachedBiomeGenerator.Chunk> cacheMap = new FifoMap<ChunkCoordinate, Chunk>(4096); // TODO: This gets slow at large sizes, test/profile to find the best size.
     /**
      * The uncached biome generator.
      */

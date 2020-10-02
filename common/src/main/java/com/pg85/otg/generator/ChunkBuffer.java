@@ -9,7 +9,7 @@ import com.pg85.otg.util.ChunkCoordinate;
  */
 public interface ChunkBuffer {
 
-    /**
+	/**
      * Gets the chunk coordinate of this buffer.
      * 
      * @return The chunk coordinate.

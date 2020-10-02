@@ -12,6 +12,7 @@ import com.pg85.otg.configuration.world.WorldConfig.ImageOrientation;
 import com.pg85.otg.configuration.world.WorldConfig.TerrainMode;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,24 +23,33 @@ public class WorldStandardValues extends Settings
     public static final String FALLBACK_FILE_NAME = "Fallbacks.ini";
     public static final String WORLD_BIOMES_DIRECTORY_NAME = "WorldBiomes";
     public static final String WORLD_OBJECTS_DIRECTORY_NAME = "WorldObjects";
-
+    
+    public static String BackupFileSuffix = "-backup";
+	public static String StructureDataFileExtension = ".dat";
+    
+    // Contains the O menu settings for a world/dims.
 	public static String DimensionsConfigFileName = "Config.yaml";
-	public static String DimensionsConfigBackupFileName = "Config-backup.yaml";
+	public static String DimensionsConfigBackupFileName = "Config" + BackupFileSuffix + ".yaml";
+	// Contains the biome id's for a world/dim, generated on world/dim creation
 	public static String BiomeIdDataFileName = "BiomeIds.txt";
-	public static String BiomeIdDataBackupFileName = "BiomeIds-backup.txt";
+	public static String BiomeIdDataBackupFileName = "BiomeIds" + BackupFileSuffix + ".txt";
+	// Data about dimensions, used to load dims on server start.
 	public static String DimensionsDataFileName = "Dimensions.txt";
-	public static String DimensionsDataBackupFileName = "Dimensions-backup.txt";
-	public static String StructureDataFileName = "StructureData.txt";
-	public static String StructureDataBackupFileName = "StructureData-backup.txt";
-	public static String NullChunksFileName = "NullChunks.txt";
-	public static String NullChunksBackupFileName = "NullChunks-backup.txt";
-	public static String SpawnedStructuresFileName = "SpawnedStructures.txt";
-	public static String SpawnedStructuresBackupFileName = "SpawnedStructures-backup.txt";
-	public static String ChunkProviderPopulatedChunksFileName = "ChunkProviderPopulatedChunks.txt";
+	public static String DimensionsDataBackupFileName = "Dimensions" + BackupFileSuffix + ".txt";
+	// Data on all chunks containing structures or spawners/particles/moddata
+	public static String StructureDataFolderName = "StructureData";	
+	public static String StructureDataBackupFileExtension = BackupFileSuffix + StructureDataFileExtension;
+	public static String PlottedChunksDataFolderName = StructureDataFolderName + File.separator + "PlottedChunks";
+	// Data about structure start points and bo4 groups, used for distance.
+	public static String SpawnedStructuresFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataFileExtension;
+	public static String SpawnedStructuresBackupFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataBackupFileExtension;
+	// Data about pregenerator progress
 	public static String PregeneratedChunksFileName = "PregeneratedChunks.txt";
-	public static String PregeneratedChunksBackupFileName = "PregeneratedChunks-backup.txt";
+	public static String PregeneratedChunksBackupFileName = "PregeneratedChunks" + BackupFileSuffix + ".txt";
+	// Misc data that should be saved with the world. Currently only contains version, 
+	// can be used for backwards compatibility when updating configs.
 	public static String WorldSaveDataFileName = "WorldSave.txt";
-	public static String WorldSaveDataBackupFileName = "WorldSave-backup.txt";
+	public static String WorldSaveDataBackupFileName = "WorldSave" + BackupFileSuffix + ".txt";
     
     /**
      * Temperatures below this temperature will cause the biome to be covered

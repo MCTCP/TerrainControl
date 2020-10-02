@@ -76,7 +76,6 @@ class ObjectCoordinate
 
             ObjectCoordinate newCoordinate = new ObjectCoordinate(x, y, z);
 
-
             String workingDataString = value;
             if (workingDataString.contains("#"))
             {
@@ -85,22 +84,18 @@ class ObjectCoordinate
                 String branchData[] = stringSet[1].split("@");
                 newCoordinate.BranchDirection = Integer.parseInt(branchData[0]);
                 newCoordinate.BranchOdds = Integer.parseInt(branchData[1]);
-
             }
             newCoordinate.material = MaterialHelper.readMaterial(workingDataString);
 
             return newCoordinate;
-
         }
         catch (NumberFormatException e)
         {
             return null;
-
         }
         catch (InvalidConfigException e)
         {
-            return null;
-            
+            return null;            
         }
     }
 }

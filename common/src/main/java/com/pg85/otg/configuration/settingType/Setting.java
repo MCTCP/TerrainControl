@@ -10,7 +10,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 public abstract class Setting<T>
 {
     private final String name;
-
+    
     protected Setting(String name)
     {
         this.name = name;
@@ -20,8 +20,8 @@ public abstract class Setting<T>
      * Gets the default value of the setting.
      * @return The default value.
      */
-    public abstract T getDefaultValue();
-
+    public abstract T getDefaultValue();   
+    
     /**
      * Gets the name of this setting, like BiomeHeight.
      * @return The name of this setting.
@@ -30,7 +30,7 @@ public abstract class Setting<T>
     {
         return name;
     }
-
+    
     /**
      * Reads the given setting from a string.
      * @param string The value of the setting.
