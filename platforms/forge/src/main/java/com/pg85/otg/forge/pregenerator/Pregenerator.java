@@ -461,11 +461,18 @@ public class Pregenerator
 		} catch (MinecraftException e) {
 			e.printStackTrace();
 		}
-        ((WorldServer)this.world.getWorld()).flushToDisk();
-        ((WorldServer)this.world.getWorld()).disableLevelSaving = flag;
-        
-		this.world.getStructureCache().compressCache();
-    }	
+        try
+        {
+        	((WorldServer)this.world.getWorld()).flushToDisk();
+        }
+        catch(NoSuchElementException ex)
+        {
+        	// TODO: Happens sometimes during pregeneration, likely a threading issue.
+        	// Hopefully aborting and retrying later won't cause problems.
+        	OTG.log(LogMarker.INFO, "An error occurred while flushing chunks to disk, aborting flush and continuing pregeneration.");
+        }
+        ((WorldServer)this.world.getWorld()).disableLevelSaving = flag;        
+    }
 
 	private void pause()
 	{
