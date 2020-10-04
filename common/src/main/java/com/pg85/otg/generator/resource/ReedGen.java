@@ -108,7 +108,7 @@ public class ReedGen extends Resource
         int n = 1 + rand.nextInt(2);
         for (int i1 = 0; i1 < n; i1++)
         {
-            world.setBlock(x, y + i1, z, this.material, null, chunkBeingPopulated);
+            world.setBlock(x, y + i1, z, this.material, null, chunkBeingPopulated, false);
         }
     }
     

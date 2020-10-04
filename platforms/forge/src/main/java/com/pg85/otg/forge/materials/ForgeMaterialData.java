@@ -12,6 +12,11 @@ import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 
+//TODO: Make this class unmodifiable (parseForWorld modifies atm),
+//implement a world-specific materials cache and ensure only one
+//instance of each unique material (id+metadata) exists in memory.
+//TODO: Do creation of new material instances in one place only?
+
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
  *
@@ -23,31 +28,37 @@ public class ForgeMaterialData extends LocalMaterialData
 	private byte metaId;
 	private boolean materialIdSet = false;
 	private int materialId;
-
-    private ForgeMaterialData(IBlockState blockData, int blockId, int blockMetaData)
+	// TODO: Clean up the constructors, hasData is only used for blocks parsed from configs,
+	// so we can write them back properly, so may produce unexpected results when used differently.
+	private boolean hasData;
+	
+    private ForgeMaterialData(IBlockState blockData, int blockId, int blockMetaData, boolean hasData)
     {
         this.blockData = blockData;
         this.materialIdSet = true;
         this.materialId = blockId;
         this.metaIdSet = true;
         this.metaId = (byte)blockMetaData;
+        this.hasData = hasData;
     }
     
-    private ForgeMaterialData(IBlockState blockData, String raw)
+    private ForgeMaterialData(IBlockState blockData, String raw, boolean hasData)
     {
         this.blockData = blockData;
         this.rawEntry = raw;
+        this.hasData = hasData;
     }
     
-    private ForgeMaterialData(String raw)
+    private ForgeMaterialData(String raw, boolean hasData)
     {
     	this.blockData = null;
     	this.rawEntry = raw;
+    	this.hasData = hasData; 
     }
     
     public static ForgeMaterialData getBlank()
     {
-    	ForgeMaterialData material = new ForgeMaterialData((IBlockState)null, null);
+    	ForgeMaterialData material = new ForgeMaterialData((IBlockState)null, null, false);
     	material.isBlank = true;
     	return material;
     }
@@ -65,6 +76,7 @@ public class ForgeMaterialData extends LocalMaterialData
     		return ForgeMaterialData.getBlank();
     	}
 
+    	// Try blockname / minecraft:blockname syntax
     	String newInput = input;
 
         net.minecraft.block.Block block = net.minecraft.block.Block.getBlockFromName(newInput);
@@ -94,40 +106,36 @@ public class ForgeMaterialData extends LocalMaterialData
         	{
         		newInput = input + ":0"; // TODO: Shouldn't this be 3? This appears to fix the problem for the dungeon dimension but I still see it in BB, double check?
         	} else {
-	            return ForgeMaterialData.ofMinecraftBlock(block, input);
+	            return ForgeMaterialData.ofMinecraftBlock(block, input, false);
         	}
         }
 
         // Try block(:data) syntax
-        return getMaterial0(newInput);
-    }
-
-    private static ForgeMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
-    {
-        String blockName = input;
+        
+        String blockName = newInput;
         int blockData = -1;
 
         // When there is a . or a : in the name, extract block data
-        int splitIndex = input.lastIndexOf(":");
+        int splitIndex = newInput.lastIndexOf(":");
         if (splitIndex == -1)
         {
-            splitIndex = input.lastIndexOf(".");
+            splitIndex = newInput.lastIndexOf(".");
         }
         if (splitIndex != -1)
         {
-            blockName = input.substring(0, splitIndex);
+            blockName = newInput.substring(0, splitIndex);
             try
             {
-            	blockData = Integer.parseInt(input.substring(splitIndex + 1));            
+            	blockData = Integer.parseInt(newInput.substring(splitIndex + 1));            
             }
             catch (NumberFormatException e)
             {
-            	blockName = input;
+            	blockName = newInput;
             }
         }
 
-        // Parse block name
-        Block block = Block.getBlockFromName(blockName);
+        // Try block name without data
+        block = Block.getBlockFromName(blockName);
         if (block == null)
         {
             DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
@@ -172,26 +180,26 @@ public class ForgeMaterialData extends LocalMaterialData
             if (blockData == -1)
             {
                 // Use default
-                return ForgeMaterialData.ofMinecraftBlock(block, input);
+                return ForgeMaterialData.ofMinecraftBlock(block, newInput, false);
             } else {
                 // Use specified data
                 try
                 {
-                    return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData), input);
+                    return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData), newInput, true);
                 }
                 catch(java.lang.ArrayIndexOutOfBoundsException e)
                 {
-                	throw new InvalidConfigException("Illegal meta data for the block type, cannot use " + input);
+                	throw new InvalidConfigException("Illegal meta data for the block type, cannot use " + newInput);
                 }
                 catch (IllegalArgumentException e)
                 {
-                	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
+                	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + newInput);
                 }
             }
         }
 
         // Failed, try parsing later as a fallback.
-        return new ForgeMaterialData(input);
+        return new ForgeMaterialData(newInput, false); // TODO: Assuming all fallback blocks contain data atm.
     }
     
     /**
@@ -205,7 +213,7 @@ public class ForgeMaterialData extends LocalMaterialData
     {
         Block block = Block.getBlockById(id);
         IBlockState blockData = block.getStateFromMeta(data);
-        return new ForgeMaterialData(blockData, id, data);
+        return new ForgeMaterialData(blockData, id, data, true);
     }
 
     /**
@@ -231,9 +239,9 @@ public class ForgeMaterialData extends LocalMaterialData
      * @param block The material.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofMinecraftBlock(Block block, String raw)
+    public static ForgeMaterialData ofMinecraftBlock(Block block, String raw, boolean hasData)
     {
-        return ofMinecraftBlockState(block.getDefaultState(), raw);
+        return ofMinecraftBlockState(block.getDefaultState(), raw, hasData);
     }
 
     /**
@@ -243,7 +251,7 @@ public class ForgeMaterialData extends LocalMaterialData
      */
     public static ForgeMaterialData ofMinecraftBlockState(IBlockState blockData)
     {
-        return new ForgeMaterialData(blockData, null);
+        return new ForgeMaterialData(blockData, null, true);
     }
     
     /**
@@ -251,9 +259,9 @@ public class ForgeMaterialData extends LocalMaterialData
      * @param blockData The material an data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofMinecraftBlockState(IBlockState blockData, String raw)
+    public static ForgeMaterialData ofMinecraftBlockState(IBlockState blockData, String raw, boolean hasData)
     {
-        return new ForgeMaterialData(blockData, raw);
+        return new ForgeMaterialData(blockData, raw, hasData);
     }
     
     @SuppressWarnings("deprecation")
@@ -270,7 +278,7 @@ public class ForgeMaterialData extends LocalMaterialData
         }
 
         Block block = this.blockData.getBlock();
-        return ofMinecraftBlockState(block.getStateFromMeta(i), this.rawEntry);
+        return ofMinecraftBlockState(block.getStateFromMeta(i), this.rawEntry, true);
     }
 
     @Override
@@ -324,7 +332,6 @@ public class ForgeMaterialData extends LocalMaterialData
     	} else {
 	        Block block = this.blockData.getBlock();	
 	        byte data = getBlockData();
-	        boolean noData = this.blockData.getPropertyKeys().isEmpty();
 	        // Note that the above line is not equivalent to data != 0, as for
 	        // example pumpkins have a default data value of 2
 	
@@ -336,13 +343,13 @@ public class ForgeMaterialData extends LocalMaterialData
 	            // Use Minecraft's name
 	            if (nonDefaultData)
 	            {
-	            	return Block.REGISTRY.getNameForObject(block) + (noData ? "" : ":" + data);
+	            	return Block.REGISTRY.getNameForObject(block) + (!this.hasData ? "" : ":" + data);
 	            } else {
 	            	return Block.REGISTRY.getNameForObject(block).toString();
 	            }
 	        } else {
 	            // Use our name
-	        	return defaultMaterial.name() + (noData ? "" : ":" + data);
+	        	return defaultMaterial.name() + (!this.hasData ? "" : ":" + data);
 	        }
     	}
     }
@@ -421,8 +428,17 @@ public class ForgeMaterialData extends LocalMaterialData
         }
 
         return this.blockData == null ? false : this.blockData.getMaterial().isSolid();    	
-    }     
+    }
 
+    // TODO: Caching result means fallbacks will only work for one world, fix this!
+    // TODO: Not returning a copy means that any block parsed is modified, this may
+    // unintentionally include things like MaterialHelper blocks. 
+    // Redesign this, or at least make sure this doesn't cause problems.
+    // TODO: This is only applied for settings using a materialset and (non-bo) resources atm,
+    // fix this for bo's and any other material settings (do all use materialset?), will
+    // need a world-specific materials cache for readMaterial, should probably just parse
+    // materials immediately when reading settings, so pass world info to configs loading 
+    // code?
 	@Override
 	public LocalMaterialData parseForWorld(LocalWorld world)
 	{
@@ -474,9 +490,21 @@ public class ForgeMaterialData extends LocalMaterialData
         if (!(obj instanceof ForgeMaterialData))
         {
             return false;
-        }
+        }        
         ForgeMaterialData other = (ForgeMaterialData) obj;
-        return this.blockData.equals(other.blockData);
+        if(this.isBlank != other.isBlank)
+        {
+        	return false;
+        }
+        else if(this.isBlank)
+        {
+        	return true;
+        }
+
+        return 
+    		(this.blockData != null && other.blockData != null && this.blockData.equals(other.blockData)) ||    		
+    		(this.rawEntry != null && other.rawEntry != null && this.rawEntry.equals(other.rawEntry))    	
+		;
     }
     
     /**
@@ -488,7 +516,12 @@ public class ForgeMaterialData extends LocalMaterialData
      */
     public int hashCode()
     {
-        // From 4096 to 69632 when there are 4096 block ids
-        return PluginStandardValues.SUPPORTED_BLOCK_IDS + (getBlockId() * 16) + getBlockData();
-    }    
+    	return PluginStandardValues.SUPPORTED_BLOCK_IDS + (getBlockId() * 16) + getBlockData();
+    }
+
+	@Override
+	public boolean hasData()
+	{
+		return this.hasData;
+	}
 }

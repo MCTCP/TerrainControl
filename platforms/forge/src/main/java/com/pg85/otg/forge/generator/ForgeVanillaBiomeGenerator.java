@@ -84,7 +84,7 @@ public class ForgeVanillaBiomeGenerator extends VanillaBiomeGenerator
     	int biomeId = ((ForgeEngine)OTG.getEngine()).getBiomeRegistryManager().getBiomeRegistryId(this.worldChunkManager.getBiome(new BlockPos(x, 0, z)));
     	if(biomeId == -1)
     	{
-    		throw new RuntimeException();
+    		throw new RuntimeException("This shouldn't happen, please contact Team OTG about this crash.");
     	}
         return biomeId; 
     }

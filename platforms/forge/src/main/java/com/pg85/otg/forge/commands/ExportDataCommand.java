@@ -1,10 +1,7 @@
 package com.pg85.otg.forge.commands;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
@@ -78,6 +75,9 @@ public class ExportDataCommand extends BaseCommand
 		        	                	OTG.log(LogMarker.INFO, "Exporting .BO4Data for structure start " + ((BO4)structure).getName());
 		        	    	            OTG.generateBO4Data(((BO4)structure).getConfig());
 		        	    	            OTG.getEngine().getCustomObjectManager().getGlobalObjects().unloadCustomObjectFiles();
+		        	    	            
+		        	                	// TODO: Sending a message here will only show it after this command finishes, export async?
+		        	                	//sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Exporting .BO4Data for structure start " + VALUE_COLOR + ((BO4)structure).getName()));
 	        						}
 	        					}
 	        				}
@@ -85,9 +85,9 @@ public class ExportDataCommand extends BaseCommand
 	        		}
 	        	}
 	        }
-	        
+
 	        ArrayList<String> boNames = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForWorld(dimConfig.PresetName);
-	        
+
 	        int i = 0;
 	        for (String boName : boNames)
 	        {
@@ -96,6 +96,8 @@ public class ExportDataCommand extends BaseCommand
 	        	if(bo != null && bo instanceof BO4 && !OTG.bo4DataExists(((BO4)bo).getConfig()))
 	        	{
 		            OTG.log(LogMarker.INFO, "Exporting .BO4Data " + i + "/" + boNames.size() + " " + boName);
+                	// TODO: Sending a message here will only show it after this command finishes, export async?
+		            // sender.sendMessage(new TextComponentString(MESSAGE_COLOR + "Exporting .BO4Data " + VALUE_COLOR + i + "/" + boNames.size() + " " + boName));
 		            OTG.generateBO4Data(((BO4)bo).getConfig());
 		            OTG.getEngine().getCustomObjectManager().getGlobalObjects().unloadCustomObjectFiles();
 	        	}

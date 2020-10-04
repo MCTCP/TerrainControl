@@ -37,6 +37,38 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
     }
 
     @Override
+    public LocalMaterialData getSurfaceBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+    {
+    	double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+    	
+        for (LayerChoice layer : this.layerChoices)
+        {
+            if (noise <= layer.maxNoise)
+            {
+            	return layer.surfaceBlock;
+            }
+        }
+     
+        return biomeConfig.getDefaultSurfaceBlock();
+    }
+    
+	@Override
+	public LocalMaterialData getGroundBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	{	
+   		double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+    	
+        for (LayerChoice layer : this.layerChoices)
+        {
+            if (noise <= layer.maxNoise)
+            {
+            	return layer.groundBlock;
+            }
+        }
+        
+        return biomeConfig.getDefaultGroundBlock();
+	}
+
+    @Override
     public void spawn(LocalWorld world, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
     {
         int x = xInWorld & 0xf;
@@ -53,7 +85,7 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         }
 
         // Fall back on normal column
-        spawnColumn(world, config.surfaceBlock, config.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
+        spawnColumn(world, null, null, generatingChunkInfo, chunkBuffer, config, x, z);
     }
 
     @Override
@@ -73,5 +105,4 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         stringBuilder.deleteCharAt(stringBuilder.length() - 2);
         return stringBuilder.toString();
     }
-
 }

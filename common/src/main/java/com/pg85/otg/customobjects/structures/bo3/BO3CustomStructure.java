@@ -2,6 +2,7 @@ package com.pg85.otg.customobjects.structures.bo3;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
@@ -133,7 +134,7 @@ public class BO3CustomStructure extends CustomStructure
             for (CustomStructureCoordinate coordObject : objectsInChunk)
             {
                 BO3 bo3 = ((BO3)((BO3CustomStructureCoordinate)coordObject).getObject());
-                bo3.trySpawnAt(this, world, random, coordObject.rotation, coordObject.x, height.getCorrectY(world, coordObject.x, coordObject.y, coordObject.z, chunkCoordinate), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, chunkCoordinate);
+                bo3.trySpawnAt(this, world, random, coordObject.rotation, coordObject.x, height.getCorrectY(world, coordObject.x, coordObject.y, coordObject.z, chunkCoordinate), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, chunkCoordinate, true);
             }
         }
     }

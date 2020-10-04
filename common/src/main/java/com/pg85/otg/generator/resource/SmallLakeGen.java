@@ -190,7 +190,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, material, null, chunkBeingPopulated);
+                            world.setBlock(x + j, y + i2, z + i1, material, null, chunkBeingPopulated, false);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -198,7 +198,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, air, null, chunkBeingPopulated);
+                            world.setBlock(x + j, y + i2, z + i1, air, null, chunkBeingPopulated, false);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }

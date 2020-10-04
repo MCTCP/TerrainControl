@@ -1,9 +1,14 @@
 package com.pg85.otg.common;
 
 import com.pg85.otg.OTGEngine;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.util.helpers.BlockHelper;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
+
+// TODO: Make this class unmodifiable (parseForWorld modifies atm),
+// implement a world-specific materials cache and ensure only one
+// instance of each unique material (id+metadata) exists in memory.
+// TODO: Do creation of new material instances in one place only?
 
 /**
  * Represents one of Minecraft's materials. Also includes its data value.
@@ -211,12 +216,22 @@ public abstract class LocalMaterialData
     }
 
     /**
-     * Parses this material through the fallback system of world if required.
+     * Parses this material through the fallback system of the world if required.
      * 
      * @param world The world this material will be parsed through, each world may have different fallbacks.
      * @return The parsed material
      */
     public abstract LocalMaterialData parseForWorld(LocalWorld world);
+    
+	public LocalMaterialData parseWithBiomeAndHeight(LocalWorld world, BiomeConfig biomeConfig, int y)
+	{	
+        if (!biomeConfig.worldConfig.biomeConfigsHaveReplacement)
+        {
+            // Don't waste time here, ReplacedBlocks is empty everywhere
+            return this;
+        }
+        return biomeConfig.replacedBlocks.replaceBlock(y, this);
+	}
 
     /**
      * Gets whether this material falls down when no other block supports this
@@ -260,4 +275,6 @@ public abstract class LocalMaterialData
 				!isMaterial(DefaultMaterial.WATER_LILY)
 			);
     }
+
+	public abstract boolean hasData();
 }

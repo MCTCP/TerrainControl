@@ -128,11 +128,11 @@ public class SurfacePatchGen extends Resource
             LocalMaterialData materialAtLocation = world.getMaterial(x, y, z, chunkBeingPopulated);
             if (sourceBlocks.contains(materialAtLocation))
             {
-                world.setBlock(x, y, z, material, null, chunkBeingPopulated);
+                world.setBlock(x, y, z, material, null, chunkBeingPopulated, true);
 
                 if (yNoise < 0.12D)
                 {
-                    world.setBlock(x, y + 1, z, decorationAboveReplacements, null, chunkBeingPopulated);
+                    world.setBlock(x, y + 1, z, decorationAboveReplacements, null, chunkBeingPopulated, true);
                 }
             }
         }

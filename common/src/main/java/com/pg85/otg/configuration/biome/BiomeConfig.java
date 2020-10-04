@@ -2,6 +2,7 @@ package com.pg85.otg.configuration.biome;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
@@ -65,9 +66,9 @@ public class BiomeConfig extends ConfigFile
     public float biomeTemperature;
     public float biomeWetness;
 
-    public LocalMaterialData stoneBlock;
-    public LocalMaterialData surfaceBlock;
-    public LocalMaterialData groundBlock;
+    private LocalMaterialData stoneBlock;
+    private LocalMaterialData surfaceBlock;
+    private LocalMaterialData groundBlock;
     public ReplacedBlocksMatrix replacedBlocks;
     public SurfaceGenerator surfaceAndGroundControl;
 
@@ -76,9 +77,9 @@ public class BiomeConfig extends ConfigFile
     public boolean useWorldWaterLevel;
     public int waterLevelMax;
     public int waterLevelMin;
-    public LocalMaterialData waterBlock;
-    public LocalMaterialData iceBlock;
-    public LocalMaterialData cooledLavaBlock;
+    private LocalMaterialData waterBlock;
+    private LocalMaterialData iceBlock;
+    private LocalMaterialData cooledLavaBlock;
 
     public int riverWaterLevel;
 
@@ -339,6 +340,7 @@ public class BiomeConfig extends ConfigFile
         this.groundBlock = settings.getSetting(BiomeStandardValues.GROUND_BLOCK,
                 MaterialHelper.toLocalMaterialData(defaultSettings.defaultGroundBlock, 0));
         this.replacedBlocks = settings.getSetting(BiomeStandardValues.REPLACED_BLOCKS);
+        this.replacedBlocks.init(this.iceBlock, this.waterBlock, this.stoneBlock, this.groundBlock, this.surfaceBlock, this.worldConfig.getDefaultBedrockBlock());
         this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings(settings);
 
         this.useWorldWaterLevel = settings.getSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL);
@@ -417,8 +419,7 @@ public class BiomeConfig extends ConfigFile
             {
                 throw new AssertionError(e);
             }
-        } else
-        {
+        } else {
             defaultSetting = new SimpleSurfaceGenerator();
         }
 
@@ -1191,4 +1192,96 @@ public class BiomeConfig extends ConfigFile
         StreamHelper.writeStringToStream(stream, this.replaceToBiomeName);        
         StreamHelper.writeStringToStream(stream, this.biomeDictId);
     }
+
+    // Materials
+    
+    // Any blocks spawned/checked during base terrain gen that use the biomeconfig materials
+    // call getXXXBlockReplaced to get the replaced blocks.
+    // Any blocks spawned during population will have their materials parsed before spawning them
+    // via world.setBlock(), so they use the default biomeconfig materials.
+    
+    public LocalMaterialData getDefaultSurfaceBlock()
+    {
+    	return this.surfaceBlock;
+    }
+
+    public LocalMaterialData getDefaultGroundBlock()
+    {
+    	return this.groundBlock;
+    }
+    
+	public LocalMaterialData getDefaultStoneBlock()
+	{		
+		return this.stoneBlock;
+	}
+	
+	public LocalMaterialData getDefaultWaterBlock()
+	{		
+		return this.waterBlock;
+	}
+	
+	public LocalMaterialData getDefaultIceBlock()
+	{
+		return this.iceBlock;
+	}
+
+	public LocalMaterialData getDefaultCooledLavaBlock()
+	{
+		return this.cooledLavaBlock;
+	}
+    
+	public boolean replacesDefaultWaterBlock()
+	{
+		return this.replacedBlocks.replacesWater;
+	}
+	
+	public boolean replacesDefaultStoneBlock()
+	{
+		return this.replacedBlocks.replacesStone;
+	}
+	
+	public LocalMaterialData getIceBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesIce)
+		{
+			return this.iceBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.iceBlock;
+	}
+        
+	public LocalMaterialData getWaterBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesWater)
+		{
+			return this.waterBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.waterBlock;
+	}
+
+	public LocalMaterialData getStoneBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesStone)
+		{
+			return this.stoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.stoneBlock;
+	}
+
+	public LocalMaterialData getGroundBlockReplaced(LocalWorld localWorld, int y)
+	{	
+		if(this.replacedBlocks.replacesGround)
+		{
+			return this.groundBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.groundBlock;
+	}
+	
+	public LocalMaterialData getSurfaceBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesSurface)
+		{
+			return this.surfaceBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.surfaceBlock;
+	}
 }

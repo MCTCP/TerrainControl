@@ -774,6 +774,7 @@ public final class ServerConfigProvider implements ConfigProvider
         {
             this.worldConfig.biomeConfigsHaveReplacement = biomeConfig.replacedBlocks.hasReplaceSettings();
         }
+        biomeConfig.replacedBlocks.parseForWorld(this.world);
 
         // Indexing MaxSmoothRadius
         if (this.worldConfig.maxSmoothRadius < biomeConfig.smoothRadius)

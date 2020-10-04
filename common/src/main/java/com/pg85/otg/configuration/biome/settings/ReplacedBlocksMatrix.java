@@ -1,6 +1,8 @@
 package com.pg85.otg.configuration.biome.settings;
 
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
@@ -8,19 +10,31 @@ import com.pg85.otg.util.materials.MaterialHelper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 public class ReplacedBlocksMatrix
 {
+	// Redesigned this to use ReplaceBlockEntry instead, since we're now replacing
+	// blocks when they're placed, not 4x per chunk at the end of population.
+	// TODO: After removing replaceblocks from localworld, clean this up.
+	
     private static final String NO_REPLACE = "None";
 
+    private class ReplaceBlockEntry
+    {
+    	public final HashMap<Integer,LocalMaterialData> targetsWithoutBlockData = new HashMap<Integer, LocalMaterialData>();
+    	public final HashMap<Integer,LocalMaterialData> targetsWithBlockData = new HashMap<Integer, LocalMaterialData>();
+    }
+    
     public static class ReplacedBlocksInstruction
     {
         private final LocalMaterialData from;
         private final LocalMaterialData to;
         private final int minHeight;
         private final int maxHeight;
-
+        
         /**
          * Parses the given instruction string.
          * 
@@ -106,11 +120,21 @@ public class ReplacedBlocksMatrix
      */
     private final int maxHeight;
     private List<ReplacedBlocksInstruction> instructions;
-        
+    private final ReplaceBlockEntry[] targetsAtHeights;
+    
+	public boolean replacesIce = false;
+	public boolean replacesWater = false;
+	public boolean replacesStone = false;
+	public boolean replacesGround = false;
+	public boolean replacesSurface = false;
+	public boolean replacesBedrock = false;
+
+    @SuppressWarnings("unchecked")
     public ReplacedBlocksMatrix(String setting, int maxHeight) throws InvalidConfigException
     {
         this.maxHeight = maxHeight;
-
+        this.targetsAtHeights = (ReplaceBlockEntry[])new ReplaceBlockEntry[256];
+        
         // Parse
         if (setting.isEmpty() || setting.equalsIgnoreCase(NO_REPLACE))
         {
@@ -133,11 +157,127 @@ public class ReplacedBlocksMatrix
             {
                 throw new InvalidConfigException("One of the parts is missing braces around it.");
             }
-
         }
 
         // Set
         setInstructions(instructions);
+        
+        // Fill maps for faster access
+        for(ReplacedBlocksInstruction instruction : this.instructions)
+        {
+        	for(int y = instruction.minHeight; y <= instruction.maxHeight; y++)
+        	{
+        		if(y > PluginStandardValues.WORLD_HEIGHT - 1)
+        		{
+        			break;
+        		}
+        		if(y < PluginStandardValues.WORLD_DEPTH)
+        		{
+        			continue;
+        		}
+        		ReplaceBlockEntry targetsAtHeight = this.targetsAtHeights[y];
+        		if(targetsAtHeight == null)
+        		{
+        			targetsAtHeight = new ReplaceBlockEntry();
+        			this.targetsAtHeights[y] = targetsAtHeight;
+        		}
+        		// Users can chain replacedblocks to replace replacedblocks, instead of actually
+        		// replacing the same block to different materials multiple times, we'll calculate
+        		// the end result in advance.
+        		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithoutBlockData.entrySet())
+        		{
+        			if(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
+        			{
+        				entry.setValue(instruction.to);
+        			}
+        		}
+        		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithBlockData.entrySet())
+        		{
+        			if(instruction.from.hasData() &&  instruction.from.hashCode() == entry.getValue().hashCode())
+        			{
+        				entry.setValue(instruction.to);
+        			}
+        		}
+        		if(instruction.from.hasData())
+        		{
+        			targetsAtHeight.targetsWithBlockData.put(instruction.from.hashCode(), instruction.to);
+        		} else {
+        			targetsAtHeight.targetsWithoutBlockData.put(instruction.from.hashCodeWithoutBlockData(), instruction.to);
+        		}
+        	}
+        }
+    }
+    
+	public void init(LocalMaterialData biomeIceBlock, LocalMaterialData biomeWaterBlock, LocalMaterialData biomeStoneBlock, LocalMaterialData biomeGroundBlock, LocalMaterialData biomeSurfaceBlock, LocalMaterialData biomeBedrockBlock)
+	{
+        // Fill maps for faster access
+        for(ReplacedBlocksInstruction instruction : this.instructions)
+        {
+        	if(instruction.from.equals(biomeIceBlock))
+        	{
+        		this.replacesIce = true;
+        	}
+        	if(instruction.from.equals(biomeWaterBlock))
+        	{
+        		this.replacesWater = true;
+        	}
+        	if(instruction.from.equals(biomeStoneBlock))
+        	{
+        		this.replacesStone = true;
+        	}
+        	if(instruction.from.equals(biomeGroundBlock))
+        	{
+        		this.replacesGround = true;
+        	}
+        	if(instruction.from.equals(biomeSurfaceBlock))
+        	{
+        		this.replacesSurface = true;
+        	}
+        	if(instruction.from.equals(biomeBedrockBlock))
+        	{
+        		this.replacesBedrock = true;
+        	}
+        }
+	}
+
+	private boolean parsedFallBacks = false;
+	public void parseForWorld(LocalWorld world)
+	{
+		if(!parsedFallBacks)
+		{
+			parsedFallBacks = true;
+			for(ReplacedBlocksInstruction instruction : this.instructions)
+			{
+				if(instruction.from != null)
+				{
+					instruction.from.parseForWorld(world);
+				}
+				if(instruction.to != null)
+				{
+					instruction.to.parseForWorld(world);
+				}
+			}
+		}
+	}
+   
+    public LocalMaterialData replaceBlock(int y, LocalMaterialData material)
+    {
+    	ReplaceBlockEntry targetsAtHeight = targetsAtHeights[y];
+    	if(targetsAtHeight == null)
+    	{
+    		return material;
+    	}
+    	LocalMaterialData replaceToMaterial = targetsAtHeight.targetsWithoutBlockData.get(material.hashCodeWithoutBlockData());
+    	if(replaceToMaterial != null)
+    	{
+    		return replaceToMaterial;
+    	}
+    	replaceToMaterial = targetsAtHeight.targetsWithBlockData.get(material.hashCode());
+    	if(replaceToMaterial != null)
+    	{
+    		return replaceToMaterial;
+    	}
+    	return material;
     }
 
     /**
@@ -190,8 +330,8 @@ public class ReplacedBlocksMatrix
         for (ReplacedBlocksInstruction instruction : getInstructions())
         {
             builder.append('(');
-            builder.append(instruction.getFrom());
-            builder.append(',').append(instruction.getTo());
+            builder.append(instruction.from);
+            builder.append(',').append(instruction.to);
             if (instruction.getMinHeight() != 0 || instruction.getMaxHeight() != this.maxHeight)
             {
                 // Add custom height setting

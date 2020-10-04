@@ -133,8 +133,7 @@ public class TreeGen extends Resource
                         {
                     		if(OTG.getPluginConfig().spawnLog)
                     		{
-                    			BiomeConfig biomeConfig = world.getBiome(chunkCoord.getChunkX() * 16 + 15, chunkCoord.getChunkZ() * 16 + 15).getBiomeConfig();
-                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree in biome " + biomeConfig.getName() + ". BO3: " + treeNames.get(treeNumber));
+                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + treeNames.get(treeNumber));
                     		}
                     		continue;
                         }                    
@@ -161,8 +160,7 @@ public class TreeGen extends Resource
                         {
                     		if(OTG.getPluginConfig().spawnLog)
                     		{
-                    			BiomeConfig biomeConfig = world.getBiome(chunkCoord.getChunkX() * 16 + 15, chunkCoord.getChunkZ() * 16 + 15).getBiomeConfig();
-                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree in biome " + biomeConfig.getName() + ". BO3: " + treeNames.get(treeNumber));
+                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + treeNames.get(treeNumber));
                     		}
                     		continue;
                         }                        	        		

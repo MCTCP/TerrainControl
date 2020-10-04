@@ -138,13 +138,15 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
                     	IOHelper.deleteRecursive(dimensionsDataFile);
                     }
                     
-                    File structureDataFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.StructureDataFileName);
+                    // Legacy
+                    File structureDataFile = new File(worldDir.getAbsolutePath() + File.separator + "StructureData.txt");
                     if (structureDataFile.exists())
                     {
                     	IOHelper.deleteRecursive(structureDataFile);
                     }
                     
-                    File nullChunksFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.NullChunksFileName);
+                    // Legacy
+                    File nullChunksFile = new File(worldDir.getAbsolutePath() + File.separator + "NullChunks.txt");
                     if (nullChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(nullChunksFile);
@@ -156,7 +158,8 @@ public class OTGGuiWorldSelection extends GuiScreen implements GuiYesNoCallback
                     	IOHelper.deleteRecursive(spawnedStructuresFile);
                     }
 
-                    File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + File.separator + WorldStandardValues.ChunkProviderPopulatedChunksFileName);
+                    // Legacy
+                    File chunkProviderPopulatedChunksFile = new File(worldDir.getAbsolutePath() + File.separator + "ChunkProviderPopulatedChunks.txt");
                     if (chunkProviderPopulatedChunksFile.exists())
                     {
                     	IOHelper.deleteRecursive(chunkProviderPopulatedChunksFile);

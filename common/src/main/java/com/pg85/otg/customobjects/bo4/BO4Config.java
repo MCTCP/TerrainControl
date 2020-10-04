@@ -109,7 +109,7 @@ public class BO4Config extends CustomObjectConfigFile
     public String replaceWithStoneBlock;
     // Define a group that this BO3 belongs to and a range in chunks that members of this group should have to each other
     private String bo3Group;
-    public HashMap<String, Integer> bo3Groups;
+    public HashMap<String, Integer> bo4Groups;
     // If this is set to true then this BO3 can spawn on top of or inside other BO3's
     public boolean canOverride;
 
@@ -1208,7 +1208,7 @@ public class BO4Config extends CustomObjectConfigFile
         this.replaceWithStoneBlock = readSettings(BO4Settings.REPLACEWITHSTONEBLOCK);
         
         this.bo3Group = readSettings(BO4Settings.BO3GROUP);
-        this.bo3Groups = new HashMap<String, Integer>();
+        this.bo4Groups = new HashMap<String, Integer>();
         if(this.bo3Group != null && this.bo3Group.trim().length() > 0)
         {
 	        String[] groupStrings = this.bo3Group.split(",");
@@ -1219,7 +1219,7 @@ public class BO4Config extends CustomObjectConfigFile
 	            	String[] groupString = groupStrings[i].trim().length() > 0 ? groupStrings[i].split(":") : null;
 	            	if(groupString != null && groupString.length == 2)
 	            	{
-	            		this.bo3Groups.put(groupString[0].trim(), Integer.parseInt(groupString[1].trim()));
+	            		this.bo4Groups.put(groupString[0].trim(), Integer.parseInt(groupString[1].trim()));
 	            	}
 	        	}
 	        }
@@ -1590,6 +1590,42 @@ public class BO4Config extends CustomObjectConfigFile
         stream.writeBoolean(this.isSpawnPoint);        
         stream.writeBoolean(this.isCollidable);
 
+        stream.writeInt(this.branchesOTGPlus.length);
+        for(BO4BranchFunction func : Arrays.asList(this.branchesOTGPlus))
+        {
+        	if(func instanceof BO4WeightedBranchFunction)
+        	{
+        		stream.writeBoolean(true); // false For BO4BranchFunction, true for BO4WeightedBranchFunction
+        	} else {
+        		stream.writeBoolean(false); // false For BO4BranchFunction, true for BO4WeightedBranchFunction
+        	}
+        	func.writeToStream(stream);
+        }
+        
+        stream.writeInt(this.entityDataOTGPlus.length);
+        for(BO4EntityFunction func : Arrays.asList(this.entityDataOTGPlus))
+        {
+        	func.writeToStream(stream);
+        }
+        
+        stream.writeInt(this.particleDataOTGPlus.length);
+        for(BO4ParticleFunction func : Arrays.asList(this.particleDataOTGPlus))
+        {
+        	func.writeToStream(stream);
+        }
+
+        stream.writeInt(this.spawnerDataOTGPlus.length);
+        for(BO4SpawnerFunction func : Arrays.asList(this.spawnerDataOTGPlus))
+        {
+        	func.writeToStream(stream);
+        }
+
+        stream.writeInt(this.modDataOTGPlus.length);
+        for(BO4ModDataFunction func : Arrays.asList(this.modDataOTGPlus))
+        {
+        	func.writeToStream(stream);
+        }        
+        
         ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
         ArrayList<String> metaDataNames = new ArrayList<String>();
         int randomBlockCount = 0;
@@ -1718,42 +1754,6 @@ public class BO4Config extends CustomObjectConfigFile
 		        }        	
 	        }
         }
-        
-        stream.writeInt(this.branchesOTGPlus.length);
-        for(BO4BranchFunction func : Arrays.asList(this.branchesOTGPlus))
-        {
-        	if(func instanceof BO4WeightedBranchFunction)
-        	{
-        		stream.writeBoolean(true); // false For BO4BranchFunction, true for BO4WeightedBranchFunction
-        	} else {
-        		stream.writeBoolean(false); // false For BO4BranchFunction, true for BO4WeightedBranchFunction
-        	}
-        	func.writeToStream(stream);
-        }
-        
-        stream.writeInt(this.entityDataOTGPlus.length);
-        for(BO4EntityFunction func : Arrays.asList(this.entityDataOTGPlus))
-        {
-        	func.writeToStream(stream);
-        }
-        
-        stream.writeInt(this.particleDataOTGPlus.length);
-        for(BO4ParticleFunction func : Arrays.asList(this.particleDataOTGPlus))
-        {
-        	func.writeToStream(stream);
-        }
-
-        stream.writeInt(this.spawnerDataOTGPlus.length);
-        for(BO4SpawnerFunction func : Arrays.asList(this.spawnerDataOTGPlus))
-        {
-        	func.writeToStream(stream);
-        }
-
-        stream.writeInt(this.modDataOTGPlus.length);
-        for(BO4ModDataFunction func : Arrays.asList(this.modDataOTGPlus))
-        {
-        	func.writeToStream(stream);
-        }
     }
 
     public BO4Config readFromBO4DataFile(boolean getBlocks)
@@ -1857,7 +1857,7 @@ public class BO4Config extends CustomObjectConfigFile
 	    	        }
 	            }
 	            
-	            this.bo3Groups = new HashMap<String, Integer>();
+	            this.bo4Groups = new HashMap<String, Integer>();
 	            if(this.bo3Group != null && this.bo3Group.trim().length() > 0)
 	            {
 	    	        String[] groupStrings = this.bo3Group.split(",");
@@ -1868,7 +1868,7 @@ public class BO4Config extends CustomObjectConfigFile
 	    	            	String[] groupString = groupStrings[i].trim().length() > 0 ? groupStrings[i].split(":") : null;
 	    	            	if(groupString != null && groupString.length == 2)
 	    	            	{
-	    	            		this.bo3Groups.put(groupString[0].trim(), Integer.parseInt(groupString[1].trim()));
+	    	            		this.bo4Groups.put(groupString[0].trim(), Integer.parseInt(groupString[1].trim()));
 	    	            	}
 	    	        	}
 	    	        }
@@ -1924,108 +1924,7 @@ public class BO4Config extends CustomObjectConfigFile
 	    	        	}
 	    	        }
 	            }
-				            
-				// Reconstruct blocks
-				short metaDataNamesArrLength = buffer.getShort();
-				String[] metaDataNames = new String[metaDataNamesArrLength];
-		        for(int i = 0; i < metaDataNamesArrLength; i++)
-		        {
-		        	metaDataNames[i] = StreamHelper.readStringFromBuffer(buffer);
-		        }
-		        
-		        short blocksArrArrLength = buffer.getShort();
-		        LocalMaterialData[] blocksArr = new LocalMaterialData[blocksArrArrLength];
-		        for(int i = 0; i < blocksArrArrLength; i++)
-		        {
-		        	String materialName = StreamHelper.readStringFromBuffer(buffer);
-		        	try {
-						blocksArr[i] = MaterialHelper.readMaterial(materialName);
-					} catch (InvalidConfigException e) {
-						if(OTG.getPluginConfig().spawnLog)
-						{
-							OTG.log(LogMarker.WARN, "Could not read material \"" + materialName + "\" for BO4 \"" + this.getName() + "\"");
-							e.printStackTrace();
-						}
-					}
-		        }
-		        
-		        short[][] columnSizes = new short[xSize][zSize];
-		               
-		        // TODO: This assumes that loading blocks in a different order won't matter, which may not be true?
-		        // Anything that spawns on top, entities/spawners etc, should be spawned last tho, so shouldn't be a problem?
-		        int nonRandomBlockCount = buffer.getInt();
-		        int nonRandomBlockIndex = 0;
-		        ArrayList<BO4BlockFunction> nonRandomBlocks = new ArrayList<BO4BlockFunction>();
-		        if(nonRandomBlockCount > 0)
-		        {
-			        for(int x = this.getminX(); x < xSize; x++)
-			        {
-			        	for(int z = this.getminZ(); z < zSize; z++)
-			        	{
-				        	short blocksInColumnSize = buffer.getShort();
-				        	for(int j = 0; j < blocksInColumnSize; j++)
-				        	{
-				        		columnSizes[x][z]++;
-				        		nonRandomBlocks.add(BO4BlockFunction.fromStream(x, z, metaDataNames, blocksArr, this, buffer));
-				        		nonRandomBlockIndex++;
-				        		if(nonRandomBlockCount == nonRandomBlockIndex)
-				        		{
-				        			break;
-				        		}
-				        	}
-			        		if(nonRandomBlockCount == nonRandomBlockIndex)
-			        		{
-			        			break;
-			        		}
-			        	}
-		        		if(nonRandomBlockCount == nonRandomBlockIndex)
-		        		{
-		        			break;
-		        		}
-			        }
-		        }		       
-		        		        
-		        int randomBlockCount = buffer.getInt();
-		        int randomBlockIndex = 0;
-		        ArrayList<BO4RandomBlockFunction> randomBlocks = new ArrayList<BO4RandomBlockFunction>();
-		        if(randomBlockCount > 0)
-		        {
-			        for(int x = this.getminX(); x < xSize; x++)
-			        {
-			        	for(int z = this.getminZ(); z < zSize; z++)
-			        	{
-			        		short blocksInColumnSize = buffer.getShort();
-				        	for(int j = 0; j < blocksInColumnSize; j++)
-				        	{
-				        		columnSizes[x][z]++;
-				        		randomBlocks.add(BO4RandomBlockFunction.fromStream(x, z, metaDataNames, blocksArr, this, buffer));
-				        		randomBlockIndex++;
-				        		if(randomBlockCount == randomBlockIndex)
-				        		{
-				        			break;
-				        		}
-				        	}
-			        		if(randomBlockCount == randomBlockIndex)
-			        		{
-			        			break;
-			        		}
-			        	}
-		        		if(randomBlockCount == randomBlockIndex)
-		        		{
-		        			break;
-		        		}
-			        }
-		        }
-		        		        
-				ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();				
-				newBlocks.addAll(nonRandomBlocks);
-				newBlocks.addAll(randomBlocks);
-				
-				if(getBlocks)
-				{
-					loadBlockArrays(newBlocks, columnSizes);
-				}
-								
+
 		        int branchesOTGPlusLength = buffer.getInt();
 		        boolean branchType;
 		        BO4BranchFunction branch;
@@ -2070,7 +1969,107 @@ public class BO4Config extends CustomObjectConfigFile
 		        {
 		        	this.modDataOTGPlus[i] = BO4ModDataFunction.fromStream(this, buffer);
 		        }
+	            
+				// Reconstruct blocks
+		        if(getBlocks)
+		        {
+					short metaDataNamesArrLength = buffer.getShort();
+					String[] metaDataNames = new String[metaDataNamesArrLength];
+			        for(int i = 0; i < metaDataNamesArrLength; i++)
+			        {
+			        	metaDataNames[i] = StreamHelper.readStringFromBuffer(buffer);
+			        }
+			        
+			        short blocksArrArrLength = buffer.getShort();
+			        LocalMaterialData[] blocksArr = new LocalMaterialData[blocksArrArrLength];
+			        for(int i = 0; i < blocksArrArrLength; i++)
+			        {
+			        	String materialName = StreamHelper.readStringFromBuffer(buffer);
+			        	try {
+							blocksArr[i] = MaterialHelper.readMaterial(materialName);
+						} catch (InvalidConfigException e) {
+							if(OTG.getPluginConfig().spawnLog)
+							{
+								OTG.log(LogMarker.WARN, "Could not read material \"" + materialName + "\" for BO4 \"" + this.getName() + "\"");
+								e.printStackTrace();
+							}
+						}
+			        }
+			        
+			        short[][] columnSizes = new short[xSize][zSize];
+			               
+			        // TODO: This assumes that loading blocks in a different order won't matter, which may not be true?
+			        // Anything that spawns on top, entities/spawners etc, should be spawned last tho, so shouldn't be a problem?
+			        int nonRandomBlockCount = buffer.getInt();
+			        int nonRandomBlockIndex = 0;
+			        ArrayList<BO4BlockFunction> nonRandomBlocks = new ArrayList<BO4BlockFunction>();
+			        if(nonRandomBlockCount > 0)
+			        {
+				        for(int x = this.getminX(); x < xSize; x++)
+				        {
+				        	for(int z = this.getminZ(); z < zSize; z++)
+				        	{
+					        	short blocksInColumnSize = buffer.getShort();
+					        	for(int j = 0; j < blocksInColumnSize; j++)
+					        	{
+					        		columnSizes[x][z]++;
+					        		nonRandomBlocks.add(BO4BlockFunction.fromStream(x, z, metaDataNames, blocksArr, this, buffer));
+					        		nonRandomBlockIndex++;
+					        		if(nonRandomBlockCount == nonRandomBlockIndex)
+					        		{
+					        			break;
+					        		}
+					        	}
+				        		if(nonRandomBlockCount == nonRandomBlockIndex)
+				        		{
+				        			break;
+				        		}
+				        	}
+			        		if(nonRandomBlockCount == nonRandomBlockIndex)
+			        		{
+			        			break;
+			        		}
+				        }
+			        }		       
+			        		        
+			        int randomBlockCount = buffer.getInt();
+			        int randomBlockIndex = 0;
+			        ArrayList<BO4RandomBlockFunction> randomBlocks = new ArrayList<BO4RandomBlockFunction>();
+			        if(randomBlockCount > 0)
+			        {
+				        for(int x = this.getminX(); x < xSize; x++)
+				        {
+				        	for(int z = this.getminZ(); z < zSize; z++)
+				        	{
+				        		short blocksInColumnSize = buffer.getShort();
+					        	for(int j = 0; j < blocksInColumnSize; j++)
+					        	{
+					        		columnSizes[x][z]++;
+					        		randomBlocks.add(BO4RandomBlockFunction.fromStream(x, z, metaDataNames, blocksArr, this, buffer));
+					        		randomBlockIndex++;
+					        		if(randomBlockCount == randomBlockIndex)
+					        		{
+					        			break;
+					        		}
+					        	}
+				        		if(randomBlockCount == randomBlockIndex)
+				        		{
+				        			break;
+				        		}
+				        	}
+			        		if(randomBlockCount == randomBlockIndex)
+			        		{
+			        			break;
+			        		}
+				        }
+			        }
+			        		        
+					ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();				
+					newBlocks.addAll(nonRandomBlocks);
+					newBlocks.addAll(randomBlocks);
 				
+					loadBlockArrays(newBlocks, columnSizes);
+		        }
 			}
 	    	catch (IOException e1)
 	    	{

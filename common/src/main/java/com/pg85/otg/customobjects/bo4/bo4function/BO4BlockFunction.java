@@ -27,10 +27,10 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
     	this.holder = holder;
     }
     	
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    @Override
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
-        material.parseForWorld(world);
-        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated);
+        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, true);
     }
     
     public BO4BlockFunction rotate(Rotation rotation)
@@ -111,7 +111,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
         	stream.writeShort(-1);
         }
     }
-    
+        
     public static BO4BlockFunction fromStream(int x, int z, String[] metaDataNames, LocalMaterialData[] materials, BO4Config holder, ByteBuffer buffer) throws IOException
     {
     	BO4BlockFunction rbf = new BO4BlockFunction(holder);

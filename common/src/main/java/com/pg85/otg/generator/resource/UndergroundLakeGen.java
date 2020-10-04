@@ -136,10 +136,10 @@ public class UndergroundLakeGen extends Resource
                         if (materialBelow != null && materialBelow.isAir())
                         {
                             // Air block, also set position above to air
-                            world.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingPopulated);
+                            world.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingPopulated, false);
                         } else {
                             // Not air, set position above to water
-                            world.setBlock(xLake, yLake, zLake, material, null, chunkBeingPopulated);
+                            world.setBlock(xLake, yLake, zLake, material, null, chunkBeingPopulated, false);
                         }
                     }
                 }

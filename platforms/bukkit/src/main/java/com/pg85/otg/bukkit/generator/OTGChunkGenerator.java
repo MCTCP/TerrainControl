@@ -6,6 +6,7 @@ import com.pg85.otg.bukkit.materials.BukkitMaterialData;
 import com.pg85.otg.bukkit.util.NBTHelper;
 import com.pg85.otg.bukkit.world.BukkitWorld;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkProviderOTG;
@@ -31,14 +32,15 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.material.MaterialData;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 
 public class OTGChunkGenerator extends ChunkGenerator
 {
     private DataConverter dataConverter;
-    //private Chunk[] chunkCache;
     private ChunkProviderOTG chunkProviderOTG;
     // Why does the chunk generator require multiple block populators, each with their own ObjectSpawner instance? For multiple dims?
     private ArrayList<BlockPopulator> BlockPopulator = new ArrayList<BlockPopulator>();
@@ -49,10 +51,12 @@ public class OTGChunkGenerator extends ChunkGenerator
     // Caches
 	private FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
 	private FifoMap<ChunkCoordinate, ChunkData> unloadedChunksCache;
-	private FifoMap<ChunkCoordinate, Chunk> lastUsedChunks;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk1;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk2;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk3;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk4;
 	Object chunkCacheLock = new Object();
     //
-
     
     public OTGChunkGenerator(OTGPlugin _plugin, BukkitWorld world)
     {
@@ -63,7 +67,10 @@ public class OTGChunkGenerator extends ChunkGenerator
         // Worlds with lots of BO4's and large smoothing areas may want to increase this. 
         this.unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
         this.unloadedChunksCache = new FifoMap<ChunkCoordinate, ChunkData>(128);
-        this.lastUsedChunks = new FifoMap<ChunkCoordinate, Chunk>(4);
+    	lastUsedChunk1 = null;
+    	lastUsedChunk2 = null;
+    	lastUsedChunk3 = null;
+    	lastUsedChunk4 = null; 
     }
     
 	// Called by /otg flush command to clear memory.
@@ -72,7 +79,10 @@ public class OTGChunkGenerator extends ChunkGenerator
     {
     	synchronized(this.chunkCacheLock)
     	{
-	    	this.lastUsedChunks.clear();
+        	lastUsedChunk1 = null;
+        	lastUsedChunk2 = null;
+        	lastUsedChunk3 = null;
+        	lastUsedChunk4 = null; 
 	   		this.unloadedBlockColumnsCache.clear();
 	   		this.unloadedChunksCache.clear();
     	}
@@ -82,7 +92,22 @@ public class OTGChunkGenerator extends ChunkGenerator
     {
     	synchronized(this.chunkCacheLock)
     	{
-    		this.lastUsedChunks.remove(chunkCoordinate);
+    		if(lastUsedChunk1 != null && lastUsedChunk1.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk1 = null;
+    		}
+    		else if(lastUsedChunk2 != null && lastUsedChunk2.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk2 = null;
+    		}
+    		else if(lastUsedChunk3 != null && lastUsedChunk3.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk3 = null;
+    		}
+    		else if(lastUsedChunk4 != null && lastUsedChunk4.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk4 = null;
+    		}
     	}
     }
     
@@ -178,10 +203,25 @@ public class OTGChunkGenerator extends ChunkGenerator
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
         
-        Chunk chunk;
+        Chunk chunk = null;
     	synchronized(this.chunkCacheLock)
     	{
-    		chunk = this.lastUsedChunks.get(chunkCoord);
+    		if(lastUsedChunk1 != null && lastUsedChunk1.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk1.getValue();
+    		}
+    		else if(lastUsedChunk2 != null && lastUsedChunk2.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk2.getValue();
+    		}
+    		else if(lastUsedChunk3 != null && lastUsedChunk3.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk3.getValue();
+    		}
+    		else if(lastUsedChunk4 != null && lastUsedChunk4.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk4.getValue();
+    		}
     	}
         if(chunk == null)
         {
@@ -197,24 +237,22 @@ public class OTGChunkGenerator extends ChunkGenerator
 	        {
 	        	synchronized(this.chunkCacheLock)
 	        	{
-		        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        		lastUsedChunk4 = lastUsedChunk3;
+	        		lastUsedChunk3 = lastUsedChunk2;
+	        		lastUsedChunk2 = lastUsedChunk1;
+	        		lastUsedChunk1 = new AbstractMap.SimpleEntry<ChunkCoordinate, Chunk>(chunkCoord, chunk);
 	        	}
 	        }
         }
-
     	return chunk;    
-    }
-   
-    public void startPopulation(ChunkCoordinate chunkCoord) { }
-
-    public void endPopulation() { }
+    }   
     
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, BiomeConfig biomeConfig)
     {
         if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
         {
             return;
-        }
+        }     
     	
         try
         {
@@ -398,6 +436,11 @@ public class OTGChunkGenerator extends ChunkGenerator
         unloadedBlockColumnsCache.put(blockPos, cachedColumn);		
         return blocksInColumn;
     }
+    
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	return this.chunkProviderOTG.getBiomeBlocksNoiseValue(blockX, blockZ);
+    }    
     
     public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
     {

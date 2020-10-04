@@ -10,7 +10,8 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 //TODO: Clean up and optimise ForgeMaterialData/BukkitMaterialData/LocalMaterialData/MaterialHelper/OTGEngine.readMaterial
 public class MaterialHelper
 {
-    private static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096);
+	// Materials are stored in a cache for fast parsing from config (txt) files, each material should exist only once.
+    private static FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096); // TODO: This is probably too large, makes lookups slow.
     
     public static final LocalMaterialData AIR = MaterialHelper.toLocalMaterialData(DefaultMaterial.AIR, 0);
     public static final LocalMaterialData SANDSTONE = MaterialHelper.toLocalMaterialData(DefaultMaterial.SANDSTONE, 0);
@@ -43,8 +44,7 @@ public class MaterialHelper
     	{
     		return null;
     	}
-    	
-    	// TODO: Make sure it won't cause problems to return the same material object multiple times, is it not changed anywhere?
+
     	LocalMaterialData material = CachedMaterials.get(name);
     	if(material != null)
     	{
@@ -87,7 +87,7 @@ public class MaterialHelper
     		String breakpoint = "";
     	}
 
-    	CachedMaterials.put(originalName, material);
+		CachedMaterials.put(originalName, material);
 
         return material;
     }
@@ -97,7 +97,7 @@ public class MaterialHelper
      */
     public static LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData)
     {
-        return OTG.getEngine().toLocalMaterialData(defaultMaterial, blockData);
+        return OTG.getEngine().toLocalMaterialData(defaultMaterial, blockData); // Never used when parsing blocks from configs(?), so never source block
     }
 
 	public static boolean isOre(LocalMaterialData material)
