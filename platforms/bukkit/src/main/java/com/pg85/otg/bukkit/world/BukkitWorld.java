@@ -9,17 +9,14 @@ import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.Entity;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftGuardian;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
 import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.LightningStrike;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
@@ -1280,7 +1277,7 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	private Entity createEntityFromData(EntityFunction<?> entityData) {
-        Entity entity;
+        Entity entity = null;
         NBTTagCompound nbttagcompound = new NBTTagCompound();
 
         if(entityData.getMetaData() != null && entityData.getMetaData().trim().length() > 0)
@@ -1313,9 +1310,15 @@ public class BukkitWorld implements LocalWorld
                 entity.setHeadRotation(nbttagcompound.getByte("Rotation"));
             }
         } else {
-            // Create a default entity from the given mob type
-            nbttagcompound.setString("id", entityData.resourceLocation);
-            entity = ChunkRegionLoader.spawnEntity(nbttagcompound, world, entityData.x+0.5, entityData.y, entityData.z+0.5, true, CreatureSpawnEvent.SpawnReason.CUSTOM);
+            try
+            {
+                org.bukkit.entity.Entity e = world.getWorld().spawn(new Location(world.getWorld(), entityData.x+0.5, entityData.y+0.0, entityData.z+0.5), EntityType.fromName(entityData.name).getEntityClass());
+                //entity = (Entity) EntityType.fromName(entityData.name).getEntityClass().getConstructor(new Class[] {World.class}).newInstance(world);
+                entity = world.getEntity( e.getUniqueId());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
         if(OTG.getPluginConfig().spawnLog)
         {

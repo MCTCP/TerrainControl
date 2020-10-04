@@ -94,9 +94,9 @@ public enum EntityNames
     XP_BOTTLE("xp_bottle","xpbottle", "thrownexpbottle"),
     XP_ORB("xp_orb", "xp_orb", "experienceorb"),
     ZOMBIE("zombie", "zombie"),
-    ZOMBIE_HORSE("zombie_horse", "zombiehorse"),
+    ZOMBIE_HORSE("zombie_horse", "zombiehorse", "horsezombie"),
     ZOMBIE_PIGMAN("zombie_pigman", "zombiepigman", "pigzombie"),
-    ZOMBIE_VILLAGER("zombie_villager", "zombievillager");
+    ZOMBIE_VILLAGER("zombie_villager", "zombievillager", "villagerzombie");
    
     // Contains all aliases (alias, internalName)
     private static Map<String, String> MobAliases = new HashMap<String, String>();

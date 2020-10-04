@@ -39,9 +39,7 @@ import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.*;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.init.Blocks;
@@ -1357,6 +1355,10 @@ public class ForgeWorld implements LocalWorld
             // Create a default entity from the given mob type
             nbttagcompound.setString("id", entityData.resourceLocation);
             entity = AnvilChunkLoader.readWorldEntityPos(nbttagcompound, world, entityData.x + 0.5, entityData.y, entityData.z + 0.5, true);
+            if (entity instanceof EntityLiving) {
+                ((EntityLiving)entity).onInitialSpawn(world.getDifficultyForLocation(
+                                new BlockPos(entityData.x, entityData.y, entityData.z)),(IEntityLivingData)null);
+            }
             if (entity == null)
                 return null;
         }
