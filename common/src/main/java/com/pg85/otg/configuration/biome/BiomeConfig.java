@@ -34,6 +34,14 @@ import java.util.*;
 
 public class BiomeConfig extends ConfigFile
 {
+    public enum enumBiomeConfigMaterial
+    {
+    	WATER_BLOCK,
+    	ICE_BLOCK,
+    	COOLED_LAVA_BLOCK,
+    	STONE_BLOCK
+    }
+	
     private StandardBiomeTemplate defaultSettings;
     public WorldConfig worldConfig;
 	
@@ -69,6 +77,8 @@ public class BiomeConfig extends ConfigFile
     private LocalMaterialData stoneBlock;
     private LocalMaterialData surfaceBlock;
     private LocalMaterialData groundBlock;
+    private LocalMaterialData sandStoneBlock;
+    private LocalMaterialData redSandStoneBlock;
     public ReplacedBlocksMatrix replacedBlocks;
     public SurfaceGenerator surfaceAndGroundControl;
 
@@ -333,22 +343,26 @@ public class BiomeConfig extends ConfigFile
         this.biomeVolatility = settings.getSetting(BiomeStandardValues.BIOME_VOLATILITY, defaultSettings.defaultBiomeVolatility);
         this.smoothRadius = settings.getSetting(BiomeStandardValues.SMOOTH_RADIUS);
         this.CHCSmoothRadius = settings.getSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS);
-
+        
         this.stoneBlock = settings.getSetting(BiomeStandardValues.STONE_BLOCK);
         this.surfaceBlock = settings.getSetting(BiomeStandardValues.SURFACE_BLOCK,
                 MaterialHelper.toLocalMaterialData(defaultSettings.defaultSurfaceBlock, 0));
         this.groundBlock = settings.getSetting(BiomeStandardValues.GROUND_BLOCK,
                 MaterialHelper.toLocalMaterialData(defaultSettings.defaultGroundBlock, 0));
+        this.configWaterBlock = settings.getSetting(BiomeStandardValues.WATER_BLOCK);
+        this.configIceBlock = settings.getSetting(BiomeStandardValues.ICE_BLOCK);
+        this.configCooledLavaBlock = settings.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK);
         this.replacedBlocks = settings.getSetting(BiomeStandardValues.REPLACED_BLOCKS);
-        this.replacedBlocks.init(this.iceBlock, this.waterBlock, this.stoneBlock, this.groundBlock, this.surfaceBlock, this.worldConfig.getDefaultBedrockBlock());
+
+        this.sandStoneBlock = MaterialHelper.SANDSTONE;
+        this.redSandStoneBlock = MaterialHelper.RED_SANDSTONE;
+
+        this.replacedBlocks.init(this.useWorldWaterLevel ? worldConfig.cooledLavaBlock : this.configCooledLavaBlock, this.useWorldWaterLevel ? worldConfig.iceBlock : this.configIceBlock, this.useWorldWaterLevel ? worldConfig.waterBlock : this.configWaterBlock, this.stoneBlock, this.groundBlock, this.surfaceBlock, this.worldConfig.getDefaultBedrockBlock(), this.sandStoneBlock, this.redSandStoneBlock);
         this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings(settings);
 
         this.useWorldWaterLevel = settings.getSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL);
         this.configWaterLevelMax = settings.getSetting(BiomeStandardValues.WATER_LEVEL_MAX);
         this.configWaterLevelMin = settings.getSetting(BiomeStandardValues.WATER_LEVEL_MIN);
-        this.configWaterBlock = settings.getSetting(BiomeStandardValues.WATER_BLOCK);
-        this.configIceBlock = settings.getSetting(BiomeStandardValues.ICE_BLOCK);
-        this.configCooledLavaBlock = settings.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK);
 
         this.skyColor = settings.getSetting(BiomeStandardValues.SKY_COLOR);
         this.waterColor = settings.getSetting(BiomeStandardValues.WATER_COLOR, defaultSettings.defaultWaterColorMultiplier);
@@ -1210,8 +1224,10 @@ public class BiomeConfig extends ConfigFile
     	return this.groundBlock;
     }
     
+	// TODO: Optimise BO4, make it use replacedBlocks.replacesStoneBlock
+	// instead of replacing stone as a generic block during setBlock.
 	public LocalMaterialData getDefaultStoneBlock()
-	{		
+	{
 		return this.stoneBlock;
 	}
 	
@@ -1220,11 +1236,15 @@ public class BiomeConfig extends ConfigFile
 		return this.waterBlock;
 	}
 	
+	// TODO: Optimise FrozenSurfaceHelper, make it use replacedBlocks.replacesIce
+	// instead of replacing ice as a generic block during setBlock.
 	public LocalMaterialData getDefaultIceBlock()
 	{
 		return this.iceBlock;
 	}
 
+	// TODO: Optimise FrozenSurfaceHelper, make it use replacedBlocks.replacesCooledLavaBlock
+	// instead of replacing ice as a generic block during setBlock.	
 	public LocalMaterialData getDefaultCooledLavaBlock()
 	{
 		return this.cooledLavaBlock;
@@ -1238,7 +1258,16 @@ public class BiomeConfig extends ConfigFile
 	public boolean replacesDefaultStoneBlock()
 	{
 		return this.replacedBlocks.replacesStone;
-	}
+	}	
+	
+	public LocalMaterialData getCooledLavaBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesCooledLava)
+		{
+			return this.cooledLavaBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.cooledLavaBlock;
+	}	
 	
 	public LocalMaterialData getIceBlockReplaced(LocalWorld localWorld, int y)
 	{
@@ -1283,5 +1312,23 @@ public class BiomeConfig extends ConfigFile
 			return this.surfaceBlock.parseWithBiomeAndHeight(localWorld, this, y);
 		}
 		return this.surfaceBlock;
+	}
+	
+	public LocalMaterialData getSandStoneBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesSandStone)
+		{
+			return this.sandStoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.sandStoneBlock;
+	}
+	
+	public LocalMaterialData getRedSandStoneBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesRedSandStone)
+		{
+			return this.redSandStoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.redSandStoneBlock;
 	}
 }

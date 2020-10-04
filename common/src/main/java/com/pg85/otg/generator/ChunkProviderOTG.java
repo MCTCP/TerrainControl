@@ -273,14 +273,19 @@ public class ChunkProviderOTG
                                 newY = y * 8 + piece_y;
                                 if (newY < waterLevelMax && newY > biomeConfig.waterLevelMin)
                                 {
+                                	// TODO: Setting replaced blocks here might cause problems for mods
+                                	// that check for biome.waterblock during the replaceBiomeBlocks event.
                                 	block = biomeConfig.getWaterBlockReplaced(this.localWorld, newY);
+                                	chunkBuffer.setHighestBlockForColumn(piece_x + x1 * 4, z1 * 4 + piece_z, newY);
                                 }
-
                                 if (d16 > 0.0D)
                                 {
+                                	// TODO: Setting replaced blocks here might cause problems for mods
+                                	// that check for biome.stoneblock during the replaceBiomeBlocks event.
                                 	block = biomeConfig.getStoneBlockReplaced(this.localWorld, newY);
+                                	chunkBuffer.setHighestBlockForColumn(piece_x + x1 * 4, z1 * 4 + piece_z, newY);
                                 }
-                                
+                                                                
                                 chunkBuffer.setBlock(piece_x + x1 * 4, newY, z1 * 4 + piece_z, block);                                
                                 d16 += d17;
                             }
@@ -432,9 +437,7 @@ public class ChunkProviderOTG
                     noiseHeight -= maxAverageDepth;
                     noiseHeight /= 1.4D;
                     noiseHeight /= 2.0D;
-                }
-                else
-                {
+                } else {
                     if (noiseHeight > 1.0D)
                     {
                         noiseHeight = 1.0D;
@@ -449,14 +452,10 @@ public class ChunkProviderOTG
                     if (worldConfig.improvedRivers)
                     {
                         this.biomeFactorWithRivers(x, z, usedYSections, noiseHeight, biomeArray, riverArray);
-                    }
-                    else
-                    {
+                    } else {
                         this.biomeFactor(x, z, usedYSections, noiseHeight, biomeArray);
                     }
-                }
-                else
-                {
+                } else {
                     this.oldBiomeFactor(x, z, i2D, usedYSections, noiseHeight, biomeArray);
             	}
 
@@ -471,8 +470,7 @@ public class ChunkProviderOTG
                 {
                     // This function modifies the arrays directly, no need to set
                     smoothCHC(CHC, riverCHC, x, z, maxYSections, biomeArray);
-                }
-                else {
+                } else {
                     // If smoothing is not enabled, revert to the original CHC data
                     CHC = biomeConfig.heightMatrix;
                     riverCHC = biomeConfig.riverHeightMatrix;
@@ -488,8 +486,7 @@ public class ChunkProviderOTG
                     if (this.riverFound)
                     {
                         columnHeight = (this.riverHeight - y) * 12.0D * 128.0D / this.heightCap / this.riverVol;
-                    } else
-                    {
+                    } else {
                         columnHeight = (this.heightFactor - y) * 12.0D * 128.0D / this.heightCap / this.volatilityFactor;
                     }
 
@@ -510,8 +507,7 @@ public class ChunkProviderOTG
                     else if (noise > volatilityWeight2)
                     {
                         output = vol2;
-                    } else
-                    {
+                    } else {
                         output = vol1 + (vol2 - vol1) * noise;
                     }
 
@@ -529,8 +525,7 @@ public class ChunkProviderOTG
                     if (this.riverFound)
                     {
                     	output += riverCHC[Math.min(biomeConfig.riverHeightMatrix.length - 1, y)];
-                    } else
-                    {
+                    } else {
                     	output += CHC[Math.min(biomeConfig.heightMatrix.length - 1, y)];
                     }
 

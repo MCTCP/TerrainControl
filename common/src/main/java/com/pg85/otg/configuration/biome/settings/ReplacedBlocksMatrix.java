@@ -21,7 +21,7 @@ public class ReplacedBlocksMatrix
 	// TODO: After removing replaceblocks from localworld, clean this up.
 	
     private static final String NO_REPLACE = "None";
-
+    
     private class ReplaceBlockEntry
     {
     	public final HashMap<Integer,LocalMaterialData> targetsWithoutBlockData = new HashMap<Integer, LocalMaterialData>();
@@ -122,14 +122,16 @@ public class ReplacedBlocksMatrix
     private List<ReplacedBlocksInstruction> instructions;
     private final ReplaceBlockEntry[] targetsAtHeights;
     
+    public boolean replacesCooledLava = false;
 	public boolean replacesIce = false;
 	public boolean replacesWater = false;
 	public boolean replacesStone = false;
 	public boolean replacesGround = false;
 	public boolean replacesSurface = false;
 	public boolean replacesBedrock = false;
+	public boolean replacesSandStone = false;
+	public boolean replacesRedSandStone = false;
 
-    @SuppressWarnings("unchecked")
     public ReplacedBlocksMatrix(String setting, int maxHeight) throws InvalidConfigException
     {
         this.maxHeight = maxHeight;
@@ -186,14 +188,20 @@ public class ReplacedBlocksMatrix
         		// the end result in advance.
         		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithoutBlockData.entrySet())
         		{
-        			if(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
+        			if(
+    					(instruction.from.hasData() && instruction.from.hashCode() == entry.getValue().hashCode()) ||
+    					(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
+					)
         			{
         				entry.setValue(instruction.to);
         			}
         		}
         		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithBlockData.entrySet())
         		{
-        			if(instruction.from.hasData() &&  instruction.from.hashCode() == entry.getValue().hashCode())
+        			if(
+    					(instruction.from.hasData() &&  instruction.from.hashCode() == entry.getValue().hashCode()) ||
+        				(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
+    				)
         			{
         				entry.setValue(instruction.to);
         			}
@@ -208,34 +216,73 @@ public class ReplacedBlocksMatrix
         }
     }
     
-	public void init(LocalMaterialData biomeIceBlock, LocalMaterialData biomeWaterBlock, LocalMaterialData biomeStoneBlock, LocalMaterialData biomeGroundBlock, LocalMaterialData biomeSurfaceBlock, LocalMaterialData biomeBedrockBlock)
+	public void init(LocalMaterialData biomeCooledLavaBlock, LocalMaterialData biomeIceBlock, LocalMaterialData biomeWaterBlock, LocalMaterialData biomeStoneBlock, LocalMaterialData biomeGroundBlock, LocalMaterialData biomeSurfaceBlock, LocalMaterialData biomeBedrockBlock, LocalMaterialData biomeSandStoneBlock, LocalMaterialData biomeRedSandStoneBlock)
 	{
         // Fill maps for faster access
         for(ReplacedBlocksInstruction instruction : this.instructions)
-        {
-        	if(instruction.from.equals(biomeIceBlock))
+        {     
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeCooledLavaBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeCooledLavaBlock.hashCode() 
+			)
+        	{
+        		this.replacesCooledLava = true;
+        	}        	
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeIceBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeIceBlock.hashCode() 
+			)
         	{
         		this.replacesIce = true;
         	}
-        	if(instruction.from.equals(biomeWaterBlock))
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeWaterBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeWaterBlock.hashCode() 
+			)        		
         	{
         		this.replacesWater = true;
         	}
-        	if(instruction.from.equals(biomeStoneBlock))
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeStoneBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeStoneBlock.hashCode()
+			)
         	{
         		this.replacesStone = true;
         	}
-        	if(instruction.from.equals(biomeGroundBlock))
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeGroundBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeGroundBlock.hashCode()
+			)
         	{
         		this.replacesGround = true;
         	}
-        	if(instruction.from.equals(biomeSurfaceBlock))
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeSurfaceBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeSurfaceBlock.hashCode()
+			)        	
         	{
         		this.replacesSurface = true;
         	}
-        	if(instruction.from.equals(biomeBedrockBlock))
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeBedrockBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeBedrockBlock.hashCode()
+			)        	
         	{
         		this.replacesBedrock = true;
+        	}
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeSandStoneBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeSandStoneBlock.hashCode()
+			)        	
+        	{
+        		this.replacesSandStone = true;
+        	}
+        	if(
+    			!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeRedSandStoneBlock.hashCodeWithoutBlockData() : 
+				instruction.from.hashCode() == biomeRedSandStoneBlock.hashCode()
+			)        	
+        	{
+        		this.replacesRedSandStone = true;
         	}
         }
 	}
@@ -362,4 +409,20 @@ public class ReplacedBlocksMatrix
             throw new AssertionError(e);
         }
     }
+
+	public boolean replacesBlock(LocalMaterialData surfaceBlock)
+	{				
+        for(ReplacedBlocksInstruction instruction : this.instructions)
+        {
+        	if(
+    			instruction.getFrom().hasData() ? 
+    			surfaceBlock.hashCode() == instruction.from.hashCode() : 
+        		surfaceBlock.hashCodeWithoutBlockData() == instruction.from.hashCodeWithoutBlockData()
+    		)
+        	{
+        		return true;
+        	}
+        }
+    	return false;
+	}
 }
