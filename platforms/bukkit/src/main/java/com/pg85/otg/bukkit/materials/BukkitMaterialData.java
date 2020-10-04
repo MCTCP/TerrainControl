@@ -1,9 +1,11 @@
 package com.pg85.otg.bukkit.materials;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.Block;
@@ -406,8 +408,14 @@ public class BukkitMaterialData extends LocalMaterialData
         if (!this.checkedFallbacks && this.isEmpty() && this.rawEntry != null)
 		{
 			this.checkedFallbacks = true;
-			int newId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;
-			if(newId != this.combinedBlockId)
+            int newId;
+            try {
+                newId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;
+            } catch (NullPointerException e) {
+                OTG.log(LogMarker.ERROR, "Could not parse fallback for "+rawEntry);
+                throw e;
+            }
+            if(newId != this.combinedBlockId)
 			{
 				this.combinedBlockId = newId;
 				this.defaultMaterial = null;
