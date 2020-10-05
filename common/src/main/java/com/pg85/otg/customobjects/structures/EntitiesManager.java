@@ -56,7 +56,8 @@ public class EntitiesManager
             	newEntityData.x = coordObject.getX() + newEntityData.x;
             	newEntityData.z = coordObject.getZ() + newEntityData.z;
 
-            	newEntityData.mobName = entityDataInObject[i].mobName;
+            	newEntityData.name = entityDataInObject[i].name;
+            	newEntityData.resourceLocation = entityDataInObject[i].resourceLocation;
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
 
@@ -68,7 +69,8 @@ public class EntitiesManager
             	newEntityData.x = coordObject.getX() + entityDataInObject[i].x;
             	newEntityData.z = coordObject.getZ() + entityDataInObject[i].z;
 
-            	newEntityData.mobName = entityDataInObject[i].mobName;
+            	newEntityData.name = entityDataInObject[i].name;
+            	newEntityData.resourceLocation = entityDataInObject[i].resourceLocation;
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
 
