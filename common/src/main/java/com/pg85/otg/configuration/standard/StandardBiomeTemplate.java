@@ -13,7 +13,7 @@ import com.pg85.otg.generator.terrain.TerrainShapeBase;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-import com.pg85.otg.util.minecraft.defaults.MobNames;
+import com.pg85.otg.util.minecraft.defaults.EntityNames;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,22 +96,22 @@ public class StandardBiomeTemplate
     public boolean inheritSaplingResource = false;
     
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
-            new WeightedMobSpawnGroup(MobNames.SHEEP, 12, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.PIG, 10, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.CHICKEN, 10, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.COW, 8, 4, 4));
+            new WeightedMobSpawnGroup(EntityNames.SHEEP, 12, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.PIG, 10, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.CHICKEN, 10, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.COW, 8, 4, 4));
     public List<WeightedMobSpawnGroup> defaultMonsters = Arrays.asList(
-            new WeightedMobSpawnGroup(MobNames.SPIDER, 100, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.ZOMBIE, 100, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.SKELETON, 100, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.CREEPER, 100, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.SLIME, 100, 4, 4),
-            new WeightedMobSpawnGroup(MobNames.ENDERMAN, 10, 1, 4),
-            new WeightedMobSpawnGroup(MobNames.WITCH, 5, 1, 1));
+            new WeightedMobSpawnGroup(EntityNames.SPIDER, 100, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.ZOMBIE, 100, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.SKELETON, 100, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.CREEPER, 100, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.SLIME, 100, 4, 4),
+            new WeightedMobSpawnGroup(EntityNames.ENDERMAN, 10, 1, 4),
+            new WeightedMobSpawnGroup(EntityNames.WITCH, 5, 1, 1));
     public List<WeightedMobSpawnGroup> defaultAmbientCreatures = Collections.singletonList(
-            new WeightedMobSpawnGroup(MobNames.BAT, 10, 8, 8));
+            new WeightedMobSpawnGroup(EntityNames.BAT, 10, 8, 8));
     public List<WeightedMobSpawnGroup> defaultWaterCreatures = Collections.singletonList(
-            new WeightedMobSpawnGroup(MobNames.SQUID, 10, 4, 4));
+            new WeightedMobSpawnGroup(EntityNames.SQUID, 10, 4, 4));
 
     public StandardBiomeTemplate(int worldHeight)
     {

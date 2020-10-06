@@ -2,7 +2,7 @@ package com.pg85.otg.configuration.biome.settings;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.minecraft.defaults.MobNames;
+import com.pg85.otg.util.minecraft.defaults.EntityNames;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,14 +26,14 @@ public class WeightedMobSpawnGroup
         this.max = max;
     }
 
-    public WeightedMobSpawnGroup(MobNames mobName, int weight, int min, int max)
+    public WeightedMobSpawnGroup(EntityNames mobName, int weight, int min, int max)
     {
         this(mobName.getInternalName(), weight, min, max);
     }
 
     public String getInternalName()
     {
-        return MobNames.toInternalName(this.getMob());
+        return EntityNames.toInternalName(this.getMob());
     }
 
     public int getWeight()

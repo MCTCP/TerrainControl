@@ -31,7 +31,8 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
         rotatedBlock.y = rotatedCoords.getY();
         rotatedBlock.z = rotatedCoords.getZ();
 
-        rotatedBlock.mobName = mobName;
+        rotatedBlock.name = name;
+        rotatedBlock.resourceLocation = resourceLocation;
         rotatedBlock.groupSize = groupSize;
         rotatedBlock.originalNameTagOrNBTFileName = originalNameTagOrNBTFileName;
         rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;
@@ -57,7 +58,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
         stream.writeInt(this.y);
         stream.writeInt(this.z);       
 
-        StreamHelper.writeStringToStream(stream, this.mobName);
+        StreamHelper.writeStringToStream(stream, this.resourceLocation);
         stream.writeInt(this.groupSize);
         StreamHelper.writeStringToStream(stream, this.nameTagOrNBTFileName);
         StreamHelper.writeStringToStream(stream, this.originalNameTagOrNBTFileName);        	
@@ -71,7 +72,7 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
     	entityFunction.y = buffer.getInt();
     	entityFunction.z = buffer.getInt();
     	
-    	entityFunction.mobName = StreamHelper.readStringFromBuffer(buffer);
+    	entityFunction.processEntityName(StreamHelper.readStringFromBuffer(buffer));
     	entityFunction.groupSize = buffer.getInt();
     	entityFunction.nameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
     	entityFunction.originalNameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);

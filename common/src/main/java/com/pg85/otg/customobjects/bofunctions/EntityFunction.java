@@ -1,8 +1,12 @@
 package com.pg85.otg.customobjects.bofunctions;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.minecraft.defaults.EntityNames;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,10 +21,11 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 {
     public int y;
 
-    public String mobName = "";
+    public String name = "";
     public int groupSize = 1;
     public String nameTagOrNBTFileName = "";
     public String originalNameTagOrNBTFileName = "";
+    public String resourceLocation = "";
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
@@ -31,7 +36,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 		x = readInt(args.get(0), -100, 100);
         y = readInt(args.get(1), -1000, 1000);
         z = readInt(args.get(2), -100, 100);
-        mobName = args.get(3);
+        processEntityName(args.get(3));
         groupSize = readInt(args.get(4), 0, Integer.MAX_VALUE);
 
         if(args.size() > 5)
@@ -45,10 +50,27 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
         }
     }
 
+    public void processEntityName(String name) {
+        // When loading from file, it will contain either a mob name or a resource location.
+        // If a mob name, we get the mob's vanilla resource location
+        // If a resource location, we store it and extract a mob name from it
+        if (name == null)
+            return;
+        if (name.contains(":")) {
+            resourceLocation = name.toLowerCase().trim();
+        } else {
+            resourceLocation = EntityNames.toInternalName(name);
+            if (!resourceLocation.contains(":")) {
+                OTG.log(LogMarker.ERROR, "Could not find entity '"+name+"', are you sure you spelled it correctly?");
+            }
+        }
+        this.name = resourceLocation.split(":")[1];
+    }
+
     @Override
     public String makeString()
     {
-        return "Entity(" + x + ',' + y + ',' + z + ',' + mobName + ',' + groupSize + (originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.length() > 0 ? ',' + originalNameTagOrNBTFileName : "") + ')';
+        return "Entity(" + x + ',' + y + ',' + z + ',' + resourceLocation + ',' + groupSize + (originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.length() > 0 ? ',' + originalNameTagOrNBTFileName : "") + ')';
     }
 
     private String metaDataTag;
@@ -94,7 +116,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
             return false;
         }
         EntityFunction<T> block = (EntityFunction<T>) other;
-        return block.x == x && block.y == y && block.z == z && block.mobName.equalsIgnoreCase(mobName) && block.groupSize == groupSize && block.originalNameTagOrNBTFileName == originalNameTagOrNBTFileName;
+        return block.x == x && block.y == y && block.z == z && block.resourceLocation.equalsIgnoreCase(resourceLocation) && block.groupSize == groupSize && block.originalNameTagOrNBTFileName.equalsIgnoreCase(originalNameTagOrNBTFileName);
     }
 
 	public abstract EntityFunction<T> createNewInstance();
