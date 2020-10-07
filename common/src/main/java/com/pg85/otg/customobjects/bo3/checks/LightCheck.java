@@ -56,7 +56,7 @@ public class LightCheck extends BO3Check
     public BO3Check rotate()
     {
         LightCheck rotatedCheck = new LightCheck();
-        rotatedCheck.x = z - 1;
+        rotatedCheck.x = z;
         rotatedCheck.y = y;
         rotatedCheck.z = -x;
         rotatedCheck.minLightLevel = minLightLevel;
