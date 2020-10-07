@@ -1133,6 +1133,10 @@ public class BukkitWorld implements LocalWorld
 				{
 					return new net.minecraft.server.v1_12_R1.EntityPolarBear(world);
 				}
+                                else if (org.bukkit.entity.Parrot.class.isAssignableFrom(clazz))
+				{
+					return new net.minecraft.server.v1_12_R1.EntityParrot(world);
+				}
 			}
 		}
 		// TODO: Improve this to look for blocks to attach to (without causing cascading chunk gen..)
