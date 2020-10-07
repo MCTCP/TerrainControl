@@ -319,8 +319,7 @@ public class OTGWorldProvider extends WorldProviderSurface
     	{
 	        for (int i = 0; i <= 15; ++i)
 	        {
-	            //float f1 = 1.0F - (float)i / 15.0F;
-	        	float f1 = 0.0F;
+	            float f1 = 1.0F - (float)i / 15.0F;
 	            this.lightBrightnessTable[i] = (1.0F - f1) / (f1 * 3.0F + 1.0F) * 0.9F + 0.1F;
 	        }
     	} else {
@@ -464,11 +463,21 @@ public class OTGWorldProvider extends WorldProviderSurface
     	DimensionConfig worldConfig = getDimensionConfig();
     	return worldConfig != null ? !worldConfig.Settings.CanRespawnHere ? worldConfig.Settings.RespawnDimension : super.getRespawnDimension(player) : super.getRespawnDimension(player);
     }
-    
-    @Override
+        
+    /**
+     * If this method returns true, then chunks received by the client will
+     * have {@link net.minecraft.world.chunk.Chunk#resetRelightChecks} called
+     * on them, queuing lighting checks for all air blocks in the chunk (and
+     * any adjacent light-emitting blocks).
+     *
+     * Returning true here is recommended if the chunk generator used also
+     * does this for newly generated chunks.
+     *
+     * @return true if lighting checks should be performed
+     */
     public boolean shouldClientCheckLighting()
     {
-        return true;
+    	return true;
+        //return !(this instanceof WorldProviderSurface); // TODO: Figure out if we actually need this, also for night worlds.
     }
-    
 }
