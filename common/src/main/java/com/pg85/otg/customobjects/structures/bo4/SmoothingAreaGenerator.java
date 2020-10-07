@@ -1435,8 +1435,8 @@ public class SmoothingAreaGenerator
 				{
 					e.printStackTrace();
 				}
-			}		
-			
+			}
+		
 			if(!useBiomeBlocks && ((BO4)start.getObject()).getConfig().smoothingGroundBlock != null && ((BO4)start.getObject()).getConfig().smoothingGroundBlock.trim().length() > 0)
 			{
 				try
@@ -1547,22 +1547,22 @@ public class SmoothingAreaGenerator
 	                        // Apply sagc'd biome blocks
             				if(placingGroundBlock)
                 			{
-                				if(useBiomeBlocks)
+                				if(useBiomeBlocks || groundBlockMaterial == null)
                 				{
-                                    blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);                           
-        			        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig, false);                					
-                				} else {
-                					blockToQueueForSpawn.material = groundBlockMaterial;
+                                    blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
     	                            if(blockToQueueForSpawn.material == null)
     	                            {
     	                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
     	                            }
+        			        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig, false);                					
+                				} else {
+                					blockToQueueForSpawn.material = groundBlockMaterial;
     	                            setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig);
                 				}
                 			}
             				else if(placingSurfaceBlock)
                 			{
-                				if(useBiomeBlocks)
+                				if(useBiomeBlocks || surfaceBlockMaterial == null)
                 				{
 	                                blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
 	                                if(blockToQueueForSpawn.material.isAir())
@@ -1581,10 +1581,6 @@ public class SmoothingAreaGenerator
 	    			        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig, false);	                			
                 				} else {
                 					blockToQueueForSpawn.material = surfaceBlockMaterial;
-    	                            if(blockToQueueForSpawn.material == null)
-    	                            {
-    	                            	blockToQueueForSpawn.material = MaterialHelper.GRASS;
-    	                            }
     	                            setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig);    	                            
                 				}
                 			}
@@ -1685,8 +1681,7 @@ public class SmoothingAreaGenerator
 	                    			}
 		                    	}
 	                    	}
-	                    }
-                    	
+	                    }                    	
 	                    
 	                    if(
                     		(placingAirBlock ? 1 : 0) +
@@ -1717,20 +1712,16 @@ public class SmoothingAreaGenerator
 	                        // Apply sagc'd biome blocks
                 			if(placingGroundBlock)
                 			{
-                				if(useBiomeBlocks)
+                				if(useBiomeBlocks || groundBlockMaterial == null)
                 				{
                 					materialToSet = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToSpawn.x, blockToSpawn.y, blockToSpawn.z);
                 				} else {
                 					materialToSet = groundBlockMaterial;
-    	                            if(materialToSet == null)
-    	                            {
-    	                            	materialToSet = MaterialHelper.DIRT;
-    	                            }                					
                 				}
                 			}
                 			else if(placingSurfaceBlock)
                 			{
-                				if(useBiomeBlocks)
+                				if(useBiomeBlocks || surfaceBlockMaterial == null)
                 				{
 	                				materialToSet = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToSpawn.x, blockToSpawn.y, blockToSpawn.z);
 	                				if(materialToSet.isAir())
@@ -1748,10 +1739,6 @@ public class SmoothingAreaGenerator
 	                				}
                 				} else {
     		                    	materialToSet = surfaceBlockMaterial;
-    	                            if(materialToSet == null)
-    	                            {
-    	                            	materialToSet = MaterialHelper.GRASS;
-    	                            }
                 				}
                 			}
                         }
@@ -1767,10 +1754,7 @@ public class SmoothingAreaGenerator
                         		materialToSet = MaterialHelper.AIR;
                         	}
                         	setBlock(blockToSpawn.x, y, blockToSpawn.z, materialToSet, null, world, chunkBeingPopulated, biomeConfig, !(useBiomeBlocks && (placingGroundBlock || placingSurfaceBlock)));
-	                    } else {
-               				// TODO: Remove after testing
-               				throw new RuntimeException("This shouldn't happen, please contact Team OTG about this crash");
-                        }
+	                    }
 	                    if(bBreak)
 	                    {
 	                        break;
