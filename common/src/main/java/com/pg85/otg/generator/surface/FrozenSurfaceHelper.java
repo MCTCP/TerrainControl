@@ -84,10 +84,30 @@ public class FrozenSurfaceHelper
             LocalMaterialData materialToFreeze = this.world.getMaterial(x, y, z, chunkBeingPopulated);
             if (materialToFreeze.isLiquid())
             {
+            	boolean bFroze = false;
                 // Water & Stationary Water => IceBlock
-                freezeType(x, y, z, materialToFreeze, biome.getBiomeConfig().getDefaultIceBlock(), DefaultMaterial.WATER, DefaultMaterial.STATIONARY_WATER, chunkBeingPopulated);
-                // Lava & Stationary Lava => CooledLavaBlock
-                freezeType(x, y, z, materialToFreeze, biome.getBiomeConfig().getDefaultCooledLavaBlock(), DefaultMaterial.LAVA, DefaultMaterial.STATIONARY_LAVA, chunkBeingPopulated);
+            	LocalMaterialData iceBlock = biome.getBiomeConfig().getIceBlockReplaced(this.world, y);
+                if(shouldFreeze(x, y, z, materialToFreeze, iceBlock, DefaultMaterial.WATER, DefaultMaterial.STATIONARY_WATER, chunkBeingPopulated))
+                {
+                    world.setBlock(x, y, z, iceBlock, null, chunkBeingPopulated, false);
+                    bFroze = true;
+                } else {
+                    LocalMaterialData cooledLavaBlock = biome.getBiomeConfig().getCooledLavaBlockReplaced(this.world, y);
+	                // Lava & Stationary Lava => CooledLavaBlock
+                	if(shouldFreeze(x, y, z, materialToFreeze, cooledLavaBlock, DefaultMaterial.LAVA, DefaultMaterial.STATIONARY_LAVA, chunkBeingPopulated))
+	                {
+	                    world.setBlock(x, y, z, cooledLavaBlock, null, chunkBeingPopulated, true);
+	                    bFroze = true;
+	                }
+                }
+                if(bFroze)
+                {
+                    if (worldConfig.fullyFreezeLakes && this.currentPropagationSize < this.maxPropagationSize)
+                    {
+                        this.currentPropagationSize++;
+                        propagateFreeze(x, y, z, chunkBeingPopulated);
+                    }
+                }
                 return true;
             }
         }
@@ -106,24 +126,16 @@ public class FrozenSurfaceHelper
      * @param check1 The first material to check for
      * @param check2 The second meterial to check for
      */
-    private void freezeType(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, DefaultMaterial check1, DefaultMaterial check2, ChunkCoordinate chunkBeingPopulated)
+    private boolean shouldFreeze(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, DefaultMaterial check1, DefaultMaterial check2, ChunkCoordinate chunkBeingPopulated)
     {
-        if (
+        return (
     		(
 				thawedMaterial.isMaterial(check1) || 
 				thawedMaterial.isMaterial(check2)
 			) && 
     		!frozenMaterial.isMaterial(check1) &&
     		!frozenMaterial.isMaterial(check2)
-		)
-        {
-            world.setBlock(x, y, z, frozenMaterial, null, chunkBeingPopulated, true);
-            if (worldConfig.fullyFreezeLakes && this.currentPropagationSize < this.maxPropagationSize)
-            {
-                this.currentPropagationSize++;
-                propagateFreeze(x, y, z, chunkBeingPopulated);
-            }
-        }
+		);
     }
 
     /**

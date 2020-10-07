@@ -39,33 +39,31 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
     @Override
     public LocalMaterialData getSurfaceBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
     {
-    	double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
-    	
+    	double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);    	
         for (LayerChoice layer : this.layerChoices)
         {
             if (noise <= layer.maxNoise)
             {
-            	return layer.surfaceBlock;
+            	return layer.getSurfaceBlockReplaced(world, biomeConfig, yInWorld);
             }
         }
-     
-        return biomeConfig.getDefaultSurfaceBlock();
+        
+        return biomeConfig.getSurfaceBlockReplaced(world, yInWorld);
     }
     
 	@Override
 	public LocalMaterialData getGroundBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{	
-   		double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
-    	
+   		double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
         for (LayerChoice layer : this.layerChoices)
         {
             if (noise <= layer.maxNoise)
             {
-            	return layer.groundBlock;
+            	return layer.getGroundBlockReplaced(world, biomeConfig, yInWorld);
             }
         }
         
-        return biomeConfig.getDefaultGroundBlock();
+        return biomeConfig.getGroundBlockReplaced(world, yInWorld);
 	}
 
     @Override
@@ -79,13 +77,13 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         {
             if (noise <= layer.maxNoise)
             {
-                spawnColumn(world, layer.surfaceBlock, layer.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
+                spawnColumn(world, layer, generatingChunkInfo, chunkBuffer, config, x, z);
                 return;
             }
         }
 
         // Fall back on normal column
-        spawnColumn(world, null, null, generatingChunkInfo, chunkBuffer, config, x, z);
+        spawnColumn(world, null, generatingChunkInfo, chunkBuffer, config, x, z);
     }
 
     @Override

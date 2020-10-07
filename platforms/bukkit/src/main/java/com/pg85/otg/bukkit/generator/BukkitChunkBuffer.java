@@ -7,7 +7,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 
 import org.bukkit.generator.ChunkGenerator.ChunkData;
 
-final class BukkitChunkBuffer implements ChunkBuffer
+final class BukkitChunkBuffer extends ChunkBuffer
 {
     private final ChunkCoordinate chunkCoord;
     private final ChunkData chunkData;

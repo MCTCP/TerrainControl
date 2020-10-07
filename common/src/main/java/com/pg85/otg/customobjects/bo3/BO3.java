@@ -235,26 +235,28 @@ public class BO3 implements StructuredCustomObject
     private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
         Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-        int y = 0;
+        int offsetY = 0;
+        int baseY = 0;
         if (settings.spawnHeight == SpawnHeightEnum.randomY)
         {
-            y = minY == maxY ? minY : RandomHelper.numberInRange(random, minY, maxY);
+        	baseY = minY == maxY ? minY : RandomHelper.numberInRange(random, minY, maxY);
         }
         if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
-            y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+        	baseY = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
         }
         if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
-            y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
+        	baseY = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
         }
         // Offset by static and random settings values
-        y += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
-        return trySpawnAt(null, world, random, rotation, x, y, z, minY, maxY, chunkBeingPopulated, replaceBlocks);
+        // TODO: This is pointless used with randomY?
+        offsetY = baseY += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        return trySpawnAt(null, world, random, rotation, x, offsetY, z, minY, maxY, baseY, chunkBeingPopulated, replaceBlocks);
     }
     
     // Used for trees, customobjects and customstructures during population.
-    public boolean trySpawnAt(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+    public boolean trySpawnAt(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, int baseY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
         if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT) // Isn't this already done before this method is called?
         {
@@ -272,7 +274,10 @@ public class BO3 implements StructuredCustomObject
         // Check for spawning
         for (BO3Check check : checks)
         {
-            if (check.preventsSpawn(world, x + check.x, y + check.y, z + check.z, chunkBeingPopulated))
+        	// Don't apply spawn height offset/variance to block checks,
+        	// they should only be used with highestBlock/highestSolidBlock,
+        	// and need to check for things like grass at the original spawn y.
+        	if (check.preventsSpawn(world, x + check.x, baseY + check.y, z + check.z, chunkBeingPopulated))
             {
                 // A check failed
                 return false;

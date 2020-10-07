@@ -449,6 +449,8 @@ public class Pregenerator
 
 	private void flushChunksToDisk()
 	{
+		//if(1 == 1) { return; }
+		
         if (this.world.getWorld().getMinecraftServer().getPlayerList() != null)
         {
         	this.world.getWorld().getMinecraftServer().getPlayerList().saveAllPlayerData();

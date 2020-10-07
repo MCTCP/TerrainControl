@@ -51,7 +51,7 @@ public class BlockCheck extends BO3Check
     public BO3Check rotate()
     {
         BlockCheck rotatedCheck = new BlockCheck();
-        rotatedCheck.x = z;
+        rotatedCheck.x = z - 1;
         rotatedCheck.y = y;
         rotatedCheck.z = -x;
         rotatedCheck.toCheck = this.toCheck.rotate();

@@ -1,6 +1,9 @@
 package com.pg85.otg.forge.generator;
 
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -16,7 +19,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
  * blocks internally, just like Minecraft does for chunk generation.
  *
  */
-public class ForgeChunkBuffer implements ChunkBuffer
+public class ForgeChunkBuffer extends ChunkBuffer
 {
     private final ChunkCoordinate chunkCoord;
     private final ChunkPrimer chunkPrimer;
@@ -32,19 +35,20 @@ public class ForgeChunkBuffer implements ChunkBuffer
     	return chunkPrimer;
     }
     
-    @Override
     public ChunkCoordinate getChunkCoordinate()
     {
         return this.chunkCoord;
     }
 
-    @Override
     public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
     {
+    	if(material == null)
+    	{
+    		throw new RuntimeException("This should not happen, please contact Team OTG about this crash.");
+    	}
         this.chunkPrimer.setBlockState(blockX, blockY, blockZ, ((ForgeMaterialData) material).internalBlock());
     }
 
-    @Override
     public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
     {
         IBlockState blockState = this.chunkPrimer.getBlockState(blockX, blockY, blockZ);
@@ -62,5 +66,4 @@ public class ForgeChunkBuffer implements ChunkBuffer
     {
         return new Chunk(world, this.chunkPrimer, this.chunkCoord.getChunkX(), this.chunkCoord.getChunkZ());
     }
-
 }

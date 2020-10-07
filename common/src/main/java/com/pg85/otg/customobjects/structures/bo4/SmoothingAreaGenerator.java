@@ -10,14 +10,12 @@ import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
@@ -1469,6 +1467,7 @@ public class SmoothingAreaGenerator
             // TODO: Find out if this actually makes any noticeable difference, it doesnt exactly
             // make the code any easier to read..
             SmoothingAreaBlock blockToSpawn;
+            SmoothingAreaBlock blockToQueueForSpawn;
             boolean goingUp;
             boolean secondPass;
             LocalMaterialData sourceBlockMaterial;           
@@ -1476,9 +1475,7 @@ public class SmoothingAreaGenerator
             LocalMaterialData materialToSet;
             boolean bBreak;
             short yStart;
-            short yEnd;
-            SmoothingAreaBlock blockToQueueForSpawn = new SmoothingAreaBlock();
-            
+            short yEnd;            
             boolean placingGroundBlock;
             boolean placingSurfaceBlock;
             boolean placingReplaceAboveBlock;
@@ -1525,10 +1522,14 @@ public class SmoothingAreaGenerator
 	                    placingGroundBlock = false;
 	                    placingSurfaceBlock = false;
 	                    materialToSet = null;
+                        blockToQueueForSpawn = new SmoothingAreaBlock();
+                        blockToQueueForSpawn.x = blockToSpawn.x;
+                        blockToQueueForSpawn.y = y;
+                        blockToQueueForSpawn.z = blockToSpawn.z;
 	                    
-	                    if(y == blockToSpawn.y)
+	                    if(y == blockToQueueForSpawn.y)
 	                    {
-	                		sourceBlockMaterialAbove = world.getMaterial(blockToSpawn.x, y + 1, blockToSpawn.z, chunkBeingPopulated);
+	                		sourceBlockMaterialAbove = world.getMaterial(blockToQueueForSpawn.x, y + 1, blockToQueueForSpawn.z, chunkBeingPopulated);
 	                		if(sourceBlockMaterialAbove == null || sourceBlockMaterialAbove.isAir())
 	                		{
 	                			placingSurfaceBlock = true;
@@ -1536,53 +1537,57 @@ public class SmoothingAreaGenerator
 	                			placingGroundBlock = true;
 	                		}
 	                    }
-	                    else if(y < blockToSpawn.y)
+	                    else if(y < blockToQueueForSpawn.y)
 	                    {
 	                    	placingGroundBlock = true;
 	                    }
 	                    
                         if(placingGroundBlock || placingSurfaceBlock)
                         {                        	
-	                        // Apply chc'd biome blocks
+	                        // Apply sagc'd biome blocks
             				if(placingGroundBlock)
                 			{
                 				if(useBiomeBlocks)
                 				{
-                					materialToSet = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToSpawn.x, y, blockToSpawn.z);
+                                    blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);                           
+        			        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig, false);                					
                 				} else {
-                					materialToSet = groundBlockMaterial;
+                					blockToQueueForSpawn.material = groundBlockMaterial;
+    	                            if(blockToQueueForSpawn.material == null)
+    	                            {
+    	                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
+    	                            }
+    	                            setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig);
                 				}
-	                            if(materialToSet == null)
-	                            {
-	                            	materialToSet = MaterialHelper.DIRT;
-	                            }
                 			}
             				else if(placingSurfaceBlock)
                 			{
                 				if(useBiomeBlocks)
                 				{
-	                				materialToSet = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToSpawn.x, y, blockToSpawn.z);
+	                                blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+	                                if(blockToQueueForSpawn.material.isAir())
+	                                {
+		                                if(blockToQueueForSpawn.y < biomeConfig.waterLevelMax)
+		                                {
+		                                	blockToQueueForSpawn.material = MaterialHelper.WATER;
+		                                } else {
+		                					blockToQueueForSpawn.material = surfaceBlockMaterial;
+		    	                            if(blockToQueueForSpawn.material == null)
+		    	                            {
+		    	                            	blockToQueueForSpawn.material = MaterialHelper.GRASS;
+		    	                            }
+		                                }
+	                                }
+	    			        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig, false);	                			
                 				} else {
-    		                    	materialToSet = surfaceBlockMaterial;
+                					blockToQueueForSpawn.material = surfaceBlockMaterial;
+    	                            if(blockToQueueForSpawn.material == null)
+    	                            {
+    	                            	blockToQueueForSpawn.material = MaterialHelper.GRASS;
+    	                            }
+    	                            setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig);    	                            
                 				}
-	                            if(materialToSet == null)
-	                            {
-	                            	materialToSet = MaterialHelper.GRASS;
-	                            }
                 			}
-                        }
-                        if(materialToSet != null)
-                        {
-                            blockToQueueForSpawn = new SmoothingAreaBlock();
-                            blockToQueueForSpawn.x = blockToSpawn.x;
-                            blockToQueueForSpawn.y = y;
-                            blockToQueueForSpawn.z = blockToSpawn.z;
-                            blockToQueueForSpawn.material = materialToSet;                        
-                            
-			        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig);
-                        } else {
-               				// TODO: Remove after testing
-               				throw new RuntimeException("This shouldn't happen, please contact Team OTG about this crash");
                         }
 	                    if(bBreak)
 	                    {
@@ -1704,37 +1709,50 @@ public class SmoothingAreaGenerator
 	                    }
 	                    else if(placingReplaceAboveBlock)
 	                    {
-	                    	// ReplaceAbove is not affected by CHC
+	                    	// ReplaceAbove is not affected by sagcd
 	                    	materialToSet = replaceAboveMaterial;
 	                    }
 	                    else if(placingGroundBlock || placingSurfaceBlock)
                         {
-	                        // Apply chc'd biome blocks
+	                        // Apply sagc'd biome blocks
                 			if(placingGroundBlock)
                 			{
                 				if(useBiomeBlocks)
                 				{
-                					materialToSet = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToSpawn.x, blockToQueueForSpawn.y, blockToSpawn.z);
+                					materialToSet = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToSpawn.x, blockToSpawn.y, blockToSpawn.z);
                 				} else {
                 					materialToSet = groundBlockMaterial;
+    	                            if(materialToSet == null)
+    	                            {
+    	                            	materialToSet = MaterialHelper.DIRT;
+    	                            }                					
                 				}
-	                            if(materialToSet == null)
-	                            {
-	                            	materialToSet = MaterialHelper.DIRT;
-	                            }
                 			}
                 			else if(placingSurfaceBlock)
                 			{
                 				if(useBiomeBlocks)
                 				{
-	                				materialToSet = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToSpawn.x, blockToQueueForSpawn.y, blockToSpawn.z);
+	                				materialToSet = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToSpawn.x, blockToSpawn.y, blockToSpawn.z);
+	                				if(materialToSet.isAir())
+	                				{
+		                                if(blockToSpawn.y < biomeConfig.waterLevelMax)
+		                                {
+		                                	materialToSet = MaterialHelper.WATER;
+		                                } else {
+		                                	materialToSet = surfaceBlockMaterial;
+		    	                            if(materialToSet == null)
+		    	                            {
+		    	                            	materialToSet = MaterialHelper.GRASS;
+		    	                            }		                                	
+		                                }
+	                				}
                 				} else {
     		                    	materialToSet = surfaceBlockMaterial;
+    	                            if(materialToSet == null)
+    	                            {
+    	                            	materialToSet = MaterialHelper.GRASS;
+    	                            }
                 				}
-	                            if(materialToSet == null)
-	                            {
-	                            	materialToSet = MaterialHelper.GRASS;
-	                            }
                 			}
                         }
 	                    
@@ -1748,14 +1766,7 @@ public class SmoothingAreaGenerator
                         	{
                         		materialToSet = MaterialHelper.AIR;
                         	}
-	                    	
-	                        blockToQueueForSpawn = new SmoothingAreaBlock();
-	                        blockToQueueForSpawn.x = blockToSpawn.x;
-	                        blockToQueueForSpawn.y = y;
-	                        blockToQueueForSpawn.z = blockToSpawn.z;
-	                        blockToQueueForSpawn.material = materialToSet;
-	                        
-			        		setBlock(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, null, world, chunkBeingPopulated, biomeConfig);
+                        	setBlock(blockToSpawn.x, y, blockToSpawn.z, materialToSet, null, world, chunkBeingPopulated, biomeConfig, !(useBiomeBlocks && (placingGroundBlock || placingSurfaceBlock)));
 	                    } else {
                				// TODO: Remove after testing
                				throw new RuntimeException("This shouldn't happen, please contact Team OTG about this crash");
@@ -1777,6 +1788,11 @@ public class SmoothingAreaGenerator
 
     private void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, LocalWorld world, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig)
     {
+    	setBlock(x, y, z, material, metaDataTag, world, chunkBeingPopulated, biomeConfig, false);
+    }
+
+    private void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, LocalWorld world, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean needsReplaceBlocks)
+    {
     	/* TODO: Don't think anyone actually uses this? Remove if noone complains about missing it..
 	    HashMap<LocalMaterialData,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
 	    if(blocksToReplace != null && blocksToReplace.size() > 0)
@@ -1788,7 +1804,7 @@ public class SmoothingAreaGenerator
 	    	}
 	    }
 	    */
-	    world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, biomeConfig, true);
+	    world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, biomeConfig, needsReplaceBlocks);
     }
 
     private ArrayList<SmoothingAreaLineBlock> mergeSmoothingAreas(ChunkCoordinate chunkCoordinate, ArrayList<SmoothingAreaLine> smoothingAreas, LocalWorld world, CustomStructureCoordinate start)
@@ -1990,8 +2006,9 @@ public class SmoothingAreaGenerator
 	            	block = blockColumn[i];
 	            	material = block;
 
+	            	// TODO: How can material be null, this seems like a bug?
 	                if(
-	                    !material.isEmptyOrAir() &&
+	                    !(material == null || material.isEmptyOrAir()) &&
 	                    (
 	                        (
                         		i <= (diagonalLineoriginPointY > -1 ? diagonalLineoriginPointY : originPointY) &&

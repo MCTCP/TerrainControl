@@ -242,12 +242,7 @@ public class BO4 implements StructuredCustomObject
 
     	boolean outOfBounds = false;
     	ChunkCoordinate destChunk;
-    	
-    	boolean useBiomeBlocks = config.replaceWithBiomeBlocks;
-        boolean useBiomeGroundBlock;
-        boolean useBiomeSurfaceBlock;
-        boolean useBiomeStoneBlock;
-    	
+    	    	
         // Spawn
     	long startTime = System.currentTimeMillis();
         for (BO4BlockFunction block : config.getBlocks())
@@ -352,14 +347,6 @@ public class BO4 implements StructuredCustomObject
 	        			{
                             blockToQueueForSpawn = new BO4BlockFunction();
 
-	        				if(spawnUnderWater && blockY >= waterLevel)
-			            	{
-	        					blockToQueueForSpawn.material = MaterialHelper.AIR;
-			            	} else {
-			            		// ReplaceAbove is not affected by CHC
-			            		blockToQueueForSpawn.material = replaceAboveMaterial;			            		
-			            	}
-
 	        				// TODO: Make override leaves and air configurable
 	        				// TODO: Make replaceAbove height configurable
                             blockToQueueForSpawn.x = x + newBlock.x;
@@ -372,6 +359,13 @@ public class BO4 implements StructuredCustomObject
         					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
         					if(chunkCoord.equals(destChunk))
         					{
+    	        				if(spawnUnderWater && blockY >= waterLevel)
+    			            	{
+    	        					blockToQueueForSpawn.material = MaterialHelper.AIR;
+    			            	} else {
+    			            		// ReplaceAbove is not affected by sagc
+    			            		blockToQueueForSpawn.material = replaceAboveMaterial;			            		
+    			            	}
     							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);
         					} else {
         						outOfBounds = true;
@@ -381,7 +375,7 @@ public class BO4 implements StructuredCustomObject
 	        			}
 	        		}
 	        	}
-	        	
+	        	        	
 	        	if(replaceBelowMaterial != null && newBlock.y == 0 && !newBlock.material.isEmptyOrAir() && doReplaceAboveBelowOnly)
 	        	{
 	        		boolean bFound = false;
@@ -415,27 +409,26 @@ public class BO4 implements StructuredCustomObject
 			                            blockToQueueForSpawn.x = x + newBlock.x;
 			                            blockToQueueForSpawn.y = (short) blockY;
 			                            blockToQueueForSpawn.z = z + newBlock.z;
-			                            blockToQueueForSpawn.material = replaceBelowMaterial;
-	
-				                        // Apply chc'd biome blocks
-		                				if(useBiomeBlocks)
-		                				{
-		                					blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-		                				} else {
-		                					blockToQueueForSpawn.material = replaceBelowMaterial;
-		                				}
-			                            if(blockToQueueForSpawn.material == null)
-			                            {
-			                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
-			                            }
-			                            
+			                            blockToQueueForSpawn.material = replaceBelowMaterial;			                            
 			    						blockToQueueForSpawn.metaDataName = newBlock.metaDataName;
 			    						blockToQueueForSpawn.metaDataTag = newBlock.metaDataTag;	                				
 		                				
 	                					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
 	                					if(chunkCoord.equals(destChunk))
 	                					{
-	            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);
+					                        // Apply sagc'd biome blocks
+			                				if(replaceWithBiomeBlocks)
+			                				{
+			                					blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+			                					setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);			                					
+			                				} else {
+			                					blockToQueueForSpawn.material = replaceBelowMaterial;
+					                            if(blockToQueueForSpawn.material == null)
+					                            {
+					                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
+					                            }
+			                					setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);			                					
+			                				}
 	                					} else {
 	                						outOfBounds = true;
 	                					}
@@ -463,59 +456,49 @@ public class BO4 implements StructuredCustomObject
 					blockToQueueForSpawn.metaDataName = newBlock.metaDataName;
 					blockToQueueForSpawn.metaDataTag = newBlock.metaDataTag;
 
-					sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
-					
-                    useBiomeGroundBlock = false;
-                    useBiomeSurfaceBlock = false;
-                    useBiomeStoneBlock = false;
-    				if(replaceWithBiomeBlocks)
-    				{
-    					if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
-    					{
-    						useBiomeGroundBlock = true;
-                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-        	    	        if(blockToQueueForSpawn.material == null)
-        	    	        {
-        	    	        	blockToQueueForSpawn.material = MaterialHelper.DIRT;
-        	    	        }
-    					}
-    					else if(blockToQueueForSpawn.material.equals(bo3StoneBlock))
-    					{
-    						useBiomeStoneBlock = true;
-                			blockToQueueForSpawn.material = biomeConfig.getDefaultStoneBlock();
-        	    	        if(blockToQueueForSpawn.material == null)
-        	    	        {
-        	    	        	blockToQueueForSpawn.material = MaterialHelper.STONE;
-        	    	        }    						
-    					}
-    					else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
-    					{
-       						useBiomeSurfaceBlock = true;
-                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-        	    	        if(blockToQueueForSpawn.material == null)
-        	    	        {
-        	    	        	blockToQueueForSpawn.material = MaterialHelper.GRASS;
-        	    	        }       						
-    					}
-    				}
-    				
-					if(!useBiomeSurfaceBlock && !useBiomeGroundBlock && !useBiomeStoneBlock)
-					{
+					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
+					if(chunkCoord.equals(destChunk))
+					{					
+	    				if(replaceWithBiomeBlocks)
+	    				{
+	    					if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
+	    					{
+	                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+	                			setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);
+	                			continue;
+	    					}
+	    					else if(blockToQueueForSpawn.material.equals(bo3StoneBlock))
+	    					{
+	                			blockToQueueForSpawn.material = biomeConfig.getStoneBlockReplaced(world, blockToQueueForSpawn.y);
+	                			setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);	                			
+	                			continue;
+	    					}
+	    					else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
+	    					{
+	                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+	                			if(blockToQueueForSpawn.material.isAir())
+	                			{
+	                                if(blockToQueueForSpawn.y < biomeConfig.waterLevelMax)
+	                                {
+	                                	blockToQueueForSpawn.material = MaterialHelper.WATER;
+	                                } else {
+	                                	blockToQueueForSpawn.material = newBlock.material;
+	                                }
+	                			}
+	                			setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);	                			
+	                			continue;
+	    					}
+	    				}
+	    				
 						// Don't spawn torches underwater
-						// TODO: Implement stuff like this in setblock instead?
 	    				if(
 							spawnUnderWater && 
 							blockToQueueForSpawn.material.isMaterial(DefaultMaterial.TORCH) && 
-							sourceBlockMaterial.isLiquid()
+							world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated).isLiquid()
 						)
 	    				{
 	    					continue;
-	    				}
-					}
-
-					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
-					if(chunkCoord.equals(destChunk))
-					{
+	    				}						
 						setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);
 					} else {
 						outOfBounds = true;
@@ -556,7 +539,7 @@ public class BO4 implements StructuredCustomObject
 			            	{
 	        					blockToQueueForSpawn.material = MaterialHelper.AIR;
 			            	} else {
-		                    	// ReplaceAbove is not affected by CHC
+		                    	// ReplaceAbove is not affected by sagc
 			            		blockToQueueForSpawn.material = replaceAboveMaterial;
 			            	}
 
@@ -567,22 +550,17 @@ public class BO4 implements StructuredCustomObject
     						blockToQueueForSpawn.metaDataName = block.metaDataName;
     						blockToQueueForSpawn.metaDataTag = block.metaDataTag;
 
-                            sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
-
-                			if(!sourceBlockMaterial.equals(blockToQueueForSpawn.material))
-                			{
-            					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
-            					if(chunkCoord.equals(destChunk))
-            					{
-           							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);
-            					} else {
-            						outOfBounds = true;
-            					}
-                			}
+        					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
+        					if(chunkCoord.equals(destChunk))
+        					{
+       							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);
+        					} else {
+        						outOfBounds = true;
+        					}
 	        				blockY += 1;
 	        			}
 	        		}
-	        	}
+	        	}   			
     			
     			if(replaceBelowMaterial != null && block.y == 0 && !block.material.isEmptyOrAir() && doReplaceAboveBelowOnly)
     			{
@@ -617,27 +595,26 @@ public class BO4 implements StructuredCustomObject
 			                            blockToQueueForSpawn.x = x + block.x;
 			                            blockToQueueForSpawn.y = (short) blockY;
 			                            blockToQueueForSpawn.z = z + block.z;
-			                            blockToQueueForSpawn.material = replaceBelowMaterial;
-	
-				                        // Apply chc'd biome blocks
-		                				if(useBiomeBlocks)
-		                				{
-		                					blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-		                				} else {
-		                					blockToQueueForSpawn.material = replaceBelowMaterial;
-		                				}
-			                            if(blockToQueueForSpawn.material == null)
-			                            {
-			                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
-			                            }
-			                            
+			                            blockToQueueForSpawn.material = replaceBelowMaterial;			                            
 			    						blockToQueueForSpawn.metaDataName = block.metaDataName;
 			    						blockToQueueForSpawn.metaDataTag = block.metaDataTag;	                				
 		                				
 	                					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
 	                					if(chunkCoord.equals(destChunk))
 	                					{
-	            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);
+					                        // Apply sagc'd biome blocks
+			                				if(replaceWithBiomeBlocks)
+			                				{
+			                					blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+		            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);			                					
+			                				} else {
+			                					blockToQueueForSpawn.material = replaceBelowMaterial;
+					                            if(blockToQueueForSpawn.material == null)
+					                            {
+					                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
+					                            }			                					
+		            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);					                            
+			                				}
 	                					} else {
 	                						outOfBounds = true;
 	                					}
@@ -663,61 +640,51 @@ public class BO4 implements StructuredCustomObject
 					blockToQueueForSpawn.material = block.material;
 
 					blockToQueueForSpawn.metaDataName = block.metaDataName;
-					blockToQueueForSpawn.metaDataTag = block.metaDataTag;
+					blockToQueueForSpawn.metaDataTag = block.metaDataTag;   			
 
-					sourceBlockMaterial = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated);
-					
-                    useBiomeGroundBlock = false;
-                    useBiomeSurfaceBlock = false;
-                    useBiomeStoneBlock = false;
-    				if(replaceWithBiomeBlocks)
-    				{
-    					if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
-    					{
-    						useBiomeGroundBlock = true;
-                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-        	    	        if(blockToQueueForSpawn.material == null)
-        	    	        {
-        	    	        	blockToQueueForSpawn.material = MaterialHelper.DIRT;
-        	    	        }
-    					}
-    					else if(blockToQueueForSpawn.material.equals(bo3StoneBlock))
-    					{
-    						useBiomeStoneBlock = true;
-                			blockToQueueForSpawn.material = biomeConfig.getDefaultStoneBlock();
-        	    	        if(blockToQueueForSpawn.material == null)
-        	    	        {
-        	    	        	blockToQueueForSpawn.material = MaterialHelper.STONE;
-        	    	        }    						
-    					}
-    					else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
-    					{
-       						useBiomeSurfaceBlock = true;
-                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
-        	    	        if(blockToQueueForSpawn.material == null)
-        	    	        {
-        	    	        	blockToQueueForSpawn.material = MaterialHelper.GRASS;
-        	    	        }       						
-    					}
-    				}
-    				
-					if(!useBiomeSurfaceBlock && !useBiomeGroundBlock && !useBiomeStoneBlock)
-					{
+					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
+					if(chunkCoord.equals(destChunk))
+					{						
+	    				if(replaceWithBiomeBlocks)
+	    				{
+	    					if(blockToQueueForSpawn.material.equals(bo3GroundBlock))
+	    					{
+	                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+	                			setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);
+	                			continue;
+	    					}
+	    					else if(blockToQueueForSpawn.material.equals(bo3StoneBlock))
+	    					{
+	                			blockToQueueForSpawn.material = biomeConfig.getStoneBlockReplaced(world, blockToQueueForSpawn.y);
+	                			setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);
+	                			continue;    						
+	    					}
+	    					else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
+	    					{
+	                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);
+	                			if(blockToQueueForSpawn.material.isAir())
+	                			{
+	                                if(blockToQueueForSpawn.y < biomeConfig.waterLevelMax)
+	                                {
+	                                	blockToQueueForSpawn.material = MaterialHelper.WATER;
+	                                } else {
+	                                	blockToQueueForSpawn.material = block.material;
+	                                }
+	                			}
+	                			setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);
+	                			continue;
+	    					}
+	    				}
+	    				
 						// Don't spawn torches underwater
-						// TODO: Implement stuff like this in setblock instead?
 	    				if(
 							spawnUnderWater && 
 							blockToQueueForSpawn.material.isMaterial(DefaultMaterial.TORCH) && 
-							sourceBlockMaterial.isLiquid()
+							world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated).isLiquid()
 						)
 	    				{
 	    					continue;
 	    				}
-					}
-
-					destChunk = ChunkCoordinate.fromBlockCoords(blockToQueueForSpawn.x, blockToQueueForSpawn.z);
-					if(chunkCoord.equals(destChunk))
-					{
 						setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig);
 					} else {
 						outOfBounds = true;
@@ -742,6 +709,11 @@ public class BO4 implements StructuredCustomObject
     }
     
     private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig)
+    {
+    	setBlock(world, x, y, z, material, metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, true);
+    }
+    
+    private void setBlock(LocalWorld world, int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, boolean isStructureAtSpawn, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean needsReplaceBlock)
     {
     	/* TODO: Don't think anyone actually uses this? Remove if noone complains about missing it..
 	    HashMap<LocalMaterialData,LocalMaterialData> blocksToReplace = world.getConfigs().getWorldConfig().getReplaceBlocksDict();
@@ -784,6 +756,6 @@ public class BO4 implements StructuredCustomObject
 		    	return;
 		    }
 	    }
-	    world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, biomeConfig, true);
+	    world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, biomeConfig, needsReplaceBlock);
     }
 }
