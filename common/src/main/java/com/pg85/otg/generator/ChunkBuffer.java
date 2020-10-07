@@ -7,14 +7,15 @@ import com.pg85.otg.util.ChunkCoordinate;
  * A chunk buffer holds all blocks of a chunk. It is not part of the world.
  *
  */
-public interface ChunkBuffer {
+public abstract class ChunkBuffer
+{
 
-    /**
+	/**
      * Gets the chunk coordinate of this buffer.
      * 
      * @return The chunk coordinate.
      */
-    ChunkCoordinate getChunkCoordinate();
+	public abstract ChunkCoordinate getChunkCoordinate();
 
     /**
      * Sets the block at the given location in the chunk. The implementation may
@@ -28,7 +29,7 @@ public interface ChunkBuffer {
      *               - 1), inclusive.
      * @param material The material to set the block to.
      */
-    void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material);
+    public abstract void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material);
 
     /**
      * Gets the block material at the given position.
@@ -40,5 +41,19 @@ public interface ChunkBuffer {
      *               - 1), inclusive.
      * @return The block material.
      */
-    LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
+    public abstract LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
+	
+    private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_X_SIZE * ChunkCoordinate.CHUNK_Z_SIZE];
+	public int getHighestBlockForColumn(int blockX, int blockZ)
+	{
+		return highestBlockHeight[blockX * ChunkCoordinate.CHUNK_X_SIZE + blockZ];
+	}
+
+	public void setHighestBlockForColumn(int blockX, int blockZ, int height)
+	{
+		if(height > highestBlockHeight[blockX * ChunkCoordinate.CHUNK_X_SIZE + blockZ])
+		{
+			highestBlockHeight[blockX * ChunkCoordinate.CHUNK_X_SIZE + blockZ] = (short)height;
+		}
+	}
 }

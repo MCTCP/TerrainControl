@@ -68,7 +68,7 @@ public class ServerTickHandler
 	@SubscribeEvent
 	public void onServerTick(ServerTickEvent event)
 	{
-		if(event.phase == Phase.END)
+		if(event.phase == Phase.START)
 		{
 			((ForgeEngine)OTG.getEngine()).processPregeneratorTick();
 
@@ -201,7 +201,7 @@ public class ServerTickHandler
 		    								try
 		    								{
 		    									EntityFunction<?> entityFunc;
-		    									if(world.isOTGPlus())
+		    									if(world.isBo4Enabled())
 		    									{
 	    											entityFunc = new BO4EntityFunction();		
 		    									} else {
@@ -211,10 +211,16 @@ public class ServerTickHandler
 		    									entityFunc.y = modDataBlockY;
 		    									entityFunc.z = modDataBlockZ;
 
-		    									entityFunc.mobName = paramString2[1];
+		    									entityFunc.processEntityName(paramString2[1]);
 		    									entityFunc.groupSize = paramString2.length > 2 ? Integer.parseInt(paramString2[2]) : 1;
-		    									entityFunc.nameTagOrNBTFileName = paramString2.length > 5 ? paramString2[5] : null;
-		    									entityFunc.originalNameTagOrNBTFileName = entityFunc.nameTagOrNBTFileName;
+												if (paramString2.length > 5)
+													entityFunc.processNameTagOrFileName(paramString2[5]);
+												else
+												{
+													entityFunc.nameTagOrNBTFileName = null;
+													entityFunc.originalNameTagOrNBTFileName = null;
+												}
+												entityFunc.rotation = 0;
 
 		    									world.spawnEntity(entityFunc, null);
 		    								}
@@ -230,7 +236,7 @@ public class ServerTickHandler
 		    							{
 		    								try {
 												LocalMaterialData material = MaterialHelper.readMaterial(paramString2[1]);
-			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, null);
+			    								world.setBlock(modDataBlockX, modDataBlockY, modDataBlockZ, material, null, null, false);
 											}
 		    								catch (InvalidConfigException e)
 		    								{

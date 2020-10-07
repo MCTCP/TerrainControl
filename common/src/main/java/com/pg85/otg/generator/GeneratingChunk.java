@@ -98,11 +98,5 @@ public final class GeneratingChunk
             return amountBelowHeightCap <= this.random.nextInt(BEDROCK_LAYER_HEIGHT);
         }
         return false;
-    }
-
-    public long getSeed()
-    {
-        // TODO Auto-generated method stub
-        return 0;
-    }   
+    } 
 }

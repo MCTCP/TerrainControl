@@ -1,15 +1,22 @@
 package com.pg85.otg.bukkit.materials;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import net.minecraft.server.v1_12_R1.Block;
 import net.minecraft.server.v1_12_R1.BlockFalling;
 import net.minecraft.server.v1_12_R1.Blocks;
 import net.minecraft.server.v1_12_R1.IBlockData;
+
+//TODO: Make this class unmodifiable (parseForWorld modifies atm),
+//implement a world-specific materials cache and ensure only one
+//instance of each unique material (id+metadata) exists in memory.
+//TODO: Do creation of new material instances in one place only?
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -26,21 +33,27 @@ public class BukkitMaterialData extends LocalMaterialData
      * format as this field.
      */	
 	private int combinedBlockId;
+	// Used only for blocks read from settings, so we know whether to append data when writing
+	// TODO: Clean up the constructors, hasData is only used for blocks parsed from configs,
+	// so we can write them back properly, so may produce unexpected results when used differently.
+	private boolean hasData; 
 	
-    private BukkitMaterialData(int blockId, int blockData)
+    private BukkitMaterialData(int blockId, int blockData, boolean hasData)
     {
         this.combinedBlockId = blockId << 4 | blockData;
+        this.hasData = hasData;
     }
 
-    public BukkitMaterialData(String input)
+    public BukkitMaterialData(String input, boolean hasData)
     {
 		this.combinedBlockId = -1;
 		this.rawEntry = input;
+		this.hasData = hasData;
 	}
 
     public static BukkitMaterialData getBlank()
     {
-    	BukkitMaterialData material = new BukkitMaterialData(null);
+    	BukkitMaterialData material = new BukkitMaterialData(null, false);
     	material.isBlank = true;
     	return material;
     }
@@ -58,6 +71,7 @@ public class BukkitMaterialData extends LocalMaterialData
     		return BukkitMaterialData.getBlank();
     	}
     	
+    	// Try blockname / minecraft:blockname syntax
     	String newInput = input;
 		
         Block block = Block.getByName(newInput);
@@ -87,47 +101,36 @@ public class BukkitMaterialData extends LocalMaterialData
         	{
         		newInput = input + ":0"; // TODO: Shouldn't this be 3? This appears to fix the problem for the dungeon dimension but I still see it in BB, double check?
         	} else {
-	            return BukkitMaterialData.ofMinecraftBlock(block);
+	            return BukkitMaterialData.ofMinecraftBlock(block, false);
         	}
         }
 
-        try
-        {
-            // Try block(:data) syntax
-            return getMaterial0(newInput);
-        } catch (NumberFormatException e)
-        {
-            throw new InvalidConfigException("Unknown material: " + input);
-        }    
-    }
-
-    @SuppressWarnings("deprecation")
-    private static BukkitMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
-    {
-        String blockName = input;
+        // Try block(:data) syntax
+        
+        String blockName = newInput;
         int blockData = -1;
 
         // When there is a . or a : in the name, extract block data
-        int splitIndex = input.lastIndexOf(":");
+        int splitIndex = newInput.lastIndexOf(":");
         if (splitIndex == -1)
         {
-            splitIndex = input.lastIndexOf(".");
+            splitIndex = newInput.lastIndexOf(".");
         }
         if (splitIndex != -1)
         {
-            blockName = input.substring(0, splitIndex);
+            blockName = newInput.substring(0, splitIndex);
             try
             {
-            	blockData = Integer.parseInt(input.substring(splitIndex + 1));            
+            	blockData = Integer.parseInt(newInput.substring(splitIndex + 1));            
             }
             catch (NumberFormatException e)
             {
-            	blockName = input;
+            	blockName = newInput;
             }
         }
 
-        // Parse block name
-        Block block = Block.getByName(blockName);
+        // Try block name without data
+        block = Block.getByName(blockName);
         if (block == null)
         {
             DefaultMaterial defaultMaterial = DefaultMaterial.getMaterial(blockName);
@@ -172,28 +175,26 @@ public class BukkitMaterialData extends LocalMaterialData
             if (blockData == -1)
             {
                 // Use default
-                return BukkitMaterialData.ofMinecraftBlock(block);
-            } else
-            {               
+                return BukkitMaterialData.ofMinecraftBlock(block, false);
+            } else {           
                 // Use specified data
                 try
                 {
-                    //return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData));
                     return BukkitMaterialData.ofMinecraftBlockData(block.fromLegacyData(blockData));
                 }
                 catch(java.lang.ArrayIndexOutOfBoundsException e)
                 {
-                	throw new InvalidConfigException("Illegal meta data for the block type, cannot use " + input);
+                	throw new InvalidConfigException("Illegal meta data for the block type, cannot use " + newInput);
                 }
                 catch (IllegalArgumentException e)
                 {
-                	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
+                	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + newInput);
                 }
             }
         }
 
         // Failed, try parsing later as a fallback.
-        return new BukkitMaterialData(input);
+        return new BukkitMaterialData(newInput, false); // TODO: Assuming all fallback blocks contain data atm.
     }
 
     /**
@@ -204,7 +205,7 @@ public class BukkitMaterialData extends LocalMaterialData
      */
     public static BukkitMaterialData ofIds(int id, int data)
     {
-        return new BukkitMaterialData(id, data);
+        return new BukkitMaterialData(id, data, true);
     }
     
     /**
@@ -230,9 +231,11 @@ public class BukkitMaterialData extends LocalMaterialData
      * @param block The material.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static BukkitMaterialData ofMinecraftBlock(Block block)
+    public static BukkitMaterialData ofMinecraftBlock(Block block, boolean hasData)
     {
-        return ofIds(Block.getId(block), block.toLegacyData(block.getBlockData()));
+    	BukkitMaterialData material = ofIds(Block.getId(block), block.toLegacyData(block.getBlockData()));
+    	material.hasData = hasData;
+        return material;
     }
 
     public static BukkitMaterialData ofBukkitBlock(org.bukkit.block.Block block)
@@ -247,8 +250,8 @@ public class BukkitMaterialData extends LocalMaterialData
      */
     public static BukkitMaterialData ofMinecraftBlockData(IBlockData blockData)
     {
-        Block block = blockData.getBlock();
-        return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData));
+    	Block block = blockData.getBlock();
+        return new BukkitMaterialData(Block.getId(block), block.toLegacyData(blockData), true);
     } 
     
     @SuppressWarnings("deprecation")
@@ -302,7 +305,6 @@ public class BukkitMaterialData extends LocalMaterialData
     	} else { 	
 	        Block block = Block.getById(getBlockId());	
 	        byte data = getBlockData();
-	        boolean noData = block.getBlockData().s().isEmpty(); //s == getPropertyKeys
 	        // Note that the above line is not equivalent to data != 0, as for
 	        // example pumpkins have a default data value of 2
 	
@@ -314,12 +316,12 @@ public class BukkitMaterialData extends LocalMaterialData
 	            // Use Minecraft's name
 	            if (nonDefaultData)
 	            {
-	            	return Block.REGISTRY.b(block) + (noData ? "" : ":" + data);
+	            	return Block.REGISTRY.b(block) + (!this.hasData ? "" : ":" + data);
 	            } else {
 	            	return Block.REGISTRY.b(block).toString();
 	            }
 	        } else {
-	        	return defaultMaterial.name() + (noData ? "" : ":" + data);
+	        	return defaultMaterial.name() + (!this.hasData ? "" : ":" + data);
 	        }
     	}
     }   
@@ -400,14 +402,29 @@ public class BukkitMaterialData extends LocalMaterialData
         return this.internalBlock().getMaterial().isSolid();
     }	    
         
+    // TODO: Caching result means fallbacks will only work for one world, fix this!
+    // TODO: Not returning a copy means that any block parsed is modified, this may
+    // unintentionally include things like MaterialHelper blocks. 
+    // Redesign this, or at least make sure this doesn't cause problems.
+    // TODO: This is only applied for settings using a materialset and (non-bo) resources atm,
+    // fix this for bo's and any other material settings (do all use materialset?), will
+    // need a world-specific materials cache for readMaterial, should probably just parse
+    // materials immediately when reading settings, so pass world info to configs loading 
+    // code?
 	@Override
 	public LocalMaterialData parseForWorld(LocalWorld world)
 	{
         if (!this.checkedFallbacks && this.isEmpty() && this.rawEntry != null)
 		{
 			this.checkedFallbacks = true;
-			int newId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;
-			if(newId != this.combinedBlockId)
+            int newId;
+            try {
+                newId = ((BukkitMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)).combinedBlockId;
+            } catch (NullPointerException e) {
+                OTG.log(LogMarker.ERROR, "Could not parse fallback for "+rawEntry);
+                throw e;
+            }
+            if(newId != this.combinedBlockId)
 			{
 				this.combinedBlockId = newId;
 				this.defaultMaterial = null;
@@ -449,12 +466,26 @@ public class BukkitMaterialData extends LocalMaterialData
         if (!(obj instanceof BukkitMaterialData))
         {
             return false;
-        }
+        }      
         BukkitMaterialData other = (BukkitMaterialData) obj;
+        if(this.isBlank != other.isBlank)
+        {
+        	return false;
+        }
+        else if(this.isBlank)
+        {
+        	return true;
+        }        
         if (combinedBlockId != other.combinedBlockId)
         {
             return false;
         }
         return true;
-    }	
+    }
+
+	@Override
+	public boolean hasData()
+	{
+		return this.hasData;
+	}
 }

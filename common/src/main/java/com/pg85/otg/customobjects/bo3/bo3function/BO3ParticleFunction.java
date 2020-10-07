@@ -11,7 +11,7 @@ public class BO3ParticleFunction extends ParticleFunction<BO3Config>
     public BO3ParticleFunction rotate()
     {
     	BO3ParticleFunction rotatedBlock = new BO3ParticleFunction();
-        rotatedBlock.x = z - 1;
+        rotatedBlock.x = z;// - 1;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.particleName = particleName;

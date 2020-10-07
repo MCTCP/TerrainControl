@@ -105,7 +105,7 @@ public class UnderWaterOreGen extends Resource
                         sourceBlock = world.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
                         if (this.sourceBlocks.contains(sourceBlock))
                         {
-                            world.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated);
+                            world.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated, true);
                         }
                     }
                 }

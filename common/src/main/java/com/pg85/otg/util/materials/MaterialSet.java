@@ -5,6 +5,7 @@ import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
+import com.pg85.otg.util.materials.MaterialSetEntry;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -16,9 +17,6 @@ import java.util.Set;
  * this set, and as such, this set can't be iterated over and its size remains
  * unknown.
  */
-// TODO: This seems really inefficient and riddiculously overcomplicated, burn with fire.
-// Looks like this is optimised mainly for use with blockchecks and BOfunctions, resources like oregen also use it though,
-// they shouldn't need any other functionality than containing a list of materials.
 public class MaterialSet
 {
     /**
@@ -155,7 +153,8 @@ public class MaterialSet
         materials.add(entry);
     }
     
-    public void parseForWorld(LocalWorld world) {
+    public void parseForWorld(LocalWorld world)
+    {
         if (!parsed)
         {
             for (MaterialSetEntry material : materials)
@@ -222,6 +221,7 @@ public class MaterialSet
         updateIntSet();
 
         // Check if the material is included
+        // If SAND is in the list, both SAND:0 and SAND:1 return true.
         if (Arrays.binarySearch(materialIntSet, material.hashCodeWithoutBlockData()) >= 0)
         {
             return true;
@@ -302,5 +302,4 @@ public class MaterialSet
         }
         return rotated;
     }
-
 }

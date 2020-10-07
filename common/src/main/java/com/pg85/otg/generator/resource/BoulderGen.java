@@ -76,7 +76,7 @@ public class BoulderGen extends Resource
                         float f4 = i3 - y;
                         if (f2 * f2 + f3 * f3 + f4 * f4 <= f1 * f1)
                         {
-                            world.setBlock(i1, i3, i2, this.material, null, chunkBeingPopulated);
+                            world.setBlock(i1, i3, i2, this.material, null, chunkBeingPopulated, true);
                         }
                     }
                 }

@@ -1,11 +1,13 @@
 package com.pg85.otg.customobjects.structures;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
@@ -37,742 +39,1030 @@ import com.pg85.otg.customobjects.structures.bo4.SmoothingAreaLineDiagonal;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.helpers.MathHelper;
+import com.pg85.otg.util.helpers.StreamHelper;
 
 public class CustomStructureFileManager
-{
-	static void saveStructuresFile(Map<ChunkCoordinate, CustomStructure> structures, LocalWorld world)
+{	
+	// Plotted chunks
+	
+	public static void savePlottedChunksData(LocalWorld world, Map<ChunkCoordinate, boolean[][]> populatedChunks)
 	{
-		// When loading files we first load all the structure files and put them in worldInfoChunks and structurecache 
-		// (if they are outside the pregenerated region), then from any structures that have ObjectsToSpawn or 
-		// SmoothingAreas to spawn we create structures in the structure cache for each of those (overriding some of 
-		// the structures we added earlier). Then we load all the null chunks and add them to the structurecache (if 
-		// they are outside the pregenerated region), potentially overriding some of the structures we added earlier.
-
-		// So don't worry about saving structure files for structures that have already been spawned, they won't be added to the structure cache when loading
-
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
-		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataBackupFileName);
 
-    	StringBuilder stringbuilder = new StringBuilder();
-    	if(structures.size() > 0)
+    	if(populatedChunks.size() > 0)
     	{
-	    	stringbuilder.append("[");
-
-			for(Entry<ChunkCoordinate, CustomStructure> entry : structures.entrySet())
-			{
-				ChunkCoordinate chunkCoord = entry.getKey();
-				CustomStructure structure = entry.getValue();
-
-				if(stringbuilder.length() > 1)
-				{
-					stringbuilder.append(" ");
-				}
-
-		    	if(structure.start != null)
-		    	{
-		    		//stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][" + structure.MinY + "," + structure.Start.isSpawned + "," + structure.Start.isBranch + "," + structure.Start.branchDepth + "," + structure.Start.isRequiredBranch + "," + structure.Start.BO3Name + "," + structure.Start.rotation.toString() + "," + structure.Start.getX() + "," + structure.Start.getY() + "," + structure.Start.getZ() + "," + structure.startChunkBlockChecksDone + "]");
-		    		stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][" + structure.start.bo3Name + "," + structure.start.rotation.toString() + "," + structure.start.getX() + "," + structure.start.getY() + "," + structure.start.getZ() + "]");
-		    	} else {
-		    		stringbuilder.append("[" + entry.getKey().getChunkX() + "," + entry.getKey().getChunkZ() + "][Null structure]");
-		    	}
-
-				ChunkCoordinate key;
-				Stack<BO4CustomStructureCoordinate> coords;
-
-				// If this is the origin of this structure then save its ObjectsToSpawn and SmoothingAreasToSpawn
-				// All the chunks belonging to this structure will be reconstituted when this file is loaded				
-				stringbuilder.append("[");
-				if(structure instanceof BO4CustomStructure && ((BO4CustomStructure)structure).objectsToSpawn.entrySet().size() > 0 && chunkCoord.getChunkX() == ((BO4CustomStructureCoordinate)structure.start).getChunkX() && chunkCoord.getChunkZ() == ((BO4CustomStructureCoordinate)structure.start).getChunkZ())
-				{
-					boolean added = false;
-					for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectToSpawn : ((BO4CustomStructure)structure).objectsToSpawn.entrySet())
-					{
-						if(added)
-						{
-							stringbuilder.append(";");
-						}
-						key = objectToSpawn.getKey();
-						stringbuilder.append(key.getChunkX() + "," + key.getChunkZ());
-						added = true;
-
-						coords = objectToSpawn.getValue();
-						for(CustomStructureCoordinate coord : coords)
-						{
-							//stringbuilder.append("," + coord.isSpawned + "," + coord.isBranch + "," + coord.branchDepth + "," + coord.isRequiredBranch + "," + coord.BO3Name + "," + coord.rotation.toString() + "," + coord.getX() + "," + coord.getY() + "," + coord.getZ());
-							stringbuilder.append("," + coord.bo3Name + "," + coord.rotation.toString() + "," + coord.getX() + "," + coord.getY() + "," + coord.getZ());
-						}
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure instanceof BO4CustomStructure && ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size() > 0 && chunkCoord.getChunkX() == ((BO4CustomStructureCoordinate)structure.start).getChunkX() && chunkCoord.getChunkZ() == ((BO4CustomStructureCoordinate)structure.start).getChunkZ())
-				{
-					boolean added = false;
-					ArrayList<SmoothingAreaLine> coords2;
-					String append;
-					for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet())
-					{
-						if(added)
-						{
-							stringbuilder.append(";");
-						}
-						key = smoothingAreaToSpawn.getKey();
-						stringbuilder.append(key.getChunkX() + "," + key.getChunkZ());
-						added = true;
-
-						coords2 = smoothingAreaToSpawn.getValue();
-						for(SmoothingAreaLine coord : coords2)
-						{
-							append = ":";
-							
-							append += coord.beginPointX;
-							append += "," + coord.beginPointY;
-							append += "," + coord.beginPointZ;
-
-							append += "," + coord.endPointX;
-							append += "," + coord.endPointY;
-							append += "," + coord.endPointZ;
-
-							append += "," + coord.originPointX;
-							append += "," + coord.originPointY;
-							append += "," + coord.originPointZ;
-
-							append += "," + coord.finalDestinationPointX;
-							append += "," + coord.finalDestinationPointY;
-							append += "," + coord.finalDestinationPointZ;
-							
-							if(coord instanceof SmoothingAreaLineDiagonal)
-							{
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointX; // 12;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineoriginPointY; // 13;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointZ; // 14;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointX; // 15;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointY; // 16;
-								append += "," + ((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointZ; // 17;								
-							}
-							
-							stringbuilder.append(append);
-						}
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure.modDataManager.modData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
-				{
-					boolean added = false;
-					for(ModDataFunction<?> modData : structure.modDataManager.modData)
-					{
-						if(added)
-						{
-							stringbuilder.append(":");
-						}
-						stringbuilder.append(modData.x + "," + modData.y + "," + modData.z + "," + modData.modId.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + modData.modData.replace(":", "&#58;").replace(" ", "&nbsp;"));
-						added = true;
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure.spawnerManager.spawnerData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
-				{
-					boolean added = false;
-					for(SpawnerFunction<?> spawnerData : structure.spawnerManager.spawnerData)
-					{
-						if(added)
-						{
-							stringbuilder.append(":");
-						}
-						stringbuilder.append(spawnerData.x + "," + spawnerData.y + "," + spawnerData.z + "," + spawnerData.mobName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.originalnbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.nbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;") + "," + spawnerData.groupSize + "," + spawnerData.interval + "," + spawnerData.spawnChance + "," + spawnerData.maxCount + "," + spawnerData.despawnTime + "," + spawnerData.velocityX + "," + spawnerData.velocityY + "," + spawnerData.velocityZ + "," + spawnerData.velocityXSet + "," + spawnerData.velocityYSet + "," + spawnerData.velocityZSet + "," + spawnerData.yaw + "," + spawnerData.pitch);
-						added = true;
-					}
-				}
-
-				stringbuilder.append("][");
-
-				if(structure.particlesManager.particleData.size() > 0 && chunkCoord.getChunkX() == structure.start.getChunkX() && chunkCoord.getChunkZ() == structure.start.getChunkZ())
-				{
-					boolean added = false;
-					for(ParticleFunction<?> particleData : structure.particlesManager.particleData)
-					{
-						if(added)
-						{
-							stringbuilder.append(":");
-						}
-						stringbuilder.append(particleData.x + "," + particleData.y + "," + particleData.z + "," + particleData.particleName.replace(":", "&#58;").replace(" ", "&nbsp;")+ "," + particleData.interval + "," + particleData.velocityX + "," + particleData.velocityY + "," + particleData.velocityZ + "," + particleData.velocityXSet + "," + particleData.velocityYSet + "," + particleData.velocityZSet);
-						added = true;
-					}
-				}
-
-				stringbuilder.append("]");
-			}
-
-			stringbuilder.append("]");
-
-			BufferedWriter writer = null;
-	        try
-	        {
-	    		if(!occupiedChunksFile.exists())
+    		for(Entry<ChunkCoordinate, boolean[][]> chunkPerRegionEntry : populatedChunks.entrySet())
+    		{
+        		File occupiedChunksFile = new File(
+    				world.getWorldSaveDir().getAbsolutePath() + File.separator + 
+    				PluginStandardValues.PLUGIN_NAME + File.separator + 
+    				(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+    				WorldStandardValues.PlottedChunksDataFolderName + File.separator +
+    				chunkPerRegionEntry.getKey().getChunkX() + "_" +
+    				chunkPerRegionEntry.getKey().getChunkZ() +
+    				WorldStandardValues.StructureDataFileExtension
+				);
+        		File occupiedChunksBackupFile = new File(
+    				world.getWorldSaveDir().getAbsolutePath() + File.separator + 
+    				PluginStandardValues.PLUGIN_NAME + File.separator + 
+    				(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+    				WorldStandardValues.PlottedChunksDataFolderName + File.separator +
+    				chunkPerRegionEntry.getKey().getChunkX() + "_" +
+    				chunkPerRegionEntry.getKey().getChunkZ() +    				
+    				WorldStandardValues.StructureDataBackupFileExtension
+				);
+        		
+        		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        		DataOutputStream dos = new DataOutputStream(bos);
+    			
+        		boolean[][] entriesByStructureName = chunkPerRegionEntry.getValue();
+	    		try
 	    		{
-	    			occupiedChunksFile.getParentFile().mkdirs();
-	    		} else {
-	    			Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-	    		}
+	    			int version = 1;
+	    			dos.writeInt(version);
+					dos.writeInt(CustomStructureCache.REGION_SIZE);
 
-	        	writer = new BufferedWriter(new FileWriter(occupiedChunksFile));
-	            writer.write(stringbuilder.toString());
-	        }
-	        catch (IOException e)
-	        {
-				e.printStackTrace();
-				throw new RuntimeException(
-					"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
-					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
-					+ "If your dimension's " + WorldStandardValues.StructureDataFileName + " and its backup have been corrupted, "
-					+ "you can replace it with your own backup.");
-	        }
-	        finally
-	        {
-	            try
-	            {
-	                // Close the writer regardless of what happens...
-	                writer.close();
-	            } catch (Exception e) { }
-	        }
+		    		for(int x = 0; x < CustomStructureCache.REGION_SIZE; x++)
+		    		{
+		    			boolean[] structureArr = entriesByStructureName[x];
+		    			for(int z = 0; z < CustomStructureCache.REGION_SIZE; z++)
+		    			{
+		    				dos.writeBoolean(structureArr[z]);
+		    			}
+		    		}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					return;
+				}
+
+				DataOutputStream dos2 = null;
+				FileOutputStream fos = null;
+		        try {
+		    		if(!occupiedChunksFile.exists())
+		    		{
+		    			occupiedChunksFile.getParentFile().mkdirs();
+		    		} else {
+		    			Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		    		}
+					byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
+					dos.close();
+					fos = new FileOutputStream(occupiedChunksFile);
+					dos2 = new DataOutputStream(fos);
+					dos2.write(compressedBytes, 0, compressedBytes.length);
+		        }
+		        catch (IOException e)
+		        {
+					e.printStackTrace();
+					throw new RuntimeException(
+						"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
+						+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+						+ "If your dimension's structure data files and backups have been corrupted, you can delete them,"
+						+ "at the risk of losing data for unspawned structure parts."
+					);
+		        } finally {
+		            try {
+		                if(dos != null)
+		                {
+		                	dos.close();
+		                }
+		            } catch (Exception e) { }
+		            try {
+		                if(dos2 != null)
+		                {
+		                	dos2.close();
+		                }
+		            } catch (Exception e) { }
+		            try {
+		                if(fos != null)
+		                {
+		                	fos.close();
+		                }
+		            } catch (Exception e) { }
+		        }
+    		}
     	}
     }
 	
-	static Map<ChunkCoordinate, CustomStructure> loadStructuresFile(LocalWorld world)
-	{		
-		// When loading files we first load all the structure files and put them in worldInfoChunks 
-		// and structurecache (if they are outside the pregenerated region), then from any structures 
-		// that have ObjectsToSpawn or SmoothingAreas to spawn we create structures in the structurecache 
-		// for each of those (overriding some of the structures we added earlier). Then we load all the 
-		// null chunks and add them to the structurecache (if they are outside the pregenerated region), 
-		// potentially overriding some of the structures we added earlier.
-		
+	public static Map<ChunkCoordinate, boolean[][]> loadPlottedChunksData(LocalWorld world)
+	{
 		int dimensionId = world.getDimensionId();
-		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataFileName);
-		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.StructureDataBackupFileName);
+		
+		HashMap<ChunkCoordinate, boolean[][]> output = new HashMap<ChunkCoordinate, boolean[][]>();
+		
+		File occupiedChunksFolder = new File(
+			world.getWorldSaveDir().getAbsolutePath() + File.separator + 
+			PluginStandardValues.PLUGIN_NAME + File.separator + 
+			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+			WorldStandardValues.PlottedChunksDataFolderName + File.separator
+		);
+		
+		HashMap<File, File> saveFiles = new HashMap<File, File>();
+		ArrayList<File> mainFiles = new ArrayList<File>();
+		ArrayList<File> backupFiles = new ArrayList<File>();
+		if(occupiedChunksFolder.exists())
+		{
+			for(File file : occupiedChunksFolder.listFiles())
+			{
+				if(
+					file.getPath().endsWith(WorldStandardValues.StructureDataFileExtension) && 
+					file.getName().replace(WorldStandardValues.StructureDataFileExtension, "").split("_").length == 2 &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.StructureDataFileExtension, "").split("_")[0]) &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.StructureDataFileExtension, "").split("_")[1])
+				) {
+					mainFiles.add(file);
+				}
+				else if(
+					file.getPath().endsWith(WorldStandardValues.StructureDataBackupFileExtension) &&
+					file.getName().replace(WorldStandardValues.BackupFileSuffix, "").split("_").length == 2 &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.BackupFileSuffix, "").split("_")[0]) &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.BackupFileSuffix, "").split("_")[1])
+				)
+				{
+					backupFiles.add(file);
+				}
+			}
 
-	    if(!occupiedChunksFile.exists() && !occupiedChunksBackupFile.exists())
-	    {
-	    	return null;
-	    }
+			for(File file : mainFiles)
+			{
+				boolean bFound = false;
+				for(File backupFile : backupFiles)
+				{
+					if(file.getPath().replace(WorldStandardValues.StructureDataFileExtension, "").equals(backupFile.getPath().replace(WorldStandardValues.StructureDataBackupFileExtension, "")))
+					{
+						saveFiles.put(file, backupFile);
+						bFound = true;
+						break;
+					}
+				}
+				if(!bFound)
+				{
+					saveFiles.put(file, null);
+				}
+			}
+		}
 				
-	    if(occupiedChunksFile.exists())
-	    {
-	    	StringBuilder stringbuilder = new StringBuilder();
+		for(Entry<File, File> saveFile : saveFiles.entrySet())
+		{
 			boolean bSuccess = false;
-			try
-			{
-				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksFile));
-				try
-				{
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        line = reader.readLine();
-				    }
-			    	bSuccess = true;
-				} finally {
-					reader.close();
-				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-				OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
-			}
-			
-		    if(bSuccess)
+			File occupiedChunksFile = saveFile.getKey();
+			File occupiedChunksBackupFile = saveFile.getValue();
+				
+		    if(
+	    		(occupiedChunksFile == null || !occupiedChunksFile.exists()) &&
+				(occupiedChunksBackupFile == null || !occupiedChunksBackupFile.exists())
+    		)
 		    {
-		    	try
-		    	{
-		    		String[] structuresString = stringbuilder.toString().substring(1, stringbuilder.length() - 1).split(" ");	    
-			    	return parseStructuresFile(structuresString, world);
-		    	}
-			    catch(Exception ex)
-				{
-			    	ex.printStackTrace();
-			    	OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
-				}
-		    }			
-	    }
-	    
-	    if(occupiedChunksBackupFile.exists())
-	    {
-	    	StringBuilder stringbuilder = new StringBuilder();
-			boolean bSuccess = false;
-			try
-			{
-				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksBackupFile));
-				try
-				{
-					String line = reader.readLine();
+		    	continue;
+		    }
 
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        line = reader.readLine();
-				    }
-			    	bSuccess = true;
-				} finally {
-					reader.close();
+		    if(occupiedChunksFile != null && occupiedChunksFile.exists())
+		    {			
+		    	FileInputStream fis = null;
+		    	boolean[][] result = null;
+		    	ChunkCoordinate regionCoord = null;
+				try {
+			    	String[] chunkCoords = occupiedChunksFile.getName().replace(WorldStandardValues.StructureDataFileExtension, "").split("_");
+			    	int regionX = Integer.parseInt(chunkCoords[0]);
+			    	int regionZ = Integer.parseInt(chunkCoords[1]);
+			    	regionCoord = ChunkCoordinate.fromChunkCoords(regionX, regionZ);
+			    	
+			    	fis = new FileInputStream(occupiedChunksFile);			
+		    		ByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
+					
+					byte[] compressedBytes = new byte[(int) fis.getChannel().size()];
+					buffer.get(compressedBytes);
+					byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
+		    		buffer = ByteBuffer.wrap(decompressedBytes);
+		    		result = parsePlottedChunksFileFromStream(buffer, world);
 				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-		    if(bSuccess)
-		    {
-		    	try
-		    	{
-		    		String[] structuresString = stringbuilder.toString().substring(1, stringbuilder.length() - 1).split(" ");	    
-			    	return parseStructuresFile(structuresString, world);
-		    	}
-			    catch(Exception ex)
+				catch (Exception ex)
 				{
-			    	ex.printStackTrace();
+					ex.printStackTrace();
+					OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
+				} finally {
+					if(fis != null)
+					{
+						try {
+							fis.getChannel().close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						try {
+							fis.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				if(result != null)
+				{
+					bSuccess = true;
+					output.put(regionCoord, result);
 				}
 		    }
-	    }
-	    
-		throw new RuntimeException(
-			"OTG encountered a critical error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
-			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
-			+ "If your dimension's " + WorldStandardValues.StructureDataFileName + " and its backup have been corrupted, you can "
-			+ "replace it with a backup."
-		);
+		    
+		    if(!bSuccess && occupiedChunksBackupFile != null && occupiedChunksBackupFile.exists())
+		    {			
+		    	FileInputStream fis = null;
+		    	boolean[][] result = null;
+		    	ChunkCoordinate regionCoord = null;
+				try {
+			    	String[] chunkCoords = occupiedChunksFile.getName().replace(WorldStandardValues.StructureDataBackupFileExtension, "").split("_");
+			    	int regionX = Integer.parseInt(chunkCoords[0]);
+			    	int regionZ = Integer.parseInt(chunkCoords[1]);
+			    	regionCoord = ChunkCoordinate.fromChunkCoords(regionX, regionZ);
+			    	
+			    	fis = new FileInputStream(occupiedChunksBackupFile);			
+		    		ByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
+					
+					byte[] compressedBytes = new byte[(int) fis.getChannel().size()];
+					buffer.get(compressedBytes);
+					byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
+		    		buffer = ByteBuffer.wrap(decompressedBytes);
+		    		result = parsePlottedChunksFileFromStream(buffer, world);
+				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
+				} finally {
+					if(fis != null)
+					{
+						try {
+							fis.getChannel().close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						try {
+							fis.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				if(result != null)
+				{
+					bSuccess = true;
+					output.put(regionCoord, result);
+				}				
+		    }
+		    
+		    if(!bSuccess)
+		    {
+				throw new RuntimeException(
+					"OTG encountered a critical error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
+					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+					+ "If your dimension's structure data files and backups have been corrupted, you can delete them,"
+					+ "at the risk of losing data for unspawned structure parts."
+				);
+		    }
+		}
+		
+		return output.size() > 0 ? output : null;
 	}
 	
-	private static Map<ChunkCoordinate, CustomStructure> parseStructuresFile(String[] structuresString, LocalWorld world)
+	private static boolean[][] parsePlottedChunksFileFromStream(ByteBuffer buffer, LocalWorld world) throws IOException
 	{
-	    Map<ChunkCoordinate, CustomStructure> structuresFile = new HashMap<ChunkCoordinate, CustomStructure>();
-	    for(int i = 0; i < structuresString.length; i++)
-	    {
-	    	String[] structureStringArray = structuresString[i].substring(1, structuresString[i].length() - 1).split("\\]\\[");
-	    	String structureString = structureStringArray[1];
+		int version = buffer.getInt();		
+		int regionSize = buffer.getInt();
+		boolean[][] chunksMatrix = new boolean[regionSize][regionSize];
+		
+		for(int x = 0; x < regionSize; x++)
+		{		
+			for(int z = 0; z < regionSize; z++)
+			{
+				chunksMatrix[x][z] = buffer.get() != 0;
+			}
+		}
+		
+		return chunksMatrix;
+	}
+	
+	
+	// Structure cache
 
-		    int minY = 0;
-		    CustomStructureCoordinate structureStart = null;
-		    Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
-		    Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
-		    HashSet<ModDataFunction<?>> modData = new HashSet<ModDataFunction<?>>();
-		    HashSet<SpawnerFunction<?>> spawnerData = new HashSet<SpawnerFunction<?>>();
-		    HashSet<ParticleFunction<?>> particleData = new HashSet<ParticleFunction<?>>();
+	// TODO: Since we're using regions now, can use byte/short for internal coords instead of int.
+	static void saveStructureData(Map<ChunkCoordinate, CustomStructure> structures, LocalWorld world)
+	{
+		int dimensionId = world.getDimensionId();
 
-		    String[] chunkCoordString = structureStringArray[0].split(",");
-		    int chunkX = Integer.parseInt(chunkCoordString[0]);
-		    int chunkZ = Integer.parseInt(chunkCoordString[1]);
-		    ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+		// Sort structures start bo4 name, then split them into regions
+		
+		// For the start of each structure save its ObjectsToSpawn and SmoothingAreasToSpawn
+		// save chunk coords for branches that have already spawned (not in ObjectsToSpawn/SmoothingAreasToSpawn)
+    	if(structures.size() > 0)
+    	{
+    		HashMap<ChunkCoordinate, HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>>> structuresPerRegion = new HashMap<ChunkCoordinate, HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>>>();
+    		for(Entry<ChunkCoordinate, CustomStructure> entry : structures.entrySet())
+    		{
+    			ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
+					MathHelper.floor(entry.getKey().getChunkX() / CustomStructureCache.REGION_SIZE), 
+					MathHelper.floor(entry.getKey().getChunkZ() / CustomStructureCache.REGION_SIZE)
+				);
+    		
+        		HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> entriesByStructureName = structuresPerRegion.get(regionCoord);
+        		if(entriesByStructureName == null)
+        		{
+    				entriesByStructureName = new HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>>();
+    				structuresPerRegion.put(regionCoord, entriesByStructureName);
+    			}
+    			
+    			// BO3's that add spawners/particles/moddata are saved as null structures
+    			String startBo3Name = "NULL"; 
+    			if(entry.getValue().start != null)
+    			{
+    				startBo3Name = entry.getValue().start.bo3Name;
+    			}
 
-		    if(!structureString.equals("Null structure"))
+				HashMap<CustomStructure, ArrayList<ChunkCoordinate>> entryByStructureName = entriesByStructureName.get(startBo3Name);
+				ArrayList<ChunkCoordinate> structureChunks = new ArrayList<ChunkCoordinate>();
+    			if(entryByStructureName == null)
+    			{
+    				entryByStructureName = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
+    				entryByStructureName.put(entry.getValue(), structureChunks);
+    				entriesByStructureName.put(startBo3Name, entryByStructureName);
+    			} else {
+    				structureChunks = entryByStructureName.get(entry.getValue());
+    				if(structureChunks == null)
+    				{
+    					structureChunks = new ArrayList<ChunkCoordinate>();
+    					entryByStructureName.put(entry.getValue(), structureChunks);
+    				}
+    			}
+    			structureChunks.add(entry.getKey());
+    		}
+    		
+    		for(Entry<ChunkCoordinate, HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>>> structuresPerRegionEntry : structuresPerRegion.entrySet())
+    		{
+        		File occupiedChunksFile = new File(
+    				world.getWorldSaveDir().getAbsolutePath() + File.separator + 
+    				PluginStandardValues.PLUGIN_NAME + File.separator + 
+    				(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+    				WorldStandardValues.StructureDataFolderName + File.separator +
+    				structuresPerRegionEntry.getKey().getChunkX() + "_" +
+    				structuresPerRegionEntry.getKey().getChunkZ() +
+    				WorldStandardValues.StructureDataFileExtension
+				);
+        		File occupiedChunksBackupFile = new File(
+    				world.getWorldSaveDir().getAbsolutePath() + File.separator + 
+    				PluginStandardValues.PLUGIN_NAME + File.separator + 
+    				(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+    				WorldStandardValues.StructureDataFolderName + File.separator +
+    				structuresPerRegionEntry.getKey().getChunkX() + "_" +
+    				structuresPerRegionEntry.getKey().getChunkZ() +    				
+    				WorldStandardValues.StructureDataBackupFileExtension
+				);
+    			
+        		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        		DataOutputStream dos = new DataOutputStream(bos);
+        		
+    			HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> entriesByStructureName = structuresPerRegionEntry.getValue();
+	    		try
+	    		{
+	    			int version = 1;
+	    			dos.writeInt(version);
+					dos.writeInt(entriesByStructureName.entrySet().size());
+					for(Entry<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> entry : entriesByStructureName.entrySet())
+					{
+						StreamHelper.writeStringToStream(dos, entry.getKey());
+						dos.writeInt(entry.getValue().entrySet().size());
+						// Structures have been de-duplicated, should be only one entry per structure start
+						for(Entry<CustomStructure, ArrayList<ChunkCoordinate>> entry1 : entry.getValue().entrySet())
+						{
+							CustomStructure structure = entry1.getKey();
+	
+							// Write structure start data (if any)
+							// If name is "NULL", we'll know not to look for these when reading.
+							if(entry1.getKey().start != null)
+							{
+		    					dos.writeInt(entry1.getKey().start.rotation.getRotationId());
+		    					dos.writeInt(entry1.getKey().start.getX());
+		    					dos.writeInt(entry1.getKey().start.getY());
+		    					dos.writeInt(entry1.getKey().start.getZ());
+							}
+	
+							// Write all chunks used for structure
+							int a = entry1.getValue().size();
+							int b = 0;
+	    					dos.writeInt(entry1.getValue().size());
+	    					for(ChunkCoordinate chunkCoord : entry1.getValue())
+	    					{
+	    						b++;
+								// TODO: Use byte/short for internal coords
+					    		dos.writeInt(chunkCoord.getChunkX());
+					    		dos.writeInt(chunkCoord.getChunkZ());
+	    					}
+	
+							if(
+								structure instanceof BO4CustomStructure &&
+								((BO4CustomStructure)structure).objectsToSpawn.entrySet().size() > 0
+							)
+							{
+								dos.writeBoolean(true);
+								dos.writeInt(((BO4CustomStructure)structure).objectsToSpawn.entrySet().size());
+								for(Entry<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectToSpawn : ((BO4CustomStructure)structure).objectsToSpawn.entrySet())
+								{
+									ChunkCoordinate key = objectToSpawn.getKey();
+									dos.writeInt(key.getChunkX());
+									dos.writeInt(key.getChunkZ());
+	
+									Stack<BO4CustomStructureCoordinate> coords = objectToSpawn.getValue();
+									dos.writeInt(coords.size());
+									for(CustomStructureCoordinate coord : coords)
+									{
+										StreamHelper.writeStringToStream(dos, coord.bo3Name); 
+										dos.writeInt(coord.rotation.getRotationId());
+										dos.writeInt(coord.getX());
+										dos.writeInt(coord.getY());
+										dos.writeInt(coord.getZ());
+									}
+								}
+							} else {
+								dos.writeBoolean(false);
+							}
+			
+							if(
+								structure instanceof BO4CustomStructure && 
+								((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size() > 0 
+							)
+							{								
+								ArrayList<SmoothingAreaLine> coords2;
+								dos.writeBoolean(true);
+								dos.writeInt(((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size());
+								for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet())
+								{
+									ChunkCoordinate key = smoothingAreaToSpawn.getKey();
+									dos.writeInt(key.getChunkX());
+									dos.writeInt(key.getChunkZ());
+			
+									coords2 = smoothingAreaToSpawn.getValue();
+									dos.writeInt(coords2.size());
+									for(SmoothingAreaLine coord : coords2)
+									{
+										// TODO: Should only need origin and destination?
+										dos.writeInt(coord.beginPointX);
+										dos.writeInt(coord.beginPointY);
+										dos.writeInt(coord.beginPointZ);
+			
+										dos.writeInt(coord.endPointX);
+										dos.writeInt(coord.endPointY);
+										dos.writeInt(coord.endPointZ);
+			
+										dos.writeInt(coord.originPointX);
+										dos.writeInt(coord.originPointY);
+										dos.writeInt(coord.originPointZ);
+			
+										dos.writeInt(coord.finalDestinationPointX);
+										dos.writeInt(coord.finalDestinationPointY);
+										dos.writeInt(coord.finalDestinationPointZ);
+										
+										if(coord instanceof SmoothingAreaLineDiagonal)
+										{
+											dos.writeBoolean(true);
+											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointX);
+											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineoriginPointY);
+											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointZ);
+											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointX);
+											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointY);
+											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointZ);								
+										} else {
+											dos.writeBoolean(false);
+										}
+									}
+								}
+							} else {
+								dos.writeBoolean(false);
+							}
+	
+							// Save moddata/particles/spawner data
+							// Bo3 objects/structures have start == null
+							// For Bo4's, only save for the start bo4, data will be reconstituted when the file is loaded.
+							
+							if(structure.modDataManager.modData.size() > 0)
+							{
+								dos.writeBoolean(true);
+								dos.writeInt(structure.modDataManager.modData.size());
+								for(ModDataFunction<?> modData : structure.modDataManager.modData)
+								{
+									dos.writeInt(modData.x);
+									dos.writeInt(modData.y);
+									dos.writeInt(modData.z);
+									StreamHelper.writeStringToStream(dos, modData.modId.replace(":", "&#58;").replace(" ", "&nbsp;"));
+									StreamHelper.writeStringToStream(dos, modData.modData.replace(":", "&#58;").replace(" ", "&nbsp;"));
+								}
+							} else {
+								dos.writeBoolean(false);
+							}
+	
+							if(structure.spawnerManager.spawnerData.size() > 0)
+							{
+								dos.writeBoolean(true);
+								dos.writeInt(structure.spawnerManager.spawnerData.size());
+								for(SpawnerFunction<?> spawnerData : structure.spawnerManager.spawnerData)
+								{
+									dos.writeInt(spawnerData.x); 
+									dos.writeInt(spawnerData.y); 
+									dos.writeInt(spawnerData.z);
+									StreamHelper.writeStringToStream(dos, spawnerData.mobName.replace(":", "&#58;").replace(" ", "&nbsp;")); 
+									StreamHelper.writeStringToStream(dos, spawnerData.originalnbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;")); 
+									StreamHelper.writeStringToStream(dos, spawnerData.nbtFileName.replace(":", "&#58;").replace(" ", "&nbsp;"));
+									dos.writeInt(spawnerData.groupSize);
+									dos.writeInt(spawnerData.interval);
+									dos.writeInt(spawnerData.spawnChance); 
+									dos.writeInt(spawnerData.maxCount); 
+									dos.writeInt(spawnerData.despawnTime); 
+									dos.writeDouble(spawnerData.velocityX); 
+									dos.writeDouble(spawnerData.velocityY); 
+									dos.writeDouble(spawnerData.velocityZ); 
+									dos.writeBoolean(spawnerData.velocityXSet); 
+									dos.writeBoolean(spawnerData.velocityYSet); 
+									dos.writeBoolean(spawnerData.velocityZSet); 
+									dos.writeFloat(spawnerData.yaw); 
+									dos.writeFloat(spawnerData.pitch);
+								}
+							} else {
+								dos.writeBoolean(false);
+							}
+	
+							if(structure.particlesManager.particleData.size() > 0)
+							{
+								dos.writeBoolean(true);
+								dos.writeInt(structure.particlesManager.particleData.size());
+								for(ParticleFunction<?> particleData : structure.particlesManager.particleData)
+								{
+									dos.writeInt(particleData.x); 
+									dos.writeInt(particleData.y);
+									dos.writeInt(particleData.z); 
+									StreamHelper.writeStringToStream(dos, particleData.particleName.replace(":", "&#58;").replace(" ", "&nbsp;")); 
+									dos.writeDouble(particleData.interval); 
+									dos.writeDouble(particleData.velocityX); 
+									dos.writeDouble(particleData.velocityY); 
+									dos.writeDouble(particleData.velocityZ); 
+									dos.writeBoolean(particleData.velocityXSet); 
+									dos.writeBoolean(particleData.velocityYSet); 
+									dos.writeBoolean(particleData.velocityZSet);
+								}
+							} else {
+								dos.writeBoolean(false);
+							}					
+						}
+					}
+				} catch (IOException e1) {
+					e1.printStackTrace();
+					return;
+				}
+	    			
+				DataOutputStream dos2 = null;
+				FileOutputStream fos = null;
+		        try {
+		    		if(!occupiedChunksFile.exists())
+		    		{
+		    			occupiedChunksFile.getParentFile().mkdirs();
+		    		} else {
+		    			Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		    		}
+					byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
+					dos.close();
+					fos = new FileOutputStream(occupiedChunksFile);
+					dos2 = new DataOutputStream(fos);
+					dos2.write(compressedBytes, 0, compressedBytes.length);
+		        }
+		        catch (IOException e)
+		        {
+					e.printStackTrace();
+					throw new RuntimeException(
+						"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
+						+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+						+ "If your dimension's structure data files and backups have been corrupted, you can delete them,"
+						+ "at the risk of losing data for unspawned structure parts."
+					);
+		        } finally {
+		            try {
+		                if(dos != null)
+		                {
+		                	dos.close();
+		                }
+		            } catch (Exception e) { }
+		            try {
+		                if(dos2 != null)
+		                {
+		                	dos2.close();
+		                }
+		            } catch (Exception e) { }
+		            try {
+		                if(fos != null)
+		                {
+		                	fos.close();
+		                }
+		            } catch (Exception e) { }
+		        }
+    		}
+    	}
+    }
+
+	public static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> loadStructureData(LocalWorld world)
+	{		
+		int dimensionId = world.getDimensionId();
+		
+		HashMap<CustomStructure, ArrayList<ChunkCoordinate>> output = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
+		
+		File occupiedChunksFolder = new File(
+			world.getWorldSaveDir().getAbsolutePath() + File.separator + 
+			PluginStandardValues.PLUGIN_NAME + File.separator + 
+			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
+			WorldStandardValues.StructureDataFolderName + File.separator
+		);
+		
+		HashMap<File, File> saveFiles = new HashMap<File, File>();
+		ArrayList<File> mainFiles = new ArrayList<File>();
+		ArrayList<File> backupFiles = new ArrayList<File>();
+		if(occupiedChunksFolder.exists())
+		{
+			for(File file : occupiedChunksFolder.listFiles())
+			{
+				if(
+					file.getPath().endsWith(WorldStandardValues.StructureDataFileExtension) && 
+					file.getName().replace(WorldStandardValues.StructureDataFileExtension, "").split("_").length == 2 &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.StructureDataFileExtension, "").split("_")[0]) &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.StructureDataFileExtension, "").split("_")[1])
+				) {
+					mainFiles.add(file);
+				}
+				else if(
+					file.getPath().endsWith(WorldStandardValues.StructureDataBackupFileExtension) &&
+					file.getName().replace(WorldStandardValues.BackupFileSuffix, "").split("_").length == 2 &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.BackupFileSuffix, "").split("_")[0]) &&
+					MathHelper.tryParseInt(file.getName().replace(WorldStandardValues.BackupFileSuffix, "").split("_")[1])
+				)
+				{
+					backupFiles.add(file);
+				}
+			}
+			for(File file : mainFiles)
+			{
+				boolean bFound = false;
+				for(File backupFile : backupFiles)
+				{
+					if(file.getPath().replace(WorldStandardValues.StructureDataFileExtension, "").equals(backupFile.getPath().replace(WorldStandardValues.StructureDataBackupFileExtension, "")))
+					{
+						saveFiles.put(file, backupFile);
+						bFound = true;
+						break;
+					}
+				}
+				if(!bFound)
+				{
+					saveFiles.put(file, null);
+				}
+			}
+		}
+				
+		for(Entry<File, File> saveFile : saveFiles.entrySet())
+		{
+			boolean bSuccess = false;
+			File occupiedChunksFile = saveFile.getKey();
+			File occupiedChunksBackupFile = saveFile.getValue();
+				
+		    if(
+	    		(occupiedChunksFile == null || !occupiedChunksFile.exists()) &&
+				(occupiedChunksBackupFile == null || !occupiedChunksBackupFile.exists())
+    		)
 		    {
-		    	if(world.isOTGPlus())
-		    	{
-		    		structureStart = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
-		    	} else {
-		    		structureStart = new BO3CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0);
-		    	}
+		    	continue;
+		    }
 
-			    String[] structureStartString = structureStringArray[1].split(",");
-			    String[] objectsToSpawnString = {};
-			    if(structureStringArray.length > 2 && !structureStringArray[2].equals(""))
-			    {
-			    	objectsToSpawnString = structureStringArray[2].split(";");
-			    }
-			    String[] smoothingAreasToSpawnString = {};
-			    if(structureStringArray.length > 3 && !structureStringArray[3].equals(""))
-		    	{
-			    	smoothingAreasToSpawnString = structureStringArray[3].split(";");
-		    	}
-			    String[] modDataString = {};
-			    if(structureStringArray.length > 4 && !structureStringArray[4].equals(""))
-			    {
-			    	modDataString = structureStringArray[4].split(":");
-			    }
-			    String[] spawnerDataString = {};
-			    if(structureStringArray.length > 5 && !structureStringArray[5].equals(""))
-			    {
-			    	spawnerDataString = structureStringArray[5].split(":");
-			    }
-			    String[] particleDataString = {};
-			    if(structureStringArray.length > 6 && !structureStringArray[6].equals(""))
-			    {
-			    	particleDataString = structureStringArray[6].split(":");
-			    }
+		    if(occupiedChunksFile != null && occupiedChunksFile.exists())
+		    {			
+		    	FileInputStream fis = null;
+		    	HashMap<CustomStructure, ArrayList<ChunkCoordinate>> result = null;
+				try {			
+			    	fis = new FileInputStream(occupiedChunksFile);			
+		    		ByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
+					
+					byte[] compressedBytes = new byte[(int) fis.getChannel().size()];
+					buffer.get(compressedBytes);
+					byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
+		    		buffer = ByteBuffer.wrap(decompressedBytes);
+		    		result = parseStructuresFileFromStream(buffer, world);
+				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
+					OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
+				} finally {
+					if(fis != null)
+					{
+						try {
+							fis.getChannel().close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						try {
+							fis.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				if(result != null)
+				{
+					bSuccess = true;
+					for(Entry<CustomStructure, ArrayList<ChunkCoordinate>> entry : result.entrySet())
+					{
+						ArrayList<ChunkCoordinate> coords = output.get(entry.getKey());
+						if(coords != null)
+						{
+							coords.addAll(entry.getValue());
+						} else {
+							output.put(entry.getKey(), entry.getValue());
+						}
+					}
+				}
+		    }
+		    
+		    if(!bSuccess && occupiedChunksBackupFile != null && occupiedChunksBackupFile.exists())
+		    {			
+		    	FileInputStream fis = null;
+		    	HashMap<CustomStructure, ArrayList<ChunkCoordinate>> result = null;
+				try {			
+			    	fis = new FileInputStream(occupiedChunksBackupFile);			
+		    		ByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
+					
+					byte[] compressedBytes = new byte[(int) fis.getChannel().size()];
+					buffer.get(compressedBytes);
+					byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
+		    		buffer = ByteBuffer.wrap(decompressedBytes);
+		    		result = parseStructuresFileFromStream(buffer, world);
+				}
+				catch (Exception ex)
+				{
+					ex.printStackTrace();
+				} finally {
+					if(fis != null)
+					{
+						try {
+							fis.getChannel().close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						try {
+							fis.close();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				if(result != null)
+				{
+					bSuccess = true;
+					for(Entry<CustomStructure, ArrayList<ChunkCoordinate>> entry : result.entrySet())
+					{
+						ArrayList<ChunkCoordinate> coords = output.get(entry.getKey());
+						if(coords != null)
+						{
+							coords.addAll(entry.getValue());
+						} else {
+							output.put(entry.getKey(), entry.getValue());
+						}
+					}
+				}
+		    }
+		    if(!bSuccess)
+		    {
+				throw new RuntimeException(
+					"OTG encountered a critical error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
+					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
+					+ "If your dimension's structure data files and backups have been corrupted, you can delete them,"
+					+ "at the risk of losing data for unspawned structure parts."
+				);
+		    }
+		}
+		
+		return output.size() > 0 ? output : null;
+	}
 
-			    structureStart.bo3Name = structureStartString[0];
-			    structureStart.rotation = Rotation.FromString(structureStartString[1]);
-			    structureStart.x = Integer.parseInt(structureStartString[2]);
-			    structureStart.y = Short.parseShort(structureStartString[3]);
-			    structureStart.z = Integer.parseInt(structureStartString[4]);
+	// TODO: Since we're using regions now, can use byte/short for internal coords instead of int.
+	private static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> parseStructuresFileFromStream(ByteBuffer buffer, LocalWorld world) throws IOException
+	{
+		int version = buffer.getInt();		
+		HashMap<CustomStructure, ArrayList<ChunkCoordinate>> structuresFile = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
+		int structureNamesSize = buffer.getInt();
+		for(int i = 0; i < structureNamesSize; i++)
+		{			
+			String structureName = StreamHelper.readStringFromBuffer(buffer);
+			Rotation startRotationId;
+			int startX;
+			int startY;
+			int startZ;
+			int structuresSize = buffer.getInt();
+			for(int j = 0; j < structuresSize; j++)
+			{
+				CustomStructureCoordinate structureStart = null;
 
-			    ChunkCoordinate chunk;
-			    Stack<BO4CustomStructureCoordinate> coords;
-			    BO4CustomStructureCoordinate coord;
-			    String[] objectAsString;
-
-			    for(String objectToSpawn : objectsToSpawnString)
-			    {
-			    	objectAsString = objectToSpawn.split(",");
-
-			    	chunk = ChunkCoordinate.fromChunkCoords(Integer.parseInt(objectAsString[0]),Integer.parseInt(objectAsString[1]));
-			    	coords = new Stack<BO4CustomStructureCoordinate>();
-			    	for(int j = 2; j < objectAsString.length; j += 5)//9)
+				// Check if this is a structure start
+				if(!structureName.equals("NULL"))
+				{
+					startRotationId = Rotation.getRotation(buffer.getInt());
+					startX = buffer.getInt();
+					startY = buffer.getInt();
+					startZ = buffer.getInt();
+					
+			    	if(world.isBo4Enabled())
 			    	{
-					    coord = new BO4CustomStructureCoordinate(world, null, null, null, 0, (short)0, 0, 0, false, false, null);
+			    		structureStart = new BO4CustomStructureCoordinate(world, null, structureName, startRotationId, startX, (short)startY, startZ, 0, false, false, null);
+			    	} else {
+			    		structureStart = new BO3CustomStructureCoordinate(world, null, structureName, startRotationId, startX, (short)startY, startZ);
+			    	}					
+				}
 
-					    coord.bo3Name = objectAsString[j];
-					    coord.rotation = Rotation.FromString(objectAsString[j + 1]);
-					    coord.x = Integer.parseInt(objectAsString[j + 2]);
-					    coord.y = Short.parseShort(objectAsString[j + 3]);
-					    coord.z = Integer.parseInt(objectAsString[j + 4]);
-					    coords.add(coord);
-			    	}
-			    	objectsToSpawn.put(chunk, coords);
-			    }
+				// Get all chunks used for structure
+				int chunksSize = buffer.getInt();
+				ArrayList<ChunkCoordinate> chunkCoords = new ArrayList<ChunkCoordinate>(); 
+				for(int k = 0; k < chunksSize; k++)
+				{
+					chunkCoords.add(ChunkCoordinate.fromChunkCoords(buffer.getInt(), buffer.getInt()));
+				}
 
-			    ArrayList<SmoothingAreaLine> coords2;
-			    SmoothingAreaLine object;
-			    for(String smoothingAreaToSpawn : smoothingAreasToSpawnString)
-			    {
-			    	objectAsString = smoothingAreaToSpawn.split(":");
+				Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();	
+				if(buffer.get() != 0)
+				{
+					int objectsToSpawnSize = buffer.getInt();
+					for(int l = 0; l < objectsToSpawnSize; l++)
+					{
+						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(buffer.getInt(), buffer.getInt());
+						Stack<BO4CustomStructureCoordinate> coords = new Stack<BO4CustomStructureCoordinate>();								
+						int coordsSize = buffer.getInt();
+						for(int m = 0; m < coordsSize; m++)
+						{
+							String bo3Name = StreamHelper.readStringFromBuffer(buffer); 
+							Rotation coordRotation = Rotation.getRotation(buffer.getInt());
+							int coordX = buffer.getInt();
+							int coordY = buffer.getInt();
+							int coordZ = buffer.getInt();
+					    	coords.add(new BO4CustomStructureCoordinate(world, null, bo3Name, coordRotation, coordX, (short)coordY, coordZ, 0, false, false, null));
+						}
+						objectsToSpawn.put(chunkCoord, coords);
+					}
+				}
 
-			    	chunk = ChunkCoordinate.fromChunkCoords(Integer.parseInt(objectAsString[0].split(",")[0]),Integer.parseInt(objectAsString[0].split(",")[1]));
+			    Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
+				if(buffer.get() != 0)
+				{
+					int smoothingAreasToSpawnSize = buffer.getInt();
+					for(int l = 0; l < smoothingAreasToSpawnSize; l++)
+					{
+						ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(buffer.getInt(), buffer.getInt());
+						int coordsSize = buffer.getInt();
+						ArrayList<SmoothingAreaLine> smoothingAreaLines = new ArrayList<SmoothingAreaLine>();
+						for(int m = 0; m < coordsSize; m++)
+						{
+							SmoothingAreaLine smoothingAreaLine;
+							
+							int beginPointX = buffer.getInt();
+							int beginPointY = buffer.getInt();
+							int beginPointZ = buffer.getInt();
 
-			    	coords2 = new ArrayList<SmoothingAreaLine>();
+							int endPointX = buffer.getInt();
+							int endPointY = buffer.getInt();
+							int endPointZ = buffer.getInt();
 
-			    	for(String objectArray : objectAsString)
-			    	{
-			    		if(objectArray != objectAsString[0])
-			    		{
-			    			
-			    			String params[] = objectArray.split(",");
-		    						    				
-		    				if(params.length > 12)
-		    				{
-		    					object = new SmoothingAreaLineDiagonal();
-		    				} else {
-		    					object = new SmoothingAreaLine();
-		    				}
-		    				
-		    				object.beginPointX = Integer.parseInt(params[0]);
-		    				object.beginPointY = Short.parseShort(params[1]);
-		    				object.beginPointZ = Integer.parseInt(params[2]);
-		    				object.endPointX = Integer.parseInt(params[3]);
-		    				object.endPointY = Short.parseShort(params[4]);
-		    				object.endPointZ = Integer.parseInt(params[5]);
-		    				object.originPointX = Integer.parseInt(params[6]);
-		    				object.originPointY = Short.parseShort(params[7]);
-		    				object.originPointZ = Integer.parseInt(params[8]);
-		    				object.finalDestinationPointX = Integer.parseInt(params[9]);
-		    				object.finalDestinationPointY = Short.parseShort(params[10]);
-		    				object.finalDestinationPointZ = Integer.parseInt(params[11]);
+							int originPointX = buffer.getInt();
+							int originPointY = buffer.getInt();
+							int originPointZ = buffer.getInt();
 
-		    				if(params.length > 12)
-		    				{
-		    					((SmoothingAreaLineDiagonal)object).diagonalLineOriginPointX = Integer.parseInt(params[12]);
-		    					((SmoothingAreaLineDiagonal)object).diagonalLineoriginPointY = Short.parseShort(params[13]);
-		    					((SmoothingAreaLineDiagonal)object).diagonalLineOriginPointZ = Integer.parseInt(params[14]);
-		    					((SmoothingAreaLineDiagonal)object).diagonalLineFinalDestinationPointX = Integer.parseInt(params[15]);
-		    					((SmoothingAreaLineDiagonal)object).diagonalLineFinalDestinationPointY = Short.parseShort(params[16]);
-		    					((SmoothingAreaLineDiagonal)object).diagonalLineFinalDestinationPointZ = Integer.parseInt(params[17]);		    					
-		    				}
-		    				
-			    			coords2.add(object);
-			    		}
-			    	}
-
-			    	smoothingAreasToSpawn.put(chunk, coords2);
-			    }
-
-			    for(String modData1 : modDataString)
-			    {
-			    	objectAsString = modData1.split(",");
-
-			    	for(int j = 0; j < objectAsString.length; j += 5)
-			    	{
+							int finalDestinationPointX = buffer.getInt();
+							int finalDestinationPointY = buffer.getInt();
+							int finalDestinationPointZ = buffer.getInt();
+							
+							if(buffer.get() != 0)
+							{
+								int diagonalLineOriginPointX = buffer.getInt();
+								int diagonalLineOriginPointY = buffer.getInt();
+								int diagonalLineOriginPointZ = buffer.getInt();
+								int diagonalLineFinalDestinationPointX = buffer.getInt();
+								int diagonalLineFinalDestinationPointY = buffer.getInt();
+								int diagonalLineFinalDestinationPointZ = buffer.getInt();
+								smoothingAreaLine = new SmoothingAreaLineDiagonal(beginPointX, (short)beginPointY, beginPointZ, endPointX, (short)endPointY, endPointZ, originPointX, (short)originPointY, originPointZ, finalDestinationPointX, (short)finalDestinationPointY, finalDestinationPointZ, diagonalLineOriginPointX, (short)diagonalLineOriginPointY, diagonalLineOriginPointZ, diagonalLineFinalDestinationPointX, (short)diagonalLineFinalDestinationPointY, diagonalLineFinalDestinationPointZ);
+							} else {
+								smoothingAreaLine = new SmoothingAreaLine(beginPointX, (short)beginPointY, beginPointZ, endPointX, (short)endPointY, endPointZ, originPointX, (short)originPointY, originPointZ, finalDestinationPointX, (short)finalDestinationPointY, finalDestinationPointZ);
+							}
+							smoothingAreaLines.add(smoothingAreaLine);
+						}
+						smoothingAreasToSpawn.put(chunkCoord, smoothingAreaLines);
+					}
+				}
+				
+				// Save moddata/particles/spawner data
+				// Bo3 objects/structures have start == null
+				// For Bo4's, only save for the start bo4, data will be reconstituted when the file is loaded.
+				
+			    HashSet<ModDataFunction<?>> modData = new HashSet<ModDataFunction<?>>();			
+				if(buffer.get() != 0)
+				{
+					int modDataSize = buffer.getInt();
+					for(int l = 0; l < modDataSize; l++)						
+					{
 			    		ModDataFunction<?> modDataFunction;
-				    	if(world.isOTGPlus())
+				    	if(world.isBo4Enabled())
 				    	{
 				    		modDataFunction = new BO4ModDataFunction();
 				    	} else {
 				    		modDataFunction = new BO3ModDataFunction();
 				    	}
 				    	
-	    				modDataFunction.x = Integer.parseInt(objectAsString[j]);
-			    		modDataFunction.y = Integer.parseInt(objectAsString[j + 1]);
-			    		modDataFunction.z = Integer.parseInt(objectAsString[j + 2]);
-			    		modDataFunction.modId = objectAsString[j + 3].replace("&#58;",":").replace("&nbsp;", " ");
-			    		modDataFunction.modData = objectAsString[j + 4].replace("&#58;",":").replace("&nbsp;", " ");
-				    	modData.add(modDataFunction);
-			    	}
-			    }
+				    	modDataFunction.x = buffer.getInt();
+				    	modDataFunction.y = buffer.getInt();
+				    	modDataFunction.z = buffer.getInt();
+				    	modDataFunction.modId = StreamHelper.readStringFromBuffer(buffer);
+				    	modDataFunction.modData = StreamHelper.readStringFromBuffer(buffer);
+						modData.add(modDataFunction);
+					}
+				}
 
-			    for(String spawnerData1 : spawnerDataString)
-			    {
-			    	objectAsString = spawnerData1.split(",");
-
-			    	for(int j = 0; j < objectAsString.length; j += 19)
-			    	{
+			    HashSet<SpawnerFunction<?>> spawnerData = new HashSet<SpawnerFunction<?>>();				
+				if(buffer.get() != 0)
+				{
+					int spawnerDataSize = buffer.getInt();
+					for(int l = 0; l < spawnerDataSize; l++)
+					{
 				    	SpawnerFunction<?> spawnerFunction;
-				    	if(world.isOTGPlus())
+				    	if(world.isBo4Enabled())
 				    	{
 				    		spawnerFunction = new BO4SpawnerFunction();
 				    	} else {
 				    		spawnerFunction = new BO3SpawnerFunction();
 				    	}
-				    	
-				    	spawnerFunction.x = Integer.parseInt(objectAsString[j]);
-				    	spawnerFunction.y = Integer.parseInt(objectAsString[j + 1]);
-				    	spawnerFunction.z = Integer.parseInt(objectAsString[j + 2]);
-				    	spawnerFunction.mobName = objectAsString[j + 3].replace("&#58;",":").replace("&nbsp;", " ");
-				    	spawnerFunction.originalnbtFileName = objectAsString[j + 4].replace("&#58;",":").replace("&nbsp;", " ");
-				    	spawnerFunction.nbtFileName = objectAsString[j + 5].replace("&#58;",":").replace("&nbsp;", " ");
-				    	spawnerFunction.groupSize = Integer.parseInt(objectAsString[j + 6]);
-				    	spawnerFunction.interval =  Integer.parseInt(objectAsString[j + 7]);
-				    	spawnerFunction.spawnChance =  Integer.parseInt(objectAsString[j + 8]);
-				    	spawnerFunction.maxCount =  Integer.parseInt(objectAsString[j + 9]);
-				    	spawnerFunction.despawnTime =  Integer.parseInt(objectAsString[j + 10]);
-				    	spawnerFunction.velocityX =  Double.parseDouble(objectAsString[j + 11]);
-				    	spawnerFunction.velocityY =  Double.parseDouble(objectAsString[j + 12]);
-				    	spawnerFunction.velocityZ =  Double.parseDouble(objectAsString[j + 13]);
-				    	spawnerFunction.velocityXSet =  Boolean.parseBoolean(objectAsString[j + 14]);
-				    	spawnerFunction.velocityYSet =  Boolean.parseBoolean(objectAsString[j + 15]);
-				    	spawnerFunction.velocityZSet =  Boolean.parseBoolean(objectAsString[j + 16]);
-				    	spawnerFunction.yaw =  Float.parseFloat(objectAsString[j + 17]);
-				    	spawnerFunction.pitch =  Float.parseFloat(objectAsString[j + 18]);
+						
+				    	spawnerFunction.x = buffer.getInt();
+				    	spawnerFunction.y = buffer.getInt();
+				    	spawnerFunction.z = buffer.getInt();
+				    	spawnerFunction.mobName = StreamHelper.readStringFromBuffer(buffer);
+				    	spawnerFunction.originalnbtFileName = StreamHelper.readStringFromBuffer(buffer);
+				    	spawnerFunction.nbtFileName = StreamHelper.readStringFromBuffer(buffer);
+				    	spawnerFunction.groupSize = buffer.getInt();
+				    	spawnerFunction.interval = buffer.getInt();
+				    	spawnerFunction.spawnChance = buffer.getInt();
+				    	spawnerFunction.maxCount = buffer.getInt();
+				    	spawnerFunction.despawnTime = buffer.getInt(); 
+				    	spawnerFunction.velocityX = buffer.getDouble();
+				    	spawnerFunction.velocityY = buffer.getDouble(); 
+				    	spawnerFunction.velocityZ = buffer.getDouble(); 
+				    	spawnerFunction.velocityXSet = buffer.get() != 0; 
+				    	spawnerFunction.velocityYSet = buffer.get() != 0; 
+				    	spawnerFunction.velocityZSet = buffer.get() != 0;
+				    	spawnerFunction.yaw = buffer.getFloat();
+				    	spawnerFunction.pitch = buffer.getFloat();						
+						spawnerData.add(spawnerFunction);
+					}
+				}
 
-				    	spawnerData.add(spawnerFunction);
-			    	}
-			    }
-
-			    for(String particleData1 : particleDataString)
-			    {
-			    	objectAsString = particleData1.split(",");
-
-			    	for(int j = 0; j < objectAsString.length; j += 11)
-			    	{
+			    HashSet<ParticleFunction<?>> particleData = new HashSet<ParticleFunction<?>>();				
+				if(buffer.get() != 0)
+				{
+					int particleDataSize = buffer.getInt();
+					for(int l = 0; l < particleDataSize; l++)
+					{
 				    	ParticleFunction<?> particleFunction;
-				    	if(world.isOTGPlus())
+				    	if(world.isBo4Enabled())
 				    	{
 				    		particleFunction = new BO4ParticleFunction();
 				    	} else {
 				    		particleFunction = new BO3ParticleFunction();
 				    	}
-				    	
-				    	particleFunction.x = Integer.parseInt(objectAsString[j]);
-				    	particleFunction.y = Integer.parseInt(objectAsString[j + 1]);
-				    	particleFunction.z = Integer.parseInt(objectAsString[j + 2]);
-				    	particleFunction.particleName = objectAsString[j + 3].replace("&#58;",":").replace("&nbsp;", " ");
-
-				    	particleFunction.interval = Double.parseDouble(objectAsString[j + 4]);
-
-				    	particleFunction.velocityX =  Double.parseDouble(objectAsString[j + 5]);
-				    	particleFunction.velocityY =  Double.parseDouble(objectAsString[j + 6]);
-				    	particleFunction.velocityZ =  Double.parseDouble(objectAsString[j + 7]);
-				    	particleFunction.velocityXSet =  Boolean.parseBoolean(objectAsString[j + 8]);
-				    	particleFunction.velocityYSet =  Boolean.parseBoolean(objectAsString[j + 9]);
-				    	particleFunction.velocityZSet =  Boolean.parseBoolean(objectAsString[j + 10]);
-
-				    	particleData.add(particleFunction);
-			    	}
+						
+				    	particleFunction.x = buffer.getInt();
+				    	particleFunction.y = buffer.getInt();
+				    	particleFunction.z = buffer.getInt(); 
+						particleFunction.particleName = StreamHelper.readStringFromBuffer(buffer);
+				    	particleFunction.interval = buffer.getDouble(); 
+				    	particleFunction.velocityX = buffer.getDouble(); 
+				    	particleFunction.velocityY = buffer.getDouble();
+				    	particleFunction.velocityZ = buffer.getDouble();
+				    	particleFunction.velocityXSet = buffer.get() != 0;
+				    	particleFunction.velocityYSet = buffer.get() != 0; 
+				    	particleFunction.velocityZSet = buffer.get() != 0;
+						
+						particleData.add(particleFunction);
+					}
+				}
+				
+			    CustomStructure structure;
+			    if(world.isBo4Enabled())
+			    {
+			    	structure = new BO4CustomStructure(world, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, 0);
+				    ((BO4CustomStructure)structure).startChunkBlockChecksDone = true;
+			    } else {
+			    	structure = new BO3CustomStructure((BO3CustomStructureCoordinate)structureStart);
 			    }
-		    }
-
-		    CustomStructure structure;
-		    if(world.isOTGPlus())
-		    {
-		    	structure = new BO4CustomStructure(world, (BO4CustomStructureCoordinate)structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
-			    ((BO4CustomStructure)structure).startChunkBlockChecksDone = true;
-		    } else {
-		    	structure = new BO3CustomStructure((BO3CustomStructureCoordinate)structureStart);
-		    }
-		    structure.modDataManager.modData = modData;
-		    structure.spawnerManager.spawnerData = spawnerData;
-		    structure.particlesManager.particleData = particleData;
-
-		    structuresFile.put(chunkCoord, structure);
-	    }    
-	    return structuresFile;
-	}
-
-	static void saveNullChunksFile(ArrayList<ChunkCoordinate> chunks, LocalWorld world)
-	{
-		int dimensionId = world.getDimensionId();
-		File nullChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksFileName);
-		File nullChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksBackupFileName);
-
-		if(chunks.size() > 0)
-		{
-			StringBuilder stringbuilder = new StringBuilder();
-			for(ChunkCoordinate chunkCoord : chunks)
-			{
-				if(stringbuilder.length() > 0)
-				{
-					stringbuilder.append("," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ());
-				} else {
-					stringbuilder.append(chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ());
-				}
-			}
-
-			BufferedWriter writer = null;
-	        try
-	        {
-	    		if(!nullChunksFile.exists())
-	    		{
-	    			nullChunksFile.getParentFile().mkdirs();
-	    		} else {
-	    			Files.move(nullChunksFile.toPath(), nullChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-	    		}
-	    		
-	        	writer = new BufferedWriter(new FileWriter(nullChunksFile));
-	            writer.write(stringbuilder.toString());
-	        }
-	        catch (IOException e)
-	        {
-				e.printStackTrace();
-				throw new RuntimeException(
-					"OTG encountered a critical error writing " + nullChunksFile.getAbsolutePath() + ", exiting. "
-					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
-					+ "If your dimension's " + WorldStandardValues.NullChunksFileName + " and its backup have been corrupted, "
-					+ "you can replace it with your own backup.");
-	        }
-	        finally
-	        {
-	            try
-	            {
-	                // Close the writer regardless of what happens...
-	                writer.close();
-	            }
-	            catch (Exception e) { }
-	        }
-		}
-	}
-
-	static ArrayList<ChunkCoordinate> loadNullChunksFile(LocalWorld world)
-	{
-		int dimensionId = world.getDimensionId();
-		File nullChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksFileName);
-		File nullChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.NullChunksBackupFileName);
-
-		if(!nullChunksFile.exists() && !nullChunksBackupFile.exists())
-		{
-			return null;
-		}
-		
-		if(nullChunksFile.exists())
-		{
-			StringBuilder stringbuilder = new StringBuilder();
-			String[] nullChunkCoords = {};
-			boolean bSuccess = false;			
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(nullChunksFile));
-				try {
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        line = reader.readLine();
-				    }
-				    if(stringbuilder.length() > 0)
-				    {
-				    	nullChunkCoords = stringbuilder.toString().split(",");
-				    }
-				    bSuccess = true;				    
-				} finally {
-					reader.close();
-				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-				OTG.log(LogMarker.WARN, "Failed to load " + nullChunksFile.getAbsolutePath() + ", trying to load backup.");
-			}
-			
-			if(bSuccess)
-			{
-				try
-				{
-					return parseNullChunks(nullChunkCoords);
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-					OTG.log(LogMarker.WARN, "Failed to load " + nullChunksFile.getAbsolutePath() + ", trying to load backup.");
-				}
+			    structure.modDataManager.modData = modData;
+			    structure.spawnerManager.spawnerData = spawnerData;
+			    structure.particlesManager.particleData = particleData;
+			    
+		    	structuresFile.put(structure, chunkCoords);
 			}
 		}
 		
-		if(nullChunksBackupFile.exists())
-		{
-			StringBuilder stringbuilder = new StringBuilder();
-			String[] nullChunkCoords = {};
-			boolean bSuccess = false;			
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(nullChunksBackupFile));
-				try {
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        line = reader.readLine();
-				    }
-				    if(stringbuilder.length() > 0)
-				    {
-				    	nullChunkCoords = stringbuilder.toString().split(",");
-					    bSuccess = true;
-				    }
-				} finally {
-					reader.close();
-				}
-			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-			
-			if(bSuccess)
-			{
-				try
-				{
-					return parseNullChunks(nullChunkCoords);
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-				}
-			}			
-		}
-		
-		throw new RuntimeException(
-			"OTG encountered a critical error loading " + nullChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
-			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
-			+ "If your dimension's " + WorldStandardValues.NullChunksFileName + " and its backup have been corrupted, you can "
-			+ "replace it with a backup.");
-	}
-	
-	private static ArrayList<ChunkCoordinate> parseNullChunks(String[] nullChunkCoords)
-	{
-		ArrayList<ChunkCoordinate> chunks = new ArrayList<ChunkCoordinate>();
-		if(nullChunkCoords.length > 0)
-		{
-			for(int i = 0; i < nullChunkCoords.length; i += 2)
-			{
-				chunks.add(ChunkCoordinate.fromChunkCoords(Integer.parseInt(nullChunkCoords[i]),Integer.parseInt(nullChunkCoords[i + 1])));
-			}
-		}
-		return chunks;
+		return structuresFile;
 	}
 
 	public static void saveChunksMapFile(LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
@@ -781,67 +1071,83 @@ public class CustomStructureFileManager
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
 		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
 
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bos);
+		
 		if(spawnedStructuresByName.size() > 0)
 		{
-			StringBuilder stringbuilder = new StringBuilder();
-			for(Map.Entry<String, ArrayList<ChunkCoordinate>> entry : spawnedStructuresByName.entrySet())
-			{
-				if(stringbuilder.length() == 0)
-				{
-					stringbuilder.append(entry.getKey().replace(",", "\\"));
-				} else {
-					stringbuilder.append("/" + entry.getKey().replace(",", "\\"));
-				}
-				for(ChunkCoordinate chunkCoord : entry.getValue())
-				{
-					stringbuilder.append("," + chunkCoord.getChunkX() + "," + chunkCoord.getChunkZ());
-				}
-			}
-			
-			stringbuilder.append("|");
-			
-			for(Entry<String, HashMap<ChunkCoordinate, Integer>> entry : spawnedStructuresByGroup.entrySet())
-			{
-				if(stringbuilder.length() == 0)
-				{
-					stringbuilder.append(entry.getKey().replace(",", "\\"));
-				} else {
-					stringbuilder.append("/" + entry.getKey().replace(",", "\\"));
-				}
-				for(Entry<ChunkCoordinate, Integer> valueEntry : entry.getValue().entrySet())
-				{					
-					stringbuilder.append("," + valueEntry.getKey().getChunkX() + "," + valueEntry.getKey().getChunkZ() + "," + valueEntry.getValue().intValue() + ",");
-				}
-			}
+    		try {
+    			int version = 1;
+    			dos.writeInt(version);
 
-			BufferedWriter writer = null;
+    			dos.writeInt(spawnedStructuresByName.entrySet().size());
+				for(Map.Entry<String, ArrayList<ChunkCoordinate>> entry : spawnedStructuresByName.entrySet())
+				{
+					StreamHelper.writeStringToStream(dos,  entry.getKey());
+					dos.writeInt(entry.getValue().size());
+					for(ChunkCoordinate chunkCoord : entry.getValue())
+					{
+						dos.writeInt(chunkCoord.getChunkX());
+						dos.writeInt(chunkCoord.getChunkZ());
+					}
+				}
+				
+				dos.writeInt(spawnedStructuresByGroup.entrySet().size());
+				for(Entry<String, HashMap<ChunkCoordinate, Integer>> entry : spawnedStructuresByGroup.entrySet())
+				{
+					StreamHelper.writeStringToStream(dos,  entry.getKey());
+					dos.writeInt(entry.getValue().entrySet().size());
+					for(Entry<ChunkCoordinate, Integer> valueEntry : entry.getValue().entrySet())
+					{					
+						dos.writeInt(valueEntry.getKey().getChunkX());
+						dos.writeInt(valueEntry.getKey().getChunkZ());
+						dos.writeInt(valueEntry.getValue().intValue());
+					}
+				}
+    		} catch (IOException e1) {
+				e1.printStackTrace();
+				return;
+			}			
+			
+			DataOutputStream dos2 = null;
+			FileOutputStream fos = null;
 	        try
-	        {
+	        {				
 	    		if(!occupiedChunksFile.exists())
 	    		{
 	    			occupiedChunksFile.getParentFile().mkdirs();
 	    		} else {
 	    			Files.move(occupiedChunksFile.toPath(), occupiedChunksBackupFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 	    		}
-	    		
-	        	writer = new BufferedWriter(new FileWriter(occupiedChunksFile));
-	            writer.write(stringbuilder.toString());
-	        }
-	        catch (IOException e)
-	        {
+				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
+				fos = new FileOutputStream(occupiedChunksFile);
+				dos2 = new DataOutputStream(fos);
+				dos2.write(compressedBytes, 0, compressedBytes.length);
+	        } catch (IOException e) {
 				e.printStackTrace();
 				throw new RuntimeException(
 					"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
 					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
 					+ "If your dimension's " + WorldStandardValues.SpawnedStructuresFileName + " and its backup have been corrupted, "
 					+ "you can replace it with your own backup.");
-	        }
-	        finally
-	        {
-	            try
-	            {
-	                // Close the writer regardless of what happens...
-	                writer.close();
+	        } finally {
+	            try {
+	                if(dos != null)
+	                {
+	                	dos.close();
+	                }
+	            } catch (Exception e) { }	        	
+	            try {
+	                if(dos2 != null)
+	                {
+	                	dos2.close();
+	                }
+	            } catch (Exception e) { }
+	            try {
+	                if(fos != null)
+	                {
+	                	fos.close();
+	                }
 	            } catch (Exception e) { }
 	        }
 		}
@@ -853,116 +1159,79 @@ public class CustomStructureFileManager
 		File occupiedChunksFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
 		File occupiedChunksBackupFile = new File(world.getWorldSaveDir().getAbsolutePath() + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
 
-		if(!occupiedChunksFile.exists() && !occupiedChunksBackupFile.exists())
-		{
-			return;
-		}	
-
-		if(occupiedChunksFile.exists())
-		{
-			StringBuilder stringbuilder = new StringBuilder();
-			String[] occupiedChunksByName = {};
-			String[] occupiedChunksByGroup = {};
-			boolean bSuccess = false;			
-			try
-			{
-				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksFile));
-				try
-				{
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        //sb.append(System.lineSeparator());
-				        line = reader.readLine();
-				    }
-				    if(stringbuilder.length() > 0)
-				    {
-				    	String[] allData = stringbuilder.toString().split("\\|");				    	
-				    	occupiedChunksByName = allData[0].split("/");
-				    	if(allData.length > 1) // Legacy files may not have occupiedChunksByGroup
-				    	{
-				    		occupiedChunksByGroup = allData[1].split("/");
-				    	}					    
-				    }
-				    bSuccess = true;				    
-				} finally {
-					reader.close();
-				}
+	    if(!occupiedChunksFile.exists() && !occupiedChunksBackupFile.exists())
+	    {
+	    	return;
+	    }
+				
+	    if(occupiedChunksFile.exists())
+	    {			
+	    	FileInputStream fis = null;
+			try {			
+		    	fis = new FileInputStream(occupiedChunksFile);			
+	    		ByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
+				
+				byte[] compressedBytes = new byte[(int) fis.getChannel().size()];
+				buffer.get(compressedBytes);
+				byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
+	    		buffer = ByteBuffer.wrap(decompressedBytes);
+	    		parseChunksMapFileFromStream(buffer, world, spawnedStructuresByName, spawnedStructuresByGroup);
+	    		return;
 			}
-			catch (IOException e)
+			catch (Exception ex)
 			{
-				e.printStackTrace();
+				ex.printStackTrace();
 				OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
-			}
-			
-			if(bSuccess)
-			{
-				try
+			} finally {
+				if(fis != null)
 				{
-					parseChunksMapFile(occupiedChunksByName, occupiedChunksByGroup, spawnedStructuresByName, spawnedStructuresByGroup);
-					return;
-				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-					OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
-				}
-			}
-		}
-		
-		if(occupiedChunksBackupFile.exists())
-		{
-			StringBuilder stringbuilder = new StringBuilder();
-			String[] occupiedChunksByName = {};
-			String[] occupiedChunksByGroup = {};
-			boolean bSuccess = false;			
-			try
-			{
-				BufferedReader reader = new BufferedReader(new FileReader(occupiedChunksFile));
-				try
-				{
-					String line = reader.readLine();
-
-				    while (line != null)
-				    {
-				    	stringbuilder.append(line);
-				        //sb.append(System.lineSeparator());
-				        line = reader.readLine();
-				    }
-				    if(stringbuilder.length() > 0)
-				    {
-				    	String[] allData = stringbuilder.toString().split("\\|");				    	
-				    	occupiedChunksByName = allData[0].split("/");
-				    	if(allData.length > 1) // Legacy files may not have occupiedChunksByGroup
-				    	{
-				    		occupiedChunksByGroup = allData[1].split("/");
-				    	}
-				    }
-				    bSuccess = true;				    
-				} finally {
-					reader.close();
+					try {
+						fis.getChannel().close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					try {
+						fis.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
 			}
-			catch (IOException e)
-			{
-				e.printStackTrace();
+	    }
+	    
+	    if(occupiedChunksBackupFile.exists())
+	    {			
+	    	FileInputStream fis = null;
+			try {			
+		    	fis = new FileInputStream(occupiedChunksBackupFile);			
+	    		ByteBuffer buffer = fis.getChannel().map(FileChannel.MapMode.READ_ONLY, 0, fis.getChannel().size());				
+				
+				byte[] compressedBytes = new byte[(int) fis.getChannel().size()];
+				buffer.get(compressedBytes);
+				byte[] decompressedBytes = com.pg85.otg.util.CompressionUtils.decompress(compressedBytes);
+	    		buffer = ByteBuffer.wrap(decompressedBytes);
+	    		parseChunksMapFileFromStream(buffer, world, spawnedStructuresByName, spawnedStructuresByGroup);
+	    		return;
 			}
-			
-			if(bSuccess)
+			catch (Exception ex)
 			{
-				try
+				ex.printStackTrace();
+			} finally {
+				if(fis != null)
 				{
-					parseChunksMapFile(occupiedChunksByName, occupiedChunksByGroup, spawnedStructuresByName, spawnedStructuresByGroup);
-					return;
+					try {
+						fis.getChannel().close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					try {
+						fis.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 				}
-				catch(Exception ex)
-				{
-					ex.printStackTrace();
-				}
-			}			
-		}
+			}
+	    }
 		
 		throw new RuntimeException(
 			"OTG encountered a critical error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
@@ -970,48 +1239,38 @@ public class CustomStructureFileManager
 			+ "If your dimension's " + WorldStandardValues.SpawnedStructuresFileName + " and its backup have been corrupted, you can "
 			+ "replace it with a backup.");
 	}
-	
-	private static void parseChunksMapFile(String[] occupiedChunksByName, String[] occupiedChunksByGroup, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
+
+	private static void parseChunksMapFileFromStream(ByteBuffer buffer, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup) throws IOException
 	{
 		HashMap<String, ArrayList<ChunkCoordinate>> chunksByName = new HashMap<String, ArrayList<ChunkCoordinate>>();
 		HashMap<String, HashMap<ChunkCoordinate, Integer>> chunksByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();		
+
+		int version = buffer.getInt();
 		
-		String[] occupiedChunkByNameCoords = {};
-		for(String entry : occupiedChunksByName)
+		int spawnedStructuresByNameSize = buffer.getInt();
+		for(int i = 0; i < spawnedStructuresByNameSize; i++)
 		{
-			entry = entry.replace(",,", ","); // Legacy configs could have ,, in them.
-			occupiedChunkByNameCoords = entry.split(",");
-			String key = occupiedChunkByNameCoords[0].replace("\\", ",");
-			ArrayList<ChunkCoordinate> value = new ArrayList<ChunkCoordinate>();
-
-			if(occupiedChunkByNameCoords.length > 0)
-			{
-				for(int i = 1; i < occupiedChunkByNameCoords.length; i += 2)
-				{
-					value.add(ChunkCoordinate.fromChunkCoords(Integer.parseInt(occupiedChunkByNameCoords[i]),Integer.parseInt(occupiedChunkByNameCoords[i + 1])));
-				}
+			String name = StreamHelper.readStringFromBuffer(buffer);
+			int coordsSize = buffer.getInt();
+			ArrayList<ChunkCoordinate> coords = new ArrayList<ChunkCoordinate>();
+			for(int j = 0; j < coordsSize; j++)
+			{				
+				coords.add(ChunkCoordinate.fromChunkCoords(buffer.getInt(), buffer.getInt()));
 			}
-
-			chunksByName.put(key, value);
+			chunksByName.put(name, coords);
 		}
-				
-		String[] occupiedChunkByGroupCoords = {};
-		for(String entry : occupiedChunksByGroup)
+		
+		int spawnedStructuresByGroupSize = buffer.getInt();
+		for(int k = 0; k < spawnedStructuresByGroupSize; k++)
 		{
-			entry = entry.replace(",,", ","); // Legacy configs could have ,, in them.
-			occupiedChunkByGroupCoords = entry.split(",");
-			String key = occupiedChunkByGroupCoords[0].replace("\\", ",");
-			HashMap<ChunkCoordinate, Integer> value = new HashMap<ChunkCoordinate, Integer>();
-
-			if(occupiedChunkByGroupCoords.length > 0)
+			String name = StreamHelper.readStringFromBuffer(buffer);
+			HashMap<ChunkCoordinate, Integer> coords = new HashMap<ChunkCoordinate, Integer>();
+			int coordsSize = buffer.getInt();
+			for(int l = 0; l < coordsSize; l++)
 			{
-				for(int i = 1; i < occupiedChunkByGroupCoords.length; i += 3)
-				{
-					value.put(ChunkCoordinate.fromChunkCoords(Integer.parseInt(occupiedChunkByGroupCoords[i]),Integer.parseInt(occupiedChunkByGroupCoords[i + 2])), Integer.valueOf(Integer.parseInt(occupiedChunkByGroupCoords[i + 1])));
-				}
+				coords.put(ChunkCoordinate.fromChunkCoords(buffer.getInt(), buffer.getInt()), Integer.valueOf(buffer.getInt()));
 			}
-
-			chunksByGroup.put(key, value);
+			chunksByGroup.put(name, coords);
 		}
 		
 		spawnedStructuresByName.clear();

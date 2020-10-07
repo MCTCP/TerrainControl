@@ -10,9 +10,17 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.NoSuchElementException;
 
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.IProgressUpdate;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.MinecraftException;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
@@ -441,17 +449,32 @@ public class Pregenerator
 
 	private void flushChunksToDisk()
 	{
-		((ChunkProviderServer) this.world.getWorld().getChunkProvider()).queueUnloadAll();
-		try
-		{
-			((ChunkProviderServer) this.world.getWorld().getChunkProvider()).flushToDisk();
+		//if(1 == 1) { return; }
+		
+        if (this.world.getWorld().getMinecraftServer().getPlayerList() != null)
+        {
+        	this.world.getWorld().getMinecraftServer().getPlayerList().saveAllPlayerData();
+        }
+
+        boolean flag = ((WorldServer)this.world.getWorld()).disableLevelSaving;
+        ((WorldServer)this.world.getWorld()).disableLevelSaving = false;
+        try {
+			((WorldServer)this.world.getWorld()).saveAllChunks(true, (IProgressUpdate)null);
+		} catch (MinecraftException e) {
+			e.printStackTrace();
 		}
-		catch(NoSuchElementException ex)
-		{
-			// TODO: Find a thread-safe way to do this..
-		}
-		this.world.getStructureCache().compressCache();
-	}
+        try
+        {
+        	((WorldServer)this.world.getWorld()).flushToDisk();
+        }
+        catch(NoSuchElementException ex)
+        {
+        	// TODO: Happens sometimes during pregeneration, likely a threading issue.
+        	// Hopefully aborting and retrying later won't cause problems.
+        	OTG.log(LogMarker.INFO, "An error occurred while flushing chunks to disk, aborting flush and continuing pregeneration.");
+        }
+        ((WorldServer)this.world.getWorld()).disableLevelSaving = flag;        
+    }
 
 	private void pause()
 	{

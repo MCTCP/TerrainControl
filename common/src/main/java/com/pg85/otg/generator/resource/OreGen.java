@@ -11,7 +11,6 @@ import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 import com.pg85.otg.util.materials.MaterialSetEntry;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -22,6 +21,8 @@ public class OreGen extends Resource
     private final int maxSize;
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
+    // use a byte since y is always between 0-255
+    byte[][] highestBlocksCache;
 
     public OreGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -79,9 +80,7 @@ public class OreGen extends Resource
     {
         return "Ore(" + material + "," + maxSize + "," + frequency + "," + rarity + "," + minAltitude + "," + maxAltitude + makeMaterials(sourceBlocks) + ")";
     }
-        
-    // use a byte since y is always between 0-255
-    byte[][] highestBlocksCache;
+
     protected void createCache()
     {
    		this.highestBlocksCache = new byte[32][32];
@@ -91,7 +90,7 @@ public class OreGen extends Resource
     {
     	this.highestBlocksCache = null;
     }
-    
+
     @Override
     public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
@@ -143,9 +142,8 @@ public class OreGen extends Resource
         
         int areaBeingPoulatedSize = 32;
         boolean bFound = false;
-        
+               
         // TODO: This seems to be really poorly optimised.
-        // Tries to spawn blocks in the same position a lot.
         // Redesign this.
         for (int i = 0; i < this.maxSize; i++)
         {
@@ -168,45 +166,55 @@ public class OreGen extends Resource
             
             if(j < chunkBeingPopulated.getBlockX())
             {
-            	j = chunkBeingPopulated.getBlockX();
+            	continue;
+            	//j = chunkBeingPopulated.getBlockX();
             }
             if(j > chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1)
             {
-            	j = chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1;
+            	continue;
+            	//j = chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1;
             }
             if(i1 < chunkBeingPopulated.getBlockX())
             {
-            	i1 = chunkBeingPopulated.getBlockX();
+            	continue;
+            	//i1 = chunkBeingPopulated.getBlockX();
             }
             if(i1 > chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1)
             {
-            	i1 = chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1;
+            	continue;
+            	//i1 = chunkBeingPopulated.getBlockX() + areaBeingPoulatedSize - 1;
             }
             
             if(l < chunkBeingPopulated.getBlockZ())
             {
-            	l = chunkBeingPopulated.getBlockZ();
+            	continue;
+            	//l = chunkBeingPopulated.getBlockZ();
             }
             if(l > chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1)
             {
-            	l = chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1;
+            	continue;
+            	//l = chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1;
             }
             if(k1 < chunkBeingPopulated.getBlockZ())
             {
-            	k1 = chunkBeingPopulated.getBlockZ();
+            	continue;
+            	//k1 = chunkBeingPopulated.getBlockZ();
             }
             if(k1 > chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1)
             {
-            	k1 = chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1;
+            	continue;
+            	//k1 = chunkBeingPopulated.getBlockZ() + areaBeingPoulatedSize - 1;
             }
             
     		if(k < PluginStandardValues.WORLD_DEPTH)
     		{
-    			k = PluginStandardValues.WORLD_DEPTH;
+    			//k = PluginStandardValues.WORLD_DEPTH;
+    			continue;
     		}
     		if(k > PluginStandardValues.WORLD_HEIGHT - 1)
     		{
-    			k = PluginStandardValues.WORLD_HEIGHT - 1;
+    			//k = PluginStandardValues.WORLD_HEIGHT - 1;
+    			continue;
     		}
             
             for (int i3 = j; i3 <= i1; i3++)
@@ -247,11 +255,11 @@ public class OreGen extends Resource
                                 d15 = ((double)i5 + 0.5D - d8) / (d10 / 2.0D);
                                 if((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D))
                                 {
-	                                material = world.getMaterial(i3, i4, i5, chunkBeingPopulated);
+                            		material = world.getMaterial(i3, i4, i5, chunkBeingPopulated);
 	                                bFound = false;
 	                                for(MaterialSetEntry sourceBlockEntry : this.sourceBlocks.materials)
 	                                {
-	                                	if(sourceBlockEntry.material.equals(material))
+	                                	if(sourceBlockEntry.equals(material))
 	                                	{
 	                                		bFound = true;
 	                                		break;
@@ -259,7 +267,7 @@ public class OreGen extends Resource
 	                                }
 	                                if(bFound)
 	                                {
-	                                    world.setBlock(i3, i4, i5, this.material, null, chunkBeingPopulated);
+	                                    world.setBlock(i3, i4, i5, this.material, null, chunkBeingPopulated, true);
 	                                }
                                 }
                             }

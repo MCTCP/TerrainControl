@@ -2,6 +2,7 @@ package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
@@ -116,7 +117,7 @@ class Vein
                                 double d15 = (i5 + 0.5D - d9) / (d11 / 2.0D);
                                 if ((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D) && sourceBlocks.contains(world.getMaterial(i3, i4, i5, chunkBeingPopulated)))
                                 {
-                                    world.setBlock(i3, i4, i5, material, null, chunkBeingPopulated);
+                                    world.setBlock(i3, i4, i5, material, null, chunkBeingPopulated, true);
                                 }
                             }
                         }

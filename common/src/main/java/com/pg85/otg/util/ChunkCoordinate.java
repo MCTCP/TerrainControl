@@ -1,7 +1,5 @@
 package com.pg85.otg.util;
 
-import com.pg85.otg.util.helpers.MathHelper;
-
 /**
  * Position of a chunk.
  *
@@ -116,8 +114,9 @@ public class ChunkCoordinate
         // be placed in the bottom left corner of a chunk. That's why this
         // formula looks a bit overly complicated. <-- TODO: Why should objects never be placed in the bottom-left corner of a chunk?
         return new ChunkCoordinate(
-                MathHelper.floor((blockX - CHUNK_POPULATION_OFFSET_X) / (double) CHUNK_X_SIZE),
-                MathHelper.floor((blockZ - CHUNK_POPULATION_OFFSET_Z) / (double) CHUNK_Z_SIZE));
+            (blockX - CHUNK_POPULATION_OFFSET_X) >> 4,
+            (blockZ - CHUNK_POPULATION_OFFSET_Z) >> 4
+        );
     }
 
     /**
@@ -128,9 +127,7 @@ public class ChunkCoordinate
      */
     public static ChunkCoordinate fromBlockCoords(int blockX, int blockZ)
     {
-        return new ChunkCoordinate(
-                MathHelper.floor(blockX / (double) CHUNK_X_SIZE), 
-                MathHelper.floor(blockZ / (double) CHUNK_Z_SIZE));
+        return new ChunkCoordinate(blockX >> 4, blockZ >> 4);
     }
 
     public static ChunkCoordinate fromChunkCoords(int chunkX, int chunkZ)

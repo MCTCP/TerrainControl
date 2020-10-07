@@ -8,30 +8,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import com.pg85.otg.bukkit.util.NBTHelper;
+import net.minecraft.server.v1_12_R1.*;
+import net.minecraft.server.v1_12_R1.Entity;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_12_R1.CraftWorld;
-import org.bukkit.craftbukkit.v1_12_R1.block.CraftBlock;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftAmbient;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftAnimals;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftComplexLivingEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftElderGuardian;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftFlying;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftGolem;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftGuardian;
 import org.bukkit.craftbukkit.v1_12_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftMonster;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftSlime;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftVillager;
-import org.bukkit.craftbukkit.v1_12_R1.entity.CraftWaterMob;
 import org.bukkit.craftbukkit.v1_12_R1.generator.CustomChunkGenerator;
 import org.bukkit.craftbukkit.v1_12_R1.inventory.CraftItemStack;
-import org.bukkit.entity.Arrow;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.FallingBlock;
-import org.bukkit.entity.LightningStrike;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.pg85.otg.OTG;
@@ -76,54 +63,7 @@ import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.helpers.ReflectionHelper;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
-import net.minecraft.server.v1_12_R1.BiomeBase;
-import net.minecraft.server.v1_12_R1.Block;
-import net.minecraft.server.v1_12_R1.BlockLeaves;
-import net.minecraft.server.v1_12_R1.BlockLeaves1;
-import net.minecraft.server.v1_12_R1.BlockLog1;
-import net.minecraft.server.v1_12_R1.BlockPosition;
-import net.minecraft.server.v1_12_R1.BlockWood;
-import net.minecraft.server.v1_12_R1.Blocks;
-import net.minecraft.server.v1_12_R1.Chunk;
-import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;
-import net.minecraft.server.v1_12_R1.ChunkGenerator;
-import net.minecraft.server.v1_12_R1.ChunkProviderServer;
-import net.minecraft.server.v1_12_R1.ChunkSection;
-import net.minecraft.server.v1_12_R1.DefinedStructure;
-import net.minecraft.server.v1_12_R1.DefinedStructureManager;
-import net.minecraft.server.v1_12_R1.DimensionManager;
-import net.minecraft.server.v1_12_R1.Entity;
-import net.minecraft.server.v1_12_R1.EntityFallingBlock;
-import net.minecraft.server.v1_12_R1.EntityLightning;
-import net.minecraft.server.v1_12_R1.EntityLiving;
-import net.minecraft.server.v1_12_R1.EntityOcelot;
-import net.minecraft.server.v1_12_R1.EntityTippedArrow;
-import net.minecraft.server.v1_12_R1.EnumCreatureType;
-import net.minecraft.server.v1_12_R1.EnumDirection;
-import net.minecraft.server.v1_12_R1.IBlockData;
-import net.minecraft.server.v1_12_R1.MinecraftKey;
-import net.minecraft.server.v1_12_R1.NBTBase;
-import net.minecraft.server.v1_12_R1.NBTTagCompound;
-import net.minecraft.server.v1_12_R1.SpawnerCreature;
-import net.minecraft.server.v1_12_R1.StructureGenerator;
-import net.minecraft.server.v1_12_R1.World;
-import net.minecraft.server.v1_12_R1.WorldChunkManager;
-import net.minecraft.server.v1_12_R1.WorldGenAcaciaTree;
-import net.minecraft.server.v1_12_R1.WorldGenBigTree;
-import net.minecraft.server.v1_12_R1.WorldGenDungeons;
-import net.minecraft.server.v1_12_R1.WorldGenForest;
-import net.minecraft.server.v1_12_R1.WorldGenForestTree;
-import net.minecraft.server.v1_12_R1.WorldGenFossils;
-import net.minecraft.server.v1_12_R1.WorldGenGroundBush;
-import net.minecraft.server.v1_12_R1.WorldGenHugeMushroom;
-import net.minecraft.server.v1_12_R1.WorldGenJungleTree;
-import net.minecraft.server.v1_12_R1.WorldGenMegaTree;
-import net.minecraft.server.v1_12_R1.WorldGenSwampTree;
-import net.minecraft.server.v1_12_R1.WorldGenTaiga1;
-import net.minecraft.server.v1_12_R1.WorldGenTaiga2;
-import net.minecraft.server.v1_12_R1.WorldGenTrees;
-import net.minecraft.server.v1_12_R1.WorldServer;
-
+// TODO: Change localworld into abstract class and implement common logic there
 public class BukkitWorld implements LocalWorld
 {
     private static final int MAX_BIOMES_COUNT = 4096;
@@ -171,6 +111,10 @@ public class BukkitWorld implements LocalWorld
     private WorldGenTaiga2 taigaTree2;
 
 	private BukkitWorldSession worldSession;
+
+    // 32x32 biomes cache for fast lookups during population
+	private LocalBiome[][] cachedBiomes;
+    private boolean cacheIsValid;
 
     public BukkitWorld(String _name)
     {
@@ -393,7 +337,7 @@ public class BukkitWorld implements LocalWorld
             this.initialized = true;
         } else {
             // Things that need to be done only on reloading
-            this.structureCache.reload(this);
+            this.structureCache.reloadBo3StructureCache(this);
         }
     }
     
@@ -434,19 +378,7 @@ public class BukkitWorld implements LocalWorld
         	ReflectionHelper.setValueInFieldOfType(chunkProvider, ChunkGenerator.class, chunkGenerator);
         }
     }
-    
-    @Override
-    public void startPopulation(ChunkCoordinate chunkCoord)
-    {
-    	this.getChunkGenerator().startPopulation(chunkCoord);
-    }
 
-    @Override
-    public void endPopulation()
-    {
-    	this.getChunkGenerator().endPopulation();
-    }
-    
     // Biomes
     
     @Override
@@ -494,6 +426,36 @@ public class BukkitWorld implements LocalWorld
             return getCalculatedBiome(x, z);
         //}
     }
+
+    @Override
+    public LocalBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    {
+    	// Cache is invalidated when cascading chunkgen happens.
+    	return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomes[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+    }
+
+	@Override
+	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
+	{
+		this.cachedBiomes = new LocalBiome[32][32];
+
+		int areaSize = 32;
+		for(int x = 0; x < areaSize; x++)
+		{
+			for(int z = 0; z < areaSize; z++)
+			{
+				this.cachedBiomes[x][z] = getBiome(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+			}
+		}
+		this.cacheIsValid = true;
+	}
+
+	// Population biome cache is invalidated when cascading chunkgen happens
+	@Override
+	public void invalidatePopulationBiomeCache()
+	{
+		this.cacheIsValid = false;
+	}
 
     @Override
     public String getSavedBiomeName(int x, int z)
@@ -770,11 +732,21 @@ public class BukkitWorld implements LocalWorld
         return new MojangStructurePart(name, mojangStructurePart);
     }
     
-    // Replace blocks
+    // Replace blocks / chc
 
+	@Override
+	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld)
+	{
+		return this.getChunkGenerator().getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+	}
+
+	// TODO: No longer needed, we're replacing blocks when placing them now.
+	// Remove this after doing some profiling to compare performance.
     @Override
     public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
+    	if(1 == 1) { return; }
+
         if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
         {
             // Don't waste time here, ReplacedBlocks is empty everywhere
@@ -821,6 +793,7 @@ public class BukkitWorld implements LocalWorld
                     	{
                     		replaceArray = new ReplacedBlocksInstruction[0];
                     	} else {
+                    		biome.getBiomeConfig().replacedBlocks.parseForWorld(this);
                     		replaceArray = new ReplacedBlocksInstruction[biome.getBiomeConfig().replacedBlocks.getInstructions().size()];
                     		replaceArray = (ReplacedBlocksInstruction[])biome.getBiomeConfig().replacedBlocks.getInstructions().toArray(replaceArray);
                     	}
@@ -1274,303 +1247,134 @@ public class BukkitWorld implements LocalWorld
 	@Override
 	public void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated)
 	{
-    	Random rand = new Random();
+        if(OTG.getPluginConfig().spawnLog)
+        {
+            OTG.log(LogMarker.DEBUG, "Attempting to spawn BO3 Entity() " + entityData.groupSize + " x " + entityData.name + " at " + entityData.x + " " + entityData.y + " " + entityData.z);
+        }
+        if (chunkBeingPopulated != null && !OTG.IsInAreaBeingPopulated((int) Math.floor(entityData.x), (int) Math.floor(entityData.z), chunkBeingPopulated)) {
+            // If outside area being populated, abort and remove entity
+            if(OTG.getPluginConfig().spawnLog)
+            {
+                OTG.log(LogMarker.DEBUG, "Tried to spawn entity "+ entityData.resourceLocation +"outside population bounds, aborting");
+            }
+            return;
+        }
+        if (entityData.y < 0 || entityData.y >= 256) {
+            if(OTG.getPluginConfig().spawnLog)
+            {
+                OTG.log(LogMarker.ERROR, "Failed to spawn mob "+entityData.name +", spawn position out of bounds");
+            }
+            return;
+        }
 
-		String mobTypeName = entityData.mobName;
-		int groupSize = entityData.groupSize;
 		String nameTag = entityData.nameTagOrNBTFileName;
 
-		EntityType entityType = null;
+		Entity entity = createEntityFromData(entityData);
+        if(entity == null) return;
 
-		for(EntityType entityType1 : EntityType.values())
-		{
-			if(entityType1.name() != null && mobTypeName.toLowerCase().replace("_", "").replace(" ", "").replace("entity","").equals(entityType1.name().toLowerCase().replace("_", "").replace(" ", "").replace("entity","")))
-			{
-				entityType = entityType1;
-				break;
-			}
-		}
-
-		// Make sure all mob names that forge accepts also work here
-
-    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("evocationillager"))
-    	{
-    		entityType = org.bukkit.entity.EntityType.EVOKER;
-    	}
-    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("vindicationillager"))
-    	{
-    		entityType = org.bukkit.entity.EntityType.VINDICATOR;
-    	}
-    	if(mobTypeName.toLowerCase().replace("entity", "").replace("_", "").replace(" ", "").equals("zombiepigman"))
-    	{
-    		entityType = org.bukkit.entity.EntityType.PIG_ZOMBIE;
-    	}
-
-    	//
-
-		if(entityType == null)
-		{
-			if(OTG.getPluginConfig().spawnLog)
-			{
-				OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
-			}
-			return;
-		}
-
-		if (entityType == EntityType.PLAYER)
-		{
-			return;
-		}
-
-		EnumDirection direction = EnumDirection.SOUTH;
-        float rotationFromNbt = 0;
-        boolean rotationFromNbtSet = false;
-        
-		String nbtData = entityData.getMetaData();
-		if(nbtData != null && nbtData.trim().length() > 0)
-		{
-			NBTTagCompound nbttagcompound = new NBTTagCompound();
-	        try
-	        {
-	            NBTBase nbtbase = JsonToNBT.getTagFromJson(nbtData);
-
-	            if (!(nbtbase instanceof NBTTagCompound))
-	            {
-	            	if(OTG.getPluginConfig().spawnLog)
-	            	{
-	            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + nbtData + ". Skipping mob.");
-	            	}
-	            	return;
-	            }
-	            nbttagcompound = (NBTTagCompound)nbtbase;
-	        }
-	        catch (NBTException nbtexception)
-	        {
-	        	if(OTG.getPluginConfig().spawnLog)
-	        	{
-	        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + nbtData + ". Skipping mob.");
-	        	}
-	        	return;
-	        }
-	        if(nbttagcompound.hasKey("Facing"))
-	        {
-	        	int facing = nbttagcompound.getByte("Facing");
-	        	switch(facing)
-	        	{
-	        		case 0:
-	        			direction = EnumDirection.DOWN;
-        			break;
-	        		case 1:
-	        			direction = EnumDirection.UP;
-        			break;
-	        		case 2:
-	        			direction = EnumDirection.NORTH;
-        			break;
-	        		case 3:
-	        			direction = EnumDirection.SOUTH;
-        			break;
-	        		case 4:
-	        			direction = EnumDirection.WEST;
-        			break;
-	        		case 5:
-	        			direction = EnumDirection.EAST;
-        			break;        			        			
-	        	}
-    			rotationFromNbt = direction.get2DRotationValue() * 90;
-	        	rotationFromNbtSet = true;
-	        }
-	        else if(nbttagcompound.hasKey("Rotation"))
-	        {
-	        	rotationFromNbt = nbttagcompound.getByte("Rotation");
-	        	rotationFromNbtSet = true;
-	        }
-		}
-		
-		Entity entityLiving = getEntity(entityType.getEntityClass(), direction);
-        if(entityLiving != null)
+        // If either the block is a full block, or entity is a fish out of water, then we cancel
+        org.bukkit.Material material = world.getWorld().getBlockAt(new Location(world.getWorld(), entityData.x, entityData.y, entityData.z)).getType();
+        if (!material.isTransparent() || material.isSolid() ||
+                ((entity.getBukkitEntity() instanceof CraftGuardian || EnumCreatureType.WATER_CREATURE.a().isAssignableFrom(entity.getClass())
+                        && (material != org.bukkit.Material.WATER && material != org.bukkit.Material.STATIONARY_WATER))))
         {
-    		org.bukkit.entity.Entity bukkitEntityLiving = entityLiving.getBukkitEntity();
-    		boolean isWaterMob = bukkitEntityLiving instanceof CraftGuardian || bukkitEntityLiving instanceof CraftElderGuardian;        	
-			EnumCreatureType creatureType = EnumCreatureType.CREATURE;
+            world.removeEntity(entity);
+            return;
+        }
 
-			// MONSTER
-			if(
-				bukkitEntityLiving instanceof CraftComplexLivingEntity || // Dragon
-				bukkitEntityLiving instanceof CraftSlime || // Slime/Magma
-				bukkitEntityLiving instanceof CraftMonster ||
-				bukkitEntityLiving instanceof CraftFlying // Ghast
-			)
-			{
-				creatureType = EnumCreatureType.MONSTER;
-			}
-
-			// AMBIENT
-			if(
-				bukkitEntityLiving instanceof CraftAmbient // Bat
-			)
-			{
-				creatureType = EnumCreatureType.AMBIENT;
-			}
-
-			// CREATURE
-			if(
-				bukkitEntityLiving instanceof CraftAnimals || // Creature
-				bukkitEntityLiving instanceof CraftVillager ||
-				bukkitEntityLiving instanceof CraftGolem
-			)
-			{
-				creatureType = EnumCreatureType.CREATURE;
-			}
-
-			// WATERCREATURE
-			if(
-				bukkitEntityLiving instanceof CraftWaterMob
-			)
-			{
-				creatureType = EnumCreatureType.WATER_CREATURE;
-			}
-
-            int j1 = entityData.x;
-            int k1 = entityData.y;
-            int l1 = entityData.z;
-
-            int x = entityData.x;
-            int y = entityData.y;
-            int z = entityData.z;
-
-            CraftBlock block = (CraftBlock) world.getWorld().getBlockAt(new Location(world.getWorld(), x, y, z));
-            org.bukkit.Material material = block.getType();
-
-            boolean isOutsideBuildHeight = y < 0 || y >= 256;
-            boolean isOpaque = material.isTransparent() ? false : material.isSolid();
-            boolean isFullCube = material != org.bukkit.Material.STEP;
-            boolean canProvidePower = block.isBlockPowered();
-            boolean isBlockNormalCube = !isOutsideBuildHeight && isOpaque && isFullCube && !canProvidePower;
-
-            if (!isBlockNormalCube && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && (material == org.bukkit.Material.WATER || material == org.bukkit.Material.STATIONARY_WATER)) || material == org.bukkit.Material.AIR))
+        if(entity instanceof EntityLiving)
+        {
+            for (int r = 0; r < entityData.groupSize; r++)
             {
-	            float f = (float)j1 + 0.5F;
-	            float f1 = (float)k1;
-	            float f2 = (float)l1 + 0.5F;
+                if (r != 0) {
+                    entity = createEntityFromData(entityData);
+                    if (entity == null) {
+                        return;
+                    }
+                }
 
-	            if(entityLiving instanceof EntityLiving)
-	            {
-	            	for(int r = 0; r < groupSize; r++)
-	            	{
-    					if(
-							chunkBeingPopulated == null || 
-							(
-								OTG.IsInAreaBeingPopulated((int)Math.floor(f), (int)Math.floor(f2), chunkBeingPopulated)// || 
-								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
-							)
-						)
-    					{
-	            			CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());
+                if(nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
+                    entity.setCustomName(nameTag);
 
-		            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-		           			{
-		           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
-		           			}
+                ((CraftLivingEntity) CraftLivingEntity.getEntity(world.getServer(), entity))
+                        .setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
+            }
+        } else {
+            for (int r = 0; r < entityData.groupSize; r++)
+            {
+                if(r != 0)
+                {
+                    entity = createEntityFromData(entityData);
+                    if (entity == null) continue;
+                }
 
-		            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
-		            		{
-		            			if(nameTag != null && nameTag.length() > 0)
-		        				{
-		            				entity.setCustomName(nameTag);
-		        				}
-		            		}
-
-		            		if(entity instanceof CraftLivingEntity)
-		            		{
-		            			((CraftLivingEntity) entity).setRemoveWhenFarAway(false); // <- makes sure mobs don't de-spawn
-		            		}
-    					}	            	
-	            	}
-	            } else {
-	            	for(int r = 0; r < groupSize; r++)
-	            	{
-    					if(
-							chunkBeingPopulated == null || 
-							(
-								OTG.IsInAreaBeingPopulated((int)Math.floor(f), (int)Math.floor(f2), chunkBeingPopulated)// || 
-								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
-							)
-						)
-    					{
-		            		try
-		            		{
-			            		CraftEntity entity = (CraftEntity) world.getWorld().spawn(new Location(world.getWorld(), (double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F), entityType.getEntityClass());	            		
-			            		if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-			           			{
-			           				applyMetaData(entity, entityData.mobName, entityData.getMetaData());
-			           			}
-		            		}
-		            		catch(IllegalArgumentException ex)
-		            		{
-		            			if(OTG.getPluginConfig().spawnLog)
-		            			{
-		            				OTG.log(LogMarker.WARN, "Could not spawn entity " + entityData.mobName + " in world. Please note that hanging entities such as item frames may cause problems, this will be fixed in a future update. Exception: ");
-		            				ex.printStackTrace();
-		            			}
-		            		}
-	    			    	
-    					}
-	            	}
-	            }
+                if (entity instanceof EntityItemFrame)
+                    if (((EntityItemFrame)entity).direction == null)
+                        ((EntityItemFrame)entity).direction = EnumDirection.SOUTH;
             }
 		}
 	}
-    
-    private void applyMetaData(CraftEntity entity, String mobName, String metaDataString)
-	{
-    	NBTTagCompound nbttagcompound = new NBTTagCompound();
 
-        try
+	private Entity createEntityFromData(EntityFunction<?> entityData) {
+        Entity entity = null;
+        NBTTagCompound nbttagcompound = new NBTTagCompound();
+
+        if(entityData.getMetaData() != null && entityData.getMetaData().trim().length() > 0)
         {
-            NBTBase nbtbase = JsonToNBT.getTagFromJson(metaDataString);
-
-            if (!(nbtbase instanceof NBTTagCompound))
+            try
             {
-            	if(OTG.getPluginConfig().spawnLog)
-            	{
-            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
-            	}
-            	return;
+                if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
+                {
+                    nbttagcompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
+                    // Specify which type of entity to spawn
+                    nbttagcompound.setString("id", entityData.resourceLocation);
+                }
+                else if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+                {
+                    nbttagcompound = NBTHelper.getNMSFromNBTTagCompound(entityData.namedBinaryTag);
+                }
             }
-
-            nbttagcompound = (NBTTagCompound)nbtbase;
+            catch (NBTException nbtexception)
+            {
+                if(OTG.getPluginConfig().spawnLog)
+                {
+                    OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+                }
+                return null;
+            }
+            if(nbttagcompound.hasKey("Facing"))
+            {
+                // Rotate the item frame with the object
+                int face = nbttagcompound.getByte("Facing");
+                nbttagcompound.setByte("Facing", (byte) ((face + (6 - entityData.rotation)) % 4));
+            }
+            // Set rotation if specified
+            if(nbttagcompound.hasKey("Rotation"))
+            {
+                // Rotate with the BO3
+                NBTTagList list = nbttagcompound.getList("Rotation", 5);
+                list.a(0, new NBTTagFloat((list.g(0)+ ((2 - entityData.rotation) % 4)*90) % 360));
+            }
+            // Spawn entity, with potential passengers
+            entity = ChunkRegionLoader.spawnEntity(nbttagcompound, world, entityData.x+0.5, entityData.y, entityData.z+0.5, true, CreatureSpawnEvent.SpawnReason.CUSTOM);
+            if (entity == null) return null;
+        } else {
+            try
+            {
+                org.bukkit.entity.Entity e = world.getWorld().spawn(new Location(world.getWorld(), entityData.x+0.5, entityData.y+0.0, entityData.z+0.5), EntityType.fromName(entityData.name).getEntityClass());
+                //entity = (Entity) EntityType.fromName(entityData.name).getEntityClass().getConstructor(new Class[] {World.class}).newInstance(world);
+                entity = world.getEntity( e.getUniqueId());
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         }
-        catch (NBTException nbtexception)
+        if(OTG.getPluginConfig().spawnLog)
         {
-        	if(OTG.getPluginConfig().spawnLog)
-        	{
-        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + metaDataString + ". Skipping mob.");
-        	}
-        	return;
+            OTG.log(LogMarker.DEBUG, "Spawned OK");
         }
-
-        nbttagcompound.setString("id", mobName);
-
-		Entity nmsEntity = ((CraftEntity)entity).getHandle();
-
-		NBTTagCompound originalTag = new NBTTagCompound();
-		nmsEntity.c(originalTag);
-
-		NBTBase originalPos = originalTag.get("Pos");
-		nbttagcompound.set("Pos", originalPos);
-		
-		NBTBase originalRot = originalTag.get("Rotation");
-		nbttagcompound.set("Rotation", originalRot);
-	
-		NBTBase originalUUIDLeast = originalTag.get("UUIDLeast");
-		NBTBase originalUUIDMost = originalTag.get("UUIDMost");
-
-		nbttagcompound.set("UUIDLeast", originalUUIDLeast);
-		nbttagcompound.set("UUIDMost", originalUUIDMost);
-
-		nmsEntity.f(nbttagcompound);
-		nmsEntity.recalcPosition();
-	}
+        return entity;
+    }
 	
     // Chunks
         
@@ -1855,10 +1659,23 @@ public class BukkitWorld implements LocalWorld
 	}
     
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+    {
+    	setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, null, replaceBlocks);
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean replaceBlocks)
     {
     	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
     	{
+    		return;
+    	}
+
+    	if(material.isEmpty())
+    	{
+    		// Happens when configs contain blocks that don't exist.
+    		// TODO: Catch this earlier up the chain, avoid doing work?
     		return;
     	}
 
@@ -1872,7 +1689,20 @@ public class BukkitWorld implements LocalWorld
 			)
 		)
     	{
-    		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag);
+    		if(replaceBlocks)
+    		{
+        		if(biomeConfig == null)
+        		{
+        			if(chunkBeingPopulated == null)
+        			{
+        				biomeConfig = this.getBiome(x, z).getBiomeConfig();
+        			} else {
+        				biomeConfig = this.getBiomeForPopulation(x, z, chunkBeingPopulated).getBiomeConfig();
+        			}
+        		}
+    			material = material.parseWithBiomeAndHeight(this, biomeConfig, y);
+    		}
+    		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag, biomeConfig);
     	}
     }   
 
@@ -1889,7 +1719,7 @@ public class BukkitWorld implements LocalWorld
 	}
 
 	@Override
-	public boolean isOTGPlus()
+	public boolean isBo4Enabled()
 	{
 		return this.getConfigs().getWorldConfig().isOTGPlus;
 	}

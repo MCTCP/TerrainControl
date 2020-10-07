@@ -70,10 +70,10 @@ public class CustomStructureGen extends Resource
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
             {
-                CustomStructure structureStart = world.getStructureCache().getStructureStart(random, searchChunkX, searchChunkZ);
+            	BO3CustomStructure structureStart = world.getStructureCache().getBo3StructureStart(random, searchChunkX, searchChunkZ);
                 if (structureStart != null)
                 {
-                	((BO3CustomStructure)structureStart).spawnInChunk(chunkCoord, world);
+                	structureStart.spawnInChunk(chunkCoord, world);
                 }
             }
         }
@@ -92,7 +92,7 @@ public class CustomStructureGen extends Resource
             	StructuredCustomObject object = getObjects(world.getName()).get(objectNumber);
             	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
             	{
-            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomObjectCoordinate(world, random, chunkX, chunkZ);
+            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(world, random, chunkX, chunkZ);
             	} else {
             		if(OTG.getPluginConfig().spawnLog)
             		{

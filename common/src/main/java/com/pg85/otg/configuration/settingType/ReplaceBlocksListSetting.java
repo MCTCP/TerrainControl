@@ -15,7 +15,6 @@ import java.util.List;
  */
 class ReplaceBlocksListSetting extends Setting<List<ReplaceBlocks>>
 {
-
     ReplaceBlocksListSetting(String name)
     {
         super(name);

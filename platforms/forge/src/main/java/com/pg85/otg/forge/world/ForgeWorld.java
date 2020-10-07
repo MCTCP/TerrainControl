@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.world;
 
-import com.pg85.otg.*;
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -21,7 +21,7 @@ import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.IOHelper;
-import com.pg85.otg.forge.util.MobSpawnGroupHelper;
+import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
@@ -34,22 +34,18 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
-
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.*;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -62,6 +58,7 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.chunk.EmptyChunk;
+import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
 import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.MapGenCaves;
@@ -72,16 +69,18 @@ import net.minecraft.world.gen.structure.StructureOceanMonument;
 import net.minecraft.world.gen.structure.template.Template;
 import net.minecraft.world.gen.structure.template.TemplateManager;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
-// TODO: Move this to com.pg85.otg.forge.world for 1.13. Has to be in com.pg85.otg.forge for Streams 1.12, which depends on it. 
+// TODO: Change localworld into abstract class and implement common logic there 
 public class ForgeWorld implements LocalWorld
 {
     public static final int MAX_BIOMES_COUNT = 4096;
@@ -125,6 +124,10 @@ public class ForgeWorld implements LocalWorld
     private WorldGenSwamp swampTree;
     private WorldGenTaiga1 taigaTree1;
     private WorldGenTaiga2 taigaTree2;
+    
+    // 32x32 biomes cache for fast lookups during population
+    private LocalBiome[][] cachedBiomes;
+    private boolean cacheIsValid;
 
     public ForgeWorld(String _name)
     {
@@ -209,7 +212,7 @@ public class ForgeWorld implements LocalWorld
         this.world = world;
         this.seed = world.getSeed();
     }
-
+    
     /**
      * Call this method when the configs are loaded.
      * @param configs The configs.
@@ -324,13 +327,7 @@ public class ForgeWorld implements LocalWorld
     {
     	return world.provider.getSpawnPoint();
     }
-    
-    @Override
-    public void startPopulation(ChunkCoordinate chunkCoord) { }
-
-    @Override
-    public void endPopulation() { }
-    
+        
     // World session
     
     @Override
@@ -358,6 +355,8 @@ public class ForgeWorld implements LocalWorld
     
     // Biomes
     
+	// TODO: Chunk only contains the replacetobiome id?
+	// Only used for fog
 	public Biome getBiomeFromChunk(int blockX, int blockZ)
 	{
 		if(this.getWorld().isBlockLoaded(new BlockPos(blockX,255,blockZ)))
@@ -369,7 +368,7 @@ public class ForgeWorld implements LocalWorld
 		        int i = blockX & 15;
 		        int j = blockZ & 15;
 		        int biomeId = blockBiomeArray[j << 4 | i] & 255;
-		        return Biome.getBiome(biomeId);			
+		        return Biome.getBiome(biomeId);
 			}
 		}
 		return null;
@@ -392,6 +391,36 @@ public class ForgeWorld implements LocalWorld
         	return getCalculatedBiome(x, z);
         //}
     }
+    
+    @Override
+    public LocalBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    {
+    	// Cache is invalidated when cascading chunkgen happens.
+    	return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomes[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+    }
+
+	@Override
+	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
+	{
+		this.cachedBiomes = new LocalBiome[32][32];
+		
+		int areaSize = 32; 
+		for(int x = 0; x < areaSize; x++)
+		{
+			for(int z = 0; z < areaSize; z++)
+			{
+				this.cachedBiomes[x][z] = getBiome(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+			}
+		}
+		this.cacheIsValid = true;
+	}
+	
+	// Population biome cache is invalidated when cascading chunkgen happens
+	@Override
+	public void invalidatePopulationBiomeCache()
+	{
+		this.cacheIsValid = false;
+	}
 
     @Override
     public String getSavedBiomeName(int x, int z)
@@ -406,7 +435,7 @@ public class ForgeWorld implements LocalWorld
      	   return biomeConfig.replaceToBiomeName;
         }
     }
-    
+
     @Override
     public ArrayList<LocalBiome> getAllBiomes()
     {
@@ -744,7 +773,14 @@ public class ForgeWorld implements LocalWorld
     }
 
     @Override
-    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated)
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+    {
+    	setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, null, replaceBlocks);
+    }   
+    
+    // Only called directly by any resources spawning blocks that fetch the biomeconfig for each xz column anyway (bo4's and smoothing areas)
+    @Override
+    public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean replaceBlocks)
     {
     	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
     	{
@@ -768,6 +804,19 @@ public class ForgeWorld implements LocalWorld
 			)
 		)
     	{
+    		if(replaceBlocks)
+    		{
+        		if(biomeConfig == null)
+        		{
+        			if(chunkBeingPopulated == null)
+        			{
+        				biomeConfig = this.getBiome(x, z).getBiomeConfig();
+        			} else {
+        				biomeConfig = this.getBiomeForPopulation(x, z, chunkBeingPopulated).getBiomeConfig();
+        			}
+        		}
+    			material = material.parseWithBiomeAndHeight(this, biomeConfig, y);
+    		}
     		this.getChunkGenerator().setBlock(x, y, z, material, metaDataTag);
     	}
     }
@@ -1093,12 +1142,22 @@ public class ForgeWorld implements LocalWorld
 
         return null;
     }	
-    
-    // Replace blocks
 
+    // Replace blocks / CHC
+
+	@Override
+	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld) 
+	{
+		return this.getChunkGenerator().getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+	}
+
+	// TODO: No longer needed, we're replacing blocks when placing them now.
+	// Remove this after doing some profiling to compare performance.
     @Override
     public void replaceBlocks(ChunkCoordinate chunkCoord)
     {
+    	if(1 == 1) { return; }
+    	
         if (!this.settings.getWorldConfig().biomeConfigsHaveReplacement)
         {
             // Don't waste time here, ReplacedBlocks is empty everywhere
@@ -1145,6 +1204,7 @@ public class ForgeWorld implements LocalWorld
                     	{
                     		replaceArray = new ReplacedBlocksInstruction[0];
                     	} else {
+                    		biome.getBiomeConfig().replacedBlocks.parseForWorld(this);
                     		replaceArray = new ReplacedBlocksInstruction[biome.getBiomeConfig().replacedBlocks.getInstructions().size()];
                     		replaceArray = (ReplacedBlocksInstruction[])biome.getBiomeConfig().replacedBlocks.getInstructions().toArray(replaceArray);
                     	}
@@ -1247,284 +1307,138 @@ public class ForgeWorld implements LocalWorld
     }    
     
     // Entity spawning
-    	
     @Override
     public void spawnEntity(EntityFunction<?> entityData, ChunkCoordinate chunkBeingPopulated)
-    { 	
-    	if(OTG.getPluginConfig().spawnLog)
-    	{
-    		OTG.log(LogMarker.DEBUG, "Attempting to spawn BO3 Entity() " + entityData.groupSize + " x " + entityData.mobName + " at " + entityData.x + " " + entityData.y + " " + entityData.z);
-    	}
-
-    	Random rand = new Random();
-
-		String mobTypeName = entityData.mobName;
-		int groupSize = entityData.groupSize;
-		String nameTag = entityData.nameTagOrNBTFileName;
-        Class<? extends Entity> entityClass = MobSpawnGroupHelper.toMinecraftClass(mobTypeName);
-    	
-        if(entityClass == null)
+    {
+        if(OTG.getPluginConfig().spawnLog)
         {
-        	if(OTG.getPluginConfig().spawnLog)
-        	{
-        		OTG.log(LogMarker.WARN, "Could not find entity: " + mobTypeName);
-        	}
-        	return;
+            OTG.log(LogMarker.DEBUG, "Attempting to spawn BO3 Entity() " + entityData.groupSize + " x " + entityData.name + " at " + entityData.x + " " + entityData.y + " " + entityData.z);
         }
-        
-		ResourceLocation entityResourceLocation = MobSpawnGroupHelper.resourceLocationFromMinecraftClass(entityClass);
+        if (chunkBeingPopulated != null && !OTG.IsInAreaBeingPopulated((int) Math.floor(entityData.x), (int) Math.floor(entityData.z), chunkBeingPopulated)) {
+            // If outside area being populated, abort and remove entity
+            if(OTG.getPluginConfig().spawnLog)
+            {
+                OTG.log(LogMarker.DEBUG, "Tried to spawn entity "+ entityData.resourceLocation +"outside population bounds, aborting");
+            }
+            return;
+        }
+        if (entityData.y < 0 || entityData.y >= 256) {
+            if(OTG.getPluginConfig().spawnLog)
+            {
+                OTG.log(LogMarker.ERROR, "Failed to spawn mob "+entityData.name +", spawn position out of bounds");
+            }
+            return;
+        }
 
-        Entity entityliving = null;
-        float rotationFromNbt = 0;
-        boolean rotationFromNbtSet = false;
+        String nameTag = entityData.nameTagOrNBTFileName;
+
+        Entity entity = createEntityFromData(entityData);
+        if (entity == null) return;
+
+        // If either the block is a full block, or entity is a fish out of water, then we cancel
+        if (world.isBlockNormalCube(new BlockPos(entityData.x, entityData.y, entityData.z), false)
+                || ((entity.isCreatureType(EnumCreatureType.WATER_CREATURE, false) || entity instanceof EntityGuardian)
+                    && world.getBlockState(new BlockPos(entityData.x, entityData.y, entityData.z)).getMaterial() != Material.WATER))
+        {
+            world.removeEntity(entity);
+            return;
+        }
+
+        if(entity instanceof EntityLiving)
+        {
+            for (int r = 0; r < entityData.groupSize; r++)
+            {
+                if(r != 0)
+                {
+                    entity = createEntityFromData(entityData);
+                    if (entity == null) continue;
+                }
+
+                if (nameTag != null && !nameTag.toLowerCase().trim().endsWith(".txt") && !nameTag.toLowerCase().trim().endsWith(".nbt"))
+                    entity.setCustomNameTag(nameTag);
+
+                ((EntityLiving) entity).enablePersistence(); // <- makes sure mobs don't de-spawn
+            }
+        } else {
+            for (int r = 0; r < entityData.groupSize; r++)
+            {
+                if(r != 0)
+                {
+                    entity = createEntityFromData(entityData);
+                    if (entity == null) continue;
+                }
+
+                if(entity instanceof EntityItemFrame)
+                    if (((EntityItemFrame)entity).facingDirection == null)
+                        ((EntityItemFrame)entity).facingDirection = EnumFacing.SOUTH;
+            }
+        }
+    }
+
+    /** Spawns an entity in the world and returns it.
+     *
+     * @param entityData The entity function being run
+     * @return The spawned entity, or null if spawn failed
+     */
+    private Entity createEntityFromData(EntityFunction<?> entityData) {
+        Entity entity;
+        NBTTagCompound nbttagcompound = new NBTTagCompound();
 
         if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
         {
-        	NBTTagCompound nbttagcompound = new NBTTagCompound();
+            try
+            {
+                if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt")) {
+                    nbttagcompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
+                    // Specify which type of entity to spawn
+                    nbttagcompound.setString("id", entityData.resourceLocation);
+                }
+                // Get NBT compound from provided string
+                else if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")) {
+                    nbttagcompound = NBTHelper.getNMSFromNBTTagCompound(entityData.namedBinaryTag);
+                }
+            }
+            catch (NBTException nbtexception)
+            {
+                if(OTG.getPluginConfig().spawnLog)
+                {
+                    OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
+                }
+                return null;
+            }
+            if(nbttagcompound.hasKey("Facing"))
+            {
+                // Rotate the item frame with the object
+                int face = nbttagcompound.getByte("Facing");
+                nbttagcompound.setByte("Facing", (byte) ((face + (6 - entityData.rotation)) % 4));
+            }
+            // Set rotation if specified
+            if(nbttagcompound.hasKey("Rotation"))
+            {
+                // Rotate with the BO3
+                NBTTagList list = nbttagcompound.getTagList("Rotation", 5);
+                list.set(0, new NBTTagFloat((list.getFloatAt(0)+ ((2 - entityData.rotation) % 4)*90) % 360));
+            }
 
-	        try
-	        {
-	            NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
-
-	            if (!(nbtbase instanceof NBTTagCompound))
-	            {
-	            	if(OTG.getPluginConfig().spawnLog)
-	            	{
-	            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
-	            	}
-		        	return;
-	            }
-
-	            nbttagcompound = (NBTTagCompound)nbtbase;
-	        }
-	        catch (NBTException nbtexception)
-	        {
-	        	if(OTG.getPluginConfig().spawnLog)
-	        	{
-	        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
-	        	}
-	        	return;
-	        }
-
-	        nbttagcompound.setString("id", entityResourceLocation.toString());
-	        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
-	        // TODO: Rotated item frames don't stick to walls correctly or don't pop off when their support block is removed.
-	        if(nbttagcompound.hasKey("Facing"))
-	        {
-	        	EnumFacing facing = EnumFacing.byIndex(nbttagcompound.getByte("Facing"));
-	        	rotationFromNbt = facing.getHorizontalIndex() * 90;
-	        	rotationFromNbtSet = true;
-	        }
-	        
+            // Spawn entity, with potential passengers
+            entity = AnvilChunkLoader.readWorldEntityPos(nbttagcompound, world, entityData.x+0.5, entityData.y, entityData.z+0.5, true);
+            if (entity == null) return null;
         } else {
-	        try
-	        {
-	            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
-	        }
-	        catch (Exception exception)
-	        {
-	            exception.printStackTrace();
-	            return;
-	        }
+            // Create a default entity from the given mob type
+            nbttagcompound.setString("id", entityData.resourceLocation);
+            entity = AnvilChunkLoader.readWorldEntityPos(nbttagcompound, world, entityData.x + 0.5, entityData.y, entityData.z + 0.5, true);
+            if (entity instanceof EntityLiving) {
+                ((EntityLiving)entity).onInitialSpawn(world.getDifficultyForLocation(
+                                new BlockPos(entityData.x, entityData.y, entityData.z)),(IEntityLivingData)null);
+            }
+            if (entity == null)
+                return null;
         }
-
-        if(entityliving != null)
+        if(OTG.getPluginConfig().spawnLog)
         {
-            EnumCreatureType creatureType = EnumCreatureType.MONSTER;
-            if(!entityliving.isCreatureType(creatureType, false))
-            {
-            	creatureType = EnumCreatureType.CREATURE;
-            	if(!entityliving.isCreatureType(creatureType, false))
-            	{
-            		creatureType = EnumCreatureType.AMBIENT;
-            		if(!entityliving.isCreatureType(creatureType, false))
-            		{
-                		creatureType = EnumCreatureType.WATER_CREATURE;
-                		if(!entityliving.isCreatureType(creatureType, false))
-                		{
-                        	creatureType = EnumCreatureType.CREATURE;
-                		}
-            		}
-            	}
-            }
-
-            int j1 = entityData.x;
-            int k1 = entityData.y;
-            int l1 = entityData.z;
-
-            boolean isWaterMob = entityliving instanceof EntityGuardian;
-
-            Material material = world.getBlockState(new BlockPos(j1, k1, l1)).getMaterial();
-            if (!world.isBlockNormalCube(new BlockPos(j1, k1, l1), false) && (((creatureType == EnumCreatureType.WATER_CREATURE || isWaterMob) && material == Material.WATER) || material == Material.AIR))
-            {
-	            float f = (float)j1 + 0.5F;
-	            float f1 = (float)k1;
-	            float f2 = (float)l1 + 0.5F;
-
-	            entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F);
-
-	            if(entityliving instanceof EntityLiving)
-	            {
-	            	for(int r = 0; r < groupSize; r++)
-	            	{
-	            		if(r != 0)
-	            		{
-	            	        if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-	            	        {
-	            	        	NBTTagCompound nbttagcompound = new NBTTagCompound();
-
-	            		        try
-	            		        {
-	            		            NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
-
-	            		            if (!(nbtbase instanceof NBTTagCompound))
-	            		            {
-	            		            	if(OTG.getPluginConfig().spawnLog)
-	            		            	{
-	            		            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
-	            		            	}
-		            		        	return;
-	            		            }
-
-	            		            nbttagcompound = (NBTTagCompound)nbtbase;
-	            		        }
-	            		        catch (NBTException nbtexception)
-	            		        {
-	            		        	if(OTG.getPluginConfig().spawnLog)
-	            		        	{
-	            		        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
-	            		        	}
-	            		        	return;
-	            		        }
-
-	            		        nbttagcompound.setString("id", entityResourceLocation.toString());
-	            		        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
-	            	        } else {
-	            		        try
-	            		        {
-	            		            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
-	            		        }
-	            		        catch (Exception exception)
-	            		        {
-	            		            exception.printStackTrace();
-	            		            return;
-	            		        }
-	            	        }
-	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F);
-	            		}
-
-	            		if(entityData.nameTagOrNBTFileName != null && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") && !entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
-	            		{
-	            			if(nameTag != null && nameTag.length() > 0)
-	        				{
-	        					((EntityLiving) entityliving).setCustomNameTag(nameTag);
-	        				}
-	            		}
-
-    					((EntityLiving) entityliving).enablePersistence(); // <- makes sure mobs don't de-spawn
-
-    					if(
-							chunkBeingPopulated == null || 
-							(
-								OTG.IsInAreaBeingPopulated((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ), chunkBeingPopulated)// || 
-								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
-							)
-						)
-    					{
-	    			    	if(OTG.getPluginConfig().spawnLog)
-	    			    	{
-	    			    		OTG.log(LogMarker.DEBUG, "Spawned OK");
-	    			    	}
-	
-	    					world.spawnEntity(entityliving);
-    					}
-	            	}
-	            } else {
-	            	for(int r = 0; r < groupSize; r++)
-	            	{
-	            		if(r != 0)
-	            		{
-	            	        if(entityData.nameTagOrNBTFileName != null && (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt") || entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")))
-	            	        {
-	            	        	NBTTagCompound nbttagcompound = new NBTTagCompound();
-
-	            		        try
-	            		        {
-	            		            NBTBase nbtbase = JsonToNBT.getTagFromJson(entityData.getMetaData());
-
-	            		            if (!(nbtbase instanceof NBTTagCompound))
-	            		            {
-	            		            	if(OTG.getPluginConfig().spawnLog)
-	            		            	{
-	            		            		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
-	            		            	}
-	            			        	return;
-	            		            }
-
-	            		            nbttagcompound = (NBTTagCompound)nbtbase;
-	            		        }
-	            		        catch (NBTException nbtexception)
-	            		        {
-	            		        	if(OTG.getPluginConfig().spawnLog)
-	            		        	{
-	            		        		OTG.log(LogMarker.WARN, "Invalid NBT tag for mob in EntityFunction: " + entityData.getMetaData() + ". Skipping mob.");
-	            		        	}
-	            		        	return;
-	            		        }
-
-	            		        nbttagcompound.setString("id", entityResourceLocation.toString());
-	            		        entityliving = EntityList.createEntityFromNBT(nbttagcompound, world);
-	            		        // TODO: Rotated item frames don't stick to walls correctly or don't pop off when their support block is removed.
-	            		        if(nbttagcompound.hasKey("Facing"))
-	            		        {
-	            		        	EnumFacing facing = EnumFacing.byIndex(nbttagcompound.getByte("Facing"));
-	            		        	rotationFromNbt = facing.getHorizontalIndex() * 90;
-	            		        	rotationFromNbtSet = true;
-	            		        }
-	            		        
-	            	        } else {
-	            		        try
-	            		        {
-	            		            entityliving = (Entity) entityClass.getConstructor(new Class[] {World.class}).newInstance(new Object[] { world });
-	            		        }
-	            		        catch (Exception exception)
-	            		        {
-	            		            exception.printStackTrace();
-	            		            return;
-	            		        }
-	            	        }
-	                        entityliving.setLocationAndAngles((double)f, (double)f1, (double)f2, rotationFromNbtSet ? rotationFromNbt : rand.nextFloat() * 360.0F, 0.0F);
-	            		}
-
-    			    	if(OTG.getPluginConfig().spawnLog)
-    			    	{
-    			    		OTG.log(LogMarker.DEBUG, "Spawned OK");
-    			    	}
-    			    	
-    			    	if(entityliving instanceof EntityItemFrame)
-    			    	{
-    			    		((EntityItemFrame)entityliving).facingDirection = ((EntityItemFrame)entityliving).facingDirection == null ? EnumFacing.SOUTH : ((EntityItemFrame)entityliving).facingDirection;  
-    			    	}
-
-    					if(
-							chunkBeingPopulated == null || 
-							(
-								OTG.IsInAreaBeingPopulated((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ), chunkBeingPopulated)// || 
-								//getChunkGenerator().chunkExists((int)Math.floor(entityliving.posX), (int)Math.floor(entityliving.posZ))
-							)
-						)
-    					{
-	    			    	if(OTG.getPluginConfig().spawnLog)
-	    			    	{
-	    			    		OTG.log(LogMarker.DEBUG, "Spawned OK");
-	    			    	}
-	
-	    					world.spawnEntity(entityliving);
-    					}
-	            	}
-	            }
-            }
-		}
+            OTG.log(LogMarker.DEBUG, "Spawned OK");
+        }
+        return entity;
     }
 
 	@Override
@@ -1550,7 +1464,7 @@ public class ForgeWorld implements LocalWorld
 	private boolean isOTGPlusLoaded = false;
 	private boolean isOTGPlus = false;
 	@Override
-	public boolean isOTGPlus()
+	public boolean isBo4Enabled()
 	{
 		if(!isOTGPlusLoaded)
 		{

@@ -9,6 +9,7 @@ import java.util.Random;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
@@ -163,14 +164,13 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
         for (int i = 0; i < blockCount; i++)
         {
             if (random.nextInt(100) < blockChances[i])
             {
-            	blocks[i].parseForWorld(world);
-                world.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated);
+                world.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated, true);
                 break;
             }
         }

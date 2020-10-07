@@ -72,7 +72,7 @@ public class RavinesGen extends TerrainGenBase
         
         LocalBiome biome;
         BiomeConfig biomeConfig;
-        LocalMaterialData surfaceblockDefaultMaterial;
+        //LocalMaterialData surfaceblockDefaultMaterial;
         double d10;
         boolean surfaceBlockFound;
         LocalMaterialData surfaceBlockMaterial;
@@ -196,7 +196,7 @@ public class RavinesGen extends TerrainGenBase
                 {
                     biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
                     biomeConfig = biome.getBiomeConfig();
-                    surfaceblockDefaultMaterial = biomeConfig.surfaceBlock;
+                    //surfaceblockDefaultMaterial = biomeConfig.surfaceBlock;
                     d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
                     surfaceBlockFound = false;
                     surfaceBlockMaterial = null;
@@ -210,14 +210,14 @@ public class RavinesGen extends TerrainGenBase
                             {
                             	material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ);
                                 
-                                if (!surfaceBlockFound && material.equals(surfaceblockDefaultMaterial))
+                                if (!surfaceBlockFound && material.equals(biomeConfig.getSurfaceBlockReplaced(this.world, currentDepth)))
                                 {
                                 	surfaceBlockFound = true;
                                 	surfaceBlockMaterial = material;
                                 }
                                 
                                 if (
-                            		!material.isMaterial(DefaultMaterial.BEDROCK) &&
+                            		!material.isMaterial(DefaultMaterial.BEDROCK) && // TODO: get replaced bedrock block? (could cause other problems, if common blocks are used as bedrock)
                     				!material.isAir()
                         		)
                                 {                               	
@@ -228,7 +228,7 @@ public class RavinesGen extends TerrainGenBase
                                 if (
                             		surfaceBlockFound &&
                             		(
-	                                	!block.isMaterial(DefaultMaterial.BEDROCK) &&
+	                                	!block.isMaterial(DefaultMaterial.BEDROCK) && // TODO: get replaced bedrock block? (could cause other problems, if common blocks are used as bedrock)
 										!block.isMaterial(DefaultMaterial.WATER) &&
 										!block.isMaterial(DefaultMaterial.STATIONARY_WATER) &&
 										!block.isMaterial(DefaultMaterial.LAVA) &&

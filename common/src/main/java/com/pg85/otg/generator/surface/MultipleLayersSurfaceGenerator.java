@@ -37,6 +37,36 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
     }
 
     @Override
+    public LocalMaterialData getSurfaceBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+    {
+    	double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);    	
+        for (LayerChoice layer : this.layerChoices)
+        {
+            if (noise <= layer.maxNoise)
+            {
+            	return layer.getSurfaceBlockReplaced(world, biomeConfig, yInWorld);
+            }
+        }
+        
+        return biomeConfig.getSurfaceBlockReplaced(world, yInWorld);
+    }
+    
+	@Override
+	public LocalMaterialData getGroundBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	{	
+   		double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
+        for (LayerChoice layer : this.layerChoices)
+        {
+            if (noise <= layer.maxNoise)
+            {
+            	return layer.getGroundBlockReplaced(world, biomeConfig, yInWorld);
+            }
+        }
+        
+        return biomeConfig.getGroundBlockReplaced(world, yInWorld);
+	}
+
+    @Override
     public void spawn(LocalWorld world, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
     {
         int x = xInWorld & 0xf;
@@ -47,13 +77,13 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         {
             if (noise <= layer.maxNoise)
             {
-                spawnColumn(world, layer.surfaceBlock, layer.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
+                spawnColumn(world, layer, generatingChunkInfo, chunkBuffer, config, x, z);
                 return;
             }
         }
 
         // Fall back on normal column
-        spawnColumn(world, config.surfaceBlock, config.groundBlock, generatingChunkInfo, chunkBuffer, config, x, z);
+        spawnColumn(world, null, generatingChunkInfo, chunkBuffer, config, x, z);
     }
 
     @Override
@@ -73,5 +103,4 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         stringBuilder.deleteCharAt(stringBuilder.length() - 2);
         return stringBuilder.toString();
     }
-
 }

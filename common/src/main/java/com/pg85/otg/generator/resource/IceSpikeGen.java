@@ -127,7 +127,7 @@ public class IceSpikeGen extends Resource
                     	worldMaterial = world.getMaterial(actualX, deltaY, actualZ, chunkBeingPopulated);
                         if (worldMaterial != null && this.sourceBlocks.contains(worldMaterial))
                         {
-                            world.setBlock(actualX, deltaY, actualZ, this.material, null, chunkBeingPopulated);
+                            world.setBlock(actualX, deltaY, actualZ, this.material, null, chunkBeingPopulated, true);
                         }
                     }
                 }
@@ -187,7 +187,7 @@ public class IceSpikeGen extends Resource
                     		(worldMaterial = world.getMaterial(x + var11, y + var8, z + var13, chunkBeingPopulated)) != null && 
                     		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                         {
-                            world.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingPopulated);
+                            world.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingPopulated, true);
                         }
 
                         if (var8 != 0 && var10 > 1)
@@ -196,7 +196,7 @@ public class IceSpikeGen extends Resource
                         		(worldMaterial = world.getMaterial(x + var11, y - var8, z + var13, chunkBeingPopulated)) != null && 
                         		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                             {
-                                world.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingPopulated);
+                                world.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingPopulated, true);
                             }                        	
                         }
                     }
@@ -242,7 +242,7 @@ public class IceSpikeGen extends Resource
 							)
             			)
                     	{
-                            world.setBlock(x + var16, var11, z + var10, this.material, null, chunkBeingPopulated);
+                            world.setBlock(x + var16, var11, z + var10, this.material, null, chunkBeingPopulated, true);
                             --var11;
                             --var17;
 

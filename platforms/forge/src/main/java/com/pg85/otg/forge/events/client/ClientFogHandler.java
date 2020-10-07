@@ -64,16 +64,13 @@ public class ClientFogHandler
 		if (forgeWorld == null)
 		{
 			return;
-		}	
+		}
 		
 		int blockX = (int) Math.floor(event.getEntity().posX);
 		int blockZ = (int) Math.floor(event.getEntity().posZ);
 
 		boolean hasMoved = event.getEntity().posX != lastX || event.getEntity().posZ != lastZ;
-		
-		lastX = event.getEntity().posX;
-		lastZ = event.getEntity().posZ;
-		
+				
 		BlockPos.MutableBlockPos blockPos = new BlockPos.MutableBlockPos(blockX, 0, blockZ);
 		BiomeConfig biomeConfig = getBiomeConfig(forgeWorld, 0, 0, blockPos, hasMoved);
 		if(biomeConfig != null)
@@ -87,6 +84,9 @@ public class ClientFogHandler
 				event.setBlue((float) fogColor.z);
 			}
 		}
+		
+		lastX = event.getEntity().posX;
+		lastZ = event.getEntity().posZ;
 	}
 
 	@SideOnly(Side.CLIENT)

@@ -18,6 +18,8 @@ import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
@@ -98,9 +100,7 @@ public class SaplingListener
         if (saplingType == SaplingType.Custom)
         {
             sapling = biomeConfig.getCustomSaplingGen(material, wideTrunk);
-        }
-        else
-        {
+        } else {
             sapling = biomeConfig.getSaplingGen(saplingType);
         }
         // Check inheritance
@@ -159,22 +159,18 @@ public class SaplingListener
             int saplingZ = blockPos.getZ();
             if (wideTrunk)
             {
-                localWorld.setBlock
-                        (saplingX, saplingY, saplingZ, material, null, null);
-                localWorld.setBlock
-                        (saplingX + 1, saplingY, saplingZ, material, null, null);
-                localWorld.setBlock
-                        (saplingX, saplingY, saplingZ + 1, material, null, null);
-                localWorld.setBlock
-                        (saplingX + 1, saplingY, saplingZ + 1, material, null, null);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, material, null, null, false);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ, material, null, null, false);
+                localWorld.setBlock(saplingX, saplingY, saplingZ + 1, material, null, null, false);
+                localWorld.setBlock(saplingX + 1, saplingY, saplingZ + 1, material, null, null, false);
             } else {
-                localWorld.setBlock
-                        (saplingX, saplingY, saplingZ, material, null, null);
+                localWorld.setBlock(saplingX, saplingY, saplingZ, material, null, null, false);
             }
         }
     }
 
     @SubscribeEvent
+    @SideOnly(Side.SERVER)
     public void onBonemealUse(BonemealEvent event)
     {
         ForgeWorld localWorld = ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());

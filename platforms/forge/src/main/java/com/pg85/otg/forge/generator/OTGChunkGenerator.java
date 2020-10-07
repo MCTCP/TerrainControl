@@ -3,6 +3,7 @@ package com.pg85.otg.forge.generator;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Map.Entry;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
@@ -49,13 +51,16 @@ public class OTGChunkGenerator implements IChunkGenerator
 {
     private boolean testMode = false;
     private ForgeWorld world;
-    private ChunkProviderOTG generator;
+    private ChunkProviderOTG chunkProviderOTG;
     public ObjectSpawner spawner;
-
+    
     // Caches
 	private FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
 	private FifoMap<ChunkCoordinate, Chunk> unloadedChunksCache;
-	private FifoMap<ChunkCoordinate, Chunk> lastUsedChunks;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk1;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk2;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk3;
+	private Entry<ChunkCoordinate, Chunk> lastUsedChunk4;
     ForgeChunkBuffer chunkBuffer;
     Object chunkBufferLock = new Object();
     Object chunkCacheLock = new Object();
@@ -69,13 +74,16 @@ public class OTGChunkGenerator implements IChunkGenerator
 
         this.testMode = this.world.getConfigs().getWorldConfig().modeTerrain == WorldConfig.TerrainMode.TerrainTest;
 
-        this.generator = new ChunkProviderOTG(this.world.getConfigs(), this.world);
+        this.chunkProviderOTG = new ChunkProviderOTG(this.world.getConfigs(), this.world);
         this.spawner = new ObjectSpawner(this.world.getConfigs(), this.world);
         // TODO: Add a setting to the worldconfig for the size of these caches. 
         // Worlds with lots of BO4's and large smoothing areas may want to increase this. 
         this.unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
         this.unloadedChunksCache = new FifoMap<ChunkCoordinate, Chunk>(128);
-        this.lastUsedChunks = new FifoMap<ChunkCoordinate, Chunk>(4);
+    	lastUsedChunk1 = null;
+    	lastUsedChunk2 = null;
+    	lastUsedChunk3 = null;
+    	lastUsedChunk4 = null; 
     }
     
 	// Chunks
@@ -85,7 +93,10 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
     	synchronized(this.chunkCacheLock)
     	{
-	    	this.lastUsedChunks.clear();
+			lastUsedChunk1 = null;
+			lastUsedChunk2 = null;
+			lastUsedChunk3 = null;
+			lastUsedChunk4 = null;
 	   		this.unloadedBlockColumnsCache.clear();
 	   		this.unloadedChunksCache.clear();
     	}
@@ -95,7 +106,22 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
     	synchronized(this.chunkCacheLock)
     	{
-    		this.lastUsedChunks.remove(chunkCoordinate);
+    		if(lastUsedChunk1 != null && lastUsedChunk1.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk1 = null;
+    		}
+    		else if(lastUsedChunk2 != null && lastUsedChunk2.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk2 = null;
+    		}
+    		else if(lastUsedChunk3 != null && lastUsedChunk3.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk3 = null;
+    		}
+    		else if(lastUsedChunk4 != null && lastUsedChunk4.getKey().equals(chunkCoordinate))
+    		{
+    			lastUsedChunk4 = null;
+    		}
     	}
     }
 
@@ -176,10 +202,25 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
         
-        Chunk chunk;
+        Chunk chunk = null;
     	synchronized(this.chunkCacheLock)
     	{
-    		chunk = this.lastUsedChunks.get(chunkCoord);
+    		if(lastUsedChunk1 != null && lastUsedChunk1.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk1.getValue();
+    		}
+    		else if(lastUsedChunk2 != null && lastUsedChunk2.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk2.getValue();
+    		}
+    		else if(lastUsedChunk3 != null && lastUsedChunk3.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk3.getValue();
+    		}
+    		else if(lastUsedChunk4 != null && lastUsedChunk4.getKey().equals(chunkCoord))
+    		{
+    			chunk = lastUsedChunk4.getValue();
+    		}
     	}
         if(chunk == null)
         {
@@ -194,7 +235,10 @@ public class OTGChunkGenerator implements IChunkGenerator
 	        {
 	        	synchronized(this.chunkCacheLock)
 	        	{
-		        	this.lastUsedChunks.put(chunkCoord, chunk);
+	        		lastUsedChunk4 = lastUsedChunk3;
+	        		lastUsedChunk3 = lastUsedChunk2;
+	        		lastUsedChunk2 = lastUsedChunk1;
+	        		lastUsedChunk1 = new AbstractMap.SimpleEntry<ChunkCoordinate, Chunk>(chunkCoord, chunk);
 	        	}
 	        }
         }
@@ -214,7 +258,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     		synchronized(chunkBufferLock)
     		{
 	    		chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-	    		this.generator.generate(chunkBuffer);
+	    		this.chunkProviderOTG.generate(chunkBuffer);
 	    		chunk = chunkBuffer.toChunk(this.world.getWorld());
 		        chunkBuffer = null;
     		}
@@ -287,7 +331,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 	    	synchronized(chunkBufferLock)
 	    	{
 				chunkBuffer = new ForgeChunkBuffer(chunkCoord);
-				this.generator.generate(chunkBuffer);
+				this.chunkProviderOTG.generate(chunkBuffer);
 				chunk = chunkBuffer.toChunk(this.world.getWorld());
 				chunkBuffer = null;
 	    	}
@@ -311,6 +355,11 @@ public class OTGChunkGenerator implements IChunkGenerator
 		unloadedBlockColumnsCache.put(blockPos, cachedColumn);
 		
         return blocksInColumn;
+    }
+    
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	return this.chunkProviderOTG.getBiomeBlocksNoiseValue(blockX, blockZ);
     }
     
     public LocalMaterialData getMaterialInUnloadedChunk(int x, int y, int z)
@@ -354,7 +403,7 @@ public class OTGChunkGenerator implements IChunkGenerator
         {
             return;
         }
-
+        
         IBlockState newState = ((ForgeMaterialData) material).internalBlock();
         
         BlockPos pos = new BlockPos(x, y, z);
@@ -388,7 +437,7 @@ public class OTGChunkGenerator implements IChunkGenerator
 
 	    // Notify world: (2 | 16) == update client, don't update observers
     	this.world.getWorld().markAndNotifyBlock(pos, chunk, iblockstate, newState, 2 | 16);
-    }   
+    }
 
     private void attachMetadata(int x, int y, int z, NamedBinaryTag tag)
     {

@@ -44,7 +44,7 @@ public abstract class MinecraftObjectFunction<T extends CustomObjectConfigFile> 
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
     	// TODO: May cause cascading chunkgen.
         SpawnableObject object = world.getMojangStructurePart(structurePart.getPath());

@@ -25,4 +25,20 @@ public abstract class CustomStructure
     protected Random random;
     
     protected CustomStructure() { }
+    
+    public boolean equals(Object other)
+    {
+    	return 
+			this == other ||
+			(
+				other instanceof CustomStructure &&
+				this.start != null &&
+				((CustomStructure)other).start != null &&
+				((CustomStructure)other).start.bo3Name.equals(this.start.bo3Name) &&
+				((CustomStructure)other).start.getX() == this.start.getX() &&
+				((CustomStructure)other).start.getY() == this.start.getY() &&
+				((CustomStructure)other).start.getZ() == this.start.getZ()
+			)
+		;
+    }
 }

@@ -48,6 +48,7 @@ class BO4Settings extends Settings
 			BRANCH_FREQUENCY_GROUP = stringSetting("BranchFrequencyGroup", ""),
 			REPLACEWITHGROUNDBLOCK = stringSetting("ReplaceWithGroundBlock", "DIRT"),
 			REPLACEWITHSURFACEBLOCK = stringSetting("ReplaceWithSurfaceBlock", "GRASS"),
+			REPLACEWITHSTONEBLOCK = stringSetting("ReplaceWithStoneBlock", "STONE"),
 			SMOOTHINGSURFACEBLOCK = stringSetting("SmoothingSurfaceBlock", ""),
 			SMOOTHINGGROUNDBLOCK = stringSetting("SmoothingGroundBlock", ""),
 			MUSTBEINSIDE = stringSetting("MustBeInside", ""),

@@ -2,6 +2,7 @@ package com.pg85.otg.configuration.biome;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
@@ -33,6 +34,14 @@ import java.util.*;
 
 public class BiomeConfig extends ConfigFile
 {
+    public enum enumBiomeConfigMaterial
+    {
+    	WATER_BLOCK,
+    	ICE_BLOCK,
+    	COOLED_LAVA_BLOCK,
+    	STONE_BLOCK
+    }
+	
     private StandardBiomeTemplate defaultSettings;
     public WorldConfig worldConfig;
 	
@@ -65,9 +74,11 @@ public class BiomeConfig extends ConfigFile
     public float biomeTemperature;
     public float biomeWetness;
 
-    public LocalMaterialData stoneBlock;
-    public LocalMaterialData surfaceBlock;
-    public LocalMaterialData groundBlock;
+    private LocalMaterialData stoneBlock;
+    private LocalMaterialData surfaceBlock;
+    private LocalMaterialData groundBlock;
+    private LocalMaterialData sandStoneBlock;
+    private LocalMaterialData redSandStoneBlock;
     public ReplacedBlocksMatrix replacedBlocks;
     public SurfaceGenerator surfaceAndGroundControl;
 
@@ -76,9 +87,9 @@ public class BiomeConfig extends ConfigFile
     public boolean useWorldWaterLevel;
     public int waterLevelMax;
     public int waterLevelMin;
-    public LocalMaterialData waterBlock;
-    public LocalMaterialData iceBlock;
-    public LocalMaterialData cooledLavaBlock;
+    private LocalMaterialData waterBlock;
+    private LocalMaterialData iceBlock;
+    private LocalMaterialData cooledLavaBlock;
 
     public int riverWaterLevel;
 
@@ -332,21 +343,26 @@ public class BiomeConfig extends ConfigFile
         this.biomeVolatility = settings.getSetting(BiomeStandardValues.BIOME_VOLATILITY, defaultSettings.defaultBiomeVolatility);
         this.smoothRadius = settings.getSetting(BiomeStandardValues.SMOOTH_RADIUS);
         this.CHCSmoothRadius = settings.getSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS);
-
+        
         this.stoneBlock = settings.getSetting(BiomeStandardValues.STONE_BLOCK);
         this.surfaceBlock = settings.getSetting(BiomeStandardValues.SURFACE_BLOCK,
                 MaterialHelper.toLocalMaterialData(defaultSettings.defaultSurfaceBlock, 0));
         this.groundBlock = settings.getSetting(BiomeStandardValues.GROUND_BLOCK,
                 MaterialHelper.toLocalMaterialData(defaultSettings.defaultGroundBlock, 0));
+        this.configWaterBlock = settings.getSetting(BiomeStandardValues.WATER_BLOCK);
+        this.configIceBlock = settings.getSetting(BiomeStandardValues.ICE_BLOCK);
+        this.configCooledLavaBlock = settings.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK);
         this.replacedBlocks = settings.getSetting(BiomeStandardValues.REPLACED_BLOCKS);
+
+        this.sandStoneBlock = MaterialHelper.SANDSTONE;
+        this.redSandStoneBlock = MaterialHelper.RED_SANDSTONE;
+
+        this.replacedBlocks.init(this.useWorldWaterLevel ? worldConfig.cooledLavaBlock : this.configCooledLavaBlock, this.useWorldWaterLevel ? worldConfig.iceBlock : this.configIceBlock, this.useWorldWaterLevel ? worldConfig.waterBlock : this.configWaterBlock, this.stoneBlock, this.groundBlock, this.surfaceBlock, this.worldConfig.getDefaultBedrockBlock(), this.sandStoneBlock, this.redSandStoneBlock);
         this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings(settings);
 
         this.useWorldWaterLevel = settings.getSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL);
         this.configWaterLevelMax = settings.getSetting(BiomeStandardValues.WATER_LEVEL_MAX);
         this.configWaterLevelMin = settings.getSetting(BiomeStandardValues.WATER_LEVEL_MIN);
-        this.configWaterBlock = settings.getSetting(BiomeStandardValues.WATER_BLOCK);
-        this.configIceBlock = settings.getSetting(BiomeStandardValues.ICE_BLOCK);
-        this.configCooledLavaBlock = settings.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK);
 
         this.skyColor = settings.getSetting(BiomeStandardValues.SKY_COLOR);
         this.waterColor = settings.getSetting(BiomeStandardValues.WATER_COLOR, defaultSettings.defaultWaterColorMultiplier);
@@ -417,8 +433,7 @@ public class BiomeConfig extends ConfigFile
             {
                 throw new AssertionError(e);
             }
-        } else
-        {
+        } else {
             defaultSetting = new SimpleSurfaceGenerator();
         }
 
@@ -1191,4 +1206,129 @@ public class BiomeConfig extends ConfigFile
         StreamHelper.writeStringToStream(stream, this.replaceToBiomeName);        
         StreamHelper.writeStringToStream(stream, this.biomeDictId);
     }
+
+    // Materials
+    
+    // Any blocks spawned/checked during base terrain gen that use the biomeconfig materials
+    // call getXXXBlockReplaced to get the replaced blocks.
+    // Any blocks spawned during population will have their materials parsed before spawning them
+    // via world.setBlock(), so they use the default biomeconfig materials.
+    
+    public LocalMaterialData getDefaultSurfaceBlock()
+    {
+    	return this.surfaceBlock;
+    }
+
+    public LocalMaterialData getDefaultGroundBlock()
+    {
+    	return this.groundBlock;
+    }
+    
+	// TODO: Optimise BO4, make it use replacedBlocks.replacesStoneBlock
+	// instead of replacing stone as a generic block during setBlock.
+	public LocalMaterialData getDefaultStoneBlock()
+	{
+		return this.stoneBlock;
+	}
+	
+	public LocalMaterialData getDefaultWaterBlock()
+	{		
+		return this.waterBlock;
+	}
+	
+	// TODO: Optimise FrozenSurfaceHelper, make it use replacedBlocks.replacesIce
+	// instead of replacing ice as a generic block during setBlock.
+	public LocalMaterialData getDefaultIceBlock()
+	{
+		return this.iceBlock;
+	}
+
+	// TODO: Optimise FrozenSurfaceHelper, make it use replacedBlocks.replacesCooledLavaBlock
+	// instead of replacing ice as a generic block during setBlock.	
+	public LocalMaterialData getDefaultCooledLavaBlock()
+	{
+		return this.cooledLavaBlock;
+	}
+    
+	public boolean replacesDefaultWaterBlock()
+	{
+		return this.replacedBlocks.replacesWater;
+	}
+	
+	public boolean replacesDefaultStoneBlock()
+	{
+		return this.replacedBlocks.replacesStone;
+	}	
+	
+	public LocalMaterialData getCooledLavaBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesCooledLava)
+		{
+			return this.cooledLavaBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.cooledLavaBlock;
+	}	
+	
+	public LocalMaterialData getIceBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesIce)
+		{
+			return this.iceBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.iceBlock;
+	}
+        
+	public LocalMaterialData getWaterBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesWater)
+		{
+			return this.waterBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.waterBlock;
+	}
+
+	public LocalMaterialData getStoneBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesStone)
+		{
+			return this.stoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.stoneBlock;
+	}
+
+	public LocalMaterialData getGroundBlockReplaced(LocalWorld localWorld, int y)
+	{	
+		if(this.replacedBlocks.replacesGround)
+		{
+			return this.groundBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.groundBlock;
+	}
+	
+	public LocalMaterialData getSurfaceBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesSurface)
+		{
+			return this.surfaceBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.surfaceBlock;
+	}
+	
+	public LocalMaterialData getSandStoneBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesSandStone)
+		{
+			return this.sandStoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.sandStoneBlock;
+	}
+	
+	public LocalMaterialData getRedSandStoneBlockReplaced(LocalWorld localWorld, int y)
+	{
+		if(this.replacedBlocks.replacesRedSandStone)
+		{
+			return this.redSandStoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+		}
+		return this.redSandStoneBlock;
+	}
 }
