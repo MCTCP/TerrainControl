@@ -60,6 +60,8 @@ public class EntitiesManager
             	newEntityData.resourceLocation = entityDataInObject[i].resourceLocation;
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
+            	newEntityData.namedBinaryTag = entityDataInObject[i].namedBinaryTag;
+            	newEntityData.rotation = rotations;
 
         		world.spawnEntity(newEntityData, chunkCoordinate);
         	} else {
@@ -73,6 +75,8 @@ public class EntitiesManager
             	newEntityData.resourceLocation = entityDataInObject[i].resourceLocation;
             	newEntityData.groupSize = entityDataInObject[i].groupSize;
             	newEntityData.nameTagOrNBTFileName = entityDataInObject[i].nameTagOrNBTFileName;
+            	newEntityData.namedBinaryTag = entityDataInObject[i].namedBinaryTag;
+				newEntityData.rotation = 0;
 
         		world.spawnEntity(newEntityData, chunkCoordinate);
         	}

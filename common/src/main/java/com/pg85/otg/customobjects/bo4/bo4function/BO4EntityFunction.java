@@ -36,6 +36,8 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
         rotatedBlock.groupSize = groupSize;
         rotatedBlock.originalNameTagOrNBTFileName = originalNameTagOrNBTFileName;
         rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;
+        rotatedBlock.namedBinaryTag = namedBinaryTag;
+        rotatedBlock.rotation = rotation.getRotationId();
 
         return rotatedBlock;
     }
@@ -76,6 +78,9 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
     	entityFunction.groupSize = buffer.getInt();
     	entityFunction.nameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
     	entityFunction.originalNameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
+    	if (entityFunction.originalNameTagOrNBTFileName != null)
+    	    entityFunction.processNameTagOrFileName(entityFunction.originalNameTagOrNBTFileName);
+    	entityFunction.rotation = 0;
     	
     	return entityFunction;
     }

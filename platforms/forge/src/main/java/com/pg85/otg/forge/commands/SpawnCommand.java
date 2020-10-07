@@ -31,7 +31,7 @@ public class SpawnCommand extends BaseCommand
         super();
         name = "spawn";
         usage = "spawn <object name> [targetBiome1, targetBiome2, ...]";
-        description = "Spawn a BO3 or BO4 object. For BO3 CustomObject, spawns the object on the block you are looking at. For BO4 CustomStructure, plots the structure in nearby unpopulated chunks, targetBiomes can be provided, otherwise all biomes are allowed. BO3 CustomStructructures are not supported for this command.";
+        description = "Spawn a BO3 or BO4 object. For BO3 CustomObject, spawns the object on the block you are looking at. For BO4 CustomStructure, plots the structure in nearby unpopulated chunks, targetBiomes can be provided, otherwise all biomes are allowed. BO3 CustomStructructures are not supported for this command. If spawning a BO3 object, you can specify rotation with [west] or [east]";
     }
 
     @Override
@@ -144,10 +144,11 @@ public class SpawnCommand extends BaseCommand
         }
 
         RayTraceResult trace = this.rayTrace(sender.getEntityWorld(), (EntityPlayer) sender.getCommandSenderEntity());
+        Rotation rot = targetBiomes.isEmpty() ? Rotation.NORTH : Rotation.FromString(targetBiomes.get(0));
         if (trace != null && trace.typeOfHit == RayTraceResult.Type.BLOCK)
         {
             BlockPos pos = trace.getBlockPos();
-            if (spawnObject.spawnForced(forgeWorld, random, Rotation.NORTH, pos.getX(), pos.getY(), pos.getZ()))
+            if (spawnObject.spawnForced(forgeWorld, random, rot, pos.getX(), pos.getY(), pos.getZ()))
             {
                 sender.sendMessage(
                         new TextComponentString(BaseCommand.MESSAGE_COLOR + spawnObject.getName() + " was spawned."));
