@@ -18,6 +18,8 @@ import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.terraingen.SaplingGrowTreeEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.Random;
 
@@ -168,6 +170,7 @@ public class SaplingListener
     }
 
     @SubscribeEvent
+    @SideOnly(Side.SERVER)
     public void onBonemealUse(BonemealEvent event)
     {
         ForgeWorld localWorld = ((ForgeEngine)OTG.getEngine()).getWorld(event.getWorld());

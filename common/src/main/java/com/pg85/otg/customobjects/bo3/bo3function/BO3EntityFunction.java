@@ -11,7 +11,7 @@ public class BO3EntityFunction extends EntityFunction<BO3Config>
     public BO3EntityFunction rotate()
     {
     	BO3EntityFunction rotatedBlock = new BO3EntityFunction();
-        rotatedBlock.x = z - 1;
+        rotatedBlock.x = z;// - 1;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.name = name;
@@ -19,6 +19,8 @@ public class BO3EntityFunction extends EntityFunction<BO3Config>
         rotatedBlock.groupSize = groupSize;
         rotatedBlock.originalNameTagOrNBTFileName = originalNameTagOrNBTFileName;
         rotatedBlock.nameTagOrNBTFileName = nameTagOrNBTFileName;
+        rotatedBlock.namedBinaryTag = namedBinaryTag;
+        rotatedBlock.rotation = (rotation + 1) % 4;
 
         return rotatedBlock;
     }

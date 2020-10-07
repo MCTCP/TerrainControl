@@ -213,8 +213,14 @@ public class ServerTickHandler
 
 		    									entityFunc.processEntityName(paramString2[1]);
 		    									entityFunc.groupSize = paramString2.length > 2 ? Integer.parseInt(paramString2[2]) : 1;
-		    									entityFunc.nameTagOrNBTFileName = paramString2.length > 5 ? paramString2[5] : null;
-		    									entityFunc.originalNameTagOrNBTFileName = entityFunc.nameTagOrNBTFileName;
+												if (paramString2.length > 5)
+													entityFunc.processNameTagOrFileName(paramString2[5]);
+												else
+												{
+													entityFunc.nameTagOrNBTFileName = null;
+													entityFunc.originalNameTagOrNBTFileName = null;
+												}
+												entityFunc.rotation = 0;
 
 		    									world.spawnEntity(entityFunc, null);
 		    								}

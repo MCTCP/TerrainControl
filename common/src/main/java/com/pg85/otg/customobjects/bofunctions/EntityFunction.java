@@ -5,13 +5,10 @@ import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.EntityNames;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -26,6 +23,8 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
     public String nameTagOrNBTFileName = "";
     public String originalNameTagOrNBTFileName = "";
     public String resourceLocation = "";
+    public NamedBinaryTag namedBinaryTag = null;
+    public int rotation = 0;
 
     @Override
     public void load(List<String> args) throws InvalidConfigException
@@ -41,12 +40,7 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
 
         if(args.size() > 5)
         {
-    		originalNameTagOrNBTFileName = args.get(5);
-        }
-
-        if(originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
-        {
-        	nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + originalNameTagOrNBTFileName;
+            processNameTagOrFileName(args.get(5));
         }
     }
 
@@ -65,6 +59,41 @@ public abstract class EntityFunction<T extends CustomObjectConfigFile> extends C
             }
         }
         this.name = resourceLocation.split(":")[1];
+    }
+
+    public void processNameTagOrFileName(String s) {
+        originalNameTagOrNBTFileName = s;
+
+        if(originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
+        {
+            nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + originalNameTagOrNBTFileName;
+        }
+        else if(originalNameTagOrNBTFileName != null && originalNameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+        {
+            nameTagOrNBTFileName = getHolder().getFile().getParentFile().getAbsolutePath() + File.separator + originalNameTagOrNBTFileName;
+            if (namedBinaryTag == null) {
+                // load NBT data from .nbt file
+                try {
+                    FileInputStream stream = new FileInputStream(nameTagOrNBTFileName);
+                    namedBinaryTag = NamedBinaryTag.readFrom(stream, true);
+                } catch (FileNotFoundException e) {
+                    if(OTG.getPluginConfig().spawnLog)
+                    {
+                        OTG.log(LogMarker.WARN, "Could not find file: "+nameTagOrNBTFileName);
+                    }
+                    // Set it to null so we don't go looking for this later
+                    nameTagOrNBTFileName = null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+        else
+        {
+            // It's a name tag
+            nameTagOrNBTFileName = originalNameTagOrNBTFileName;
+        }
     }
 
     @Override

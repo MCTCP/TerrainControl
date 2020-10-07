@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.world;
 
-import com.pg85.otg.*;
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
@@ -21,9 +21,8 @@ import com.pg85.otg.forge.generator.OTGChunkGenerator;
 import com.pg85.otg.forge.generator.structure.*;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.IOHelper;
-import com.pg85.otg.forge.util.MobSpawnGroupHelper;
+import com.pg85.otg.forge.util.NBTHelper;
 import com.pg85.otg.generator.ChunkBuffer;
-import com.pg85.otg.generator.ChunkProviderOTG;
 import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
@@ -35,18 +34,18 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
-
 import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.entity.*;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.entity.IEntityLivingData;
 import net.minecraft.entity.item.EntityItemFrame;
 import net.minecraft.entity.monster.EntityGuardian;
 import net.minecraft.init.Blocks;
-import net.minecraft.nbt.JsonToNBT;
-import net.minecraft.nbt.NBTException;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.*;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -76,7 +75,10 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
 
 // TODO: Change localworld into abstract class and implement common logic there 
 public class ForgeWorld implements LocalWorld
@@ -1386,8 +1388,15 @@ public class ForgeWorld implements LocalWorld
         {
             try
             {
+                if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt")) {
+                    nbttagcompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
+                    // Specify which type of entity to spawn
+                    nbttagcompound.setString("id", entityData.resourceLocation);
+                }
                 // Get NBT compound from provided string
-                nbttagcompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
+                else if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt")) {
+                    nbttagcompound = NBTHelper.getNMSFromNBTTagCompound(entityData.namedBinaryTag);
+                }
             }
             catch (NBTException nbtexception)
             {
@@ -1397,22 +1406,23 @@ public class ForgeWorld implements LocalWorld
                 }
                 return null;
             }
-            // Specify which type of entity to spawn
-            nbttagcompound.setString("id", entityData.resourceLocation);
+            if(nbttagcompound.hasKey("Facing"))
+            {
+                // Rotate the item frame with the object
+                int face = nbttagcompound.getByte("Facing");
+                nbttagcompound.setByte("Facing", (byte) ((face + (6 - entityData.rotation)) % 4));
+            }
+            // Set rotation if specified
+            if(nbttagcompound.hasKey("Rotation"))
+            {
+                // Rotate with the BO3
+                NBTTagList list = nbttagcompound.getTagList("Rotation", 5);
+                list.set(0, new NBTTagFloat((list.getFloatAt(0)+ ((2 - entityData.rotation) % 4)*90) % 360));
+            }
 
             // Spawn entity, with potential passengers
             entity = AnvilChunkLoader.readWorldEntityPos(nbttagcompound, world, entityData.x+0.5, entityData.y, entityData.z+0.5, true);
             if (entity == null) return null;
-
-            // Set rotation if specified
-            if(nbttagcompound.hasKey("Facing"))
-            {
-                entity.setRotationYawHead(EnumFacing.byIndex(nbttagcompound.getByte("Facing")).getHorizontalIndex()*90);
-            }
-            else if(nbttagcompound.hasKey("Rotation"))
-            {
-                entity.setRotationYawHead(nbttagcompound.getByte("Rotation"));
-            }
         } else {
             // Create a default entity from the given mob type
             nbttagcompound.setString("id", entityData.resourceLocation);

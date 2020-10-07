@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
+import com.pg85.otg.bukkit.util.NBTHelper;
 import net.minecraft.server.v1_12_R1.*;
 import net.minecraft.server.v1_12_R1.Entity;
 import org.bukkit.Location;
@@ -1318,7 +1319,16 @@ public class BukkitWorld implements LocalWorld
         {
             try
             {
-                nbttagcompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
+                if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".txt"))
+                {
+                    nbttagcompound = JsonToNBT.getTagFromJson(entityData.getMetaData());
+                    // Specify which type of entity to spawn
+                    nbttagcompound.setString("id", entityData.resourceLocation);
+                }
+                else if (entityData.nameTagOrNBTFileName.toLowerCase().trim().endsWith(".nbt"))
+                {
+                    nbttagcompound = NBTHelper.getNMSFromNBTTagCompound(entityData.namedBinaryTag);
+                }
             }
             catch (NBTException nbtexception)
             {
@@ -1328,21 +1338,22 @@ public class BukkitWorld implements LocalWorld
                 }
                 return null;
             }
-            // Specify which type of entity to spawn
-            nbttagcompound.setString("id", entityData.resourceLocation);
-
+            if(nbttagcompound.hasKey("Facing"))
+            {
+                // Rotate the item frame with the object
+                int face = nbttagcompound.getByte("Facing");
+                nbttagcompound.setByte("Facing", (byte) ((face + (6 - entityData.rotation)) % 4));
+            }
+            // Set rotation if specified
+            if(nbttagcompound.hasKey("Rotation"))
+            {
+                // Rotate with the BO3
+                NBTTagList list = nbttagcompound.getList("Rotation", 5);
+                list.a(0, new NBTTagFloat((list.g(0)+ ((2 - entityData.rotation) % 4)*90) % 360));
+            }
             // Spawn entity, with potential passengers
             entity = ChunkRegionLoader.spawnEntity(nbttagcompound, world, entityData.x+0.5, entityData.y, entityData.z+0.5, true, CreatureSpawnEvent.SpawnReason.CUSTOM);
             if (entity == null) return null;
-
-            if(nbttagcompound.hasKey("Facing"))
-            {
-                entity.setHeadRotation(EnumDirection.fromType1(nbttagcompound.getByte("Facing")).get2DRotationValue() * 90);
-            }
-            else if(nbttagcompound.hasKey("Rotation"))
-            {
-                entity.setHeadRotation(nbttagcompound.getByte("Rotation"));
-            }
         } else {
             try
             {

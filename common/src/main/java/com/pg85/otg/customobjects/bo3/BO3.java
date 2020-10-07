@@ -491,6 +491,8 @@ public class BO3 implements StructuredCustomObject
             newEntityData.groupSize = entity.groupSize;
             newEntityData.nameTagOrNBTFileName = entity.nameTagOrNBTFileName;
             newEntityData.originalNameTagOrNBTFileName = entity.originalNameTagOrNBTFileName;
+            newEntityData.namedBinaryTag = entity.namedBinaryTag;
+            newEntityData.rotation = entity.rotation;
 
            	world.spawnEntity(newEntityData, chunkBeingPopulated);
         }
