@@ -1,20 +1,15 @@
 package com.pg85.otg.forge.generator.structure;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.forge.biomes.ForgeBiome;
 import com.pg85.otg.forge.world.ForgeWorld;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
-import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.MapGenBase;
-import net.minecraft.world.gen.structure.MapGenStructure;
 import net.minecraft.world.gen.structure.StructureStart;
 import java.util.ArrayList;
 import java.util.List;

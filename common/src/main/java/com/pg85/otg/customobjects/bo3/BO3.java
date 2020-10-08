@@ -8,7 +8,6 @@ import java.util.Random;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;

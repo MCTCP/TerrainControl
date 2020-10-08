@@ -143,7 +143,6 @@ public class ObjectSpawner
         int z = chunkCoord.getChunkZ() * 16;
         
         LocalBiome biome = this.world.getBiomeForPopulation(x + 8, z + 8, chunkCoord);
-        BiomeConfig biomeConfig = biome.getBiomeConfig();
         
         // Null check
         if (biome == null)
@@ -151,7 +150,9 @@ public class ObjectSpawner
             OTG.log(LogMarker.WARN, "Unknown biome at {},{}  (chunk {}). Could not populate chunk.", x + 8, z + 8, chunkCoord);
             return;
         }
-    	
+
+        BiomeConfig biomeConfig = biome.getBiomeConfig();
+        
         // Use BO4 logic for BO4 worlds
 		if(this.world.isBo4Enabled())
 		{

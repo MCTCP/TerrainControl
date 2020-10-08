@@ -3,7 +3,6 @@ package com.pg85.otg.customobjects.bo3.bo3function;
 import java.util.Random;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bofunctions.BlockFunction;
 import com.pg85.otg.util.ChunkCoordinate;

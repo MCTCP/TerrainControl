@@ -9,8 +9,6 @@ import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.forge.gui.GuiHandler;
 import com.pg85.otg.forge.gui.dimensions.OTGGuiDimensionList;
 import com.pg85.otg.forge.gui.dimensions.base.OTGGuiScrollingList;
-import com.pg85.otg.logging.LogMarker;
-
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.Tessellator;
 

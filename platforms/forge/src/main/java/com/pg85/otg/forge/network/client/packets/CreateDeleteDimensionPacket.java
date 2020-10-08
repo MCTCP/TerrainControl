@@ -3,7 +3,6 @@ package com.pg85.otg.forge.network.client.packets;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.util.text.TextComponentString;

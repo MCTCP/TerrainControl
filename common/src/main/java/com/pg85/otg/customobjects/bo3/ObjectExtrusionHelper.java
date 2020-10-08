@@ -1,7 +1,6 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;

@@ -10,18 +10,12 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.NoSuchElementException;
 
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IProgressUpdate;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.MinecraftException;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;

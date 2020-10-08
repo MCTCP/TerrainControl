@@ -1,8 +1,6 @@
 package com.pg85.otg.forge.events.server;
 
 import java.io.File;
-import java.util.ArrayList;
-
 import net.minecraft.world.World;
 import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;

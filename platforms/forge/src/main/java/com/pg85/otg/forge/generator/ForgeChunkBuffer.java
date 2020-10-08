@@ -1,9 +1,6 @@
 package com.pg85.otg.forge.generator;
 
 import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;

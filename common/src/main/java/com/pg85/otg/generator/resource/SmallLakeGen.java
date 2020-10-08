@@ -8,8 +8,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;

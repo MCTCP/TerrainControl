@@ -1,14 +1,10 @@
 package com.pg85.otg.forge.blocks;
 
-import com.pg85.otg.configuration.standard.PluginStandardValues;
-
 import net.minecraft.block.Block;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @EventBusSubscriber
 public class BlockRegistryHandler

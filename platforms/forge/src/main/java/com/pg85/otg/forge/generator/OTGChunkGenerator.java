@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalMaterialData;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
