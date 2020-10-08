@@ -65,7 +65,7 @@ public enum EntityNames
     ZOMBIE("zombie", "zombie"),
     ZOMBIE_HORSE("zombie_horse", "zombiehorse", "horsezombie"),
     ZOMBIE_PIGMAN("zombie_pigman", "zombiepigman", "pigzombie"),
-    ZOMBIE_VILLAGER("zombie_villager", "zombievillager", "villagerzombie");
+    ZOMBIE_VILLAGER("zombie_villager", "zombievillager", "villagerzombie"),
 
 	// Projectiles
 	
@@ -105,7 +105,7 @@ public enum EntityNames
     SPAWNER_MINECART("spawner_minecart", "spawnerminecart", "minecartmobspawner"),
     TNT("tnt", "tnt", "primedtnt"),
     TNT_MINECART("tnt_minecart", "tntminecart", "minecarttnt"),
-    WITHER_SKULL("wither_skull", "witherskull"),
+    WITHER_SKULL("wither_skull", "witherskull");
    
     // Contains all aliases (alias, internalName)
     private static Map<String, String> MobAliases = new HashMap<String, String>();

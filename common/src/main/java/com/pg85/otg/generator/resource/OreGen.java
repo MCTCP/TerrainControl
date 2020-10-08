@@ -259,7 +259,7 @@ public class OreGen extends Resource
 	                                bFound = false;
 	                                for(MaterialSetEntry sourceBlockEntry : this.sourceBlocks.materials)
 	                                {
-	                                	if(sourceBlockEntry.equals(material))
+	                                	if(sourceBlockEntry.material.equals(material))
 	                                	{
 	                                		bFound = true;
 	                                		break;
