@@ -256,16 +256,7 @@ public class OreGen extends Resource
                                 if((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D))
                                 {
                             		material = world.getMaterial(i3, i4, i5, chunkBeingPopulated);
-	                                bFound = false;
-	                                for(MaterialSetEntry sourceBlockEntry : this.sourceBlocks.materials)
-	                                {
-	                                	if(sourceBlockEntry.material.equals(material))
-	                                	{
-	                                		bFound = true;
-	                                		break;
-	                                	}
-	                                }
-	                                if(bFound)
+	                                if(this.sourceBlocks.contains(material))
 	                                {
 	                                    world.setBlock(i3, i4, i5, this.material, null, chunkBeingPopulated, true);
 	                                }
