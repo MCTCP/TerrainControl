@@ -26,7 +26,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.sk89q.worldedit.bukkit.selections.Selection;
 
 import net.minecraft.server.v1_12_R1.ChunkCoordIntPair;

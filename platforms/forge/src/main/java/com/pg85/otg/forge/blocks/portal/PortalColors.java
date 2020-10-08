@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
-import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.logging.LogMarker;
 

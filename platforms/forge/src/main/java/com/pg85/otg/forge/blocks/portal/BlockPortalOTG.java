@@ -4,7 +4,6 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.blocks.BlockBreakableBase;
-import com.pg85.otg.forge.blocks.ModBlocks;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
 
 import java.util.Random;
