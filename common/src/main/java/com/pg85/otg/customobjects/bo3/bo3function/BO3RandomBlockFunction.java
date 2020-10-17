@@ -31,7 +31,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
     public BO3RandomBlockFunction rotate()
     {
         BO3RandomBlockFunction rotatedBlock = new BO3RandomBlockFunction();
-        rotatedBlock.x = z - 1;
+        rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.blockCount = blockCount;
