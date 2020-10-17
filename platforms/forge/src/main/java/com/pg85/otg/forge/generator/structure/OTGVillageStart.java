@@ -38,14 +38,7 @@ public class OTGVillageStart extends StructureStart
         StructureVillagePieces.Start startPiece = new StructureVillagePieces.Start(world.getBiomeProvider(), 0, random, startX, startZ, villagePieces, size);
         
         // Apply the villageType setting
-        LocalWorld worldTC = ((ForgeEngine)OTG.getEngine()).getWorld(world);
-        
-        if(worldTC == null)
-        {
-        	worldTC = ((ForgeEngine)OTG.getEngine()).getWorld(world);
-        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-        }
-        
+        LocalWorld worldTC = ((ForgeEngine)OTG.getEngine()).getWorld(world);                
         LocalBiome currentBiome = worldTC.getBiome(startX, startZ);
         BiomeConfig config = currentBiome.getBiomeConfig();
         if (config != null)

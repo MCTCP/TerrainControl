@@ -153,13 +153,7 @@ public class OTGWorldType extends WorldType
     	}
         //
 
-        ForgeWorld world = ((ForgeEngine)OTG.getEngine()).getWorldLoader().getOrCreateForgeWorld(mcWorld);
-        if (world == null) // TODO: When does this happen, if the world is not an OTG world?
-        {
-            throw new RuntimeException("This shouldn't happen, please contact team OTG about this crash.");
-            //return super.getBiomeProvider(mcWorld);
-        }
-
+        ForgeWorld world = ((ForgeEngine)OTG.getEngine()).getWorldLoader().getOrCreateForgeWorld(mcWorld);        
         Class<? extends BiomeGenerator> biomeGenClass = world.getConfigs().getWorldConfig().biomeMode;
         BiomeGenerator biomeGenerator = OTG.getBiomeModeManager().createCached(biomeGenClass, world);
         BiomeProvider biomeProvider = this.createBiomeProvider(world, biomeGenerator);

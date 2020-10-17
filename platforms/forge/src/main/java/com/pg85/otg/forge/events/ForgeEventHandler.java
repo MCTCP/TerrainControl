@@ -17,8 +17,7 @@ import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate;
 import net.minecraftforge.event.terraingen.TerrainGen;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,8 +50,8 @@ public class ForgeEventHandler extends EventHandler
     public boolean onResourceProcess(Resource resource, LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
     {
         ForgeWorld world = (ForgeWorld) localWorld;
-        int blockX = chunkX * CHUNK_X_SIZE;
-        int blockZ = chunkZ * CHUNK_Z_SIZE;
+        int blockX = chunkX * CHUNK_SIZE;
+        int blockZ = chunkZ * CHUNK_SIZE;
         BlockPos blockPos = new BlockPos(blockX, 0, blockZ);
                 
         // Convert to Forge event and fire
@@ -121,8 +120,8 @@ public class ForgeEventHandler extends EventHandler
     public void onPopulateEnd(LocalWorld localWorld, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         ForgeWorld world = (ForgeWorld) localWorld;
-        int blockX = chunkX * CHUNK_X_SIZE;
-        int blockZ = chunkZ * CHUNK_Z_SIZE;
+        int blockX = chunkX * CHUNK_SIZE;
+        int blockZ = chunkZ * CHUNK_SIZE;
         BlockPos blockPos = new BlockPos(blockX, 0, blockZ);
 
         // Fire all events

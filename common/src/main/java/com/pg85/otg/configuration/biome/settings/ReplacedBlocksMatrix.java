@@ -6,6 +6,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,8 +25,8 @@ public class ReplacedBlocksMatrix
     
     private class ReplaceBlockEntry
     {
-    	public final HashMap<Integer,LocalMaterialData> targetsWithoutBlockData = new HashMap<Integer, LocalMaterialData>();
-    	public final HashMap<Integer,LocalMaterialData> targetsWithBlockData = new HashMap<Integer, LocalMaterialData>();
+    	public final HashMap<Integer, LocalMaterialData> targetsWithoutBlockData = new HashMap<Integer, LocalMaterialData>();
+    	public final HashMap<Integer, LocalMaterialData> targetsWithBlockData = new HashMap<Integer, LocalMaterialData>();
     }
     
     public static class ReplacedBlocksInstruction
@@ -189,7 +190,9 @@ public class ReplacedBlocksMatrix
         		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithoutBlockData.entrySet())
         		{
         			if(
+            			// BLOCK:X replaces BLOCK:X
     					(instruction.from.hasData() && instruction.from.hashCode() == entry.getValue().hashCode()) ||
+            			// BLOCK replaces all BLOCK:X
     					(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
 					)
         			{
@@ -199,7 +202,9 @@ public class ReplacedBlocksMatrix
         		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithBlockData.entrySet())
         		{
         			if(
+            			// BLOCK:X replaces BLOCK:X
     					(instruction.from.hasData() &&  instruction.from.hashCode() == entry.getValue().hashCode()) ||
+    					// BLOCK replaces all BLOCK:X
         				(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
     				)
         			{

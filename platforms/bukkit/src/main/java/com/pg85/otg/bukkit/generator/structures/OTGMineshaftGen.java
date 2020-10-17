@@ -75,8 +75,8 @@ public class OTGMineshaftGen extends StructureGenerator
     protected StructureStart b(int chunkX, int chunkZ)
     {
         LocalWorld world = WorldHelper.toLocalWorld(this.g);
-        LocalBiome biome = world.getBiome(chunkX * ChunkCoordinate.CHUNK_X_SIZE + 8,
-                chunkZ * ChunkCoordinate.CHUNK_Z_SIZE + 8);
+        LocalBiome biome = world.getBiome(chunkX * ChunkCoordinate.CHUNK_SIZE + 8,
+                chunkZ * ChunkCoordinate.CHUNK_SIZE + 8);
         BiomeConfig biomeConfig = biome.getBiomeConfig();
         WorldGenMineshaft.Type mineshaftType = WorldGenMineshaft.Type.NORMAL;
         if (biomeConfig.mineshaftType == MineshaftType.mesa)

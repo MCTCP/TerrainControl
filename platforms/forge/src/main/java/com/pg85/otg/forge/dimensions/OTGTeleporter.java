@@ -645,8 +645,6 @@ public class OTGTeleporter
             	makePortal(portalMaterial, portalBlock, destinationWorld, entityIn, _this);
             	placeInExistingPortal(destinationWorld, entityIn, rotationYaw, _this);
             }
-        } else {
-    		throw new RuntimeException("This shouldn't happen. Please contact team OTG about this crash."); // TODO: Does this ever happen?
         }
     }
 

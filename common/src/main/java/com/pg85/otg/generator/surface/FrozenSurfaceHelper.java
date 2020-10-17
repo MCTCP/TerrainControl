@@ -33,9 +33,9 @@ public class FrozenSurfaceHelper
     {
         int x = chunkCoord.getBlockXCenter();
         int z = chunkCoord.getBlockZCenter();
-        for (int i = 0; i < ChunkCoordinate.CHUNK_X_SIZE; i++)
+        for (int i = 0; i < ChunkCoordinate.CHUNK_SIZE; i++)
         {
-            for (int j = 0; j < ChunkCoordinate.CHUNK_Z_SIZE; j++)
+            for (int j = 0; j < ChunkCoordinate.CHUNK_SIZE; j++)
             {
                 int blockToFreezeX = x + i;
                 int blockToFreezeZ = z + j;
