@@ -43,6 +43,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     private boolean tree;
     private boolean branch;
     private boolean needsFoundation;
+    private boolean doReplaceBlocks;
     private int rarity;
     private double collisionPercentage;
     private int spawnElevationMin;
@@ -59,6 +60,12 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         return tree;
     }
 
+    @Override
+    public boolean doReplaceBlocks()
+    {
+    	return this.doReplaceBlocks;
+    }
+    
     @Override
     public boolean canRotateRandomly()
     {
@@ -115,11 +122,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             {
     			if(worldMaterial.isAir())
             	{
-    				setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null, false);
+    				setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null, this.doReplaceBlocks());
 	            }
 				else if (dig)
 	            {
-	                setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null, false);
+	                setBlock(world, x + point.x, y + point.y, z + point.z, point.material, null, false, null, this.doReplaceBlocks());
 	            }
             }
         }
@@ -338,11 +345,11 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         {
             ObjectRarity -= 100;
 
-            int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            int x = chunkCoord.getBlockX() + rand.nextInt(ChunkCoordinate.CHUNK_SIZE);
+            int z = chunkCoord.getBlockZ() + rand.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
             // TODO: Are BO2/BO3 trees ever spawned via this method? If so, then don't replace blocks.
-            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax, chunkCoord, !this.tree);
+            objectSpawned = spawn(world, rand, x, z, this.spawnElevationMin, this.spawnElevationMax, chunkCoord, this.doReplaceBlocks());
         }
 
         return objectSpawned;
@@ -372,6 +379,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         this.tree = readSettings(BO2Settings.TREE);
         this.branch = readSettings(BO2Settings.BRANCH);
         this.needsFoundation = readSettings(BO2Settings.NEEDS_FOUNDATION);
+        this.doReplaceBlocks = readSettings(BO2Settings.DO_REPLACE_BLOCKS);
         this.rarity = readSettings(BO2Settings.RARITY);
         this.collisionPercentage = readSettings(BO2Settings.COLLISION_PERCENTAGE);
         this.spawnElevationMin = readSettings(BO2Settings.SPAWN_ELEVATION_MIN);

@@ -39,7 +39,7 @@ public class BO3 implements StructuredCustomObject
     private BO3Config settings;
     private final String name;
     private final File file;
-    public boolean isInvalidConfig;
+    private boolean isInvalidConfig;
 
     /**
      * Creates a BO3 from a file.
@@ -56,18 +56,18 @@ public class BO3 implements StructuredCustomObject
     @Override
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     public BO3Config getSettings()
     {
-        return settings;
+        return this.settings;
     }
 
     @Override
     public boolean onEnable()
     {
-    	if(isInvalidConfig)
+    	if(this.isInvalidConfig)
     	{
     		return false;
     	}
@@ -77,7 +77,7 @@ public class BO3 implements StructuredCustomObject
     	}
         try
         {
-            this.settings = new BO3Config(new FileSettingsReaderOTGPlus(name, file));
+            this.settings = new BO3Config(new FileSettingsReaderOTGPlus(this.name, this.file));
             if (this.settings.settingsMode != ConfigMode.WriteDisable)
             {
                 FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode);
@@ -85,7 +85,7 @@ public class BO3 implements StructuredCustomObject
         }
         catch (InvalidConfigException ex)
         {
-        	isInvalidConfig = true;
+        	this.isInvalidConfig = true;
             return false;
         }
         return true;
@@ -94,31 +94,31 @@ public class BO3 implements StructuredCustomObject
     @Override
     public boolean canSpawnAsTree()
     {
-        return settings.tree;
+        return this.settings.tree;
     }
 
     // Used for saplings
     @Override
     public boolean canRotateRandomly()
     {
-        return settings.rotateRandomly;
+        return this.settings.rotateRandomly;
     }
     
 	@Override
 	public boolean loadChecks()
 	{
-		return settings == null ? false : this.settings.parseModChecks();
+		return this.settings == null ? false : this.settings.parseModChecks();
 	}
 
     // Used to safely spawn this object from a grown sapling
     @Override
     public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
+        BO3BlockFunction[] blocks = this.settings.getBlocks(rotation.getRotationId());
 
         ArrayList<BO3BlockFunction> blocksToSpawn = new ArrayList<BO3BlockFunction>();
 
-        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(this.settings.extrudeMode, this.settings.extrudeThroughBlocks);
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
         LocalMaterialData localMaterial;
@@ -166,23 +166,23 @@ public class BO3 implements StructuredCustomObject
     @Override
     public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
     {
-        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
-        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
+        BO3BlockFunction[] blocks = this.settings.getBlocks(rotation.getRotationId());
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(this.settings.extrudeMode, this.settings.extrudeThroughBlocks);
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
         for (BO3BlockFunction block : blocks)
         {
             // Places if BO3 is in placeAnyway mode, or if target block is a source block
-            if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway
-                    || settings.sourceBlocks.contains(block.material))
+            if (this.settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway
+                    || this.settings.sourceBlocks.contains(block.material))
             {
-                block.spawn(world, random, x + block.x, y + block.y, z + block.z, null, true);
+                block.spawn(world, random, x + block.x, y + block.y, z + block.z, null, this.doReplaceBlocks());
                 oeh.addBlock(block);
                 chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
             }
         }
 
-        oeh.extrude(world, random, x, y, z, null, true);
+        oeh.extrude(world, random, x, y, z, null, this.doReplaceBlocks());
         handleBO3Functions(null, world, random, rotation, x, y, z, chunks, null);
 
         return true;
@@ -197,14 +197,14 @@ public class BO3 implements StructuredCustomObject
 
         int chunkMiddleX = chunkCoord.getBlockXCenter();
         int chunkMiddleZ = chunkCoord.getBlockZCenter();
-        for (int i = 0; i < settings.frequency; i++)
+        for (int i = 0; i < this.settings.frequency; i++)
         {
-            if (settings.rarity > random.nextDouble() * 100.0)
+            if (this.settings.rarity > random.nextDouble() * 100.0)
             {
-                int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-                int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+                int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+                int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
-                if (spawn(world, random, x, z, settings.minHeight, settings.maxHeight, chunkCoord, !settings.tree))
+                if (spawn(world, random, x, z, this.settings.minHeight, this.settings.maxHeight, chunkCoord, this.doReplaceBlocks()))
                 {
                     atLeastOneObjectHasSpawned = true;
                 }
@@ -233,24 +233,24 @@ public class BO3 implements StructuredCustomObject
     // Used for customobject and trees during population
     private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
-        Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int offsetY = 0;
         int baseY = 0;
-        if (settings.spawnHeight == SpawnHeightEnum.randomY)
+        if (this.settings.spawnHeight == SpawnHeightEnum.randomY)
         {
         	baseY = minY == maxY ? minY : RandomHelper.numberInRange(random, minY, maxY);
         }
-        if (settings.spawnHeight == SpawnHeightEnum.highestBlock)
+        if (this.settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
         	baseY = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
         }
-        if (settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
+        if (this.settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
         	baseY = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
         }
         // Offset by static and random settings values
         // TODO: This is pointless used with randomY?
-        offsetY = baseY += this.getOffsetAndVariance(random, settings.spawnHeightOffset, settings.spawnHeightVariance);
+        offsetY = baseY += this.getOffsetAndVariance(random, this.settings.spawnHeightOffset, this.settings.spawnHeightVariance);
         return trySpawnAt(null, world, random, rotation, x, offsetY, z, minY, maxY, baseY, chunkBeingPopulated, replaceBlocks);
     }
     
@@ -268,7 +268,7 @@ public class BO3 implements StructuredCustomObject
             return false;
         }
         
-        BO3Check[] checks = settings.bo3Checks[rotation.getRotationId()];
+        BO3Check[] checks = this.settings.bo3Checks[rotation.getRotationId()];
 
         // Check for spawning
         for (BO3Check check : checks)
@@ -283,7 +283,7 @@ public class BO3 implements StructuredCustomObject
             }
     	}
 
-        BO3BlockFunction[] blocks = settings.getBlocks(rotation.getRotationId());
+        BO3BlockFunction[] blocks = this.settings.getBlocks(rotation.getRotationId());
         HashSet<ChunkCoordinate> loadedChunks = new HashSet<ChunkCoordinate>();
         ChunkCoordinate chunkCoord;
         for (BO3BlockFunction block : blocks)
@@ -308,23 +308,23 @@ public class BO3 implements StructuredCustomObject
 
         ArrayList<BO3BlockFunction> blocksToSpawn = new ArrayList<BO3BlockFunction>();
 
-        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(settings.extrudeMode, settings.extrudeThroughBlocks);
+        ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(this.settings.extrudeMode, this.settings.extrudeThroughBlocks);
         HashSet<ChunkCoordinate> chunks = new HashSet<ChunkCoordinate>();
 
         int blocksOutsideSourceBlock = 0;
         int maxBlocksOutsideSourceBlock = (int) Math.ceil(
-                blocks.length * (settings.maxPercentageOutsideSourceBlock / 100.0));
+                blocks.length * (this.settings.maxPercentageOutsideSourceBlock / 100.0));
         for (BO3BlockFunction block : blocks)
         {
             if (
         		(
     				(
-						settings.maxPercentageOutsideSourceBlock < 100 && 
+						this.settings.maxPercentageOutsideSourceBlock < 100 && 
 						blocksOutsideSourceBlock <= maxBlocksOutsideSourceBlock
 					) || 
-    				settings.outsideSourceBlock == OutsideSourceBlock.dontPlace
+    				this.settings.outsideSourceBlock == OutsideSourceBlock.dontPlace
 				) && 
-    			!settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z, chunkBeingPopulated))
+    			!this.settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z, chunkBeingPopulated))
     		)
             {
                 blocksOutsideSourceBlock++;
@@ -334,7 +334,7 @@ public class BO3 implements StructuredCustomObject
                     return false;
                 }
 
-                if (settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway)
+                if (this.settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway)
                 {
                     chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
                     blocksToSpawn.add(block);
@@ -374,7 +374,7 @@ public class BO3 implements StructuredCustomObject
         HashSet<ChunkCoordinate> chunksCustomObject = new HashSet<ChunkCoordinate>();
 
         HashSet<BO3ModDataFunction> newModDataInObject = new HashSet<BO3ModDataFunction>();
-        BO3ModDataFunction[] modDataInObject = settings.modDataFunctions[rotation.getRotationId()];
+        BO3ModDataFunction[] modDataInObject = this.settings.modDataFunctions[rotation.getRotationId()];
         for (BO3ModDataFunction modData : modDataInObject)
         {
             BO3ModDataFunction newModData = new BO3ModDataFunction();
@@ -428,7 +428,7 @@ public class BO3 implements StructuredCustomObject
         }
 
         HashSet<BO3ParticleFunction> newParticleDataInObject = new HashSet<BO3ParticleFunction>();
-        BO3ParticleFunction[] particleDataInObject = settings.particleFunctions[rotation.getRotationId()];
+        BO3ParticleFunction[] particleDataInObject = this.settings.particleFunctions[rotation.getRotationId()];
         for (BO3ParticleFunction particleData : particleDataInObject)
         {
             BO3ParticleFunction newParticleData = new BO3ParticleFunction();
@@ -476,7 +476,7 @@ public class BO3 implements StructuredCustomObject
             }
         }
 
-        BO3EntityFunction[] entityDataInObject = settings.entityFunctions[rotation.getRotationId()];
+        BO3EntityFunction[] entityDataInObject = this.settings.entityFunctions[rotation.getRotationId()];
         for (BO3EntityFunction entity : entityDataInObject)
         {
             BO3EntityFunction newEntityData = new BO3EntityFunction();
@@ -499,7 +499,7 @@ public class BO3 implements StructuredCustomObject
 
     public Branch[] getBranches(Rotation rotation)
     {
-        return settings.branches[rotation.getRotationId()];
+        return this.settings.branches[rotation.getRotationId()];
     }
     
     public StructurePartSpawnHeight getStructurePartSpawnHeight()
@@ -515,7 +515,7 @@ public class BO3 implements StructuredCustomObject
 
     public int getMaxBranchDepth() // This used to be in CustomObject?
     {
-        return settings.maxBranchDepth;
+        return this.settings.maxBranchDepth;
     }
 
     /**
@@ -543,8 +543,14 @@ public class BO3 implements StructuredCustomObject
     
     public CustomStructureCoordinate makeCustomStructureCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
     {
-        Rotation rotation = settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
-        int height = RandomHelper.numberInRange(random, settings.minHeight, settings.maxHeight);
+        Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
+        int height = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
         return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
-    }    
+    }
+
+	@Override
+	public boolean doReplaceBlocks()
+	{
+		return this.settings.doReplaceBlocks;
+	}
 }
