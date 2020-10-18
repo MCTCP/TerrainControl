@@ -21,7 +21,7 @@ public abstract class ChunkBuffer
      * Sets the block at the given location in the chunk. The implementation may
      * ignore block data or may ignore blocks with ids larger than 255.
      *
-     * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_X_SIZE}
+     * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
      *               - 1), inclusive.
      * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
      *               - 1), inclusive.
@@ -33,7 +33,7 @@ public abstract class ChunkBuffer
 
     /**
      * Gets the block material at the given position.
-     * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_X_SIZE}
+     * @param blockX Block x, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
      *               - 1), inclusive.
      * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
      *               - 1), inclusive.
@@ -43,17 +43,17 @@ public abstract class ChunkBuffer
      */
     public abstract LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
 	
-    private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_X_SIZE * ChunkCoordinate.CHUNK_Z_SIZE];
+    private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_SIZE * ChunkCoordinate.CHUNK_SIZE];
 	public int getHighestBlockForColumn(int blockX, int blockZ)
 	{
-		return highestBlockHeight[blockX * ChunkCoordinate.CHUNK_X_SIZE + blockZ];
+		return highestBlockHeight[blockX * ChunkCoordinate.CHUNK_SIZE + blockZ];
 	}
 
 	public void setHighestBlockForColumn(int blockX, int blockZ, int height)
 	{
-		if(height > highestBlockHeight[blockX * ChunkCoordinate.CHUNK_X_SIZE + blockZ])
+		if(height > highestBlockHeight[blockX * ChunkCoordinate.CHUNK_SIZE + blockZ])
 		{
-			highestBlockHeight[blockX * ChunkCoordinate.CHUNK_X_SIZE + blockZ] = (short)height;
+			highestBlockHeight[blockX * ChunkCoordinate.CHUNK_SIZE + blockZ] = (short)height;
 		}
 	}
 }

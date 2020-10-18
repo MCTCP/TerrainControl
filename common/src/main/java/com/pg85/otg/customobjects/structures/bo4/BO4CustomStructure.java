@@ -5,52 +5,29 @@ import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.pg85.otg.customobjects.structures.CustomStructure;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
+import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaGenerator;
+import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaLine;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.RandomHelper;
-
 import java.util.*;
 import java.util.Map.Entry;
 
-/**
- * Represents a collection of all {@link CustomObject}s in a structure. It is
- * calculated by finding the branches of one object, then finding the branches
- * of those branches, etc., until
- * {@link CustomObject#getMaxBranchDepth()} is reached.
- *
- */
 public class BO4CustomStructure extends CustomStructure
-{
+{	
     private Random worldRandom;
-
-	private SmoothingAreaGenerator smoothingAreaManager = new SmoothingAreaGenerator();
-	
-    // Stores all the branches of this branching structure that should spawn along with the chunkcoordinates they should spawn in
-    public Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
-    // TODO: Make sure this never becomes an issue for memory usage. 
-    public Map<ChunkCoordinate, String> ObjectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();
-
-    boolean IsSpawned;
+	public SmoothingAreaGenerator smoothingAreaManager = new SmoothingAreaGenerator();
     private boolean isStructureAtSpawn = false;
-
-    public int minY;
-
-    // A smoothing area is drawn around all outer blocks (or blocks neighbouring air) on the lowest layer of blocks in each BO3 of this branching structure that has a SmoothRadius set greater than 0.
-    public Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
-
-    private int branchesTried = 0;
-
-    public boolean startChunkBlockChecksDone = false;
-    
+    private int branchesTried = 0;    
     private Stack<BranchDataItem> AllBranchesBranchData = new Stack<BranchDataItem>();
     private HashMap<ChunkCoordinate, ArrayList<BranchDataItem>> AllBranchesBranchDataByChunk = new HashMap<ChunkCoordinate, ArrayList<BranchDataItem>>();
 	private HashMap<String, ArrayList<ChunkCoordinate>> AllBranchesBranchDataByName = new HashMap<String, ArrayList<ChunkCoordinate>>(); // Used to find distance between branches and branch groups
@@ -58,11 +35,98 @@ public class BO4CustomStructure extends CustomStructure
     private HashSet<Integer> AllBranchesBranchDataHash = new HashSet<Integer>();
     private boolean SpawningCanOverrideBranches = false;
     private int Cycle = 0;
-    
     private BranchDataItem currentSpawningRequiredChildrenForOptionalBranch;
     private boolean spawningRequiredChildrenForOptionalBranch = false;
     private boolean spawnedBranchThisCycle = false;
     private boolean spawnedBranchLastCycle = false;
+    private int minY; 
+
+    boolean IsSpawned;
+
+    public boolean startChunkBlockChecksDone = false;
+
+    // Stores all the branches of this branching structure that should spawn along with the chunkcoordinates they should spawn in
+    public Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
+    // TODO: Make sure this never becomes an issue for memory usage. 
+    public Map<ChunkCoordinate, String> ObjectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();    
+    
+	// Branches:
+    // BO4 structures are rasterized and split into 16x16 chunks, each BO4 containing the blocks for one chunk. Branch syntax is used to glue all the 
+    // chunks of a structure together and allows OTG to spawn one chunk at a time. Each BO4 can have branches that are used to place more BO4's at specified 
+    // coordinates relative to the parent.   
+    //
+    // Procedural generation:
+    // Branches can be randomised to create procedurally generated structures. OTG branch spawning mechanics work by the principle of spawning a basic (required) 
+    // structure layout first, then spawning any optional additions/modifications on top. Different kinds of branches are used to create these.
+    //
+    // Branch spawn cycles:
+    // Each structure starts with one master BO4, that can contain any number of branches and/or branch groups, that can in turn contain branches.
+    // Branches are spawned in pulses/cycles, where each pulse/cycle spawns one layer of child-branches. Branches are spawned one at a time, in the order
+    // they are listed in the BO4. There is a specific spawn order for different types of branches, this is explained in the Spawn order 
+    // section below.
+    //
+    // Required and optional branches:
+    // Required branches are used to mark parts of structures that must spawn together in the same cycle (such as a 2x2 chunk room, consisting of 4 BO4's 
+    // that must all spawn), optional branches are used to create randomised components and add interiors and decorations. 
+    //
+    // Branch groups:
+    // Branches can be assigned to a group. When a group contains multiple branches, OTG tries to spawn each of the branches. 
+    // If a branch spawns, it considers the group successfully spawned and skips the remaining branches in the group.
+    //
+    // Spawn requirements and rollbacks:
+    // Branches can have spawn requirements such as a biome or material to be placed upon (water/land), they can also use collision detection to make sure they 
+    // don't overlap with other branches. When a required branch or branch group fails to spawn, its parent is rolled back, and spawning of the rolled-back branch's 
+    // sibling branches continues as if the branch had originally failed to spawn. This will delete the current branch and in the parent branch tries to spawn any 
+    // branches that couldn't spawn because of this branch. This means that each branch only tries to spawn once, if it fails, it is never tried again, even if the 
+    // surrounding chunks/branches have changed and spawning might be possible. This is done to prevent infinite recursion. 
+    // If rollbacks cascade up to the master BO4, the structure fails to spawn entirely.
+    //
+    // Branch depth:
+    // For BO4's with optional branches, the master BO4 passes a branch depth to each of its branches. This number is passed down to each child branch, and is decreased 
+    // by one for each optional branch. When branch depth is depleted, optional branches are no longer able to spawn and only required branches attempt to spawn.
+    // This allows the maximum size of the structure's optional parts (such as tunnels with random length) to be set via the master BO4. Alternatively, branch depth can 
+	// be overridden for each branch, this can be useful for spawning optional components at the ends of a branch, when the master BO4's branch depth is depleted (to cap the end of a tunnel f.e). 
+    // Be careful not to create infinite loops when overriding the master BO4's branch depth. 
+    // 
+    // CanOverride branches:
+    // CanOverride branches can override any other branch, so aren't affected by collision detection. CanOverride branches don't care about spawning on !canOverride branches, 
+    // though !canOverride branches do care about spawning on canOverride branches.   
+    //
+    // CanOverride required branches:
+    // CanOverride required branches are used for things that need to be spawned in the same cycle as their parent branch, and override/overlap with existing branches. 
+    // Typically things that should be part of the base layout of the structure, for instance non-optional components that override/modify the base structure or marker BO4's 
+    // used for collision detection.
+    //
+    // CanOverride optional branches:
+    // Optional things that should be spawned after the base of the structure has spawned, and override/overlap with existing branches. For instance randomised room interiors, 
+    // adapter/modifier pieces that knock out walls/ceilings/floors between rooms and creates stairs/bridges etc.
+    //
+    // Spawn order:
+    // *CanOverride optional branches are completely ignored during step 1-3, that spawn the basic (required) structure layout.
+    // 1. Traverse all spawned branches until a branch is found that has unspawned children and try spawning required branches, if optional branches 
+    // exist in the same branchgroups (if any) that haven't tried to spawn yet, skip the required branches. 
+    // 2. Traverse all spawned branches until a branch is found that has unspawned children and try spawning optional branches. If an optional branch spawns, 
+    // immediately spawn its required branches (same as 1, skips required branches if optional branches queued).
+    // 3. Repeat 1-2 until all branches have spawned or until a required branch (or branchgroup containing a required branch) cannot spawn, which triggers a rollback. If
+    // rollbacks cascade up to the master BO4, cancel spawning the structure.
+    // 4. Spawn CanOverride optional branches and their children: 
+    // Optional CanOverride branches never cause a rollback for their parent, so are used to add optional additions/modification on top of existing branches, and are completely 
+    // ignored during step 1-3. Step 4 repeats steps 1-3, starting at any unspawned optional CanOverride:true branches that were ignored before. Each optional CanOverride branch spawns 
+    // its children as usual, until all branches are depleted. Optional CanOverride:true branches should not have other optional CanOverride:true branches as children, they are ignored.
+    //
+    // *NOTE: Optional CanOverride:true branches should not be placed in a branchgroup with required branches. If an optional CanOverride:true branch is placed in a group with a 
+    // required branch, it is ignored during steps 1-3. During step 4, the branch will try to spawn, but won't cause a rollback for its branchgroup if it fails, since the branchgroup is 
+    // guaranteed to have already spawned a branch during steps 1-3.
+    //
+    // *NOTE2: MustSpawnBelow branches retry spawning each cycle during steps 1-3 until no branch was spawned the last cycle. If they still can't spawn, they fail and can cause a rollback.
+   
+    // TODO: Create a new branch type that cannot cause rollbacks and waits till all other branches are done spawning. Make optional canoverride branches behave like other branches,
+    // so they are no longer an exception to the rule. Allow the new branch type to chain as many times as desired, so you could spawn a foundation, then walls, then roads, then 
+    // structures fe. Would also have to add a CollisionGroup setting for BO4's, to easily specify which branches can/can't collide.  
+
+    // TODO: Remove the 16x16 requirement, allow users to use larger Bo4's, make OTG do the slicing.
+    
+    // TODO: Don't allow canOverride optional branches in the same branch group as required branches.    
     
     public BO4CustomStructure(BO4CustomStructureCoordinate start)
     {
@@ -73,7 +137,7 @@ public class BO4CustomStructure extends CustomStructure
     {
     	this(world, structureStart);
     	this.objectsToSpawn = objectsToSpawn;
-    	this.smoothingAreasToSpawn = smoothingAreasToSpawn;
+    	this.smoothingAreaManager.smoothingAreasToSpawn = smoothingAreasToSpawn;
     	this.minY = minY;
     }
 
@@ -149,7 +213,7 @@ public class BO4CustomStructure extends CustomStructure
 		{
 			if(chunkCoordSet.getValue() != null)
 			{
-	        	// Don't spawn BO3's that have been overriden because of replacesBO3
+	        	// Don't spawn BO4's that have been overriden because of replacesBO4
 	        	for (CustomStructureCoordinate coordObject : chunkCoordSet.getValue())
 	        	{
 	        		BO4Config objectConfig = ((BO4)coordObject.getObject()).getConfig();
@@ -178,8 +242,7 @@ public class BO4CustomStructure extends CustomStructure
         // that there is a smooth transition in height from the surrounding
         // terrain to the BO3. This way BO3's won't float above the ground
         // or spawn inside a hole with vertical walls.
-		smoothingAreasToSpawn = smoothingAreaManager.calculateSmoothingAreas(objectsToSpawn, (BO4CustomStructureCoordinate)this.start, world);
-		smoothingAreaManager.customObjectStructureSpawn(smoothingAreasToSpawn);
+		smoothingAreaManager.calculateSmoothingAreas(objectsToSpawn, (BO4CustomStructureCoordinate)this.start, world);
 		
 		// Add the structure to the structure caches
 		
@@ -188,7 +251,7 @@ public class BO4CustomStructure extends CustomStructure
 			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);		
 		}
 
-		for(ChunkCoordinate chunkCoord : smoothingAreasToSpawn.keySet())
+		for(ChunkCoordinate chunkCoord : this.smoothingAreaManager.smoothingAreasToSpawn.keySet())
 		{
 			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);
 		}
@@ -225,29 +288,51 @@ public class BO4CustomStructure extends CustomStructure
 			// A BO3 may need to perform material checks when using !CanSpawnOnWater or SpawnOnWaterOnly
 
 	    	short startY = 0;
+			int centerX = this.start.getX() + 8;
+			int centerZ = this.start.getZ() + 7;
+			// If this structure has been exported as BO4Data with a minimum size,
+			// use the center of the structure to check terrain height
+	    	if(
+				((BO4)this.start.getObject()).getConfig().minimumSizeTop != -1 &&
+				((BO4)this.start.getObject()).getConfig().minimumSizeBottom != -1 &&
+				((BO4)this.start.getObject()).getConfig().minimumSizeLeft != -1 &&
+				((BO4)this.start.getObject()).getConfig().minimumSizeRight != -1)
+	    	{
+	    		if(this.start.rotation == Rotation.NORTH)
+	    		{
+	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeLeft + ((BO4)this.start.getObject()).getConfig().minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeTop + ((BO4)this.start.getObject()).getConfig().minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    		}
+	    		if(this.start.rotation == Rotation.SOUTH)
+	    		{
+	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeRight + ((BO4)this.start.getObject()).getConfig().minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeBottom + ((BO4)this.start.getObject()).getConfig().minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    		}
+	    		if(this.start.rotation == Rotation.EAST)
+	    		{
+	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeBottom + ((BO4)this.start.getObject()).getConfig().minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeLeft + ((BO4)this.start.getObject()).getConfig().minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    		}    		
+	    		if(this.start.rotation == Rotation.WEST)
+	    		{
+	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeTop + ((BO4)this.start.getObject()).getConfig().minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeRight + ((BO4)this.start.getObject()).getConfig().minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
+	    		}    		
+	    	}
 	    		    	
 			if(
 				((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestBlock || 
 				((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock
 			)
-			{
+			{				
 				if(((BO4)this.start.getObject()).getConfig().spawnAtWaterLevel)
 				{
-					LocalBiome biome = world.getBiome(this.start.getX() + 8, this.start.getZ() + 7);
+					LocalBiome biome = world.getBiome(centerX, centerZ);
 					startY = (short) (biome.getBiomeConfig().useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biome.getBiomeConfig().waterLevelMax);
-				} else {
+				} else {				
 					// OTG.log(LogMarker.INFO, "Request height for chunk X" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkX() + " Z" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkZ());
 					// Passing null for chunk being populated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
-
-					int highestBlock = 0;
-
-					if(!((BO4)this.start.getObject()).getConfig().spawnUnderWater)
-					{
-						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true, null);
-					} else {
-						highestBlock = world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, false, true, true, true, null);
-					}
-
+					int highestBlock = world.getHighestBlockYAt(centerX, centerZ, true, !((BO4)this.start.getObject()).getConfig().spawnUnderWater, ((BO4)this.start.getObject()).getConfig().spawnUnderWater, true, true, null);
 					if(highestBlock < 0)
 					{
 						//OTG.log(LogMarker.INFO, "Structure " + Start.BO3Name + " could not be plotted at Y < 1. If you are creating empty chunks intentionally (for a sky world for instance) then make sure you don't use the highestBlock setting for your BO3's");
@@ -542,83 +627,6 @@ public class BO4CustomStructure extends CustomStructure
     	}
     }
     
-	// Branches:
-    // BO4 structures are rasterized and split into 16x16 chunks, each BO4 containing the blocks for one chunk. Branch syntax is used to glue all the 
-    // chunks of a structure together and allows OTG to spawn one chunk at a time. Each BO4 can have branches that are used to place more BO4's at specified 
-    // coordinates relative to the parent.   
-    //
-    // Procedural generation:
-    // Branches can be randomised to create procedurally generated structures. OTG branch spawning mechanics work by the principle of spawning a basic (required) 
-    // structure layout first, then spawning any optional additions/modifications on top. Different kinds of branches are used to create these.
-    //
-    // Branch spawn cycles:
-    // Each structure starts with one master BO4, that can contain any number of branches and/or branch groups, that can in turn contain branches.
-    // Branches are spawned in pulses/cycles, where each pulse/cycle spawns one layer of child-branches. Branches are spawned one at a time, in the order
-    // they are listed in the BO4. There is a specific spawn order for different types of branches, this is explained in the Spawn order 
-    // section below.
-    //
-    // Required and optional branches:
-    // Required branches are used to mark parts of structures that must spawn together in the same cycle (such as a 2x2 chunk room, consisting of 4 BO4's 
-    // that must all spawn), optional branches are used to create randomised components and add interiors and decorations. 
-    //
-    // Branch groups:
-    // Branches can be assigned to a group. When a group contains multiple branches, OTG tries to spawn each of the branches. 
-    // If a branch spawns, it considers the group successfully spawned and skips the remaining branches in the group.
-    //
-    // Spawn requirements and rollbacks:
-    // Branches can have spawn requirements such as a biome or material to be placed upon (water/land), they can also use collision detection to make sure they 
-    // don't overlap with other branches. When a required branch or branch group fails to spawn, its parent is rolled back, and spawning of the rolled-back branch's 
-    // sibling branches continues as if the branch had originally failed to spawn. This will delete the current branch and in the parent branch tries to spawn any 
-    // branches that couldn't spawn because of this branch. This means that each branch only tries to spawn once, if it fails, it is never tried again, even if the 
-    // surrounding chunks/branches have changed and spawning might be possible. This is done to prevent infinite recursion. 
-    // If rollbacks cascade up to the master BO4, the structure fails to spawn entirely.
-    //
-    // Branch depth:
-    // For BO4's with optional branches, the master BO4 passes a branch depth to each of its branches. This number is passed down to each child branch, and is decreased 
-    // by one for each optional branch. When branch depth is depleted, optional branches are no longer able to spawn and only required branches attempt to spawn.
-    // This allows the maximum size of the structure's optional parts (such as tunnels with random length) to be set via the master BO4. Alternatively, branch depth can 
-	// be overridden for each branch, this can be useful for spawning optional components at the ends of a branch, when the master BO4's branch depth is depleted (to cap the end of a tunnel f.e). 
-    // Be careful not to create infinite loops when overriding the master BO4's branch depth. 
-    // 
-    // CanOverride branches:
-    // CanOverride branches can override any other branch, so aren't affected by collision detection. CanOverride branches don't care about spawning on !canOverride branches, 
-    // though !canOverride branches do care about spawning on canOverride branches.   
-    //
-    // CanOverride required branches:
-    // CanOverride required branches are used for things that need to be spawned in the same cycle as their parent branch, and override/overlap with existing branches. 
-    // Typically things that should be part of the base layout of the structure, for instance non-optional components that override/modify the base structure or marker BO4's 
-    // used for collision detection.
-    //
-    // CanOverride optional branches:
-    // Optional things that should be spawned after the base of the structure has spawned, and override/overlap with existing branches. For instance randomised room interiors, 
-    // adapter/modifier pieces that knock out walls/ceilings/floors between rooms and creates stairs/bridges etc.
-    //
-    // Spawn order:
-    // *CanOverride optional branches are completely ignored during step 1-3, that spawn the basic (required) structure layout.
-    // 1. Traverse all spawned branches until a branch is found that has unspawned children and try spawning required branches, if optional branches 
-    // exist in the same branchgroups (if any) that haven't tried to spawn yet, skip the required branches. 
-    // 2. Traverse all spawned branches until a branch is found that has unspawned children and try spawning optional branches. If an optional branch spawns, 
-    // immediately spawn its required branches (same as 1, skips required branches if optional branches queued).
-    // 3. Repeat 1-2 until all branches have spawned or until a required branch (or branchgroup containing a required branch) cannot spawn, which triggers a rollback. If
-    // rollbacks cascade up to the master BO4, cancel spawning the structure.
-    // 4. Spawn CanOverride optional branches and their children: 
-    // Optional CanOverride branches never cause a rollback for their parent, so are used to add optional additions/modification on top of existing branches, and are completely 
-    // ignored during step 1-3. Step 4 repeats steps 1-3, starting at any unspawned optional CanOverride:true branches that were ignored before. Each optional CanOverride branch spawns 
-    // its children as usual, until all branches are depleted. Optional CanOverride:true branches should not have other optional CanOverride:true branches as children, they are ignored.
-    //
-    // *NOTE: Optional CanOverride:true branches should not be placed in a branchgroup with required branches. If an optional CanOverride:true branch is placed in a group with a 
-    // required branch, it is ignored during steps 1-3. During step 4, the branch will try to spawn, but won't cause a rollback for its branchgroup if it fails, since the branchgroup is 
-    // guaranteed to have already spawned a branch during steps 1-3.
-    //
-    // *NOTE2: MustSpawnBelow branches retry spawning each cycle during steps 1-3 until no branch was spawned the last cycle. If they still can't spawn, they fail and can cause a rollback.
-   
-    // TODO: Create a new branch type that cannot cause rollbacks and waits till all other branches are done spawning. Make optional canoverride branches behave like other branches,
-    // so they are no longer an exception to the rule. Allow the new branch type to chain as many times as desired, so you could spawn a foundation, then walls, then roads, then 
-    // structures fe. Would also have to add a CollisionGroup setting for BO4's, to easily specify which branches can/can't collide.  
-
-    // TODO: Remove the 16x16 requirement, allow users to use larger Bo4's, make OTG do the slicing.
-    
-    // TODO: Don't allow canOverride optional branches in the same branch group as required branches.
     private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
     {
     	// CanOverride optional branches are spawned only after the main structure has spawned.
@@ -920,7 +928,8 @@ public class BO4CustomStructure extends CustomStructure
 		        		{
 		        			if(
 	        					childBranchDataItem2 != childBranchDataItem &&
-	    						(childBranchDataItem.branch.branchGroup != null && childBranchDataItem.branch.branchGroup.length() >= 0) &&
+	    						//(childBranchDataItem.branch.branchGroup != null && childBranchDataItem.branch.branchGroup.length() >= 0) && // TODO: Why check >= 0??
+    							(childBranchDataItem.branch.branchGroup != null) &&
 	        					childBranchDataItem.branch.branchGroup.equals(childBranchDataItem2.branch.branchGroup)
         					)
 		        			{
@@ -1016,7 +1025,8 @@ public class BO4CustomStructure extends CustomStructure
 				        		{
 				        			if(
 			        					childBranchDataItem2 != childBranchDataItem &&
-			    						(childBranchDataItem.branch.branchGroup != null && childBranchDataItem.branch.branchGroup.length() >= 0) &&
+			    						//(childBranchDataItem.branch.branchGroup != null && childBranchDataItem.branch.branchGroup.length() >= 0) && // TODO: Why check >= 0??
+	        							(childBranchDataItem.branch.branchGroup != null) &&
 			        					childBranchDataItem.branch.branchGroup.equals(childBranchDataItem2.branch.branchGroup) &&
 				        				!childBranchDataItem2.doneSpawning &&
 				        				!childBranchDataItem2.cannotSpawn
@@ -1108,7 +1118,8 @@ public class BO4CustomStructure extends CustomStructure
 								        		{
 								        			if(
 							        					childBranchDataItem3 != childBranchDataItem2 &&
-							    						(childBranchDataItem2.branch.branchGroup != null && childBranchDataItem2.branch.branchGroup.length() >= 0) &&
+							    						//(childBranchDataItem2.branch.branchGroup != null && childBranchDataItem2.branch.branchGroup.length() >= 0) && // TODO: Why check >= 0??
+					        							(childBranchDataItem2.branch.branchGroup != null) &&
 							    						childBranchDataItem2.branch.branchGroup.equals(childBranchDataItem3.branch.branchGroup) &&
 								        				!childBranchDataItem3.doneSpawning &&
 								        				!childBranchDataItem3.cannotSpawn
@@ -1332,12 +1343,6 @@ public class BO4CustomStructure extends CustomStructure
 		return bFoundOther;
 	}
 
-	/**
-     * 
-     * @param childBranchDataItem
-     * @param bo3
-     * @return True if the branch can spawn
-     */
     private boolean checkCannotBeInside(BranchDataItem childBranchDataItem, BO4 bo3)
     {
 		boolean foundSpawnBlocker = false;
@@ -1579,7 +1584,8 @@ public class BO4CustomStructure extends CustomStructure
         			if(currentBranchFound)
         			{
         				if(
-    						branchData.branch.branchGroup != null && branchData.branch.branchGroup.length() >= 0 &&
+    						//branchData.branch.branchGroup != null && branchData.branch.branchGroup.length() >= 0 && // TODO: Why check >= 0??
+    						branchData.branch.branchGroup != null &&
     						branchData.branch.branchGroup.equals(branchDataItem2.branch.branchGroup)
 						)
         				{
@@ -2031,7 +2037,7 @@ public class BO4CustomStructure extends CustomStructure
     private boolean checkYBounds(CustomStructureCoordinate branchData1Branch)
     {
         int startY = branchData1Branch.getY() + ((BO4)branchData1Branch.getObject()).getConfig().getminY();
-        return startY >= 0;
+        return startY > 0;
     }
     
     private boolean checkCollision(CustomStructureCoordinate branchData1Branch, CustomStructureCoordinate branchData2Branch)
@@ -2084,8 +2090,6 @@ public class BO4CustomStructure extends CustomStructure
 
     /**
      * Add the object to the list of BO4's to be spawned for this chunk
-     * @param coordObject
-     * @param chunkCoordinate
      */
     private void addToChunk(BO4CustomStructureCoordinate coordObject, ChunkCoordinate chunkCoordinate, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectList)
     {
@@ -2106,16 +2110,12 @@ public class BO4CustomStructure extends CustomStructure
     /**
     * Checks if this structure or any of its branches are inside the given
     * chunk and spawns all objects that are including their smoothing areas (if any)
-    *
-    * @param chunkCoordinate
     */
     public void spawnInChunk(ChunkCoordinate chunkCoordinate, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
     {
-    	//OTG.log(LogMarker.INFO, "SpawnForChunk X" + chunkCoordinate.getChunkX() + " Z" + chunkCoordinate.getChunkZ() + " " + this.start.bo3Name);
-    	   	
     	if (
 			!objectsToSpawn.containsKey(chunkCoordinate) && 
-			!smoothingAreasToSpawn.containsKey(chunkCoordinate)
+			!this.smoothingAreaManager.smoothingAreasToSpawn.containsKey(chunkCoordinate)
 		)
         {
             return;
@@ -2135,16 +2135,20 @@ public class BO4CustomStructure extends CustomStructure
             	biomeConfig = biome.getBiomeConfig();
         	}
 
-            // Spawn ReplaceAbove / ReplaceBelow before anything else.
+            // Spawn smooth areas in this chunk if any exist, before replaceabove/replacebelow or bo4 blocks.
+        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, this.start, world, chunkBeingPopulated);
+            
+            // Spawn ReplaceAbove / ReplaceBelow before bo4 blocks.
             for (BO4CustomStructureCoordinate coordObject : objectsInChunk)
             {
+            	// Ignore any bo4's that are overridden via ReplacesBO4
                 if (coordObject.isSpawned)
                 {
                     continue;
                 }
 
                 BO4 bo4 = ((BO4)coordObject.getObject());
-                BO4Config objectConfig = bo4.getConfig();                
+                BO4Config objectConfig = bo4.getConfig();
                 if (
             		!((BO4)coordObject.getObject()).trySpawnAt(
         				world, 
@@ -2164,7 +2168,8 @@ public class BO4CustomStructure extends CustomStructure
 						!config.spawnUnderWater ? -1 : (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax), 
 						false, 
 						true, 
-						chunkBeingPopulated
+						chunkBeingPopulated,
+						objectConfig.doReplaceBlocks
 					)
         		)
                 {
@@ -2173,17 +2178,15 @@ public class BO4CustomStructure extends CustomStructure
                 		OTG.log(LogMarker.WARN, "Could not spawn chunk " + coordObject.bo3Name + " for structure " + this.start.getObject().getName());
                 	}
             		objectsToSpawn.remove(chunkCoordinate);
-            		smoothingAreasToSpawn.remove(chunkCoordinate);	
+            		this.smoothingAreaManager.smoothingAreasToSpawn.remove(chunkCoordinate);	
                 	return;
                 }
             }
 
-            // Spawn smooth areas in this chunk if any exist
-        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, smoothingAreasToSpawn, this.start, world, chunkBeingPopulated);
-
         	// Spawn blocks/modData/spawners/particles/entities.
             for (BO4CustomStructureCoordinate coordObject : objectsInChunk)
             {
+            	// Ignore any bo4's that are overridden via ReplacesBO4
                 if (coordObject.isSpawned)
                 {
                     continue;
@@ -2211,7 +2214,8 @@ public class BO4CustomStructure extends CustomStructure
 						!config.spawnUnderWater ? -1 : (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax), 
 						false, 
 						false, 
-						chunkBeingPopulated
+						chunkBeingPopulated,
+						objectConfig.doReplaceBlocks
 					)
         		)
                 {
@@ -2220,7 +2224,7 @@ public class BO4CustomStructure extends CustomStructure
                 		OTG.log(LogMarker.WARN, "Could not spawn chunk " + coordObject.bo3Name + " for structure " + this.start.getObject().getName());
                 	}
             		objectsToSpawn.remove(chunkCoordinate);
-            		smoothingAreasToSpawn.remove(chunkCoordinate);
+            		this.smoothingAreaManager.smoothingAreasToSpawn.remove(chunkCoordinate);
                 	return;
                 } else {
                 	this.modDataManager.spawnModData(objectConfig.getModData(), coordObject, chunkCoordinate);
@@ -2232,10 +2236,10 @@ public class BO4CustomStructure extends CustomStructure
             }
         } else {
             // Spawn smooth areas in this chunk if any exist
-        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, smoothingAreasToSpawn, this.start, world, chunkBeingPopulated);
+        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, this.start, world, chunkBeingPopulated);
         }
 
 		objectsToSpawn.remove(chunkCoordinate);
-		smoothingAreasToSpawn.remove(chunkCoordinate);
+		this.smoothingAreaManager.smoothingAreasToSpawn.remove(chunkCoordinate);
     }
 }

@@ -22,7 +22,7 @@ public class BO3BlockFunction extends BlockFunction<BO3Config>
     public BO3BlockFunction rotate()
     {
         BO3BlockFunction rotatedBlock = new BO3BlockFunction();
-        rotatedBlock.x = z;// - 1;
+        rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.material = material.rotate();

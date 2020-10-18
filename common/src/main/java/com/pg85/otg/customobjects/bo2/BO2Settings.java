@@ -19,7 +19,8 @@ class BO2Settings extends Settings
             DIG = booleanSetting("dig", false),
             TREE = booleanSetting("tree", false),
             BRANCH = booleanSetting("branch", false),
-            NEEDS_FOUNDATION = booleanSetting("needsFoundation", true);
+            NEEDS_FOUNDATION = booleanSetting("needsFoundation", true),
+    		DO_REPLACE_BLOCKS = booleanSetting("doReplaceBlocks", true);
 
     static final Setting<Double> COLLISION_PERCENTAGE = doubleSetting("collisionPercentage", 2, 0, 100);
 

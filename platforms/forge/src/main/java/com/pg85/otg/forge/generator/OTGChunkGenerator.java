@@ -1,7 +1,6 @@
 package com.pg85.otg.forge.generator;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -286,7 +285,7 @@ public class OTGChunkGenerator implements IChunkGenerator
     {
         byte[] chunkBiomeArray = chunk.getBiomeArray();
         ConfigProvider configProvider = this.world.getConfigs();
-        int[] biomeShortArray = this.world.getBiomeGenerator().getBiomes(null, chunk.x * CHUNK_X_SIZE, chunk.z * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+        int[] biomeShortArray = this.world.getBiomeGenerator().getBiomes(null, chunk.x * CHUNK_SIZE, chunk.z * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, OutputType.DEFAULT_FOR_WORLD);
         int generationId;
         LocalBiome biome;
         

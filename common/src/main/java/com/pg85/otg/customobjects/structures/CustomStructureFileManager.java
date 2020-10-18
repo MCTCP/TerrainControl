@@ -34,8 +34,7 @@ import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructure;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
-import com.pg85.otg.customobjects.structures.bo4.SmoothingAreaLine;
-import com.pg85.otg.customobjects.structures.bo4.SmoothingAreaLineDiagonal;
+import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaLine;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
@@ -356,8 +355,8 @@ public class CustomStructureFileManager
     		for(Entry<ChunkCoordinate, CustomStructure> entry : structures.entrySet())
     		{
     			ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-					MathHelper.floor(entry.getKey().getChunkX() / CustomStructureCache.REGION_SIZE), 
-					MathHelper.floor(entry.getKey().getChunkZ() / CustomStructureCache.REGION_SIZE)
+					MathHelper.floor((double)entry.getKey().getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+					MathHelper.floor((double)entry.getKey().getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 				);
     		
         		HashMap<String, HashMap<CustomStructure, ArrayList<ChunkCoordinate>>> entriesByStructureName = structuresPerRegion.get(regionCoord);
@@ -483,13 +482,13 @@ public class CustomStructureFileManager
 			
 							if(
 								structure instanceof BO4CustomStructure && 
-								((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size() > 0 
+								((BO4CustomStructure)structure).smoothingAreaManager.smoothingAreasToSpawn.entrySet().size() > 0 
 							)
 							{								
 								ArrayList<SmoothingAreaLine> coords2;
 								dos.writeBoolean(true);
-								dos.writeInt(((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet().size());
-								for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreasToSpawn.entrySet())
+								dos.writeInt(((BO4CustomStructure)structure).smoothingAreaManager.smoothingAreasToSpawn.entrySet().size());
+								for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreaToSpawn : ((BO4CustomStructure)structure).smoothingAreaManager.smoothingAreasToSpawn.entrySet())
 								{
 									ChunkCoordinate key = smoothingAreaToSpawn.getKey();
 									dos.writeInt(key.getChunkX());
@@ -514,20 +513,7 @@ public class CustomStructureFileManager
 			
 										dos.writeInt(coord.finalDestinationPointX);
 										dos.writeInt(coord.finalDestinationPointY);
-										dos.writeInt(coord.finalDestinationPointZ);
-										
-										if(coord instanceof SmoothingAreaLineDiagonal)
-										{
-											dos.writeBoolean(true);
-											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointX);
-											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineoriginPointY);
-											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineOriginPointZ);
-											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointX);
-											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointY);
-											dos.writeInt(((SmoothingAreaLineDiagonal)coord).diagonalLineFinalDestinationPointZ);								
-										} else {
-											dos.writeBoolean(false);
-										}
+										dos.writeInt(coord.finalDestinationPointZ);										
 									}
 								}
 							} else {
@@ -934,18 +920,7 @@ public class CustomStructureFileManager
 							int finalDestinationPointY = buffer.getInt();
 							int finalDestinationPointZ = buffer.getInt();
 							
-							if(buffer.get() != 0)
-							{
-								int diagonalLineOriginPointX = buffer.getInt();
-								int diagonalLineOriginPointY = buffer.getInt();
-								int diagonalLineOriginPointZ = buffer.getInt();
-								int diagonalLineFinalDestinationPointX = buffer.getInt();
-								int diagonalLineFinalDestinationPointY = buffer.getInt();
-								int diagonalLineFinalDestinationPointZ = buffer.getInt();
-								smoothingAreaLine = new SmoothingAreaLineDiagonal(beginPointX, (short)beginPointY, beginPointZ, endPointX, (short)endPointY, endPointZ, originPointX, (short)originPointY, originPointZ, finalDestinationPointX, (short)finalDestinationPointY, finalDestinationPointZ, diagonalLineOriginPointX, (short)diagonalLineOriginPointY, diagonalLineOriginPointZ, diagonalLineFinalDestinationPointX, (short)diagonalLineFinalDestinationPointY, diagonalLineFinalDestinationPointZ);
-							} else {
-								smoothingAreaLine = new SmoothingAreaLine(beginPointX, (short)beginPointY, beginPointZ, endPointX, (short)endPointY, endPointZ, originPointX, (short)originPointY, originPointZ, finalDestinationPointX, (short)finalDestinationPointY, finalDestinationPointZ);
-							}
+							smoothingAreaLine = new SmoothingAreaLine(beginPointX, (short)beginPointY, beginPointZ, endPointX, (short)endPointY, endPointZ, originPointX, (short)originPointY, originPointZ, finalDestinationPointX, (short)finalDestinationPointY, finalDestinationPointZ);
 							smoothingAreaLines.add(smoothingAreaLine);
 						}
 						smoothingAreasToSpawn.put(chunkCoord, smoothingAreaLines);

@@ -17,6 +17,10 @@ public class TreeGen extends Resource
 {
     private final List<Integer> treeChances;
     private final List<String> treeNames;
+    private CustomObject[] treeObjects;
+    private int[] treeObjectMinChances;
+    private int[] treeObjectMaxChances;
+    private boolean treesLoaded = false;
 
     public TreeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
@@ -104,10 +108,74 @@ public class TreeGen extends Resource
         // Left blank, as spawnInChunk already handles this
     }
     
+	// TODO: Could this cause problems for developer mode / flushcache, trees not updating during a session?
+    private void loadTrees(String worldName)
+    {
+    	if(!treesLoaded)
+    	{
+    		treesLoaded = true;
+    		
+		    treeObjects = new CustomObject[treeNames.size()];
+		    treeObjectMinChances = new int[treeNames.size()];
+		    treeObjectMaxChances = new int[treeNames.size()];
+	    	
+	    	for (int treeNumber = 0; treeNumber < treeNames.size(); treeNumber++)
+	    	{
+	        	String treeName = treeNames.get(treeNumber);
+	        	CustomObject tree = null;
+				int minHeight = -1;
+				int maxHeight = -1;
+	
+			    treeObjectMinChances[treeNumber] = minHeight;
+			    treeObjectMaxChances[treeNumber] = maxHeight;
+				
+	        	if(treeName.contains("("))
+	        	{
+	        		String[] params = treeName.replace(")", "").split("\\(");
+	        		treeName = params[0];
+	        		tree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeName, worldName);
+	        		treeObjects[treeNumber] = tree;    		    
+	                if(tree == null)
+	                {
+	            		if(OTG.getPluginConfig().spawnLog)
+	            		{
+	            			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + treeNames.get(treeNumber));
+	            		}
+	            		continue;
+	                }                    
+	        		
+	    			params = params[1].split(";");
+	    			String sMinHeight = params[0].toLowerCase().replace("minheight=", "");
+	    			String sMaxHeight = params[1].toLowerCase().replace("maxheight=", "");   			
+	    			try
+	    			{
+	        			minHeight = Integer.parseInt(sMinHeight);
+	        			maxHeight = Integer.parseInt(sMaxHeight);
+	        		    treeObjectMinChances[treeNumber] = minHeight;
+	        		    treeObjectMaxChances[treeNumber] = maxHeight;        			
+	    			} catch(NumberFormatException ex) {  }
+	        	} else {
+	        		tree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeName, worldName);                
+	    		    treeObjects[treeNumber] = tree;
+	        		if(tree == null)
+	                {
+	            		if(OTG.getPluginConfig().spawnLog)
+	            		{
+	            			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + treeNames.get(treeNumber));
+	            		}
+	            		continue;
+	                }
+	        	}
+	    	}
+    	}
+    }
+    
     @Override
     protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {    	   	
     	// TODO: Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
+    	
+    	loadTrees(world.getName());
     	
         for (int i = 0; i < frequency; i++)
         {        	
@@ -115,61 +183,16 @@ public class TreeGen extends Resource
             {           	            
                 if (random.nextInt(100) < treeChances.get(treeNumber))
                 {                	
-                    int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-                    int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);               	
+                    int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+                    int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);               	
                     
-                    //CustomObject tree = getTrees(world.getName()).get(treeNumber);
-                    
-    	        	String treeName = treeNames.get(treeNumber);
-    	        	CustomObject tree = null;
-        			int minHeight = 0;
-        			int maxHeight = 0;
-    	        	if(treeName.contains("("))
-    	        	{
-    	        		String[] params = treeName.replace(")", "").split("\\(");
-    	        		treeName = params[0];
-    	        		tree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeName, world.getName());
-                        if(tree == null)
-                        {
-                    		if(OTG.getPluginConfig().spawnLog)
-                    		{
-                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + treeNames.get(treeNumber));
-                    		}
-                    		continue;
-                        }                    
-    	        		
-            			params = params[1].split(";");
-            			String sMinHeight = params[0].toLowerCase().replace("minheight=", "");
-            			String sMaxHeight = params[1].toLowerCase().replace("maxheight=", "");
-
-            			try
-            			{
-    	        			minHeight = Integer.parseInt(sMinHeight);
-    	        			maxHeight = Integer.parseInt(sMaxHeight);
-            			} catch(NumberFormatException ex) {  }	        				        			
-
-                		if(tree.spawnAsTree(world, random, x, z, minHeight, maxHeight, chunkCoord))
-                		{
-        	                // Success!
-        	                break;
-                		}
-
-    	        	} else {
-    	        		tree = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(treeName, world.getName());
-                        if(tree == null)
-                        {
-                    		if(OTG.getPluginConfig().spawnLog)
-                    		{
-                    			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for Tree, BO3: " + treeNames.get(treeNumber));
-                    		}
-                    		continue;
-                        }                        	        		
-                		if(tree.spawnAsTree(world, random, x, z, -1, -1, chunkCoord))
-                		{
-        	                // Success!
-        	                break;
-                		}
-    	        	}
+                    CustomObject tree = treeObjects[treeNumber];
+                    // Min/Max == -1 means use bo2/bo3 internal min/max height, otherwise use the optional min/max height defined with Tree()
+            		if(tree != null && tree.spawnAsTree(world, random, x, z, treeObjectMinChances[treeNumber], treeObjectMaxChances[treeNumber], chunkCoord))
+            		{
+    	                // Success!
+    	                break;
+            		}
                 }
             }
         }    		

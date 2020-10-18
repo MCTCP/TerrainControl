@@ -201,8 +201,8 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
             {
                 continue;
             }
-            int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+            int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
             spawn(world, random, false, x, z, chunkCoord);
         }
         

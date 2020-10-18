@@ -13,11 +13,10 @@ package com.pg85.otg.util;
  */
 public class ChunkCoordinate
 {
-    public static final int CHUNK_X_SIZE = 16;
+    public static final int CHUNK_SIZE = 16;
     public static final int CHUNK_Y_SIZE = 256;
-    public static final int CHUNK_Z_SIZE = 16;
-    private static final int CHUNK_POPULATION_OFFSET_X = CHUNK_X_SIZE / 2 - 1;
-    private static final int CHUNK_POPULATION_OFFSET_Z = CHUNK_Z_SIZE / 2 - 1;
+    private static final int CHUNK_POPULATION_OFFSET_X = CHUNK_SIZE / 2 - 1;
+    private static final int CHUNK_POPULATION_OFFSET_Z = CHUNK_SIZE / 2 - 1;
 
     private final int chunkX;
     private final int chunkZ;
@@ -146,7 +145,7 @@ public class ChunkCoordinate
      * @return The x position.
      */
     public int getBlockXCenter() {
-        return chunkX * CHUNK_X_SIZE + CHUNK_POPULATION_OFFSET_X;
+        return chunkX * CHUNK_SIZE + CHUNK_POPULATION_OFFSET_X;
     }
     
     /**
@@ -154,7 +153,7 @@ public class ChunkCoordinate
      * @return The z position.
      */
     public int getBlockZCenter() {
-        return chunkZ * CHUNK_Z_SIZE + CHUNK_POPULATION_OFFSET_Z;
+        return chunkZ * CHUNK_SIZE + CHUNK_POPULATION_OFFSET_Z;
     }
 
     /**
@@ -164,7 +163,7 @@ public class ChunkCoordinate
      */
     public int getBlockX()
     {
-        return chunkX * CHUNK_X_SIZE;
+        return chunkX * CHUNK_SIZE;
     }
 
     /**
@@ -174,7 +173,7 @@ public class ChunkCoordinate
      */
     public int getBlockZ()
     {
-        return chunkZ * CHUNK_Z_SIZE;
+        return chunkZ * CHUNK_SIZE;
     }
 
     /**

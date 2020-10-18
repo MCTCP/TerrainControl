@@ -141,7 +141,7 @@ public class ObjectSpawner
         // Get the corner block coords
         int x = chunkCoord.getChunkX() * 16;
         int z = chunkCoord.getChunkZ() * 16;
-        
+     
         LocalBiome biome = this.world.getBiomeForPopulation(x + 8, z + 8, chunkCoord);
         
         // Null check

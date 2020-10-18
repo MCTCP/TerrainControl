@@ -54,9 +54,9 @@ class Vein
         {
             if (random.nextInt(100) < gen.oreRarity)
             {
-                int oreX = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+                int oreX = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
                 int oreY = RandomHelper.numberInRange(random, gen.minAltitude, gen.maxAltitude);
-                int oreZ = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+                int oreZ = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
                 if ((oreX - x) * (oreX - x) + (oreY - y) * (oreY - y) + (oreZ - z) * (oreZ - z) < sizeSquared)
                 {

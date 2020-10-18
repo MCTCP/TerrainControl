@@ -80,8 +80,8 @@ public class OTGMineshaftGen extends OTGMapGenStructure
     protected StructureStart getStructureStart(int chunkX, int chunkZ)
     {
         LocalWorld world = ((ForgeEngine)OTG.getEngine()).getWorld(this.world);
-        LocalBiome biome = world.getBiome(chunkX * ChunkCoordinate.CHUNK_X_SIZE + 8,
-                chunkZ * ChunkCoordinate.CHUNK_Z_SIZE + 8);
+        LocalBiome biome = world.getBiome(chunkX * ChunkCoordinate.CHUNK_SIZE + 8,
+                chunkZ * ChunkCoordinate.CHUNK_SIZE + 8);
         BiomeConfig biomeConfig = biome.getBiomeConfig();
         MapGenMineshaft.Type mineshaftType = MapGenMineshaft.Type.NORMAL;
         if (biomeConfig.mineshaftType == MineshaftType.mesa)

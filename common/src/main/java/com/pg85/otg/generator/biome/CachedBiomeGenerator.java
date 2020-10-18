@@ -19,12 +19,12 @@ class CachedBiomeGenerator extends BiomeGenerator
         /**
          * The array of biome types stored in this BiomeCache.Block.
          */
-        private int[] biomes = new int[ChunkCoordinate.CHUNK_X_SIZE * ChunkCoordinate.CHUNK_Z_SIZE];
+        private int[] biomes = new int[ChunkCoordinate.CHUNK_SIZE * ChunkCoordinate.CHUNK_SIZE];
 
         Chunk(BiomeGenerator generator, ChunkCoordinate chunkCoord)
         {
-            biomes = generator.getBiomes(biomes, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), ChunkCoordinate.CHUNK_X_SIZE,
-                    ChunkCoordinate.CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+            biomes = generator.getBiomes(biomes, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), ChunkCoordinate.CHUNK_SIZE,
+                    ChunkCoordinate.CHUNK_SIZE, OutputType.DEFAULT_FOR_WORLD);
         }
 
         /**
@@ -105,7 +105,7 @@ class CachedBiomeGenerator extends BiomeGenerator
     @Override
     public int[] getBiomes(int[] biomeArray, int x, int z, int xSize, int zSize, OutputType type)
     {
-        if (xSize == ChunkCoordinate.CHUNK_X_SIZE && zSize == ChunkCoordinate.CHUNK_Z_SIZE && (x & 0xF) == 0 && (z & 0xF) == 0)
+        if (xSize == ChunkCoordinate.CHUNK_SIZE && zSize == ChunkCoordinate.CHUNK_SIZE && (x & 0xF) == 0 && (z & 0xF) == 0)
         {
             if (biomeArray == null || biomeArray.length < xSize * zSize)
             {

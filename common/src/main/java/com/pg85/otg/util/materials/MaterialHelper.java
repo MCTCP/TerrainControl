@@ -40,7 +40,7 @@ public class MaterialHelper
      */
     public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
     {
-    	if(name == null)
+    	if(name == null || name.isEmpty())
     	{
     		return null;
     	}

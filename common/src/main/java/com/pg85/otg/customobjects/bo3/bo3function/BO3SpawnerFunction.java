@@ -11,7 +11,7 @@ public class BO3SpawnerFunction extends SpawnerFunction<BO3Config>
     public BO3SpawnerFunction rotate()
     {
     	BO3SpawnerFunction rotatedBlock = new BO3SpawnerFunction();
-        rotatedBlock.x = z;// - 1;
+        rotatedBlock.x = z;
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.mobName = mobName;

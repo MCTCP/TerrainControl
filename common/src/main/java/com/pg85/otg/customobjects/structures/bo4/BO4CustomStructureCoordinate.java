@@ -13,7 +13,7 @@ import com.pg85.otg.customobjects.structures.StructuredCustomObject;
  */
 public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 {
-	boolean isSpawned;
+	public boolean isSpawned;
 	int branchDepth;
 	boolean isRequiredBranch;
 	boolean isWeightedBranch;
@@ -209,7 +209,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
     }
     
     // TODO: Why is this necessary for smoothing areas?
-    static BO4CustomStructureCoordinate getRotatedSmoothingCoords(int x, short y, int z, Rotation newRotation)
+    public static BO4CustomStructureCoordinate getRotatedSmoothingCoords(int x, short y, int z, Rotation newRotation)
     {
         // Assuming initial rotation is always north
 

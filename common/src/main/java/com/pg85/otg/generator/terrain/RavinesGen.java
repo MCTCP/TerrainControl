@@ -259,9 +259,9 @@ public class RavinesGen extends TerrainGenBase
         {
             return;
         }
-        double d1 = currentChunk.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+        double d1 = currentChunk.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
         double d2 = RandomHelper.numberInRange(random, this.worldSettings.ravineMinAltitude, this.worldSettings.ravineMaxAltitude);
-        double d3 = currentChunk.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+        double d3 = currentChunk.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
         int i = 1;
 

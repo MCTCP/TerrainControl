@@ -360,7 +360,7 @@ public class CavesGen extends TerrainGenBase
     	float f3;
         for (int j = 0; j < i; j++)
         {
-            x = chunkCoord.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
+            x = chunkCoord.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
             if (this.worldSettings.evenCaveDistribution)
             {
@@ -369,7 +369,7 @@ public class CavesGen extends TerrainGenBase
                 y = this.random.nextInt(this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude + 1) + 1) + this.worldSettings.caveMinAltitude;
             }
 
-            z = chunkCoord.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            z = chunkCoord.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
             count = this.worldSettings.caveSystemFrequency;
             largeCaveSpawned = false;

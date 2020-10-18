@@ -701,7 +701,10 @@ public class BiomeConfig extends ConfigFile
             "Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])",
             "Example :",
             "  ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)",
-            "Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ");
+            "Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height ",
+        	"Only the following biome resources are affected: CustomObject, CustomStructure, Ore, UnderWaterOre, ",
+        	"Vein, SurfacePatch, Boulder, IceSpike.",
+        	"BO's used as CustomObject/CustomStructure may have DoReplaceBlocks:false to save performance.");
 
         writer.smallTitle("Water / Lava & Frozen States");
 
