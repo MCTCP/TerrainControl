@@ -347,7 +347,7 @@ public class CustomStructurePlotter
 	            	BO4CustomStructureCoordinate structureCoord = null;
 	            	BO4CustomStructure structureStart2 = null;
 
-	            	ArrayList<Object[]> BO3sBySize = new ArrayList<Object[]>();
+	            	ArrayList<Object[]> bo4sBySize = new ArrayList<Object[]>();
 	            	ArrayList<String> structuresToSpawn1 = new ArrayList<String>();
 
 	            	// Get list of BO3's that should spawn at the spawn point
@@ -364,7 +364,7 @@ public class CustomStructurePlotter
 			                	try {
 			                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
 				                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
-			                		BO3sBySize.add(new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
+			                		bo4sBySize.add(new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
 								}
 			                	catch (InvalidConfigException e)
 			                	{
@@ -373,14 +373,20 @@ public class CustomStructurePlotter
 		            		}
 		            	}
 	            	}
-	            	if(!spawningStructureAtSpawn || BO3sBySize.size() == 0)
+
+	            	if(!spawningStructureAtSpawn || bo4sBySize.size() == 0)
 	            	{
-		            	// Get list of BO3's able to spawn in this chunk
+		            	if(spawningStructureAtSpawn && bo4sBySize.size() == 0)
+		            	{
+		            		spawningStructureAtSpawn = false;
+		            	}
+		            	
+		            	// Get list of BO4's able to spawn in this chunk
 		            	for(Map.Entry<StructuredCustomObject, Double> bo4AndRarity : structuredCustomObjects.entrySet())
 		            	{
 		            		if(!((BO4)bo4AndRarity.getKey()).isInvalidConfig && (int)Math.round(bo4AndRarity.getValue()) > 0)
 		            		{
-		            			// TODO: avoid calling IsBO3AllowedToSpawnAt so much, cache and reuse any nearest group members found
+		            			// TODO: avoid calling IsBO4AllowedToSpawnAt so much, cache and reuse any nearest group members found
 
 		            			if(isBO4AllowedToSpawnAtByFrequency(chunkCoord, ((BO4)bo4AndRarity.getKey())))
 		            			{
@@ -391,9 +397,9 @@ public class CustomStructurePlotter
 				                	try {
 				                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
 					                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
-					            		int insertAtIndex = BO3sBySize.size();
+					            		int insertAtIndex = bo4sBySize.size();
 					            		int i = 0;
-					                	for(Object[] entry : BO3sBySize)
+					                	for(Object[] entry : bo4sBySize)
 					                	{
 					                		if(((BO4)bo4AndRarity.getKey()).getConfig().timesSpawned < ((BO4)entry[0]).getConfig().timesSpawned || (BO3size > (Double)entry[2] && ((BO4)bo4AndRarity.getKey()).getConfig().timesSpawned == ((BO4)entry[0]).getConfig().timesSpawned))
 					                		{
@@ -402,7 +408,7 @@ public class CustomStructurePlotter
 					                		}
 					                		i += 1;
 					                	}
-				                		BO3sBySize.add(insertAtIndex, new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
+				                		bo4sBySize.add(insertAtIndex, new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
 									}
 				                	catch (InvalidConfigException e)
 				                	{
@@ -413,12 +419,12 @@ public class CustomStructurePlotter
 		            	}
 	            	}
 
-	            	if(BO3sBySize.size() > 0)
+	            	if(bo4sBySize.size() > 0)
 	            	{
 		            	// Go over the list and try to spawn each structure, from largest to smallest.
 	            		// We have to spawn large structures first, since small structures would 
 	            		// clutter the landscape and make it impossible to find a large open space.
-		        		for(Object[] currentStructureSpawning : BO3sBySize)
+		        		for(Object[] currentStructureSpawning : bo4sBySize)
 		        		{
 			            	int pass = 0;
 
