@@ -30,7 +30,8 @@ import java.util.Random;
  */
 public class CustomStructureCache
 {
-	public static final int REGION_SIZE = 250;
+	//public static final int REGION_SIZE = 250;
+	public static final int REGION_SIZE = 5;
 	
 	// BO3	
 	private FifoMap<ChunkCoordinate, BO3CustomStructure> bo3StructureCache;
@@ -66,8 +67,8 @@ public class CustomStructureCache
 	private boolean worldInfoChunksContainsKey(ChunkCoordinate chunkCoordinate)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		CustomStructure[][] chunkRegion = worldInfoChunks.get(regionCoord);
@@ -79,8 +80,8 @@ public class CustomStructureCache
 	private CustomStructure getFromWorldInfoChunks(ChunkCoordinate chunkCoordinate)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		CustomStructure[][] chunkRegion = this.worldInfoChunks.get(regionCoord);
@@ -96,8 +97,8 @@ public class CustomStructureCache
 	private void addToWorldInfoChunks(ChunkCoordinate chunkCoordinate, CustomStructure structure)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		CustomStructure[][] chunkRegion = this.worldInfoChunks.get(regionCoord);
@@ -311,9 +312,6 @@ public class CustomStructureCache
 	    				}
 	    			}
 	    		}
-	    	} else {
-	    		// TODO: Remove after testing.
-	    		throw new RuntimeException("This shouldn't happen, please contact Team OTG about this crash.");
 	    	}
 	    }
 
