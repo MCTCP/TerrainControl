@@ -117,6 +117,12 @@ public class SmoothingAreaColumn
 				{
 					highestBlockInWorld = world.getHighestBlockYAt(this.x, this.z, true, false, true, true, true, null);
 				}
+				
+				for(int y = highestBlockInWorld; y > this.lowestCuttingBlock.y; y--)
+				{
+					world.setBlock(this.lowestCuttingBlock.x, y, this.lowestCuttingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);	
+				}
+				
 				// Set the new top block to surface block
 				if(highestBlockInWorld > this.lowestCuttingBlock.y)
 				{
@@ -153,10 +159,6 @@ public class SmoothingAreaColumn
 						world.setBlock(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
 					}
 				}
-				for(int y = highestBlockInWorld; y > this.lowestCuttingBlock.y; y--)
-				{
-					world.setBlock(this.lowestCuttingBlock.x, y, this.lowestCuttingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);	
-				}
 			}
 		}
 		if(this.highestFillingBlock != null)
@@ -164,6 +166,16 @@ public class SmoothingAreaColumn
 			if(highestBlockInWorld == -1)
 			{
 				highestBlockInWorld = world.getHighestBlockYAt(this.x, this.z, true, false, true, true, true, null);
+			}
+			
+			// ReplaceAbove 
+			// Should be AIR, WATER or none
+			if(replaceAboveMaterial != null)
+			{
+				for(int y = highestBlockInWorld; y > this.highestFillingBlock.y; y--)
+				{
+					world.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);	
+				}
 			}
 			
 			// Place the surface block
@@ -200,17 +212,7 @@ public class SmoothingAreaColumn
 			{
             	world.setBlock(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
 			}
-			
-			// ReplaceAbove 
-			// Should be AIR, WATER or none
-			if(replaceAboveMaterial != null)
-			{
-				for(int y = highestBlockInWorld; y > this.highestFillingBlock.y; y--)
-				{
-					world.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);	
-				}
-			}
-			
+						
 			// ReplaceBelow
 			if(smoothingGroundBlock != null && !bo4Config.replaceWithBiomeBlocks)
 			{
