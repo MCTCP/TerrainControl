@@ -30,8 +30,7 @@ import java.util.Random;
  */
 public class CustomStructureCache
 {
-	//public static final int REGION_SIZE = 250;
-	public static final int REGION_SIZE = 5;
+	public static final int REGION_SIZE = 250;
 	
 	// BO3	
 	private FifoMap<ChunkCoordinate, BO3CustomStructure> bo3StructureCache;
