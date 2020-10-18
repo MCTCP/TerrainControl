@@ -3,8 +3,7 @@ package com.pg85.otg.generator;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.util.ChunkCoordinate;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
 
 import java.util.Random;
 
@@ -33,25 +32,25 @@ public final class GeneratingChunk
     /**
      * Gets the surface noise value at the given position.
      * 
-     * @param x X position, 0 <= x < {@value ChunkCoordinate#CHUNK_X_SIZE}.
-     * @param z Z position, 0 <= z < {@value ChunkCoordinate#CHUNK_X_SIZE}.
+     * @param x X position, 0 <= x < {@value ChunkCoordinate#CHUNK_SIZE}.
+     * @param z Z position, 0 <= z < {@value ChunkCoordinate#CHUNK_SIZE}.
      * @return The surface noise value.
      */
     public double getNoise(int x, int z)
     {
-        return this.surfaceNoise[x + z * CHUNK_X_SIZE];
+        return this.surfaceNoise[x + z * CHUNK_SIZE];
     }
 
     /**
      * Gets the water level at the given position.
      * 
-     * @param x X position, 0 <= x < {@value ChunkCoordinate#CHUNK_X_SIZE}.
-     * @param z Z position, 0 <= z < {@value ChunkCoordinate#CHUNK_X_SIZE}.
+     * @param x X position, 0 <= x < {@value ChunkCoordinate#CHUNK_SIZE}.
+     * @param z Z position, 0 <= z < {@value ChunkCoordinate#CHUNK_SIZE}.
      * @return The water level.
      */
     public int getWaterLevel(int x, int z)
     {
-        return this.waterLevel[z + x * CHUNK_Z_SIZE] & 0xff;
+        return this.waterLevel[z + x * CHUNK_SIZE] & 0xff;
     }
 
     /**

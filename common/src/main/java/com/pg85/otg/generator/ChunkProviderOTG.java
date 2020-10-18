@@ -18,16 +18,15 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
 
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_X_SIZE;
-import static com.pg85.otg.util.ChunkCoordinate.CHUNK_Z_SIZE;
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
 
 import java.util.Random;
 
 public class ChunkProviderOTG
 {
     // Several constants describing the chunk size of Minecraft
-    private static final int NOISE_MAX_X = CHUNK_X_SIZE / 4 + 1;
-    private static final int NOISE_MAX_Z = CHUNK_Z_SIZE / 4 + 1;
+    private static final int NOISE_MAX_X = CHUNK_SIZE / 4 + 1;
+    private static final int NOISE_MAX_Z = CHUNK_SIZE / 4 + 1;
 
     private final Random random;
     private final NoiseGeneratorPerlinOctaves vol1NoiseGen;
@@ -37,7 +36,7 @@ public class ChunkProviderOTG
     private final NoiseGeneratorPerlinOctaves oldTerrainGeneratorNoiseGen;
     private final NoiseGeneratorPerlinOctaves noiseHeightNoiseGen;
 
-    private double[] biomeBlocksNoise = new double[CHUNK_X_SIZE * CHUNK_Z_SIZE];
+    private double[] biomeBlocksNoise = new double[CHUNK_SIZE * CHUNK_SIZE];
 
     private double[] volNoise;
     private double[] vol1Noise;
@@ -146,7 +145,7 @@ public class ChunkProviderOTG
     private boolean generateTerrainA(int x, int z, ChunkBuffer chunkBuffer)
     {
         int[] biomeArray = null;
-        byte[] waterLevel = new byte[CHUNK_X_SIZE * CHUNK_Z_SIZE];;
+        byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];;
     	
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
         int chunkX = chunkCoord.getChunkX();
@@ -167,7 +166,7 @@ public class ChunkProviderOTG
         {
             biomeArray = biomeGenerator.getBiomesUnZoomed(biomeArray, chunkX * 4 - maxSmoothRadius, chunkZ * 4 - maxSmoothRadius, NOISE_MAX_X + maxSmoothDiameter, NOISE_MAX_Z + maxSmoothDiameter, OutputType.DEFAULT_FOR_WORLD);
         } else {
-            biomeArray = biomeGenerator.getBiomes(biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+            biomeArray = biomeGenerator.getBiomes(biomeArray, chunkX * CHUNK_SIZE, chunkZ * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, OutputType.DEFAULT_FOR_WORLD);
         }
 
         double[] rawTerrain = generateTerrainNoise(chunkX * 4, chunkZ * 4, maxYSections, usedYSections, biomeArray, riverArray);
@@ -175,7 +174,7 @@ public class ChunkProviderOTG
         // Now that the raw terrain is generated, replace raw biome array (5 x 5) with a higher resolution (16 x 16) one.
         if (biomeGenerator.canGenerateUnZoomed())
         {
-            biomeArray = biomeGenerator.getBiomes(biomeArray, chunkX * CHUNK_X_SIZE, chunkZ * CHUNK_Z_SIZE, CHUNK_X_SIZE, CHUNK_Z_SIZE, OutputType.DEFAULT_FOR_WORLD);
+            biomeArray = biomeGenerator.getBiomes(biomeArray, chunkX * CHUNK_SIZE, chunkZ * CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE, OutputType.DEFAULT_FOR_WORLD);
         }
 		
         // The terrain generator takes low resolution noise and upscales it to a full chunk through trilinear interpolation.
@@ -365,18 +364,18 @@ public class ChunkProviderOTG
         int dryBlocksOnSurface = 256;
 
         final double d1 = 0.03125D;
-        this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_X_SIZE, CHUNK_Z_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
+        this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
 
         GeneratingChunk generatingChunk = new GeneratingChunk(this.random, waterLevel, this.biomeBlocksNoise, this.heightCap);
 
-        for (int x = 0; x < CHUNK_X_SIZE; x++)
+        for (int x = 0; x < CHUNK_SIZE; x++)
         {
-            for (int z = 0; z < CHUNK_Z_SIZE; z++)
+            for (int z = 0; z < CHUNK_SIZE; z++)
             {
                 // The following code is executed for each column in the chunk
 
                 // Get the current biome config and some properties
-                final BiomeConfig biomeConfig = toBiomeConfig(biomeArray[(x + z * CHUNK_X_SIZE)]);
+                final BiomeConfig biomeConfig = toBiomeConfig(biomeArray[(x + z * CHUNK_SIZE)]);
 
                 biomeConfig.surfaceAndGroundControl.spawn(localWorld, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 

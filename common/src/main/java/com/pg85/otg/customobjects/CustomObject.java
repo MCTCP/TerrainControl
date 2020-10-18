@@ -86,4 +86,7 @@ public interface CustomObject extends SpawnableObject
     boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);  
 
 	public boolean loadChecks();
+
+	// Disables biomeconfig replaceBlocks to save performance.
+	boolean doReplaceBlocks();
 }

@@ -133,7 +133,7 @@ public class BO3CustomStructure extends CustomStructure
             for (CustomStructureCoordinate coordObject : objectsInChunk)
             {
                 BO3 bo3 = ((BO3)((BO3CustomStructureCoordinate)coordObject).getObject());
-                bo3.trySpawnAt(this, world, random, coordObject.rotation, coordObject.x, height.getCorrectY(world, coordObject.x, coordObject.y, coordObject.z, chunkCoordinate), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, coordObject.y, chunkCoordinate, true);
+                bo3.trySpawnAt(this, world, random, coordObject.rotation, coordObject.x, height.getCorrectY(world, coordObject.x, coordObject.y, coordObject.z, chunkCoordinate), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, coordObject.y, chunkCoordinate, bo3.doReplaceBlocks());
             }
         }
     }

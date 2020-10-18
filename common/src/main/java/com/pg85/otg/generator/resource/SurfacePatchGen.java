@@ -143,9 +143,9 @@ public class SurfacePatchGen extends Resource
     {
         int chunkX = chunkCoord.getBlockXCenter();
         int chunkZ = chunkCoord.getBlockZCenter();
-        for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_Z_SIZE; z0++)
+        for (int z0 = 0; z0 < ChunkCoordinate.CHUNK_SIZE; z0++)
         {
-            for (int x0 = 0; x0 < ChunkCoordinate.CHUNK_X_SIZE; x0++)
+            for (int x0 = 0; x0 < ChunkCoordinate.CHUNK_SIZE; x0++)
             {
                 int x = chunkX + x0;
                 int z = chunkZ + z0;

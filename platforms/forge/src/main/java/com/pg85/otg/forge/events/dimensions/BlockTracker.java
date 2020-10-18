@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.dimensions.DimensionConfig;
+import com.pg85.otg.configuration.dimensions.DimensionsConfig;
 import com.pg85.otg.forge.world.WorldHelper;
 
 public class BlockTracker
@@ -13,30 +14,45 @@ public class BlockTracker
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event)
     {
-    	DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(event.getWorld()));
-    	if(dimConfig != null && !dimConfig.Settings.PlayersCanBreakBlocks)
+    	DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+    	// TODO: DimsConfig and event should never be null, but we've had crash reports when using OTG with other mods, reproduce and confirm.
+    	if(dimsConfig != null && event != null)
     	{
-    		event.setCanceled(true);
+	    	DimensionConfig dimConfig = dimsConfig.getDimensionConfig(WorldHelper.getName(event.getWorld()));
+	    	if(dimConfig != null && !dimConfig.Settings.PlayersCanBreakBlocks)
+	    	{
+	    		event.setCanceled(true);
+	    	}
     	}
     }
 
 	@SubscribeEvent
 	public void onBlockPlace(BlockEvent.PlaceEvent event)
 	{
-		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(event.getWorld()));
-		if(dimConfig != null && !dimConfig.Settings.PlayersCanPlaceBlocks)
-		{
-			event.setCanceled(true);
-		}	
+    	DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+    	// TODO: DimsConfig and event should never be null, but we've had crash reports when using OTG with other mods, reproduce and confirm.
+    	if(dimsConfig != null && event != null)
+    	{		
+			DimensionConfig dimConfig = dimsConfig.getDimensionConfig(WorldHelper.getName(event.getWorld()));
+			if(dimConfig != null && !dimConfig.Settings.PlayersCanPlaceBlocks)
+			{
+				event.setCanceled(true);
+			}	
+    	}
 	}
 
 	@SubscribeEvent
 	public void onExplosion(ExplosionEvent.Start event)
 	{
-		DimensionConfig dimConfig = OTG.getDimensionsConfig().getDimensionConfig(WorldHelper.getName(event.getWorld()));
-		if(dimConfig != null && !dimConfig.Settings.ExplosionsCanBreakBlocks)
-		{
-			event.setCanceled(true);
-		}
+    	DimensionsConfig dimsConfig = OTG.getDimensionsConfig();
+    	// TODO: DimsConfig and event should never be null, but we've had crash reports when using OTG with other mods, reproduce and confirm.    	
+    	if(dimsConfig != null && event != null)
+    	{
+			DimensionConfig dimConfig = dimsConfig.getDimensionConfig(WorldHelper.getName(event.getWorld()));
+			if(dimConfig != null && !dimConfig.Settings.ExplosionsCanBreakBlocks)
+			{
+				event.setCanceled(true);
+			}
+    	}
 	}
 }

@@ -133,8 +133,8 @@ public class GrassGen extends Resource
         if (random.nextDouble() * 100.0 <= this.rarity)
         {
             // Passed Rarity test, place about Frequency grass in this chunk
-            int centerX = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            int centerZ = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            int centerX = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+            int centerZ = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
             int centerY = world.getHighestBlockAboveYAt(centerX, centerZ, chunkBeingPopulated);
             
             if(centerY < PluginStandardValues.WORLD_DEPTH)
@@ -204,8 +204,8 @@ public class GrassGen extends Resource
                 continue;
             }
             
-            x = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-            z = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+            x = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+            z = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
             y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
 
             if(y < PluginStandardValues.WORLD_DEPTH)

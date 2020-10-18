@@ -23,11 +23,6 @@ public class OTGRareBuildingStart extends StructureStart
     OTGRareBuildingStart(World world, Random random, int chunkX, int chunkZ)
     {
         LocalWorld localWorld = ((ForgeEngine)OTG.getEngine()).getWorld(world);
-        if(localWorld == null)
-        {
-        	localWorld = ((ForgeEngine)OTG.getEngine()).getWorld(world);
-        	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
-        }
         BiomeConfig biomeConfig = localWorld.getBiome(chunkX * 16 + 8, chunkZ * 16 + 8).getBiomeConfig();
         StructureComponent building;
         switch (biomeConfig.rareBuildingType)

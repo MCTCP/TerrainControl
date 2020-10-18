@@ -10,7 +10,6 @@ import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.materials.MaterialSetEntry;
 
 import java.util.List;
 import java.util.Random;
@@ -141,7 +140,6 @@ public class OreGen extends Resource
         int highestSolidBlock;            
         
         int areaBeingPoulatedSize = 32;
-        boolean bFound = false;
                
         // TODO: This seems to be really poorly optimised.
         // Redesign this.

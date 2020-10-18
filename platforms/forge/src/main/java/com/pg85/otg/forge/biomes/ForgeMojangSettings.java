@@ -34,7 +34,7 @@ public final class ForgeMojangSettings implements MojangSettings
     	{
     		return fromBiomeBase(baseBiome);
     	}
-    	throw new RuntimeException("This should not happen."); // TODO: Remove after testing
+    	return null;
     }
 
     /**

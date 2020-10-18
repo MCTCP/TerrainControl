@@ -39,10 +39,6 @@ public class ForgeChunkBuffer extends ChunkBuffer
 
     public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
     {
-    	if(material == null)
-    	{
-    		throw new RuntimeException("This should not happen, please contact Team OTG about this crash.");
-    	}
         this.chunkPrimer.setBlockState(blockX, blockY, blockZ, ((ForgeMaterialData) material).internalBlock());
     }
 

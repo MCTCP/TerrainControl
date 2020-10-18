@@ -69,7 +69,7 @@ public final class ConfigToNetworkSender
         {
             if (biome == null)
             {
-            	throw new RuntimeException("Whatever it is you're trying to do, we didn't write any code for it (sorry). Please contact Team OTG about this crash.");
+            	throw new RuntimeException("This shouldn't happen. Please contact Team OTG about this crash.");
             }
             stream.writeInt(biome.getIds().getOTGBiomeId());
             stream.writeInt(biome.getIds().getSavedId());

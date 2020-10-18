@@ -51,8 +51,8 @@ public class TreeObject implements CustomObject
     {
         // A tree has no frequency or rarity, so spawn it once in the chunk
     	// Make sure we stay within population bounds.
-        int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_X_SIZE);
-        int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_Z_SIZE);
+        int x = chunkCoord.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
+        int z = chunkCoord.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
                 
         int y = world.getHighestBlockAboveYAt(x, z, chunkCoord);        
         if (y < minHeight || y > maxHeight)
@@ -108,5 +108,11 @@ public class TreeObject implements CustomObject
 	public boolean loadChecks()
 	{
 		return true;
+	}
+
+	@Override
+	public boolean doReplaceBlocks()
+	{
+		return false;
 	}
 }

@@ -35,7 +35,8 @@ import com.pg85.otg.util.minecraft.defaults.DefaultStructurePart;
 public class BO3Config extends CustomObjectConfigFile
 {
 	private boolean isOTGPlus; // Legacy setting
-
+	public boolean doReplaceBlocks;
+	
 	public String author;
 	public String description;
 	public ConfigMode settingsMode;
@@ -385,6 +386,10 @@ public class BO3Config extends CustomObjectConfigFile
 				"What to do when a block is about to be placed outside the SourceBlock? (dontPlace, placeAnyway)");
 		writer.setting(BO3Settings.OUTSIDE_SOURCE_BLOCK, this.outsideSourceBlock);
 
+		writer.comment(
+				"Disable doReplaceBlocks to make this BO3 ignore any ReplacedBlocks settings in biome configs, improves performance.");
+		writer.setting(BO3Settings.DO_REPLACE_BLOCKS, this.doReplaceBlocks);
+		
 		writer.comment("OTG+ settings #");
 
 		writer.comment(
@@ -427,7 +432,8 @@ public class BO3Config extends CustomObjectConfigFile
 		this.sourceBlocks = readSettings(BO3Settings.SOURCE_BLOCKS);
 		this.maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK);
 		this.outsideSourceBlock = readSettings(BO3Settings.OUTSIDE_SOURCE_BLOCK);
-
+		this.doReplaceBlocks = readSettings(BO3Settings.DO_REPLACE_BLOCKS);
+		
 		// Read the resources
 		readResources();
 

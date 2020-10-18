@@ -51,6 +51,7 @@ public class BO4Config extends CustomObjectConfigFile
 	public String author;
     public String description;
     public ConfigMode settingsMode;
+    public boolean doReplaceBlocks;
     public int frequency;
     
     private final int xSize = 16;
@@ -1163,6 +1164,9 @@ public class BO4Config extends CustomObjectConfigFile
         writer.comment("Defaults to false. Set to true if this BO4 should spawn at the player spawn point. When the server starts the spawn point is determined and the BO4's for the biome it is in are loaded, one of these BO4s that has IsSpawnPoint set to true (if any) is selected randomly and is spawned at the spawn point regardless of its rarity (so even Rarity:0, IsSpawnPoint: true BO4's can get spawned as the spawn point!).");
         writer.setting(BO4Settings.ISSPAWNPOINT, this.isSpawnPoint);
 
+        writer.comment("Defaults to true. Set to false to make the BO4 ignore any ReplacedBlocks settings in Biome Configs.");
+        writer.setting(BO4Settings.DO_REPLACE_BLOCKS, this.doReplaceBlocks);
+        
         // Blocks and other things
         writeResources(writer, blocksList, branchesList);
         
@@ -1321,6 +1325,8 @@ public class BO4Config extends CustomObjectConfigFile
         this.maxHeight = readSettings(BO4Settings.MAX_HEIGHT);
         this.maxHeight = this.maxHeight < this.minHeight ? this.minHeight : this.maxHeight;
 
+        this.doReplaceBlocks = readSettings(BO4Settings.DO_REPLACE_BLOCKS);
+        
         // Read the resources
         readResources();
 
@@ -1572,6 +1578,7 @@ public class BO4Config extends CustomObjectConfigFile
         stream.writeBoolean(this.spawnOnWaterOnly);
         stream.writeBoolean(this.spawnUnderWater);
         stream.writeBoolean(this.spawnAtWaterLevel);
+        stream.writeBoolean(this.doReplaceBlocks);
         stream.writeInt(this.heightOffset);
         stream.writeBoolean(this.removeAir);
         StreamHelper.writeStringToStream(stream, this.replaceAbove);
@@ -1822,6 +1829,7 @@ public class BO4Config extends CustomObjectConfigFile
 				this.spawnOnWaterOnly = buffer.get() != 0;
 				this.spawnUnderWater = buffer.get() != 0;
 				this.spawnAtWaterLevel = buffer.get() != 0;
+		        this.doReplaceBlocks = buffer.get() != 0;
 				this.heightOffset = buffer.getInt();
 				this.removeAir = buffer.get() != 0;
 				this.replaceAbove = StreamHelper.readStringFromBuffer(buffer);

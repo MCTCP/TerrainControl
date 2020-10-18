@@ -13,7 +13,8 @@ public class BO3Settings extends Settings
     static final Setting<Boolean>
             TREE = booleanSetting("Tree", true),
             ROTATE_RANDOMLY = booleanSetting("RotateRandomly", false),
-			IS_OTG_PLUS = booleanSetting("IsOTGPlus",false)
+			IS_OTG_PLUS = booleanSetting("IsOTGPlus",false),
+			DO_REPLACE_BLOCKS = booleanSetting("DoReplaceBlocks", true)
             ;
 
     static final Setting<Double> RARITY = doubleSetting("Rarity", 100, 0.000001, 100);

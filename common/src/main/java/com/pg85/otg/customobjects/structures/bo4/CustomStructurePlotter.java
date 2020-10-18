@@ -72,8 +72,8 @@ public class CustomStructurePlotter
 	private boolean structureCacheContainsKey(ChunkCoordinate chunkCoordinate)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
@@ -86,8 +86,8 @@ public class CustomStructurePlotter
 	private void addToStructureCache(ChunkCoordinate chunkCoordinate, BO4CustomStructure structure)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		BO4CustomStructure[][] chunkRegion = this.bo4StructureCache.get(regionCoord);
@@ -104,8 +104,8 @@ public class CustomStructurePlotter
 	private void removeFromStructureCache(ChunkCoordinate chunkCoordinate)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		BO4CustomStructure[][] chunkRegion = this.bo4StructureCache.get(regionCoord);
@@ -122,8 +122,8 @@ public class CustomStructurePlotter
 	private BO4CustomStructure getFromStructureCache(ChunkCoordinate chunkCoordinate)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		BO4CustomStructure[][] chunkRegion = this.bo4StructureCache.get(regionCoord);
@@ -141,23 +141,24 @@ public class CustomStructurePlotter
 	private boolean plottedChunksContainsKey(ChunkCoordinate chunkCoordinate)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
 		
 		boolean[][] chunkRegion = plottedChunks.get(regionCoord);
 		int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
-		int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE); 
+		int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE);
+		
 		return chunkRegion != null && chunkRegion[internalX][internalZ];
 	}
 	
 	private void addToPlottedChunks(ChunkCoordinate chunkCoordinate)
 	{
 		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor(chunkCoordinate.getChunkX() / CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor(chunkCoordinate.getChunkZ() / CustomStructureCache.REGION_SIZE)
+			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
 		);
-		
+				
 		boolean[][] chunkRegion = this.plottedChunks.get(regionCoord);
 		if(chunkRegion == null)
 		{
@@ -166,6 +167,7 @@ public class CustomStructurePlotter
 		}
 		int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
 		int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE);
+		
 		chunkRegion[internalX][internalZ] = true;
 	}	
 	
@@ -189,12 +191,6 @@ public class CustomStructurePlotter
 	// SmoothingArea chunk after branches have been calculated    
 	public void addBo4ToStructureCache(ChunkCoordinate chunkCoordinate, BO4CustomStructure structure)
 	{
-		if(structure == null)
-		{
-			// TODO: Remove after testing
-			throw new RuntimeException("This shouldn't happen. Please contact Team OTG about this crash.");
-		}
-		
 		// Add to structure cache so we can spawn parts later
 		addToStructureCache(chunkCoordinate, structure);
 
@@ -259,7 +255,7 @@ public class CustomStructurePlotter
 	}
 	
 	private BO4CustomStructure plotStructures(CustomStructureCache structureCache, BO4 targetStructure, ArrayList<String> targetBiomes, LocalWorld world, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn)
-    {		
+    {
 		// Make sure the BO4 at spawn is plotted before anything else
 		// This isn't thread-safe so there's a race condition, shouldn't 
 		// cause problems though due to the lock later on.
@@ -351,7 +347,7 @@ public class CustomStructurePlotter
 	            	BO4CustomStructureCoordinate structureCoord = null;
 	            	BO4CustomStructure structureStart2 = null;
 
-	            	ArrayList<Object[]> BO3sBySize = new ArrayList<Object[]>();
+	            	ArrayList<Object[]> bo4sBySize = new ArrayList<Object[]>();
 	            	ArrayList<String> structuresToSpawn1 = new ArrayList<String>();
 
 	            	// Get list of BO3's that should spawn at the spawn point
@@ -368,7 +364,7 @@ public class CustomStructurePlotter
 			                	try {
 			                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
 				                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
-			                		BO3sBySize.add(new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
+			                		bo4sBySize.add(new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
 								}
 			                	catch (InvalidConfigException e)
 			                	{
@@ -377,14 +373,20 @@ public class CustomStructurePlotter
 		            		}
 		            	}
 	            	}
-	            	if(!spawningStructureAtSpawn || BO3sBySize.size() == 0)
+
+	            	if(!spawningStructureAtSpawn || bo4sBySize.size() == 0)
 	            	{
-		            	// Get list of BO3's able to spawn in this chunk
+		            	if(spawningStructureAtSpawn && bo4sBySize.size() == 0)
+		            	{
+		            		spawningStructureAtSpawn = false;
+		            	}
+		            	
+		            	// Get list of BO4's able to spawn in this chunk
 		            	for(Map.Entry<StructuredCustomObject, Double> bo4AndRarity : structuredCustomObjects.entrySet())
 		            	{
 		            		if(!((BO4)bo4AndRarity.getKey()).isInvalidConfig && (int)Math.round(bo4AndRarity.getValue()) > 0)
 		            		{
-		            			// TODO: avoid calling IsBO3AllowedToSpawnAt so much, cache and reuse any nearest group members found
+		            			// TODO: avoid calling IsBO4AllowedToSpawnAt so much, cache and reuse any nearest group members found
 
 		            			if(isBO4AllowedToSpawnAtByFrequency(chunkCoord, ((BO4)bo4AndRarity.getKey())))
 		            			{
@@ -395,9 +397,9 @@ public class CustomStructurePlotter
 				                	try {
 				                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(world);
 					                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
-					            		int insertAtIndex = BO3sBySize.size();
+					            		int insertAtIndex = bo4sBySize.size();
 					            		int i = 0;
-					                	for(Object[] entry : BO3sBySize)
+					                	for(Object[] entry : bo4sBySize)
 					                	{
 					                		if(((BO4)bo4AndRarity.getKey()).getConfig().timesSpawned < ((BO4)entry[0]).getConfig().timesSpawned || (BO3size > (Double)entry[2] && ((BO4)bo4AndRarity.getKey()).getConfig().timesSpawned == ((BO4)entry[0]).getConfig().timesSpawned))
 					                		{
@@ -406,7 +408,7 @@ public class CustomStructurePlotter
 					                		}
 					                		i += 1;
 					                	}
-				                		BO3sBySize.add(insertAtIndex, new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
+				                		bo4sBySize.add(insertAtIndex, new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
 									}
 				                	catch (InvalidConfigException e)
 				                	{
@@ -417,12 +419,12 @@ public class CustomStructurePlotter
 		            	}
 	            	}
 
-	            	if(BO3sBySize.size() > 0)
+	            	if(bo4sBySize.size() > 0)
 	            	{
 		            	// Go over the list and try to spawn each structure, from largest to smallest.
 	            		// We have to spawn large structures first, since small structures would 
 	            		// clutter the landscape and make it impossible to find a large open space.
-		        		for(Object[] currentStructureSpawning : BO3sBySize)
+		        		for(Object[] currentStructureSpawning : bo4sBySize)
 		        		{
 			            	int pass = 0;
 
@@ -963,7 +965,7 @@ public class CustomStructurePlotter
 						                		((BO4)structureCoord.getObject()).getConfig().timesSpawned += 1;
 						                		if(OTG.getPluginConfig().spawnLog)
 						                		{
-						                			OTG.log(LogMarker.INFO, "Plotted structure " + structureCoord.getObject().getName() + " at chunk X" + spawnCoordX + " Z" + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
+						                			OTG.log(LogMarker.INFO, "Plotted structure " + structureCoord.getObject().getName() + " at chunk " + spawnCoordX + " " + spawnCoordZ + " ("+ (spawnCoordX * 16) + " 100 " + (spawnCoordZ * 16) + ")");// + " biome " + biome3.getName());
 						                		}
 
 						                		if(((BO4)currentStructureSpawning[0]).getConfig().frequency > 0 || ((BO4)currentStructureSpawning[0]).getConfig().bo4Groups.size() > 0)
@@ -1163,7 +1165,7 @@ public class CustomStructurePlotter
 					{
 						this.addToStructureCache(chunkCoord, (BO4CustomStructure)loadedStructure.getKey()); // This structure has blocks that need to be spawned
 					}
-					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).smoothingAreasToSpawn.keySet())
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).smoothingAreaManager.smoothingAreasToSpawn.keySet())
 					{
 						this.addToStructureCache(chunkCoord, (BO4CustomStructure)loadedStructure.getKey()); // This structure has smoothing area blocks that need to be spawned
 					}
