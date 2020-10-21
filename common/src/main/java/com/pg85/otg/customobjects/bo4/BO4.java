@@ -481,7 +481,7 @@ public class BO4 implements StructuredCustomObject
 	    					else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
 	    					{
 	    						blockAbove = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y + 1, blockToQueueForSpawn.z, chunkBeingPopulated);
-	    						if(blockAbove.isSolid() || blockAbove.isLiquid())
+	    						if(blockAbove != null && (blockAbove.isSolid() || blockAbove.isLiquid()))
 	    						{
 	    							blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);	    							    							
 	    						} else {
@@ -672,7 +672,7 @@ public class BO4 implements StructuredCustomObject
 	    					else if(blockToQueueForSpawn.material.equals(bo3SurfaceBlock))
 	    					{
 	    						blockAbove = world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y + 1, blockToQueueForSpawn.z, chunkBeingPopulated);
-	    						if(blockAbove.isSolid() || blockAbove.isLiquid())
+	    						if(blockAbove != null && (blockAbove.isSolid() || blockAbove.isLiquid()))
 	    						{
 		                			blockToQueueForSpawn.material = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z);	    							    							
 	    						} else {

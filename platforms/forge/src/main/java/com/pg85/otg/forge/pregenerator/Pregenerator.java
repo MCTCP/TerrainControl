@@ -184,7 +184,7 @@ public class Pregenerator
 
 	public void processTick()
 	{
-		if(!this.processing)
+		if(!this.processing && this.world.getWorld().getMinecraftServer().isServerRunning())
 		{
 			this.processing = true;
 			if(this.spawned < this.total && this.pregenerationRadius > 0)
@@ -511,24 +511,73 @@ public class Pregenerator
 		this.spawnedThisTick++;
 			
 		ChunkProviderServer chunkProvider = (ChunkProviderServer) this.world.getWorld().getChunkProvider();
-		Chunk chunk1 = chunkProvider.getLoadedChunk(currentX, currentZ);
-    	if(chunk1 == null || !chunk1.isPopulated())
+		Chunk chunk = chunkProvider.getLoadedChunk(currentX, currentZ);
+    	if(chunk == null || !chunk.isPopulated())
     	{
-    		// Load the 2x2 chunk area being populated, then populate the target chunk.
-    		// This may populate the other 3 chunks, if their surrounding chunks are loaded.
-    		if(chunkProvider.getLoadedChunk(currentX + 1, currentZ) == null)
+    		if(!OTG.getPluginConfig().developerMode)
     		{
-    			chunkProvider.provideChunk(currentX + 1, currentZ);
+	    		// Terraingen is done per chunk, population per 2x2 chunks, lighting requires 
+	    		// all 8 chunks to be loaded around the chunk being populated.
+	    		// Loading 9 chunks will cause any of them to populate if their 3 neighbours
+	    		// in the +1 x +1 z direction are loaded, which is not a problem in this case.
+	    		
+	    		if(chunkProvider.getLoadedChunk(currentX - 1, currentZ) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX - 1, currentZ);
+	    		}
+	    		if(chunkProvider.getLoadedChunk(currentX, currentZ - 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX, currentZ - 1);
+	    		}
+	    		if(chunkProvider.getLoadedChunk(currentX - 1, currentZ - 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX - 1, currentZ - 1);
+	    		}
+	
+	    		if(chunkProvider.getLoadedChunk(currentX - 1, currentZ + 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX - 1, currentZ + 1);
+	    		}
+	    		if(chunkProvider.getLoadedChunk(currentX + 1, currentZ - 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX + 1, currentZ - 1);
+	    		}
+	    		
+	    		if(chunkProvider.getLoadedChunk(currentX + 1, currentZ) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX + 1, currentZ);
+	    		}
+	    		if(chunkProvider.getLoadedChunk(currentX, currentZ + 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX, currentZ + 1);
+	    		}
+	    		if(chunkProvider.getLoadedChunk(currentX + 1, currentZ + 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX + 1, currentZ + 1);
+	    		}
+	    		
+	    		chunk = chunkProvider.provideChunk(currentX, currentZ);
+	    		
+	    		// Force a chunk tick to update lighting.
+	    		chunk.onTick(false);
+    		} else {
+    			// For developer mode, only do 2x2 chunks for terraingen 
+    			// and population, no need to do lighting.
+	    		if(chunkProvider.getLoadedChunk(currentX + 1, currentZ) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX + 1, currentZ);
+	    		}
+	    		if(chunkProvider.getLoadedChunk(currentX, currentZ + 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX, currentZ + 1);
+	    		}
+	    		if(chunkProvider.getLoadedChunk(currentX + 1, currentZ + 1) == null)
+	    		{
+	    			chunkProvider.provideChunk(currentX + 1, currentZ + 1);
+	    		}
+	    		
+	    		chunk = chunkProvider.provideChunk(currentX, currentZ);
     		}
-    		if(chunkProvider.getLoadedChunk(currentX, currentZ + 1) == null)
-    		{
-    			chunkProvider.provideChunk(currentX, currentZ + 1);
-    		}
-    		if(chunkProvider.getLoadedChunk(currentX + 1, currentZ + 1) == null)
-    		{
-    			chunkProvider.provideChunk(currentX + 1, currentZ + 1);
-    		}
-    		chunk1 = chunkProvider.provideChunk(currentX, currentZ);
     	}
 		
 		if(this.spawned - this.lastSpawnedWhenSaved > this.compressCustomStructureCacheThreshHold)
@@ -608,7 +657,7 @@ public class Pregenerator
     {
         return bytes / 1024L / 1024L;
     }
-
+    
     public void shutDown()
     {
     	if(this.pregeneratorIsRunning)
@@ -616,7 +665,7 @@ public class Pregenerator
     		// Don't save pregenerator data on MP client
     		if(this.world.world != null)
     		{
-    			savePregeneratorData(false);
+    			savePregeneratorData(true);
     		}	    	
     		this.pregeneratorIsRunning = false;
     	}
@@ -630,7 +679,7 @@ public class Pregenerator
     	// Don't save pregenerator data on MP client
     	if(this.world.world != null)
     	{
-    		savePregeneratorData(false);
+    		savePregeneratorData(true);
     	}
     }
 
@@ -783,11 +832,11 @@ public class Pregenerator
 			}
 		}
 
-		throw new RuntimeException(
-			"OTG encountered a critical error loading " + pregeneratedChunksFile.getAbsolutePath() + " and could not load a backup, exiting. "
-			+ "OTG automatically backs up files before writing and will try to use the backup when loading. "
-			+ "If your dimension's " + WorldStandardValues.PregeneratedChunksFileName + " and its backup have been corrupted, you can "
-			+ "replace it with a backup.");
+		OTG.log(LogMarker.WARN, 
+			"OTG encountered an error loading " + pregeneratedChunksFile.getAbsolutePath() + " and could not load a backup, substituting default (empty) data. ",
+			"This sets pregenerator progress back to zero, you can safely pregenerate back up to the original progress (which also helps performance for BO4 worlds)."
+		);
+		saveDefaults();
 	}
 	
 	private void parsePregeneratorData(String[] pregeneratedChunksFileValues)

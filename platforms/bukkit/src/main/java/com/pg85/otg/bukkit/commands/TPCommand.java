@@ -19,7 +19,7 @@ public class TPCommand extends BaseCommand
         super(_plugin);
         name = "tp";
         perm = OTGPerm.CMD_TP.node;
-        usage = "tp <biome name or id>";
+        usage = "tp <biome/dimension name or id> [-p player]";
     }
 
     @Override
@@ -36,11 +36,34 @@ public class TPCommand extends BaseCommand
             sender.sendMessage(ERROR_COLOR + "Plugin is not enabled for this world.");
             return true;
         }
+        
+        Player player = null;
+        if (args.contains("-p")) {
+            String name = args.get(args.size()-1);
+            player = sender.getServer().getPlayer(name);
+            if (player == null)
+            {
+                sender.sendMessage(ERROR_COLOR + "Could not find player " + name);
+                return true;
+            }
+        } else if (!(sender instanceof Player)) {
+            sender.sendMessage(ERROR_COLOR + "Must be a player to send this command without player argument " + name);
+            return true;
+        }
+        if(player == null)
+        {
+        	player = (Player) sender;
+        }
 
     	String biomeName = "";
     	for(int i = 0; i < args.size(); i++)
     	{
-    		biomeName += args.get(i) + " ";
+    		// If there's a -p flag, then the final arg is a player name
+    		if(args.get(i).equalsIgnoreCase("-p"))
+    		{
+    			break;
+    		}
+			biomeName += args.get(i) + " ";
     	}
     	biomeName = biomeName.trim();
     	if(biomeName.length() > 0)
@@ -52,9 +75,7 @@ public class TPCommand extends BaseCommand
     		}
     		catch(NumberFormatException ex) { }
     		
-			ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);
-    		
-			Player player = (Player) sender;
+			ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords(playerX, playerZ);    		
 			Location playerLoc = player.getLocation();
 
     		int maxRadius = 500;
@@ -70,6 +91,8 @@ public class TPCommand extends BaseCommand
     		
     		if(biomeId != -1)
     		{
+    	        sender.sendMessage(MESSAGE_COLOR + "Searching for destination biome \"" + VALUE_COLOR + biomeName + MESSAGE_COLOR + "\".");
+    			
         		for(int cycle = 1; cycle < maxRadius; cycle++)
         		{
             		for(int x1 = playerX - cycle; x1 <= playerX + cycle; x1++)

@@ -137,7 +137,7 @@ public class BO4CustomStructure extends CustomStructure
     {
     	this(world, structureStart);
     	this.objectsToSpawn = objectsToSpawn;
-    	this.smoothingAreaManager.smoothingAreasToSpawn = smoothingAreasToSpawn;
+    	this.smoothingAreaManager.fillSmoothingLineCaches(smoothingAreasToSpawn);
     	this.minY = minY;
     }
 
@@ -251,7 +251,7 @@ public class BO4CustomStructure extends CustomStructure
 			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);		
 		}
 
-		for(ChunkCoordinate chunkCoord : this.smoothingAreaManager.smoothingAreasToSpawn.keySet())
+		for(ChunkCoordinate chunkCoord : this.smoothingAreaManager.getSmoothingAreaChunkCoords())
 		{
 			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);
 		}
@@ -329,13 +329,11 @@ public class BO4CustomStructure extends CustomStructure
 				{
 					LocalBiome biome = world.getBiome(centerX, centerZ);
 					startY = (short) (biome.getBiomeConfig().useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biome.getBiomeConfig().waterLevelMax);
-				} else {				
-					// OTG.log(LogMarker.INFO, "Request height for chunk X" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkX() + " Z" + ChunkCoordinate.fromBlockCoords(Start.getX(), Start.getZ()).getChunkZ());
+				} else {
 					// Passing null for chunk being populated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
 					int highestBlock = world.getHighestBlockYAt(centerX, centerZ, true, !((BO4)this.start.getObject()).getConfig().spawnUnderWater, ((BO4)this.start.getObject()).getConfig().spawnUnderWater, true, true, null);
 					if(highestBlock < 0)
 					{
-						//OTG.log(LogMarker.INFO, "Structure " + Start.BO3Name + " could not be plotted at Y < 1. If you are creating empty chunks intentionally (for a sky world for instance) then make sure you don't use the highestBlock setting for your BO3's");
 						if(((BO4)this.start.getObject()).getConfig().heightOffset > 0) // Allow floating structures that use highestblock + heightoffset
 						{
 							highestBlock = ((BO4)this.start.getObject()).getConfig().heightOffset;
@@ -2112,14 +2110,14 @@ public class BO4CustomStructure extends CustomStructure
     * chunk and spawns all objects that are including their smoothing areas (if any)
     */
     public void spawnInChunk(ChunkCoordinate chunkCoordinate, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
-    {
+    {   	
     	if (
 			!objectsToSpawn.containsKey(chunkCoordinate) && 
 			!this.smoothingAreaManager.smoothingAreasToSpawn.containsKey(chunkCoordinate)
 		)
         {
             return;
-        }
+        }    
     	
         // Get all BO3's that should spawn in the given chunk, if any
         // Note: The given chunk may not necessarily be the chunkCoordinate of this.Start
@@ -2178,7 +2176,11 @@ public class BO4CustomStructure extends CustomStructure
                 		OTG.log(LogMarker.WARN, "Could not spawn chunk " + coordObject.bo3Name + " for structure " + this.start.getObject().getName());
                 	}
             		objectsToSpawn.remove(chunkCoordinate);
-            		this.smoothingAreaManager.smoothingAreasToSpawn.remove(chunkCoordinate);	
+            		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
+            		// Mark the structurecache region for saving.
+            		// TODO: Make this prettier?
+            		world.getStructureCache().markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
+            		world.getStructureCache().markRegionForSaving(chunkCoordinate.toRegionCoord());            		
                 	return;
                 }
             }
@@ -2224,7 +2226,11 @@ public class BO4CustomStructure extends CustomStructure
                 		OTG.log(LogMarker.WARN, "Could not spawn chunk " + coordObject.bo3Name + " for structure " + this.start.getObject().getName());
                 	}
             		objectsToSpawn.remove(chunkCoordinate);
-            		this.smoothingAreaManager.smoothingAreasToSpawn.remove(chunkCoordinate);
+            		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
+            		// Mark the structurecache region for saving.
+            		// TODO: Make this prettier?
+            		world.getStructureCache().markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
+            		world.getStructureCache().markRegionForSaving(chunkCoordinate.toRegionCoord());            		
                 	return;
                 } else {
                 	this.modDataManager.spawnModData(objectConfig.getModData(), coordObject, chunkCoordinate);
@@ -2240,6 +2246,11 @@ public class BO4CustomStructure extends CustomStructure
         }
 
 		objectsToSpawn.remove(chunkCoordinate);
-		this.smoothingAreaManager.smoothingAreasToSpawn.remove(chunkCoordinate);
+		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
+		
+		// Mark the structurecache region for saving.
+		// TODO: Make this prettier?
+		world.getStructureCache().markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
+		world.getStructureCache().markRegionForSaving(chunkCoordinate.toRegionCoord());
     }
 }

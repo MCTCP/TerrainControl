@@ -70,10 +70,10 @@ public class ObjectSpawner
     {
     	boolean unlockWhenDone = false;
 		// Wait for another thread running SaveToDisk, then place a lock.
+		boolean firstLog = false;
 		while(true)
 		{
 			//OTG.log(LogMarker.INFO, "Populate waiting on SaveToDisk.");
-
 			synchronized(this.lockingObject)
 			{
 				if(!this.saving)
@@ -87,6 +87,12 @@ public class ObjectSpawner
 						unlockWhenDone = true;
 					}
 					break;
+				} else {
+					if(firstLog)
+					{
+						OTG.log(LogMarker.WARN, "Populate waiting on SaveToDisk. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
+						firstLog = false;
+					}
 				}
 			}
 		}
@@ -132,7 +138,7 @@ public class ObjectSpawner
 		// the spawnpoint so players don't spawn mid-air or underground
 		if(chunkCoord.equals(this.world.getSpawnChunk()))
 		{
-			this.world.updateSpawnPointY(chunkCoord);
+			this.world.updateSpawnPointY();
 		}
     }
 

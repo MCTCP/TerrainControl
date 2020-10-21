@@ -1,5 +1,8 @@
 package com.pg85.otg.util;
 
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
+import com.pg85.otg.util.helpers.MathHelper;
+
 /**
  * Position of a chunk.
  *
@@ -133,7 +136,25 @@ public class ChunkCoordinate
     {
         return new ChunkCoordinate(chunkX, chunkZ);
     }
+    
+	public ChunkCoordinate toRegionCoord()
+	{
+		return ChunkCoordinate.fromChunkCoords(
+			MathHelper.floor((double)getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
+			MathHelper.floor((double)getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
+		);
+	}
 
+	public int getRegionInternalX()
+	{
+		return MathHelper.mod(getChunkX(), CustomStructureCache.REGION_SIZE);
+	}
+	
+	public int getRegionInternalZ()
+	{
+		return MathHelper.mod(getChunkZ(), CustomStructureCache.REGION_SIZE);
+	}
+	
     @Override
     public String toString()
     {

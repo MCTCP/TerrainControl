@@ -1726,7 +1726,7 @@ public class BukkitWorld implements LocalWorld
 
 	// Forge only atm, used to update the spawn point after populating the spawn chunk.
 	@Override
-	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated)
+	public void updateSpawnPointY()
 	{
 		// TODO: Implement this for spigot.
 	}

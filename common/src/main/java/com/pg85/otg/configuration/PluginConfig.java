@@ -143,7 +143,8 @@ public final class PluginConfig extends ConfigFile
         
         writer.smallTitle("Developer mode");
         writer.putSetting(PluginStandardValues.DEVELOPER_MODE, this.developerMode,
-        		"Clears the BO2/BO3 cache whenever a world or dimension is unloaded (similar to using /otg unloadbo3s and recreating a world).",
+        		"Changes the behaviour of some features to speed up development: Clears the BO2/BO3 cache whenever a world or dimension is unloaded (similar to using /otg unloadbo3s ",
+        		" and recreating a world), makes the pregenerator skip light population for faster pregeneration.", 
         		"Defaults to: false"
 		);         
        
