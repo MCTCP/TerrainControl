@@ -32,6 +32,8 @@ import com.pg85.otg.network.ServerConfigProvider;
 import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
+import com.pg85.otg.util.materials.MaterialHelper;
+import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.pg85.otg.util.minecraft.defaults.StructureNames;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 import net.minecraft.block.*;
@@ -304,7 +306,7 @@ public class ForgeWorld implements LocalWorld
 	}
     
 	@Override
-	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated)
+	public void updateSpawnPointY()
 	{		
         // Spawn point is only saved for overworld by MC, 
         // so we have to save it ourselves for dimensions.
@@ -313,9 +315,24 @@ public class ForgeWorld implements LocalWorld
 		if(!dimConfig.Settings.SpawnPointSet)
 		{
 			BlockPos spawnPos = this.getSpawnPoint();
-			int highestY = this.getHighestBlockAboveYAt(spawnPos.getX(), spawnPos.getZ(), chunkBeingPopulated);
-			this.world.getWorldInfo().setSpawn(new BlockPos(spawnPos.getX(), highestY, spawnPos.getZ()));
-	        dimConfig.Settings.SpawnPointSet = true; // TODO: This breaks getrandomisedspawnpoint and spawns the player at the exact same coords each time.
+			// Try to spawn players beneath leaves, otherwise they may spawn at a random xz 
+			// offset in the air next to the tree.
+			int highestY = this.getHighestBlockYAt(spawnPos.getX(), spawnPos.getZ(), true, true, false, true, true, null);
+			if(highestY == -1)
+			{
+				highestY = this.getHighestBlockYAt(spawnPos.getX(), spawnPos.getZ(), true, true, false, true, false, null);
+			}
+			LocalMaterialData highestBlockMaterial = this.getMaterial(spawnPos.getX(), highestY, spawnPos.getZ(), null);
+			if(highestBlockMaterial.isMaterial(DefaultMaterial.WATER) || highestBlockMaterial.isMaterial(DefaultMaterial.STATIONARY_WATER))
+			{			
+				this.setBlock(spawnPos.getX(), highestY, spawnPos.getZ(), MaterialHelper.ICE, null, null, false);
+			}
+			else if(highestBlockMaterial.isMaterial(DefaultMaterial.LAVA) || highestBlockMaterial.isMaterial(DefaultMaterial.STATIONARY_LAVA))
+			{			
+				this.setBlock(spawnPos.getX(), highestY, spawnPos.getZ(), MaterialHelper.MAGMA, null, null, false);
+			}
+			this.world.getWorldInfo().setSpawn(new BlockPos(spawnPos.getX(), highestY + 1, spawnPos.getZ()));
+	        dimConfig.Settings.SpawnPointSet = true;
 	        dimConfig.Settings.SpawnPointX = spawnPos.getX();
 	        dimConfig.Settings.SpawnPointY = highestY;
 	        dimConfig.Settings.SpawnPointZ = spawnPos.getZ();
@@ -635,7 +652,17 @@ public class ForgeWorld implements LocalWorld
         	isLiquid = material.isLiquid();
         	isSolid =
 			(
-    			material.isSolid() ||
+    			(
+					material.isSolid() &&
+					(
+						!ignoreLeaves || 
+						(
+							block != Blocks.LOG && 
+							block != Blocks.LOG2
+						)
+					)
+    			)
+    			||
     			(
 					!ignoreLeaves && 
 					(
