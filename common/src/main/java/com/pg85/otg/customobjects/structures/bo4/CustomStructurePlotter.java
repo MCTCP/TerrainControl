@@ -14,6 +14,7 @@ import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.structures.CustomStructure;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.customobjects.structures.CustomStructureFileManager;
+import com.pg85.otg.customobjects.structures.PlottedChunksRegion;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -22,7 +23,6 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.helpers.MathHelper;
 
 public class CustomStructurePlotter
 {
@@ -34,7 +34,7 @@ public class CustomStructurePlotter
     // We unfortunately need this because MC can't tell use whether a chunk
     // has been populated, only whether is has had terraingen done, or if it
     // is completely done being populated and lit (its neighbours have all spawned).
-    private final Map<ChunkCoordinate, boolean[][]> plottedChunks; // Per region
+    private final Map<ChunkCoordinate, PlottedChunksRegion> plottedChunks; // Per region
 
 	// Used to find distance between structures and structure groups, only stores 1 chunk per structure in the 
 	// calculated center of the structure. Does not clean itself when used with the pre-generator and will become 
@@ -64,31 +64,21 @@ public class CustomStructurePlotter
         this.spawnedStructuresByName = new HashMap<String, ArrayList<ChunkCoordinate>>();
         this.spawnedStructuresByGroup = new HashMap<String, HashMap<ChunkCoordinate, Integer>>();
         this.bo4StructureCache = new HashMap<ChunkCoordinate, BO4CustomStructure[][]>();
-        this.plottedChunks = new HashMap<ChunkCoordinate, boolean[][]>(); 
+        this.plottedChunks = new HashMap<ChunkCoordinate, PlottedChunksRegion>(); 
 	}
 
 	// Structure cache
 	
 	private boolean structureCacheContainsKey(ChunkCoordinate chunkCoordinate)
 	{
-		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
-		);
-		
-		int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
-		int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE); 
-		
+		ChunkCoordinate regionCoord = chunkCoordinate.toRegionCoord();				
 		BO4CustomStructure[][] chunkRegion = bo4StructureCache.get(regionCoord);
-		return chunkRegion != null && chunkRegion[internalX][internalZ] != null;
+		return chunkRegion != null && chunkRegion[chunkCoordinate.getRegionInternalX()][chunkCoordinate.getRegionInternalZ()] != null;
 	}
 	
 	private void addToStructureCache(ChunkCoordinate chunkCoordinate, BO4CustomStructure structure)
 	{
-		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
-		);
+		ChunkCoordinate regionCoord = chunkCoordinate.toRegionCoord();
 		
 		BO4CustomStructure[][] chunkRegion = this.bo4StructureCache.get(regionCoord);
 		if(chunkRegion == null)
@@ -96,24 +86,17 @@ public class CustomStructurePlotter
 			chunkRegion = new BO4CustomStructure[CustomStructureCache.REGION_SIZE][CustomStructureCache.REGION_SIZE];
 			this.bo4StructureCache.put(regionCoord, chunkRegion);
 		}
-		int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
-		int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE); 
-		chunkRegion[internalX][internalZ] = structure;
+		chunkRegion[chunkCoordinate.getRegionInternalX()][chunkCoordinate.getRegionInternalZ()] = structure;
 	}
 	
 	private void removeFromStructureCache(ChunkCoordinate chunkCoordinate)
 	{
-		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
-		);
+		ChunkCoordinate regionCoord = chunkCoordinate.toRegionCoord();
 		
 		BO4CustomStructure[][] chunkRegion = this.bo4StructureCache.get(regionCoord);
 		if(chunkRegion != null)
 		{
-			int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
-			int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE); 
-			chunkRegion[internalX][internalZ] = null;
+			chunkRegion[chunkCoordinate.getRegionInternalX()][chunkCoordinate.getRegionInternalZ()] = null;
 		}
 		
 		// TODO: Remove region from bo4StructureCache if it's empty? Shouldn't matter too much, region shouldn't be saved if it's empty.
@@ -121,17 +104,11 @@ public class CustomStructurePlotter
 	
 	private BO4CustomStructure getFromStructureCache(ChunkCoordinate chunkCoordinate)
 	{
-		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
-		);
-		
+		ChunkCoordinate regionCoord = chunkCoordinate.toRegionCoord();		
 		BO4CustomStructure[][] chunkRegion = this.bo4StructureCache.get(regionCoord);
 		if(chunkRegion != null)
 		{
-			int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
-			int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE); 
-			return chunkRegion[internalX][internalZ];
+			return chunkRegion[chunkCoordinate.getRegionInternalX()][chunkCoordinate.getRegionInternalZ()];
 		}
 		return null;
 	}
@@ -140,35 +117,21 @@ public class CustomStructurePlotter
 	
 	private boolean plottedChunksContainsKey(ChunkCoordinate chunkCoordinate)
 	{
-		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
-		);
-		
-		boolean[][] chunkRegion = plottedChunks.get(regionCoord);
-		int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
-		int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE);
-		
-		return chunkRegion != null && chunkRegion[internalX][internalZ];
+		ChunkCoordinate regionCoord = chunkCoordinate.toRegionCoord();
+		PlottedChunksRegion chunkRegion = plottedChunks.get(regionCoord);
+		return chunkRegion != null && chunkRegion.getChunk(chunkCoordinate.getRegionInternalX(), chunkCoordinate.getRegionInternalZ());
 	}
 	
 	private void addToPlottedChunks(ChunkCoordinate chunkCoordinate)
 	{
-		ChunkCoordinate regionCoord = ChunkCoordinate.fromChunkCoords(
-			MathHelper.floor((double)chunkCoordinate.getChunkX() / (double)CustomStructureCache.REGION_SIZE), 
-			MathHelper.floor((double)chunkCoordinate.getChunkZ() / (double)CustomStructureCache.REGION_SIZE)
-		);
-				
-		boolean[][] chunkRegion = this.plottedChunks.get(regionCoord);
+		ChunkCoordinate regionCoord = chunkCoordinate.toRegionCoord();				
+		PlottedChunksRegion chunkRegion = this.plottedChunks.get(regionCoord);
 		if(chunkRegion == null)
 		{
-			chunkRegion = new boolean[CustomStructureCache.REGION_SIZE][CustomStructureCache.REGION_SIZE];
+			chunkRegion = new PlottedChunksRegion();
 			this.plottedChunks.put(regionCoord, chunkRegion);
 		}
-		int internalX = MathHelper.mod(chunkCoordinate.getChunkX(), CustomStructureCache.REGION_SIZE);
-		int internalZ = MathHelper.mod(chunkCoordinate.getChunkZ(), CustomStructureCache.REGION_SIZE);
-		
-		chunkRegion[internalX][internalZ] = true;
+		chunkRegion.setChunk(chunkCoordinate.getRegionInternalX(), chunkCoordinate.getRegionInternalZ());
 	}	
 	
 	// Used while calculating branches
@@ -1143,7 +1106,7 @@ public class CustomStructurePlotter
 	public void loadStructureCache(LocalWorld world, Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures)
 	{
         this.bo4StructureCache.clear();
-
+        
 		if(world.isBo4Enabled())
 		{
 			if(loadedStructures != null)
@@ -1154,7 +1117,7 @@ public class CustomStructurePlotter
 					{
 						throw new RuntimeException("This shouldn't happen, please ask for help on the OTG Discord and/or file an issue on the OTG github.");
 					}
-
+				
 					// loadedStructures contains chunkcoords for every chunk ever plotted.
 					// We only need chunks plotted but not yet populated that contain structure parts.
 					// objectsToSpawn and smoothingAreasToSpawn contain all unspawned branches and 
@@ -1165,7 +1128,7 @@ public class CustomStructurePlotter
 					{
 						this.addToStructureCache(chunkCoord, (BO4CustomStructure)loadedStructure.getKey()); // This structure has blocks that need to be spawned
 					}
-					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).smoothingAreaManager.smoothingAreasToSpawn.keySet())
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).smoothingAreaManager.getSmoothingAreaChunkCoords())
 					{
 						this.addToStructureCache(chunkCoord, (BO4CustomStructure)loadedStructure.getKey()); // This structure has smoothing area blocks that need to be spawned
 					}

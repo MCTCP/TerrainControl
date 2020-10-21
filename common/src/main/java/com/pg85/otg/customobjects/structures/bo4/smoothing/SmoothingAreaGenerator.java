@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
@@ -17,16 +16,20 @@ import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaBlock.enumSmoothingBlockType;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 
 public class SmoothingAreaGenerator
 { 
     // A smoothing area is drawn around all outer blocks (or blocks neighbouring air) on the lowest layer of blocks in each BO3 of this branching structure that has a SmoothRadius set greater than 0.
 	// Holds all unspawned smoothing area lines per chunk.
-    public Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();	
+	public Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();	
     private Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawnPerLineDestination = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
-	
+	   
+    public ArrayList<ChunkCoordinate> getSmoothingAreaChunkCoords()
+    {
+    	return new ArrayList<ChunkCoordinate>(smoothingAreasToSpawn.keySet());
+    }
+    
 	// Adds a smoothing area around the lowest layer of blocks in all BO4's within this branching structure that have smoothRadius set to a value higher than 0.
 	// The smoothing area is a collection of lines starting from the edge of the BO4 going outwards and connecting to the surrounding terrain. Each line starts 
     // from a non-air block at y0 in the BO4 that has no neighbouring (non-air) block on one of four sides (taking into account any neighbouring branches that connect 
@@ -876,9 +879,12 @@ public class SmoothingAreaGenerator
     // Fill smoothingAreasToSpawn to store plotted smoothing areas until they're spawned, 
     // fill smoothingAreasToSpawnPerLineDestination so we can update all y endpoints at once after doing a terrain height check.
     
-    private void fillSmoothingLineCaches(Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn)
-	{
-		ChunkCoordinate destinationCoords;	
+    public void fillSmoothingLineCaches(Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn)
+	{    	
+    	this.smoothingAreasToSpawn.clear();
+    	this.smoothingAreasToSpawnPerLineDestination.clear();
+    	
+		ChunkCoordinate destinationCoords;
 		ArrayList<SmoothingAreaLine> smoothingAreaLines;
         ArrayList<SmoothingAreaLine> smoothingAreasAtEndpoint;
 		for(Entry<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingArea : smoothingAreasToSpawn.entrySet())
@@ -896,11 +902,16 @@ public class SmoothingAreaGenerator
 				if(!smoothingAreasAtEndpoint.contains(smoothingAreaLine))
 				{
 					smoothingAreasAtEndpoint.add(smoothingAreaLine);
-				}			
+				}
 			}
 		}
-		this.smoothingAreasToSpawn.putAll(smoothingAreasToSpawn);
+		this.smoothingAreasToSpawn.putAll(smoothingAreasToSpawn);		
 	}
+    
+    public void clearChunkFromCache(ChunkCoordinate chunkCoordinate)
+    {
+    	smoothingAreasToSpawn.remove(chunkCoordinate);
+    }
     
 	// Merges all the smoothing lines that were plotted earlier into one smoothing area per chunk and then spawns the smoothing area.
 	// Returns false if a smoothing area could not be finalised and spawning has to be delayed until other chunks have spawned.
@@ -917,7 +928,7 @@ public class SmoothingAreaGenerator
             // spawn in for chunk based collision detection so keep them
             // but empty them of blocks
             // TODO: Is this still needed?
-            smoothingAreasToSpawn.put(chunkCoordinate, null);
+            // smoothingAreasToSpawn.put(chunkCoordinate, null);
         }
     }
 
@@ -946,13 +957,13 @@ public class SmoothingAreaGenerator
 					smoothingBeginAndEndPoints.finalDestinationPointZ, 
 					true, false, true, true, true, null
 				);
-
+				
 				// Set the y coord for every smoothing line that uses this coord as an end point, so we don't have to do multiple height checks.
 				destinationCoords = ChunkCoordinate.fromChunkCoords(smoothingBeginAndEndPoints.finalDestinationPointX, smoothingBeginAndEndPoints.finalDestinationPointZ);
-				smoothingAreaLinesAtEndPoint = smoothingAreasToSpawnPerLineDestination.get(destinationCoords);
+				smoothingAreaLinesAtEndPoint = this.smoothingAreasToSpawnPerLineDestination.get(destinationCoords);
 				if(smoothingAreaLinesAtEndPoint != null) // smoothingAreaLinesAtEndPoint can be null when Pitman deletes and re-generates region files (sigh).
-				{
-					for(SmoothingAreaLine lineAtEndPoint : smoothingAreaLinesAtEndPoint)
+				{			
+					for(SmoothingAreaLine lineAtEndPoint : new ArrayList<SmoothingAreaLine>(smoothingAreaLinesAtEndPoint))
 					{
 						if(
 							lineAtEndPoint.finalDestinationPointX == smoothingBeginAndEndPoints.finalDestinationPointX &&
@@ -960,6 +971,21 @@ public class SmoothingAreaGenerator
 						)
 						{
 							lineAtEndPoint.finalDestinationPointY = smoothingBeginAndEndPoints.finalDestinationPointY;
+
+							// Make the cache self-cleaning, clear the line from the cache, we won't be needing it anymore.
+							smoothingAreaLinesAtEndPoint.remove(lineAtEndPoint);
+							if(smoothingAreaLinesAtEndPoint.isEmpty())
+							{
+								this.smoothingAreasToSpawnPerLineDestination.remove(destinationCoords);
+							}
+							
+							// Mark the structure cache chunk region for saving (structure start region is also marked at the end of bo4 spawnForChunk)
+							world.getStructureCache().markRegionForSaving(
+								ChunkCoordinate.fromBlockCoords(
+									lineAtEndPoint.beginPointX,
+									lineAtEndPoint.beginPointZ
+								).toRegionCoord()
+							);
 						}
 					}
 				}
