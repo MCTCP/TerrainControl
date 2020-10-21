@@ -216,7 +216,7 @@ public interface LocalWorld
 
 	public boolean isBo4Enabled();
 	
-	public void updateSpawnPointY(ChunkCoordinate chunkBeingPopulated);
+	public void updateSpawnPointY();
 
     // Used when setting blocks during population that should 
 	// use the same chc settings as the base terrain.

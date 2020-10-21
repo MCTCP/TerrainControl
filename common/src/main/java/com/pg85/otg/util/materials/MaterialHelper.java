@@ -33,6 +33,8 @@ public class MaterialHelper
     public static final LocalMaterialData STONE = MaterialHelper.toLocalMaterialData(DefaultMaterial.STONE, 0);
     public static final LocalMaterialData SNOW_BLOCK = MaterialHelper.toLocalMaterialData(DefaultMaterial.SNOW_BLOCK, 0);
     public static final LocalMaterialData VINE = MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 0);
+    public static final LocalMaterialData ICE = MaterialHelper.toLocalMaterialData(DefaultMaterial.ICE, 0);
+    public static final LocalMaterialData MAGMA = MaterialHelper.toLocalMaterialData(DefaultMaterial.MAGMA, 0);
     
     /**
      * @throws InvalidConfigException 
