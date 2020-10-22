@@ -43,7 +43,7 @@ import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v9.0_r12", dependencies="required-after:otgcore@[1.12.2 - v9.0_r12]")
+@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v9.0_r13", dependencies="required-after:otgcore@[1.12.2 - v9.0_r13]")
 public class OTGPlugin
 {	
 	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
@@ -146,7 +146,7 @@ public class OTGPlugin
     public void onFingerprintViolation(FMLFingerprintViolationEvent event)
     {
         //logger.warning("Invalid fingerprint detected!");
-    }
+    }        
     
     @EventHandler
     public void serverAboutToStart(FMLServerAboutToStartEvent event)
