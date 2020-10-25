@@ -461,19 +461,6 @@ public class Pregenerator
         ((WorldServer)this.world.getWorld()).disableLevelSaving = flag;
 
         ((WorldServer)this.world.getWorld()).getSaveHandler().flush();
-
-        /*
-        try
-        {
-        	((WorldServer)this.world.getWorld()).flushToDisk();
-        }
-        catch(NoSuchElementException ex)
-        {
-        	// TODO: Happens sometimes during pregeneration, likely a threading issue.
-        	// Hopefully aborting and retrying later won't cause problems.
-        	OTG.log(LogMarker.INFO, "An error occurred while flushing chunks to disk, aborting flush and continuing pregeneration.");
-        }
-        */
         
         this.world.getStructureCache().saveToDisk();
     }
