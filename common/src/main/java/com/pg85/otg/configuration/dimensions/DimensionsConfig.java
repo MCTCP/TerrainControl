@@ -10,6 +10,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -23,6 +24,9 @@ import com.pg85.otg.logging.LogMarker;
 
 public class DimensionsConfig
 {	
+	public String ModPackConfigName = null;
+	public int ModPackConfigVersion = 0;
+	
 	File worldSavesDir;
 	// Use capitals since we're serialising to yaml and we want to make it look nice
 	public boolean ShowOTGWorldCreationMenu = true;
@@ -45,7 +49,8 @@ public class DimensionsConfig
 		this.worldSavesDir = mcWorldSavesDir;
 		this.WorldName = worldDir;
 	}
-	
+		
+	@JsonIgnore	
 	public List<DimensionConfig> getAllDimensions()
 	{
 		List<DimensionConfig> dimensions = new ArrayList<DimensionConfig>();
@@ -176,7 +181,7 @@ public class DimensionsConfig
 		return presetsConfig;
 	}
 	
-	static DimensionsConfig defaultConfigfromFile(File file, File otgRootFolder)
+	static DimensionsConfig defaultConfigfromFile(File file, File otgRootFolder, boolean isModPackConfig)
 	{
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         DimensionsConfig presetsConfig = null;
@@ -192,17 +197,19 @@ public class DimensionsConfig
        	       	
        	if(presetsConfig != null)
        	{
-       		updateConfig(presetsConfig, otgRootFolder);
+       		updateConfig(presetsConfig, otgRootFolder, isModPackConfig);
        	}
        	
        	return presetsConfig;
 	}
 	
-	private static void updateConfig(DimensionsConfig dimsConfig, File otgRootFolder)
+	private static void updateConfig(DimensionsConfig dimsConfig, File otgRootFolder, boolean isModPackConfig)
 	{
+		boolean doSave = false;
        	// Update the config if necessary
        	if(dimsConfig.version == 0)
        	{
+       		doSave = true;
        		// Update the IsOTGPlus field from the worldconfig, added for v1.
        		if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
        		{
@@ -223,8 +230,72 @@ public class DimensionsConfig
            			}
        			}
        		}
-       		dimsConfig.save();
        	}
+       	if(!isModPackConfig)
+       	{
+			DimensionsConfig modPackConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(dimsConfig.Overworld.PresetName);
+			if(modPackConfig != null)
+			{
+				// The modpack config has been updated, overwrite settings for overworld and existing dims.
+				if(modPackConfig.ModPackConfigName != null && modPackConfig.ModPackConfigVersion > dimsConfig.ModPackConfigVersion)
+				{
+					doSave = true;
+					dimsConfig.ModPackConfigName = modPackConfig.ModPackConfigName;
+					dimsConfig.ModPackConfigVersion = modPackConfig.ModPackConfigVersion;
+					String seed = dimsConfig.Overworld.Seed;
+					String gameType = dimsConfig.Overworld.GameType;
+					boolean bonusChest = dimsConfig.Overworld.BonusChest;
+					boolean allowCheats = dimsConfig.Overworld.AllowCheats;
+					int dimId = 0;
+					int pregenerationRadius = dimsConfig.Overworld.PregeneratorRadiusInChunks;
+					int worldBorderRadius = dimsConfig.Overworld.WorldBorderRadiusInChunks;
+					DimensionConfig modPackDimConfigClone;
+					dimsConfig.Overworld = modPackConfig.Overworld.clone();
+					dimsConfig.Overworld.GameType = gameType;
+					dimsConfig.Overworld.BonusChest = bonusChest;
+					dimsConfig.Overworld.AllowCheats = allowCheats;
+					dimsConfig.Overworld.Seed = seed;
+					dimsConfig.Overworld.PregeneratorRadiusInChunks = pregenerationRadius;
+					dimsConfig.Overworld.WorldBorderRadiusInChunks = worldBorderRadius;
+					for(DimensionConfig modPackDimConfig : modPackConfig.Dimensions)
+					{
+						boolean bFound = false;
+						for(DimensionConfig dimConfig : new ArrayList<DimensionConfig>(dimsConfig.Dimensions))
+						{
+	   						if(dimConfig.PresetName.equals(modPackDimConfig.PresetName))
+	   						{
+	   							bFound = true;
+	   							dimsConfig.Dimensions.remove(dimConfig);
+	   							seed = dimConfig.Seed;
+	   							gameType = dimConfig.GameType;
+	   							bonusChest = dimConfig.BonusChest;
+	   							allowCheats = dimConfig.AllowCheats;	   							
+	   							dimId = dimConfig.DimensionId;
+	   							pregenerationRadius = dimConfig.PregeneratorRadiusInChunks;
+	   							worldBorderRadius = dimConfig.WorldBorderRadiusInChunks;
+	   							modPackDimConfigClone = modPackDimConfig.clone();
+	   							modPackDimConfigClone.Seed = seed;
+	   							modPackDimConfigClone.GameType = gameType;
+	   							modPackDimConfigClone.BonusChest = bonusChest;
+	   							modPackDimConfigClone.AllowCheats = allowCheats;
+	   							modPackDimConfigClone.DimensionId = dimId;
+	   							modPackDimConfigClone.PregeneratorRadiusInChunks = pregenerationRadius;
+	   							modPackDimConfigClone.WorldBorderRadiusInChunks = worldBorderRadius;	
+	   							dimsConfig.Dimensions.add(modPackDimConfigClone);
+	   						}
+						}
+						if(!bFound)
+						{
+							dimsConfig.Dimensions.add(modPackDimConfig.clone());
+						}
+					}
+				}
+			}
+       	}
+   		if(doSave)
+   		{
+   			dimsConfig.save();
+   		}
 	}
 	
 	/**
@@ -260,7 +331,7 @@ public class DimensionsConfig
 		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
 		       	try
 		       	{
-			       	updateConfig(presetsConfig, otgRootFolder);
+			       	updateConfig(presetsConfig, otgRootFolder, false);
 					return presetsConfig;
 		       	}
 		       	catch(Exception ex)
@@ -288,7 +359,7 @@ public class DimensionsConfig
 		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
 		       	try
 		       	{
-			       	updateConfig(presetsConfig, otgRootFolder);
+			       	updateConfig(presetsConfig, otgRootFolder, false);
 					return presetsConfig;
 		       	}
 		       	catch(Exception ex)

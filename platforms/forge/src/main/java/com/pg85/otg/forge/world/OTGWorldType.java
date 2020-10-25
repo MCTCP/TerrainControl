@@ -76,6 +76,8 @@ public class OTGWorldType extends WorldType
         	        if(modPackConfig != null)
         	        {
         	        	DimensionsConfig dimsConfig = new DimensionsConfig(mcWorld.getSaveHandler().getWorldDirectory());
+        	        	dimsConfig.ModPackConfigName = modPackConfig.ModPackConfigName;
+        	        	dimsConfig.ModPackConfigVersion = modPackConfig.ModPackConfigVersion;
         	        	dimsConfig.Overworld = modPackConfig.Overworld.clone();
         	        	for(DimensionConfig dimConfig : modPackConfig.Dimensions)
     	        		{

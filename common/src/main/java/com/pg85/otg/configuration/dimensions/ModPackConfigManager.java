@@ -24,7 +24,7 @@ public class ModPackConfigManager
 		{
 			for(File f : configDir.listFiles())
 			{
-				DimensionsConfig forgeWorldConfig = DimensionsConfig.defaultConfigfromFile(f, otgRootFolder);
+				DimensionsConfig forgeWorldConfig = DimensionsConfig.defaultConfigfromFile(f, otgRootFolder, true);
 				if(forgeWorldConfig != null)
 				{
 					// If there's multiple configs targeting the same preset for their overworld,
