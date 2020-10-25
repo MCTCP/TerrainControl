@@ -188,7 +188,7 @@ public class BO4CustomStructure extends CustomStructure
 		{
 			calculateBranches(false, world, targetBiomes, chunkBeingPopulated);
 		} catch (InvalidConfigException ex) {
-			OTG.log(LogMarker.FATAL, "An unknown error occurred while calculating branches for BO3 " + this.start.bo3Name + ". This is probably an error in the BO3's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
+			OTG.log(LogMarker.FATAL, "An unknown error occurred while calculating branches for BO4 " + this.start.bo3Name + ". This is probably an error in the BO4's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
 			throw new RuntimeException();
 		}
 
@@ -287,56 +287,61 @@ public class BO4CustomStructure extends CustomStructure
 			// Material checks:
 			// A BO3 may need to perform material checks when using !CanSpawnOnWater or SpawnOnWaterOnly
 
+	    	BO4Config config = ((BO4)this.start.getObject()).getConfig();
+	    	
 	    	short startY = 0;
 			int centerX = this.start.getX() + 8;
 			int centerZ = this.start.getZ() + 7;
-			// If this structure has been exported as BO4Data with a minimum size,
-			// use the center of the structure to check terrain height
-	    	if(
-				((BO4)this.start.getObject()).getConfig().minimumSizeTop != -1 &&
-				((BO4)this.start.getObject()).getConfig().minimumSizeBottom != -1 &&
-				((BO4)this.start.getObject()).getConfig().minimumSizeLeft != -1 &&
-				((BO4)this.start.getObject()).getConfig().minimumSizeRight != -1)
-	    	{
-	    		if(this.start.rotation == Rotation.NORTH)
-	    		{
-	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeLeft + ((BO4)this.start.getObject()).getConfig().minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeTop + ((BO4)this.start.getObject()).getConfig().minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    		}
-	    		if(this.start.rotation == Rotation.SOUTH)
-	    		{
-	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeRight + ((BO4)this.start.getObject()).getConfig().minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeBottom + ((BO4)this.start.getObject()).getConfig().minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    		}
-	    		if(this.start.rotation == Rotation.EAST)
-	    		{
-	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeBottom + ((BO4)this.start.getObject()).getConfig().minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeLeft + ((BO4)this.start.getObject()).getConfig().minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    		}    		
-	    		if(this.start.rotation == Rotation.WEST)
-	    		{
-	    			centerX = this.start.getX() + 8 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeTop + ((BO4)this.start.getObject()).getConfig().minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    			centerZ = this.start.getZ() + 7 + (((-((BO4)this.start.getObject()).getConfig().minimumSizeRight + ((BO4)this.start.getObject()).getConfig().minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
-	    		}    		
-	    	}
-	    		    	
+			if(config.useCenterForHighestBlock)
+			{
+				// If this structure has been exported as BO4Data with a minimum size,
+				// use the center of the structure to check terrain height
+		    	if(
+	    			config.minimumSizeTop != -1 &&
+					config.minimumSizeBottom != -1 &&
+					config.minimumSizeLeft != -1 &&
+					config.minimumSizeRight != -1)
+		    	{
+		    		if(this.start.rotation == Rotation.NORTH)
+		    		{
+		    			centerX = this.start.getX() + 8 + (((-config.minimumSizeLeft + config.minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    			centerZ = this.start.getZ() + 7 + (((-config.minimumSizeTop + config.minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    		}
+		    		if(this.start.rotation == Rotation.SOUTH)
+		    		{
+		    			centerX = this.start.getX() + 8 + (((-config.minimumSizeRight + config.minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    			centerZ = this.start.getZ() + 7 + (((-config.minimumSizeBottom + config.minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    		}
+		    		if(this.start.rotation == Rotation.EAST)
+		    		{
+		    			centerX = this.start.getX() + 8 + (((-config.minimumSizeBottom + config.minimumSizeTop) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    			centerZ = this.start.getZ() + 7 + (((-config.minimumSizeLeft + config.minimumSizeRight) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    		}    		
+		    		if(this.start.rotation == Rotation.WEST)
+		    		{
+		    			centerX = this.start.getX() + 8 + (((-config.minimumSizeTop + config.minimumSizeBottom) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    			centerZ = this.start.getZ() + 7 + (((-config.minimumSizeRight + config.minimumSizeLeft) * ChunkCoordinate.CHUNK_SIZE) / 2);
+		    		}    		
+		    	}
+			}
+
 			if(
-				((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestBlock || 
-				((BO4)this.start.getObject()).getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock
+				config.spawnHeight == SpawnHeightEnum.highestBlock || 
+				config.spawnHeight == SpawnHeightEnum.highestSolidBlock
 			)
 			{				
-				if(((BO4)this.start.getObject()).getConfig().spawnAtWaterLevel)
+				if(config.spawnAtWaterLevel)
 				{
 					LocalBiome biome = world.getBiome(centerX, centerZ);
 					startY = (short) (biome.getBiomeConfig().useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biome.getBiomeConfig().waterLevelMax);
 				} else {
 					// Passing null for chunk being populated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
-					int highestBlock = world.getHighestBlockYAt(centerX, centerZ, true, !((BO4)this.start.getObject()).getConfig().spawnUnderWater, ((BO4)this.start.getObject()).getConfig().spawnUnderWater, true, true, null);
+					int highestBlock = world.getHighestBlockYAt(centerX, centerZ, true, !config.spawnUnderWater, config.spawnUnderWater, true, true, null);
 					if(highestBlock < 0)
 					{
-						if(((BO4)this.start.getObject()).getConfig().heightOffset > 0) // Allow floating structures that use highestblock + heightoffset
+						if(config.heightOffset > 0) // Allow floating structures that use highestblock + heightoffset
 						{
-							highestBlock = ((BO4)this.start.getObject()).getConfig().heightOffset;
+							highestBlock = config.heightOffset;
 						} else {
 							return false;
 						}
@@ -345,27 +350,27 @@ public class BO4CustomStructure extends CustomStructure
 					}
 				}
 			} else {
-				if(((BO4)this.start.getObject()).getConfig().maxHeight != ((BO4)this.start.getObject()).getConfig().minHeight)
+				if(config.maxHeight != config.minHeight)
 				{
-					startY = (short) (((BO4)this.start.getObject()).getConfig().minHeight + new Random().nextInt(((BO4)this.start.getObject()).getConfig().maxHeight - ((BO4)this.start.getObject()).getConfig().minHeight));
+					startY = (short) (config.minHeight + new Random().nextInt(config.maxHeight - config.minHeight));
 				} else {
-					startY = (short) ((BO4)this.start.getObject()).getConfig().minHeight;
+					startY = (short) config.minHeight;
 				}
 			}
 
-			if(startY < ((BO4)this.start.getObject()).getConfig().minHeight || startY > ((BO4)this.start.getObject()).getConfig().maxHeight)
+			if(startY < config.minHeight || startY > config.maxHeight)
 			{
 				return false;
 			}
 
-			startY += ((BO4)this.start.getObject()).getConfig().heightOffset;
+			startY += config.heightOffset;
 
 			if(startY < PluginStandardValues.WORLD_DEPTH || startY >= PluginStandardValues.WORLD_HEIGHT)
 			{
 				return false;
 			}
 
-			if(!((BO4)this.start.getObject()).getConfig().canSpawnOnWater)
+			if(!config.canSpawnOnWater)
 			{
 				if(world.getMaterial(this.start.getX() + 8, world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true, null), this.start.getZ() + 7, null).isLiquid())
 				{
@@ -373,7 +378,7 @@ public class BO4CustomStructure extends CustomStructure
 				}
 			}
 
-			if(((BO4)this.start.getObject()).getConfig().spawnOnWaterOnly)
+			if(config.spawnOnWaterOnly)
 			{
 				if(
 					!(
@@ -863,7 +868,7 @@ public class BO4CustomStructure extends CustomStructure
 
 	        		    if(!minimumSize && canSpawn)
 	        		    {
-	        	    		if(!checkYBounds(childBranchDataItem.branch))
+	        	    		if(!checkYBounds(world, childBranchDataItem.branch))
 	        	    		{
 		    					canSpawn = false;
         						chunkIsIneligible = true;
@@ -2032,10 +2037,10 @@ public class BO4CustomStructure extends CustomStructure
     	return collidingObjects;
     }
 
-    private boolean checkYBounds(CustomStructureCoordinate branchData1Branch)
+    private boolean checkYBounds(LocalWorld world, CustomStructureCoordinate branchData1Branch)
     {
         int startY = branchData1Branch.getY() + ((BO4)branchData1Branch.getObject()).getConfig().getminY();
-        return startY > 0;
+        return world.getConfigs().getWorldConfig().disableBedrock ? startY >= 0 : startY > 0;
     }
     
     private boolean checkCollision(CustomStructureCoordinate branchData1Branch, CustomStructureCoordinate branchData2Branch)

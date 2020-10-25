@@ -24,7 +24,8 @@ class BO4Settings extends Settings
 		ISSPAWNPOINT = booleanSetting("IsSpawnPoint", false),
 		SMOOTHSTARTTOP = booleanSetting("SmoothStartTop", false),
 		SMOOTHSTARTWOOD = booleanSetting("SmoothStartWood", false),
-		DO_REPLACE_BLOCKS = booleanSetting("DoReplaceBlocks", true)
+		DO_REPLACE_BLOCKS = booleanSetting("DoReplaceBlocks", true),
+		USE_CENTER_FOR_HIGHEST_BLOCK = booleanSetting("UseCenterForHighestBlock", true)		
     ;
 
     static final Setting<Rotation> INHERITBO3ROTATION = rotationSetting("InheritBO3Rotation", Rotation.NORTH);
