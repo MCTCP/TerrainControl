@@ -250,7 +250,7 @@ public class BO3 implements StructuredCustomObject
         }
         // Offset by static and random settings values
         // TODO: This is pointless used with randomY?
-        offsetY = baseY += this.getOffsetAndVariance(random, this.settings.spawnHeightOffset, this.settings.spawnHeightVariance);
+        offsetY = baseY + this.getOffsetAndVariance(random, this.settings.spawnHeightOffset, this.settings.spawnHeightVariance);
         return trySpawnAt(null, world, random, rotation, x, offsetY, z, minY, maxY, baseY, chunkBeingPopulated, replaceBlocks);
     }
     
