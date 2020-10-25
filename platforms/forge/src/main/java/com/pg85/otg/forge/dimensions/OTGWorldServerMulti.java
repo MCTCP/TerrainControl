@@ -88,7 +88,7 @@ public class OTGWorldServerMulti extends WorldServer
     	}
         return this;
     }
-
+    
     /**
      * Syncs all changes to disk and wait for completion.
      */

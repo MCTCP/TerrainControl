@@ -23,6 +23,7 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.forge.dimensions.OTGDimensionManager;
+import com.pg85.otg.forge.dimensions.OTGWorldServerMulti;
 import com.pg85.otg.forge.world.ForgeWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -457,6 +458,11 @@ public class Pregenerator
 		} catch (MinecraftException e) {
 			e.printStackTrace();
 		}
+        ((WorldServer)this.world.getWorld()).disableLevelSaving = flag;
+
+        ((WorldServer)this.world.getWorld()).getSaveHandler().flush();
+
+        /*
         try
         {
         	((WorldServer)this.world.getWorld()).flushToDisk();
@@ -467,7 +473,9 @@ public class Pregenerator
         	// Hopefully aborting and retrying later won't cause problems.
         	OTG.log(LogMarker.INFO, "An error occurred while flushing chunks to disk, aborting flush and continuing pregeneration.");
         }
-        ((WorldServer)this.world.getWorld()).disableLevelSaving = flag;        
+        */
+        
+        this.world.getStructureCache().saveToDisk();
     }
 
 	private void pause()

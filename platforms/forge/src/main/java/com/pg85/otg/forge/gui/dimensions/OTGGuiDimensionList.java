@@ -65,8 +65,12 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
     private OTGGuiSlotDimensionList dimensionsList;
     public int selectedDimensionIndex = -1;
     public String worldName;
+    // TODO: Why not just cache the modpack config / DimensionsConfig?
+    public String modPackConfigName;
+    public int modPackConfigVersion;
     public final ArrayList<DimensionConfig> dimensions;
-    private final ArrayList<DimensionConfig> originalDimensions;
+    //
+    private final ArrayList<DimensionConfig> originalDimensions;   
     public DimensionConfig selectedDimension;
     
     public int listWidth = 100;
@@ -113,6 +117,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         	if(Minecraft.getMinecraft().isSingleplayer())
         	{
         		// For SP values are applied immediately, don't clone.
+        		this.modPackConfigName = OTG.getDimensionsConfig().ModPackConfigName;
+        		this.modPackConfigVersion = OTG.getDimensionsConfig().ModPackConfigVersion;
         		this.dimensions.add(OTG.getDimensionsConfig().Overworld);
             	for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
             	{
@@ -134,6 +140,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		        defaultConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(previousMenu.selectedPreset.getFirst());
 		        if(defaultConfig != null)
 		        {
+		        	this.modPackConfigName = defaultConfig.ModPackConfigName;
+		        	this.modPackConfigVersion = defaultConfig.ModPackConfigVersion;
 		        	this.dimensions.add(defaultConfig.Overworld.clone());
 		        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
 		        	{
@@ -192,6 +200,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
         this.lastScrollPos = lastScrollPos;
         
     	// If world is null then we're ingame
+        this.modPackConfigName = OTG.getDimensionsConfig().ModPackConfigName;
+        this.modPackConfigVersion = OTG.getDimensionsConfig().ModPackConfigVersion;
 		this.dimensions.add(OTG.getDimensionsConfig().Overworld.clone());
     	for(DimensionConfig dimConfig : OTG.getDimensionsConfig().Dimensions)
     	{
@@ -257,6 +267,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
 		    	        if(defaultConfig != null)
 		    	        {
 		    				DimensionConfig newConfig = null;
+		    				this.modPackConfigName = defaultConfig.ModPackConfigName;
+		    				this.modPackConfigVersion = defaultConfig.ModPackConfigVersion;
 		    	        	for(DimensionConfig dimConfig : defaultConfig.Dimensions)
 		    	        	{
 		    	        		if(dimConfig.PresetName.equals(this.selectPresetForDimensionMenu.selectedPreset.getFirst()))
@@ -707,6 +719,8 @@ public class OTGGuiDimensionList extends GuiScreen implements GuiYesNoCallback
             if (this.mc.getSaveLoader().getWorldInfo(worldName) == null)
             {    				
         		DimensionsConfig forgeWorldConfig = new DimensionsConfig(new File(this.mc.gameDir.getAbsolutePath() + File.separator + "saves" + File.separator), this.worldName);
+        		forgeWorldConfig.ModPackConfigName = this.modPackConfigName;
+        		forgeWorldConfig.ModPackConfigVersion = this.modPackConfigVersion;
         		forgeWorldConfig.WorldName = this.worldName;
         		forgeWorldConfig.Overworld = this.dimensions.get(0).clone();
         		forgeWorldConfig.Dimensions = new ArrayList<DimensionConfig>();

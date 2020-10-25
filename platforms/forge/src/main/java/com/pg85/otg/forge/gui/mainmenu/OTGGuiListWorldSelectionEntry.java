@@ -365,6 +365,8 @@ public class OTGGuiListWorldSelectionEntry implements GuiListExtended.IGuiListEn
 			DimensionsConfig modPackConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(null);
 			if(modPackConfig != null)
 			{
+				dimsConfig.ModPackConfigName = modPackConfig.ModPackConfigName;
+				dimsConfig.ModPackConfigVersion = modPackConfig.ModPackConfigVersion;
 				dimsConfig.Overworld = modPackConfig.Overworld.clone();
 				for(DimensionConfig dimConfig : modPackConfig.Dimensions)
 				{

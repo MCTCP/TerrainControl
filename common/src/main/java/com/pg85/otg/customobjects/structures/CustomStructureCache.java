@@ -231,7 +231,7 @@ public class CustomStructureCache
 
     public void saveToDisk()
     {
-    	OTG.log(LogMarker.INFO, "Saving structure data");
+    	OTG.log(LogMarker.INFO, "Saving structure and pregenerator data.");
     	boolean firstLog = false;
     	long starTime = System.currentTimeMillis();
 		while(true)
@@ -265,23 +265,17 @@ public class CustomStructureCache
 			this.world.getObjectSpawner().saveRequired = false;
 			this.world.getObjectSpawner().saving = false;
 		}
-		OTG.log(LogMarker.INFO, "Structure data saved.");
+		OTG.log(LogMarker.INFO, "Structure and pregenerator data saved.");
     }
 
     private void saveStructureCache()
     {
-    	OTG.log(LogMarker.INFO, "Saving structures and pre-generator data");
-        
 	    CustomStructureFileManager.saveStructureData(this.worldInfoChunks, this.world);
 	    
 	    if(this.world.isBo4Enabled())
 	    {
 	    	plotter.saveStructureCache(this.world);
 	    }
-
-	    //OTG.log(LogMarker.DEBUG, "Saved " + structuresSaved + " structure chunks");
-	    
-		OTG.log(LogMarker.INFO, "Saving done");
     }
 
 	private void loadStructureCache()

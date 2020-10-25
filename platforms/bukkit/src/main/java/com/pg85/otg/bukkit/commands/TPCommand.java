@@ -107,7 +107,7 @@ public class TPCommand extends BaseCommand
 
         						if(
     								biome != null &&
-									biome.getIds().getOTGBiomeId() == biomeId        	        	    										
+									biome.getIds().getOTGBiomeId() == biomeId
 								)
         						{
         							Location loc = new Location(playerLoc.getWorld(), (double)chunkCoord.getBlockXCenter(), (double)world.getHighestBlockAboveYAt(chunkCoord.getBlockXCenter(), chunkCoord.getBlockZCenter(), null), (double)chunkCoord.getBlockZCenter());
