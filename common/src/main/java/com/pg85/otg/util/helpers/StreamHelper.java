@@ -44,7 +44,7 @@ public class StreamHelper
 	    }
 	}
 	
-	public static String readStringFromBuffer(ByteBuffer buffer) throws IOException
+	public static String readStringFromBuffer(ByteBuffer buffer) throws IOException, BufferUnderflowException
 	{
 		boolean isNull = buffer.get() != 0;
 		if(isNull)
@@ -56,14 +56,7 @@ public class StreamHelper
 	    byte[] chars = new byte[length];
 	    if(length > 0)
 	    {
-	    	try
-	    	{
-	    		buffer.get(chars, 0, chars.length);
-	    	}
-	    	catch(BufferUnderflowException ex)
-	    	{
-	    		throw new EOFException();
-	    	}
+    		buffer.get(chars, 0, chars.length);
 		    return new String(chars);
 	    } else {
     		return "";

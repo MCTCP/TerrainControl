@@ -122,12 +122,7 @@ public class CustomStructureFileManager
 		        catch (IOException e)
 		        {
 					e.printStackTrace();
-					throw new RuntimeException(
-						"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
-						+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
-						+ "If your dimension's structure data files and backups have been corrupted, you can delete them,"
-						+ "at the risk of losing data for unspawned structure parts."
-					);
+					OTG.log(LogMarker.INFO, "OTG encountered an error writing " + occupiedChunksFile.getAbsolutePath() + ", skipping.");
 		        } finally {
 		            try {
 		                if(dos != null)
@@ -250,7 +245,7 @@ public class CustomStructureFileManager
 				catch (Exception ex)
 				{
 					ex.printStackTrace();
-					OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
+					OTG.log(LogMarker.INFO, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
 				} finally {
 					if(fis != null)
 					{
@@ -322,7 +317,7 @@ public class CustomStructureFileManager
 		    	if(regionCoord != null)
 		    	{
 		    		output.put(regionCoord, PlottedChunksRegion.getFilledRegion());
-					OTG.log(LogMarker.WARN,
+					OTG.log(LogMarker.INFO,
 						"OTG encountered an error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, substituting a default filled region. "
 						+ "This may result in areas with missing BO4's, smoothing areas, /otg structure info and spawners/particles/moddata."
 					);
@@ -344,16 +339,20 @@ public class CustomStructureFileManager
 	{
 		int version = buffer.getInt();		
 		int regionSize = buffer.getInt();
-		boolean[][] chunksMatrix = new boolean[regionSize][regionSize];
-		
-		for(int x = 0; x < regionSize; x++)
-		{
-			for(int z = 0; z < regionSize; z++)
+		boolean[][] chunksMatrix = new boolean[CustomStructureCache.REGION_SIZE][CustomStructureCache.REGION_SIZE];
+		if(regionSize == CustomStructureCache.REGION_SIZE)
+		{		
+			for(int x = 0; x < regionSize; x++)
 			{
-				chunksMatrix[x][z] = buffer.get() != 0;
+				for(int z = 0; z < regionSize; z++)
+				{
+					chunksMatrix[x][z] = buffer.get() != 0;
+				}
 			}
+		} else {
+			OTG.log(LogMarker.INFO, "PlottedChunks region files were corrupted or exported with an incompatible version of OTG, ignoring.");
+			return PlottedChunksRegion.getFilledRegion();
 		}
-
 		return new PlottedChunksRegion(chunksMatrix);
 	}
 	
@@ -711,12 +710,7 @@ public class CustomStructureFileManager
         catch (IOException e)
         {
 			e.printStackTrace();
-			throw new RuntimeException(
-				"OTG encountered a critical error writing " + structuresRegionFile.getAbsolutePath() + ", exiting. "
-				+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
-				+ "If your dimension's structure data files and backups have been corrupted, you can delete them,"
-				+ "at the risk of losing data for unspawned structure parts."
-			);
+			OTG.log(LogMarker.INFO, "OTG encountered an error writing " + structuresRegionFile.getAbsolutePath() + ", skipping.");
         } finally {
             try {
                 if(dos != null)
@@ -836,7 +830,7 @@ public class CustomStructureFileManager
 				catch (Exception ex)
 				{
 					ex.printStackTrace();
-					OTG.log(LogMarker.WARN, "Failed to load " + structureDataFile.getAbsolutePath() + ", trying to load backup.");
+					OTG.log(LogMarker.INFO, "Failed to load " + structureDataFile.getAbsolutePath() + ", trying to load backup.");
 				} finally {
 					if(fis != null)
 					{
@@ -904,7 +898,7 @@ public class CustomStructureFileManager
 		    }
 		    if(!bSuccess)
 		    {
-				OTG.log(LogMarker.WARN,
+				OTG.log(LogMarker.INFO,
 					"OTG encountered an error loading " + structureDataFile.getAbsolutePath() + " and could not load a backup, ignoring. "
 					+ "This may result in areas with missing BO4's, smoothing areas, /otg structure info and spawners/particles/moddata."
 				);
@@ -954,13 +948,14 @@ public class CustomStructureFileManager
 	}
 
 	// TODO: Since we're using regions now, can use byte/short for internal coords instead of int.
+	// TODO: Dev versions of v9 used region size 100, not 250, this may cause problems.
 	private static HashMap<CustomStructure, ArrayList<ChunkCoordinate>> parseStructuresFileFromStream(ByteBuffer buffer, ChunkCoordinate regionCoord, LocalWorld world) throws IOException
 	{
-		int version = buffer.getInt();		
+		int version = buffer.getInt();
 		HashMap<CustomStructure, ArrayList<ChunkCoordinate>> structuresFile = new HashMap<CustomStructure, ArrayList<ChunkCoordinate>>();
 		int structureNamesSize = buffer.getInt();
 		for(int i = 0; i < structureNamesSize; i++)
-		{			
+		{
 			String structureName = StreamHelper.readStringFromBuffer(buffer);
 			Rotation startRotationId;
 			int startX;
@@ -1236,11 +1231,7 @@ public class CustomStructureFileManager
 				dos2.write(compressedBytes, 0, compressedBytes.length);
 	        } catch (IOException e) {
 				e.printStackTrace();
-				throw new RuntimeException(
-					"OTG encountered a critical error writing " + occupiedChunksFile.getAbsolutePath() + ", exiting. "
-					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "					
-					+ "If your dimension's " + WorldStandardValues.SpawnedStructuresFileName + " and its backup have been corrupted, "
-					+ "you can replace it with your own backup.");
+				OTG.log(LogMarker.INFO, "OTG encountered an error writing " + occupiedChunksFile.getAbsolutePath() + ", skipping.");
 	        } finally {
 	            try {
 	                if(dos != null)
@@ -1292,7 +1283,7 @@ public class CustomStructureFileManager
 			catch (Exception ex)
 			{
 				ex.printStackTrace();
-				OTG.log(LogMarker.WARN, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
+				OTG.log(LogMarker.INFO, "Failed to load " + occupiedChunksFile.getAbsolutePath() + ", trying to load backup.");
 			} finally {
 				if(fis != null)
 				{
@@ -1344,7 +1335,7 @@ public class CustomStructureFileManager
 			}
 	    }
 		
-		OTG.log(LogMarker.WARN, "OTG encountered an error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, skipping. ");
+		OTG.log(LogMarker.INFO, "OTG encountered an error loading " + occupiedChunksFile.getAbsolutePath() + " and could not load a backup, skipping. ");
 	}
 
 	private static void parseChunksMapFileFromStream(ByteBuffer buffer, LocalWorld world, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup) throws IOException

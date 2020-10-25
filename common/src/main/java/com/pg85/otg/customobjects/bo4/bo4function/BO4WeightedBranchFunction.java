@@ -183,21 +183,15 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
     {    	
         StreamHelper.writeStringToStream(stream, makeString());
     }
-    
-    public static BO4WeightedBranchFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException
+
+    public static BO4WeightedBranchFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException, InvalidConfigException
     {
-    	BO4WeightedBranchFunction branchFunction = new BO4WeightedBranchFunction(holder);  	
-    	
+    	BO4WeightedBranchFunction branchFunction = new BO4WeightedBranchFunction(holder);
         String configFunctionString = StreamHelper.readStringFromBuffer(buffer);
         int bracketIndex = configFunctionString.indexOf('(');
         String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
         List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
-        
-        try {
-			branchFunction.load(args);
-		} catch (InvalidConfigException e) {
-			e.printStackTrace();
-		}            	           
+		branchFunction.load(args);
     	return branchFunction;
     }
 }

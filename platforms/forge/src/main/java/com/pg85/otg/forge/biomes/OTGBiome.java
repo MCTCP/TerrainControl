@@ -125,7 +125,7 @@ public class OTGBiome extends Biome implements IOTGASMBiome
     			return super.getFoliageColorAtPos(pos);
     		}
     	}
-    }   
+    }
 
     // Adds the mobs to the internal list
     private void addMobs(List<SpawnListEntry> internalList, List<WeightedMobSpawnGroup> configList)//, boolean improvedMobSpawning)

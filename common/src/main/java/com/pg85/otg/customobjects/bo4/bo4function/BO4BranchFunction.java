@@ -213,20 +213,14 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
         StreamHelper.writeStringToStream(stream, makeString());
     }
     
-    public static BO4BranchFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException
+    public static BO4BranchFunction fromStream(BO4Config holder, ByteBuffer buffer) throws IOException, InvalidConfigException
     {
-    	BO4BranchFunction branchFunction = new BO4BranchFunction(holder);  	
-    	
+    	BO4BranchFunction branchFunction = new BO4BranchFunction(holder);    	
         String configFunctionString = StreamHelper.readStringFromBuffer(buffer);
         int bracketIndex = configFunctionString.indexOf('(');
         String parameters = configFunctionString.substring(bracketIndex + 1, configFunctionString.length() - 1);
-        List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));
-        
-        try {
-			branchFunction.load(args);
-		} catch (InvalidConfigException e) {
-			e.printStackTrace();
-		}            	           
+        List<String> args = Arrays.asList(StringHelper.readCommaSeperatedString(parameters));        
+		branchFunction.load(args);
     	return branchFunction;
     }
 }

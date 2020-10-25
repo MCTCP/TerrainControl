@@ -73,13 +73,15 @@ public class BO4EntityFunction extends EntityFunction<BO4Config>
     	entityFunction.x = buffer.getInt();
     	entityFunction.y = buffer.getInt();
     	entityFunction.z = buffer.getInt();
-    	
+
     	entityFunction.processEntityName(StreamHelper.readStringFromBuffer(buffer));
     	entityFunction.groupSize = buffer.getInt();
     	entityFunction.nameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
     	entityFunction.originalNameTagOrNBTFileName= StreamHelper.readStringFromBuffer(buffer);
     	if (entityFunction.originalNameTagOrNBTFileName != null)
+    	{
     	    entityFunction.processNameTagOrFileName(entityFunction.originalNameTagOrNBTFileName);
+    	}
     	entityFunction.rotation = 0;
     	
     	return entityFunction;
