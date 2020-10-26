@@ -202,8 +202,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        		(
 	        				this.mc.world.provider.getDimension() == 0 && 
 	        				this.controlsScreen.selectedDimensionIndex == 0
-        				) ||
-		        		(
+        				) || (
 	        				this.mc.world.provider.getDimension() != 0 &&
 		        			selectedDim.PresetName.equals(loadedWorld.getName())
 	        			)
@@ -261,7 +260,7 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 	        else if(advancedSettingsMenu)
 	        {
 	        	this.controlsScreen.btnCancel.displayString = "Back";              	
-	        	        
+
 		        listEntries.add(new CategoryEntry(this, "Blocks"));
 		        
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("PlayersCanBreakBlocks", dimConfig.Settings.PlayersCanBreakBlocks, defaultConfig != null ? defaultConfig.Settings.PlayersCanBreakBlocks : WorldStandardValues.PLAYERS_CAN_BREAK_BLOCKS.getDefaultValue(), null, null, false), this));
@@ -291,9 +290,9 @@ public class OTGGuiDimensionSettingsList extends OTGGuiListExtended
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("HasSkyLight", dimConfig.Settings.HasSkyLight, defaultConfig != null ? defaultConfig.Settings.HasSkyLight : WorldStandardValues.HasSkyLight.getDefaultValue(), true), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("AlwaysNight", dimConfig.Settings.IsNightWorld, defaultConfig != null ? defaultConfig.Settings.IsNightWorld : WorldStandardValues.IsNightWorld.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("IsSkyColored", dimConfig.Settings.IsSkyColored, defaultConfig != null ? defaultConfig.Settings.IsSkyColored : WorldStandardValues.IsSkyColored.getDefaultValue(), false), this));
-	
+
 		        listEntries.add(new CategoryEntry(this, "Weather and fog"));
-		        
+
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("CanDoLightning", dimConfig.Settings.CanDoLightning, defaultConfig != null ? defaultConfig.Settings.CanDoLightning : WorldStandardValues.CanDoLightning.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Boolean>("CanDoRainSnowIce", dimConfig.Settings.CanDoRainSnowIce, defaultConfig != null ? defaultConfig.Settings.CanDoRainSnowIce : WorldStandardValues.CanDoRainSnowIce.getDefaultValue(), false), this));
 		        listEntries.add(new KeyEntry(this, new SettingEntry<Integer>("CloudHeight", dimConfig.Settings.CloudHeight, defaultConfig != null ? defaultConfig.Settings.CloudHeight : WorldStandardValues.CloudHeight.getDefaultValue(), ((IntSetting)WorldStandardValues.CloudHeight).getMinValue(), ((IntSetting)WorldStandardValues.CloudHeight).getMaxValue(), false), this));
