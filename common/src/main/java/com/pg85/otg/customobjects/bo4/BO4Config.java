@@ -1554,7 +1554,7 @@ public class BO4Config extends CustomObjectConfigFile
         }
     }
 
-    int bo4DataVersion = 1;
+    int bo4DataVersion = 2;
     public void writeToStream(DataOutput stream) throws IOException
     {
     	stream.writeInt(this.bo4DataVersion);    	
