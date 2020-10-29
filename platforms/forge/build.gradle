@@ -1,139 +1,152 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
         jcenter()
-        maven { url = "http://files.minecraftforge.net/maven" }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'signing'
+apply plugin: 'net.minecraftforge.gradle'
+// Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 
-// Project properties
-archivesBaseName = "openterraingenerator-forge"
-description = "OpenTerrainGenerator for Minecraft Forge"
-ext.worldeditVersion = "6.1"
-minecraft.runDir = "run"
+version = '1.0'
+group = 'com.pg85.otg' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = 'otg'
 
-sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
-compileJava {
-    sourceCompatibility = targetCompatibility = '1.8'
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-    version = "1.12.2-14.23.5.2838"
-    runDir = "run"
-    
-    // the mappings can be changed at any time, and must be in the following format.
-    // snapshot_YYYYMMDD   snapshot are built nightly.
-    // stable_#            stables are built at the discretion of the MCP team.
+
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    // The mappings can be changed at any time, and must be in the following format.
+    // snapshot_YYYYMMDD   Snapshot are built nightly.
+    // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
-    // simply re-run your setup task after changing the mappings to update your workspace.
-    mappings = "snapshot_20180814"
+    // Simply re-run your setup task after changing the mappings to update your workspace.
+    mappings channel: 'snapshot', version: '20200514-1.16'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
-}
+    
+    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-repositories
-{
-    maven 
-    {   // Worldedit API
-   		url "https://maven.sk89q.com/repo/" 
-   	}
-}
+    // Default run configurations.
+    // These can be tweaked, removed, or duplicated as needed.
+    runs {
+        client {
+            workingDirectory project.file('run')
 
-dependencies
-{
-    compile project(':common')
-	provided ('com.sk89q.worldedit:worldedit-forge-mc1.11:6.1.6') {
-		exclude group: 'com.google.guava'
-		exclude group: 'com.google.gson'
-	}
-	provided ('com.sk89q.worldedit:worldedit-core:6.1') {
-		exclude group: 'com.google.guava'
-		exclude group: 'com.google.gson'
-	}
-	compile 'com.google.guava:guava:23.0'
-	compile 'com.google.code.gson:gson:2.6.2'
-}
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
 
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-                
-        // replace version and mcversion
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-        
-    // copy everything else except the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-    }
-}
+            mods {
+                openterraingenerator {
+                    source sourceSets.main
+                }
+            }
+        }
 
-// Include all OpenTerrainGenerator files in the jar
-jar
-{
-    destinationDir = new File(project.buildDir, "distributions")
-    classifier = ''
-    from
-    {
-        project(":common").sourceSets.main.output.files
-    }
-}
+        server {
+            workingDirectory project.file('run')
 
-// Package OTG-Core jar inside the OTG-Forge jar.
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
 
-reobf {
-    asmJar {}
-    rootJar {}
-}
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
 
-task asmJar(type: Jar, dependsOn: 'compileJava') {
-    from (sourceSets.main.output) {
-        // Include all of your coremod files here
-        // Example line >> include "testmod/asm/**"
-		include "com/pg85/otg/forge/asm/**"
-    }
-    archiveName = "OTG-Core.jar" // You can change this to anything you wish, remember to change it below also
-    manifest {
-        // Your previous manifest attributes go here
-        // Example line >> attributes 'FMLCorePlugin': 'testmod.asm.TweakPlugin'
-		attributes 'FMLCorePlugin': 'com.pg85.otg.forge.asm.excluded.launch.OTGCorePlugin'
-		attributes 'FMLCorePluginContainsMod': 'true'
+            mods {
+                openterraingenerator {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+
+            // Recommended logging data for a userdev environment
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+
+            // Recommended logging level for the console
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'openterraingenerator', '--all', '--output', file('src/generated/resources/')
+
+            mods {
+                openterraingenerator {
+                    source sourceSets.main
+                }
+            }
+        }
     }
 }
 
-task rootJar(type: Jar, dependsOn: ['compileJava', asmJar]) {
+dependencies {
+    // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
+    // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
+    // The userdev artifact is a special name and will get all sorts of transformations applied to it.
+    minecraft 'net.minecraftforge:forge:1.16.2-33.0.58'
 
-	// The common project's manifest will be added to the final OTG jar instead of this one, so OTG-Core.jar and FMLAT have to be listed there as well.
-	manifest
-    {
-		attributes 'ContainedDeps': 'OTG-Core.jar'
-        attributes 'FMLAT': 'openterraingenerator_at.cfg'
-	}
+    // You may put jars on which you depend on in ./libs or you may define them like so..
+    // compile "some.group:artifact:version:classifier"
+    // compile "some.group:artifact:version"
 
-    from (sourceSets.main.output) {
-        // Exclude all of your coremod files here
-        // Example line >> exclude "testmod/asm/**"
-		exclude "com/pg85/otg/forge/asm/OTGClassTransformer.class"
-		exclude "com/pg85/otg/forge/asm/OTGHooks.class"
-		exclude "com/pg85/otg/forge/asm/launch/**"
-    }
-    from ("build/libs") {
-        include "OTG-Core.jar" // If you changed the name above, change it here also.
-    }
+	compile project(':common')
 	
-	destinationDir = new File(project.buildDir, "distributions")
+    // Real examples
+    // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
+    // compile 'com.googlecode.efficient-java-matrix-library:ejml:0.24' // adds ejml to the dev env
 
-    // Leave the following line commented out to overwrite the default jar,
-    //    otherwise <basename>-root.jar will be created, containing the embedded coremod jar
-    // classifier = 'root'
+    // The 'provided' configuration is for optional dependencies that exist at compile-time but might not at runtime.
+    // provided 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // These dependencies get remapped to your current MCP mappings
+    // deobf 'com.mod-buildcraft:buildcraft:6.0.8:dev'
+
+    // For more info...
+    // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
+    // http://www.gradle.org/docs/current/userguide/dependency_management.html
+
 }
 
-build.dependsOn rootJar
+// Example for how to get properties into the manifest for reading by the runtime..
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "openterraingenerator",
+            "Specification-Vendor": "Team OTG",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"Team OTG",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+// Example configuration to allow publishing using the maven-publish task
+// This is the preferred method to reobfuscate your jar file
+jar.finalizedBy('reobfJar') 
+// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
+//publish.dependsOn('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
+    }
+}

@@ -1,1 +1,1 @@
-include 'common', 'platforms:bukkit', 'platforms:forge', 'releases'
+include 'common', 'platforms:forge', 'releases'

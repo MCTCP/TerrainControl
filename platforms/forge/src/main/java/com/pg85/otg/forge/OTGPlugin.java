@@ -1,180 +1,84 @@
 package com.pg85.otg.forge;
 
+import net.minecraft.client.gui.screen.BiomeGeneratorTypeScreens;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.ChunkGenerator;
+import net.minecraft.world.gen.DimensionSettings;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.events.EventPriority;
-import com.pg85.otg.forge.events.*;
-import com.pg85.otg.forge.events.client.ClientConnectionEventListener;
-import com.pg85.otg.forge.events.client.ClientFogHandler;
-import com.pg85.otg.forge.events.client.ClientTickHandler;
-import com.pg85.otg.forge.events.client.KeyBoardEventListener;
-import com.pg85.otg.forge.events.dimensions.BlockTracker;
-import com.pg85.otg.forge.events.dimensions.EntityTravelToDimensionListener;
-import com.pg85.otg.forge.events.dimensions.RightClickListener;
-import com.pg85.otg.forge.events.server.SaveServerHandler;
-import com.pg85.otg.forge.events.server.ServerEventListener;
-import com.pg85.otg.forge.events.server.ServerTickHandler;
-import com.pg85.otg.forge.events.server.UnloadServerHandler;
-import com.pg85.otg.forge.generator.ForgeVanillaBiomeGenerator;
-import com.pg85.otg.forge.generator.structure.OTGRareBuildingStart;
-import com.pg85.otg.forge.generator.structure.OTGVillageStart;
-import com.pg85.otg.forge.gui.GuiHandler;
-import com.pg85.otg.forge.network.CommonProxy;
-import com.pg85.otg.forge.network.PacketDispatcher;
-import com.pg85.otg.forge.network.client.BukkitClientNetworkEventListener;
-import com.pg85.otg.forge.world.OTGWorldType;
-import com.pg85.otg.generator.biome.VanillaBiomeGenerator;
-import com.pg85.otg.util.minecraft.defaults.StructureNames;
+import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.forge.commands.OTGCommand;
+import com.pg85.otg.forge.generator.OTGNoiseChunkGenerator;
 
-import net.minecraft.init.Blocks;
-import net.minecraft.world.gen.structure.MapGenStructureIO;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.Mod.Instance;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerAboutToStartEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.network.FMLEventChannel;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.relauncher.Side;
-
-@Mod(modid = "openterraingenerator", name = "Open Terrain Generator", version = "v9.0", dependencies="required-after:otgcore@[1.12.2 - v9.0]")
+// The value here should match an entry in the META-INF/mods.toml files
+@Mod(PluginStandardValues.MOD_ID)
+@Mod.EventBusSubscriber(modid = PluginStandardValues.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class OTGPlugin
-{	
-	@SidedProxy(clientSide="com.pg85.otg.forge.network.client.ClientProxy", serverSide="com.pg85.otg.forge.network.server.ServerProxy")
-	public static CommonProxy Proxy;
+{   	
+	// TODO: Use custom DimensionSettings?
+	private static final RegistryKey<DimensionSettings> field_242734_c = RegistryKey.func_240903_a_(Registry.field_243549_ar, new ResourceLocation("overworld"));
 
-	@Instance("OTG")
-    public static OTGPlugin Instance;
+	// Register the otg worldtype for the world creation screen
+	private static final BiomeGeneratorTypeScreens otgWorldType = new BiomeGeneratorTypeScreens("otg")
+	{
+		protected ChunkGenerator func_241869_a(Registry<Biome> p_241869_1_, Registry<DimensionSettings> p_241869_2_, long p_241869_3_)
+		{
+			return new OTGNoiseChunkGenerator(
+				new OTGBiomeProvider(p_241869_3_, false, false, p_241869_1_), 
+				p_241869_3_, 
+				() -> {
+					return p_241869_2_.func_243576_d(field_242734_c);
+				}
+			);
+		}
+	};
+	
+   	public static final DeferredRegister<Biome> BIOMES = DeferredRegister.create(ForgeRegistries.BIOMES, PluginStandardValues.MOD_ID);
 
-    public static OTGWorldType OtgWorldType;
-    public static BiomeColorsListener BiomeColorsListener;
-
-    @EventHandler
-    public void load(FMLInitializationEvent event)
-    {    	       
-        // Register World listener for tracking world unloads and loads.
-        MinecraftForge.EVENT_BUS.register(new WorldListener());
-
-        // Create the world type. WorldType registers itself in the constructor
-        // - that is Mojang code, so don't blame me
-        OtgWorldType = new OTGWorldType();
-
-        // Start OpenTerrainGenerator engine
+	public OTGPlugin()
+	{		
+		// Register the setup method for modloading
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+		// Register the doClientStuff method for modloading
+		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+		
+		// Register ourselves for server and other game events we are interested in
+		MinecraftForge.EVENT_BUS.register(this);
+		
+		// Register the otg worldtype for the world creation screen
+		BiomeGeneratorTypeScreens.field_239068_c_.add(otgWorldType);
+		
+        // Start OpenTerrainGenerator engine, loads all presets.
         OTG.setEngine(new ForgeEngine());
-
-        // Register Default biome generator to OpenTerrainGenerator
-        OTG.getEngine().getBiomeModeManager().register(VanillaBiomeGenerator.GENERATOR_NAME, ForgeVanillaBiomeGenerator.class);
-
-        // Register village and rare building starts
-        MapGenStructureIO.registerStructure(OTGRareBuildingStart.class, StructureNames.RARE_BUILDING);
-        MapGenStructureIO.registerStructure(OTGVillageStart.class, StructureNames.VILLAGE);
-       
-        // Register listening channel for listening to received configs. <- Spigot only?
-        if (event.getSide() == Side.CLIENT)
-        {
-            BukkitClientNetworkEventListener networkHandler = new BukkitClientNetworkEventListener();
-            FMLEventChannel eventDrivenChannel = NetworkRegistry.INSTANCE.newEventDrivenChannel(PluginStandardValues.ChannelName);
-            eventDrivenChannel.register(networkHandler);
-            MinecraftForge.EVENT_BUS.register(networkHandler);
-        }
-
-        // Register packets
-        PacketDispatcher.registerPackets();
-
-        // Register player tracker, for detecting player login/logoff/teleport etc.
-        MinecraftForge.EVENT_BUS.register(new PlayerTracker());
-
-        // Register block tracker, for block protect etc.
-        MinecraftForge.EVENT_BUS.register(new BlockTracker());
-
-        // Register sapling tracker, for custom tree growth.
-        SaplingListener saplingListener = new SaplingListener();
-        MinecraftForge.TERRAIN_GEN_BUS.register(saplingListener);
-        MinecraftForge.EVENT_BUS.register(saplingListener);
-
-        // Register save and unload handlers for saving data and unloading BO3's.
-        MinecraftForge.EVENT_BUS.register(new SaveServerHandler());
-        MinecraftForge.EVENT_BUS.register(new UnloadServerHandler());
-
-        // Register biome colors listener, which listens to color events to apply custom colors.
-        BiomeColorsListener = new BiomeColorsListener();
-        MinecraftForge.EVENT_BUS.register(BiomeColorsListener);
-
-        // Register server tick handler which is used for the pre-generator, dimAbove/dimBelow, mob/entity spawning etc.
-        MinecraftForge.EVENT_BUS.register(new ServerTickHandler());
-
-        // Register client tick handler for handling particles.
-        MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
         
-        // Register fog event handler for biome-specific fog color
-        MinecraftForge.EVENT_BUS.register(new ClientFogHandler());
+        OTG.getEngine().getPresetLoader().registerBiomes();
+	}
 
-        // Register fog event handler for biome-specific fog color
-        MinecraftForge.EVENT_BUS.register(new ChunkListener());
-        
-        // Register gui handler for replacing MC's gui with OTG's
-        MinecraftForge.EVENT_BUS.register(new GuiHandler());
+	private void commonSetup(final FMLCommonSetupEvent event) { }
 
-        // Register KeyBoardEventListener for OTG's O menu.
-        MinecraftForge.EVENT_BUS.register(new KeyBoardEventListener());
-
-        // Register to our own events, so that they can be fired again as Forge events.
-        OTG.getEngine().registerEventHandler(new ForgeEventHandler(), EventPriority.CANCELABLE);
-
-        // Register RightClickBlockListener for detecting flint and tinder and creating portals
-        MinecraftForge.EVENT_BUS.register(new RightClickListener());
-
-    	// Register EntityTravelToDimensionListener for OTG portals that tp to other dimensions
-    	MinecraftForge.EVENT_BUS.register(new EntityTravelToDimensionListener());
-
-        // Register ClientConnectionEventListener for detecting disconnects on the client side and unloading worlds. 
-        MinecraftForge.EVENT_BUS.register(new ClientConnectionEventListener());
-        
-        // Fix lava as light source not working when spawning lava as resource
-        // TODO: This is a hack fix, lighting still needs to be fixed properly..
-        Blocks.LAVA.setLightOpacity(255);
-    }
-
-    // TODO: Is this handler really necessary to make signing work?
-    @Mod.EventHandler
-    public void onFingerprintViolation(FMLFingerprintViolationEvent event)
-    {
-        //logger.warning("Invalid fingerprint detected!");
-    }        
-    
-    @EventHandler
-    public void serverAboutToStart(FMLServerAboutToStartEvent event)
-    {
-    	ServerEventListener.serverAboutToStart(event);
-    }
-
-    @EventHandler
-    public void serverLoad(FMLServerStartingEvent event)
-    {
-    	ServerEventListener.serverLoad(event);
-    }
-    
-    @EventHandler
-    public void preInit(FMLPreInitializationEvent e)
-    {
-        Proxy.preInit(e);
-    }
-
-    @EventHandler
-    public void init(FMLInitializationEvent e)
-    {
-        Proxy.init(e);
-    }
-
-    @EventHandler
-    public void postInit(FMLPostInitializationEvent e)
-    {
-        Proxy.postInit(e);
-    }
+	private void clientSetup(final FMLClientSetupEvent event) { }	
+	
+	@SubscribeEvent
+	public void onCommandRegister(RegisterCommandsEvent event)
+	{
+		OTGCommand.register(event.getDispatcher());
+	}
+	
+	@SubscribeEvent
+	public void onServerStarting(FMLServerStartingEvent event) { }
 }

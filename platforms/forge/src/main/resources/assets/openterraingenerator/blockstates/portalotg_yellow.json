@@ -1,6 +1,0 @@
-{
-	"variants": {
-        "axis=z": { "model": "openterraingenerator:portalotg_yellow_ew" },
-        "axis=x": { "model": "openterraingenerator:portalotg_yellow_ns" }
-    }
-}

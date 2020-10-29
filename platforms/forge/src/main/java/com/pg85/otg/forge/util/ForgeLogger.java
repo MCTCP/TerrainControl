@@ -5,15 +5,9 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.logging.Logger;
 import org.apache.logging.log4j.LogManager;
 
-/**
- * CImplementation of {@link Logger} for Forge.
- *
- * <p>Note that Forge (unlike Bukkit) automatically adds the OpenTerrainGenerator
- * prefix, so we don't need to do that ourselves.</p>
- */
 public final class ForgeLogger extends Logger
 {
-    private org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME_SHORT);
+    private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME_SHORT);
 
     @Override
     public void log(LogMarker level, String message, Object... params)
@@ -23,6 +17,10 @@ public final class ForgeLogger extends Logger
             // Only log messages that we want to see...
             return;
         }
+        
+		// Forge automatically adds the OpenTerrainGenerator prefix, 
+		// so we don't need to do that ourselves.
+        
         switch (level)
         {
             case FATAL:
