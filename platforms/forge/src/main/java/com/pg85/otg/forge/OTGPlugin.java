@@ -31,19 +31,17 @@ import com.pg85.otg.forge.generator.OTGNoiseChunkGenerator;
 public class OTGPlugin
 {   	
 	// TODO: Use custom DimensionSettings?
-	private static final RegistryKey<DimensionSettings> field_242734_c = RegistryKey.func_240903_a_(Registry.field_243549_ar, new ResourceLocation("overworld"));
+	private static final RegistryKey<DimensionSettings> OVERWORLD = RegistryKey.func_240903_a_(Registry.field_243549_ar, new ResourceLocation("overworld"));
 
 	// Register the otg worldtype for the world creation screen
 	private static final BiomeGeneratorTypeScreens otgWorldType = new BiomeGeneratorTypeScreens("otg")
 	{
-		protected ChunkGenerator func_241869_a(Registry<Biome> p_241869_1_, Registry<DimensionSettings> p_241869_2_, long p_241869_3_)
+		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
 			return new OTGNoiseChunkGenerator(
-				new OTGBiomeProvider(p_241869_3_, false, false, p_241869_1_), 
-				p_241869_3_, 
-				() -> {
-					return p_241869_2_.func_243576_d(field_242734_c);
-				}
+				new OTGBiomeProvider(seed, false, false, biomes),
+					seed,
+				() -> dimensionSettings.func_243576_d(OVERWORLD)
 			);
 		}
 	};
@@ -59,7 +57,10 @@ public class OTGPlugin
 		
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
-		
+
+		Registry.register(Registry.field_239689_aA_, new ResourceLocation("otg", "otg"), OTGBiomeProvider.CODEC);
+		Registry.register(Registry.field_239690_aB_, new ResourceLocation("otg", "otg"), OTGNoiseChunkGenerator.CODEC);
+
 		// Register the otg worldtype for the world creation screen
 		BiomeGeneratorTypeScreens.field_239068_c_.add(otgWorldType);
 		

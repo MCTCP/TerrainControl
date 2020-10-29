@@ -38,6 +38,7 @@ public class ForgeMaterialData extends LocalMaterialData
     
     public static ForgeMaterialData getBlank()
     {
+    	// TODO: this null should probably be replaced with air
     	ForgeMaterialData material = new ForgeMaterialData((BlockState)null, null);
     	material.isBlank = true;
     	return material;
