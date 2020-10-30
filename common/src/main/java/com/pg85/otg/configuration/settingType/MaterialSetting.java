@@ -1,10 +1,8 @@
 package com.pg85.otg.configuration.settingType;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 /**
  * Reads and writes a material. Materials are read using
@@ -14,9 +12,11 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
  */
 public class MaterialSetting extends Setting<LocalMaterialData>
 {
-    private final DefaultMaterial defaultValue;
+    private final String defaultValue;
+    private boolean processedMaterial = false;
+    private LocalMaterialData defaultMaterial;
 
-    public MaterialSetting(String name, DefaultMaterial defaultValue)
+    public MaterialSetting(String name, String defaultValue)
     {
         super(name);
         this.defaultValue = defaultValue;
@@ -25,13 +25,21 @@ public class MaterialSetting extends Setting<LocalMaterialData>
     @Override
     public LocalMaterialData getDefaultValue()
     {
-        return MaterialHelper.toLocalMaterialData(defaultValue, 0);
+    	if(!processedMaterial)
+    	{
+    		processedMaterial = true;
+	        try {
+				defaultMaterial = OTG.getEngine().readMaterial(defaultValue);
+			} catch (InvalidConfigException e) {
+				e.printStackTrace();
+			}
+    	}
+        return defaultMaterial;
     }
 
     @Override
     public LocalMaterialData read(String string) throws InvalidConfigException
     {
-    	LocalMaterialData material = MaterialHelper.readMaterial(string);
-        return material;
+    	return OTG.getEngine().readMaterial(string);
     }
 }

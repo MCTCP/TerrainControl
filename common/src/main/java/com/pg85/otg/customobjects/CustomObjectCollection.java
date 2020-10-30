@@ -204,9 +204,9 @@ public class CustomObjectCollection
 	        {
     			OTG.log(LogMarker.INFO, "Indexing GlobalObjects folder.");
 	            customObjectFilesGlobalObjects = new HashMap<String, File>();
-	            if (new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects").exists())
+	            if (new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.GLOBAL_OBJECTS_FOLDER).exists())
 	            {
-	                indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + "GlobalObjects"), customObjectFilesGlobalObjects);
+	            	indexAllCustomObjectFilesInDir(new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.GLOBAL_OBJECTS_FOLDER), customObjectFilesGlobalObjects);
 	            }
 	
 	            // Add vanilla custom objects
@@ -228,11 +228,11 @@ public class CustomObjectCollection
 	    		OTG.log(LogMarker.INFO, "Indexing WorldObjects folder for world " + worldName);
 	            HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
 	            customObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
-	            if (worldName != null && new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects").exists())
+	            if (worldName != null && new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PRESETS_FOLDER + File.separator + worldName + File.separator + "WorldObjects").exists())
 	            {
 	                indexAllCustomObjectFilesInDir(
-	                        new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PresetsDirectoryName + File.separator + worldName + File.separator + "WorldObjects"),
-	                        worldCustomObjectFiles);
+                		new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PRESETS_FOLDER + File.separator + worldName + File.separator + "WorldObjects"),
+                        worldCustomObjectFiles);
 	            }
 	    		OTG.log(LogMarker.INFO, "WorldObjects folder for world " + worldName + " indexed.");
 	        }

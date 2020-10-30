@@ -31,7 +31,7 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
     
     /**
      * Writes this configuration settings to a file. It will use the file
-     * returned by {@link ConfigFile#getFile()}. If writing fails, the error
+     * returned by {@link ConfigFile#getPath()}. If writing fails, the error
      * is logged.
      *
      * @param config     The configuration to write to disk.

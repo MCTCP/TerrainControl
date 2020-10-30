@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;

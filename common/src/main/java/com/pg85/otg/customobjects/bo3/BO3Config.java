@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;

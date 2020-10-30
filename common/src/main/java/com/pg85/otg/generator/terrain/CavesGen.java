@@ -1,14 +1,13 @@
 package com.pg85.otg.generator.terrain;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Random;
 
@@ -187,8 +186,8 @@ public class CavesGen extends TerrainGenBase
                         {
                             material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
                             if (
-                        		material.isMaterial(DefaultMaterial.WATER) ||
-                        		material.isMaterial(DefaultMaterial.STATIONARY_WATER)
+                        		material.isMaterial(LocalMaterials.WATER) ||
+                        		material.isMaterial(LocalMaterials.STATIONARY_WATER)
                     		)
                             {
                                 waterFound = true;
@@ -254,14 +253,14 @@ public class CavesGen extends TerrainGenBase
                                 }
                                 if (this.isSuitableBlock(material, materialAbove))//, biome.getBiomeConfig()))
                                 {
-                                    generatingChunkBuffer.setBlock(local_x, currentDepth, local_z, MaterialHelper.AIR);
+                                    generatingChunkBuffer.setBlock(local_x, currentDepth, local_z, LocalMaterials.AIR);
                                     block = generatingChunkBuffer.getBlock(local_x, currentDepth - 1, local_z);
 
                                     // If a surface block was just deleted, try to move it down
                                     if (
                                 		surfaceBlockFound &&
                                 		!block.isLiquid() &&
-                                		!block.isMaterial(DefaultMaterial.BEDROCK)
+                                		!block.isMaterial(LocalMaterials.BEDROCK)
                             		)
                                     {
                                         generatingChunkBuffer.setBlock(local_x, currentDepth - 1, local_z, surfaceBlockMaterial);
@@ -311,21 +310,21 @@ public class CavesGen extends TerrainGenBase
 
     	/*
         // Few hardcoded cases
-        if (material.isMaterial(DefaultMaterial.HARD_CLAY))
+        if (material.isMaterial(LocalMaterials.HARD_CLAY))
         {
             return true;
         }
-        if (material.isMaterial(DefaultMaterial.SANDSTONE))
+        if (material.isMaterial(LocalMaterials.SANDSTONE))
         {
             return true;
         }
-        if (material.isMaterial(DefaultMaterial.RED_SANDSTONE))
+        if (material.isMaterial(LocalMaterials.RED_SANDSTONE))
         {
             return true;
         }
         */
 
-        if (material.isMaterial(DefaultMaterial.SNOW))
+        if (material.isMaterial(LocalMaterials.SNOW))
         {
             return true;
         }
@@ -394,5 +393,4 @@ public class CavesGen extends TerrainGenBase
             }
         }
     }
-
 }

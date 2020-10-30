@@ -17,8 +17,8 @@ import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public final class ClientConfigProvider implements ConfigProvider
         worldSettingsReader.putSetting(WorldStandardValues.WATER_LEVEL_MAX, stream.readInt());
         worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, StreamHelper.readStringFromStream(stream));       
         worldSettingsReader.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, StreamHelper.readStringFromStream(stream));
-        worldConfig = new WorldConfig(new File("."), worldSettingsReader, world, null);
+        worldConfig = new WorldConfig(Paths.get("."), worldSettingsReader, null);
 
         // BiomeConfigs
         StandardBiomeTemplate defaultSettings = new StandardBiomeTemplate(worldConfig.worldHeightCap);
@@ -88,7 +88,7 @@ public final class ClientConfigProvider implements ConfigProvider
         	biomeReader.putSetting(BiomeStandardValues.BIOME_DICT_ID, biomeDictId); // <-- This might be used even in MP by client mods?
 
             BiomeLoadInstruction instruction = new BiomeLoadInstruction(biomeName, defaultSettings);
-            BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig);
+            BiomeConfig config = new BiomeConfig(instruction, null, biomeReader, worldConfig, world.getPresetName());
 
             LocalBiome biome = world.createBiomeFor(config, new BiomeIds(otgBiomeId, savedBiomeId), this, false);
             biomesByOTGId[otgBiomeId] = biome;

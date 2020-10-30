@@ -4,6 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogMarker;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 
 /**
@@ -22,11 +23,11 @@ public final class FileHelper
      * otherwise. In other words: if this method returns true, you can be sure
      * now that all folders exist.
      */
-    public static boolean makeFolders(Collection<File> folders)
+    public static boolean makeFolders(Collection<Path> folders)
     {
         boolean allFoldersExist = true;
 
-        for (File directory : folders)
+        for (Path directory : folders)
         {
             if (!makeFolder(directory))
             {
@@ -45,8 +46,9 @@ public final class FileHelper
      * otherwise. In other words: if this method returns true, you can be sure
      * now that this folder exists.
      */
-    private static boolean makeFolder(File folder)
+    private static boolean makeFolder(Path folderPath)
     {
+    	File folder = folderPath.toFile();
         if (!folder.exists() && !folder.mkdirs())
         {
             OTG.log(LogMarker.ERROR, "Error creating directory \"{}\".", folder.getAbsolutePath());
@@ -55,8 +57,5 @@ public final class FileHelper
         return true;
     }
 
-    private FileHelper()
-    {
-    }
-
+    private FileHelper() { }
 }

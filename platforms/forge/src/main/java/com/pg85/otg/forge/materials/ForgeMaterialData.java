@@ -108,7 +108,7 @@ public class ForgeMaterialData extends LocalMaterialData
     private static ForgeMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
     {
         String blockName = input;
-        int blockData = -1;
+        //int blockData = -1;
 
         // When there is a . or a : in the name, extract block data
         int splitIndex = input.lastIndexOf(":");
@@ -119,14 +119,14 @@ public class ForgeMaterialData extends LocalMaterialData
         if (splitIndex != -1)
         {
             blockName = input.substring(0, splitIndex);
-            try
-            {
-            	blockData = Integer.parseInt(input.substring(splitIndex + 1));            
-            }
-            catch (NumberFormatException e)
-            {
+            //try
+            //{
+            	//blockData = Integer.parseInt(input.substring(splitIndex + 1));            
+            //}
+            //catch (NumberFormatException e)
+            //{
             	//blockName = input;
-            }
+            //}
         }
 
         // Parse block name
@@ -161,21 +161,6 @@ public class ForgeMaterialData extends LocalMaterialData
 
         // Failed, try parsing later as a fallback.
         return new ForgeMaterialData(input);
-    }
-    
-    /**
-     * Gets a {@code ForgeMaterialData} of the given id and data.
-     * @param id   The block id.
-     * @param data The block data.
-     * @return The {@code BukkitMateialData} instance.
-     */
-    @SuppressWarnings("deprecation")
-    private static ForgeMaterialData ofIds(int id, int data)
-    {
-        Block block = Block.getStateById(id).getBlock();
-        //BlockState blockData = block.getStateFromMeta(data);
-        //return new ForgeMaterialData(blockData, id, data);
-        return ForgeMaterialData.ofMinecraftBlock(block, block.getRegistryName().toString());
     }
     
     /**
@@ -325,7 +310,14 @@ public class ForgeMaterialData extends LocalMaterialData
 		}
 		return this;
 	}
-        
+	
+    @Override
+    public boolean hasData()
+    {
+    	// TODO: Implement this for 1.16    	
+    	return false;
+    }
+	
     @Override
     public boolean equals(Object obj)
     {
@@ -339,5 +331,26 @@ public class ForgeMaterialData extends LocalMaterialData
         }
         ForgeMaterialData other = (ForgeMaterialData) obj;
         return this.blockData.equals(other.blockData);
+    }
+    
+    /**
+     * Gets the hashCode of the material, based on the block id and block data.
+     * The hashCode must be unique, which is possible considering that there are
+     * only 4096 * 16 possible materials.
+     * 
+     * @return The unique hashCode.
+     */
+    @Override
+    public int hashCode()
+    {
+    	// TODO: Implement this for 1.16
+        return this.blockData.hashCode();
+    }
+    
+    @Override
+    public int hashCodeWithoutBlockData()
+    {
+    	// TODO: Implement this for 1.16
+    	return this.blockData.hashCode();
     }
 }

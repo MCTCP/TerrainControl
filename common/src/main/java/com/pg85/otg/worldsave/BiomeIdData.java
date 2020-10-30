@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
@@ -36,7 +37,7 @@ public class BiomeIdData
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
     
-	public static void saveBiomeIdData(File worldSaveDir, ServerConfigProvider serverConfigProvider, LocalWorld world)
+	public static void saveBiomeIdData(Path worldSaveDir, ServerConfigProvider serverConfigProvider, LocalWorld world)
 	{
         // If this is a previously created world then register biomes to the same OTG biome id as before.
         ArrayList<BiomeIdData> loadedBiomeIdData = loadBiomeIdData(worldSaveDir);
@@ -110,7 +111,7 @@ public class BiomeIdData
         }
 	}
 		
-	public static ArrayList<BiomeIdData> loadBiomeIdData(File worldSaveDir)
+	public static ArrayList<BiomeIdData> loadBiomeIdData(Path worldSaveDir)
 	{
 		File biomeIdDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.BiomeIdDataFileName);
 		File biomeIdDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.BiomeIdDataBackupFileName);

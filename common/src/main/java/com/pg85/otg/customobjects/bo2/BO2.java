@@ -7,8 +7,9 @@ import java.util.Map.Entry;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
@@ -18,7 +19,6 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 /**
  * The good old BO2.
@@ -86,10 +86,10 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             // Do not spawn if non-tree blocks are in the way
             if (
         		!material.isAir() && 
-        		!material.isMaterial(DefaultMaterial.LOG) && 
-        		!material.isMaterial(DefaultMaterial.LOG_2) && 
-        		!material.isMaterial(DefaultMaterial.LEAVES) && 
-				!material.isMaterial(DefaultMaterial.LEAVES_2)
+        		!material.isMaterial(LocalMaterials.LOG) && 
+        		!material.isMaterial(LocalMaterials.LOG_2) && 
+        		!material.isMaterial(LocalMaterials.LEAVES) && 
+				!material.isMaterial(LocalMaterials.LEAVES_2)
     		)
             {
                 return false;
@@ -167,8 +167,8 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         if (!spawnWater)
         {
             if (
-        		checkBlock.isMaterial(DefaultMaterial.WATER) || 
-        		checkBlock.isMaterial(DefaultMaterial.STATIONARY_WATER)
+        		checkBlock.isMaterial(LocalMaterials.WATER) || 
+        		checkBlock.isMaterial(LocalMaterials.STATIONARY_WATER)
 			)
             {
                 return false;
@@ -177,8 +177,8 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         if (!spawnLava)
         {
             if (
-        		checkBlock.isMaterial(DefaultMaterial.LAVA) || 
-        		checkBlock.isMaterial(DefaultMaterial.STATIONARY_LAVA)
+        		checkBlock.isMaterial(LocalMaterials.LAVA) || 
+        		checkBlock.isMaterial(LocalMaterials.STATIONARY_LAVA)
     		)
             {
                 return false;

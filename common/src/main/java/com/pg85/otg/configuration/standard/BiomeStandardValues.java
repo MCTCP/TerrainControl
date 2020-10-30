@@ -1,6 +1,7 @@
 package com.pg85.otg.configuration.standard;
 
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
@@ -11,7 +12,6 @@ import com.pg85.otg.configuration.settingType.MaterialSetting;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -81,9 +81,9 @@ public class BiomeStandardValues extends Settings
             MINESHAFT_RARITY = doubleSetting("MineshaftRarity", 1, 0, 100);
 
     public static final Setting<LocalMaterialData>
-            STONE_BLOCK = new MaterialSetting("StoneBlock", DefaultMaterial.STONE),
-            SURFACE_BLOCK = new MaterialSetting("SurfaceBlock", DefaultMaterial.GRASS),
-            GROUND_BLOCK = new MaterialSetting("GroundBlock", DefaultMaterial.DIRT),
+		    STONE_BLOCK = new MaterialSetting("StoneBlock", LocalMaterials.STONE_NAME),
+		    SURFACE_BLOCK = new MaterialSetting("SurfaceBlock", LocalMaterials.GRASS_NAME),
+		    GROUND_BLOCK = new MaterialSetting("GroundBlock", LocalMaterials.DIRT_NAME),
             COOLED_LAVA_BLOCK = WorldStandardValues.COOLED_LAVA_BLOCK,
             WATER_BLOCK = WorldStandardValues.WATER_BLOCK,
             ICE_BLOCK = WorldStandardValues.ICE_BLOCK;

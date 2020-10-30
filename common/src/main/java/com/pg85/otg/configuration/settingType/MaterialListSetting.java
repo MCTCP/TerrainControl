@@ -1,13 +1,12 @@
 package com.pg85.otg.configuration.settingType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 /**
  * Reads and writes a material. Materials are read using
@@ -17,9 +16,11 @@ import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
  */
 public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
 {
-    private final DefaultMaterial[] defaultValue;
+    private final String[] defaultValue;
+    private boolean processedMaterials;
+    private LocalMaterialData[] defaultMaterials;
 
-    public MaterialListSetting(String name, DefaultMaterial[] defaultValue)
+    public MaterialListSetting(String name, String[] defaultValue)
     {
         super(name);
         this.defaultValue = defaultValue;
@@ -28,12 +29,26 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
     @Override
     public ArrayList<LocalMaterialData> getDefaultValue()
     {
-    	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
-    	for(DefaultMaterial defaultMaterial : defaultValue)
+    	if(!processedMaterials)
     	{
-    		materials.add(MaterialHelper.toLocalMaterialData(defaultMaterial, 0));
+    		processedMaterials = true;
+	    	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
+	    	for(String defaultMaterial : defaultValue)
+	    	{
+	    		LocalMaterialData material = null;
+				try {
+					material = OTG.getEngine().readMaterial(defaultMaterial);
+				} catch (InvalidConfigException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+	    		if(material != null)
+	    		{
+	    			materials.add(material);
+	    		}
+	    	}
     	}
-        return materials;
+    	return this.defaultMaterials == null ? new ArrayList<LocalMaterialData>() : new ArrayList<LocalMaterialData>(Arrays.asList(this.defaultMaterials));
     }
 
     @Override
@@ -43,7 +58,7 @@ public class MaterialListSetting extends Setting<ArrayList<LocalMaterialData>>
     	ArrayList<LocalMaterialData> materials = new ArrayList<LocalMaterialData>();
     	for(String materialName : materialNames)
     	{
-    		LocalMaterialData material = MaterialHelper.readMaterial(materialName.trim());
+    		LocalMaterialData material = OTG.getEngine().readMaterial(materialName.trim());
 			materials.add(material);
     	}
         return materials;

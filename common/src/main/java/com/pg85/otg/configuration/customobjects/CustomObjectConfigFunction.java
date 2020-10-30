@@ -1,11 +1,10 @@
 package com.pg85.otg.configuration.customobjects;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.ArrayList;
@@ -246,7 +245,7 @@ public abstract class CustomObjectConfigFunction<T>
      */
     protected final LocalMaterialData readMaterial(String string) throws InvalidConfigException
     {
-        return MaterialHelper.readMaterial(string);
+        return OTG.getEngine().readMaterial(string);
     }
 
     /**

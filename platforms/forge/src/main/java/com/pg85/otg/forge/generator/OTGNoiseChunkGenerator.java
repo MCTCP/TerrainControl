@@ -94,9 +94,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	protected final Supplier<DimensionSettings> field_236080_h_;
 	private final int verticalNoiseGranularity;
 	private final int horizontalNoiseGranularity;
-	private final int noiseSizeX;
 	private final int noiseSizeY;
-	private final int noiseSizeZ;
 	private final OctavesNoiseGenerator field_222568_o;
 	private final OctavesNoiseGenerator field_222569_p;
 	private final OctavesNoiseGenerator field_222570_q;
@@ -133,9 +131,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.horizontalNoiseGranularity = noisesettings.func_236174_e_() * 4;
 		this.defaultBlock = dimensionsettings.func_236115_c_();
 		this.defaultFluid = dimensionsettings.func_236116_d_();
-		this.noiseSizeX = 16 / this.horizontalNoiseGranularity;
 		this.noiseSizeY = noisesettings.func_236169_a_() / this.verticalNoiseGranularity;
-		this.noiseSizeZ = 16 / this.horizontalNoiseGranularity;
 		this.randomSeed = new SharedSeedRandom(seed);
 		this.field_222568_o = new OctavesNoiseGenerator(this.randomSeed, IntStream.rangeClosed(-15, 0));
 		this.field_222569_p = new OctavesNoiseGenerator(this.randomSeed, IntStream.rangeClosed(-15, 0));
@@ -148,8 +144,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			SharedSeedRandom sharedseedrandom = new SharedSeedRandom(seed);
 			sharedseedrandom.skip(17292);
 			this.field_236083_v_ = new SimplexNoiseGenerator(sharedseedrandom);
-		} else
-		{
+		} else {
 			this.field_236083_v_ = null;
 		}
 	}
@@ -205,7 +200,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		double d0 = 0.0D;
 		double d1 = 0.0D;
 		double d2 = 0.0D;
-		boolean flag = true;
 		double d3 = 1.0D;
 
 		for (int i = 0; i < 16; ++i)
@@ -268,7 +262,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			float f = 0.0F;
 			float f1 = 0.0F;
 			float f2 = 0.0F;
-			int i = 2;
 			int j = this.func_230356_f_();
 			float f3 = this.biomeProvider.getNoiseBiome(noiseX, j, noiseZ).getDepth();
 
@@ -451,7 +444,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkPos chunkpos1 = p_225551_2_.getPos();
 		int k = chunkpos1.getXStart();
 		int l = chunkpos1.getZStart();
-		double d0 = 0.0625D;
 		BlockPos.Mutable blockpos$mutable = new BlockPos.Mutable();
 
 		for (int i1 = 0; i1 < 16; ++i1)
@@ -477,7 +469,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		DimensionSettings dimensionsettings = this.field_236080_h_.get();
 		int k = dimensionsettings.func_236118_f_();
 		int l = this.field_236085_x_ - 1 - dimensionsettings.func_236117_e_();
-		int i1 = 5;
 		boolean flag = l + 4 >= 0 && l < this.field_236085_x_;
 		boolean flag1 = k + 4 >= 0 && k < this.field_236085_x_;
 		if (flag || flag1)

@@ -1,16 +1,15 @@
 package com.pg85.otg.generator.terrain;
 
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.Random;
 
@@ -171,8 +170,8 @@ public class RavinesGen extends TerrainGenBase
                         {
                             materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ);
                             if (
-                        		materialAtPosition.isMaterial(DefaultMaterial.WATER) || 
-                        		materialAtPosition.isMaterial(DefaultMaterial.STATIONARY_WATER)
+                        		materialAtPosition.isMaterial(LocalMaterials.WATER) || 
+                        		materialAtPosition.isMaterial(LocalMaterials.STATIONARY_WATER)
                     		)
                             {
                                 i4 = 1;
@@ -217,23 +216,23 @@ public class RavinesGen extends TerrainGenBase
                                 }
                                 
                                 if (
-                            		!material.isMaterial(DefaultMaterial.BEDROCK) && // TODO: get replaced bedrock block? (could cause other problems, if common blocks are used as bedrock)
+                            		!material.isMaterial(LocalMaterials.BEDROCK) && // TODO: get replaced bedrock block? (could cause other problems, if common blocks are used as bedrock)
                     				!material.isAir()
                         		)
                                 {                               	
-                                    generatingChunkBuffer.setBlock(localX, currentDepth, localZ, MaterialHelper.AIR);
+                                    generatingChunkBuffer.setBlock(localX, currentDepth, localZ, LocalMaterials.AIR);
                                 }
                                 
                                 block = generatingChunkBuffer.getBlock(localX, currentDepth - 1, localZ);
                                 if (
                             		surfaceBlockFound &&
                             		(
-	                                	!block.isMaterial(DefaultMaterial.BEDROCK) && // TODO: get replaced bedrock block? (could cause other problems, if common blocks are used as bedrock)
-										!block.isMaterial(DefaultMaterial.WATER) &&
-										!block.isMaterial(DefaultMaterial.STATIONARY_WATER) &&
-										!block.isMaterial(DefaultMaterial.LAVA) &&
-										!block.isMaterial(DefaultMaterial.STATIONARY_LAVA) &&
-										!block.isMaterial(DefaultMaterial.MAGMA) &&
+	                                	!block.isMaterial(LocalMaterials.BEDROCK) && // TODO: get replaced bedrock block? (could cause other problems, if common blocks are used as bedrock)
+										!block.isMaterial(LocalMaterials.WATER) &&
+										!block.isMaterial(LocalMaterials.STATIONARY_WATER) &&
+										!block.isMaterial(LocalMaterials.LAVA) &&
+										!block.isMaterial(LocalMaterials.STATIONARY_LAVA) &&
+										!block.isMaterial(LocalMaterials.MAGMA) &&
 										!block.isAir()
                     				)
                                 )
@@ -259,20 +258,19 @@ public class RavinesGen extends TerrainGenBase
         {
             return;
         }
+        
         double d1 = currentChunk.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
         double d2 = RandomHelper.numberInRange(random, this.worldSettings.ravineMinAltitude, this.worldSettings.ravineMaxAltitude);
         double d3 = currentChunk.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-
+        
         int i = 1;
-
         for (int j = 0; j < i; j++)
         {
             float f1 = this.random.nextFloat() * 3.141593F * 2.0F;
             float f2 = (this.random.nextFloat() - 0.5F) * 2.0F / 8.0F;
-            float f3 = (this.random.nextFloat() * 2.0F + this.random.nextFloat()) * 2.0F;
-
+            float f3 = (this.random.nextFloat() * 2.0F + this.random.nextFloat()) * 2.0F;            
             int size = RandomHelper.numberInRange(random, this.worldSettings.ravineMinLength, this.worldSettings.ravineMaxLength);
-
+            
             placeBlocks(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.ravineDepth);
         }
     }

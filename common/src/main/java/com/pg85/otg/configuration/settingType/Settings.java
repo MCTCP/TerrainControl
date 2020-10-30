@@ -1,13 +1,11 @@
 package com.pg85.otg.configuration.settingType;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix;
 import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.surface.SurfaceGenerator;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 
@@ -113,17 +111,6 @@ public abstract class Settings
 
     /**
      * Creates a setting that represents a set of block materials.
-     * @param name          Name of the setting.
-     * @param defaultValues Default values for the setting.
-     * @return The newly created setting.
-     */
-    protected static final Setting<MaterialSet> materialSetSetting(String name, DefaultMaterial... defaultValues)
-    {
-        return new MaterialSetSetting(name, defaultValues);
-    }
-
-    /**
-     * Creates a setting that represents a set of block materials.
      * Warning: you will get an AssertionError later on (during config
      * reading) if you provide invalid materials.
      * {@link Settings#materialSetSetting(String, DefaultMaterial...)} is the
@@ -135,17 +122,6 @@ public abstract class Settings
     protected static final Setting<MaterialSet> materialSetSetting(String name, String... defaultValues)
     {
         return new MaterialSetSetting(name, defaultValues);
-    }
-
-    /**
-     * Creates a setting that represents one of the block materials in the game.
-     * @param name         Name of the setting.
-     * @param defaultValue Default value for the setting.
-     * @return The newly created setting.
-     */
-    protected static final Setting<LocalMaterialData> materialSetting(String name, DefaultMaterial defaultValue)
-    {
-        return new MaterialSetting(name, defaultValue);
     }
 
     /**

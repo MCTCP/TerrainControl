@@ -1,7 +1,8 @@
 package com.pg85.otg;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.presets.LocalPresetLoader;
 import com.pg85.otg.configuration.PluginConfig;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.BiomeConfigFinder.BiomeConfigStub;
@@ -23,9 +24,10 @@ import com.pg85.otg.generator.biome.BiomeModeManager;
 import com.pg85.otg.generator.resource.Resource;
 import com.pg85.otg.logging.Logger;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,6 +36,11 @@ import java.util.Random;
 
 public abstract class OTGEngine
 {
+	//
+	private final Path otgRootFolder;
+	private final LocalPresetLoader presetLoader;
+	//
+	
 	private HashMap<String, BiomeConfig[]> otgBiomeIdsByWorld = new HashMap<String, BiomeConfig[]>();
     private BiomeModeManager biomeManagers;
     private List<EventHandler> cancelableEventHandlers = new ArrayList<EventHandler>(5);
@@ -46,9 +53,11 @@ public abstract class OTGEngine
     private ModPackConfigManager modPackConfigManager;
     private Logger logger;
 
-    public OTGEngine(Logger logger)
+    protected OTGEngine(Logger logger, Path otgRootFolder, LocalPresetLoader presetLoader)
     {
         this.logger = logger;
+        this.otgRootFolder = otgRootFolder;
+        this.presetLoader = presetLoader;        
     }
     
     public void onShutdown()
@@ -66,33 +75,36 @@ public abstract class OTGEngine
         // Start the engine
 
         // Do pluginConfig loading and then log anything that happened
-        File pluginConfigFile = new File(getOTGRootFolder(), PluginStandardValues.PluginConfigFilename);
-        pluginConfig = new PluginConfig(FileSettingsReader.read(PluginStandardValues.PluginConfigFilename, pluginConfigFile));
-        FileSettingsWriter.writeToFile(pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.settingsMode);
-        logger.setLevel(pluginConfig.getLogLevel().getLevel());
-
-        biomeResourcesManager = new BiomeResourcesManager();
-        customObjectResourcesManager = new CustomObjectResourcesManager();
-        biomeManagers = new BiomeModeManager();
-        customObjectManager = new CustomObjectManager();
+        File pluginConfigFile = Paths.get(getOTGRootFolder().toString(), PluginStandardValues.PluginConfigFilename).toFile();
+        this.pluginConfig = new PluginConfig(FileSettingsReader.read(PluginStandardValues.PluginConfigFilename, pluginConfigFile));
+        FileSettingsWriter.writeToFile(this.pluginConfig.getSettingsAsMap(), pluginConfigFile, pluginConfig.settingsMode);
         
-        File globalObjectsDir = new File(getOTGRootFolder(), PluginStandardValues.BO_DirectoryName);
+        this.logger.setLevel(this.pluginConfig.getLogLevel().getLevel());
+
+        this.biomeResourcesManager = new BiomeResourcesManager();
+        this.customObjectResourcesManager = new CustomObjectResourcesManager();
+        this.biomeManagers = new BiomeModeManager();
+        this.customObjectManager = new CustomObjectManager();
+               
+        File presetsDir = Paths.get(getOTGRootFolder().toString(), PluginStandardValues.PRESETS_FOLDER).toFile();
+        if(!presetsDir.exists())
+        {
+      		presetsDir.mkdirs();
+        }
+        this.presetLoader.loadPresetsFromDisk();
+        
+        File modPacksDir = Paths.get(getOTGRootFolder().toString(), PluginStandardValues.MODPACK_CONFIGS_FOLDER).toFile();
+        if(!modPacksDir.exists())
+        {
+        	modPacksDir.mkdirs();
+        }
+        this.modPackConfigManager = new ModPackConfigManager(getOTGRootFolder());
+        
+        File globalObjectsDir = Paths.get(getOTGRootFolder().toString(), PluginStandardValues.GLOBAL_OBJECTS_FOLDER).toFile();
         if(!globalObjectsDir.exists())
         {
         	globalObjectsDir.mkdirs();
         }
-        File globalBiomesDir = new File(getOTGRootFolder(), PluginStandardValues.BiomeConfigDirectoryName);
-        if(!globalBiomesDir.exists())
-        {
-        	globalBiomesDir.mkdirs();
-        }        
-        File worldsDir = new File(getOTGRootFolder(), PluginStandardValues.PresetsDirectoryName);
-        if(!worldsDir.exists())
-        {
-      		worldsDir.mkdirs();
-        }
-
-        modPackConfigManager = new ModPackConfigManager(getOTGRootFolder());
         
         // Fire start event
         for (EventHandler handler : cancelableEventHandlers)
@@ -253,13 +265,22 @@ public abstract class OTGEngine
 		return this.modPackConfigManager;
 	}
     
-    // Plugin dirs
- 
-    public abstract File getOTGRootFolder();
-    
-    public abstract File getGlobalObjectsDirectory();
+	public LocalPresetLoader getPresetLoader()
+	{
+		return this.presetLoader;
+	}
 
-    public abstract File getWorldsDirectory();
+    // OTG dirs
+
+    public Path getOTGRootFolder()
+    {
+        return this.otgRootFolder;
+    }
+
+    public Path getPresetsDirectory()
+    {
+        return Paths.get(this.getOTGRootFolder().toString(), PluginStandardValues.PRESETS_FOLDER);
+    }
     
     // Plugin configs
     
@@ -359,8 +380,6 @@ public abstract class OTGEngine
      * @throws InvalidConfigException If no material with that name exists.
      */
     public abstract LocalMaterialData readMaterial(String name) throws InvalidConfigException;
-
-    public abstract LocalMaterialData toLocalMaterialData(DefaultMaterial defaultMaterial, int blockData);
 	
 	// Logging
 	

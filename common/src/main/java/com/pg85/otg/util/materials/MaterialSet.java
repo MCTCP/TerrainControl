@@ -1,8 +1,8 @@
 package com.pg85.otg.util.materials;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.MaterialSetEntry;
@@ -81,7 +81,7 @@ public class MaterialSet
             return;
         }
 
-        LocalMaterialData material = MaterialHelper.readMaterial(input);
+        LocalMaterialData material = OTG.getEngine().readMaterial(input);
         
         boolean checkIncludesBlockData = StringHelper.specifiesBlockData(input);
         

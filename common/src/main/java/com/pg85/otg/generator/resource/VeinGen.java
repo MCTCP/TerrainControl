@@ -6,7 +6,6 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -37,9 +36,9 @@ public class VeinGen extends Resource
         oreFrequency = readInt(args.get(5), 1, 100);
         oreRarity = readInt(args.get(6), 1, 100);
         minAltitude = readInt(args.get(7), PluginStandardValues.WORLD_DEPTH,
-                PluginStandardValues.WORLD_HEIGHT - 1);
+            PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(8), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT - 1);
+            PluginStandardValues.WORLD_HEIGHT - 1);
         sourceBlocks = readMaterials(args, 9);
     }
 
@@ -56,15 +55,15 @@ public class VeinGen extends Resource
             return false;
         final VeinGen compare = (VeinGen) other;
         return this.veinRarity == compare.veinRarity
-               && this.minRadius == compare.minRadius
-               && this.maxRadius == compare.maxRadius
-               && this.oreSize == compare.oreSize
-               && this.oreFrequency == compare.oreFrequency
-               && this.oreRarity == compare.oreRarity
-               && this.minAltitude == compare.minAltitude
-               && this.maxAltitude == compare.maxAltitude
-               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
-                   : this.sourceBlocks.equals(compare.sourceBlocks));
+           && this.minRadius == compare.minRadius
+           && this.maxRadius == compare.maxRadius
+           && this.oreSize == compare.oreSize
+           && this.oreFrequency == compare.oreFrequency
+           && this.oreRarity == compare.oreRarity
+           && this.minAltitude == compare.minAltitude
+           && this.maxAltitude == compare.maxAltitude
+           && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+               : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
     @Override
@@ -141,7 +140,7 @@ public class VeinGen extends Resource
 
         if(world.getConfigs().getWorldConfig().disableOreGen)
         {
-        	if(MaterialHelper.isOre(this.material))
+        	if(this.material.isOre())
         	{
         		return;
         	}
@@ -161,5 +160,4 @@ public class VeinGen extends Resource
             }
         }
     }
-
 }

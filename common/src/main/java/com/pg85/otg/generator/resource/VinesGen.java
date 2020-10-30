@@ -1,13 +1,12 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -28,7 +27,7 @@ public class VinesGen extends Resource
     public VinesGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        material = MaterialHelper.VINE;
+        material = LocalMaterials.VINE;
 
         assureSize(4, args);
         frequency = readInt(args.get(0), 1, 100);
@@ -122,7 +121,9 @@ public class VinesGen extends Resource
                 {
                     if (canPlace(world, _x, y, _z, direction, chunkBeingPopulated))
                     {
-                        world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, chunkBeingPopulated, false);
+                    	// TODO: Reimplement this when block data works
+                    	//world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, chunkBeingPopulated, false);
+                    	world.setBlock(_x, y, _z, LocalMaterials.VINE, null, chunkBeingPopulated, false);                        
                         break;
                     }
                 }

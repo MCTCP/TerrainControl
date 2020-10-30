@@ -1,10 +1,10 @@
 package com.pg85.otg.customobjects.bo3;
 
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.settingType.Setting;
 import com.pg85.otg.configuration.settingType.Settings;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 
@@ -38,8 +38,8 @@ public class BO3Settings extends Settings
     static final Setting<List<String>> EXCLUDED_BIOMES = stringListSetting("ExcludedBiomes", "All");
 
     static final Setting<MaterialSet>
-        SOURCE_BLOCKS = materialSetSetting("SourceBlocks", DefaultMaterial.AIR),
-        EXTRUDE_THROUGH_BLOCKS = materialSetSetting("ExtrudeThroughBlocks", DefaultMaterial.AIR)
+        SOURCE_BLOCKS = materialSetSetting("SourceBlocks", LocalMaterials.AIR_NAME),
+        EXTRUDE_THROUGH_BLOCKS = materialSetSetting("ExtrudeThroughBlocks", LocalMaterials.AIR_NAME)
     ;
 
     // Enum settings

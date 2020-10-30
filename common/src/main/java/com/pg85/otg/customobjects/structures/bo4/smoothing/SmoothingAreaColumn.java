@@ -3,15 +3,15 @@ package com.pg85.otg.customobjects.structures.bo4.smoothing;
 import java.util.ArrayList;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaBlock.enumSmoothingBlockType;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.materials.MaterialHelper;
 
 public class SmoothingAreaColumn
 {
@@ -73,7 +73,7 @@ public class SmoothingAreaColumn
 		
 		LocalMaterialData replaceAboveMaterial = null;
 		try {
-			replaceAboveMaterial = MaterialHelper.readMaterial(bo4Config.replaceAbove);
+			replaceAboveMaterial = OTG.getEngine().readMaterial(bo4Config.replaceAbove);
 		} catch (InvalidConfigException e) {
 			if(OTG.getPluginConfig().spawnLog)
 			{
@@ -84,7 +84,7 @@ public class SmoothingAreaColumn
 		LocalMaterialData smoothingSurfaceBlock = null;
 		LocalMaterialData smoothingGroundBlock = null;
 		try {
-			smoothingSurfaceBlock = MaterialHelper.readMaterial(bo4Config.smoothingSurfaceBlock);
+			smoothingSurfaceBlock = OTG.getEngine().readMaterial(bo4Config.smoothingSurfaceBlock);
 		} catch (InvalidConfigException e) {
 			if(OTG.getPluginConfig().spawnLog)
 			{
@@ -92,7 +92,7 @@ public class SmoothingAreaColumn
 			}
 		}
 		try {
-			smoothingGroundBlock = MaterialHelper.readMaterial(bo4Config.smoothingGroundBlock);
+			smoothingGroundBlock = OTG.getEngine().readMaterial(bo4Config.smoothingGroundBlock);
 		} catch (InvalidConfigException e) {
 			if(OTG.getPluginConfig().spawnLog)
 			{
@@ -151,7 +151,7 @@ public class SmoothingAreaColumn
                         		world.getMaterial(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, chunkBeingPopulated).isAir()
                     		)
                             {
-                            	surfaceBlock = MaterialHelper.WATER;
+                            	surfaceBlock = LocalMaterials.WATER;
                             } else {
                             	surfaceBlock = null;
                             }
@@ -208,7 +208,7 @@ public class SmoothingAreaColumn
                 		world.getMaterial(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, chunkBeingPopulated).isAir()
             		)
                     {
-                    	surfaceBlock = MaterialHelper.WATER;
+                    	surfaceBlock = LocalMaterials.WATER;
                     } else {
                 		surfaceBlock = null;
                     }
@@ -235,7 +235,7 @@ public class SmoothingAreaColumn
 		                {
 		                    if(y < (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
 		                    {
-		                    	groundBlock = MaterialHelper.WATER;
+		                    	groundBlock = LocalMaterials.WATER;
 		                    	needsReplaceBlocks = false;
 		                    }
 		                }
@@ -252,7 +252,7 @@ public class SmoothingAreaColumn
 		                {
 		                    if(y < (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
 		                    {
-		                    	groundBlock = MaterialHelper.WATER;
+		                    	groundBlock = LocalMaterials.WATER;
 		                    }
 		                }
 						world.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, false);

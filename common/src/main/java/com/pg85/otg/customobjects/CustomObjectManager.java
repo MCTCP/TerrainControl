@@ -64,7 +64,7 @@ public class CustomObjectManager
 	    		{
 	    			globalCustomObjects.indexGlobalObjectsFolder();
 	    			
-	    		    for(File file : OTG.getEngine().getWorldsDirectory().listFiles())
+	    			for(File file : OTG.getEngine().getPresetsDirectory().toFile().listFiles())
 	    		    {
 	    		    	if(file.isDirectory())
 	    		    	{

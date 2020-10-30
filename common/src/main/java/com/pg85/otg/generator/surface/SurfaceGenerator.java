@@ -1,7 +1,7 @@
 package com.pg85.otg.generator.surface;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;

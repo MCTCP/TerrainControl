@@ -1,19 +1,19 @@
 package com.pg85.otg.configuration.world;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFile;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
@@ -32,12 +32,12 @@ import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.materials.MaterialHelper;
+import com.pg85.otg.util.BiomeResourceLocation;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
 
 public class WorldConfig extends ConfigFile
 {
-    public final File settingsDir;
+    public final Path settingsDir;
 
     public ArrayList<String> worldBiomes = new ArrayList<String>();
 
@@ -109,7 +109,7 @@ public class WorldConfig extends ConfigFile
     public int imageXOffset;
     public int imageZOffset;
 
-    public HashMap<Integer, Integer> biomeColorMap;
+    public HashMap<Integer, BiomeResourceLocation> biomeColorMap;
 
     // Look settings
     public int worldFog;
@@ -353,7 +353,7 @@ public class WorldConfig extends ConfigFile
     	}
     }
         
-    public WorldConfig(File settingsDir, SettingsMap settingsReader, LocalWorld world, ArrayList<String> biomes)
+    public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes)
     {
         super(settingsReader.getName());
 
@@ -376,10 +376,10 @@ public class WorldConfig extends ConfigFile
        	this.correctSettings(biomes != null); // If biomes is null then we're not interested in loading biomes, squelch biome warnings.        
     }
     
-    public static DefaulWorldData createDefaultOTGWorldConfig(File settingsDir, String worldName)
+    public static DefaulWorldData createDefaultOTGWorldConfig(Path settingsDir, String worldName)
     {
     	SimpleSettingsMap settingsMap = new SimpleSettingsMap(worldName, true);
-    	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, null, getDefaultBiomeNames());
+    	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, getDefaultBiomeNames());
     	defaultWorldConfig.writeConfigSettings(settingsMap);
     	return new DefaulWorldData(defaultWorldConfig, settingsMap);
     }
@@ -418,7 +418,7 @@ public class WorldConfig extends ConfigFile
                 {
                     try
                     {
-                        material = MaterialHelper.readMaterial(replacement);
+                        material = OTG.getEngine().readMaterial(replacement);
                     }
                     catch (InvalidConfigException e)
                     {
@@ -462,7 +462,7 @@ public class WorldConfig extends ConfigFile
     			try {
     				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
     				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-					replaceBlocksDict.put(MaterialHelper.readMaterial(blockNames.getSourceBlock()), MaterialHelper.readMaterial(blockNames.getTargetBlock()));
+					replaceBlocksDict.put(OTG.getEngine().readMaterial(blockNames.getSourceBlock()), OTG.getEngine().readMaterial(blockNames.getTargetBlock()));
 				} catch (InvalidConfigException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -548,7 +548,7 @@ public class WorldConfig extends ConfigFile
 
         if (biomeMode == OTG.getBiomeModeManager().FROM_IMAGE)
         {
-            File mapFile = new File(settingsDir, imageFile);
+            File mapFile = new File(settingsDir.toString(), imageFile);
             if (!mapFile.exists())
             {
                 OTG.log(LogMarker.WARN, "Biome map file not found. Switching BiomeMode to Normal");
@@ -627,7 +627,6 @@ public class WorldConfig extends ConfigFile
         // Specialized Biomes
         this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES);
         this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
-        readCustomBiomes(reader);
 
         this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS);
         this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS);
@@ -880,264 +879,229 @@ public class WorldConfig extends ConfigFile
         this.biomeGroupManager.registerGroup(megaTaigaGroup);
     }
 
-    private void readCustomBiomes(SettingsMap reader)
-    {
-        List<String> biomes = reader.getSetting(WorldStandardValues.CUSTOM_BIOMES);
-
-        for (String biome : biomes)
-        {
-            try
-            {
-                String[] keys = biome.split(":");
-                if (keys[0].isEmpty())
-                {
-                    // Don't allow biomes with empty names
-                    continue;
-                }
-                if (keys.length == 2)
-                {
-                    int otgBiomeId = Integer.parseInt(keys[1]);
-                    customBiomeGenerationIds.put(keys[0], otgBiomeId);
-                } else {
-                    customBiomeGenerationIds.put(keys[0], -1);
-                }
-
-            } catch (NumberFormatException e)
-            {
-                System.out.println("Wrong custom biome id settings: '" + biome + "'");
-            }
-        }
-    }
-    
     @Override
     protected void writeConfigSettings(SettingsMap writer)
     {
         // About the world
         writer.bigTitle("WorldConfig");
         writer.putSetting(WorldStandardValues.AUTHOR, this.author,
-                "The author of this world");
+            "The author of this world");
 
         writer.putSetting(WorldStandardValues.DESCRIPTION, this.description,
-                "A short description of this world");
+            "A short description of this world");
 
         writer.putSetting(WorldStandardValues.WORLDPACKER_MODNAME, this.worldPackerModName,
-                "The mod name of a WorldPacker jar. The WorldPacker jar's mod image is shown in the world creation UI for this world.");
+            "The mod name of a WorldPacker jar. The WorldPacker jar's mod image is shown in the world creation UI for this world.");
         
         writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.settingsMode,
-                "What " + PluginStandardValues.PLUGIN_NAME + " does with the config files.",
-                "Possible modes:",
-                "   WriteAll - default",
-                "   WriteWithoutComments - write config files without help comments",
-                "   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
+            "What " + PluginStandardValues.PLUGIN_NAME + " does with the config files.",
+            "Possible modes:",
+            "   WriteAll - default",
+            "   WriteWithoutComments - write config files without help comments",
+            "   WriteDisable - doesn't write to the config files, it only reads. Doesn't auto-update the configs. Use with care!");
 
         // The modes
         writer.bigTitle("The modes");
 
         writer.putSetting(WorldStandardValues.TERRAIN_MODE, this.modeTerrain,
-                "Possible terrain modes:",
-                "   Normal - use all features",
-                "   TerrainTest - generate only terrain without any resources",
-                "   NotGenerate - generate empty chunks");//,
-                //"   Default - use default terrain generator",
-                //"   OldGenerator - Minecraft Beta 1.7.3-like land generator");
+            "Possible terrain modes:",
+            "   Normal - use all features",
+            "   TerrainTest - generate only terrain without any resources",
+            "   NotGenerate - generate empty chunks");//,
+            //"   Default - use default terrain generator",
+            //"   OldGenerator - Minecraft Beta 1.7.3-like land generator");
 
         writer.putSetting(WorldStandardValues.BIOME_MODE, OTG.getBiomeModeManager().getName(biomeMode),
-                "Possible biome modes:",
-                "   Normal - use all features",
-                "   FromImage - get biomes from image file",
-                //"   Default - use default Notch biome generator",
-                "For old maps two more modes are available:",
-                "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");//,
-                //"   OldGenerator - Minecraft Beta 1.7.3 biome generator");
-
-        // Custom biomes
-        writer.bigTitle("Custom biomes");
-
-        writeCustomBiomes(writer);
+            "Possible biome modes:",
+            "   Normal - use all features",
+            "   FromImage - get biomes from image file",
+            //"   Default - use default Notch biome generator",
+            "For old maps two more modes are available:",
+            "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");//,
+            //"   OldGenerator - Minecraft Beta 1.7.3 biome generator");
 
         // Settings for BiomeMode:Normal
         writer.bigTitle("Settings for BiomeMode: Normal",
-                "Also used in BiomeMode:FromImage when ImageMode is set to ContinueNormal");
+            "Also used in BiomeMode:FromImage when ImageMode is set to ContinueNormal");
 
         writer.putSetting(WorldStandardValues.GENERATION_DEPTH, this.generationDepth,
-                "Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.",
-                "Large %/total area biomes (Continents) must be set small, (limit=0)",
-                "Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)",
-                "This could also represent \"Total number of biome sizes\" ",
-                "Small values (about 1-2) and Large values (about 20) may affect generator performance.");
+            "Important value for generation. Bigger values appear to zoom out. All 'Sizes' must be smaller than this.",
+            "Large %/total area biomes (Continents) must be set small, (limit=0)",
+            "Small %/total area biomes (Oasis,Mountain Peaks) must be larger (limit=GenerationDepth)",
+            "This could also represent \"Total number of biome sizes\" ",
+            "Small values (about 1-2) and Large values (about 20) may affect generator performance.");
 
         writer.putSetting(WorldStandardValues.BIOME_RARITY_SCALE, this.biomeRarityScale,
-                "Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for",
-                "fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
+            "Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for",
+            "fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
 
         // Biome groups
         writer.smallTitle("Biome Groups",
-                "Minecraft groups similar biomes together, so that they spawn next to each other.",
-                "",
-                "Syntax: BiomeGroup(Name, Size, Rarity, BiomeName[, AnotherName[, ...]])",
-                "Name - just for clarity, choose something descriptive",
-                "Size - layer to generate on, from 0 to GenerationDepth. All biomes in the group must have a BiomeSize",
-                "       larger than or equal to this value.",
-                "Rarity - relative spawn chances.",
-                "BiomeName... - names of the biome that spawn in the group. Case sensitive.",
-                "",
-                "Note: if you're using BiomeMode: BeforeGroups, only the biome names of the groups named NormalBiomes",
-                "and IceBiomes and the size and rarity of the group named IceBiomes will be used. Other groups are",
-                "ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and",
-                "LandRarity instead.",
-                "");
+            "Minecraft groups similar biomes together, so that they spawn next to each other.",
+            "",
+            "Syntax: BiomeGroup(Name, Size, Rarity, BiomeName[, AnotherName[, ...]])",
+            "Name - just for clarity, choose something descriptive",
+            "Size - layer to generate on, from 0 to GenerationDepth. All biomes in the group must have a BiomeSize",
+            "       larger than or equal to this value.",
+            "Rarity - relative spawn chances.",
+            "BiomeName... - names of the biome that spawn in the group. Case sensitive.",
+            "",
+            "Note: if you're using BiomeMode: BeforeGroups, only the biome names of the groups named NormalBiomes",
+            "and IceBiomes and the size and rarity of the group named IceBiomes will be used. Other groups are",
+            "ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and",
+            "LandRarity instead.",
+            "");
 
         writer.addConfigFunctions(this.biomeGroupManager.getGroups());
 
         // Biome lists
         writer.smallTitle("Biome lists",
-                //"Don't forget to register your custom biomes first in CustomBiomes!",
-                "");
+            //"Don't forget to register your custom biomes first in CustomBiomes!",
+            "");
 
         writer.putSetting(WorldStandardValues.ISLE_BIOMES, this.isleBiomes,
-                "Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.",
+            "Biomes used as isles in other biomes. You must set IsleInBiome in biome config for each biome here. Biome name is case sensitive.");
 
-                "Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
-
-        writer.putSetting(WorldStandardValues.BORDER_BIOMES, this.borderBiomes);
+        writer.putSetting(WorldStandardValues.BORDER_BIOMES, this.borderBiomes,
+            "Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
 
         writer.putSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS, this.improvedBiomeBorders,
-        		"Spawns more precise borders that never spill over into neighbouring biomes. Disabled by default for legacy worlds.");
+    		"Spawns more precise borders that never spill over into neighbouring biomes. Disabled by default for legacy worlds.");
 
         writer.putSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS, this.improvedBiomeGroups,
-        		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");
+    		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");
 
         writer.putSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING, this.customHeightControlSmoothing,
-                "Smooths biome CustomHeightControl data. Disabled by default for legacy worlds.");
+            "Smooths biome CustomHeightControl data. Disabled by default for legacy worlds.");
 
         writer.putSetting(WorldStandardValues.IMPROVED_SMOOTHING, this.improvedSmoothing,
-                "Smooths volatility and max average data. Disabled by default for legacy worlds.");
+            "Smooths volatility and max average data. Disabled by default for legacy worlds.");
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 
         writer.putSetting(WorldStandardValues.LAND_RARITY, this.landRarity,
-                "Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
+            "Land rarity from 100 to 1. If you set smaller than 90 and LandSize near 0 beware Big oceans.");
 
         writer.putSetting(WorldStandardValues.LAND_SIZE, this.landSize,
-                "Land size from 0 to GenerationDepth. Biome groups are placed on this.");
+            "Land size from 0 to GenerationDepth. Biome groups are placed on this.");
 
         writer.putSetting(WorldStandardValues.LAND_FUZZY, this.landFuzzy,
-                "Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
+            "Make land more fuzzy and make lakes. Must be from 0 to GenerationDepth - LandSize");
 
         writer.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, this.defaultOceanBiome,
-        		"The default Ocean biome.");
+    		"The default Ocean biome.");
         
         writer.smallTitle("Ice area settings");
 
         writer.putSetting(WorldStandardValues.FROZEN_OCEAN, this.frozenOcean,
-                "Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
+            "Set this to false to stop the ocean from freezing near when an \"ice area\" intersects with an ocean.");
 
         writer.putSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, this.frozenOceanTemperature,
-                "This is the biome temperature when water freezes if \"FrozenOcean\" is set to true.",
-                "This used to be the case for all biomes in the \"IceBiomes\" list. Default: 0.15; Min: 0.0; Max: 2.0",
-                "Temperature Reference from Vanilla: <0.15 for snow, 0.15 - 0.95 for rain, or >1.0 for dry");
+            "This is the biome temperature when water freezes if \"FrozenOcean\" is set to true.",
+            "This used to be the case for all biomes in the \"IceBiomes\" list. Default: 0.15; Min: 0.0; Max: 2.0",
+            "Temperature Reference from Vanilla: <0.15 for snow, 0.15 - 0.95 for rain, or >1.0 for dry");
 
         writer.putSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, this.freezeAllColdGroupBiomes,
-                "If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:",
-                " - When this setting is true, all biomes in the group will have frozen oceans",
-                " - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
-                "Default: false");
+            "If the average of all biome temperatures in a biome group is less than \"OceanFreezingTemperature\", then:",
+            " - When this setting is true, all biomes in the group will have frozen oceans",
+            " - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
+            "Default: false");
 
         writer.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, this.defaultFrozenOceanBiome,
-        		"The default frozen ocean biome.");
+    		"The default frozen ocean biome.");
         
         writer.smallTitle("Rivers");
 
         writer.putSetting(WorldStandardValues.RIVER_RARITY, this.riverRarity,
-                "River rarity. Must be from 0 to GenerationDepth.");
+            "River rarity. Must be from 0 to GenerationDepth.");
 
         writer.putSetting(WorldStandardValues.RIVER_SIZE, this.riverSize,
-                "River size from 0 to GenerationDepth - RiverRarity");
+            "River size from 0 to GenerationDepth - RiverRarity");
 
         writer.putSetting(WorldStandardValues.RIVERS_ENABLED, this.riversEnabled,
-                "Set this to false to prevent the river generator from doing anything.");
+            "Set this to false to prevent the river generator from doing anything.");
 
         writer.putSetting(WorldStandardValues.IMPROVED_RIVERS, this.improvedRivers,
-                "When this is set to false, the standard river generator of Minecraft will be used.",
-                "This means that a technical biome, determined by the RiverBiome setting of the biome",
-                "the river is flowing through, will be used to generate the river.",
-                "",
-                "When enabled, the rivers won't use a technical biome in your world anymore, instead",
-                "you can control them using the river settings in the BiomeConfigs.");
+            "When this is set to false, the standard river generator of Minecraft will be used.",
+            "This means that a technical biome, determined by the RiverBiome setting of the biome",
+            "the river is flowing through, will be used to generate the river.",
+            "",
+            "When enabled, the rivers won't use a technical biome in your world anymore, instead",
+            "you can control them using the river settings in the BiomeConfigs.");
 
         writer.putSetting(WorldStandardValues.RANDOM_RIVERS, this.randomRivers,
-                "When set to true the rivers will no longer follow biome border most of the time.");
+            "When set to true the rivers will no longer follow biome border most of the time.");
         
         // Settings for BiomeMode:FromImage
         writer.bigTitle("Settings for BiomeMode:FromImage");
 
         writer.putSetting(WorldStandardValues.IMAGE_MODE, this.imageMode,
-                "Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty",
-                "   Repeat - repeat image",
-                "   Mirror - advanced repeat image mode",
-                "   ContinueNormal - continue normal generation",
-                "   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
+            "Possible modes when generator outside image boundaries: Repeat, ContinueNormal, FillEmpty",
+            "   Repeat - repeat image",
+            "   Mirror - advanced repeat image mode",
+            "   ContinueNormal - continue normal generation",
+            "   FillEmpty - fill by biome in \"ImageFillBiome settings\" ");
 
         writer.putSetting(WorldStandardValues.IMAGE_FILE, this.imageFile,
-                "Source png file for FromImage biome mode.");
+            "Source png file for FromImage biome mode.");
 
         writer.putSetting(WorldStandardValues.IMAGE_ORIENTATION, this.imageOrientation,
-                "Where the png's north is oriented? Possible values: North, East, South, West",
-                "   North - the top of your picture if north (no any rotation)",
-                "   West - previous behavior (you should rotate png CCW manually)",
-                "   East - png should be rotated CW manually",
-                "   South - rotate png 180 degrees before generating world");
+            "Where the png's north is oriented? Possible values: North, East, South, West",
+            "   North - the top of your picture if north (no any rotation)",
+            "   West - previous behavior (you should rotate png CCW manually)",
+            "   East - png should be rotated CW manually",
+            "   South - rotate png 180 degrees before generating world");
 
         writer.putSetting(WorldStandardValues.IMAGE_FILL_BIOME, this.imageFillBiome,
-                "Biome name for fill outside image boundaries with FillEmpty mode.");
+            "Biome name for fill outside image boundaries with FillEmpty mode.");
 
         writer.putSetting(WorldStandardValues.IMAGE_X_OFFSET, this.imageXOffset,
-                "Shifts map position from x=0 and z=0 coordinates.");
+            "Shifts map position from x=0 and z=0 coordinates.");
         writer.putSetting(WorldStandardValues.IMAGE_Z_OFFSET, this.imageZOffset);
 
         // Terrain height and volatility
         writer.bigTitle("Terrain height and volatility");
 
         writer.putSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, this.worldHeightScaleBits,
-                "Scales the height of the world. Adding 1 to this doubles the",
-                "height of the terrain, substracting 1 to this halves the height",
-                "of the terrain. Values must be between 5 and 8, inclusive.");
+            "Scales the height of the world. Adding 1 to this doubles the",
+            "height of the terrain, substracting 1 to this halves the height",
+            "of the terrain. Values must be between 5 and 8, inclusive.");
 
         writer.putSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, this.worldHeightCapBits,
-                "Height cap of the base terrain. Setting this to 7 makes no terrain",
-                "generate above y = 2 ^ 7 = 128. Doesn't affect resources (trees, objects, etc.).",
-                "Values must be between 5 and 8, inclusive. Values may not be lower",
-                "than WorldHeightScaleBits.");
+            "Height cap of the base terrain. Setting this to 7 makes no terrain",
+            "generate above y = 2 ^ 7 = 128. Doesn't affect resources (trees, objects, etc.).",
+            "Values must be between 5 and 8, inclusive. Values may not be lower",
+            "than WorldHeightScaleBits.");
 
         writer.putSetting(WorldStandardValues.FRACTURE_HORIZONTAL, this.fractureHorizontal,
-                "Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
+            "Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured horizontally.");
 
         writer.putSetting(WorldStandardValues.FRACTURE_VERTICAL, this.fractureVertical,
-                "Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.",
-                "Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
+            "Can increase (values greater than 0) or decrease (values less than 0) how much the landscape is fractured vertically.",
+            "Positive values will lead to large cliffs/overhangs, floating islands, and/or a cavern world depending on other settings.");
 
         // Blocks
         writer.bigTitle("Blocks");
 
         writer.putSetting(WorldStandardValues.REMOVE_SURFACE_STONE, this.removeSurfaceStone,
-                "Attempts to replace all surface stone with biome surface block.");
+            "Attempts to replace all surface stone with biome surface block.");
 
         writer.putSetting(WorldStandardValues.DISABLE_BEDROCK, this.disableBedrock,
-                "Disable bottom of map bedrock generation. Doesn't affect bedrock on the ceiling of the map.");
+            "Disable bottom of map bedrock generation. Doesn't affect bedrock on the ceiling of the map.");
 
         writer.putSetting(WorldStandardValues.CEILING_BEDROCK, this.ceilingBedrock,
-                "Enable ceiling of map bedrock generation.");
+            "Enable ceiling of map bedrock generation.");
 
         writer.putSetting(WorldStandardValues.FLAT_BEDROCK, this.flatBedrock,
-                "Make layer of bedrock flat.");
+            "Make layer of bedrock flat.");
 
         writer.putSetting(WorldStandardValues.BEDROCK_BLOCK, this.bedrockBlock,
-                "Block used as bedrock.");
+            "Block used as bedrock.");
 
         writer.putSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, this.populationBoundsCheck,
-                "Set this to false to disable the bounds check during chunk population.",
-                "While this allows you to spawn larger objects, it also makes terrain generation",
-                "dependant on the direction you explored the world in.");
+            "Set this to false to disable the bounds check during chunk population.",
+            "While this allows you to spawn larger objects, it also makes terrain generation",
+            "dependant on the direction you explored the world in.");
 
         if (this.populateUsingSavedBiomes)
         {
@@ -1147,10 +1111,10 @@ public class WorldConfig extends ConfigFile
                 "If it is set to true the biome populator will use the biome ids present in the",
                 "chunk data, ignoring the biome generator. This is useful if you have a premade",
                 "map made with for example WorldPainter, but still want to populate it using "
-                        + PluginStandardValues.PLUGIN_NAME + ".",
+                + PluginStandardValues.PLUGIN_NAME + ".",
                 "Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome",
                 "specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
-                        + " to populate the chunk, instead of the biome itself.");
+                + " to populate the chunk, instead of the biome itself.");
         }
 
         writer.smallTitle("Water / Lava & Frozen States");
@@ -1191,20 +1155,20 @@ public class WorldConfig extends ConfigFile
             // Write the old objectSpawnRatio
 
             writer.putSetting(WorldStandardValues.OBJECT_SPAWN_RATIO, this.objectSpawnRatio,
-                    "LEGACY setting for compability with old worlds. This setting should be kept at 1.",
-                    "If the setting is set at 1, the setting will vanish from the config file. Readd it",
-                    "manually with another value and it will be back.",
-                    "",
-                    "When using the UseWorld or UseBiome keyword for spawning custom objects, Open Terrain Generator",
-                    "spawns one of the possible custom objects. There is of course a chance that",
-                    "the chosen object cannot spawn. This setting tells TC how many times it should",
-                    "try to spawn that object.",
-                    "This setting doesn't affect growing saplings anymore.");
+                "LEGACY setting for compability with old worlds. This setting should be kept at 1.",
+                "If the setting is set at 1, the setting will vanish from the config file. Readd it",
+                "manually with another value and it will be back.",
+                "",
+                "When using the UseWorld or UseBiome keyword for spawning custom objects, Open Terrain Generator",
+                "spawns one of the possible custom objects. There is of course a chance that",
+                "the chosen object cannot spawn. This setting tells TC how many times it should",
+                "try to spawn that object.",
+                "This setting doesn't affect growing saplings anymore.");
         }
 
         // OreGen
         writer.putSetting(WorldStandardValues.DISABLE_OREGEN, this.disableOreGen,
-                "Disables Ore(), UnderWaterOre() and Vein() biome resources that use any type of ore block.");
+            "Disables Ore(), UnderWaterOre() and Vein() biome resources that use any type of ore block.");
         
         // Structures
         writer.bigTitle("Structures",
@@ -1291,8 +1255,8 @@ public class WorldConfig extends ConfigFile
         //
 
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
-                "Maximum radius of custom structures in chunks. Custom structures are spawned by",
-                "the CustomStructure resource in the biome configuration files. Not used for BO4's.");
+            "Maximum radius of custom structures in chunks. Custom structures are spawned by",
+            "the CustomStructure resource in the biome configuration files. Not used for BO4's.");
 
         // Other structures
         writer.smallTitle("Other structures");
@@ -1301,61 +1265,61 @@ public class WorldConfig extends ConfigFile
 
         // Visual settings
         writer.bigTitle("Visual settings",
-                "Warning: this section will work only for players with the single version of Open Terrain Generator installed.");
+            "Warning: this section will work only for players with the single version of Open Terrain Generator installed.");
 
         writer.putSetting(WorldStandardValues.WORLD_FOG, this.worldFog,
-                "World fog color");
+            "World fog color");
 
         writer.putSetting(WorldStandardValues.WORLD_NIGHT_FOG, this.worldNightFog,
-                "World night fog color");
+            "World night fog color");
 
         // Cave settings (still using code from Bucyruss' BiomeTerrainMod)
         writer.bigTitle("Cave settings");
 
         writer.putSetting(WorldStandardValues.CAVE_RARITY, this.caveRarity,
-                "This controls the odds that a given chunk will host a single cave and/or the start of a cave system.");
+            "This controls the odds that a given chunk will host a single cave and/or the start of a cave system.");
 
         writer.putSetting(WorldStandardValues.CAVE_FREQUENCY, this.caveFrequency,
-                "The number of times the cave generation algorithm will attempt to create single caves and cave",
-                "systems in the given chunk. This value is larger because the likelihood for the cave generation",
-                "algorithm to bailout is fairly high and it is used in a randomizer that trends towards lower",
-                "random numbers. With an input of 40 (default) the randomizer will result in an average random",
-                "result of 5 to 6. This can be turned off by setting evenCaveDistribution (below) to true.");
+            "The number of times the cave generation algorithm will attempt to create single caves and cave",
+            "systems in the given chunk. This value is larger because the likelihood for the cave generation",
+            "algorithm to bailout is fairly high and it is used in a randomizer that trends towards lower",
+            "random numbers. With an input of 40 (default) the randomizer will result in an average random",
+            "result of 5 to 6. This can be turned off by setting evenCaveDistribution (below) to true.");
 
         writer.putSetting(WorldStandardValues.CAVE_MIN_ALTITUDE, this.caveMinAltitude,
-                "Sets the minimum and maximum altitudes at which caves will be generated. These values are",
-                "used in a randomizer that trends towards lower numbers so that caves become more frequent",
-                "the closer you get to the bottom of the map. Setting even cave distribution (above) to true",
-                "will turn off this randomizer and use a flat random number generator that will create an even",
-                "density of caves at all altitudes.");
+            "Sets the minimum and maximum altitudes at which caves will be generated. These values are",
+            "used in a randomizer that trends towards lower numbers so that caves become more frequent",
+            "the closer you get to the bottom of the map. Setting even cave distribution (above) to true",
+            "will turn off this randomizer and use a flat random number generator that will create an even",
+            "density of caves at all altitudes.");
         writer.putSetting(WorldStandardValues.CAVE_MAX_ALTITUDE, this.caveMaxAltitude);
 
         writer.putSetting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY, this.individualCaveRarity,
-                "The odds that the cave generation algorithm will generate a single cavern without an accompanying",
-                "cave system. Note that whenever the algorithm generates an individual cave it will also attempt to",
-                "generate a pocket of cave systems in the vicinity (no guarantee of connection or that the cave system",
-                "will actually be created).");
+            "The odds that the cave generation algorithm will generate a single cavern without an accompanying",
+            "cave system. Note that whenever the algorithm generates an individual cave it will also attempt to",
+            "generate a pocket of cave systems in the vicinity (no guarantee of connection or that the cave system",
+            "will actually be created).");
 
         writer.putSetting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY, this.caveSystemFrequency,
-                "The number of times the algorithm will attempt to start a cave system in a given chunk per cycle of",
-                "the cave generation algorithm (see cave frequency setting above). Note that setting this value too",
-                "high with an accompanying high cave frequency value can cause extremely long world generation time.");
+            "The number of times the algorithm will attempt to start a cave system in a given chunk per cycle of",
+            "the cave generation algorithm (see cave frequency setting above). Note that setting this value too",
+            "high with an accompanying high cave frequency value can cause extremely long world generation time.");
 
         writer.putSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE, this.caveSystemPocketChance,
-                "This can be set to create an additional chance that a cave system pocket (a higher than normal",
-                "density of cave systems) being started in a given chunk. Normally, a cave pocket will only be",
-                "attempted if an individual cave is generated, but this will allow more cave pockets to be generated",
-                "in addition to the individual cave trigger.");
+            "This can be set to create an additional chance that a cave system pocket (a higher than normal",
+            "density of cave systems) being started in a given chunk. Normally, a cave pocket will only be",
+            "attempted if an individual cave is generated, but this will allow more cave pockets to be generated",
+            "in addition to the individual cave trigger.");
 
         writer.putSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, this.caveSystemPocketMinSize,
-                "The minimum and maximum size that a cave system pocket can be. This modifies/overrides the",
-                "cave system frequency setting (above) when triggered.");
+            "The minimum and maximum size that a cave system pocket can be. This modifies/overrides the",
+            "cave system frequency setting (above) when triggered.");
         writer.putSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, this.caveSystemPocketMaxSize);
 
         writer.putSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, this.evenCaveDistribution,
-                "Setting this to true will turn off the randomizer for cave frequency (above). Do note that",
-                "if you turn this on you will probably want to adjust the cave frequency down to avoid long",
-                "load times at world creation.");
+            "Setting this to true will turn off the randomizer for cave frequency (above). Do note that",
+            "if you turn this on you will probably want to adjust the cave frequency down to avoid long",
+            "load times at world creation.");
 
         // Ravine settings
         writer.bigTitle("Ravine settings");
@@ -1392,108 +1356,108 @@ public class WorldConfig extends ConfigFile
         // Dimensions
         writer.bigTitle("Dimension");
         writer.putSetting(WorldStandardValues.DIMENSIONS, this.dimensions,
-                "Dimensions that should be loaded for this world at world creation. A world directory of the same name must be present in mods/OpenTerrainGenerator/"+ PluginStandardValues.PresetsDirectoryName + "/");
+    		"Dimensions that should be loaded for this world at world creation. A world directory of the same name must be present in mods/OpenTerrainGenerator/"+ PluginStandardValues.PRESETS_FOLDER + "/");
         writer.putSetting(WorldStandardValues.DIMENSIONBELOW, this.dimensionBelow,
-                "When a player goes below Y 0, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
+            "When a player goes below Y 0, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
         writer.putSetting(WorldStandardValues.DIMENSIONABOVE, this.dimensionAbove,
-        		"When a player goes above Y 255, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
+    		"When a player goes above Y 255, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
         writer.putSetting(WorldStandardValues.DIMENSIONBELOWHEIGHT, this.dimensionBelowHeight,
-                "The Y coordinate (height) for the DimensionBelow setting.");
+            "The Y coordinate (height) for the DimensionBelow setting.");
         writer.putSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT, this.dimensionAboveHeight,
-        		"The Y coordinate (height) for the DimensionAbove setting.");
+    		"The Y coordinate (height) for the DimensionAbove setting.");
         writer.putSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS, this.dimensionPortalMaterials,
-                "A comma seperated list of blocks, dimension portals made of one or more of these blocks will lead to this world.",
-                "For blocks that have rotation such as stairs be sure to add all rotations (0,1,2,3,4,5,6,7), for instance: QUARTZ_STAIRS:0, QUARTZ_STAIRS:1, QUARTZ_STAIRS:2 etc.",
-                "For blocks that have rotation such as QUARTZ_STAIRS, \"QUARTZ_STAIRS\" is the same as \"QUARTZ_STAIRS:3\"."
-        		);
+            "A comma seperated list of blocks, dimension portals made of one or more of these blocks will lead to this world.",
+            "For blocks that have rotation such as stairs be sure to add all rotations (0,1,2,3,4,5,6,7), for instance: QUARTZ_STAIRS:0, QUARTZ_STAIRS:1, QUARTZ_STAIRS:2 etc.",
+            "For blocks that have rotation such as QUARTZ_STAIRS, \"QUARTZ_STAIRS\" is the same as \"QUARTZ_STAIRS:3\"."
+		);
 
         writer.putSetting(WorldStandardValues.PORTAL_COLOR, this.portalColor,
-        		"The color of OTG portal blocks, \"" + WorldStandardValues.PORTAL_COLOR + "\" by default." + 
-        		"Colors: beige, black, blue, crystalblue, darkblue, darkgreen, darkred, emerald, flame," +
-				"gold, green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default.");         
+    		"The color of OTG portal blocks, \"" + WorldStandardValues.PORTAL_COLOR + "\" by default." + 
+    		"Colors: beige, black, blue, crystalblue, darkblue, darkgreen, darkred, emerald, flame," +
+			"gold, green, grey, lightblue, lightgreen, orange, pink, red, white, yellow, default.");         
         writer.putSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE, this.portalParticleType,
-        		"The type of particles spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_PARTICLE_TYPE + "\" by default. For a list of particles, use /otg particles"); 
+    		"The type of particles spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_PARTICLE_TYPE + "\" by default. For a list of particles, use /otg particles"); 
         writer.putSetting(WorldStandardValues.PORTAL_MOB_TYPE, this.portalMobType,        		
-        		"The type of mobs spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_TYPE + "\" by default. For a list of mobs, use /otg entities");
+    		"The type of mobs spawned by OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_TYPE + "\" by default. For a list of mobs, use /otg entities");
         writer.putSetting(WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE, this.portalMobSpawnChance,        		
-        		"The mob spawn chance for OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE + "\" by default, lower value means higher chance. Mob spawn chance also depends on difficulty level.");        
+    		"The mob spawn chance for OTG portal blocks, \"" + WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE + "\" by default, lower value means higher chance. Mob spawn chance also depends on difficulty level.");        
 
         writer.putSetting(WorldStandardValues.TeleportToSpawnOnly, this.teleportToSpawnOnly,
-        		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
+    		"If this is set to true then portals to this dimension will always teleport players to the world's spawn point.");
 
         writer.smallTitle("Game rules", "Game rules for this world. These settings are still in development, may not all work (please submit an issue on the git) and may be subject to change in upcoming releases.", "");
 
         writer.putSetting(WorldStandardValues.CommandBlockOutput, Boolean.parseBoolean(this.commandBlockOutput),
-        		"Whether command blocks should notify admins when they perform commands");
+    		"Whether command blocks should notify admins when they perform commands");
         writer.putSetting(WorldStandardValues.DisableElytraMovementCheck, Boolean.parseBoolean(this.disableElytraMovementCheck),
-        		"Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).");
+    		"Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).");
         writer.putSetting(WorldStandardValues.DoDaylightCycle, Boolean.parseBoolean(this.doDaylightCycle),
-        		"Whether the day-night cycle and moon phases progress");
+    		"Whether the day-night cycle and moon phases progress");
         writer.putSetting(WorldStandardValues.DoEntityDrops, Boolean.parseBoolean(this.doEntityDrops),
-        		"Whether entities that are not mobs should have drops");
+    		"Whether entities that are not mobs should have drops");
         writer.putSetting(WorldStandardValues.DoFireTick, Boolean.parseBoolean(this.doFireTick),
-        		"Whether fire should spread and naturally extinguish");
+    		"Whether fire should spread and naturally extinguish");
         writer.putSetting(WorldStandardValues.DoLimitedCrafting, Boolean.parseBoolean(this.doLimitedCrafting),
-        		"Whether players should only be able to craft recipes that they've unlocked first");
+    		"Whether players should only be able to craft recipes that they've unlocked first");
         writer.putSetting(WorldStandardValues.DoMobLoot, Boolean.parseBoolean(this.doMobLoot),
-        		"Whether mobs should drop items");
+    		"Whether mobs should drop items");
         writer.putSetting(WorldStandardValues.DoMobSpawning, Boolean.parseBoolean(this.doMobSpawning),
-        		"Whether mobs should naturally spawn. Does not affect monster spawners.");
+    		"Whether mobs should naturally spawn. Does not affect monster spawners.");
         writer.putSetting(WorldStandardValues.DoTileDrops, Boolean.parseBoolean(this.doTileDrops),
-        		"Whether blocks should have drops");
+    		"Whether blocks should have drops");
         writer.putSetting(WorldStandardValues.DoWeatherCycle, Boolean.parseBoolean(this.doWeatherCycle),
-        		"Whether the weather will change");
+    		"Whether the weather will change");
         writer.putSetting(WorldStandardValues.GameLoopFunction, Boolean.parseBoolean(this.gameLoopFunction),
-        		"The function to run every game tick");        
+    		"The function to run every game tick");        
         writer.putSetting(WorldStandardValues.KeepInventory, Boolean.parseBoolean(this.keepInventory),
-        		"Whether the player should keep items in their inventory after death");
+    		"Whether the player should keep items in their inventory after death");
         writer.putSetting(WorldStandardValues.LogAdminCommands, Boolean.parseBoolean(this.logAdminCommands),
-        		"Whether to log admin commands to server log");
+    		"Whether to log admin commands to server log");
         writer.putSetting(WorldStandardValues.MaxCommandChainLength, Integer.parseInt(this.maxCommandChainLength),
-        		"Determines the number at which the chain command block acts as a \"chain\"");        
+    		"Determines the number at which the chain command block acts as a \"chain\"");        
         writer.putSetting(WorldStandardValues.MaxEntityCramming, Integer.parseInt(this.maxEntityCramming),
-        		"The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.");
+    		"The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.");
         writer.putSetting(WorldStandardValues.MobGriefing, Boolean.parseBoolean(this.mobGriefing),
-        		"Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items");
+    		"Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items");
         writer.putSetting(WorldStandardValues.NaturalRegeneration, Boolean.parseBoolean(this.naturalRegeneration),
-        		"Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)");
+    		"Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)");
         writer.putSetting(WorldStandardValues.RandomTickSpeed, Integer.parseInt(this.randomTickSpeed),
-        		"How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks");
+    		"How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks");
         writer.putSetting(WorldStandardValues.ReducedDebugInfo, Boolean.parseBoolean(this.reducedDebugInfo),
-        		"Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.");
+    		"Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.");
         writer.putSetting(WorldStandardValues.SendCommandFeedback, Boolean.parseBoolean(this.sendCommandFeedback),
-        		"Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text");
+    		"Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text");
         writer.putSetting(WorldStandardValues.ShowDeathMessages, Boolean.parseBoolean(this.showDeathMessages),
-        		"Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies");
+    		"Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies");
         writer.putSetting(WorldStandardValues.SpawnRadius, Integer.parseInt(this.spawnRadius),
-        		"The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.");
+    		"The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.");
         writer.putSetting(WorldStandardValues.SpectatorsGenerateChunks, Boolean.parseBoolean(this.spectatorsGenerateChunks),
-        		"Whether players in spectator mode can generate chunks");
+    		"Whether players in spectator mode can generate chunks");
 
         // World provider settings for worlds used as dimensions with Forge
         writer.smallTitle("World provider settings", "World provider settings for this world. These settings are still in development, may not all work (please submit an issue on the git) and may be subject to change in upcoming releases.", "");
 
         writer.putSetting(WorldStandardValues.WelcomeMessage, this.welcomeMessage,
-        		"A message to display to the user when they transfer to this dimension.");
+    		"A message to display to the user when they transfer to this dimension.");
         writer.putSetting(WorldStandardValues.DepartMessage, this.departMessage,
-        		"A Message to display to the user when they transfer out of this dimension.");
+    		"A Message to display to the user when they transfer out of this dimension.");
         writer.putSetting(WorldStandardValues.HasSkyLight, this.hasSkyLight,
-        		"A boolean that tells if a world has a sky or not. Used for calculating weather and skylight. Also affects GetActualHeight(), hasSkyLight = false worlds are seen as 128 height worlds, which affects nether portal placement/detection.");
+    		"A boolean that tells if a world has a sky or not. Used for calculating weather and skylight. Also affects GetActualHeight(), hasSkyLight = false worlds are seen as 128 height worlds, which affects nether portal placement/detection.");
         writer.putSetting(WorldStandardValues.IsSurfaceWorld, this.isSurfaceWorld,
-        		"Returns 'true' if in the \"main surface world\", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.");
+    		"Returns 'true' if in the \"main surface world\", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.");
         writer.putSetting(WorldStandardValues.CanRespawnHere, this.canRespawnHere,
-        		"True if the player can respawn in this dimension (true = overworld, false = nether).");
+    		"True if the player can respawn in this dimension (true = overworld, false = nether).");
         writer.putSetting(WorldStandardValues.DoesWaterVaporize, this.doesWaterVaporize,
-        		"True for nether, any water that is placed vaporises.");
+    		"True for nether, any water that is placed vaporises.");
         writer.putSetting(WorldStandardValues.DoesXZShowFog, this.doesXZShowFog,
-        		"Returns true if the given X,Z coordinate should show environmental fog. True for Nether.");
+    		"Returns true if the given X,Z coordinate should show environmental fog. True for Nether.");
         writer.putSetting(WorldStandardValues.UseCustomFogColor, this.useCustomFogColor,
-        		"Set this to true if you want to use the fog color settings below.");
+    		"Set this to true if you want to use the fog color settings below.");
         writer.putSetting(WorldStandardValues.FogColorRed, this.fogColorRed);
         writer.putSetting(WorldStandardValues.FogColorGreen, this.fogColorGreen);
         writer.putSetting(WorldStandardValues.FogColorBlue, this.fogColorBlue);
         writer.putSetting(WorldStandardValues.IsSkyColored, this.isSkyColored,
-        		"Is set to false for End (black sky?)");
+    		"Is set to false for End (black sky?)");
         //writer.putSetting(WorldStandardValues.averageGroundlevel, this.averageGroundlevel,
         		//"Affects spawn point location and village spawning. Should be equal to sea level + 1(?)");
         //writer.putSetting(WorldStandardValues.horizonHeight, this.horizonHeight,
@@ -1502,74 +1466,74 @@ public class WorldConfig extends ConfigFile
         writer.putSetting(WorldStandardValues.CanDoLightning, this.canDoLightning);
         writer.putSetting(WorldStandardValues.CanDoRainSnowIce, this.canDoRainSnowIce);
         writer.putSetting(WorldStandardValues.IsNightWorld, this.isNightWorld,
-        		"If true then the sky will be locked at midnight with the moon and stars above but the world will be lit as if it were day time. Useful for space dimensions.");
+    		"If true then the sky will be locked at midnight with the moon and stars above but the world will be lit as if it were day time. Useful for space dimensions.");
         writer.putSetting(WorldStandardValues.VoidFogYFactor, this.voidFogYFactor,
-        		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");
+    		"A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.");
 
         writer.putSetting(WorldStandardValues.GravityFactor, this.gravityFactor,
-        		"A value above 0.0, defaults to 0.08. Affects entities jumping and falling. 0.04 would result in half the gravity and falling damage.",
-        		"NOTE: Broken for Forge 1.11.2 MP atm, should work fine for SP and 1.12.2 SP & MP.");
+    		"A value above 0.0, defaults to 0.08. Affects entities jumping and falling. 0.04 would result in half the gravity and falling damage.",
+    		"NOTE: Broken for Forge 1.11.2 MP atm, should work fine for SP and 1.12.2 SP & MP.");
 
         writer.putSetting(WorldStandardValues.ShouldMapSpin, this.shouldMapSpin,
-        		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
+    		"Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.");
         writer.putSetting(WorldStandardValues.CanDropChunk, this.canDropChunk,
-        		"Used for dimensions, when set to false, no chunks are ever unloaded in the dimension. Used for The End.");
+    		"Used for dimensions, when set to false, no chunks are ever unloaded in the dimension. Used for The End.");
         writer.putSetting(WorldStandardValues.RESPAWN_DIMENSION, this.respawnDimension,
-        		"Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.");
+    		"Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.");
         writer.putSetting(WorldStandardValues.MOVEMENT_FACTOR, this.movementFactor,
-        		"The dimension's movement factor. Whenever a player or entity changes dimension from world A to world B, their coordinates are multiplied by worldA.provider.getMovementFactor() / worldB.provider.getMovementFactor(). Example: Overworld factor is 1, nether factor is 8. Traveling from overworld to nether multiplies coordinates by 1/8.");
+    		"The dimension's movement factor. Whenever a player or entity changes dimension from world A to world B, their coordinates are multiplied by worldA.provider.getMovementFactor() / worldB.provider.getMovementFactor(). Example: Overworld factor is 1, nether factor is 8. Traveling from overworld to nether multiplies coordinates by 1/8.");
 
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION, this.itemsToAddOnJoinDimension,
-        		"Similar to the /give command, gives players items when they enter a dimension/world.",
-        		"Example (single): { \"flint_and_steel\", \"1\" }",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
-        		"Use -1 as amount to remove all matching items.");
+    		"Similar to the /give command, gives players items when they enter a dimension/world.",
+    		"Example (single): { \"flint_and_steel\", \"1\" }",
+    		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",
+    		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+    		"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION, this.itemsToRemoveOnJoinDimension,
-        		"The opposite of the /give command, removes items from players inventories when they enter a dimension/world.",
-        		"Example (single): { \"flint_and_steel\", \"1\" }",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
-        		"Use -1 as amount to remove all matching items.");
+    		"The opposite of the /give command, removes items from players inventories when they enter a dimension/world.",
+    		"Example (single): { \"flint_and_steel\", \"1\" }",
+    		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
+    		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+    		"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION, this.itemsToAddOnLeaveDimension,
-        		"Similar to the /give command, gives players items when they leave a dimension/world.",
-        		"Example (single): { \"flint_and_steel\", \"1\" }",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
-    			"Use -1 as amount to remove all matching items.");
+    		"Similar to the /give command, gives players items when they leave a dimension/world.",
+    		"Example (single): { \"flint_and_steel\", \"1\" }",
+    		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
+    		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+			"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION, this.itemsToRemoveOnLeaveDimension,
-        		"The opposite of the /give command, removes items from players inventories when they leave a dimension/world.",
-        		"Example (single): { \"flint_and_steel\", \"1\" }",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
-    			"Use -1 as amount to remove all matching items.");
+    		"The opposite of the /give command, removes items from players inventories when they leave a dimension/world.",
+    		"Example (single): { \"flint_and_steel\", \"1\" }",
+    		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",        		
+    		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+			"Use -1 as amount to remove all matching items.");
         writer.putSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN, this.itemsToAddOnRespawn,
-        		"Similar to the /give command, gives players items when they respawn in a dimension/world.",
-        		"Example (single): { \"flint_and_steel\", \"1\" }",
-        		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",
-        		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
-    			"Use -1 as amount to remove all matching items.");
+    		"Similar to the /give command, gives players items when they respawn in a dimension/world.",
+    		"Example (single): { \"flint_and_steel\", \"1\" }",
+    		"Example (single): { \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" } // 0 is metaDataString",
+    		"Example (multiple): [{ \"diamond_sword\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }, { \"diamond_helmet\", \"1\", \"0\", \"{ench:[{id:16,lvl:5}]}\" }]",
+			"Use -1 as amount to remove all matching items.");
 
 		writer.putSetting(WorldStandardValues.SPAWN_POINT_SET, this.spawnPointSet,
-				"Set this to true to set the server spawn point to SpawnPointX, SpawnPointY, SpawnPointZ");
+			"Set this to true to set the server spawn point to SpawnPointX, SpawnPointY, SpawnPointZ");
 
 		writer.putSetting(WorldStandardValues.SPAWN_POINT_X, this.spawnPointX,
-				"Use this with SpawnPointSet: true to set a spawn coordinate.");
+			"Use this with SpawnPointSet: true to set a spawn coordinate.");
 
 		writer.putSetting(WorldStandardValues.SPAWN_POINT_Y, this.spawnPointY,
-				"Use this with SpawnPointSet: true to set a spawn coordinate.");
+			"Use this with SpawnPointSet: true to set a spawn coordinate.");
 
 		writer.putSetting(WorldStandardValues.SPAWN_POINT_Z, this.spawnPointZ,
-				"Use this with SpawnPointSet: true to set a spawn coordinate.");
+			"Use this with SpawnPointSet: true to set a spawn coordinate.");
 
 		writer.putSetting(WorldStandardValues.PLAYERS_CAN_BREAK_BLOCKS, this.playersCanBreakBlocks,
-				"When set to false players cannot break blocks in this world. Defaults to: true");
+			"When set to false players cannot break blocks in this world. Defaults to: true");
 
 		writer.putSetting(WorldStandardValues.EXPLOSIONS_CAN_BREAK_BLOCKS, this.explosionsCanBreakBlocks,
-				"When set to false explosions cannot break blocks in this world. Defaults to: true");
+			"When set to false explosions cannot break blocks in this world. Defaults to: true");
 
 		writer.putSetting(WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS, this.playersCanPlaceBlocks,
-				"When set to false players cannot place blocks in this world. Defaults to: true");
+			"When set to false players cannot place blocks in this world. Defaults to: true");
     }
     
     private final Comparator<Entry<String, Integer>> CBV = new Comparator<Entry<String, Integer>>()
@@ -1581,58 +1545,15 @@ public class WorldConfig extends ConfigFile
         }
     };    
     
-    private void writeCustomBiomes(SettingsMap writer)
-    {
-        List<String> output = new ArrayList<String>();
-        // Custom biome id
-        List<Entry<String, Integer>> cbi = new ArrayList<Entry<String, Integer>>(this.customBiomeGenerationIds.entrySet());
-        Collections.sort(cbi, CBV);
-        // Print all custom biomes
-        for (Iterator<Entry<String, Integer>> it = cbi.iterator(); it.hasNext();)
-        {
-            Entry<String, Integer> entry = it.next();
-    		if(!((entry.getValue() > 39 && entry.getValue() < 127) || (entry.getValue() > 167)))
-        	{
-    			// Skip custom biomes with vanilla id's.
-    			// Forge adds these to the custom biomes list
-    			// to make vanilla biomes fully customisable
-    			// but the vanilla biome id's shouldn't actually
-    			// be written to the WorldConfig.ini file
-    			continue;
-        	}
-            output.add(entry.getKey() + ":" + entry.getValue());
-        }
-        writer.putSetting(WorldStandardValues.CUSTOM_BIOMES, output,
-        		"NOTE: This is a legacy setting and is only used for OTG worlds created with 1.12.2 v6 or lower.",
-        		"For 1.12.2 v6 or higher, OTG reads all biomes in the BiomeConfigs directory and assigns biome id's.",
-                "You need to register your custom biomes here. This setting will make Open Terrain Generator",
-                "generate setting files for them. However, it won't place them in the world automatically.",
-                "See the settings for your BiomeMode below on how to add them to the world.",
-                "",
-                "Syntax: CustomBiomes:BiomeName:id[,AnotherBiomeName:id[,...]]",
-                "Example: CustomBiomes:TestBiome1:30,BiomeTest2:31",
-                "This will add two biomes and generate the BiomeConfigs for them.",
-                "All changes here need a server restart.",
-                "",
-                "Due to the way Mojang's loading code works, all biome ids need to be unique",
-                "on the server. If you don't do this, the client will display the biomes just fine,",
-                "but the server can think it is another biome with the same id. This will cause saplings,",
-                "snowfall and mobs to work as in the other biome.",
-                "",
-                "The available ids range from 0 to 1023 and the ids 0-39 and 127-167 are taken by vanilla.",
-                "The ids 256-1023 cannot be saved to the map files, so use ReplaceToBiomeName in that biome."
-				);
-    }
-    
-	public static WorldConfig fromDisk(File worldDir)
+	public static WorldConfig fromDisk(Path worldDir)
 	{
-        File worldConfigFile = new File(worldDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+		File worldConfigFile = Paths.get(worldDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE_NAME).toFile();
         if(!worldConfigFile.exists())
         {
         	return null;
         }
-        SettingsMap settingsMap = FileSettingsReader.read(worldDir.getName(), worldConfigFile);
-        return new WorldConfig(worldDir, settingsMap, null, null);
+        SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile);
+        return new WorldConfig(worldDir, settingsMap, null);
 	}
 	
 	public LocalMaterialData getDefaultBedrockBlock()

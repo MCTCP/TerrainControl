@@ -1,14 +1,13 @@
 package com.pg85.otg.generator.surface;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class SimpleSurfaceGenerator implements SurfaceGenerator
 {    
@@ -56,8 +55,8 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         boolean useBiomeStoneBlockForGround = false;
         boolean useLayerGroundBlockForGround = true;
         boolean useSandStoneForGround = true;
-        boolean biomeGroundBlockIsSand = biomeConfig.getDefaultGroundBlock().isMaterial(DefaultMaterial.SAND);
-        boolean layerGroundBlockIsSand = layer != null && layer.groundBlock.isMaterial(DefaultMaterial.SAND);
+        boolean biomeGroundBlockIsSand = biomeConfig.getDefaultGroundBlock().isMaterial(LocalMaterials.SAND);
+        boolean layerGroundBlockIsSand = layer != null && layer.groundBlock.isMaterial(LocalMaterials.SAND);
         final int currentWaterLevel = generatingChunk.getWaterLevel(x, z);
         LocalMaterialData blockOnCurrentPos;
         
@@ -148,7 +147,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         {
                         	if(useAirForSurface)
                         	{
-                        		currentSurfaceBlock = MaterialHelper.AIR;
+                        		currentSurfaceBlock = LocalMaterials.AIR;
                         	}
                         	else if(useIceForSurface)
                         	{
@@ -209,12 +208,14 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         }
                         else if(useSandStoneForGround)
                         {
-                        	chunkBuffer.setBlock(x, y, z,
-            					(layerGroundBlockIsSand ? layer.groundBlock : biomeConfig.getDefaultGroundBlock())
-            					.getBlockData() == 1 ? 
-	    							biomeConfig.getRedSandStoneBlockReplaced(world, y) : 
-									biomeConfig.getSandStoneBlockReplaced(world, y)
-                			);
+                        	// TODO: Reimplement this when block data works
+                        	//chunkBuffer.setBlock(x, y, z,
+            					//(layerGroundBlockIsSand ? layer.groundBlock : biomeConfig.getDefaultGroundBlock())
+            					//.getBlockData() == 1 ? 
+	    							//biomeConfig.getRedSandStoneBlockReplaced(world, y) : 
+									//biomeConfig.getSandStoneBlockReplaced(world, y)
+                			//);
+                        	chunkBuffer.setBlock(x, y, z, biomeConfig.getSandStoneBlockReplaced(world, y));
                         }
                     }
                 }

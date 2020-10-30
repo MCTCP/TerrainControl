@@ -1,12 +1,12 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.generator.noise.NoiseGeneratorSurfacePatchOctaves;
+import com.pg85.otg.generator.noise.legacy.NoiseGeneratorSurfacePatchOctaves;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
 
