@@ -24,7 +24,9 @@ dependencies
 		'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7',
 		'com.fasterxml.jackson.core:jackson-databind:2.9.7',
 		'org.yaml:snakeyaml:1.23',
-		'org.apache.commons:commons-lang3:3.4'
+		'org.apache.commons:commons-lang3:3.4',
+		'it.unimi.dsi:fastutil:8.2.1',
+		'com.google.guava:guava:21.0'
     )	
 }
 

@@ -1,14 +1,14 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -54,9 +54,9 @@ public class UnderWaterPlantGen extends Resource
             return false;
         final UnderWaterPlantGen compare = (UnderWaterPlantGen) other;
         return this.minAltitude == compare.minAltitude
-               && this.maxAltitude == compare.maxAltitude
-               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
-                   : this.sourceBlocks.equals(compare.sourceBlocks));
+           && this.maxAltitude == compare.maxAltitude
+           && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+               : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
     @Override
@@ -104,7 +104,7 @@ public class UnderWaterPlantGen extends Resource
             worldMaterial = world.getMaterial(j, k , m, chunkBeingPopulated);
             worldMaterialBelow = world.getMaterial(j, k - 1, m, chunkBeingPopulated);
             if (
-        		(worldMaterial == null || !worldMaterial.isMaterial(DefaultMaterial.STATIONARY_WATER)) ||
+        		(worldMaterial == null || !worldMaterial.isMaterial(LocalMaterials.STATIONARY_WATER)) ||
         		(worldMaterialBelow == null || !sourceBlocks.contains(worldMaterialBelow))
     		)
             {

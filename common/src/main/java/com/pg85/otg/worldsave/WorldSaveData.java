@@ -7,6 +7,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import com.pg85.otg.OTG;
@@ -33,7 +34,7 @@ public class WorldSaveData
     // Saving / Loading
     // TODO: It's crude but it works, can improve later
     
-	public static void saveWorldSaveData(File worldSaveDir, WorldSaveData worldSaveData)
+	public static void saveWorldSaveData(Path worldSaveDir, WorldSaveData worldSaveData)
 	{
 		File worldSaveDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataFileName);
 		File worldSaveDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataBackupFileName);
@@ -75,7 +76,7 @@ public class WorldSaveData
         }
 	}
 		
-	public static WorldSaveData loadWorldSaveData(File worldSaveDir)
+	public static WorldSaveData loadWorldSaveData(Path worldSaveDir)
 	{
 		File worldSaveDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataFileName);
 		File worldSaveDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataBackupFileName);

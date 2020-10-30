@@ -6,8 +6,9 @@ import java.util.Random;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
@@ -22,8 +23,6 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class BO4 implements StructuredCustomObject
 {	
@@ -164,27 +163,27 @@ public class BO4 implements StructuredCustomObject
 		}
 
     	try {
-    		bo3SurfaceBlock = replaceWithSurfaceBlock != null && replaceWithSurfaceBlock.length() > 0 ? MaterialHelper.readMaterial(replaceWithSurfaceBlock) : MaterialHelper.GRASS;
+    		bo3SurfaceBlock = replaceWithSurfaceBlock != null && replaceWithSurfaceBlock.length() > 0 ? OTG.getEngine().readMaterial(replaceWithSurfaceBlock) : LocalMaterials.GRASS;
 		} catch (InvalidConfigException e1) {
-			bo3SurfaceBlock = MaterialHelper.GRASS;
+			bo3SurfaceBlock = LocalMaterials.GRASS;
 			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.WARN, "Value " + replaceWithSurfaceBlock + " for replaceWithSurfaceBlock in BO4 " + this.getName() + " was not recognised. Using GRASS instead.");
 			}
 		}
     	try {
-    		bo3GroundBlock = replaceWithGroundBlock != null && replaceWithGroundBlock.length() > 0 ? MaterialHelper.readMaterial(replaceWithGroundBlock) : MaterialHelper.DIRT;
+    		bo3GroundBlock = replaceWithGroundBlock != null && replaceWithGroundBlock.length() > 0 ? OTG.getEngine().readMaterial(replaceWithGroundBlock) : LocalMaterials.DIRT;
 		} catch (InvalidConfigException e1) {
-			bo3GroundBlock = MaterialHelper.DIRT;
+			bo3GroundBlock = LocalMaterials.DIRT;
 			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.WARN, "Value " + replaceWithGroundBlock + " for replaceWithGroundBlock in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
 		}
     	try {
-    		bo3StoneBlock = replaceWithStoneBlock != null && replaceWithStoneBlock.length() > 0 ? MaterialHelper.readMaterial(replaceWithStoneBlock) : MaterialHelper.STONE;
+    		bo3StoneBlock = replaceWithStoneBlock != null && replaceWithStoneBlock.length() > 0 ? OTG.getEngine().readMaterial(replaceWithStoneBlock) : LocalMaterials.STONE;
 		} catch (InvalidConfigException e1) {
-			bo3StoneBlock = MaterialHelper.STONE;
+			bo3StoneBlock = LocalMaterials.STONE;
 			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.WARN, "Value " + replaceWithStoneBlock + " for replaceWithStoneBlock in BO4 " + this.getName() + " was not recognised. Using STONE instead.");
@@ -192,18 +191,18 @@ public class BO4 implements StructuredCustomObject
 		}
     	
     	try {
-			replaceBelowMaterial = config.replaceBelow != null && config.replaceBelow.toLowerCase().equals("none") ? null : replaceBelow != null && replaceBelow.length() > 0 ? MaterialHelper.readMaterial(replaceBelow) : null;
+			replaceBelowMaterial = config.replaceBelow != null && config.replaceBelow.toLowerCase().equals("none") ? null : replaceBelow != null && replaceBelow.length() > 0 ? OTG.getEngine().readMaterial(replaceBelow) : null;
 		} catch (InvalidConfigException e1) {
-			replaceBelowMaterial = MaterialHelper.DIRT;
+			replaceBelowMaterial = LocalMaterials.DIRT;
 			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.INFO, "Value " + config.replaceBelow + " for replaceBelow in BO4 " + this.getName() + " was not recognised. Using DIRT instead.");
 			}
 		}
     	try {
-			replaceAboveMaterial = config.replaceAbove != null && config.replaceAbove.toLowerCase().equals("none") ? null : replaceAbove != null && replaceAbove.length() > 0 ? MaterialHelper.readMaterial(replaceAbove) : null;
+			replaceAboveMaterial = config.replaceAbove != null && config.replaceAbove.toLowerCase().equals("none") ? null : replaceAbove != null && replaceAbove.length() > 0 ? OTG.getEngine().readMaterial(replaceAbove) : null;
 		} catch (InvalidConfigException e1) {
-			replaceAboveMaterial = MaterialHelper.AIR;
+			replaceAboveMaterial = LocalMaterials.AIR;
 			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.INFO, "Value " + config.replaceAbove + " for replaceAbove in BO4 " + this.getName() + " was not recognised. Using AIR instead.");
@@ -371,7 +370,7 @@ public class BO4 implements StructuredCustomObject
 	        					{
 	    	        				if(spawnUnderWater && blockY >= waterLevel)
 	    			            	{
-	    	        					blockToQueueForSpawn.material = MaterialHelper.AIR;
+	    	        					blockToQueueForSpawn.material = LocalMaterials.AIR;
 	    			            	} else {
 	    			            		// ReplaceAbove is not affected by sagc
 	    			            		blockToQueueForSpawn.material = replaceAboveMaterial;			            		
@@ -434,7 +433,7 @@ public class BO4 implements StructuredCustomObject
 				                					blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? replaceBelowMaterial.parseWithBiomeAndHeight(world, biomeConfig, blockToQueueForSpawn.y) : replaceBelowMaterial;
 						                            if(blockToQueueForSpawn.material == null)
 						                            {
-						                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
+						                            	blockToQueueForSpawn.material = LocalMaterials.DIRT;
 						                            }
 				                				}
 			                					setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);
@@ -496,7 +495,7 @@ public class BO4 implements StructuredCustomObject
 		                			{
 		                                if(blockToQueueForSpawn.y < biomeConfig.waterLevelMax)
 		                                {
-		                                	blockToQueueForSpawn.material = MaterialHelper.WATER;
+		                                	blockToQueueForSpawn.material = LocalMaterials.WATER;
 		                                } else {
 		                                	blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? newBlock.material.parseWithBiomeAndHeight(world, biomeConfig, blockToQueueForSpawn.y) : newBlock.material;
 		                                }
@@ -509,7 +508,7 @@ public class BO4 implements StructuredCustomObject
 							// Don't spawn torches underwater
 		    				if(
 								spawnUnderWater && 
-								blockToQueueForSpawn.material.isMaterial(DefaultMaterial.TORCH) && 
+								blockToQueueForSpawn.material.isMaterial(LocalMaterials.TORCH) && 
 								world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated).isLiquid()
 							)
 		    				{
@@ -552,7 +551,7 @@ public class BO4 implements StructuredCustomObject
 	
 		        				if(spawnUnderWater && blockY >= waterLevel)// && replaceAboveMaterial.isLiquid())
 				            	{
-		        					blockToQueueForSpawn.material = MaterialHelper.AIR;
+		        					blockToQueueForSpawn.material = LocalMaterials.AIR;
 				            	} else {
 			                    	// ReplaceAbove is not affected by sagc
 				            		blockToQueueForSpawn.material = replaceAboveMaterial;
@@ -625,7 +624,7 @@ public class BO4 implements StructuredCustomObject
 				                					blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? replaceBelowMaterial.parseWithBiomeAndHeight(world, biomeConfig, blockToQueueForSpawn.y) : replaceBelowMaterial;
 						                            if(blockToQueueForSpawn.material == null)
 						                            {
-						                            	blockToQueueForSpawn.material = MaterialHelper.DIRT;
+						                            	blockToQueueForSpawn.material = LocalMaterials.DIRT;
 						                            }
 				                				}
 		            							setBlock(world, blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, blockToQueueForSpawn.material, blockToQueueForSpawn.metaDataTag, isStructureAtSpawn, chunkBeingPopulated, biomeConfig, false);
@@ -687,7 +686,7 @@ public class BO4 implements StructuredCustomObject
 		                			{
 		                                if(blockToQueueForSpawn.y < biomeConfig.waterLevelMax)
 		                                {
-		                                	blockToQueueForSpawn.material = MaterialHelper.WATER;
+		                                	blockToQueueForSpawn.material = LocalMaterials.WATER;
 		                                } else {
 		                                	blockToQueueForSpawn.material = doBiomeConfigReplaceBlocks ? block.material.parseWithBiomeAndHeight(world, biomeConfig, blockToQueueForSpawn.y) : block.material;
 		                                }
@@ -700,7 +699,7 @@ public class BO4 implements StructuredCustomObject
 							// Don't spawn torches underwater
 		    				if(
 								spawnUnderWater && 
-								blockToQueueForSpawn.material.isMaterial(DefaultMaterial.TORCH) && 
+								blockToQueueForSpawn.material.isMaterial(LocalMaterials.TORCH) && 
 								world.getMaterial(blockToQueueForSpawn.x, blockToQueueForSpawn.y, blockToQueueForSpawn.z, chunkBeingPopulated).isLiquid()
 							)
 		    				{
@@ -747,29 +746,29 @@ public class BO4 implements StructuredCustomObject
 	    {
 		    LocalMaterialData worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated);
 		    if(
-	    		worldMaterial.isMaterial(DefaultMaterial.GOLD_BLOCK) ||
-	    		worldMaterial.isMaterial(DefaultMaterial.IRON_BLOCK) ||
-	    		worldMaterial.isMaterial(DefaultMaterial.REDSTONE_BLOCK) ||
-	    		worldMaterial.isMaterial(DefaultMaterial.DIAMOND_BLOCK) ||
-	    		worldMaterial.isMaterial(DefaultMaterial.LAPIS_BLOCK) ||
-	    		worldMaterial.isMaterial(DefaultMaterial.COAL_BLOCK) ||
-	    		worldMaterial.isMaterial(DefaultMaterial.QUARTZ_BLOCK) ||
-	    		worldMaterial.isMaterial(DefaultMaterial.EMERALD_BLOCK)
+	    		worldMaterial.isMaterial(LocalMaterials.GOLD_BLOCK) ||
+	    		worldMaterial.isMaterial(LocalMaterials.IRON_BLOCK) ||
+	    		worldMaterial.isMaterial(LocalMaterials.REDSTONE_BLOCK) ||
+	    		worldMaterial.isMaterial(LocalMaterials.DIAMOND_BLOCK) ||
+	    		worldMaterial.isMaterial(LocalMaterials.LAPIS_BLOCK) ||
+	    		worldMaterial.isMaterial(LocalMaterials.COAL_BLOCK) ||
+	    		worldMaterial.isMaterial(LocalMaterials.QUARTZ_BLOCK) ||
+	    		worldMaterial.isMaterial(LocalMaterials.EMERALD_BLOCK)
     		)
 		    {
 		    	if(
-		    		material.isMaterial(DefaultMaterial.GOLD_BLOCK) ||
-					material.isMaterial(DefaultMaterial.IRON_BLOCK) ||
-					material.isMaterial(DefaultMaterial.REDSTONE_BLOCK) ||
-					material.isMaterial(DefaultMaterial.DIAMOND_BLOCK) ||
-					material.isMaterial(DefaultMaterial.LAPIS_BLOCK) ||
-					material.isMaterial(DefaultMaterial.COAL_BLOCK) ||
-					material.isMaterial(DefaultMaterial.QUARTZ_BLOCK) ||
-					material.isMaterial(DefaultMaterial.EMERALD_BLOCK)
+		    		material.isMaterial(LocalMaterials.GOLD_BLOCK) ||
+					material.isMaterial(LocalMaterials.IRON_BLOCK) ||
+					material.isMaterial(LocalMaterials.REDSTONE_BLOCK) ||
+					material.isMaterial(LocalMaterials.DIAMOND_BLOCK) ||
+					material.isMaterial(LocalMaterials.LAPIS_BLOCK) ||
+					material.isMaterial(LocalMaterials.COAL_BLOCK) ||
+					material.isMaterial(LocalMaterials.QUARTZ_BLOCK) ||
+					material.isMaterial(LocalMaterials.EMERALD_BLOCK)
     			)
 		    	{
-		    		world.setBlock(x, y, z, MaterialHelper.GLOWSTONE, null, chunkBeingPopulated, false);
-			    	return;		    		
+		    		world.setBlock(x, y, z, LocalMaterials.GLOWSTONE, null, chunkBeingPopulated, biomeConfig, false);
+			    	return;
 		    	}
 		    }
 	    }

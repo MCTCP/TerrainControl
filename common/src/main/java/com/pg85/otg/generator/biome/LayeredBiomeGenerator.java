@@ -1,7 +1,7 @@
 package com.pg85.otg.generator.biome;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.generator.biome.layers.Layer;
+import com.pg85.otg.generator.biome.layers.legacy.Layer;
 
 /**
  * Skeletal implementation for biome modes that use the {@link Layer} class to

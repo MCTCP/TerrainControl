@@ -1,6 +1,6 @@
 package com.pg85.otg.generator;
 
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.util.ChunkCoordinate;
 
 /**

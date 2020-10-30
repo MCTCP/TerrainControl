@@ -6,8 +6,9 @@ import java.util.HashSet;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.io.FileSettingsReaderOTGPlus;
 import com.pg85.otg.configuration.io.FileSettingsWriterOTGPlus;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
@@ -32,7 +33,6 @@ import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 public class BO3 implements StructuredCustomObject
 {
@@ -132,11 +132,11 @@ public class BO3 implements StructuredCustomObject
                 // Do not spawn if non-tree blocks are in the way
                 if (
             		!localMaterial.isAir() && 
-            		!localMaterial.isMaterial(DefaultMaterial.LOG) && 
-            		!localMaterial.isMaterial(DefaultMaterial.LOG_2) && 
-            		!localMaterial.isMaterial(DefaultMaterial.LEAVES) && 
-            		!localMaterial.isMaterial(DefaultMaterial.LEAVES_2) && 
-            		!localMaterial.isMaterial(DefaultMaterial.SAPLING)
+            		!localMaterial.isMaterial(LocalMaterials.LOG) && 
+            		!localMaterial.isMaterial(LocalMaterials.LOG_2) && 
+            		!localMaterial.isMaterial(LocalMaterials.LEAVES) && 
+            		!localMaterial.isMaterial(LocalMaterials.LEAVES_2) && 
+            		!localMaterial.isMaterial(LocalMaterials.SAPLING)
         		)
                 {
                     return false;

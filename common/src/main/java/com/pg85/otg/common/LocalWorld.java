@@ -1,5 +1,6 @@
 package com.pg85.otg.common;
 
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
@@ -10,11 +11,12 @@ import com.pg85.otg.generator.ObjectSpawner;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.BiomeIds;
+import com.pg85.otg.util.BiomeResourceLocation;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -28,7 +30,7 @@ public interface LocalWorld
 
     public long getSeed();
 
-	public File getWorldSaveDir();
+	public Path getWorldSaveDir();
 
     public ConfigProvider getConfigs();
     
@@ -36,7 +38,7 @@ public interface LocalWorld
 	
     public CustomStructureCache getStructureCache();
     	
-	public WorldSession getWorldSession();
+    public LocalWorldSession getWorldSession();
 
 	public void deleteWorldSessionData();
 	   
@@ -217,6 +219,10 @@ public interface LocalWorld
 	public boolean isBo4Enabled();
 	
 	public void updateSpawnPointY();
+	
+	public int getBiomeId(BiomeResourceLocation otgResourceLocation);
+
+	public String getPresetName();	
 
     // Used when setting blocks during population that should 
 	// use the same chc settings as the base terrain.

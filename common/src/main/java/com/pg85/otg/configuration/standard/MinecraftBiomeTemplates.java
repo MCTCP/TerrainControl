@@ -1,12 +1,12 @@
 package com.pg85.otg.configuration.standard;
 
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.configuration.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.configuration.biome.BiomeConfig.VillageType;
 import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.generator.surface.MesaSurfaceGenerator;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
 import java.util.ArrayList;
@@ -34,23 +34,16 @@ public class MinecraftBiomeTemplates
             // which gets them from Minecraft
             this.defaultBiomeSurface = this.mojangSettings.getSurfaceHeight();
             this.defaultBiomeVolatility = this.mojangSettings.getSurfaceVolatility();
-            this.defaultSurfaceBlock = this.mojangSettings.getSurfaceBlock().toDefaultMaterial();
-            this.defaultGroundBlock = this.mojangSettings.getGroundBlock().toDefaultMaterial();
+            this.defaultSurfaceBlock = this.mojangSettings.getSurfaceBlock();
+            this.defaultGroundBlock = this.mojangSettings.getGroundBlock();
             this.defaultBiomeTemperature = this.mojangSettings.getTemperature();
             this.defaultBiomeWetness = this.mojangSettings.getWetness();
 
-            // Remove default mobs for vanilla biomes, these will be inherited
-            // TODO: Check if this breaks Bukkit mob spawning
-
+            // Don't load default mobs for vanilla biomes, they will be inherited
             this.defaultCreatures = new ArrayList<WeightedMobSpawnGroup>();
             this.defaultMonsters = new ArrayList<WeightedMobSpawnGroup>();
             this.defaultWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
             this.defaultAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-
-            //this.defaultMonsters = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.MONSTER);
-            //this.defaultCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.CREATURE);
-            //this.defaultWaterCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.WATER_CREATURE);
-            //this.defaultAmbientCreatures = this.mojangSettings.getMobSpawnGroup(MojangSettings.EntityCategory.AMBIENT_CREATURE);
         }
 
         protected void clearDefaultBorder()
@@ -116,8 +109,8 @@ public class MinecraftBiomeTemplates
             this.defaultReed = 10;
             this.defaultCactus = 10;
             this.defaultColor = 0xFA9418;
-            this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2,
-                    this.worldHeight, DefaultMaterial.SAND};
+            this.defaultWell = new Object[] { LocalMaterials.SANDSTONE, LocalMaterials.STONE_SLAB + ":1", LocalMaterials.WATER, 1, 0.1, 2,
+                    this.worldHeight, LocalMaterials.SAND};
             this.defaultVillageType = VillageType.sandstone;
             this.defaultRareBuildingType = RareBuildingType.desertPyramid;
             this.defaultBorder.add(DefaultBiome.MESA.Name);
@@ -145,8 +138,8 @@ public class MinecraftBiomeTemplates
             this.defaultDandelions = 4;
             this.defaultEmeraldOre = BiomeStandardValues.EmeraldDepositFrequency;
             this.defaultTree = new Object[] {1, TreeType.Taiga2, 10, TreeType.BigTree, 1, TreeType.Tree, 9};
-            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, 1.0,
-                    DefaultMaterial.STONE, DefaultMaterial.STONE, 10.0};
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] { LocalMaterials.GRASS, LocalMaterials.DIRT, 1.0,
+            		LocalMaterials.STONE, LocalMaterials.STONE, 10.0};
 
             this.defaultReplaceToBiomeName = "minecraft:extreme_hills";
             this.defaultInheritMobsBiomeName = "minecraft:extreme_hills";
@@ -354,7 +347,7 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
 
-            this.defaultSurfaceBlock = DefaultMaterial.MYCEL;
+            this.defaultSurfaceBlock = LocalMaterials.MYCELIUM;
             this.defaultMushroom = 2;
             this.defaultGrass = 0;
             this.defaultDandelions = 0;
@@ -437,8 +430,8 @@ public class MinecraftBiomeTemplates
             this.defaultReed = 50;
             this.defaultCactus = 10;
             this.defaultColor = 0xD25F12;
-            this.defaultWell = new Object[] {DefaultMaterial.SANDSTONE, DefaultMaterial.STEP + ":1", DefaultMaterial.WATER, 1, 0.1, 2,
-                    this.worldHeight, DefaultMaterial.SAND};
+            this.defaultWell = new Object[] { LocalMaterials.SANDSTONE, LocalMaterials.STONE_SLAB + ":1", LocalMaterials.WATER, 1, 0.1, 2,
+                    this.worldHeight, LocalMaterials.SAND};
             this.defaultVillageType = VillageType.sandstone;
             this.defaultRareBuildingType = RareBuildingType.desertPyramid;
 
@@ -699,8 +692,8 @@ public class MinecraftBiomeTemplates
             this.defaultFerns = 80;
             this.defaultMushroom = 8;
             this.defaultLargeFerns = 60;
-            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.DIRT + ":2", DefaultMaterial.DIRT, -0.95,
-                    DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75};
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] { LocalMaterials.DIRT + ":2", LocalMaterials.DIRT, -0.95,
+            		LocalMaterials.DIRT + ":1", LocalMaterials.DIRT, 1.75};
 
             this.defaultVillageType = VillageType.taiga;
 
@@ -816,8 +809,8 @@ public class MinecraftBiomeTemplates
             // Open Terrain Generator does it the other way round: it places
             // hardcoded sand and stained clay and lets the user change the
             // grass and dirt blocks.
-            this.defaultSurfaceBlock = DefaultMaterial.GRASS;
-            this.defaultGroundBlock = DefaultMaterial.DIRT;
+            this.defaultSurfaceBlock = LocalMaterials.GRASS;
+            this.defaultGroundBlock = LocalMaterials.DIRT;
 
             this.defaultReplaceToBiomeName = "minecraft:mesa_rock";
             this.defaultInheritMobsBiomeName = "minecraft:mesa_rock";
@@ -894,8 +887,8 @@ public class MinecraftBiomeTemplates
         {
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x525252;
-            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0,
-                    DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] { LocalMaterials.GRAVEL, LocalMaterials.GRAVEL, -1.0,
+            		LocalMaterials.GRASS, LocalMaterials.DIRT, 2.0, LocalMaterials.GRAVEL, LocalMaterials.GRAVEL, 10.0};
             this.defaultRarity = 10;
 
             this.defaultReplaceToBiomeName = "minecraft:mutated_extreme_hills";
@@ -1093,8 +1086,8 @@ public class MinecraftBiomeTemplates
             super(mojangSettings, worldHeight);
             this.defaultColor = 0x466246;
             this.defaultRarity = 10;
-            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, -1.0,
-                    DefaultMaterial.GRASS, DefaultMaterial.DIRT, 2.0, DefaultMaterial.GRAVEL, DefaultMaterial.GRAVEL, 10.0};
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] { LocalMaterials.GRASS, LocalMaterials.DIRT, -0.5,
+        		LocalMaterials.DIRT + ":1", LocalMaterials.DIRT, 1.75, LocalMaterials.STONE, LocalMaterials.STONE, 10};
             // Override IsleInBiome: Extreme Hills of Extreme Hills+
             this.defaultIsle.clear();
             this.defaultIsle.add(DefaultBiome.EXTREME_HILLS_MOUNTAINS.Name);
@@ -1113,8 +1106,8 @@ public class MinecraftBiomeTemplates
             this.defaultRarity = 10;
             this.defaultGrass = 60;
             this.defaultDoubleGrass = 0;
-            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {DefaultMaterial.GRASS, DefaultMaterial.DIRT, -0.5,
-                    DefaultMaterial.DIRT + ":1", DefaultMaterial.DIRT, 1.75, DefaultMaterial.STONE, DefaultMaterial.STONE, 10};
+            this.defaultSurfaceSurfaceAndGroundControl = new Object[] {LocalMaterials.GRASS, LocalMaterials.DIRT, -0.5,
+        		LocalMaterials.DIRT + ":1", LocalMaterials.DIRT, 1.75, LocalMaterials.STONE, LocalMaterials.STONE, 10};
 
             this.defaultReplaceToBiomeName = "minecraft:mutated_savanna";
             this.defaultInheritMobsBiomeName = "minecraft:mutated_savanna";

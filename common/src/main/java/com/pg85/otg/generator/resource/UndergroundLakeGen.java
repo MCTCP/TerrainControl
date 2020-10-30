@@ -1,15 +1,14 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -24,16 +23,16 @@ public class UndergroundLakeGen extends Resource
     public UndergroundLakeGen(BiomeConfig biomeConfig, List<String> args) throws InvalidConfigException
     {
         super(biomeConfig);
-        material = MaterialHelper.WATER;
+        material = LocalMaterials.WATER;
         assureSize(6, args);
         minSize = readInt(args.get(0), 1, 25);
         maxSize = readInt(args.get(1), minSize, 60);
         frequency = readInt(args.get(2), 1, 100);
         rarity = readRarity(args.get(3));
         minAltitude = readInt(args.get(4), PluginStandardValues.WORLD_DEPTH,
-                PluginStandardValues.WORLD_HEIGHT - 1);
+            PluginStandardValues.WORLD_HEIGHT - 1);
         maxAltitude = readInt(args.get(5), minAltitude,
-                PluginStandardValues.WORLD_HEIGHT - 1);
+            PluginStandardValues.WORLD_HEIGHT - 1);
     }
 
     @Override
@@ -49,9 +48,9 @@ public class UndergroundLakeGen extends Resource
             return false;
         final UndergroundLakeGen compare = (UndergroundLakeGen) other;
         return this.maxAltitude == compare.maxAltitude
-               && this.minAltitude == compare.minAltitude
-               && this.minSize == compare.minSize
-               && this.maxSize == compare.maxSize;
+           && this.minAltitude == compare.minAltitude
+           && this.minSize == compare.minSize
+           && this.maxSize == compare.maxSize;
     }
 
     @Override
@@ -119,7 +118,7 @@ public class UndergroundLakeGen extends Resource
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
                         LocalMaterialData material = world.getMaterial(xLake, yLake, zLake, chunkBeingPopulated);
-                        if (material == null || material.isEmptyOrAir() || material.isMaterial(DefaultMaterial.BEDROCK))
+                        if (material == null || material.isEmptyOrAir() || material.isMaterial(LocalMaterials.BEDROCK))
                         {
                             // Don't replace air or bedrock
                             continue;

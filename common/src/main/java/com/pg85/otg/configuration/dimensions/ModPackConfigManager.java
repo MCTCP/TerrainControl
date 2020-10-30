@@ -1,6 +1,7 @@
 package com.pg85.otg.configuration.dimensions;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -10,16 +11,15 @@ import com.pg85.otg.configuration.standard.PluginStandardValues;
 public class ModPackConfigManager
 {
 	private HashMap<String, DimensionsConfig> defaultConfigs = new HashMap<String, DimensionsConfig>();
-	
-	public ModPackConfigManager(File otgRootFolder)
+
+	public ModPackConfigManager(Path otgRootFolder)
 	{
 		indexModPackConfigs(otgRootFolder);
 	}
-	
-	private void indexModPackConfigs(File otgRootFolder)
+
+	private void indexModPackConfigs(Path otgRootFolder)
 	{
-		// TODO: Doesn't Forge provide a better way of getting the config dir?
-		File configDir = new File(otgRootFolder.getParentFile().getParentFile() + File.separator + "config" + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator);
+		File configDir = new File(otgRootFolder.toFile() + File.separator + PluginStandardValues.MODPACK_CONFIGS_FOLDER + File.separator);
 		if(configDir.exists())
 		{
 			for(File f : configDir.listFiles())

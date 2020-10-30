@@ -1,14 +1,13 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
 import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
@@ -50,10 +49,10 @@ public class OreGen extends Resource
             return false;
         final OreGen compare = (OreGen) other;
         return this.maxSize == compare.maxSize
-               && this.minAltitude == compare.minAltitude
-               && this.maxAltitude == compare.maxAltitude
-               && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
-                   : this.sourceBlocks.equals(compare.sourceBlocks));
+           && this.minAltitude == compare.minAltitude
+           && this.maxAltitude == compare.maxAltitude
+           && (this.sourceBlocks == null ? this.sourceBlocks == compare.sourceBlocks
+               : this.sourceBlocks.equals(compare.sourceBlocks));
     }
 
     @Override
@@ -99,7 +98,7 @@ public class OreGen extends Resource
         
         if(world.getConfigs().getWorldConfig().disableOreGen)
         {
-        	if(MaterialHelper.isOre(this.material))
+        	if(this.material.isOre())
         	{
         		return;
         	}

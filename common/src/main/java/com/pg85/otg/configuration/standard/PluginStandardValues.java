@@ -13,9 +13,9 @@ public class PluginStandardValues extends Settings
     
     // Folders
     
-    public static final String BiomeConfigDirectoryName = "GlobalBiomes";
-    public static final String BO_DirectoryName = "GlobalObjects";
-    public static final String PresetsDirectoryName = "worlds";
+    public static final String PRESETS_FOLDER = "Presets";
+    public static final String MODPACK_CONFIGS_FOLDER = "Modpacks";
+    public static final String GLOBAL_OBJECTS_FOLDER = "GlobalObjects";
     
     // Network
     
@@ -31,12 +31,6 @@ public class PluginStandardValues extends Settings
     public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
     public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 5, 1, 10);
 	public static final String MOD_ID = "openterraingenerator";
-
-	// TODO: This could be changed by other mods?
-	/**
-	 * The amount of different block ids that are supported. 4096 on Minecraft. 65535 with NotEnoughId's mod
-	 */
-	public static final int SUPPORTED_BLOCK_IDS = 65535;//4096; // TODO: Test if this creates lag   
 
 	/**
 	 * The world depth that the engine supports. Not the actual depth the

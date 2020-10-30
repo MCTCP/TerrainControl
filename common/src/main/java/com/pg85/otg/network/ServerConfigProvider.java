@@ -1,11 +1,11 @@
 package com.pg85.otg.network;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,11 +24,11 @@ import com.pg85.otg.configuration.io.FileSettingsReader;
 import com.pg85.otg.configuration.io.FileSettingsWriter;
 import com.pg85.otg.configuration.io.SettingsMap;
 import com.pg85.otg.configuration.standard.BiomeStandardValues;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
+import com.pg85.otg.util.BiomeResourceLocation;
 import com.pg85.otg.util.helpers.FileHelper;
 import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
@@ -53,7 +53,7 @@ public final class ServerConfigProvider implements ConfigProvider
 {
     private static final int MAX_INHERITANCE_DEPTH = 15;
     private LocalWorld world;
-    private File settingsDir;
+    private Path settingsDir;
     private WorldConfig worldConfig;
 
     /**
@@ -74,7 +74,7 @@ public final class ServerConfigProvider implements ConfigProvider
      * @param settingsDir The directory to load from.
      * @param world       The world to load the settings for.
      */
-    public ServerConfigProvider(File settingsDir, LocalWorld world, File worldSaveFolder)
+    public ServerConfigProvider(Path settingsDir, LocalWorld world, Path worldSaveFolder)
     {
         this.settingsDir = settingsDir;
         this.world = world;
@@ -109,35 +109,13 @@ public final class ServerConfigProvider implements ConfigProvider
     {
         return this.biomesByOTGId;
     }
-    
-    /**
-     * For pre-v7 worlds: Gets the generation id that the given biome should have, based on
-     * {@link DefaultBiome the default biomes} and
-     * {@link WorldConfig#customBiomeGenerationIds the CustomBiomes setting}.
-     * @param biomeConfig The biome.
-     * @return The preferred generation id.
-     */
-    private int getRequestedGenerationId(BiomeConfig biomeConfig)
-    {
-        Integer requestedGenerationId = DefaultBiome.getId(biomeConfig.getName());
-        if (requestedGenerationId == null)
-        {
-            requestedGenerationId = biomeConfig.worldConfig.customBiomeGenerationIds.get(biomeConfig.getName());
-        }
-        // For v7 and later worlds, worldConfig.customBiomeGenerationIds isn't used.
-        if (requestedGenerationId == null)
-        {
-        	return -1;
-        }
-        return requestedGenerationId;
-    }
-    
+        
     /**
      * Loads all settings. Expects the biomes array to be empty (filled with
      * nulls), the savedBiomes collection to be empty and the biomesCount
      * field to be zero.
      */
-    private void loadSettings(File worldSaveFolder, boolean isReload)
+    private void loadSettings(Path worldSaveFolder, boolean isReload)
     {   	
         SettingsMap worldConfigSettings = loadAndInitWorldConfig();
         loadFallbacks();
@@ -149,7 +127,7 @@ public final class ServerConfigProvider implements ConfigProvider
     }
     
     private void loadFallbacks() {
-        File fallbackFile = new File(settingsDir, WorldStandardValues.FALLBACK_FILE_NAME);
+    	File fallbackFile = new File(settingsDir.toString(), WorldStandardValues.FALLBACK_FILE_NAME);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), fallbackFile);   
 
         FallbackConfig fallbacks = new FallbackConfig(settingsMap);
@@ -160,15 +138,15 @@ public final class ServerConfigProvider implements ConfigProvider
 
     private SettingsMap loadAndInitWorldConfig()
     {
-        File worldConfigFile = new File(settingsDir, WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+    	File worldConfigFile = new File(settingsDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE_NAME);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), worldConfigFile);
 
     	ArrayList<String> biomes = new ArrayList<String>();
-    	File biomesDirectory = new File(settingsDir, WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME); 	
+    	File biomesDirectory = new File(settingsDir.toString(), WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME); 	
 
     	addBiomesFromDirRecursive(biomes, biomesDirectory);
     	
-        this.worldConfig = new WorldConfig(settingsDir, settingsMap, world, biomes);
+    	this.worldConfig = new WorldConfig(settingsDir, settingsMap, biomes);
         FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.settingsMode);
 
         return settingsMap;
@@ -192,14 +170,13 @@ public final class ServerConfigProvider implements ConfigProvider
     	}
     }
 
-    private void loadBiomes(SettingsMap worldConfigSettings, File worldSaveFolder, boolean isReload)
+    private void loadBiomes(SettingsMap worldConfigSettings, Path presetDir, boolean isReload)
     {
+    	String presetName = presetDir.getFileName().toString();
+    	
         // Establish folders
-        List<File> biomeDirs = new ArrayList<File>(2);
-        // OpenTerrainGenerator/Presets/<WorldName>/<WorldBiomes/
-        biomeDirs.add(new File(settingsDir, OTG.correctOldBiomeConfigFolder(settingsDir)));
-        // OpenTerrainGenerator/GlobalBiomes/
-        biomeDirs.add(new File(OTG.getEngine().getOTGRootFolder(), PluginStandardValues.BiomeConfigDirectoryName));
+        List<Path> biomeDirs = new ArrayList<Path>(2);
+        biomeDirs.add(Paths.get(settingsDir.toString(), WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME));
 
         FileHelper.makeFolders(biomeDirs);
 
@@ -222,10 +199,10 @@ public final class ServerConfigProvider implements ConfigProvider
         Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(this.worldConfig, this.worldConfig.worldHeightScale, biomeDirs, biomesToLoad);
         
         // Read all settings
-        Map<String, BiomeConfig> loadedBiomes = readAndWriteSettings(this.worldConfig, biomeConfigStubs, true);
+        Map<String, BiomeConfig> loadedBiomes = readAndWriteSettings(this.worldConfig, biomeConfigStubs, presetName, true);
         
         // Index all necessary settings
-        String loadedBiomeNames = indexSettings(this.worldConfig.customBiomeGenerationIds, worldConfigSettings.isNewConfig(), loadedBiomes, worldSaveFolder, isReload);
+        String loadedBiomeNames = indexSettings(worldConfigSettings.isNewConfig(), loadedBiomes, presetDir, isReload);
 
         OTG.log(LogMarker.DEBUG, "{} biomes Loaded", biomesCount);
         OTG.log(LogMarker.DEBUG, "{}", loadedBiomeNames);
@@ -242,7 +219,7 @@ public final class ServerConfigProvider implements ConfigProvider
         loadSettings(this.world.getWorldSaveDir(), true);
     }
 
-    public static Map<String, BiomeConfig> readAndWriteSettings(WorldConfig worldConfig, Map<String, BiomeConfigStub> biomeConfigStubs, boolean write)
+    public static Map<String, BiomeConfig> readAndWriteSettings(WorldConfig worldConfig, Map<String, BiomeConfigStub> biomeConfigStubs, String presetName, boolean write)
     {
         Map<String, BiomeConfig> loadedBiomes = new HashMap<String, BiomeConfig>();
 
@@ -256,18 +233,18 @@ public final class ServerConfigProvider implements ConfigProvider
             processMobInheritance(biomeConfigStubs, biomeConfigStub, 0);
 
             // Settings reading
-            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub, biomeConfigStub.getSettings(), worldConfig);
+            BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub, biomeConfigStub.getSettings(), worldConfig, presetName);
             loadedBiomes.put(biomeConfigStub.getBiomeName(), biomeConfig);
 
             // Settings writing
             if(write)
             {
-	            File writeFile = biomeConfigStub.getFile();
+            	Path writeFile = biomeConfigStub.getPath();
 	            if (!biomeConfig.biomeExtends.isEmpty())
 	            {
-	                writeFile = new File(writeFile.getAbsolutePath() + ".inherited");
+	            	writeFile = Paths.get(writeFile + ".inherited");
 	            }
-	            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile, worldConfig.settingsMode);
+	            FileSettingsWriter.writeToFile(biomeConfig.getSettingsAsMap(), writeFile.toFile(), worldConfig.settingsMode);
             }
         }
 
@@ -361,7 +338,7 @@ public final class ServerConfigProvider implements ConfigProvider
 		        // Check for too much recursion
 		        if (currentDepth > MAX_INHERITANCE_DEPTH)
 		        {
-		            OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getFile().getName(), inheritMobsBiomeConfig.getFile().getName()});
+		        	OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getPath().toFile().getName(), inheritMobsBiomeConfig.getPath().toFile().getName()});
 		        }
 
 		        if(inheritMobsBiomeConfig != null)
@@ -393,7 +370,7 @@ public final class ServerConfigProvider implements ConfigProvider
     // rules for OTG biome ids and saved id's. 
     // This method does too much and handles too many different situations, split it up!
     // TODO: Drop support for legacy worlds for 1.13/1.14 and clean this up.
-    private String indexSettings(Map<String, Integer> worldBiomes, boolean isNewWorldConfig, Map<String, BiomeConfig> loadedBiomes, File worldSaveFolder, boolean isReload)
+    private String indexSettings(boolean isNewWorldConfig, Map<String, BiomeConfig> loadedBiomes, Path worldSaveFolder, boolean isReload)
     {
         StringBuilder loadedBiomeNames = new StringBuilder();
        
@@ -455,28 +432,6 @@ public final class ServerConfigProvider implements ConfigProvider
         
         List<BiomeConfig> loadedBiomeList = new ArrayList<BiomeConfig>(loadedBiomes.values());
         
-        // For backwards compatibility load custom biomes from the world config
-        // A world created with a previous version of OTG may not have worlddata
-        if(!OTG.IsNewWorldBeingCreated && !hasWorldData && worldBiomes.size() > 0)
-        {
-        	loadedBiomeIdData = new ArrayList<BiomeIdData>();
-	        for(Entry<String, Integer> worldBiome : worldBiomes.entrySet())
-	        {
-	        	BiomeConfig biomeConfig = loadedBiomes.get(worldBiome.getKey());
-	        	
-	        	loadedBiomeIdData.add(
-        			new BiomeIdData(
-    					world.getName() + "_" + worldBiome.getKey(), 
-    					worldBiome.getValue(), 
-    					worldBiome.getValue() > 255 || (
-							biomeConfig.replaceToBiomeName != null && 
-							biomeConfig.replaceToBiomeName.trim().length() > 0
-						) ? -1 : worldBiome.getValue()
-					)
-    			);
-	        }
-        }
-        
         // Get OTG world save version
         WorldSaveData worldSaveData = WorldSaveData.loadWorldSaveData(worldSaveFolder);
         
@@ -490,19 +445,7 @@ public final class ServerConfigProvider implements ConfigProvider
         	worldSaveData = new WorldSaveData(isLegacyWorld ? 6 : 8);
             WorldSaveData.saveWorldSaveData(worldSaveFolder, worldSaveData);
         }
-        
-        // For backwards compatibility with legacy worlds, sort the biomes by generation id.
-        // TODO: Should biome load order matter for the biome gen? Or even biome id's? Could use names or resourcelocations instead?
-        if(isLegacyWorld)
-        {
-	        Collections.sort(loadedBiomeList, new Comparator<BiomeConfig>() {
-	            @Override
-	            public int compare(BiomeConfig a, BiomeConfig b) {
-	                return getRequestedGenerationId(a) - getRequestedGenerationId(b);
-	            }
-	        });
-        }
-                
+                        
         List<BiomeConfig> usedBiomes = loadedBiomeList; 
         if(loadedBiomeIdData != null)
         {
@@ -792,11 +735,11 @@ public final class ServerConfigProvider implements ConfigProvider
         {
             if (this.worldConfig.biomeColorMap == null)
             {
-                this.worldConfig.biomeColorMap = new HashMap<Integer, Integer>();
+            	this.worldConfig.biomeColorMap = new HashMap<Integer, BiomeResourceLocation>();
             }
 
             int color = biomeConfig.biomeColor;
-            this.worldConfig.biomeColorMap.put(color, biome.getIds().getOTGBiomeId());
+            this.worldConfig.biomeColorMap.put(color, new BiomeResourceLocation(world.getName(), biome.getName()));
         }
     }   
     

@@ -12,6 +12,8 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.BiomeRegistryNames;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,7 +49,7 @@ public final class BiomeConfigFinder
      *
      * @return A map of biome name --> location on disk.
      */
-    public Map<String, BiomeConfigStub> findBiomes(WorldConfig worldConfig, int worldHeightScale, Collection<File> directories, Collection<BiomeLoadInstruction> biomesToLoad)
+    public Map<String, BiomeConfigStub> findBiomes(WorldConfig worldConfig, int worldHeightScale, Collection<Path> directories, Collection<BiomeLoadInstruction> biomesToLoad)
     {
         Map<String, BiomeConfigStub> biomeConfigsStore = new HashMap<String, BiomeConfigStub>();
 
@@ -59,8 +61,9 @@ public final class BiomeConfigFinder
         }
 
         // Search all directories
-        for (File directory : directories)
+        for (Path directoryPath  : directories)
         {
+        	File directory = directoryPath.toFile();
             // Account for the possibility that folder creation failed
             if (directory.exists())
             {
@@ -69,10 +72,10 @@ public final class BiomeConfigFinder
         }
         
         // Create all biomes that weren't loaded
-        File preferredDirectory = directories.iterator().next();
+        Path preferredDirectory = directories.iterator().next();
         for (BiomeLoadInstruction localBiome : remainingBiomes.values())
         {
-            File newConfigFile = new File(preferredDirectory, toFileName(localBiome));
+        	Path newConfigFile = Paths.get(preferredDirectory.toString(), toFileName(localBiome));
             SettingsMap settings = new SimpleSettingsMap(localBiome.getBiomeName(), true);
             BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, newConfigFile, localBiome);
             biomeConfigsStore.put(localBiome.getBiomeName(), biomeConfigStub);
@@ -112,7 +115,7 @@ public final class BiomeConfigFinder
             BiomeLoadInstruction preloadedBiome = new BiomeLoadInstruction(biomeName, new StandardBiomeTemplate(worldHeightScale));
             File preloadedRenamedFile = renameBiomeFile(file, preloadedBiome);
             SettingsMap preloadedSettings = FileSettingsReader.read(biomeName, preloadedRenamedFile);
-            BiomeConfigStub preloadedBiomeConfigStub = new BiomeConfigStub(preloadedSettings, file, preloadedBiome);
+            BiomeConfigStub preloadedBiomeConfigStub = new BiomeConfigStub(preloadedSettings, file.toPath(), preloadedBiome);
             
             // Get the correct LocalBiome, 
             
@@ -159,7 +162,7 @@ public final class BiomeConfigFinder
             // Load biome and remove it from the todo list
             File renamedFile = renameBiomeFile(file, biome);
             SettingsMap settings = FileSettingsReader.read(biomeName, renamedFile);
-            BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, file, biome);
+            BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, file.toPath(), biome);
             biomeConfigsStore.put(biomeName, biomeConfigStub);
             
             if(remainingBiomes.containsKey(biome.getBiomeName()))
@@ -241,7 +244,7 @@ public final class BiomeConfigFinder
     public final class BiomeConfigStub
     {
         private final SettingsMap settings;
-        private final File file;
+        private final Path file;
         private final BiomeLoadInstruction loadInstructions;
         public boolean biomeExtendsProcessed = false;
         
@@ -261,7 +264,7 @@ public final class BiomeConfigFinder
         public List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
         public List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();        
                         
-        private BiomeConfigStub(SettingsMap settings, File file, BiomeLoadInstruction loadInstructions)
+        private BiomeConfigStub(SettingsMap settings, Path file, BiomeLoadInstruction loadInstructions)
         {
             super();
             this.settings = settings;
@@ -367,7 +370,7 @@ public final class BiomeConfigFinder
          * Gets the file the biome is stored in.
          * @return The file.
          */
-        public File getFile()
+        public Path getPath()
         {
             return file;
         }

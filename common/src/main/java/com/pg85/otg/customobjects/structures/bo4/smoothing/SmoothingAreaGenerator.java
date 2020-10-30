@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Map.Entry;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;

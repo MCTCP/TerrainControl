@@ -1,13 +1,13 @@
 package com.pg85.otg.generator.surface;
 
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
 import com.pg85.otg.util.helpers.StringHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,8 +28,8 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         layerChoices = new ArrayList<LayerChoice>();
         for (int i = 0; i < args.length - 2; i += 3)
         {
-            LocalMaterialData surfaceBlock = MaterialHelper.readMaterial(args[i]);
-            LocalMaterialData groundBlock = MaterialHelper.readMaterial(args[i+1]);
+            LocalMaterialData surfaceBlock = OTG.getEngine().readMaterial(args[i]);
+            LocalMaterialData groundBlock = OTG.getEngine().readMaterial(args[i+1]);
             float maxNoise = (float) StringHelper.readDouble(args[i + 2], -20, 20);
             layerChoices.add(new LayerChoice(surfaceBlock, groundBlock, maxNoise));
         }

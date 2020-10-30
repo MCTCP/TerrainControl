@@ -1,6 +1,7 @@
 package com.pg85.otg.configuration.standard;
 
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.settings.ReplaceBlocks;
 import com.pg85.otg.configuration.settingType.MaterialListSetting;
 import com.pg85.otg.configuration.settingType.MaterialSetting;
@@ -10,7 +11,6 @@ import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
 import com.pg85.otg.configuration.world.WorldConfig.ImageMode;
 import com.pg85.otg.configuration.world.WorldConfig.ImageOrientation;
 import com.pg85.otg.configuration.world.WorldConfig.TerrainMode;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -21,8 +21,8 @@ public class WorldStandardValues extends Settings
     // Files and folders
     public static final String WORLD_CONFIG_FILE_NAME = "WorldConfig.ini";
     public static final String FALLBACK_FILE_NAME = "Fallbacks.ini";
-    public static final String WORLD_BIOMES_DIRECTORY_NAME = "WorldBiomes";
-    public static final String WORLD_OBJECTS_DIRECTORY_NAME = "WorldObjects";
+    public static final String WORLD_BIOMES_DIRECTORY_NAME = "Biomes";
+    public static final String WORLD_OBJECTS_DIRECTORY_NAME = "Objects";
     
     public static String BackupFileSuffix = "-backup";
 	public static String StructureDataFileExtension = ".dat";
@@ -239,25 +239,28 @@ public class WorldStandardValues extends Settings
     ;
 
     public static final Setting<LocalMaterialData>
-    	WATER_BLOCK = new MaterialSetting("WaterBlock", DefaultMaterial.STATIONARY_WATER),
-        ICE_BLOCK = new MaterialSetting("IceBlock", DefaultMaterial.ICE),
-        COOLED_LAVA_BLOCK = new MaterialSetting("CooledLavaBlock", DefaultMaterial.STATIONARY_LAVA),
-        BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", DefaultMaterial.BEDROCK);
+    	WATER_BLOCK = new MaterialSetting("WaterBlock", LocalMaterials.WATER_NAME),
+        ICE_BLOCK = new MaterialSetting("IceBlock", LocalMaterials.ICE_NAME),
+        COOLED_LAVA_BLOCK = new MaterialSetting("CooledLavaBlock", LocalMaterials.LAVA_NAME),
+        BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", LocalMaterials.BEDROCK_NAME)
+    ;
 
     public static final Setting<ArrayList<LocalMaterialData>>
-    	DIMENSION_PORTAL_MATERIALS = new MaterialListSetting("DimensionPortalMaterials", new DefaultMaterial[] { DefaultMaterial.QUARTZ_BLOCK });
+    	DIMENSION_PORTAL_MATERIALS = new MaterialListSetting("DimensionPortalMaterials", new String[] { LocalMaterials.QUARTZ_BLOCK_NAME })
+	;
 
     public static final Setting<List<ReplaceBlocks>>
-		REPLACE_BLOCKS_LIST = replaceBlocksListSetting("ReplaceBlocksList");
+		REPLACE_BLOCKS_LIST = replaceBlocksListSetting("ReplaceBlocksList")
+	;
 
     public static final Setting<List<String>>
         ISLE_BIOMES = stringListSetting("IsleBiomes", "Deep Ocean", "MushroomIsland",
-                "Ice Mountains", "DesertHills", "ForestHills", "Forest", "TaigaHills",
-                "JungleHills", "Cold Taiga Hills", "Birch Forest Hills", "Extreme Hills+",
-                "Mesa Plateau", "Mesa Plateau F", "Mesa Plateau M", "Mesa Plateau F M",
-                "Mesa (Bryce)", "Mega Taiga Hills", "Mega Spruce Taiga Hills"),
+            "Ice Mountains", "DesertHills", "ForestHills", "Forest", "TaigaHills",
+            "JungleHills", "Cold Taiga Hills", "Birch Forest Hills", "Extreme Hills+",
+            "Mesa Plateau", "Mesa Plateau F", "Mesa Plateau M", "Mesa Plateau F M",
+            "Mesa (Bryce)", "Mega Taiga Hills", "Mega Spruce Taiga Hills"),
         BORDER_BIOMES = stringListSetting("BorderBiomes",
-                "JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
+            "JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
     	CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
 		DIMENSIONS = stringListSetting("Dimensions")
 	;
@@ -280,14 +283,14 @@ public class WorldStandardValues extends Settings
 
     public static final Setting<Integer>
 	    WORLD_FOG = colorSetting("WorldFog", "0xC0D8FF"),
-	    WORLD_NIGHT_FOG = colorSetting("WorldNightFog", "0x0B0D17");
+	    WORLD_NIGHT_FOG = colorSetting("WorldNightFog", "0x0B0D17")
+    ;
 
     public static final Setting<Long> RESOURCES_SEED = longSetting("ResourcesSeed", 0, Long.MIN_VALUE, Long.MAX_VALUE);
 
     // Deprecated settings
     public static final Setting<Boolean> FROZEN_RIVERS = booleanSetting("FrozenRivers", true);
     public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting("NormalBiomes", "Desert", "Forest", "Extreme Hills",
-            "Swampland", "Plains", "Taiga", "Jungle", "River");
+        "Swampland", "Plains", "Taiga", "Jungle", "River");
     public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");
-
 }

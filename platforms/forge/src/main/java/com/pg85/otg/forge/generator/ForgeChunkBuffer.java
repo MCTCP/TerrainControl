@@ -9,7 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkPrimer;
 
-public class ForgeChunkBuffer implements ChunkBuffer
+public class ForgeChunkBuffer extends ChunkBuffer
 {
 	private final ChunkPrimer chunk;
 
@@ -17,6 +17,7 @@ public class ForgeChunkBuffer implements ChunkBuffer
 	{
 		this.chunk = chunk;
 	}
+	
 	@Override
 	public ChunkCoordinate getChunkCoordinate()
 	{

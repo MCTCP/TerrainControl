@@ -1,15 +1,14 @@
 package com.pg85.otg.generator.resource;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.materials.MaterialHelper;
 
 import java.util.*;
 
@@ -51,7 +50,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
         if (saplingType == SaplingType.Custom)
         {
             try {
-                saplingMaterial = MaterialHelper.readMaterial(args.get(1));
+            	saplingMaterial = OTG.getEngine().readMaterial(args.get(1));
             } catch (InvalidConfigException e) {
                 OTG.log(LogMarker.ERROR, "Invalid custom sapling configuration! Syntax: Sapling(Custom, material, widetrunk, TreeName, TreeChance, ...)");
             }

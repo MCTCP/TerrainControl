@@ -3,14 +3,14 @@ package com.pg85.otg.generator.surface;
 import java.util.Arrays;
 import java.util.Random;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.biome.settings.ReplacedBlocksMatrix;
 import com.pg85.otg.generator.ChunkBuffer;
 import com.pg85.otg.generator.GeneratingChunk;
-import com.pg85.otg.generator.noise.NoiseGeneratorPerlinMesaBlocks;
-import com.pg85.otg.util.materials.MaterialHelper;
+import com.pg85.otg.generator.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
 
 public class MesaSurfaceGenerator implements SurfaceGenerator
 {
@@ -26,14 +26,14 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private NoiseGeneratorPerlinMesaBlocks pillarRoofNoise;
     private NoiseGeneratorPerlinMesaBlocks clayBandsOffsetNoise;
     
-    private LocalMaterialData hardClay = MaterialHelper.HARDENED_CLAY;
-    private LocalMaterialData orangeClay = MaterialHelper.ORANGE_STAINED_CLAY;
-    private LocalMaterialData yellowClay = MaterialHelper.YELLOW_STAINED_CLAY;
-    private LocalMaterialData brownClay = MaterialHelper.BROWN_STAINED_CLAY;
-    private LocalMaterialData redClay = MaterialHelper.RED_STAINED_CLAY;
-    private LocalMaterialData whiteClay = MaterialHelper.WHITE_STAINED_CLAY;
-    private LocalMaterialData silverClay = MaterialHelper.SILVER_STAINED_CLAY;
-    private LocalMaterialData redSand = MaterialHelper.RED_SAND;
+    private LocalMaterialData hardClay = LocalMaterials.STAINED_CLAY;
+    private LocalMaterialData orangeClay = LocalMaterials.ORANGE_STAINED_CLAY;
+    private LocalMaterialData yellowClay = LocalMaterials.YELLOW_STAINED_CLAY;
+    private LocalMaterialData brownClay = LocalMaterials.BROWN_STAINED_CLAY;
+    private LocalMaterialData redClay = LocalMaterials.RED_STAINED_CLAY;
+    private LocalMaterialData whiteClay = LocalMaterials.WHITE_STAINED_CLAY;
+    private LocalMaterialData silverClay = LocalMaterials.SILVER_STAINED_CLAY;
+    private LocalMaterialData redSand = LocalMaterials.RED_SAND;
     
     boolean initialized;
 	private boolean hardClayIsReplaced;

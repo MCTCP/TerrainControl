@@ -1,13 +1,13 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
@@ -110,7 +110,7 @@ public class SmallLakeGen extends Resource
         {
         	LocalMaterialData localMaterialData;
         	LocalMaterialData localMaterialData2;
-            LocalMaterialData air = MaterialHelper.AIR;
+        	LocalMaterialData air = LocalMaterials.AIR;
             boolean[] BooleanBuffer = new boolean[2048];
             int i = rand.nextInt(4) + 4;
             double d1;

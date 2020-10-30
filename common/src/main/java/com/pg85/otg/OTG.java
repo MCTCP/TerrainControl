@@ -6,7 +6,6 @@ import com.pg85.otg.configuration.PluginConfig;
 import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.configuration.dimensions.DimensionsConfig;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.customobjects.bo4.BO4Config;
@@ -328,26 +327,7 @@ public class OTG
         PrintWriter printWriter = new PrintWriter(stringWriter);
         e.printStackTrace(printWriter);
         Engine.getLogger().log(level, stringWriter.toString());
-    }
-    
-    public static String correctOldBiomeConfigFolder(File settingsDir)
-    {
-        // Rename the old folder
-        String biomeFolderName = WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME;
-        File oldBiomeConfigs = new File(settingsDir, "BiomeConfigs");
-        if (oldBiomeConfigs.exists())
-        {
-            if (!oldBiomeConfigs.renameTo(new File(settingsDir, biomeFolderName)))
-            {
-                OTG.log(LogMarker.WARN, "========================");
-                OTG.log(LogMarker.WARN, "Found old `BiomeConfigs` folder, but it could not be renamed to `", biomeFolderName, "`!");
-                OTG.log(LogMarker.WARN, "Please rename the folder manually.");
-                OTG.log(LogMarker.WARN, "========================");
-                biomeFolderName = "BiomeConfigs";
-            }
-        }
-        return biomeFolderName;
-    }       
+    }      
 	
     public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
     {

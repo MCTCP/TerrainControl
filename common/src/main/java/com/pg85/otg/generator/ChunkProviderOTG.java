@@ -2,21 +2,21 @@ package com.pg85.otg.generator;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.world.WorldConfig;
 import com.pg85.otg.generator.biome.BiomeGenerator;
 import com.pg85.otg.generator.biome.OutputType;
-import com.pg85.otg.generator.noise.NoiseGeneratorPerlinMesaBlocks;
-import com.pg85.otg.generator.noise.NoiseGeneratorPerlinOctaves;
+import com.pg85.otg.generator.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
+import com.pg85.otg.generator.noise.legacy.NoiseGeneratorPerlinOctaves;
 import com.pg85.otg.generator.terrain.CavesGen;
 import com.pg85.otg.generator.terrain.RavinesGen;
 import com.pg85.otg.generator.terrain.TerrainGenBase;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
-import com.pg85.otg.util.materials.MaterialHelper;
 
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
 
@@ -118,7 +118,7 @@ public class ChunkProviderOTG
         int z = chunkCoord.getChunkZ();
         this.random.setSeed(x * 341873128712L + z * 132897987541L);
               
-        boolean dry = generateTerrainA(x, z, chunkBuffer);
+        boolean dry = generateTerrain(x, z, chunkBuffer);
                 
         if(!this.localWorld.generateModdedCaveGen(x, z, chunkBuffer))
         {
@@ -132,17 +132,8 @@ public class ChunkProviderOTG
             this.localWorld.prepareDefaultStructures(x, z, dry);
         }
     }
-
-    // Used by Streams
-    private void generateTerrain(ChunkBuffer chunkBuffer)
-    {
-    	
-    }
     
-    // Renamed this to generateTerrainA for v8, since Streams injects code into generateTerrain for v6
-    // to make it fire the ReplaceBiomeBlocks event. V8 fires the event itself, so just to make sure 
-    // Streams doesnt crash when trying to inject code, have an empty generateTerrain method.
-    private boolean generateTerrainA(int x, int z, ChunkBuffer chunkBuffer)
+    private boolean generateTerrain(int x, int z, ChunkBuffer chunkBuffer)
     {
         int[] biomeArray = null;
         byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];;
@@ -293,7 +284,7 @@ public class ChunkProviderOTG
                                 // Get the final density based on the z progress
                                 density = lerp(zLerp, z0, z1);
 
-                                block = MaterialHelper.AIR;
+                                block = LocalMaterials.AIR;
 
                                 realY = (noiseY * 8) + pieceY;
 

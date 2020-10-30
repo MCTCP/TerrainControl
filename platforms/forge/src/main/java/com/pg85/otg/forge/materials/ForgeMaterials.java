@@ -11,7 +11,6 @@ public class ForgeMaterials extends LocalMaterials
 {
     private static final FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096); // TODO: Smaller cache should be ok, only most frequently used should be cached?
     
-	private static ForgeMaterials forgeMaterials = new ForgeMaterials();
 	private ForgeMaterials()
 	{
 	    // Blocks used in OTG code

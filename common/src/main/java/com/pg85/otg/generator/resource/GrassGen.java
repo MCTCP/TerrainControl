@@ -1,14 +1,14 @@
 package com.pg85.otg.generator.resource;
 
-import com.pg85.otg.common.LocalMaterialData;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.configuration.ConfigFunction;
 import com.pg85.otg.configuration.biome.BiomeConfig;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
-import com.pg85.otg.util.minecraft.defaults.DefaultMaterial;
 
 import java.util.List;
 import java.util.Random;
@@ -151,8 +151,8 @@ public class GrassGen extends Resource
 					(worldMaterial = world.getMaterial(centerX, centerY, centerZ, chunkBeingPopulated)) != null &&
 					(
 						worldMaterial.isAir() || 
-						worldMaterial.isMaterial(DefaultMaterial.LEAVES) || 
-						worldMaterial.isMaterial(DefaultMaterial.LEAVES_2)
+						worldMaterial.isMaterial(LocalMaterials.LEAVES) || 
+						worldMaterial.isMaterial(LocalMaterials.LEAVES_2)
 					) &&
     				(worldMaterial = world.getMaterial(centerX, centerY - 1, centerZ, chunkBeingPopulated)) != null
 				) && (
@@ -218,8 +218,8 @@ public class GrassGen extends Resource
     				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
     				(
 	    				worldMaterial.isAir() || 
-						worldMaterial.isMaterial(DefaultMaterial.LEAVES) || 
-						worldMaterial.isMaterial(DefaultMaterial.LEAVES_2)
+						worldMaterial.isMaterial(LocalMaterials.LEAVES) || 
+						worldMaterial.isMaterial(LocalMaterials.LEAVES_2)
 					) &&
     				(worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null
 				) && 

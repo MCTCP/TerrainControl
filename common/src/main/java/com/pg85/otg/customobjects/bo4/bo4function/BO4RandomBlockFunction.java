@@ -7,8 +7,9 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.common.LocalMaterialData;
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
@@ -16,7 +17,6 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.bo3.Rotation;
-import com.pg85.otg.util.materials.MaterialHelper;
 
 public class BO4RandomBlockFunction extends BO4BlockFunction
 {
@@ -82,7 +82,7 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
         while (i < size)
         {
             // Parse chance and metadata
-        	this.blocks[blockCount] = MaterialHelper.readMaterial(args.get(i));
+        	this.blocks[blockCount] = OTG.getEngine().readMaterial(args.get(i));
             i++;
             if (i >= size)
             {

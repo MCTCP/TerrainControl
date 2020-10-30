@@ -11,8 +11,6 @@ import net.minecraft.util.registry.RegistryLookupCodec;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProvider;
-import net.minecraft.world.gen.layer.Layer;
-import net.minecraft.world.gen.layer.LayerUtil;
 
 import com.pg85.otg.generator.biome.layers.BiomeLayers;
 import com.pg85.otg.generator.biome.layers.LayerSource;
