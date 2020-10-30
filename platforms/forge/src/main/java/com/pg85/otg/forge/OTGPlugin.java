@@ -37,11 +37,7 @@ public class OTGPlugin
 	{
 		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
-			return new OTGNoiseChunkGenerator(
-				new OTGBiomeProvider(seed, false, false, biomes),
-					seed,
-				() -> dimensionSettings.func_243576_d(OVERWORLD)
-			);
+			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OVERWORLD));
 		}
 	};
 	
@@ -72,13 +68,13 @@ public class OTGPlugin
 	private void commonSetup(final FMLCommonSetupEvent event) { }
 
 	private void clientSetup(final FMLClientSetupEvent event) { }	
-	
+
 	@SubscribeEvent
 	public void onCommandRegister(RegisterCommandsEvent event)
 	{
 		OTGCommand.register(event.getDispatcher());
 	}
-	
+
 	@SubscribeEvent
 	public void onServerStarting(FMLServerStartingEvent event) { }
 }

@@ -23,7 +23,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 		{
 			for(BiomeConfig biomeConfig : preset.getAllBiomeConfigs())
 			{
-				OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> BiomeMaker.func_244226_a(false)); // Register to both mc and forge so forge doesn't complain when synching registries
+				// Register to both mc and forge so forge doesn't complain when synching registries
+				OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> BiomeMaker.func_244226_a(false));
 			}
 		}
 	}

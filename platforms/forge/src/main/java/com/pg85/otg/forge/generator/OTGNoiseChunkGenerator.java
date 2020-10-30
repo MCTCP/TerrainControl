@@ -51,15 +51,13 @@ import net.minecraft.world.spawner.WorldEntitySpawner;
 
 public final class OTGNoiseChunkGenerator extends ChunkGenerator
 {
-	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create((p_236091_0_) ->
-			p_236091_0_.group(
-					BiomeProvider.field_235202_a_.fieldOf("biome_source").forGetter((p_236096_0_) ->
-							p_236096_0_.biomeProvider),
-					Codec.LONG.fieldOf("seed").stable().forGetter((p_236093_0_) ->
-							p_236093_0_.field_236084_w_),
-					DimensionSettings.field_236098_b_.fieldOf("settings").forGetter((p_236090_0_) ->
-							p_236090_0_.field_236080_h_)
-			).apply(p_236091_0_, p_236091_0_.stable(OTGNoiseChunkGenerator::new)));
+	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
+		(p_236091_0_) -> p_236091_0_.group(
+			BiomeProvider.field_235202_a_.fieldOf("biome_source").forGetter((p_236096_0_) -> p_236096_0_.biomeProvider),
+			Codec.LONG.fieldOf("seed").stable().forGetter((p_236093_0_) -> p_236093_0_.field_236084_w_),
+			DimensionSettings.field_236098_b_.fieldOf("settings").forGetter((p_236090_0_) -> p_236090_0_.field_236080_h_)
+		).apply(p_236091_0_, p_236091_0_.stable(OTGNoiseChunkGenerator::new))
+	);
 
 	private static final float[] field_222561_h = Util.make(new float[13824], (p_236094_0_) ->
 	{
@@ -116,7 +114,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		super(biomeProvider, p_i241976_2_, p_i241976_5_.get().func_236108_a_(), seed);
 
-		if (!(biomeProvider instanceof LayerSource)) {
+		if (!(biomeProvider instanceof LayerSource))
+		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
 
@@ -159,12 +158,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			if (j >= 0 && j < 24)
 			{
 				return k >= 0 && k < 24 ? (double) field_222561_h[k * 24 * 24 + i * 24 + j] : 0.0D;
-			} else
-			{
+			} else {
 				return 0.0D;
 			}
-		} else
-		{
+		} else {
 			return 0.0D;
 		}
 	}
@@ -253,12 +250,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			if (d0 > 0.0D)
 			{
 				d1 = 0.25D;
-			} else
-			{
+			} else {
 				d1 = 1.0D;
 			}
-		} else
-		{
+		} else {
 			float f = 0.0F;
 			float f1 = 0.0F;
 			float f2 = 0.0F;
@@ -278,8 +273,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					{
 						f6 = 1.0F + f4 * 2.0F;
 						f7 = 1.0F + f5 * 4.0F;
-					} else
-					{
+					} else {
 						f6 = f4;
 						f7 = f5;
 					}
@@ -323,8 +317,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			if (d10 > 0.0D)
 			{
 				d7 = d7 + d10 * 4.0D;
-			} else
-			{
+			} else {
 				d7 = d7 + d10;
 			}
 
@@ -351,8 +344,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (d0 < 0.0D)
 		{
 			d1 = -d0 * 0.3D;
-		} else
-		{
+		} else {
 			d1 = d0;
 		}
 
@@ -420,11 +412,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (p_236086_1_ > 0.0D)
 		{
 			blockstate = this.defaultBlock;
-		} else if (p_236086_3_ < this.func_230356_f_())
+		}
+		else if (p_236086_3_ < this.func_230356_f_())
 		{
 			blockstate = this.defaultFluid;
-		} else
-		{
+		} else {
 			blockstate = AIR;
 		}
 

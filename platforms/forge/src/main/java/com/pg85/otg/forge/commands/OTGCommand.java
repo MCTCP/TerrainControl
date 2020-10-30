@@ -12,17 +12,20 @@ public class OTGCommand
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
 		dispatcher.register(
-			Commands.literal("otg").requires((p_198521_0_) ->
-			{
-				return p_198521_0_.hasPermissionLevel(2);
-			}).executes((p_198520_0_) -> 
-			{
-				return showHelp(p_198520_0_.getSource());
-			}).then(
-				Commands.argument("help", StringArgumentType.word()).executes((p_229810_0_) ->
-				{
-					return showHelp(p_229810_0_.getSource());
-				})
+			Commands.literal("otg").requires(
+				(p_198521_0_) -> {
+					return p_198521_0_.hasPermissionLevel(2);
+				}
+			).executes(
+				(p_198520_0_) -> {
+					return showHelp(p_198520_0_.getSource());
+				}
+			).then(
+				Commands.argument("help", StringArgumentType.word()).executes(
+					(p_229810_0_) -> {
+						return showHelp(p_229810_0_.getSource());
+					}
+				)
 			)
 		);
 	}
