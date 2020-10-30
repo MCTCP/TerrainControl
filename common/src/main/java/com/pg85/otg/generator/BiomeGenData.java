@@ -5,6 +5,10 @@ package com.pg85.otg.generator;
  */
 public class BiomeGenData
 {
+	public static final BiomeGenData[] LOOKUP = new BiomeGenData[256];
+
+	public int color = 0xFFFFFF;
+
 	public int smoothRadius = 2;
 
 	// depth
@@ -49,6 +53,8 @@ public class BiomeGenData
 		data.horizontalFracture = 0.5;
 		data.verticalFracture = 0.5;
 		data.smoothRadius = 12;
+		data.color = 0x9ec949;
+		LOOKUP[1] = data;
 
 		return data;
 	}
@@ -63,6 +69,8 @@ public class BiomeGenData
 		data.volatility1 = 2.25;
 		data.volatility2 = 2.25;
 		data.smoothRadius = 12;
+		data.color = 0x37bd58;
+		LOOKUP[0] = data;
 		
 		return data;
 	}

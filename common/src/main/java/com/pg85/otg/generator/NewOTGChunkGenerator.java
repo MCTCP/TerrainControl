@@ -268,7 +268,7 @@ public class NewOTGChunkGenerator
 
 	private BiomeGenData getBiomeAt(int x, int z)
 	{
-		return biomeGenerator.getSampler().sample(x, z) == 0 ? BiomeGenData.FOREST : BiomeGenData.PLAINS;
+		return BiomeGenData.LOOKUP[biomeGenerator.getSampler().sample(x, z)];
 	}
 
 	public void populateNoise(ChunkBuffer buffer, ChunkCoordinate pos)
