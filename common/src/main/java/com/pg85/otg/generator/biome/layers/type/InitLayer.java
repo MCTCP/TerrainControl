@@ -5,6 +5,9 @@ import com.pg85.otg.generator.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.generator.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.generator.biome.layers.util.LayerSampler;
 
+/**
+ * The type for layers that create a new layer generation stack.
+ */
 public interface InitLayer
 {
    default <R extends LayerSampler> LayerFactory<R> create(LayerSampleContext<R> context)
@@ -17,5 +20,5 @@ public interface InitLayer
       };
    }
 
-   int sample(LayerRandomnessSource context, int x, int y);
+   int sample(LayerSampleContext<?> context, int x, int y);
 }
