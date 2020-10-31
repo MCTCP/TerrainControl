@@ -9,15 +9,13 @@ import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-
 import com.pg85.otg.OTG;
 import com.pg85.otg.configuration.standard.PluginStandardValues;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
@@ -41,10 +39,11 @@ public class OTGPlugin
 		}
 	};
 	
-   	public static final DeferredRegister<Biome> BIOMES = DeferredRegister.create(ForgeRegistries.BIOMES, PluginStandardValues.MOD_ID);
+	// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
+   	//public static final DeferredRegister<Biome> BIOMES = DeferredRegister.create(ForgeRegistries.BIOMES, PluginStandardValues.MOD_ID);
 
 	public OTGPlugin()
-	{		
+	{	
 		// Register the setup method for modloading
 		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
 		// Register the doClientStuff method for modloading
@@ -53,17 +52,21 @@ public class OTGPlugin
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 
-		Registry.register(Registry.field_239689_aA_, new ResourceLocation("otg", "otg"), OTGBiomeProvider.CODEC);
-		Registry.register(Registry.field_239690_aB_, new ResourceLocation("otg", "otg"), OTGNoiseChunkGenerator.CODEC);
+		Registry.register(Registry.field_239689_aA_, "otg_biomeprovider", OTGBiomeProvider.CODEC);
+		Registry.register(Registry.field_239690_aB_, "otg_noisechunkgenerator", OTGNoiseChunkGenerator.CODEC);
 
 		// Register the otg worldtype for the world creation screen
 		BiomeGeneratorTypeScreens.field_239068_c_.add(otgWorldType);
 		
         // Start OpenTerrainGenerator engine, loads all presets.
         OTG.setEngine(new ForgeEngine());
-        
-        OTG.getEngine().getPresetLoader().registerBiomes();
 	}
+	
+    @SubscribeEvent
+    public static void registerBiomes(RegistryEvent.Register<Biome> event)
+    {
+    	OTG.getEngine().getPresetLoader().registerBiomes();
+    }
 
 	private void commonSetup(final FMLCommonSetupEvent event) { }
 

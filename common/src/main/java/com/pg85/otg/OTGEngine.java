@@ -323,62 +323,30 @@ public abstract class OTGEngine
     
 	public void setOTGBiomeId(String worldName, int i, BiomeConfig biomeConfig, boolean replaceExisting)
 	{
-    	if(!otgBiomeIdsByWorld.containsKey(worldName))
+    	if(!this.otgBiomeIdsByWorld.containsKey(worldName))
     	{
-    		otgBiomeIdsByWorld.put(worldName, new BiomeConfig[1024]);
+    		this.otgBiomeIdsByWorld.put(worldName, new BiomeConfig[1024]);
     	}
-    	if(replaceExisting || otgBiomeIdsByWorld.get(worldName)[i] == null)
+    	if(replaceExisting || this.otgBiomeIdsByWorld.get(worldName)[i] == null)
     	{
-    		otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
+    		this.otgBiomeIdsByWorld.get(worldName)[i] = biomeConfig;
     	} else {
-    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + otgBiomeIdsByWorld.get(worldName)[i].getName() + ". OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
+    		throw new RuntimeException("Tried to register OTG biome " + biomeConfig.getName() + " with id " + i + " but the id is in use by biome " + this.otgBiomeIdsByWorld.get(worldName)[i].getName() + ". OTG 1.12.2 v7 and above use dynamic biome id's for new worlds, this avoids the problem completely.");
     	}
 	}
 
     public BiomeConfig[] getOTGBiomeIds(String worldName)
     {
-    	return otgBiomeIdsByWorld.containsKey(worldName) ? otgBiomeIdsByWorld.get(worldName) : new BiomeConfig[1024];
+    	return this.otgBiomeIdsByWorld.containsKey(worldName) ? this.otgBiomeIdsByWorld.get(worldName) : new BiomeConfig[1024];
     }
     
 	public boolean isOTGBiomeIdAvailable(String worldName, int i)
 	{
-		return !otgBiomeIdsByWorld.containsKey(worldName) || otgBiomeIdsByWorld.get(worldName)[i] == null;
+		return !this.otgBiomeIdsByWorld.containsKey(worldName) || this.otgBiomeIdsByWorld.get(worldName)[i] == null;
 	}
 
-	public void unregisterOTGBiomeId(String worldName, int i)
-	{
-		otgBiomeIdsByWorld.get(worldName)[i] = null;
-	}    
-    
     // Materials
 
-    /**
-     * Gets the material with the given name. The name can be one of
-     * Minecraft's material names, a modded material name, one of the names
-     * from {@link DefaultMaterial} or a block id (deprecated). Block data can
-     * be included
-     * in the name using the "blockName:blockData" syntax or the "blockName.id"
-     * syntax (deprecated).
-     * <p>
-     * Examples of valid block names:
-     * <ul>
-     * <li>STONE</li>
-     * <li>minecraft:stone</li>
-     * <li>Stone</li>
-     * <li>Wool:1</li>
-     * <li>Wool.1 <i>(deprecated, use ':')</i></li>
-     * <li>minecraft:wool:1</li>
-     * <li>35:1 <i>(deprecated, use block name)</i></li>
-     * <li>35.1 <i>(deprecated, use block name and ':')</i></li>
-     * <li>buildcraft:blockRedLaser <i>(only when BuildCraft is
-     * installed)</i></li>
-     * </ul>
-     * <p>
-     * @param name The name of the material.
-     * @return The material, or null if not found.
-     * <p>
-     * @throws InvalidConfigException If no material with that name exists.
-     */
     public abstract LocalMaterialData readMaterial(String name) throws InvalidConfigException;
 	
 	// Logging
