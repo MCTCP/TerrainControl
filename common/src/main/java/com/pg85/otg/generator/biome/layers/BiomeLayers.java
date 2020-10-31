@@ -18,16 +18,21 @@ public class BiomeLayers
 	// The land bit marks whether a sample is land or not. This is used to place biomes.
 	public static final int LAND_BIT = (1 << 30);
 
-	public static final int GROUP_SHIFT = 24;
+	public static final int GROUP_SHIFT = 23;
 
 	// The marker for biome groups
-	public static final int GROUP_BIT = (1 << GROUP_SHIFT);
+	public static final int GROUP_BIT = (127 << GROUP_SHIFT);
 
 	// This is the amount of bits we & the sample at the end to get the correct biome id.
-	public static final int BIOME_BITS = GROUP_BIT - 1;
+	public static final int BIOME_BITS = (1 << GROUP_SHIFT) - 1;
 
 	public static boolean isLand(int sample) {
 		return (sample & LAND_BIT) == 0;
+	}
+
+	public static int getGroupId(int sample)
+	{
+		return (sample & GROUP_BIT) >> GROUP_SHIFT;
 	}
 
 	private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider)
@@ -54,9 +59,13 @@ public class BiomeLayers
 				factory = new AddIslandsLayer().create(contextProvider.apply(depth), factory);
 			}
 
-			if (depth == 3)
-			{
-				factory = new PlaceBiomesLayer().create(contextProvider.apply(79), factory);
+
+			if (data.groups.containsKey(depth)) {
+				factory = new BiomeGroupLayer(data.groups.get(depth)).create(contextProvider.apply(depth), factory);
+			}
+
+			if (data.biomeDepths.contains(depth)) {
+				factory = new BiomeLayer(data, depth).create(contextProvider.apply(depth), factory);
 			}
 		}
 
@@ -69,7 +78,7 @@ public class BiomeLayers
 	// Create a sampler that can get a biome at a position
 	public static CachingLayerSampler create(long seed)
 	{
-		LayerFactory<CachingLayerSampler> factory = build(new BiomeLayerData(), salt -> new CachingLayerContext(25, seed, salt));
+		LayerFactory<CachingLayerSampler> factory = build(BiomeLayerData.INSTANCE, salt -> new CachingLayerContext(25, seed, salt));
 		return factory.make();
 	}
 }
