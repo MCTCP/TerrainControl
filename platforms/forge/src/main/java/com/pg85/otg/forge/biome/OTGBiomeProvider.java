@@ -15,6 +15,8 @@ import net.minecraft.world.biome.provider.BiomeProvider;
 import com.pg85.otg.generator.biome.layers.BiomeLayers;
 import com.pg85.otg.generator.biome.layers.LayerSource;
 import com.pg85.otg.generator.biome.layers.util.CachingLayerSampler;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -35,6 +37,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	private final boolean largeBiomes;
 	private final Registry<Biome> registry;
 	private final CachingLayerSampler layer;
+	private final Int2ObjectMap<RegistryKey<Biome>> lookup;
 
 	public OTGBiomeProvider(long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{
@@ -48,6 +51,11 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		this.largeBiomes = largeBiomes;
 		this.registry = registry;
 		this.layer = BiomeLayers.create(seed);
+		this.lookup = new Int2ObjectOpenHashMap<>();
+		this.lookup.put(0, Biomes.OCEAN);
+		this.lookup.put(1, Biomes.PLAINS);
+		this.lookup.put(2, Biomes.FOREST);
+		this.lookup.put(3, Biomes.DESERT);
 	}
 
 	protected Codec<? extends BiomeProvider> func_230319_a_()
@@ -64,7 +72,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	public Biome getNoiseBiome(int x, int y, int z)
 	{
 		// TODO: this is hardcoded for now until layer generation is fixed
-		return registry.func_230516_a_(layer.sample(x, z) == 0 ? Biomes.FOREST : Biomes.PLAINS);
+		return registry.func_230516_a_(lookup.get(this.layer.sample(x, z)));
 	}
 
 	@Override

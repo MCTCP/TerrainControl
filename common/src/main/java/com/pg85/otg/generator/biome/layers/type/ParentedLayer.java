@@ -13,9 +13,9 @@ public interface ParentedLayer
    {
       return () -> {
          R layerSampler = parent.make();
-         return context.createSampler((i, j) -> {
-            context.initSeed(i, j);
-            return this.sample(context, layerSampler, i, j);
+         return context.createSampler((x, z) -> {
+            context.initSeed(x, z);
+            return this.sample(context, layerSampler, x, z);
          }, layerSampler);
       };
    }

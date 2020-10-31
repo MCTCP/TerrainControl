@@ -1,5 +1,7 @@
 package com.pg85.otg.generator.biome.layers;
 
+import static com.pg85.otg.generator.biome.layers.BiomeLayers.LAND_BIT;
+
 import com.pg85.otg.generator.biome.layers.type.InitLayer;
 import com.pg85.otg.generator.biome.layers.type.ParentedLayer;
 import com.pg85.otg.generator.biome.layers.util.LayerRandomnessSource;
@@ -21,14 +23,18 @@ public class LandLayer implements ParentedLayer
 	@Override
 	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
 	{
+		int sample = parent.sample(x, z);
 		// If we're on the center sample return land to try and make sure that the player doesn't spawn in the ocean.
 		if (x == 0 && z == 0)
 		{
-			return 1;
+			return sample | LAND_BIT;
 		}
 
 		// Set land based on the rarity
-		// TODO: do we need the land bit here? or can we just use the 1?
-		return context.nextInt(this.rarity) == 0 ? 1 : 0;
+		if (context.nextInt(this.rarity) == 0) {
+			return sample | LAND_BIT;
+		}
+
+		return sample;
 	}
 }

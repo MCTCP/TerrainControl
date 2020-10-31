@@ -42,8 +42,24 @@ public class BiomeGenData
 	}
 
 	public static final BiomeGenData INSTANCE = new BiomeGenData();
+	public static final BiomeGenData OCEAN = ocean();
 	public static final BiomeGenData PLAINS = plains();
 	public static final BiomeGenData FOREST = forest();
+	public static final BiomeGenData DESERT = desert();
+
+	private static BiomeGenData ocean()
+	{
+		BiomeGenData data = new BiomeGenData();
+		data.biomeHeight = -0.5f;
+		data.biomeVolatility = 0.1f;
+		data.horizontalFracture = 0.5;
+		data.verticalFracture = 0.5;
+		data.smoothRadius = 12;
+		data.color = 0x0f4db8;
+		LOOKUP[0] = data;
+
+		return data;
+	}
 
 	private static BiomeGenData plains()
 	{
@@ -70,8 +86,25 @@ public class BiomeGenData
 		data.volatility2 = 2.25;
 		data.smoothRadius = 12;
 		data.color = 0x37bd58;
-		LOOKUP[0] = data;
+		LOOKUP[2] = data;
 		
+		return data;
+	}
+
+
+	private static BiomeGenData desert()
+	{
+		BiomeGenData data = new BiomeGenData();
+		data.biomeHeight = 0.8f;
+		data.biomeVolatility = 0.25f;
+		data.horizontalFracture = 0.5;
+		data.verticalFracture = 0.5;
+		data.volatility1 = 1.5;
+		data.volatility2 = 1.5;
+		data.smoothRadius = 12;
+		data.color = 0xc8d166;
+		LOOKUP[3] = data;
+
 		return data;
 	}
 }

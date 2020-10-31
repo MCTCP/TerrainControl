@@ -13,6 +13,23 @@ import com.pg85.otg.generator.biome.layers.util.LayerSampler;
  */
 public class BiomeLayers
 {
+	// Bit masks for biome generation
+
+	// The land bit marks whether a sample is land or not. This is used to place biomes.
+	public static final int LAND_BIT = (1 << 30);
+
+	public static final int GROUP_SHIFT = 24;
+
+	// The marker for biome groups
+	public static final int GROUP_BIT = (1 << GROUP_SHIFT);
+
+	// This is the amount of bits we & the sample at the end to get the correct biome id.
+	public static final int BIOME_BITS = GROUP_BIT - 1;
+
+	public static boolean isLand(int sample) {
+		return (sample & LAND_BIT) == 0;
+	}
+
 	private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider)
 	{
 		// Create an empty layer to start the biome generation
@@ -36,12 +53,20 @@ public class BiomeLayers
 			{
 				factory = new AddIslandsLayer().create(contextProvider.apply(depth), factory);
 			}
+
+			if (depth == 3)
+			{
+				factory = new PlaceBiomesLayer().create(contextProvider.apply(79), factory);
+			}
 		}
+
+		// Finalize the biome data
+		factory = new FinalizeLayer().create(contextProvider.apply(1L), factory);
 
 		return factory;
 	}
 
-	// Create a
+	// Create a sampler that can get a biome at a position
 	public static CachingLayerSampler create(long seed)
 	{
 		LayerFactory<CachingLayerSampler> factory = build(new BiomeLayerData(), salt -> new CachingLayerContext(25, seed, salt));
