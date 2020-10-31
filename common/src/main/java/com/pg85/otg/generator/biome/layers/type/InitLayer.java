@@ -1,7 +1,6 @@
 package com.pg85.otg.generator.biome.layers.type;
 
 import com.pg85.otg.generator.biome.layers.util.LayerFactory;
-import com.pg85.otg.generator.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.generator.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.generator.biome.layers.util.LayerSampler;
 

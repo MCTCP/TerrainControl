@@ -88,7 +88,7 @@ public abstract class LocalPresetLoader
         ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(presetDir, worldConfig);
 
         // We have to wait for the loading in order to get things like temperature
-        //worldConfig.biomeGroupManager.processBiomeData(); // TODO: Re-implement this for 1.16.2
+        //worldConfig.biomeGroupManager.processBiomeData(); // TODO: Re-implement this for 1.16
 
         return new Preset(presetName, worldConfig, biomeConfigs);       
     }

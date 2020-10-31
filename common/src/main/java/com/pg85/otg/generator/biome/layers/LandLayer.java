@@ -2,9 +2,7 @@ package com.pg85.otg.generator.biome.layers;
 
 import static com.pg85.otg.generator.biome.layers.BiomeLayers.LAND_BIT;
 
-import com.pg85.otg.generator.biome.layers.type.InitLayer;
 import com.pg85.otg.generator.biome.layers.type.ParentedLayer;
-import com.pg85.otg.generator.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.generator.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.generator.biome.layers.util.LayerSampler;
 
