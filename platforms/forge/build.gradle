@@ -15,7 +15,7 @@ apply plugin: 'maven-publish'
 
 version = '1.0'
 group = 'com.pg85.otg' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = 'otg'
+archivesBaseName = "openterraingenerator-forge"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -32,8 +32,6 @@ minecraft {
 	mappings channel: 'snapshot', version: '20200514-1.16'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
     runs {
@@ -119,6 +117,12 @@ dependencies {
 
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+	destinationDir = new File(project.buildDir, "distributions")
+    classifier = ''
+    from
+    {
+        project(":common").sourceSets.main.output.files
+    }	
     manifest {
         attributes([
             "Specification-Title": "openterraingenerator",
