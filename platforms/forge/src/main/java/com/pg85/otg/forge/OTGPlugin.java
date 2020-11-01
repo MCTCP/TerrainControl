@@ -17,10 +17,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.commands.OTGCommand;
-import com.pg85.otg.forge.generator.OTGNoiseChunkGenerator;
+import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 
 // The value here should match an entry in the META-INF/mods.toml files
 @Mod(PluginStandardValues.MOD_ID)
@@ -52,8 +52,8 @@ public class OTGPlugin
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 
-		Registry.register(Registry.field_239689_aA_, "otg_biomeprovider", OTGBiomeProvider.CODEC);
-		Registry.register(Registry.field_239690_aB_, "otg_noisechunkgenerator", OTGNoiseChunkGenerator.CODEC);
+		Registry.register(Registry.field_239689_aA_, new ResourceLocation("otg", "otg"), OTGBiomeProvider.CODEC);
+		Registry.register(Registry.field_239690_aB_, new ResourceLocation("otg", "otg"), OTGNoiseChunkGenerator.CODEC);
 
 		// Register the otg worldtype for the world creation screen
 		BiomeGeneratorTypeScreens.field_239068_c_.add(otgWorldType);
