@@ -125,29 +125,29 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		
 		// TODO: this is hardcoded for now until layer generation is fixed.
 		// TODO: Get the RegistryKey when registering biomes and reuse it?
-		Biome biome1 = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.ocean"));
-		if(biome1 != null)
+		Biome biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.ocean"));
+		if(biome != null)
 		{
 			this.lookup.put(0, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.ocean")));
 		} else {
 			this.lookup.put(0, Biomes.OCEAN);
 		}
-		biome1 = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.plains"));
-		if(biome1 != null)
+		biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.plains"));
+		if(biome != null)
 		{
 			this.lookup.put(1, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.plains")));
 		} else {
 			this.lookup.put(1, Biomes.PLAINS);
 		}
-		biome1 = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.forest"));
-		if(biome1 != null)
+		biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.forest"));
+		if(biome != null)
 		{
 			this.lookup.put(2, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.forest")));
 		} else {
 			this.lookup.put(2, Biomes.FOREST);
 		}
-		biome1 = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.desert"));
-		if(biome1 != null)
+		biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.desert"));
+		if(biome != null)
 		{
 			this.lookup.put(3, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.desert")));
 		} else {

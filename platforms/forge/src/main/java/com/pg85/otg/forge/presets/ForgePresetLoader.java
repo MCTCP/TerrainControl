@@ -1,11 +1,15 @@
 package com.pg85.otg.forge.presets;
 
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.pg85.otg.common.presets.LocalPresetLoader;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.preset.Preset;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
+import com.pg85.otg.gen.BiomeGenData;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
@@ -28,7 +32,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	{
 		super(otgRootFolder);
 	}
-	
+		
 	@Override
 	public void registerBiomes()
 	{
@@ -40,6 +44,35 @@ public class ForgePresetLoader extends LocalPresetLoader
 				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
 				// TODO: Get RegistryKey<Biome> and store it for reuse?
  				ForgeRegistries.BIOMES.register(createOTGBiome(biomeConfig));
+ 				
+ 				// TODO: this is hardcoded for now until layer generation is fixed.
+				BiomeGenData data = new BiomeGenData();
+				data.biomeHeight = biomeConfig.biomeHeight;
+				data.biomeVolatility = biomeConfig.biomeVolatility;
+				data.horizontalFracture = biomeConfig.worldConfig.fractureHorizontal;
+				data.verticalFracture = biomeConfig.worldConfig.fractureVertical;
+				data.volatility1 = biomeConfig.volatility1;
+				data.volatility2 = biomeConfig.volatility2;
+				data.smoothRadius = biomeConfig.smoothRadius;
+				data.color = biomeConfig.biomeColor;
+ 				
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.ocean"))
+ 				{
+ 					BiomeGenData.LOOKUP[0] = data;
+ 				}
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.plains"))
+ 				{
+ 					BiomeGenData.LOOKUP[1] = data;
+ 				}
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.forest"))
+ 				{
+ 					BiomeGenData.LOOKUP[2] = data;
+ 				}
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.desert"))
+ 				{
+ 					BiomeGenData.LOOKUP[3] = data;
+ 				}
+ 				//
 			}
 		}
 	}
