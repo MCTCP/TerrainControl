@@ -49,8 +49,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 				BiomeGenData data = new BiomeGenData();
 				data.biomeHeight = biomeConfig.biomeHeight;
 				data.biomeVolatility = biomeConfig.biomeVolatility;
-				data.horizontalFracture = biomeConfig.worldConfig.fractureHorizontal;
-				data.verticalFracture = biomeConfig.worldConfig.fractureVertical;
+				data.horizontalFracture = biomeConfig.worldConfig.getFractureHorizontal();
+				data.verticalFracture = biomeConfig.worldConfig.getFractureVertical();
 				data.volatility1 = biomeConfig.volatility1;
 				data.volatility2 = biomeConfig.volatility2;
 				data.smoothRadius = biomeConfig.smoothRadius;
