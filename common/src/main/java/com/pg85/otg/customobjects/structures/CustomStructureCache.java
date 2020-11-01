@@ -2,7 +2,7 @@ package com.pg85.otg.customobjects.structures;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
 import com.pg85.otg.customobjects.bofunctions.ParticleFunction;
@@ -11,7 +11,7 @@ import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructure;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.customobjects.structures.bo4.CustomStructurePlotter;
-import com.pg85.otg.generator.resource.CustomStructureGen;
+import com.pg85.otg.gen.resource.CustomStructureGen;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;

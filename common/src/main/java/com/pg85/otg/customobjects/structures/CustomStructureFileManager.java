@@ -19,8 +19,8 @@ import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ModDataFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3ParticleFunction;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3SpawnerFunction;

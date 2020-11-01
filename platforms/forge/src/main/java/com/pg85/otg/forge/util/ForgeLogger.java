@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.util;
 
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.logging.Logger;
 import org.apache.logging.log4j.LogManager;

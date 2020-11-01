@@ -1,8 +1,8 @@
 package com.pg85.otg.util.helpers;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.world.WorldConfig;
-import com.pg85.otg.generator.biome.*;
+import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.gen.biome.*;
 
 /**
  * Counts how much each biome mode is used.

@@ -1,6 +1,6 @@
 package com.pg85.otg.util;
 
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
 
 public class BiomeResourceLocation
 {

@@ -3,7 +3,7 @@ package com.pg85.otg.network;
 import java.util.List;
 
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.config.world.WorldConfig;
 
 /**
  * Provides the configuration objects of a world. This includes:

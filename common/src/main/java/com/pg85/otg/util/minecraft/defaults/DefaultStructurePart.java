@@ -1,6 +1,6 @@
 package com.pg85.otg.util.minecraft.defaults;
 
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
 
 import java.util.HashMap;

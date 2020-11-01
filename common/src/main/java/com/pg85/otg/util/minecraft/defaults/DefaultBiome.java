@@ -1,10 +1,10 @@
 package com.pg85.otg.util.minecraft.defaults;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.standard.MinecraftBiomeTemplates.*;
-import com.pg85.otg.configuration.biome.BiomeLoadInstruction;
-import com.pg85.otg.configuration.standard.MojangSettings;
-import com.pg85.otg.configuration.standard.StandardBiomeTemplate;
+import com.pg85.otg.config.biome.BiomeLoadInstruction;
+import com.pg85.otg.config.standard.MojangSettings;
+import com.pg85.otg.config.standard.StandardBiomeTemplate;
+import com.pg85.otg.config.standard.MinecraftBiomeTemplates.*;
 import com.pg85.otg.logging.LogMarker;
 
 /**

@@ -1,8 +1,8 @@
 package com.pg85.otg.customobjects.bofunctions;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFile;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import java.io.BufferedReader;

@@ -1,7 +1,7 @@
 package com.pg85.otg.network;
 
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.configuration.world.WorldConfig;
+import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.util.helpers.StreamHelper;
 
 import java.io.DataOutput;

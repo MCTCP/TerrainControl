@@ -1,8 +1,8 @@
 package com.pg85.otg.forge.biome;
 
 import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.configuration.biome.settings.WeightedMobSpawnGroup;
-import com.pg85.otg.configuration.standard.MojangSettings;
+import com.pg85.otg.config.biome.settings.WeightedMobSpawnGroup;
+import com.pg85.otg.config.standard.MojangSettings;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 
 import net.minecraft.util.RegistryKey;

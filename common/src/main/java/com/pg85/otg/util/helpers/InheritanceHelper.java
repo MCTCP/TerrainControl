@@ -1,7 +1,7 @@
 package com.pg85.otg.util.helpers;
 
-import com.pg85.otg.configuration.ConfigFunction;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.config.ConfigFunction;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
 
 import java.util.ArrayList;
 import java.util.Collection;

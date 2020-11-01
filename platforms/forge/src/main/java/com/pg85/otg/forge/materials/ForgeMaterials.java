@@ -107,7 +107,7 @@ public class ForgeMaterials extends LocalMaterials
     	{
     		return null;
     	}
-
+    	
     	LocalMaterialData material = CachedMaterials.get(name);
     	if(material != null)
     	{

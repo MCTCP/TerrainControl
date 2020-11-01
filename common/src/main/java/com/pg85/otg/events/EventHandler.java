@@ -2,7 +2,7 @@ package com.pg85.otg.events;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
-import com.pg85.otg.generator.resource.Resource;
+import com.pg85.otg.gen.resource.Resource;
 
 import java.util.Random;
 

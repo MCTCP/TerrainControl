@@ -1,14 +1,14 @@
 package com.pg85.otg.common;
 
 import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
-import com.pg85.otg.generator.ChunkBuffer;
-import com.pg85.otg.generator.ObjectSpawner;
-import com.pg85.otg.generator.biome.BiomeGenerator;
+import com.pg85.otg.gen.ChunkBuffer;
+import com.pg85.otg.gen.ObjectSpawner;
+import com.pg85.otg.gen.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.BiomeResourceLocation;

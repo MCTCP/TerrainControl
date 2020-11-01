@@ -1,8 +1,8 @@
 package com.pg85.otg.customobjects.bo4;
 
-import com.pg85.otg.configuration.settingType.Setting;
-import com.pg85.otg.configuration.settingType.Settings;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.config.settingType.Setting;
+import com.pg85.otg.config.settingType.Settings;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.pg85.otg.util.bo3.Rotation;
 

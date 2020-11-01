@@ -1,8 +1,8 @@
 package com.pg85.otg.customobjects.bofunctions;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFile;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;

@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.bo3.checks;
 
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;

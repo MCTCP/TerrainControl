@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.bofunctions;
 
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFile;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.structures.Branch;
 import com.pg85.otg.exception.InvalidConfigException;
 import java.util.*;

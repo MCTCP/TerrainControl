@@ -2,9 +2,9 @@ package com.pg85.otg.forge.presets;
 
 import java.nio.file.Path;
 import com.pg85.otg.common.presets.LocalPresetLoader;
-import com.pg85.otg.configuration.biome.BiomeConfig;
-import com.pg85.otg.configuration.preset.Preset;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.preset.Preset;
+import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 
 import net.minecraft.util.ResourceLocation;

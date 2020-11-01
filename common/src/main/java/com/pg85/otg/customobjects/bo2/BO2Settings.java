@@ -1,9 +1,9 @@
 package com.pg85.otg.customobjects.bo2;
 
 import com.pg85.otg.common.materials.LocalMaterials;
-import com.pg85.otg.configuration.settingType.Setting;
-import com.pg85.otg.configuration.settingType.Settings;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
+import com.pg85.otg.config.settingType.Setting;
+import com.pg85.otg.config.settingType.Settings;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.util.materials.MaterialSet;
 
 class BO2Settings extends Settings

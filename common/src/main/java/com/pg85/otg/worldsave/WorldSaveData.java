@@ -11,8 +11,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;
 
 public class WorldSaveData

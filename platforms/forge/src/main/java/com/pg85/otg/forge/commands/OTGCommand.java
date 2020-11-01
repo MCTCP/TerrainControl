@@ -9,7 +9,7 @@ import javax.imageio.ImageIO;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
-import com.pg85.otg.generator.BiomeGenData;
+import com.pg85.otg.gen.BiomeGenData;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;

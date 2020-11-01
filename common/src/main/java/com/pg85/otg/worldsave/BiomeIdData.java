@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.standard.PluginStandardValues;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
+import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.network.ServerConfigProvider;
 

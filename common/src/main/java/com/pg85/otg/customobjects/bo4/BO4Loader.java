@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects.bo4;
 import java.io.File;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
+import com.pg85.otg.config.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectLoader;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;

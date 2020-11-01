@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.bo3;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
+import com.pg85.otg.config.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectLoader;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;

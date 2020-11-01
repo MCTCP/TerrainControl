@@ -13,9 +13,10 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProvider;
 
-import com.pg85.otg.generator.biome.layers.BiomeLayers;
-import com.pg85.otg.generator.biome.layers.LayerSource;
-import com.pg85.otg.generator.biome.layers.util.CachingLayerSampler;
+import com.pg85.otg.gen.biome.layers.BiomeLayers;
+import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
+
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import net.minecraftforge.api.distmarker.Dist;

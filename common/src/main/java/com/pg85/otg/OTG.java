@@ -2,18 +2,18 @@ package com.pg85.otg;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.PluginConfig;
-import com.pg85.otg.configuration.biome.settings.BiomeResourcesManager;
-import com.pg85.otg.configuration.customobjects.CustomObjectResourcesManager;
-import com.pg85.otg.configuration.dimensions.DimensionsConfig;
+import com.pg85.otg.config.PluginConfig;
+import com.pg85.otg.config.biome.settings.BiomeResourcesManager;
+import com.pg85.otg.config.customobjects.CustomObjectResourcesManager;
+import com.pg85.otg.config.dimensions.DimensionsConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.events.EventHandler;
 import com.pg85.otg.events.EventPriority;
-import com.pg85.otg.generator.ChunkBuffer;
-import com.pg85.otg.generator.biome.BiomeModeManager;
-import com.pg85.otg.generator.resource.Resource;
+import com.pg85.otg.gen.ChunkBuffer;
+import com.pg85.otg.gen.biome.BiomeModeManager;
+import com.pg85.otg.gen.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 

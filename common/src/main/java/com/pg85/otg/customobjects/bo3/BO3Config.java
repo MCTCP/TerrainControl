@@ -7,12 +7,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFile;
-import com.pg85.otg.configuration.customobjects.CustomObjectConfigFunction;
-import com.pg85.otg.configuration.io.SettingsReaderOTGPlus;
-import com.pg85.otg.configuration.io.SettingsWriterOTGPlus;
-import com.pg85.otg.configuration.standard.WorldStandardValues;
-import com.pg85.otg.configuration.world.WorldConfig.ConfigMode;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFile;
+import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
+import com.pg85.otg.config.io.SettingsReaderOTGPlus;
+import com.pg85.otg.config.io.SettingsWriterOTGPlus;
+import com.pg85.otg.config.standard.WorldStandardValues;
+import com.pg85.otg.config.world.WorldConfig.ConfigMode;
 import com.pg85.otg.customobjects.bo3.BO3Settings.OutsideSourceBlock;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.pg85.otg.customobjects.bo3.bo3function.BO3BlockFunction;

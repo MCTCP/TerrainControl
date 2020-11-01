@@ -1,6 +1,6 @@
 package com.pg85.otg.forge.biome;
 
-import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.util.BiomeIds;
 
 import net.minecraft.util.ResourceLocation;
