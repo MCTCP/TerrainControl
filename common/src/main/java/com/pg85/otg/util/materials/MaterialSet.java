@@ -222,9 +222,9 @@ public class MaterialSet
 
         // Check if the material is included
         // If SAND is in the list, both SAND:0 and SAND:1 return true.
-        if (Arrays.binarySearch(materialIntSet, material.hashCodeWithoutBlockData()) >= 0)
+        //if (Arrays.binarySearch(materialIntSet, material.hashCodeWithoutBlockData()) >= 0)
         {
-            return true;
+            //return true;
         }
         if (Arrays.binarySearch(materialIntSet, material.hashCode()) >= 0)
         {

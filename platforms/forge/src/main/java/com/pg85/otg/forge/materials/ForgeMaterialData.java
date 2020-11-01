@@ -1,13 +1,19 @@
 package com.pg85.otg.forge.materials;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
+import net.minecraft.command.arguments.BlockStateArgument;
+import net.minecraft.command.arguments.BlockStateInput;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -51,116 +57,94 @@ public class ForgeMaterialData extends LocalMaterialData
     		return null;
     	}
 
+        // Try parsing as an internal Minecraft name
+        // This is so that things like "minecraft:stone" aren't parsed
+        // as the block "minecraft" with data "stone", but instead as the
+        // block "minecraft:stone" with no block data.    
+    	
     	// Used in BO4's as placeholder/detector block.
     	if(input.toLowerCase().equals("blank"))
     	{
     		return ForgeMaterialData.getBlank();
     	}
     	
-        // Try parsing as an internal Minecraft name
-        // This is so that things like "minecraft:stone" aren't parsed
-        // as the block "minecraft" with data "stone", but instead as the
-        // block "minecraft:stone" with no block data.
+    	// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
+    	Block block = null;
     	
-    	String newInput = input;
-
-    	net.minecraft.block.Block block = null;
+    	// Use mc /setblock command logic to parse block string for us <3
+		BlockStateArgument blockStateArgument = new BlockStateArgument();
+		BlockStateInput parseResult = null;
+		try {
+			String newInput = input.contains(":") ? input : "minecraft:" + input;
+			parseResult = blockStateArgument.parse(new StringReader(newInput));
+		} catch (CommandSyntaxException e) { }
+		
+		if(parseResult != null)
+		{
+			return new ForgeMaterialData(parseResult.getState(), input);
+		}
+		
+    	String blockNameCorrected = input.trim().toLowerCase();
+    	// Remove any old metadata, fe STONE:0 or STONE:1 -> STONE
+    	// TODO: this only works for single-digit metadata ><
     	try
-    	{    
-    		block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(newInput.toLowerCase().trim()));
+    	{
+    		Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.length() - 1));
+    		if(blockNameCorrected.substring(blockNameCorrected.length() - 2, blockNameCorrected.length() - 1).equals(":"))
+    		{
+    			blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.length() - 2);
+    		}
+    	} catch(NumberFormatException ex) { }
+		
+    	try
+    	{
+    		// This returns AIR if block is not found ><.
+    		block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockNameCorrected));
     	} catch(net.minecraft.util.ResourceLocationException ex) {
-    		String breakpoint = "";
+    		//String breakpoint = "";
     	}
-        if (block != null)
-        {
-        	// Some old apps exported schematics/bo3's exported "STAIRS" without metadata (for instance "STAIRS:0").
-        	// However, the default rotation has changed so fix this by adding the correct metadata.
+    	if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
+    	{
+    		return ofMinecraftBlock(block, input);
+    	}
+    	
+    	block = fromLegacyBlockName(blockNameCorrected);
+    	if(block != null)
+    	{
+    		return ofMinecraftBlock(block, input);
+    	}
 
-        	if(
-    			block == Blocks.NETHER_PORTAL ||
-				block == Blocks.DISPENSER ||
-    			block == Blocks.ACACIA_STAIRS ||
-        		block == Blocks.BIRCH_STAIRS ||
-        		block == Blocks.BRICK_STAIRS ||
-        		block == Blocks.DARK_OAK_STAIRS ||
-        		block == Blocks.JUNGLE_STAIRS ||
-        		block == Blocks.NETHER_BRICK_STAIRS ||
-        		block == Blocks.OAK_STAIRS ||
-        		block == Blocks.PURPUR_STAIRS ||
-        		block == Blocks.QUARTZ_STAIRS ||
-        		block == Blocks.RED_SANDSTONE_STAIRS ||
-        		block == Blocks.SANDSTONE_STAIRS ||
-        		block == Blocks.SPRUCE_STAIRS ||
-        		block == Blocks.STONE_BRICK_STAIRS ||
-        		block == Blocks.STONE_STAIRS
-    		)
-        	{
-        		newInput = input + ":0"; // TODO: Shouldn't this be 3? This appears to fix the problem for the dungeon dimension but I still see it in BB, double check?
-        	} else {
-	            return ForgeMaterialData.ofMinecraftBlock(block, input);
-        	}
-        }
+		OTG.log(LogMarker.INFO, "Could not parse block: " + input + ", substituting AIR.");
 
-        // Try block(:data) syntax
-        return getMaterial0(newInput);
+		return ofMinecraftBlock(Blocks.AIR, input);
     }
-
-    private static ForgeMaterialData getMaterial0(String input) throws NumberFormatException, InvalidConfigException
-    {
-        String blockName = input;
-        //int blockData = -1;
-
-        // When there is a . or a : in the name, extract block data
-        int splitIndex = input.lastIndexOf(":");
-        if (splitIndex == -1)
-        {
-            splitIndex = input.lastIndexOf(".");
-        }
-        if (splitIndex != -1)
-        {
-            blockName = input.substring(0, splitIndex);
-            //try
-            //{
-            	//blockData = Integer.parseInt(input.substring(splitIndex + 1));            
-            //}
-            //catch (NumberFormatException e)
-            //{
-            	//blockName = input;
-            //}
-        }
-
-        // Parse block name
-        Block block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockName.toLowerCase().trim()));
-
-        // Get the block
-        if (block != null)
-        {
-            //if (blockData == -1)
-        	if(1 == 1) // TODO: Reimplement this
-            {
-                // Use default
-                return ForgeMaterialData.ofMinecraftBlock(block, input);
-            } else {
-                // Use specified data
-            	/*
-                try
-                {
-                    return ForgeMaterialData.ofMinecraftBlockState(block.getStateFromMeta(blockData), input);
-                }
-                catch(java.lang.ArrayIndexOutOfBoundsException e)
-                {
-                	throw new InvalidConfigException("Illegal meta data for the block type, cannot use " + input);
-                }
-                catch (IllegalArgumentException e)
-                {
-                	throw new InvalidConfigException("Illegal block data for the block type, cannot use " + input);
-                }
-                */
-            }
-        }
-
-        // Failed, try parsing later as a fallback.
-        return new ForgeMaterialData(input);
+    
+    // TODO: Convert all the old blockname:metadata to new block names.
+    private static Block fromLegacyBlockName(String oldBlockName)
+    {    	
+    	switch(oldBlockName)
+    	{
+    		case "stationary_water":
+    			return Blocks.WATER;
+    		case "stationary_lava":
+    			return Blocks.LAVA;
+    		case "stained_clay":
+    			return Blocks.WHITE_TERRACOTTA;    			
+    		case "hard_clay":
+    			return Blocks.TERRACOTTA;
+    		case "step":
+    			return Blocks.STONE_STAIRS;
+    		case "sugar_cane_block":
+    			return Blocks.SUGAR_CANE;
+    		case "melon_block":
+    			return Blocks.MELON;
+    		case "water_lily":
+    			return Blocks.LILY_PAD;
+    		case "mycel":
+    			return Blocks.MYCELIUM;    			
+			default:
+				return null;
+    	}
     }
     
     /**
@@ -344,13 +328,6 @@ public class ForgeMaterialData extends LocalMaterialData
     public int hashCode()
     {
     	// TODO: Implement this for 1.16
-        return this.blockData.hashCode();
-    }
-    
-    @Override
-    public int hashCodeWithoutBlockData()
-    {
-    	// TODO: Implement this for 1.16
-    	return this.blockData.hashCode();
+        return this.blockData == null ? -1 : this.blockData.hashCode();
     }
 }

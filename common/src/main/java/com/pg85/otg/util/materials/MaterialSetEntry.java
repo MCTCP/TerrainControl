@@ -36,13 +36,13 @@ public class MaterialSetEntry
     @Override
     public int hashCode()
     {
-        if (includesBlockData)
-        {
+        //if (includesBlockData)
+        //{
             return material.hashCode();
-        } else
-        {
-            return material.hashCodeWithoutBlockData();
-        }
+        //} else
+        //{
+            //return material.hashCodeWithoutBlockData();
+        //}
     }
 
     public void parseForWorld(LocalWorld world)

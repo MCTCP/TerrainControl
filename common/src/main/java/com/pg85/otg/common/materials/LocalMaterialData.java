@@ -2,7 +2,7 @@ package com.pg85.otg.common.materials;
 
 import com.pg85.otg.OTGEngine;
 import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.configuration.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfig;
 
 // TODO: Make this class unmodifiable (parseForWorld modifies atm),
 // implement a world-specific materials cache and ensure only one
@@ -97,15 +97,6 @@ public abstract class LocalMaterialData
      * @return The unique hashCode.
      */
     public abstract int hashCode();
-
-    /**
-     * Gets the hashCode of the material, based on only the block id. No
-     * hashCode returned by this method may be the same as any hashCode returned
-     * by {@link #hashCode()}.
-     * 
-     * @return The unique hashCode.
-     */
-    public abstract int hashCodeWithoutBlockData();
     
     public String toString()
     {
