@@ -276,7 +276,7 @@ public class StandardBiomeTemplate
         // Melons (need to be spawned before trees)
         if (this.defaultSwampPatches > 0)
         {
-        	resources.add(Resource.createResource(config, SurfacePatchGen.class, LocalMaterials.STATIONARY_WATER, LocalMaterials.WATER_LILY,
+        	resources.add(Resource.createResource(config, SurfacePatchGen.class, LocalMaterials.WATER, LocalMaterials.WATER_LILY,
                 62, 62, MaterialSet.SOLID_MATERIALS));
         }
 

@@ -86,10 +86,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
             // Do not spawn if non-tree blocks are in the way
             if (
         		!material.isAir() && 
-        		!material.isMaterial(LocalMaterials.LOG) && 
-        		!material.isMaterial(LocalMaterials.LOG_2) && 
-        		!material.isMaterial(LocalMaterials.LEAVES) && 
-				!material.isMaterial(LocalMaterials.LEAVES_2)
+        		!material.isLogOrLeaves()
     		)
             {
                 return false;
@@ -166,20 +163,14 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
         }
         if (!spawnWater)
         {
-            if (
-        		checkBlock.isMaterial(LocalMaterials.WATER) || 
-        		checkBlock.isMaterial(LocalMaterials.STATIONARY_WATER)
-			)
+            if (checkBlock.isMaterial(LocalMaterials.WATER))
             {
                 return false;
             }
         }
         if (!spawnLava)
         {
-            if (
-        		checkBlock.isMaterial(LocalMaterials.LAVA) || 
-        		checkBlock.isMaterial(LocalMaterials.STATIONARY_LAVA)
-    		)
+            if (checkBlock.isMaterial(LocalMaterials.LAVA))
             {
                 return false;
             }
