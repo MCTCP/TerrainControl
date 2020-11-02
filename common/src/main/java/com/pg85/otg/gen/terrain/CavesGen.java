@@ -186,8 +186,7 @@ public class CavesGen extends TerrainGenBase
                         {
                             material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
                             if (
-                        		material.isMaterial(LocalMaterials.WATER) ||
-                        		material.isMaterial(LocalMaterials.STATIONARY_WATER)
+                        		material.isMaterial(LocalMaterials.WATER)
                     		)
                             {
                                 waterFound = true;

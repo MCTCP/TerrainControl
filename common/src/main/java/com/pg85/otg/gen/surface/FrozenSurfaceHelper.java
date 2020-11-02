@@ -86,14 +86,14 @@ public class FrozenSurfaceHelper
             	boolean bFroze = false;
                 // Water & Stationary Water => IceBlock
             	LocalMaterialData iceBlock = biome.getBiomeConfig().getIceBlockReplaced(this.world, y);
-                if(shouldFreeze(x, y, z, materialToFreeze, iceBlock, LocalMaterials.WATER, LocalMaterials.STATIONARY_WATER, chunkBeingPopulated))
+                if(shouldFreeze(x, y, z, materialToFreeze, iceBlock, LocalMaterials.WATER, chunkBeingPopulated))
                 {
                     world.setBlock(x, y, z, iceBlock, null, chunkBeingPopulated, false);
                     bFroze = true;
                 } else {
                     LocalMaterialData cooledLavaBlock = biome.getBiomeConfig().getCooledLavaBlockReplaced(this.world, y);
 	                // Lava & Stationary Lava => CooledLavaBlock
-                	if(shouldFreeze(x, y, z, materialToFreeze, cooledLavaBlock, LocalMaterials.LAVA, LocalMaterials.STATIONARY_LAVA, chunkBeingPopulated))
+                	if(shouldFreeze(x, y, z, materialToFreeze, cooledLavaBlock, LocalMaterials.LAVA, chunkBeingPopulated))
 	                {
 	                    world.setBlock(x, y, z, cooledLavaBlock, null, chunkBeingPopulated, true);
 	                    bFroze = true;
@@ -125,16 +125,9 @@ public class FrozenSurfaceHelper
      * @param check1 The first material to check for
      * @param check2 The second meterial to check for
      */
-    private boolean shouldFreeze(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, LocalMaterialData check1, LocalMaterialData check2, ChunkCoordinate chunkBeingPopulated)
+    private boolean shouldFreeze(int x, int y, int z, LocalMaterialData thawedMaterial, LocalMaterialData frozenMaterial, LocalMaterialData check1, ChunkCoordinate chunkBeingPopulated)
     {
-        return (
-    		(
-				thawedMaterial.isMaterial(check1) || 
-				thawedMaterial.isMaterial(check2)
-			) && 
-    		!frozenMaterial.isMaterial(check1) &&
-    		!frozenMaterial.isMaterial(check2)
-		);
+        return (thawedMaterial.isMaterial(check1) && !frozenMaterial.isMaterial(check1));
     }
 
     /**
@@ -204,7 +197,7 @@ public class FrozenSurfaceHelper
     private boolean setSnowFallAtLocation(int x, int y, int z, int baseSnowHeight, LocalMaterialData materialToSnowOn, ChunkCoordinate chunkBeingPopulated)
     {
         LocalMaterialData snowMass;
-        if (materialToSnowOn.isMaterial(LocalMaterials.LEAVES) || materialToSnowOn.isMaterial(LocalMaterials.LEAVES_2))
+        if (materialToSnowOn.isLeaves())
         {
             // Snow Layer(s) for trees, let each leaf carry maxLayersOnLeaves or less layers of snow,
         	// any remaining layers will fall through.

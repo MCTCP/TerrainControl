@@ -170,8 +170,7 @@ public class RavinesGen extends TerrainGenBase
                         {
                             materialAtPosition = generatingChunkBuffer.getBlock(localX, localY, localZ);
                             if (
-                        		materialAtPosition.isMaterial(LocalMaterials.WATER) || 
-                        		materialAtPosition.isMaterial(LocalMaterials.STATIONARY_WATER)
+                        		materialAtPosition.isMaterial(LocalMaterials.WATER)
                     		)
                             {
                                 i4 = 1;
@@ -229,9 +228,7 @@ public class RavinesGen extends TerrainGenBase
                             		(
 	                                	!block.isMaterial(LocalMaterials.BEDROCK) && // TODO: get replaced bedrock block? (could cause other problems, if common blocks are used as bedrock)
 										!block.isMaterial(LocalMaterials.WATER) &&
-										!block.isMaterial(LocalMaterials.STATIONARY_WATER) &&
 										!block.isMaterial(LocalMaterials.LAVA) &&
-										!block.isMaterial(LocalMaterials.STATIONARY_LAVA) &&
 										!block.isMaterial(LocalMaterials.MAGMA) &&
 										!block.isAir()
                     				)

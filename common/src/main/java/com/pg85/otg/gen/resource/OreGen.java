@@ -96,7 +96,7 @@ public class OreGen extends Resource
     	
         parseMaterials(world, this.material, this.sourceBlocks);
         
-        if(world.getConfigs().getWorldConfig().disableOreGen)
+        if(world.getWorldConfig().disableOreGen)
         {
         	if(this.material.isOre())
         	{

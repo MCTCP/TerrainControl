@@ -2,7 +2,6 @@ package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -151,8 +150,7 @@ public class GrassGen extends Resource
 					(worldMaterial = world.getMaterial(centerX, centerY, centerZ, chunkBeingPopulated)) != null &&
 					(
 						worldMaterial.isAir() || 
-						worldMaterial.isMaterial(LocalMaterials.LEAVES) || 
-						worldMaterial.isMaterial(LocalMaterials.LEAVES_2)
+						worldMaterial.isLeaves()
 					) &&
     				(worldMaterial = world.getMaterial(centerX, centerY - 1, centerZ, chunkBeingPopulated)) != null
 				) && (
@@ -218,8 +216,7 @@ public class GrassGen extends Resource
     				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
     				(
 	    				worldMaterial.isAir() || 
-						worldMaterial.isMaterial(LocalMaterials.LEAVES) || 
-						worldMaterial.isMaterial(LocalMaterials.LEAVES_2)
+						worldMaterial.isLeaves()
 					) &&
     				(worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null
 				) && 

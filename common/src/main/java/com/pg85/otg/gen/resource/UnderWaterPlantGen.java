@@ -104,7 +104,7 @@ public class UnderWaterPlantGen extends Resource
             worldMaterial = world.getMaterial(j, k , m, chunkBeingPopulated);
             worldMaterialBelow = world.getMaterial(j, k - 1, m, chunkBeingPopulated);
             if (
-        		(worldMaterial == null || !worldMaterial.isMaterial(LocalMaterials.STATIONARY_WATER)) ||
+        		(worldMaterial == null || !worldMaterial.isMaterial(LocalMaterials.WATER)) ||
         		(worldMaterialBelow == null || !sourceBlocks.contains(worldMaterialBelow))
     		)
             {
