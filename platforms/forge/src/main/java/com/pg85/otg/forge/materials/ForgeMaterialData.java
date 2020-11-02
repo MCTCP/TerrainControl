@@ -100,9 +100,8 @@ public class ForgeMaterialData extends LocalMaterialData
     	{
     		// This returns AIR if block is not found ><.
     		block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockNameCorrected));
-    	} catch(net.minecraft.util.ResourceLocationException ex) {
-    		//String breakpoint = "";
-    	}
+    	} catch(net.minecraft.util.ResourceLocationException ex) { }
+    	
     	if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
     	{
     		return ofMinecraftBlock(block, input);
@@ -122,7 +121,7 @@ public class ForgeMaterialData extends LocalMaterialData
     // TODO: Convert all the old blockname:metadata to new block names.
     private static Block fromLegacyBlockName(String oldBlockName)
     {    	
-    	switch(oldBlockName)
+    	switch(oldBlockName.replace("minecraft:", ""))
     	{
     		case "stationary_water":
     			return Blocks.WATER;
@@ -141,7 +140,24 @@ public class ForgeMaterialData extends LocalMaterialData
     		case "water_lily":
     			return Blocks.LILY_PAD;
     		case "mycel":
-    			return Blocks.MYCELIUM;    			
+    			return Blocks.MYCELIUM;
+    		case "snow_layer":
+    			return Blocks.SNOW;
+
+    		case "mcpitman":
+    			return Blocks.CREEPER_HEAD;
+    		case "pg85":
+    			return Blocks.ZOMBIE_HEAD;
+    		case "supercoder":
+    			return Blocks.CAKE;
+    		case "authvin":
+				return Blocks.WET_SPONGE;
+    		case "josh":
+				return Blocks.BARREL;				
+    		case "wahrheit":
+				return Blocks.SEA_PICKLE;
+    		case "lordsmellypants":
+				return Blocks.FLOWER_POT;				
 			default:
 				return null;
     	}

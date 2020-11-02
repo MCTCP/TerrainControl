@@ -71,6 +71,38 @@ public abstract class LocalMaterialData
 
     public abstract boolean isMaterial(LocalMaterialData material);
     
+    public boolean isLogOrLeaves()
+    {
+		return isLog() || isLeaves();
+    }
+    
+    public boolean isLog()
+    {
+		return
+			isMaterial(LocalMaterials.ACACIA_LOG) ||
+			isMaterial(LocalMaterials.BIRCH_LOG) ||
+			isMaterial(LocalMaterials.DARK_OAK_LOG) ||
+			isMaterial(LocalMaterials.OAK_LOG) ||
+			isMaterial(LocalMaterials.SPRUCE_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_ACACIA_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_BIRCH_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_DARK_OAK_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_JUNGLE_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_OAK_LOG) ||
+			isMaterial(LocalMaterials.STRIPPED_SPRUCE_LOG);
+	}
+    
+    public boolean isLeaves()
+    {
+		return
+			isMaterial(LocalMaterials.ACACIA_LEAVES) ||
+			isMaterial(LocalMaterials.BIRCH_LEAVES) ||
+			isMaterial(LocalMaterials.DARK_OAK_LEAVES) ||
+			isMaterial(LocalMaterials.JUNGLE_LEAVES) ||
+			isMaterial(LocalMaterials.OAK_LEAVES) ||
+			isMaterial(LocalMaterials.SPRUCE_LEAVES);
+    }
+    
     /**
      * Gets an instance with the same material as this object, but the default
      * block data of the material. This instance is not modified.
@@ -203,8 +235,7 @@ public abstract class LocalMaterialData
 				) && (
 					allowWood || 
 					!(
-						isMaterial(LocalMaterials.LOG) || 
-						isMaterial(LocalMaterials.LOG_2)
+						isLog()
 					)
 				) &&
 				!isMaterial(LocalMaterials.WATER_LILY)
