@@ -1,7 +1,9 @@
 package com.pg85.otg.forge.presets;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.pg85.otg.common.presets.LocalPresetLoader;
@@ -11,6 +13,7 @@ import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.gen.BiomeGenData;
 
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
@@ -28,11 +31,27 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
+	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<ResourceLocation, BiomeConfig>();
+	// TODO: Store per preset
+	private ArrayList<RegistryKey<Biome>> biomes = new ArrayList<RegistryKey<Biome>>();
+	
 	public ForgePresetLoader(Path otgRootFolder)
 	{
 		super(otgRootFolder);
 	}
-		
+
+	@Override
+	public BiomeConfig getBiomeConfig(String resourceLocationString)
+	{
+		return this.biomeConfigsByRegistryKey.get(new ResourceLocation(resourceLocationString));
+	}
+	
+	// TODO: Hardcoded to use 1 preset atm (all biomes), make this work per preset
+	public List<RegistryKey<Biome>> getBiomeRegistryKeys(String presetName)
+	{
+		return this.biomes;
+	}
+	
 	@Override
 	public void registerBiomes()
 	{
@@ -42,9 +61,15 @@ public class ForgePresetLoader extends LocalPresetLoader
 			{
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
 				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
-				// TODO: Get RegistryKey<Biome> and store it for reuse?
- 				ForgeRegistries.BIOMES.register(createOTGBiome(biomeConfig));
+				
+				Biome biome = createOTGBiome(biomeConfig);
+ 				ForgeRegistries.BIOMES.register(biome);
  				
+ 				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
+ 				ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString());
+ 				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
+ 				this.biomes.add(RegistryKey.func_240903_a_(Registry.field_239720_u_, resourceLocation));
+
  				// TODO: this is hardcoded for now until layer generation is fixed.
 				BiomeGenData data = new BiomeGenData();
 				data.biomeHeight = biomeConfig.biomeHeight;
@@ -55,7 +80,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				data.volatility2 = biomeConfig.volatility2;
 				data.smoothRadius = biomeConfig.smoothRadius;
 				data.color = biomeConfig.biomeColor;
- 				
+
  				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.ocean"))
  				{
  					BiomeGenData.LOOKUP[0] = data;
@@ -78,7 +103,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 	
 	private static Biome createOTGBiome(BiomeConfig biomeConfig)
-	{
+	{		
 		BiomeGenerationSettings.Builder biomegenerationsettings$builder = new BiomeGenerationSettings.Builder();
 		
 		// Mob spawning
@@ -89,13 +114,15 @@ public class ForgePresetLoader extends LocalPresetLoader
 		// Each biomeconfig has its own surfacebuilder, so use biome registry key as name.
 		
 		// Surface builder
+		// TODO: Register surfacebuilder properly, create a surfacebuilder that
+		// looks like 1.12.2 (same ground layer depth etc).
 		SurfaceBuilder<SurfaceBuilderConfig> surfaceBuilder = Registry.register(
 			Registry.SURFACE_BUILDER, 
 			"surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath(), 
 			new DefaultSurfaceBuilder(SurfaceBuilderConfig.field_237203_a_)
 		);
 		
-		// Default grassy surface config, grass/gravel/dirt.
+		// Taken from default grassy surface config, grass/gravel/dirt.
 		ConfiguredSurfaceBuilder<SurfaceBuilderConfig> configuredSurfaceBuilder = WorldGenRegistries.func_243663_a(
 			WorldGenRegistries.field_243651_c,
 			"surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath(),

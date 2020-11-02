@@ -351,4 +351,6 @@ public abstract class LocalPresetLoader
     }
 
 	public abstract void registerBiomes();
+
+	public abstract BiomeConfig getBiomeConfig(String resourceLocationString);
 }

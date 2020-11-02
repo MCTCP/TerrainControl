@@ -234,37 +234,9 @@ public class CustomStructureCache
     	OTG.log(LogMarker.INFO, "Saving structure and pregenerator data.");
     	boolean firstLog = false;
     	long starTime = System.currentTimeMillis();
-		while(true)
-		{
-			// TODO: Make this prettier
-			synchronized(this.world.getObjectSpawner().lockingObject)
-			{
-				if(!this.world.getObjectSpawner().populating)
-				{
-					this.world.getObjectSpawner().saving = true;
-					break;
-				}
-			}
-			if(firstLog)
-			{
-				OTG.log(LogMarker.WARN, "SaveToDisk waiting on Populate. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
-				firstLog = false;
-			}
-			int interval = 300;
-			if(System.currentTimeMillis() - starTime > (interval * 1000))
-			{
-				OTG.log(LogMarker.FATAL, "SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
-				throw new RuntimeException("SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
-			}
-		}
 
 		saveStructureCache();
 
-		synchronized(this.world.getObjectSpawner().lockingObject)
-		{
-			this.world.getObjectSpawner().saveRequired = false;
-			this.world.getObjectSpawner().saving = false;
-		}
 		OTG.log(LogMarker.INFO, "Structure and pregenerator data saved.");
     }
 

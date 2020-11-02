@@ -2,12 +2,13 @@ package com.pg85.otg.common;
 
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.customobjects.SpawnableObject;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.gen.ChunkBuffer;
-import com.pg85.otg.gen.ObjectSpawner;
+import com.pg85.otg.gen.ChunkPopulator;
 import com.pg85.otg.gen.biome.BiomeGenerator;
 import com.pg85.otg.network.ConfigProvider;
 import com.pg85.otg.util.BiomeIds;
@@ -20,6 +21,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Random;
 
+// TODO: Clean up LocalWorld, remove anything no longer necessary. Either rename or split up into LocalWorldRegion/LocalWorld.
 public interface LocalWorld
 {
     public String getName();
@@ -33,8 +35,9 @@ public interface LocalWorld
 	public Path getWorldSaveDir();
 
     public ConfigProvider getConfigs();
+    public WorldConfig getWorldConfig();
     
-	public ObjectSpawner getObjectSpawner();
+	public ChunkPopulator getChunkPopulator();
 	
     public CustomStructureCache getStructureCache();
     	
@@ -121,6 +124,7 @@ public interface LocalWorld
      * @see #getSavedBiome(int, int) to always use the chunk data.
      */
     public LocalBiome getBiome(int x, int z) throws BiomeNotFoundException;
+    public BiomeConfig getBiomeConfig(int x, int z) throws BiomeNotFoundException;
 
 	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord);
 	public void invalidatePopulationBiomeCache();	

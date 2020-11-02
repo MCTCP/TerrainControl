@@ -10,16 +10,24 @@ import javax.annotation.Nullable;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.pg85.otg.OTG;
+import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.preset.Preset;
+import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
+import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.ChunkBuffer;
 import com.pg85.otg.gen.NewOTGChunkGenerator;
+import com.pg85.otg.gen.ChunkPopulator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.util.ChunkCoordinate;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.SharedSeedRandom;
@@ -105,6 +113,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final int field_236085_x_;
 
 	private final NewOTGChunkGenerator internalGenerator;
+	private final ChunkPopulator chunkDecorator;
 
 	public OTGNoiseChunkGenerator(BiomeProvider p_i241975_1_, long p_i241975_2_, Supplier<DimensionSettings> p_i241975_4_)
 	{
@@ -121,6 +130,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 
 		this.internalGenerator = new NewOTGChunkGenerator(seed, (LayerSource) biomeProvider, ForgeMaterialData.ofMinecraftBlockState(Blocks.STONE.getDefaultState()), ForgeMaterialData.ofMinecraftBlockState(Blocks.WATER.getDefaultState()));
+		this.chunkDecorator = new ChunkPopulator();
 
 		this.field_236084_w_ = seed;
 		DimensionSettings dimensionsettings = p_i241976_5_.get();
@@ -546,6 +556,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return super.func_230353_a_(p_230353_1_, p_230353_2_, p_230353_3_, p_230353_4_);
 	}
 
+	// Mob spawning on initial chunk spawn (animals).
 	public void func_230354_a_(WorldGenRegion p_230354_1_)
 	{
 		if (!this.field_236080_h_.get().func_236120_h_())
@@ -557,5 +568,40 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			sharedseedrandom.setDecorationSeed(p_230354_1_.getSeed(), i << 4, j << 4);
 			WorldEntitySpawner.performWorldGenSpawning(p_230354_1_, biome, i, j, sharedseedrandom);
 		}
+	}
+	
+	// Populate/decorate chunk
+	@Override
+	public void func_230351_a_(WorldGenRegion p_230351_1_, StructureManager p_230351_2_)
+	{
+		int i = p_230351_1_.getMainChunkX();
+		int j = p_230351_1_.getMainChunkZ();
+		int k = i * 16;
+		int l = j * 16;
+		BlockPos blockpos = new BlockPos(k, 0, l);
+		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
+		long i1 = sharedseedrandom.setDecorationSeed(p_230351_1_.getSeed(), k, l);
+		
+		// Fetch the biomeConfig by registryKey
+		RegistryKey<Biome> key = ((OTGBiomeProvider)this.biomeProvider).getBiomeRegistryKey((i << 2) + 2, 2, (j << 2) + 2);
+		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());
+		
+		try
+		{
+			// Override normal population (Biome.func_242427_a()) with OTG's.
+			func_242427_a(biomeConfig, p_230351_2_, this, p_230351_1_, i1, sharedseedrandom, blockpos);
+		} catch (Exception exception) {
+			CrashReport crashreport = CrashReport.makeCrashReport(exception, "Biome decoration");
+			crashreport.makeCategory("Generation").addDetail("CenterX", i).addDetail("CenterZ", j).addDetail("Seed", i1);
+			throw new ReportedException(crashreport);
+		}
+	}
+	
+	// Population method taken from Biome (Biome.func_242427_a())
+	public void func_242427_a(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
+	{		
+		// TODO: Hardcoded preset name, world creation gui / config.yaml should have preset name.
+		Preset preset = OTG.getEngine().getPresetLoader().getPresetByName("Default");
+		this.chunkDecorator.populate(ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ()), new ForgeWorldGenRegion(p_242427_3_, preset.getWorldConfig(), this), biomeConfig);	
 	}
 }
