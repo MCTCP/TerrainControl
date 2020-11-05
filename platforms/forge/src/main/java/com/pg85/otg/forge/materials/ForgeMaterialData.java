@@ -52,7 +52,7 @@ public class ForgeMaterialData extends LocalMaterialData
 
     public static ForgeMaterialData ofString(String input) throws InvalidConfigException
     {
-    	if(input == null)
+    	if(input == null || input.trim().isEmpty())
     	{
     		return null;
     	}
@@ -68,6 +68,17 @@ public class ForgeMaterialData extends LocalMaterialData
     		return ForgeMaterialData.getBlank();
     	}
     	
+    	String blockNameCorrected = input.trim().toLowerCase();
+    	// Try parsing as legacy block id and get proper name.
+    	if(!blockNameCorrected.contains(":"))
+    	{
+	    	try
+	    	{
+	    		int blockId = Integer.parseInt(blockNameCorrected);
+	    		blockNameCorrected = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
+	    	} catch(NumberFormatException ex) { }
+    	}
+    	
     	// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
     	Block block = null;
     	
@@ -75,94 +86,55 @@ public class ForgeMaterialData extends LocalMaterialData
 		BlockStateArgument blockStateArgument = new BlockStateArgument();
 		BlockStateInput parseResult = null;
 		try {
-			String newInput = input.contains(":") ? input : "minecraft:" + input;
+			String newInput = blockNameCorrected.contains(":") ? blockNameCorrected : "minecraft:" + blockNameCorrected;
 			parseResult = blockStateArgument.parse(new StringReader(newInput));
-		} catch (CommandSyntaxException e) { }
-		
+		} catch (CommandSyntaxException e) { }		
 		if(parseResult != null)
 		{
 			return new ForgeMaterialData(parseResult.getState(), input);
 		}
 		
-    	String blockNameCorrected = input.trim().toLowerCase();
-    	// Remove any old metadata, fe STONE:0 or STONE:1 -> STONE
-    	// TODO: this only works for single-digit metadata ><
-    	try
-    	{
-    		Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.length() - 1));
-    		if(blockNameCorrected.substring(blockNameCorrected.length() - 2, blockNameCorrected.length() - 1).equals(":"))
-    		{
-    			blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.length() - 2);
-    		}
-    	} catch(NumberFormatException ex) { }
-		
+    	// Try legacy block with data (fe SAND:1 or 12:1)
+		if(blockNameCorrected.contains(":"))
+		{
+    		// Try parsing data argument as int.
+	    	try
+	    	{
+	    		String blockNameOrId = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));
+	    		int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
+	    		BlockState blockState = LegacyMaterials.fromLegacyBlockNameOrIdWithData(blockNameOrId, data);
+				if(blockState != null)
+				{
+					return ofMinecraftBlockState(blockState, input); 
+				}
+				
+				// Remove any old metadata, fe STONE:0 or STONE:1 -> STONE	    	
+				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));				
+	    	} catch(NumberFormatException ex) { }	    	
+    	}
+
     	try
     	{
     		// This returns AIR if block is not found ><.
     		block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockNameCorrected));
+        	if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
+        	{
+        		return ofMinecraftBlock(block, input);
+        	}
     	} catch(net.minecraft.util.ResourceLocationException ex) { }
-    	
-    	if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
-    	{
-    		return ofMinecraftBlock(block, input);
-    	}
-    	
-    	block = fromLegacyBlockName(blockNameCorrected);
+
+    	// Try OTG legacy block names
+    	block = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
     	if(block != null)
     	{
     		return ofMinecraftBlock(block, input);
     	}
-
+    	
 		OTG.log(LogMarker.INFO, "Could not parse block: " + input + ", substituting AIR.");
 
 		return ofMinecraftBlock(Blocks.AIR, input);
     }
-    
-    // TODO: Convert all the old blockname:metadata to new block names.
-    private static Block fromLegacyBlockName(String oldBlockName)
-    {    	
-    	switch(oldBlockName.replace("minecraft:", ""))
-    	{
-    		case "stationary_water":
-    			return Blocks.WATER;
-    		case "stationary_lava":
-    			return Blocks.LAVA;
-    		case "stained_clay":
-    			return Blocks.WHITE_TERRACOTTA;    			
-    		case "hard_clay":
-    			return Blocks.TERRACOTTA;
-    		case "step":
-    			return Blocks.STONE_STAIRS;
-    		case "sugar_cane_block":
-    			return Blocks.SUGAR_CANE;
-    		case "melon_block":
-    			return Blocks.MELON;
-    		case "water_lily":
-    			return Blocks.LILY_PAD;
-    		case "mycel":
-    			return Blocks.MYCELIUM;
-    		case "snow_layer":
-    			return Blocks.SNOW;
-
-    		case "mcpitman":
-    			return Blocks.CREEPER_HEAD;
-    		case "pg85":
-    			return Blocks.ZOMBIE_HEAD;
-    		case "supercoder":
-    			return Blocks.CAKE;
-    		case "authvin":
-				return Blocks.WET_SPONGE;
-    		case "josh":
-				return Blocks.BARREL;				
-    		case "wahrheit":
-				return Blocks.SEA_PICKLE;
-    		case "lordsmellypants":
-				return Blocks.FLOWER_POT;				
-			default:
-				return null;
-    	}
-    }
-    
+        
     /**
      * Gets a {@code BukkitMaterialData} of the given Minecraft block. The
      * default block data (usually 0) will be used.

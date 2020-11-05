@@ -113,7 +113,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final int field_236085_x_;
 
 	private final NewOTGChunkGenerator internalGenerator;
-	private final ChunkPopulator chunkDecorator;
+	private final ChunkPopulator chunkPopulator;
 
 	public OTGNoiseChunkGenerator(BiomeProvider p_i241975_1_, long p_i241975_2_, Supplier<DimensionSettings> p_i241975_4_)
 	{
@@ -130,7 +130,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 
 		this.internalGenerator = new NewOTGChunkGenerator(seed, (LayerSource) biomeProvider, ForgeMaterialData.ofMinecraftBlockState(Blocks.STONE.getDefaultState()), ForgeMaterialData.ofMinecraftBlockState(Blocks.WATER.getDefaultState()));
-		this.chunkDecorator = new ChunkPopulator();
+		this.chunkPopulator = new ChunkPopulator();
 
 		this.field_236084_w_ = seed;
 		DimensionSettings dimensionsettings = p_i241976_5_.get();
@@ -602,6 +602,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{		
 		// TODO: Hardcoded preset name, world creation gui / config.yaml should have preset name.
 		Preset preset = OTG.getEngine().getPresetLoader().getPresetByName("Default");
-		this.chunkDecorator.populate(ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ()), new ForgeWorldGenRegion(p_242427_3_, preset.getWorldConfig(), this), biomeConfig);	
+		this.chunkPopulator.populate(ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ()), new ForgeWorldGenRegion(p_242427_3_, preset.getWorldConfig(), this), biomeConfig);	
 	}
 }
