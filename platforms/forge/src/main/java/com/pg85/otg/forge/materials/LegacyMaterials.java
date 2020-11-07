@@ -93,7 +93,7 @@ public class LegacyMaterials
     		case "stationary_lava":
     			return Blocks.LAVA;
     		case "stained_clay":
-    			return Blocks.WHITE_TERRACOTTA;    			
+    			return Blocks.WHITE_TERRACOTTA;
     		case "hard_clay":
     			return Blocks.TERRACOTTA;
     		case "step":
@@ -104,10 +104,55 @@ public class LegacyMaterials
     			return Blocks.MELON;
     		case "water_lily":
     			return Blocks.LILY_PAD;
+    		case "soil":
+    			return Blocks.FARMLAND;
+    		case "long_grass":
+    			return Blocks.TALL_GRASS;
     		case "mycel":
     			return Blocks.MYCELIUM;
     		case "snow_layer":
     			return Blocks.SNOW;
+    		case "leaves":
+    			return Blocks.OAK_LEAVES;
+    		case "red_rose":
+    			return Blocks.ROSE_BUSH;
+    		case "yellow_flower":
+    			return Blocks.DANDELION;
+    		case "web":
+    			return Blocks.COBWEB;
+    		case "log":
+    		case "wood":
+    			return Blocks.OAK_LOG;
+    		case "magma":
+    			return Blocks.MAGMA_BLOCK;
+    		case "tallgrass":
+				return Blocks.GRASS;
+    		case "cobble_wall":
+    			return Blocks.COBBLESTONE_WALL;
+    		case "iron_fence":
+    			return Blocks.IRON_BARS;
+    		case "workbench":
+    			return Blocks.CRAFTING_TABLE;
+    		case "mob_spawner":
+    			return Blocks.INFESTED_STONE;
+    		case "double_step":
+    			return Blocks.SMOOTH_STONE;
+    		case "smooth_brick":
+    			return Blocks.STONE_BRICKS;
+    		case "rails":
+    			return Blocks.RAIL;    			
+    		case "fence":
+    			return Blocks.OAK_FENCE;
+    		case "wood_step":
+    			return Blocks.OAK_SLAB;
+    		case "thin_glass":
+    			return Blocks.GLASS_PANE;
+    		case "stone_plate":
+    			return Blocks.STONE_PRESSURE_PLATE;
+    		case "wood_plate":
+    			return Blocks.OAK_PRESSURE_PLATE;
+    		case "wood_double_step":
+    			return Blocks.OAK_PLANKS; // TODO: Should be double slab
     		case "mcpitman":
     			return Blocks.CREEPER_HEAD;
     		case "pg85":
@@ -119,9 +164,9 @@ public class LegacyMaterials
     		case "josh":
 				return Blocks.BARREL;				
     		case "wahrheit":
-				return Blocks.SEA_PICKLE;
+				return Blocks.LECTERN;
     		case "lordsmellypants":
-				return Blocks.FLOWER_POT;    			
+				return Blocks.FLOWER_POT;
 			default:
 				return null;
     	}
@@ -136,23 +181,23 @@ public class LegacyMaterials
 	    	case 1:
 	    		return "stone";
 	    	case 2:
-	    		return "grass";
+	    		return "grass_block";
 	    	case 3:
 	    		return "dirt";
 	    	case 4:
 	    		return "cobblestone";
 	    	case 5:
-	    		return "planks";
+	    		return "oak_planks";
 	    	case 6:
-	    		return "sapling";
+	    		return "oak_sapling";
 	    	case 7:
 	    		return "bedrock";
 	    	case 8:
-	    		return "flowing_water";
+	    		return "water";
 	    	case 9:
 	    		return "water";
 	    	case 10:
-	    		return "flowing_lava";
+	    		return "lava";
 	    	case 11:
 	    		return "lava";
 	    	case 12:
@@ -166,9 +211,9 @@ public class LegacyMaterials
 	    	case 16:
 	    		return "coal_ore";
 	    	case 17:
-	    		return "log";
+	    		return "oak_log";
 	    	case 18:
-	    		return "leaves";
+	    		return "oak_leaves";
 	    	case 19:
 	    		return "sponge";
 	    	case 20:
@@ -182,33 +227,33 @@ public class LegacyMaterials
 	    	case 24:
 	    		return "sandstone";
 	    	case 25:
-	    		return "noteblock";
+	    		return "note_block";
 	    	case 26:
-	    		return "bed";
+	    		return "white_bed";
 	    	case 27:
-	    		return "golden_rail";
+	    		return "powered_rail";
 	    	case 28:
 	    		return "detector_rail";
 	    	case 29:
 	    		return "sticky_piston";
 	    	case 30:
-	    		return "web";
+	    		return "cobweb";
 	    	case 31:
-	    		return "tallgrass";
+	    		return "tall_grass";
 	    	case 32:
-	    		return "deadbush";
+	    		return "dead_bush";
 	    	case 33:
 	    		return "piston";
 	    	case 34:
 	    		return "piston_head";
 	    	case 35:
-	    		return "wool";
+	    		return "white_wool";
 	    	case 36:
 	    		return "piston_extension";
 	    	case 37:
-	    		return "yellow_flower";
+	    		return "dandelion";
 	    	case 38:
-	    		return "red_flower";
+	    		return "rose_bush";
 	    	case 39:
 	    		return "brown_mushroom";
 	    	case 40:
@@ -218,11 +263,11 @@ public class LegacyMaterials
 	    	case 42:
 	    		return "iron_block";
 	    	case 43:
-	    		return "double_stone_slab";
+	    		return "smooth_stone"; // Double-slab
 	    	case 44:
 	    		return "stone_slab";
 	    	case 45:
-	    		return "brick_block";
+	    		return "bricks";
 	    	case 46:
 	    		return "tnt";
 	    	case 47:
@@ -236,7 +281,7 @@ public class LegacyMaterials
 	    	case 51:
 	    		return "fire";
 	    	case 52:
-	    		return "mob_spawner";
+	    		return "spawner";
 	    	case 53:
 	    		return "oak_stairs";
 	    	case 54:
@@ -256,11 +301,11 @@ public class LegacyMaterials
 	    	case 61:
 	    		return "furnace";
 	    	case 62:
-	    		return "lit_furnace";
+	    		return "furnace"; // TODO: Should be lit
 	    	case 63:
-	    		return "standing_sign";
+	    		return "oak_sign";
 	    	case 64:
-	    		return "wooden_door";
+	    		return "oak_door";
 	    	case 65:
 	    		return "ladder";
 	    	case 66:
@@ -268,7 +313,7 @@ public class LegacyMaterials
 	    	case 67:
 	    		return "stone_stairs";
 	    	case 68:
-	    		return "wall_sign";
+	    		return "oak_wall_sign";
 	    	case 69:
 	    		return "lever";
 	    	case 70:
@@ -276,33 +321,33 @@ public class LegacyMaterials
 	    	case 71:
 	    		return "iron_door";
 	    	case 72:
-	    		return "wooden_pressure_plate";
+	    		return "oak_pressure_plate";
 	    	case 73:
 	    		return "redstone_ore";
 	    	case 74:
-	    		return "lit_redstone_ore";
+	    		return "redstone_ore"; // TODO: Should be lit
 	    	case 75:
-	    		return "unlit_redstone_torch";
+	    		return "redstone_torch"; // TODO: Should be unlit
 	    	case 76:
-	    		return "redstone_torch";
+	    		return "redstone_torch"; // TODO: Should be lit
 	    	case 77:
 	    		return "stone_button";
 	    	case 78:
-	    		return "snow_layer";
+	    		return "snow";
 	    	case 79:
 	    		return "ice";
 	    	case 80:
-	    		return "snow";
+	    		return "snow_block";
 	    	case 81:
 	    		return "cactus";
 	    	case 82:
 	    		return "clay";
 	    	case 83:
-	    		return "reeds";
+	    		return "sugar_cane";
 	    	case 84:
 	    		return "jukebox";
 	    	case 85:
-	    		return "fence";
+	    		return "oak_fence";
 	    	case 86:
 	    		return "pumpkin";
 	    	case 87:
@@ -312,9 +357,9 @@ public class LegacyMaterials
 	    	case 89:
 	    		return "glowstone";
 	    	case 90:
-	    		return "portal";
+	    		return "nether_portal";
 	    	case 91:
-	    		return "lit_pumpkin";
+	    		return "jack_o_lantern";
 	    	case 92:
 	    		return "cake";
 	    	case 93:
@@ -322,13 +367,13 @@ public class LegacyMaterials
 	    	case 94:
 	    		return "powered_repeater";
 	    	case 95:
-	    		return "stained_glass";
+	    		return "white_stained_glass";
 	    	case 96:
-	    		return "trapdoor";
+	    		return "oak_trapdoor";
 	    	case 97:
-	    		return "monster_egg";
+	    		return "infested_stone";
 	    	case 98:
-	    		return "stonebrick";
+	    		return "stone_bricks";
 	    	case 99:
 	    		return "brown_mushroom_block";
 	    	case 100:
@@ -338,7 +383,7 @@ public class LegacyMaterials
 	    	case 102:
 	    		return "glass_pane";
 	    	case 103:
-	    		return "melon_block";
+	    		return "melon";
 	    	case 104:
 	    		return "pumpkin_stem";
 	    	case 105:
@@ -346,7 +391,7 @@ public class LegacyMaterials
 	    	case 106:
 	    		return "vine";
 	    	case 107:
-	    		return "fence_gate";
+	    		return "oak_fence_gate";
 	    	case 108:
 	    		return "brick_stairs";
 	    	case 109:
@@ -354,9 +399,9 @@ public class LegacyMaterials
 	    	case 110:
 	    		return "mycelium";
 	    	case 111:
-	    		return "waterlily";
+	    		return "lily_pad";
 	    	case 112:
-	    		return "nether_brick";
+	    		return "nether_bricks";
 	    	case 113:
 	    		return "nether_brick_fence";
 	    	case 114:
@@ -380,11 +425,11 @@ public class LegacyMaterials
 	    	case 123:
 	    		return "redstone_lamp";
 	    	case 124:
-	    		return "lit_redstone_lamp";
+	    		return "redstone_lamp"; // TODO: Should be lit
 	    	case 125:
-	    		return "double_wooden_slab";
+	    		return "oak_planks"; // Double-slab
 	    	case 126:
-	    		return "wooden_slab";
+	    		return "oak_slab";
 	    	case 127:
 	    		return "cocoa";
 	    	case 128:
@@ -418,9 +463,9 @@ public class LegacyMaterials
 	    	case 142:
 	    		return "potatoes";
 	    	case 143:
-	    		return "wooden_button";
+	    		return "oak_button";
 	    	case 144:
-	    		return "skull";
+	    		return "skeleton_skull";
 	    	case 145:
 	    		return "anvil";
 	    	case 146:
@@ -430,15 +475,15 @@ public class LegacyMaterials
 	    	case 148:
 	    		return "heavy_weighted_pressure_plate";
 	    	case 149:
-	    		return "unpowered_comparator";
+	    		return "comparator"; // TODO: Should be unpowered 
 	    	case 150:
-	    		return "powered_comparator";
+	    		return "comparator"; // TODO: Should be powered
 	    	case 151:
 	    		return "daylight_detector";
 	    	case 152:
 	    		return "redstone_block";
 	    	case 153:
-	    		return "quartz_ore";
+	    		return "nether_quartz_ore";
 	    	case 154:
 	    		return "hopper";
 	    	case 155:
@@ -450,19 +495,19 @@ public class LegacyMaterials
 	    	case 158:
 	    		return "dropper";
 	    	case 159:
-	    		return "stained_hardened_clay";
+	    		return "white_terracotta";
 	    	case 160:
-	    		return "stained_glass_pane";
+	    		return "white_stained_glass_pane";
 	    	case 161:
-	    		return "leaves2";
+	    		return "acacia_leaves";
 	    	case 162:
-	    		return "log2";
+	    		return "acacia_log";
 	    	case 163:
 	    		return "acacia_stairs";
 	    	case 164:
 	    		return "dark_oak_stairs";
 	    	case 165:
-	    		return "slime";
+	    		return "slime_block";
 	    	case 166:
 	    		return "barrier";
 	    	case 167:
@@ -474,19 +519,19 @@ public class LegacyMaterials
 	    	case 170:
 	    		return "hay_block";
 	    	case 171:
-	    		return "carpet";
+	    		return "white_carpet";
 	    	case 172:
-	    		return "hardened_clay";
+	    		return "white_terracotta";
 	    	case 173:
 	    		return "coal_block";
 	    	case 174:
 	    		return "packed_ice";
 	    	case 175:
-	    		return "double_plant";
+	    		return "sunflower";
 	    	case 176:
 	    		return "standing_banner";
 	    	case 177:
-	    		return "wall_banner";
+	    		return "white_wall_banner";
 	    	case 178:
 	    		return "daylight_detector_inverted";
 	    	case 179:
@@ -494,9 +539,9 @@ public class LegacyMaterials
 	    	case 180:
 	    		return "red_sandstone_stairs";
 	    	case 181:
-	    		return "double_stone_slab2";
+	    		return "red_sandstone"; // Double-slab
 	    	case 182:
-	    		return "stone_slab2";
+	    		return "red_sandstone_slab";
 	    	case 183:
 	    		return "spruce_fence_gate";
 	    	case 184:
@@ -544,7 +589,7 @@ public class LegacyMaterials
 	    	case 205:
 	    		return "purpur_slab";
 	    	case 206:
-	    		return "end_bricks";
+	    		return "end_stone_bricks";
 	    	case 207:
 	    		return "beetroots";
 	    	case 208:
@@ -558,11 +603,11 @@ public class LegacyMaterials
 	    	case 212:
 	    		return "frosted_ice";
 	    	case 213:
-	    		return "magma";
+	    		return "magma_block";
 	    	case 214:
 	    		return "nether_wart_block";
 	    	case 215:
-	    		return "red_nether_brick";
+	    		return "red_nether_bricks";
 	    	case 216:
 	    		return "bone_block";
 	    	case 217:
@@ -586,7 +631,7 @@ public class LegacyMaterials
 	    	case 226:
 	    		return "gray_shulker_box";
 	    	case 227:
-	    		return "silver_shulker_box";
+	    		return "light_gray_shulker_box";
 	    	case 228:
 	    		return "cyan_shulker_box";
 	    	case 229:
@@ -618,7 +663,7 @@ public class LegacyMaterials
 	    	case 242:
 	    		return "gray_glazed_terracotta";
 	    	case 243:
-	    		return "silver_glazed_terracotta";
+	    		return "light_gray_glazed_terracotta";
 	    	case 244:
 	    		return "cyan_glazed_terracotta";
 	    	case 245:
@@ -634,11 +679,31 @@ public class LegacyMaterials
 	    	case 250:
 	    		return "black_glazed_terracotta";
 	    	case 251:
-	    		return "concrete";
+	    		return "white_concrete";
 	    	case 252:
-	    		return "concrete_powder";
+	    		return "white_concrete_powder";
 	    	case 255:
 	    		return "structure_block";
+	    	case 342:
+	    		return "chest_minecart";
+	    	case 343:
+	    		return "furnace_minecart";
+	    	case 397:
+	    		return "skeleton_skull";
+	    	case 404:
+	    		return "comparator";
+	    	case 405:
+	    		return "nether_bricks";
+	    	case 427:
+	    		return "spruce_door";
+	    	case 428:
+	    		return "birch_door";
+	    	case 429:
+	    		return "jungle_door";
+	    	case 430:
+	    		return "acacia_door";
+	    	case 431:
+	    		return "dark_oak_door";
 	    	default:
 	    		return null;
     	}
@@ -659,12 +724,13 @@ public class LegacyMaterials
         	{
         		return null;
         	}
-    	} catch(NumberFormatException ex) { }    	
+    	} catch(NumberFormatException ex) { }
     	
     	switch(blockName)
     	{
 			// Legacy blocks with block data that are now their own block
     		case "banner":
+    		case "white_banner":
     			switch(data)
     			{
     				case 0:
@@ -703,6 +769,7 @@ public class LegacyMaterials
     			}		
 			// TODO: How does facing for bed blocks in bo's work for 1.12.2, can only specify color via data?
     		case "bed":
+    		case "white_bed":
     			switch(data)
     			{
     				case 0:
@@ -740,6 +807,7 @@ public class LegacyMaterials
     					return Blocks.BLACK_BED.getDefaultState();
     			}
     		case "carpet":
+    		case "white_carpet":
     			switch(data)
     			{
     				case 0:
@@ -776,7 +844,8 @@ public class LegacyMaterials
     				case 15:
     					return Blocks.BLACK_CARPET.getDefaultState();
     			}
-    		case "cobblestone_wall":    		
+    		case "cobblestone_wall":
+    		case "cobble_wall":
     			switch(data)
     			{
     				case 0:
@@ -786,6 +855,7 @@ public class LegacyMaterials
     					return Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState();
     			}
     		case "concrete":
+    		case "white_concrete":
     			switch(data)
     			{
     				case 0:
@@ -823,6 +893,7 @@ public class LegacyMaterials
     					return Blocks.BLACK_CONCRETE.getDefaultState();
     			}
     		case "concrete_powder":
+    		case "white_concrete_powder":
     			switch(data)
     			{
     				case 0:
@@ -872,6 +943,9 @@ public class LegacyMaterials
     			}
 			// TODO: This only spawns the bottom half?
     		case "double_plant":
+    		case "sunflower":
+    		case "rose_bush":
+    		case "tall_grass":
     			switch(data)
     			{
     				case 0:
@@ -889,6 +963,7 @@ public class LegacyMaterials
     					return Blocks.PEONY.getDefaultState();
     			}
     		case "double_stone_slab":
+    		case "smooth_stone":
     			switch(data)
     			{
 					case 0:
@@ -910,6 +985,7 @@ public class LegacyMaterials
     			}
     		// TODO: Did this even exist for 1.12.2?
     		case "double_wooden_slab":
+    		case "wood_double_step":
     			switch(data)
     			{
 					case 0:
@@ -927,6 +1003,7 @@ public class LegacyMaterials
 						return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
     			}
     		case "leaves":
+    		case "oak_leaves":
     			switch(data)
     			{
     				case 0:
@@ -952,8 +1029,9 @@ public class LegacyMaterials
     					return Blocks.JUNGLE_LEAVES.getDefaultState();
     			}
     		case "leaves2":
+    		case "acacia_leaves":
     			switch(data)
-    			{    					
+    			{
     				case 0:
     				case 4:
     				case 8:
@@ -967,6 +1045,8 @@ public class LegacyMaterials
     					return Blocks.DARK_OAK_LEAVES.getDefaultState();
     			}
     		case "monster_egg":
+    		case "monster_eggs":
+    		case "infested_stone":
     			switch(data)
     			{
     				case 0:
@@ -984,6 +1064,7 @@ public class LegacyMaterials
     					return Blocks.INFESTED_CHISELED_STONE_BRICKS.getDefaultState();
     			}
     		case "planks":
+    		case "oak_planks":
     			switch(data)
     			{
     				case 0:
@@ -1080,6 +1161,7 @@ public class LegacyMaterials
     					return Blocks.SMOOTH_SANDSTONE.getDefaultState();
     			}
     		case "sapling":
+    		case "oak_sapling":
     			switch(data)
     			{
     				case 0:
@@ -1097,6 +1179,7 @@ public class LegacyMaterials
     					return Blocks.DARK_OAK_SAPLING.getDefaultState();
     			}
     		case "skull":
+    		case "skeleton_skull":
     			switch(data)
     			{
     				case 0:
@@ -1123,6 +1206,7 @@ public class LegacyMaterials
     					return Blocks.WET_SPONGE.getDefaultState();
     			}    		
     		case "stained_glass":
+    		case "white_stained_glass":
     			switch(data)
     			{
     				case 0:
@@ -1160,11 +1244,13 @@ public class LegacyMaterials
     					return Blocks.BLACK_STAINED_GLASS.getDefaultState();
     			}
     		case "stained_glass_pane":
+    		case "white_stained_glass_pane":
+    		case "thing_glass":
     			switch(data)
     			{
     				case 0:
     				default:
-    					return Blocks.BLACK_STAINED_GLASS_PANE.getDefaultState();
+    					return Blocks.WHITE_STAINED_GLASS_PANE.getDefaultState();
     				case 1:
     					return Blocks.ORANGE_STAINED_GLASS_PANE.getDefaultState();
     				case 2:
@@ -1199,6 +1285,7 @@ public class LegacyMaterials
     		case "stained_hardened_clay":
     		case "stained_clay":
     		case "hard_clay":
+    		case "white_terracotta":
     			switch(data)
     			{
     				case 0:
@@ -1291,6 +1378,8 @@ public class LegacyMaterials
     					return Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
     			}
     		case "stonebrick":
+    		case "stone_bricks":
+    		case "smooth_brick":
     			switch(data)
     			{
     				case 0:
@@ -1304,15 +1393,18 @@ public class LegacyMaterials
     					return Blocks.CHISELED_STONE_BRICKS.getDefaultState();
     			}
     		case "tallgrass":
+    		case "long_grass":
     			switch(data)
     			{
     				case 0:
-    				default:    					
+    				default:
     					return Blocks.GRASS.getDefaultState();
     				case 1:
     					return Blocks.FERN.getDefaultState();
     			}
     		case "wooden_slab":
+    		case "wood_step":
+    		case "oak_slab":
     			switch(data)
     			{
     				case 0:
@@ -1342,6 +1434,7 @@ public class LegacyMaterials
     					return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);    					
     			}
     		case "wool":
+    		case "white_wool":
     			switch(data)
     			{
     				case 0:
@@ -1383,8 +1476,10 @@ public class LegacyMaterials
     		case "cake":
     			return Blocks.CAKE.getDefaultState().with(CakeBlock.BITES, data); 
     		case "stone_pressure_plate":
+    		case "stone_plate":
     			return Blocks.STONE_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
     		case "wooden_pressure_plate":
+    		case "wood_plate":
     			return Blocks.OAK_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
     		case "light_weighted_pressure_plate":
     			return Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE.getDefaultState().with(WeightedPressurePlateBlock.POWER, data);
@@ -1407,18 +1502,23 @@ public class LegacyMaterials
     		case "beetroot":
     			return Blocks.BEETROOTS.getDefaultState().with(BeetrootBlock.BEETROOT_AGE, data);
     		case "farmland":
+    		case "soil":
     			return Blocks.FARMLAND.getDefaultState().with(FarmlandBlock.MOISTURE, data);
     		case "anvil":
     			return getAnvilWithData(0, data);
 			case "log":
+			case "wood":
+			case "oak_log":
 				return getLogWithData(data);
 			case "log_2":
+			case "acacia_log":
 				return getLog2WithData(data);
     		case "quartz_block":
     			return getQuartzBlockWithData(data);
 			case "torch":
 				return getTorchWithData(0, data);
 			case "redstone_torch_off":
+			case "redstone_torch":
 				return getTorchWithData(1, data);
 			case "redstone_torch_on":
 				return getTorchWithData(2, data);			
@@ -1571,11 +1671,11 @@ public class LegacyMaterials
 			case "melon_stem":
 				// TODO: Hopefully this auto-updates to ATTACHED_MELON_STEM when placed next to a melon block..
 				return Blocks.MELON_STEM.getDefaultState().with(StemBlock.AGE, data);
-			case "pumpkin":
+			case "carved_pumpkin":
 				return getJackOLanternOrPumpkinWithData(0, data);
 			case "jack_o_lantern":
 			case "lit_pumpkin":
-				return getJackOLanternOrPumpkinWithData(1, data);			
+				return getJackOLanternOrPumpkinWithData(1, data);
 			case "diode_block_off":
 			case "repeater":
 				return getRepeaterWithData(0, data);
@@ -1593,6 +1693,7 @@ public class LegacyMaterials
 				//return getBedBlockWithData(data);
 			case "trap_door":
 			case "trapdoor":
+			case "oak_trapdoor":
 				return getTrapDoorBlockWithData(0, data);
 			case "iron_trapdoor":
 				return getTrapDoorBlockWithData(1, data);			
@@ -1975,9 +2076,9 @@ public class LegacyMaterials
 			case 0:
 				return Blocks.LEVER.getDefaultState().with(LeverBlock.FACE, face).with(LeverBlock.HORIZONTAL_FACING, getFacingLever(facing)).with(LeverBlock.POWERED, powered == 1);
 			case 1:
-				return Blocks.STONE_BUTTON.getDefaultState().with(StoneButtonBlock.FACE, face).with(StoneButtonBlock.HORIZONTAL_FACING, getFacingDownEastWestSouthNorthUp(facing)).with(StoneButtonBlock.POWERED, powered == 1);
+				return Blocks.STONE_BUTTON.getDefaultState().with(StoneButtonBlock.FACE, face).with(StoneButtonBlock.HORIZONTAL_FACING, getFacingButton(facing)).with(StoneButtonBlock.POWERED, powered == 1);
 			case 2:
-				return Blocks.OAK_BUTTON.getDefaultState().with(WoodButtonBlock.FACE, face).with(WoodButtonBlock.HORIZONTAL_FACING, getFacingDownEastWestSouthNorthUp(facing)).with(WoodButtonBlock.POWERED, powered == 1);
+				return Blocks.OAK_BUTTON.getDefaultState().with(WoodButtonBlock.FACE, face).with(WoodButtonBlock.HORIZONTAL_FACING, getFacingButton(facing)).with(WoodButtonBlock.POWERED, powered == 1);
 			default:
 				return null;
 		}
@@ -2186,7 +2287,7 @@ public class LegacyMaterials
     	switch(material)
     	{
     		case 0:
-    			return Blocks.PUMPKIN.getDefaultState().with(CarvedPumpkinBlock.FACING, getFacingSouthWestNorthEast(facing));
+    			return Blocks.CARVED_PUMPKIN.getDefaultState().with(CarvedPumpkinBlock.FACING, getFacingSouthWestNorthEast(facing));
     		case 1:
     			return Blocks.JACK_O_LANTERN.getDefaultState().with(CarvedPumpkinBlock.FACING, getFacingSouthWestNorthEast(facing));
     		default:
@@ -2649,6 +2750,23 @@ public class LegacyMaterials
     		case 3:
     		case 5:
     		case 7:
+    			return Direction.SOUTH;
+    		case 4:
+    			return Direction.NORTH;
+			default:
+				return Direction.EAST;
+    	}
+    }
+    
+    private static Direction getFacingButton(int data)
+    {
+    	switch(data)
+    	{
+    		case 1:
+    			return Direction.EAST;
+    		case 2:
+    			return Direction.WEST;
+    		case 3:
     			return Direction.SOUTH;
     		case 4:
     			return Direction.NORTH;
