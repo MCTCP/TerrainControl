@@ -115,7 +115,7 @@ public class ForgeChunkGenNoise
 					}
 
 					float f8 = f4 > f3 ? 0.5F : 1.0F;
-					float f9 = f8 * this.field_236081_j_[k + 2 + (l + 2) * 5] / (f6 + 2.0F);
+					float f9 = f8 * ForgeChunkGenNoise.field_236081_j_[k + 2 + (l + 2) * 5] / (f6 + 2.0F);
 					f += f7 * f9;
 					f1 += f6 * f9;
 					f2 += f9;
@@ -314,20 +314,6 @@ public class ForgeChunkGenNoise
 	
 	// TODO: Do we need these?
 	
-	private static final float[] field_222561_h = Util.make(new float[13824], (p_236094_0_) ->
-	{
-		for (int i = 0; i < 24; ++i)
-		{
-			for (int j = 0; j < 24; ++j)
-			{
-				for (int k = 0; k < 24; ++k)
-				{
-					p_236094_0_[i * 24 * 24 + j * 24 + k] = (float) func_222554_b(j - 12, k - 12, i - 12);
-				}
-			}
-		}
-	});
-	
 	private static double func_222554_b(int p_222554_0_, int p_222554_1_, int p_222554_2_)
 	{
 		double d0 = p_222554_0_ * p_222554_0_ + p_222554_2_ * p_222554_2_;
@@ -336,23 +322,5 @@ public class ForgeChunkGenNoise
 		double d3 = Math.pow(Math.E, -(d2 / 16.0D + d0 / 16.0D));
 		double d4 = -d1 * MathHelper.fastInvSqrt(d2 / 2.0D + d0 / 2.0D) / 2.0D;
 		return d4 * d3;
-	}
-	
-	private static double func_222556_a(int p_222556_0_, int p_222556_1_, int p_222556_2_)
-	{
-		int i = p_222556_0_ + 12;
-		int j = p_222556_1_ + 12;
-		int k = p_222556_2_ + 12;
-		if (i >= 0 && i < 24)
-		{
-			if (j >= 0 && j < 24)
-			{
-				return k >= 0 && k < 24 ? (double) field_222561_h[k * 24 * 24 + i * 24 + j] : 0.0D;
-			} else {
-				return 0.0D;
-			}
-		} else {
-			return 0.0D;
-		}
 	}	
 }

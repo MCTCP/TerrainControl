@@ -7,7 +7,6 @@ import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.BannerBlock;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BeetrootBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BrewingStandBlock;
@@ -2692,29 +2691,7 @@ public class LegacyMaterials
 			default:
 				return Direction.EAST;
     	}
-    }
-        
-    private static Direction getFacingDownEastWestSouthNorthUp(int data)
-    {
-    	switch(data)
-    	{
-    		case 0:
-    			return Direction.DOWN;    			
-    		case 1:
-    			return Direction.EAST;
-    		case 2:
-    			return Direction.WEST;
-    		case 3:
-    			return Direction.SOUTH;
-    		case 4:
-    			return Direction.NORTH;
-    		case 5:
-    			return Direction.UP;
-			default:
-				return Direction.DOWN;
-    	}
-    }   
-    
+    }           
 	
     private static Direction getFacingEastWestSouthNorth(int data)
     {
@@ -2732,7 +2709,6 @@ public class LegacyMaterials
 				return Direction.EAST;
     	}
     }
-	
 	
 	// TODO: Couldn't find docs for 1.12.2 shulker box  
 	// data values, these rotations may be incorrect.
@@ -2836,8 +2812,6 @@ public class LegacyMaterials
 		}
 		return bits;
 	}
-	
-	
 	
 	private static int getBit(int source, int index)
 	{

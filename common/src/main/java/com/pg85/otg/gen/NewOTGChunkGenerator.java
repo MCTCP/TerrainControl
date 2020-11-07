@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.gen.biome.layers.LayerSource;
