@@ -3,10 +3,7 @@ package com.pg85.otg.common;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.util.BiomeIds;
 
-/**
- * Class to access the properties of a biome.
- * 
- */
+// TODO: Clean this up for 1.16
 public interface LocalBiome
 {
     /**

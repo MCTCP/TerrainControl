@@ -19,10 +19,10 @@ import java.util.List;
 public class WorldStandardValues extends Settings
 {
     // Files and folders
-    public static final String WORLD_CONFIG_FILE_NAME = "WorldConfig.ini";
-    public static final String FALLBACK_FILE_NAME = "Fallbacks.ini";
-    public static final String WORLD_BIOMES_DIRECTORY_NAME = "Biomes";
-    public static final String WORLD_OBJECTS_DIRECTORY_NAME = "Objects";
+    public static final String WORLD_CONFIG_FILE = "WorldConfig.ini";
+    public static final String FALLBACK_FILE = "Fallbacks.ini";
+    public static final String WORLD_BIOMES_FOLDER = "Biomes";
+    public static final String WORLD_OBJECTS_FOLDER = "Objects";
     
     public static String BackupFileSuffix = "-backup";
 	public static String StructureDataFileExtension = ".dat";

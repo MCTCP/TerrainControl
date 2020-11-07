@@ -2,6 +2,7 @@ package com.pg85.otg.customobjects;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.minecraft.defaults.TreeType;
 
@@ -228,10 +229,10 @@ public class CustomObjectCollection
 	    		OTG.log(LogMarker.INFO, "Indexing WorldObjects folder for world " + worldName);
 	            HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
 	            customObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
-	            if (worldName != null && new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PRESETS_FOLDER + File.separator + worldName + File.separator + "WorldObjects").exists())
+	            if (worldName != null && new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PRESETS_FOLDER + File.separator + worldName + File.separator + WorldStandardValues.WORLD_OBJECTS_FOLDER).exists())
 	            {
 	                indexAllCustomObjectFilesInDir(
-                		new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PRESETS_FOLDER + File.separator + worldName + File.separator + "WorldObjects"),
+                		new File(OTG.getEngine().getOTGRootFolder() + File.separator + PluginStandardValues.PRESETS_FOLDER + File.separator + worldName + File.separator + WorldStandardValues.WORLD_OBJECTS_FOLDER),
                         worldCustomObjectFiles);
 	            }
 	    		OTG.log(LogMarker.INFO, "WorldObjects folder for world " + worldName + " indexed.");

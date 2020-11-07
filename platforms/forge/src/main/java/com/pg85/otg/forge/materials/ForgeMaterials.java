@@ -144,11 +144,6 @@ public class ForgeMaterials extends LocalMaterials
     	}
 
     	CachedMaterials.put(name, material);
-
-    	if(material == null)
-    	{
-    		String breakpoint = "";
-    	}
     	
         return material;
 	}

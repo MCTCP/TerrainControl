@@ -61,7 +61,7 @@ public abstract class LocalPresetLoader
 	    		{
 	    			for(File file : presetDir.listFiles())
 	    			{
-	    				if(file.getName().equals(WorldStandardValues.WORLD_CONFIG_FILE_NAME))
+	    				if(file.getName().equals(WorldStandardValues.WORLD_CONFIG_FILE))
 	    				{
 			    			worldNames.add(presetDir.getName());			    			
 			    			Preset preset = loadPreset(presetDir.toPath());
@@ -76,8 +76,8 @@ public abstract class LocalPresetLoader
 
     private Preset loadPreset(Path presetDir)
     {
-        File worldConfigFile = new File(presetDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE_NAME);
-    	File biomesDirectory = new File(presetDir.toString(), WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME);
+        File worldConfigFile = new File(presetDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE);
+    	File biomesDirectory = new File(presetDir.toString(), WorldStandardValues.WORLD_BIOMES_FOLDER);
     	String presetName = presetDir.toFile().getName();
 
         SettingsMap worldConfigSettings = FileSettingsReader.read(presetName, worldConfigFile);
@@ -115,7 +115,7 @@ public abstract class LocalPresetLoader
 
     private void loadFallbacks(Path presetDir, WorldConfig worldConfig)
     {
-        File fallbackFile = new File(presetDir.toString(), WorldStandardValues.FALLBACK_FILE_NAME);
+        File fallbackFile = new File(presetDir.toString(), WorldStandardValues.FALLBACK_FILE);
         SettingsMap settingsMap = FileSettingsReader.read(presetDir.toFile().getName(), fallbackFile);   
 
         FallbackConfig fallbacks = new FallbackConfig(settingsMap);
@@ -130,7 +130,7 @@ public abstract class LocalPresetLoader
 
         // Establish folders
         List<Path> biomeDirs = new ArrayList<Path>(2);
-        biomeDirs.add(Paths.get(presetDir.toString(), WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME));
+        biomeDirs.add(Paths.get(presetDir.toString(), WorldStandardValues.WORLD_BIOMES_FOLDER));
 
         // Build a set of all biomes to load
         Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();

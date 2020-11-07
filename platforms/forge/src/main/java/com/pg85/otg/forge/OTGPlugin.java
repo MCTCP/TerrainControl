@@ -77,7 +77,7 @@ public class OTGPlugin
 	{
 		OTGCommand.register(event.getDispatcher());
 	}
-
+	
 	@SubscribeEvent
 	public void onServerStarting(FMLServerStartingEvent event) { }
 }

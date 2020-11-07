@@ -29,7 +29,7 @@ public class DimensionsConfig
 	public String ModPackConfigName = null;
 	public int ModPackConfigVersion = 0;
 	
-	File worldSavesDir;
+	Path worldSavesDir;
 	// Use capitals since we're serialising to yaml and we want to make it look nice
 	public boolean ShowOTGWorldCreationMenu = true;
 	public int version = 0; // Only changed when saving, otherwise legacy configs that don't have the version field will get this value.
@@ -40,13 +40,13 @@ public class DimensionsConfig
 
 	public DimensionsConfig() { }
 	
-	public DimensionsConfig(File mcWorldSaveDir)
+	public DimensionsConfig(Path mcWorldSaveDir)
 	{
-		this.WorldName = mcWorldSaveDir.getName();
-       	this.worldSavesDir = mcWorldSaveDir.getParentFile();
+		this.WorldName = mcWorldSaveDir.toFile().getName();
+       	this.worldSavesDir = mcWorldSaveDir.getParent();
 	}
 	
-	public DimensionsConfig(File mcWorldSavesDir, String worldDir)
+	public DimensionsConfig(Path mcWorldSavesDir, String worldDir)
 	{
 		this.worldSavesDir = mcWorldSavesDir;
 		this.WorldName = worldDir;
@@ -81,8 +81,8 @@ public class DimensionsConfig
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?
 		if(worldSavesDir != null)
 		{
-			File dimensionsConfigFile = new File(worldSavesDir.getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigFileName);
-			File dimensionsConfigBackupFile = new File(worldSavesDir.getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
+			File dimensionsConfigFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigFileName);
+			File dimensionsConfigBackupFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
 		
 			// Create an ObjectMapper mapper for YAML
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -305,7 +305,7 @@ public class DimensionsConfig
 	 * @param mcWorldSaveDir Refers to mc/saves/worlddir/
 	 * @return
 	 */
-	public static DimensionsConfig loadFromFile(File mcWorldSaveDir, Path otgRootFolder)
+	public static DimensionsConfig loadFromFile(Path mcWorldSaveDir, Path otgRootFolder)
 	{
 		File dimensionsConfigFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigFileName);		
 		File dimensionsConfigBackupFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
@@ -329,8 +329,8 @@ public class DimensionsConfig
 
 	       	if (presetsConfig != null)
 	       	{
-		       	presetsConfig.WorldName = mcWorldSaveDir.getName();
-		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
+		       	presetsConfig.WorldName = mcWorldSaveDir.toFile().getName();
+		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParent();
 		       	try
 		       	{
 			       	updateConfig(presetsConfig, otgRootFolder, false);
@@ -357,8 +357,8 @@ public class DimensionsConfig
 	       	
 	       	if (presetsConfig != null)
 	       	{
-		       	presetsConfig.WorldName = mcWorldSaveDir.getName();
-		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParentFile();
+		       	presetsConfig.WorldName = mcWorldSaveDir.toFile().getName();
+		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParent();
 		       	try
 		       	{
 			       	updateConfig(presetsConfig, otgRootFolder, false);
