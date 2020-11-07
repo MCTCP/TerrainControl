@@ -1,7 +1,7 @@
 package com.pg85.otg.util.materials;
 
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.config.world.WorldConfig;
 
 public class MaterialSetEntry
 {
@@ -45,9 +45,9 @@ public class MaterialSetEntry
         //}
     }
 
-    public void parseForWorld(LocalWorld world)
+    public void parseForWorld(WorldConfig worldConfig)
     {
-    	material.parseForWorld(world);
+    	material.parseForWorld(worldConfig);
     }
 
     @Override

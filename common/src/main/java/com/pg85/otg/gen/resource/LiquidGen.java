@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -75,27 +75,27 @@ public class LiquidGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenregion.getWorldConfig(), material, sourceBlocks);
 
-        LocalMaterialData worldMaterial = world.getMaterial(x, y + 1, z, chunkBeingPopulated);
+        LocalMaterialData worldMaterial = worldGenregion.getMaterial(x, y + 1, z, chunkBeingPopulated);
         if (worldMaterial == null || !sourceBlocks.contains(worldMaterial))
         {
             return;
         }
         
-        worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
+        worldMaterial = worldGenregion.getMaterial(x, y - 1, z, chunkBeingPopulated);
         if (worldMaterial == null || !sourceBlocks.contains(worldMaterial))
         {
             return;
         }
 
-        worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated);
+        worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated);
         if (worldMaterial == null || !worldMaterial.isAir() || !sourceBlocks.contains(worldMaterial))
         {
             return;
@@ -104,26 +104,25 @@ public class LiquidGen extends Resource
         int i = 0;
         int j = 0;
 
-        worldMaterial = world.getMaterial(x - 1, y, z, chunkBeingPopulated);
+        worldMaterial = worldGenregion.getMaterial(x - 1, y, z, chunkBeingPopulated);
         i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
         j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
 
-        worldMaterial = world.getMaterial(x + 1, y, z, chunkBeingPopulated);
+        worldMaterial = worldGenregion.getMaterial(x + 1, y, z, chunkBeingPopulated);
         i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
         j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
 
-        worldMaterial = world.getMaterial(x, y, z - 1, chunkBeingPopulated);
+        worldMaterial = worldGenregion.getMaterial(x, y, z - 1, chunkBeingPopulated);
         i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
         j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
 
-        worldMaterial = world.getMaterial(x, y, z + 1, chunkBeingPopulated);
+        worldMaterial = worldGenregion.getMaterial(x, y, z + 1, chunkBeingPopulated);
         i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
         j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
 
         if ((i == 3) && (j == 1))
         {
-            world.setBlock(x, y, z, material, null, chunkBeingPopulated, false);
+        	worldGenregion.setBlock(x, y, z, material, null, chunkBeingPopulated, false);
         }
     }
-
 }

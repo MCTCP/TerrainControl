@@ -1,10 +1,11 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -106,27 +107,27 @@ public class GrassGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Left blank, as spawnInChunk already handles this.
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated)
     {
-        sourceBlocks.parseForWorld(world);
+        sourceBlocks.parseForWorld(worldGenregion.getWorldConfig());
         switch (groupOption)
         {
             case Grouped:
-                spawnGrouped(world, random, chunkBeingPopulated);
+                spawnGrouped(worldGenregion, random, chunkBeingPopulated);
                 break;
             case NotGrouped:
-                spawnNotGrouped(world, random, chunkBeingPopulated);
+                spawnNotGrouped(worldGenregion, random, chunkBeingPopulated);
                 break;
         }
     }
     
-    private void spawnGrouped(LocalWorld world, Random random, ChunkCoordinate chunkBeingPopulated)
+    private void spawnGrouped(LocalWorldGenRegion worldGenregion, Random random, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         if (random.nextDouble() * 100.0 <= this.rarity)
@@ -134,7 +135,7 @@ public class GrassGen extends Resource
             // Passed Rarity test, place about Frequency grass in this chunk
             int centerX = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
             int centerZ = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-            int centerY = world.getHighestBlockAboveYAt(centerX, centerZ, chunkBeingPopulated);
+            int centerY = worldGenregion.getHighestBlockAboveYAt(centerX, centerZ, chunkBeingPopulated);
             
             if(centerY < PluginStandardValues.WORLD_DEPTH)
             {
@@ -147,12 +148,12 @@ public class GrassGen extends Resource
             while (
         		(
     				(centerY >= PluginStandardValues.WORLD_DEPTH && centerY < PluginStandardValues.WORLD_HEIGHT) &&
-					(worldMaterial = world.getMaterial(centerX, centerY, centerZ, chunkBeingPopulated)) != null &&
+					(worldMaterial = worldGenregion.getMaterial(centerX, centerY, centerZ, chunkBeingPopulated)) != null &&
 					(
 						worldMaterial.isAir() || 
 						worldMaterial.isLeaves()
 					) &&
-    				(worldMaterial = world.getMaterial(centerX, centerY - 1, centerZ, chunkBeingPopulated)) != null
+    				(worldMaterial = worldGenregion.getMaterial(centerX, centerY - 1, centerZ, chunkBeingPopulated)) != null
 				) && (
 					centerY > 0
 				)
@@ -174,21 +175,21 @@ public class GrassGen extends Resource
                 y = centerY + random.nextInt(4) - random.nextInt(4);
                 z = centerZ + random.nextInt(8) - random.nextInt(8);
                 if (
-    				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
+    				(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
     				worldMaterial.isAir() &&
     				(
-        				(worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null && 
+        				(worldMaterial = worldGenregion.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null && 
         				this.sourceBlocks.contains(worldMaterial)
     				)
 				)
                 {
-                    plant.spawn(world, x, y, z, chunkBeingPopulated);
+                    plant.spawn(worldGenregion, x, y, z, chunkBeingPopulated);
                 }
             }
         }
     }
 
-    private void spawnNotGrouped(LocalWorld world, Random random, ChunkCoordinate chunkBeingPopulated)
+    private void spawnNotGrouped(LocalWorldGenRegion worldGenregion, Random random, ChunkCoordinate chunkBeingPopulated)
     {
         LocalMaterialData worldMaterial;
         int x;
@@ -204,7 +205,7 @@ public class GrassGen extends Resource
             
             x = chunkBeingPopulated.getBlockXCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
             z = chunkBeingPopulated.getBlockZCenter() + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-            y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+            y = worldGenregion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
 
             if(y < PluginStandardValues.WORLD_DEPTH)
             {
@@ -213,12 +214,12 @@ public class GrassGen extends Resource
             
             while (
         		(
-    				(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
+    				(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) != null &&
     				(
 	    				worldMaterial.isAir() || 
 						worldMaterial.isLeaves()
 					) &&
-    				(worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null
+    				(worldMaterial = worldGenregion.getMaterial(x, y - 1, z, chunkBeingPopulated)) != null
 				) && 
         		y > 0
     		)
@@ -228,17 +229,17 @@ public class GrassGen extends Resource
 
             if (            		
         		(
-    				(worldMaterial = world.getMaterial(x, y + 1, z, chunkBeingPopulated)) == null ||
+    				(worldMaterial = worldGenregion.getMaterial(x, y + 1, z, chunkBeingPopulated)) == null ||
 					!worldMaterial.isAir()
 				) || (
-					(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) == null ||
+					(worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) == null ||
 					!sourceBlocks.contains(worldMaterial)
 				)
     		)
             {
                 continue;
             }
-            plant.spawn(world, x, y + 1, z, chunkBeingPopulated);
+            plant.spawn(worldGenregion, x, y + 1, z, chunkBeingPopulated);
         }
     }
 }

@@ -1,7 +1,6 @@
 package com.pg85.otg.config.biome;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.ConfigFile;
@@ -1274,74 +1273,74 @@ public class BiomeConfig extends ConfigFile
 		return this.replacedBlocks.replacesStone;
 	}	
 	
-	public LocalMaterialData getCooledLavaBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getCooledLavaBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesCooledLava)
 		{
-			return this.cooledLavaBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.cooledLavaBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.cooledLavaBlock;
 	}	
 	
-	public LocalMaterialData getIceBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getIceBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesIce)
 		{
-			return this.iceBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.iceBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.iceBlock;
 	}
         
-	public LocalMaterialData getWaterBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getWaterBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesWater)
 		{
-			return this.waterBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.waterBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.waterBlock;
 	}
 
-	public LocalMaterialData getStoneBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getStoneBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesStone)
 		{
-			return this.stoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.stoneBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.stoneBlock;
 	}
 
-	public LocalMaterialData getGroundBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getGroundBlockReplaced(int y)
 	{	
 		if(this.replacedBlocks.replacesGround)
 		{
-			return this.groundBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.groundBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.groundBlock;
 	}
 	
-	public LocalMaterialData getSurfaceBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getSurfaceBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesSurface)
 		{
-			return this.surfaceBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.surfaceBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.surfaceBlock;
 	}
 	
-	public LocalMaterialData getSandStoneBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getSandStoneBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesSandStone)
 		{
-			return this.sandStoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.sandStoneBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.sandStoneBlock;
 	}
 	
-	public LocalMaterialData getRedSandStoneBlockReplaced(LocalWorld localWorld, int y)
+	public LocalMaterialData getRedSandStoneBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesRedSandStone)
 		{
-			return this.redSandStoneBlock.parseWithBiomeAndHeight(localWorld, this, y);
+			return this.redSandStoneBlock.parseWithBiomeAndHeight(this, y);
 		}
 		return this.redSandStoneBlock;
 	}

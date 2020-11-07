@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -73,7 +73,7 @@ public class SmallLakeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
@@ -90,7 +90,7 @@ public class SmallLakeGen extends Resource
 
         // Search any free space
         LocalMaterialData worldMaterial;
-        while (y > 5 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
+        while (y > 5 && (worldMaterial = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             y--;
         }
@@ -103,7 +103,7 @@ public class SmallLakeGen extends Resource
         // y = floor
         y -= 4;
         
-        parseMaterials(world, material, null);
+        parseMaterials(worldGenRegion.getWorldConfig(), material, null);
 
         // TODO: Why on earth would this be necessary or useful?
         synchronized (BooleanBuffer)
@@ -165,12 +165,12 @@ public class SmallLakeGen extends Resource
 
                         if (flag)
                         {
-                            localMaterialData = world.getMaterial(x + j, y + i2, z + i1, chunkBeingPopulated);
+                            localMaterialData = worldGenRegion.getMaterial(x + j, y + i2, z + i1, chunkBeingPopulated);
                             if ((i2 >= 4) && (localMaterialData == null || localMaterialData.isLiquid()))
                             {
                                 return;
                             }
-                            localMaterialData2 = world.getMaterial(x + j, y + i2, z + i1, chunkBeingPopulated);
+                            localMaterialData2 = worldGenRegion.getMaterial(x + j, y + i2, z + i1, chunkBeingPopulated);
                             if ((i2 < 4) && (localMaterialData == null || !localMaterialData.isSolid()) && (localMaterialData2 == null || !localMaterialData2.equals(material)))
                             {
                                 return;
@@ -188,7 +188,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, material, null, chunkBeingPopulated, false);
+                        	worldGenRegion.setBlock(x + j, y + i2, z + i1, material, null, chunkBeingPopulated, false);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }
@@ -196,7 +196,7 @@ public class SmallLakeGen extends Resource
                     {
                         if (BooleanBuffer[((j * 16 + i1) * 8 + i2)])
                         {
-                            world.setBlock(x + j, y + i2, z + i1, air, null, chunkBeingPopulated, false);
+                        	worldGenRegion.setBlock(x + j, y + i2, z + i1, air, null, chunkBeingPopulated, false);
                             BooleanBuffer[((j * 16 + i1) * 8 + i2)] = false;
                         }
                     }

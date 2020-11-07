@@ -1,7 +1,6 @@
 package com.pg85.otg.customobjects.bofunctions;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.util.bo3.Rotation;
@@ -55,14 +54,14 @@ public class BranchNode implements Comparable<BranchNode>
     /**
      * @return the branch CustomObject
      */
-    public StructuredCustomObject getCustomObject(boolean lazyLoad, LocalWorld world)
+    public StructuredCustomObject getCustomObject(boolean lazyLoad, String worldName)
     {
     	if(customObject != null || !lazyLoad)
     	{
     		return customObject;
     	}
 
-    	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(customObjectName, world.getName());
+    	CustomObject customObject = OTG.getCustomObjectManager().getGlobalObjects().getObjectByName(customObjectName, worldName);
     	if(customObject != null && !(customObject instanceof StructuredCustomObject))
     	{
     		customObject = null;

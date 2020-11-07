@@ -1,6 +1,6 @@
 package com.pg85.otg.customobjects.bo3;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.util.ChunkCoordinate;
 
@@ -32,7 +32,7 @@ public interface StructurePartSpawnHeight
     {
 
         @Override
-        public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
+        public int getCorrectY(LocalWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
         {
             return y;
         }
@@ -45,9 +45,9 @@ public interface StructurePartSpawnHeight
     {
 
         @Override
-        public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
+        public int getCorrectY(LocalWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
         {
-            return world.getHighestBlockAboveYAt(x, z, chunkBeingSpawned);
+            return worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingSpawned);
         }
     };
 
@@ -58,9 +58,9 @@ public interface StructurePartSpawnHeight
     {
 
         @Override
-        public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
+        public int getCorrectY(LocalWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingSpawned)
         {
-            return world.getBlockAboveSolidHeight(x, z, chunkBeingSpawned);
+            return worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingSpawned);
         }
     };
 
@@ -77,5 +77,5 @@ public interface StructurePartSpawnHeight
      * @param z     The z position the object is spawning on.
      * @return The y position the object should spawn on instead.
      */
-    public int getCorrectY(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingSpawned);
+    public int getCorrectY(LocalWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingSpawned);
 }

@@ -1,6 +1,5 @@
 package com.pg85.otg.customobjects.bo3.bo3function;
 
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bofunctions.BranchNode;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructureCoordinate;
@@ -23,7 +22,7 @@ public class BO3WeightedBranchFunction extends BO3BranchFunction
     }
 
     @Override
-    public CustomStructureCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
+    public CustomStructureCoordinate toCustomObjectCoordinate(String worldName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
     {
         double randomChance = random.nextDouble() * (totalChanceSet
                 ? totalChance
@@ -35,7 +34,7 @@ public class BO3WeightedBranchFunction extends BO3BranchFunction
 		{
 			if (branch.getChance() >= randomChance)
 			{
-				return new BO3CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
+				return new BO3CustomStructureCoordinate(worldName, branch.getCustomObject(false, worldName), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
 			}
 		}
         return null;

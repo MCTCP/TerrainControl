@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -38,7 +38,7 @@ public class VinesGen extends Resource
                 PluginStandardValues.WORLD_HEIGHT - 1);
     }
     
-    private boolean canPlace(LocalWorld world, int x, int y, int z, int paramInt4, ChunkCoordinate chunkBeingPopulated)
+    private boolean canPlace(LocalWorldGenRegion worldGenRegion, int x, int y, int z, int paramInt4, ChunkCoordinate chunkBeingPopulated)
     {
         LocalMaterialData sourceBlock;
         switch (paramInt4)
@@ -46,19 +46,19 @@ public class VinesGen extends Resource
             default:
                 return false;
             case 1:
-                sourceBlock = world.getMaterial(x, y + 1, z, chunkBeingPopulated);
+                sourceBlock = worldGenRegion.getMaterial(x, y + 1, z, chunkBeingPopulated);
                 break;
             case 2:
-                sourceBlock = world.getMaterial(x, y, z + 1, chunkBeingPopulated);
+                sourceBlock = worldGenRegion.getMaterial(x, y, z + 1, chunkBeingPopulated);
                 break;
             case 3:
-                sourceBlock = world.getMaterial(x, y, z - 1, chunkBeingPopulated);
+                sourceBlock = worldGenRegion.getMaterial(x, y, z - 1, chunkBeingPopulated);
                 break;
             case 5:
-                sourceBlock = world.getMaterial(x - 1, y, z, chunkBeingPopulated);
+                sourceBlock = worldGenRegion.getMaterial(x - 1, y, z, chunkBeingPopulated);
                 break;
             case 4:
-                sourceBlock = world.getMaterial(x + 1, y, z, chunkBeingPopulated);
+                sourceBlock = worldGenRegion.getMaterial(x + 1, y, z, chunkBeingPopulated);
                 break;
         }
         return sourceBlock != null && sourceBlock.isSolid();
@@ -103,7 +103,7 @@ public class VinesGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int _x = x;
@@ -114,16 +114,16 @@ public class VinesGen extends Resource
         
         while (y <= maxAltitude)
         {
-        	worldMaterial = world.getMaterial(_x, y, _z, chunkBeingPopulated);
+        	worldMaterial = worldGenRegion.getMaterial(_x, y, _z, chunkBeingPopulated);
             if (worldMaterial != null && worldMaterial.isAir())
             {
                 for (int direction = 2; direction <= 5; direction++)
                 {
-                    if (canPlace(world, _x, y, _z, direction, chunkBeingPopulated))
+                    if (canPlace(worldGenRegion, _x, y, _z, direction, chunkBeingPopulated))
                     {
                     	// TODO: Reimplement this when block data works
                     	//world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, chunkBeingPopulated, false);
-                    	world.setBlock(_x, y, _z, LocalMaterials.VINE, null, chunkBeingPopulated, false);                        
+                    	worldGenRegion.setBlock(_x, y, _z, LocalMaterials.VINE, null, chunkBeingPopulated, false);                        
                         break;
                     }
                 }

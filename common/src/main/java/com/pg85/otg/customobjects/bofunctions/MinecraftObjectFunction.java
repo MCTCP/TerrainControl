@@ -1,6 +1,6 @@
 package com.pg85.otg.customobjects.bofunctions;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.SpawnableObject;
@@ -44,11 +44,11 @@ public abstract class MinecraftObjectFunction<T extends CustomObjectConfigFile> 
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
     	// TODO: May cause cascading chunkgen.
-        SpawnableObject object = world.getMojangStructurePart(structurePart.getPath());
-        object.spawnForced(world, random, rotation, x, y, z);
+        SpawnableObject object = worldGenRegion.getMojangStructurePart(structurePart.getPath());
+        object.spawnForced(null, worldGenRegion, random, rotation, x, y, z);
     }
 
     @Override

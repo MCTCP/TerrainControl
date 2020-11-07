@@ -1,6 +1,7 @@
 package com.pg85.otg.events;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.gen.resource.Resource;
 
@@ -42,7 +43,7 @@ public abstract class EventHandler
      *         events, so returning true when the event is already cancelled
      *         does nothing.
      */
-    public boolean canCustomObjectSpawn(CustomObject object, LocalWorld world, int x, int y, int z, boolean isCancelled)
+    public boolean canCustomObjectSpawn(CustomObject object, LocalWorldGenRegion worldGenRegion, int x, int y, int z, boolean isCancelled)
     {
         return true;
     }
@@ -61,8 +62,7 @@ public abstract class EventHandler
      *         events, so returning true when the event is already cancelled
      *         does nothing.
      */
-    public boolean onResourceProcess(Resource resource, LocalWorld world, Random random,
-            boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
+    public boolean onResourceProcess(Resource resource, LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int chunkX, int chunkZ, boolean isCancelled)
     {
         return true;
     }

@@ -1,6 +1,7 @@
 package com.pg85.otg.customobjects;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 
@@ -58,7 +59,7 @@ public interface CustomObject extends SpawnableObject
      * @param z
      * @return Whether the attempt was successful. (It should never fail, but you never know.)
      */
-    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
+    public boolean spawnForced(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);
         
     /**
      * Spawns the object at the given position. It should search a suitable y
@@ -70,7 +71,7 @@ public interface CustomObject extends SpawnableObject
      * @param z
      * @return Whether the attempt was successful.
      */
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated);
+    public boolean spawnAsTree(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated);
     
     /**
      * Spawns the object one or more times in a chunk. The object can search a good y position by
@@ -81,9 +82,9 @@ public interface CustomObject extends SpawnableObject
      * @param chunkCoord The chunk to spawn the objects in.
      * @return Whether at least one object spawned successfully.
      */
-    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord);
+    public boolean process(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkCoord);
 
-    boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);  
+    boolean spawnFromSapling(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);  
 
 	public boolean loadChecks();
 

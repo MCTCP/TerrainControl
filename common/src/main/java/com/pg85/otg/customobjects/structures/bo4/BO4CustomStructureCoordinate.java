@@ -1,7 +1,6 @@
 package com.pg85.otg.customobjects.structures.bo4;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.customobjects.CustomObject;
@@ -19,9 +18,9 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 	boolean isWeightedBranch;
 	String branchGroup;
 	   
-    public BO4CustomStructureCoordinate(LocalWorld world, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
+    public BO4CustomStructureCoordinate(String worldName, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z, int branchDepth, boolean isRequiredBranch, boolean isWeightedBranch, String branchGroup)
     {
-    	this.worldName = world != null ? world.getName() : null;
+    	this.worldName = worldName;
     	this.bo3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;
         this.object = object;
         this.rotation = rotation != null ? rotation : Rotation.NORTH;

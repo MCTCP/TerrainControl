@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -33,21 +33,23 @@ public class BoulderGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-    	int y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
-        if (y < this.minAltitude || y > this.maxAltitude) {
+    	int y = worldGenregion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+        if (y < this.minAltitude || y > this.maxAltitude)
+        {
             return;
         }
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenregion.getWorldConfig(), material, sourceBlocks);
 
         while (y > 3)
         {
-            LocalMaterialData material = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
-            if (sourceBlocks.contains(material)) {
+            LocalMaterialData material = worldGenregion.getMaterial(x, y - 1, z, chunkBeingPopulated);
+            if (sourceBlocks.contains(material))
+            {
                 break;
             }
             y--;
@@ -76,7 +78,7 @@ public class BoulderGen extends Resource
                         float f4 = i3 - y;
                         if (f2 * f2 + f3 * f3 + f4 * f4 <= f1 * f1)
                         {
-                            world.setBlock(i1, i3, i2, this.material, null, chunkBeingPopulated, true);
+                        	worldGenregion.setBlock(i1, i3, i2, this.material, null, chunkBeingPopulated, true);
                         }
                     }
                 }
@@ -99,5 +101,4 @@ public class BoulderGen extends Resource
     {
         return -22;
     }
-
 }

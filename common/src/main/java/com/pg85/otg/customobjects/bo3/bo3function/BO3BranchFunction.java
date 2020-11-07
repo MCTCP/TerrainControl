@@ -1,6 +1,5 @@
 package com.pg85.otg.customobjects.bo3.bo3function;
 
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bofunctions.BranchFunction;
 import com.pg85.otg.customobjects.bofunctions.BranchNode;
@@ -69,7 +68,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
      * should spawn. Returns null if no branch passes the check.
      */
     @Override
-    public CustomStructureCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
+    public CustomStructureCoordinate toCustomObjectCoordinate(String worldName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
     {
         for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
         {
@@ -78,7 +77,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
             double randomChance = random.nextDouble() * totalChance;
             if (randomChance < branch.getChance())
             {
-                return new BO3CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
+                return new BO3CustomStructureCoordinate(worldName, branch.getCustomObject(false, worldName), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
             }
         }
         return null;

@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -22,17 +22,17 @@ public class AboveWaterGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {    	
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-        int y = world.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated);
+        int y = worldGenregion.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated);
         if (y == -1)
 		{
             return;
 		}
 
-        parseMaterials(world, material, null);
+        parseMaterials(worldGenregion.getWorldConfig(), material, null);
         
         int j;
         int k;
@@ -46,13 +46,13 @@ public class AboveWaterGen extends Resource
             k = y + rand.nextInt(4) - rand.nextInt(4);
             m = z + rand.nextInt(8) - rand.nextInt(8);
             
-            worldMaterial = world.getMaterial(j, k, m, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(j, k, m, chunkBeingPopulated);
             if (worldMaterial == null || !worldMaterial.isAir())
             {
             	continue;
             }
 
-            worldMaterialBeneath = world.getMaterial(j, k - 1, m, chunkBeingPopulated);            
+            worldMaterialBeneath = worldGenregion.getMaterial(j, k - 1, m, chunkBeingPopulated);            
             if (
         		worldMaterialBeneath != null &&
 				!worldMaterialBeneath.isLiquid()
@@ -61,7 +61,7 @@ public class AboveWaterGen extends Resource
                 continue;
             }
             
-            world.setBlock(j, k, m, material, null, chunkBeingPopulated, false);
+            worldGenregion.setBlock(j, k, m, material, null, chunkBeingPopulated, false);
         }
     }
 

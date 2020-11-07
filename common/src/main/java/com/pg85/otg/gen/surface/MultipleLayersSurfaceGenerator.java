@@ -1,7 +1,7 @@
 package com.pg85.otg.gen.surface;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -37,37 +37,35 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
     }
 
     @Override
-    public LocalMaterialData getSurfaceBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+    public LocalMaterialData getSurfaceBlockAtHeight(LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
     {
-    	double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);    	
+    	double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);    	
         for (LayerChoice layer : this.layerChoices)
         {
             if (noise <= layer.maxNoise)
             {
-            	return layer.getSurfaceBlockReplaced(world, biomeConfig, yInWorld);
+            	return layer.getSurfaceBlockReplaced(biomeConfig, yInWorld);
             }
-        }
-        
-        return biomeConfig.getSurfaceBlockReplaced(world, yInWorld);
+        }        
+        return biomeConfig.getSurfaceBlockReplaced(yInWorld);
     }
     
 	@Override
-	public LocalMaterialData getGroundBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	public LocalMaterialData getGroundBlockAtHeight(LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{	
-   		double noise = world.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
+   		double noise = worldGenRegion.getBiomeBlocksNoiseValue(xInWorld, zInWorld);  		
         for (LayerChoice layer : this.layerChoices)
         {
             if (noise <= layer.maxNoise)
             {
-            	return layer.getGroundBlockReplaced(world, biomeConfig, yInWorld);
+            	return layer.getGroundBlockReplaced(biomeConfig, yInWorld);
             }
-        }
-        
-        return biomeConfig.getGroundBlockReplaced(world, yInWorld);
+        }        
+        return biomeConfig.getGroundBlockReplaced(yInWorld);
 	}
 
     @Override
-    public void spawn(LocalWorld world, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
+    public void spawn(long worldSeed, GeneratingChunk generatingChunkInfo, ChunkBuffer chunkBuffer, BiomeConfig config, int xInWorld, int zInWorld)
     {
         int x = xInWorld & 0xf;
         int z = zInWorld & 0xf;
@@ -77,13 +75,13 @@ public class MultipleLayersSurfaceGenerator extends SimpleSurfaceGenerator
         {
             if (noise <= layer.maxNoise)
             {
-                spawnColumn(world, layer, generatingChunkInfo, chunkBuffer, config, x, z);
+                spawnColumn(layer, generatingChunkInfo, chunkBuffer, config, x, z);
                 return;
             }
         }
 
         // Fall back on normal column
-        spawnColumn(world, null, generatingChunkInfo, chunkBuffer, config, x, z);
+        spawnColumn(null, generatingChunkInfo, chunkBuffer, config, x, z);
     }
 
     @Override

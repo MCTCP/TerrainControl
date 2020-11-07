@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.Stack;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.pg85.otg.customobjects.structures.Branch;
 import com.pg85.otg.customobjects.bo4.BO4;
@@ -49,9 +49,9 @@ class BranchDataItem
 		branchNumber = BranchDataItem.BranchDataItemCounter;
 	}	
 	
-	Stack<BranchDataItem> getChildren(boolean dontSpawn, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
+	Stack<BranchDataItem> getChildren(boolean dontSpawn, LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated)
 	{
-		if(world == null)
+		if(worldGenRegion == null)
 		{
 			throw new RuntimeException();
 		}
@@ -61,7 +61,7 @@ class BranchDataItem
 	        Branch[] branches = ((BO4)this.branch.getStructuredObject()).getBranches();
 	        for (Branch branch1 : branches)
 	        {
-		    	BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(world, this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name);
+		    	BO4CustomStructureCoordinate childCoordObject = (BO4CustomStructureCoordinate)branch1.toCustomObjectCoordinate(worldGenRegion.getWorldName(), this.random, this.branch.getRotation(), this.branch.getX(), this.branch.getY(), this.branch.getZ(), this.startBO3Name != null ? this.startBO3Name : this.branch.bo3Name);
 		    	// Can be null if spawn roll fails TODO: dont roll for spawn in branch.toCustomObjectCoordinate?
 		    	if(childCoordObject != null)
 		    	{
@@ -94,7 +94,7 @@ class BranchDataItem
 		    		{
     		    		if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestBlock || childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel)
     		    		{
-    		    			childCoordObject.y = (short) world.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getConfig().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel, childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getConfig().spawnAtWaterLevel, true, true, null);
+    		    			childCoordObject.y = (short) worldGenRegion.getHighestBlockYAt(childCoordObject.getX(), childCoordObject.getZ(), true, childBO3.getConfig().spawnHeight != SpawnHeightEnum.highestSolidBlock || childBO3.getConfig().spawnAtWaterLevel, childBO3.getConfig().spawnHeight == SpawnHeightEnum.highestSolidBlock && !childBO3.getConfig().spawnAtWaterLevel, true, true, null);
     		    		}
     		    		else if(childBO3.getConfig().spawnHeight == SpawnHeightEnum.randomY)
     		    		{

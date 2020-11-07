@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects.bofunctions;
 import java.util.List;
 import java.util.Random;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.customobjects.CustomObjectConfigFile;
 import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
@@ -73,7 +73,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
      * @param z      The absolute z to spawn. The z-position in this object is
      *               ignored.
      */
-    public abstract void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock);
+    public abstract void spawn(LocalWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock);
     
     @Override
     public boolean isAnalogousTo(CustomObjectConfigFunction<T> other)

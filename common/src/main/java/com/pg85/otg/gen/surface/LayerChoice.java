@@ -1,6 +1,5 @@
 package com.pg85.otg.gen.surface;
 
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.settings.ReplacedBlocksMatrix;
@@ -22,26 +21,26 @@ public class LayerChoice implements Comparable<LayerChoice>
         this.maxNoise = maxNoise;
     }
 
-    public LocalMaterialData getSurfaceBlockReplaced(LocalWorld world, BiomeConfig biomeConfig, int y)
+    public LocalMaterialData getSurfaceBlockReplaced(BiomeConfig biomeConfig, int y)
     {    	
     	// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
     	// Make this prettier?
     	Init(biomeConfig.replacedBlocks);
     	if(this.surfaceBlockIsReplaced)
     	{
-    		return this.surfaceBlock.parseWithBiomeAndHeight(world, biomeConfig, y);	
+    		return this.surfaceBlock.parseWithBiomeAndHeight(biomeConfig, y);	
     	}
     	return this.surfaceBlock;
     }
     
-    public LocalMaterialData getGroundBlockReplaced(LocalWorld world, BiomeConfig biomeConfig, int y)
+    public LocalMaterialData getGroundBlockReplaced(BiomeConfig biomeConfig, int y)
     {
     	// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
     	// Make this prettier?
     	Init(biomeConfig.replacedBlocks);
     	if(this.groundBlockIsReplaced)
     	{
-    		return this.groundBlock.parseWithBiomeAndHeight(world, biomeConfig, y);	
+    		return this.groundBlock.parseWithBiomeAndHeight(biomeConfig, y);	
     	}
     	return this.groundBlock;
     }

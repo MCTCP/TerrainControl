@@ -1,12 +1,13 @@
 package com.pg85.otg.customobjects.structures.bo3;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
 import com.pg85.otg.customobjects.bo3.StructurePartSpawnHeight;
 import com.pg85.otg.customobjects.structures.Branch;
 import com.pg85.otg.customobjects.structures.CustomStructure;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.logging.LogMarker;
@@ -33,7 +34,7 @@ public class BO3CustomStructure extends CustomStructure
     	this.start = start;
     }
     
-    public BO3CustomStructure(LocalWorld world, BO3CustomStructureCoordinate start)
+    public BO3CustomStructure(LocalWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start)
     {
         StructuredCustomObject object = (StructuredCustomObject)start.getObject();
 
@@ -53,16 +54,16 @@ public class BO3CustomStructure extends CustomStructure
         this.start = start;
         this.height = ((BO3)object).getStructurePartSpawnHeight();
         this.maxBranchDepth = ((BO3)object).getMaxBranchDepth();
-        this.random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), world.getSeed());
+        this.random = RandomHelper.getRandomForCoords(start.getX(), start.getY(), start.getZ(), worldGenRegion.getSeed());
 
         // Calculate all branches and add them to a list
         objectsToSpawn = new LinkedHashMap<ChunkCoordinate, Set<CustomStructureCoordinate>>();
 
         addToSpawnList((BO3CustomStructureCoordinate)start, object); // Add the object itself
-        addBranches((BO3CustomStructureCoordinate)start, 1, world);
+        addBranches((BO3CustomStructureCoordinate)start, 1, worldGenRegion);
     }
 
-    private void addBranches(BO3CustomStructureCoordinate coordObject, int depth, LocalWorld world)
+    private void addBranches(BO3CustomStructureCoordinate coordObject, int depth, LocalWorldGenRegion worldGenRegion)
     {
     	StructuredCustomObject object = coordObject.getObject();
 
@@ -71,7 +72,7 @@ public class BO3CustomStructure extends CustomStructure
 	        for (Branch branch : getBranches(object, coordObject.getRotation()))
 	        {
 	        	// TODO: Does passing null as startbo3name work?
-	        	BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(world, random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null);
+	        	BO3CustomStructureCoordinate childCoordObject = (BO3CustomStructureCoordinate)branch.toCustomObjectCoordinate(worldGenRegion.getWorldName(), random, coordObject.getRotation(), coordObject.getX(), coordObject.getY(), coordObject.getZ(), null);
 
 	            // Don't add null objects
 	            if (childCoordObject == null)
@@ -85,7 +86,7 @@ public class BO3CustomStructure extends CustomStructure
 	            // Also add the branches of this object
 	            if (depth < maxBranchDepth)
 	            {
-	                addBranches(childCoordObject, depth + 1, world);
+	                addBranches(childCoordObject, depth + 1, worldGenRegion);
 	            }
 	        }
     	}
@@ -121,10 +122,10 @@ public class BO3CustomStructure extends CustomStructure
         }
     }
 
-    public void spawnInChunk(ChunkCoordinate chunkCoordinate, LocalWorld world)
+    public void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoordinate)
     {
         Set<CustomStructureCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
-        if(!world.getConfigs().getWorldConfig().populationBoundsCheck)
+        if(!worldGenRegion.getWorldConfig().populationBoundsCheck)
         {
         	chunkCoordinate = null;
         }
@@ -133,7 +134,7 @@ public class BO3CustomStructure extends CustomStructure
             for (CustomStructureCoordinate coordObject : objectsInChunk)
             {
                 BO3 bo3 = ((BO3)((BO3CustomStructureCoordinate)coordObject).getObject());
-                bo3.trySpawnAt(this, world, random, coordObject.rotation, coordObject.x, height.getCorrectY(world, coordObject.x, coordObject.y, coordObject.z, chunkCoordinate), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, coordObject.y, chunkCoordinate, bo3.doReplaceBlocks());
+                bo3.trySpawnAt(this, structureCache, worldGenRegion, random, coordObject.rotation, coordObject.x, height.getCorrectY(worldGenRegion, coordObject.x, coordObject.y, coordObject.z, chunkCoordinate), coordObject.z, bo3.getSettings().minHeight, bo3.getSettings().maxHeight, coordObject.y, chunkCoordinate, bo3.doReplaceBlocks());
             }
         }
     }

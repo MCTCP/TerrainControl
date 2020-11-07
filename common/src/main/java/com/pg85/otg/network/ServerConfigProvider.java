@@ -127,7 +127,7 @@ public final class ServerConfigProvider implements ConfigProvider
     }
     
     private void loadFallbacks() {
-    	File fallbackFile = new File(settingsDir.toString(), WorldStandardValues.FALLBACK_FILE_NAME);
+    	File fallbackFile = new File(settingsDir.toString(), WorldStandardValues.FALLBACK_FILE);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), fallbackFile);   
 
         FallbackConfig fallbacks = new FallbackConfig(settingsMap);
@@ -138,11 +138,11 @@ public final class ServerConfigProvider implements ConfigProvider
 
     private SettingsMap loadAndInitWorldConfig()
     {
-    	File worldConfigFile = new File(settingsDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE_NAME);
+    	File worldConfigFile = new File(settingsDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE);
         SettingsMap settingsMap = FileSettingsReader.read(world.getName(), worldConfigFile);
 
     	ArrayList<String> biomes = new ArrayList<String>();
-    	File biomesDirectory = new File(settingsDir.toString(), WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME); 	
+    	File biomesDirectory = new File(settingsDir.toString(), WorldStandardValues.WORLD_BIOMES_FOLDER); 	
 
     	addBiomesFromDirRecursive(biomes, biomesDirectory);
     	
@@ -176,7 +176,7 @@ public final class ServerConfigProvider implements ConfigProvider
     	
         // Establish folders
         List<Path> biomeDirs = new ArrayList<Path>(2);
-        biomeDirs.add(Paths.get(settingsDir.toString(), WorldStandardValues.WORLD_BIOMES_DIRECTORY_NAME));
+        biomeDirs.add(Paths.get(settingsDir.toString(), WorldStandardValues.WORLD_BIOMES_FOLDER));
 
         FileHelper.makeFolders(biomeDirs);
 
@@ -717,7 +717,7 @@ public final class ServerConfigProvider implements ConfigProvider
         {
             this.worldConfig.biomeConfigsHaveReplacement = biomeConfig.replacedBlocks.hasReplaceSettings();
         }
-        biomeConfig.replacedBlocks.parseForWorld(this.world);
+        biomeConfig.replacedBlocks.parseForWorld(this.getWorldConfig());
 
         // Indexing MaxSmoothRadius
         if (this.worldConfig.maxSmoothRadius < biomeConfig.smoothRadius)

@@ -1,18 +1,14 @@
 package com.pg85.otg.customobjects.bo3.checks;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 
 import java.util.List;
 
-/**
- *
- */
 public class LightCheck extends BO3Check
 {
-
     /**
      * The minimum Light level, inclusive
      */
@@ -23,9 +19,9 @@ public class LightCheck extends BO3Check
     private int maxLightLevel;
 
     @Override
-    public boolean preventsSpawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    public boolean preventsSpawn(LocalWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        int lightLevel = world.getLightLevel(x, y, z, chunkBeingPopulated);
+        int lightLevel = worldGenRegion.getLightLevel(x, y, z, chunkBeingPopulated);
         if (lightLevel < minLightLevel || lightLevel > maxLightLevel)
         {
             // Out of bounds

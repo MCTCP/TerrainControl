@@ -2,7 +2,7 @@ package com.pg85.otg.gen;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -50,7 +50,6 @@ public class ChunkProviderOTG
     // Always false if improved rivers disabled
     private boolean riverFound = false;
 
-    private final LocalWorld localWorld;
     private double volatilityFactor;
     private double heightFactor;
 
@@ -71,14 +70,15 @@ public class ChunkProviderOTG
     // TODO: Should this really be limited to 1024?
     private BiomeConfig[] biomes = new BiomeConfig[1024];
     
-    public ChunkProviderOTG(ConfigProvider configs, LocalWorld world)
+    public ChunkProviderOTG(ConfigProvider configs, long worldSeed)
     {    	
+        WorldConfig worldConfig = configs.getWorldConfig();
+    	
         this.configProvider = configs;
-        this.localWorld = world;
-        this.heightCap = world.getHeightCap();
-        this.heightScale = world.getHeightScale();
+        this.heightCap = worldConfig.worldHeightCap;
+        this.heightScale = worldConfig.worldHeightScale;
 
-        this.random = new Random(world.getSeed());
+        this.random = new Random(worldSeed);
 
         this.vol1NoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
         this.vol2NoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
@@ -87,10 +87,8 @@ public class ChunkProviderOTG
         this.oldTerrainGeneratorNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 10);
         this.noiseHeightNoiseGen = new NoiseGeneratorPerlinOctaves(this.random, 16);
 
-        this.caveGen = new CavesGen(configs.getWorldConfig(), this.localWorld);
-        this.canyonGen = new RavinesGen(configs.getWorldConfig(), this.localWorld);
-
-        WorldConfig worldConfig = configs.getWorldConfig();
+        this.caveGen = new CavesGen(configs.getWorldConfig(), worldSeed);
+        this.canyonGen = new RavinesGen(configs.getWorldConfig(), worldSeed);
 
         // Contains 2d array maxSmoothDiameter*maxSmoothDiameter.
         // Maximum weight is in array center.
@@ -111,29 +109,29 @@ public class ChunkProviderOTG
 
     }
     
-    public void generate(ChunkBuffer chunkBuffer)
+    public void generate(long worldSeed, ChunkBuffer chunkBuffer, LocalWorldGenRegion worldGenRegion)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
         int x = chunkCoord.getChunkX();
         int z = chunkCoord.getChunkZ();
         this.random.setSeed(x * 341873128712L + z * 132897987541L);
               
-        boolean dry = generateTerrain(x, z, chunkBuffer);
-                
-        if(!this.localWorld.generateModdedCaveGen(x, z, chunkBuffer))
+        boolean dry = generateTerrain(worldSeed, x, z, chunkBuffer, worldGenRegion.getBiomeGenerator());
+
+        if(!worldGenRegion.generateModdedCaveGen(worldSeed, x, z, chunkBuffer))
         {
-            this.caveGen.generate(chunkBuffer);        	
+            this.caveGen.generate(worldGenRegion, chunkBuffer);
         }
-        this.canyonGen.generate(chunkBuffer);
+        this.canyonGen.generate(worldGenRegion, chunkBuffer);
 
         WorldConfig worldConfig = configProvider.getWorldConfig();
         if (worldConfig.modeTerrain == WorldConfig.TerrainMode.Normal)// || worldConfig.modeTerrain == WorldConfig.TerrainMode.OldGenerator)
         {
-            this.localWorld.prepareDefaultStructures(x, z, dry);
+        	worldGenRegion.prepareDefaultStructures(worldSeed, x, z, dry);
         }
     }
     
-    private boolean generateTerrain(int x, int z, ChunkBuffer chunkBuffer)
+    private boolean generateTerrain(long worldSeed, int x, int z, ChunkBuffer chunkBuffer, BiomeGenerator biomeGenerator)
     {
         int[] biomeArray = null;
         byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];;
@@ -146,7 +144,6 @@ public class ChunkProviderOTG
         int usedYSections = this.heightScale / 8 + 1;
 
         WorldConfig worldConfig = configProvider.getWorldConfig();
-        BiomeGenerator biomeGenerator = this.localWorld.getBiomeGenerator();
         int[] riverArray = null;
         if (worldConfig.improvedRivers)
         {
@@ -293,7 +290,7 @@ public class ChunkProviderOTG
                                 {
                                 	// TODO: Setting replaced blocks here might cause problems for mods
                                 	// that check for biome.waterblock during the replaceBiomeBlocks event.
-                                	block = biomeConfig.getWaterBlockReplaced(this.localWorld, realY);
+                                	block = biomeConfig.getWaterBlockReplaced(realY);
                                 	chunkBuffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
                                 }
                                 
@@ -302,7 +299,7 @@ public class ChunkProviderOTG
                                 {
                                 	// TODO: Setting replaced blocks here might cause problems for mods
                                 	// that check for biome.stoneblock during the replaceBiomeBlocks event.
-                                	block = biomeConfig.getStoneBlockReplaced(this.localWorld, realY);
+                                	block = biomeConfig.getStoneBlockReplaced(realY);
                                 	chunkBuffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
                                 }
                                 
@@ -316,9 +313,9 @@ public class ChunkProviderOTG
         }
 
         boolean dry = false;
-        if(OTG.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld))
+        if(OTG.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer))
 		{
-        	dry = addBiomeBlocksAndCheckWater(chunkBuffer, biomeArray, waterLevel);
+        	dry = addBiomeBlocksAndCheckWater(worldSeed, chunkBuffer, biomeArray, waterLevel);
 		}
         return dry;
     }
@@ -348,7 +345,7 @@ public class ChunkProviderOTG
      * @return Whether there is a lot of water in this chunk. If yes, no
      *         villages will be placed.
      */
-    private boolean addBiomeBlocksAndCheckWater(ChunkBuffer chunkBuffer, int[] biomeArray, byte[] waterLevel)
+    private boolean addBiomeBlocksAndCheckWater(long worldSeed, ChunkBuffer chunkBuffer, int[] biomeArray, byte[] waterLevel)
     {
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
 
@@ -368,7 +365,7 @@ public class ChunkProviderOTG
                 // Get the current biome config and some properties
                 final BiomeConfig biomeConfig = toBiomeConfig(biomeArray[(x + z * CHUNK_SIZE)]);
 
-                biomeConfig.surfaceAndGroundControl.spawn(localWorld, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+                biomeConfig.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
                 // Count liquid blocks
                 if (

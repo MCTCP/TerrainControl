@@ -23,8 +23,6 @@ import net.minecraftforge.fml.loading.FMLLoader;
 
 public class ForgeEngine extends OTGEngine
 {
-    private static final int STANDARD_WORLD_HEIGHT = 128; // TODO: Why is this 128, should be 255?
-	
 	public ForgeEngine()
 	{
 		super(
@@ -77,7 +75,7 @@ public class ForgeEngine extends OTGEngine
         for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
             int id = defaultBiome.Id;
-            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), STANDARD_WORLD_HEIGHT);
+            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), 128); // TODO: Why is this 128, should be 255?
             standardBiomes.add(instruction);
         }
 

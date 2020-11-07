@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.io.FileSettingsReaderOTGPlus;
@@ -23,6 +23,7 @@ import com.pg85.otg.customobjects.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobjects.bo3.checks.BO3Check;
 import com.pg85.otg.customobjects.structures.Branch;
 import com.pg85.otg.customobjects.structures.CustomStructure;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructure;
@@ -112,7 +113,7 @@ public class BO3 implements StructuredCustomObject
 
     // Used to safely spawn this object from a grown sapling
     @Override
-    public boolean spawnFromSapling(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    public boolean spawnFromSapling(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
     {
         BO3BlockFunction[] blocks = this.settings.getBlocks(rotation.getRotationId());
 
@@ -124,7 +125,7 @@ public class BO3 implements StructuredCustomObject
         LocalMaterialData localMaterial;
         for (BO3BlockFunction block : blocks)
         {
-            localMaterial = world.getMaterial(x + block.x, y + block.y, z + block.z, null);
+            localMaterial = worldGenRegion.getMaterial(x + block.x, y + block.y, z + block.z, null);
 
             // Ignore blocks in the ground when checking spawn conditions
             if (block.y >= 0)
@@ -149,11 +150,12 @@ public class BO3 implements StructuredCustomObject
 
             oeh.addBlock((BO3BlockFunction) block);
         }
-        for (BO3BlockFunction block : blocksToSpawn) {
-            block.spawn(world, random, x + block.x, y + block.y, z + block.z, null, false);
+        for (BO3BlockFunction block : blocksToSpawn)
+        {
+            block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z, null, false);
         }
-        oeh.extrude(world, random, x, y, z, null, false);
-        handleBO3Functions(null, world, random, rotation, x, y, z, chunks, null);
+        oeh.extrude(worldGenRegion, random, x, y, z, null, false);
+        handleBO3Functions(null, structureCache, worldGenRegion, random, rotation, x, y, z, chunks, null);
 
         return true;
     }
@@ -161,7 +163,7 @@ public class BO3 implements StructuredCustomObject
     // Force spawns a BO3 object. Used by /otg spawn and bo3AtSpawn.
     // This method ignores the maxPercentageOutsideBlock setting
     @Override
-    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z)
+    public boolean spawnForced(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z)
     {
         BO3BlockFunction[] blocks = this.settings.getBlocks(rotation.getRotationId());
         ObjectExtrusionHelper oeh = new ObjectExtrusionHelper(this.settings.extrudeMode, this.settings.extrudeThroughBlocks);
@@ -173,14 +175,14 @@ public class BO3 implements StructuredCustomObject
             if (this.settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway
                     || this.settings.sourceBlocks.contains(block.material))
             {
-                block.spawn(world, random, x + block.x, y + block.y, z + block.z, null, this.doReplaceBlocks());
+                block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z, null, this.doReplaceBlocks());
                 oeh.addBlock(block);
                 chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
             }
         }
 
-        oeh.extrude(world, random, x, y, z, null, this.doReplaceBlocks());
-        handleBO3Functions(null, world, random, rotation, x, y, z, chunks, null);
+        oeh.extrude(worldGenRegion, random, x, y, z, null, this.doReplaceBlocks());
+        handleBO3Functions(null, structureCache, worldGenRegion, random, rotation, x, y, z, chunks, null);
 
         return true;
     }
@@ -188,7 +190,7 @@ public class BO3 implements StructuredCustomObject
     // This method is only used to spawn CustomObject.
     // Called during population.
     @Override
-    public boolean process(LocalWorld world, Random random, ChunkCoordinate chunkCoord)
+    public boolean process(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, ChunkCoordinate chunkCoord)
     {
         boolean atLeastOneObjectHasSpawned = false;
 
@@ -201,7 +203,7 @@ public class BO3 implements StructuredCustomObject
                 int x = chunkMiddleX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
                 int z = chunkMiddleZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
-                if (spawn(world, random, x, z, this.settings.minHeight, this.settings.maxHeight, chunkCoord, this.doReplaceBlocks()))
+                if (spawn(structureCache, worldGenRegion, random, x, z, this.settings.minHeight, this.settings.maxHeight, chunkCoord, this.doReplaceBlocks()))
                 {
                     atLeastOneObjectHasSpawned = true;
                 }
@@ -213,7 +215,7 @@ public class BO3 implements StructuredCustomObject
 
     // Used for trees during population
     @Override
-    public boolean spawnAsTree(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
+    public boolean spawnAsTree(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated)
     {
     	// A bit ugly, but avoids having to create and implement another spawnAsTree method.
     	if(minY == -1)
@@ -224,11 +226,11 @@ public class BO3 implements StructuredCustomObject
     	{
     		maxY = this.getSettings().maxHeight;
     	}
-        return spawn(world, random, x, z, minY, maxY, chunkBeingPopulated, false);
+        return spawn(structureCache, worldGenRegion, random, x, z, minY, maxY, chunkBeingPopulated, false);
     }
 
     // Used for customobject and trees during population
-    private boolean spawn(LocalWorld world, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+    private boolean spawn(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, int x, int z, int minY, int maxY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
         Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int offsetY = 0;
@@ -239,20 +241,20 @@ public class BO3 implements StructuredCustomObject
         }
         if (this.settings.spawnHeight == SpawnHeightEnum.highestBlock)
         {
-        	baseY = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+        	baseY = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
         }
         if (this.settings.spawnHeight == SpawnHeightEnum.highestSolidBlock)
         {
-        	baseY = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
+        	baseY = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
         }
         // Offset by static and random settings values
         // TODO: This is pointless used with randomY?
         offsetY = baseY + this.getOffsetAndVariance(random, this.settings.spawnHeightOffset, this.settings.spawnHeightVariance);
-        return trySpawnAt(null, world, random, rotation, x, offsetY, z, minY, maxY, baseY, chunkBeingPopulated, replaceBlocks);
+        return trySpawnAt(null, structureCache, worldGenRegion, random, rotation, x, offsetY, z, minY, maxY, baseY, chunkBeingPopulated, replaceBlocks);
     }
     
     // Used for trees, customobjects and customstructures during population.
-    public boolean trySpawnAt(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, int baseY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+    public boolean trySpawnAt(CustomStructure structure, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, int minY, int maxY, int baseY, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
     {
         if (y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT) // Isn't this already done before this method is called?
         {
@@ -273,7 +275,7 @@ public class BO3 implements StructuredCustomObject
         	// Don't apply spawn height offset/variance to block checks,
         	// they should only be used with highestBlock/highestSolidBlock,
         	// and need to check for things like grass at the original spawn y.
-        	if (check.preventsSpawn(world, x + check.x, baseY + check.y, z + check.z, chunkBeingPopulated))
+        	if (check.preventsSpawn(worldGenRegion, x + check.x, baseY + check.y, z + check.z, chunkBeingPopulated))
             {
                 // A check failed
                 return false;
@@ -321,7 +323,7 @@ public class BO3 implements StructuredCustomObject
 					) || 
     				this.settings.outsideSourceBlock == OutsideSourceBlock.dontPlace
 				) && 
-    			!this.settings.sourceBlocks.contains(world.getMaterial(x + block.x, y + block.y, z + block.z, chunkBeingPopulated))
+    			!this.settings.sourceBlocks.contains(worldGenRegion.getMaterial(x + block.x, y + block.y, z + block.z, chunkBeingPopulated))
     		)
             {
                 blocksOutsideSourceBlock++;
@@ -347,7 +349,7 @@ public class BO3 implements StructuredCustomObject
         }
 
         // Call event
-        if (!OTG.fireCanCustomObjectSpawnEvent(this, world, x, y, z))
+        if (!OTG.fireCanCustomObjectSpawnEvent(this, worldGenRegion, x, y, z))
         {
             // Cancelled
             return false;
@@ -357,16 +359,16 @@ public class BO3 implements StructuredCustomObject
 
         for (BO3BlockFunction block : blocksToSpawn)
         {
-            block.spawn(world, random, x + block.x, y + block.y, z + block.z, chunkBeingPopulated, replaceBlocks);
+            block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z, chunkBeingPopulated, replaceBlocks);
         }
 
-        oeh.extrude(world, random, x, y, z, chunkBeingPopulated, replaceBlocks);
-        handleBO3Functions(structure, world, random, rotation, x, y, z, chunks, chunkBeingPopulated);
+        oeh.extrude(worldGenRegion, random, x, y, z, chunkBeingPopulated, replaceBlocks);
+        handleBO3Functions(structure, structureCache, worldGenRegion, random, rotation, x, y, z, chunks, chunkBeingPopulated);
 
         return true;
     }
 
-    public void handleBO3Functions(CustomStructure structure, LocalWorld world, Random random, Rotation rotation, int x, int y, int z, HashSet<ChunkCoordinate> chunks, ChunkCoordinate chunkBeingPopulated)
+    public void handleBO3Functions(CustomStructure structure, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, HashSet<ChunkCoordinate> chunks, ChunkCoordinate chunkBeingPopulated)
     {
         HashSet<ChunkCoordinate> chunksCustomObject = new HashSet<ChunkCoordinate>();
 
@@ -459,17 +461,17 @@ public class BO3 implements StructuredCustomObject
 
             for (ChunkCoordinate structureCoord : chunks)
             {
-            	world.getStructureCache().addBo3ToStructureCache(structureCoord, structure, true);
+            	structureCache.addBo3ToStructureCache(structureCoord, structure, true);
             }
         } else {
-            CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(world, this, this.getName(), Rotation.NORTH, x, (short) 0, z));
+            CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(worldGenRegion.getWorldName(), this, this.getName(), Rotation.NORTH, x, (short) 0, z));
             placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
             placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);
             placeHolderStructure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
 
             for (ChunkCoordinate structureCoord : chunksCustomObject)
             {
-            	world.getStructureCache().addBo3ToStructureCache(structureCoord, placeHolderStructure, false);            
+            	structureCache.addBo3ToStructureCache(structureCoord, placeHolderStructure, false);            
             }
         }
 
@@ -490,7 +492,7 @@ public class BO3 implements StructuredCustomObject
             newEntityData.namedBinaryTag = entity.namedBinaryTag;
             newEntityData.rotation = entity.rotation;
 
-           	world.spawnEntity(newEntityData, chunkBeingPopulated);
+            worldGenRegion.spawnEntity(newEntityData, chunkBeingPopulated);
         }
     }
 
@@ -538,11 +540,11 @@ public class BO3 implements StructuredCustomObject
         return MathHelper.clamp(offset + variance, PluginStandardValues.WORLD_DEPTH, PluginStandardValues.WORLD_HEIGHT - 1);
     }
     
-    public CustomStructureCoordinate makeCustomStructureCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public CustomStructureCoordinate makeCustomStructureCoordinate(String worldName, Random random, int chunkX, int chunkZ)
     {
         Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int height = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
-        return new BO3CustomStructureCoordinate(world, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
+        return new BO3CustomStructureCoordinate(worldName, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
     }
 
 	@Override

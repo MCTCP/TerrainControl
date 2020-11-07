@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects.structures.bo4.smoothing;
 import java.util.ArrayList;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -32,7 +32,7 @@ public class SmoothingAreaColumn
 		this.blocks.add(block);
 	}
 
-	public void processBlocks(LocalWorld world, ChunkCoordinate chunkBeingPopulated, BO4Config bo4Config)
+	public void processBlocks(LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, BO4Config bo4Config)
 	{
 		if(this.highestFillingBlock == null && this.lowestCuttingBlock == null)
 		{
@@ -64,13 +64,13 @@ public class SmoothingAreaColumn
 			// TODO: When using SmoothStartTop:true, if a smoothing line is underneath a bo4 block, we can 
 			// cancel spawning the rest of the line since we know we won't need it.
 		}
-		spawn(world, chunkBeingPopulated, bo4Config);
+		spawn(worldGenRegion, chunkBeingPopulated, bo4Config);
 	}
 	
-	private void spawn(LocalWorld world, ChunkCoordinate chunkBeingPopulated, BO4Config bo4Config)
+	private void spawn(LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, BO4Config bo4Config)
 	{
-		BiomeConfig biomeConfig = world.getBiome(this.x, this.z).getBiomeConfig();
-		
+		BiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(this.x, this.z);
+
 		LocalMaterialData replaceAboveMaterial = null;
 		try {
 			replaceAboveMaterial = OTG.getEngine().readMaterial(bo4Config.replaceAbove);
@@ -115,14 +115,14 @@ public class SmoothingAreaColumn
 			{
 				if(highestBlockInWorld == -1)
 				{
-					highestBlockInWorld = world.getHighestBlockYAt(this.x, this.z, true, false, true, true, true, null);
+					highestBlockInWorld = worldGenRegion.getHighestBlockYAt(this.x, this.z, true, false, true, true, true, null);
 				}
 				
 				for(int y = highestBlockInWorld; y > this.lowestCuttingBlock.y; y--)
 				{
 					if(y > 0)
 					{
-						world.setBlock(this.lowestCuttingBlock.x, y, this.lowestCuttingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);
+						worldGenRegion.setBlock(this.lowestCuttingBlock.x, y, this.lowestCuttingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);
 					}
 				}
 				
@@ -136,19 +136,19 @@ public class SmoothingAreaColumn
 					{
 						surfaceBlock = smoothingSurfaceBlock;
 					} else {
-						blockAbove = world.getMaterial(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y + 1, this.lowestCuttingBlock.z, chunkBeingPopulated);
+						blockAbove = worldGenRegion.getMaterial(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y + 1, this.lowestCuttingBlock.z, chunkBeingPopulated);
 						if(blockAbove != null && (blockAbove.isSolid() || blockAbove.isLiquid()))
 						{
-							surfaceBlock = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z);	    							    							
+							surfaceBlock = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(worldGenRegion, biomeConfig, this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z);	    							    							
 						} else {
-							surfaceBlock = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z);
+							surfaceBlock = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(worldGenRegion, biomeConfig, this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z);
 						}
 						needsReplaceBlocks = false;
                         if(surfaceBlock.isAir())
                         {
                             if(
-                        		this.lowestCuttingBlock.y < (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax) &&
-                        		world.getMaterial(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, chunkBeingPopulated).isAir()
+                        		this.lowestCuttingBlock.y < (biomeConfig.useWorldWaterLevel ? worldGenRegion.getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax) &&
+                        		worldGenRegion.getMaterial(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, chunkBeingPopulated).isAir()
                     		)
                             {
                             	surfaceBlock = LocalMaterials.WATER;
@@ -159,7 +159,7 @@ public class SmoothingAreaColumn
 					}
 					if(surfaceBlock != null)
 					{						
-						world.setBlock(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
+						worldGenRegion.setBlock(this.lowestCuttingBlock.x, this.lowestCuttingBlock.y, this.lowestCuttingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
 					}
 				}
 			}
@@ -168,7 +168,7 @@ public class SmoothingAreaColumn
 		{
 			if(highestBlockInWorld == -1)
 			{
-				highestBlockInWorld = world.getHighestBlockYAt(this.x, this.z, true, false, true, true, true, null);
+				highestBlockInWorld = worldGenRegion.getHighestBlockYAt(this.x, this.z, true, false, true, true, true, null);
 			}
 			
 			// ReplaceAbove 
@@ -179,7 +179,7 @@ public class SmoothingAreaColumn
 				{
 					if(y > 0)
 					{
-						world.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);
+						worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, replaceAboveMaterial, null, chunkBeingPopulated, false);
 					}
 				}
 			}
@@ -192,20 +192,20 @@ public class SmoothingAreaColumn
 				surfaceBlock = smoothingSurfaceBlock;
 			} else {
 				
-				blockAbove = world.getMaterial(this.highestFillingBlock.x, this.highestFillingBlock.y + 1, this.highestFillingBlock.z, chunkBeingPopulated);
+				blockAbove = worldGenRegion.getMaterial(this.highestFillingBlock.x, this.highestFillingBlock.y + 1, this.highestFillingBlock.z, chunkBeingPopulated);
 				if(blockAbove != null && (blockAbove.isSolid() || blockAbove.isLiquid()))
 				{
-					surfaceBlock = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z);	    							    							
+					surfaceBlock = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(worldGenRegion, biomeConfig, this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z);	    							    							
 				} else {
-					surfaceBlock = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(world, biomeConfig, this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z);
+					surfaceBlock = biomeConfig.surfaceAndGroundControl.getSurfaceBlockAtHeight(worldGenRegion, biomeConfig, this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z);
 				}				
 				
 				needsReplaceBlocks = false;
                 if(surfaceBlock.isAir())
                 {
                     if(
-                		this.highestFillingBlock.y < (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax) &&
-                		world.getMaterial(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, chunkBeingPopulated).isAir()
+                		this.highestFillingBlock.y < (biomeConfig.useWorldWaterLevel ? worldGenRegion.getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax) &&
+                		worldGenRegion.getMaterial(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, chunkBeingPopulated).isAir()
             		)
                     {
                     	surfaceBlock = LocalMaterials.WATER;
@@ -218,7 +218,7 @@ public class SmoothingAreaColumn
 			{
 				if(this.highestFillingBlock.y > 0)
 				{
-					world.setBlock(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
+					worldGenRegion.setBlock(this.highestFillingBlock.x, this.highestFillingBlock.y, this.highestFillingBlock.z, surfaceBlock, null, chunkBeingPopulated, needsReplaceBlocks);
 				}
 			}
 						
@@ -233,13 +233,13 @@ public class SmoothingAreaColumn
 						needsReplaceBlocks = bo4Config.doReplaceBlocks;
 		                if(groundBlock.isAir())
 		                {
-		                    if(y < (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
+		                    if(y < (biomeConfig.useWorldWaterLevel ? worldGenRegion.getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
 		                    {
 		                    	groundBlock = LocalMaterials.WATER;
 		                    	needsReplaceBlocks = false;
 		                    }
 		                }
-						world.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, needsReplaceBlocks);
+		                worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, needsReplaceBlocks);
 					}
 				}
 			} else {
@@ -247,15 +247,15 @@ public class SmoothingAreaColumn
 				{
 					if(y > 0)
 					{
-						groundBlock = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(world, biomeConfig, this.highestFillingBlock.x, y, this.highestFillingBlock.z);
+						groundBlock = biomeConfig.surfaceAndGroundControl.getGroundBlockAtHeight(worldGenRegion, biomeConfig, this.highestFillingBlock.x, y, this.highestFillingBlock.z);
 		                if(groundBlock.isAir())
 		                {
-		                    if(y < (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
+		                    if(y < (biomeConfig.useWorldWaterLevel ? worldGenRegion.getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax))
 		                    {
 		                    	groundBlock = LocalMaterials.WATER;
 		                    }
 		                }
-						world.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, false);
+		                worldGenRegion.setBlock(this.highestFillingBlock.x, y, this.highestFillingBlock.z, groundBlock, null, chunkBeingPopulated, false);
 					}
 				}
 			}

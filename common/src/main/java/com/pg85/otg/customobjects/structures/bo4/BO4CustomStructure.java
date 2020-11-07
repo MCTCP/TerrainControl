@@ -1,13 +1,14 @@
 package com.pg85.otg.customobjects.structures.bo4;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bo3.BO3Settings.SpawnHeightEnum;
 import com.pg85.otg.customobjects.structures.CustomStructure;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaGenerator;
@@ -133,9 +134,9 @@ public class BO4CustomStructure extends CustomStructure
     	this.start = start;
     }
     
-    public BO4CustomStructure(LocalWorld world, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, int minY)
+    public BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, int minY)
     {
-    	this(world, structureStart);
+    	this(worldSeed, structureStart);
     	this.objectsToSpawn = objectsToSpawn;
     	this.smoothingAreaManager.fillSmoothingLineCaches(smoothingAreasToSpawn);
     	this.minY = minY;
@@ -146,7 +147,7 @@ public class BO4CustomStructure extends CustomStructure
     
     }
     
-    public BO4CustomStructure(LocalWorld world, BO4CustomStructureCoordinate start)
+    public BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate start)
     {
         this.isStructureAtSpawn = false;
 
@@ -160,10 +161,10 @@ public class BO4CustomStructure extends CustomStructure
         }
 
         this.start = start;
-        this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, world.getSeed());
+        this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, worldSeed);
     }
     
-    public BO4CustomStructure(LocalWorld world, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
+    public BO4CustomStructure(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
     {
         this.isStructureAtSpawn = isStructureAtSpawn;
 
@@ -173,11 +174,11 @@ public class BO4CustomStructure extends CustomStructure
         }
 
         this.start = start;
-        this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, world.getSeed());
+        this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, worldGenRegion.getSeed());
 
 		long startTime = System.currentTimeMillis();
 
-		if(!doStartChunkBlockChecks(world, chunkBeingPopulated))
+		if(!doStartChunkBlockChecks(worldGenRegion, chunkBeingPopulated))
 		{
 			return;
 		}
@@ -186,7 +187,7 @@ public class BO4CustomStructure extends CustomStructure
 		
 		try
 		{
-			calculateBranches(false, world, targetBiomes, chunkBeingPopulated);
+			calculateBranches(false, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 		} catch (InvalidConfigException ex) {
 			OTG.log(LogMarker.FATAL, "An unknown error occurred while calculating branches for BO4 " + this.start.bo3Name + ". This is probably an error in the BO4's branch configuration, not a bug. If you can track this down, please tell me what caused it!");
 			throw new RuntimeException();
@@ -242,18 +243,18 @@ public class BO4CustomStructure extends CustomStructure
         // that there is a smooth transition in height from the surrounding
         // terrain to the BO3. This way BO3's won't float above the ground
         // or spawn inside a hole with vertical walls.
-		smoothingAreaManager.calculateSmoothingAreas(objectsToSpawn, (BO4CustomStructureCoordinate)this.start, world);
+		smoothingAreaManager.calculateSmoothingAreas(objectsToSpawn, (BO4CustomStructureCoordinate)this.start, worldGenRegion);
 		
 		// Add the structure to the structure caches
 		
 		for(ChunkCoordinate chunkCoord : objectsToSpawn.keySet())
 		{
-			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);		
+			structureCache.addBo4ToStructureCache(chunkCoord, this);		
 		}
 
 		for(ChunkCoordinate chunkCoord : this.smoothingAreaManager.getSmoothingAreaChunkCoords())
 		{
-			world.getStructureCache().addBo4ToStructureCache(chunkCoord, this);
+			structureCache.addBo4ToStructureCache(chunkCoord, this);
 		}
 
 		if(objectsToSpawn.size() > 0)
@@ -272,7 +273,7 @@ public class BO4CustomStructure extends CustomStructure
 		}
     }
 
-    private boolean doStartChunkBlockChecks(LocalWorld world, ChunkCoordinate chunkBeingPopulated)
+    private boolean doStartChunkBlockChecks(LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated)
     {
     	if(!startChunkBlockChecksDone)
     	{
@@ -332,11 +333,11 @@ public class BO4CustomStructure extends CustomStructure
 			{				
 				if(config.spawnAtWaterLevel)
 				{
-					LocalBiome biome = world.getBiome(centerX, centerZ);
-					startY = (short) (biome.getBiomeConfig().useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biome.getBiomeConfig().waterLevelMax);
+					BiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(centerX, centerZ);
+					startY = (short) (biomeConfig.useWorldWaterLevel ? worldGenRegion.getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax);
 				} else {
 					// Passing null for chunk being populated, so we can query unloaded/ungenerated chunks (we'll generate them in memory only and cache them for later use)
-					int highestBlock = world.getHighestBlockYAt(centerX, centerZ, true, !config.spawnUnderWater, config.spawnUnderWater, true, true, null);
+					int highestBlock = worldGenRegion.getHighestBlockYAt(centerX, centerZ, true, !config.spawnUnderWater, config.spawnUnderWater, true, true, null);
 					if(highestBlock < 0)
 					{
 						if(config.heightOffset > 0) // Allow floating structures that use highestblock + heightoffset
@@ -372,7 +373,7 @@ public class BO4CustomStructure extends CustomStructure
 
 			if(!config.canSpawnOnWater)
 			{
-				if(world.getMaterial(this.start.getX() + 8, world.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true, null), this.start.getZ() + 7, null).isLiquid())
+				if(worldGenRegion.getMaterial(this.start.getX() + 8, worldGenRegion.getHighestBlockYAt(this.start.getX() + 8, this.start.getZ() + 7, true, true, false, true, true, null), this.start.getZ() + 7, null).isLiquid())
 				{
 					return false;
 				}
@@ -382,10 +383,10 @@ public class BO4CustomStructure extends CustomStructure
 			{
 				if(
 					!(
-						world.getMaterial(this.start.getX(), world.getHighestBlockYAt(this.start.getX(), this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
-						world.getMaterial(this.start.getX(), world.getHighestBlockYAt(this.start.getX(), this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid() &&
-						world.getMaterial(this.start.getX() + 15, world.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
-						world.getMaterial(this.start.getX() + 15, world.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid()
+						worldGenRegion.getMaterial(this.start.getX(), worldGenRegion.getHighestBlockYAt(this.start.getX(), this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
+						worldGenRegion.getMaterial(this.start.getX(), worldGenRegion.getHighestBlockYAt(this.start.getX(), this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid() &&
+						worldGenRegion.getMaterial(this.start.getX() + 15, worldGenRegion.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ(), true, true, false, true, true, null), this.start.getZ(), null).isLiquid() &&
+						worldGenRegion.getMaterial(this.start.getX() + 15, worldGenRegion.getHighestBlockYAt(this.start.getX() + 15, this.start.getZ() + 15, true, true, false, true, true, null), this.start.getZ() + 15, null).isLiquid()
 					)
 				)
 				{
@@ -403,7 +404,7 @@ public class BO4CustomStructure extends CustomStructure
      * If this structure were spawned as small as possible (with branchDepth 0)
      * @throws InvalidConfigException
      */
-    public Object[] getMinimumSize(LocalWorld world) throws InvalidConfigException
+    public Object[] getMinimumSize(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion) throws InvalidConfigException
     {
     	if(
 			((BO4)this.start.getObject()).getConfig().minimumSizeTop != -1 &&
@@ -415,7 +416,7 @@ public class BO4CustomStructure extends CustomStructure
     		return returnValue;
     	}
     	
-    	calculateBranches(true, world, null, null);
+    	calculateBranches(true, structureCache, worldGenRegion, null, null);
 
         // Calculate smoothing areas around the entire branching structure
         // Smooth the terrain in all directions bordering the structure so
@@ -480,7 +481,7 @@ public class BO4CustomStructure extends CustomStructure
     	return returnValue;
     }
 
-    private void calculateBranches(boolean minimumSize, LocalWorld world, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated) throws InvalidConfigException
+    private void calculateBranches(boolean minimumSize, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated) throws InvalidConfigException
     {
     	if(OTG.getPluginConfig().spawnLog)
     	{
@@ -517,13 +518,13 @@ public class BO4CustomStructure extends CustomStructure
     			OTG.log(LogMarker.INFO, "---- Cycle " + Cycle + " ----");
     		}
 
-    		traverseAndSpawnChildBranches(branchData, minimumSize, true, world, targetBiomes, chunkBeingPopulated);
+    		traverseAndSpawnChildBranches(branchData, minimumSize, true, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 
 			if(OTG.getPluginConfig().spawnLog)
 			{
 				OTG.log(LogMarker.INFO, "All branch groups with required branches only have been processed for cycle " + Cycle + ", plotting branch groups with optional branches.");
 			}
-			traverseAndSpawnChildBranches(branchData, minimumSize, false, world, targetBiomes, chunkBeingPopulated);
+			traverseAndSpawnChildBranches(branchData, minimumSize, false, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 
 			processingDone = true;
             for(BranchDataItem branchDataItem3 : AllBranchesBranchData)
@@ -544,7 +545,7 @@ public class BO4CustomStructure extends CustomStructure
             	processingDone = false;
 	            for(BranchDataItem branchDataItem3 : AllBranchesBranchData)
 	            {
-	            	for(BranchDataItem childBranch : branchDataItem3.getChildren(false, world, chunkBeingPopulated))
+	            	for(BranchDataItem childBranch : branchDataItem3.getChildren(false, worldGenRegion, chunkBeingPopulated))
 	            	{
 	            		if(
             				!childBranch.branch.isRequiredBranch &&
@@ -609,34 +610,34 @@ public class BO4CustomStructure extends CustomStructure
         AllBranchesBranchDataHash.clear();
     }
 
-    private void traverseAndSpawnChildBranches(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
+    private void traverseAndSpawnChildBranches(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
     {
     	if(!branchData.doneSpawning)
     	{
-    		addBranches(branchData, minimumSize, false, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+    		addBranches(branchData, minimumSize, false, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
     	} else {
     		if(!branchData.cannotSpawn)
     		{
-    			for(BranchDataItem branchDataItem2 : branchData.getChildren(false, world, chunkBeingPopulated))
+    			for(BranchDataItem branchDataItem2 : branchData.getChildren(false, worldGenRegion, chunkBeingPopulated))
     			{
     				// BranchData.DoneSpawning can be set to true by a child branch
     				// that tried to spawn but couldnt
     				if(!branchDataItem2.cannotSpawn && branchData.doneSpawning)
     				{
-    					traverseAndSpawnChildBranches(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+    					traverseAndSpawnChildBranches(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
     				}
     			}
     		}
     	}
     }
     
-    private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
+    private void addBranches(BranchDataItem branchDataItem, boolean minimumSize, boolean traverseOnlySpawnedChildren, boolean spawningRequiredBranchesOnly, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
     {
     	// CanOverride optional branches are spawned only after the main structure has spawned.
     	// This is useful for adding interiors and knocking out walls between rooms.
     	if(!SpawningCanOverrideBranches)
     	{
-	    	for(BranchDataItem branchDataItem3 : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+	    	for(BranchDataItem branchDataItem3 : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 	    	{
 	    		if(
     				(
@@ -667,7 +668,7 @@ public class BO4CustomStructure extends CustomStructure
     		// The second (optional branches) phase of this branch spawning cycle will call AddBranches on the branch for the
     		// second time to try to spawn them and will set DoneSpawning to true.
 			boolean hasOnlyRequiredBranches = true;
-			for(BranchDataItem branchDataItem3 : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+			for(BranchDataItem branchDataItem3 : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 			{
 				if(!branchDataItem3.branch.isRequiredBranch && !branchDataItem3.doneSpawning && !branchDataItem3.cannotSpawn)
 				{
@@ -686,7 +687,7 @@ public class BO4CustomStructure extends CustomStructure
 
     	if(!branchDataItem.cannotSpawn)
     	{    		
-	        for(BranchDataItem childBranchDataItem : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+	        for(BranchDataItem childBranchDataItem : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 	        {        	
 	        	if(!AllBranchesBranchDataHash.contains(childBranchDataItem.branchNumber) && !childBranchDataItem.spawnDelayed)
 	        	{
@@ -732,7 +733,7 @@ public class BO4CustomStructure extends CustomStructure
     		    			boolean hasOnlyRequiredBranches = true;
     		    			if(childBranchDataItem.branch.branchGroup != null && childBranchDataItem.branch.branchGroup.length() > 0)
     		    			{
-	    		    			for(BranchDataItem branchDataItem3 : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+	    		    			for(BranchDataItem branchDataItem3 : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 	    		    			{
 	    		    				if(
     		    						!branchDataItem3.branch.isRequiredBranch &&
@@ -784,13 +785,13 @@ public class BO4CustomStructure extends CustomStructure
 	        		Stack<BranchDataItem> collidingBranches = null;
 	        		if(canSpawn)
 	        		{
-	        			if(!minimumSize && world.chunkHasDefaultStructure(this.worldRandom, childBranchDataItem.chunkCoordinate))
+	        			if(!minimumSize && worldGenRegion.chunkHasDefaultStructure(this.worldRandom, childBranchDataItem.chunkCoordinate))
 	        			{
 	        				chunkIsIneligible = true;
 	        				canSpawn = false;
 	        			}
 
-	        			if(!minimumSize && bo3.getConfig().mustBeInsideWorldBorders && !world.isInsideWorldBorder(childBranchDataItem.chunkCoordinate))
+	        			if(!minimumSize && bo3.getConfig().mustBeInsideWorldBorders && !worldGenRegion.isInsideWorldBorder(childBranchDataItem.chunkCoordinate))
 	        			{
 	        				chunkIsIneligible = true;
 	        				canSpawn = false;
@@ -800,10 +801,10 @@ public class BO4CustomStructure extends CustomStructure
 		    			{
 		    				if(
 		    					!(
-	    							world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
-		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid() &&
-		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
-		    						world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid()
+	    							worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
+	    							worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX(), worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX(), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid() &&
+	    							worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ(), true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ(), null).isLiquid() &&
+	    							worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 15, worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 15, childBranchDataItem.chunkCoordinate.getBlockZ() + 15, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 15, null).isLiquid()
 		    					)
 		    				)
 		    				{
@@ -814,7 +815,7 @@ public class BO4CustomStructure extends CustomStructure
 		        		
 		        		if(canSpawn && !minimumSize && !bo3.getConfig().canSpawnOnWater)
 		    			{
-		    				if(world.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 8, world.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 8, childBranchDataItem.chunkCoordinate.getBlockZ() + 7, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 7, null).isLiquid())
+		    				if(worldGenRegion.getMaterial(childBranchDataItem.chunkCoordinate.getBlockX() + 8, worldGenRegion.getHighestBlockYAt(childBranchDataItem.chunkCoordinate.getBlockX() + 8, childBranchDataItem.chunkCoordinate.getBlockZ() + 7, true, true, false, true, true, null), childBranchDataItem.chunkCoordinate.getBlockZ() + 7, null).isLiquid())
 		    				{
 		    					wasOnWater = true;
 		    					canSpawn = false;
@@ -868,7 +869,7 @@ public class BO4CustomStructure extends CustomStructure
 
 	        		    if(!minimumSize && canSpawn)
 	        		    {
-	        	    		if(!checkYBounds(world, childBranchDataItem.branch))
+	        	    		if(!checkYBounds(worldGenRegion.getWorldConfig(), childBranchDataItem.branch))
 	        	    		{
 		    					canSpawn = false;
         						chunkIsIneligible = true;
@@ -878,7 +879,7 @@ public class BO4CustomStructure extends CustomStructure
 	        		    if(!minimumSize && canSpawn)
 	        		    {
 	        			    // Check if any other structures in the world are in this chunk
-	        			    if(world.getStructureCache().isChunkOccupied(world, childBranchDataItem.chunkCoordinate))
+	        			    if(structureCache.isChunkOccupied(childBranchDataItem.chunkCoordinate))
 	        			    {
 		    					canSpawn = false;
         						chunkIsIneligible = true;
@@ -889,7 +890,7 @@ public class BO4CustomStructure extends CustomStructure
 	        			{
 	        				// Returns null if the branch cannot spawn in the given biome or if there's another BO4 structure in the chunk, otherwise returns colliding branches. 
 	        				// CanOverride branches never collide with other branches, but may be unable to spawn if there's not enough space for smoothing areas.
-	    					collidingBranches = checkSpawnRequirementsAndCollisions(childBranchDataItem, minimumSize, world, targetBiomes);
+	    					collidingBranches = checkSpawnRequirementsAndCollisions(structureCache, childBranchDataItem, minimumSize, worldGenRegion, targetBiomes);
 	    					if(collidingBranches == null)
 	    					{
 		    					canSpawn = false;
@@ -921,13 +922,13 @@ public class BO4CustomStructure extends CustomStructure
 			        		OTG.log(LogMarker.INFO, "Plotted X" + childBranchDataItem.chunkCoordinate.getChunkX() + " Z" + childBranchDataItem.chunkCoordinate.getChunkZ() + (minimumSize ? "" : " Y" + (childBranchDataItem.branch.getY())) + " " +  childBranchDataItem.branch.bo3Name + ":" + childBranchDataItem.branch.getRotation() + (childBranchDataItem.branch.isRequiredBranch ? " required" : " optional") + " cycle " + Cycle + allParentsString);
 		        		}
 
-	        	    	if(childBranchDataItem.getChildren(false, world, chunkBeingPopulated).size() == 0)
+	        	    	if(childBranchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated).size() == 0)
 	        	    	{
 	        	    		childBranchDataItem.doneSpawning = true;
 	        	    	}
 
 	        	    	// Mark any branches in the same branch group so they wont try to spawn
-		        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+		        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 		        		{
 		        			if(
 	        					childBranchDataItem2 != childBranchDataItem &&
@@ -960,7 +961,7 @@ public class BO4CustomStructure extends CustomStructure
 
 		        			spawningRequiredChildrenForOptionalBranch = true;
         					currentSpawningRequiredChildrenForOptionalBranch = childBranchDataItem;
-			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, world, targetBiomes, chunkBeingPopulated);
+			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 			        		spawningRequiredChildrenForOptionalBranch = false;
 
 			        		// Make sure the branch wasn't rolled back because the required branches couldn't spawn.
@@ -993,7 +994,7 @@ public class BO4CustomStructure extends CustomStructure
 	        				childBranchDataItem.branch.isRequiredBranch
         				)
 		        		{
-			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, world, targetBiomes, chunkBeingPopulated);
+			        		traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, true, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 		        		}
 		        	}
 
@@ -1024,7 +1025,7 @@ public class BO4CustomStructure extends CustomStructure
 
 			        	    	// Check if there are any more branches in this group that haven't tried to spawn yet.
 			        			// *At this point, all optional branches should have had a chance to spawn.
-			        			for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+			        			for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 				        		{
 				        			if(
 			        					childBranchDataItem2 != childBranchDataItem &&
@@ -1078,13 +1079,13 @@ public class BO4CustomStructure extends CustomStructure
 			        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.branch.getChunkX() + " Z" + branchDataItem.branch.getChunkZ() + " Y" + branchDataItem.branch.getY() + " " + branchDataItem.branch.bo3Name + ":" + branchDataItem.branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.branch.bo3Name + " couldn't spawn. Reason: " + reason);
 			            		}
 
-		            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+		            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 		            			bBreak = true;
 			        		} else {
 				        		// if this child branch could not spawn then in some cases other child branches won't be able to either
 				        		// mark those child branches so they dont try to spawn and roll back the whole branch if a required branch can't spawn
 			        			// mustBeBelowOther / spawnOnWaterOnly / canSpawnOnWater
-				        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+				        		for(BranchDataItem childBranchDataItem2 : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 				        		{
 				        			if(!wasntBelowOther || !spawnedBranchLastCycle)
 				        			{
@@ -1117,7 +1118,7 @@ public class BO4CustomStructure extends CustomStructure
 
 							        	    	// Check if there are any more branches in this group that haven't tried to spawn yet.
 							        			// *At this point, all optional branches should have had a chance to spawn.
-								        		for(BranchDataItem childBranchDataItem3 : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+								        		for(BranchDataItem childBranchDataItem3 : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 								        		{
 								        			if(
 							        					childBranchDataItem3 != childBranchDataItem2 &&
@@ -1174,7 +1175,7 @@ public class BO4CustomStructure extends CustomStructure
 							        	    				(!branchFrequencyGroupsNotPassed && !branchFrequencyNotPassed && !wasntBelowOther && !cannotSpawnInsideOther && !wasntOnWater && !wasOnWater && !wasntBelowOther && !chunkIsIneligible && spaceIsOccupied ? "SpaceIsOccupied by" + occupiedByObjectsString : "") + (wasntBelowOther ? "WasntBelowOther " : "") + (chunkIsIneligible ? "ChunkIsIneligible: Either the chunk is occupied by another structure or a default structure, or the BO3/smoothing area is not allowed in the Biome)" : "");
 							        	    		OTG.log(LogMarker.INFO, "Rolling back X" + branchDataItem.branch.getChunkX() + " Z" + branchDataItem.branch.getChunkZ() + " Y" + branchDataItem.branch.getY() + " " + branchDataItem.branch.bo3Name + ":" + branchDataItem.branch.getRotation() + allParentsString + " because required branch "+ childBranchDataItem.branch.bo3Name + " couldn't spawn. Reason: " + reason);
 							            		}
-						            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+						            			rollBackBranch(branchDataItem, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 						            			bBreak = true;
 						            			break;
 					        				}
@@ -1203,7 +1204,7 @@ public class BO4CustomStructure extends CustomStructure
         		!branchDataItem.cannotSpawn
     		)
 	        {
-	        	for(BranchDataItem childBranchDataItem : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+	        	for(BranchDataItem childBranchDataItem : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 	        	{
 	        		if(AllBranchesBranchDataHash.contains(childBranchDataItem.branchNumber))
 	        		{
@@ -1222,7 +1223,7 @@ public class BO4CustomStructure extends CustomStructure
 							)
 						)
 						{
-							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 						}
 	        		}
 	        	}
@@ -1235,13 +1236,13 @@ public class BO4CustomStructure extends CustomStructure
         		!branchDataItem.cannotSpawn
     		)
 	        {
-	        	for(BranchDataItem childBranchDataItem : branchDataItem.getChildren(false, world, chunkBeingPopulated))
+	        	for(BranchDataItem childBranchDataItem : branchDataItem.getChildren(false, worldGenRegion, chunkBeingPopulated))
 	        	{
 	        		if(AllBranchesBranchDataHash.contains(childBranchDataItem.branchNumber))
 	        		{
 						if(childBranchDataItem.branch.isRequiredBranch)
 						{
-							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+							traverseAndSpawnChildBranches(childBranchDataItem, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 						}
 	        		}
 	        	}
@@ -1437,7 +1438,7 @@ public class BO4CustomStructure extends CustomStructure
 		return false;
 	}
 
-	private void rollBackBranch(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
+	private void rollBackBranch(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
     {
     	// When spawning an optional branch its required branches are spawned immediately as well (if there are no optional branches in the same branchGroup)
     	// This can cause a rollback if the required branches cannot spawn. Make sure that the parent branch of the optional branch isn't rolled back since it
@@ -1458,7 +1459,7 @@ public class BO4CustomStructure extends CustomStructure
     	branchData.wasDeleted = true;
 
     	branchData.isBeingRolledBack = true;
-    	deleteBranchChildren(branchData,minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+    	deleteBranchChildren(branchData,minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 
     	if(AllBranchesBranchDataHash.contains(branchData.branchNumber))
     	{
@@ -1513,7 +1514,7 @@ public class BO4CustomStructure extends CustomStructure
 		    					}
 			    				if(!branchAboveFound)
 			    				{
-			    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+			    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 			    				}
 			    			}
 		    			}
@@ -1561,7 +1562,7 @@ public class BO4CustomStructure extends CustomStructure
 								// Check if the branch can remain spawned without the branch we're rolling back
 	    	    				if(!checkMustBeInside(branchDataItem2, ((BO4)branchDataItem2.branch.getObject())))
 	    	    				{
-	    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+	    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 	    	    				}
 							}
 		    			}
@@ -1576,13 +1577,13 @@ public class BO4CustomStructure extends CustomStructure
     		if(branchData.branch.isRequiredBranch)
     		{
     			//OTG.log(LogMarker.INFO, "RollBackBranch 4: " + branchData.Parent.Branch.BO3Name + " <> " + branchData.Branch.BO3Name);
-    			rollBackBranch(branchData.parent, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+    			rollBackBranch(branchData.parent, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
     		} else {
 
     			// Mark for spawning the parent and all other branches in the same branch group that spawn after this branch (unless they have already been spawned successfully)
     			boolean parentDoneSpawning = true;
     			boolean currentBranchFound = false;
-        		for (BranchDataItem branchDataItem2 : branchData.parent.getChildren(false, world, chunkBeingPopulated))
+        		for (BranchDataItem branchDataItem2 : branchData.parent.getChildren(false, worldGenRegion, chunkBeingPopulated))
         		{
         			if(currentBranchFound)
         			{
@@ -1634,7 +1635,7 @@ public class BO4CustomStructure extends CustomStructure
             				// AddBranches should be called for the parent of the branch being rolled back and its parent if a branch group failed to spawn (and so on).
 
                 			// Since we're using SpawningRequiredBranchesOnly AddBranches can traverse all child branches without problems.
-            				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+            				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
         				} else {
         					// 2. During the second phase of a cycle branch groups with optional branches are spawned, the optional branches get a chance to spawn first, after that the
         					// required branches try to spawn, if that fails the branch is rolled back.
@@ -1642,7 +1643,7 @@ public class BO4CustomStructure extends CustomStructure
 
                 			// Since we're not using SpawningRequiredBranchesOnly AddBranches should only traverse child branches for any branches that it spawns from the branch group its re-trying.
         					// Otherwise some branches may have the same children traversed multiple times in a single phase.
-            				addBranches(branchData.parent, minimumSize, true, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+            				addBranches(branchData.parent, minimumSize, true, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
         				}
         			} else {
 
@@ -1658,7 +1659,7 @@ public class BO4CustomStructure extends CustomStructure
 
         				spawningRequiredChildrenForOptionalBranch = false;
             			// Since we're using SpawningRequiredBranchesOnly AddBranches can traverse all child branches without problems.
-        				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+        				addBranches(branchData.parent, minimumSize, false, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
         				spawningRequiredChildrenForOptionalBranch = true;
         			}
     			}
@@ -1668,19 +1669,19 @@ public class BO4CustomStructure extends CustomStructure
     	branchData.isBeingRolledBack = false;
     }
 
-    private void deleteBranchChildren(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, LocalWorld world, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
+    private void deleteBranchChildren(BranchDataItem branchData, boolean minimumSize, boolean spawningRequiredBranchesOnly, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated)
     {
     	// Remove all children of this branch from AllBranchesBranchData
-    	Stack<BranchDataItem> children = branchData.getChildren(true, world, chunkBeingPopulated);
+    	Stack<BranchDataItem> children = branchData.getChildren(true, worldGenRegion, chunkBeingPopulated);
         for(BranchDataItem branchDataItem : children)
         {
         	branchDataItem.cannotSpawn = true;
         	branchDataItem.doneSpawning = true;
         	branchDataItem.wasDeleted = true;
 
-        	if(branchDataItem.getChildren(true, world, chunkBeingPopulated).size() > 0)
+        	if(branchDataItem.getChildren(true, worldGenRegion, chunkBeingPopulated).size() > 0)
         	{
-    			deleteBranchChildren(branchDataItem, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+    			deleteBranchChildren(branchDataItem, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
         	}
         	if(AllBranchesBranchDataHash.contains(branchDataItem.branchNumber))
         	{
@@ -1734,7 +1735,7 @@ public class BO4CustomStructure extends CustomStructure
 		    	    					}
 			    	    				if(!branchAboveFound)
 			    	    				{
-			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 			    	    				}
 			    	    			}
 			        			}
@@ -1782,7 +1783,7 @@ public class BO4CustomStructure extends CustomStructure
 										// Check if the branch can remain spawned without the branch we're rolling back
 		    	    					if(!checkMustBeInside(branchDataItem2, ((BO4)branchDataItem2.branch.getObject())))
 			    	    				{
-			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, world, targetBiomes, chunkBeingPopulated);
+			    	    					rollBackBranch(branchDataItem2, minimumSize, spawningRequiredBranchesOnly, structureCache, worldGenRegion, targetBiomes, chunkBeingPopulated);
 			    	    				}
 									}
 			        			}
@@ -1875,7 +1876,7 @@ public class BO4CustomStructure extends CustomStructure
 
 	// Returns null if the branch cannot spawn in the given biome or if there's another BO4 structure in the chunk, otherwise returns colliding branches. 
 	// CanOverride branches never collide with other branches, but may be unable to spawn if there's not enough space for smoothing areas.
-    private Stack<BranchDataItem> checkSpawnRequirementsAndCollisions(BranchDataItem branchData, boolean minimumSize, LocalWorld world, ArrayList<String> targetBiomes)
+    private Stack<BranchDataItem> checkSpawnRequirementsAndCollisions(CustomStructureCache structureCache, BranchDataItem branchData, boolean minimumSize, LocalWorldGenRegion worldGenRegion, ArrayList<String> targetBiomes)
     {
     	CustomStructureCoordinate coordObject = branchData.branch;
 
@@ -1887,11 +1888,11 @@ public class BO4CustomStructure extends CustomStructure
     			// If targetbiomes size is 0, allow all biomes.
     			if(targetBiomes.size() > 0)
     			{
-        			LocalBiome biome3 = world.getBiome(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
-        			if(!targetBiomes.contains(biome3.getName()))
+        			BiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
+        			if(!targetBiomes.contains(biomeConfig3.getName()))
         			{
         				return null;
-        			}    				
+        			}
     			}
     		}
 		    // Check if the structure can spawn in this biome
@@ -1899,8 +1900,7 @@ public class BO4CustomStructure extends CustomStructure
 		    {
 		    	ArrayList<String> biomeStructures;
 
-            	LocalBiome biome3 = world.getBiome(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
-                BiomeConfig biomeConfig3 = biome3.getBiomeConfig();
+		    	BiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(branchData.chunkCoordinate.getChunkX() * 16 + 8, branchData.chunkCoordinate.getChunkZ() * 16 + 7);
                 // Get Bo3's for this biome
                 ArrayList<String> structuresToSpawn = new ArrayList<String>();
                 for (CustomStructureGen res : biomeConfig3.getCustomStructures())
@@ -1946,7 +1946,7 @@ public class BO4CustomStructure extends CustomStructure
 	            		if(distanceBetweenStructures <= radiusInChunks)
 	            		{
 	            		    // Check if any other structures in world are in this chunk
-	            			if(world.getStructureCache().isChunkOccupied(world, ChunkCoordinate.fromChunkCoords(x,z)))
+	            			if(structureCache.isChunkOccupied(ChunkCoordinate.fromChunkCoords(x,z)))
 	            		    {
 	            		        // Structures' bounding boxes are overlapping, don't add this branch.
 	            				return null;
@@ -1958,8 +1958,8 @@ public class BO4CustomStructure extends CustomStructure
 	                			// If targetbiomes size is 0, allow all biomes.
 	                			if(targetBiomes.size() > 0)
 	                			{
-	                				LocalBiome biome3 = world.getBiome(x * 16 + 8, z * 16 + 7);
-	                    			if(!targetBiomes.contains(biome3.getName()))
+	                				BiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + 8, z * 16 + 7);
+	                    			if(!targetBiomes.contains(biomeConfig3.getName()))
 	                    			{
 	                    				return null;
 	                    			}    				
@@ -1970,8 +1970,7 @@ public class BO4CustomStructure extends CustomStructure
 		            		    // Check if the structure can spawn in this biome
 		            			ArrayList<String> biomeStructures;
 
-	        	            	LocalBiome biome3 = world.getBiome(x * 16 + 8, z * 16 + 7);
-	        	                BiomeConfig biomeConfig3 = biome3.getBiomeConfig();
+		            			BiomeConfig biomeConfig3 = worldGenRegion.getBiomeConfig(x * 16 + 8, z * 16 + 7);
 	        	                // Get Bo3's for this biome
 	        	                ArrayList<String> structuresToSpawn = new ArrayList<String>();
 	        	                for (CustomStructureGen res : biomeConfig3.getCustomStructures())
@@ -2037,10 +2036,10 @@ public class BO4CustomStructure extends CustomStructure
     	return collidingObjects;
     }
 
-    private boolean checkYBounds(LocalWorld world, CustomStructureCoordinate branchData1Branch)
+    private boolean checkYBounds(WorldConfig worldConfig, CustomStructureCoordinate branchData1Branch)
     {
         int startY = branchData1Branch.getY() + ((BO4)branchData1Branch.getObject()).getConfig().getminY();
-        return world.getConfigs().getWorldConfig().disableBedrock ? startY >= 0 : startY > 0;
+        return worldConfig.disableBedrock ? startY >= 0 : startY > 0;
     }
     
     private boolean checkCollision(CustomStructureCoordinate branchData1Branch, CustomStructureCoordinate branchData2Branch)
@@ -2114,7 +2113,7 @@ public class BO4CustomStructure extends CustomStructure
     * Checks if this structure or any of its branches are inside the given
     * chunk and spawns all objects that are including their smoothing areas (if any)
     */
-    public void spawnInChunk(ChunkCoordinate chunkCoordinate, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
+    public void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated)
     {   	
     	if (
 			!objectsToSpawn.containsKey(chunkCoordinate) && 
@@ -2130,16 +2129,14 @@ public class BO4CustomStructure extends CustomStructure
         if (objectsInChunk != null)
         {
         	BO4Config config = ((BO4)this.start.getObject()).getConfig();
-            LocalBiome biome = null;
             BiomeConfig biomeConfig = null;
             if(config.spawnUnderWater)
         	{
-            	biome = world.getBiome(this.start.getX() + 8, this.start.getZ() + 8);
-            	biomeConfig = biome.getBiomeConfig();
+            	biomeConfig = worldGenRegion.getBiomeConfig(this.start.getX() + 8, this.start.getZ() + 8);
         	}
 
             // Spawn smooth areas in this chunk if any exist, before replaceabove/replacebelow or bo4 blocks.
-        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, this.start, world, chunkBeingPopulated);
+        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, this.start, structureCache, worldGenRegion, chunkBeingPopulated);
             
             // Spawn ReplaceAbove / ReplaceBelow before bo4 blocks.
             for (BO4CustomStructureCoordinate coordObject : objectsInChunk)
@@ -2154,7 +2151,7 @@ public class BO4CustomStructure extends CustomStructure
                 BO4Config objectConfig = bo4.getConfig();
                 if (
             		!((BO4)coordObject.getObject()).trySpawnAt(
-        				world, 
+        				worldGenRegion, 
         				random,
         				coordObject.getRotation(),
         				chunkCoordinate, 
@@ -2168,7 +2165,7 @@ public class BO4CustomStructure extends CustomStructure
 						config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceWithGroundBlock : objectConfig.replaceWithGroundBlock,
 						config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceWithStoneBlock : objectConfig.replaceWithStoneBlock,
 						config.spawnUnderWater,  
-						!config.spawnUnderWater ? -1 : (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax), 
+						!config.spawnUnderWater ? -1 : (biomeConfig.useWorldWaterLevel ? worldGenRegion.getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax), 
 						false, 
 						true, 
 						chunkBeingPopulated,
@@ -2184,8 +2181,8 @@ public class BO4CustomStructure extends CustomStructure
             		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
             		// Mark the structurecache region for saving.
             		// TODO: Make this prettier?
-            		world.getStructureCache().markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
-            		world.getStructureCache().markRegionForSaving(chunkCoordinate.toRegionCoord());            		
+            		structureCache.markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
+            		structureCache.markRegionForSaving(chunkCoordinate.toRegionCoord());            		
                 	return;
                 }
             }
@@ -2204,7 +2201,7 @@ public class BO4CustomStructure extends CustomStructure
 
                 if (
             		!((BO4)coordObject.getObject()).trySpawnAt(
-        				world, 
+        				worldGenRegion, 
         				random, 
         				coordObject.getRotation(),
         				chunkCoordinate, 
@@ -2218,7 +2215,7 @@ public class BO4CustomStructure extends CustomStructure
 						config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceWithGroundBlock : objectConfig.replaceWithGroundBlock,
 						config.overrideChildSettings && objectConfig.overrideChildSettings ? config.replaceWithStoneBlock : objectConfig.replaceWithStoneBlock,
 						config.spawnUnderWater,  
-						!config.spawnUnderWater ? -1 : (biomeConfig.useWorldWaterLevel ? world.getConfigs().getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax), 
+						!config.spawnUnderWater ? -1 : (biomeConfig.useWorldWaterLevel ? worldGenRegion.getWorldConfig().waterLevelMax : biomeConfig.waterLevelMax), 
 						false, 
 						false, 
 						chunkBeingPopulated,
@@ -2234,28 +2231,28 @@ public class BO4CustomStructure extends CustomStructure
             		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
             		// Mark the structurecache region for saving.
             		// TODO: Make this prettier?
-            		world.getStructureCache().markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
-            		world.getStructureCache().markRegionForSaving(chunkCoordinate.toRegionCoord());            		
+            		structureCache.markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
+            		structureCache.markRegionForSaving(chunkCoordinate.toRegionCoord());            		
                 	return;
                 } else {
                 	this.modDataManager.spawnModData(objectConfig.getModData(), coordObject, chunkCoordinate);
                 	this.spawnerManager.spawnSpawners(objectConfig.getSpawnerData(), coordObject, chunkCoordinate);
                 	this.particlesManager.spawnParticles(objectConfig.getParticleData(), coordObject, chunkCoordinate);
-                	this.entitiesManager.spawnEntities(world, objectConfig.getEntityData(), coordObject, chunkCoordinate);
+                	this.entitiesManager.spawnEntities(worldGenRegion, objectConfig.getEntityData(), coordObject, chunkCoordinate);
                     coordObject.isSpawned = true;
                 }
             }
         } else {
             // Spawn smooth areas in this chunk if any exist
-        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, this.start, world, chunkBeingPopulated);
+        	smoothingAreaManager.spawnSmoothAreas(chunkCoordinate, this.start, structureCache, worldGenRegion, chunkBeingPopulated);
         }
 
 		objectsToSpawn.remove(chunkCoordinate);
 		this.smoothingAreaManager.clearChunkFromCache(chunkCoordinate);
-		
+
 		// Mark the structurecache region for saving.
 		// TODO: Make this prettier?
-		world.getStructureCache().markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
-		world.getStructureCache().markRegionForSaving(chunkCoordinate.toRegionCoord());
+		structureCache.markRegionForSaving(ChunkCoordinate.fromChunkCoords(this.start.getChunkX(), this.start.getChunkZ()).toRegionCoord());
+		structureCache.markRegionForSaving(chunkCoordinate.toRegionCoord());
     }
 }

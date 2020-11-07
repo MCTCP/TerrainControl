@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
@@ -163,13 +163,13 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
         for (int i = 0; i < blockCount; i++)
         {
             if (random.nextInt(100) < blockChances[i])
             {
-                world.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated, true);
+            	worldGenRegion.setBlock(x, y, z, blocks[i], metaDataTags[i], chunkBeingPopulated, true);
                 break;
             }
         }

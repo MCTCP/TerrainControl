@@ -1,9 +1,9 @@
 package com.pg85.otg.config.biome.settings;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
 
@@ -292,7 +292,7 @@ public class ReplacedBlocksMatrix
 	}
 
 	private boolean parsedFallBacks = false;
-	public void parseForWorld(LocalWorld world)
+	public void parseForWorld(WorldConfig worldConfig)
 	{
 		if(!parsedFallBacks)
 		{
@@ -301,11 +301,11 @@ public class ReplacedBlocksMatrix
 			{
 				if(instruction.from != null)
 				{
-					instruction.from.parseForWorld(world);
+					instruction.from.parseForWorld(worldConfig);
 				}
 				if(instruction.to != null)
 				{
-					instruction.to.parseForWorld(world);
+					instruction.to.parseForWorld(worldConfig);
 				}
 			}
 		}

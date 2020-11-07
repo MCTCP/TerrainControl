@@ -1,11 +1,12 @@
 package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.bo3.Rotation;
@@ -142,7 +143,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
      *                   the trunk.
      * @return Whether a tree was grown.
      */
-    public boolean growSapling(LocalWorld world, Random random, boolean isWideTree, int x, int y, int z)
+    public boolean growSapling(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, boolean isWideTree, int x, int y, int z)
     {
     	loadTreeObjects();
     	
@@ -163,7 +164,7 @@ public class SaplingGen extends ConfigFunction<BiomeConfig>
                     spawnZ += offset[1];
                 }
 
-                if (tree.spawnFromSapling(world, random, rotation, spawnX, y, spawnZ))
+                if (tree.spawnFromSapling(structureCache, worldGenRegion, random, rotation, spawnX, y, spawnZ))
                 {
                     // Success!
                     return true;

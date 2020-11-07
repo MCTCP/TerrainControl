@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -74,15 +74,15 @@ public class ReedGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-        int y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
-        LocalMaterialData materialA = world.getMaterial(x - 1, y - 1, z, chunkBeingPopulated);
-        LocalMaterialData materialB = world.getMaterial(x + 1, y - 1, z, chunkBeingPopulated);
-        LocalMaterialData materialC = world.getMaterial(x, y - 1, z - 1, chunkBeingPopulated);
-        LocalMaterialData materialD = world.getMaterial(x, y - 1, z + 1, chunkBeingPopulated);
+        int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
+        LocalMaterialData materialA = worldGenRegion.getMaterial(x - 1, y - 1, z, chunkBeingPopulated);
+        LocalMaterialData materialB = worldGenRegion.getMaterial(x + 1, y - 1, z, chunkBeingPopulated);
+        LocalMaterialData materialC = worldGenRegion.getMaterial(x, y - 1, z - 1, chunkBeingPopulated);
+        LocalMaterialData materialD = worldGenRegion.getMaterial(x, y - 1, z + 1, chunkBeingPopulated);
         if (
     		y > this.maxAltitude || 
     		y < this.minAltitude || 
@@ -97,9 +97,9 @@ public class ReedGen extends Resource
             return;
         }
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenRegion.getWorldConfig(), material, sourceBlocks);
         
-        LocalMaterialData worldMaterial = world.getMaterial(x, y - 1, z, chunkBeingPopulated);        
+        LocalMaterialData worldMaterial = worldGenRegion.getMaterial(x, y - 1, z, chunkBeingPopulated);        
         if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
         {
             return;
@@ -108,8 +108,7 @@ public class ReedGen extends Resource
         int n = 1 + rand.nextInt(2);
         for (int i1 = 0; i1 < n; i1++)
         {
-            world.setBlock(x, y + i1, z, this.material, null, chunkBeingPopulated, false);
+        	worldGenRegion.setBlock(x, y + i1, z, this.material, null, chunkBeingPopulated, false);
         }
     }
-    
 }

@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -77,35 +77,35 @@ public class IceSpikeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         switch(type) {
             case Basement:
-                spawnBasement(world, random, x, z, chunkBeingPopulated);
+                spawnBasement(worldGenregion, random, x, z, chunkBeingPopulated);
                 break;
             case HugeSpike:
-                spawnSpike(world, random, x, z, true, chunkBeingPopulated);
+                spawnSpike(worldGenregion, random, x, z, true, chunkBeingPopulated);
                 break;
             case SmallSpike:
-                spawnSpike(world, random, x, z, false, chunkBeingPopulated);
+                spawnSpike(worldGenregion, random, x, z, false, chunkBeingPopulated);
                 break;
         }
     }
 
-    private void spawnBasement(LocalWorld world, Random random,int x, int z, ChunkCoordinate chunkBeingPopulated)
+    private void spawnBasement(LocalWorldGenRegion worldGenregion, Random random,int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int y = RandomHelper.numberInRange(random, this.minAltitude, this.maxAltitude);
 
         LocalMaterialData worldMaterial;
-        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
+        while (y > 2 && (worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             y--;
         }
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenregion.getWorldConfig(), material, sourceBlocks);
         
-        if ((worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) == null || !this.sourceBlocks.contains(worldMaterial))
+        if ((worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) == null || !this.sourceBlocks.contains(worldMaterial))
         {
             return;
         }
@@ -124,10 +124,10 @@ public class IceSpikeGen extends Resource
                 {
                     for (int deltaY = y - one; deltaY <= y + one; deltaY++)
                     {
-                    	worldMaterial = world.getMaterial(actualX, deltaY, actualZ, chunkBeingPopulated);
+                    	worldMaterial = worldGenregion.getMaterial(actualX, deltaY, actualZ, chunkBeingPopulated);
                         if (worldMaterial != null && this.sourceBlocks.contains(worldMaterial))
                         {
-                            world.setBlock(actualX, deltaY, actualZ, this.material, null, chunkBeingPopulated, true);
+                        	worldGenregion.setBlock(actualX, deltaY, actualZ, this.material, null, chunkBeingPopulated, true);
                         }
                     }
                 }
@@ -135,19 +135,19 @@ public class IceSpikeGen extends Resource
         }
     }
 
-    private void spawnSpike(LocalWorld world, Random random, int x, int z, boolean hugeSpike, ChunkCoordinate chunkBeingPopulated)
+    private void spawnSpike(LocalWorldGenRegion worldGenregion, Random random, int x, int z, boolean hugeSpike, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
         LocalMaterialData worldMaterial;
-        while (y > 2 && (worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
+        while (y > 2 && (worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) != null && worldMaterial.isAir())
         {
             --y;
         }
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenregion.getWorldConfig(), material, sourceBlocks);
 
-        if ((worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) == null || !sourceBlocks.contains(worldMaterial))
+        if ((worldMaterial = worldGenregion.getMaterial(x, y, z, chunkBeingPopulated)) == null || !sourceBlocks.contains(worldMaterial))
         {
             return;
         }
@@ -184,19 +184,19 @@ public class IceSpikeGen extends Resource
                     if ((var11 == 0 && var13 == 0 || var12 * var12 + var14 * var14 <= var9 * var9) && (var11 != -var10 && var11 != var10 && var13 != -var10 && var13 != var10 || random.nextFloat() <= 0.75F))
                     {
                         if (
-                    		(worldMaterial = world.getMaterial(x + var11, y + var8, z + var13, chunkBeingPopulated)) != null && 
+                    		(worldMaterial = worldGenregion.getMaterial(x + var11, y + var8, z + var13, chunkBeingPopulated)) != null && 
                     		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                         {
-                            world.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingPopulated, true);
+                        	worldGenregion.setBlock(x + var11, y + var8, z + var13, this.material, null, chunkBeingPopulated, true);
                         }
 
                         if (var8 != 0 && var10 > 1)
                         {
                             if (
-                        		(worldMaterial = world.getMaterial(x + var11, y - var8, z + var13, chunkBeingPopulated)) != null && 
+                        		(worldMaterial = worldGenregion.getMaterial(x + var11, y - var8, z + var13, chunkBeingPopulated)) != null && 
                         		(worldMaterial.isAir() || sourceBlocks.contains(worldMaterial)))
                             {
-                                world.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingPopulated, true);
+                            	worldGenregion.setBlock(x + var11, y - var8, z + var13, this.material, null, chunkBeingPopulated, true);
                             }                        	
                         }
                     }
@@ -234,7 +234,7 @@ public class IceSpikeGen extends Resource
                     if (var11 > 50)
                     {
                     	if(
-                			(worldMaterial = world.getMaterial(x + var16, var11, z + var10, chunkBeingPopulated)) != null &&
+                			(worldMaterial = worldGenregion.getMaterial(x + var16, var11, z + var10, chunkBeingPopulated)) != null &&
         					(
     							worldMaterial.isAir() || 
     							sourceBlocks.contains(worldMaterial) || 
@@ -242,7 +242,7 @@ public class IceSpikeGen extends Resource
 							)
             			)
                     	{
-                            world.setBlock(x + var16, var11, z + var10, this.material, null, chunkBeingPopulated, true);
+                    		worldGenregion.setBlock(x + var16, var11, z + var10, this.material, null, chunkBeingPopulated, true);
                             --var11;
                             --var17;
 

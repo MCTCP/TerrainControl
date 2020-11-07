@@ -1,8 +1,8 @@
 package com.pg85.otg.util.materials;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.materials.MaterialSetEntry;
@@ -153,13 +153,13 @@ public class MaterialSet
         materials.add(entry);
     }
     
-    public void parseForWorld(LocalWorld world)
+    public void parseForWorld(WorldConfig worldConfig)
     {
         if (!parsed)
         {
             for (MaterialSetEntry material : materials)
             {
-                material.parseForWorld(world);
+                material.parseForWorld(worldConfig);
             }
             parsed = true;
             intSetUpToDate = false;

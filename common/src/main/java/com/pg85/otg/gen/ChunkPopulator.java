@@ -1,9 +1,10 @@
 package com.pg85.otg.gen;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.gen.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -19,7 +20,7 @@ public class ChunkPopulator
         this.rand = new Random();
     }
 
-    public void populate(ChunkCoordinate chunkCoord, LocalWorld world, BiomeConfig biomeConfig)
+    public void populate(ChunkCoordinate chunkCoord, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig)
     {
 		// Cache all biomes in the are being populated (2x2 chunks)
 		//world.cacheBiomesForPopulation(chunkCoord);
@@ -40,7 +41,7 @@ public class ChunkPopulator
         }
         
         // Get the random generator
-        long resourcesSeed = world.getWorldConfig().resourcesSeed != 0L ? world.getWorldConfig().resourcesSeed : world.getSeed();
+        long resourcesSeed = worldGenRegion.getWorldConfig().resourcesSeed != 0L ? worldGenRegion.getWorldConfig().resourcesSeed : worldGenRegion.getSeed();
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
@@ -59,7 +60,7 @@ public class ChunkPopulator
         {
             if (res instanceof Resource)
             {
-                ((Resource)res).process(world, this.rand, hasVillage, chunkCoord);
+                ((Resource)res).process(structureCache, worldGenRegion, this.rand, hasVillage, chunkCoord);
             }
         }
 

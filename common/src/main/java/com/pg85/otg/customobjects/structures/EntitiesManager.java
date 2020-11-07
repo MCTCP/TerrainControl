@@ -1,13 +1,13 @@
 package com.pg85.otg.customobjects.structures;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.bofunctions.EntityFunction;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 
 public class EntitiesManager
 {
-    public void spawnEntities(LocalWorld world, EntityFunction<?>[] entityDataInObject, CustomStructureCoordinate coordObject, ChunkCoordinate chunkCoordinate)
+    public void spawnEntities(LocalWorldGenRegion worldGenRegion, EntityFunction<?>[] entityDataInObject, CustomStructureCoordinate coordObject, ChunkCoordinate chunkCoordinate)
     {
     	for(int i = 0; i < entityDataInObject.length; i++)
     	{
@@ -63,7 +63,7 @@ public class EntitiesManager
             	newEntityData.namedBinaryTag = entityDataInObject[i].namedBinaryTag;
             	newEntityData.rotation = rotations;
 
-        		world.spawnEntity(newEntityData, chunkCoordinate);
+            	worldGenRegion.spawnEntity(newEntityData, chunkCoordinate);
         	} else {
 
             	newEntityData.y = coordObject.getY() + entityDataInObject[i].y;
@@ -78,7 +78,7 @@ public class EntitiesManager
             	newEntityData.namedBinaryTag = entityDataInObject[i].namedBinaryTag;
 				newEntityData.rotation = 0;
 
-        		world.spawnEntity(newEntityData, chunkCoordinate);
+				worldGenRegion.spawnEntity(newEntityData, chunkCoordinate);
         	}
     	}
     }

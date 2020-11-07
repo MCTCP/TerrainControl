@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.terrain;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.gen.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
 
@@ -10,19 +10,19 @@ public abstract class TerrainGenBase
 {
     protected int checkAreaSize = 8;
     protected Random random = new Random();
-    protected LocalWorld world;
     private final long worldLong1;
     private final long worldLong2;
+    private final long worldSeed;
 
-    TerrainGenBase(LocalWorld world)
+    TerrainGenBase(long worldSeed)
     {
-        this.world = world;
-        this.random.setSeed(this.world.getSeed());
+        this.random.setSeed(worldSeed);        
         worldLong1 = this.random.nextLong();
         worldLong2 = this.random.nextLong();
+        this.worldSeed = worldSeed;
     }
 
-    public void generate(ChunkBuffer chunkBuffer)
+    public void generate(LocalWorldGenRegion worldGenRegion, ChunkBuffer chunkBuffer)
     {
         int i = this.checkAreaSize;
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
@@ -34,8 +34,8 @@ public abstract class TerrainGenBase
             {
                 long l3 = x * worldLong1;
                 long l4 = z * worldLong2;
-                this.random.setSeed(l3 ^ l4 ^ this.world.getSeed());
-                generateChunk(ChunkCoordinate.fromChunkCoords(x, z), chunkBuffer);
+                this.random.setSeed(l3 ^ l4 ^ this.worldSeed);
+                generateChunk(worldGenRegion, ChunkCoordinate.fromChunkCoords(x, z), chunkBuffer);
             }
     }
 
@@ -48,5 +48,5 @@ public abstract class TerrainGenBase
      * @param generatingChunkBuffer The chunk that is currently being
      *                              generated.
      */
-    protected abstract void generateChunk(ChunkCoordinate currentChunk, ChunkBuffer generatingChunkBuffer);
+    protected abstract void generateChunk(LocalWorldGenRegion worldGenRegion, ChunkCoordinate currentChunk, ChunkBuffer generatingChunkBuffer);
 }

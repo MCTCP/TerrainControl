@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -66,19 +66,19 @@ public class UnderWaterOreGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-        int firstSolidBlock = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated) - 1;
-        if (world.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated) < firstSolidBlock || firstSolidBlock == -1)
+        int firstSolidBlock = worldGenRegion.getBlockAboveSolidHeight(x, z, chunkBeingPopulated) - 1;
+        if (worldGenRegion.getBlockAboveLiquidHeight(x, z, chunkBeingPopulated) < firstSolidBlock || firstSolidBlock == -1)
         {
             return;
         }
         
-        parseMaterials(world, this.material, this.sourceBlocks);
+        parseMaterials(worldGenRegion.getWorldConfig(), this.material, this.sourceBlocks);
 
-        if(world.getWorldConfig().disableOreGen)
+        if(worldGenRegion.getWorldConfig().disableOreGen)
         {
     		if(this.material.isOre())
         	{
@@ -101,10 +101,10 @@ public class UnderWaterOreGen extends Resource
                 {
                     for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
                     {
-                        sourceBlock = world.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
+                        sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
                         if (this.sourceBlocks.contains(sourceBlock))
                         {
-                            world.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated, true);
+                        	worldGenRegion.setBlock(currentX, y, currentZ, this.material, null, chunkBeingPopulated, true);
                         }
                     }
                 }

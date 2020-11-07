@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -34,13 +34,13 @@ public class CactusGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenregion.getWorldConfig(), material, sourceBlocks);
         LocalMaterialData worldMaterial;
         int cactusX;
         int cactusBaseY;
@@ -52,39 +52,39 @@ public class CactusGen extends Resource
             cactusBaseY = y + rand.nextInt(4) - rand.nextInt(4);
             cactusZ = z + rand.nextInt(8) - rand.nextInt(8);
 
-            worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ,  chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ,  chunkBeingPopulated);
             if(worldMaterial == null || !worldMaterial.isAir())
             {
             	continue;
             }
             
             // Check foundation
-            worldMaterial = world.getMaterial(cactusX, cactusBaseY - 1, cactusZ, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY - 1, cactusZ, chunkBeingPopulated);
             if (worldMaterial == null || !sourceBlocks.contains(worldMaterial))
             {
                 continue;
             }
 
             // Check neighbors
-            worldMaterial = world.getMaterial(cactusX - 1, cactusBaseY, cactusZ, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(cactusX - 1, cactusBaseY, cactusZ, chunkBeingPopulated);
             if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
             }
             
-            worldMaterial = world.getMaterial(cactusX + 1, cactusBaseY, cactusZ, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(cactusX + 1, cactusBaseY, cactusZ, chunkBeingPopulated);
             if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
             }
             
-            worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ - 1, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ - 1, chunkBeingPopulated);
             if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
             }
             
-            worldMaterial = world.getMaterial(cactusX, cactusBaseY, cactusZ + 1, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(cactusX, cactusBaseY, cactusZ + 1, chunkBeingPopulated);
             if (worldMaterial == null || !worldMaterial.isAir())
             {
                 continue;
@@ -94,7 +94,7 @@ public class CactusGen extends Resource
             int cactusHeight = 1 + rand.nextInt(rand.nextInt(3) + 1);
             for (int dY = 0; dY < cactusHeight; dY++)
             {
-                world.setBlock(cactusX, cactusBaseY + dY, cactusZ, material, null, chunkBeingPopulated, false);
+            	worldGenregion.setBlock(cactusX, cactusBaseY + dY, cactusZ, material, null, chunkBeingPopulated, false);
             }
         }
     }

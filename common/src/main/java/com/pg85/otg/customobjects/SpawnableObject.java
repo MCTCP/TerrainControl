@@ -1,6 +1,7 @@
 package com.pg85.otg.customobjects;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.util.bo3.Rotation;
 
 import java.util.Random;
@@ -24,7 +25,7 @@ public interface SpawnableObject
      * @param z        Z coord of the object origin.
      * @return Whether the attempt was successful. (It should never fail, but you never know.)
      */
-    public boolean spawnForced(LocalWorld world, Random random, Rotation rotation, int x, int y, int z);
+    public boolean spawnForced(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z);
     
     /**
      * Returns the name of this object.

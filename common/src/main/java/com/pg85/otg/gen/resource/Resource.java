@@ -6,9 +6,12 @@ import java.util.Random;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.materials.MaterialSet;
@@ -99,13 +102,13 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
         return material;
     }
     
-    protected void parseMaterials(LocalWorld world, LocalMaterialData material, MaterialSet sourceBlocks)
+    protected void parseMaterials(WorldConfig worldConfig, LocalMaterialData material, MaterialSet sourceBlocks)
     {
-		material.parseForWorld(world);
+		material.parseForWorld(worldConfig);
 
         if (sourceBlocks != null)
         {
-            sourceBlocks.parseForWorld(world);
+            sourceBlocks.parseForWorld(worldConfig);
         }
     }
 
@@ -148,16 +151,16 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
      * @param villageInChunk Whether there is a village in the chunk.
      * @param chunkCoord     The chunk coordinate.
      */
-    public final void process(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    public final void process(CustomStructureCache structureCache, LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         // Fire event
-        if (!OTG.fireResourceProcessEvent(this, world, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
+        if (!OTG.fireResourceProcessEvent(this, worldGenregion, random, villageInChunk, chunkCoord.getChunkX(), chunkCoord.getChunkZ()))
         {
             return;
         }
 
         // Spawn
-        spawnInChunk(world, random, villageInChunk, chunkCoord);
+        spawnInChunk(structureCache, worldGenregion, random, villageInChunk, chunkCoord);
     }
 
     /**
@@ -175,7 +178,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
      * @param x              The block x.
      * @param z              The block z.
      */
-    public abstract void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated);
+    public abstract void spawn(LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated);
 
     /**
      * Places the resource in a chunk. The default implementation simply calls
@@ -188,7 +191,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
      * @param villageInChunk Whether there is a village in the chunk.
      * @param chunkCoord     The chunk coordinate.
      */
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         int chunkX = chunkCoord.getBlockXCenter();
         int chunkZ = chunkCoord.getBlockZCenter();
@@ -203,7 +206,7 @@ public abstract class Resource extends ConfigFunction<BiomeConfig> implements Co
             }
             int x = chunkX + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
             int z = chunkZ + random.nextInt(ChunkCoordinate.CHUNK_SIZE);
-            spawn(world, random, false, x, z, chunkCoord);
+            spawn(worldGenregion, random, false, x, z, chunkCoord);
         }
         
         clearCache();

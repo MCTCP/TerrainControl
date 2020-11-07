@@ -2,6 +2,7 @@ package com.pg85.otg;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.PluginConfig;
 import com.pg85.otg.config.biome.settings.BiomeResourcesManager;
 import com.pg85.otg.config.customobjects.CustomObjectResourcesManager;
@@ -231,18 +232,18 @@ public class OTG
         Engine.registerEventHandler(handler, priority);
     }
     
-    public static boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer, LocalWorld localWorld)
+    public static boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer)
     {
-    	return Engine.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer, localWorld);
+    	return Engine.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer);
     }
     
     /**
      * @see OTGEngine#fireCanCustomObjectSpawnEvent(CustomObject,
      * LocalWorld, int, int, int)
      */
-    public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
+    public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorldGenRegion worldGenRegion, int x, int y, int z)
     {
-        return Engine.fireCanCustomObjectSpawnEvent(object, world, x, y, z);
+        return Engine.fireCanCustomObjectSpawnEvent(object, worldGenRegion, x, y, z);
     }
 
     /**
@@ -267,9 +268,9 @@ public class OTG
      * @see OTGEngine#fireResourceProcessEvent(Resource,
      * LocalWorld, Random, boolean, int, int)
      */
-    public static boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    public static boolean fireResourceProcessEvent(Resource resource, LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
-        return Engine.fireResourceProcessEvent(resource, world, random, villageInChunk, chunkX, chunkZ);
+        return Engine.fireResourceProcessEvent(resource, worldGenregion, random, villageInChunk, chunkX, chunkZ);
     }    
     
     // Logging

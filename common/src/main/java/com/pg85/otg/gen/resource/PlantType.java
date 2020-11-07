@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -154,12 +154,12 @@ public class PlantType
      * @param y Y position of the lowest block of the plant.
      * @param z Z position of the plant.
      */
-    void spawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    void spawn(LocalWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {        
-        world.setBlock(x, y, z, bottomBlock, null, chunkBeingPopulated, false);
+    	worldGenregion.setBlock(x, y, z, bottomBlock, null, chunkBeingPopulated, false);
         if (topBlock != null)
         {
-            world.setBlock(x, y + 1, z, topBlock, null, chunkBeingPopulated, false);
+        	worldGenregion.setBlock(x, y + 1, z, topBlock, null, chunkBeingPopulated, false);
         }
     }
 

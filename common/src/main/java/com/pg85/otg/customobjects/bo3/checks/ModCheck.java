@@ -3,7 +3,7 @@ package com.pg85.otg.customobjects.bo3.checks;
 import java.util.List;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -13,7 +13,7 @@ public class ModCheck extends BO3Check
     private String[] mods;
 
     @Override
-    public boolean preventsSpawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
+    public boolean preventsSpawn(LocalWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
         return false;
     }

@@ -1,7 +1,6 @@
 package com.pg85.otg.gen.terrain;
 
-import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -18,13 +17,13 @@ public class RavinesGen extends TerrainGenBase
     private float[] a = new float[1024];
     private WorldConfig worldSettings;
 
-    public RavinesGen(WorldConfig wrk, LocalWorld world)
+    public RavinesGen(WorldConfig worldConfig, long worldSeed)
     {
-        super(world);
-        this.worldSettings = wrk;
+        super(worldSeed);
+        this.worldSettings = worldConfig;
     }
 
-    private void placeBlocks(long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
+    private void placeBlocks(LocalWorldGenRegion worldGenRegion, long paramLong, ChunkBuffer generatingChunkBuffer, double paramDouble1, double paramDouble2, double paramDouble3, float paramFloat1, float paramFloat2, float paramFloat3, int size, double paramDouble4)
     {
         Random localRandom = new Random(paramLong);
 
@@ -69,7 +68,6 @@ public class RavinesGen extends TerrainGenBase
         int i4;
         LocalMaterialData materialAtPosition;
         
-        LocalBiome biome;
         BiomeConfig biomeConfig;
         //LocalMaterialData surfaceblockDefaultMaterial;
         double d10;
@@ -192,8 +190,7 @@ public class RavinesGen extends TerrainGenBase
                 d9 = (localX + generatingChunk.getBlockX() + 0.5D - paramDouble1) / d3;
                 for (int localZ = i2; localZ < i3; localZ++)
                 {
-                    biome = world.getBiome(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
-                    biomeConfig = biome.getBiomeConfig();
+                	biomeConfig = worldGenRegion.getBiomeConfig(localZ + generatingChunk.getBlockX(), localX + generatingChunk.getBlockZ());
                     //surfaceblockDefaultMaterial = biomeConfig.surfaceBlock;
                     d10 = (localZ + generatingChunk.getBlockZ() + 0.5D - paramDouble3) / d3;
                     surfaceBlockFound = false;
@@ -208,7 +205,7 @@ public class RavinesGen extends TerrainGenBase
                             {
                             	material = generatingChunkBuffer.getBlock(localX, currentDepth, localZ);
                                 
-                                if (!surfaceBlockFound && material.equals(biomeConfig.getSurfaceBlockReplaced(this.world, currentDepth)))
+                                if (!surfaceBlockFound && material.equals(biomeConfig.getSurfaceBlockReplaced(currentDepth)))
                                 {
                                 	surfaceBlockFound = true;
                                 	surfaceBlockMaterial = material;
@@ -249,7 +246,7 @@ public class RavinesGen extends TerrainGenBase
     }
 
     @Override
-    protected void generateChunk(ChunkCoordinate currentChunk, ChunkBuffer generatingChunkBuffer)
+    protected void generateChunk(LocalWorldGenRegion worldGenRegion, ChunkCoordinate currentChunk, ChunkBuffer generatingChunkBuffer)
     {
         if (this.random.nextInt(100) >= this.worldSettings.ravineRarity)
         {
@@ -268,7 +265,7 @@ public class RavinesGen extends TerrainGenBase
             float f3 = (this.random.nextFloat() * 2.0F + this.random.nextFloat()) * 2.0F;            
             int size = RandomHelper.numberInRange(random, this.worldSettings.ravineMinLength, this.worldSettings.ravineMaxLength);
             
-            placeBlocks(this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.ravineDepth);
+            placeBlocks(worldGenRegion, this.random.nextLong(), generatingChunkBuffer, d1, d2, d3, f3, f1, f2, size, this.worldSettings.ravineDepth);
         }
     }
 }

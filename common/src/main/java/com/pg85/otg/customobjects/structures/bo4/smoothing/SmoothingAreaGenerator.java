@@ -7,11 +7,12 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Map.Entry;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobjects.bo4.bo4function.BO4RandomBlockFunction;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaBlock.enumSmoothingBlockType;
@@ -41,7 +42,7 @@ public class SmoothingAreaGenerator
     // *SmoothStartTop:true can be used to make smoothing area lines start at the highest block in each column that has a no neighbouring (non-air) block on one of 
     // four sides, instead of all blocks at y 0 in the bo4.
     // *Settings like SpawnUnderWater can be used to make smoothing areas place underwater and fill with water up to biome waterlevel where necessary.
-	public void calculateSmoothingAreas(Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate start, LocalWorld world)
+	public void calculateSmoothingAreas(Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate start, LocalWorldGenRegion worldGenRegion)
     {
         // TODO: Don't check neighbouring BO4's with SmoothRadius -1
 
@@ -281,7 +282,7 @@ public class SmoothingAreaGenerator
             }
         }
 
-        calculateBeginAndEndPointsPerChunk(world, smoothToBlocksPerChunk, ((BO4)start.getObject()).getConfig().smoothRadius - 1);
+        calculateBeginAndEndPointsPerChunk(smoothToBlocksPerChunk, ((BO4)start.getObject()).getConfig().smoothRadius - 1);
     }
 	
 	// Rotates neighbouring block info for a block
@@ -429,7 +430,7 @@ public class SmoothingAreaGenerator
     // Now that we have all the smoothing area start points on the edges of the BO4, calculate the xz end points (y is determined only when spawning since it requires terrain height checks). 
     // The lines we plot may traverse several chunks so divide them up into one chunk segments and make a collection of line segments per chunk.
     // For each line-segment store the beginning and endpoints within the chunk as well as the origin and final destination coordinate.
-    private void calculateBeginAndEndPointsPerChunk(LocalWorld world, Map<ChunkCoordinate, ArrayList<BlockCoordsAndNeighbours>> smoothToBlocksPerChunk, int smoothRadius)
+    private void calculateBeginAndEndPointsPerChunk(Map<ChunkCoordinate, ArrayList<BlockCoordsAndNeighbours>> smoothToBlocksPerChunk, int smoothRadius)
     {
         Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn = new HashMap<ChunkCoordinate, ArrayList<SmoothingAreaLine>>();
         
@@ -458,37 +459,37 @@ public class SmoothingAreaGenerator
                 // Non-corner blocks (straight lines)
                 if(!isCornerBlock && blockCoordsAndNeighbours.smoothInDirection1)
                 {
-                    plotStraightLine(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 1);                    
+                    plotStraightLine(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 1);                    
                 }
                 if(!isCornerBlock && blockCoordsAndNeighbours.smoothInDirection2)
                 {
-                    plotStraightLine(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 2);
+                    plotStraightLine(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 2);
                 }
                 if(!isCornerBlock && blockCoordsAndNeighbours.smoothInDirection3)
                 {
-                    plotStraightLine(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 3);
+                    plotStraightLine(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 3);
                 }
                 if(!isCornerBlock && blockCoordsAndNeighbours.smoothInDirection4)
                 {
-                	plotStraightLine(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 4);
+                	plotStraightLine(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 4);
                 }
 
                 // Corner blocks (angled lines)
                 if(blockCoordsAndNeighbours.smoothInDirection1 && blockCoordsAndNeighbours.smoothInDirection3)
                 {
-                	plotCorner(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 1);
+                	plotCorner(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 1);
                 }
                 if(blockCoordsAndNeighbours.smoothInDirection1 && blockCoordsAndNeighbours.smoothInDirection4)
                 {
-                	plotCorner(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 2);
+                	plotCorner(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 2);
                 }
                 if(blockCoordsAndNeighbours.smoothInDirection2 && blockCoordsAndNeighbours.smoothInDirection3)
                 {
-                	plotCorner(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 3);
+                	plotCorner(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 3);
                 }
                 if(blockCoordsAndNeighbours.smoothInDirection2 && blockCoordsAndNeighbours.smoothInDirection4)
                 {
-                	plotCorner(world, blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 4);
+                	plotCorner(blockCoordsAndNeighbours.blockX, blockCoordsAndNeighbours.blockY, blockCoordsAndNeighbours.blockZ, smoothRadius, smoothingAreasToSpawn, blockCoordsAndNeighbours.bO3, 4);
                 }
             }
         }
@@ -496,7 +497,7 @@ public class SmoothingAreaGenerator
 		fillSmoothingLineCaches(smoothingAreasToSpawn);
     }
 
-    void plotStraightLine(LocalWorld world, int blockX, short blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
+    void plotStraightLine(int blockX, short blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
     {
     	int normalizedSmoothStartPointBlockX = 0;
     	int normalizedSmoothStartPointBlockZ = 0;
@@ -642,7 +643,7 @@ public class SmoothingAreaGenerator
     
     // Plots a quarter-circle of blocks for each smoothing area corner block, in order to create rounded corners around the structure.
     // For each corner, creates smoothing lines fanning out from the center of the circle to fill the entire quarter-circle. 
-    void plotCorner(LocalWorld world, int blockX, int blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
+    void plotCorner(int blockX, int blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
     {    	
     	int originPointX = blockX + bO4.getX();
     	short originPointY = (short)(blockY + bO4.getY());
@@ -696,30 +697,30 @@ public class SmoothingAreaGenerator
        			{
             		if(direction == 1)
             		{
-            			plotLineAtAngle(world, originPointX, originPointY, originPointZ, destinationPointX, destinationPointZ + 1, smoothingAreasToSpawn);
+            			plotLineAtAngle(originPointX, originPointY, originPointZ, destinationPointX, destinationPointZ + 1, smoothingAreasToSpawn);
             		}
             		if(direction == 2)
             		{
-            			plotLineAtAngle(world, originPointX, originPointY, originPointZ, destinationPointX + 1, destinationPointZ, smoothingAreasToSpawn);
+            			plotLineAtAngle(originPointX, originPointY, originPointZ, destinationPointX + 1, destinationPointZ, smoothingAreasToSpawn);
             		}
             		if(direction == 3)
             		{
-            			plotLineAtAngle(world, originPointX, originPointY, originPointZ, destinationPointX - 1, destinationPointZ, smoothingAreasToSpawn);
+            			plotLineAtAngle(originPointX, originPointY, originPointZ, destinationPointX - 1, destinationPointZ, smoothingAreasToSpawn);
             		}
             		if(direction == 4)
             		{
-            			plotLineAtAngle(world, originPointX, originPointY, originPointZ, destinationPointX, destinationPointZ - 1, smoothingAreasToSpawn);
+            			plotLineAtAngle(originPointX, originPointY, originPointZ, destinationPointX, destinationPointZ - 1, smoothingAreasToSpawn);
             		}
        			}
         	}
         	previousDestinationPointX = destinationPointX;
         	previousDestinationPointZ = destinationPointZ;
         	
-        	plotLineAtAngle(world, originPointX, originPointY, originPointZ, destinationPointX, destinationPointZ, smoothingAreasToSpawn);
+        	plotLineAtAngle(originPointX, originPointY, originPointZ, destinationPointX, destinationPointZ, smoothingAreasToSpawn);
         }
     }
     
-    private void plotLineAtAngle(LocalWorld world, int originPointX, short originPointY, int originPointZ, int destinationPointX, int destinationPointZ, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn)
+    private void plotLineAtAngle(int originPointX, short originPointY, int originPointZ, int destinationPointX, int destinationPointZ, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn)
     {
     	ChunkCoordinate currentChunk;
     	ChunkCoordinate previousChunk = null;
@@ -915,14 +916,14 @@ public class SmoothingAreaGenerator
     
 	// Merges all the smoothing lines that were plotted earlier into one smoothing area per chunk and then spawns the smoothing area.
 	// Returns false if a smoothing area could not be finalised and spawning has to be delayed until other chunks have spawned.
-    public void spawnSmoothAreas(ChunkCoordinate chunkCoordinate, CustomStructureCoordinate start, LocalWorld world, ChunkCoordinate chunkBeingPopulated)
+    public void spawnSmoothAreas(ChunkCoordinate chunkCoordinate, CustomStructureCoordinate start, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated)
     {
         // Get all smoothing areas (lines) that should spawn in this chunk for this branching structure
         ArrayList<SmoothingAreaLine> smoothingAreaInChunk = smoothingAreasToSpawn.get(chunkCoordinate);
         if(smoothingAreaInChunk != null && chunkCoordinate != null)
         {
             // Merge all smooth areas (lines) so that in one x + z coordinate there can be a maximum of 2 smoothing area blocks, 1 going up and 1 going down (first pass and second pass)
-        	mergeAndSpawnSmoothingAreas(chunkCoordinate, smoothingAreaInChunk, world, start);
+        	mergeAndSpawnSmoothingAreas(chunkCoordinate, smoothingAreaInChunk, structureCache, worldGenRegion, start);
 
             // We'll still be using the chunks that smoothing areas
             // spawn in for chunk based collision detection so keep them
@@ -933,7 +934,7 @@ public class SmoothingAreaGenerator
     }
 
     // Merges all the smoothing lines that were plotted earlier into one smoothing area per chunk
-    private void mergeAndSpawnSmoothingAreas(ChunkCoordinate chunkCoordinate, ArrayList<SmoothingAreaLine> smoothingAreas, LocalWorld world, CustomStructureCoordinate start)
+    private void mergeAndSpawnSmoothingAreas(ChunkCoordinate chunkCoordinate, ArrayList<SmoothingAreaLine> smoothingAreas, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, CustomStructureCoordinate start)
     {
     	// Make sure there's only 2 blocks per column, one filling and one cutting line.
     	// The lowest block in each column is the filling line, the highest is the cutting line
@@ -952,7 +953,7 @@ public class SmoothingAreaGenerator
     		// cutting lines should never be below their origin
 			if(smoothingBeginAndEndPoints.finalDestinationPointY == -1)
 			{
-				smoothingBeginAndEndPoints.finalDestinationPointY = (short)world.getHighestBlockYAt(
+				smoothingBeginAndEndPoints.finalDestinationPointY = (short)worldGenRegion.getHighestBlockYAt(
 					smoothingBeginAndEndPoints.finalDestinationPointX, 
 					smoothingBeginAndEndPoints.finalDestinationPointZ, 
 					true, false, true, true, true, null
@@ -980,7 +981,7 @@ public class SmoothingAreaGenerator
 							}
 							
 							// Mark the structure cache chunk region for saving (structure start region is also marked at the end of bo4 spawnForChunk)
-							world.getStructureCache().markRegionForSaving(
+							structureCache.markRegionForSaving(
 								ChunkCoordinate.fromBlockCoords(
 									lineAtEndPoint.beginPointX,
 									lineAtEndPoint.beginPointZ
@@ -1048,7 +1049,7 @@ public class SmoothingAreaGenerator
     	HashMap<ChunkCoordinate, SmoothingAreaColumn> smoothingBlocksPerColumn = new HashMap<ChunkCoordinate, SmoothingAreaColumn>();
     	for(SmoothingAreaLine smoothingBeginAndEndPoints : smoothingAreas)
     	{
-    		mergeLine(world, smoothingBeginAndEndPoints, chunkCoordinate, smoothingBeginAndEndPoints, smoothingBlocksPerColumn, smoothRadius);    		
+    		mergeLine(smoothingBeginAndEndPoints, chunkCoordinate, smoothingBeginAndEndPoints, smoothingBlocksPerColumn, smoothRadius);    		
     	}
 
     	// For each column, make sure there is only one cutting line (the lowest cutting block in the column)
@@ -1056,11 +1057,11 @@ public class SmoothingAreaGenerator
     	// TODO: This causes problems when multiple lines on a diferent axis target the same endpoint
     	for(Entry<ChunkCoordinate, SmoothingAreaColumn> smoothingBlocksInColumn : smoothingBlocksPerColumn.entrySet())
     	{
-    		smoothingBlocksInColumn.getValue().processBlocks(world, chunkCoordinate, ((BO4)start.getObject()).getConfig());
+    		smoothingBlocksInColumn.getValue().processBlocks(worldGenRegion, chunkCoordinate, ((BO4)start.getObject()).getConfig());
     	}
     }
     
-    private void mergeLine(LocalWorld world, SmoothingAreaLine smoothingAreaLine, ChunkCoordinate chunkBeingSpawned, SmoothingAreaLine smoothingBeginAndEndPoints, HashMap<ChunkCoordinate, SmoothingAreaColumn> smoothingBlocksPerColumn, int smoothRadius)
+    private void mergeLine(SmoothingAreaLine smoothingAreaLine, ChunkCoordinate chunkBeingSpawned, SmoothingAreaLine smoothingBeginAndEndPoints, HashMap<ChunkCoordinate, SmoothingAreaColumn> smoothingBlocksPerColumn, int smoothRadius)
     {
     	short blockY;
     	ChunkCoordinate columnCoords;

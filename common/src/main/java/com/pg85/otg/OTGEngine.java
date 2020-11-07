@@ -1,6 +1,7 @@
 package com.pg85.otg;
 
 import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.presets.LocalPresetLoader;
 import com.pg85.otg.config.PluginConfig;
@@ -57,7 +58,7 @@ public abstract class OTGEngine
     {
         this.logger = logger;
         this.otgRootFolder = otgRootFolder;
-        this.presetLoader = presetLoader;        
+        this.presetLoader = presetLoader; 
     }
     
     public void onShutdown()
@@ -149,7 +150,7 @@ public abstract class OTGEngine
         }
     }
     
-	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer, LocalWorld localWorld)
+	public boolean fireReplaceBiomeBlocksEvent(int x, int z, ChunkBuffer chunkBuffer)
 	{
         return true;
 	}
@@ -162,19 +163,19 @@ public abstract class OTGEngine
      * @return True if the event handlers allow that the object is spawned,
      *         false otherwise.
      */
-    public boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorld world, int x, int y, int z)
+    public boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorldGenRegion worldGenRegion, int x, int y, int z)
     {
         boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
         {
-            if (!handler.canCustomObjectSpawn(object, world, x, y, z, !success))
+            if (!handler.canCustomObjectSpawn(object, worldGenRegion, x, y, z, !success))
             {
                 success = false;
             }
         }
         for (EventHandler handler : monitoringEventHandlers)
         {
-            handler.canCustomObjectSpawn(object, world, x, y, z, !success);
+            handler.canCustomObjectSpawn(object, worldGenRegion, x, y, z, !success);
         }
         return success;
     }
@@ -214,20 +215,20 @@ public abstract class OTGEngine
      * @return True if the event handlers allow that the resource is spawned,
      *         false otherwise.
      */
-    public boolean fireResourceProcessEvent(Resource resource, LocalWorld world, Random random, boolean villageInChunk, int chunkX,
+    public boolean fireResourceProcessEvent(Resource resource, LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int chunkX,
             int chunkZ)
     {    	
         boolean success = true;
         for (EventHandler handler : cancelableEventHandlers)
         {
-            if (!handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success))
+            if (!handler.onResourceProcess(resource, worldGenregion, random, villageInChunk, chunkX, chunkZ, !success))
             {
                 success = false;
             }
         }
         for (EventHandler handler : monitoringEventHandlers)
         {
-            handler.onResourceProcess(resource, world, random, villageInChunk, chunkX, chunkZ, !success);
+            handler.onResourceProcess(resource, worldGenregion, random, villageInChunk, chunkX, chunkZ, !success);
         }
         return success;
     }
@@ -270,7 +271,7 @@ public abstract class OTGEngine
 		return this.presetLoader;
 	}
 
-    // OTG dirs
+	// OTG dirs
 
     public Path getOTGRootFolder()
     {

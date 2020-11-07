@@ -1,47 +1,53 @@
 package com.pg85.otg.forge.biome;
 
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.util.BiomeIds;
 
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
 
-public class ForgeBiome
+public class ForgeBiome implements LocalBiome
 {
-	private final ResourceLocation registryName;
-    private final BiomeIds biomeIds;
-    private final BiomeConfig biomeConfig;
-
-    public ForgeBiome(ResourceLocation registryName, BiomeConfig biomeConfig, BiomeIds biomeIds)
+	private final Biome biomeBase;
+	private final BiomeConfig biomeConfig;
+    
+    public ForgeBiome(Biome biomeBase, BiomeConfig biomeConfig)
     {
-    	this.registryName = registryName;
-        this.biomeIds = biomeIds;
-        this.biomeConfig = biomeConfig;
+    	this.biomeBase = biomeBase;
+    	this.biomeConfig = biomeConfig;
     }
 
-    public ResourceLocation getRegistryName()
+    @Override
+    public float getTemperatureAt(int x, int y, int z)
     {
-    	return this.registryName;
-    }
-    
-    public BiomeIds getIds()
-    {
-        return this.biomeIds;
-    }
-    
-    public BiomeConfig getBiomeConfig()
-    {
-        return this.biomeConfig;
-    }
-    
-    public String getName()
-    {
-        return this.getBiomeConfig().getName();
+        return this.biomeBase.getTemperature(new BlockPos(x, y, z));
     }
 
-    public Biome getBiome()
-    {
-        return ForgeRegistries.BIOMES.getValue(getRegistryName());
-    }
+	@Override
+	public BiomeConfig getBiomeConfig()
+	{
+		return this.biomeConfig;
+	}    
+    
+	@Override
+	public boolean isCustom()
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public String getName()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public BiomeIds getIds()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

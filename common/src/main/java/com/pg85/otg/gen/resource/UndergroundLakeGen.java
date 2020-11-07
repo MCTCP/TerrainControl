@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -78,12 +78,12 @@ public class UndergroundLakeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
-        if (y >= world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated))
+        if (y >= worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated))
         {
             return;
         }
@@ -117,7 +117,7 @@ public class UndergroundLakeGen extends Resource
                 {
                     for (int zLake = (int) (zAdjusted - horizontalSize / 2.0D); zLake <= (int) (zAdjusted + horizontalSize / 2.0D); zLake++)
                     {
-                        LocalMaterialData material = world.getMaterial(xLake, yLake, zLake, chunkBeingPopulated);
+                        LocalMaterialData material = worldGenRegion.getMaterial(xLake, yLake, zLake, chunkBeingPopulated);
                         if (material == null || material.isEmptyOrAir() || material.isMaterial(LocalMaterials.BEDROCK))
                         {
                             // Don't replace air or bedrock
@@ -131,14 +131,14 @@ public class UndergroundLakeGen extends Resource
                         {
                             continue;
                         }
-                        LocalMaterialData materialBelow = world.getMaterial(xLake, yLake - 1, zLake, chunkBeingPopulated);
+                        LocalMaterialData materialBelow = worldGenRegion.getMaterial(xLake, yLake - 1, zLake, chunkBeingPopulated);
                         if (materialBelow != null && materialBelow.isAir())
                         {
                             // Air block, also set position above to air
-                            world.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingPopulated, false);
+                        	worldGenRegion.setBlock(xLake, yLake, zLake, materialBelow, null, chunkBeingPopulated, false);
                         } else {
                             // Not air, set position above to water
-                            world.setBlock(xLake, yLake, zLake, material, null, chunkBeingPopulated, false);
+                        	worldGenRegion.setBlock(xLake, yLake, zLake, material, null, chunkBeingPopulated, false);
                         }
                     }
                 }

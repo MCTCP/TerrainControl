@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.terrain;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.world.WorldConfig;
@@ -13,12 +13,12 @@ import java.util.Random;
 
 public class CavesGen extends TerrainGenBase
 {
-    private WorldConfig worldSettings;
+    private WorldConfig worldConfig;
 
-    public CavesGen(WorldConfig wrk, LocalWorld world)
+    public CavesGen(WorldConfig worldConfig, long worldSeed)
     {
-        super(world);
-        this.worldSettings = wrk;
+        super(worldSeed);
+        this.worldConfig = worldConfig;
     }
 
     private void generateLargeCaveNode(long seed, ChunkBuffer generatingChunkBuffer, double x, double y, double z)
@@ -161,9 +161,9 @@ public class CavesGen extends TerrainGenBase
             {
                 maxDepth = 1;
             }
-            if (minDepth > this.worldSettings.worldHeightCap - 8)
+            if (minDepth > this.worldConfig.worldHeightCap - 8)
             {
-                minDepth = this.worldSettings.worldHeightCap - 8;
+                minDepth = this.worldConfig.worldHeightCap - 8;
             }
             if (i3 < 0)
             {
@@ -182,7 +182,7 @@ public class CavesGen extends TerrainGenBase
                 {
                     for (int local_y = minDepth + 1; (!waterFound) && (local_y >= maxDepth - 1); local_y--)
                     {
-                        if (local_y >= 0 && local_y < this.worldSettings.worldHeightCap)
+                        if (local_y >= 0 && local_y < this.worldConfig.worldHeightCap)
                         {
                             material = generatingChunkBuffer.getBlock(local_x, local_y, local_z);
                             if (
@@ -332,17 +332,17 @@ public class CavesGen extends TerrainGenBase
     }
 
     @Override
-    protected void generateChunk(ChunkCoordinate chunkCoord, ChunkBuffer generatingChunkBuffer)
+    protected void generateChunk(LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkBuffer generatingChunkBuffer)
     {
     	int i = 0;
-    	if(this.worldSettings.caveRarity > 0 && this.worldSettings.caveFrequency > 0)
+    	if(this.worldConfig.caveRarity > 0 && this.worldConfig.caveFrequency > 0)
     	{
-	        i = this.random.nextInt(this.random.nextInt(this.random.nextInt(this.worldSettings.caveFrequency) + 1) + 1);
-	        if (this.worldSettings.evenCaveDistribution)
+	        i = this.random.nextInt(this.random.nextInt(this.random.nextInt(this.worldConfig.caveFrequency) + 1) + 1);
+	        if (this.worldConfig.evenCaveDistribution)
 	        {
-	            i = this.worldSettings.caveFrequency;
+	            i = this.worldConfig.caveFrequency;
 	        }
-	        if (this.random.nextInt(100) >= this.worldSettings.caveRarity)
+	        if (this.random.nextInt(100) >= this.worldConfig.caveRarity)
 	        {
 	            i = 0;
 	        }
@@ -360,26 +360,26 @@ public class CavesGen extends TerrainGenBase
         {
             x = chunkCoord.getBlockX() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
-            if (this.worldSettings.evenCaveDistribution)
+            if (this.worldConfig.evenCaveDistribution)
             {
-                y = RandomHelper.numberInRange(random, this.worldSettings.caveMinAltitude, this.worldSettings.caveMaxAltitude);
+                y = RandomHelper.numberInRange(random, this.worldConfig.caveMinAltitude, this.worldConfig.caveMaxAltitude);
             } else {
-                y = this.random.nextInt(this.random.nextInt(this.worldSettings.caveMaxAltitude - this.worldSettings.caveMinAltitude + 1) + 1) + this.worldSettings.caveMinAltitude;
+                y = this.random.nextInt(this.random.nextInt(this.worldConfig.caveMaxAltitude - this.worldConfig.caveMinAltitude + 1) + 1) + this.worldConfig.caveMinAltitude;
             }
 
             z = chunkCoord.getBlockZ() + this.random.nextInt(ChunkCoordinate.CHUNK_SIZE);
 
-            count = this.worldSettings.caveSystemFrequency;
+            count = this.worldConfig.caveSystemFrequency;
             largeCaveSpawned = false;
-            if (this.random.nextInt(100) <= this.worldSettings.individualCaveRarity)
+            if (this.random.nextInt(100) <= this.worldConfig.individualCaveRarity)
             {
                 generateLargeCaveNode(this.random.nextLong(), generatingChunkBuffer, x, y, z);
                 largeCaveSpawned = true;
             }
 
-            if ((largeCaveSpawned) || (this.random.nextInt(100) <= this.worldSettings.caveSystemPocketChance - 1))
+            if ((largeCaveSpawned) || (this.random.nextInt(100) <= this.worldConfig.caveSystemPocketChance - 1))
             {
-                count += RandomHelper.numberInRange(random, this.worldSettings.caveSystemPocketMinSize, this.worldSettings.caveSystemPocketMaxSize);
+                count += RandomHelper.numberInRange(random, this.worldConfig.caveSystemPocketMinSize, this.worldConfig.caveSystemPocketMaxSize);
             }
             while (count > 0)
             {

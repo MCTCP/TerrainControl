@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.surface;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.gen.ChunkBuffer;
@@ -28,7 +28,7 @@ public interface SurfaceGenerator
      * @param xInWorld        X position in the world.
      * @param zInWorld        Z position in the world.
      */
-    void spawn(LocalWorld world, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld);
+    void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld);
 
     /**
      * Writes the settings used to a string. There must be a constructor to
@@ -38,7 +38,7 @@ public interface SurfaceGenerator
      */
     String toString();
 
-	LocalMaterialData getSurfaceBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld);
+	LocalMaterialData getSurfaceBlockAtHeight(LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld);
 
-	LocalMaterialData getGroundBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld);
+	LocalMaterialData getGroundBlockAtHeight(LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld);
 }

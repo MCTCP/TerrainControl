@@ -3,8 +3,8 @@ package com.pg85.otg.forge.materials;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 
@@ -56,7 +56,7 @@ public class ForgeMaterialData extends LocalMaterialData
     	{
     		return null;
     	}
-
+    	
         // Try parsing as an internal Minecraft name
         // This is so that things like "minecraft:stone" aren't parsed
         // as the block "minecraft" with data "stone", but instead as the
@@ -68,19 +68,28 @@ public class ForgeMaterialData extends LocalMaterialData
     		return ForgeMaterialData.getBlank();
     	}
     	
+    	Block block = null;
     	String blockNameCorrected = input.trim().toLowerCase();
-    	// Try parsing as legacy block id and get proper name.
+    	// Try parsing as legacy block name / id
     	if(!blockNameCorrected.contains(":"))
     	{
+        	block = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
+        	if(block != null)
+        	{
+        		return ofMinecraftBlock(block, input);
+        	}    		
 	    	try
 	    	{
 	    		int blockId = Integer.parseInt(blockNameCorrected);
-	    		blockNameCorrected = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
-	    	} catch(NumberFormatException ex) { }
+	    		String fromLegacyIdName = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
+	    		if(fromLegacyIdName != null)
+	    		{
+	    			blockNameCorrected = fromLegacyIdName;
+	    		}
+	    	} catch(NumberFormatException ex) { }	    		    
     	}
     	
     	// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
-    	Block block = null;
     	
     	// Use mc /setblock command logic to parse block string for us <3
 		BlockStateArgument blockStateArgument = new BlockStateArgument();
@@ -98,17 +107,21 @@ public class ForgeMaterialData extends LocalMaterialData
 		if(blockNameCorrected.contains(":"))
 		{
     		// Try parsing data argument as int.
+    		String blockNameOrId = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));
 	    	try
 	    	{
-	    		String blockNameOrId = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));
+	    		int blockId = Integer.parseInt(blockNameOrId);
+	    		blockNameOrId = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
+	    	} catch(NumberFormatException ex) { }	    	
+	    	try
+	    	{
 	    		int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
 	    		BlockState blockState = LegacyMaterials.fromLegacyBlockNameOrIdWithData(blockNameOrId, data);
 				if(blockState != null)
 				{
 					return ofMinecraftBlockState(blockState, input); 
-				}
-				
-				// Remove any old metadata, fe STONE:0 or STONE:1 -> STONE	    	
+				}				
+				// Remove any old metadata, fe STONE:0 or STONE:1 -> STONE
 				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));				
 	    	} catch(NumberFormatException ex) { }	    	
     	}
@@ -123,7 +136,7 @@ public class ForgeMaterialData extends LocalMaterialData
         	}
     	} catch(net.minecraft.util.ResourceLocationException ex) { }
 
-    	// Try OTG legacy block names
+    	// Try legacy name again, without data.
     	block = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
     	if(block != null)
     	{
@@ -131,7 +144,7 @@ public class ForgeMaterialData extends LocalMaterialData
     	}
     	
 		OTG.log(LogMarker.INFO, "Could not parse block: " + input + ", substituting AIR.");
-
+		
 		return ofMinecraftBlock(Blocks.AIR, input);
     }
         
@@ -267,12 +280,12 @@ public class ForgeMaterialData extends LocalMaterialData
     }
 
 	@Override
-	public LocalMaterialData parseForWorld(LocalWorld world)
+	public LocalMaterialData parseForWorld(WorldConfig worldConfig)
 	{
         if (!this.checkedFallbacks && this.isEmpty() && this.rawEntry != null)
 		{
 			this.checkedFallbacks = true;
-			ForgeMaterialData newMaterialData = ((ForgeMaterialData)world.getConfigs().getWorldConfig().parseFallback(this.rawEntry)); 
+			ForgeMaterialData newMaterialData = ((ForgeMaterialData)worldConfig.parseFallback(this.rawEntry)); 
 			if(newMaterialData != null && newMaterialData.blockData != null)
 			{
 				// TODO: Should blockData be a clone?

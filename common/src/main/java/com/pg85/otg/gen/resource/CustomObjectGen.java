@@ -1,10 +1,11 @@
 package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -50,19 +51,19 @@ public class CustomObjectGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Left blank, as spawnInChunk already handles this.
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
-        for (CustomObject object : getObjects(world.getName()))
+        for (CustomObject object : getObjects(worldGenRegion.getWorldName()))
         {
         	if(object != null) // if null then BO2/BO3 file could not be found
         	{
-        		object.process(world, random, chunkCoord);
+        		object.process(structureCache, worldGenRegion, random, chunkCoord);
         	}
         }
     }

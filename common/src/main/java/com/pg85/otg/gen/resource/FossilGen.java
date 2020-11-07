@@ -1,8 +1,9 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 
@@ -21,13 +22,13 @@ public final class FossilGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Left blank, as spawnInChunk already handles this.
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         if (random.nextDouble() * 100.0 > rarity)
         {
@@ -40,7 +41,7 @@ public final class FossilGen extends Resource
         // spawn exactly the same object at exactly the same location. In
         // other words: don't bother adding a frequency parameter, unless
         // you are going to rewrite the fossil code.
-        world.placeFossil(random, chunkCoord);
+        worldGenRegion.placeFossil(random, chunkCoord);
     }
 
     @Override

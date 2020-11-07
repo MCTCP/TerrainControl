@@ -2,7 +2,7 @@ package com.pg85.otg.customobjects.bo3.bo3function;
 
 import java.util.Random;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.customobjects.bo3.BO3Config;
 import com.pg85.otg.customobjects.bofunctions.BlockFunction;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -33,9 +33,9 @@ public class BO3BlockFunction extends BlockFunction<BO3Config>
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
-        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlock);
+    	worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlock);
     }
     
     @Override

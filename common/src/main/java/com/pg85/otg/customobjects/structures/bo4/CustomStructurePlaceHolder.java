@@ -5,18 +5,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.structures.bo4.smoothing.SmoothingAreaLine;
 import com.pg85.otg.util.ChunkCoordinate;
 
 public class CustomStructurePlaceHolder extends BO4CustomStructure
 {
-    public CustomStructurePlaceHolder(LocalWorld world, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, int minY)
+    public CustomStructurePlaceHolder(long worldSeed, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, int minY)
     {
-    	super(world, structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
+    	super(worldSeed, structureStart, objectsToSpawn, smoothingAreasToSpawn, minY);
     }
 
-	public void mergeWithCustomStructure(LocalWorld world, BO4CustomStructure structure)
+	public void mergeWithCustomStructure(BO4CustomStructure structure)
 	{		
 		structure.objectsToSpawn.putAll(this.objectsToSpawn);
 		

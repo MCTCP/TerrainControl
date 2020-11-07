@@ -1,11 +1,12 @@
 package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.bo3.BO3;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.customobjects.structures.StructuredCustomObject;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructure;
 import com.pg85.otg.customobjects.structures.bo3.BO3CustomStructureCoordinate;
@@ -51,17 +52,17 @@ public class CustomStructureGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Left blank, as spawnInChunk already handles this.
     }
 
     // Only used for BO3 CustomStructure
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         // Find all structures that reach this chunk, and spawn them
-        int searchRadius = world.getConfigs().getWorldConfig().maximumCustomStructureRadius;
+        int searchRadius = worldGenRegion.getWorldConfig().maximumCustomStructureRadius;
 
         int currentChunkX = chunkCoord.getChunkX();
         int currentChunkZ = chunkCoord.getChunkZ();
@@ -69,33 +70,33 @@ public class CustomStructureGen extends Resource
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
             {
-            	BO3CustomStructure structureStart = world.getStructureCache().getBo3StructureStart(random, searchChunkX, searchChunkZ);
+            	BO3CustomStructure structureStart = structureCache.getBo3StructureStart(worldGenRegion, random, searchChunkX, searchChunkZ);
                 if (structureStart != null)
                 {
-                	structureStart.spawnInChunk(chunkCoord, world);
+                	structureStart.spawnInChunk(structureCache, worldGenRegion, chunkCoord);
                 }
             }
         }
     }
 
-    public BO3CustomStructureCoordinate getRandomObjectCoordinate(LocalWorld world, Random random, int chunkX, int chunkZ)
+    public BO3CustomStructureCoordinate getRandomObjectCoordinate(LocalWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ)
     {
         if (objectNames.isEmpty())
         {
             return null;
-        }        
-        for (int objectNumber = 0; objectNumber < getObjects(world.getName()).size(); objectNumber++)
+        }
+        for (int objectNumber = 0; objectNumber < getObjects(worldGenRegion.getWorldName()).size(); objectNumber++)
         {
             if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
             {
-            	StructuredCustomObject object = getObjects(world.getName()).get(objectNumber);
+            	StructuredCustomObject object = getObjects(worldGenRegion.getWorldName()).get(objectNumber);
             	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
             	{
-            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(world, random, chunkX, chunkZ);
+            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getWorldName(), random, chunkX, chunkZ);
             	} else {
             		if(OTG.getPluginConfig().spawnLog)
             		{
-            			BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
+            			BiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
             			OTG.log(LogMarker.WARN, "Error: Could not find BO3 for CustomStructure in biome " + biomeConfig.getName() + ". BO3: " + objectNames.get(objectNumber));
             		}
             	}

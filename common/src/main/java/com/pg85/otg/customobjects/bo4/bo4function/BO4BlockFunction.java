@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.customobjects.bo3.BO3Loader;
 import com.pg85.otg.customobjects.bo4.BO4Config;
@@ -28,9 +28,9 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
     }
     	
     @Override
-    public void spawn(LocalWorld world, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
-        world.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, true);
+    	worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, true);
     }
     
     public BO4BlockFunction rotate(Rotation rotation)

@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -81,7 +81,7 @@ public class WellGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
@@ -90,16 +90,16 @@ public class WellGen extends Resource
         LocalMaterialData worldMaterial;
         while (
     		y > minAltitude && 
-    		(worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
+    		(worldMaterial = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated)) != null && 
     		worldMaterial.isAir()
 		)
         {
             --y;
         }
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenRegion.getWorldConfig(), material, sourceBlocks);
 
-        worldMaterial = world.getMaterial(x, y, z, chunkBeingPopulated);
+        worldMaterial = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated);
 
         if (worldMaterial == null || !sourceBlocks.contains(worldMaterial))
         {
@@ -114,9 +114,9 @@ public class WellGen extends Resource
             for (j = -2; j <= 2; ++j)
             {
                 if (
-                	(worldMaterial = world.getMaterial(x + i, y - 1, z + j, chunkBeingPopulated)) == null ||
+                	(worldMaterial = worldGenRegion.getMaterial(x + i, y - 1, z + j, chunkBeingPopulated)) == null ||
                 	worldMaterial.isAir() ||
-                	(worldMaterial = world.getMaterial(x + i, y - 2, z + j, chunkBeingPopulated)) == null ||
+                	(worldMaterial = worldGenRegion.getMaterial(x + i, y - 2, z + j, chunkBeingPopulated)) == null ||
                 	worldMaterial.isAir()
         		)
                 {
@@ -131,16 +131,16 @@ public class WellGen extends Resource
             {
                 for (int var9 = -2; var9 <= 2; ++var9)
                 {
-                    world.setBlock(x + j, y + i, z + var9, material, null, chunkBeingPopulated, false);
+                	worldGenRegion.setBlock(x + j, y + i, z + var9, material, null, chunkBeingPopulated, false);
                 }
             }
         }
 
-        world.setBlock(x, y, z, water, null, chunkBeingPopulated, false);
-        world.setBlock(x - 1, y, z, water, null, chunkBeingPopulated, false);
-        world.setBlock(x + 1, y, z, water, null, chunkBeingPopulated, false);
-        world.setBlock(x, y, z - 1, water, null, chunkBeingPopulated, false);
-        world.setBlock(x, y, z + 1, water, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x, y, z, water, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x - 1, y, z, water, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x + 1, y, z, water, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x, y, z - 1, water, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x, y, z + 1, water, null, chunkBeingPopulated, false);
 
         for (i = -2; i <= 2; ++i)
         {
@@ -148,15 +148,15 @@ public class WellGen extends Resource
             {
                 if (i == -2 || i == 2 || j == -2 || j == 2)
                 {
-                    world.setBlock(x + i, y + 1, z + j, material, null, chunkBeingPopulated, false);
+                	worldGenRegion.setBlock(x + i, y + 1, z + j, material, null, chunkBeingPopulated, false);
                 }
             }
         }
 
-        world.setBlock(x + 2, y + 1, z, slab, null, chunkBeingPopulated, false);
-        world.setBlock(x - 2, y + 1, z, slab, null, chunkBeingPopulated, false);
-        world.setBlock(x, y + 1, z + 2, slab, null, chunkBeingPopulated, false);
-        world.setBlock(x, y + 1, z - 2, slab, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x + 2, y + 1, z, slab, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x - 2, y + 1, z, slab, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x, y + 1, z + 2, slab, null, chunkBeingPopulated, false);
+        worldGenRegion.setBlock(x, y + 1, z - 2, slab, null, chunkBeingPopulated, false);
 
         for (i = -1; i <= 1; ++i)
         {
@@ -164,19 +164,19 @@ public class WellGen extends Resource
             {
                 if (i == 0 && j == 0)
                 {
-                    world.setBlock(x + i, y + 4, z + j, material, null, chunkBeingPopulated, false);
+                	worldGenRegion.setBlock(x + i, y + 4, z + j, material, null, chunkBeingPopulated, false);
                 } else {
-                    world.setBlock(x + i, y + 4, z + j, slab, null, chunkBeingPopulated, false);
+                	worldGenRegion.setBlock(x + i, y + 4, z + j, slab, null, chunkBeingPopulated, false);
                 }
             }
         }
 
         for (i = 1; i <= 3; ++i)
         {
-            world.setBlock(x - 1, y + i, z - 1, material, null, chunkBeingPopulated, false);
-            world.setBlock(x - 1, y + i, z + 1, material, null, chunkBeingPopulated, false);
-            world.setBlock(x + 1, y + i, z - 1, material, null, chunkBeingPopulated, false);
-            world.setBlock(x + 1, y + i, z + 1, material, null, chunkBeingPopulated, false);
+        	worldGenRegion.setBlock(x - 1, y + i, z - 1, material, null, chunkBeingPopulated, false);
+        	worldGenRegion.setBlock(x - 1, y + i, z + 1, material, null, chunkBeingPopulated, false);
+        	worldGenRegion.setBlock(x + 1, y + i, z - 1, material, null, chunkBeingPopulated, false);
+        	worldGenRegion.setBlock(x + 1, y + i, z + 1, material, null, chunkBeingPopulated, false);
         }
     }
 }

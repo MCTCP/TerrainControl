@@ -1,6 +1,6 @@
 package com.pg85.otg.customobjects.bo3.checks;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.customobjects.bo3.BO3Config;
@@ -29,7 +29,7 @@ public abstract class BO3Check extends CustomObjectConfigFunction<BO3Config>
      * @param z     The z position
      * @return Whether this check prevents the BO3 from spawning.
      */
-    public abstract boolean preventsSpawn(LocalWorld world, int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
+    public abstract boolean preventsSpawn(LocalWorldGenRegion worldGenregion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 
     /**
      * This implementation of

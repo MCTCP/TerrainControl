@@ -1,8 +1,9 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.RandomHelper;
@@ -80,10 +81,10 @@ public class VeinGen extends Resource
      * @return The vein that starts in the chunk, or null if there is no
      *         starting vein.
      */
-    private Vein getVeinStartInChunk(LocalWorld world, int chunkX, int chunkZ)
+    private Vein getVeinStartInChunk(LocalWorldGenRegion worldGenRegion, int chunkX, int chunkZ)
     {
         // Create a random generator that is constant for this chunk and vein
-        Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, material.hashCode() * (minRadius + maxRadius + 100) + world.getSeed());
+        Random random = RandomHelper.getRandomForCoords(chunkX, chunkZ, material.hashCode() * (minRadius + maxRadius + 100) + worldGenRegion.getSeed());
 
         if (random.nextDouble() * 100.0 < veinRarity)
         {
@@ -123,22 +124,22 @@ public class VeinGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Left blank, as spawnInChunk already handles this.
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
         // Find all veins that reach this chunk, and spawn them
         int searchRadius = (this.maxRadius + 15) / 16;
         
-        parseMaterials(world, this.material, this.sourceBlocks);
+        parseMaterials(worldGenRegion.getWorldConfig(), this.material, this.sourceBlocks);
 
-        if(world.getConfigs().getWorldConfig().disableOreGen)
+        if(worldGenRegion.getWorldConfig().disableOreGen)
         {
         	if(this.material.isOre())
         	{
@@ -152,10 +153,10 @@ public class VeinGen extends Resource
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
             {
-                Vein vein = getVeinStartInChunk(world, searchChunkX, searchChunkZ);
+                Vein vein = getVeinStartInChunk(worldGenRegion, searchChunkX, searchChunkZ);
                 if (vein != null && vein.reachesChunk(currentChunkX, currentChunkZ))
                 {
-                    vein.spawn(world, random, chunkBeingPopulated, this);
+                    vein.spawn(worldGenRegion, random, chunkBeingPopulated, this);
                 }
             }
         }

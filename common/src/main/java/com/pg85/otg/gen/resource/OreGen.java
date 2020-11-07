@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -90,13 +90,13 @@ public class OreGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-        parseMaterials(world, this.material, this.sourceBlocks);
+        parseMaterials(worldGenregion.getWorldConfig(), this.material, this.sourceBlocks);
         
-        if(world.getWorldConfig().disableOreGen)
+        if(worldGenregion.getWorldConfig().disableOreGen)
         {
         	if(this.material.isOre())
         	{
@@ -226,7 +226,7 @@ public class OreGen extends Resource
 	                		highestSolidBlock = this.highestBlocksCache[i3 - chunkBeingPopulated.getBlockX()][i5 - chunkBeingPopulated.getBlockZ()] & 0xFF; // byte to int conversion
 	                		if(highestSolidBlock == 0)  // 0 is default / unset.
 	                		{
-	                			highestSolidBlock = world.getHeightMapHeight(i3, i5, chunkBeingPopulated);
+	                			highestSolidBlock = worldGenregion.getHeightMapHeight(i3, i5, chunkBeingPopulated);
 	                			// TODO: This causes getHeightMapHeight to be called every time on a 0 height column, 
 	                			// can't use -1 tho since we're using byte arrays. At least we're aborting the column 
 	                			// immediately, since OreGen shouldn't be used to spawn things in empty columns. If
@@ -252,10 +252,10 @@ public class OreGen extends Resource
                                 d15 = ((double)i5 + 0.5D - d8) / (d10 / 2.0D);
                                 if((d13 * d13 + d14 * d14 + d15 * d15 < 1.0D))
                                 {
-                            		material = world.getMaterial(i3, i4, i5, chunkBeingPopulated);
+                            		material = worldGenregion.getMaterial(i3, i4, i5, chunkBeingPopulated);
 	                                if(this.sourceBlocks.contains(material))
 	                                {
-	                                    world.setBlock(i3, i4, i5, this.material, null, chunkBeingPopulated, true);
+	                                	worldGenregion.setBlock(i3, i4, i5, this.material, null, chunkBeingPopulated, true);
 	                                }
                                 }
                             }

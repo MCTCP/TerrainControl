@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.config.ConfigFunction;
@@ -1547,7 +1546,7 @@ public class WorldConfig extends ConfigFile
     
 	public static WorldConfig fromDisk(Path worldDir)
 	{
-		File worldConfigFile = Paths.get(worldDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE_NAME).toFile();
+		File worldConfigFile = Paths.get(worldDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE).toFile();
         if(!worldConfigFile.exists())
         {
         	return null;
@@ -1561,11 +1560,11 @@ public class WorldConfig extends ConfigFile
 		return this.bedrockBlock;
 	}
 
-	public LocalMaterialData getBedrockBlockReplaced(LocalWorld localWorld, BiomeConfig biomeConfig, int y)
+	public LocalMaterialData getBedrockBlockReplaced(BiomeConfig biomeConfig, int y)
 	{		
 		if(biomeConfig.replacedBlocks.replacesBedrock)
 		{
-			return this.bedrockBlock.parseWithBiomeAndHeight(localWorld, biomeConfig, y);
+			return this.bedrockBlock.parseWithBiomeAndHeight(biomeConfig, y);
 		}
 		return this.bedrockBlock;
 	}

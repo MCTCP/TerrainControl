@@ -1,6 +1,5 @@
 package com.pg85.otg.customobjects.bo4.bo4function;
 
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.customobjects.bo4.BO4Config;
 import com.pg85.otg.customobjects.structures.CustomStructureCoordinate;
 import com.pg85.otg.customobjects.structures.bo4.BO4CustomStructureCoordinate;
@@ -88,7 +87,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
     }
 
     @Override
-    public CustomStructureCoordinate toCustomObjectCoordinate(LocalWorld world, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
+    public CustomStructureCoordinate toCustomObjectCoordinate(String worldName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name)
     {
     	int cumulativeChance = 0;
     	for (BO4BranchNode branch : branchesOTGPlus)
@@ -109,7 +108,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
             {
                 BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
                 Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-                return new BO4CustomStructureCoordinate(world, branch.getCustomObject(false, world), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, true, branch.branchGroup);
+                return new BO4CustomStructureCoordinate(worldName, branch.getCustomObject(false, worldName), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, true, branch.branchGroup);
             }
             randomChance -= branch.getChance();
             if(randomChance < 0)

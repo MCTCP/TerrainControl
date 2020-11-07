@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
@@ -73,11 +73,10 @@ public class DungeonGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// TOOO: Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
         int y = RandomHelper.numberInRange(random, minAltitude, maxAltitude);
-        world.placeDungeon(random, x, y, z);
+        worldGenRegion.placeDungeon(random, x, y, z);
     }
-
 }

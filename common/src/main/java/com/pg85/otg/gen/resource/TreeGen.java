@@ -1,10 +1,11 @@
 package com.pg85.otg.gen.resource;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.customobjects.CustomObject;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -103,7 +104,7 @@ public class TreeGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
         // Left blank, as spawnInChunk already handles this
     }
@@ -171,11 +172,11 @@ public class TreeGen extends Resource
     }
     
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {    	   	
     	// TODO: Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-    	loadTrees(world.getName());
+    	loadTrees(worldGenRegion.getWorldName());
     	
         for (int i = 0; i < frequency; i++)
         {        	
@@ -188,7 +189,7 @@ public class TreeGen extends Resource
                     
                     CustomObject tree = treeObjects[treeNumber];
                     // Min/Max == -1 means use bo2/bo3 internal min/max height, otherwise use the optional min/max height defined with Tree()
-            		if(tree != null && tree.spawnAsTree(world, random, x, z, treeObjectMinChances[treeNumber], treeObjectMaxChances[treeNumber], chunkCoord))
+            		if(tree != null && tree.spawnAsTree(structureCache, worldGenRegion, random, x, z, treeObjectMinChances[treeNumber], treeObjectMaxChances[treeNumber], chunkCoord))
             		{
     	                // Success!
     	                break;

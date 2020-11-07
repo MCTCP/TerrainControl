@@ -1,7 +1,7 @@
 package com.pg85.otg.customobjects.structures;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.customobjects.bo4.BO4;
 import com.pg85.otg.customobjects.bofunctions.ModDataFunction;
@@ -17,6 +17,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.helpers.RandomHelper;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +31,11 @@ import java.util.Random;
 public class CustomStructureCache
 {
 	public static final int REGION_SIZE = 100;
+	private final Path worldSaveDir;
+	private final boolean isBO4Enabled;
+	private final int dimensionId;
+	private final String worldName;
+	private final long worldSeed;
 	
 	// BO3
 	private FifoMap<ChunkCoordinate, BO3CustomStructure> bo3StructureCache;
@@ -41,8 +47,6 @@ public class CustomStructureCache
 
     // Common
 
-    private LocalWorld world;
-
 	// WorldInfoChunks holds info on all chunks that had structures plotted on them for this world. 
     // Used for /otg structure and spawners/particles/moddata for BO structures and objects.
     // For BO4's this is also used used to avoid resources like lakes spawning on structures.
@@ -51,12 +55,16 @@ public class CustomStructureCache
     // WorldInfoChunks is used as little as possible, due to its size and slowness.
     private Map<ChunkCoordinate, StructureDataRegion> worldInfoChunks;
 
-    public CustomStructureCache(LocalWorld world)
+    public CustomStructureCache(String worldName, Path worldSaveDir, int dimensionId, long worldSeed, boolean isBO4Enabled)
     {
-        this.world = world;
         this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
         this.plotter = new CustomStructurePlotter();
         this.bo3StructureCache = new FifoMap<ChunkCoordinate, BO3CustomStructure>(400);
+        this.worldSaveDir = worldSaveDir;
+        this.isBO4Enabled = isBO4Enabled;
+        this.dimensionId = dimensionId;
+        this.worldName = worldName;
+        this.worldSeed = worldSeed;
         loadStructureCache();
     }
     
@@ -138,13 +146,12 @@ public class CustomStructureCache
     
 	// Only used for Bukkit
     // TODO: Document this, remove if possible.
-    public void reloadBo3StructureCache(LocalWorld world)
+    public void reloadBo3StructureCache()
     {
-        this.world = world;
         this.bo3StructureCache.clear();
     }
-    
-    public BO3CustomStructure getBo3StructureStart(Random worldRandom, int chunkX, int chunkZ)
+
+    public BO3CustomStructure getBo3StructureStart(LocalWorldGenRegion worldGenRegion, Random worldRandom, int chunkX, int chunkZ)
     {
         ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
         BO3CustomStructure structureStart = bo3StructureCache.get(chunkCoord);
@@ -157,18 +164,18 @@ public class CustomStructureCache
             }
             return structureStart;
         }
-        
+
         // No structure found, create one
-        Random random = RandomHelper.getRandomForCoords(chunkX ^ 2, (chunkZ + 1) * 2, world.getSeed());
-       	BiomeConfig biomeConfig = world.getBiome(chunkX * 16 + 15, chunkZ * 16 + 15).getBiomeConfig();
+        Random random = RandomHelper.getRandomForCoords(chunkX ^ 2, (chunkZ + 1) * 2, worldGenRegion.getSeed());
+       	BiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(chunkX * 16 + 15, chunkZ * 16 + 15);
        	CustomStructureGen structureGen = biomeConfig.structureGen;
-        
+
         if (structureGen != null)
         {
-            BO3CustomStructureCoordinate customObject = structureGen.getRandomObjectCoordinate(world, random, chunkX, chunkZ);
+            BO3CustomStructureCoordinate customObject = structureGen.getRandomObjectCoordinate(worldGenRegion, random, chunkX, chunkZ);
             if (customObject != null)
             {
-                structureStart = new BO3CustomStructure(world, customObject);
+                structureStart = new BO3CustomStructure(worldGenRegion, customObject);
                 bo3StructureCache.put(chunkCoord, structureStart);
                 return structureStart;
             }
@@ -185,9 +192,9 @@ public class CustomStructureCache
     // BO4 methods
 
 	// Used while calculating branches during plotting
-	public boolean isChunkOccupied(LocalWorld world, ChunkCoordinate chunkCoordinate)
+	public boolean isChunkOccupied(ChunkCoordinate chunkCoordinate)
 	{
-		return this.plotter.isBo4ChunkPlotted(world, chunkCoordinate);
+		return this.plotter.isBo4ChunkPlotted(chunkCoordinate);
 	}
 
     // Called for each structure start plotted, and each ObjectToSpawn / 
@@ -201,7 +208,7 @@ public class CustomStructureCache
     // Only used by other resources like lakes 
     public boolean isBo4ChunkOccupied(ChunkCoordinate chunkCoord)
     {
-    	if(world.isBo4Enabled())
+    	if(this.isBO4Enabled)
     	{
     		return this.worldInfoChunks.containsKey(chunkCoord);
     	}
@@ -209,21 +216,21 @@ public class CustomStructureCache
     }
     
     // Only used by ObjectSpawner during population
-    public void plotBo4Structures(Random rand, ChunkCoordinate chunkCoord)
+    public void plotBo4Structures(LocalWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord)
     {
-    	plotter.plotStructures(this, this.world, rand, chunkCoord);
+    	plotter.plotStructures(this, worldGenRegion, rand, chunkCoord);
     }
 
     // Only used by ObjectSpawner during population
-	public void spawnBo4Chunk(ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated)
+	public void spawnBo4Chunk(LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated)
 	{
-		this.plotter.spawnBO4Chunk(chunkCoord, this.world, chunkBeingPopulated);
+		this.plotter.spawnBO4Chunk(chunkCoord, this, worldGenRegion, chunkBeingPopulated);
 	}
 	
 	// Only used by /spawn command	
-    public ChunkCoordinate plotBo4Structure(BO4 structure, ArrayList<String> biomes, ChunkCoordinate chunkCoord)
+    public ChunkCoordinate plotBo4Structure(LocalWorldGenRegion worldGenRegion, BO4 structure, ArrayList<String> biomes, ChunkCoordinate chunkCoord)
     {
-    	plotter.plotStructures(this, structure, biomes, this.world, new Random(), chunkCoord);
+    	plotter.plotStructures(structure, biomes, this, worldGenRegion, new Random(), chunkCoord);
     	return null;
     }
 
@@ -242,11 +249,11 @@ public class CustomStructureCache
 
     private void saveStructureCache()
     {
-	    CustomStructureFileManager.saveStructureData(this.worldInfoChunks, this.world);
+	    CustomStructureFileManager.saveStructureData(this.worldInfoChunks, this.dimensionId, this.worldSaveDir);
 	    
-	    if(this.world.isBo4Enabled())
+	    if(this.isBO4Enabled)
 	    {
-	    	plotter.saveStructureCache(this.world);
+	    	plotter.saveStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled);
 	    }
     }
 
@@ -256,12 +263,12 @@ public class CustomStructureCache
 
         this.worldInfoChunks = new HashMap<ChunkCoordinate, StructureDataRegion>();
 		
-    	Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.world);
+    	Map<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructures = CustomStructureFileManager.loadStructureData(this.worldName, this.worldSaveDir, this.dimensionId, this.worldSeed, this.isBO4Enabled);
 		if(loadedStructures != null)
 		{
-	        if(this.world.isBo4Enabled())
+	        if(this.isBO4Enabled)
 	        {
-	        	this.plotter.loadStructureCache(this.world, loadedStructures);
+	        	this.plotter.loadStructureCache(this.worldSaveDir, this.dimensionId, this.isBO4Enabled, loadedStructures);
 	        }
 
 			for(Entry<CustomStructure, ArrayList<ChunkCoordinate>> loadedStructure : loadedStructures.entrySet())

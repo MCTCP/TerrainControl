@@ -1,10 +1,11 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorSurfacePatchOctaves;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -112,34 +113,34 @@ public class SurfacePatchGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenRegion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-        int y = world.getHighestBlockAboveYAt(x, z, chunkBeingPopulated) - 1;
+        int y = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated) - 1;
         if (y < minAltitude || y > maxAltitude)
             return;
         
-        parseMaterials(world, material, sourceBlocks);
+        parseMaterials(worldGenRegion.getWorldConfig(), material, sourceBlocks);
 		
         double yNoise = noiseGen.getYNoise(x * 0.25D, z * 0.25D);
         if (yNoise > 0.0D)
         {
-            LocalMaterialData materialAtLocation = world.getMaterial(x, y, z, chunkBeingPopulated);
+            LocalMaterialData materialAtLocation = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated);
             if (sourceBlocks.contains(materialAtLocation))
             {
-                world.setBlock(x, y, z, material, null, chunkBeingPopulated, true);
+            	worldGenRegion.setBlock(x, y, z, material, null, chunkBeingPopulated, true);
 
                 if (yNoise < 0.12D)
                 {
-                    world.setBlock(x, y + 1, z, decorationAboveReplacements, null, chunkBeingPopulated, true);
+                	worldGenRegion.setBlock(x, y + 1, z, decorationAboveReplacements, null, chunkBeingPopulated, true);
                 }
             }
         }
     }
 
     @Override
-    protected void spawnInChunk(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
+    protected void spawnInChunk(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         int chunkX = chunkCoord.getBlockXCenter();
         int chunkZ = chunkCoord.getBlockZCenter();
@@ -149,7 +150,7 @@ public class SurfacePatchGen extends Resource
             {
                 int x = chunkX + x0;
                 int z = chunkZ + z0;
-                spawn(world, random, false, x, z, chunkCoord);
+                spawn(worldGenRegion, random, false, x, z, chunkCoord);
             }
         }
     }

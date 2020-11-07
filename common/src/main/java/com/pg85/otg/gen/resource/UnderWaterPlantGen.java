@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.resource;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -83,11 +83,11 @@ public class UnderWaterPlantGen extends Resource
     }
 
     @Override
-    public void spawn(LocalWorld world, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
+    public void spawn(LocalWorldGenRegion worldGenregion, Random rand, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
     	// Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
     	
-    	sourceBlocks.parseForWorld(world);
+    	sourceBlocks.parseForWorld(worldGenregion.getWorldConfig());
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         int j;
@@ -101,8 +101,8 @@ public class UnderWaterPlantGen extends Resource
             j = x + rand.nextInt(8) - rand.nextInt(8);
             k = y + rand.nextInt(4) - rand.nextInt(4);
             m = z + rand.nextInt(8) - rand.nextInt(8);
-            worldMaterial = world.getMaterial(j, k , m, chunkBeingPopulated);
-            worldMaterialBelow = world.getMaterial(j, k - 1, m, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(j, k , m, chunkBeingPopulated);
+            worldMaterialBelow = worldGenregion.getMaterial(j, k - 1, m, chunkBeingPopulated);
             if (
         		(worldMaterial == null || !worldMaterial.isMaterial(LocalMaterials.WATER)) ||
         		(worldMaterialBelow == null || !sourceBlocks.contains(worldMaterialBelow))
@@ -111,7 +111,7 @@ public class UnderWaterPlantGen extends Resource
                 continue;
             }
 
-            plant.spawn(world, j, k, m, chunkBeingPopulated);
+            plant.spawn(worldGenregion, j, k, m, chunkBeingPopulated);
         }
     }
 }

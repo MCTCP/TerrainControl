@@ -1,8 +1,8 @@
 package com.pg85.otg.common.materials;
 
 import com.pg85.otg.OTGEngine;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.world.WorldConfig;
 
 // TODO: Make this class unmodifiable (parseForWorld modifies atm),
 // implement a world-specific materials cache and ensure only one
@@ -189,9 +189,9 @@ public abstract class LocalMaterialData
      * @param world The world this material will be parsed through, each world may have different fallbacks.
      * @return The parsed material
      */
-    public abstract LocalMaterialData parseForWorld(LocalWorld world);
+    public abstract LocalMaterialData parseForWorld(WorldConfig worldConfig);
     
-	public LocalMaterialData parseWithBiomeAndHeight(LocalWorld world, BiomeConfig biomeConfig, int y)
+	public LocalMaterialData parseWithBiomeAndHeight(BiomeConfig biomeConfig, int y)
 	{	
         if (!biomeConfig.worldConfig.biomeConfigsHaveReplacement)
         {

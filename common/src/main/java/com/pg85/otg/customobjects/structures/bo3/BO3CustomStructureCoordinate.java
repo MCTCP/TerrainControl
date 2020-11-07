@@ -1,7 +1,6 @@
 package com.pg85.otg.customobjects.structures.bo3;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalWorld;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.BoundingBox;
 import com.pg85.otg.util.bo3.Rotation;
@@ -15,9 +14,9 @@ import com.pg85.otg.logging.LogMarker;
  */
 public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
 {
-    public BO3CustomStructureCoordinate(LocalWorld world, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z)
+    public BO3CustomStructureCoordinate(String worldName, StructuredCustomObject object, String customObjectName, Rotation rotation, int x, short y, int z)
     {
-    	this.worldName = world.getName();
+    	this.worldName = worldName;
         this.object = object;
 
         bo3Name = object != null ? object.getName() : customObjectName != null && customObjectName.length() > 0 ? customObjectName : null;

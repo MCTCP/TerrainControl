@@ -1,6 +1,6 @@
 package com.pg85.otg.gen.surface;
 
-import com.pg85.otg.common.LocalWorld;
+import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -12,25 +12,25 @@ import com.pg85.otg.gen.GeneratingChunk;
 public class SimpleSurfaceGenerator implements SurfaceGenerator
 {    
     @Override
-    public LocalMaterialData getSurfaceBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+    public LocalMaterialData getSurfaceBlockAtHeight(LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
     {
-    	return biomeConfig.getSurfaceBlockReplaced(world, yInWorld);
+    	return biomeConfig.getSurfaceBlockReplaced(yInWorld);
     }
     
 	@Override
-	public LocalMaterialData getGroundBlockAtHeight(LocalWorld world, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
+	public LocalMaterialData getGroundBlockAtHeight(LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, int xInWorld, int yInWorld, int zInWorld)
 	{
-		return biomeConfig.getGroundBlockReplaced(world, yInWorld);
+		return biomeConfig.getGroundBlockReplaced(yInWorld);
 	}
 	
     @Override
-    public void spawn(LocalWorld world, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
+    public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int xInWorld, int zInWorld)
     {
-        spawnColumn(world, null, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
+        spawnColumn(null, generatingChunk, chunkBuffer, biomeConfig, xInWorld & 0xf, zInWorld & 0xf);
     }
 
     // net.minecraft.world.biome.Biome.generateBiomeTerrain
-    protected final void spawnColumn(LocalWorld world, LayerChoice layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
+    protected final void spawnColumn(LayerChoice layer, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, BiomeConfig biomeConfig, int x, int z)
     {
     	WorldConfig worldConfig = biomeConfig.worldConfig;
         float currentTemperature = biomeConfig.biomeTemperature;
@@ -41,7 +41,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         if (worldConfig.ceilingBedrock)
         {
             // Moved one block lower to fix lighting issues
-            chunkBuffer.setBlock(x, generatingChunk.heightCap - 2, z, worldConfig.getBedrockBlockReplaced(world, biomeConfig, generatingChunk.heightCap - 2));
+            chunkBuffer.setBlock(x, generatingChunk.heightCap - 2, z, worldConfig.getBedrockBlockReplaced(biomeConfig, generatingChunk.heightCap - 2));
         }
 
         // Traverse down the block column to place bedrock, ground and surface blocks
@@ -66,7 +66,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
             if (generatingChunk.mustCreateBedrockAt(worldConfig, y))
             {
                 // Place bedrock
-                chunkBuffer.setBlock(x, y, z, worldConfig.getBedrockBlockReplaced(world, biomeConfig, y));
+                chunkBuffer.setBlock(x, y, z, worldConfig.getBedrockBlockReplaced(biomeConfig, y));
             } else {
             	
                 // Surface blocks logic (grass, dirt, sand, sandstone)
@@ -84,7 +84,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
             	// same biome water block as surface/ground/stone block.                
                 // TODO: If other mods have problems bc of replaced blocks in the chunk during ReplaceBiomeBlocks, 
                 // do replaceblock for stone/water here instead of when initially filling the chunk.
-                else if(!blockOnCurrentPos.equals(biomeConfig.getWaterBlockReplaced(world, y)))
+                else if(!blockOnCurrentPos.equals(biomeConfig.getWaterBlockReplaced(y)))
                 {
                 	// Place surface/ground down to a certain depth per column,
                 	// determined via noise. groundLayerDepth == 0 means we're 
@@ -124,7 +124,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         	boolean bIsAir = useAirForSurface;
                         	if(!bIsAir && useLayerSurfaceBlockForSurface)
                         	{
-                        		bIsAir = (layer != null ? layer.getSurfaceBlockReplaced(world, biomeConfig, y) : biomeConfig.getSurfaceBlockReplaced(world, y)).isAir();
+                        		bIsAir = (layer != null ? layer.getSurfaceBlockReplaced(biomeConfig, y) : biomeConfig.getSurfaceBlockReplaced(y)).isAir();
                         	}
                         	if(bIsAir)
                         	{
@@ -151,15 +151,15 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         	}
                         	else if(useIceForSurface)
                         	{
-                        		currentSurfaceBlock = biomeConfig.getIceBlockReplaced(world, y);
+                        		currentSurfaceBlock = biomeConfig.getIceBlockReplaced(y);
                         	}
                         	else if(useWaterForSurface)
                         	{
-                        		currentSurfaceBlock = biomeConfig.getWaterBlockReplaced(world, y);
+                        		currentSurfaceBlock = biomeConfig.getWaterBlockReplaced(y);
                         	}
                         	else if(useLayerSurfaceBlockForSurface)
                         	{
-                        		currentSurfaceBlock = layer != null ? layer.getSurfaceBlockReplaced(world, biomeConfig, y) : biomeConfig.getSurfaceBlockReplaced(world, y);
+                        		currentSurfaceBlock = layer != null ? layer.getSurfaceBlockReplaced(biomeConfig, y) : biomeConfig.getSurfaceBlockReplaced(y);
                         	}
                         	
                         	chunkBuffer.setBlock(x, y, z, currentSurfaceBlock);
@@ -171,7 +171,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                             }
                             else if(useLayerGroundBlockForGround)
                             {
-                            	chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(world, biomeConfig, y) : biomeConfig.getGroundBlockReplaced(world, y));
+                            	chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(biomeConfig, y) : biomeConfig.getGroundBlockReplaced(y));
                             }                        	
                         }
                     }
@@ -187,7 +187,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
                         }
                         else if(useLayerGroundBlockForGround)
                         {
-                        	chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(world, biomeConfig, y) : biomeConfig.getGroundBlockReplaced(world, y));
+                        	chunkBuffer.setBlock(x, y, z, layer != null ? layer.getGroundBlockReplaced(biomeConfig, y) : biomeConfig.getGroundBlockReplaced(y));
                         	
                             // When a ground layer of sand is done spawning, if the BiomeBlocksNoise is above 1 (?), <- In a desert every column should have sandstone?
                         	// spawn layers of sandstone underneath. 
@@ -215,7 +215,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
 	    							//biomeConfig.getRedSandStoneBlockReplaced(world, y) : 
 									//biomeConfig.getSandStoneBlockReplaced(world, y)
                 			//);
-                        	chunkBuffer.setBlock(x, y, z, biomeConfig.getSandStoneBlockReplaced(world, y));
+                        	chunkBuffer.setBlock(x, y, z, biomeConfig.getSandStoneBlockReplaced(y));
                         }
                     }
                 }
