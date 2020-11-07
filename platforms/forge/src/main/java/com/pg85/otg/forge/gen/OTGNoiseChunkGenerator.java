@@ -231,22 +231,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
-	int i = 0;
-	static boolean derp;
 	// Chunk population method taken from Biome (Biome.func_242427_a())
 	public void func_242427_a(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
 	{
-		if(derp)
-		{
-			throw new RuntimeException();
-		}
-		derp = true;
-		int myI = i++;
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ());
-		OTG.log(LogMarker.INFO, "Populate Start " + myI + " : " + chunkBeingPopulated.getChunkX() + " " + chunkBeingPopulated.getChunkZ());
 		this.chunkPopulator.populate(chunkBeingPopulated, this.structureCache, new ForgeWorldGenRegion(this.worldName, this.worldSeed, this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig);
-		OTG.log(LogMarker.INFO, "Populate End " + myI + " : " + chunkBeingPopulated.getChunkX() + " " + chunkBeingPopulated.getChunkZ());
-		derp = false;
 	}
 	
 	// Mob spawning on initial chunk spawn (animals).
