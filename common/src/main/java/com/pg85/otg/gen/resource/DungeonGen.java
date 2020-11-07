@@ -13,7 +13,6 @@ import java.util.Random;
 
 public class DungeonGen extends Resource
 {
-
     private final int maxAltitude;
     private final int minAltitude;
 
