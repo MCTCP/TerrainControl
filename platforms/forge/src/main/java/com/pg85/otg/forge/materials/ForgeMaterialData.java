@@ -68,16 +68,16 @@ public class ForgeMaterialData extends LocalMaterialData
     		return ForgeMaterialData.getBlank();
     	}
     	
-    	Block block = null;
+    	BlockState blockState = null;
     	String blockNameCorrected = input.trim().toLowerCase();
     	// Try parsing as legacy block name / id
     	if(!blockNameCorrected.contains(":"))
     	{
-        	block = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
-        	if(block != null)
-        	{
-        		return ofMinecraftBlock(block, input);
-        	}    		
+    		blockState = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
+			if(blockState != null)
+			{
+				return ofMinecraftBlockState(blockState, input); 
+			}    		
 	    	try
 	    	{
 	    		int blockId = Integer.parseInt(blockNameCorrected);
@@ -116,16 +116,18 @@ public class ForgeMaterialData extends LocalMaterialData
 	    	try
 	    	{
 	    		int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
-	    		BlockState blockState = LegacyMaterials.fromLegacyBlockNameOrIdWithData(blockNameOrId, data);
+	    		blockState = LegacyMaterials.fromLegacyBlockNameOrIdWithData(blockNameOrId, data);
 				if(blockState != null)
 				{
-					return ofMinecraftBlockState(blockState, input); 
-				}				
+					return ofMinecraftBlockState(blockState, input);
+				}
 				// Remove any old metadata, fe STONE:0 or STONE:1 -> STONE
 				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));				
 	    	} catch(NumberFormatException ex) { }	    	
     	}
 
+		// Try without data
+		Block block = null;
     	try
     	{
     		// This returns AIR if block is not found ><.
@@ -137,11 +139,11 @@ public class ForgeMaterialData extends LocalMaterialData
     	} catch(net.minecraft.util.ResourceLocationException ex) { }
 
     	// Try legacy name again, without data.
-    	block = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
-    	if(block != null)
-    	{
-    		return ofMinecraftBlock(block, input);
-    	}
+    	blockState = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
+		if(blockState != null)
+		{
+			return ofMinecraftBlockState(blockState, input);
+		}
     	
 		OTG.log(LogMarker.INFO, "Could not parse block: " + input + ", substituting AIR.");
 		
