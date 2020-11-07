@@ -10,8 +10,8 @@ import com.pg85.otg.common.presets.LocalPresetLoader;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.preset.Preset;
 import com.pg85.otg.config.standard.WorldStandardValues;
+import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.gen.BiomeGenData;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -31,9 +31,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<ResourceLocation, BiomeConfig>();
+	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
 	// TODO: Store per preset
-	private ArrayList<RegistryKey<Biome>> biomes = new ArrayList<RegistryKey<Biome>>();
+	private ArrayList<RegistryKey<Biome>> biomes = new ArrayList<>();
 	
 	public ForgePresetLoader(Path otgRootFolder)
 	{
@@ -70,34 +70,22 @@ public class ForgePresetLoader extends LocalPresetLoader
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
  				this.biomes.add(RegistryKey.func_240903_a_(Registry.field_239720_u_, resourceLocation));
 
- 				// TODO: this is hardcoded for now until layer generation is fixed.
-				BiomeGenData data = new BiomeGenData();
-				data.biomeHeight = biomeConfig.biomeHeight;
-				data.biomeVolatility = biomeConfig.biomeVolatility;
-				data.horizontalFracture = biomeConfig.worldConfig.getFractureHorizontal();
-				data.verticalFracture = biomeConfig.worldConfig.getFractureVertical();
-				data.volatility1 = biomeConfig.volatility1;
-				data.volatility2 = biomeConfig.volatility2;
-				data.smoothRadius = biomeConfig.smoothRadius;
-				data.color = biomeConfig.biomeColor;
-
  				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.ocean"))
  				{
- 					BiomeGenData.LOOKUP[0] = data;
+ 					OTGBiomeProvider.LOOKUP[0] = biomeConfig;
  				}
  				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.plains"))
  				{
- 					BiomeGenData.LOOKUP[1] = data;
+ 					OTGBiomeProvider.LOOKUP[1] = biomeConfig;
  				}
  				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.forest"))
  				{
- 					BiomeGenData.LOOKUP[2] = data;
+ 					OTGBiomeProvider.LOOKUP[2] = biomeConfig;
  				}
  				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.desert"))
  				{
- 					BiomeGenData.LOOKUP[3] = data;
+ 					OTGBiomeProvider.LOOKUP[3] = biomeConfig;
  				}
- 				//
 			}
 		}
 	}

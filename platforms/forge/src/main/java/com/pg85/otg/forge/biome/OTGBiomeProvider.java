@@ -12,6 +12,7 @@ import net.minecraft.world.biome.Biomes;
 import net.minecraft.world.biome.provider.BiomeProvider;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
 import com.pg85.otg.gen.biome.layers.LayerSource;
@@ -24,7 +25,9 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 {
-	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
+	// TODO: This needs to be better
+	public static final BiomeConfig[] LOOKUP = new BiomeConfig[128];
+ 	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
 		(instance) -> instance.group(
 			Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
 			Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
@@ -116,5 +119,11 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	public CachingLayerSampler getSampler()
 	{
 		return this.layer;
+	}
+
+	@Override
+	public BiomeConfig getConfig(int x, int z)
+	{
+		return LOOKUP[this.layer.sample(x, z)];
 	}
 }

@@ -9,7 +9,6 @@ import javax.imageio.ImageIO;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
-import com.pg85.otg.gen.BiomeGenData;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
@@ -64,7 +63,7 @@ public class OTGCommand
 			for (int z = 0; z < img.getWidth(); z++)
 			{
 				//set the color
-				img.setRGB(x, z, BiomeGenData.LOOKUP[provider.getSampler().sample(x, z)].color);
+				img.setRGB(x, z, OTGBiomeProvider.LOOKUP[provider.getSampler().sample(x, z)].biomeColor);
 			}
 
 			//send a progress update to let people know the server isn't dying

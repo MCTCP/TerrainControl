@@ -501,7 +501,7 @@ public class ChunkProviderOTG
                 i2D++;
 
                 // Initialize both CHC for this column
-                CHC = new double[biomeConfig.heightMatrix.length];
+                CHC = new double[biomeConfig.chcData.length];
                 riverCHC = new double[biomeConfig.riverHeightMatrix.length];
 
                 // If CHC smoothing is enabled, smooth based on the biome at this column's smoothing radius
@@ -511,7 +511,7 @@ public class ChunkProviderOTG
                     smoothCHC(CHC, riverCHC, x, z, maxYSections, biomeArray);
                 } else {
                     // If smoothing is not enabled, revert to the original CHC data
-                    CHC = biomeConfig.heightMatrix;
+                    CHC = biomeConfig.chcData;
                     riverCHC = biomeConfig.riverHeightMatrix;
                 }
 
@@ -570,7 +570,7 @@ public class ChunkProviderOTG
                     	output += riverCHC[Math.min(biomeConfig.riverHeightMatrix.length - 1, y)];
                     } else {
                     	// CHC directly modifies the terrain noise at a given column, providing for fine access
-                    	output += CHC[Math.min(biomeConfig.heightMatrix.length - 1, y)];
+                    	output += CHC[Math.min(biomeConfig.chcData.length - 1, y)];
                     }
 
                     // Store the terrain noise for use in the trilinear interpolation
@@ -750,7 +750,7 @@ public class ChunkProviderOTG
 
                     // Add the custom height for both river and normal CHC
                     riverData[y] += nextBiomeConfig.riverHeightMatrix[Math.min(nextBiomeConfig.riverHeightMatrix.length - 1, y)];
-                    chcData[y] += nextBiomeConfig.heightMatrix[Math.min(nextBiomeConfig.heightMatrix.length - 1, y)];
+                    chcData[y] += nextBiomeConfig.chcData[Math.min(nextBiomeConfig.chcData.length - 1, y)];
                 }
             }
         }

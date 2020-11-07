@@ -73,7 +73,7 @@ public class StandardBiomeTemplate
     public int defaultRarityWhenIsle = 97;
     public int defaultColor = 0x000000;
     public int defaultWaterLily = 0;
-    public int defaultWaterColorMultiplier = 0xFFFFFF;
+    public int defaultWaterColorMultiplier = 0x3F76E4;
     public int defaultGrassColor = 0xFFFFFF;
     public int defaultFoliageColor = 0xFFFFFF;
     public boolean defaultStrongholds = true;

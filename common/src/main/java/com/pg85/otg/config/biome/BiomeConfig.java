@@ -138,7 +138,7 @@ public class BiomeConfig extends ConfigFile
     private double volatilityWeightRaw1;
     private double volatilityWeightRaw2;
     public boolean disableNotchHeightControl;
-    public double[] heightMatrix;
+    public double[] chcData;
 
     // Structures
     public boolean strongholdsEnabled;
@@ -416,8 +416,8 @@ public class BiomeConfig extends ConfigFile
         this.readCustomObjectSettings(settings);        
         this.readResourceSettings(settings);
         this.inheritSaplingResource = settings.getSetting(BiomeStandardValues.INHERIT_SAPLING_RESOURCE, defaultSettings.inheritSaplingResource);
-        this.heightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
-        this.readHeightSettings(settings, this.heightMatrix, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl);
+        this.chcData = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
+        this.readHeightSettings(settings, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl);
         this.riverHeightMatrix = new double[this.worldConfig.worldHeightCap / TerrainShapeBase.PIECE_Y_SIZE + 1];
         this.readHeightSettings(settings, this.riverHeightMatrix, BiomeStandardValues.RIVER_CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl);
     }
@@ -646,7 +646,7 @@ public class BiomeConfig extends ConfigFile
         writer.putSetting(BiomeStandardValues.DISABLE_BIOME_HEIGHT, this.disableNotchHeightControl,
             "Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.");
 
-        writer.putSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, this.heightMatrix,
+        writer.putSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, this.chcData,
             "List of custom height factors, 17 double entries, each controls about 7",
             "blocks height, starting at the bottom of the world. Positive entry - larger chance of spawn blocks, negative - smaller",
             "Values which affect your configuration may be found only experimentally. Values may be very big, like ~3000.0 depends from height",

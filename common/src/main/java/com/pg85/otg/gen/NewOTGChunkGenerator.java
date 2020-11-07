@@ -5,7 +5,9 @@ import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
+import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
@@ -172,7 +174,7 @@ public class NewOTGChunkGenerator
 
 	private void generateNoiseColumn(double[] noiseColumn, int noiseX, int noiseZ)
 	{
-		BiomeGenData center = getBiomeAt(noiseX, noiseZ);
+		BiomeConfig center = getBiomeAt(noiseX, noiseZ);
 
 		float height = 0; // depth
 		float volatility = 0; // scale
@@ -192,7 +194,7 @@ public class NewOTGChunkGenerator
 			for (int z1 = -center.smoothRadius; z1 <= center.smoothRadius; ++z1)
 			{
 				// TODO: thread local lossy cache for biome sampling
-				BiomeGenData data = getBiomeAt(noiseX + x1, noiseZ + z1);
+				BiomeConfig data = getBiomeAt(noiseX + x1, noiseZ + z1);
 
 				float heightAt = data.biomeHeight;
 				// TODO: vanilla reduces the weight by half when the depth here is greater than the center depth, but OTG doesn't do that?
@@ -204,20 +206,21 @@ public class NewOTGChunkGenerator
 				volatility += data.biomeVolatility * weightAt;
 				volatility1 += data.volatility1 * weightAt;
 				volatility2 += data.volatility2 * weightAt;
-				horizontalFracture += data.horizontalFracture * weightAt;
-				verticalFracture += data.verticalFracture * weightAt;
-				volatilityWeight1 += data.getVolatilityWeight1() * weightAt;
-				volatilityWeight2 += data.getVolatilityWeight2() * weightAt;
+				horizontalFracture += data.worldConfig.getFractureHorizontal() * weightAt;
+				verticalFracture += data.worldConfig.getFractureVertical() * weightAt;
+				volatilityWeight1 += data.volatilityWeight1 * weightAt;
+				volatilityWeight2 += data.volatilityWeight2 * weightAt;
 				maxAverageDepth += data.maxAverageDepth * weightAt;
 				maxAverageHeight += data.maxAverageHeight * weightAt;
 
 				for (int y = 0; y < this.noiseSizeY + 1; y++)
 				{
-					chc[y] += data.chc[y] * weightAt;
+					chc[y] += data.chcData[y] * weightAt;
 				}
 			}
 		}
 
+		// Normalize biome data
 		height /= weight;
 		volatility /= weight;
 		volatility1 /= weight;
@@ -229,18 +232,22 @@ public class NewOTGChunkGenerator
 		maxAverageDepth /= weight;
 		maxAverageHeight /= weight;
 
+		// Normalize CHC
 		for (int y = 0; y < this.noiseSizeY + 1; y++)
 		{
 			chc[y] /= weight;
 		}
 
+		// Do some math on volatility and height
 		volatility = volatility * 0.9f + 0.1f;
 		height = (height * 4.0F - 1.0F) / 8.0F;
 
+		// Vary the height with more noise
 		height += getExtraHeightAt(noiseX, noiseZ, maxAverageDepth, maxAverageHeight) * 0.2;
 
 		for (int y = 0; y <= this.noiseSizeY; ++y)
 		{
+			// Calculate falloff
 			double falloff = ((8.5D + height * 8.5D / 8.0D * 4.0D) - y) * 12.0D * 128.0D / 256.0 / volatility;
 			if (falloff > 0.0)
 			{
@@ -255,20 +262,23 @@ public class NewOTGChunkGenerator
 			// TODO: add if statement for biome height control here
 			noise += falloff;
 
+			// Reduce the last 3 layers
 			if (y > 28)
 			{
 				noise = MathHelper.clampedLerp(noise, -10, ((double) y - 28) / 3.0);
 			}
 
+			// Add chc data
 			noise += chc[y];
 
+			// Store value
 			noiseColumn[y] = noise;
 		}
 	}
 
-	private BiomeGenData getBiomeAt(int x, int z)
+	private BiomeConfig getBiomeAt(int x, int z)
 	{
-		return BiomeGenData.LOOKUP[biomeGenerator.getSampler().sample(x, z)];
+		return biomeGenerator.getConfig(x, z);
 	}
 
 	public void populateNoise(ChunkBuffer buffer, ChunkCoordinate pos)
