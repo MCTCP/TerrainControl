@@ -42,8 +42,8 @@ public class BiomeIdData
         // If this is a previously created world then register biomes to the same OTG biome id as before.
         ArrayList<BiomeIdData> loadedBiomeIdData = loadBiomeIdData(worldSaveDir);
 		
-		File biomeIdDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.BiomeIdDataFileName);
-		File biomeIdDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.BiomeIdDataBackupFileName);
+		File biomeIdDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.BiomeIdDataFileName);
+		File biomeIdDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.BiomeIdDataBackupFileName);
 		
 		StringBuilder stringbuilder = new StringBuilder();
 
@@ -113,8 +113,8 @@ public class BiomeIdData
 		
 	public static ArrayList<BiomeIdData> loadBiomeIdData(Path worldSaveDir)
 	{
-		File biomeIdDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.BiomeIdDataFileName);
-		File biomeIdDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.BiomeIdDataBackupFileName);
+		File biomeIdDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.BiomeIdDataFileName);
+		File biomeIdDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.BiomeIdDataBackupFileName);
 		
 		if(!biomeIdDataFile.exists() && !biomeIdDataBackupFile.exists())
 		{

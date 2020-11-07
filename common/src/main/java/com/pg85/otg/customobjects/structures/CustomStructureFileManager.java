@@ -62,7 +62,7 @@ public class CustomStructureFileManager
     			
         		File occupiedChunksFile = new File(
     				worldSaveDir + File.separator + 
-    				PluginStandardValues.PLUGIN_NAME + File.separator + 
+    				PluginStandardValues.MOD_ID + File.separator + 
     				(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
     				WorldStandardValues.PlottedChunksDataFolderName + File.separator +
     				chunkPerRegionEntry.getKey().getChunkX() + "_" +
@@ -71,7 +71,7 @@ public class CustomStructureFileManager
 				);
         		File occupiedChunksBackupFile = new File(
     				worldSaveDir + File.separator + 
-    				PluginStandardValues.PLUGIN_NAME + File.separator + 
+    				PluginStandardValues.MOD_ID + File.separator + 
     				(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
     				WorldStandardValues.PlottedChunksDataFolderName + File.separator +
     				chunkPerRegionEntry.getKey().getChunkX() + "_" +
@@ -153,7 +153,7 @@ public class CustomStructureFileManager
 		
 		File occupiedChunksFolder = new File(
 			worldSaveDir + File.separator + 
-			PluginStandardValues.PLUGIN_NAME + File.separator + 
+			PluginStandardValues.MOD_ID + File.separator + 
 			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
 			WorldStandardValues.PlottedChunksDataFolderName + File.separator
 		);
@@ -424,7 +424,7 @@ public class CustomStructureFileManager
 	{
 		File structuresRegionFile = new File(
 			worldSaveDir + File.separator + 
-			PluginStandardValues.PLUGIN_NAME + File.separator + 
+			PluginStandardValues.MOD_ID + File.separator + 
 			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
 			WorldStandardValues.StructureDataFolderName + File.separator +
 			regionCoord.getChunkX() + "_" +
@@ -433,7 +433,7 @@ public class CustomStructureFileManager
 		);
 		File structuresRegionBackupFile = new File(
 			worldSaveDir + File.separator + 
-			PluginStandardValues.PLUGIN_NAME + File.separator + 
+			PluginStandardValues.MOD_ID + File.separator + 
 			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
 			WorldStandardValues.StructureDataFolderName + File.separator +
 			regionCoord.getChunkX() + "_" +
@@ -735,7 +735,7 @@ public class CustomStructureFileManager
 		
 		File structureDataFolder = new File(
 			worldSaveDir + File.separator + 
-			PluginStandardValues.PLUGIN_NAME + File.separator + 
+			PluginStandardValues.MOD_ID + File.separator + 
 			(dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") +
 			WorldStandardValues.StructureDataFolderName + File.separator
 		);
@@ -1165,8 +1165,8 @@ public class CustomStructureFileManager
 
 	public static void saveChunksMapFile(Path worldSaveDir, int dimensionId, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
 	{
-		File occupiedChunksFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
-		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
+		File occupiedChunksFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
+		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
@@ -1248,8 +1248,8 @@ public class CustomStructureFileManager
 
 	public static void loadChunksMapFile(Path worldSaveDir, int dimensionId, boolean isBO4Enabled, HashMap<String, ArrayList<ChunkCoordinate>> spawnedStructuresByName, HashMap<String, HashMap<ChunkCoordinate, Integer>> spawnedStructuresByGroup)
 	{
-		File occupiedChunksFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
-		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
+		File occupiedChunksFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresFileName);
+		File occupiedChunksBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + (dimensionId != 0 ? "DIM-" + dimensionId + File.separator : "") + WorldStandardValues.SpawnedStructuresBackupFileName);
 
 	    if(!occupiedChunksFile.exists() && !occupiedChunksBackupFile.exists())
 	    {

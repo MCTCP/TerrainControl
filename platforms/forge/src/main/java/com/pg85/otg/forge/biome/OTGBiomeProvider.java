@@ -60,31 +60,31 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		
 		// TODO: this is hardcoded for now until layer generation is fixed.
 		// TODO: Get the RegistryKey when registering biomes and reuse it?
-		Biome biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.ocean"));
+		Biome biome = registry.getOrDefault(new ResourceLocation("otg:default.ocean"));
 		if(biome != null)
 		{
-			this.lookup.put(0, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.ocean")));
+			this.lookup.put(0, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.ocean")));
 		} else {
 			this.lookup.put(0, Biomes.OCEAN);
 		}
-		biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.plains"));
+		biome = registry.getOrDefault(new ResourceLocation("otg:default.plains"));
 		if(biome != null)
 		{
-			this.lookup.put(1, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.plains")));
+			this.lookup.put(1, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.plains")));
 		} else {
 			this.lookup.put(1, Biomes.PLAINS);
 		}
-		biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.forest"));
+		biome = registry.getOrDefault(new ResourceLocation("otg:default.forest"));
 		if(biome != null)
 		{
-			this.lookup.put(2, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.forest")));
+			this.lookup.put(2, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.forest")));
 		} else {
 			this.lookup.put(2, Biomes.FOREST);
 		}
-		biome = registry.getOrDefault(new ResourceLocation("openterraingenerator:default.desert"));
+		biome = registry.getOrDefault(new ResourceLocation("otg:default.desert"));
 		if(biome != null)
 		{
-			this.lookup.put(3, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("openterraingenerator:default.desert")));
+			this.lookup.put(3, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.desert")));
 		} else {
 			this.lookup.put(3, Biomes.DESERT);
 		}

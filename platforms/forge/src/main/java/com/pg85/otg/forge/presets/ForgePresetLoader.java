@@ -9,6 +9,7 @@ import java.util.Map;
 import com.pg85.otg.common.presets.LocalPresetLoader;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.preset.Preset;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -70,19 +71,19 @@ public class ForgePresetLoader extends LocalPresetLoader
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
  				this.biomes.add(RegistryKey.func_240903_a_(Registry.field_239720_u_, resourceLocation));
 
- 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.ocean"))
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("otg:default.ocean"))
  				{
  					OTGBiomeProvider.LOOKUP[0] = biomeConfig;
  				}
- 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.plains"))
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("otg:default.plains"))
  				{
  					OTGBiomeProvider.LOOKUP[1] = biomeConfig;
  				}
- 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.forest"))
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("otg:default.forest"))
  				{
  					OTGBiomeProvider.LOOKUP[2] = biomeConfig;
  				}
- 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("openterraingenerator:default.desert"))
+ 				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("otg:default.desert"))
  				{
  					OTGBiomeProvider.LOOKUP[3] = biomeConfig;
  				}
@@ -105,15 +106,15 @@ public class ForgePresetLoader extends LocalPresetLoader
 		// TODO: Register surfacebuilder properly, create a surfacebuilder that
 		// looks like 1.12.2 (same ground layer depth etc).
 		SurfaceBuilder<SurfaceBuilderConfig> surfaceBuilder = Registry.register(
-			Registry.SURFACE_BUILDER, 
-			"surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath(), 
+			Registry.SURFACE_BUILDER,
+			new ResourceLocation(PluginStandardValues.MOD_ID_SHORT, "surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath()), 
 			new DefaultSurfaceBuilder(SurfaceBuilderConfig.field_237203_a_)
 		);
 		
 		// Taken from default grassy surface config, grass/gravel/dirt.
-		ConfiguredSurfaceBuilder<SurfaceBuilderConfig> configuredSurfaceBuilder = WorldGenRegistries.func_243663_a(
+		ConfiguredSurfaceBuilder<SurfaceBuilderConfig> configuredSurfaceBuilder = WorldGenRegistries.func_243664_a(
 			WorldGenRegistries.field_243651_c,
-			"surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath(),
+			new ResourceLocation(PluginStandardValues.MOD_ID_SHORT, "surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath()),
 			surfaceBuilder.func_242929_a(
 				new SurfaceBuilderConfig(
 					((ForgeMaterialData)biomeConfig.getDefaultSurfaceBlock()).internalBlock(),

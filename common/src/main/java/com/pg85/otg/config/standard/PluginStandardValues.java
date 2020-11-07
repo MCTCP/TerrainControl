@@ -25,12 +25,12 @@ public class PluginStandardValues extends Settings
     // Plugin Defaults
     
     public static final Setting<LogLevels> LogLevel = enumSetting("LogLevel", LogLevels.Standard);
-    public static final String PLUGIN_NAME = "OpenTerrainGenerator";
-    public static final String PLUGIN_NAME_SHORT = "OTG";
+    public static final String MOD_ID = "OpenTerrainGenerator";
+	public static final String MOD_ID_LOWER_CASE = "openterraingenerator";
+    public static final String MOD_ID_SHORT = "otg";
     public static final Setting<Boolean> SPAWN_LOG = booleanSetting("SpawnLog", false);
     public static final Setting<Boolean> DEVELOPER_MODE = booleanSetting("DeveloperMode", false);
     public static final Setting<Integer> PREGENERATOR_MAX_CHUNKS_PER_TICK = intSetting("PregeneratorMaxChunksPerTick", 5, 1, 10);
-	public static final String MOD_ID = "openterraingenerator";
 
 	/**
 	 * The world depth that the engine supports. Not the actual depth the

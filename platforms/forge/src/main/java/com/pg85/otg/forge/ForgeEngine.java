@@ -27,8 +27,8 @@ public class ForgeEngine extends OTGEngine
 	{
 		super(
 			new ForgeLogger(), 
-			Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + PluginStandardValues.PLUGIN_NAME), 
-			new ForgePresetLoader(Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + PluginStandardValues.PLUGIN_NAME))
+			Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + PluginStandardValues.MOD_ID), 
+			new ForgePresetLoader(Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + PluginStandardValues.MOD_ID))
 		);
 	}
 

@@ -88,7 +88,7 @@ public enum DefaultStructurePart
         DefaultStructurePart result = ByPath.get(lookupName);
         if (result == null)
         {
-            throw new InvalidConfigException(PluginStandardValues.PLUGIN_NAME + " doesn't know about a structure part called " + name);
+            throw new InvalidConfigException(PluginStandardValues.MOD_ID + " doesn't know about a structure part called " + name);
         }
 
         return result;

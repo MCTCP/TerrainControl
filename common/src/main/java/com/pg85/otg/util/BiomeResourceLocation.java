@@ -22,7 +22,7 @@ public class BiomeResourceLocation
 
 	public String getResourceDomain()
 	{
-		return PluginStandardValues.MOD_ID;
+		return PluginStandardValues.MOD_ID_SHORT;
 	}
 
 	public String getResourcePath()
