@@ -1236,7 +1236,7 @@ public class LegacyMaterials
 	    					return Blocks.SPONGE.getDefaultState();
 	    				case 1:
 	    					return Blocks.WET_SPONGE.getDefaultState();
-	    			}    		
+	    			}
 	    		case "stained_glass":
 	    		case "white_stained_glass":
 	    			switch(data)
@@ -1605,6 +1605,8 @@ public class LegacyMaterials
 					return getStairsWithData(12, data);
 				case "purpur_stairs":
 					return getStairsWithData(13, data);
+				case "stone_brick_stairs":
+					return getStairsWithData(14, data);					
 				case "lever":
 					return getLeverOrButtonWithData(0, data);
 				case "stone_button":
@@ -1719,6 +1721,7 @@ public class LegacyMaterials
 				case "diode_block_on":
 					return getRepeaterWithData(1, data);
 				case "redstone":
+				case "redstone_wire":
 					return Blocks.REDSTONE_WIRE.getDefaultState().with(RedstoneWireBlock.POWER, data);
 				case "redstone_comparator_off":
 				case "comparator":
@@ -2009,7 +2012,7 @@ public class LegacyMaterials
 			case 4:			
 				output = Blocks.COBBLESTONE_STAIRS.getDefaultState();
 				break;
-			case 5:			
+			case 5:
 				output = Blocks.BRICK_STAIRS.getDefaultState();
 				break;
 			case 6:
@@ -2036,9 +2039,12 @@ public class LegacyMaterials
 			case 13:			
 				output = Blocks.PURPUR_STAIRS.getDefaultState();
 				break;
+			case 14:
+				output = Blocks.STONE_BRICK_STAIRS.getDefaultState();
+				break;
 			default:
 				return null;
-		}	
+		}
 		return output
 			.with(StairsBlock.FACING, getFacingEastWestSouthNorth(facing))
 			.with(StairsBlock.HALF, half == 0 ? Half.BOTTOM : Half.TOP);
