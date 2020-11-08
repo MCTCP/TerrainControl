@@ -222,12 +222,13 @@ public class CustomStructurePlotter
 		// Make sure the BO4 at spawn is plotted before anything else
 		// This isn't thread-safe so there's a race condition, shouldn't 
 		// cause problems though due to the lock later on.
-		if(!this.structurePlottedAtSpawn) 
+		// TODO: Reimplement IsSpawnPoint
+		//if(!this.structurePlottedAtSpawn) 
 		{
-			this.structurePlottedAtSpawn = true;
-			if(!chunkCoord.equals(worldGenRegion.getSpawnChunk()))
+			//this.structurePlottedAtSpawn = true;
+			//if(!chunkCoord.equals(worldGenRegion.getSpawnChunk()))
 			{
-				plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, worldGenRegion.getSpawnChunk(), true);
+				//plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, worldGenRegion.getSpawnChunk(), true);
 			}
 		}
 

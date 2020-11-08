@@ -236,7 +236,14 @@ public class ForgeMaterialData extends LocalMaterialData
     public boolean isMaterial(LocalMaterialData material)
     {
     	// TODO: Compare registry names?
-        return this.blockData.getBlock().equals(((ForgeMaterialData)material).internalBlock().getBlock());
+        return 
+    		(this.isBlank && ((ForgeMaterialData)material).isBlank) || 
+        	(
+    			!this.isBlank && 
+    			!((ForgeMaterialData)material).isBlank &&
+    			this.blockData.getBlock().equals(((ForgeMaterialData)material).internalBlock().getBlock())
+			)
+    	;
     }
     
     @Override
@@ -317,7 +324,16 @@ public class ForgeMaterialData extends LocalMaterialData
             return false;
         }
         ForgeMaterialData other = (ForgeMaterialData) obj;
-        return this.blockData.equals(other.blockData);
+        
+    	// TODO: Compare registry names?
+        return 
+    		(this.isBlank && other.isBlank) || 
+        	(
+    			!this.isBlank && 
+    			!other.isBlank &&
+    			this.blockData.getBlock().equals(other.internalBlock().getBlock())
+			)
+    	;
     }
     
     /**

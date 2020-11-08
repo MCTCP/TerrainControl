@@ -20,7 +20,7 @@ public class ChunkPopulator
         this.rand = new Random();
     }
 
-    public void populate(ChunkCoordinate chunkCoord, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig)
+    public void populate(ChunkCoordinate chunkCoord, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled)
     {
 		// Cache all biomes in the are being populated (2x2 chunks)
 		//world.cacheBiomesForPopulation(chunkCoord);
@@ -49,12 +49,26 @@ public class ChunkPopulator
 
         boolean hasVillage = false;
 
+        // Use BO4 logic for BO4 worlds
+		if(isBO4Enabled)
+		{
+			// Plot BO4's for all 4 chunks being populated, so we can be sure the chunks have
+			// had a chance to be plotted before being populated. We'll spawn BO4's after 
+			// ores and lakes, but before any other resources.
+			structureCache.plotBo4Structures(worldGenRegion, this.rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()));
+			structureCache.plotBo4Structures(worldGenRegion, this.rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1));
+			structureCache.plotBo4Structures(worldGenRegion, this.rand, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1));
+			structureCache.plotBo4Structures(worldGenRegion, this.rand, chunkCoord);
+			
+			spawnBO4s(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord);
+		}
+        
         // Generate structures
         //hasVillage = world.placeDefaultStructures(this.rand, chunkCoord);
 
         // Mark population started
         //OTG.firePopulationStartEvent(world, this.rand, hasVillage, chunkCoord);
-
+		
         // Resource sequence
         for (ConfigFunction<BiomeConfig> res : biomeConfig.resourceSequence)
         {
@@ -77,4 +91,20 @@ public class ChunkPopulator
         // Mark population ended
         //OTG.firePopulationEndEvent(world, this.rand, hasVillage, chunkCoord);
     }
+    
+	// BO4's should always stay within chunk borders, so we can spawn them for all
+	// 4 of the chunk in the populated area, ensuring all resources that should be
+	// placed afterwards spawn on top of bo4's. 
+	private void spawnBO4s(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated)
+	{
+		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ()), chunkCoord);
+		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ() + 1), chunkCoord);
+		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX() + 1, chunkCoord.getChunkZ() + 1), chunkCoord);
+		spawnBO4(structureCache, worldGenRegion, ChunkCoordinate.fromChunkCoords(chunkCoord.getChunkX(), chunkCoord.getChunkZ()), chunkCoord);
+	}	
+
+	private void spawnBO4(CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated)
+	{
+		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, chunkBeingPopulated);
+	}
 }

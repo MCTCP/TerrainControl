@@ -29,6 +29,8 @@ import net.minecraft.block.Blocks;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.ChunkStatus;
+import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -188,10 +190,58 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         }
 	}
 
+	// Used by ChunkGenerator for BO4's requesting data
+	// in chunks outside the area being populated.
+	public IChunk getChunk(ChunkCoordinate chunkCoord)
+	{
+		return this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+	}
+	
 	@Override
 	public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		return ForgeMaterialData.ofMinecraftBlockState(this.worldGenRegion.getBlockState(new BlockPos(x, y, z)));
+        if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
+        {
+        	return null;
+        }
+     
+        ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+        
+        // If the chunk exists or is inside the area being populated, fetch it normally.
+        IChunk chunk = null;
+    	if(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+    	{
+    		chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+    	}
+    	
+		// If the chunk doesn't exist so we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE)) && chunkBeingPopulated == null)
+		{
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(
+				!(
+					chunk == null && 
+					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.SURFACE)
+				)
+			)
+    		{
+       			// Calculate the material without loading the chunk.
+       			return this.chunkGenerator.getMaterialInUnloadedChunk(this, x,y,z);
+    		}
+    	}
+    	
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE))
+    	{
+            return null;
+    	}
+    	
+		// Get internal coordinates for block in chunk
+        int internalX = x & 0xF;
+        int internalZ = z & 0xF;
+        return ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(new BlockPos(internalX, y, internalZ)));
 	}
 	
 	@Override
@@ -229,21 +279,44 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingPopulated)
 	{
+        ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+        
         // If the chunk exists or is inside the area being populated, fetch it normally.
-        //Chunk chunk = null;
-    	//if(
-			//(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
-			//|| getChunkGenerator().chunkExists(x, z)
-		//)
-    	//{
-    		//chunk = getChunkGenerator().getChunk(x, z);
-    	//}
+        IChunk chunk = null;
+    	if(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+    	{
+    		chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+    	}
+    	
+		// If the chunk doesn't exist and we're doing something outside the
+    	// population sequence, return the material without loading the chunk.
+    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS)) && chunkBeingPopulated == null)
+		{
+    		// If the chunk has already been loaded, no need to use fake chunks.
+    		if(
+				!(
+					chunk == null && 
+					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS)
+				)
+			)
+    		{
+       			// Calculate the material without loading the chunk.
+       			return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+    		}
+    	}
+    	
+		// Tried to query an unloaded chunk outside the area being populated
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS))
+    	{
+    		return -1;
+    	}
     	
 		// Get internal coordinates for block in chunk
-        //int internalX = x & 0xF;
-        //int internalZ = z & 0xF;
-
-        int heightMapy = this.worldGenRegion.getHeight(Type.MOTION_BLOCKING, x, z);
+        int internalX = x & 0xF;
+        int internalZ = z & 0xF;
+        
+		int heightMapy = chunk.getHeightmap(Type.MOTION_BLOCKING).getHeight(internalX, internalZ);
         
         ForgeMaterialData material;
         boolean isSolid;
@@ -253,7 +326,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         
         for(int i = heightMapy; i >= 0; i--)
         {
-        	blockState = this.worldGenRegion.getBlockState(new BlockPos(x, i, z));
+        	blockState = chunk.getBlockState(new BlockPos(internalX, i, internalZ));
         	block = blockState.getBlock();
     		material = ForgeMaterialData.ofMinecraftBlockState(blockState);
         	isLiquid = material.isLiquid();
@@ -322,7 +395,22 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		return this.worldGenRegion.getLight(new BlockPos(x, y, z));
+    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	{
+    		return -1;
+    	}
+				
+    	// Check if the chunk has been lit, otherwise cancel.
+    	// TODO: Check if this causes problems with BO3 LightChecks.
+    	// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
+    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    	IChunk chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+    	if(chunkBeingPopulated == null && chunk.getStatus().isAtLeast(ChunkStatus.LIGHT))
+    	{
+	        // This fetches the block and skylight as if it were day.
+    		return this.worldGenRegion.getLight(new BlockPos(x, y, z));
+    	}
+		return -1;
 	}
 
 	@Override
@@ -347,14 +435,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
     	}
     	
     	// If no chunk was passed, we're doing something outside of the population cycle.
-    	// If a chunk was passed, only spawn in the area being populated, or existing chunks.
-    	if(
-			chunkBeingPopulated == null ||
-			(
-				OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated) //|| 
-				//getChunkGenerator().chunkExists(x, z)
-			)
-		)
+    	// If a chunk was passed, only spawn in the area being populated.
+    	if(chunkBeingPopulated == null || OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
     	{
     		/*
     		if(replaceBlocks)
