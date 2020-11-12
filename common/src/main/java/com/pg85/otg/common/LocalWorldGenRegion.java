@@ -29,13 +29,14 @@ public abstract class LocalWorldGenRegion
 	{
 		return this.worldConfig;
 	}
-	
+		
 	public long getSeed()
 	{
 		return this.seed;
 	}
 	
 	public abstract String getWorldName();
+	public abstract Random getWorldRandom();
 	public abstract LocalBiome getBiome(int x, int z);
 	public abstract BiomeConfig getBiomeConfig(int x, int z) throws BiomeNotFoundException;
 	public abstract boolean placeTree(TreeType type, Random rand, int x, int y, int z);

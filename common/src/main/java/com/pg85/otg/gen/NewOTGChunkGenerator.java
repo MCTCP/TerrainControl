@@ -1,15 +1,18 @@
 package com.pg85.otg.gen;
 
+import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
+
 import java.util.Arrays;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
+import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.helpers.MathHelper;
 
@@ -42,8 +45,6 @@ public class NewOTGChunkGenerator
 	private final OctavePerlinNoiseSampler depthNoise;
 	private final long seed;
 	private final LayerSource biomeGenerator;
-	private final LocalMaterialData stoneBlock;
-	private final LocalMaterialData waterBlock;
 
 	private final int noiseSizeX = 4;
 	private final int noiseSizeY = 32;
@@ -51,12 +52,16 @@ public class NewOTGChunkGenerator
 
 	private final ThreadLocal<NoiseCache> noiseCache;
 
-	public NewOTGChunkGenerator(long seed, LayerSource biomeGenerator, LocalMaterialData stoneBlock, LocalMaterialData waterBlock)
+	// Biome blocks noise
+	// TODO: Use new noise?
+	private double[] biomeBlocksNoise = new double[CHUNK_SIZE * CHUNK_SIZE];
+	private final NoiseGeneratorPerlinMesaBlocks biomeBlocksNoiseGen;
+	//
+	
+	public NewOTGChunkGenerator(long seed, LayerSource biomeGenerator)
 	{
 		this.seed = seed;
 		this.biomeGenerator = biomeGenerator;
-		this.stoneBlock = stoneBlock;
-		this.waterBlock = waterBlock;
 
 		// Setup noises
 		Random random = new Random(seed);
@@ -64,10 +69,11 @@ public class NewOTGChunkGenerator
 		this.interpolationNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-7, 0));
 		this.lowerInterpolatedNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-15, 0));
 		this.upperInterpolatedNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-15, 0));
-
 		this.depthNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-15, 0));
 
 		this.noiseCache = ThreadLocal.withInitial(() -> new NoiseCache(128, this.noiseSizeY + 1));
+		
+		this.biomeBlocksNoiseGen = new NoiseGeneratorPerlinMesaBlocks(random, 4);
 	}
 
 	public static <T> T make(T object, Consumer<T> consumer)
@@ -280,11 +286,16 @@ public class NewOTGChunkGenerator
 		return biomeGenerator.getConfig(x, z);
 	}
 
-	public void populateNoise(ChunkBuffer buffer, ChunkCoordinate pos)
-	{
+	public void populateNoise(WorldConfig worldConfig, Random random, ChunkBuffer buffer, ChunkCoordinate pos)
+	{	
+		// Fill waterLevel array, used when placing stone/ground/surface blocks.
+		// TODO: water levels
+		byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];
+		Arrays.fill(waterLevel, (byte)63);
+
 		// TODO: this double[][][] is probably really bad for performance
 		double[][][] noiseData = new double[2][this.noiseSizeZ + 1][this.noiseSizeY + 1];
-
+		
 		// Initialize noise data on the x0 column.
 		for (int noiseZ = 0; noiseZ < this.noiseSizeZ + 1; ++noiseZ)
 		{
@@ -355,13 +366,19 @@ public class NewOTGChunkGenerator
 								double rawNoise = MathHelper.lerp(zLerp, z0, z1);
 								// Normalize the noise from (-256, 256) to [-1, 1]
 								double density = MathHelper.clamp(rawNoise / 200.0D, -1.0D, 1.0D);
-
+																
 								if (density > 0.0)
 								{
-									buffer.setBlock(localX, realY, localZ, this.stoneBlock);
-								} else if (realY < 63)
-								{ // TODO: water levels
-									buffer.setBlock(localX, realY, localZ, this.waterBlock);
+									BiomeConfig biomeConfig = this.getBiomeAt(realX, realZ);
+									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced(realY));
+									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
+								}
+								else if (realY < 63)
+								{
+									// TODO: water levels
+									BiomeConfig biomeConfig = this.getBiomeAt(realX, realZ);
+									buffer.setBlock(localX, realY, localZ, biomeConfig.getWaterBlockReplaced(realY));
+									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
 								}
 							}
 						}
@@ -374,6 +391,8 @@ public class NewOTGChunkGenerator
 			noiseData[0] = noiseData[1];
 			noiseData[1] = xColumn;
 		}
+		
+		doSurfaceAndGroundControl(random, worldConfig.worldHeightCap, this.seed, buffer, waterLevel);
 	}
 
 	private class NoiseCache
@@ -427,5 +446,30 @@ public class NewOTGChunkGenerator
 		{
 			return MathHelper.toLong(x, z);
 		}
+	}
+		
+	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
+	public void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
+	{
+        ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
+
+        final double d1 = 0.03125D;
+        this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
+
+        GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise, heightCap);
+
+        for (int x = 0; x < CHUNK_SIZE; x++)
+        {
+            for (int z = 0; z < CHUNK_SIZE; z++)
+            {
+                // The following code is executed for each column in the chunk
+
+                // Get the current biome config and some properties
+                BiomeConfig biomeConfig = this.getBiomeAt(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() +  + z);
+                biomeConfig.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+
+                // End of code for each column
+            }
+        }
 	}
 }

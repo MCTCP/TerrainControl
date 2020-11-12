@@ -2,26 +2,19 @@ package com.pg85.otg.forge.biome;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
-import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.util.BiomeIds;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeAmbience;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.BiomeGenerationSettings.Builder;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.MoodSoundAmbience;
-import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilder;
-import net.minecraft.world.gen.surfacebuilders.DefaultSurfaceBuilder;
-import net.minecraft.world.gen.surfacebuilders.SurfaceBuilder;
-import net.minecraft.world.gen.surfacebuilders.SurfaceBuilderConfig;
+import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
 
 public class ForgeBiome implements LocalBiome
 {
@@ -76,9 +69,8 @@ public class ForgeBiome implements LocalBiome
 		// Mob spawning
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 		
-		// Surface builder
-		// TODO: Should we need this, surface builders in the common project should handle this?		
-		addSurfaceBuilder(biomeGenerationSettingsBuilder, biomeConfig);
+		// NOOP surface builder, surface/ground/stone blocks / sagc are during base terrain gen.
+		biomeGenerationSettingsBuilder.func_242517_a(ConfiguredSurfaceBuilders.field_244184_p);
 
 		// Default structures
 		// TODO: Add missing structure types
@@ -182,33 +174,6 @@ public class ForgeBiome implements LocalBiome
 		//mobSpawnInfoBuilder.func_242575_a(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(EntityType.SHEEP, 12, 4, 4));
 		//mobSpawnInfoBuilder.func_242571_a();
 		return mobSpawnInfoBuilder;
-	}
-	
-	// TODO: Should we need this, surface builders in the common project should handle this?
-	private static void addSurfaceBuilder(BiomeGenerationSettings.Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig)
-	{
-		// Each biomeconfig has its own surfacebuilder, so use biome registry key as name.
-		// TODO: Create a surfacebuilder that looks like 1.12.2 (same ground layer depth etc).
-		
-		SurfaceBuilder<SurfaceBuilderConfig> surfaceBuilder = Registry.register(
-			Registry.SURFACE_BUILDER,
-			new ResourceLocation(PluginStandardValues.MOD_ID_SHORT, "surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath()), 
-			new DefaultSurfaceBuilder(SurfaceBuilderConfig.field_237203_a_)
-		);
-		
-		// Taken from default grassy surface config, grass/gravel/dirt.
-		ConfiguredSurfaceBuilder<SurfaceBuilderConfig> configuredSurfaceBuilder = WorldGenRegistries.func_243664_a(
-			WorldGenRegistries.field_243651_c,
-			new ResourceLocation(PluginStandardValues.MOD_ID_SHORT, "surfacebuilder." + biomeConfig.getRegistryKey().getResourcePath()),
-			surfaceBuilder.func_242929_a(
-				new SurfaceBuilderConfig(
-					((ForgeMaterialData)biomeConfig.getDefaultSurfaceBlock()).internalBlock(),
-					((ForgeMaterialData)biomeConfig.getDefaultGroundBlock()).internalBlock(),
-					((ForgeMaterialData)biomeConfig.getDefaultSurfaceBlock()).internalBlock() // TODO: Add UnderwaterSurfaceBlock to BiomeConfig
-				)
-			)
-		);
-		biomeGenerationSettingsBuilder.func_242517_a(configuredSurfaceBuilder);
 	}
 	
 	private static void addCarvers(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig2)

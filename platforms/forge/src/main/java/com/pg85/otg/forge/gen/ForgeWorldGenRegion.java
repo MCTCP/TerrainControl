@@ -59,6 +59,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	@Override
+	public Random getWorldRandom()
+	{
+		return this.worldGenRegion.getRandom();
+	}
+	
+	@Override
 	public LocalBiome getBiome(int x, int z) // TODO: Implement 3d biomes
 	{
 		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
