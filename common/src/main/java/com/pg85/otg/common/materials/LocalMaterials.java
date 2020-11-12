@@ -1,5 +1,7 @@
 package com.pg85.otg.common.materials;
 
+import com.pg85.otg.gen.resource.PlantType;
+
 public class LocalMaterials
 {
     // Block names used in OTG code as default values
@@ -76,6 +78,25 @@ public class LocalMaterials
 	public static final String LONG_GRASS_NAME = getRegistryKey("tall_grass");
 	public static final String DOUBLE_PLANT_NAME = getRegistryKey("sunflower");
 	public static final String RED_MUSHROOM_NAME = getRegistryKey("red_mushroom");
+	
+	public static final String ALLIUM_NAME = getRegistryKey("allium");
+	public static final String AZURE_BLUET_NAME = getRegistryKey("azure_bluet");
+	public static final String BLUE_ORCHID_NAME = getRegistryKey("blue_orchid");
+	public static final String DANDELION_NAME = getRegistryKey("dandelion");
+	public static final String DOUBLE_TALL_GRASS_NAME = getRegistryKey("tall_grass");
+	public static final String FERN_NAME = getRegistryKey("fern");
+	public static final String LARGE_FERN_NAME = getRegistryKey("large_fern");
+	public static final String LILAC_NAME = getRegistryKey("lilac");
+	public static final String ORANGE_TULIP_NAME = getRegistryKey("orange_tulip");
+	public static final String OXEYE_DAISY_NAME = getRegistryKey("oxeye_daisy");
+	public static final String PEONY_NAME = getRegistryKey("peony");
+	public static final String PINK_TULIP_NAME = getRegistryKey("pink_tulip");
+	public static final String POPPY_NAME = getRegistryKey("poppy");
+	public static final String RED_TULIP_NAME = getRegistryKey("red_tulip");
+	public static final String ROSE_BUSH_NAME = getRegistryKey("rose_bush");
+	public static final String SUNFLOWER_NAME = getRegistryKey("sunflower");
+	public static final String TALL_GRASS_NAME = getRegistryKey("grass");
+	public static final String WHITE_TULIP_NAME = getRegistryKey("white_tulip");
 
 	public static final String PUMPKIN_NAME = getRegistryKey("pumpkin");
 	public static final String CACTUS_NAME = getRegistryKey("cactus");
@@ -174,16 +195,41 @@ public class LocalMaterials
 	public static LocalMaterialData YELLOW_FLOWER;
 	public static LocalMaterialData DEAD_BUSH;
 	public static LocalMaterialData LONG_GRASS;
-	public static LocalMaterialData DOUBLE_PLANT;
 	public static LocalMaterialData RED_MUSHROOM;
-
+    public static LocalMaterialData ALLIUM;
+    public static LocalMaterialData AZURE_BLUET;
+    public static LocalMaterialData BLUE_ORCHID;
+    public static LocalMaterialData DANDELION;
+    public static LocalMaterialData DOUBLE_TALL_GRASS;
+    public static LocalMaterialData FERN;
+    public static LocalMaterialData ORANGE_TULIP;
+    public static LocalMaterialData OXEYE_DAISY;
+    public static LocalMaterialData PINK_TULIP;
+    public static LocalMaterialData POPPY;
+    public static LocalMaterialData RED_TULIP;
+    public static LocalMaterialData TALL_GRASS;
+    public static LocalMaterialData WHITE_TULIP;
+	
 	public static LocalMaterialData PUMPKIN;
     public static LocalMaterialData CACTUS;    
     public static LocalMaterialData MELON_BLOCK;
     public static LocalMaterialData VINE;
     public static LocalMaterialData SAPLING;
     public static LocalMaterialData WATER_LILY;
-    public static LocalMaterialData SUGAR_CANE_BLOCK;    
+    public static LocalMaterialData SUGAR_CANE_BLOCK;
+    
+    public static LocalMaterialData DOUBLE_TALL_GRASS_LOWER;
+    public static LocalMaterialData DOUBLE_TALL_GRASS_UPPER;
+    public static LocalMaterialData LARGE_FERN_LOWER;
+    public static LocalMaterialData LARGE_FERN_UPPER;
+    public static LocalMaterialData LILAC_LOWER;
+    public static LocalMaterialData LILAC_UPPER;
+    public static LocalMaterialData PEONY_LOWER;
+    public static LocalMaterialData PEONY_UPPER;
+    public static LocalMaterialData ROSE_BUSH_LOWER;
+    public static LocalMaterialData ROSE_BUSH_UPPER;
+    public static LocalMaterialData SUNFLOWER_LOWER;
+    public static LocalMaterialData SUNFLOWER_UPPER;
 
     // Ores
 	public static LocalMaterialData COAL_ORE;

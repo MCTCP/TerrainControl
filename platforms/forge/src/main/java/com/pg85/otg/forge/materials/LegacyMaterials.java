@@ -90,6 +90,7 @@ import net.minecraft.util.Direction;
 // Block.getStateById() says //Forge: Do not use, use GameRegistry. GameRegistry doesn't appear to provide what we need though(?)
 public class LegacyMaterials
 {
+	// TODO: Don't need any names here that match 1.16's
     static BlockState fromLegacyBlockName(String oldBlockName)
     {
     	switch(oldBlockName.replace("minecraft:", ""))
@@ -122,8 +123,45 @@ public class LegacyMaterials
     			return Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
     		case "red_rose":
     			return Blocks.ROSE_BUSH.getDefaultState();
+    			
+			case "wood_stairs":
+			case "oak_stairs":
+				return Blocks.OAK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "birch_wood_stairs":
+			case "birch_stairs":
+				return Blocks.BIRCH_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "spruce_wood_stairs":
+			case "spruce_stairs":
+				return Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "jungle_wood_stairs":				
+			case "jungle_stairs":
+				return Blocks.JUNGLE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "cobblestone_stairs":
+				return Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "stone_stairs":
+				return Blocks.STONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "brick_stairs":
+				return Blocks.BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "nether_brick_stairs":
+				return Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "sandstone_stairs":
+				return Blocks.SANDSTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "quartz_stairs":
+				return Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "acacia_stairs":
+				return Blocks.ACACIA_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "dark_oak_stairs":
+				return Blocks.DARK_OAK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "red_sandstone_stairs":
+				return Blocks.RED_SANDSTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "purpur_stairs":
+				return Blocks.PURPUR_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "stone_brick_stairs":
+				return Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
     		case "smooth_stairs":
-    			return Blocks.STONE_STAIRS.getDefaultState();
+    			return Blocks.STONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+    			
     		case "yellow_flower":
     			return Blocks.DANDELION.getDefaultState();
     		case "web":
@@ -139,8 +177,6 @@ public class LegacyMaterials
     		case "log":
     		case "wood":
     			return Blocks.OAK_LOG.getDefaultState();
-    		case "spruce_wood_stairs":
-    			return Blocks.SPRUCE_STAIRS.getDefaultState();
     		case "magma":
     			return Blocks.MAGMA_BLOCK.getDefaultState();
     		case "tallgrass":
@@ -163,8 +199,6 @@ public class LegacyMaterials
     			return Blocks.OAK_FENCE.getDefaultState();
     		case "wood_step":
     			return Blocks.OAK_SLAB.getDefaultState();
-    		case "wood_stairs":
-    			return Blocks.OAK_STAIRS.getDefaultState();
     		case "thin_glass":
     			return Blocks.GLASS_PANE.getDefaultState();
     		case "stone_plate":
@@ -1428,10 +1462,10 @@ public class LegacyMaterials
 	    		case "long_grass":
 	    			switch(data)
 	    			{
-	    				case 0:
+	    				case 1:
 	    				default:
 	    					return Blocks.GRASS.getDefaultState();
-	    				case 1:
+	    				case 2:
 	    					return Blocks.FERN.getDefaultState();
 	    			}
 	    		case "wooden_slab":
@@ -2821,6 +2855,6 @@ public class LegacyMaterials
 	
 	private static int getBit(int source, int index)
 	{
-		return (source & (1 << index));
+		return ((source & (1 << index)) >> index);
 	}
 }

@@ -12,6 +12,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
+import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.material.Material;
 import net.minecraft.command.arguments.BlockStateArgument;
 import net.minecraft.command.arguments.BlockStateInput;
 import net.minecraft.util.ResourceLocation;
@@ -60,14 +62,14 @@ public class ForgeMaterialData extends LocalMaterialData
         // Try parsing as an internal Minecraft name
         // This is so that things like "minecraft:stone" aren't parsed
         // as the block "minecraft" with data "stone", but instead as the
-        // block "minecraft:stone" with no block data.    
+        // block "minecraft:stone" with no block data.
     	
     	// Used in BO4's as placeholder/detector block.
     	if(input.toLowerCase().equals("blank"))
     	{
     		return ForgeMaterialData.getBlank();
     	}
-    	
+
     	BlockState blockState = null;
     	String blockNameCorrected = input.trim().toLowerCase();
     	// Try parsing as legacy block name / id
@@ -76,8 +78,8 @@ public class ForgeMaterialData extends LocalMaterialData
     		blockState = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
 			if(blockState != null)
 			{
-				return ofMinecraftBlockState(blockState, input); 
-			}    		
+				return ofMinecraftBlockState(blockState, input);
+			}
 	    	try
 	    	{
 	    		int blockId = Integer.parseInt(blockNameCorrected);
@@ -100,6 +102,11 @@ public class ForgeMaterialData extends LocalMaterialData
 		} catch (CommandSyntaxException e) { }		
 		if(parseResult != null)
 		{
+			// For leaves, add DISTANCE 1 to make them not decay.
+			if(parseResult.getState().getMaterial().equals(Material.LEAVES))
+			{
+				return new ForgeMaterialData(parseResult.getState().with(LeavesBlock.DISTANCE, 1), input);	
+			}
 			return new ForgeMaterialData(parseResult.getState(), input);
 		}
 		
@@ -121,7 +128,7 @@ public class ForgeMaterialData extends LocalMaterialData
 				{
 					return ofMinecraftBlockState(blockState, input);
 				}
-				// Remove any old metadata, fe STONE:0 or STONE:1 -> STONE
+				// Failed to parse data, remove. fe STONE:0 or STONE:1 -> STONE
 				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));				
 	    	} catch(NumberFormatException ex) { }	    	
     	}
@@ -134,6 +141,11 @@ public class ForgeMaterialData extends LocalMaterialData
     		block = ForgeRegistries.BLOCKS.getValue(new ResourceLocation(blockNameCorrected));
         	if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
         	{
+    			// For leaves, add DISTANCE 1 to make them not decay.
+    			if(block.getDefaultState().getMaterial().equals(Material.LEAVES))
+    			{
+    				return new ForgeMaterialData(block.getDefaultState().with(LeavesBlock.DISTANCE, 1), input);	
+    			}
         		return ofMinecraftBlock(block, input);
         	}
     	} catch(net.minecraft.util.ResourceLocationException ex) { }
@@ -189,7 +201,6 @@ public class ForgeMaterialData extends LocalMaterialData
     		return this;
     	}
         Block block = this.blockData.getBlock();
-        //return this.withBlockData(block.getMetaFromState(block.getDefaultState()));
         return ofMinecraftBlock(block, this.rawEntry);
     }
     
