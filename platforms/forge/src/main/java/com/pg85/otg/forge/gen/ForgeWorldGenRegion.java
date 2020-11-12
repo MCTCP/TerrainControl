@@ -290,14 +290,14 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
     	
 		// If the chunk doesn't exist and we're doing something outside the
     	// population sequence, return the material without loading the chunk.
-    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS)) && chunkBeingPopulated == null)
+    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE)) && chunkBeingPopulated == null)
 		{
     		// If the chunk has already been loaded, no need to use fake chunks.
     		if(
 				!(
 					chunk == null && 
 					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS)
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.SURFACE)
 				)
 			)
     		{
@@ -307,7 +307,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
     	}
     	
 		// Tried to query an unloaded chunk outside the area being populated
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS))
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE))
     	{
     		return -1;
     	}
@@ -316,6 +316,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         int internalX = x & 0xF;
         int internalZ = z & 0xF;
         
+		// Water/lava don't block motion, but MOTION_BLOCKING height map does appear to include them (?)
 		int heightMapy = chunk.getHeightmap(Type.MOTION_BLOCKING).getHeight(internalX, internalZ);
         
         ForgeMaterialData material;
@@ -376,7 +377,6 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         		}
             	if((findSolid && isLiquid) || (findLiquid && isSolid))
             	{
-            		// Found an illegal block (liquid when looking for solid, or vice-versa)
             		return -1;
             	}
         	}
@@ -389,7 +389,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		return this.worldGenRegion.getHeight(Type.MOTION_BLOCKING, x, z);
+		// Water/lava don't block motion, but MOTION_BLOCKING height map does appear to include them (?)
+		return this.worldGenRegion.getHeight(Type.MOTION_BLOCKING, x, z); 
 	}
 
 	@Override
@@ -453,7 +454,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
     			material = material.parseWithBiomeAndHeight(this, biomeConfig, y);
     		}
     		*/
-    		this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 3);    		
+    		this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);    		
     	}
 	}
 	
