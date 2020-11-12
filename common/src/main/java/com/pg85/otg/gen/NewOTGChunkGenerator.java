@@ -447,7 +447,9 @@ public class NewOTGChunkGenerator
 			return MathHelper.toLong(x, z);
 		}
 	}
-		
+
+	// Surface / ground / stone blocks / SAGC
+	
 	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
 	public void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
 	{
@@ -465,11 +467,28 @@ public class NewOTGChunkGenerator
                 // The following code is executed for each column in the chunk
 
                 // Get the current biome config and some properties
-                BiomeConfig biomeConfig = this.getBiomeAt(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() +  + z);
+                BiomeConfig biomeConfig = this.getBiomeAt(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
                 biomeConfig.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
                 // End of code for each column
             }
         }
 	}
+	
+    private int lastX = Integer.MAX_VALUE;
+    private int lastZ = Integer.MAX_VALUE;
+    private double lastNoise = 0;
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	double noise = this.lastNoise;
+    	if(this.lastX != blockX || this.lastZ != blockZ)
+    	{
+        	final double d1 = 0.03125D;
+        	noise = this.biomeBlocksNoiseGen.getRegion(new double[1], blockX, blockZ, 1, 1, d1 * 2.0D, d1 * 2.0D, 1.0D)[0];
+        	this.lastX = blockX;
+        	this.lastZ = blockZ;
+        	this.lastNoise = noise;
+    	}
+    	return noise;
+    }
 }

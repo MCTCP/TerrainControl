@@ -393,4 +393,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
         }
     	return height;
     }
+
+	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+	{
+		return this.internalGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
+	}
 }

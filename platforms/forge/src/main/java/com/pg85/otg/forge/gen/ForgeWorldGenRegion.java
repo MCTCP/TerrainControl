@@ -535,9 +535,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld)
-	{
-		// TODO: Implement this when 1.16 noisegen is done.
-		return 0;
-	}
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
+    }
 }
