@@ -76,7 +76,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final ForgeChunkGenNoise chunkGenNoise;
 	private final ChunkPopulator chunkPopulator;
 	// TODO: Move this to WorldLoader when ready
-	private final CustomStructureCache structureCache;	
+	private final CustomStructureCache structureCache;
 	
 	// TODO: Hardcoded world/preset name, should be provided via world creation gui / config.yaml.
 	private final Preset preset;

@@ -19,19 +19,19 @@ public class OTGCommand
 	public static void register(CommandDispatcher<CommandSource> dispatcher)
 	{
 		dispatcher.register(
-				Commands.literal("otg").requires(
-						(context) -> context.hasPermissionLevel(2)
-				).executes(
-						(context) -> showHelp(context.getSource())
-				).then(
-						Commands.literal("help").executes(
-								(context) -> showHelp(context.getSource())
-						)
-				).then(
-						Commands.literal("map").executes(
-								(context) -> mapBiomes(context.getSource())
-						)
+			Commands.literal("otg").requires(
+				(context) -> context.hasPermissionLevel(2)
+			).executes(
+				(context) -> showHelp(context.getSource())
+			).then(
+				Commands.literal("help").executes(
+					(context) -> showHelp(context.getSource())
 				)
+			).then(
+				Commands.literal("map").executes(
+					(context) -> mapBiomes(context.getSource())
+				)
+			)
 		);
 	}
 

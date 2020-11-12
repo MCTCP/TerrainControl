@@ -311,16 +311,4 @@ public class ForgeChunkGenNoise
 	{
 		return surfaceDepthNoise;
 	}
-	
-	// TODO: Do we need these?
-	
-	private static double func_222554_b(int p_222554_0_, int p_222554_1_, int p_222554_2_)
-	{
-		double d0 = p_222554_0_ * p_222554_0_ + p_222554_2_ * p_222554_2_;
-		double d1 = (double) p_222554_1_ + 0.5D;
-		double d2 = d1 * d1;
-		double d3 = Math.pow(Math.E, -(d2 / 16.0D + d0 / 16.0D));
-		double d4 = -d1 * MathHelper.fastInvSqrt(d2 / 2.0D + d0 / 2.0D) / 2.0D;
-		return d4 * d3;
-	}	
 }
