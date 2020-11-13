@@ -1,13 +1,20 @@
 package com.pg85.otg.forge.biome;
 
+import java.util.Optional;
+
+import com.pg85.otg.OTG;
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfig.MineshaftType;
 import com.pg85.otg.config.biome.BiomeConfig.RareBuildingType;
 import com.pg85.otg.config.biome.BiomeConfig.VillageType;
+import com.pg85.otg.config.biome.settings.WeightedMobSpawnGroup;
 import com.pg85.otg.config.standard.WorldStandardValues;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
 
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -15,6 +22,7 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeAmbience;
 import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.BiomeGenerationSettings.Builder;
+import net.minecraft.world.biome.DefaultBiomeFeatures;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.MoodSoundAmbience;
 import net.minecraft.world.gen.feature.structure.StructureFeatures;
@@ -158,16 +166,53 @@ public class ForgeBiome implements LocalBiome
 	private static MobSpawnInfo.Builder createMobSpawnInfo(BiomeConfig biomeConfig)
 	{
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = new MobSpawnInfo.Builder();
-		//mobSpawnInfoBuilder.func_242575_a(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(EntityType.SHEEP, 12, 4, 4));
-		//mobSpawnInfoBuilder.func_242571_a();
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnMonstersMerged)
+		{
+			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
+			if(entityType.isPresent())
+			{
+				mobSpawnInfoBuilder.func_242575_a(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+			} else {
+				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+			}
+		}
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnCreaturesMerged)
+		{
+			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
+			if(entityType.isPresent())
+			{
+				mobSpawnInfoBuilder.func_242575_a(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+			} else {
+				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+			}
+		}
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnWaterCreaturesMerged)
+		{
+			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
+			if(entityType.isPresent())
+			{
+				mobSpawnInfoBuilder.func_242575_a(EntityClassification.WATER_CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+			} else {
+				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+			}
+		}		
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnAmbientCreaturesMerged)
+		{
+			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
+			if(entityType.isPresent())
+			{
+				mobSpawnInfoBuilder.func_242575_a(EntityClassification.AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+			} else {
+				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+			}
+		}
+		
+		// TODO: EntityClassification.WATER_AMBIENT / EntityClassification.MISC ?
+		
+		mobSpawnInfoBuilder.func_242571_a(); // Default biomes do this, not sure if needed. Does the opposite of disablePlayerSpawn?
 		return mobSpawnInfoBuilder;
 	}
 	
-	private static void addCarvers(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig2)
-	{
-		//DefaultBiomeFeatures.func_243738_d(biomeGenerationSettingsBuilder);
-	}
-
 	private static void addDefaultStructures(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig)
 	{
 		// TODO: Village size, distance.
@@ -175,23 +220,23 @@ public class ForgeBiome implements LocalBiome
 		{
 			if(biomeConfig.villageType == VillageType.sandstone)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244155_u); // village_desert			
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244155_u);			
 			}
 			else if(biomeConfig.villageType == VillageType.savanna)
 	        {
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244156_v); // village_savanna
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244156_v);
 	        }
 			else if(biomeConfig.villageType == VillageType.taiga)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244158_x); // village_taiga			
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244158_x);			
 			}
 			else if(biomeConfig.villageType == VillageType.wood)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244154_t); // village_plains
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244154_t);
 			}
 			else if(biomeConfig.villageType == VillageType.snowy)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244157_w); // village_snowy
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244157_w);
 			}
 		}
 		
@@ -272,7 +317,7 @@ public class ForgeBiome implements LocalBiome
 		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244150_p);
 		
 		// End City
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244151_q); // end_city		
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244151_q);
 		
 		// Ruined Portal
 		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244159_y); // ruined_portal
@@ -289,6 +334,17 @@ public class ForgeBiome implements LocalBiome
 		// Misc structures: These structures generate even when the "Generate structures" world option is disabled, and also cannot be located with the /locate command.
 		// TODO: Dungeon
 		// TODO: Desert Well
+	}
+	
+	private static void addCarvers(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig)
+	{
+		// TODO: Hook up caves/ravines properly.
+		if(biomeConfig.worldConfig.caveFrequency > 0 && biomeConfig.worldConfig.caveRarity > 0)
+		{
+			// Caves and ravines default config
+			DefaultBiomeFeatures.func_243738_d(biomeGenerationSettingsBuilder);
+			//DefaultBiomeFeatures.func_243740_e(biomeGenerationSettingsBuilder); // Ocean caves, air and water carver?
+		}
 	}
 	
 	private static int getSkyColorForTemp(float p_244206_0_)
