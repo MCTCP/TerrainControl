@@ -7,6 +7,9 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.FifoMap;
 
+import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.state.properties.DoubleBlockHalf;
+
 public class ForgeMaterials extends LocalMaterials
 {
     private static final FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096); // TODO: Smaller cache should be ok, only most frequently used should be cached?
@@ -79,9 +82,34 @@ public class ForgeMaterials extends LocalMaterials
 			YELLOW_FLOWER = readMaterial(LocalMaterials.YELLOW_FLOWER_NAME);
 			DEAD_BUSH = readMaterial(LocalMaterials.DEAD_BUSH_NAME);
 			LONG_GRASS = readMaterial(LocalMaterials.LONG_GRASS_NAME);
-			DOUBLE_PLANT = readMaterial(LocalMaterials.DOUBLE_PLANT_NAME);
 			RED_MUSHROOM = readMaterial(LocalMaterials.RED_MUSHROOM_NAME);
-	
+		    ALLIUM = readMaterial(LocalMaterials.ALLIUM_NAME);
+		    AZURE_BLUET = readMaterial(LocalMaterials.AZURE_BLUET_NAME);
+		    BLUE_ORCHID = readMaterial(LocalMaterials.BLUE_ORCHID_NAME);
+		    DANDELION = readMaterial(LocalMaterials.DANDELION_NAME);
+		    DOUBLE_TALL_GRASS = readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME);
+		    FERN = readMaterial(LocalMaterials.FERN_NAME);
+		    ORANGE_TULIP = readMaterial(LocalMaterials.ORANGE_TULIP_NAME);
+		    OXEYE_DAISY = readMaterial(LocalMaterials.OXEYE_DAISY_NAME);
+		    PINK_TULIP = readMaterial(LocalMaterials.PINK_TULIP_NAME);
+		    POPPY = readMaterial(LocalMaterials.POPPY_NAME);
+		    RED_TULIP = readMaterial(LocalMaterials.RED_TULIP_NAME);
+		    TALL_GRASS = readMaterial(LocalMaterials.TALL_GRASS_NAME);
+		    WHITE_TULIP = readMaterial(LocalMaterials.WHITE_TULIP_NAME);
+
+		    DOUBLE_TALL_GRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		    DOUBLE_TALL_GRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		    LARGE_FERN_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		    LARGE_FERN_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		    LILAC_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		    LILAC_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		    PEONY_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		    PEONY_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		    ROSE_BUSH_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		    ROSE_BUSH_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		    SUNFLOWER_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+		    SUNFLOWER_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+		    
 			PUMPKIN = readMaterial(LocalMaterials.PUMPKIN_NAME);
 		    CACTUS = readMaterial(LocalMaterials.CACTUS_NAME);
 		    MELON_BLOCK = readMaterial(LocalMaterials.MELON_BLOCK_NAME);

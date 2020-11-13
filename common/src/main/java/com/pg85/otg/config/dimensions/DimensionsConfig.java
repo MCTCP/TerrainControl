@@ -81,8 +81,8 @@ public class DimensionsConfig
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?
 		if(worldSavesDir != null)
 		{
-			File dimensionsConfigFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigFileName);
-			File dimensionsConfigBackupFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
+			File dimensionsConfigFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigFileName);
+			File dimensionsConfigBackupFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
 		
 			// Create an ObjectMapper mapper for YAML
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -307,8 +307,8 @@ public class DimensionsConfig
 	 */
 	public static DimensionsConfig loadFromFile(Path mcWorldSaveDir, Path otgRootFolder)
 	{
-		File dimensionsConfigFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigFileName);		
-		File dimensionsConfigBackupFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
+		File dimensionsConfigFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigFileName);		
+		File dimensionsConfigBackupFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
         
 		if(!dimensionsConfigFile.exists() && !dimensionsConfigBackupFile.exists())
 		{

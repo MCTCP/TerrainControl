@@ -8,6 +8,9 @@ import java.util.function.Supplier;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
+import com.pg85.otg.common.LocalWorldGenRegion;
+import com.pg85.otg.common.materials.LocalMaterialData;
+import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionsConfig;
@@ -17,16 +20,16 @@ import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.ChunkBuffer;
-import com.pg85.otg.gen.NewOTGChunkGenerator;
 import com.pg85.otg.gen.ChunkPopulator;
+import com.pg85.otg.gen.NewOTGChunkGenerator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
-import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.FifoMap;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.ReportedException;
 import net.minecraft.entity.EntityClassification;
@@ -40,10 +43,10 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.ChunkPrimer;
+import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
-import net.minecraft.world.gen.Heightmap;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.Structure;
@@ -68,15 +71,20 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final int field_236085_x_;
 
 	private final NewOTGChunkGenerator internalGenerator;
-	private final ForgeChunkGenNoise chunkGenNoise;
 	private final ChunkPopulator chunkPopulator;
 	// TODO: Move this to WorldLoader when ready
-	private final CustomStructureCache structureCache;	
+	private final CustomStructureCache structureCache;
 	
 	// TODO: Hardcoded world/preset name, should be provided via world creation gui / config.yaml.
 	private final Preset preset;
-	String worldName = "New World";
-	String presetName = "Default";
+	private final boolean isBo4Enabled = false; // Set to true for BO4 testing.
+	private final String worldName = "New World";
+	private final String presetName = "Default";
+	//
+	
+	// Unloaded chunk data caches for BO4's
+	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
+	private final FifoMap<ChunkCoordinate, IChunk> unloadedChunksCache;
 	//
 	
 	public OTGNoiseChunkGenerator(BiomeProvider p_i241975_1_, long p_i241975_2_, Supplier<DimensionSettings> p_i241975_4_)
@@ -93,11 +101,23 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (!(biomeProvider instanceof LayerSource))
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
-		}	
-
-		this.internalGenerator = new NewOTGChunkGenerator(seed, (LayerSource) biomeProvider, ForgeMaterialData.ofMinecraftBlockState(Blocks.STONE.getDefaultState()), ForgeMaterialData.ofMinecraftBlockState(Blocks.WATER.getDefaultState()));
-		this.chunkPopulator = new ChunkPopulator();
+		}
+			
+		this.worldSeed = seed;
+		DimensionSettings dimensionsettings = p_i241976_5_.get();
+		this.dimensionSettings = p_i241976_5_;
+		NoiseSettings noisesettings = dimensionsettings.func_236113_b_();
+		this.field_236085_x_ = noisesettings.func_236169_a_();
+		this.defaultBlock = dimensionsettings.func_236115_c_();
+		this.defaultFluid = dimensionsettings.func_236116_d_();
 		
+		// Unloaded chunk data caches for BO4's
+        // TODO: Add a setting to the worldconfig for the size of these caches. 
+        // Worlds with lots of BO4's and large smoothing areas may want to increase this. 
+        this.unloadedBlockColumnsCache = new FifoMap<BlockPos2D, LocalMaterialData[]>(1024);
+        this.unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(128);
+        //
+
 		// TODO: Move this to world creation / loading logic, don't use hardcoded values.
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.presetName);
 		this.structureCache = new CustomStructureCache(this.worldName, Paths.get("./saves/" + this.worldName + "/"), 0, seed, false); 
@@ -107,19 +127,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		dimensionsConfig.Dimensions = new ArrayList<DimensionConfig>();
 		OTG.setDimensionsConfig(dimensionsConfig);
 		//
-		
-		this.worldSeed = seed;
-		DimensionSettings dimensionsettings = p_i241976_5_.get();
-		this.dimensionSettings = p_i241976_5_;
-		NoiseSettings noisesettings = dimensionsettings.func_236113_b_();
-		this.field_236085_x_ = noisesettings.func_236169_a_();
-		this.defaultBlock = dimensionsettings.func_236115_c_();
-		this.defaultFluid = dimensionsettings.func_236116_d_();
-		
-		this.chunkGenNoise = new ForgeChunkGenNoise(this, noisesettings, seed);
+        
+		this.internalGenerator = new NewOTGChunkGenerator(seed, (LayerSource) biomeProvider);
+		this.chunkPopulator = new ChunkPopulator();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
+	@Override
 	public ChunkGenerator func_230349_a_(long p_230349_1_)
 	{
 		return new OTGNoiseChunkGenerator(this.biomeProvider.func_230320_a_(p_230349_1_), p_230349_1_, this.dimensionSettings);
@@ -128,79 +142,19 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Base terrain gen
 	
 	// Generates the base terrain for a chunk.
+	@Override
 	public void func_230352_b_(IWorld world, StructureManager manager, IChunk chunk)
 	{
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
-		this.internalGenerator.populateNoise(buffer, buffer.getChunkCoordinate());
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig(), world.getRandom(), buffer, buffer.getChunkCoordinate());
 	}
-	
+
 	// Replaces surface and ground blocks in base terrain and places bedrock.
+	@Override
 	public void generateSurface(WorldGenRegion p_225551_1_, IChunk p_225551_2_)
 	{
-		ChunkPos chunkpos = p_225551_2_.getPos();
-		int i = chunkpos.x;
-		int j = chunkpos.z;
-		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-		sharedseedrandom.setBaseChunkSeed(i, j);
-		ChunkPos chunkpos1 = p_225551_2_.getPos();
-		int k = chunkpos1.getXStart();
-		int l = chunkpos1.getZStart();
-		BlockPos.Mutable blockpos$mutable = new BlockPos.Mutable();
-
-		for (int i1 = 0; i1 < 16; ++i1)
-		{
-			for (int j1 = 0; j1 < 16; ++j1)
-			{
-				int k1 = k + i1;
-				int l1 = l + j1;
-				int i2 = p_225551_2_.getTopBlockY(Heightmap.Type.WORLD_SURFACE_WG, i1, j1) + 1;
-				// TODO: This should be provided by NewOTGChunkGenerator?
-				double d1 = this.chunkGenNoise.getSurfaceDepthNoise().noiseAt((double) k1 * 0.0625D, (double) l1 * 0.0625D, 0.0625D, (double) i1 * 0.0625D) * 15.0D;
-				p_225551_1_.getBiome(blockpos$mutable.setPos(k + i1, i2, l + j1)).buildSurface(sharedseedrandom, p_225551_2_, k1, l1, i2, d1, this.defaultBlock, this.defaultFluid, this.func_230356_f_(), p_225551_1_.getSeed());
-			}
-		}
-
-		this.makeBedrock(p_225551_2_, sharedseedrandom);
+		// Done during this.internalGenerator.populateNoise
 	}
-
-	private void makeBedrock(IChunk chunkIn, Random rand)
-	{
-		BlockPos.Mutable blockpos$mutable = new BlockPos.Mutable();
-		int i = chunkIn.getPos().getXStart();
-		int j = chunkIn.getPos().getZStart();
-		DimensionSettings dimensionsettings = this.dimensionSettings.get();
-		int k = dimensionsettings.func_236118_f_();
-		int l = this.field_236085_x_ - 1 - dimensionsettings.func_236117_e_();
-		boolean flag = l + 4 >= 0 && l < this.field_236085_x_;
-		boolean flag1 = k + 4 >= 0 && k < this.field_236085_x_;
-		if (flag || flag1)
-		{
-			for (BlockPos blockpos : BlockPos.getAllInBoxMutable(i, 0, j, i + 15, 0, j + 15))
-			{
-				if (flag)
-				{
-					for (int j1 = 0; j1 < 5; ++j1)
-					{
-						if (j1 <= rand.nextInt(5))
-						{
-							chunkIn.setBlockState(blockpos$mutable.setPos(blockpos.getX(), l - j1, blockpos.getZ()), Blocks.BEDROCK.getDefaultState(), false);
-						}
-					}
-				}
-
-				if (flag1)
-				{
-					for (int k1 = 4; k1 >= 0; --k1)
-					{
-						if (k1 <= rand.nextInt(5))
-						{
-							chunkIn.setBlockState(blockpos$mutable.setPos(blockpos.getX(), k + k1, blockpos.getZ()), Blocks.BEDROCK.getDefaultState(), false);
-						}
-					}
-				}
-			}
-		}
-	}	
 	
 	// Population / decoration
 	
@@ -208,37 +162,43 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void func_230351_a_(WorldGenRegion p_230351_1_, StructureManager p_230351_2_)
 	{
-		int i = p_230351_1_.getMainChunkX();
-		int j = p_230351_1_.getMainChunkZ();
-		int k = i * 16;
-		int l = j * 16;
-		BlockPos blockpos = new BlockPos(k, 0, l);
-		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-		long i1 = sharedseedrandom.setDecorationSeed(p_230351_1_.getSeed(), k, l);
-
+		int chunkX = p_230351_1_.getMainChunkX();
+		int chunkZ = p_230351_1_.getMainChunkZ();
+		int blockX = chunkX * 16;
+		int blockZ = chunkZ * 16;
+		BlockPos blockpos = new BlockPos(blockX, 0, blockZ);
+        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
+		
+    	// Unloaded chunk data caches for BO4's
+        this.unloadedChunksCache.remove(chunkCoord);
+        //
+		
 		// Fetch the biomeConfig by registryKey
-		RegistryKey<Biome> key = ((OTGBiomeProvider)this.biomeProvider).getBiomeRegistryKey((i << 2) + 2, 2, (j << 2) + 2);
+		RegistryKey<Biome> key = ((OTGBiomeProvider)this.biomeProvider).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());
 
+		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
+		long decorationSeed = sharedseedrandom.setDecorationSeed(p_230351_1_.getSeed(), blockX, blockZ);
 		try
 		{
 			// Override normal population (Biome.func_242427_a()) with OTG's.
-			func_242427_a(biomeConfig, p_230351_2_, this, p_230351_1_, i1, sharedseedrandom, blockpos);
+			biomePopulate(biomeConfig, p_230351_2_, this, p_230351_1_, decorationSeed, sharedseedrandom, blockpos);
 		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.makeCrashReport(exception, "Biome decoration");
-			crashreport.makeCategory("Generation").addDetail("CenterX", i).addDetail("CenterZ", j).addDetail("Seed", i1);
+			crashreport.makeCategory("Generation").addDetail("CenterX", chunkX).addDetail("CenterZ", chunkZ).addDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
 		}
 	}
 
 	// Chunk population method taken from Biome (Biome.func_242427_a())
-	public void func_242427_a(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
+	public void biomePopulate(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
 	{
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ());
-		this.chunkPopulator.populate(chunkBeingPopulated, this.structureCache, new ForgeWorldGenRegion(this.worldName, this.worldSeed, this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig);
+		this.chunkPopulator.populate(chunkBeingPopulated, this.structureCache, new ForgeWorldGenRegion(this.worldName, this.worldSeed, this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig, this.isBo4Enabled);
 	}
 	
 	// Mob spawning on initial chunk spawn (animals).
+	@Override
 	public void func_230354_a_(WorldGenRegion p_230354_1_)
 	{
 		if (!this.dimensionSettings.get().func_236120_h_())
@@ -253,6 +213,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 	
 	// Mob spawning on chunk tick
+	@Override
 	public List<MobSpawnInfo.Spawners> func_230353_a_(Biome p_230353_1_, StructureManager p_230353_2_, EntityClassification p_230353_3_, BlockPos p_230353_4_)
 	{
 		if (p_230353_2_.func_235010_a_(p_230353_4_, true, Structure.field_236374_j_).isValid())
@@ -291,18 +252,20 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Noise
 	
-	// TODO: This should use NewOTGChunkGenerator, not chunkGenNoise? Are these ever called?
 	@Override
 	public int func_222529_a(int p_222529_1_, int p_222529_2_, Type heightmapType)
 	{
-		return this.chunkGenNoise.func_222529_a(p_222529_1_, p_222529_2_, heightmapType);
+		// Not used for OTG dimensions
+		// TODO: Make sure this won't cause problems, hook up via NewOTGChunkGenerator?		
+		return 0;
 	}
 
-	// TODO: This should use NewOTGChunkGenerator, not chunkGenNoise? Are these ever called?
 	@Override
 	public IBlockReader func_230348_a_(int p_230348_1_, int p_230348_2_)
 	{
-		return this.chunkGenNoise.func_230348_a_(p_230348_1_, p_230348_2_);
+		// Not used for OTG dimensions
+		// TODO: Make sure this won't cause problems, hook up via NewOTGChunkGenerator?
+		return null;
 	}
 	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
@@ -314,23 +277,125 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Getters / misc
 	
+	@Override
 	protected Codec<? extends ChunkGenerator> func_230347_a_()
 	{
 		return CODEC;
 	}
 
+	@Override
 	public int func_230355_e_()
 	{
 		return this.field_236085_x_;
 	}
 
+	@Override
 	public int func_230356_f_()
 	{
 		return this.dimensionSettings.get().func_236119_g_();
+	}	
+		
+	// BO4's / Smoothing Areas
+	
+	// BO4's and smoothing areas may do material and height checks in unloaded chunks, OTG generates 
+	// base terrain for the chunks in memory and caches the result in a limited size-cache.
+	// TODO: Re-use the data when chunks are properly generated, or find a way to request "normal" 
+	// base terrain gen outside of the WorldGenRegion chunks.
+	
+    public LocalMaterialData[] getBlockColumnInUnloadedChunk(LocalWorldGenRegion worldGenRegion, int x, int z)
+    {
+    	BlockPos2D blockPos = new BlockPos2D(x, z);
+    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+    	
+		// Get internal coordinates for block in chunk
+    	byte blockX = (byte)(x &= 0xF);
+    	byte blockZ = (byte)(z &= 0xF);
+
+    	LocalMaterialData[] cachedColumn = this.unloadedBlockColumnsCache.get(blockPos);
+
+    	if(cachedColumn != null)
+    	{
+    		return cachedColumn;
+    	}
+    	   
+    	IChunk chunk = ((ForgeWorldGenRegion)worldGenRegion).getChunk(chunkCoord);
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS))
+    	{
+    		chunk = this.unloadedChunksCache.get(chunkCoord);
+    	} else {
+    		this.unloadedChunksCache.remove(chunkCoord);
+    	}
+    	if(chunk == null)
+    	{
+			// Generate a chunk without populating it
+    		chunk = getUnloadedChunk(worldGenRegion.getWorldRandom(), chunkCoord);
+			unloadedChunksCache.put(chunkCoord, chunk);
+    	}
+		
+		cachedColumn = new LocalMaterialData[256];
+
+    	LocalMaterialData[] blocksInColumn = new LocalMaterialData[256];
+    	BlockState blockInChunk;
+    	for(short y = 0; y < 256; y++)
+        {
+        	blockInChunk = chunk.getBlockState(new BlockPos(blockX, y, blockZ));
+        	if(blockInChunk != null)
+        	{
+	        	blocksInColumn[y] = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
+        	} else {
+        		break;
+        	}
+        }
+		unloadedBlockColumnsCache.put(blockPos, cachedColumn);
+		
+        return blocksInColumn;
+    }
+    
+	public IChunk getUnloadedChunk(Random random, ChunkCoordinate chunkCoordinate)
+	{		
+		IChunk chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);		
+		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig(), random, buffer, buffer.getChunkCoordinate());
+		return chunk;
 	}
 	
-	public boolean func_236088_a_(long p_236088_1_, RegistryKey<DimensionSettings> p_236088_3_)
+    public LocalMaterialData getMaterialInUnloadedChunk(LocalWorldGenRegion worldGenRegion, int x, int y, int z)
+    {
+    	LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x,z);
+        return blockColumn[y];
+    }
+    
+    public int getHighestBlockYInUnloadedChunk(LocalWorldGenRegion worldGenRegion, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+    {
+    	int height = -1;
+
+    	LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
+    	ForgeMaterialData material;
+    	boolean isLiquid;
+    	boolean isSolid;
+    	
+        for(int y = 255; y > -1; y--)
+        {
+        	material = (ForgeMaterialData) blockColumn[y];
+        	isLiquid = material.isLiquid();
+        	isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(LocalMaterials.SNOW));
+        	if(!(isLiquid && ignoreLiquid))
+        	{
+            	if((findSolid && isSolid) || (findLiquid && isLiquid))
+        		{
+            		return y;
+        		}
+            	if((findSolid && isLiquid) || (findLiquid && isSolid))
+            	{
+            		return -1;
+            	}
+        	}
+        }
+    	return height;
+    }
+
+	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
-		return this.worldSeed == p_236088_1_ && this.dimensionSettings.get().func_242744_a(p_236088_3_);
+		return this.internalGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
 	}
 }

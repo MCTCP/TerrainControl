@@ -7,7 +7,7 @@ import org.apache.logging.log4j.LogManager;
 
 public final class ForgeLogger extends Logger
 {
-    private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.PLUGIN_NAME_SHORT);
+    private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.MOD_ID_SHORT);
 
     @Override
     public void log(LogMarker level, String message, Object... params)

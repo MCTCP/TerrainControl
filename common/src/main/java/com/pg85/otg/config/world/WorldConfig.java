@@ -893,7 +893,7 @@ public class WorldConfig extends ConfigFile
             "The mod name of a WorldPacker jar. The WorldPacker jar's mod image is shown in the world creation UI for this world.");
         
         writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.settingsMode,
-            "What " + PluginStandardValues.PLUGIN_NAME + " does with the config files.",
+            "What " + PluginStandardValues.MOD_ID + " does with the config files.",
             "Possible modes:",
             "   WriteAll - default",
             "   WriteWithoutComments - write config files without help comments",
@@ -1110,7 +1110,7 @@ public class WorldConfig extends ConfigFile
                 "If it is set to true the biome populator will use the biome ids present in the",
                 "chunk data, ignoring the biome generator. This is useful if you have a premade",
                 "map made with for example WorldPainter, but still want to populate it using "
-                + PluginStandardValues.PLUGIN_NAME + ".",
+                + PluginStandardValues.MOD_ID + ".",
                 "Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome",
                 "specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
                 + " to populate the chunk, instead of the biome itself.");

@@ -1,10 +1,12 @@
 package com.pg85.otg.forge.materials;
 
+import com.pg85.otg.OTG;
+import com.pg85.otg.logging.LogMarker;
+
 import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.BannerBlock;
 import net.minecraft.block.BedBlock;
 import net.minecraft.block.BeetrootBlock;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.BrewingStandBlock;
@@ -27,6 +29,7 @@ import net.minecraft.block.EndRodBlock;
 import net.minecraft.block.EnderChestBlock;
 import net.minecraft.block.FarmlandBlock;
 import net.minecraft.block.FenceGateBlock;
+import net.minecraft.block.FireBlock;
 import net.minecraft.block.FurnaceBlock;
 import net.minecraft.block.GlazedTerracottaBlock;
 import net.minecraft.block.HayBlock;
@@ -34,6 +37,7 @@ import net.minecraft.block.HopperBlock;
 import net.minecraft.block.HugeMushroomBlock;
 import net.minecraft.block.JukeboxBlock;
 import net.minecraft.block.LadderBlock;
+import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.LeverBlock;
 import net.minecraft.block.NetherPortalBlock;
 import net.minecraft.block.NetherWartBlock;
@@ -44,6 +48,7 @@ import net.minecraft.block.PotatoBlock;
 import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.block.PressurePlateBlock;
 import net.minecraft.block.RailBlock;
+import net.minecraft.block.RedstoneLampBlock;
 import net.minecraft.block.RedstoneWallTorchBlock;
 import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.RepeaterBlock;
@@ -59,6 +64,7 @@ import net.minecraft.block.StructureBlock;
 import net.minecraft.block.SugarCaneBlock;
 import net.minecraft.block.TrapDoorBlock;
 import net.minecraft.block.TrappedChestBlock;
+import net.minecraft.block.TripWireBlock;
 import net.minecraft.block.TripWireHookBlock;
 import net.minecraft.block.VineBlock;
 import net.minecraft.block.WallBannerBlock;
@@ -84,89 +90,147 @@ import net.minecraft.util.Direction;
 // Block.getStateById() says //Forge: Do not use, use GameRegistry. GameRegistry doesn't appear to provide what we need though(?)
 public class LegacyMaterials
 {
-    static Block fromLegacyBlockName(String oldBlockName)
+	// TODO: Don't need any names here that match 1.16's
+    static BlockState fromLegacyBlockName(String oldBlockName)
     {
     	switch(oldBlockName.replace("minecraft:", ""))
     	{
     		case "stationary_water":
-    			return Blocks.WATER;
+    			return Blocks.WATER.getDefaultState();
     		case "stationary_lava":
-    			return Blocks.LAVA;
+    			return Blocks.LAVA.getDefaultState();
     		case "stained_clay":
-    			return Blocks.WHITE_TERRACOTTA;
+    			return Blocks.WHITE_TERRACOTTA.getDefaultState();
     		case "hard_clay":
-    			return Blocks.TERRACOTTA;
+    			return Blocks.TERRACOTTA.getDefaultState();
     		case "step":
-    			return Blocks.STONE_SLAB;
+    			return Blocks.STONE_SLAB.getDefaultState();
     		case "sugar_cane_block":
-    			return Blocks.SUGAR_CANE;
+    			return Blocks.SUGAR_CANE.getDefaultState();
     		case "melon_block":
-    			return Blocks.MELON;
+    			return Blocks.MELON.getDefaultState();
     		case "water_lily":
-    			return Blocks.LILY_PAD;
+    			return Blocks.LILY_PAD.getDefaultState();
     		case "soil":
-    			return Blocks.FARMLAND;
+    			return Blocks.FARMLAND.getDefaultState();
     		case "long_grass":
-    			return Blocks.TALL_GRASS;
+    			return Blocks.TALL_GRASS.getDefaultState();
     		case "mycel":
-    			return Blocks.MYCELIUM;
+    			return Blocks.MYCELIUM.getDefaultState();
     		case "snow_layer":
-    			return Blocks.SNOW;
+    			return Blocks.SNOW.getDefaultState();
     		case "leaves":
-    			return Blocks.OAK_LEAVES;
+    			return Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
     		case "red_rose":
-    			return Blocks.ROSE_BUSH;
+    			return Blocks.ROSE_BUSH.getDefaultState();
+    			
+			case "wood_stairs":
+			case "oak_stairs":
+				return Blocks.OAK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "birch_wood_stairs":
+			case "birch_stairs":
+				return Blocks.BIRCH_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "spruce_wood_stairs":
+			case "spruce_stairs":
+				return Blocks.SPRUCE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "jungle_wood_stairs":				
+			case "jungle_stairs":
+				return Blocks.JUNGLE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "cobblestone_stairs":
+				return Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "stone_stairs":
+				return Blocks.STONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "brick_stairs":
+				return Blocks.BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "nether_brick_stairs":
+				return Blocks.NETHER_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "sandstone_stairs":
+				return Blocks.SANDSTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "quartz_stairs":
+				return Blocks.QUARTZ_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "acacia_stairs":
+				return Blocks.ACACIA_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "dark_oak_stairs":
+				return Blocks.DARK_OAK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "red_sandstone_stairs":
+				return Blocks.RED_SANDSTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "purpur_stairs":
+				return Blocks.PURPUR_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			case "stone_brick_stairs":
+				return Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+			// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
+    		case "smooth_stairs":
+    			return Blocks.STONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+    			
     		case "yellow_flower":
-    			return Blocks.DANDELION;
+    			return Blocks.DANDELION.getDefaultState();
     		case "web":
-    			return Blocks.COBWEB;
+    			return Blocks.COBWEB.getDefaultState();
+    		case "wall_banner":
+    			return Blocks.WHITE_WALL_BANNER.getDefaultState();
+    		case "redstone_lamp_on":
+    			return Blocks.REDSTONE_LAMP.getDefaultState().with(RedstoneLampBlock.LIT, true);
+    		case "redstone_lamp_off":
+    			return Blocks.REDSTONE_LAMP.getDefaultState().with(RedstoneLampBlock.LIT, false);
+    		case "wool":
+    			return Blocks.WHITE_WOOL.getDefaultState();
     		case "log":
     		case "wood":
-    			return Blocks.OAK_LOG;
+    			return Blocks.OAK_LOG.getDefaultState();
     		case "magma":
-    			return Blocks.MAGMA_BLOCK;
+    			return Blocks.MAGMA_BLOCK.getDefaultState();
     		case "tallgrass":
-				return Blocks.GRASS;
+				return Blocks.GRASS.getDefaultState();
     		case "cobble_wall":
-    			return Blocks.COBBLESTONE_WALL;
+    			return Blocks.COBBLESTONE_WALL.getDefaultState();
     		case "iron_fence":
-    			return Blocks.IRON_BARS;
+    			return Blocks.IRON_BARS.getDefaultState();
     		case "workbench":
-    			return Blocks.CRAFTING_TABLE;
+    			return Blocks.CRAFTING_TABLE.getDefaultState();
     		case "mob_spawner":
-    			return Blocks.INFESTED_STONE;
+    			return Blocks.INFESTED_STONE.getDefaultState();
     		case "double_step":
-    			return Blocks.SMOOTH_STONE;
+    			return Blocks.SMOOTH_STONE.getDefaultState();
     		case "smooth_brick":
-    			return Blocks.STONE_BRICKS;
+    			return Blocks.STONE_BRICKS.getDefaultState();
     		case "rails":
-    			return Blocks.RAIL;    			
+    			return Blocks.RAIL.getDefaultState();
     		case "fence":
-    			return Blocks.OAK_FENCE;
+    			return Blocks.OAK_FENCE.getDefaultState();
     		case "wood_step":
-    			return Blocks.OAK_SLAB;
+    			return Blocks.OAK_SLAB.getDefaultState();
     		case "thin_glass":
-    			return Blocks.GLASS_PANE;
+    			return Blocks.GLASS_PANE.getDefaultState();
     		case "stone_plate":
-    			return Blocks.STONE_PRESSURE_PLATE;
+    			return Blocks.STONE_PRESSURE_PLATE.getDefaultState();
     		case "wood_plate":
-    			return Blocks.OAK_PRESSURE_PLATE;
+    			return Blocks.OAK_PRESSURE_PLATE.getDefaultState();
     		case "wood_double_step":
-    			return Blocks.OAK_PLANKS; // TODO: Should be double slab
+    			return Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+    		case "brick":
+    			return Blocks.BRICKS.getDefaultState();
+    		case "iron_door_block":
+    			return Blocks.IRON_DOOR.getDefaultState();
+    		case "carpet":
+    			return Blocks.WHITE_CARPET.getDefaultState();
+    		case "carrot":
+    			return Blocks.CARROTS.getDefaultState();
+    		case "skull":
+    			return Blocks.SKELETON_SKULL.getDefaultState();
     		case "mcpitman":
-    			return Blocks.CREEPER_HEAD;
+    			return Blocks.CREEPER_HEAD.getDefaultState();
     		case "pg85":
-    			return Blocks.ZOMBIE_HEAD;
+    			return Blocks.ZOMBIE_HEAD.getDefaultState();
     		case "supercoder":
-    			return Blocks.CAKE;
+    			return Blocks.CAKE.getDefaultState();
     		case "authvin":
-				return Blocks.WET_SPONGE;
+				return Blocks.WET_SPONGE.getDefaultState();
     		case "josh":
-				return Blocks.BARREL;				
+				return Blocks.BARREL.getDefaultState();
     		case "wahrheit":
-				return Blocks.LECTERN;
+				return Blocks.LECTERN.getDefaultState();
     		case "lordsmellypants":
-				return Blocks.FLOWER_POT;
+				return Blocks.FLOWER_POT.getDefaultState();
 			default:
 				return null;
     	}
@@ -531,7 +595,7 @@ public class LegacyMaterials
 	    	case 176:
 	    		return "standing_banner";
 	    	case 177:
-	    		return "white_wall_banner";
+	    		return "wall_banner";
 	    	case 178:
 	    		return "daylight_detector_inverted";
 	    	case 179:
@@ -726,1127 +790,1084 @@ public class LegacyMaterials
         	}
     	} catch(NumberFormatException ex) { }
     	
-    	switch(blockName)
+    	try
     	{
-			// Legacy blocks with block data that are now their own block
-    		case "banner":
-    		case "white_banner":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.BLACK_BANNER.getDefaultState();
-    				case 1:
-    					return Blocks.RED_BANNER.getDefaultState();
-    				case 2:
-    					return Blocks.GREEN_BANNER.getDefaultState();
-    				case 3:
-    					return Blocks.BROWN_BANNER.getDefaultState();
-    				case 4:
-    					return Blocks.BLUE_BANNER.getDefaultState();
-    				case 5:
-    					return Blocks.PURPLE_BANNER.getDefaultState();
-    				case 6:
-    					return Blocks.CYAN_BANNER.getDefaultState();
-    				case 7:
-    					return Blocks.LIGHT_GRAY_BANNER.getDefaultState();
-    				case 8:
-    					return Blocks.GRAY_BANNER.getDefaultState();
-    				case 9:
-    					return Blocks.PINK_BANNER.getDefaultState();
-    				case 10:
-    					return Blocks.LIME_BANNER.getDefaultState();
-    				case 11:
-    					return Blocks.YELLOW_BANNER.getDefaultState();
-    				case 12:
-    					return Blocks.LIGHT_BLUE_BANNER.getDefaultState();
-    				case 13:
-    					return Blocks.MAGENTA_BANNER.getDefaultState();
-    				case 14:
-    					return Blocks.ORANGE_BANNER.getDefaultState();
-    				case 15:
-    					return Blocks.WHITE_BANNER.getDefaultState();
-    			}		
-			// TODO: How does facing for bed blocks in bo's work for 1.12.2, can only specify color via data?
-    		case "bed":
-    		case "white_bed":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.WHITE_BED.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_BED.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_BED.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_BED.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_BED.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_BED.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_BED.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_BED.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_BED.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_BED.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_BED.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_BED.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_BED.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_BED.getDefaultState();
-    				case 14:
-    					return Blocks.RED_BED.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_BED.getDefaultState();
-    			}
-    		case "carpet":
-    		case "white_carpet":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.WHITE_CARPET.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_CARPET.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_CARPET.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_CARPET.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_CARPET.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_CARPET.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_CARPET.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_CARPET.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_CARPET.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_CARPET.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_CARPET.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_CARPET.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_CARPET.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_CARPET.getDefaultState();
-    				case 14:
-    					return Blocks.RED_CARPET.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_CARPET.getDefaultState();
-    			}
-    		case "cobblestone_wall":
-    		case "cobble_wall":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.COBBLESTONE_WALL.getDefaultState();
-    				case 1:
-    					return Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState();
-    			}
-    		case "concrete":
-    		case "white_concrete":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.WHITE_CONCRETE.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_CONCRETE.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_CONCRETE.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_CONCRETE.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_CONCRETE.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_CONCRETE.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_CONCRETE.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_CONCRETE.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_CONCRETE.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_CONCRETE.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_CONCRETE.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_CONCRETE.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_CONCRETE.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_CONCRETE.getDefaultState();
-    				case 14:
-    					return Blocks.RED_CONCRETE.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_CONCRETE.getDefaultState();
-    			}
-    		case "concrete_powder":
-    		case "white_concrete_powder":
-    			switch(data)
-    			{
-    				case 0:
-    				default:    					
-    					return Blocks.WHITE_CONCRETE_POWDER.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_CONCRETE_POWDER.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_CONCRETE_POWDER.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_CONCRETE_POWDER.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_CONCRETE_POWDER.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_CONCRETE_POWDER.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_CONCRETE_POWDER.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_CONCRETE_POWDER.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_CONCRETE_POWDER.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_CONCRETE_POWDER.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_CONCRETE_POWDER.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_CONCRETE_POWDER.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_CONCRETE_POWDER.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_CONCRETE_POWDER.getDefaultState();
-    				case 14:
-    					return Blocks.RED_CONCRETE_POWDER.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_CONCRETE_POWDER.getDefaultState();
-    			}
-    		case "dirt":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.DIRT.getDefaultState();
-    				case 1:
-    					return Blocks.COARSE_DIRT.getDefaultState();
-    				case 2:
-    					return Blocks.PODZOL.getDefaultState();    					
-    			}
-			// TODO: This only spawns the bottom half?
-    		case "double_plant":
-    		case "sunflower":
-    		case "rose_bush":
-    		case "tall_grass":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.SUNFLOWER.getDefaultState();		
-    				case 1:
-    					return Blocks.LILAC.getDefaultState();
-    				case 2:
-    					return Blocks.TALL_GRASS.getDefaultState();
-    				case 3:
-    					return Blocks.LARGE_FERN.getDefaultState();	
-    				case 4:
-    					return Blocks.ROSE_BUSH.getDefaultState();
-    				case 5:
-    					return Blocks.PEONY.getDefaultState();
-    			}
-    		case "double_stone_slab":
-    		case "smooth_stone":
-    			switch(data)
-    			{
-					case 0:
-					default:
-						return Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 1:
-						return Blocks.SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					//case 2:
-					case 3:
-						return Blocks.COBBLESTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 4:
-						return Blocks.BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 5:
-						return Blocks.STONE_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 6:
-						return Blocks.NETHER_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 7:
-						return Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-    			}
-    		// TODO: Did this even exist for 1.12.2?
-    		case "double_wooden_slab":
-    		case "wood_double_step":
-    			switch(data)
-    			{
-					case 0:
-					default:
-						return Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 1:
-						return Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 2:
-						return Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 3:
-						return Blocks.JUNGLE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 4:
-						return Blocks.ACACIA_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-					case 5:
-						return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
-    			}
-    		case "leaves":
-    		case "oak_leaves":
-    			switch(data)
-    			{
-    				case 0:
-    				case 4:
-    				case 8:
-    				case 12:
-    				default:    					
-    					return Blocks.OAK_LEAVES.getDefaultState();
-    				case 1:
-    				case 5:
-    				case 9:
-    				case 13:
-    					return Blocks.SPRUCE_LEAVES.getDefaultState();
-    				case 2:
-    				case 6:
-    				case 10:
-    				case 14:
-    					return Blocks.BIRCH_LEAVES.getDefaultState();
-    				case 3:
-    				case 7:
-    				case 11:
-    				case 15:
-    					return Blocks.JUNGLE_LEAVES.getDefaultState();
-    			}
-    		case "leaves2":
-    		case "acacia_leaves":
-    			switch(data)
-    			{
-    				case 0:
-    				case 4:
-    				case 8:
-    				case 12:
-    				default:
-    					return Blocks.ACACIA_LEAVES.getDefaultState();
-    				case 1:
-    				case 5:
-    				case 9:
-    				case 13:
-    					return Blocks.DARK_OAK_LEAVES.getDefaultState();
-    			}
-    		case "monster_egg":
-    		case "monster_eggs":
-    		case "infested_stone":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.INFESTED_STONE.getDefaultState();
-    				case 1:
-    					return Blocks.INFESTED_COBBLESTONE.getDefaultState();
-    				case 2:
-    					return Blocks.INFESTED_STONE_BRICKS.getDefaultState();
-    				case 3:
-    					return Blocks.INFESTED_MOSSY_STONE_BRICKS.getDefaultState();
-    				case 4:
-    					return Blocks.INFESTED_CRACKED_STONE_BRICKS.getDefaultState();
-    				case 5:
-    					return Blocks.INFESTED_CHISELED_STONE_BRICKS.getDefaultState();
-    			}
-    		case "planks":
-    		case "oak_planks":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.OAK_PLANKS.getDefaultState();
-    				case 1:
-    					return Blocks.SPRUCE_PLANKS.getDefaultState();
-    				case 2:
-    					return Blocks.BIRCH_PLANKS.getDefaultState();
-    				case 3:
-    					return Blocks.JUNGLE_PLANKS.getDefaultState();
-    				case 4:
-    					return Blocks.ACACIA_PLANKS.getDefaultState();
-    				case 5:
-    					return Blocks.DARK_OAK_PLANKS.getDefaultState();
-    			}
-    		case "prismarine":
-    			switch(data)
-    			{
-    				// TODO: Docs contradict each other about whether 2 or 3 is bricks/dark, test this.
-    				case 0:
-    				default:
-    					return Blocks.PRISMARINE.getDefaultState();
-    				case 1:
-    					return Blocks.PRISMARINE_BRICKS.getDefaultState();
-    				case 2:
-    					return Blocks.DARK_PRISMARINE.getDefaultState();
-    			}
-    		case "purpur_slab":
-    			return Blocks.PURPUR_SLAB.getDefaultState()
-					.with(SlabBlock.TYPE, data == 2 ? SlabType.BOTTOM : data == 10 ? SlabType.TOP : SlabType.BOTTOM);
-    		case "red_flower":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.POPPY.getDefaultState();
-    				case 1:
-    					return Blocks.BLUE_ORCHID.getDefaultState();
-    				case 2:
-    					return Blocks.ALLIUM.getDefaultState();
-    				case 3:
-    					return Blocks.AZURE_BLUET.getDefaultState();
-    				case 4:
-    					return Blocks.RED_TULIP.getDefaultState();
-    				case 5:
-    					return Blocks.ORANGE_TULIP.getDefaultState();
-    				case 6:
-    					return Blocks.WHITE_TULIP.getDefaultState();
-    				case 7:    					
-    					return Blocks.PINK_TULIP.getDefaultState();
-    				case 8:
-    					return Blocks.OXEYE_DAISY.getDefaultState();
-    			}
-    		case "red_sandstone":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.RED_SANDSTONE.getDefaultState();
-    				case 1:
-    					return Blocks.CHISELED_RED_SANDSTONE.getDefaultState();
-    				case 2:
-    					return Blocks.SMOOTH_RED_SANDSTONE.getDefaultState();
-    			}
-    		case "red_sandstone_slab":
-    		case "stone_slab2": 
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.RED_SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 8:
-    					return Blocks.CHISELED_RED_SANDSTONE.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    			}
-    		case "sand":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.SAND.getDefaultState();
-    				case 1:
-    					return Blocks.RED_SAND.getDefaultState();
-    			}
-    		case "sandstone":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.SANDSTONE.getDefaultState();
-    				case 1:
-    					return Blocks.CHISELED_SANDSTONE.getDefaultState();
-    				case 2:
-    					return Blocks.SMOOTH_SANDSTONE.getDefaultState();
-    			}
-    		case "sapling":
-    		case "oak_sapling":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.OAK_SAPLING.getDefaultState();
-    				case 1:
-    					return Blocks.SPRUCE_SAPLING.getDefaultState();
-    				case 2:
-    					return Blocks.BIRCH_SAPLING.getDefaultState();
-    				case 3:
-    					return Blocks.JUNGLE_SAPLING.getDefaultState();
-    				case 4:
-    					return Blocks.ACACIA_SAPLING.getDefaultState();
-    				case 5:
-    					return Blocks.DARK_OAK_SAPLING.getDefaultState();
-    			}
-    		case "skull":
-    		case "skeleton_skull":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.SKELETON_SKULL.getDefaultState();
-    				case 1:
-    					return Blocks.WITHER_SKELETON_SKULL.getDefaultState();
-    				case 2:
-    					return Blocks.ZOMBIE_HEAD.getDefaultState();
-    				case 3:
-    					return Blocks.PLAYER_HEAD.getDefaultState();
-    				case 4:
-    					return Blocks.CREEPER_HEAD.getDefaultState();
-    				case 5:
-    					return Blocks.DRAGON_HEAD.getDefaultState();
-    			}
-    		case "sponge":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.SPONGE.getDefaultState();
-    				case 1:
-    					return Blocks.WET_SPONGE.getDefaultState();
-    			}    		
-    		case "stained_glass":
-    		case "white_stained_glass":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.WHITE_STAINED_GLASS.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_STAINED_GLASS.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_STAINED_GLASS.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_STAINED_GLASS.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_STAINED_GLASS.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_STAINED_GLASS.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_STAINED_GLASS.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_STAINED_GLASS.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_STAINED_GLASS.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_STAINED_GLASS.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_STAINED_GLASS.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_STAINED_GLASS.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_STAINED_GLASS.getDefaultState();
-    				case 14:
-    					return Blocks.RED_STAINED_GLASS.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_STAINED_GLASS.getDefaultState();
-    			}
-    		case "stained_glass_pane":
-    		case "white_stained_glass_pane":
-    		case "thing_glass":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.WHITE_STAINED_GLASS_PANE.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_STAINED_GLASS_PANE.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_STAINED_GLASS_PANE.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_STAINED_GLASS_PANE.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_STAINED_GLASS_PANE.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_STAINED_GLASS_PANE.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_STAINED_GLASS_PANE.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_STAINED_GLASS_PANE.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_STAINED_GLASS_PANE.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_STAINED_GLASS_PANE.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_STAINED_GLASS_PANE.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_STAINED_GLASS_PANE.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_STAINED_GLASS_PANE.getDefaultState();
-    				case 14:
-    					return Blocks.RED_STAINED_GLASS_PANE.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_STAINED_GLASS_PANE.getDefaultState();
-    			}
-    		case "stained_hardened_clay":
-    		case "stained_clay":
-    		case "hard_clay":
-    		case "white_terracotta":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.WHITE_TERRACOTTA.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_TERRACOTTA.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_TERRACOTTA.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_TERRACOTTA.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_TERRACOTTA.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_TERRACOTTA.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_TERRACOTTA.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_TERRACOTTA.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_TERRACOTTA.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_TERRACOTTA.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_TERRACOTTA.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_TERRACOTTA.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_TERRACOTTA.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_TERRACOTTA.getDefaultState();
-    				case 14:
-    					return Blocks.RED_TERRACOTTA.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_TERRACOTTA.getDefaultState();
-    			}
-    		case "stone":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.STONE.getDefaultState();
-    				case 1:
-    					return Blocks.GRANITE.getDefaultState();
-    				case 2:
-    					return Blocks.POLISHED_GRANITE.getDefaultState();
-    				case 3:
-    					return Blocks.DIORITE.getDefaultState();
-    				case 4:
-    					return Blocks.POLISHED_DIORITE.getDefaultState();
-    				case 5:
-    					return Blocks.ANDESITE.getDefaultState();
-    				case 6:
-    					return Blocks.POLISHED_ANDESITE.getDefaultState();
-    			}
-    		case "stone_slab":
-			case "step":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 1:
-    					return Blocks.SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				//case 2:
-    				case 3:
-    					return Blocks.COBBLESTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 4:
-    					return Blocks.BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 5:
-    					return Blocks.STONE_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 6:
-    					return Blocks.NETHER_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 7:
-    					return Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 8:
-    					return Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 9:
-    					return Blocks.SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				//case 10:
-    				case 11:
-    					return Blocks.COBBLESTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 12:
-    					return Blocks.BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 13:
-    					return Blocks.STONE_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 14:
-    					return Blocks.NETHER_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 15:
-    					return Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    			}
-    		case "stonebrick":
-    		case "stone_bricks":
-    		case "smooth_brick":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.STONE_BRICKS.getDefaultState();
-    				case 1:
-    					return Blocks.MOSSY_STONE_BRICKS.getDefaultState();
-    				case 2:
-    					return Blocks.CRACKED_STONE_BRICKS.getDefaultState();
-    				case 3:
-    					return Blocks.CHISELED_STONE_BRICKS.getDefaultState();
-    			}
-    		case "tallgrass":
-    		case "long_grass":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.GRASS.getDefaultState();
-    				case 1:
-    					return Blocks.FERN.getDefaultState();
-    			}
-    		case "wooden_slab":
-    		case "wood_step":
-    		case "oak_slab":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    					return Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 1:
-    					return Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 2:
-    					return Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 3:
-    					return Blocks.JUNGLE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 4:
-    					return Blocks.ACACIA_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 5:
-    					return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
-    				case 8:
-    					return Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 9:
-    					return Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 10:
-    					return Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 11:
-    					return Blocks.JUNGLE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 12:
-    					return Blocks.ACACIA_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
-    				case 13:
-    					return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);    					
-    			}
-    		case "wool":
-    		case "white_wool":
-    			switch(data)
-    			{
-    				case 0:
-    				default:
-    	    			return Blocks.WHITE_WOOL.getDefaultState();
-    				case 1:
-    					return Blocks.ORANGE_WOOL.getDefaultState();
-    				case 2:
-    					return Blocks.MAGENTA_WOOL.getDefaultState();
-    				case 3:
-    					return Blocks.LIGHT_BLUE_WOOL.getDefaultState();
-    				case 4:
-    					return Blocks.YELLOW_WOOL.getDefaultState();
-    				case 5:
-    					return Blocks.LIME_WOOL.getDefaultState();
-    				case 6:
-    					return Blocks.PINK_WOOL.getDefaultState();
-    				case 7:
-    					return Blocks.GRAY_WOOL.getDefaultState();
-    				case 8:
-    					return Blocks.LIGHT_GRAY_WOOL.getDefaultState();
-    				case 9:
-    					return Blocks.CYAN_WOOL.getDefaultState();
-    				case 10:
-    					return Blocks.PURPLE_WOOL.getDefaultState();
-    				case 11:
-    					return Blocks.BLUE_WOOL.getDefaultState();
-    				case 12:
-    					return Blocks.BROWN_WOOL.getDefaultState();
-    				case 13:
-    					return Blocks.GREEN_WOOL.getDefaultState();
-    				case 14:
-    					return Blocks.RED_WOOL.getDefaultState();
-    				case 15:
-    					return Blocks.BLACK_WOOL.getDefaultState();
-    			}
-
-    		// Blocks with data
-    		case "cake":
-    			return Blocks.CAKE.getDefaultState().with(CakeBlock.BITES, data); 
-    		case "stone_pressure_plate":
-    		case "stone_plate":
-    			return Blocks.STONE_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
-    		case "wooden_pressure_plate":
-    		case "wood_plate":
-    			return Blocks.OAK_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
-    		case "light_weighted_pressure_plate":
-    			return Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE.getDefaultState().with(WeightedPressurePlateBlock.POWER, data);
-    		case "heavy_weighted_pressure_plate":
-    			return Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE.getDefaultState().with(WeightedPressurePlateBlock.POWER, data);
-    		case "snow_layer":
-    			return Blocks.SNOW.getDefaultState().with(SnowBlock.LAYERS, data);
-    		case "cactus":
-    			return Blocks.CACTUS.getDefaultState().with(CactusBlock.AGE, data);
-    		case "reeds":
-    			return Blocks.SUGAR_CANE.getDefaultState().with(SugarCaneBlock.AGE, data);
-    		case "jukebox":
-    			return Blocks.JUKEBOX.getDefaultState().with(JukeboxBlock.HAS_RECORD, data == 1);
-    		case "wheat":
-    			return Blocks.WHEAT.getDefaultState().with(CropsBlock.AGE, data);
-    		case "carrot":
-    			return Blocks.CARROTS.getDefaultState().with(CarrotBlock.AGE, data);
-    		case "potato":
-    			return Blocks.POTATOES.getDefaultState().with(PotatoBlock.AGE, data);
-    		case "beetroot":
-    			return Blocks.BEETROOTS.getDefaultState().with(BeetrootBlock.BEETROOT_AGE, data);
-    		case "farmland":
-    		case "soil":
-    			return Blocks.FARMLAND.getDefaultState().with(FarmlandBlock.MOISTURE, data);
-    		case "anvil":
-    			return getAnvilWithData(0, data);
-			case "log":
-			case "wood":
-			case "oak_log":
-				return getLogWithData(data);
-			case "log_2":
-			case "acacia_log":
-				return getLog2WithData(data);
-    		case "quartz_block":
-    			return getQuartzBlockWithData(data);
-			case "torch":
-				return getTorchWithData(0, data);
-			case "redstone_torch_off":
-			case "redstone_torch":
-				return getTorchWithData(1, data);
-			case "redstone_torch_on":
-				return getTorchWithData(2, data);			
-			case "rails":
-				return Blocks.RAIL.getDefaultState().with(RailBlock.SHAPE, getRailShape(data));
-			case "powered_rail":
-			case "golden_rail":
-				return getRailsWithData(0, data);
-			case "detector_rail":
-				return getRailsWithData(1, data);
-			case "activator_rail":
-				return getRailsWithData(2, data);				
-			case "hay_block":
-				return Blocks.HAY_BLOCK.getDefaultState().with(HayBlock.AXIS, getAxisXYZ(data));
-			case "bone_block":
-				return Blocks.BONE_BLOCK.getDefaultState().with(RotatedPillarBlock.AXIS, getAxisXYZ(data));			
-			case "wood_stairs":
-			case "oak_stairs":
-				return getStairsWithData(0, data);
-			case "birch_wood_stairs":
-			case "birch_stairs":
-				return getStairsWithData(1, data);
-			case "spruce_wood_stairs":
-			case "spruce_stairs":
-				return getStairsWithData(2, data);
-			case "jungle_wood_stairs":
-			case "jungle_stairs":
-				return getStairsWithData(3, data);
-			case "cobblestone_stairs":
-			case "stone_stairs":
-				return getStairsWithData(4, data);
-			case "brick_stairs":
-				return getStairsWithData(5, data);
-			// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
-			case "smooth_stairs": 
-				return getStairsWithData(6, data);
-			case "nether_brick_stairs":
-				return getStairsWithData(7, data);
-			case "sandstone_stairs":
-				return getStairsWithData(8, data);
-			case "quartz_stairs":
-				return getStairsWithData(9, data);
-			case "acacia_stairs":
-				return getStairsWithData(10, data);
-			case "dark_oak_stairs":
-				return getStairsWithData(11, data);
-			case "red_sandstone_stairs":
-				return getStairsWithData(12, data);
-			case "purpur_stairs":
-				return getStairsWithData(13, data);
-			case "lever":
-				return getLeverOrButtonWithData(0, data);
-			case "stone_button":
-				return getLeverOrButtonWithData(1, data);
-			case "wood_button":
-			case "wooden_button":
-				return getLeverOrButtonWithData(2, data);
-			case "wooden_door":
-				return getDoorWithData(0, data);
-			case "iron_door_block":
-			case "iron_door":
-				return getDoorWithData(1, data);
-			case "spruce_door":
-				return getDoorWithData(2, data);
-			case "birch_door":
-				return getDoorWithData(3, data);
-			case "jungle_door":
-				return getDoorWithData(4, data);
-			case "acacia_door":
-				return getDoorWithData(5, data);
-			case "dark_oak_door":
-				return getDoorWithData(6, data);			
-			case "sign_post":
-			case "sign": // TODO: This will also pick up wall signs
-				return getSignPostWithData(data);
-			case "standing_banner":
-				return Blocks.BLACK_BANNER.getDefaultState().with(BannerBlock.ROTATION, data);
-			case "wall_banner":
-				return Blocks.BLACK_WALL_BANNER.getDefaultState().with(WallBannerBlock.HORIZONTAL_FACING, getFacingNorthSouthWestEast(data));
-			case "end_rod":
-				return Blocks.END_ROD.getDefaultState().with(EndRodBlock.FACING, getFacingDownUpNorthSouthWestEast(data));
-			case "daylight_detector":
-				return Blocks.DAYLIGHT_DETECTOR.getDefaultState().with(DaylightDetectorBlock.POWER, data);
-			case "command":
-			case "command_block":
-				return getCommandBlockWithData(0, data);
-			case "command_repeating":
-			case "repeating_command_block":
-				return getCommandBlockWithData(1, data);
-			case "command_chain":
-			case "chain_command_block":
-				return getCommandBlockWithData(2, data);
-			case "white_shulker_box":
-				return getShulkerBoxWithData(0, data);
-			case "orange_shulker_box":
-				return getShulkerBoxWithData(1, data);
-			case "magenta_shulker_box":
-				return getShulkerBoxWithData(2, data);
-			case "light_blue_shulker_box":
-				return getShulkerBoxWithData(3, data);
-			case "yellow_shulker_box":
-				return getShulkerBoxWithData(4, data);
-			case "lime_shulker_box":
-				return getShulkerBoxWithData(5, data);
-			case "pink_shulker_box":
-				return getShulkerBoxWithData(6, data);
-			case "gray_shulker_box":
-				return getShulkerBoxWithData(7, data);
-			case "silver_shulker_box":
-				return getShulkerBoxWithData(8, data);				
-			case "cyan_shulker_box":
-				return getShulkerBoxWithData(9, data);				
-			case "purple_shulker_box":
-				return getShulkerBoxWithData(10, data);
-			case "blue_shulker_box":
-				return getShulkerBoxWithData(11, data);
-			case "brown_shulker_box":
-				return getShulkerBoxWithData(12, data);
-			case "green_shulker_box":
-				return getShulkerBoxWithData(13, data);
-			case "red_shulker_box":
-				return getShulkerBoxWithData(14, data);
-			case "black_shulker_box":
-				return getShulkerBoxWithData(15, data);			
-			case "ladder":
-				return getLadderChestOrFurnaceWithData(0, data);
-			case "chest":
-				return getLadderChestOrFurnaceWithData(1, data);
-			case "ender_chest":
-				return getLadderChestOrFurnaceWithData(2, data);
-			case "trapped_chest":
-				return getLadderChestOrFurnaceWithData(3, data);
-			case "furnace":
-				return getLadderChestOrFurnaceWithData(4, data);
-			case "burning_furnace":
-				return getLadderChestOrFurnaceWithData(5, data);				
-			case "wall_sign":
-				return getWallSignWithData(data);			
-			case "observer":
-				return getObserverWithData(data);
-			case "dispenser":
-				return getDispenserHopperDropperWithData(0, data); 
-			case "dropper":
-				return getDispenserHopperDropperWithData(1, data);
-			case "hopper":
-				return getDispenserHopperDropperWithData(2, data);
-			case "pumpkin_stem":
-				// TODO: Hopefully this auto-updates to ATTACHED_PUMPKIN_STEM when placed next to a pumpkin block..
-				return Blocks.PUMPKIN_STEM.getDefaultState().with(StemBlock.AGE, data); 
-			case "melon_stem":
-				// TODO: Hopefully this auto-updates to ATTACHED_MELON_STEM when placed next to a melon block..
-				return Blocks.MELON_STEM.getDefaultState().with(StemBlock.AGE, data);
-			case "carved_pumpkin":
-				return getJackOLanternOrPumpkinWithData(0, data);
-			case "jack_o_lantern":
-			case "lit_pumpkin":
-				return getJackOLanternOrPumpkinWithData(1, data);
-			case "diode_block_off":
-			case "repeater":
-				return getRepeaterWithData(0, data);
-			case "diode_block_on":
-				return getRepeaterWithData(1, data);
-			case "redstone":
-				return Blocks.REDSTONE_WIRE.getDefaultState().with(RedstoneWireBlock.POWER, data);
-			case "redstone_comparator_off":
-			case "comparator":
-				return getComparatorWithData(0, data);
-			case "redstone_comparator_on":
-				return getComparatorWithData(1, data);
-			// TODO: How does facing for bed blocks in bo's work for 1.12.2, can only specify color via data?
-			//case "bed_block":
-				//return getBedBlockWithData(data);
-			case "trap_door":
-			case "trapdoor":
-			case "oak_trapdoor":
-				return getTrapDoorBlockWithData(0, data);
-			case "iron_trapdoor":
-				return getTrapDoorBlockWithData(1, data);			
-			case "piston_base":
-			case "piston":
-				return getPistonWithData(0, data);				
-			case "piston_sticky_base":
-			case "sticky_piston":				
-				return getPistonWithData(1, data);
-			case "piston_extension":
-				return getPistonHeadWithData(data);
-			case "huge_mushroom_1":
-			case "brown_mushroom_block":
-				return getHugeMushroomWithData(0, data);
-			case "huge_mushroom_2":
-			case "red_mushroom_block":
-				return getHugeMushroomWithData(1, data);
-			case "vine":
-				return getVineWithData(data);				
-			case "fence_gate":
-				return getFenceGateWithData(0, data);
-			case "spruce_fence_gate":
-				return getFenceGateWithData(1, data);
-			case "birch_fence_gate":
-				return getFenceGateWithData(2, data);
-			case "jungle_fence_gate":
-				return getFenceGateWithData(3, data);
-			case "dark_oak_fence_gate":
-				return getFenceGateWithData(4, data);
-			case "acacia_fence_gate":
-				return getFenceGateWithData(5, data);
-			case "cocoa":
-				return getCocoaWithData(data);
-			// What about trip-wire (the wire itself)?
-			case "tripwire_hook":
-				return getTripWireHookWithData(data);
-			case "purpur_pillar":
-				return Blocks.PURPUR_PILLAR.getDefaultState().with(RotatedPillarBlock.AXIS, getAxisXYZ(data));
-			case "nether_wart":
-				return Blocks.NETHER_WART.getDefaultState().with(NetherWartBlock.AGE, data);
-			case "brewing_stand":
-				return Blocks.BREWING_STAND.getDefaultState()
-					.with(BrewingStandBlock.HAS_BOTTLE[0], Boolean.valueOf(getBit(data, 0) == 1))
-					.with(BrewingStandBlock.HAS_BOTTLE[1], Boolean.valueOf(getBit(data, 1) == 1))
-					.with(BrewingStandBlock.HAS_BOTTLE[2], Boolean.valueOf(getBit(data, 2) == 1))
-				;
-			case "cauldron":
-				return Blocks.CAULDRON.getDefaultState().with(CauldronBlock.LEVEL, data);
-			case "portal":
-				return Blocks.NETHER_PORTAL.getDefaultState().with(NetherPortalBlock.AXIS, getAxisXZ(data));
-			case "end_portal_frame":
-				return getEndPortalFrameWithData(data);
-			case "structure_block":
-				return getStructureBlockWithData(data);
-			case "black_glazed_terracotta":
-				return getGlazedTerracottaWithData(0, data);
-			case "blue_glazed_terracotta":
-				return getGlazedTerracottaWithData(1, data);
-			case "brown_glazed_terracotta":
-				return getGlazedTerracottaWithData(2, data);
-			case "cyan_glazed_terracotta":
-				return getGlazedTerracottaWithData(3, data);
-			case "gray_glazed_terracotta":
-				return getGlazedTerracottaWithData(4, data);
-			case "green_glazed_terracotta":
-				return getGlazedTerracottaWithData(5, data);
-			case "light_blue_glazed_terracotta":
-				return getGlazedTerracottaWithData(6, data);
-			case "lime_glazed_terracotta":
-				return getGlazedTerracottaWithData(7, data);
-			case "magenta_glazed_terracotta":
-				return getGlazedTerracottaWithData(8, data);
-			case "orange_glazed_terracotta":
-				return getGlazedTerracottaWithData(9, data);
-			case "pink_glazed_terracotta":
-				return getGlazedTerracottaWithData(10, data);
-			case "purple_glazed_terracotta":
-				return getGlazedTerracottaWithData(11, data);
-			case "red_glazed_terracotta":
-				return getGlazedTerracottaWithData(12, data);
-			case "silver_glazed_terracotta":
-				return getGlazedTerracottaWithData(13, data);
-			case "white_glazed_terracotta":
-				return getGlazedTerracottaWithData(14, data);
-			case "yellow_glazed_terracotta":
-				return getGlazedTerracottaWithData(15, data);
-			default:
-				return null;
+	    	switch(blockName)
+	    	{
+				// Legacy blocks with block data that are now their own block
+	    		case "banner":
+	    		case "white_banner":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.BLACK_BANNER.getDefaultState();
+	    				case 1:
+	    					return Blocks.RED_BANNER.getDefaultState();
+	    				case 2:
+	    					return Blocks.GREEN_BANNER.getDefaultState();
+	    				case 3:
+	    					return Blocks.BROWN_BANNER.getDefaultState();
+	    				case 4:
+	    					return Blocks.BLUE_BANNER.getDefaultState();
+	    				case 5:
+	    					return Blocks.PURPLE_BANNER.getDefaultState();
+	    				case 6:
+	    					return Blocks.CYAN_BANNER.getDefaultState();
+	    				case 7:
+	    					return Blocks.LIGHT_GRAY_BANNER.getDefaultState();
+	    				case 8:
+	    					return Blocks.GRAY_BANNER.getDefaultState();
+	    				case 9:
+	    					return Blocks.PINK_BANNER.getDefaultState();
+	    				case 10:
+	    					return Blocks.LIME_BANNER.getDefaultState();
+	    				case 11:
+	    					return Blocks.YELLOW_BANNER.getDefaultState();
+	    				case 12:
+	    					return Blocks.LIGHT_BLUE_BANNER.getDefaultState();
+	    				case 13:
+	    					return Blocks.MAGENTA_BANNER.getDefaultState();
+	    				case 14:
+	    					return Blocks.ORANGE_BANNER.getDefaultState();
+	    				case 15:
+	    					return Blocks.WHITE_BANNER.getDefaultState();
+	    			}		
+				// TODO: How does facing for bed blocks in bo's work for 1.12.2, can only specify color via data?
+	    		case "bed":
+	    		case "white_bed":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.WHITE_BED.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_BED.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_BED.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_BED.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_BED.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_BED.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_BED.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_BED.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_BED.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_BED.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_BED.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_BED.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_BED.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_BED.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_BED.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_BED.getDefaultState();
+	    			}
+	    		case "carpet":
+	    		case "white_carpet":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.WHITE_CARPET.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_CARPET.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_CARPET.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_CARPET.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_CARPET.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_CARPET.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_CARPET.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_CARPET.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_CARPET.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_CARPET.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_CARPET.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_CARPET.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_CARPET.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_CARPET.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_CARPET.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_CARPET.getDefaultState();
+	    			}
+	    		case "cobblestone_wall":
+	    		case "cobble_wall":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.COBBLESTONE_WALL.getDefaultState();
+	    				case 1:
+	    					return Blocks.MOSSY_COBBLESTONE_WALL.getDefaultState();
+	    			}
+	    		case "concrete":
+	    		case "white_concrete":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.WHITE_CONCRETE.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_CONCRETE.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_CONCRETE.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_CONCRETE.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_CONCRETE.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_CONCRETE.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_CONCRETE.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_CONCRETE.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_CONCRETE.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_CONCRETE.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_CONCRETE.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_CONCRETE.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_CONCRETE.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_CONCRETE.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_CONCRETE.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_CONCRETE.getDefaultState();
+	    			}
+	    		case "concrete_powder":
+	    		case "white_concrete_powder":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:    					
+	    					return Blocks.WHITE_CONCRETE_POWDER.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_CONCRETE_POWDER.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_CONCRETE_POWDER.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_CONCRETE_POWDER.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_CONCRETE_POWDER.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_CONCRETE_POWDER.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_CONCRETE_POWDER.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_CONCRETE_POWDER.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_CONCRETE_POWDER.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_CONCRETE_POWDER.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_CONCRETE_POWDER.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_CONCRETE_POWDER.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_CONCRETE_POWDER.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_CONCRETE_POWDER.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_CONCRETE_POWDER.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_CONCRETE_POWDER.getDefaultState();
+	    			}
+	    		case "dirt":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.DIRT.getDefaultState();
+	    				case 1:
+	    					return Blocks.COARSE_DIRT.getDefaultState();
+	    				case 2:
+	    					return Blocks.PODZOL.getDefaultState();    					
+	    			}
+				// TODO: This only spawns the bottom half?
+	    		case "double_plant":
+	    		case "sunflower":
+	    		case "rose_bush":
+	    		case "tall_grass":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.SUNFLOWER.getDefaultState();		
+	    				case 1:
+	    					return Blocks.LILAC.getDefaultState();
+	    				case 2:
+	    					return Blocks.TALL_GRASS.getDefaultState();
+	    				case 3:
+	    					return Blocks.LARGE_FERN.getDefaultState();	
+	    				case 4:
+	    					return Blocks.ROSE_BUSH.getDefaultState();
+	    				case 5:
+	    					return Blocks.PEONY.getDefaultState();
+	    			}
+	    		case "double_stone_slab":
+	    		case "smooth_stone":
+	    			switch(data)
+	    			{
+						case 0:
+						default:
+							return Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 1:
+							return Blocks.SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						//case 2:
+						case 3:
+							return Blocks.COBBLESTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 4:
+							return Blocks.BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 5:
+							return Blocks.STONE_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 6:
+							return Blocks.NETHER_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 7:
+							return Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+	    			}
+	    		// TODO: Did this even exist for 1.12.2?
+	    		case "double_wooden_slab":
+	    		case "wood_double_step":
+	    			switch(data)
+	    			{
+						case 0:
+						default:
+							return Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 1:
+							return Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 2:
+							return Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 3:
+							return Blocks.JUNGLE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 4:
+							return Blocks.ACACIA_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+						case 5:
+							return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE);
+	    			}
+	    		case "leaves":
+	    		case "oak_leaves":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				case 4:
+	    				case 8:
+	    				case 12:
+	    				default:    					
+	    					return Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
+	    				case 1:
+	    				case 5:
+	    				case 9:
+	    				case 13:
+	    					return Blocks.SPRUCE_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
+	    				case 2:
+	    				case 6:
+	    				case 10:
+	    				case 14:
+	    					return Blocks.BIRCH_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
+	    				case 3:
+	    				case 7:
+	    				case 11:
+	    				case 15:
+	    					return Blocks.JUNGLE_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
+	    			}
+	    		case "leaves2":
+	    		case "acacia_leaves":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				case 4:
+	    				case 8:
+	    				case 12:
+	    				default:
+	    					return Blocks.ACACIA_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
+	    				case 1:
+	    				case 5:
+	    				case 9:
+	    				case 13:
+	    					return Blocks.DARK_OAK_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
+	    			}
+	    		case "monster_egg":
+	    		case "monster_eggs":
+	    		case "infested_stone":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.INFESTED_STONE.getDefaultState();
+	    				case 1:
+	    					return Blocks.INFESTED_COBBLESTONE.getDefaultState();
+	    				case 2:
+	    					return Blocks.INFESTED_STONE_BRICKS.getDefaultState();
+	    				case 3:
+	    					return Blocks.INFESTED_MOSSY_STONE_BRICKS.getDefaultState();
+	    				case 4:
+	    					return Blocks.INFESTED_CRACKED_STONE_BRICKS.getDefaultState();
+	    				case 5:
+	    					return Blocks.INFESTED_CHISELED_STONE_BRICKS.getDefaultState();
+	    			}
+	    		case "planks":
+	    		case "oak_planks":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.OAK_PLANKS.getDefaultState();
+	    				case 1:
+	    					return Blocks.SPRUCE_PLANKS.getDefaultState();
+	    				case 2:
+	    					return Blocks.BIRCH_PLANKS.getDefaultState();
+	    				case 3:
+	    					return Blocks.JUNGLE_PLANKS.getDefaultState();
+	    				case 4:
+	    					return Blocks.ACACIA_PLANKS.getDefaultState();
+	    				case 5:
+	    					return Blocks.DARK_OAK_PLANKS.getDefaultState();
+	    			}
+	    		case "prismarine":
+	    			switch(data)
+	    			{
+	    				// TODO: Docs contradict each other about whether 2 or 3 is bricks/dark, test this.
+	    				case 0:
+	    				default:
+	    					return Blocks.PRISMARINE.getDefaultState();
+	    				case 1:
+	    					return Blocks.PRISMARINE_BRICKS.getDefaultState();
+	    				case 2:
+	    					return Blocks.DARK_PRISMARINE.getDefaultState();
+	    			}
+	    		case "purpur_slab":
+	    			return Blocks.PURPUR_SLAB.getDefaultState()
+						.with(SlabBlock.TYPE, data == 2 ? SlabType.BOTTOM : data == 10 ? SlabType.TOP : SlabType.BOTTOM);
+	    		case "red_flower":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.POPPY.getDefaultState();
+	    				case 1:
+	    					return Blocks.BLUE_ORCHID.getDefaultState();
+	    				case 2:
+	    					return Blocks.ALLIUM.getDefaultState();
+	    				case 3:
+	    					return Blocks.AZURE_BLUET.getDefaultState();
+	    				case 4:
+	    					return Blocks.RED_TULIP.getDefaultState();
+	    				case 5:
+	    					return Blocks.ORANGE_TULIP.getDefaultState();
+	    				case 6:
+	    					return Blocks.WHITE_TULIP.getDefaultState();
+	    				case 7:    					
+	    					return Blocks.PINK_TULIP.getDefaultState();
+	    				case 8:
+	    					return Blocks.OXEYE_DAISY.getDefaultState();
+	    			}
+	    		case "red_sandstone":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.RED_SANDSTONE.getDefaultState();
+	    				case 1:
+	    					return Blocks.CHISELED_RED_SANDSTONE.getDefaultState();
+	    				case 2:
+	    					return Blocks.SMOOTH_RED_SANDSTONE.getDefaultState();
+	    			}
+	    		case "red_sandstone_slab":
+	    		case "stone_slab2": 
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.RED_SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 8:
+	    					return Blocks.CHISELED_RED_SANDSTONE.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    			}
+	    		case "sand":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.SAND.getDefaultState();
+	    				case 1:
+	    					return Blocks.RED_SAND.getDefaultState();
+	    			}
+	    		case "sandstone":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.SANDSTONE.getDefaultState();
+	    				case 1:
+	    					return Blocks.CHISELED_SANDSTONE.getDefaultState();
+	    				case 2:
+	    					return Blocks.SMOOTH_SANDSTONE.getDefaultState();
+	    			}
+	    		case "sapling":
+	    		case "oak_sapling":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.OAK_SAPLING.getDefaultState();
+	    				case 1:
+	    					return Blocks.SPRUCE_SAPLING.getDefaultState();
+	    				case 2:
+	    					return Blocks.BIRCH_SAPLING.getDefaultState();
+	    				case 3:
+	    					return Blocks.JUNGLE_SAPLING.getDefaultState();
+	    				case 4:
+	    					return Blocks.ACACIA_SAPLING.getDefaultState();
+	    				case 5:
+	    					return Blocks.DARK_OAK_SAPLING.getDefaultState();
+	    			}
+	    		case "skull":
+	    		case "skeleton_skull":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.SKELETON_SKULL.getDefaultState();
+	    				case 1:
+	    					return Blocks.WITHER_SKELETON_SKULL.getDefaultState();
+	    				case 2:
+	    					return Blocks.ZOMBIE_HEAD.getDefaultState();
+	    				case 3:
+	    					return Blocks.PLAYER_HEAD.getDefaultState();
+	    				case 4:
+	    					return Blocks.CREEPER_HEAD.getDefaultState();
+	    				case 5:
+	    					return Blocks.DRAGON_HEAD.getDefaultState();
+	    			}
+	    		case "sponge":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.SPONGE.getDefaultState();
+	    				case 1:
+	    					return Blocks.WET_SPONGE.getDefaultState();
+	    			}
+	    		case "stained_glass":
+	    		case "white_stained_glass":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.WHITE_STAINED_GLASS.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_STAINED_GLASS.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_STAINED_GLASS.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_STAINED_GLASS.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_STAINED_GLASS.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_STAINED_GLASS.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_STAINED_GLASS.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_STAINED_GLASS.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_STAINED_GLASS.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_STAINED_GLASS.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_STAINED_GLASS.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_STAINED_GLASS.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_STAINED_GLASS.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_STAINED_GLASS.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_STAINED_GLASS.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_STAINED_GLASS.getDefaultState();
+	    			}
+	    		case "stained_glass_pane":
+	    		case "white_stained_glass_pane":
+	    		case "thing_glass":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.WHITE_STAINED_GLASS_PANE.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_STAINED_GLASS_PANE.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_STAINED_GLASS_PANE.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_STAINED_GLASS_PANE.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_STAINED_GLASS_PANE.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_STAINED_GLASS_PANE.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_STAINED_GLASS_PANE.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_STAINED_GLASS_PANE.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_STAINED_GLASS_PANE.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_STAINED_GLASS_PANE.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_STAINED_GLASS_PANE.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_STAINED_GLASS_PANE.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_STAINED_GLASS_PANE.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_STAINED_GLASS_PANE.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_STAINED_GLASS_PANE.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_STAINED_GLASS_PANE.getDefaultState();
+	    			}
+	    		case "stained_hardened_clay":
+	    		case "stained_clay":
+	    		case "hard_clay":
+	    		case "white_terracotta":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.WHITE_TERRACOTTA.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_TERRACOTTA.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_TERRACOTTA.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_TERRACOTTA.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_TERRACOTTA.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_TERRACOTTA.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_TERRACOTTA.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_TERRACOTTA.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_TERRACOTTA.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_TERRACOTTA.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_TERRACOTTA.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_TERRACOTTA.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_TERRACOTTA.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_TERRACOTTA.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_TERRACOTTA.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_TERRACOTTA.getDefaultState();
+	    			}
+	    		case "stone":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.STONE.getDefaultState();
+	    				case 1:
+	    					return Blocks.GRANITE.getDefaultState();
+	    				case 2:
+	    					return Blocks.POLISHED_GRANITE.getDefaultState();
+	    				case 3:
+	    					return Blocks.DIORITE.getDefaultState();
+	    				case 4:
+	    					return Blocks.POLISHED_DIORITE.getDefaultState();
+	    				case 5:
+	    					return Blocks.ANDESITE.getDefaultState();
+	    				case 6:
+	    					return Blocks.POLISHED_ANDESITE.getDefaultState();
+	    			}
+	    		case "stone_slab":
+				case "step":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 1:
+	    					return Blocks.SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				//case 2:
+	    				case 3:
+	    					return Blocks.COBBLESTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 4:
+	    					return Blocks.BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 5:
+	    					return Blocks.STONE_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 6:
+	    					return Blocks.NETHER_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 7:
+	    					return Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 8:
+	    					return Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 9:
+	    					return Blocks.SANDSTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				//case 10:
+	    				case 11:
+	    					return Blocks.COBBLESTONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 12:
+	    					return Blocks.BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 13:
+	    					return Blocks.STONE_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 14:
+	    					return Blocks.NETHER_BRICK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 15:
+	    					return Blocks.QUARTZ_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    			}
+	    		case "stonebrick":
+	    		case "stone_bricks":
+	    		case "smooth_brick":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.STONE_BRICKS.getDefaultState();
+	    				case 1:
+	    					return Blocks.MOSSY_STONE_BRICKS.getDefaultState();
+	    				case 2:
+	    					return Blocks.CRACKED_STONE_BRICKS.getDefaultState();
+	    				case 3:
+	    					return Blocks.CHISELED_STONE_BRICKS.getDefaultState();
+	    			}
+	    		case "tallgrass":
+	    		case "long_grass":
+	    			switch(data)
+	    			{
+	    				case 1:
+	    				default:
+	    					return Blocks.GRASS.getDefaultState();
+	    				case 2:
+	    					return Blocks.FERN.getDefaultState();
+	    			}
+	    		case "wooden_slab":
+	    		case "wood_step":
+	    		case "oak_slab":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    					return Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 1:
+	    					return Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 2:
+	    					return Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 3:
+	    					return Blocks.JUNGLE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 4:
+	    					return Blocks.ACACIA_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 5:
+	    					return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
+	    				case 8:
+	    					return Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 9:
+	    					return Blocks.SPRUCE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 10:
+	    					return Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 11:
+	    					return Blocks.JUNGLE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 12:
+	    					return Blocks.ACACIA_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
+	    				case 13:
+	    					return Blocks.DARK_OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);    					
+	    			}
+	    		case "wool":
+	    		case "white_wool":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    				default:
+	    	    			return Blocks.WHITE_WOOL.getDefaultState();
+	    				case 1:
+	    					return Blocks.ORANGE_WOOL.getDefaultState();
+	    				case 2:
+	    					return Blocks.MAGENTA_WOOL.getDefaultState();
+	    				case 3:
+	    					return Blocks.LIGHT_BLUE_WOOL.getDefaultState();
+	    				case 4:
+	    					return Blocks.YELLOW_WOOL.getDefaultState();
+	    				case 5:
+	    					return Blocks.LIME_WOOL.getDefaultState();
+	    				case 6:
+	    					return Blocks.PINK_WOOL.getDefaultState();
+	    				case 7:
+	    					return Blocks.GRAY_WOOL.getDefaultState();
+	    				case 8:
+	    					return Blocks.LIGHT_GRAY_WOOL.getDefaultState();
+	    				case 9:
+	    					return Blocks.CYAN_WOOL.getDefaultState();
+	    				case 10:
+	    					return Blocks.PURPLE_WOOL.getDefaultState();
+	    				case 11:
+	    					return Blocks.BLUE_WOOL.getDefaultState();
+	    				case 12:
+	    					return Blocks.BROWN_WOOL.getDefaultState();
+	    				case 13:
+	    					return Blocks.GREEN_WOOL.getDefaultState();
+	    				case 14:
+	    					return Blocks.RED_WOOL.getDefaultState();
+	    				case 15:
+	    					return Blocks.BLACK_WOOL.getDefaultState();
+	    			}
+	
+	    		// Blocks with data
+	    		case "fire":
+	    			return Blocks.FIRE.getDefaultState().with(FireBlock.AGE, data);
+	    		case "cake":
+	    		case "cake_block":
+	    			return Blocks.CAKE.getDefaultState().with(CakeBlock.BITES, data); 
+	    		case "stone_pressure_plate":
+	    		case "stone_plate":
+	    			return Blocks.STONE_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
+	    		case "wooden_pressure_plate":
+	    		case "wood_plate":
+	    			return Blocks.OAK_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
+	    		case "light_weighted_pressure_plate":
+	    			return Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE.getDefaultState().with(WeightedPressurePlateBlock.POWER, data);
+	    		case "heavy_weighted_pressure_plate":
+	    			return Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE.getDefaultState().with(WeightedPressurePlateBlock.POWER, data);
+	    		case "snow_layer":
+	    			return Blocks.SNOW.getDefaultState().with(SnowBlock.LAYERS, data);
+	    		case "cactus":
+	    			return Blocks.CACTUS.getDefaultState().with(CactusBlock.AGE, data);
+	    		case "reeds":
+	    			return Blocks.SUGAR_CANE.getDefaultState().with(SugarCaneBlock.AGE, data);
+	    		case "jukebox":
+	    			return Blocks.JUKEBOX.getDefaultState().with(JukeboxBlock.HAS_RECORD, data == 1);
+	    		case "wheat":
+	    		case "crops":
+	    			return Blocks.WHEAT.getDefaultState().with(CropsBlock.AGE, data);
+	    		case "carrot":
+	    			return Blocks.CARROTS.getDefaultState().with(CarrotBlock.AGE, data);
+	    		case "potato":
+	    			return Blocks.POTATOES.getDefaultState().with(PotatoBlock.AGE, data);
+	    		case "beetroot":
+	    			return Blocks.BEETROOTS.getDefaultState().with(BeetrootBlock.BEETROOT_AGE, data);
+	    		case "farmland":
+	    		case "soil":
+	    			return Blocks.FARMLAND.getDefaultState().with(FarmlandBlock.MOISTURE, data);
+	    		case "anvil":
+	    			return getAnvilWithData(0, data);
+				case "log":
+				case "wood":
+				case "oak_log":
+					return getLogWithData(data);
+				case "log_2":
+				case "acacia_log":
+					return getLog2WithData(data);
+	    		case "quartz_block":
+	    			return getQuartzBlockWithData(data);
+				case "torch":
+					return getTorchWithData(0, data);
+				case "redstone_torch_off":
+				case "redstone_torch":
+					return getTorchWithData(1, data);
+				case "redstone_torch_on":
+					return getTorchWithData(2, data);			
+				case "rails":
+					return Blocks.RAIL.getDefaultState().with(RailBlock.SHAPE, getRailShape(data));
+				case "powered_rail":
+				case "golden_rail":
+					return getRailsWithData(0, data);
+				case "detector_rail":
+					return getRailsWithData(1, data);
+				case "activator_rail":
+					return getRailsWithData(2, data);				
+				case "hay_block":
+					return Blocks.HAY_BLOCK.getDefaultState().with(HayBlock.AXIS, getAxisXYZ(data));
+				case "bone_block":
+					return Blocks.BONE_BLOCK.getDefaultState().with(RotatedPillarBlock.AXIS, getAxisXYZ(data));			
+				case "wood_stairs":
+				case "oak_stairs":
+					return getStairsWithData(0, data);
+				case "birch_wood_stairs":
+				case "birch_stairs":
+					return getStairsWithData(1, data);
+				case "spruce_wood_stairs":
+				case "spruce_stairs":
+					return getStairsWithData(2, data);
+				case "jungle_wood_stairs":
+				case "jungle_stairs":
+					return getStairsWithData(3, data);
+				case "cobblestone_stairs":
+				case "stone_stairs":
+					return getStairsWithData(4, data);
+				case "brick_stairs":
+					return getStairsWithData(5, data);
+				// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
+				case "smooth_stairs":
+					return getStairsWithData(6, data);
+				case "nether_brick_stairs":
+					return getStairsWithData(7, data);
+				case "sandstone_stairs":
+					return getStairsWithData(8, data);
+				case "quartz_stairs":
+					return getStairsWithData(9, data);
+				case "acacia_stairs":
+					return getStairsWithData(10, data);
+				case "dark_oak_stairs":
+					return getStairsWithData(11, data);
+				case "red_sandstone_stairs":
+					return getStairsWithData(12, data);
+				case "purpur_stairs":
+					return getStairsWithData(13, data);
+				case "stone_brick_stairs":
+					return getStairsWithData(14, data);					
+				case "lever":
+					return getLeverOrButtonWithData(0, data);
+				case "stone_button":
+					return getLeverOrButtonWithData(1, data);
+				case "wood_button":
+				case "wooden_button":
+					return getLeverOrButtonWithData(2, data);
+				case "wooden_door":
+				case "oak_door":
+					return getDoorWithData(0, data);
+				case "iron_door_block":
+				case "iron_door":
+					return getDoorWithData(1, data);
+				case "spruce_door":
+					return getDoorWithData(2, data);
+				case "birch_door":
+					return getDoorWithData(3, data);
+				case "jungle_door":
+					return getDoorWithData(4, data);
+				case "acacia_door":
+					return getDoorWithData(5, data);
+				case "dark_oak_door":
+					return getDoorWithData(6, data);			
+				case "sign_post":
+				case "sign": // TODO: This will also pick up wall signs
+					return getSignPostWithData(data);
+				case "standing_banner":
+					return Blocks.BLACK_BANNER.getDefaultState().with(BannerBlock.ROTATION, data);
+				case "wall_banner":
+					return Blocks.WHITE_WALL_BANNER.getDefaultState().with(WallBannerBlock.HORIZONTAL_FACING, getFacingNorthSouthWestEast(data));
+				case "end_rod":
+					return Blocks.END_ROD.getDefaultState().with(EndRodBlock.FACING, getFacingDownUpNorthSouthWestEast(data));
+				case "daylight_detector":
+					return Blocks.DAYLIGHT_DETECTOR.getDefaultState().with(DaylightDetectorBlock.POWER, data);
+				case "command":
+				case "command_block":
+					return getCommandBlockWithData(0, data);
+				case "command_repeating":
+				case "repeating_command_block":
+					return getCommandBlockWithData(1, data);
+				case "command_chain":
+				case "chain_command_block":
+					return getCommandBlockWithData(2, data);
+				case "white_shulker_box":
+					return getShulkerBoxWithData(0, data);
+				case "orange_shulker_box":
+					return getShulkerBoxWithData(1, data);
+				case "magenta_shulker_box":
+					return getShulkerBoxWithData(2, data);
+				case "light_blue_shulker_box":
+					return getShulkerBoxWithData(3, data);
+				case "yellow_shulker_box":
+					return getShulkerBoxWithData(4, data);
+				case "lime_shulker_box":
+					return getShulkerBoxWithData(5, data);
+				case "pink_shulker_box":
+					return getShulkerBoxWithData(6, data);
+				case "gray_shulker_box":
+					return getShulkerBoxWithData(7, data);
+				case "silver_shulker_box":
+					return getShulkerBoxWithData(8, data);				
+				case "cyan_shulker_box":
+					return getShulkerBoxWithData(9, data);				
+				case "purple_shulker_box":
+					return getShulkerBoxWithData(10, data);
+				case "blue_shulker_box":
+					return getShulkerBoxWithData(11, data);
+				case "brown_shulker_box":
+					return getShulkerBoxWithData(12, data);
+				case "green_shulker_box":
+					return getShulkerBoxWithData(13, data);
+				case "red_shulker_box":
+					return getShulkerBoxWithData(14, data);
+				case "black_shulker_box":
+					return getShulkerBoxWithData(15, data);			
+				case "ladder":
+					return getLadderChestOrFurnaceWithData(0, data);
+				case "chest":
+					return getLadderChestOrFurnaceWithData(1, data);
+				case "ender_chest":
+					return getLadderChestOrFurnaceWithData(2, data);
+				case "trapped_chest":
+					return getLadderChestOrFurnaceWithData(3, data);
+				case "furnace":
+					return getLadderChestOrFurnaceWithData(4, data);
+				case "burning_furnace":
+					return getLadderChestOrFurnaceWithData(5, data);				
+				case "wall_sign":
+					return getWallSignWithData(data);			
+				case "observer":
+					return getObserverWithData(data);
+				case "dispenser":
+					return getDispenserHopperDropperWithData(0, data); 
+				case "dropper":
+					return getDispenserHopperDropperWithData(1, data);
+				case "hopper":
+					return getDispenserHopperDropperWithData(2, data);
+				case "pumpkin_stem":
+					// TODO: Hopefully this auto-updates to ATTACHED_PUMPKIN_STEM when placed next to a pumpkin block..
+					return Blocks.PUMPKIN_STEM.getDefaultState().with(StemBlock.AGE, data); 
+				case "melon_stem":
+					// TODO: Hopefully this auto-updates to ATTACHED_MELON_STEM when placed next to a melon block..
+					return Blocks.MELON_STEM.getDefaultState().with(StemBlock.AGE, data);
+				case "carved_pumpkin":
+					return getJackOLanternOrPumpkinWithData(0, data);
+				case "jack_o_lantern":
+				case "lit_pumpkin":
+					return getJackOLanternOrPumpkinWithData(1, data);
+				case "diode_block_off":
+				case "repeater":
+					return getRepeaterWithData(0, data);
+				case "diode_block_on":
+					return getRepeaterWithData(1, data);
+				case "redstone":
+				case "redstone_wire":
+					return Blocks.REDSTONE_WIRE.getDefaultState().with(RedstoneWireBlock.POWER, data);
+				case "redstone_comparator_off":
+				case "comparator":
+					return getComparatorWithData(0, data);
+				case "redstone_comparator_on":
+					return getComparatorWithData(1, data);
+				// TODO: How does facing for bed blocks in bo's work for 1.12.2, can only specify color via data?
+				case "bed_block":
+					return getBedBlockWithData(data);
+				case "trap_door":
+				case "trapdoor":
+				case "oak_trapdoor":
+					return getTrapDoorBlockWithData(0, data);
+				case "iron_trapdoor":
+					return getTrapDoorBlockWithData(1, data);			
+				case "piston_base":
+				case "piston":
+					return getPistonWithData(0, data);				
+				case "piston_sticky_base":
+				case "sticky_piston":				
+					return getPistonWithData(1, data);
+				case "piston_extension":
+				case "piston_head":
+					return getPistonHeadWithData(data);
+				case "huge_mushroom_1":
+				case "brown_mushroom_block":
+					return getHugeMushroomWithData(0, data);
+				case "huge_mushroom_2":
+				case "red_mushroom_block":
+					return getHugeMushroomWithData(1, data);
+				case "vine":
+					return getVineWithData(data);				
+				case "fence_gate":
+					return getFenceGateWithData(0, data);
+				case "spruce_fence_gate":
+					return getFenceGateWithData(1, data);
+				case "birch_fence_gate":
+					return getFenceGateWithData(2, data);
+				case "jungle_fence_gate":
+					return getFenceGateWithData(3, data);
+				case "dark_oak_fence_gate":
+					return getFenceGateWithData(4, data);
+				case "acacia_fence_gate":
+					return getFenceGateWithData(5, data);
+				case "cocoa":
+					return getCocoaWithData(data);
+				// What about trip-wire (the wire itself)?
+				case "tripwire_hook":
+					return getTripWireHookWithData(data);
+				case "tripwire":
+					return getTripWireWithData(data);
+				case "purpur_pillar":
+					return Blocks.PURPUR_PILLAR.getDefaultState().with(RotatedPillarBlock.AXIS, getAxisXYZ(data));
+				case "nether_wart":
+					return Blocks.NETHER_WART.getDefaultState().with(NetherWartBlock.AGE, data);
+				case "brewing_stand":
+					return Blocks.BREWING_STAND.getDefaultState()
+						.with(BrewingStandBlock.HAS_BOTTLE[0], Boolean.valueOf(getBit(data, 0) == 1))
+						.with(BrewingStandBlock.HAS_BOTTLE[1], Boolean.valueOf(getBit(data, 1) == 1))
+						.with(BrewingStandBlock.HAS_BOTTLE[2], Boolean.valueOf(getBit(data, 2) == 1))
+					;
+				case "cauldron":
+					return Blocks.CAULDRON.getDefaultState().with(CauldronBlock.LEVEL, data);
+				case "portal":
+					return Blocks.NETHER_PORTAL.getDefaultState().with(NetherPortalBlock.AXIS, getAxisXZ(data));
+				case "end_portal_frame":
+					return getEndPortalFrameWithData(data);
+				case "structure_block":
+					return getStructureBlockWithData(data);
+				case "black_glazed_terracotta":
+					return getGlazedTerracottaWithData(0, data);
+				case "blue_glazed_terracotta":
+					return getGlazedTerracottaWithData(1, data);
+				case "brown_glazed_terracotta":
+					return getGlazedTerracottaWithData(2, data);
+				case "cyan_glazed_terracotta":
+					return getGlazedTerracottaWithData(3, data);
+				case "gray_glazed_terracotta":
+					return getGlazedTerracottaWithData(4, data);
+				case "green_glazed_terracotta":
+					return getGlazedTerracottaWithData(5, data);
+				case "light_blue_glazed_terracotta":
+					return getGlazedTerracottaWithData(6, data);
+				case "lime_glazed_terracotta":
+					return getGlazedTerracottaWithData(7, data);
+				case "magenta_glazed_terracotta":
+					return getGlazedTerracottaWithData(8, data);
+				case "orange_glazed_terracotta":
+					return getGlazedTerracottaWithData(9, data);
+				case "pink_glazed_terracotta":
+					return getGlazedTerracottaWithData(10, data);
+				case "purple_glazed_terracotta":
+					return getGlazedTerracottaWithData(11, data);
+				case "red_glazed_terracotta":
+					return getGlazedTerracottaWithData(12, data);
+				case "silver_glazed_terracotta":
+					return getGlazedTerracottaWithData(13, data);
+				case "white_glazed_terracotta":
+					return getGlazedTerracottaWithData(14, data);
+				case "yellow_glazed_terracotta":
+					return getGlazedTerracottaWithData(15, data);
+				default:
+					return null;
+	    	}
+    	} catch(IllegalArgumentException ex) {
+    		OTG.log(LogMarker.INFO, "Could not parse block with data, illegal data: " + blockName + ":" + data + ". Exception: " + ex.getMessage());
     	}
+    	return null;
     }
 
     //
     
-	private static BlockState getGlazedTerracottaWithData(int material, int data)
-	{
-		int facing = getBits(data, 0, 2);
-		BlockState blockState;
-		switch(material)
-		{
-			case 0:
-				blockState = Blocks.BLACK_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 1:
-				blockState = Blocks.BLUE_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 2:
-				blockState = Blocks.BROWN_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 3:
-				blockState = Blocks.CYAN_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 4:
-				blockState = Blocks.GRAY_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 5:
-				blockState = Blocks.GREEN_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 6:
-				blockState = Blocks.LIGHT_BLUE_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 7:
-				blockState = Blocks.LIME_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 8:
-				blockState = Blocks.MAGENTA_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 9:
-				blockState = Blocks.ORANGE_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 10:
-				blockState = Blocks.PINK_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 11:
-				blockState = Blocks.PURPLE_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 12:
-				blockState = Blocks.RED_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 13:
-				blockState = Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 14:
-				blockState = Blocks.WHITE_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			case 15:
-				blockState = Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState();
-				break;
-			default:
-				return Blocks.BLACK_GLAZED_TERRACOTTA.getDefaultState();
-		}
-		return blockState.with(GlazedTerracottaBlock.HORIZONTAL_FACING, getFacingSouthWestNorthEast(facing));
-	}
-
 	private static BlockState getAnvilWithData(int material, int data)
     {
 		Direction orientation = getBit(data, 0) == 0 ? Direction.NORTH : Direction.WEST;
@@ -1910,7 +1931,6 @@ public class LegacyMaterials
 				return Blocks.ACACIA_LOG.getDefaultState();
 		}
 	}
-    
 	
     private static BlockState getQuartzBlockWithData(int data)
     {
@@ -1929,7 +1949,6 @@ public class LegacyMaterials
 				return Blocks.QUARTZ_PILLAR.getDefaultState().with(RotatedPillarBlock.AXIS, Direction.Axis.Z);
 		}
 	}
-    
 
 	private static BlockState getTorchWithData(int material, int data)
 	{
@@ -1987,7 +2006,6 @@ public class LegacyMaterials
 				return null;
 		}
 	}
-	
 
 	private static BlockState getRailsWithData(int material, int data)
 	{
@@ -2005,7 +2023,6 @@ public class LegacyMaterials
 				return null;
 		}
 	}
-	
 	
 	private static BlockState getStairsWithData(int material, int data)
 	{
@@ -2029,7 +2046,7 @@ public class LegacyMaterials
 			case 4:			
 				output = Blocks.COBBLESTONE_STAIRS.getDefaultState();
 				break;
-			case 5:			
+			case 5:
 				output = Blocks.BRICK_STAIRS.getDefaultState();
 				break;
 			case 6:
@@ -2056,15 +2073,17 @@ public class LegacyMaterials
 			case 13:			
 				output = Blocks.PURPUR_STAIRS.getDefaultState();
 				break;
+			case 14:
+				output = Blocks.STONE_BRICK_STAIRS.getDefaultState();
+				break;
 			default:
 				return null;
-		}	
+		}
 		return output
 			.with(StairsBlock.FACING, getFacingEastWestSouthNorth(facing))
 			.with(StairsBlock.HALF, half == 0 ? Half.BOTTOM : Half.TOP);
 	}
 	
-
 	private static BlockState getLeverOrButtonWithData(int material, int data)
 	{
 		int facing = getBits(data, 0, 3);
@@ -2083,7 +2102,6 @@ public class LegacyMaterials
 				return null;
 		}
 	}
-	
 	
 	private static BlockState getDoorWithData(int material, int data)
 	{
@@ -2138,14 +2156,12 @@ public class LegacyMaterials
 		;
 	}
 	
-
 	private static BlockState getSignPostWithData(int data)
 	{	
 		int rotation = getBits(data, 0, 4);
 		// TODO: Hopefully rotation is still mapped to the same int values as 1.12..
 		return Blocks.OAK_SIGN.getDefaultState().with(StandingSignBlock.ROTATION, rotation); 
 	}
-	
 
 	private static BlockState getWallSignWithData(int data)
 	{
@@ -2153,7 +2169,6 @@ public class LegacyMaterials
 		return Blocks.OAK_WALL_SIGN.getDefaultState().with(WallSignBlock.FACING, getFacingNorthSouthWestEast(facing));
 	}
 	
-
 	// TODO: Can't find information on 1.12 command block block data, what about facing?
 	private static BlockState getCommandBlockWithData(int material, int data)
 	{
@@ -2174,7 +2189,6 @@ public class LegacyMaterials
 		}
 		return blockState;
 	}
-	
 	
 	// TODO: Can't find information on 1.12 command block block data, what about facing?
 	private static BlockState getShulkerBoxWithData(int material, int data)
@@ -2238,7 +2252,6 @@ public class LegacyMaterials
 		}		
 		return blockState.with(ShulkerBoxBlock.FACING, getFacingDownEastNorthSouthUpWest(data));
 	}
-
 	
 	private static BlockState getLadderChestOrFurnaceWithData(int material, int data)
 	{
@@ -2262,7 +2275,6 @@ public class LegacyMaterials
 		}
 	}
 	
-	
 	private static BlockState getDispenserHopperDropperWithData(int material, int data)
 	{
 		int facing = getBits(data, 0, 3);
@@ -2280,7 +2292,6 @@ public class LegacyMaterials
 		}
 	}
 
-
     private static BlockState getJackOLanternOrPumpkinWithData(int material, int data)
     {
     	int facing = getBits(data, 0, 2);
@@ -2295,19 +2306,17 @@ public class LegacyMaterials
     	}
 	}
     
-    
 	private static BlockState getObserverWithData(int data)
 	{
 		int facing = getBits(data, 0, 3);
 		int powered = getBit(data, 3);
 		return Blocks.OBSERVER.getDefaultState().with(ObserverBlock.FACING, getFacingDownUpNorthSouthWestEast(facing)).with(ObserverBlock.POWERED, powered == 1);
 	}
-	
     
 	private static BlockState getRepeaterWithData(int material, int data)
 	{
 		int facing = getBits(data, 0, 2);
-		int delay = getBits(data, 2, 2);
+		int delay = getBits(data, 2, 2) + 1;
 		BlockState blockState;
 		switch(material)
 		{
@@ -2323,9 +2332,8 @@ public class LegacyMaterials
 		return blockState
 			.with(RepeaterBlock.DELAY, delay)
 			.with(RepeaterBlock.HORIZONTAL_FACING, getFacingNorthEastSouthWest(facing))
-		;	
+		;
 	}
-	
 	
 	private static BlockState getComparatorWithData(int material, int data)
 	{
@@ -2339,7 +2347,6 @@ public class LegacyMaterials
 		;
 	}
 	
-	
 	private static BlockState getBedBlockWithData(int data)
 	{
 		int facing = getBits(data, 0, 2);
@@ -2351,7 +2358,6 @@ public class LegacyMaterials
 			.with(BedBlock.PART, part == 0 ? BedPart.FOOT : BedPart.HEAD)
 		;
 	}
-	
 	
 	private static BlockState getTrapDoorBlockWithData(int material, int data)
 	{
@@ -2377,7 +2383,6 @@ public class LegacyMaterials
 		;
 	}
 	
-	
 	private static BlockState getPistonWithData(int material, int data)
 	{
 		int facing = getBits(data, 0, 3);
@@ -2393,8 +2398,6 @@ public class LegacyMaterials
 		}
 	}
 	
-	
-
 	private static BlockState getPistonHeadWithData(int data)
 	{
 		int facing = getBits(data, 0, 3);
@@ -2404,8 +2407,6 @@ public class LegacyMaterials
 			.with(PistonHeadBlock.TYPE, type == 0 ? PistonType.DEFAULT : PistonType.STICKY)			
 		;
 	}
-	
-	
 
 	private static BlockState getHugeMushroomWithData(int material, int data)
 	{
@@ -2442,8 +2443,6 @@ public class LegacyMaterials
 		;
 	}
 	
-	
-	
 	private static BlockState getVineWithData(int data)
 	{
 		int south = getBit(data, 0);
@@ -2459,8 +2458,6 @@ public class LegacyMaterials
 			.with(VineBlock.UP, up == 1)
 		;
 	}
-	
-	
 	
 	private static BlockState getFenceGateWithData(int material, int data)
 	{
@@ -2496,15 +2493,12 @@ public class LegacyMaterials
 		;
 	}
 	
-	
-	
 	private static BlockState getCocoaWithData(int data)
 	{
 		int facing = getBits(data, 0, 2);
 		int age = getBits(data, 2, 2);
 		return Blocks.COCOA.getDefaultState().with(CocoaBlock.HORIZONTAL_FACING, getFacingNorthEastSouthWest(facing)).with(CocoaBlock.AGE, age);
 	}
-	
 	
     private static BlockState getTripWireHookWithData(int data)
     {
@@ -2531,11 +2525,79 @@ public class LegacyMaterials
 		return Blocks.STRUCTURE_BLOCK.getDefaultState().with(StructureBlock.MODE, structureBlockMode);
 	}
 	
-    //
-    
+	private static BlockState getGlazedTerracottaWithData(int material, int data)
+	{
+		int facing = getBits(data, 0, 2);
+		BlockState blockState;
+		switch(material)
+		{
+			case 0:
+				blockState = Blocks.BLACK_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 1:
+				blockState = Blocks.BLUE_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 2:
+				blockState = Blocks.BROWN_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 3:
+				blockState = Blocks.CYAN_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 4:
+				blockState = Blocks.GRAY_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 5:
+				blockState = Blocks.GREEN_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 6:
+				blockState = Blocks.LIGHT_BLUE_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 7:
+				blockState = Blocks.LIME_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 8:
+				blockState = Blocks.MAGENTA_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 9:
+				blockState = Blocks.ORANGE_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 10:
+				blockState = Blocks.PINK_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 11:
+				blockState = Blocks.PURPLE_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 12:
+				blockState = Blocks.RED_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 13:
+				blockState = Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 14:
+				blockState = Blocks.WHITE_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			case 15:
+				blockState = Blocks.YELLOW_GLAZED_TERRACOTTA.getDefaultState();
+				break;
+			default:
+				return Blocks.BLACK_GLAZED_TERRACOTTA.getDefaultState();
+		}
+		return blockState.with(GlazedTerracottaBlock.HORIZONTAL_FACING, getFacingSouthWestNorthEast(facing));
+	}
 	
-	//
-    
+	private static BlockState getTripWireWithData(int data)
+	{
+		int active = getBit(data, 0);
+		int attached = getBit(data, 2);
+		int disarmed = getBit(data, 3);
+		return Blocks.TRIPWIRE.getDefaultState()
+			.with(TripWireBlock.POWERED, active == 1)
+			.with(TripWireBlock.ATTACHED, attached == 1)
+			.with(TripWireBlock.DISARMED, disarmed == 1)
+		;
+	}
+	
+	//    
 
 	private static Direction.Axis getAxisXYZ(int data)
 	{
@@ -2564,8 +2626,6 @@ public class LegacyMaterials
 				return Direction.Axis.X;
     	}
 	}
-	    
-	
     
     private static Direction getFacingSouthWestNorthEast(int data)
     {
@@ -2671,29 +2731,7 @@ public class LegacyMaterials
 			default:
 				return Direction.EAST;
     	}
-    }
-        
-    private static Direction getFacingDownEastWestSouthNorthUp(int data)
-    {
-    	switch(data)
-    	{
-    		case 0:
-    			return Direction.DOWN;    			
-    		case 1:
-    			return Direction.EAST;
-    		case 2:
-    			return Direction.WEST;
-    		case 3:
-    			return Direction.SOUTH;
-    		case 4:
-    			return Direction.NORTH;
-    		case 5:
-    			return Direction.UP;
-			default:
-				return Direction.DOWN;
-    	}
-    }   
-    
+    }           
 	
     private static Direction getFacingEastWestSouthNorth(int data)
     {
@@ -2711,7 +2749,6 @@ public class LegacyMaterials
 				return Direction.EAST;
     	}
     }
-	
 	
 	// TODO: Couldn't find docs for 1.12.2 shulker box  
 	// data values, these rotations may be incorrect.
@@ -2805,8 +2842,6 @@ public class LegacyMaterials
 	}    
 	
     //
-    
-	
 
 	private static int getBits(int source, int index, int length)
 	{
@@ -2818,10 +2853,8 @@ public class LegacyMaterials
 		return bits;
 	}
 	
-	
-	
 	private static int getBit(int source, int index)
 	{
-		return (source & (1 << index));
+		return ((source & (1 << index)) >> index);
 	}
 }

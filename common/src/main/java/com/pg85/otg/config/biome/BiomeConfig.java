@@ -866,7 +866,7 @@ public class BiomeConfig extends ConfigFile
         writer.addConfigFunctions(this.resourceSequence);
 
         writer.bigTitle("Sapling resource",
-            PluginStandardValues.PLUGIN_NAME + " allows you to grow your custom objects from saplings, instead",
+            PluginStandardValues.MOD_ID + " allows you to grow your custom objects from saplings, instead",
             "of the vanilla trees. Add one or more Sapling functions here to override vanilla",
             "spawning for that sapling.",
             "",

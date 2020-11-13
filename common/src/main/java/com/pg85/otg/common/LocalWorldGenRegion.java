@@ -29,13 +29,14 @@ public abstract class LocalWorldGenRegion
 	{
 		return this.worldConfig;
 	}
-	
+		
 	public long getSeed()
 	{
 		return this.seed;
 	}
 	
 	public abstract String getWorldName();
+	public abstract Random getWorldRandom();
 	public abstract LocalBiome getBiome(int x, int z);
 	public abstract BiomeConfig getBiomeConfig(int x, int z) throws BiomeNotFoundException;
 	public abstract boolean placeTree(TreeType type, Random rand, int x, int y, int z);
@@ -48,8 +49,9 @@ public abstract class LocalWorldGenRegion
 	public abstract int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated);
 	public abstract void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks);
 	public abstract void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean replaceBlocks);
-
-	//
+	public abstract double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);
+	
+	//	
 	
 	public abstract void spawnEntity(EntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate);
 	public abstract boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);
@@ -64,10 +66,7 @@ public abstract class LocalWorldGenRegion
 	
 	// Do we still need this?
 	public abstract SpawnableObject getMojangStructurePart(String path);
-	
-	// TODO: Implement this when 1.16 noisegen is done.
-	public abstract double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);
-	
+		
 	// TODO: Do we still need this with the new biome/chunkgen?
 	public abstract BiomeGenerator getBiomeGenerator();
 }

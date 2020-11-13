@@ -36,8 +36,8 @@ public class WorldSaveData
     
 	public static void saveWorldSaveData(Path worldSaveDir, WorldSaveData worldSaveData)
 	{
-		File worldSaveDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataFileName);
-		File worldSaveDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataBackupFileName);
+		File worldSaveDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.WorldSaveDataFileName);
+		File worldSaveDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.WorldSaveDataBackupFileName);
 
 		StringBuilder stringbuilder = new StringBuilder();
 		stringbuilder.append(worldSaveData.version);
@@ -78,8 +78,8 @@ public class WorldSaveData
 		
 	public static WorldSaveData loadWorldSaveData(Path worldSaveDir)
 	{
-		File worldSaveDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataFileName);
-		File worldSaveDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.PLUGIN_NAME + File.separator + WorldStandardValues.WorldSaveDataBackupFileName);
+		File worldSaveDataFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.WorldSaveDataFileName);
+		File worldSaveDataBackupFile = new File(worldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.WorldSaveDataBackupFileName);
 		
 		if(!worldSaveDataFile.exists() && !worldSaveDataBackupFile.exists())
 		{

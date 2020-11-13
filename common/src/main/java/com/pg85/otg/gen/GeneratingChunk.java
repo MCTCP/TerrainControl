@@ -21,7 +21,7 @@ public final class GeneratingChunk
     private final byte[] waterLevel;
     private final double[] surfaceNoise;
 
-    GeneratingChunk(Random random, byte[] waterLevel, double[] surfaceNoise, int heightCap)
+    public GeneratingChunk(Random random, byte[] waterLevel, double[] surfaceNoise, int heightCap)
     {
         this.random = random;
         this.waterLevel = waterLevel;

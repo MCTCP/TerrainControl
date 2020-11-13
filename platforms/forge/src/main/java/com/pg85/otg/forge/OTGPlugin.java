@@ -23,8 +23,8 @@ import com.pg85.otg.forge.commands.OTGCommand;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 
 // The value here should match an entry in the META-INF/mods.toml files
-@Mod(PluginStandardValues.MOD_ID)
-@Mod.EventBusSubscriber(modid = PluginStandardValues.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod(PluginStandardValues.MOD_ID_SHORT)
+@Mod.EventBusSubscriber(modid = PluginStandardValues.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class OTGPlugin
 {   	
 	// TODO: Use custom DimensionSettings?

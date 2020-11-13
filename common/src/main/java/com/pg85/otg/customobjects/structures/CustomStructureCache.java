@@ -277,22 +277,22 @@ public class CustomStructureCache
 				{
 					throw new RuntimeException("This shouldn't happen, please ask for help on the OTG Discord and/or file an issue on the OTG github.");
 				}
-					
+
 				for(ChunkCoordinate chunkCoord : loadedStructure.getValue())
 				{
 					addToWorldInfoChunks(loadedStructure.getKey(), chunkCoord, false);
 				}
-	
+
 				for(ModDataFunction<?> modDataFunc : loadedStructure.getKey().modDataManager.modData)
 				{
 					addToWorldInfoChunks(loadedStructure.getKey(), ChunkCoordinate.fromBlockCoords(modDataFunc.x, modDataFunc.z), false);
 				}
-	
+
 				for(SpawnerFunction<?> spawnerFunc : loadedStructure.getKey().spawnerManager.spawnerData)
 				{
 					addToWorldInfoChunks(loadedStructure.getKey(), ChunkCoordinate.fromBlockCoords(spawnerFunc.x, spawnerFunc.z), false);
 				}
-	
+
 				for(ParticleFunction<?> particleFunc : loadedStructure.getKey().particlesManager.particleData)
 				{
 					addToWorldInfoChunks(loadedStructure.getKey(), ChunkCoordinate.fromBlockCoords(particleFunc.x, particleFunc.z), false);
