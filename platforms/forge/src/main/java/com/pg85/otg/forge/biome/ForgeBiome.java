@@ -2,6 +2,9 @@ package com.pg85.otg.forge.biome;
 
 import com.pg85.otg.common.LocalBiome;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfig.MineshaftType;
+import com.pg85.otg.config.biome.BiomeConfig.RareBuildingType;
+import com.pg85.otg.config.biome.BiomeConfig.VillageType;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.util.BiomeIds;
 
@@ -14,6 +17,7 @@ import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.BiomeGenerationSettings.Builder;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.MoodSoundAmbience;
+import net.minecraft.world.gen.feature.structure.StructureFeatures;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
 
 public class ForgeBiome implements LocalBiome
@@ -62,8 +66,6 @@ public class ForgeBiome implements LocalBiome
 
 	public static Biome createOTGBiome(BiomeConfig biomeConfig)
 	{
-		// TODO: These were taken from BiomeMaker Plains biome, there may still be resources missing.
-
 		BiomeGenerationSettings.Builder biomeGenerationSettingsBuilder = new BiomeGenerationSettings.Builder();
 
 		// Mob spawning
@@ -73,25 +75,10 @@ public class ForgeBiome implements LocalBiome
 		biomeGenerationSettingsBuilder.func_242517_a(ConfiguredSurfaceBuilders.field_244184_p);
 
 		// Default structures
-		// TODO: Add missing structure types
-		
-		// Villages 
-		addVillages(biomeGenerationSettingsBuilder, biomeConfig);	
-
-		// Mineshafts
-		addMineShafts(biomeGenerationSettingsBuilder, biomeConfig);
-
-		// Ruined portals
-		addRuinedPortals(biomeGenerationSettingsBuilder, biomeConfig);
-
-		//
+		addDefaultStructures(biomeGenerationSettingsBuilder, biomeConfig);
 		
 		// Carvers
 		addCarvers(biomeGenerationSettingsBuilder, biomeConfig);
-
-		// Underground structures
-		// TODO: What are these?
-		addUnderGroundStructures(biomeGenerationSettingsBuilder, biomeConfig);
 
 	    float safeTemperature = biomeConfig.biomeTemperature;
 	    if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
@@ -178,27 +165,130 @@ public class ForgeBiome implements LocalBiome
 	
 	private static void addCarvers(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig2)
 	{
-		//DefaultBiomeFeatures.func_243738_d(biomegenerationsettings$builder);
+		//DefaultBiomeFeatures.func_243738_d(biomeGenerationSettingsBuilder);
 	}
 
-	private static void addUnderGroundStructures(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig2)
+	private static void addDefaultStructures(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig)
 	{
-		//DefaultBiomeFeatures.func_243746_h(biomegenerationsettings$builder);
-	}
-	
-	private static void addRuinedPortals(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig2)
-	{
-		//biomegenerationsettings$builder.func_242516_a(StructureFeatures.field_244159_y);
-	}
+		// TODO: Village size, distance.
+		if(biomeConfig.worldConfig.villagesEnabled)
+		{
+			if(biomeConfig.villageType == VillageType.sandstone)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244155_u); // village_desert			
+			}
+			else if(biomeConfig.villageType == VillageType.savanna)
+	        {
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244156_v); // village_savanna
+	        }
+			else if(biomeConfig.villageType == VillageType.taiga)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244158_x); // village_taiga			
+			}
+			else if(biomeConfig.villageType == VillageType.wood)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244154_t); // village_plains
+			}
+			else if(biomeConfig.villageType == VillageType.snowy)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244157_w); // village_snowy
+			}
+		}
+		
+		// TODO: Stronghold count, distance, spread.
+		if(biomeConfig.worldConfig.strongholdsEnabled)
+		{
+			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244145_k);
+		}
+				
+		// TODO: Ocean monument gridsize, offset.
+		if(biomeConfig.worldConfig.oceanMonumentsEnabled)
+		{
+			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244146_l);
+		}
+		
+		// TODO: Min/max distance for rare buildings.
+		if(biomeConfig.worldConfig.rareBuildingsEnabled)
+		{
+			if(biomeConfig.rareBuildingType == RareBuildingType.desertPyramid)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244140_f);
+			}		
+			if(biomeConfig.rareBuildingType == RareBuildingType.igloo)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244141_g);
+			}		
+			if(biomeConfig.rareBuildingType == RareBuildingType.jungleTemple)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244139_e);
+			}
+			if(biomeConfig.rareBuildingType == RareBuildingType.swampHut)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244144_j);
+			}
+		}
+		
+		if(biomeConfig.woodLandMansionsEnabled)
+		{
+			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244138_d);
+		}
+		
+		if(biomeConfig.netherFortressesEnabled)
+		{
+			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244149_o);
+		}
 
-	private static void addMineShafts(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig2)
-	{
-		//DefaultBiomeFeatures.func_243733_b(biomegenerationsettings$builder);
-	}
-
-	private static void addVillages(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig2)
-	{
-		//biomegenerationsettings$builder.func_242516_a(StructureFeatures.field_244154_t).func_242516_a(StructureFeatures.field_244135_a);
+		// TODO: Mineshaft rarity.
+		if(biomeConfig.worldConfig.mineshaftsEnabled)
+		{
+			if(biomeConfig.mineshaftType == MineshaftType.normal)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244136_b);
+			}
+			else if(biomeConfig.mineshaftType == MineshaftType.mesa)
+			{
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244137_c);
+			}
+		}
+		
+		// Buried Treasure
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244152_r); // buried_treasure		
+		
+		// Ocean Ruins
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244147_m); // ocean_ruin_cold
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244148_n); // ocean_ruin_warm
+				
+		// Shipwreck
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244142_h); // shipwreck
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244143_i); // shipwreck_beached		
+		
+		// Pillager Outpost
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244135_a);
+		
+		// Bastion Remnant
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244153_s);
+		
+		// Nether Fossil
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244150_p);
+		
+		// End City
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244151_q); // end_city		
+		
+		// Ruined Portal
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244159_y); // ruined_portal
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244160_z); // ruined_portal_desert
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244130_A); // ruined_portal_jungle
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244131_B); // ruined_portal_swamp
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244132_C); // ruined_portal_mountain
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244133_D); // ruined_portal_ocean
+		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244134_E); // ruined_portal_nether
+		
+		// TODO: Fossil
+		// TODO: Amethyst Geode (1.17?)
+		
+		// Misc structures: These structures generate even when the "Generate structures" world option is disabled, and also cannot be located with the /locate command.
+		// TODO: Dungeon
+		// TODO: Desert Well
 	}
 	
 	private static int getSkyColorForTemp(float p_244206_0_)

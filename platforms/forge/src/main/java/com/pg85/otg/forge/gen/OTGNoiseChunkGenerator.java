@@ -255,16 +255,14 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public int func_222529_a(int p_222529_1_, int p_222529_2_, Type heightmapType)
 	{
-		// Not used for OTG dimensions
-		// TODO: Make sure this won't cause problems, hook up via NewOTGChunkGenerator?		
+		// TODO: Used for structure spawning, implement this. See NoiseChunkGenerator func_222529_a
 		return 0;
 	}
 
 	@Override
 	public IBlockReader func_230348_a_(int p_230348_1_, int p_230348_2_)
 	{
-		// Not used for OTG dimensions
-		// TODO: Make sure this won't cause problems, hook up via NewOTGChunkGenerator?
+		// TODO: Used for structure spawning, implement this. See NoiseChunkGenerator func_230348_a_
 		return null;
 	}
 	

@@ -171,7 +171,8 @@ public class BiomeConfig extends ConfigFile
         wood,
         sandstone,
         taiga,
-        savanna
+        savanna,
+        snowy
     }
 
     public VillageType villageType;
@@ -916,7 +917,7 @@ public class BiomeConfig extends ConfigFile
             "Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
 
         writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, villageType,
-            "The village type in this biome. Can be wood, sandstone, taiga, savanna or disabled.");
+            "The village type in this biome. Can be wood, sandstone, taiga, savanna, snowy or disabled.");
 
         writer.putSetting(BiomeStandardValues.MINESHAFT_TYPE, mineshaftType,
             "The mineshaft type in this biome. Can be normal, mesa or disabled.");
