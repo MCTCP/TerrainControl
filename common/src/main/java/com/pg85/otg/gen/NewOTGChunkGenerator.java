@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
@@ -467,7 +468,8 @@ public class NewOTGChunkGenerator
                 // The following code is executed for each column in the chunk
 
                 // Get the current biome config and some properties
-                BiomeConfig biomeConfig = this.getBiomeAt(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+				// TODO: Technically, we should be providing the hashed seed here. Perhaps this may work for the time being?
+                BiomeConfig biomeConfig = BiomeInterpolator.getConfig(this.seed, chunkCoord.getBlockX() + x, 0, chunkCoord.getBlockZ() + z, this.biomeGenerator);
                 biomeConfig.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
 
                 // End of code for each column
