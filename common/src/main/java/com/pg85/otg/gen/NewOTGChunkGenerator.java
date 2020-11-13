@@ -454,38 +454,33 @@ public class NewOTGChunkGenerator
 	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
 	public void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
 	{
+		// Process surface and ground blocks for each column in the chunk
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
-
-        final double d1 = 0.03125D;
+        double d1 = 0.03125D;
         this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
-
         GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise, heightCap);
-
         for (int x = 0; x < CHUNK_SIZE; x++)
         {
             for (int z = 0; z < CHUNK_SIZE; z++)
             {
-                // The following code is executed for each column in the chunk
-
                 // Get the current biome config and some properties
 				// TODO: Technically, we should be providing the hashed seed here. Perhaps this may work for the time being?
                 BiomeConfig biomeConfig = BiomeInterpolator.getConfig(this.seed, chunkCoord.getBlockX() + x, 0, chunkCoord.getBlockZ() + z, this.biomeGenerator);
                 biomeConfig.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
-
-                // End of code for each column
             }
         }
 	}
-	
+
     private int lastX = Integer.MAX_VALUE;
     private int lastZ = Integer.MAX_VALUE;
     private double lastNoise = 0;
+    // Used by sagc for generating surface/ground block patterns
     public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
     {
     	double noise = this.lastNoise;
     	if(this.lastX != blockX || this.lastZ != blockZ)
     	{
-        	final double d1 = 0.03125D;
+        	double d1 = 0.03125D;
         	noise = this.biomeBlocksNoiseGen.getRegion(new double[1], blockX, blockZ, 1, 1, d1 * 2.0D, d1 * 2.0D, 1.0D)[0];
         	this.lastX = blockX;
         	this.lastZ = blockZ;
