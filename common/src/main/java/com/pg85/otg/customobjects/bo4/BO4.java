@@ -217,12 +217,12 @@ public class BO4 implements StructuredCustomObject
     	BiomeConfig biomeConfig3 = null;
     	BiomeConfig biomeConfig4 = null;
 
-    	biomeConfig = worldGenRegion.getBiomeConfig(x, z);
+    	biomeConfig = worldGenRegion.getBiomeConfigForPopulation(x, z, chunkBeingPopulated);
     	if(replaceWithBiomeBlocks)
     	{
-    		biomeConfig2 = worldGenRegion.getBiomeConfig(x + 15, z);
-    		biomeConfig3 = worldGenRegion.getBiomeConfig(x, z + 15);
-    		biomeConfig4 = worldGenRegion.getBiomeConfig(x + 15, z + 15);
+    		biomeConfig2 = worldGenRegion.getBiomeConfigForPopulation(x + 15, z, chunkBeingPopulated);
+    		biomeConfig3 = worldGenRegion.getBiomeConfigForPopulation(x, z + 15, chunkBeingPopulated);
+    		biomeConfig4 = worldGenRegion.getBiomeConfigForPopulation(x + 15, z + 15, chunkBeingPopulated);
 
 	        if(!(biomeConfig == biomeConfig2 && biomeConfig == biomeConfig3 && biomeConfig == biomeConfig4))
 	        {
@@ -327,7 +327,7 @@ public class BO4 implements StructuredCustomObject
 	
 	                if(isOnBiomeBorder)
 	                {
-	                	biomeConfig = worldGenRegion.getBiomeConfig(x + newBlock.x, z + newBlock.z);
+	                	biomeConfig = worldGenRegion.getBiomeConfigForPopulation(x + newBlock.x, z + newBlock.z, chunkBeingPopulated);
 	                }
 		        	
 		        	// TODO: See BlockFunction.Spawn for what should be done with metadata
@@ -521,7 +521,7 @@ public class BO4 implements StructuredCustomObject
 	
 	                if(isOnBiomeBorder)
 	                {
-		                biomeConfig = worldGenRegion.getBiomeConfig(x + block.x, z + block.z);
+		                biomeConfig = worldGenRegion.getBiomeConfigForPopulation(x + block.x, z + block.z, chunkBeingPopulated);
 	                }
 	        		
 	    			if(replaceAboveMaterial != null && doReplaceAboveBelowOnly)

@@ -43,7 +43,7 @@ public class FrozenSurfaceHelper
      */
     private void freezeColumn(LocalWorldGenRegion worldGenRegion, int x, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        LocalBiome biome = worldGenRegion.getBiome(x, z);
+        LocalBiome biome = worldGenRegion.getBiomeForPopulation(x, z, chunkBeingPopulated);
         if (biome != null)
         {
             int blockToFreezeY = worldGenRegion.getHighestBlockAboveYAt(x, z, chunkBeingPopulated);
@@ -70,7 +70,7 @@ public class FrozenSurfaceHelper
      */
     private boolean freezeLiquid(LocalWorldGenRegion worldGenRegion, int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
     {
-        BiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(x, z);
+        BiomeConfig biomeConfig = worldGenRegion.getBiomeConfigForPopulation(x, z, chunkBeingPopulated);
         if (biomeConfig != null)
         {
             LocalMaterialData materialToFreeze = worldGenRegion.getMaterial(x, y, z, chunkBeingPopulated);

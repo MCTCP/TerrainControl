@@ -1,7 +1,5 @@
 package com.pg85.otg.common.materials;
 
-import com.pg85.otg.gen.resource.PlantType;
-
 public class LocalMaterials
 {
     // Block names used in OTG code as default values

@@ -9,11 +9,13 @@ import com.pg85.otg.gen.resource.Resource;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class ChunkPopulator
 {
     private final Random rand;
+    private boolean processing = false;
    
     public ChunkPopulator()
     {
@@ -22,9 +24,31 @@ public class ChunkPopulator
 
     public void populate(ChunkCoordinate chunkCoord, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled)
     {
-		// Cache all biomes in the are being populated (2x2 chunks)
-		//world.cacheBiomesForPopulation(chunkCoord);
-		
+		if (!this.processing)
+		{
+			this.processing = true;
+
+			// Cache all biomes in the are being populated (2x2 chunks)
+			worldGenRegion.cacheBiomesForPopulation(chunkCoord);
+			doPopulate(chunkCoord, structureCache, worldGenRegion, biomeConfig, isBO4Enabled);
+			
+			this.processing = false;
+		} else {
+
+			// Don't use the population chunk biome cache during cascading chunk generation
+			worldGenRegion.invalidatePopulationBiomeCache();
+			doPopulate(chunkCoord, structureCache, worldGenRegion, biomeConfig, isBO4Enabled);
+			
+			OTG.log(LogMarker.INFO, "Cascading chunk generation detected.");
+			if(OTG.getPluginConfig().developerMode)
+			{			
+				OTG.log(LogMarker.INFO, Arrays.toString(Thread.currentThread().getStackTrace()));
+			}
+		}
+    }
+    	
+    public void doPopulate(ChunkCoordinate chunkCoord, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled)
+    {    	
         // Get the corner block coords
         int x = chunkCoord.getChunkX() * 16;
         int z = chunkCoord.getChunkZ() * 16;

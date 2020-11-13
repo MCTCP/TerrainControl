@@ -44,6 +44,10 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	private final OTGNoiseChunkGenerator chunkGenerator;
 	private final String worldName;
 	
+    // 32x32 biomes cache for fast lookups during population
+    private LocalBiome[][] cachedBiomeConfigs;
+    private boolean cacheIsValid;
+	
 	public ForgeWorldGenRegion(String worldName, long worldSeed, WorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(worldConfig, worldSeed);
@@ -98,7 +102,54 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		return null;
 	}
+	
+	// A 32x32 cache of biomes is filled when population starts for each chunk, any resource 
+	// spawning during population should use getBiomeForPopulation/getBiomeConfigForPopulation 
+	// for any operation that is intended to stay within population bounds.
 
+    @Override
+    public LocalBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    {
+    	// Cache is invalidated when cascading chunkgen happens.
+    	return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+    }
+	
+    @Override
+    public BiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    {
+    	// Cache is invalidated when cascading chunkgen happens.
+    	return !cacheIsValid ? getBiome(worldZ, worldX).getBiomeConfig() : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()].getBiomeConfig();
+    }
+
+	@Override
+	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
+	{
+		this.cachedBiomeConfigs = new LocalBiome[32][32];
+		
+		int areaSize = 32; 
+		for(int x = 0; x < areaSize; x++)
+		{
+			for(int z = 0; z < areaSize; z++)
+			{
+				this.cachedBiomeConfigs[x][z] = getBiome(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+			}
+		}
+		this.cacheIsValid = true;
+	}
+	
+	// Population biome cache is invalidated when cascading chunkgen happens
+	@Override
+	public void invalidatePopulationBiomeCache()
+	{
+		this.cacheIsValid = false;
+	}
+
+	@Override
+    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+    {
+    	return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
+    }	
+	
 	// TODO: Create tree configs that don't do rarity/chance rolls (we've already done that),
 	// and make sure they look more or less the same as 1.12.2.
 	@Override
@@ -445,21 +496,19 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
     	// If a chunk was passed, only spawn in the area being populated.
     	if(chunkBeingPopulated == null || OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
     	{
-    		/*
     		if(replaceBlocks)
     		{
         		if(biomeConfig == null)
         		{
         			if(chunkBeingPopulated == null)
         			{
-        				biomeConfig = this.getBiome(x, z).getBiomeConfig();
+        				biomeConfig = this.getBiomeConfig(x, z);
         			} else {
-        				biomeConfig = this.getBiomeForPopulation(x, z, chunkBeingPopulated).getBiomeConfig();
+        				biomeConfig = this.getBiomeConfigForPopulation(x, z, chunkBeingPopulated);
         			}
         		}
-    			material = material.parseWithBiomeAndHeight(this, biomeConfig, y);
+    			material = material.parseWithBiomeAndHeight(biomeConfig, y);
     		}
-    		*/
     		this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);    		
     	}
 	}
@@ -533,10 +582,4 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Do we still need this with the new biome/chunkgen?
 		return null;
 	}
-
-	@Override
-    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
-    {
-    	return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
-    }
 }

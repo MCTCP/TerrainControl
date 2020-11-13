@@ -69,7 +69,7 @@ public class SmoothingAreaColumn
 	
 	private void spawn(LocalWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, BO4Config bo4Config)
 	{
-		BiomeConfig biomeConfig = worldGenRegion.getBiomeConfig(this.x, this.z);
+		BiomeConfig biomeConfig = worldGenRegion.getBiomeConfigForPopulation(this.x, this.z, chunkBeingPopulated);
 
 		LocalMaterialData replaceAboveMaterial = null;
 		try {
