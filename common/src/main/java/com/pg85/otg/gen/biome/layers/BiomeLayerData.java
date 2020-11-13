@@ -15,7 +15,7 @@ public class BiomeLayerData
 {
 	public int generationDepth = 10;
 	public int landSize = 0;
-	public int landFuzzy = 0;
+	public int landFuzzy = 5;
 	public int landRarity = 99;
 	public Map<Integer, List<NewBiomeGroup>> groups = new HashMap<>();
 	public List<Integer> biomeDepths = new ArrayList<>(); // Depths with biomes
