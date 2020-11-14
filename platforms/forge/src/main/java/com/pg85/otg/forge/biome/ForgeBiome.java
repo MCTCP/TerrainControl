@@ -15,6 +15,7 @@ import com.pg85.otg.util.BiomeIds;
 
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -79,7 +80,7 @@ public class ForgeBiome implements LocalBiome
 		// Mob spawning
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 		
-		// NOOP surface builder, surface/ground/stone blocks / sagc are during base terrain gen.
+		// NOOP surface builder, surface/ground/stone blocks / sagc are done during base terrain gen.
 		biomeGenerationSettingsBuilder.func_242517_a(ConfiguredSurfaceBuilders.field_244184_p);
 
 		// Default structures
