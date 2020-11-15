@@ -36,22 +36,21 @@ import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraft.world.gen.feature.IFeatureConfig;
+import net.minecraft.world.storage.IServerWorldInfo;
 import net.minecraft.world.gen.WorldGenRegion;
 
 public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
 	private final WorldGenRegion worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
-	private final String worldName;
 	
     // 32x32 biomes cache for fast lookups during population
     private LocalBiome[][] cachedBiomeConfigs;
     private boolean cacheIsValid;
 	
-	public ForgeWorldGenRegion(String worldName, long worldSeed, WorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	public ForgeWorldGenRegion(WorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(worldConfig, worldSeed);
-		this.worldName = worldName;
+		super(worldConfig, worldGenRegion.getSeed());
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -59,7 +58,13 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public String getWorldName()
 	{
-		return this.worldName;
+		return ((IServerWorldInfo)this.worldGenRegion.getWorldInfo()).getWorldName();
+	}
+	
+	@Override
+	public long getSeed()
+	{
+		return this.worldGenRegion.getSeed();
 	}
 	
 	@Override

@@ -1,7 +1,6 @@
 package com.pg85.otg.forge.gen;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -15,6 +14,7 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionsConfig;
 import com.pg85.otg.config.preset.Preset;
+import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -53,12 +53,14 @@ import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.settings.NoiseSettings;
 import net.minecraft.world.spawner.WorldEntitySpawner;
+import net.minecraft.world.storage.IServerWorldInfo;
 
 public final class OTGNoiseChunkGenerator extends ChunkGenerator
 {
 	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
 		(p_236091_0_) -> p_236091_0_.group(
-			BiomeProvider.field_235202_a_.fieldOf("biome_source").forGetter((p_236096_0_) -> p_236096_0_.biomeProvider),
+			// TODO: Add DimensionConfig (required for saving/loading from disk?)
+			OTGBiomeProvider.field_235202_a_.fieldOf("biome_source").forGetter((p_236096_0_) -> p_236096_0_.biomeProvider),
 			Codec.LONG.fieldOf("seed").stable().forGetter((p_236093_0_) -> p_236093_0_.worldSeed),
 			DimensionSettings.field_236098_b_.fieldOf("settings").forGetter((p_236090_0_) -> p_236090_0_.dimensionSettings)
 		).apply(p_236091_0_, p_236091_0_.stable(OTGNoiseChunkGenerator::new))
@@ -72,15 +74,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	private final NewOTGChunkGenerator internalGenerator;
 	private final ChunkPopulator chunkPopulator;
-	// TODO: Move this to WorldLoader when ready
-	private final CustomStructureCache structureCache;
 	
-	// TODO: Hardcoded world/preset name, should be provided via world creation gui / config.yaml.
+	// TODO: Move this to WorldLoader when ready?
+	private CustomStructureCache structureCache;
+	
+	private final DimensionConfig dimensionConfig;
 	private final Preset preset;
-	private final boolean isBo4Enabled = false; // Set to true for BO4 testing.
-	private final String worldName = "New World";
-	private final String presetName = "Default";
-	//
 	
 	// Unloaded chunk data caches for BO4's
 	private final FifoMap<BlockPos2D, LocalMaterialData[]> unloadedBlockColumnsCache;
@@ -89,12 +88,18 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	public OTGNoiseChunkGenerator(BiomeProvider p_i241975_1_, long p_i241975_2_, Supplier<DimensionSettings> p_i241975_4_)
 	{
-		this(p_i241975_1_, p_i241975_1_, p_i241975_2_, p_i241975_4_);
+		// TODO: Generate Default preset on install
+		this(new DimensionConfig(PluginStandardValues.DEFAULT_PRESET_NAME, 0, true), p_i241975_1_, p_i241975_1_, p_i241975_2_, p_i241975_4_);
 	}
 
+	public OTGNoiseChunkGenerator(DimensionConfig dimensionConfig, BiomeProvider p_i241975_1_, long p_i241975_2_, Supplier<DimensionSettings> p_i241975_4_)
+	{
+		this(dimensionConfig, p_i241975_1_, p_i241975_1_, p_i241975_2_, p_i241975_4_);
+	}
+	
 	// TODO: Why are there 2 biome providers, and why does getBiomeProvider() return the second, while we're using the first?
 	// It looks like vanilla just inserts the same biomeprovider twice?
-	private OTGNoiseChunkGenerator(BiomeProvider biomeProvider, BiomeProvider p_i241976_2_, long seed, Supplier<DimensionSettings> p_i241976_5_)
+	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfig, BiomeProvider biomeProvider, BiomeProvider p_i241976_2_, long seed, Supplier<DimensionSettings> p_i241976_5_)
 	{
 		super(biomeProvider, p_i241976_2_, p_i241976_5_.get().func_236108_a_(), seed);
 
@@ -102,7 +107,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
-			
+
+		this.dimensionConfig = dimensionConfig;
 		this.worldSeed = seed;
 		DimensionSettings dimensionsettings = p_i241976_5_.get();
 		this.dimensionSettings = p_i241976_5_;
@@ -118,15 +124,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
         this.unloadedChunksCache = new FifoMap<ChunkCoordinate, IChunk>(128);
         //
 
-		// TODO: Move this to world creation / loading logic, don't use hardcoded values.
-		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.presetName);
-		this.structureCache = new CustomStructureCache(this.worldName, Paths.get("./saves/" + this.worldName + "/"), 0, seed, false); 
-		DimensionsConfig dimensionsConfig = new DimensionsConfig(Paths.get("./saves/" + this.worldName + "/"), this.worldName);
-		dimensionsConfig.WorldName = this.worldName;
-		dimensionsConfig.Overworld = new DimensionConfig(preset.getName(), 0, true, preset.getWorldConfig());	
-		dimensionsConfig.Dimensions = new ArrayList<DimensionConfig>();
-		OTG.setDimensionsConfig(dimensionsConfig);
-		//
+		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.dimensionConfig.PresetName);
         
 		this.internalGenerator = new NewOTGChunkGenerator(seed, (LayerSource) biomeProvider);
 		this.chunkPopulator = new ChunkPopulator();
@@ -136,8 +134,23 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public ChunkGenerator func_230349_a_(long p_230349_1_)
 	{
-		return new OTGNoiseChunkGenerator(this.biomeProvider.func_230320_a_(p_230349_1_), p_230349_1_, this.dimensionSettings);
-	}	
+		return new OTGNoiseChunkGenerator(this.dimensionConfig, this.biomeProvider.func_230320_a_(p_230349_1_), p_230349_1_, this.dimensionSettings);
+	}
+	
+	// TODO: Move this to WorldLoader when ready?
+	private boolean isInitialised = false;
+	private void init(String worldName)
+	{
+		if(!isInitialised)
+		{
+			isInitialised = true;
+			this.structureCache = new CustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus); 
+			DimensionsConfig dimensionsConfig = new DimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName);
+			dimensionsConfig.WorldName = worldName;
+			dimensionsConfig.Overworld = this.dimensionConfig;
+			OTG.setDimensionsConfig(dimensionsConfig);
+		}
+	}
 	
 	// Base terrain gen
 	
@@ -193,8 +206,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Chunk population method taken from Biome (Biome.func_242427_a())
 	public void biomePopulate(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
 	{
+		init(((IServerWorldInfo)p_242427_3_.getWorldInfo()).getWorldName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ());
-		this.chunkPopulator.populate(chunkBeingPopulated, this.structureCache, new ForgeWorldGenRegion(this.worldName, this.worldSeed, this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig, this.isBo4Enabled);
+		this.chunkPopulator.populate(chunkBeingPopulated, this.structureCache, new ForgeWorldGenRegion(this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig);
 	}
 	
 	// Mob spawning on initial chunk spawn (animals).

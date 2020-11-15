@@ -22,7 +22,7 @@ public class ChunkPopulator
         this.rand = new Random();
     }
 
-    public void populate(ChunkCoordinate chunkCoord, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled)
+    public void populate(ChunkCoordinate chunkCoord, CustomStructureCache structureCache, LocalWorldGenRegion worldGenRegion, BiomeConfig biomeConfig)
     {
 		if (!this.processing)
 		{
@@ -30,14 +30,14 @@ public class ChunkPopulator
 
 			// Cache all biomes in the are being populated (2x2 chunks)
 			worldGenRegion.cacheBiomesForPopulation(chunkCoord);
-			doPopulate(chunkCoord, structureCache, worldGenRegion, biomeConfig, isBO4Enabled);
+			doPopulate(chunkCoord, structureCache, worldGenRegion, biomeConfig, worldGenRegion.getWorldConfig().isOTGPlus);
 			
 			this.processing = false;
 		} else {
 
 			// Don't use the population chunk biome cache during cascading chunk generation
 			worldGenRegion.invalidatePopulationBiomeCache();
-			doPopulate(chunkCoord, structureCache, worldGenRegion, biomeConfig, isBO4Enabled);
+			doPopulate(chunkCoord, structureCache, worldGenRegion, biomeConfig, worldGenRegion.getWorldConfig().isOTGPlus);
 			
 			OTG.log(LogMarker.INFO, "Cascading chunk generation detected.");
 			if(OTG.getPluginConfig().developerMode)

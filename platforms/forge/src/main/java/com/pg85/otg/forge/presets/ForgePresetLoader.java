@@ -3,6 +3,7 @@ package com.pg85.otg.forge.presets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +22,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 public class ForgePresetLoader extends LocalPresetLoader
 {
 	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
-	// TODO: Store per preset
-	private ArrayList<RegistryKey<Biome>> biomes = new ArrayList<>();
+	private Map<String,List<RegistryKey<Biome>>> biomesByPresetName = new LinkedHashMap<>();
 	
 	public ForgePresetLoader(Path otgRootFolder)
 	{
@@ -35,10 +35,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 		return this.biomeConfigsByRegistryKey.get(new ResourceLocation(resourceLocationString));
 	}
 	
-	// TODO: Hardcoded to use 1 preset atm (all biomes), make this work per preset
 	public List<RegistryKey<Biome>> getBiomeRegistryKeys(String presetName)
 	{
-		return this.biomes;
+		return this.biomesByPresetName.get(presetName);
 	}
 	
 	@Override
@@ -46,6 +45,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 	{
 		for(Preset preset : this.presets.values())
 		{
+			List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
+			this.biomesByPresetName.put(preset.getName(), presetBiomes);
+			
 			for(BiomeConfig biomeConfig : preset.getAllBiomeConfigs())
 			{
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
@@ -57,7 +59,8 @@ public class ForgePresetLoader extends LocalPresetLoader
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
  				ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString());
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
- 				this.biomes.add(RegistryKey.func_240903_a_(Registry.field_239720_u_, resourceLocation));
+ 				
+ 				presetBiomes.add(RegistryKey.func_240903_a_(Registry.field_239720_u_, resourceLocation));
 
  				if(biomeConfig.getRegistryKey().toResourceLocationString().equals("otg:default.ocean"))
  				{

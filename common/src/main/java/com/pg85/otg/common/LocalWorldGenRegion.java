@@ -17,25 +17,19 @@ import com.pg85.otg.util.minecraft.defaults.TreeType;
 public abstract class LocalWorldGenRegion
 {
 	private WorldConfig worldConfig;
-	private long seed;
 	
 	protected LocalWorldGenRegion(WorldConfig worldConfig, long seed)
 	{
 		this.worldConfig = worldConfig;
-		this.seed = seed;
 	}
 	
 	public WorldConfig getWorldConfig()
 	{
 		return this.worldConfig;
 	}
-		
-	public long getSeed()
-	{
-		return this.seed;
-	}
-	
+
 	public abstract String getWorldName();
+	public abstract long getSeed();	
 	public abstract Random getWorldRandom();
 	public abstract LocalBiome getBiome(int x, int z);
 	public abstract BiomeConfig getBiomeConfig(int x, int z) throws BiomeNotFoundException;
