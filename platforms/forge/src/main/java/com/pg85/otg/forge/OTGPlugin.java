@@ -50,7 +50,8 @@ public class OTGPlugin
 		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
 			// Provide our custom chunk generator, biome provider and dimension settings.
-			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(null, seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OTG_DIMENSION_SETTINGS));
+			// TODO: Generate default preset on install
+			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(PluginStandardValues.DEFAULT_PRESET_NAME, seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OTG_DIMENSION_SETTINGS));
 		}
 	};
 	
@@ -99,7 +100,6 @@ public class OTGPlugin
 								OTGPlugin.createOTGDimensionGeneratorSettings(
 									createWorldScreen.field_238934_c_.func_239055_b_(),
 									dimensionGeneratorSettings,
-									OTG_WORLD_TYPE,
 									dimensionConfig
 								)
 							);
@@ -116,12 +116,12 @@ public class OTGPlugin
 	    ;
 	}
 
-	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, DimensionGeneratorSettings dimensionGeneratorSettings, BiomeGeneratorTypeScreens biomeGeneratorTypeScreens, DimensionConfig dimensionConfig)
+	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, DimensionGeneratorSettings dimensionGeneratorSettings, DimensionConfig dimensionConfig)
 	{
 		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.func_243612_b(Registry.field_239698_ad_);
 		Registry<Biome> biomesRegistry = dynamicRegistries.func_243612_b(Registry.field_239720_u_);
 		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.func_243612_b(Registry.field_243549_ar);
-
+		
 		return new DimensionGeneratorSettings(
 			dimensionGeneratorSettings.func_236221_b_(),
 			dimensionGeneratorSettings.func_236222_c_(),
