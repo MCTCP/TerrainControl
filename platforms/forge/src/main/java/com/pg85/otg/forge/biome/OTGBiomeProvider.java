@@ -31,8 +31,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 {
-	// TODO: This needs to be better
-	public static final BiomeConfig[] LOOKUP = new BiomeConfig[128];
  	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
 		(instance) -> instance.group(
 			Codec.STRING.fieldOf("preset_name").stable().forGetter((provider) -> provider.presetName),
@@ -42,7 +40,10 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 			RegistryLookupCodec.func_244331_a(Registry.field_239720_u_).forGetter((provider) -> provider.registry)
 		).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
-	
+
+	// TODO: This needs to be better
+	public static final BiomeConfig[] LOOKUP = new BiomeConfig[128];
+ 	
 	private final long seed;
 	private final boolean legacyBiomeInitLayer;
 	private final boolean largeBiomes;
