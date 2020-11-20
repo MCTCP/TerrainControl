@@ -59,6 +59,10 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.util.*;
 
+// TODO: Clean this up further, atm BiomeConfigBase implements
+// anything needed for IBiomeConfig, which describes any
+// methods used by other projects. BiomeConfig only contains
+// fields/methods used for io/serialisation/instantiation.
 public class BiomeConfig extends BiomeConfigBase
 {
 	// TODO: Clean these fields up, move to BiomeConfigBase if  
@@ -293,7 +297,7 @@ public class BiomeConfig extends BiomeConfigBase
     	this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, defaultSettings.defaultInheritMobsBiomeName, logger, null);
 
         this.readCustomObjectSettings(reader, logger);
-        this.readResourceSettings(reader, biomeResourcesManager, spawnLog, logger);
+        this.readResourceSettings(reader, biomeResourcesManager, spawnLog, logger, materialReader);
         this.inheritSaplingResource = reader.getSetting(BiomeStandardValues.INHERIT_SAPLING_RESOURCE, defaultSettings.inheritSaplingResource, logger, null);
         this.chcData = new double[this.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
         this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl, logger);
@@ -330,10 +334,10 @@ public class BiomeConfig extends BiomeConfigBase
         return settings.getSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, defaultSetting, logger, materialReader);
     }
 
-    private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger)
+    private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
     	// Disable resourceinheritance for saplings
-    	List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, false, biomeResourcesManager, spawnLog, logger));
+    	List<ConfigFunction<IBiomeConfig>> resources = new ArrayList<>(settings.getConfigFunctions(this, false, biomeResourcesManager, spawnLog, logger, materialReader));
         for (ConfigFunction<IBiomeConfig> res : resources)
         {
             if (res != null)
@@ -364,7 +368,7 @@ public class BiomeConfig extends BiomeConfigBase
             }
         }
 
-        resources = new ArrayList<>(settings.getConfigFunctions(this, this.doResourceInheritance, biomeResourcesManager, spawnLog, logger));
+        resources = new ArrayList<>(settings.getConfigFunctions(this, this.doResourceInheritance, biomeResourcesManager, spawnLog, logger, materialReader));
         for (ConfigFunction<IBiomeConfig> res : resources)
         {
             if (res != null)
@@ -998,7 +1002,7 @@ public class BiomeConfig extends BiomeConfigBase
             {
                 try
                 {
-                    LocalMaterialData fromId = OTG.getEngine().readMaterial(replacedBlock.split("=")[0]);
+                    LocalMaterialData fromId = materialReader.readMaterial(replacedBlock.split("=")[0]);
                     String rest = replacedBlock.split("=")[1];
                     LocalMaterialData to;
                     int minHeight = 0;
@@ -1009,12 +1013,12 @@ public class BiomeConfig extends BiomeConfigBase
                     if (start != -1 && end != -1)
                     {   // Found height settings
                         String[] ranges = rest.substring(start + 1, end).split("-");
-                        to = OTG.getEngine().readMaterial(rest.substring(0, start));
+                        to = materialReader.readMaterial(rest.substring(0, start));
                         minHeight = StringHelper.readInt(ranges[0], minHeight, maxHeight);
                         maxHeight = StringHelper.readInt(ranges[1], minHeight, maxHeight);
                     } else {
                     	// No height settings
-                        to = OTG.getEngine().readMaterial(rest);
+                        to = materialReader.readMaterial(rest);
                     }
 
                     output.add(new ReplacedBlocksInstruction(fromId, to, minHeight, maxHeight));

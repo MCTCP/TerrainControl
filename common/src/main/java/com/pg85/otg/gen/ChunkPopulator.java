@@ -6,6 +6,7 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.Resource;
 import com.pg85.otg.config.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.customobjects.CustomObjectManager;
+import com.pg85.otg.customobjects.resource.CustomObjectResource;
 import com.pg85.otg.customobjects.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
@@ -30,9 +31,8 @@ public class ChunkPopulator
         this.rand = new Random();
     }
 
-    public void populate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig)
+    public void populate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
     {
-    	CustomStructureCache structureCache = null; // TODO
     	Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
     	boolean developerMode = OTG.getPluginConfig().developerMode;
     	boolean spawnLog = OTG.getPluginConfig().spawnLog;
@@ -41,8 +41,8 @@ public class ChunkPopulator
     	CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
     	IMaterialReader materialReader = OTG.getEngine().getMaterialReader();
     	CustomObjectResourcesManager customObjectResourcesManager = OTG.getEngine().getCustomObjectResourcesManager();
-    	IPresetNameProvider presetNameProvider = null; // TODO
-    	IModLoadedChecker modLoadedChecker = null; // TODO
+    	IModLoadedChecker modLoadedChecker = OTG.getEngine().getModLoadedChecker();
+        IPresetNameProvider presetNameProvider = OTG.getEngine().getPresetNameProvider();
     	
 		if (!this.processing)
 		{
@@ -116,7 +116,11 @@ public class ChunkPopulator
         // Resource sequence
         for (ConfigFunction<IBiomeConfig> res : biomeConfig.getResourceSequence())
         {
-            if (res instanceof Resource)
+            if (res instanceof CustomObjectResource)
+            {
+                ((CustomObjectResource)res).process(structureCache, worldGenRegion, this.rand, hasVillage, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, customObjectResourcesManager, modLoadedChecker);
+            }
+            else if (res instanceof Resource)
             {
                 ((Resource)res).process(worldGenRegion, this.rand, hasVillage, chunkCoord, OTG.getEngine().getLogger(), OTG.getEngine().getMaterialReader());
             }

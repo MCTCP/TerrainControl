@@ -11,13 +11,14 @@ import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobjects.CustomObjectManager;
-import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.Logger;
 import com.pg85.otg.presets.LocalPresetLoader;
+import com.pg85.otg.presets.PresetNameProvider;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.interfaces.IModLoadedChecker;
+import com.pg85.otg.util.interfaces.IPresetNameProvider;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -43,15 +44,19 @@ public abstract class OTGEngine
     private PluginConfig pluginConfig;
     private DimensionsConfig dimensionsConfig = null;
     private ModPackConfigManager modPackConfigManager;
-    private Logger logger;
-    private IMaterialReader materialReader;
+    private final Logger logger;
+    private final IMaterialReader materialReader;
+    private final IModLoadedChecker modLoadedChecker;
+    private final IPresetNameProvider presetNameProvider;
 
-    protected OTGEngine(Logger logger, Path otgRootFolder, IMaterialReader materialReader, LocalPresetLoader presetLoader)
+    protected OTGEngine(Logger logger, Path otgRootFolder, IMaterialReader materialReader, IModLoadedChecker modLoadedChecker, LocalPresetLoader presetLoader)
     {
         this.logger = logger;
         this.otgRootFolder = otgRootFolder;
         this.presetLoader = presetLoader;
         this.materialReader = materialReader;
+        this.modLoadedChecker = modLoadedChecker;
+        this.presetNameProvider = new PresetNameProvider();
     }
     
     public void onShutdown()
@@ -295,6 +300,21 @@ public abstract class OTGEngine
 	{
 		return this.presetLoader;
 	}
+	
+	public IModLoadedChecker getModLoadedChecker()
+	{
+		return this.modLoadedChecker;
+	}
+	
+	public IMaterialReader getMaterialReader()
+	{
+		return this.materialReader;
+	}
+
+	public IPresetNameProvider getPresetNameProvider()
+	{
+		return this.presetNameProvider;
+	}	
 
 	// OTG dirs
 
@@ -324,18 +344,6 @@ public abstract class OTGEngine
     {
     	this.dimensionsConfig = dimensionsConfig;
     }
-    
-	public String getPresetName(String worldName)
-	{
-		// If this dim's name is the same as the preset worldname then this is an OTG overworld
-		if(worldName.equals("overworld") || worldName.equals(OTG.getDimensionsConfig().WorldName))
-    	{
-    		return OTG.getDimensionsConfig().Overworld.PresetName;	
-    	} else {
-    		// If this is an OTG dim other than the overworld then the world name will always match the preset name
-    		return worldName;
-    	}
-	}
 
 	// Worlds
 	
@@ -371,10 +379,6 @@ public abstract class OTGEngine
 		return !this.otgBiomeIdsByWorld.containsKey(worldName) || this.otgBiomeIdsByWorld.get(worldName)[i] == null;
 	}
 
-    // Materials
-
-    public abstract LocalMaterialData readMaterial(String name) throws InvalidConfigException;
-	
 	// Logging
 	
     public Logger getLogger()
@@ -382,16 +386,9 @@ public abstract class OTGEngine
         return logger;
     }
 
-	public abstract boolean isModLoaded(String mod);
-
 	public abstract boolean areEnoughBiomeIdsAvailableForPresets(ArrayList<String> presetNames);
 
 	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
 
 	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
-
-	public IMaterialReader getMaterialReader()
-	{
-		return this.materialReader;
-	}
 }

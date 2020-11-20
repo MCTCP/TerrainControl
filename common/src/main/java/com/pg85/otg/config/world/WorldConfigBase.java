@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.biome.ReplaceBlocks;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.biome.SettingsEnums.ConfigMode;
+import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -202,7 +202,7 @@ public abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
         return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
     }
     
-    public HashMap<LocalMaterialData,LocalMaterialData> getReplaceBlocksDict()
+    public HashMap<LocalMaterialData,LocalMaterialData> getReplaceBlocksDict(IMaterialReader materialReader)
     {
     	if(this.replaceBlocksDict != null)
     	{
@@ -216,7 +216,7 @@ public abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
     			try {
     				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
     				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-    				this.replaceBlocksDict.put(OTG.getEngine().readMaterial(blockNames.getSourceBlock()), OTG.getEngine().readMaterial(blockNames.getTargetBlock()));
+    				this.replaceBlocksDict.put(materialReader.readMaterial(blockNames.getSourceBlock()), materialReader.readMaterial(blockNames.getTargetBlock()));
 				} catch (InvalidConfigException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -30,6 +30,10 @@ import com.pg85.otg.util.biome.SettingsEnums.TerrainMode;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+//TODO: Clean this up further, atm WorldConfigBase implements
+//anything needed for IWorldConfig, which describes any
+//methods used by other projects. WorldConfig only contains
+//fields/methods used for io/serialisation/instantiation.
 public class WorldConfig extends WorldConfigBase
 {
 	// TODO: Clean these fields up, move to WorldConfigBase if
