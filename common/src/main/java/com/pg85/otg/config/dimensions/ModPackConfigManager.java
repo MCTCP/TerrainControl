@@ -5,26 +5,28 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.config.io.IConfigFunctionProvider;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.IMaterialReader;
 
 public class ModPackConfigManager
 {
 	private HashMap<String, DimensionsConfig> defaultConfigs = new HashMap<String, DimensionsConfig>();
 
-	public ModPackConfigManager(Path otgRootFolder)
+	public ModPackConfigManager(Path otgRootFolder, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		indexModPackConfigs(otgRootFolder);
+		indexModPackConfigs(otgRootFolder, biomeResourcesManager, spawnLog, logger, materialReader);
 	}
 
-	private void indexModPackConfigs(Path otgRootFolder)
+	private void indexModPackConfigs(Path otgRootFolder, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		File configDir = new File(otgRootFolder.toFile() + File.separator + PluginStandardValues.MODPACK_CONFIGS_FOLDER + File.separator);
+		File configDir = new File(otgRootFolder.toFile() + File.separator + Constants.MODPACK_CONFIGS_FOLDER + File.separator);
 		if(configDir.exists())
 		{
 			for(File f : configDir.listFiles())
 			{
-				DimensionsConfig forgeWorldConfig = DimensionsConfig.defaultConfigfromFile(f, otgRootFolder, true);
+				DimensionsConfig forgeWorldConfig = DimensionsConfig.defaultConfigfromFile(f, otgRootFolder, true, this, biomeResourcesManager, spawnLog, logger, materialReader);
 				if(forgeWorldConfig != null)
 				{
 					// If there's multiple configs targeting the same preset for their overworld,
@@ -62,10 +64,10 @@ public class ModPackConfigManager
 		return new ArrayList<DimensionsConfig>(this.defaultConfigs.values());
 	}
 
-	public HashMap<Integer, String> getReservedDimIds()
+	public HashMap<Integer, String> getReservedDimIds(DimensionsConfig dimensionsConfig)
 	{
 		HashMap<Integer, String> reservedIds = new HashMap<Integer, String>();
-		String overworldPresetName = OTG.getDimensionsConfig().Overworld.PresetName;
+		String overworldPresetName = dimensionsConfig.Overworld.PresetName;
 		for(DimensionsConfig dimsConfig : this.defaultConfigs.values())
 		{
 			if((overworldPresetName == null && dimsConfig.Overworld.PresetName == null) || (overworldPresetName != null && overworldPresetName.equals(dimsConfig.Overworld.PresetName)))

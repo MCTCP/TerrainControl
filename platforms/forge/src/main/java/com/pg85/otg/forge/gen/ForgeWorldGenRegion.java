@@ -3,25 +3,25 @@ package com.pg85.otg.forge.gen;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalWorldGenRegion;
-import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.standard.PluginStandardValues;
-import com.pg85.otg.config.world.WorldConfig;
-import com.pg85.otg.customobjects.SpawnableObject;
-import com.pg85.otg.customobjects.bofunctions.EntityFunction;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
-import com.pg85.otg.gen.ChunkBuffer;
-import com.pg85.otg.gen.biome.BiomeGenerator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.biome.LocalBiome;
+import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
-import com.pg85.otg.util.minecraft.defaults.TreeType;
+import com.pg85.otg.util.gen.LocalWorldGenRegion;
+import com.pg85.otg.util.interfaces.IBiome;
+import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.IEntityFunction;
+import com.pg85.otg.util.interfaces.IWorldConfig;
+import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.minecraft.TreeType;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -45,12 +45,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	private final OTGNoiseChunkGenerator chunkGenerator;
 	
     // 32x32 biomes cache for fast lookups during population
-    private LocalBiome[][] cachedBiomeConfigs;
+    private IBiome[][] cachedBiomeConfigs;
     private boolean cacheIsValid;
-	
-	public ForgeWorldGenRegion(WorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+
+	public ForgeWorldGenRegion(IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(worldConfig, worldGenRegion.getSeed());
+		super(worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -74,7 +74,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 	
 	@Override
-	public LocalBiome getBiome(int x, int z) // TODO: Implement 3d biomes
+	public IBiome getBiome(int x, int z) // TODO: Implement 3d biomes
 	{
 		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
 		if(biome != null)
@@ -91,7 +91,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		return null;
 	}
-	
+
 	@Override
 	public BiomeConfig getBiomeConfig(int x, int z) throws BiomeNotFoundException // TODO: Implement 3d biomes
 	{
@@ -113,14 +113,14 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	// for any operation that is intended to stay within population bounds.
 
     @Override
-    public LocalBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    public IBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
     {
     	// Cache is invalidated when cascading chunkgen happens.
     	return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
     }
 	
     @Override
-    public BiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+    public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
     {
     	// Cache is invalidated when cascading chunkgen happens.
     	return !cacheIsValid ? getBiome(worldZ, worldX).getBiomeConfig() : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()].getBiomeConfig();
@@ -160,7 +160,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
 	{
-    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
     	{
     		return false;
     	}
@@ -262,7 +262,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-        if (y >= PluginStandardValues.WORLD_HEIGHT || y < PluginStandardValues.WORLD_DEPTH)
+        if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
         {
         	return null;
         }
@@ -271,7 +271,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         
         // If the chunk exists or is inside the area being populated, fetch it normally.
         IChunk chunk = null;
-    	if(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+    	if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
     	{
     		chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
     	}
@@ -290,7 +290,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
     		{
        			// Calculate the material without loading the chunk.
-       			return this.chunkGenerator.getMaterialInUnloadedChunk(this, x,y,z);
+       			return this.chunkGenerator.getMaterialInUnloadedChunk(this, x , y, z);
     		}
     	}
     	
@@ -345,7 +345,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
         
         // If the chunk exists or is inside the area being populated, fetch it normally.
         IChunk chunk = null;
-    	if(chunkBeingPopulated != null && OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+    	if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
     	{
     		chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
     	}
@@ -458,7 +458,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
     	{
     		return -1;
     	}
@@ -483,9 +483,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, BiomeConfig biomeConfig, boolean replaceBlocks)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
 	{
-    	if(y < PluginStandardValues.WORLD_DEPTH || y >= PluginStandardValues.WORLD_HEIGHT)
+    	if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
     	{
     		return;
     	}
@@ -499,20 +499,20 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
     	
     	// If no chunk was passed, we're doing something outside of the population cycle.
     	// If a chunk was passed, only spawn in the area being populated.
-    	if(chunkBeingPopulated == null || OTG.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+    	if(chunkBeingPopulated == null || ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
     	{
     		if(replaceBlocks)
     		{
-        		if(biomeConfig == null)
+        		if(replaceBlocksMatrix == null)
         		{
         			if(chunkBeingPopulated == null)
         			{
-        				biomeConfig = this.getBiomeConfig(x, z);
+        				replaceBlocksMatrix = this.getBiomeConfig(x, z).getReplaceBlocks();
         			} else {
-        				biomeConfig = this.getBiomeConfigForPopulation(x, z, chunkBeingPopulated);
+        				replaceBlocksMatrix = this.getBiomeConfigForPopulation(x, z, chunkBeingPopulated).getReplaceBlocks();
         			}
         		}
-    			material = material.parseWithBiomeAndHeight(biomeConfig, y);
+    			material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
     		}
     		this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);    		
     	}
@@ -528,14 +528,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}	
 	
 	@Override
-	public boolean generateModdedCaveGen(long worldSeed, int x, int z, ChunkBuffer chunkBuffer)
-	{
-		// TODO: Implement this.
-		return false;
-	}	
-	
-	@Override
-	public void spawnEntity(EntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate)
+	public void spawnEntity(IEntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate)
 	{
 		// TODO: Implement this.
 	}
@@ -569,22 +562,6 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public ChunkCoordinate getSpawnChunk()
 	{
 		// TODO: Implement this.
-		return null;
-	}
-		
-	//
-	
-	@Override
-	public SpawnableObject getMojangStructurePart(String path)
-	{
-		// TODO: Do we still need this?
-		return null;
-	}
-	
-	@Override
-	public BiomeGenerator getBiomeGenerator()
-	{
-		// TODO: Do we still need this with the new biome/chunkgen?
 		return null;
 	}
 }

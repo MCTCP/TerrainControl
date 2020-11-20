@@ -18,11 +18,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.pg85.otg.OTG;
-import com.pg85.otg.config.standard.PluginStandardValues;
-import com.pg85.otg.config.standard.WorldStandardValues;
+import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 
 public class DimensionsConfig
 {	
@@ -81,8 +83,8 @@ public class DimensionsConfig
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?
 		if(worldSavesDir != null)
 		{
-			File dimensionsConfigFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigFileName);
-			File dimensionsConfigBackupFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
+			File dimensionsConfigFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + Constants.MOD_ID + File.separator + Constants.DimensionsConfigFileName);
+			File dimensionsConfigBackupFile = new File(worldSavesDir.toFile().getAbsolutePath() + File.separator + WorldName + File.separator + Constants.MOD_ID + File.separator + Constants.DimensionsConfigBackupFileName);
 		
 			// Create an ObjectMapper mapper for YAML
 			ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -138,9 +140,9 @@ public class DimensionsConfig
 				throw new RuntimeException(
 					"OTG encountered a critical error writing " + dimensionsConfigFile.getAbsolutePath() + ", exiting. "
 					+ "OTG automatically backs up files before writing and will try to use the backup when loading. "
-					+ "If your world's " + WorldStandardValues.DimensionsConfigFileName + " and its backup have been corrupted, you can "
+					+ "If your world's " + Constants.DimensionsConfigFileName + " and its backup have been corrupted, you can "
 					+ "replace it with your own backup or create a new world with the same dimensions and copy its " 
-					+ WorldStandardValues.DimensionsConfigFileName + " (edit the WorldName node if necessary)."
+					+ Constants.DimensionsConfigFileName + " (edit the WorldName node if necessary)."
 				);
 			}		
 		}
@@ -183,7 +185,7 @@ public class DimensionsConfig
 		return presetsConfig;
 	}
 	
-	static DimensionsConfig defaultConfigfromFile(File file, Path otgRootFolder, boolean isModPackConfig)
+	static DimensionsConfig defaultConfigfromFile(File file, Path otgRootFolder, boolean isModPackConfig, ModPackConfigManager modPackConfigManager, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         DimensionsConfig presetsConfig = null;
@@ -193,19 +195,19 @@ public class DimensionsConfig
 		}
        	catch (IOException e)
        	{
-			OTG.log(LogMarker.WARN, "Modpack Config " + file.getName() + " could not be read.");
+       		logger.log(LogMarker.WARN, "Modpack Config " + file.getName() + " could not be read.");
 			e.printStackTrace();
 		}
        	       	
        	if(presetsConfig != null)
        	{
-       		updateConfig(presetsConfig, otgRootFolder, isModPackConfig);
+       		updateConfig(presetsConfig, otgRootFolder, isModPackConfig, modPackConfigManager, biomeResourcesManager, spawnLog, logger, materialReader);
        	}
        	
        	return presetsConfig;
 	}
 	
-	private static void updateConfig(DimensionsConfig dimsConfig, Path otgRootFolder, boolean isModPackConfig)
+	private static void updateConfig(DimensionsConfig dimsConfig, Path otgRootFolder, boolean isModPackConfig, ModPackConfigManager modPackConfigManager, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		boolean doSave = false;
        	// Update the config if necessary
@@ -215,27 +217,27 @@ public class DimensionsConfig
        		// Update the IsOTGPlus field from the worldconfig, added for v1.
        		if(dimsConfig.Overworld != null && dimsConfig.Overworld.PresetName != null)
        		{
-       			WorldConfig worldConfig = WorldConfig.fromDisk(Paths.get(otgRootFolder.toString(), PluginStandardValues.PRESETS_FOLDER + File.separator + dimsConfig.Overworld.PresetName));
+       			IWorldConfig worldConfig = WorldConfig.fromDisk(Paths.get(otgRootFolder.toString(), Constants.PRESETS_FOLDER + File.separator + dimsConfig.Overworld.PresetName), biomeResourcesManager, spawnLog, logger, materialReader);
        			if(worldConfig != null)
        			{
-       				dimsConfig.Overworld.Settings.IsOTGPlus = worldConfig.isOTGPlus;
+       				dimsConfig.Overworld.Settings.IsOTGPlus = worldConfig.isOTGPlus();
        			}
        		}
        		if(dimsConfig.Dimensions != null)
        		{
        			for(DimensionConfig dimConfig : dimsConfig.Dimensions)
        			{
-       				WorldConfig worldConfig = WorldConfig.fromDisk(Paths.get(otgRootFolder.toString(), PluginStandardValues.PRESETS_FOLDER + File.separator + dimConfig.PresetName));
+       				IWorldConfig worldConfig = WorldConfig.fromDisk(Paths.get(otgRootFolder.toString(), Constants.PRESETS_FOLDER + File.separator + dimConfig.PresetName), biomeResourcesManager, spawnLog, logger, materialReader);
            			if(worldConfig != null)
            			{
-           				dimConfig.Settings.IsOTGPlus = worldConfig.isOTGPlus;
+           				dimConfig.Settings.IsOTGPlus = worldConfig.isOTGPlus();
            			}
        			}
        		}
        	}
        	if(!isModPackConfig)
        	{
-			DimensionsConfig modPackConfig = OTG.getEngine().getModPackConfigManager().getModPackConfig(dimsConfig.Overworld.PresetName);
+			DimensionsConfig modPackConfig = modPackConfigManager.getModPackConfig(dimsConfig.Overworld.PresetName);
 			if(modPackConfig != null)
 			{
 				// The modpack config has been updated, overwrite settings for overworld and existing dims.
@@ -305,10 +307,10 @@ public class DimensionsConfig
 	 * @param mcWorldSaveDir Refers to mc/saves/worlddir/
 	 * @return
 	 */
-	public static DimensionsConfig loadFromFile(Path mcWorldSaveDir, Path otgRootFolder)
+	public static DimensionsConfig loadFromFile(Path mcWorldSaveDir, Path otgRootFolder, ModPackConfigManager modPackConfigManager, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		File dimensionsConfigFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigFileName);		
-		File dimensionsConfigBackupFile = new File(mcWorldSaveDir + File.separator + PluginStandardValues.MOD_ID + File.separator + WorldStandardValues.DimensionsConfigBackupFileName);
+		File dimensionsConfigFile = new File(mcWorldSaveDir + File.separator + Constants.MOD_ID + File.separator + Constants.DimensionsConfigFileName);		
+		File dimensionsConfigBackupFile = new File(mcWorldSaveDir + File.separator + Constants.MOD_ID + File.separator + Constants.DimensionsConfigBackupFileName);
         
 		if(!dimensionsConfigFile.exists() && !dimensionsConfigBackupFile.exists())
 		{
@@ -324,7 +326,7 @@ public class DimensionsConfig
 				presetsConfig = mapper.readValue(dimensionsConfigFile, DimensionsConfig.class);
 			} catch (IOException e) {
 				e.printStackTrace();
-				OTG.log(LogMarker.WARN, "Failed to load " + dimensionsConfigFile.getAbsolutePath() + ", trying to load backup.");
+				logger.log(LogMarker.WARN, "Failed to load " + dimensionsConfigFile.getAbsolutePath() + ", trying to load backup.");
 			}
 
 	       	if (presetsConfig != null)
@@ -333,13 +335,13 @@ public class DimensionsConfig
 		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParent();
 		       	try
 		       	{
-			       	updateConfig(presetsConfig, otgRootFolder, false);
+			       	updateConfig(presetsConfig, otgRootFolder, false, modPackConfigManager, biomeResourcesManager, spawnLog, logger, materialReader);
 					return presetsConfig;
 		       	}
 		       	catch(Exception ex)
 		       	{
 		       		ex.printStackTrace();
-		       		OTG.log(LogMarker.WARN, "Failed to load " + dimensionsConfigFile.getAbsolutePath() + ", trying to load backup.");
+		       		logger.log(LogMarker.WARN, "Failed to load " + dimensionsConfigFile.getAbsolutePath() + ", trying to load backup.");
 		       	}
 			}
 		}
@@ -361,7 +363,7 @@ public class DimensionsConfig
 		       	presetsConfig.worldSavesDir = mcWorldSaveDir.getParent();
 		       	try
 		       	{
-			       	updateConfig(presetsConfig, otgRootFolder, false);
+			       	updateConfig(presetsConfig, otgRootFolder, false, modPackConfigManager, biomeResourcesManager, spawnLog, logger, materialReader);
 					return presetsConfig;
 		       	}
 		       	catch(Exception ex)
@@ -374,9 +376,9 @@ public class DimensionsConfig
 		throw new RuntimeException(
 			"OTG encountered a critical error loading " + dimensionsConfigFile.getAbsolutePath() + " and could not load a backup, exiting."
 			+ "OTG automatically backs up files before writing and tries to use the backup when loading. "
-			+ "If your world's " + WorldStandardValues.DimensionsConfigFileName + " and its backup have been corrupted, you can "
+			+ "If your world's " + Constants.DimensionsConfigFileName + " and its backup have been corrupted, you can "
 			+ "replace it with your own backup or create a new world with the same dimensions and copy its " 
-			+ WorldStandardValues.DimensionsConfigFileName + " (edit the WorldName node if necessary)."
+			+ Constants.DimensionsConfigFileName + " (edit the WorldName node if necessary)."
 		);
 	}
 }

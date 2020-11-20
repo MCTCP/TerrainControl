@@ -1,11 +1,11 @@
 package com.pg85.otg.forge.materials;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.common.materials.LocalMaterials;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.FifoMap;
+import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.materials.LocalMaterials;
 
 import net.minecraft.block.DoublePlantBlock;
 import net.minecraft.state.properties.DoubleBlockHalf;

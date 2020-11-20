@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.preset.Preset;
+import com.pg85.otg.presets.Preset;
 
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.DialogTexts;

@@ -1,22 +1,16 @@
 package com.pg85.otg;
 
-import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.LocalWorldGenRegion;
 import com.pg85.otg.config.PluginConfig;
-import com.pg85.otg.config.biome.settings.BiomeResourcesManager;
+import com.pg85.otg.config.biome.BiomeResourcesManager;
 import com.pg85.otg.config.customobjects.CustomObjectResourcesManager;
 import com.pg85.otg.config.dimensions.DimensionsConfig;
-import com.pg85.otg.customobjects.CustomObject;
 import com.pg85.otg.customobjects.CustomObjectManager;
 import com.pg85.otg.customobjects.bo4.BO4Config;
-import com.pg85.otg.events.EventHandler;
-import com.pg85.otg.events.EventPriority;
-import com.pg85.otg.gen.ChunkBuffer;
-import com.pg85.otg.gen.biome.BiomeModeManager;
-import com.pg85.otg.gen.resource.Resource;
+import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.interfaces.IModLoadedChecker;
+import com.pg85.otg.util.interfaces.IPresetNameProvider;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -24,11 +18,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.ArrayList;
+import java.nio.file.Path;
 import java.util.List;
-import java.util.Random;
 
 public class OTG
 {		
@@ -92,10 +83,12 @@ public class OTG
      * <p>
      * @return The biome managers.
      */
+    /*
     public static BiomeModeManager getBiomeModeManager()
     {
         return Engine.getBiomeModeManager();
     }
+    */
 
     public static BiomeResourcesManager getBiomeResourcesManager()
     {
@@ -147,6 +140,7 @@ public class OTG
 	* @return The biome name, or null if the world isn't managed by Terrain
     *         Control.
     */
+    /*
 	public static String getBiomeName(String worldName, int x, int z)
 	{
 	   LocalWorld world = getWorld(worldName);
@@ -212,21 +206,25 @@ public class OTG
     {
         return Engine.getAllWorlds();
     }
+    */
     
     // Events
     
     /**
      * @see OTGEngine#registerEventHandler(EventHandler)
      */
+    /*
     public static void registerEventHandler(EventHandler handler)
     {
         Engine.registerEventHandler(handler);
     }
+    */
 
     /**
      * @see OTGEngine#registerEventHandler(EventHandler,
      * EventPriority)
      */
+    /*
     public static void registerEventHandler(EventHandler handler, EventPriority priority)
     {
         Engine.registerEventHandler(handler, priority);
@@ -236,42 +234,51 @@ public class OTG
     {
     	return Engine.fireReplaceBiomeBlocksEvent(x, z, chunkBuffer);
     }
+    */
     
     /**
      * @see OTGEngine#fireCanCustomObjectSpawnEvent(CustomObject,
      * LocalWorld, int, int, int)
      */
-    public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, LocalWorldGenRegion worldGenRegion, int x, int y, int z)
+    /*
+    public static boolean fireCanCustomObjectSpawnEvent(CustomObject object, IWorldGenRegion worldGenRegion, int x, int y, int z)
     {
         return Engine.fireCanCustomObjectSpawnEvent(object, worldGenRegion, x, y, z);
     }
+    */
 
     /**
      * @see OTGEngine#firePopulationEndEvent(LocalWorld, Random,
      * boolean, ChunkCoordinate)
      */
+    /*
     public static void firePopulationEndEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         Engine.firePopulationEndEvent(world, random, villageInChunk, chunkCoord);
     }
+    */
 
     /**
      * @see OTGEngine#firePopulationStartEvent(LocalWorld, Random,
      * boolean, ChunkCoordinate)
      */
+    /*
     public static void firePopulationStartEvent(LocalWorld world, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord)
     {
         Engine.firePopulationStartEvent(world, random, villageInChunk, chunkCoord);
     }
+    */
 
     /**
      * @see OTGEngine#fireResourceProcessEvent(Resource,
      * LocalWorld, Random, boolean, int, int)
      */
-    public static boolean fireResourceProcessEvent(Resource resource, LocalWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int chunkX, int chunkZ)
+    /*
+    public static boolean fireResourceProcessEvent(Resource resource, IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int chunkX, int chunkZ)
     {
         return Engine.fireResourceProcessEvent(resource, worldGenregion, random, villageInChunk, chunkX, chunkZ);
-    }    
+    }
+    */   
     
     // Logging
     
@@ -324,27 +331,9 @@ public class OTG
      */
     public static void printStackTrace(LogMarker level, Throwable e, int maxDepth)
     {
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter printWriter = new PrintWriter(stringWriter);
-        e.printStackTrace(printWriter);
-        Engine.getLogger().log(level, stringWriter.toString());
-    }      
-	
-    public static boolean IsInAreaBeingPopulated(int blockX, int blockZ, ChunkCoordinate chunkBeingPopulated)
-    {
-        int chunkX = blockX >> 4;
-        int chunkZ = blockZ >> 4;
-        return
-			(
-				chunkX == chunkBeingPopulated.getChunkX() ||
-				chunkX == chunkBeingPopulated.getChunkX() + 1
-			) && (
-				chunkZ == chunkBeingPopulated.getChunkZ() ||
-				chunkZ == chunkBeingPopulated.getChunkZ() + 1
-			)
-		;
+        Engine.getLogger().log(level, e, maxDepth);
     }
-    
+	    
     public static boolean bo4DataExists(BO4Config config)
     {
 		String filePath = 
@@ -358,7 +347,7 @@ public class OTG
         return file.exists();
     }
     
-    public static void generateBO4Data(BO4Config config)
+    public static void generateBO4Data(BO4Config config, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         //write to disk
 		String filePath = 
@@ -374,8 +363,8 @@ public class OTG
             try {
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				DataOutputStream dos = new DataOutputStream(bos);
-				config.writeToStream(dos);
-				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray());
+				config.writeToStream(dos, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), spawnLog, logger);
 				dos.close();
 				FileOutputStream fos = new FileOutputStream(file);
 				DataOutputStream dos2 = new DataOutputStream(fos);

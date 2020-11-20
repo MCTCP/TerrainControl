@@ -1,13 +1,17 @@
 package com.pg85.otg.forge.util;
 
-import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.logging.Logger;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 import org.apache.logging.log4j.LogManager;
 
 public final class ForgeLogger extends Logger
 {
-    private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(PluginStandardValues.MOD_ID_SHORT);
+    private final org.apache.logging.log4j.Logger logger = LogManager.getLogger(Constants.MOD_ID_SHORT);
 
     @Override
     public void log(LogMarker level, String message, Object... params)
@@ -49,4 +53,19 @@ public final class ForgeLogger extends Logger
                 throw new RuntimeException("Unknown log marker: " + level);
         }
     }
+    
+	@Override
+	public void log(LogMarker level, Throwable e, int maxDepth)
+	{
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(stringWriter);
+        e.printStackTrace(printWriter);
+        log(level, stringWriter.toString());
+	}
+
+	@Override
+	public void printStackTrace(LogMarker level, Exception e)
+	{
+		log(level, e, Integer.MAX_VALUE);
+	}
 }

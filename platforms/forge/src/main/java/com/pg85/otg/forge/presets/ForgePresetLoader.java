@@ -9,12 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.pg85.otg.common.presets.LocalPresetLoader;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.preset.Preset;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.forge.biome.ForgeBiome;
+import com.pg85.otg.forge.biome.ForgeBiome;
+import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.presets.LocalPresetLoader;
+import com.pg85.otg.presets.Preset;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -81,7 +84,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
 				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
 				
-				Biome biome = ForgeBiome.createOTGBiome(biomeConfig);
+				Biome biome = ForgeBiome.createOTGBiome(preset.getWorldConfig(), biomeConfig);
  				ForgeRegistries.BIOMES.register(biome);
  				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.

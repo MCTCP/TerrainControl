@@ -4,7 +4,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -12,334 +11,145 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.config.ConfigFile;
-import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.biome.BiomeGroup;
-import com.pg85.otg.config.biome.BiomeGroupManager;
-import com.pg85.otg.config.biome.settings.ReplaceBlocks;
-import com.pg85.otg.config.fallbacks.BlockFallback;
 import com.pg85.otg.config.fallbacks.FallbackConfig;
 import com.pg85.otg.config.io.FileSettingsReader;
+import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.io.SimpleSettingsMap;
+import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
-import com.pg85.otg.config.standard.PluginStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
-import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.gen.biome.BiomeGenerator;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeResourceLocation;
-import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
+import com.pg85.otg.util.biome.SettingsEnums.ImageMode;
+import com.pg85.otg.util.biome.SettingsEnums.ImageOrientation;
+import com.pg85.otg.util.biome.SettingsEnums.TerrainMode;
+import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.materials.LocalMaterialData;
 
-public class WorldConfig extends ConfigFile
+public class WorldConfig extends WorldConfigBase
 {
-    public final Path settingsDir;
+	// TODO: Clean these fields up, move to WorldConfigBase if
+	// they need to be exposed, or remove if no longer used.
+	private final Path settingsDir;
 
-    public ArrayList<String> worldBiomes = new ArrayList<String>();
-
-    public Map<String, Integer> customBiomeGenerationIds = new HashMap<String, Integer>();
+	private Map<String, Integer> customBiomeGenerationIds = new HashMap<String, Integer>();
 
     // Biome Groups and special biome lists
-    public BiomeGroupManager biomeGroupManager;
+    //public BiomeGroupManager biomeGroupManager;
 
-    public List<String> isleBiomes = new ArrayList<String>();
-    public List<String> borderBiomes = new ArrayList<String>();
+	private List<String> isleBiomes = new ArrayList<String>();
+	private List<String> borderBiomes = new ArrayList<String>();
 
-    public boolean improvedBiomeBorders;
-    public boolean improvedBiomeGroups;
-    public boolean customHeightControlSmoothing;
-    public boolean improvedSmoothing;
+	private boolean improvedBiomeBorders;
+	private boolean improvedBiomeGroups;
+	private boolean customHeightControlSmoothing;
+    private boolean improvedSmoothing;
 
     // Dimensions
-    public List<String> dimensions = new ArrayList<String>();
 
-    // OTG+
-	public boolean isOTGPlus;
-	
 	// Replace blocks
-	private List<ReplaceBlocks> replaceBlocksList = null;
-    private HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
     private FallbackConfig fallbacks;
     private Map<String, LocalMaterialData> fallbackCache = new HashMap<String, LocalMaterialData>();
-
    
     // For old biome generator
 
-    public double minMoisture;
-    public double maxMoisture;
-    public double minTemperature;
-    public double maxTemperature;
+    private double minMoisture;
+    private double maxMoisture;
+    private double minTemperature;
+    private double maxTemperature;
 
     // Biome generator
-    public int generationDepth;
-    public int biomeRarityScale;
-
-    public int landRarity;
-    public int landSize;
-    public int landFuzzy;
-
-    public int maxSmoothRadius = 2;
-
-    public boolean frozenOcean;
-    public boolean freezeAllColdGroupBiomes;
-    public double frozenOceanTemperature;
     
-	public String defaultOceanBiome;
-	public String defaultFrozenOceanBiome;
+    private int landRarity;
+    private int landSize;
+    private int landFuzzy;    
+
+    private boolean frozenOcean;
+    private boolean freezeAllColdGroupBiomes;
+    private double frozenOceanTemperature;
+    
+    private String defaultOceanBiome;
+	private String defaultFrozenOceanBiome;
 
     // Rivers
 
-    public int riverRarity;
-    public int riverSize;
-    public boolean riversEnabled;
-    public boolean improvedRivers;
-    public boolean randomRivers;
+	private int riverRarity;
+	private int riverSize;
+	private boolean riversEnabled;
+	private boolean improvedRivers;
+	private boolean randomRivers;
 
     // Biome image
 
-    public String imageFile;
-    public ImageOrientation imageOrientation;
-    public ImageMode imageMode;
+	private String imageFile;
+	private ImageOrientation imageOrientation;
+	private ImageMode imageMode;
     // public int imageZoom;
-    public String imageFillBiome;
-    public int imageXOffset;
-    public int imageZOffset;
+	private String imageFillBiome;
+    private int imageXOffset;
+    private int imageZOffset;
 
-    public HashMap<Integer, BiomeResourceLocation> biomeColorMap;
+    private HashMap<Integer, BiomeResourceLocation> biomeColorMap;
 
     // Look settings
-    public int worldFog;
+    private int worldFog;
     // TODO: Implement this?
-    public float worldFogR;
-    public float worldFogG;
-    public float worldFogB;
+    private float worldFogR;
+    private float worldFogG;
+    private float worldFogB;
 
-    public int worldNightFog;
+    private int worldNightFog;
     // TODO: Implement this?
-    public float worldNightFogR;
-    public float worldNightFogG;
-    public float worldNightFogB;
+    private float worldNightFogR;
+    private float worldNightFogG;
+    private float worldNightFogB;
 
     // Specific biome settings
 
-    // Caves
-    public int caveRarity;
-    public int caveFrequency;
-    public int caveMinAltitude;
-    public int caveMaxAltitude;
-    public int individualCaveRarity;
-    public int caveSystemFrequency;
-    public int caveSystemPocketChance;
-    public int caveSystemPocketMinSize;
-    public int caveSystemPocketMaxSize;
-    public boolean evenCaveDistribution;
-
-    // Ravines
-    public int ravineRarity;
-    public int ravineMinAltitude;
-    public int ravineMaxAltitude;
-    public int ravineMinLength;
-    public int ravineMaxLength;
-    public double ravineDepth;
-
     // Strongholds
-    public boolean strongholdsEnabled;
-    public double strongholdDistance;
-    public int strongholdCount;
-    public int strongholdSpread;
+    private double strongholdDistance;
+    private int strongholdCount;
+    private int strongholdSpread;
 
     // Villages
-    public boolean villagesEnabled;
-    public int villageSize;
-    public int villageDistance; // Has a minimum of 9
+    private int villageSize;
+    private int villageDistance; // Has a minimum of 9
 
     // Pyramids (also swamp huts and jungle temples)
-    public boolean rareBuildingsEnabled;
-    public int minimumDistanceBetweenRareBuildings; // Minecraft's internal
+    private int minimumDistanceBetweenRareBuildings; // Minecraft's internal
     // value is 1 chunk lower
-    public int maximumDistanceBetweenRareBuildings;
+    private int maximumDistanceBetweenRareBuildings;
 
     // Ocean monuments
-    public boolean oceanMonumentsEnabled;
-    public int oceanMonumentGridSize;
-    public int oceanMonumentRandomOffset;
+    private int oceanMonumentGridSize;
+    private int oceanMonumentRandomOffset;
 
     // Other structures
-    public boolean mineshaftsEnabled;
-    public boolean netherFortressesEnabled;
-    public boolean woodLandMansionsEnabled;
+    private boolean netherFortressesEnabled;
+    private boolean woodLandMansionsEnabled;
 
     // Terrain
-    public boolean oldTerrainGenerator;
+    private boolean oldTerrainGenerator;
+    
+    private boolean populateUsingSavedBiomes;
 
-    public int waterLevelMax;
-    public int waterLevelMin;
-    public LocalMaterialData waterBlock;
-    public LocalMaterialData iceBlock;
-    public LocalMaterialData cooledLavaBlock;
-    public boolean betterSnowFall;
-    public boolean fullyFreezeLakes;
+    private int objectSpawnRatio;
+    private TerrainMode modeTerrain;
+    //public Class<? extends BiomeGenerator> biomeMode;    
 
-    public double fractureHorizontal;
-    public double fractureVertical;
-
-    public boolean disableBedrock;
-    public boolean flatBedrock;
-    public boolean ceilingBedrock;
-    private LocalMaterialData bedrockBlock;
-    public boolean populationBoundsCheck;
-    public boolean populateUsingSavedBiomes;
-    public boolean removeSurfaceStone;
-
-    public int objectSpawnRatio;
-
-    public ConfigMode settingsMode;
-    public TerrainMode modeTerrain;
-    public Class<? extends BiomeGenerator> biomeMode;
-
-    public boolean biomeConfigsHaveReplacement = false;
-
-    public int worldHeightScaleBits;
-    public int worldHeightScale;
-    public int worldHeightCapBits;
-    public int worldHeightCap;
-
-    public long resourcesSeed;
-    public int maximumCustomStructureRadius;
-
-    public boolean disableOreGen;
+    private int worldHeightScaleBits;
+    private int worldHeightCapBits;    
     
     // Settings for console commands
-    public String author;
-    public String description;
-    public String worldPackerModName;
+   
+    private String bo3AtSpawn;
 
-	public int preGenerationRadius;
-	public int worldBorderRadius;
-    public String worldSeed;
-
-    public ArrayList<LocalMaterialData> dimensionPortalMaterials;
-    public String portalColor;
-    public String portalParticleType; 
-    public String portalMobType;
-    public int portalMobSpawnChance;
-    
-    public String dimensionBelow;
-    public String dimensionAbove;
-    public int dimensionBelowHeight;
-    public int dimensionAboveHeight;
-
-    public String bo3AtSpawn;
-
-    public boolean teleportToSpawnOnly; // If this is set to true then portals to this dimension will always teleport players to the world's spawn point.
-
-	// Game rules for worlds used as dimensions with Forge // TODO: Apply to overworld too?
-
-    public String commandBlockOutput; // Whether command blocks should notify admins when they perform commands
-    public String disableElytraMovementCheck; // Whether the server should skip checking player speed when the player is wearing elytra. Often helps with jittering due to lag in multiplayer, but may also be used to travel unfairly long distances in survival mode (cheating).
-    public String doDaylightCycle; // Whether the day-night cycle and moon phases progress
-    public String doEntityDrops; // Whether entities that are not mobs should have drops
-    public String doFireTick; // Whether fire should spread and naturally extinguish
-    public String doLimitedCrafting; // Whether players should only be able to craft recipes that they've unlocked first
-    public String doMobLoot; // Whether mobs should drop items
-    public String doMobSpawning; // Whether mobs should naturally spawn. Does not affect monster spawners.
-    public String doTileDrops; // Whether blocks should have drops
-    public String doWeatherCycle; // Whether the weather will change
-    public String gameLoopFunction = "true"; // The function to run every game tick
-    public String keepInventory; // Whether the player should keep items in their inventory after death
-    public String logAdminCommands; // Whether to log admin commands to server log
-    public String maxCommandChainLength = "65536"; // Determines the number at which the chain command block acts as a "chain".
-    public String maxEntityCramming; // The maximum number of other pushable entities a mob or player can push, before taking 3 doublehearts suffocation damage per half-second. Setting to 0 disables the rule. Damage affects survival-mode or adventure-mode players, and all mobs but bats. Pushable entities include non-spectator-mode players, any mob except bats, as well as boats and minecarts.
-    public String mobGriefing; // Whether creepers, zombies, endermen, ghasts, withers, ender dragons, rabbits, sheep, and villagers should be able to change blocks and whether villagers, zombies, skeletons, and zombie pigmen can pick up items
-    public String naturalRegeneration; // Whether the player can regenerate health naturally if their hunger is full enough (doesn't affect external healing, such as golden apples, the Regeneration effect, etc.)
-    public String randomTickSpeed; // How often a random block tick occurs (such as plant growth, leaf decay, etc.) per chunk section per game tick. 0 will disable random ticks, higher numbers will increase random ticks
-    public String reducedDebugInfo; // Whether the debug screen shows all or reduced information; and whether the effects of F3+B (entity hitboxes) and F3+G (chunk boundaries) are shown.
-    public String sendCommandFeedback; // Whether the feedback from commands executed by a player should show up in chat. Also affects the default behavior of whether command blocks store their output text
-    public String showDeathMessages; // Whether death messages are put into chat when a player dies. Also affects whether a message is sent to the pet's owner when the pet dies.
-    public String spawnRadius; // The number of blocks outward from the world spawn coordinates that a player will spawn in when first joining a server or when dying without a spawnpoint.
-    public String spectatorsGenerateChunks; // Whether players in spectator mode can generate chunks
-
-	public String welcomeMessage; // A message to display to the user when they transfer to this dimension.
-	public String departMessage; // A Message to display to the user when they transfer out of this dimension.
-	public boolean hasSkyLight; // A boolean that tells if a world does not have a sky. Used in calculating weather and skylight. Also affects GetActualHeight(), hasNoSky = true worlds are seen as 128 height worlds, which affects nether portal placement/detection.
-	public boolean isSurfaceWorld; // Returns 'true' if in the "main surface world", but 'false' if in the Nether or End dimensions. Affects: Clock, Compass, sky/cloud rendering, allowed to sleep here, zombie pigmen spawning in portal frames.
-	public boolean canRespawnHere; // True if the player can respawn in this dimension.
-
-	public boolean doesWaterVaporize; // True for nether, any water that is placed vaporises.
-
-	public boolean doesXZShowFog; // Returns true if the given X,Z coordinate should show environmental fog. True for Nether.
-
-	public boolean useCustomFogColor = false;
-	public double fogColorRed;
-	public double fogColorGreen;
-	public double fogColorBlue;
-
-	public boolean isSkyColored; // Is set to false for End (black sky?)
-
-	//public int averageGroundlevel; // Affects spawn point location and village spawning. Should be equal to sea level + 1(?)
-	//public int horizonHeight; // Returns horizon height for use in rendering the sky. Should be equal to sea level(?)
-	public int cloudHeight;
-    public boolean canDoLightning;
-    public boolean canDoRainSnowIce;
-    public boolean isNightWorld; // Sky is always moon and stars but light levels are same as day
-    public double voidFogYFactor; // A double value representing the Y value relative to the top of the map at which void fog is at its maximum. The default factor of 0.03125 relative to 256, for example, means the void fog will be at its maximum at (256*0.03125), or 8.
-    public double gravityFactor; // 0.08D; Affects entities jumping and falling
-    public boolean shouldMapSpin; // Determine if the cursor on the map should 'spin' when rendered, like it does for the player in the nether.
-    public boolean canDropChunk; // Called to determine if the chunk at the given chunk coordinates within the provider's world can be dropped. Used in WorldProviderSurface to prevent spawn chunks from being unloaded.
-    public int respawnDimension; // Dimension that players respawn in when dying in this dimension, defaults to 0, only applies when canRespawnHere = false.
-    public int movementFactor; // The dimension's movement factor. Whenever a player or entity changes dimension from world A to world B, their coordinates are multiplied by worldA.provider.getMovementFactor() / worldB.provider.getMovementFactor(). Example: Overworld factor is 1, nether factor is 8. Traveling from overworld to nether multiplies coordinates by 1/8.
-
-    public String itemsToAddOnJoinDimension; // Similar to the /give command, gives players items when they enter a dimension/world.
-    public String itemsToRemoveOnJoinDimension; // The opposite of the /give command, removes items from players inventories when they enter a dimension/world.
-    public String itemsToAddOnLeaveDimension; // Similar to the /give command, gives players items when they leave a dimension/world.
-    public String itemsToRemoveOnLeaveDimension; // The opposite of the /give command, removes items from players inventories when they leave a dimension/world.
-    public String itemsToAddOnRespawn; // Similar to the /give command, gives players items when they respawn in a dimension/world.
-
-    public boolean spawnPointSet;
-    public int spawnPointX;
-    public int spawnPointY;
-    public int spawnPointZ;
-
-    public boolean playersCanBreakBlocks;
-    public boolean explosionsCanBreakBlocks;
-    public boolean playersCanPlaceBlocks;
 	//
 
-    public enum TerrainMode
-    {
-        Normal,
-        //OldGenerator,
-        TerrainTest,
-        NotGenerate //,
-        //Default
-    }
-
-    public enum ImageMode
-    {
-        Repeat,
-        Mirror,
-        ContinueNormal,
-        FillEmpty,
-    }
-
-    public enum ImageOrientation
-    {
-        North,
-        East,
-        South,
-        West,
-    }
-
-    public enum ConfigMode
-    {
-        WriteAll,
-        WriteDisable,
-        WriteWithoutComments
-    }
-       
     public static class DefaulWorldData
     {
     	public WorldConfig worldConfig;
@@ -352,7 +162,7 @@ public class WorldConfig extends ConfigFile
     	}
     }
         
-    public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes)
+    public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
         super(settingsReader.getName());
 
@@ -366,19 +176,19 @@ public class WorldConfig extends ConfigFile
 	        	worldBiomes.add(biome);
 	        }
         }
-
+        
         // Fix older names
-        this.renameOldSettings(settingsReader);
+        this.renameOldSettings(settingsReader, logger, materialReader);
         // Set the local fields based on what was read from the file
-        this.readConfigSettings(settingsReader);
+        this.readConfigSettings(settingsReader, biomeResourcesManager, spawnLog, logger, materialReader);
         // Clamp Settings to acceptable values.
-       	this.correctSettings(biomes != null); // If biomes is null then we're not interested in loading biomes, squelch biome warnings.        
+       	this.correctSettings(biomes != null, OTG.getEngine().getLogger()); // If biomes is null then we're not interested in loading biomes, squelch biome warnings.        
     }
     
-    public static DefaulWorldData createDefaultOTGWorldConfig(Path settingsDir, String worldName)
+    public static DefaulWorldData createDefaultOTGWorldConfig(Path settingsDir, String worldName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
     	SimpleSettingsMap settingsMap = new SimpleSettingsMap(worldName, true);
-    	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, getDefaultBiomeNames());
+    	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, getDefaultBiomeNames(), biomeResourcesManager, spawnLog, logger, materialReader);
     	defaultWorldConfig.writeConfigSettings(settingsMap);
     	return new DefaulWorldData(defaultWorldConfig, settingsMap);
     }
@@ -394,12 +204,12 @@ public class WorldConfig extends ConfigFile
         return defaultBiomes;
     }
     
+    /*
     public void addWorldFallbacks(FallbackConfig config)
     {
-        this.fallbacks = config;
-        
-    }
-    
+        this.fallbacks = config;        
+    }    
+
     public LocalMaterialData parseFallback(String raw)
     {
         LocalMaterialData material = fallbackCache.get(raw);
@@ -436,43 +246,10 @@ public class WorldConfig extends ConfigFile
         }
         return null;
     }
-    
-    public double getFractureHorizontal()
-    {
-        return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
-    }
-
-    public double getFractureVertical()
-    {
-        return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
-    }
-    
-    public HashMap<LocalMaterialData,LocalMaterialData> getReplaceBlocksDict()
-    {
-    	if(replaceBlocksDict != null)
-    	{
-    		return replaceBlocksDict;
-    	}
-    	if(replaceBlocksDict == null && replaceBlocksList != null)
-    	{
-    		replaceBlocksDict = new HashMap<LocalMaterialData,LocalMaterialData>();
-    		for(ReplaceBlocks blockNames : replaceBlocksList)
-    		{
-    			try {
-    				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
-    				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-					replaceBlocksDict.put(OTG.getEngine().readMaterial(blockNames.getSourceBlock()), OTG.getEngine().readMaterial(blockNames.getTargetBlock()));
-				} catch (InvalidConfigException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
-    	}
-    	return replaceBlocksDict;
-    }
+    */
     
     @Override
-    protected void renameOldSettings(SettingsMap reader)
+    protected void renameOldSettings(SettingsMap reader, ILogger logger, IMaterialReader materialReader)
     {
         reader.renameOldSetting("WaterLevel", WorldStandardValues.WATER_LEVEL_MAX);
         reader.renameOldSetting("ModeTerrain", WorldStandardValues.TERRAIN_MODE);
@@ -487,24 +264,25 @@ public class WorldConfig extends ConfigFile
         // NormalBiomes is found, and create default groups
         if (reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
         {
-            if (reader.getSetting(WorldStandardValues.BIOME_MODE).equals("Normal"))
+            if (reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null).equals("Normal"))
             {
                 reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
             }
+            
+            /*
+            int landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger, null);
+            int landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger, null);
+            List<String> normalBiomes = reader.getSetting(WorldStandardValues.NORMAL_BIOMES, logger, null);
 
-            int landSize = reader.getSetting(WorldStandardValues.LAND_SIZE);
-            int landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY);
-            List<String> normalBiomes = reader.getSetting(WorldStandardValues.NORMAL_BIOMES);
-            BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL,
-                    landSize, landRarity, normalBiomes);
+            BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, landSize, landRarity, normalBiomes);
 
-            int iceSize = reader.getSetting(WorldStandardValues.ICE_SIZE);
-            int iceRarity = reader.getSetting(WorldStandardValues.ICE_RARITY);
-            List<String> iceBiomes = reader.getSetting(WorldStandardValues.ICE_BIOMES);
-            BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE,
-                    iceSize, iceRarity, iceBiomes);
+            int iceSize = reader.getSetting(WorldStandardValues.ICE_SIZE, logger, null);
+            int iceRarity = reader.getSetting(WorldStandardValues.ICE_RARITY, logger, null);
+            List<String> iceBiomes = reader.getSetting(WorldStandardValues.ICE_BIOMES, logger, null);
+            BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, iceSize, iceRarity, iceBiomes);
 
             reader.addConfigFunctions(Arrays.asList(normalGroup, iceGroup));
+            */
         }
 
         // Migrate bounds
@@ -517,23 +295,23 @@ public class WorldConfig extends ConfigFile
             reader.renameOldSetting("CanyonMinLength", WorldStandardValues.RAVINE_MIN_LENGTH);
             reader.renameOldSetting("CanyonMaxLength", WorldStandardValues.RAVINE_MAX_LENGTH);
 
-            decrementByOne(reader, WorldStandardValues.CAVE_MAX_ALTITUDE);
-            decrementByOne(reader, WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
-            decrementByOne(reader, WorldStandardValues.RAVINE_MAX_ALTITUDE);
-            decrementByOne(reader, WorldStandardValues.RAVINE_MAX_LENGTH);
+            decrementByOne(reader, WorldStandardValues.CAVE_MAX_ALTITUDE, logger, materialReader);
+            decrementByOne(reader, WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, logger, materialReader);
+            decrementByOne(reader, WorldStandardValues.RAVINE_MAX_ALTITUDE, logger, materialReader);
+            decrementByOne(reader, WorldStandardValues.RAVINE_MAX_LENGTH, logger, materialReader);
         }
     }
 
-    private void decrementByOne(SettingsMap reader, Setting<Integer> setting)
+    private void decrementByOne(SettingsMap reader, Setting<Integer> setting, ILogger logger, IMaterialReader materialReader)
     {
         if (reader.hasSetting(setting))
         {
-            reader.putSetting(setting, reader.getSetting(setting) - 1);
+            reader.putSetting(setting, reader.getSetting(setting, logger, materialReader) - 1);
         }
     }
 
     @Override
-    protected void correctSettings(boolean logWarnings)
+    protected void correctSettings(boolean logWarnings, ILogger logger)
     {
         landSize = lowerThanOrEqualTo(landSize, generationDepth);
         landFuzzy = lowerThanOrEqualTo(landFuzzy, generationDepth - landSize);
@@ -541,10 +319,11 @@ public class WorldConfig extends ConfigFile
         riverRarity = lowerThanOrEqualTo(riverRarity, generationDepth);
         riverSize = lowerThanOrEqualTo(riverSize, generationDepth - riverRarity);
 
-        biomeGroupManager.filterBiomes(worldBiomes, logWarnings);
+        //biomeGroupManager.filterBiomes(worldBiomes, logWarnings);
         isleBiomes = filterBiomes(isleBiomes, worldBiomes);
         borderBiomes = filterBiomes(borderBiomes, worldBiomes);
 
+        /*
         if (biomeMode == OTG.getBiomeModeManager().FROM_IMAGE)
         {
             File mapFile = new File(settingsDir.toString(), imageFile);
@@ -554,8 +333,9 @@ public class WorldConfig extends ConfigFile
                 biomeMode = OTG.getBiomeModeManager().NORMAL;
             }
         }
+        */
 
-        imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || worldBiomes.contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue();
+        imageFillBiome = (DefaultBiome.Contain(imageFillBiome) || worldBiomes.contains(imageFillBiome)) ? imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue(null);
 
         maxMoisture = higherThan(maxMoisture, minMoisture);
         maxTemperature = higherThan(maxTemperature, minTemperature);
@@ -572,77 +352,77 @@ public class WorldConfig extends ConfigFile
     }
 
     @Override
-    protected void readConfigSettings(SettingsMap reader)
+    protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
     	// OTG+
-    	this.isOTGPlus = reader.getSetting(WorldStandardValues.IS_OTG_PLUS);
-    	this.replaceBlocksList = reader.getSetting(WorldStandardValues.REPLACE_BLOCKS_LIST);
+    	this.isOTGPlus = reader.getSetting(WorldStandardValues.IS_OTG_PLUS, logger, null);
+    	this.replaceBlocksList = reader.getSetting(WorldStandardValues.REPLACE_BLOCKS_LIST, logger, null);
     	//
 
         // Main modes
-        this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE);
-        this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE);
-        this.biomeMode = OTG.getBiomeModeManager().getBiomeManager(reader.getSetting(WorldStandardValues.BIOME_MODE));
+        this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);
+        this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger, null);
+        //this.biomeMode = OTG.getBiomeModeManager().getBiomeManager(reader.getSetting(WorldStandardValues.BIOME_MODE));
 
         // World and water height
-        this.worldHeightCapBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS);
+        this.worldHeightCapBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, logger, null);
         this.worldHeightCap = 1 << this.worldHeightCapBits;
-        this.worldHeightScaleBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS);
+        this.worldHeightScaleBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, logger, null);
         this.worldHeightScaleBits = lowerThanOrEqualTo(this.worldHeightScaleBits, this.worldHeightCapBits);
         this.worldHeightScale = 1 << this.worldHeightScaleBits;
         this.waterLevelMax = worldHeightCap / 2 - 1;
 
         // Biome placement
-        this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH);
+        this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH, logger, null);
 
-        this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE);
-        this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY);
-        this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE);
-        this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY);
+        this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE, logger, null);
+        this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger, null);
+        this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger, null);
+        this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger, null);
 
-    	this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME);
+    	this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, logger, null);
         
         // Ice Area Settings
-        this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN);
-        this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE);
-        this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED);
+        this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN, logger, null);
+        this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, logger, null);
+        this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, logger, null);
 
-    	this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME);
+    	this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger, null);
     	
         // Freeze & Snow Settings
-    	this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL);
-        this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES);
+    	this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL, logger, null);
+        this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES, logger, null);
 
         // Rivers
-        this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY);
-        this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE);
-        this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED);
-        this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS);
-        this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS);
+        this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY, logger, null);
+        this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE, logger, null);
+        this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED, logger, null);
+        this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS, logger, null);
+        this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger, null);
         
 		// Biome Groups
-		readBiomeGroups(reader);
+		//readBiomeGroups(reader);
     
         // Specialized Biomes
-        this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES);
-        this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES);
+        this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger, null);
+        this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger, null);
 
-        this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS);
-        this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS);
-        this.customHeightControlSmoothing = reader.getSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING);
-        this.improvedSmoothing = reader.getSetting(WorldStandardValues.IMPROVED_SMOOTHING);
+        this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS, logger, null);
+        this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS, logger, null);
+        this.customHeightControlSmoothing = reader.getSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING, logger, null);
+        this.improvedSmoothing = reader.getSetting(WorldStandardValues.IMPROVED_SMOOTHING, logger, null);
         
         // Images
-        this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE);
-        this.imageFile = reader.getSetting(WorldStandardValues.IMAGE_FILE);
-        this.imageOrientation = reader.getSetting(WorldStandardValues.IMAGE_ORIENTATION);
-        this.imageFillBiome = reader.getSetting(WorldStandardValues.IMAGE_FILL_BIOME);
-        this.imageXOffset = reader.getSetting(WorldStandardValues.IMAGE_X_OFFSET);
-        this.imageZOffset = reader.getSetting(WorldStandardValues.IMAGE_Z_OFFSET);
+        this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE, logger, null);
+        this.imageFile = reader.getSetting(WorldStandardValues.IMAGE_FILE, logger, null);
+        this.imageOrientation = reader.getSetting(WorldStandardValues.IMAGE_ORIENTATION, logger, null);
+        this.imageFillBiome = reader.getSetting(WorldStandardValues.IMAGE_FILL_BIOME, logger, null);
+        this.imageXOffset = reader.getSetting(WorldStandardValues.IMAGE_X_OFFSET, logger, null);
+        this.imageZOffset = reader.getSetting(WorldStandardValues.IMAGE_Z_OFFSET, logger, null);
 
         // Fog
-        this.worldFog = reader.getSetting(WorldStandardValues.WORLD_FOG);
-        this.worldNightFog = reader.getSetting(WorldStandardValues.WORLD_NIGHT_FOG);
+        this.worldFog = reader.getSetting(WorldStandardValues.WORLD_FOG, logger, null);
+        this.worldNightFog = reader.getSetting(WorldStandardValues.WORLD_NIGHT_FOG, logger, null);
 
         this.worldFogR = ((worldFog & 0xFF0000) >> 16) / 255F;
         this.worldFogG = ((worldFog & 0xFF00) >> 8) / 255F;
@@ -653,178 +433,179 @@ public class WorldConfig extends ConfigFile
         this.worldNightFogB = (worldNightFog & 0xFF) / 255F;
 
         // Structures
-        this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED);
-        this.strongholdCount = reader.getSetting(WorldStandardValues.STRONGHOLD_COUNT);
-        this.strongholdDistance = reader.getSetting(WorldStandardValues.STRONGHOLD_DISTANCE);
-        this.strongholdSpread = reader.getSetting(WorldStandardValues.STRONGHOLD_SPREAD);
+        this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED, logger, null);
+        this.strongholdCount = reader.getSetting(WorldStandardValues.STRONGHOLD_COUNT, logger, null);
+        this.strongholdDistance = reader.getSetting(WorldStandardValues.STRONGHOLD_DISTANCE, logger, null);
+        this.strongholdSpread = reader.getSetting(WorldStandardValues.STRONGHOLD_SPREAD, logger, null);
 
-        this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED);
-        this.villageDistance = reader.getSetting(WorldStandardValues.VILLAGE_DISTANCE);
-        this.villageSize = reader.getSetting(WorldStandardValues.VILLAGE_SIZE);
+        this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED, logger, null);
+        this.villageDistance = reader.getSetting(WorldStandardValues.VILLAGE_DISTANCE, logger, null);
+        this.villageSize = reader.getSetting(WorldStandardValues.VILLAGE_SIZE, logger, null);
 
-        this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED);
-        this.minimumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
-        this.maximumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS);
+        this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, logger, null);
+        this.minimumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, logger, null);
+        this.maximumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, logger, null);
 
-        this.woodLandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED);
+        this.woodLandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, logger, null);
 
-        this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED);
-        this.oceanMonumentRandomOffset = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET);
-        this.oceanMonumentGridSize = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE);
+        this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, logger, null);
+        this.oceanMonumentRandomOffset = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, logger, null);
+        this.oceanMonumentGridSize = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, logger, null);
 
-        this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS);
-        this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED);
-        this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED);
+        this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger, null);
+        this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED, logger, null);
+        this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, logger, null);
 
         // Caves
-        this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY);
-        this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY);
-        this.caveMinAltitude = reader.getSetting(WorldStandardValues.CAVE_MIN_ALTITUDE);
-        this.caveMaxAltitude = reader.getSetting(WorldStandardValues.CAVE_MAX_ALTITUDE);
-        this.individualCaveRarity = reader.getSetting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY);
-        this.caveSystemFrequency = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY);
-        this.caveSystemPocketChance = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE);
-        this.caveSystemPocketMinSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE);
-        this.caveSystemPocketMaxSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE);
-        this.evenCaveDistribution = reader.getSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION);
+        this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY, logger, null);
+        this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY, logger, null);
+        this.caveMinAltitude = reader.getSetting(WorldStandardValues.CAVE_MIN_ALTITUDE, logger, null);
+        this.caveMaxAltitude = reader.getSetting(WorldStandardValues.CAVE_MAX_ALTITUDE, logger, null);
+        this.individualCaveRarity = reader.getSetting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY, logger, null);
+        this.caveSystemFrequency = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY, logger, null);
+        this.caveSystemPocketChance = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE, logger, null);
+        this.caveSystemPocketMinSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, logger, null);
+        this.caveSystemPocketMaxSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, logger, null);
+        this.evenCaveDistribution = reader.getSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, logger, null);
 
         // Ravines
-        this.ravineRarity = reader.getSetting(WorldStandardValues.RAVINE_RARITY);
-        this.ravineMinAltitude = reader.getSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE);
-        this.ravineMaxAltitude = reader.getSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE);
-        this.ravineMinLength = reader.getSetting(WorldStandardValues.RAVINE_MIN_LENGTH);
-        this.ravineMaxLength = reader.getSetting(WorldStandardValues.RAVINE_MAX_LENGTH);
-        this.ravineDepth = reader.getSetting(WorldStandardValues.RAVINE_DEPTH);
+        this.ravineRarity = reader.getSetting(WorldStandardValues.RAVINE_RARITY, logger, null);
+        this.ravineMinAltitude = reader.getSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE, logger, null);
+        this.ravineMaxAltitude = reader.getSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE, logger, null);
+        this.ravineMinLength = reader.getSetting(WorldStandardValues.RAVINE_MIN_LENGTH, logger, null);
+        this.ravineMaxLength = reader.getSetting(WorldStandardValues.RAVINE_MAX_LENGTH, logger, null);
+        this.ravineDepth = reader.getSetting(WorldStandardValues.RAVINE_DEPTH, logger, null);
 
         // Water
-        this.waterLevelMax = reader.getSetting(WorldStandardValues.WATER_LEVEL_MAX);
-        this.waterLevelMin = reader.getSetting(WorldStandardValues.WATER_LEVEL_MIN);
-        this.waterBlock = reader.getSetting(WorldStandardValues.WATER_BLOCK);
-        this.iceBlock = reader.getSetting(WorldStandardValues.ICE_BLOCK);
+        this.waterLevelMax = reader.getSetting(WorldStandardValues.WATER_LEVEL_MAX, logger, null);
+        this.waterLevelMin = reader.getSetting(WorldStandardValues.WATER_LEVEL_MIN, logger, null);
+        this.waterBlock = reader.getSetting(WorldStandardValues.WATER_BLOCK, logger, materialReader);
+        this.iceBlock = reader.getSetting(WorldStandardValues.ICE_BLOCK, logger, materialReader);
 
         // Lava
-        this.cooledLavaBlock = reader.getSetting(WorldStandardValues.COOLED_LAVA_BLOCK);
+        this.cooledLavaBlock = reader.getSetting(WorldStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
 
         // Fracture
-        this.fractureHorizontal = reader.getSetting(WorldStandardValues.FRACTURE_HORIZONTAL);
-        this.fractureVertical = reader.getSetting(WorldStandardValues.FRACTURE_VERTICAL);
+        this.fractureHorizontal = reader.getSetting(WorldStandardValues.FRACTURE_HORIZONTAL, logger, null);
+        this.fractureVertical = reader.getSetting(WorldStandardValues.FRACTURE_VERTICAL, logger, null);
 
         // Bedrock
-        this.disableBedrock = reader.getSetting(WorldStandardValues.DISABLE_BEDROCK);
-        this.ceilingBedrock = reader.getSetting(WorldStandardValues.CEILING_BEDROCK);
-        this.flatBedrock = reader.getSetting(WorldStandardValues.FLAT_BEDROCK);
-        this.bedrockBlock = reader.getSetting(WorldStandardValues.BEDROCK_BLOCK);
+        this.disableBedrock = reader.getSetting(WorldStandardValues.DISABLE_BEDROCK, logger, null);
+        this.ceilingBedrock = reader.getSetting(WorldStandardValues.CEILING_BEDROCK, logger, null);
+        this.flatBedrock = reader.getSetting(WorldStandardValues.FLAT_BEDROCK, logger, null);
+        this.bedrockBlock = reader.getSetting(WorldStandardValues.BEDROCK_BLOCK, logger, materialReader);
 
         // Misc
-        this.removeSurfaceStone = reader.getSetting(WorldStandardValues.REMOVE_SURFACE_STONE);
-        this.objectSpawnRatio = reader.getSetting(WorldStandardValues.OBJECT_SPAWN_RATIO);
-        this.resourcesSeed = reader.getSetting(WorldStandardValues.RESOURCES_SEED);
-        this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK);
-        this.populateUsingSavedBiomes = reader.getSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES);
-        this.disableOreGen = reader.getSetting(WorldStandardValues.DISABLE_OREGEN);
+        this.removeSurfaceStone = reader.getSetting(WorldStandardValues.REMOVE_SURFACE_STONE, logger, null);
+        this.objectSpawnRatio = reader.getSetting(WorldStandardValues.OBJECT_SPAWN_RATIO, logger, null);
+        this.resourcesSeed = reader.getSetting(WorldStandardValues.RESOURCES_SEED, logger, null);
+        this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, logger, null);
+        this.populateUsingSavedBiomes = reader.getSetting(WorldStandardValues.POPULATE_USING_SAVED_BIOMES, logger, null);
+        this.disableOreGen = reader.getSetting(WorldStandardValues.DISABLE_OREGEN, logger, null);
         
         this.oldTerrainGenerator = false; //this.modeTerrain == TerrainMode.OldGenerator;
 
-        this.author = reader.getSetting(WorldStandardValues.AUTHOR);
-        this.description = reader.getSetting(WorldStandardValues.DESCRIPTION);
-        this.worldPackerModName = reader.getSetting(WorldStandardValues.WORLDPACKER_MODNAME);
+        this.author = reader.getSetting(WorldStandardValues.AUTHOR, logger, null);
+        this.description = reader.getSetting(WorldStandardValues.DESCRIPTION, logger, null);
+        this.worldPackerModName = reader.getSetting(WorldStandardValues.WORLDPACKER_MODNAME, logger, null);
         
-        this.preGenerationRadius = reader.getSetting(WorldStandardValues.PREGENERATION_RADIUS);
-        this.worldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS);
+        this.preGenerationRadius = reader.getSetting(WorldStandardValues.PREGENERATION_RADIUS, logger, null);
+        this.worldBorderRadius = reader.getSetting(WorldStandardValues.WORLD_BORDER_RADIUS, logger, null);
 
-        this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED);
-        this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN);
-        this.dimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS);
+        this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED, logger, null);
+        this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger, null);
+        this.dimensionPortalMaterials = reader.getSetting(WorldStandardValues.DIMENSION_PORTAL_MATERIALS, logger, materialReader);
 
-        this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR);
-        this.portalParticleType = reader.getSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE);
-        this.portalMobType = reader.getSetting(WorldStandardValues.PORTAL_MOB_TYPE);
-        this.portalMobSpawnChance = reader.getSetting(WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE);
+        this.portalColor = reader.getSetting(WorldStandardValues.PORTAL_COLOR, logger, null);
+        this.portalParticleType = reader.getSetting(WorldStandardValues.PORTAL_PARTICLE_TYPE, logger, null);
+        this.portalMobType = reader.getSetting(WorldStandardValues.PORTAL_MOB_TYPE, logger, null);
+        this.portalMobSpawnChance = reader.getSetting(WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE, logger, null);
 
         // Dimensions
-        this.dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS);
+        this.dimensions = reader.getSetting(WorldStandardValues.DIMENSIONS, logger, null);
 
-        this.dimensionBelow = reader.getSetting(WorldStandardValues.DIMENSIONBELOW);
-        this.dimensionAbove = reader.getSetting(WorldStandardValues.DIMENSIONABOVE);
+        this.dimensionBelow = reader.getSetting(WorldStandardValues.DIMENSIONBELOW, logger, null);
+        this.dimensionAbove = reader.getSetting(WorldStandardValues.DIMENSIONABOVE, logger, null);
 
-        this.dimensionBelowHeight = reader.getSetting(WorldStandardValues.DIMENSIONBELOWHEIGHT);
-        this.dimensionAboveHeight = reader.getSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT);
+        this.dimensionBelowHeight = reader.getSetting(WorldStandardValues.DIMENSIONBELOWHEIGHT, logger, null);
+        this.dimensionAboveHeight = reader.getSetting(WorldStandardValues.DIMENSIONABOVEHEIGHT, logger, null);
 
         if(this.dimensionBelowHeight >= this.dimensionAboveHeight)
         {
-        	this.dimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue();
-        	this.dimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue();
+        	this.dimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue(null);
+        	this.dimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue(null);
     		OTG.log(LogMarker.WARN, "World " + this.getName() + " WorldConfig setting dimensionBelowHeight was higher than dimensionAboveHeight, using default values instead.");
         }
 
-        this.teleportToSpawnOnly = reader.getSetting(WorldStandardValues.TeleportToSpawnOnly);
-        this.commandBlockOutput = reader.getSetting(WorldStandardValues.CommandBlockOutput).toString();
-        this.disableElytraMovementCheck = reader.getSetting(WorldStandardValues.DisableElytraMovementCheck).toString();
-        this.doDaylightCycle = reader.getSetting(WorldStandardValues.DoDaylightCycle).toString();
-        this.doEntityDrops = reader.getSetting(WorldStandardValues.DoEntityDrops).toString();
-        this.doFireTick = reader.getSetting(WorldStandardValues.DoFireTick).toString();
-        this.doLimitedCrafting = reader.getSetting(WorldStandardValues.DoLimitedCrafting).toString();
-        this.doMobLoot = reader.getSetting(WorldStandardValues.DoMobLoot).toString();
-        this.doMobSpawning = reader.getSetting(WorldStandardValues.DoMobSpawning).toString();
-        this.doTileDrops = reader.getSetting(WorldStandardValues.DoTileDrops).toString();
-        this.doWeatherCycle = reader.getSetting(WorldStandardValues.DoWeatherCycle).toString();
-        this.gameLoopFunction = reader.getSetting(WorldStandardValues.GameLoopFunction).toString();
-        this.keepInventory = reader.getSetting(WorldStandardValues.KeepInventory).toString();
-        this.logAdminCommands = reader.getSetting(WorldStandardValues.LogAdminCommands).toString();
-        this.maxCommandChainLength = reader.getSetting(WorldStandardValues.MaxCommandChainLength).toString();
-        this.maxEntityCramming = reader.getSetting(WorldStandardValues.MaxEntityCramming).toString();
-        this.mobGriefing = reader.getSetting(WorldStandardValues.MobGriefing).toString();
-        this.naturalRegeneration = reader.getSetting(WorldStandardValues.NaturalRegeneration).toString();
-        this.randomTickSpeed = reader.getSetting(WorldStandardValues.RandomTickSpeed).toString();
-        this.reducedDebugInfo = reader.getSetting(WorldStandardValues.ReducedDebugInfo).toString();
-        this.sendCommandFeedback = reader.getSetting(WorldStandardValues.SendCommandFeedback).toString();
-        this.showDeathMessages = reader.getSetting(WorldStandardValues.ShowDeathMessages).toString();
-        this.spawnRadius = reader.getSetting(WorldStandardValues.SpawnRadius).toString(); // "10";
-        this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.SpectatorsGenerateChunks).toString();
+        this.teleportToSpawnOnly = reader.getSetting(WorldStandardValues.TeleportToSpawnOnly, logger, null);
+        this.commandBlockOutput = reader.getSetting(WorldStandardValues.CommandBlockOutput, logger, null).toString();
+        this.disableElytraMovementCheck = reader.getSetting(WorldStandardValues.DisableElytraMovementCheck, logger, null).toString();
+        this.doDaylightCycle = reader.getSetting(WorldStandardValues.DoDaylightCycle, logger, null).toString();
+        this.doEntityDrops = reader.getSetting(WorldStandardValues.DoEntityDrops, logger, null).toString();
+        this.doFireTick = reader.getSetting(WorldStandardValues.DoFireTick, logger, null).toString();
+        this.doLimitedCrafting = reader.getSetting(WorldStandardValues.DoLimitedCrafting, logger, null).toString();
+        this.doMobLoot = reader.getSetting(WorldStandardValues.DoMobLoot, logger, null).toString();
+        this.doMobSpawning = reader.getSetting(WorldStandardValues.DoMobSpawning, logger, null).toString();
+        this.doTileDrops = reader.getSetting(WorldStandardValues.DoTileDrops, logger, null).toString();
+        this.doWeatherCycle = reader.getSetting(WorldStandardValues.DoWeatherCycle, logger, null).toString();
+        this.gameLoopFunction = reader.getSetting(WorldStandardValues.GameLoopFunction, logger, null).toString();
+        this.keepInventory = reader.getSetting(WorldStandardValues.KeepInventory, logger, null).toString();
+        this.logAdminCommands = reader.getSetting(WorldStandardValues.LogAdminCommands, logger, null).toString();
+        this.maxCommandChainLength = reader.getSetting(WorldStandardValues.MaxCommandChainLength, logger, null).toString();
+        this.maxEntityCramming = reader.getSetting(WorldStandardValues.MaxEntityCramming, logger, null).toString();
+        this.mobGriefing = reader.getSetting(WorldStandardValues.MobGriefing, logger, null).toString();
+        this.naturalRegeneration = reader.getSetting(WorldStandardValues.NaturalRegeneration, logger, null).toString();
+        this.randomTickSpeed = reader.getSetting(WorldStandardValues.RandomTickSpeed, logger, null).toString();
+        this.reducedDebugInfo = reader.getSetting(WorldStandardValues.ReducedDebugInfo, logger, null).toString();
+        this.sendCommandFeedback = reader.getSetting(WorldStandardValues.SendCommandFeedback, logger, null).toString();
+        this.showDeathMessages = reader.getSetting(WorldStandardValues.ShowDeathMessages, logger, null).toString();
+        this.spawnRadius = reader.getSetting(WorldStandardValues.SpawnRadius, logger, null).toString(); // "10";
+        this.spectatorsGenerateChunks = reader.getSetting(WorldStandardValues.SpectatorsGenerateChunks, logger, null).toString();
 
         // World provider settings for Forge OTG worlds
 
-        this.welcomeMessage = reader.getSetting(WorldStandardValues.WelcomeMessage);
-        this.departMessage = reader.getSetting(WorldStandardValues.DepartMessage);
-        this.hasSkyLight = reader.getSetting(WorldStandardValues.HasSkyLight);
-        this.isSurfaceWorld = reader.getSetting(WorldStandardValues.IsSurfaceWorld);
-        this.canRespawnHere = reader.getSetting(WorldStandardValues.CanRespawnHere);
-        this.doesWaterVaporize = reader.getSetting(WorldStandardValues.DoesWaterVaporize);
-        this.doesXZShowFog = reader.getSetting(WorldStandardValues.DoesXZShowFog);
-        this.useCustomFogColor = reader.getSetting(WorldStandardValues.UseCustomFogColor);
-        this.fogColorRed = reader.getSetting(WorldStandardValues.FogColorRed);
-        this.fogColorGreen = reader.getSetting(WorldStandardValues.FogColorGreen);
-        this.fogColorBlue = reader.getSetting(WorldStandardValues.FogColorBlue);
-        this.isSkyColored = reader.getSetting(WorldStandardValues.IsSkyColored);
+        this.welcomeMessage = reader.getSetting(WorldStandardValues.WelcomeMessage, logger, null);
+        this.departMessage = reader.getSetting(WorldStandardValues.DepartMessage, logger, null);
+        this.hasSkyLight = reader.getSetting(WorldStandardValues.HasSkyLight, logger, null);
+        this.isSurfaceWorld = reader.getSetting(WorldStandardValues.IsSurfaceWorld, logger, null);
+        this.canRespawnHere = reader.getSetting(WorldStandardValues.CanRespawnHere, logger, null);
+        this.doesWaterVaporize = reader.getSetting(WorldStandardValues.DoesWaterVaporize, logger, null);
+        this.doesXZShowFog = reader.getSetting(WorldStandardValues.DoesXZShowFog, logger, null);
+        this.useCustomFogColor = reader.getSetting(WorldStandardValues.UseCustomFogColor, logger, null);
+        this.fogColorRed = reader.getSetting(WorldStandardValues.FogColorRed, logger, null);
+        this.fogColorGreen = reader.getSetting(WorldStandardValues.FogColorGreen, logger, null);
+        this.fogColorBlue = reader.getSetting(WorldStandardValues.FogColorBlue, logger, null);
+        this.isSkyColored = reader.getSetting(WorldStandardValues.IsSkyColored, logger, null);
         //this.averageGroundlevel = reader.getSetting(WorldStandardValues.averageGroundlevel);
         //this.horizonHeight = reader.getSetting(WorldStandardValues.horizonHeight);
-        this.cloudHeight = reader.getSetting(WorldStandardValues.CloudHeight);
-        this.canDoLightning = reader.getSetting(WorldStandardValues.CanDoLightning);
-        this.canDoRainSnowIce = reader.getSetting(WorldStandardValues.CanDoRainSnowIce);
-        this.isNightWorld = reader.getSetting(WorldStandardValues.IsNightWorld);
-        this.voidFogYFactor = reader.getSetting(WorldStandardValues.VoidFogYFactor);
-        this.gravityFactor = reader.getSetting(WorldStandardValues.GravityFactor);
-        this.shouldMapSpin = reader.getSetting(WorldStandardValues.ShouldMapSpin);
-        this.canDropChunk = reader.getSetting(WorldStandardValues.CanDropChunk);
-        this.respawnDimension = reader.getSetting(WorldStandardValues.RESPAWN_DIMENSION);
-        this.movementFactor = reader.getSetting(WorldStandardValues.MOVEMENT_FACTOR);
+        this.cloudHeight = reader.getSetting(WorldStandardValues.CloudHeight, logger, null);
+        this.canDoLightning = reader.getSetting(WorldStandardValues.CanDoLightning, logger, null);
+        this.canDoRainSnowIce = reader.getSetting(WorldStandardValues.CanDoRainSnowIce, logger, null);
+        this.isNightWorld = reader.getSetting(WorldStandardValues.IsNightWorld, logger, null);
+        this.voidFogYFactor = reader.getSetting(WorldStandardValues.VoidFogYFactor, logger, null);
+        this.gravityFactor = reader.getSetting(WorldStandardValues.GravityFactor, logger, null);
+        this.shouldMapSpin = reader.getSetting(WorldStandardValues.ShouldMapSpin, logger, null);
+        this.canDropChunk = reader.getSetting(WorldStandardValues.CanDropChunk, logger, null);
+        this.respawnDimension = reader.getSetting(WorldStandardValues.RESPAWN_DIMENSION, logger, null);
+        this.movementFactor = reader.getSetting(WorldStandardValues.MOVEMENT_FACTOR, logger, null);
 
-        this.itemsToAddOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION);
-        this.itemsToRemoveOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION);
-        this.itemsToAddOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION);
-        this.itemsToRemoveOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION);
-        this.itemsToAddOnRespawn = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN);
+        this.itemsToAddOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION, logger, null);
+        this.itemsToRemoveOnJoinDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION, logger, null);
+        this.itemsToAddOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION, logger, null);
+        this.itemsToRemoveOnLeaveDimension = reader.getSetting(WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION, logger, null);
+        this.itemsToAddOnRespawn = reader.getSetting(WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN, logger, null);
 
-        this.spawnPointSet = reader.getSetting(WorldStandardValues.SPAWN_POINT_SET);
-        this.spawnPointX = reader.getSetting(WorldStandardValues.SPAWN_POINT_X);
-        this.spawnPointY = reader.getSetting(WorldStandardValues.SPAWN_POINT_Y);
-        this.spawnPointZ = reader.getSetting(WorldStandardValues.SPAWN_POINT_Z);
+        this.spawnPointSet = reader.getSetting(WorldStandardValues.SPAWN_POINT_SET, logger, null);
+        this.spawnPointX = reader.getSetting(WorldStandardValues.SPAWN_POINT_X, logger, null);
+        this.spawnPointY = reader.getSetting(WorldStandardValues.SPAWN_POINT_Y, logger, null);
+        this.spawnPointZ = reader.getSetting(WorldStandardValues.SPAWN_POINT_Z, logger, null);
 
-        this.playersCanBreakBlocks = reader.getSetting(WorldStandardValues.PLAYERS_CAN_BREAK_BLOCKS);
-        this.explosionsCanBreakBlocks = reader.getSetting(WorldStandardValues.EXPLOSIONS_CAN_BREAK_BLOCKS);
-        this.playersCanPlaceBlocks = reader.getSetting(WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS);
+        this.playersCanBreakBlocks = reader.getSetting(WorldStandardValues.PLAYERS_CAN_BREAK_BLOCKS, logger, null);
+        this.explosionsCanBreakBlocks = reader.getSetting(WorldStandardValues.EXPLOSIONS_CAN_BREAK_BLOCKS, logger, null);
+        this.playersCanPlaceBlocks = reader.getSetting(WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS, logger, null);
     }
 
+    /*
     private void readBiomeGroups(SettingsMap reader)
     {
         this.biomeGroupManager = new BiomeGroupManager();
@@ -877,6 +658,7 @@ public class WorldConfig extends ConfigFile
                 Arrays.asList("Mega Taiga", "Mega Spruce Taiga"));
         this.biomeGroupManager.registerGroup(megaTaigaGroup);
     }
+    */
 
     @Override
     protected void writeConfigSettings(SettingsMap writer)
@@ -893,7 +675,7 @@ public class WorldConfig extends ConfigFile
             "The mod name of a WorldPacker jar. The WorldPacker jar's mod image is shown in the world creation UI for this world.");
         
         writer.putSetting(WorldStandardValues.SETTINGS_MODE, this.settingsMode,
-            "What " + PluginStandardValues.MOD_ID + " does with the config files.",
+            "What " + Constants.MOD_ID + " does with the config files.",
             "Possible modes:",
             "   WriteAll - default",
             "   WriteWithoutComments - write config files without help comments",
@@ -910,6 +692,7 @@ public class WorldConfig extends ConfigFile
             //"   Default - use default terrain generator",
             //"   OldGenerator - Minecraft Beta 1.7.3-like land generator");
 
+        /*
         writer.putSetting(WorldStandardValues.BIOME_MODE, OTG.getBiomeModeManager().getName(biomeMode),
             "Possible biome modes:",
             "   Normal - use all features",
@@ -918,6 +701,7 @@ public class WorldConfig extends ConfigFile
             "For old maps two more modes are available:",
             "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");//,
             //"   OldGenerator - Minecraft Beta 1.7.3 biome generator");
+        */
 
         // Settings for BiomeMode:Normal
         writer.bigTitle("Settings for BiomeMode: Normal",
@@ -935,6 +719,7 @@ public class WorldConfig extends ConfigFile
             "fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
 
         // Biome groups
+        /*
         writer.smallTitle("Biome Groups",
             "Minecraft groups similar biomes together, so that they spawn next to each other.",
             "",
@@ -950,8 +735,9 @@ public class WorldConfig extends ConfigFile
             "ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and",
             "LandRarity instead.",
             "");
+        */
 
-        writer.addConfigFunctions(this.biomeGroupManager.getGroups());
+        //writer.addConfigFunctions(this.biomeGroupManager.getGroups());
 
         // Biome lists
         writer.smallTitle("Biome lists",
@@ -1110,7 +896,7 @@ public class WorldConfig extends ConfigFile
                 "If it is set to true the biome populator will use the biome ids present in the",
                 "chunk data, ignoring the biome generator. This is useful if you have a premade",
                 "map made with for example WorldPainter, but still want to populate it using "
-                + PluginStandardValues.MOD_ID + ".",
+                + Constants.MOD_ID + ".",
                 "Using this together with " + BiomeStandardValues.REPLACE_TO_BIOME_NAME + " is discouraged: it uses the biome",
                 "specified in " + BiomeStandardValues.REPLACE_TO_BIOME_NAME
                 + " to populate the chunk, instead of the biome itself.");
@@ -1355,7 +1141,7 @@ public class WorldConfig extends ConfigFile
         // Dimensions
         writer.bigTitle("Dimension");
         writer.putSetting(WorldStandardValues.DIMENSIONS, this.dimensions,
-    		"Dimensions that should be loaded for this world at world creation. A world directory of the same name must be present in mods/OpenTerrainGenerator/"+ PluginStandardValues.PRESETS_FOLDER + "/");
+    		"Dimensions that should be loaded for this world at world creation. A world directory of the same name must be present in mods/OpenTerrainGenerator/"+ Constants.PRESETS_FOLDER + "/");
         writer.putSetting(WorldStandardValues.DIMENSIONBELOW, this.dimensionBelow,
             "When a player goes below Y 0, they will be teleported to this dimension. The dimension must be registered either via Dimensions in the worldconfig or via the /otg dim -c <dimname> console command.");
         writer.putSetting(WorldStandardValues.DIMENSIONABOVE, this.dimensionAbove,
@@ -1544,28 +1330,14 @@ public class WorldConfig extends ConfigFile
         }
     };    
     
-	public static WorldConfig fromDisk(Path worldDir)
+	public static WorldConfig fromDisk(Path worldDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		File worldConfigFile = Paths.get(worldDir.toString(), WorldStandardValues.WORLD_CONFIG_FILE).toFile();
+		File worldConfigFile = Paths.get(worldDir.toString(), Constants.WORLD_CONFIG_FILE).toFile();
         if(!worldConfigFile.exists())
         {
         	return null;
         }
-        SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile);
-        return new WorldConfig(worldDir, settingsMap, null);
-	}
-	
-	public LocalMaterialData getDefaultBedrockBlock()
-	{
-		return this.bedrockBlock;
-	}
-
-	public LocalMaterialData getBedrockBlockReplaced(BiomeConfig biomeConfig, int y)
-	{		
-		if(biomeConfig.replacedBlocks.replacesBedrock)
-		{
-			return this.bedrockBlock.parseWithBiomeAndHeight(biomeConfig, y);
-		}
-		return this.bedrockBlock;
+        SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile, logger);
+        return new WorldConfig(worldDir, settingsMap, null, biomeResourcesManager, spawnLog, logger, materialReader);
 	}
 }
