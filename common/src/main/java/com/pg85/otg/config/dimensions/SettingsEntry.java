@@ -2,28 +2,28 @@ package com.pg85.otg.config.dimensions;
 
 import java.util.ArrayList;
 
-import com.pg85.otg.OTG;
-import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.materials.LocalMaterialData;
 
 public class SettingsEntry
 {
 	// Capital letters since we'll be serialising to yaml (and we want to make it look nice)
 	public String[] DimensionPortalMaterials = new String[] { "DIRT" }; // WorldStandardValues.DIMENSION_PORTAL_MATERIALS.getDefaultValue(); // TODO: Fetch from worldstandardvalues
-	public String PortalColor = WorldStandardValues.PORTAL_COLOR.getDefaultValue();
-	public String PortalParticleType = WorldStandardValues.PORTAL_PARTICLE_TYPE.getDefaultValue(); 
-	public String PortalMobType = WorldStandardValues.PORTAL_MOB_TYPE.getDefaultValue();
-	public int PortalMobSpawnChance = WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE.getDefaultValue();
+	public String PortalColor = WorldStandardValues.PORTAL_COLOR.getDefaultValue(null);
+	public String PortalParticleType = WorldStandardValues.PORTAL_PARTICLE_TYPE.getDefaultValue(null); 
+	public String PortalMobType = WorldStandardValues.PORTAL_MOB_TYPE.getDefaultValue(null);
+	public int PortalMobSpawnChance = WorldStandardValues.PORTAL_MOB_SPAWN_CHANCE.getDefaultValue(null);
 	
-	public ArrayList<LocalMaterialData> GetDimensionPortalMaterials()
+	public ArrayList<LocalMaterialData> GetDimensionPortalMaterials(IMaterialReader materialReader)
 	{
         ArrayList<LocalMaterialData> portalMaterials = new ArrayList<LocalMaterialData>();                
     	for(String mat : this.DimensionPortalMaterials)
     	{
     		LocalMaterialData forgeMat;
 			try {
-				forgeMat = OTG.getEngine().readMaterial(mat);
+				forgeMat = materialReader.readMaterial(mat);
 				portalMaterials.add(forgeMat);
 			} catch (InvalidConfigException e) {
 				e.printStackTrace();
@@ -32,46 +32,46 @@ public class SettingsEntry
     	return portalMaterials;
 	}	
 	
-	public boolean IsOTGPlus = WorldStandardValues.IS_OTG_PLUS.getDefaultValue();
-	public String DimensionBelow = WorldStandardValues.DIMENSIONBELOW.getDefaultValue();
-	public String DimensionAbove = WorldStandardValues.DIMENSIONABOVE.getDefaultValue();
-	public int DimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue();
-	public int DimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue();
-	public boolean TeleportToSpawnOnly = WorldStandardValues.TeleportToSpawnOnly.getDefaultValue();
-	public String WelcomeMessage = WorldStandardValues.WelcomeMessage.getDefaultValue();
-	public String DepartMessage = WorldStandardValues.DepartMessage.getDefaultValue();
-	public boolean HasSkyLight = WorldStandardValues.HasSkyLight.getDefaultValue();
-	public boolean IsSurfaceWorld = WorldStandardValues.IsSurfaceWorld.getDefaultValue();
-	public boolean CanRespawnHere = WorldStandardValues.CanRespawnHere.getDefaultValue();
-	public boolean DoesWaterVaporize = WorldStandardValues.DoesWaterVaporize.getDefaultValue();
-	public boolean DoesXZShowFog = WorldStandardValues.DoesXZShowFog.getDefaultValue();
-	public boolean UseCustomFogColor = WorldStandardValues.UseCustomFogColor.getDefaultValue();
-	public double FogColorRed = WorldStandardValues.FogColorRed.getDefaultValue();
-	public double FogColorGreen = WorldStandardValues.FogColorGreen.getDefaultValue();
-	public double FogColorBlue = WorldStandardValues.FogColorBlue.getDefaultValue();
-	public boolean IsSkyColored = WorldStandardValues.IsSkyColored.getDefaultValue();
-	public int CloudHeight = WorldStandardValues.CloudHeight.getDefaultValue();
-	public boolean CanDoLightning = WorldStandardValues.CanDoLightning.getDefaultValue();
-	public boolean CanDoRainSnowIce = WorldStandardValues.CanDoRainSnowIce.getDefaultValue();
-	public boolean IsNightWorld = WorldStandardValues.IsNightWorld.getDefaultValue();
-	public double VoidFogYFactor = WorldStandardValues.VoidFogYFactor.getDefaultValue();
-	public double GravityFactor = WorldStandardValues.GravityFactor.getDefaultValue();
-	public boolean ShouldMapSpin = WorldStandardValues.ShouldMapSpin.getDefaultValue();
-	public boolean CanDropChunk = WorldStandardValues.CanDropChunk.getDefaultValue();
-	public int RespawnDimension = WorldStandardValues.RESPAWN_DIMENSION.getDefaultValue();
-	public int MovementFactor = WorldStandardValues.MOVEMENT_FACTOR.getDefaultValue();
-	public String ItemsToAddOnJoinDimension = WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue();
-	public String ItemsToRemoveOnJoinDimension = WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue();
-	public String ItemsToAddOnLeaveDimension = WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue();
-	public String ItemsToRemoveOnLeaveDimension = WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue();
-	public String ItemsToAddOnRespawn = WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN.getDefaultValue();
-	public boolean SpawnPointSet = WorldStandardValues.SPAWN_POINT_SET.getDefaultValue();
-	public int SpawnPointX = WorldStandardValues.SPAWN_POINT_X.getDefaultValue();
-	public int SpawnPointY = WorldStandardValues.SPAWN_POINT_Y.getDefaultValue();
-	public int SpawnPointZ = WorldStandardValues.SPAWN_POINT_Z.getDefaultValue();
-	public boolean PlayersCanBreakBlocks = WorldStandardValues.PLAYERS_CAN_BREAK_BLOCKS.getDefaultValue();
-	public boolean ExplosionsCanBreakBlocks = WorldStandardValues.EXPLOSIONS_CAN_BREAK_BLOCKS.getDefaultValue();
-	public boolean PlayersCanPlaceBlocks = WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS.getDefaultValue();
+	public boolean IsOTGPlus = WorldStandardValues.IS_OTG_PLUS.getDefaultValue(null);
+	public String DimensionBelow = WorldStandardValues.DIMENSIONBELOW.getDefaultValue(null);
+	public String DimensionAbove = WorldStandardValues.DIMENSIONABOVE.getDefaultValue(null);
+	public int DimensionBelowHeight = WorldStandardValues.DIMENSIONBELOWHEIGHT.getDefaultValue(null);
+	public int DimensionAboveHeight = WorldStandardValues.DIMENSIONABOVEHEIGHT.getDefaultValue(null);
+	public boolean TeleportToSpawnOnly = WorldStandardValues.TeleportToSpawnOnly.getDefaultValue(null);
+	public String WelcomeMessage = WorldStandardValues.WelcomeMessage.getDefaultValue(null);
+	public String DepartMessage = WorldStandardValues.DepartMessage.getDefaultValue(null);
+	public boolean HasSkyLight = WorldStandardValues.HasSkyLight.getDefaultValue(null);
+	public boolean IsSurfaceWorld = WorldStandardValues.IsSurfaceWorld.getDefaultValue(null);
+	public boolean CanRespawnHere = WorldStandardValues.CanRespawnHere.getDefaultValue(null);
+	public boolean DoesWaterVaporize = WorldStandardValues.DoesWaterVaporize.getDefaultValue(null);
+	public boolean DoesXZShowFog = WorldStandardValues.DoesXZShowFog.getDefaultValue(null);
+	public boolean UseCustomFogColor = WorldStandardValues.UseCustomFogColor.getDefaultValue(null);
+	public double FogColorRed = WorldStandardValues.FogColorRed.getDefaultValue(null);
+	public double FogColorGreen = WorldStandardValues.FogColorGreen.getDefaultValue(null);
+	public double FogColorBlue = WorldStandardValues.FogColorBlue.getDefaultValue(null);
+	public boolean IsSkyColored = WorldStandardValues.IsSkyColored.getDefaultValue(null);
+	public int CloudHeight = WorldStandardValues.CloudHeight.getDefaultValue(null);
+	public boolean CanDoLightning = WorldStandardValues.CanDoLightning.getDefaultValue(null);
+	public boolean CanDoRainSnowIce = WorldStandardValues.CanDoRainSnowIce.getDefaultValue(null);
+	public boolean IsNightWorld = WorldStandardValues.IsNightWorld.getDefaultValue(null);
+	public double VoidFogYFactor = WorldStandardValues.VoidFogYFactor.getDefaultValue(null);
+	public double GravityFactor = WorldStandardValues.GravityFactor.getDefaultValue(null);
+	public boolean ShouldMapSpin = WorldStandardValues.ShouldMapSpin.getDefaultValue(null);
+	public boolean CanDropChunk = WorldStandardValues.CanDropChunk.getDefaultValue(null);
+	public int RespawnDimension = WorldStandardValues.RESPAWN_DIMENSION.getDefaultValue(null);
+	public int MovementFactor = WorldStandardValues.MOVEMENT_FACTOR.getDefaultValue(null);
+	public String ItemsToAddOnJoinDimension = WorldStandardValues.ITEMS_TO_ADD_ON_JOIN_DIMENSION.getDefaultValue(null);
+	public String ItemsToRemoveOnJoinDimension = WorldStandardValues.ITEMS_TO_REMOVE_ON_JOIN_DIMENSION.getDefaultValue(null);
+	public String ItemsToAddOnLeaveDimension = WorldStandardValues.ITEMS_TO_ADD_ON_LEAVE_DIMENSION.getDefaultValue(null);
+	public String ItemsToRemoveOnLeaveDimension = WorldStandardValues.ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION.getDefaultValue(null);
+	public String ItemsToAddOnRespawn = WorldStandardValues.ITEMS_TO_ADD_ON_RESPAWN.getDefaultValue(null);
+	public boolean SpawnPointSet = WorldStandardValues.SPAWN_POINT_SET.getDefaultValue(null);
+	public int SpawnPointX = WorldStandardValues.SPAWN_POINT_X.getDefaultValue(null);
+	public int SpawnPointY = WorldStandardValues.SPAWN_POINT_Y.getDefaultValue(null);
+	public int SpawnPointZ = WorldStandardValues.SPAWN_POINT_Z.getDefaultValue(null);
+	public boolean PlayersCanBreakBlocks = WorldStandardValues.PLAYERS_CAN_BREAK_BLOCKS.getDefaultValue(null);
+	public boolean ExplosionsCanBreakBlocks = WorldStandardValues.EXPLOSIONS_CAN_BREAK_BLOCKS.getDefaultValue(null);
+	public boolean PlayersCanPlaceBlocks = WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS.getDefaultValue(null);
 	
 	public SettingsEntry clone()
 	{

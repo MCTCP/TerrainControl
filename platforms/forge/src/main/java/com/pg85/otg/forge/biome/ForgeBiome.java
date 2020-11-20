@@ -3,15 +3,16 @@ package com.pg85.otg.forge.biome;
 import java.util.Optional;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.LocalBiome;
-import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.biome.BiomeConfig.MineshaftType;
-import com.pg85.otg.config.biome.BiomeConfig.RareBuildingType;
-import com.pg85.otg.config.biome.BiomeConfig.VillageType;
-import com.pg85.otg.config.biome.settings.WeightedMobSpawnGroup;
-import com.pg85.otg.config.standard.WorldStandardValues;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
+import com.pg85.otg.util.biome.LocalBiome;
+import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.util.biome.SettingsEnums.MineshaftType;
+import com.pg85.otg.util.biome.SettingsEnums.RareBuildingType;
+import com.pg85.otg.util.biome.SettingsEnums.VillageType;
+import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
@@ -31,9 +32,9 @@ import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
 public class ForgeBiome implements LocalBiome
 {
 	private final Biome biomeBase;
-	private final BiomeConfig biomeConfig;
+	private final IBiomeConfig biomeConfig;
     
-    public ForgeBiome(Biome biomeBase, BiomeConfig biomeConfig)
+    public ForgeBiome(Biome biomeBase, IBiomeConfig biomeConfig)
     {
     	this.biomeBase = biomeBase;
     	this.biomeConfig = biomeConfig;
@@ -46,7 +47,7 @@ public class ForgeBiome implements LocalBiome
     }
 
 	@Override
-	public BiomeConfig getBiomeConfig()
+	public IBiomeConfig getBiomeConfig()
 	{
 		return this.biomeConfig;
 	}    
@@ -72,7 +73,7 @@ public class ForgeBiome implements LocalBiome
 		return null;
 	}
 
-	public static Biome createOTGBiome(BiomeConfig biomeConfig)
+	public static Biome createOTGBiome(IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		BiomeGenerationSettings.Builder biomeGenerationSettingsBuilder = new BiomeGenerationSettings.Builder();
 
@@ -83,12 +84,12 @@ public class ForgeBiome implements LocalBiome
 		biomeGenerationSettingsBuilder.func_242517_a(ConfiguredSurfaceBuilders.field_244184_p);
 
 		// Default structures
-		addDefaultStructures(biomeGenerationSettingsBuilder, biomeConfig);
+		addDefaultStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
 		
 		// Carvers
-		addCarvers(biomeGenerationSettingsBuilder, biomeConfig);
+		addCarvers(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
 
-	    float safeTemperature = biomeConfig.biomeTemperature;
+	    float safeTemperature = biomeConfig.getBiomeTemperature();
 	    if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
 	    {
 	        // Avoid temperatures between 0.1 and 0.2, Minecraft restriction
@@ -97,10 +98,10 @@ public class ForgeBiome implements LocalBiome
 
 	    BiomeAmbience.Builder biomeAmbienceBuilder =
 			new BiomeAmbience.Builder()
-				.func_235239_a_(biomeConfig.fogColor != 0x000000 ? biomeConfig.fogColor : 12638463)
-				.func_235248_c_(biomeConfig.fogColor != 0x000000 ? biomeConfig.fogColor : 329011) // TODO: Add a setting for Water fog color.						
-				.func_235246_b_(biomeConfig.waterColor != 0xffffff ? biomeConfig.waterColor : 4159204)
-				.func_242539_d(biomeConfig.skyColor != 0x7BA5FF ? biomeConfig.skyColor : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
+				.func_235239_a_(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 12638463)
+				.func_235248_c_(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 329011) // TODO: Add a setting for Water fog color.						
+				.func_235246_b_(biomeConfig.getWaterColor() != 0xffffff ? biomeConfig.getWaterColor() : 4159204)
+				.func_242539_d(biomeConfig.getSkyColor() != 0x7BA5FF ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
 				// TODO: Implement these
 				//particle
 				//.func_235244_a_()
@@ -114,16 +115,16 @@ public class ForgeBiome implements LocalBiome
 				//.func_235240_a_()				
 		;
 
-	    if(biomeConfig.foliageColor != 0xffffff)
+	    if(biomeConfig.getFoliageColor() != 0xffffff)
 	    {
-			biomeAmbienceBuilder.func_242540_e(biomeConfig.foliageColor);
+			biomeAmbienceBuilder.func_242540_e(biomeConfig.getFoliageColor());
 	    }
 
-	    if(biomeConfig.grassColor != 0xffffff)
+	    if(biomeConfig.getGrassColor() != 0xffffff)
 	    {
-	    	if(!biomeConfig.grassColorIsMultiplier)
+	    	if(!biomeConfig.getGrassColorIsMultiplier())
 	    	{
-				biomeAmbienceBuilder.func_242541_f(biomeConfig.grassColor);
+				biomeAmbienceBuilder.func_242541_f(biomeConfig.getGrassColor());
 	    	} else {
 	    		// TODO: grass color multiplier
 	    		//int multipliedGrassColor = (defaultGrassColor + biomeConfig.grassColor) / 2;
@@ -134,15 +135,15 @@ public class ForgeBiome implements LocalBiome
 		Biome.Builder biomeBuilder = 
 			new Biome.Builder()
 			.precipitation(
-				biomeConfig.biomeWetness <= 0.0001 ? Biome.RainType.NONE : 
-				biomeConfig.biomeTemperature > WorldStandardValues.SNOW_AND_ICE_TEMP ? Biome.RainType.RAIN : 
+				biomeConfig.getBiomeWetness() <= 0.0001 ? Biome.RainType.NONE : 
+				biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.RainType.RAIN : 
 				Biome.RainType.SNOW
 			)
 			.category(Biome.Category.PLAINS) // TODO: Find out what category is used for.
-			.depth(biomeConfig.biomeHeight)
-			.scale(biomeConfig.biomeVolatility)
+			.depth(biomeConfig.getBiomeHeight())
+			.scale(biomeConfig.getBiomeVolatility())
 			.temperature(safeTemperature)
-			.downfall(biomeConfig.biomeWetness)
+			.downfall(biomeConfig.getBiomeWetness())
 			// Ambience (colours/sounds)
 			.func_235097_a_(
 				biomeAmbienceBuilder.func_235238_a_()
@@ -163,10 +164,10 @@ public class ForgeBiome implements LocalBiome
 		;
 	}
 
-	private static MobSpawnInfo.Builder createMobSpawnInfo(BiomeConfig biomeConfig)
+	private static MobSpawnInfo.Builder createMobSpawnInfo(IBiomeConfig biomeConfig)
 	{
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = new MobSpawnInfo.Builder();
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnMonstersMerged)
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getMonsters())
 		{
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
@@ -176,7 +177,7 @@ public class ForgeBiome implements LocalBiome
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
 		}
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnCreaturesMerged)
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getCreatures())
 		{
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
@@ -186,7 +187,7 @@ public class ForgeBiome implements LocalBiome
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
 		}
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnWaterCreaturesMerged)
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getWaterCreatures())
 		{
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
@@ -196,7 +197,7 @@ public class ForgeBiome implements LocalBiome
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
 		}		
-		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.spawnAmbientCreaturesMerged)
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getAmbientCreatures())
 		{
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
@@ -213,84 +214,84 @@ public class ForgeBiome implements LocalBiome
 		return mobSpawnInfoBuilder;
 	}
 	
-	private static void addDefaultStructures(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig)
+	private static void addDefaultStructures(Builder biomeGenerationSettingsBuilder, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		// TODO: Village size, distance.
-		if(biomeConfig.worldConfig.villagesEnabled)
+		if(worldConfig.getVillagesEnabled())
 		{
-			if(biomeConfig.villageType == VillageType.sandstone)
+			if(biomeConfig.getVillageType() == VillageType.sandstone)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244155_u);			
+				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244155_u);
 			}
-			else if(biomeConfig.villageType == VillageType.savanna)
+			else if(biomeConfig.getVillageType() == VillageType.savanna)
 	        {
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244156_v);
 	        }
-			else if(biomeConfig.villageType == VillageType.taiga)
+			else if(biomeConfig.getVillageType() == VillageType.taiga)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244158_x);			
 			}
-			else if(biomeConfig.villageType == VillageType.wood)
+			else if(biomeConfig.getVillageType() == VillageType.wood)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244154_t);
 			}
-			else if(biomeConfig.villageType == VillageType.snowy)
+			else if(biomeConfig.getVillageType() == VillageType.snowy)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244157_w);
 			}
 		}
 		
 		// TODO: Stronghold count, distance, spread.
-		if(biomeConfig.worldConfig.strongholdsEnabled)
+		if(worldConfig.getStrongholdsEnabled())
 		{
 			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244145_k);
 		}
 				
 		// TODO: Ocean monument gridsize, offset.
-		if(biomeConfig.worldConfig.oceanMonumentsEnabled)
+		if(worldConfig.getOceanMonumentsEnabled())
 		{
 			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244146_l);
 		}
 		
 		// TODO: Min/max distance for rare buildings.
-		if(biomeConfig.worldConfig.rareBuildingsEnabled)
+		if(worldConfig.getRareBuildingsEnabled())
 		{
-			if(biomeConfig.rareBuildingType == RareBuildingType.desertPyramid)
+			if(biomeConfig.getRareBuildingType() == RareBuildingType.desertPyramid)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244140_f);
 			}		
-			if(biomeConfig.rareBuildingType == RareBuildingType.igloo)
+			if(biomeConfig.getRareBuildingType() == RareBuildingType.igloo)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244141_g);
 			}		
-			if(biomeConfig.rareBuildingType == RareBuildingType.jungleTemple)
+			if(biomeConfig.getRareBuildingType() == RareBuildingType.jungleTemple)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244139_e);
 			}
-			if(biomeConfig.rareBuildingType == RareBuildingType.swampHut)
+			if(biomeConfig.getRareBuildingType() == RareBuildingType.swampHut)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244144_j);
 			}
 		}
 		
-		if(biomeConfig.woodLandMansionsEnabled)
+		if(biomeConfig.getWoodlandMansionsEnabled())
 		{
 			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244138_d);
 		}
 		
-		if(biomeConfig.netherFortressesEnabled)
+		if(biomeConfig.getNetherFortressesEnabled())
 		{
 			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244149_o);
 		}
 
 		// TODO: Mineshaft rarity.
-		if(biomeConfig.worldConfig.mineshaftsEnabled)
+		if(worldConfig.getMineshaftsEnabled())
 		{
-			if(biomeConfig.mineshaftType == MineshaftType.normal)
+			if(biomeConfig.getMineShaftType() == MineshaftType.normal)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244136_b);
 			}
-			else if(biomeConfig.mineshaftType == MineshaftType.mesa)
+			else if(biomeConfig.getMineShaftType() == MineshaftType.mesa)
 			{
 				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244137_c);
 			}
@@ -336,10 +337,10 @@ public class ForgeBiome implements LocalBiome
 		// TODO: Desert Well
 	}
 	
-	private static void addCarvers(Builder biomeGenerationSettingsBuilder, BiomeConfig biomeConfig)
+	private static void addCarvers(Builder biomeGenerationSettingsBuilder, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
 	{
 		// TODO: Hook up caves/ravines properly.
-		if(biomeConfig.worldConfig.caveFrequency > 0 && biomeConfig.worldConfig.caveRarity > 0)
+		if(worldConfig.getCaveFrequency() > 0 && worldConfig.getCaveRarity() > 0)
 		{
 			// Caves and ravines default config
 			DefaultBiomeFeatures.func_243738_d(biomeGenerationSettingsBuilder);

@@ -18,7 +18,7 @@ import net.minecraft.world.biome.provider.BiomeProvider;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
 import com.pg85.otg.gen.biome.layers.LayerSource;
@@ -102,7 +102,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		if(biomesForPreset == null)
 		{
 			// TODO: Generate Default preset on install
-			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(PluginStandardValues.DEFAULT_PRESET_NAME);
+			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(Constants.DEFAULT_PRESET_NAME);
 		}
 		if(biomesForPreset == null)
 		{

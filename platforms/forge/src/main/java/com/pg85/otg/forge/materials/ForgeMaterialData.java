@@ -3,10 +3,9 @@ package com.pg85.otg.forge.materials;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -299,6 +298,7 @@ public class ForgeMaterialData extends LocalMaterialData
         return this.blockData == null ? false : this.blockData.getMaterial().isSolid();    	
     }
 
+    /*
 	@Override
 	public LocalMaterialData parseForWorld(WorldConfig worldConfig)
 	{
@@ -315,6 +315,7 @@ public class ForgeMaterialData extends LocalMaterialData
 		}
 		return this;
 	}
+	*/
 	
     @Override
     public boolean hasData()

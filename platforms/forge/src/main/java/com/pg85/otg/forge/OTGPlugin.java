@@ -28,33 +28,33 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.standard.PluginStandardValues;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.commands.OTGCommand;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gui.screens.CreateOTGWorldScreen;
 
-@Mod(PluginStandardValues.MOD_ID_SHORT) // Should match META-INF/mods.toml
-@Mod.EventBusSubscriber(modid = PluginStandardValues.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod(Constants.MOD_ID_SHORT) // Should match META-INF/mods.toml
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class OTGPlugin
 {
 	// Generate registry key for OTG DimensionSettings
-	private static final RegistryKey<DimensionSettings> OTG_DIMENSION_SETTINGS = RegistryKey.func_240903_a_(
+	private static final RegistryKey<DimensionSettings> OTG_DIMENSION_SETTINGS_KEY = RegistryKey.func_240903_a_(
 		Registry.field_243549_ar, 
-		new ResourceLocation(PluginStandardValues.MOD_ID_SHORT, "otg_dimension")
+		new ResourceLocation(Constants.MOD_ID_SHORT, "otg_dimension")
 	);
 	
 	// Define a new world type for the world creation screen
-	private static final BiomeGeneratorTypeScreens OTG_WORLD_TYPE = new BiomeGeneratorTypeScreens(PluginStandardValues.MOD_ID_SHORT)
+	private static final BiomeGeneratorTypeScreens OTG_WORLD_TYPE = new BiomeGeneratorTypeScreens(Constants.MOD_ID_SHORT)
 	{
 		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
 			// Provide our custom chunk generator, biome provider and dimension settings.
 			// TODO: Generate default preset on install
-			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(PluginStandardValues.DEFAULT_PRESET_NAME, seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OTG_DIMENSION_SETTINGS));
+			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(Constants.DEFAULT_PRESET_NAME, seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OTG_DIMENSION_SETTINGS_KEY));
 		}
 	};
-	
+
 	static
 	{
 		// Register the otg worldtype for the world creation screen
@@ -64,7 +64,7 @@ public class OTGPlugin
 		// TODO: Taken from vanilla overworld dim settings, adapt.
 		WorldGenRegistries.func_243664_a(
 			WorldGenRegistries.field_243658_j, 
-			OTGPlugin.OTG_DIMENSION_SETTINGS.func_240901_a_(), 
+			OTGPlugin.OTG_DIMENSION_SETTINGS_KEY.func_240901_a_(), 
 			new DimensionSettings(
 				new DimensionStructuresSettings(true), 
 				new NoiseSettings(
@@ -139,7 +139,7 @@ public class OTGPlugin
 						biomesRegistry
 					),
 					dimensionGeneratorSettings.func_236221_b_(),
-					() -> { return dimensionSettingsRegistry.func_243576_d(OTG_DIMENSION_SETTINGS); }
+					() -> { return dimensionSettingsRegistry.func_243576_d(OTG_DIMENSION_SETTINGS_KEY); }
 				)
 			)
 		);
@@ -156,8 +156,8 @@ public class OTGPlugin
 		MinecraftForge.EVENT_BUS.register(this);
 		
 		// TODO: Document why we need these, they don't appear to be used for anything atm?
-		Registry.register(Registry.field_239689_aA_, new ResourceLocation(PluginStandardValues.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
-		Registry.register(Registry.field_239690_aB_, new ResourceLocation(PluginStandardValues.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
+		Registry.register(Registry.field_239689_aA_, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
+		Registry.register(Registry.field_239690_aB_, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		
         // Start OpenTerrainGenerator engine, loads all presets.
         OTG.setEngine(new ForgeEngine());

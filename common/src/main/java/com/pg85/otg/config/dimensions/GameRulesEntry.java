@@ -5,29 +5,29 @@ import com.pg85.otg.config.standard.WorldStandardValues;
 public class GameRulesEntry
 {
 	// Capital letters since we'll be serialising to yaml (and we want to make it look nice) 
-	public boolean CommandBlockOutput = WorldStandardValues.CommandBlockOutput.getDefaultValue();
-	public boolean DisableElytraMovementCheck = WorldStandardValues.DisableElytraMovementCheck.getDefaultValue();
-	public boolean DoDaylightCycle = WorldStandardValues.DoDaylightCycle.getDefaultValue();
-	public boolean DoEntityDrops = WorldStandardValues.DoEntityDrops.getDefaultValue();
-	public boolean DoFireTick = WorldStandardValues.DoFireTick.getDefaultValue();
-	public boolean DoLimitedCrafting = WorldStandardValues.DoLimitedCrafting.getDefaultValue();
-	public boolean DoMobLoot = WorldStandardValues.DoMobLoot.getDefaultValue();
-	public boolean DoMobSpawning = WorldStandardValues.DoMobSpawning.getDefaultValue();
-	public boolean DoTileDrops = WorldStandardValues.DoTileDrops.getDefaultValue();
-	public boolean DoWeatherCycle = WorldStandardValues.DoWeatherCycle.getDefaultValue();
-	public boolean GameLoopFunction = WorldStandardValues.GameLoopFunction.getDefaultValue();
-	public boolean KeepInventory = WorldStandardValues.KeepInventory.getDefaultValue();
-	public boolean LogAdminCommands = WorldStandardValues.LogAdminCommands.getDefaultValue();
-	public int MaxCommandChainLength = WorldStandardValues.MaxCommandChainLength.getDefaultValue();
-	public int MaxEntityCramming = WorldStandardValues.MaxEntityCramming.getDefaultValue();
-	public boolean MobGriefing = WorldStandardValues.MobGriefing.getDefaultValue();
-	public boolean NaturalRegeneration = WorldStandardValues.NaturalRegeneration.getDefaultValue();
-	public int RandomTickSpeed = WorldStandardValues.RandomTickSpeed.getDefaultValue();
-	public boolean ReducedDebugInfo = WorldStandardValues.ReducedDebugInfo.getDefaultValue();
-	public boolean SendCommandFeedback = WorldStandardValues.SendCommandFeedback.getDefaultValue();
-	public boolean ShowDeathMessages = WorldStandardValues.ShowDeathMessages.getDefaultValue();
-	public int SpawnRadius = WorldStandardValues.SpawnRadius.getDefaultValue();
-	public boolean SpectatorsGenerateChunks = WorldStandardValues.SpectatorsGenerateChunks.getDefaultValue();
+	public boolean CommandBlockOutput = WorldStandardValues.CommandBlockOutput.getDefaultValue(null);
+	public boolean DisableElytraMovementCheck = WorldStandardValues.DisableElytraMovementCheck.getDefaultValue(null);
+	public boolean DoDaylightCycle = WorldStandardValues.DoDaylightCycle.getDefaultValue(null);
+	public boolean DoEntityDrops = WorldStandardValues.DoEntityDrops.getDefaultValue(null);
+	public boolean DoFireTick = WorldStandardValues.DoFireTick.getDefaultValue(null);
+	public boolean DoLimitedCrafting = WorldStandardValues.DoLimitedCrafting.getDefaultValue(null);
+	public boolean DoMobLoot = WorldStandardValues.DoMobLoot.getDefaultValue(null);
+	public boolean DoMobSpawning = WorldStandardValues.DoMobSpawning.getDefaultValue(null);
+	public boolean DoTileDrops = WorldStandardValues.DoTileDrops.getDefaultValue(null);
+	public boolean DoWeatherCycle = WorldStandardValues.DoWeatherCycle.getDefaultValue(null);
+	public boolean GameLoopFunction = WorldStandardValues.GameLoopFunction.getDefaultValue(null);
+	public boolean KeepInventory = WorldStandardValues.KeepInventory.getDefaultValue(null);
+	public boolean LogAdminCommands = WorldStandardValues.LogAdminCommands.getDefaultValue(null);
+	public int MaxCommandChainLength = WorldStandardValues.MaxCommandChainLength.getDefaultValue(null);
+	public int MaxEntityCramming = WorldStandardValues.MaxEntityCramming.getDefaultValue(null);
+	public boolean MobGriefing = WorldStandardValues.MobGriefing.getDefaultValue(null);
+	public boolean NaturalRegeneration = WorldStandardValues.NaturalRegeneration.getDefaultValue(null);
+	public int RandomTickSpeed = WorldStandardValues.RandomTickSpeed.getDefaultValue(null);
+	public boolean ReducedDebugInfo = WorldStandardValues.ReducedDebugInfo.getDefaultValue(null);
+	public boolean SendCommandFeedback = WorldStandardValues.SendCommandFeedback.getDefaultValue(null);
+	public boolean ShowDeathMessages = WorldStandardValues.ShowDeathMessages.getDefaultValue(null);
+	public int SpawnRadius = WorldStandardValues.SpawnRadius.getDefaultValue(null);
+	public boolean SpectatorsGenerateChunks = WorldStandardValues.SpectatorsGenerateChunks.getDefaultValue(null);
 	
 	public GameRulesEntry clone()
 	{

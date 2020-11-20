@@ -6,9 +6,9 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.util.materials.LocalMaterialData;
 
 // Make sure isNewConfig isn't serialised
 @JsonIgnoreProperties(value = { "isNewConfig" })
@@ -21,12 +21,12 @@ public abstract class DimensionConfigBase
 	public String PresetName;
 	public int DimensionId;
 	public boolean ShowInWorldCreationGUI = true;
-	public String Seed = WorldStandardValues.WORLD_SEED.getDefaultValue();
+	public String Seed = WorldStandardValues.WORLD_SEED.getDefaultValue(null);
     public String GameType = "Survival";
     public boolean BonusChest = false;
     public boolean AllowCheats = false;	
-	public int WorldBorderRadiusInChunks = WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue();
-	public int PregeneratorRadiusInChunks = WorldStandardValues.PREGENERATION_RADIUS.getDefaultValue();
+	public int WorldBorderRadiusInChunks = WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(null);
+	public int PregeneratorRadiusInChunks = WorldStandardValues.PREGENERATION_RADIUS.getDefaultValue(null);
 	public SettingsEntry Settings = new SettingsEntry();
 	public GameRulesEntry GameRules = new GameRulesEntry();
 	
@@ -94,7 +94,7 @@ public abstract class DimensionConfigBase
 		this.Settings.SpawnPointX = worldConfig.spawnPointX;
 		this.Settings.SpawnPointY = worldConfig.spawnPointY;
 		this.Settings.SpawnPointZ = worldConfig.spawnPointZ;
-		this.Settings.IsOTGPlus = worldConfig.isOTGPlus;
+		this.Settings.IsOTGPlus = worldConfig.isOTGPlus();
 		this.Settings.TeleportToSpawnOnly = worldConfig.teleportToSpawnOnly;
 		this.Settings.UseCustomFogColor = worldConfig.useCustomFogColor;
 		this.Settings.VoidFogYFactor = worldConfig.voidFogYFactor;
