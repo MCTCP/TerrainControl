@@ -33,6 +33,7 @@ import com.pg85.otg.gen.resource.VeinGen;
 import com.pg85.otg.gen.resource.VinesGen;
 import com.pg85.otg.gen.resource.WellGen;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 public class BiomeResourcesManager implements IConfigFunctionProvider
@@ -93,7 +94,7 @@ public class BiomeResourcesManager implements IConfigFunctionProvider
      */
     @SuppressWarnings("unchecked")
     // It's checked with clazz.getConstructor(holder.getClass(), ...))
-    public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args)
+    public <T> ConfigFunction<T> getConfigFunction(String name, T holder, List<String> args, ILogger logger, IMaterialReader materialReader)
     {
         // Get the class of the config function
         Class<? extends ConfigFunction<?>> clazz = configFunctions.get(name.toLowerCase());
@@ -105,8 +106,8 @@ public class BiomeResourcesManager implements IConfigFunctionProvider
         // Get a config function
         try
         {
-            Constructor<? extends ConfigFunction<?>> constructor = clazz.getConstructor(holder.getClass(), List.class, ILogger.class, IMaterialReader.class);
-            return (ConfigFunction<T>) constructor.newInstance(args);
+            Constructor<? extends ConfigFunction<?>> constructor = clazz.getConstructor(IBiomeConfig.class, List.class, ILogger.class, IMaterialReader.class);
+            return (ConfigFunction<T>) constructor.newInstance(holder, args, logger, materialReader);
         }
         catch (NoSuchMethodException e1)
         {

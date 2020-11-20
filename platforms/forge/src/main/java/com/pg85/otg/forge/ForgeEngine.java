@@ -12,14 +12,11 @@ import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.minecraft.DefaultBiome;
-import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.forge.biome.ForgeMojangSettings;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
-import com.pg85.otg.forge.materials.ForgeMaterials;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeLogger;
-import com.pg85.otg.util.materials.LocalMaterialData;
-
+import com.pg85.otg.forge.util.ForgeModLoadedChecker;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 public class ForgeEngine extends OTGEngine
@@ -30,6 +27,7 @@ public class ForgeEngine extends OTGEngine
 			new ForgeLogger(), 
 			Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + Constants.MOD_ID),
 			new ForgeMaterialReader(),
+			new ForgeModLoadedChecker(),			
 			new ForgePresetLoader(Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + Constants.MOD_ID))
 		);
 	}
@@ -58,13 +56,6 @@ public class ForgeEngine extends OTGEngine
 	*/
 
 	@Override
-	public boolean isModLoaded(String mod)
-	{
-		// TODO: Implement this
-		return false;
-	}
-
-	@Override
 	public boolean areEnoughBiomeIdsAvailableForPresets(ArrayList<String> presetNames)
 	{
 		// TODO: Implement this
@@ -90,11 +81,5 @@ public class ForgeEngine extends OTGEngine
 	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{
 		// TODO: Implement this
-	}
-
-	@Override
-	public LocalMaterialData readMaterial(String name) throws InvalidConfigException
-	{
-		return ForgeMaterials.readMaterial(name);
 	}
 }

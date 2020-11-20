@@ -39,7 +39,7 @@ public class FallbackConfig extends ConfigFile
 	@Override
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{		
-		for (ConfigFunction<FallbackConfig> res : reader.getConfigFunctions(this, false, biomeResourcesManager, spawnLog, logger))
+		for (ConfigFunction<FallbackConfig> res : reader.getConfigFunctions(this, false, biomeResourcesManager, spawnLog, logger, materialReader))
 		{
 			if (res != null && res instanceof BlockFallback)
 			{
