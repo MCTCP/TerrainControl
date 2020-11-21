@@ -5,7 +5,7 @@ import java.util.List;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
-import com.pg85.otg.util.BiomeResourceLocation;
+import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.gen.ChunkBuffer;

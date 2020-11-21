@@ -1,6 +1,6 @@
 package com.pg85.otg.util.interfaces;
 
-import com.pg85.otg.util.BiomeIds;
+import com.pg85.otg.util.biome.BiomeIds;
 
 public interface IBiome
 {
