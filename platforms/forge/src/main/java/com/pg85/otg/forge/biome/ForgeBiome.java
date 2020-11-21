@@ -9,8 +9,8 @@ import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
-import com.pg85.otg.util.biome.LocalBiome;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
+import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 
@@ -29,7 +29,7 @@ import net.minecraft.world.biome.MoodSoundAmbience;
 import net.minecraft.world.gen.feature.structure.StructureFeatures;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
 
-public class ForgeBiome implements LocalBiome
+public class ForgeBiome implements IBiome
 {
 	private final Biome biomeBase;
 	private final IBiomeConfig biomeConfig;
