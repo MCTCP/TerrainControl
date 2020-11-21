@@ -9,7 +9,7 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
  *
  * <p>Numbers are limited to the given min and max values.
  */
-public class FloatSetting extends Setting<Float>
+class FloatSetting extends Setting<Float>
 {
     private final float defaultValue;
     private final float minValue;

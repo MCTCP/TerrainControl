@@ -13,7 +13,7 @@ public class SurfaceGeneratorSetting extends Setting<SurfaceGenerator>
 {
     public static final Setting<SurfaceGenerator> SURFACE_AND_GROUND_CONTROL = surfaceGeneratorSetting("SurfaceAndGroundControl");	
 
-    SurfaceGeneratorSetting(String name)
+    private SurfaceGeneratorSetting(String name)
     {
         super(name);
     }
@@ -45,7 +45,7 @@ public class SurfaceGeneratorSetting extends Setting<SurfaceGenerator>
      * @param name Name of the setting.
      * @return The newly created setting.
      */
-    protected static final Setting<SurfaceGenerator> surfaceGeneratorSetting(String name)
+    private static final Setting<SurfaceGenerator> surfaceGeneratorSetting(String name)
     {
         return new SurfaceGeneratorSetting(name);
     }

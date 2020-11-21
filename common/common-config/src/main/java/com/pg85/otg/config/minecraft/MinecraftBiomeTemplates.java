@@ -22,9 +22,9 @@ import java.util.Arrays;
  */
 public class MinecraftBiomeTemplates
 {
-    public abstract static class MinecraftBiomeTemplate extends StandardBiomeTemplate
+    abstract static class MinecraftBiomeTemplate extends StandardBiomeTemplate
     {
-        protected final MojangSettings mojangSettings;
+        private final MojangSettings mojangSettings;
 
         // For each biome's vanilla settings see net.minecraft.world.biome.Biome
         public MinecraftBiomeTemplate(MojangSettings mojangSettings, int worldHeight)
@@ -56,9 +56,9 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Ocean extends MinecraftBiomeTemplate
+    static class Ocean extends MinecraftBiomeTemplate
     {
-        public Ocean(MojangSettings mojangSettings, int worldHeight)
+    	public Ocean(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
@@ -74,9 +74,9 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Plains extends MinecraftBiomeTemplate
+    static class Plains extends MinecraftBiomeTemplate
     {
-        public Plains(MojangSettings mojangSettings, int worldHeight)
+    	public Plains(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
@@ -99,9 +99,9 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Desert extends MinecraftBiomeTemplate
+    static class Desert extends MinecraftBiomeTemplate
     {
-        public Desert(MojangSettings mojangSettings, int worldHeight)
+    	public Desert(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
@@ -130,9 +130,9 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ExtremeHills extends MinecraftBiomeTemplate
+    static class ExtremeHills extends MinecraftBiomeTemplate
     {
-        public ExtremeHills(MojangSettings mojangSettings, int worldHeight)
+    	public ExtremeHills(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
@@ -149,9 +149,9 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Forest extends MinecraftBiomeTemplate
+    static class Forest extends MinecraftBiomeTemplate
     {
-        public Forest(MojangSettings mojangSettings, int worldHeight)
+    	public Forest(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
@@ -171,9 +171,9 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Taiga extends MinecraftBiomeTemplate
+    static class Taiga extends MinecraftBiomeTemplate
     {
-        public Taiga(MojangSettings mojangSettings, int worldHeight)
+    	public Taiga(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
@@ -196,9 +196,9 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Swampland extends MinecraftBiomeTemplate
+    static class Swampland extends MinecraftBiomeTemplate
     {
-        public Swampland(MojangSettings mojangSettings, int worldHeight)
+    	public Swampland(MojangSettings mojangSettings, int worldHeight)
         {
             super(mojangSettings, worldHeight);
 
@@ -229,7 +229,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class River extends MinecraftBiomeTemplate
+    static class River extends MinecraftBiomeTemplate
     {
         public River(MojangSettings mojangSettings, int worldHeight)
         {
@@ -248,7 +248,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Hell extends MinecraftBiomeTemplate
+    static class Hell extends MinecraftBiomeTemplate
     {
         public Hell(MojangSettings mojangSettings, int worldHeight)
         {
@@ -262,7 +262,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Sky extends MinecraftBiomeTemplate
+    static class Sky extends MinecraftBiomeTemplate
     {
         public Sky(MojangSettings mojangSettings, int worldHeight)
         {
@@ -275,7 +275,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class FrozenOcean extends Ocean
+    static class FrozenOcean extends Ocean
     {
         public FrozenOcean(MojangSettings mojangSettings, int worldHeight)
         {
@@ -289,7 +289,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class FrozenRiver extends MinecraftBiomeTemplate
+    static class FrozenRiver extends MinecraftBiomeTemplate
     {
         public FrozenRiver(MojangSettings mojangSettings, int worldHeight)
         {
@@ -305,7 +305,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class IcePlains extends MinecraftBiomeTemplate
+    static class IcePlains extends MinecraftBiomeTemplate
     {
         public IcePlains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -325,7 +325,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class IceMountains extends MinecraftBiomeTemplate
+    static class IceMountains extends MinecraftBiomeTemplate
     {
         public IceMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -343,7 +343,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MushroomIsland extends MinecraftBiomeTemplate
+    static class MushroomIsland extends MinecraftBiomeTemplate
     {
         public MushroomIsland(MojangSettings mojangSettings, int worldHeight)
         {
@@ -369,7 +369,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MushroomIslandShore extends MushroomIsland
+    static class MushroomIslandShore extends MushroomIsland
     {
         public MushroomIslandShore(MojangSettings mojangSettings, int worldHeight)
         {
@@ -386,7 +386,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Beach extends MinecraftBiomeTemplate
+    static class Beach extends MinecraftBiomeTemplate
     {
         public Beach(MojangSettings mojangSettings, int worldHeight)
         {
@@ -417,7 +417,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class DesertHills extends Desert
+    static class DesertHills extends Desert
     {
         public DesertHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -446,7 +446,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ForestHills extends Forest
+    static class ForestHills extends Forest
     {
         public ForestHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -464,7 +464,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class TaigaHills extends Taiga
+    static class TaigaHills extends Taiga
     {
         public TaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -484,7 +484,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ExtremeHillsEdge extends ExtremeHills
+    static class ExtremeHillsEdge extends ExtremeHills
     {
         public ExtremeHillsEdge(MojangSettings mojangSettings, int worldHeight)
         {
@@ -502,7 +502,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Jungle extends MinecraftBiomeTemplate
+    static class Jungle extends MinecraftBiomeTemplate
     {
         public Jungle(MojangSettings mojangSettings, int worldHeight)
         {
@@ -524,7 +524,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class JungleHills extends Jungle
+    static class JungleHills extends Jungle
     {
         public JungleHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -539,7 +539,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class JungleEdge extends Jungle
+    static class JungleEdge extends Jungle
     {
         public JungleEdge(MojangSettings mojangSettings, int worldHeight)
         {
@@ -554,7 +554,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class DeepOcean extends Ocean
+    static class DeepOcean extends Ocean
     {
         public DeepOcean(MojangSettings mojangSettings, int worldHeight)
         {
@@ -570,7 +570,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class StoneBeach extends MinecraftBiomeTemplate
+    static class StoneBeach extends MinecraftBiomeTemplate
     {
         public StoneBeach(MojangSettings mojangSettings, int worldHeight)
         {
@@ -583,7 +583,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ColdBeach extends MinecraftBiomeTemplate
+    static class ColdBeach extends MinecraftBiomeTemplate
     {
         public ColdBeach(MojangSettings mojangSettings, int worldHeight)
         {
@@ -597,7 +597,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class BirchForest extends Forest
+    static class BirchForest extends Forest
     {
         public BirchForest(MojangSettings mojangSettings, int worldHeight)
         {
@@ -613,7 +613,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class BirchForestHills extends BirchForest
+    static class BirchForestHills extends BirchForest
     {
         public BirchForestHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -628,7 +628,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class RoofedForest extends MinecraftBiomeTemplate
+    static class RoofedForest extends MinecraftBiomeTemplate
     {
         public RoofedForest(MojangSettings mojangSettings, int worldHeight)
         {
@@ -647,7 +647,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ColdTaiga extends Taiga
+    static class ColdTaiga extends Taiga
     {
         public ColdTaiga(MojangSettings mojangSettings, int worldHeight)
         {
@@ -664,7 +664,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ColdTaigaHills extends ColdTaiga
+    static class ColdTaigaHills extends ColdTaiga
     {
         public ColdTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -682,7 +682,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MegaTaiga extends MinecraftBiomeTemplate
+    static class MegaTaiga extends MinecraftBiomeTemplate
     {
         public MegaTaiga(MojangSettings mojangSettings, int worldHeight)
         {
@@ -705,7 +705,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MegaTaigaHills extends MegaTaiga
+    static class MegaTaigaHills extends MegaTaiga
     {
         public MegaTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -722,7 +722,7 @@ public class MinecraftBiomeTemplates
     }
 
     // Actually called EXTREME_HILLS_WITH_TREES in this version of MC
-    public static class ExtremeHillsPlus extends ExtremeHills
+    static class ExtremeHillsPlus extends ExtremeHills
     {
         public ExtremeHillsPlus(MojangSettings mojangSettings, int worldHeight)
         {
@@ -739,7 +739,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Savanna extends MinecraftBiomeTemplate
+    static class Savanna extends MinecraftBiomeTemplate
     {
         public Savanna(MojangSettings mojangSettings, int worldHeight)
         {
@@ -759,7 +759,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class SavannaPlateau extends Savanna
+    static class SavannaPlateau extends Savanna
     {
         public SavannaPlateau(MojangSettings mojangSettings, int worldHeight)
         {
@@ -775,7 +775,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class Mesa extends MinecraftBiomeTemplate
+    static class Mesa extends MinecraftBiomeTemplate
     {
         public Mesa(MojangSettings mojangSettings, int worldHeight)
         {
@@ -796,7 +796,7 @@ public class MinecraftBiomeTemplates
     }
 
     // Actually called MESA_ROCK in this version of MC
-    public static class MesaPlateauForest extends MesaPlateau
+    static class MesaPlateauForest extends MesaPlateau
     {
         public MesaPlateauForest(MojangSettings mojangSettings, int worldHeight)
         {
@@ -821,7 +821,7 @@ public class MinecraftBiomeTemplates
     }
 
     // Actually called MESA_CLEAR_ROCK in this version of MC
-    public static class MesaPlateau extends Mesa
+    static class MesaPlateau extends Mesa
     {
         public MesaPlateau(MojangSettings mojangSettings, int worldHeight)
         {
@@ -836,7 +836,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class TheVoid extends MinecraftBiomeTemplate
+    static class TheVoid extends MinecraftBiomeTemplate
     {
         public TheVoid(MojangSettings mojangSettings, int worldHeight)
         {
@@ -852,7 +852,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class SunflowerPlains extends Plains
+    static class SunflowerPlains extends Plains
     {
         public SunflowerPlains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -866,7 +866,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class DesertMountains extends Desert
+    static class DesertMountains extends Desert
     {
         public DesertMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -883,7 +883,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ExtremeHillsMountains extends ExtremeHills
+    static class ExtremeHillsMountains extends ExtremeHills
     {
         public ExtremeHillsMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -898,7 +898,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class FlowerForest extends Forest
+    static class FlowerForest extends Forest
     {
         public FlowerForest(MojangSettings mojangSettings, int worldHeight)
         {
@@ -923,7 +923,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class TaigaMountains extends Taiga
+    static class TaigaMountains extends Taiga
     {
         public TaigaMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -938,7 +938,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class SwamplandMountains extends Swampland
+    static class SwamplandMountains extends Swampland
     {
         public SwamplandMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -951,7 +951,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class IcePlainsSpikes extends IcePlains
+    static class IcePlainsSpikes extends IcePlains
     {
         public IcePlainsSpikes(MojangSettings mojangSettings, int worldHeight)
         {
@@ -969,7 +969,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class JungleMountains extends Jungle
+    static class JungleMountains extends Jungle
     {
         public JungleMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -982,7 +982,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class JungleEdgeMountains extends JungleMountains
+    static class JungleEdgeMountains extends JungleMountains
     {
         public JungleEdgeMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -996,7 +996,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class BirchForestMountains extends BirchForest
+    static class BirchForestMountains extends BirchForest
     {
         public BirchForestMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1010,7 +1010,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class BirchForestHillsMountains extends BirchForestHills
+    static class BirchForestHillsMountains extends BirchForestHills
     {
         public BirchForestHillsMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1026,7 +1026,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class RoofedForestMountains extends RoofedForest
+    static class RoofedForestMountains extends RoofedForest
     {
         public RoofedForestMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1039,7 +1039,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ColdTaigaMountains extends ColdTaiga
+    static class ColdTaigaMountains extends ColdTaiga
     {
         public ColdTaigaMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1053,7 +1053,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MegaSpruceTaiga extends MegaTaiga
+    static class MegaSpruceTaiga extends MegaTaiga
     {
         public MegaSpruceTaiga(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1067,7 +1067,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MegaSpruceTaigaHills extends MegaSpruceTaiga
+    static class MegaSpruceTaigaHills extends MegaSpruceTaiga
     {
         public MegaSpruceTaigaHills(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1081,7 +1081,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class ExtremeHillsPlusMountains extends ExtremeHillsPlus
+    static class ExtremeHillsPlusMountains extends ExtremeHillsPlus
     {
         public ExtremeHillsPlusMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1099,7 +1099,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class SavannaMountains extends Savanna
+    static class SavannaMountains extends Savanna
     {
         public SavannaMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1116,7 +1116,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class SavannaPlateauMountains extends SavannaMountains
+    static class SavannaPlateauMountains extends SavannaMountains
     {
         public SavannaPlateauMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1131,7 +1131,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MesaBryce extends Mesa
+    static class MesaBryce extends Mesa
     {
         public MesaBryce(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1148,7 +1148,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MesaPlateauForestMountains extends MesaPlateauForest
+    static class MesaPlateauForestMountains extends MesaPlateauForest
     {
         public MesaPlateauForestMountains(MojangSettings mojangSettings, int worldHeight)
         {
@@ -1161,7 +1161,7 @@ public class MinecraftBiomeTemplates
         }
     }
 
-    public static class MesaPlateauMountains extends MesaPlateau
+    static class MesaPlateauMountains extends MesaPlateau
     {
         public MesaPlateauMountains(MojangSettings mojangSettings, int worldHeight)
         {

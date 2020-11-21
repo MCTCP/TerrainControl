@@ -11,7 +11,7 @@ import com.pg85.otg.gen.biome.NewBiomeData;
 /**
  * Class to hold biome layer data until world configs are working. This class will eventually be removed.
  */
-public class BiomeLayerData
+class BiomeLayerData
 {
 	public int generationDepth = 10;
 	public int landSize = 0;

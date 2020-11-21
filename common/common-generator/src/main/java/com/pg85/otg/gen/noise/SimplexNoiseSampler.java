@@ -5,19 +5,19 @@ import java.util.Random;
 import com.pg85.otg.util.helpers.MathHelper;
 
 // Derived from net.minecraft.world.gen.SimplexNoiseGenerator
-public class SimplexNoiseSampler
+class SimplexNoiseSampler
 {
 	// TODO: flatten this array
 	protected static final int[][] GRAD = new int[][] {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}, {1, 1, 0}, {0, -1, 1}, {-1, 1, 0}, {0, -1, -1}};
 	private static final double SQRT_3 = Math.sqrt(3.0D);
 	private static final double F2 = 0.5D * (SQRT_3 - 1.0D);
 	private static final double G2 = (3.0D - SQRT_3) / 6.0D;
-	public final double xOffset;
-	public final double yOffset;
-	public final double zOffset;
+	final double xOffset;
+	final double yOffset;
+	final double zOffset;
 	private final int[] permutations = new int[512];
 
-	public SimplexNoiseSampler(Random seed)
+	SimplexNoiseSampler(Random seed)
 	{
 		this.xOffset = seed.nextDouble() * 256.0D;
 		this.yOffset = seed.nextDouble() * 256.0D;

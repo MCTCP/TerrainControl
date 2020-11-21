@@ -35,7 +35,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
      * {@link #processBiomeData(LocalWorld)} it has the value of
      * {@link #getGroupRarity()} plus the biome rarity values of each biome.
      */
-    public int totalGroupRarity;
+    private int totalGroupRarity;
 
     /**
      * Loads the biome group using the provided settings.
@@ -83,7 +83,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
      * group rarity.
      * @param world Used to look up biomes.
      */
-    public void processBiomeData(IBiomeRegistryProvider biomeProvider, ILogger logger)
+    void processBiomeData(IBiomeRegistryProvider biomeProvider, ILogger logger)
     {
         float totalTemp = 0;
         this.totalGroupRarity = 0;
@@ -224,7 +224,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
         return false;
     }
 
-	HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMapOrHigher = new HashMap<Integer, TreeMap<Integer, IBiome>>();
+	private HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMapOrHigher = new HashMap<Integer, TreeMap<Integer, IBiome>>();
     public SortedMap<Integer, IBiome> getDepthMapOrHigher(int depth)
     {    	
     	TreeMap<Integer, IBiome> map = cachedDepthMapOrHigher.get(new Integer(depth));
@@ -249,7 +249,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
         return map;
     }
 
-    HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMaps = new HashMap<Integer, TreeMap<Integer, IBiome>>();
+    private HashMap<Integer, TreeMap<Integer, IBiome>> cachedDepthMaps = new HashMap<Integer, TreeMap<Integer, IBiome>>();
     SortedMap<Integer, IBiome> getDepthMap(int depth)
     {
     	TreeMap<Integer, IBiome> map = cachedDepthMaps.get(new Integer(depth));

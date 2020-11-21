@@ -157,12 +157,12 @@ public class WorldConfig extends WorldConfigBase
 
 	//
 
-    public static class DefaulWorldData
+    private static class DefaulWorldData
     {
-    	public WorldConfig worldConfig;
-    	public SettingsMap settingsMap;
+    	private WorldConfig worldConfig;
+    	private SettingsMap settingsMap;
     	
-    	public DefaulWorldData(WorldConfig worldConfig, SettingsMap settingsMap)
+    	private DefaulWorldData(WorldConfig worldConfig, SettingsMap settingsMap)
     	{
     		this.worldConfig = worldConfig;
     		this.settingsMap = settingsMap;

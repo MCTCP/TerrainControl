@@ -2,7 +2,7 @@ package com.pg85.otg.gen.noise.legacy;
 
 import java.util.Random;
 
-public class NoiseGeneratorSurfacePatch
+class NoiseGeneratorSurfacePatch
 {
     private static final double Square3 = Math.sqrt(3.0D);
     private static int[][] Grad3 = {{1, 1, 0}, {-1, 1, 0}, {1, -1, 0}, {-1, -1, 0}, {1, 0, 1}, {-1, 0, 1}, {1, 0, -1}, {-1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};

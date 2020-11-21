@@ -8,7 +8,7 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 /**
  * Fuzzes the edge of land and ocean by adding islands and adding ocean.
  */
-public class AddIslandsLayer implements DiagonalCrossSamplingLayer
+class AddIslandsLayer implements DiagonalCrossSamplingLayer
 {
 	@Override
 	public int sample(LayerSampleContext<?> context, int x, int z, int sw, int se, int ne, int nw, int center)

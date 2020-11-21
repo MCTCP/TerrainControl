@@ -35,7 +35,7 @@ public final class PluginConfig extends ConfigFile
 	 * Forge only: This is the number of chunks the pre-generator generates each server tick.
 	 * Higher values make pre-generation faster but can cause lag and increased memory usage.
 	 */
-	public int pregeneratorMaxChunksPerTick = PluginConfigStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK.getDefaultValue(null);
+	private int pregeneratorMaxChunksPerTick = PluginConfigStandardValues.PREGENERATOR_MAX_CHUNKS_PER_TICK.getDefaultValue(null);
     
     public PluginConfig(SettingsMap settingsReader, IConfigFunctionProvider biomeResourcesManager, ILogger logger, IMaterialReader materialReader)
     {

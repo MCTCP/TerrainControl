@@ -9,11 +9,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkPrimer;
 
-public class ForgeChunkBuffer extends ChunkBuffer
+class ForgeChunkBuffer extends ChunkBuffer
 {
 	private final ChunkPrimer chunk;
 
-	public ForgeChunkBuffer(ChunkPrimer chunk)
+	ForgeChunkBuffer(ChunkPrimer chunk)
 	{
 		this.chunk = chunk;
 	}

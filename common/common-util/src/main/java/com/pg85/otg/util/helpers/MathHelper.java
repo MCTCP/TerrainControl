@@ -53,7 +53,7 @@ public class MathHelper
         return start + delta * (end - start);
     }
 
-    public static double lerp2(double deltaX, double deltaY, double val00, double val10, double val01, double val11)
+    private static double lerp2(double deltaX, double deltaY, double val00, double val10, double val01, double val11)
     {
         return lerp(deltaY, lerp(deltaX, val00, val10), lerp(deltaX, val01, val11));
     }

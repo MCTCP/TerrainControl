@@ -13,7 +13,7 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
-public class MesaSurfaceGenerator implements SurfaceGenerator
+class MesaSurfaceGenerator implements SurfaceGenerator
 {
     private LocalMaterialData[] clayBands;
     private long worldSeed;
@@ -32,7 +32,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
     private LocalMaterialData silverClay = LocalMaterials.SILVER_STAINED_CLAY;
     private LocalMaterialData redSand = LocalMaterials.RED_SAND;
     
-    boolean initialized;
+    private boolean initialized;
 	private boolean hardClayIsReplaced;
 	private boolean orangeClayIsReplaced;
 	private boolean yellowClayIsReplaced;
@@ -73,7 +73,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         return null;
     }
 
-    public void Init(ReplacedBlocksMatrix replacedBlocks)
+    private void Init(ReplacedBlocksMatrix replacedBlocks)
     {
     	if(!this.initialized)
     	{
@@ -236,7 +236,7 @@ public class MesaSurfaceGenerator implements SurfaceGenerator
         }
     }
 
-    boolean clayBandsGenerated = false;
+    private boolean clayBandsGenerated = false;
     // net.minecraft.world.biome.BiomeMesa.genTerrainBlocks
     @Override
     public void spawn(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int xInWorld, int zInWorld)

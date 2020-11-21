@@ -40,7 +40,7 @@ public class MaterialSet
     private boolean allNonSolidMaterials = false;
 
     private int[] materialIntSet = new int[0];
-    public Set<MaterialSetEntry> materials = new LinkedHashSet<MaterialSetEntry>();
+    private Set<MaterialSetEntry> materials = new LinkedHashSet<MaterialSetEntry>();
     private boolean intSetUpToDate = true;
     private boolean parsed = false;
 

@@ -28,17 +28,17 @@ import com.pg85.otg.util.interfaces.IWorldConfig;
 
 public class DimensionsConfig
 {	
-	public String ModPackConfigName = null;
-	public int ModPackConfigVersion = 0;
+	private String ModPackConfigName = null;
+	private int ModPackConfigVersion = 0;
 	
-	Path worldSavesDir;
+	private Path worldSavesDir;
 	// Use capitals since we're serialising to yaml and we want to make it look nice
 	public boolean ShowOTGWorldCreationMenu = true;
-	public int version = 0; // Only changed when saving, otherwise legacy configs that don't have the version field will get this value.
+	private int version = 0; // Only changed when saving, otherwise legacy configs that don't have the version field will get this value.
 	private static int currentVersion = 1; // The current version
 	public String WorldName;
 	public DimensionConfig Overworld;
-	public ArrayList<DimensionConfig> Dimensions = new ArrayList<DimensionConfig>();
+	ArrayList<DimensionConfig> Dimensions = new ArrayList<DimensionConfig>();
 
 	public DimensionsConfig() { }
 	
@@ -77,7 +77,7 @@ public class DimensionsConfig
 		return null;
 	}
 
-	public void save()
+	private void save()
 	{
 		// Don't save default configs (loaded via defaultConfigfromFile)
 		// TODO: Make this prettier, Save shouldn't work depending on which constructor was used ><. Split this class up?

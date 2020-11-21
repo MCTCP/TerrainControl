@@ -19,7 +19,7 @@ import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeModLoadedChecker;
 import net.minecraftforge.fml.loading.FMLLoader;
 
-public class ForgeEngine extends OTGEngine
+class ForgeEngine extends OTGEngine
 {
 	public ForgeEngine()
 	{

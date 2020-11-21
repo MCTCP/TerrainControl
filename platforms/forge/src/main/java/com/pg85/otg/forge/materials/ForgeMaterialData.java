@@ -43,7 +43,7 @@ public class ForgeMaterialData extends LocalMaterialData
     	this.rawEntry = raw;
     }
     
-    public static ForgeMaterialData getBlank()
+    private static ForgeMaterialData getBlank()
     {
     	// TODO: this null should probably be replaced with air
     	ForgeMaterialData material = new ForgeMaterialData((BlockState)null, null);
@@ -51,7 +51,7 @@ public class ForgeMaterialData extends LocalMaterialData
     	return material;
     }
 
-    public static ForgeMaterialData ofString(String input) throws InvalidConfigException
+    static ForgeMaterialData ofString(String input) throws InvalidConfigException
     {
     	if(input == null || input.trim().isEmpty())
     	{
@@ -167,7 +167,7 @@ public class ForgeMaterialData extends LocalMaterialData
      * @param block The material.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofMinecraftBlock(Block block, String raw)
+    private static ForgeMaterialData ofMinecraftBlock(Block block, String raw)
     {
         return ofMinecraftBlockState(block.getDefaultState(), raw);
     }
@@ -187,7 +187,7 @@ public class ForgeMaterialData extends LocalMaterialData
      * @param blockData The material an data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofMinecraftBlockState(BlockState blockData, String raw)
+    private static ForgeMaterialData ofMinecraftBlockState(BlockState blockData, String raw)
     {
         return new ForgeMaterialData(blockData, raw);
     }   

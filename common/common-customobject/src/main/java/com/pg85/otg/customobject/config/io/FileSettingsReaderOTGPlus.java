@@ -1,6 +1,5 @@
 package com.pg85.otg.customobject.config.io;
 
-import com.pg85.otg.config.helpers.InheritanceHelper;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
@@ -23,7 +22,7 @@ import java.util.Map.Entry;
  */
 public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
 {  
-    public static final <T, C extends CustomObjectConfigFunction<T>> List<C> mergeListsCustomObject(Collection<? extends C> childList, Collection<? extends C> parentList)
+    private static final <T, C extends CustomObjectConfigFunction<T>> List<C> mergeListsCustomObject(Collection<? extends C> childList, Collection<? extends C> parentList)
     {
         List<C> returnList = new ArrayList<C>(childList);
         for (C parentFunction : parentList)
@@ -240,7 +239,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
         this.settingsCache.put(setting.getName().toLowerCase(), new StringOnLine(setting.write(value), -1));
     }
 
-    public void readSettings(ILogger logger)
+    private void readSettings(ILogger logger)
     {
         BufferedReader settingsReader = null;
 

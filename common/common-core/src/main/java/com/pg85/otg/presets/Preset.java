@@ -12,7 +12,7 @@ public class Preset
 	private final WorldConfig worldConfig;
 	private final HashMap<String, BiomeConfig> biomeConfigs = new HashMap<String, BiomeConfig>();
 
-	public Preset(String name, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
+	Preset(String name, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
 	{
 		this.name = name;
 		this.worldConfig = worldConfig;

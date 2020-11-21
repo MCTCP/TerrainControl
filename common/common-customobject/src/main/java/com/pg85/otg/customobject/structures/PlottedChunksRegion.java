@@ -11,17 +11,17 @@ public class PlottedChunksRegion
 
 	public PlottedChunksRegion() { }
 
-	public PlottedChunksRegion(boolean[][] plottedChunks)
+	PlottedChunksRegion(boolean[][] plottedChunks)
 	{
 		this.plottedChunks = plottedChunks;
 	}
 
-	public boolean requiresSave()
+	boolean requiresSave()
 	{
 		return this.requiresSave;
 	}
 
-	public void markSaved()
+	void markSaved()
 	{
 		this.requiresSave = false;
 	}
@@ -42,7 +42,7 @@ public class PlottedChunksRegion
 		return this.plottedChunks;
 	}
 
-	public static PlottedChunksRegion getFilledRegion()
+	static PlottedChunksRegion getFilledRegion()
 	{
 		boolean[][] plottedChunks = new boolean[Constants.REGION_SIZE][Constants.REGION_SIZE];
 		for(int i = 0; i < Constants.REGION_SIZE; i++)

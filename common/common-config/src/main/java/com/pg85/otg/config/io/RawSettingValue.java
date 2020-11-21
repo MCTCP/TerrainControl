@@ -10,7 +10,7 @@ import com.pg85.otg.config.settingType.Setting;
  * Information about the unparsed value of a setting. It contains what was found
  * in a config file: the line nubmer, the setting value and the comments.
  */
-public final class RawSettingValue
+final class RawSettingValue
 {
     /**
      * The type of a setting value.

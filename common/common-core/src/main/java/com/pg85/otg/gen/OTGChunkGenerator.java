@@ -78,7 +78,7 @@ public class OTGChunkGenerator
 		this.biomeBlocksNoiseGen = new NoiseGeneratorPerlinMesaBlocks(random, 4);
 	}
 
-	public static <T> T make(T object, Consumer<T> consumer)
+	private static <T> T make(T object, Consumer<T> consumer)
 	{
 		consumer.accept(object);
 		return object;
@@ -173,7 +173,7 @@ public class OTGChunkGenerator
 		return noiseHeight;
 	}
 
-	protected void getNoiseColumn(double[] buffer, int x, int z)
+	private void getNoiseColumn(double[] buffer, int x, int z)
 	{
 		// TODO: check only for edges
 		this.noiseCache.get().get(buffer, x, z);
@@ -453,7 +453,7 @@ public class OTGChunkGenerator
 	// Surface / ground / stone blocks / SAGC
 	
 	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
-	public void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
+	private void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
 	{
 		// Process surface and ground blocks for each column in the chunk
         ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();

@@ -2,7 +2,7 @@ package com.pg85.otg.gen.noise.legacy;
 
 import java.util.Random;
 
-public class NoiseGeneratorPerlin
+class NoiseGeneratorPerlin
 {
     private int permutations[];
     private double xCoord;

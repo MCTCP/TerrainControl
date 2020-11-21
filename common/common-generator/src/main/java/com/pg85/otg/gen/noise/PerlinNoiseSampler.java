@@ -7,9 +7,9 @@ import com.pg85.otg.util.helpers.MathHelper;
 // Derived from net.minecraft.world.gen.ImprovedNoiseGenerator
 public class PerlinNoiseSampler
 {
-	public final double xOffset;
-	public final double yOffset;
-	public final double zOffset;
+	private final double xOffset;
+	final double yOffset;
+	private final double zOffset;
 	private final byte[] permutations;
 
 	public PerlinNoiseSampler(Random random)
@@ -72,7 +72,7 @@ public class PerlinNoiseSampler
 		return this.permutations[idx & 255] & 255;
 	}
 
-	public double sample(int sectionX, int sectionY, int sectionZ, double localX, double localY, double localZ, double smoothedX, double smoothedY, double smoothedZ)
+	private double sample(int sectionX, int sectionY, int sectionZ, double localX, double localY, double localZ, double smoothedX, double smoothedY, double smoothedZ)
 	{
 		int i = this.permute(sectionX) + sectionY;
 		int j = this.permute(i) + sectionZ;

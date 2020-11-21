@@ -2,7 +2,6 @@ package com.pg85.otg.util.interfaces;
 
 import java.util.Random;
 
-import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
@@ -19,7 +18,7 @@ public interface IWorldGenRegion
 	public void invalidatePopulationBiomeCache();
 	public IBiome getBiome(int x, int z);
 	public IBiome getBiomeForPopulation(int x, int z, ChunkCoordinate chunkBeingPopulated);
-	public IBiomeConfig getBiomeConfig(int x, int z) throws BiomeNotFoundException;
+	public IBiomeConfig getBiomeConfig(int x, int z);
 	public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated);
 	public double getBiomeBlocksNoiseValue(int xInWorld, int zInWorld);
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z);

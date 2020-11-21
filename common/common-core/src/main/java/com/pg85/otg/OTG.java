@@ -1,7 +1,6 @@
 package com.pg85.otg;
 
 import com.pg85.otg.logging.LogMarker;
-import java.util.List;
 
 public class OTG
 {		
@@ -35,23 +34,8 @@ public class OTG
     
     // Logging
     
-    public static void log(LogMarker level, List<String> messages)
-    {
-        Engine.getLogger().log(level, messages);
-    }
-
     public static void log(LogMarker level, String message, Object... params)
     {
         Engine.getLogger().log(level, message, params);
-    }
-
-    public static void printStackTrace(LogMarker level, Throwable e)
-    {
-        printStackTrace(level, e, Integer.MAX_VALUE);
-    }
-
-    public static void printStackTrace(LogMarker level, Throwable e, int maxDepth)
-    {
-        Engine.getLogger().log(level, e, maxDepth);
     }
 }

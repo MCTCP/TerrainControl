@@ -11,7 +11,7 @@ import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 
-public class BO3Settings extends Settings
+class BO3Settings extends Settings
 {
     static final Setting<Boolean>
         TREE = booleanSetting("Tree", true),
@@ -47,6 +47,6 @@ public class BO3Settings extends Settings
 
     // Enum settings
     static final Setting<OutsideSourceBlock> OUTSIDE_SOURCE_BLOCK = enumSetting("OutsideSourceBlock", OutsideSourceBlock.placeAnyway);
-    public static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
+    static final Setting<SpawnHeightEnum> SPAWN_HEIGHT = enumSetting("SpawnHeight", SpawnHeightEnum.highestBlock);
     static final Setting<ExtrudeMode> EXTRUDE_MODE = enumSetting("ExtrudeMode", ExtrudeMode.None);
 }

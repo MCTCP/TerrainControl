@@ -3,7 +3,7 @@ package com.pg85.otg.gen.surface;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-public class LayerChoice implements Comparable<LayerChoice>
+class LayerChoice implements Comparable<LayerChoice>
 {
 	protected final LocalMaterialData surfaceBlock;
 	protected final LocalMaterialData groundBlock;
@@ -20,7 +20,7 @@ public class LayerChoice implements Comparable<LayerChoice>
         this.maxNoise = maxNoise;
     }
 
-    public LocalMaterialData getSurfaceBlockReplaced(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
+    LocalMaterialData getSurfaceBlockReplaced(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
     {    	
     	// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
     	// Make this prettier?
@@ -32,7 +32,7 @@ public class LayerChoice implements Comparable<LayerChoice>
     	return this.surfaceBlock;
     }
     
-    public LocalMaterialData getGroundBlockReplaced(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
+    LocalMaterialData getGroundBlockReplaced(boolean biomeConfigsHaveReplacement, ReplacedBlocksMatrix replaceBlocks, int y)
     {
     	// TODO: BiomeConfig should always be the same, this layer should only be used in a single biome,
     	// Make this prettier?
@@ -44,7 +44,7 @@ public class LayerChoice implements Comparable<LayerChoice>
     	return this.groundBlock;
     }
     
-    public void Init(ReplacedBlocksMatrix replacedBlocks)
+    private void Init(ReplacedBlocksMatrix replacedBlocks)
     {
     	if(!initialized)
     	{

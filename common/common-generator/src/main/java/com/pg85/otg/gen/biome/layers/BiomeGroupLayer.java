@@ -14,13 +14,13 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 /**
  * Places a biome group at a certain depth.
  */
-public class BiomeGroupLayer implements ParentedLayer
+class BiomeGroupLayer implements ParentedLayer
 {
 	// The sorted map of rarities to biome groups
 	private final TreeMap<Integer, NewBiomeGroup> rarityMap = new TreeMap<>();
 	// The rarity sum of all the groups. This is used to choose the biome group.
 	private final int maxRarity;
-	public BiomeGroupLayer(List<NewBiomeGroup> groups) {
+	BiomeGroupLayer(List<NewBiomeGroup> groups) {
 		int maxRarity = 0;
 
 		// Iterate through groups and keep a tally of the rarity of each group.

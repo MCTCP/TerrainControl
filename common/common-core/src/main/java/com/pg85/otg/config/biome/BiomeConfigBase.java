@@ -27,7 +27,7 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.SaplingType;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 
-public abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
+abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 {
     private final BiomeResourceLocation registryKey;
 	
@@ -62,7 +62,7 @@ public abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     protected LocalMaterialData cooledLavaBlock;
 
     protected List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
-    protected ICustomStructureGen structureGen;
+    private ICustomStructureGen structureGen;
 
     protected double maxAverageHeight;
     protected double maxAverageDepth;

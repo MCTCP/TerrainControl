@@ -1,7 +1,5 @@
 package com.pg85.otg.util.interfaces;
 
-import com.pg85.otg.util.biome.BiomeIds;
-
 public interface IBiome
 {
 	IBiomeConfig getBiomeConfig();
@@ -9,8 +7,6 @@ public interface IBiome
     boolean isCustom();
 
     String getName();
-
-    BiomeIds getIds();
 
     /**
      * Gets the temperature at the given position, if this biome would be

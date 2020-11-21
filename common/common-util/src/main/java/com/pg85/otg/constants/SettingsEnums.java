@@ -32,15 +32,7 @@ public class SettingsEnums
         WriteAll,
         WriteDisable,
         WriteWithoutComments
-    }
-    
-    public enum enumBiomeConfigMaterial
-    {
-    	WATER_BLOCK,
-    	ICE_BLOCK,
-    	COOLED_LAVA_BLOCK,
-    	STONE_BLOCK
-    }    
+    } 
     
     public enum VillageType
     {

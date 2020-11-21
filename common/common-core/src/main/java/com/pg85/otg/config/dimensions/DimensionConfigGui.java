@@ -10,12 +10,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.pg85.otg.config.world.WorldConfig;
 
-public class DimensionConfigGui extends DimensionConfigBase
+class DimensionConfigGui extends DimensionConfigBase
 {
-	public List<String> dimensions = new ArrayList<String>();
-	public String author = null;
-	public String description = null;
-	public String worldPackerModName = null;
+	private List<String> dimensions = new ArrayList<String>();
+	private String author = null;
+	private String description = null;
+	private String worldPackerModName = null;
 	
 	public DimensionConfigGui()
 	{

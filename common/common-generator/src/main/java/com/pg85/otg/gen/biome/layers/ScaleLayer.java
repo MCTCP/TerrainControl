@@ -4,16 +4,16 @@ import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 
-public class ScaleLayer implements ParentedLayer
+class ScaleLayer implements ParentedLayer
 {
    public ScaleLayer() { }
 
-   public int transformX(int x)
+   private int transformX(int x)
    {
       return x >> 1;
    }
 
-   public int transformZ(int y)
+   private int transformZ(int y)
    {
       return y >> 1;
    }

@@ -143,7 +143,7 @@ public class CustomObjectCollection
      * 
      * @param object The object to add to the list of loaded objects.
      */
-    public void addLoadedGlobalObject(CustomObject object)
+    void addLoadedGlobalObject(CustomObject object)
     {
     	synchronized(indexingFilesLock)
     	{
@@ -170,7 +170,7 @@ public class CustomObjectCollection
     	}
     }
     
-    public void reloadCustomObjectFiles()
+    void reloadCustomObjectFiles()
     {
     	synchronized(indexingFilesLock)
     	{
@@ -201,7 +201,7 @@ public class CustomObjectCollection
     	}
     }
     
-    public void indexGlobalObjectsFolder(boolean spawnLog, ILogger logger, Path otgRootFolder)
+    void indexGlobalObjectsFolder(boolean spawnLog, ILogger logger, Path otgRootFolder)
     {
     	synchronized(indexingFilesLock)
     	{
@@ -224,7 +224,7 @@ public class CustomObjectCollection
     	}
     }
     
-    public void indexWorldObjectsFolder(String worldName, boolean spawnLog, ILogger logger, Path otgRootFolder)
+    void indexWorldObjectsFolder(String worldName, boolean spawnLog, ILogger logger, Path otgRootFolder)
     {
     	synchronized(indexingFilesLock)
     	{
@@ -250,7 +250,7 @@ public class CustomObjectCollection
      * @param name Name of the object.
      * @return The object, or null if not found.
      */
-    public CustomObject getObjectByName(String name, String worldName, boolean searchGlobalObjects, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private CustomObject getObjectByName(String name, String worldName, boolean searchGlobalObjects, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	synchronized(indexingFilesLock)
     	{

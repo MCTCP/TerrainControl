@@ -21,7 +21,7 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
     private boolean writeComments;
     private BufferedWriter writer;
 	
-    public FileSettingsWriterOTGPlus(File file)
+    private FileSettingsWriterOTGPlus(File file)
     {
         this.file = file;
     }

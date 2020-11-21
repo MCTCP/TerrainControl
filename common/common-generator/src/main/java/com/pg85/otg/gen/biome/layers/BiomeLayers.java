@@ -21,16 +21,16 @@ public class BiomeLayers
 	public static final int GROUP_SHIFT = 23;
 
 	// The marker for biome groups
-	public static final int GROUP_BIT = (127 << GROUP_SHIFT);
+	private static final int GROUP_BIT = (127 << GROUP_SHIFT);
 
 	// This is the amount of bits we & the sample at the end to get the correct biome id.
 	public static final int BIOME_BITS = (1 << GROUP_SHIFT) - 1;
 
-	public static boolean isLand(int sample) {
+	static boolean isLand(int sample) {
 		return (sample & LAND_BIT) == 0;
 	}
 
-	public static int getGroupId(int sample)
+	static int getGroupId(int sample)
 	{
 		return (sample & GROUP_BIT) >> GROUP_SHIFT;
 	}

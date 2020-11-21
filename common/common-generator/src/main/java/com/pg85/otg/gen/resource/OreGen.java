@@ -23,7 +23,7 @@ public class OreGen extends Resource
     private final int minAltitude;
     private final MaterialSet sourceBlocks;
     // use a byte since y is always between 0-255
-    byte[][] highestBlocksCache;
+    private byte[][] highestBlocksCache;
 
     public OreGen(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
     {

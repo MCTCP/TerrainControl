@@ -6,7 +6,7 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 /**
  * Initializes the biome sample for biome generation.
  */
-public class InitializationLayer implements InitLayer
+class InitializationLayer implements InitLayer
 {
 	@Override
 	public int sample(LayerSampleContext<?> context, int x, int y)

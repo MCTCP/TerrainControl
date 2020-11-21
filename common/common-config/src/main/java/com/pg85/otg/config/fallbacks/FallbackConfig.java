@@ -10,7 +10,7 @@ import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
-public class FallbackConfig extends ConfigFile
+class FallbackConfig extends ConfigFile
 {
 	private List<BlockFallback> fallbacks = new ArrayList<BlockFallback>();
 

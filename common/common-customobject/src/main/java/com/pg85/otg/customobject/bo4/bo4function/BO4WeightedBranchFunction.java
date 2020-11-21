@@ -29,7 +29,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
 	
 	public BO4WeightedBranchFunction() { }
 	
-	public BO4WeightedBranchFunction(BO4Config holder)
+	private BO4WeightedBranchFunction(BO4Config holder)
 	{
 		super(holder);
 	}

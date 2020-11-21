@@ -77,7 +77,7 @@ public class BO4CustomStructureCoordinate extends CustomStructureCoordinate
 	 *
 	 * @return The casted object.
 	*/
-    public StructuredCustomObject getStructuredObject(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    StructuredCustomObject getStructuredObject(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	return (StructuredCustomObject)getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
     }

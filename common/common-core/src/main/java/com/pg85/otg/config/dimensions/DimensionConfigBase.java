@@ -12,23 +12,23 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 
 // Make sure isNewConfig isn't serialised
 @JsonIgnoreProperties(value = { "isNewConfig" })
-public abstract class DimensionConfigBase
+abstract class DimensionConfigBase
 {
 	// isNewConfig isn't serialised
 	public boolean isNewConfig = false;
 	
 	// Capital letters since we'll be serialising to yaml (and we want to make it look nice)
 	public String PresetName;
-	public int DimensionId;
-	public boolean ShowInWorldCreationGUI = true;
+	int DimensionId;
+	boolean ShowInWorldCreationGUI = true;
 	public String Seed = WorldStandardValues.WORLD_SEED.getDefaultValue(null);
-    public String GameType = "Survival";
-    public boolean BonusChest = false;
-    public boolean AllowCheats = false;	
-	public int WorldBorderRadiusInChunks = WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(null);
-	public int PregeneratorRadiusInChunks = WorldStandardValues.PREGENERATION_RADIUS.getDefaultValue(null);
-	public SettingsEntry Settings = new SettingsEntry();
-	public GameRulesEntry GameRules = new GameRulesEntry();
+    String GameType = "Survival";
+    boolean BonusChest = false;
+    boolean AllowCheats = false;	
+	int WorldBorderRadiusInChunks = WorldStandardValues.WORLD_BORDER_RADIUS.getDefaultValue(null);
+	int PregeneratorRadiusInChunks = WorldStandardValues.PREGENERATION_RADIUS.getDefaultValue(null);
+	SettingsEntry Settings = new SettingsEntry();
+	GameRulesEntry GameRules = new GameRulesEntry();
 	
 	public DimensionConfigBase() { }
 	

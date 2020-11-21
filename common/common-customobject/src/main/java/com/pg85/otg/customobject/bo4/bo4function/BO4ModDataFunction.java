@@ -17,7 +17,7 @@ public class BO4ModDataFunction extends ModDataFunction<BO4Config>
 {
 	public BO4ModDataFunction() { }
 	
-	public BO4ModDataFunction(BO4Config holder)
+	private BO4ModDataFunction(BO4Config holder)
 	{
 		this.holder = holder;
 	}

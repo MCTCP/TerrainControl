@@ -6,7 +6,7 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.util.Random;
 
-public abstract class TerrainGenBase
+abstract class TerrainGenBase
 {
     protected int checkAreaSize = 8;
     protected Random random = new Random();
