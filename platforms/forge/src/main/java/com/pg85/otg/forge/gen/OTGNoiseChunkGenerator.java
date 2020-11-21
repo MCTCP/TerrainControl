@@ -175,12 +175,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			isInitialised = true;
 			// TODO: PresetNameProvider / ModLoadedCheckProvider
-			this.structureCache = new CustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus(), OTG.getEngine().getOTGRootFolder(), OTG.getPluginConfig().spawnLog, OTG.getEngine().getLogger(), OTG.getCustomObjectManager(), null, OTG.getEngine().getMaterialReader(), OTG.getCustomObjectResourcesManager(), null);
+			this.structureCache = new CustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().spawnLog, OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), null, OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), null);
 			//this.structureCache = new CustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus); 
 			DimensionsConfig dimensionsConfig = new DimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName);
 			dimensionsConfig.WorldName = worldName;
 			dimensionsConfig.Overworld = this.dimensionConfig;
-			OTG.setDimensionsConfig(dimensionsConfig);
+			OTG.getEngine().setDimensionsConfig(dimensionsConfig);
 		}
 	}
 	
