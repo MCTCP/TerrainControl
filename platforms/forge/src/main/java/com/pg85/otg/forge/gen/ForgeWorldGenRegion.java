@@ -12,7 +12,6 @@ import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
-import com.pg85.otg.util.biome.LocalBiome;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
@@ -129,7 +128,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
 	{
-		this.cachedBiomeConfigs = new LocalBiome[32][32];
+		this.cachedBiomeConfigs = new IBiome[32][32];
 		
 		int areaSize = 32; 
 		for(int x = 0; x < areaSize; x++)
