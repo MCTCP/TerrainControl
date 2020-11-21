@@ -4,13 +4,13 @@ import java.util.Optional;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.MineshaftType;
+import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
+import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.BiomeIds;
 import com.pg85.otg.util.biome.LocalBiome;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
-import com.pg85.otg.util.biome.SettingsEnums.MineshaftType;
-import com.pg85.otg.util.biome.SettingsEnums.RareBuildingType;
-import com.pg85.otg.util.biome.SettingsEnums.VillageType;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 

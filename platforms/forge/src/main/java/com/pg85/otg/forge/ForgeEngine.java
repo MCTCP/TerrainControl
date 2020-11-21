@@ -32,36 +32,6 @@ public class ForgeEngine extends OTGEngine
 		);
 	}
 
-	/*
-	@Override
-	public LocalWorld getWorld(String name)
-	{
-		// TODO: Implement this
-		return null;
-	}
-
-	@Override
-	public LocalWorld getUnloadedWorld(String name)
-	{
-		// TODO: Implement this
-		return null;
-	}
-
-	@Override
-	public ArrayList<LocalWorld> getAllWorlds()
-	{
-		// TODO: Implement this
-		return null;
-	}
-	*/
-
-	@Override
-	public boolean areEnoughBiomeIdsAvailableForPresets(ArrayList<String> presetNames)
-	{
-		// TODO: Implement this
-		return false;
-	}
-
 	@Override
 	public Collection<BiomeLoadInstruction> getDefaultBiomes()
 	{

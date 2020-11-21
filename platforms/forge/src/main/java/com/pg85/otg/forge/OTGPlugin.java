@@ -160,7 +160,7 @@ public class OTGPlugin
 		Registry.register(Registry.field_239690_aB_, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		
         // Start OpenTerrainGenerator engine, loads all presets.
-        OTG.setEngine(new ForgeEngine());
+        OTG.startEngine(new ForgeEngine());
 	}
 	
     @SubscribeEvent
