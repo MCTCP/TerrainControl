@@ -69,6 +69,9 @@ public class BiomeLayers
 			}
 		}
 
+		// Add ocean biomes. This only adds the regular ocean at the moment, soon it will add others.
+		factory = new ApplyOceanLayer(data).create(contextProvider.apply(3L), factory);
+
 		// Finalize the biome data
 		factory = new FinalizeLayer().create(contextProvider.apply(1L), factory);
 
@@ -76,9 +79,9 @@ public class BiomeLayers
 	}
 
 	// Create a sampler that can get a biome at a position
-	public static CachingLayerSampler create(long seed)
+	public static CachingLayerSampler create(long seed, BiomeLayerData data)
 	{
-		LayerFactory<CachingLayerSampler> factory = build(BiomeLayerData.INSTANCE, salt -> new CachingLayerContext(25, seed, salt));
+		LayerFactory<CachingLayerSampler> factory = build(data, salt -> new CachingLayerContext(25, seed, salt));
 		return factory.make();
 	}
 }

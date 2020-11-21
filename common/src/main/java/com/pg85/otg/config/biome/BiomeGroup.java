@@ -28,7 +28,7 @@ public final class BiomeGroup extends ConfigFunction<WorldConfig>
     private int groupRarity;
     private int generationDepth = 0;
     private float avgTemp = 0;
-    private Map<String, LocalBiome> biomes = new LinkedHashMap<String, LocalBiome>(32);
+    public Map<String, LocalBiome> biomes = new LinkedHashMap<String, LocalBiome>(32);
 
     /**
      * Variable used by the the ungrouped biome generator. This generator

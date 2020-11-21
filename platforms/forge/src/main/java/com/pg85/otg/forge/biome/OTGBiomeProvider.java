@@ -40,16 +40,14 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 			RegistryLookupCodec.func_244331_a(Registry.field_239720_u_).forGetter((provider) -> provider.registry)
 		).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
-
-	// TODO: This needs to be better
-	public static final BiomeConfig[] LOOKUP = new BiomeConfig[128];
  	
 	private final long seed;
 	private final boolean legacyBiomeInitLayer;
 	private final boolean largeBiomes;
 	private final Registry<Biome> registry;
 	private final CachingLayerSampler layer;
-	private final Int2ObjectMap<RegistryKey<Biome>> lookup;
+	public final Int2ObjectMap<BiomeConfig> configLookup;
+	private final Int2ObjectMap<RegistryKey<Biome>> keyLookup;
 	private final String presetName;
 	
 	public OTGBiomeProvider(String presetName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
@@ -60,40 +58,21 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		this.legacyBiomeInitLayer = legacyBiomeInitLayer;
 		this.largeBiomes = largeBiomes;
 		this.registry = registry;
-		this.layer = BiomeLayers.create(seed);
-		this.lookup = new Int2ObjectOpenHashMap<>();
-		
-		// TODO: this is hardcoded for now until layer generation is fixed.
-		// TODO: Get the RegistryKey when registering biomes and reuse it?
-		Biome biome = registry.getOrDefault(new ResourceLocation("otg:default.ocean"));
-		if(biome != null)
+		this.layer = BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetName));
+		this.keyLookup = new Int2ObjectOpenHashMap<>();
+
+		// Default to let us know if we did anything wrong
+		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
+
+		this.configLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping();
+
+		for (int biomeId : this.configLookup.keySet())
 		{
-			this.lookup.put(0, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.ocean")));
-		} else {
-			this.lookup.put(0, Biomes.OCEAN);
+			BiomeConfig config = this.configLookup.get(biomeId);
+
+			RegistryKey<Biome> key = RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
+			this.keyLookup.put(biomeId, key);
 		}
-		biome = registry.getOrDefault(new ResourceLocation("otg:default.plains"));
-		if(biome != null)
-		{
-			this.lookup.put(1, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.plains")));
-		} else {
-			this.lookup.put(1, Biomes.PLAINS);
-		}
-		biome = registry.getOrDefault(new ResourceLocation("otg:default.forest"));
-		if(biome != null)
-		{
-			this.lookup.put(2, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.forest")));
-		} else {
-			this.lookup.put(2, Biomes.FOREST);
-		}
-		biome = registry.getOrDefault(new ResourceLocation("otg:default.desert"));
-		if(biome != null)
-		{
-			this.lookup.put(3, RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation("otg:default.desert")));
-		} else {
-			this.lookup.put(3, Biomes.DESERT);
-		}
-		//
 	}
 	
 	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetName, Registry<Biome> registry)
@@ -127,14 +106,14 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	public RegistryKey<Biome> getBiomeRegistryKey(int x, int y, int z)
 	{
 		// TODO: this is hardcoded for now until layer generation is fixed
-		return lookup.get(this.layer.sample(x, z));
+		return keyLookup.get(this.layer.sample(x, z));
 	}
 
 	@Override
 	public Biome getNoiseBiome(int x, int y, int z)
 	{
 		// TODO: this is hardcoded for now until layer generation is fixed
-		return registry.func_230516_a_(lookup.get(this.layer.sample(x, z)));
+		return registry.func_230516_a_(keyLookup.get(this.layer.sample(x, z)));
 	}
 
 	@Override
@@ -146,6 +125,6 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	@Override
 	public BiomeConfig getConfig(int x, int z)
 	{
-		return LOOKUP[this.layer.sample(x, z)];
+		return configLookup.get(this.layer.sample(x, z));
 	}
 }

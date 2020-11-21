@@ -63,7 +63,7 @@ public class OTGCommand
 			for (int z = 0; z < img.getWidth(); z++)
 			{
 				//set the color
-				img.setRGB(x, z, OTGBiomeProvider.LOOKUP[provider.getSampler().sample(x, z)].biomeColor);
+				img.setRGB(x, z, provider.configLookup.get(provider.getSampler().sample(x, z)).biomeColor);
 			}
 
 			//send a progress update to let people know the server isn't dying
