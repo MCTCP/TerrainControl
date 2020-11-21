@@ -55,13 +55,13 @@ public abstract class OTGEngine
         this.presetNameProvider = new PresetNameProvider();
     }
     
-    public void onShutdown()
+    void onShutdown()
     {
         // Shutdown all loaders
         customObjectManager.shutdown();
     }
 
-    public void onStart()
+    void onStart()
     {
     	// Load plugin config
     	

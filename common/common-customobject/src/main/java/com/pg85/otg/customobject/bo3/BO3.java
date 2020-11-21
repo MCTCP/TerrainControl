@@ -55,7 +55,7 @@ public class BO3 implements StructuredCustomObject
      * @param name Name of the BO3.
      * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
      */
-    public BO3(String name, File file)
+    BO3(String name, File file)
     {
         this.name = name;
         this.file = file;
@@ -375,7 +375,7 @@ public class BO3 implements StructuredCustomObject
         return true;
     }
 
-    public void handleBO3Functions(CustomStructure structure, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, HashSet<ChunkCoordinate> chunks, ChunkCoordinate chunkBeingPopulated)
+    private void handleBO3Functions(CustomStructure structure, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, int x, int y, int z, HashSet<ChunkCoordinate> chunks, ChunkCoordinate chunkBeingPopulated)
     {
         HashSet<ChunkCoordinate> chunksCustomObject = new HashSet<ChunkCoordinate>();
 

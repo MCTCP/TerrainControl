@@ -13,7 +13,6 @@ public class LocalMaterials
     public static final String GRASS_NAME = getRegistryKey("grass_block");
     public static final String DIRT_NAME = getRegistryKey("dirt");
 
-	public static final String COARSE_DIRT_NAME = getRegistryKey("coarse_dirt");
 	public static final String CLAY_NAME = getRegistryKey("clay");
 	public static final String TERRACOTTA_NAME = getRegistryKey("terracotta");
 	public static final String STAINED_CLAY_NAME = getRegistryKey("gray_glazed_terracotta");
@@ -51,7 +50,6 @@ public class LocalMaterials
 	public static final String ACACIA_LOG_NAME = getRegistryKey("acacia_log");
 	public static final String BIRCH_LOG_NAME = getRegistryKey("birch_log");
 	public static final String DARK_OAK_LOG_NAME = getRegistryKey("dark_oak_log");
-	public static final String JUNGLE_LOG_NAME = getRegistryKey("jungle_log");
 	public static final String OAK_LOG_NAME = getRegistryKey("oak_log");
 	public static final String SPRUCE_LOG_NAME = getRegistryKey("spruce_log");
 	public static final String STRIPPED_ACACIA_LOG_NAME = getRegistryKey("stripped_acacia_log");
@@ -74,27 +72,15 @@ public class LocalMaterials
 	public static final String YELLOW_FLOWER_NAME = getRegistryKey("dandelion");
 	public static final String DEAD_BUSH_NAME = getRegistryKey("dead_bush");
 	public static final String LONG_GRASS_NAME = getRegistryKey("tall_grass");
-	public static final String DOUBLE_PLANT_NAME = getRegistryKey("sunflower");
 	public static final String RED_MUSHROOM_NAME = getRegistryKey("red_mushroom");
 	
-	public static final String ALLIUM_NAME = getRegistryKey("allium");
-	public static final String AZURE_BLUET_NAME = getRegistryKey("azure_bluet");
-	public static final String BLUE_ORCHID_NAME = getRegistryKey("blue_orchid");
-	public static final String DANDELION_NAME = getRegistryKey("dandelion");
 	public static final String DOUBLE_TALL_GRASS_NAME = getRegistryKey("tall_grass");
-	public static final String FERN_NAME = getRegistryKey("fern");
 	public static final String LARGE_FERN_NAME = getRegistryKey("large_fern");
 	public static final String LILAC_NAME = getRegistryKey("lilac");
-	public static final String ORANGE_TULIP_NAME = getRegistryKey("orange_tulip");
-	public static final String OXEYE_DAISY_NAME = getRegistryKey("oxeye_daisy");
+
 	public static final String PEONY_NAME = getRegistryKey("peony");
-	public static final String PINK_TULIP_NAME = getRegistryKey("pink_tulip");
-	public static final String POPPY_NAME = getRegistryKey("poppy");
-	public static final String RED_TULIP_NAME = getRegistryKey("red_tulip");
 	public static final String ROSE_BUSH_NAME = getRegistryKey("rose_bush");
 	public static final String SUNFLOWER_NAME = getRegistryKey("sunflower");
-	public static final String TALL_GRASS_NAME = getRegistryKey("grass");
-	public static final String WHITE_TULIP_NAME = getRegistryKey("white_tulip");
 
 	public static final String PUMPKIN_NAME = getRegistryKey("pumpkin");
 	public static final String CACTUS_NAME = getRegistryKey("cactus");
@@ -133,7 +119,6 @@ public class LocalMaterials
 
     public static LocalMaterialData GRASS;
     public static LocalMaterialData DIRT;
-    public static LocalMaterialData COARSE_DIRT;
     public static LocalMaterialData CLAY;
     public static LocalMaterialData TERRACOTTA;
     public static LocalMaterialData STAINED_CLAY;
@@ -170,7 +155,6 @@ public class LocalMaterials
     public static LocalMaterialData ACACIA_LOG;
     public static LocalMaterialData BIRCH_LOG;
     public static LocalMaterialData DARK_OAK_LOG;
-    public static LocalMaterialData JUNGLE_LOG;
     public static LocalMaterialData OAK_LOG;
     public static LocalMaterialData SPRUCE_LOG;
     public static LocalMaterialData STRIPPED_ACACIA_LOG;
@@ -194,19 +178,6 @@ public class LocalMaterials
 	public static LocalMaterialData DEAD_BUSH;
 	public static LocalMaterialData LONG_GRASS;
 	public static LocalMaterialData RED_MUSHROOM;
-    public static LocalMaterialData ALLIUM;
-    public static LocalMaterialData AZURE_BLUET;
-    public static LocalMaterialData BLUE_ORCHID;
-    public static LocalMaterialData DANDELION;
-    public static LocalMaterialData DOUBLE_TALL_GRASS;
-    public static LocalMaterialData FERN;
-    public static LocalMaterialData ORANGE_TULIP;
-    public static LocalMaterialData OXEYE_DAISY;
-    public static LocalMaterialData PINK_TULIP;
-    public static LocalMaterialData POPPY;
-    public static LocalMaterialData RED_TULIP;
-    public static LocalMaterialData TALL_GRASS;
-    public static LocalMaterialData WHITE_TULIP;
 	
 	public static LocalMaterialData PUMPKIN;
     public static LocalMaterialData CACTUS;    

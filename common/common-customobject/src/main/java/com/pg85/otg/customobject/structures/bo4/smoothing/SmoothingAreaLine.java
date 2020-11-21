@@ -28,7 +28,7 @@ public class SmoothingAreaLine
     	this.finalDestinationPointY = finalDestinationPointY;
     }
     
-    public SmoothingAreaLine(int beginPointX, int beginPointZ, int endPointX, int endPointZ, int originPointX, short originPointY, int originPointZ, int finalDestinationPointX, int finalDestinationPointZ)
+    SmoothingAreaLine(int beginPointX, int beginPointZ, int endPointX, int endPointZ, int originPointX, short originPointY, int originPointZ, int finalDestinationPointX, int finalDestinationPointZ)
     {
     	this.beginPointX = beginPointX;
     	this.beginPointZ = beginPointZ;

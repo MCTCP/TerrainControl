@@ -44,18 +44,18 @@ import com.pg85.otg.util.minecraft.DefaultStructurePart;
 public class BO3Config extends CustomObjectConfigFile
 {
 	private boolean isOTGPlus; // Legacy setting
-	public boolean doReplaceBlocks;
+	boolean doReplaceBlocks;
 	
-	public String author;
-	public String description;
-	public ConfigMode settingsMode;
+	private String author;
+	private String description;
+	ConfigMode settingsMode;
 	boolean tree;
 	int frequency;
 	double rarity;
 	protected boolean rotateRandomly;
-	public SpawnHeightEnum spawnHeight;
+	SpawnHeightEnum spawnHeight;
 	// Extra spawn height settings
-	public int spawnHeightOffset;
+	int spawnHeightOffset;
 	int spawnHeightVariance;
 
 	// Extrusion
@@ -188,7 +188,7 @@ public class BO3Config extends CustomObjectConfigFile
 		this.branches[0] = branches.toArray(new BO3BranchFunction[branches.size()]);
 	}
 
-	public void extractBlocks(List<BO3BlockFunction> tempBlocksList)
+	private void extractBlocks(List<BO3BlockFunction> tempBlocksList)
 	{
 		this.blocksX = new byte[4][tempBlocksList.size()];
 		this.blocksY = new short[4][tempBlocksList.size()];
@@ -239,7 +239,7 @@ public class BO3Config extends CustomObjectConfigFile
 		return this.reader.getFile();
 	}
 
-	public BO3BlockFunction[] getBlocks(int rotation)
+	BO3BlockFunction[] getBlocks(int rotation)
 	{
 		BO3BlockFunction[] blocksOTGPlus = new BO3BlockFunction[this.blocksX[rotation].length];
 
@@ -705,7 +705,7 @@ public class BO3Config extends CustomObjectConfigFile
 	/**
 	 * Rotates all the blocks and all the checks
 	 */
-	public void rotateBlocksAndChecks(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private void rotateBlocksAndChecks(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (int i = 1; i < 4; i++)
 		{
@@ -779,7 +779,7 @@ public class BO3Config extends CustomObjectConfigFile
 		}
 	}
 
-	public boolean parseModChecks(IModLoadedChecker modLoadedChecker)
+	boolean parseModChecks(IModLoadedChecker modLoadedChecker)
 	{
 		for (BO3Check check : bo3Checks[0])
 		{

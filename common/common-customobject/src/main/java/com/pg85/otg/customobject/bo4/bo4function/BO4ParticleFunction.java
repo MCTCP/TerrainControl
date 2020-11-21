@@ -17,7 +17,7 @@ public class BO4ParticleFunction extends ParticleFunction<BO4Config>
 {
 	public BO4ParticleFunction() { }	
 	
-	public BO4ParticleFunction(BO4Config holder)
+	private BO4ParticleFunction(BO4Config holder)
 	{
 		this.holder = holder;
 	}

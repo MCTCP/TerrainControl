@@ -39,7 +39,7 @@ public class BO3CustomStructureCoordinate extends CustomStructureCoordinate
      * Gets the chunk that should populate for this object.
      * @return The chunk.
      */
-    public ChunkCoordinate getPopulatingChunk(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    ChunkCoordinate getPopulatingChunk(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         // In the past we simply returned the chunk populating for the origin
         // of the object. However, the origin is not guaranteed to be at the

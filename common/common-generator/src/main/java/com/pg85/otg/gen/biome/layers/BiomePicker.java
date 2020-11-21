@@ -30,10 +30,10 @@ public class BiomePicker {
 		return (double) random.nextInt(Integer.MAX_VALUE) * weightTotal / Integer.MAX_VALUE;
 	}
 
-	public static class Entry {
+	private static class Entry {
 		private final int biomeId;
 		private final double weight;
-		public Entry(int biome, double weight) {
+		private Entry(int biome, double weight) {
 			this.biomeId = biome;
 			this.weight = weight;
 		}

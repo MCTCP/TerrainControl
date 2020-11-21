@@ -13,14 +13,7 @@ class SmoothingAreaBlock
     int z = 0;
 	enumSmoothingBlockType smoothingBlockType = null;
 
-    public SmoothingAreaBlock() { }
-    
-    public SmoothingAreaBlock(int x, short y, int z)
-    {
-    	this.x = x;
-    	this.y = y;
-    	this.z = z;
-    }    
+    public SmoothingAreaBlock() { } 
     
     public SmoothingAreaBlock(int x, short y, int z, enumSmoothingBlockType smoothingBlockType)
     {

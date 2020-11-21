@@ -10,7 +10,7 @@ import java.util.Random;
  * Describes some small object (must fit in a single chunk) that can be spawned
  * in a world.
  */
-public interface SpawnableObject
+interface SpawnableObject
 {
     /**
      * Spawns the object at the given position. It shouldn't execute any spawn

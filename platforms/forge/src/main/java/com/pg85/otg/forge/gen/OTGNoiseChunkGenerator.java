@@ -91,9 +91,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	);
 
-	protected final BlockState defaultBlock;
-	protected final BlockState defaultFluid;
-	protected final Supplier<DimensionSettings> dimensionSettingsSupplier;
+	private final BlockState defaultBlock;
+	private final BlockState defaultFluid;
+	private final Supplier<DimensionSettings> dimensionSettingsSupplier;
 	private final long worldSeed;
 	private final int noiseHeight;
 
@@ -103,7 +103,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
 	
-	protected final DimensionConfig dimensionConfig;
+	private final DimensionConfig dimensionConfig;
 	private final Preset preset;
 	
 	// Unloaded chunk data caches for BO4's
@@ -117,7 +117,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this(new DimensionConfig(Constants.DEFAULT_PRESET_NAME, 0, true), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
-	public OTGNoiseChunkGenerator(String dimensionConfigYaml, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
+	private OTGNoiseChunkGenerator(String dimensionConfigYaml, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
 		this(DimensionConfig.fromYamlString(dimensionConfigYaml), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
@@ -236,7 +236,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Chunk population method taken from Biome (Biome.func_242427_a())
-	public void biomePopulate(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
+	private void biomePopulate(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
 	{
 		init(((IServerWorldInfo)p_242427_3_.getWorldInfo()).getWorldName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ());
@@ -339,7 +339,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// TODO: Re-use the data when chunks are properly generated, or find a way to request "normal" 
 	// base terrain gen outside of the WorldGenRegion chunks.
 	
-    public LocalMaterialData[] getBlockColumnInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z)
+    private LocalMaterialData[] getBlockColumnInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z)
     {
     	BlockPos2D blockPos = new BlockPos2D(x, z);
     	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
@@ -388,7 +388,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
         return blocksInColumn;
     }
     
-	public IChunk getUnloadedChunk(Random random, ChunkCoordinate chunkCoordinate)
+	private IChunk getUnloadedChunk(Random random, ChunkCoordinate chunkCoordinate)
 	{		
 		IChunk chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);		
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
@@ -396,13 +396,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return chunk;
 	}
 	
-    public LocalMaterialData getMaterialInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int y, int z)
+    LocalMaterialData getMaterialInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int y, int z)
     {
     	LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x,z);
         return blockColumn[y];
     }
     
-    public int getHighestBlockYInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+    int getHighestBlockYInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
     {
     	int height = -1;
 
@@ -431,7 +431,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
     	return height;
     }
 
-	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+	double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
 		return this.internalGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
 	}

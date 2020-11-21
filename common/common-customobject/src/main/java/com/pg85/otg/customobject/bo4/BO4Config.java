@@ -5,7 +5,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
-import com.pg85.otg.customobject.bo3.BO3Settings;
 import com.pg85.otg.customobject.bo4.BO4Config;
 import com.pg85.otg.customobject.bo4.BO4Settings;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BlockFunction;
@@ -54,9 +53,9 @@ import java.util.zip.DataFormatException;
 
 public class BO4Config extends CustomObjectConfigFile
 {
-	public String author;
-    public String description;
-    public ConfigMode settingsMode;
+	private String author;
+    private String description;
+    ConfigMode settingsMode;
     public boolean doReplaceBlocks;
     public int frequency;
     
@@ -178,7 +177,7 @@ public class BO4Config extends CustomObjectConfigFile
     private BO4EntityFunction[] entityDataOTGPlus;
        
     private boolean isCollidable = false;
-    public boolean isBO4Data = false;
+    boolean isBO4Data = false;
        
     /**
      * Creates a BO3Config from a file.
@@ -187,7 +186,7 @@ public class BO4Config extends CustomObjectConfigFile
      * @param directory    The directory the BO3 is stored in.
      * @param otherObjects All other loaded objects by their name.
      */
-    public BO4Config(SettingsReaderOTGPlus reader, boolean init, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+    BO4Config(SettingsReaderOTGPlus reader, boolean init, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
         super(reader);
         if(init)
@@ -398,7 +397,7 @@ public class BO4Config extends CustomObjectConfigFile
     	return this.heightMap;
     }
 
-    public BO4BlockFunction[] getBlocks(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    BO4BlockFunction[] getBlocks(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	return getBlocks(true, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
     }
@@ -1078,7 +1077,7 @@ public class BO4Config extends CustomObjectConfigFile
         writer.setting(BO4Settings.FREQUENCY, this.frequency);
 
         writer.comment("The spawn height of the BO4: randomY, highestBlock or highestSolidBlock.");
-        writer.setting(BO3Settings.SPAWN_HEIGHT, this.spawnHeight);
+        writer.setting(BO4Settings.SPAWN_HEIGHT, this.spawnHeight);
 
         writer.comment("When set to true, uses the center of the structure (determined by minimum structure size) when checking the highestBlock to spawn at.");
         writer.setting(BO4Settings.USE_CENTER_FOR_HIGHEST_BLOCK, this.useCenterForHighestBlock);
@@ -1343,7 +1342,7 @@ public class BO4Config extends CustomObjectConfigFile
         this.settingsMode = readSettings(WorldStandardValues.SETTINGS_MODE_BO3, spawnLog, logger, materialReader, manager);
 
         this.frequency = readSettings(BO4Settings.FREQUENCY, spawnLog, logger, materialReader, manager);
-        this.spawnHeight = readSettings(BO3Settings.SPAWN_HEIGHT, spawnLog, logger, materialReader, manager);
+        this.spawnHeight = readSettings(BO4Settings.SPAWN_HEIGHT, spawnLog, logger, materialReader, manager);
         this.minHeight = readSettings(BO4Settings.MIN_HEIGHT, spawnLog, logger, materialReader, manager);
         this.maxHeight = readSettings(BO4Settings.MAX_HEIGHT, spawnLog, logger, materialReader, manager);
         this.maxHeight = this.maxHeight < this.minHeight ? this.minHeight : this.maxHeight;
@@ -1560,8 +1559,8 @@ public class BO4Config extends CustomObjectConfigFile
         }
     }
 
-    int bo4DataVersion = 2;
-    public void writeToStream(DataOutput stream, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
+    private int bo4DataVersion = 2;
+    void writeToStream(DataOutput stream, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws IOException
     {
     	stream.writeInt(this.bo4DataVersion);    	
     	stream.writeInt(this.minimumSizeTop);
@@ -1787,7 +1786,7 @@ public class BO4Config extends CustomObjectConfigFile
         }
     }
 
-    public BO4Config readFromBO4DataFile(boolean getBlocks, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+    private BO4Config readFromBO4DataFile(boolean getBlocks, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
     {   	
     	FileInputStream fis;
     	ByteBuffer bufferCompressed = null;

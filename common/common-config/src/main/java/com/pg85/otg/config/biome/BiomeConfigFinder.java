@@ -257,10 +257,10 @@ public final class BiomeConfigFinder
         List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
         List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
         
-        public List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
-        public List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-        public List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-        public List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();        
+        List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
+        List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();        
                         
         private BiomeConfigStub(SettingsMap settings, Path file, BiomeLoadInstruction loadInstructions, ILogger logger, IMaterialReader materialReader)
         {
@@ -335,7 +335,7 @@ public final class BiomeConfigFinder
             inheritMobsBiomeNameProcessed = true;
         }
         
-        public List<WeightedMobSpawnGroup> mergeMobs(List<WeightedMobSpawnGroup> childSpawnableMonsterList, List<WeightedMobSpawnGroup> parentSpawnableMonsterList)
+        private List<WeightedMobSpawnGroup> mergeMobs(List<WeightedMobSpawnGroup> childSpawnableMonsterList, List<WeightedMobSpawnGroup> parentSpawnableMonsterList)
         {
         	// Inherit only mobs that do not appear in this biomes' list
         	// This way a biome's mob spawn settings can override inherited settings.

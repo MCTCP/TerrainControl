@@ -31,8 +31,8 @@ import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
 public abstract class LocalPresetLoader
 {
-	protected static final int MAX_INHERITANCE_DEPTH = 15;
-	protected final File presetsDir;
+	private static final int MAX_INHERITANCE_DEPTH = 15;
+	private final File presetsDir;
 	protected final HashMap<String, Preset> presets = new HashMap<String, Preset>();
 
 	public LocalPresetLoader(Path otgRootFolder)

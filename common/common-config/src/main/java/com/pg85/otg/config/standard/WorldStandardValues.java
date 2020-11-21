@@ -216,7 +216,6 @@ public class WorldStandardValues extends Settings
             "Mesa (Bryce)", "Mega Taiga Hills", "Mega Spruce Taiga Hills"),
         BORDER_BIOMES = stringListSetting("BorderBiomes",
             "JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
-    	CUSTOM_BIOMES = stringListSetting("CustomBiomes"),
 		DIMENSIONS = stringListSetting("Dimensions")
 	;
 

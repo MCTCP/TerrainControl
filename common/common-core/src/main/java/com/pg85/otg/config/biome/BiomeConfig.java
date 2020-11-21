@@ -1142,7 +1142,7 @@ public class BiomeConfig extends BiomeConfigBase
      *            The biome config. Custom objects must already be loaded.
      * @return The default resources for this biome.
      */
-    public List<Resource> createDefaultResources(StandardBiomeTemplate biomeTemplate, ILogger logger, IMaterialReader materialReader)
+    private List<Resource> createDefaultResources(StandardBiomeTemplate biomeTemplate, ILogger logger, IMaterialReader materialReader)
     {
         List<Resource> resources = new ArrayList<Resource>(32);
 

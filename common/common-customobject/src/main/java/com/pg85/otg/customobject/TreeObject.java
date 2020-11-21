@@ -23,11 +23,11 @@ import java.util.Random;
  * to accept {@link SpawnableObject}s instead of {@link CustomObject}s, so that
  * all the extra methods are no longer needed.
  */
-public class TreeObject implements CustomObject
+class TreeObject implements CustomObject
 {
     private TreeType type;
-    public int minHeight = Constants.WORLD_DEPTH;
-    public int maxHeight = Constants.WORLD_HEIGHT - 1;
+    private int minHeight = Constants.WORLD_DEPTH;
+    private int maxHeight = Constants.WORLD_HEIGHT - 1;
 
     TreeObject(TreeType type)
     {

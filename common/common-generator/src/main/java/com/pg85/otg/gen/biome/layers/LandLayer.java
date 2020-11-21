@@ -9,10 +9,10 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 /**
  * Sets land based on the provided rarity.
  */
-public class LandLayer implements ParentedLayer
+class LandLayer implements ParentedLayer
 {
-	public final int rarity;
-	public LandLayer(int landRarity)
+	private final int rarity;
+	LandLayer(int landRarity)
 	{
 		// Scale rarity from the world config
 		this.rarity = 101 - landRarity;

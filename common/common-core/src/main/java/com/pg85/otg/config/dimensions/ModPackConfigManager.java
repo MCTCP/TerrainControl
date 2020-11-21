@@ -40,7 +40,7 @@ public class ModPackConfigManager
 		}
 	}
 
-	public DimensionsConfig getModPackConfig(String presetName)
+	DimensionsConfig getModPackConfig(String presetName)
 	{
 		return this.defaultConfigs.get(presetName);
 	}

@@ -10,8 +10,8 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
 
 public class BlockFallback extends ConfigFunction<FallbackConfig>
 {	
-	public String materialFrom;
-	public List<String> materialsTo;
+	private String materialFrom;
+	private List<String> materialsTo;
 
 	public BlockFallback(FallbackConfig fallbackConfig, List<String> args, ILogger logger, IMaterialReader materialReader)
 	{

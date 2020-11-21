@@ -10,7 +10,7 @@ import com.pg85.otg.util.materials.LocalMaterials;
 import net.minecraft.block.DoublePlantBlock;
 import net.minecraft.state.properties.DoubleBlockHalf;
 
-public class ForgeMaterials extends LocalMaterials
+class ForgeMaterials extends LocalMaterials
 {
     private static final FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<String, LocalMaterialData>(4096); // TODO: Smaller cache should be ok, only most frequently used should be cached?
     
@@ -22,7 +22,6 @@ public class ForgeMaterials extends LocalMaterials
 			AIR = readMaterial(LocalMaterials.AIR_NAME);
 		    GRASS = readMaterial(LocalMaterials.GRASS_NAME);
 		    DIRT = readMaterial(LocalMaterials.DIRT_NAME);
-		    COARSE_DIRT = readMaterial(LocalMaterials.COARSE_DIRT_NAME);
 		    CLAY = readMaterial(LocalMaterials.CLAY_NAME);
 		    TERRACOTTA = readMaterial(LocalMaterials.TERRACOTTA_NAME);
 		    STAINED_CLAY = readMaterial(LocalMaterials.STAINED_CLAY_NAME);
@@ -59,7 +58,6 @@ public class ForgeMaterials extends LocalMaterials
 			ACACIA_LOG = readMaterial(LocalMaterials.ACACIA_LOG_NAME);
 			BIRCH_LOG = readMaterial(LocalMaterials.BIRCH_LOG_NAME);
 			DARK_OAK_LOG = readMaterial(LocalMaterials.DARK_OAK_LOG_NAME);
-			JUNGLE_LOG = readMaterial(LocalMaterials.JUNGLE_LOG_NAME);
 			OAK_LOG = readMaterial(LocalMaterials.OAK_LOG_NAME);
 			SPRUCE_LOG = readMaterial(LocalMaterials.SPRUCE_LOG_NAME);
 			STRIPPED_ACACIA_LOG = readMaterial(LocalMaterials.STRIPPED_ACACIA_LOG_NAME);
@@ -83,19 +81,6 @@ public class ForgeMaterials extends LocalMaterials
 			DEAD_BUSH = readMaterial(LocalMaterials.DEAD_BUSH_NAME);
 			LONG_GRASS = readMaterial(LocalMaterials.LONG_GRASS_NAME);
 			RED_MUSHROOM = readMaterial(LocalMaterials.RED_MUSHROOM_NAME);
-		    ALLIUM = readMaterial(LocalMaterials.ALLIUM_NAME);
-		    AZURE_BLUET = readMaterial(LocalMaterials.AZURE_BLUET_NAME);
-		    BLUE_ORCHID = readMaterial(LocalMaterials.BLUE_ORCHID_NAME);
-		    DANDELION = readMaterial(LocalMaterials.DANDELION_NAME);
-		    DOUBLE_TALL_GRASS = readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME);
-		    FERN = readMaterial(LocalMaterials.FERN_NAME);
-		    ORANGE_TULIP = readMaterial(LocalMaterials.ORANGE_TULIP_NAME);
-		    OXEYE_DAISY = readMaterial(LocalMaterials.OXEYE_DAISY_NAME);
-		    PINK_TULIP = readMaterial(LocalMaterials.PINK_TULIP_NAME);
-		    POPPY = readMaterial(LocalMaterials.POPPY_NAME);
-		    RED_TULIP = readMaterial(LocalMaterials.RED_TULIP_NAME);
-		    TALL_GRASS = readMaterial(LocalMaterials.TALL_GRASS_NAME);
-		    WHITE_TULIP = readMaterial(LocalMaterials.WHITE_TULIP_NAME);
 
 		    DOUBLE_TALL_GRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
 		    DOUBLE_TALL_GRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
@@ -144,7 +129,7 @@ public class ForgeMaterials extends LocalMaterials
 		}
 	};
 
-    public static LocalMaterialData readMaterial(String name) throws InvalidConfigException
+    static LocalMaterialData readMaterial(String name) throws InvalidConfigException
 	{
     	if(name == null)
     	{

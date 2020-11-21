@@ -13,27 +13,27 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-public abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
+abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 {
 	protected int worldHeightCap;
 	protected int worldHeightScale;
 	protected double fractureHorizontal;
 	protected double fractureVertical;
 	protected int generationDepth;
-	protected int maxSmoothRadius = 2;
+	private int maxSmoothRadius = 2;
 	
 	protected ArrayList<String> worldBiomes = new ArrayList<String>();
 	protected int biomeRarityScale;
 	
 	protected List<ReplaceBlocks> replaceBlocksList = null;
-	protected HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
+	private HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
 	
 	protected boolean isOTGPlus;
 	protected long resourcesSeed;
 	protected boolean disableOreGen;
 	protected boolean fullyFreezeLakes;
 	protected boolean betterSnowFall;
-	protected boolean biomeConfigsHaveReplacement = false;
+	private boolean biomeConfigsHaveReplacement = false;
 	protected boolean removeSurfaceStone;
 	protected ConfigMode settingsMode;
     

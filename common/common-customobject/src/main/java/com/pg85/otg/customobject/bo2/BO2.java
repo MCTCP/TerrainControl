@@ -31,7 +31,7 @@ import com.pg85.otg.util.materials.MaterialSet;
 /**
  * The good old BO2.
  */
-public class BO2 extends CustomObjectConfigFile implements CustomObject
+class BO2 extends CustomObjectConfigFile implements CustomObject
 {	
     private ObjectCoordinate[][] data = new ObjectCoordinate[4][];
 
@@ -458,7 +458,7 @@ public class BO2 extends CustomObjectConfigFile implements CustomObject
     	worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlocks);
     }
 
-    boolean isEnabled = false;
+    private boolean isEnabled = false;
     
     @Override
     public boolean onEnable(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)

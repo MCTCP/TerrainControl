@@ -10,7 +10,7 @@ public final class CachingLayerSampler implements LayerSampler
 	private final Long2IntLinkedOpenHashMap cache;
 	private final int cacheCapacity;
 
-	public CachingLayerSampler(Long2IntLinkedOpenHashMap cache, int cacheCapacity, LayerOperator operator)
+	CachingLayerSampler(Long2IntLinkedOpenHashMap cache, int cacheCapacity, LayerOperator operator)
 	{
 		this.cache = cache;
 		this.cacheCapacity = cacheCapacity;

@@ -44,7 +44,7 @@ public class BO4 implements StructuredCustomObject
      * @param name Name of the BO3.
      * @param file File of the BO3. If the file does not exist, a BO3 with the default settings is created.
      */
-    public BO4(String name, File file)
+    BO4(String name, File file)
     {
         this.name = name;
         this.file = file;

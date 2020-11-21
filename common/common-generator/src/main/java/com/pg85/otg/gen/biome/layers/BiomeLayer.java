@@ -14,14 +14,14 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 /**
  * Places the biomes at a specific depth, given the biome groups.
  */
-public class BiomeLayer implements ParentedLayer
+class BiomeLayer implements ParentedLayer
 {
 	private final BiomeLayerData data;
 	private final int depth;
 
 	private final Map<NewBiomeGroup, Integer> groupToMaxRarity = new HashMap<>();
 	private final Map<NewBiomeGroup, Map<Integer, NewBiomeData>> groupBiomes = new HashMap<>();
-	public BiomeLayer(BiomeLayerData data, int depth) {
+	BiomeLayer(BiomeLayerData data, int depth) {
 		this.data = data;
 		this.depth = depth;
 

@@ -193,7 +193,7 @@ public class CustomStructureCache
     }
     
     // TODO: Taken from structuregen, duplicate code, clean this up.
-    public BO3CustomStructureCoordinate getRandomObjectCoordinate(ICustomStructureGen structureGen, IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private BO3CustomStructureCoordinate getRandomObjectCoordinate(ICustomStructureGen structureGen, IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         if (structureGen.isEmpty())
         {

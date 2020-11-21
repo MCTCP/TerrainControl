@@ -54,7 +54,7 @@ public class BO4CustomStructure extends CustomStructure
     // Stores all the branches of this branching structure that should spawn along with the chunkcoordinates they should spawn in
     public Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn = new HashMap<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>>();
     // TODO: Make sure this never becomes an issue for memory usage. 
-    public Map<ChunkCoordinate, String> ObjectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();    
+    private Map<ChunkCoordinate, String> ObjectsToSpawnInfo = new HashMap<ChunkCoordinate, String>();    
     
 	// Branches:
     // BO4 structures are rasterized and split into 16x16 chunks, each BO4 containing the blocks for one chunk. Branch syntax is used to glue all the 
@@ -134,11 +134,6 @@ public class BO4CustomStructure extends CustomStructure
     
     // TODO: Don't allow canOverride optional branches in the same branch group as required branches.    
     
-    public BO4CustomStructure(BO4CustomStructureCoordinate start)
-    {
-    	this.start = start;
-    }
-    
     public BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate structureStart, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, int minY, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	this(worldSeed, structureStart, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
@@ -152,7 +147,7 @@ public class BO4CustomStructure extends CustomStructure
     
     }
     
-    public BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    BO4CustomStructure(long worldSeed, BO4CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         this.isStructureAtSpawn = false;
 
@@ -169,7 +164,7 @@ public class BO4CustomStructure extends CustomStructure
         this.random = RandomHelper.getRandomForCoords(start.getX() + 8, start.getY(), start.getZ() + 7, worldSeed);
     }
     
-    public BO4CustomStructure(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    BO4CustomStructure(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, BO4CustomStructureCoordinate start, boolean isStructureAtSpawn, ArrayList<String> targetBiomes, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         this.isStructureAtSpawn = isStructureAtSpawn;
 
@@ -409,7 +404,7 @@ public class BO4CustomStructure extends CustomStructure
      * If this structure were spawned as small as possible (with branchDepth 0)
      * @throws InvalidConfigException
      */
-    public Object[] getMinimumSize(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+    Object[] getMinimumSize(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
     	BO4 bo4 = ((BO4)this.start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker));
     	BO4Config bo4Config = bo4.getConfig();
@@ -2148,7 +2143,7 @@ public class BO4CustomStructure extends CustomStructure
     * Checks if this structure or any of its branches are inside the given
     * chunk and spawns all objects that are including their smoothing areas (if any)
     */
-    public void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    void spawnInChunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {   	
     	if (
 			!objectsToSpawn.containsKey(chunkCoordinate) && 

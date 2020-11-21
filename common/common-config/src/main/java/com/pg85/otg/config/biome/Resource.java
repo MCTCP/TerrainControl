@@ -34,7 +34,7 @@ public abstract class Resource extends ConfigFunction<IBiomeConfig> implements C
      *               each arg will be passed to the resource.
      * @return A resource based on the given parameters.
      */
-    public static Resource createResource(IBiomeConfig config, ILogger logger, IMaterialReader materialReader, Class<? extends Resource> clazz, Object... args)
+    static Resource createResource(IBiomeConfig config, ILogger logger, IMaterialReader materialReader, Class<? extends Resource> clazz, Object... args)
     {
         List<String> stringArgs = new ArrayList<String>(args.length);
         for (Object arg : args)

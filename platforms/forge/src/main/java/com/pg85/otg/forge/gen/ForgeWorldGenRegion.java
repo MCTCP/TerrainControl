@@ -5,7 +5,6 @@ import java.util.Random;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.exception.BiomeNotFoundException;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -38,7 +37,7 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.storage.IServerWorldInfo;
 import net.minecraft.world.gen.WorldGenRegion;
 
-public class ForgeWorldGenRegion extends LocalWorldGenRegion
+class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
 	private final WorldGenRegion worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
@@ -47,7 +46,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
     private IBiome[][] cachedBiomeConfigs;
     private boolean cacheIsValid;
 
-	public ForgeWorldGenRegion(IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	ForgeWorldGenRegion(IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(worldConfig);
 		this.worldGenRegion = worldGenRegion;
@@ -92,7 +91,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public BiomeConfig getBiomeConfig(int x, int z) throws BiomeNotFoundException // TODO: Implement 3d biomes
+	public BiomeConfig getBiomeConfig(int x, int z) // TODO: Implement 3d biomes
 	{
 		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
 		if(biome != null)
@@ -253,7 +252,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 	// Used by ChunkGenerator for BO4's requesting data
 	// in chunks outside the area being populated.
-	public IChunk getChunk(ChunkCoordinate chunkCoord)
+	IChunk getChunk(ChunkCoordinate chunkCoord)
 	{
 		return this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 	}

@@ -3,14 +3,14 @@ package com.pg85.otg.gen.noise.legacy;
 import java.util.Random;
 
 // Same as net.minecraft.world.gen.NoiseGeneratorSimplex
-public class NoiseGeneratorSimplex
+class NoiseGeneratorSimplex
 {
     private static final int[][] grad3 = new int[][] {{1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
-    public static final double SQRT_3 = Math.sqrt(3.0D);
+    private static final double SQRT_3 = Math.sqrt(3.0D);
     private final int[] p;
-    public double xo;
-    public double yo;
-    public double zo;
+    private double xo;
+    private double yo;
+    private double zo;
     private static final double F2 = 0.5D * (SQRT_3 - 1.0D);
     private static final double G2 = (3.0D - SQRT_3) / 6.0D;
 
@@ -19,7 +19,7 @@ public class NoiseGeneratorSimplex
         this(new Random());
     }
 
-    public NoiseGeneratorSimplex(Random seed)
+    NoiseGeneratorSimplex(Random seed)
     {
         this.p = new int[512];
         this.xo = seed.nextDouble() * 256.0D;
@@ -51,7 +51,7 @@ public class NoiseGeneratorSimplex
         return (double)p_151604_0_[0] * p_151604_1_ + (double)p_151604_0_[1] * p_151604_3_;
     }
 
-    public double getValue(double p_151605_1_, double p_151605_3_)
+    double getValue(double p_151605_1_, double p_151605_3_)
     {
         double d3 = 0.5D * (SQRT_3 - 1.0D);
         double d4 = (p_151605_1_ + p_151605_3_) * d3;

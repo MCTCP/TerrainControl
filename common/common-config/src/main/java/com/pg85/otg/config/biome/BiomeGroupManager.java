@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Manages a collection of biome groups that are accesible by their name and id.
  */
-public final class BiomeGroupManager
+final class BiomeGroupManager
 {
     static final int MAX_BIOME_GROUP_COUNT = 127;
     private int cumulativeGroupRarity = 0;
@@ -105,7 +105,7 @@ public final class BiomeGroupManager
     }
 
     // TODO: Turn into array?
-    HashMap<Integer, TreeMap<Integer, BiomeGroup>> cachedGroupDepthMaps = new HashMap<Integer, TreeMap<Integer, BiomeGroup>>();
+    private HashMap<Integer, TreeMap<Integer, BiomeGroup>> cachedGroupDepthMaps = new HashMap<Integer, TreeMap<Integer, BiomeGroup>>();
     public SortedMap<Integer, BiomeGroup> getGroupDepthMap(int depth)
     {
     	TreeMap<Integer, BiomeGroup> map = cachedGroupDepthMaps.get(new Integer(depth));

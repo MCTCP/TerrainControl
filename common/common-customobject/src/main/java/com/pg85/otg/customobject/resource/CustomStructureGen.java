@@ -30,7 +30,7 @@ import java.util.Random;
 
 public class CustomStructureGen extends CustomObjectResource implements ICustomStructureGen
 {
-    public List<Double> objectChances;
+    private List<Double> objectChances;
     public List<String> objectNames;
 
     public CustomStructureGen(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException

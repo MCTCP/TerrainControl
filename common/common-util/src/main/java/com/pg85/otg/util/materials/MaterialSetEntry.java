@@ -1,8 +1,8 @@
 package com.pg85.otg.util.materials;
 
-public class MaterialSetEntry
+class MaterialSetEntry
 {
-    public LocalMaterialData material;
+    private LocalMaterialData material;
     private final boolean includesBlockData;
 
     MaterialSetEntry(LocalMaterialData material, boolean includesBlockData)

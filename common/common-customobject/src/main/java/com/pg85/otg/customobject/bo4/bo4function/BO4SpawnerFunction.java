@@ -17,7 +17,7 @@ public class BO4SpawnerFunction extends SpawnerFunction<BO4Config>
 {	
 	public BO4SpawnerFunction() { }
 	
-	public BO4SpawnerFunction(BO4Config holder)
+	private BO4SpawnerFunction(BO4Config holder)
 	{
 		this.holder = holder;
 	}

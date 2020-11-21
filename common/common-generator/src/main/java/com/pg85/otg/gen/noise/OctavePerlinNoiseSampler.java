@@ -28,7 +28,7 @@ public class OctavePerlinNoiseSampler
 		this(random, octaves.boxed().collect(ImmutableList.toImmutableList()));
 	}
 
-	public OctavePerlinNoiseSampler(Random random, List<Integer> octaves)
+	private OctavePerlinNoiseSampler(Random random, List<Integer> octaves)
 	{
 		this(random, new IntRBTreeSet(octaves));
 	}

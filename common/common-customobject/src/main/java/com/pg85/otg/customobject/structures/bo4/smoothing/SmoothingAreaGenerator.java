@@ -511,7 +511,7 @@ public class SmoothingAreaGenerator
 		fillSmoothingLineCaches(smoothingAreasToSpawn);
     }
 
-    void plotStraightLine(int blockX, short blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
+    private void plotStraightLine(int blockX, short blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
     {
     	int normalizedSmoothStartPointBlockX = 0;
     	int normalizedSmoothStartPointBlockZ = 0;
@@ -657,7 +657,7 @@ public class SmoothingAreaGenerator
     
     // Plots a quarter-circle of blocks for each smoothing area corner block, in order to create rounded corners around the structure.
     // For each corner, creates smoothing lines fanning out from the center of the circle to fill the entire quarter-circle. 
-    void plotCorner(int blockX, int blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
+    private void plotCorner(int blockX, int blockY, int blockZ, int smoothRadius, Map<ChunkCoordinate, ArrayList<SmoothingAreaLine>> smoothingAreasToSpawn, BO4CustomStructureCoordinate bO4, int direction)
     {    	
     	int originPointX = blockX + bO4.getX();
     	short originPointY = (short)(blockY + bO4.getY());

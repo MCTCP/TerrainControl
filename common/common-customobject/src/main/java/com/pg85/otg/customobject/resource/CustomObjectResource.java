@@ -18,7 +18,7 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 public abstract class CustomObjectResource extends Resource
 {
-	public CustomObjectResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader)
+	CustomObjectResource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader)
 	{
 		super(biomeConfig, args, logger, materialReader);
 	}

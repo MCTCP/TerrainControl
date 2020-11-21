@@ -11,17 +11,17 @@ import com.pg85.otg.gen.biome.NewBiomeData;
 /**
  * Class to hold biome layer data until world configs are working. This class will eventually be removed.
  */
-public class BiomeLayerData
+class BiomeLayerData
 {
-	public int generationDepth = 10;
-	public int landSize = 0;
-	public int landFuzzy = 5;
-	public int landRarity = 99;
+	int generationDepth = 10;
+	int landSize = 0;
+	int landFuzzy = 5;
+	int landRarity = 99;
 	public Map<Integer, List<NewBiomeGroup>> groups = new HashMap<>();
-	public List<Integer> biomeDepths = new ArrayList<>(); // Depths with biomes
-	public Map<Integer, NewBiomeGroup> groupRegistry = new HashMap<>();
+	List<Integer> biomeDepths = new ArrayList<>(); // Depths with biomes
+	Map<Integer, NewBiomeGroup> groupRegistry = new HashMap<>();
 
-	public static final BiomeLayerData INSTANCE = init();
+	static final BiomeLayerData INSTANCE = init();
 
 	private static BiomeLayerData init() {
 		BiomeLayerData data = new BiomeLayerData();

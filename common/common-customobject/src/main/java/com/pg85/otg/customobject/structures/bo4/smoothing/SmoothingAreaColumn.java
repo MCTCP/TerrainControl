@@ -14,7 +14,7 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
-public class SmoothingAreaColumn
+class SmoothingAreaColumn
 {
 	private int x;
 	private int z;
@@ -22,18 +22,18 @@ public class SmoothingAreaColumn
 	private SmoothingAreaBlock highestFillingBlock = null;
 	private SmoothingAreaBlock lowestCuttingBlock = null;
 
-	public SmoothingAreaColumn(int x, int z)
+	SmoothingAreaColumn(int x, int z)
 	{
 		this.x = x;
 		this.z = z;
 	}
 
-	public void addBlock(SmoothingAreaBlock block)
+	void addBlock(SmoothingAreaBlock block)
 	{
 		this.blocks.add(block);
 	}
 
-	public void processBlocks(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, BO4Config bo4Config, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	void processBlocks(IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, BO4Config bo4Config, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		if(this.highestFillingBlock == null && this.lowestCuttingBlock == null)
 		{

@@ -35,7 +35,7 @@ import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gui.screens.CreateOTGWorldScreen;
 
 @Mod(Constants.MOD_ID_SHORT) // Should match META-INF/mods.toml
-@Mod.EventBusSubscriber(modid = Constants.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = Constants.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.MOD) 
 public class OTGPlugin
 {
 	// Generate registry key for OTG DimensionSettings
@@ -116,7 +116,7 @@ public class OTGPlugin
 	    ;
 	}
 
-	public static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, DimensionGeneratorSettings dimensionGeneratorSettings, DimensionConfig dimensionConfig)
+	private static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, DimensionGeneratorSettings dimensionGeneratorSettings, DimensionConfig dimensionConfig)
 	{
 		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.func_243612_b(Registry.field_239698_ad_);
 		Registry<Biome> biomesRegistry = dynamicRegistries.func_243612_b(Registry.field_239720_u_);

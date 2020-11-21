@@ -34,7 +34,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
    
     public BO4BranchFunction() { }
     
-    public BO4BranchFunction(BO4Config holder)
+    BO4BranchFunction(BO4Config holder)
     {
     	this.holder = holder;
     }
