@@ -8,7 +8,7 @@ import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.BiomeIds;
+import com.pg85.otg.util.biome.BiomeIds;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;

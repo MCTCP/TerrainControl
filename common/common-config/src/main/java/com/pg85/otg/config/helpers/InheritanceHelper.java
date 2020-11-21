@@ -1,7 +1,6 @@
 package com.pg85.otg.config.helpers;
 
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.config.customobjects.CustomObjectConfigFunction;
 import com.pg85.otg.logging.ILogger;
 
 import java.util.ArrayList;
@@ -9,37 +8,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class InheritanceHelper
-{
-	// OTG+
-	
-    public static final <T, C extends CustomObjectConfigFunction<T>> List<C> mergeListsCustomObject(Collection<? extends C> childList, Collection<? extends C> parentList)
-    {
-        List<C> returnList = new ArrayList<C>(childList);
-        for (C parentFunction : parentList)
-        {
-            if (!hasAnalogousFunction(parentFunction, childList))
-            {
-                returnList.add(parentFunction);
-            }
-        }
-        return returnList;
-    }	
-    
-    private static final <T, C extends CustomObjectConfigFunction<T>> boolean hasAnalogousFunction(C function, Collection<? extends C> list)
-    {
-        for (C toCheck : list)
-        {
-            if (function.isAnalogousTo(toCheck))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-	//
-	
-	
+{	
     private InheritanceHelper()
     {
     }

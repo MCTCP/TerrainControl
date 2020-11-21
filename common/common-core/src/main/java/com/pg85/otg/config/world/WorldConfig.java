@@ -27,7 +27,7 @@ import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.constants.SettingsEnums.TerrainMode;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.BiomeResourceLocation;
+import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
 //TODO: Clean this up further, atm WorldConfigBase implements

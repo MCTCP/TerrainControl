@@ -11,12 +11,12 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionsConfig;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.customobjects.structures.CustomStructureCache;
+import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
-import com.pg85.otg.gen.ChunkPopulator;
-import com.pg85.otg.gen.NewOTGChunkGenerator;
+import com.pg85.otg.gen.OTGChunkPopulator;
+import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.BlockPos2D;
@@ -97,8 +97,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final long worldSeed;
 	private final int noiseHeight;
 
-	private final NewOTGChunkGenerator internalGenerator;
-	private final ChunkPopulator chunkPopulator;
+	private final OTGChunkGenerator internalGenerator;
+	private final OTGChunkPopulator chunkPopulator;
 	
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
@@ -156,8 +156,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.dimensionConfig.PresetName);
         
-		this.internalGenerator = new NewOTGChunkGenerator(seed, (LayerSource) biomeProvider1);
-		this.chunkPopulator = new ChunkPopulator();
+		this.internalGenerator = new OTGChunkGenerator(seed, (LayerSource) biomeProvider1);
+		this.chunkPopulator = new OTGChunkPopulator();
 	}
 	
 	@OnlyIn(Dist.CLIENT)
