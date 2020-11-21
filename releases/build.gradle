@@ -50,7 +50,11 @@ def addToZip(File source, ZipOutputStream destination, Set<String> alreadyAddedF
 task createReleaseJar <<
 {
 	// We're including common only for the external libraries that are packaged with it (using Forge jar-in-jar).
-	File commonFile = getJarFile(project(":common"))
+	File commonFile1 = getJarFile(project(":common:common-util"))
+	File commonFile2 = getJarFile(project(":common:common-config"))
+	File commonFile3 = getJarFile(project(":common:common-customobject"))
+	File commonFile4 = getJarFile(project(":common:common-generator"))
+	File commonFile5 = getJarFile(project(":common:common-core"))
     File forgeFile = getJarFile(project(":platforms:forge"))
     //File bukkitFile = getJarFile(project(":platforms:bukkit"))
     File ourFile = getJarFile(project)
@@ -62,7 +66,11 @@ task createReleaseJar <<
         Set<String> alreadyAddedFiles = new HashSet<String>()
 
         addToZip(forgeFile, outputStream, alreadyAddedFiles) // Add Forge first so its jar manifest is used
-		addToZip(commonFile, outputStream, alreadyAddedFiles)	
+		addToZip(commonFile1, outputStream, alreadyAddedFiles)	
+		addToZip(commonFile2, outputStream, alreadyAddedFiles)	
+		addToZip(commonFile3, outputStream, alreadyAddedFiles)	
+		addToZip(commonFile4, outputStream, alreadyAddedFiles)	
+		addToZip(commonFile5, outputStream, alreadyAddedFiles)	
         //addToZip(bukkitFile, outputStream, alreadyAddedFiles)
 
         outputStream.close()
