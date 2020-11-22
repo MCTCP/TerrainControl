@@ -14,6 +14,9 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates a mossy rock structure by placing multiple spheres together.
+ */
 public class BoulderGen extends Resource
 {
     private MaterialSet sourceBlocks;

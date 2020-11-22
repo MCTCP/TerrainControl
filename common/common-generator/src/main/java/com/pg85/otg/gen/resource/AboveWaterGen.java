@@ -36,26 +36,23 @@ public class AboveWaterGen extends Resource
 		}
 
         //parseMaterials(worldGenregion.getWorldConfig(), material, null);
-        
-        int j;
-        int k;
-        int m;
+
         LocalMaterialData worldMaterial;
         LocalMaterialData worldMaterialBeneath;
         
         for (int i = 0; i < 10; i++)
         {
-            j = x + rand.nextInt(8) - rand.nextInt(8);
-            k = y + rand.nextInt(4) - rand.nextInt(4);
-            m = z + rand.nextInt(8) - rand.nextInt(8);
+            int localX = x + rand.nextInt(8) - rand.nextInt(8);
+            int localY = y + rand.nextInt(4) - rand.nextInt(4);
+            int localZ = z + rand.nextInt(8) - rand.nextInt(8);
             
-            worldMaterial = worldGenregion.getMaterial(j, k, m, chunkBeingPopulated);
+            worldMaterial = worldGenregion.getMaterial(localX, localY, localZ, chunkBeingPopulated);
             if (worldMaterial == null || !worldMaterial.isAir())
             {
             	continue;
             }
 
-            worldMaterialBeneath = worldGenregion.getMaterial(j, k - 1, m, chunkBeingPopulated);            
+            worldMaterialBeneath = worldGenregion.getMaterial(localX, localY - 1, localZ, chunkBeingPopulated);
             if (
         		worldMaterialBeneath != null &&
 				!worldMaterialBeneath.isLiquid()
@@ -64,7 +61,7 @@ public class AboveWaterGen extends Resource
                 continue;
             }
             
-            worldGenregion.setBlock(j, k, m, material, null, chunkBeingPopulated, false);
+            worldGenregion.setBlock(localX, localY, localZ, material, null, chunkBeingPopulated, false);
         }
     }
 

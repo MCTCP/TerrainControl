@@ -13,6 +13,10 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates a disk-alike structure for sand, gravel, and clay.
+ * TODO: This needs to be renamed to DiskGen()
+ */
 public class UnderWaterOreGen extends Resource
 {
     private final int size;
@@ -90,7 +94,6 @@ public class UnderWaterOreGen extends Resource
         }
         
         int currentSize = rand.nextInt(this.size);
-        int two = 2;
         int deltaX;
         int deltaZ;
         LocalMaterialData sourceBlock;
@@ -102,7 +105,7 @@ public class UnderWaterOreGen extends Resource
                 deltaZ = currentZ - z;
                 if (deltaX * deltaX + deltaZ * deltaZ <= currentSize * currentSize)
                 {
-                    for (int y = firstSolidBlock - two; y <= firstSolidBlock + two; y++)
+                    for (int y = firstSolidBlock - 2; y <= firstSolidBlock + 2; y++)
                     {
                         sourceBlock = worldGenRegion.getMaterial(currentX, y, currentZ, chunkBeingPopulated);
                         if (this.sourceBlocks.contains(sourceBlock))

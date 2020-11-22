@@ -15,6 +15,9 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates flower patches.
+ */
 public class PlantGen extends Resource
 {
     private final int maxAltitude;
@@ -90,19 +93,16 @@ public class PlantGen extends Resource
     	//sourceBlocks.parseForWorld(worldGenregion.getWorldConfig());
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
-        int j;
-        int k;
-        int m;
         LocalMaterialData worldMaterial;
         LocalMaterialData worldMaterialBelow;
         
         for (int i = 0; i < 64; i++)
         {
-            j = x + rand.nextInt(8) - rand.nextInt(8);
-            k = y + rand.nextInt(4) - rand.nextInt(4);
-            m = z + rand.nextInt(8) - rand.nextInt(8);
-            worldMaterial = worldGenregion.getMaterial(j, k , m, chunkBeingPopulated);
-            worldMaterialBelow = worldGenregion.getMaterial(j, k - 1, m, chunkBeingPopulated);
+            int localX = x + rand.nextInt(8) - rand.nextInt(8);
+            int localY = y + rand.nextInt(4) - rand.nextInt(4);
+            int localZ = z + rand.nextInt(8) - rand.nextInt(8);
+            worldMaterial = worldGenregion.getMaterial(localX, localY, localZ, chunkBeingPopulated);
+            worldMaterialBelow = worldGenregion.getMaterial(localX, localY - 1, localZ, chunkBeingPopulated);
             if (
         		(worldMaterial == null || !worldMaterial.isAir()) ||
         		(worldMaterialBelow == null || !sourceBlocks.contains(worldMaterialBelow))
@@ -111,7 +111,7 @@ public class PlantGen extends Resource
                 continue;
             }
 
-            plant.spawn(worldGenregion, j, k, m, chunkBeingPopulated);
+            plant.spawn(worldGenregion, localX, localY, localZ, chunkBeingPopulated);
         }
     }
 }

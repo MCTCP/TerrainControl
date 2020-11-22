@@ -14,6 +14,9 @@ import com.pg85.otg.util.materials.LocalMaterials;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates vines from a min to max altitude.
+ */
 public class VinesGen extends Resource
 {
     private static final int[] D =

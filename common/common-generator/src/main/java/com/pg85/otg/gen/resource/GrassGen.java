@@ -15,6 +15,9 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates tall grass.
+ */
 public class GrassGen extends Resource
 {
     public static enum GroupOption

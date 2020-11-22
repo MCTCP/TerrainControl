@@ -16,6 +16,10 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates patches based on noise.
+ * TODO: Expose the noise weights and scale to the config
+ */
 public class SurfacePatchGen extends Resource
 {
     private LocalMaterialData decorationAboveReplacements;

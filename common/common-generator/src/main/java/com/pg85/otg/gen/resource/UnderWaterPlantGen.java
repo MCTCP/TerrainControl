@@ -16,6 +16,9 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Places underwater plants.
+ */
 public class UnderWaterPlantGen extends Resource
 {
     private final int maxAltitude;

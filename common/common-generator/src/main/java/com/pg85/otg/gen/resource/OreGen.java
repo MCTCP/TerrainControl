@@ -16,6 +16,10 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates an ore structure by placing multiple spheres along a line.
+ * TODO: This is wildly inefficient and needs to be refactored.
+ */
 public class OreGen extends Resource
 {
     private final int maxAltitude;

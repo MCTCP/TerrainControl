@@ -15,6 +15,9 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates a cactus.
+ */
 public class CactusGen extends Resource
 {
     private int minAltitude;

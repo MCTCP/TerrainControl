@@ -106,10 +106,10 @@ public class ReedGen extends Resource
             return;
         }  
 
-        int n = 1 + rand.nextInt(2);
-        for (int i1 = 0; i1 < n; i1++)
+        int height = 1 + rand.nextInt(2);
+        for (int y1 = 0; y1 < height; y1++)
         {
-        	worldGenRegion.setBlock(x, y + i1, z, this.material, null, chunkBeingPopulated, false);
+        	worldGenRegion.setBlock(x, y + y1, z, this.material, null, chunkBeingPopulated, false);
         }
     }
 }

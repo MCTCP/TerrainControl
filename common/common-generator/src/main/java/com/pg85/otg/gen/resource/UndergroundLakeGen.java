@@ -16,6 +16,9 @@ import com.pg85.otg.util.materials.LocalMaterials;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates an underground lake.
+ */
 public class UndergroundLakeGen extends Resource
 {
     private final int maxAltitude;

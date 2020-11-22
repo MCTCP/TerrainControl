@@ -15,6 +15,9 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Generates a waterfall feature, called a Spring in minecraft code.
+ */
 public class LiquidGen extends Resource
 {
     private final int maxAltitude;
@@ -61,8 +64,7 @@ public class LiquidGen extends Resource
 				this.sourceBlocks == null ? 
 				this.sourceBlocks == compare.sourceBlocks
 				: this.sourceBlocks.equals(compare.sourceBlocks)
-			)
-		;
+			);
 	}
 
     @Override
@@ -115,28 +117,29 @@ public class LiquidGen extends Resource
             return;
         }
 
-        int i = 0;
-        int j = 0;
+        int sourceCount = 0;
+        int airCount = 0;
 
         worldMaterial = worldGenregion.getMaterial(x - 1, y, z, chunkBeingPopulated);
-        i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
-        j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
+        sourceCount = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
+        airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
         worldMaterial = worldGenregion.getMaterial(x + 1, y, z, chunkBeingPopulated);
-        i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
-        j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
+        sourceCount = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
+        airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
         worldMaterial = worldGenregion.getMaterial(x, y, z - 1, chunkBeingPopulated);
-        i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
-        j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
+        sourceCount = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
+        airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
         worldMaterial = worldGenregion.getMaterial(x, y, z + 1, chunkBeingPopulated);
-        i = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? i + 1 : i;
-        j = (worldMaterial != null && worldMaterial.isAir()) ? j + 1 : j;
+        sourceCount = (worldMaterial != null && sourceBlocks.contains(worldMaterial)) ? sourceCount + 1 : sourceCount;
+        airCount = (worldMaterial != null && worldMaterial.isAir()) ? airCount + 1 : airCount;
 
-        if ((i == 3) && (j == 1))
+        if ((sourceCount == 3) && (airCount == 1))
         {
         	worldGenregion.setBlock(x, y, z, material, null, chunkBeingPopulated, false);
+        	// TODO: we should to schedule a fluid tick here
         }
     }
 }
