@@ -93,58 +93,61 @@ public class OTGChunkGenerator
 
 	private double sampleNoise(int x, int y, int z, double horizontalScale, double verticalScale, double horizontalStretch, double verticalStretch, double volatility1, double volatility2, double volatilityWeight1, double volatilityWeight2)
 	{
-		double lowerInterpolation = 0.0D;
-		double upperInterpolation = 0.0D;
+		// The algorithm for noise generation varies slightly here as it calculates the interpolation first and then the interpolated noise to avoid sampling noise that will never be used.
+		// The end result is ~2x faster terrain generation.
+
+		double delta = getInterpolationNoise(x, y, z, horizontalStretch, verticalStretch);
+
+		if (delta < volatilityWeight1)
+		{
+			return getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1;
+		} else if (delta > volatilityWeight2)
+		{
+			return getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2;
+		} else
+		{
+			// TODO: should probably use clamping here to prevent weird artifacts
+			return MathHelper.lerp(
+					delta,
+					getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1,
+					getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2);
+		}
+	}
+
+	private double getInterpolationNoise(int x, int y, int z, double horizontalStretch, double verticalStretch) {
 		double interpolation = 0.0D;
 		double amplitude = 1.0D;
+		for (int i = 0; i < 8; i++)
+		{
+			PerlinNoiseSampler interpolationSampler = this.interpolationNoise.getOctave(i);
+			if (interpolationSampler != null)
+			{
+				interpolation += interpolationSampler.sample(OctavePerlinNoiseSampler.maintainPrecision((double) x * horizontalStretch * amplitude), OctavePerlinNoiseSampler.maintainPrecision((double) y * verticalStretch * amplitude), OctavePerlinNoiseSampler.maintainPrecision((double) z * horizontalStretch * amplitude), verticalStretch * amplitude, (double) y * verticalStretch * amplitude) / amplitude;
+			}
 
-		// TODO: interpolation optimization
+			amplitude /= 2.0D;
+		}
+
+		return (interpolation / 10.0D + 1.0D) / 2.0D;
+	}
+
+	private double getInterpolatedNoise(OctavePerlinNoiseSampler sampler, int x, int y, int z, double horizontalScale, double verticalScale) {
+		double noise = 0.0D;
+		double amplitude = 1.0D;
 		for (int i = 0; i < 16; ++i)
 		{
 			double scaledX = OctavePerlinNoiseSampler.maintainPrecision((double) x * horizontalScale * amplitude);
 			double scaledY = OctavePerlinNoiseSampler.maintainPrecision((double) y * verticalScale * amplitude);
 			double scaledZ = OctavePerlinNoiseSampler.maintainPrecision((double) z * horizontalScale * amplitude);
 			double scaledVerticalScale = verticalScale * amplitude;
-			PerlinNoiseSampler lowerSampler = this.lowerInterpolatedNoise.getOctave(i);
-			if (lowerSampler != null)
+			PerlinNoiseSampler perlinNoiseSampler = sampler.getOctave(i);
+			if (perlinNoiseSampler != null)
 			{
-				lowerInterpolation += lowerSampler.sample(scaledX, scaledY, scaledZ, scaledVerticalScale, (double) y * scaledVerticalScale) / amplitude;
+				noise += perlinNoiseSampler.sample(scaledX, scaledY, scaledZ, scaledVerticalScale, (double) y * scaledVerticalScale) / amplitude;
 			}
-
-			PerlinNoiseSampler upperSampler = this.upperInterpolatedNoise.getOctave(i);
-			if (upperSampler != null)
-			{
-				upperInterpolation += upperSampler.sample(scaledX, scaledY, scaledZ, scaledVerticalScale, (double) y * scaledVerticalScale) / amplitude;
-			}
-
-			if (i < 8)
-			{
-				PerlinNoiseSampler interpolationSampler = this.interpolationNoise.getOctave(i);
-				if (interpolationSampler != null)
-				{
-					interpolation += interpolationSampler.sample(OctavePerlinNoiseSampler.maintainPrecision((double) x * horizontalStretch * amplitude), OctavePerlinNoiseSampler.maintainPrecision((double) y * verticalStretch * amplitude), OctavePerlinNoiseSampler.maintainPrecision((double) z * horizontalStretch * amplitude), verticalStretch * amplitude, (double) y * verticalStretch * amplitude) / amplitude;
-				}
-			}
-
-			amplitude /= 2.0D;
 		}
 
-		double delta = (interpolation / 10.0D + 1.0D) / 2.0D;
-
-		double lowerNoise = lowerInterpolation / 512.0D * volatility1;
-		double upperNoise = upperInterpolation / 512.0D * volatility2;
-
-		if (delta < volatilityWeight1)
-		{
-			return lowerNoise;
-		} else if (delta > volatilityWeight2)
-		{
-			return upperNoise;
-		} else
-		{
-			// TODO: should probably use clamping here to prevent weird artifacts
-			return MathHelper.lerp(delta, lowerNoise, upperNoise);
-		}
+		return noise;
 	}
 
 	private double getExtraHeightAt(int x, int z, double maxAverageDepth, double maxAverageHeight)
