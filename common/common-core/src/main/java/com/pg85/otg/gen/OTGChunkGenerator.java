@@ -3,12 +3,16 @@ package com.pg85.otg.gen;
 import static com.pg85.otg.util.ChunkCoordinate.CHUNK_SIZE;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Random;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.gen.carver.Carver;
+import com.pg85.otg.gen.carver.CaveCarver;
+import com.pg85.otg.gen.carver.RavineCarver;
 import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
@@ -58,8 +62,11 @@ public class OTGChunkGenerator
 	// TODO: Use new noise?
 	private double[] biomeBlocksNoise = new double[CHUNK_SIZE * CHUNK_SIZE];
 	private final NoiseGeneratorPerlinMesaBlocks biomeBlocksNoiseGen;
-	//
-	
+
+	// Carvers
+	private final Carver caves = new CaveCarver(256);
+	private final Carver ravines = new RavineCarver(256);
+
 	public OTGChunkGenerator(long seed, LayerSource biomeGenerator)
 	{
 		this.seed = seed;
@@ -395,6 +402,33 @@ public class OTGChunkGenerator
 		}
 		
 		doSurfaceAndGroundControl(random, worldHeightCap, this.seed, buffer, waterLevel);
+	}
+
+	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask) {
+
+		Random random = new Random();
+		for(int localChunkX = chunkX - 8; localChunkX <= chunkX + 8; ++localChunkX) {
+			for(int localChunkZ = chunkZ - 8; localChunkZ <= chunkZ + 8; ++localChunkZ) {
+				setCarverSeed(random, seed, localChunkX, localChunkZ);
+
+				if (this.caves.shouldCarve(random, localChunkX, localChunkZ)) {
+					this.caves.carve(chunk,  random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask);
+				}
+
+				if (this.ravines.shouldCarve(random, localChunkX, localChunkZ)) {
+					this.ravines.carve(chunk,  random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask);
+				}
+			}
+		}
+	}
+
+	private long setCarverSeed(Random random, long seed, int x, int z) {
+		random.setSeed(seed);
+		long i = random.nextLong();
+		long j = random.nextLong();
+		long k = (long)x * i ^ (long)z * j ^ seed;
+		random.setSeed(k);
+		return k;
 	}
 
 	private class NoiseCache

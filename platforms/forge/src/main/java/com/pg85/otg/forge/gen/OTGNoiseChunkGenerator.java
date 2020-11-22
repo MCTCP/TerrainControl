@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.gen;
 
 import java.nio.file.Paths;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Random;
 import java.util.function.Supplier;
@@ -40,6 +41,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.BiomeManager;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.provider.BiomeProvider;
 import net.minecraft.world.chunk.ChunkPrimer;
@@ -47,6 +49,7 @@ import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
 import net.minecraft.world.gen.feature.structure.Structure;
@@ -200,7 +203,20 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		// Done during this.internalGenerator.populateNoise
 	}
-	
+
+	// Carves caves and ravines
+	@Override
+	public void func_230350_a_(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
+	{
+		if (stage == GenerationStage.Carving.AIR) {
+			ChunkPrimer protoChunk = (ChunkPrimer)chunk;
+
+			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
+			BitSet carvingMask = protoChunk.func_230345_b_(stage); // get or create carving mask
+			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
+		}
+	}
+
 	// Population / decoration
 	
 	// Does population for a given pos/chunk

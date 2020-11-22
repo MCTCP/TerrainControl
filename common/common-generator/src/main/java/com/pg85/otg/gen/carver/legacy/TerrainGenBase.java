@@ -1,4 +1,4 @@
-package com.pg85.otg.gen.terrain;
+package com.pg85.otg.gen.carver.legacy;
 
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
