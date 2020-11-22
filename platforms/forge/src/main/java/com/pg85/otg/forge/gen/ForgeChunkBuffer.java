@@ -1,19 +1,19 @@
 package com.pg85.otg.forge.gen;
 
-import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.gen.ChunkBuffer;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.gen.ChunkBuffer;
+import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.chunk.ChunkPrimer;
 
-public class ForgeChunkBuffer extends ChunkBuffer
+class ForgeChunkBuffer extends ChunkBuffer
 {
 	private final ChunkPrimer chunk;
 
-	public ForgeChunkBuffer(ChunkPrimer chunk)
+	ForgeChunkBuffer(ChunkPrimer chunk)
 	{
 		this.chunk = chunk;
 	}

@@ -3,10 +3,9 @@ package com.pg85.otg.forge.materials;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
-import com.pg85.otg.common.materials.LocalMaterialData;
-import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -44,7 +43,7 @@ public class ForgeMaterialData extends LocalMaterialData
     	this.rawEntry = raw;
     }
     
-    public static ForgeMaterialData getBlank()
+    private static ForgeMaterialData getBlank()
     {
     	// TODO: this null should probably be replaced with air
     	ForgeMaterialData material = new ForgeMaterialData((BlockState)null, null);
@@ -52,7 +51,7 @@ public class ForgeMaterialData extends LocalMaterialData
     	return material;
     }
 
-    public static ForgeMaterialData ofString(String input) throws InvalidConfigException
+    static ForgeMaterialData ofString(String input) throws InvalidConfigException
     {
     	if(input == null || input.trim().isEmpty())
     	{
@@ -168,7 +167,7 @@ public class ForgeMaterialData extends LocalMaterialData
      * @param block The material.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofMinecraftBlock(Block block, String raw)
+    private static ForgeMaterialData ofMinecraftBlock(Block block, String raw)
     {
         return ofMinecraftBlockState(block.getDefaultState(), raw);
     }
@@ -188,7 +187,7 @@ public class ForgeMaterialData extends LocalMaterialData
      * @param blockData The material an data.
      * @return The {@code BukkitMateialData} instance.
      */
-    public static ForgeMaterialData ofMinecraftBlockState(BlockState blockData, String raw)
+    private static ForgeMaterialData ofMinecraftBlockState(BlockState blockData, String raw)
     {
         return new ForgeMaterialData(blockData, raw);
     }   
@@ -299,6 +298,7 @@ public class ForgeMaterialData extends LocalMaterialData
         return this.blockData == null ? false : this.blockData.getMaterial().isSolid();    	
     }
 
+    /*
 	@Override
 	public LocalMaterialData parseForWorld(WorldConfig worldConfig)
 	{
@@ -315,6 +315,7 @@ public class ForgeMaterialData extends LocalMaterialData
 		}
 		return this;
 	}
+	*/
 	
     @Override
     public boolean hasData()

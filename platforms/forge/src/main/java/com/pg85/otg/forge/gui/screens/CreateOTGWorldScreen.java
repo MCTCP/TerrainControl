@@ -9,7 +9,7 @@ import javax.annotation.Nullable;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.preset.Preset;
+import com.pg85.otg.presets.Preset;
 
 import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.DialogTexts;
@@ -44,15 +44,6 @@ public class CreateOTGWorldScreen extends Screen
 		this.selectedPreset = new DimensionConfig(this.presetList.get(0).getName(), 0, true, this.presetList.get(0).getWorldConfig());
 	}
 	
-	public CreateOTGWorldScreen(Screen p_i242054_1_, DynamicRegistries p_i242054_2_, Consumer<DimensionConfig> dimensionConfig, DimensionConfig selectedPreset)
-	{
-		super(new TranslationTextComponent("otg.createWorld.customize.title"));
-		this.parent = p_i242054_1_;
-		this.dimensionConfig = dimensionConfig;
-		this.selectedPreset = selectedPreset;
-		this.presetList = OTG.getEngine().getPresetLoader().getAllPresets();
-	}
-
 	public void func_231175_as__()
 	{
 		this.field_230706_i_.displayGuiScreen(this.parent);

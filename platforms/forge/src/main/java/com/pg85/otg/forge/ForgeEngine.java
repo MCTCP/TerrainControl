@@ -6,65 +6,30 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
-import com.pg85.otg.common.LocalWorld;
-import com.pg85.otg.common.materials.LocalMaterialData;
 import com.pg85.otg.config.biome.BiomeLoadInstruction;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
-import com.pg85.otg.config.standard.PluginStandardValues;
-import com.pg85.otg.exception.InvalidConfigException;
+import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.forge.biome.ForgeMojangSettings;
-import com.pg85.otg.forge.materials.ForgeMaterials;
+import com.pg85.otg.forge.materials.ForgeMaterialReader;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeLogger;
-import com.pg85.otg.util.minecraft.defaults.DefaultBiome;
-
+import com.pg85.otg.forge.util.ForgeModLoadedChecker;
 import net.minecraftforge.fml.loading.FMLLoader;
 
-public class ForgeEngine extends OTGEngine
+class ForgeEngine extends OTGEngine
 {
 	public ForgeEngine()
 	{
-		super(
+		super(			
 			new ForgeLogger(), 
-			Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + PluginStandardValues.MOD_ID), 
-			new ForgePresetLoader(Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + PluginStandardValues.MOD_ID))
+			Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + Constants.MOD_ID),
+			new ForgeMaterialReader(),
+			new ForgeModLoadedChecker(),			
+			new ForgePresetLoader(Paths.get(FMLLoader.getGamePath().toString(), File.separator + "config" + File.separator + Constants.MOD_ID))
 		);
-	}
-
-	@Override
-	public LocalWorld getWorld(String name)
-	{
-		// TODO: Implement this
-		return null;
-	}
-
-	@Override
-	public LocalWorld getUnloadedWorld(String name)
-	{
-		// TODO: Implement this
-		return null;
-	}
-
-	@Override
-	public ArrayList<LocalWorld> getAllWorlds()
-	{
-		// TODO: Implement this
-		return null;
-	}
-
-	@Override
-	public boolean isModLoaded(String mod)
-	{
-		// TODO: Implement this
-		return false;
-	}
-
-	@Override
-	public boolean areEnoughBiomeIdsAvailableForPresets(ArrayList<String> presetNames)
-	{
-		// TODO: Implement this
-		return false;
 	}
 
 	@Override
@@ -75,7 +40,7 @@ public class ForgeEngine extends OTGEngine
         for (DefaultBiome defaultBiome : DefaultBiome.values())
         {
             int id = defaultBiome.Id;
-            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), 128); // TODO: Why is this 128, should be 255?
+            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), 128, OTG.getEngine().getLogger()); // TODO: Why is this 128, should be 255?
             standardBiomes.add(instruction);
         }
 
@@ -86,11 +51,5 @@ public class ForgeEngine extends OTGEngine
 	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{
 		// TODO: Implement this
-	}
-
-	@Override
-	public LocalMaterialData readMaterial(String name) throws InvalidConfigException
-	{
-		return ForgeMaterials.readMaterial(name);
 	}
 }

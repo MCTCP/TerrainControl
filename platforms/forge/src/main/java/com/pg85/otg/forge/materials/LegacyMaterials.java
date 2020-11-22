@@ -88,7 +88,7 @@ import net.minecraft.util.Direction;
 // TODO: Can probably use some Forge method to convert data to the new format, don't do it all manually?
 // ^ At least this way we have full control and can accommodate for any legacy OTG names/data/aliases etc.
 // Block.getStateById() says //Forge: Do not use, use GameRegistry. GameRegistry doesn't appear to provide what we need though(?)
-public class LegacyMaterials
+class LegacyMaterials
 {
 	// TODO: Don't need any names here that match 1.16's
     static BlockState fromLegacyBlockName(String oldBlockName)

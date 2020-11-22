@@ -1,0 +1,48 @@
+// Build script for the Common parts of OpenTerrainGenerator
+
+plugins {
+  id 'java'
+  id 'com.github.johnrengelman.shadow' version '1.2.4'
+}
+
+// Project properties
+archivesBaseName = "openterraingenerator-common-core"
+description = "Core files of OpenTerrainGenerator"
+
+repositories
+{
+	jcenter()
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies
+{
+	compile project(':common:common-util')
+	compile project(':common:common-config')
+	compile project(':common:common-customobject')
+	compile project(':common:common-generator')
+    compile (
+		'com.fasterxml.jackson.core:jackson-annotations:2.9.0',
+		'com.fasterxml.jackson.core:jackson-core:2.9.7',
+		'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7',
+		'com.fasterxml.jackson.core:jackson-databind:2.9.7',
+		'org.yaml:snakeyaml:1.23'
+    )
+}
+
+shadowJar {
+    dependencies {
+		include dependency(':jackson-annotations')
+		include dependency(':jackson-core')
+		include dependency(':jackson-dataformat-yaml')
+		include dependency(':jackson-databind')
+		include dependency(':snakeyaml')
+    }
+	relocate 'com.fasterxml.jackson', 'com.pg85.otg.shaded.fasterxml.jackson'
+	relocate 'org.yaml', 'com.pg85.otg.shaded.org.yaml'
+	archiveName = project.archivesBaseName + '-' + project.version + '.jar'
+	destinationDir = project.distsDir
+}
+
+build.finalizedBy(shadowJar)
