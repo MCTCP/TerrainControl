@@ -59,4 +59,8 @@ public interface IWorldConfig
 	public ArrayList<String> getWorldBiomes();
 	public int getWorldHeightScale();
 	public void setMaxSmoothRadius(int smoothRadius);
+	public String getDefaultOceanBiome();
+	public int getLandFuzzy();
+	public int getLandRarity();
+	public int getLandSize();
 }

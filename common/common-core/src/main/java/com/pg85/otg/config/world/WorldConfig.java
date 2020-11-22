@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.Map.Entry;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeGroup;
+import com.pg85.otg.config.biome.BiomeGroupManager;
 import com.pg85.otg.config.fallbacks.BlockFallback;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
@@ -29,6 +31,7 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 
 //TODO: Clean this up further, atm WorldConfigBase implements
 //anything needed for IWorldConfig, which describes any
@@ -47,7 +50,7 @@ public class WorldConfig extends WorldConfigBase
 	// they need to be exposed, or remove if no longer used.
 
     // Biome Groups and special biome lists
-    //public BiomeGroupManager biomeGroupManager;
+    public BiomeGroupManager biomeGroupManager;
 
 	private List<String> isleBiomes = new ArrayList<String>();
 	private List<String> borderBiomes = new ArrayList<String>();
@@ -79,8 +82,7 @@ public class WorldConfig extends WorldConfigBase
     private boolean frozenOcean;
     private boolean freezeAllColdGroupBiomes;
     private double frozenOceanTemperature;
-    
-    private String defaultOceanBiome;
+
 	private String defaultFrozenOceanBiome;
 
     // Rivers
@@ -274,7 +276,6 @@ public class WorldConfig extends WorldConfigBase
                 reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
             }
             
-            /*
             int landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger, null);
             int landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger, null);
             List<String> normalBiomes = reader.getSetting(WorldStandardValues.NORMAL_BIOMES, logger, null);
@@ -287,7 +288,6 @@ public class WorldConfig extends WorldConfigBase
             BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, iceSize, iceRarity, iceBiomes);
 
             reader.addConfigFunctions(Arrays.asList(normalGroup, iceGroup));
-            */
         }
 
         // Migrate bounds
@@ -324,7 +324,7 @@ public class WorldConfig extends WorldConfigBase
         riverRarity = lowerThanOrEqualTo(riverRarity, generationDepth);
         riverSize = lowerThanOrEqualTo(riverSize, generationDepth - riverRarity);
 
-        //biomeGroupManager.filterBiomes(worldBiomes, logWarnings);
+        biomeGroupManager.filterBiomes(worldBiomes, logWarnings, logger);
         isleBiomes = filterBiomes(isleBiomes, worldBiomes);
         borderBiomes = filterBiomes(borderBiomes, worldBiomes);
 
@@ -406,7 +406,7 @@ public class WorldConfig extends WorldConfigBase
         this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger, null);
         
 		// Biome Groups
-		//readBiomeGroups(reader);
+		readBiomeGroups(reader, biomeResourcesManager, spawnLog, logger, materialReader);
     
         // Specialized Biomes
         this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger, null);
@@ -608,60 +608,58 @@ public class WorldConfig extends WorldConfigBase
         this.playersCanPlaceBlocks = reader.getSetting(WorldStandardValues.PLAYERS_CAN_PLACE_BLOCKS, logger, null);
     }
 
-    /*
-    private void readBiomeGroups(SettingsMap reader)
+    private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
         this.biomeGroupManager = new BiomeGroupManager();
         if (reader.isNewConfig())
         {
-            createDefaultBiomeGroups();
+            createDefaultBiomeGroups(logger);
         }
-        for (ConfigFunction<WorldConfig> res : reader.getConfigFunctions(this, false))
+        for (ConfigFunction<IWorldConfig> res : new ArrayList<ConfigFunction<IWorldConfig>>(reader.getConfigFunctions(this, false, biomeResourcesManager, spawnLog, logger, materialReader)))
         {
             if (res != null)
             {
                 if (res instanceof BiomeGroup)
                 {
-                    biomeGroupManager.registerGroup((BiomeGroup) res);
+                    biomeGroupManager.registerGroup((BiomeGroup) res, logger);
                 }
             }
         }
     }
 
-    private void createDefaultBiomeGroups()
+    private void createDefaultBiomeGroups(ILogger logger)
     {
         BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 98,
                 Arrays.asList("Forest", "Roofed Forest", "Extreme Hills", "Plains",
                         "Birch Forest", "Swampland", "Flower Forest", "Roofed Forest M",
                         "Extreme Hills+", "Sunflower Plains", "Birch Forest M", "Swampland M"));
-        this.biomeGroupManager.registerGroup(normalGroup);
+        this.biomeGroupManager.registerGroup(normalGroup, logger);
 
         BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, 2, 40,
                 Arrays.asList("Ice Plains", "Cold Taiga", "Ice Plains Spikes", "Cold Taiga M"));
-        this.biomeGroupManager.registerGroup(iceGroup);
+        this.biomeGroupManager.registerGroup(iceGroup, logger);
 
         BiomeGroup hotGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.HOT, 1, 98,
                 Arrays.asList("Desert", "Savanna", "Plains", "Desert M", "Savanna M", "Sunflower Plains"));
-        this.biomeGroupManager.registerGroup(hotGroup);
+        this.biomeGroupManager.registerGroup(hotGroup, logger);
 
         BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 98,
                 Arrays.asList("Forest", "Extreme Hills", "Taiga", "Plains",
                         "Flower Forest", "Extreme Hills+", "Taiga M", "Sunflower Plains"));
-        this.biomeGroupManager.registerGroup(coldGroup);
+        this.biomeGroupManager.registerGroup(coldGroup, logger);
 
         BiomeGroup mesaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MESA, 2, 40,
                 Arrays.asList("Mesa"));
-        this.biomeGroupManager.registerGroup(mesaGroup);
+        this.biomeGroupManager.registerGroup(mesaGroup, logger);
 
         BiomeGroup jungleGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.JUNGLE, 1, 40,
                 Arrays.asList("Jungle", "Jungle M"));
-        this.biomeGroupManager.registerGroup(jungleGroup);
+        this.biomeGroupManager.registerGroup(jungleGroup, logger);
 
         BiomeGroup megaTaigaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MEGA_TAIGA, 1, 40,
                 Arrays.asList("Mega Taiga", "Mega Spruce Taiga"));
-        this.biomeGroupManager.registerGroup(megaTaigaGroup);
+        this.biomeGroupManager.registerGroup(megaTaigaGroup, logger);
     }
-    */
 
     @Override
     protected void writeConfigSettings(SettingsMap writer)

@@ -20,20 +20,28 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected double fractureHorizontal;
 	protected double fractureVertical;
 	protected int generationDepth;
-	private int maxSmoothRadius = 2;
+	protected int maxSmoothRadius = 2;
+	
+    // Biome generator
+    
+	protected int landRarity;
+	protected int landSize;
+	protected int landFuzzy;    
 	
 	protected ArrayList<String> worldBiomes = new ArrayList<String>();
 	protected int biomeRarityScale;
 	
+	//
+	
 	protected List<ReplaceBlocks> replaceBlocksList = null;
-	private HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
+	protected HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
 	
 	protected boolean isOTGPlus;
 	protected long resourcesSeed;
 	protected boolean disableOreGen;
 	protected boolean fullyFreezeLakes;
 	protected boolean betterSnowFall;
-	private boolean biomeConfigsHaveReplacement = false;
+	protected boolean biomeConfigsHaveReplacement = false;
 	protected boolean removeSurfaceStone;
 	protected ConfigMode settingsMode;
     
@@ -56,6 +64,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected LocalMaterialData cooledLavaBlock;
 	protected LocalMaterialData iceBlock;
 	protected LocalMaterialData waterBlock;
+	
+	protected String defaultOceanBiome;
 	
     // Caves
 	protected int individualCaveRarity;
@@ -459,5 +469,29 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public void setMaxSmoothRadius(int smoothRadius)
 	{
 		this.maxSmoothRadius = smoothRadius;
+	}
+	
+	@Override
+	public String getDefaultOceanBiome()
+	{
+		return this.defaultOceanBiome;
+	}
+
+	@Override
+	public int getLandFuzzy()
+	{
+		return this.landFuzzy;
+	}
+
+	@Override
+	public int getLandRarity()
+	{
+		return this.landRarity;
+	}
+
+	@Override
+	public int getLandSize()
+	{
+		return this.landSize;
 	}
 }

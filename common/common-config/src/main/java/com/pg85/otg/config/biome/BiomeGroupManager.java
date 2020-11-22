@@ -8,7 +8,7 @@ import java.util.*;
 /**
  * Manages a collection of biome groups that are accesible by their name and id.
  */
-final class BiomeGroupManager
+public final class BiomeGroupManager
 {
     static final int MAX_BIOME_GROUP_COUNT = 127;
     private int cumulativeGroupRarity = 0;
@@ -175,12 +175,12 @@ final class BiomeGroupManager
      * removed.
      * @param customBiomeNames Set of all custom biomes in the world.
      */
-    public void filterBiomes(ArrayList<String> customBiomeNames, boolean logWarnings, ILogger logger, List<String> defaultBiomes)
+    public void filterBiomes(ArrayList<String> customBiomeNames, boolean logWarnings, ILogger logger)
     {
         for (Iterator<BiomeGroup> it = idToGroup.values().iterator(); it.hasNext();)
         {
             BiomeGroup group = it.next();
-            group.filterBiomes(customBiomeNames, logWarnings, logger, defaultBiomes);
+            group.filterBiomes(customBiomeNames, logWarnings, logger);
             if (group.hasNoBiomes())
             {
                 it.remove();

@@ -1,6 +1,7 @@
 package com.pg85.otg.config.biome;
 
 import com.pg85.otg.config.ConfigFunction;
+import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
@@ -27,7 +28,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
     private int groupRarity;
     private int generationDepth = 0;
     private float avgTemp = 0;
-    private Map<String, IBiome> biomes = new LinkedHashMap<String, IBiome>(32);
+    public Map<String, IBiome> biomes = new LinkedHashMap<String, IBiome>(32);
 
     /**
      * Variable used by the the ungrouped biome generator. This generator
@@ -143,14 +144,14 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
      * unrecognized name.
      * @param customBiomeNames Set of known custom biomes.
      */
-    void filterBiomes(ArrayList<String> customBiomeNames, boolean logWarnings, ILogger logger, List<String> defaultBiomes)
+    void filterBiomes(ArrayList<String> customBiomeNames, boolean logWarnings, ILogger logger)
     {
         for (Iterator<String> it = this.biomes.keySet().iterator(); it.hasNext();)
         {
             String biomeName = it.next();
             if(biomeName != null && biomeName.trim().length() > 0)
             {
-	            if (defaultBiomes.contains(biomeName) || customBiomeNames.contains(biomeName))
+	            if (DefaultBiome.Contain(biomeName) || customBiomeNames.contains(biomeName))
 	            {
 	                continue;
 	            }

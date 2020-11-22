@@ -5,13 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
-import com.pg85.otg.gen.biome.NewBiomeData;
-
 /**
  * Class to hold biome layer data until world configs are working. This class will eventually be removed.
  */
-class BiomeLayerData
+public class BiomeLayerData
 {
 	public int generationDepth = 10;
 	public int landSize = 0;

@@ -11,13 +11,15 @@ import java.util.Set;
 
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
-import com.pg85.otg.config.preset.Preset;
 import com.pg85.otg.config.world.WorldConfig;
-import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
+import com.pg85.otg.util.biome.BiomeResourceLocation;
+import com.pg85.otg.util.interfaces.IWorldConfig;
+import com.pg85.otg.gen.biome.layers.BiomeLayerData;
+import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -25,9 +27,6 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
 import com.pg85.otg.gen.biome.NewBiomeData;
-import com.pg85.otg.gen.biome.layers.BiomeLayerData;
-import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
-import com.pg85.otg.util.BiomeResourceLocation;
 import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
@@ -102,13 +101,13 @@ public class ForgePresetLoader extends LocalPresetLoader
 
 			// Set the base data
 			BiomeLayerData data = new BiomeLayerData();
-			data.generationDepth = worldConfig.generationDepth;
-			data.landSize = worldConfig.landSize;
-			data.landFuzzy = worldConfig.landFuzzy;
-			data.landRarity = worldConfig.landRarity;
+			data.generationDepth = worldConfig.getGenerationDepth();
+			data.landSize = worldConfig.getLandSize();
+			data.landFuzzy = worldConfig.getLandFuzzy();
+			data.landRarity = worldConfig.getLandRarity();
 
 			// Get and set the ocean
-			BiomeConfig ocean = this.biomeConfigsByRegistryKey.get(new ResourceLocation(new BiomeResourceLocation(preset.getName(), worldConfig.defaultOceanBiome).toResourceLocationString()));
+			BiomeConfig ocean = this.biomeConfigsByRegistryKey.get(new ResourceLocation(new BiomeResourceLocation(preset.getName(), worldConfig.getDefaultOceanBiome()).toResourceLocationString()));
 			data.oceanId = this.reverseIdMapping.getInt(ocean);
 
 			Set<Integer> biomeDepths = new HashSet<>();
@@ -129,11 +128,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data
-					NewBiomeData newBiomeData = new NewBiomeData(this.reverseIdMapping.getInt(config), config.biomeRarity, config.biomeSize);
+					NewBiomeData newBiomeData = new NewBiomeData(this.reverseIdMapping.getInt(config), config.getBiomeRarity(), config.getBiomeSize());
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done
-					biomeDepths.add(config.biomeSize);
+					biomeDepths.add(config.getBiomeSize());
 				}
 
 				int groupSize = group.getGenerationDepth();
