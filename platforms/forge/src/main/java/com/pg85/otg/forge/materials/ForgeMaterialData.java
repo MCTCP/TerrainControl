@@ -150,7 +150,7 @@ public class ForgeMaterialData extends LocalMaterialData
     	} catch(net.minecraft.util.ResourceLocationException ex) { }
 
     	// Try legacy name again, without data.
-    	blockState = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
+    	blockState = LegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));
 		if(blockState != null)
 		{
 			return ofMinecraftBlockState(blockState, input);

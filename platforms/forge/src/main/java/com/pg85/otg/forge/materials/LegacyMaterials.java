@@ -93,7 +93,7 @@ class LegacyMaterials
 	// TODO: Don't need any names here that match 1.16's
     static BlockState fromLegacyBlockName(String oldBlockName)
     {
-    	switch(oldBlockName.replace("minecraft:", ""))
+    	switch(oldBlockName)
     	{
     		case "stationary_water":
     			return Blocks.WATER.getDefaultState();
@@ -113,6 +113,8 @@ class LegacyMaterials
     			return Blocks.LILY_PAD.getDefaultState();
     		case "soil":
     			return Blocks.FARMLAND.getDefaultState();
+    		case "grass":
+    			return Blocks.GRASS_BLOCK.getDefaultState();
     		case "long_grass":
     			return Blocks.TALL_GRASS.getDefaultState();
     		case "mycel":
@@ -794,6 +796,14 @@ class LegacyMaterials
     	{
 	    	switch(blockName)
 	    	{
+	    		// Support "GRASS:0" here, or it will be misinterpreted as the new grass (plant)
+	    		case "grass":
+	    			switch(data)
+	    			{
+	    				case 0:
+	    					return Blocks.GRASS_BLOCK.getDefaultState();
+	    			}
+	    	
 				// Legacy blocks with block data that are now their own block
 	    		case "banner":
 	    		case "white_banner":
