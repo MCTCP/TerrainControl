@@ -72,10 +72,6 @@ public class WorldConfig extends WorldConfigBase
 
     // Biome generator
     
-    private int landRarity;
-    private int landSize;
-    private int landFuzzy;    
-
     private boolean frozenOcean;
     private boolean freezeAllColdGroupBiomes;
     private double frozenOceanTemperature;
