@@ -1442,7 +1442,7 @@ public class BiomeConfig extends BiomeConfigBase
             // Dead Bush
             resources.add(Resource.createResource(this, logger, materialReader, GrassGen.class, PlantType.DeadBush, 0, biomeTemplate.defaultDeadBush,
         		BiomeStandardValues.DeadBushDepositRarity, LocalMaterials.SAND, LocalMaterials.TERRACOTTA,
-                LocalMaterials.STAINED_CLAY, LocalMaterials.DIRT));
+                LocalMaterials.TERRACOTTA, LocalMaterials.DIRT));
         }
 
         // Pumpkin

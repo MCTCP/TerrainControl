@@ -23,13 +23,13 @@ class MesaSurfaceGenerator implements SurfaceGenerator
     private NoiseGeneratorPerlinMesaBlocks pillarRoofNoise;
     private NoiseGeneratorPerlinMesaBlocks clayBandsOffsetNoise;
     
-    private LocalMaterialData hardClay = LocalMaterials.STAINED_CLAY;
-    private LocalMaterialData orangeClay = LocalMaterials.ORANGE_STAINED_CLAY;
-    private LocalMaterialData yellowClay = LocalMaterials.YELLOW_STAINED_CLAY;
-    private LocalMaterialData brownClay = LocalMaterials.BROWN_STAINED_CLAY;
-    private LocalMaterialData redClay = LocalMaterials.RED_STAINED_CLAY;
-    private LocalMaterialData whiteClay = LocalMaterials.WHITE_STAINED_CLAY;
-    private LocalMaterialData silverClay = LocalMaterials.SILVER_STAINED_CLAY;
+    private LocalMaterialData hardClay = LocalMaterials.TERRACOTTA;
+    private LocalMaterialData orangeClay = LocalMaterials.ORANGE_TERRACOTTA;
+    private LocalMaterialData yellowClay = LocalMaterials.YELLOW_TERRACOTTA;
+    private LocalMaterialData brownClay = LocalMaterials.BROWN_TERRACOTTA;
+    private LocalMaterialData redClay = LocalMaterials.RED_TERRACOTTA;
+    private LocalMaterialData whiteClay = LocalMaterials.WHITE_TERRACOTTA;
+    private LocalMaterialData silverClay = LocalMaterials.SILVER_TERRACOTTA;
     private LocalMaterialData redSand = LocalMaterials.RED_SAND;
     
     private boolean initialized;
