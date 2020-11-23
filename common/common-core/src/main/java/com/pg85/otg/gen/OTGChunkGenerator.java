@@ -152,7 +152,7 @@ public class OTGChunkGenerator
 
 	private double getExtraHeightAt(int x, int z, double maxAverageDepth, double maxAverageHeight)
 	{
-		double noiseHeight = this.depthNoise.sample(x * 200, 10.0D, z * 200, 1.0D, 0.0D, true) / 8000.0;
+		double noiseHeight = this.depthNoise.sample(x * 200, 10.0D, z * 200, 1.0D, 0.0D, true) * 65535.0 / 8000.0;
 
 		if (noiseHeight < 0.0D)
 		{
