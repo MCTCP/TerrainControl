@@ -357,7 +357,7 @@ public class WorldConfig extends WorldConfigBase
     protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
     	// OTG+
-    	this.isOTGPlus = reader.getSetting(WorldStandardValues.IS_OTG_PLUS, logger, null);
+    	this.isBO4World = reader.getSetting(WorldStandardValues.IS_OTG_PLUS, logger, null);
     	this.replaceBlocksList = reader.getSetting(WorldStandardValues.REPLACE_BLOCKS_LIST, logger, null);
     	//
 
@@ -1020,7 +1020,7 @@ public class WorldConfig extends WorldConfigBase
         // Custom structures
         writer.smallTitle("Custom structures and objects");
 
-        writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.isOTGPlus,
+        writer.putSetting(WorldStandardValues.IS_OTG_PLUS, this.isBO4World,
             "Set this to true to use BO4's for CustomStructure().",
             "BO4's allow for collision detection, fine control over structure distribution, advanced branching mechanics for",
             "procedurally generated structures, smoothing areas, extremely large structures, settings for blending structures",

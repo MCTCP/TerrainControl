@@ -40,7 +40,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected List<ReplaceBlocks> replaceBlocksList = null;
 	protected HashMap<LocalMaterialData,LocalMaterialData> replaceBlocksDict = null;
 	
-	protected boolean isOTGPlus;
+	protected boolean isBO4World;
 	protected long resourcesSeed;
 	protected boolean disableOreGen;
 	protected boolean fullyFreezeLakes;
@@ -347,7 +347,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	public boolean isOTGPlus()
 	{
-		return this.isOTGPlus;
+		return this.isBO4World;
 	}
 	
 	public long getResourcesSeed()
