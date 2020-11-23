@@ -145,6 +145,8 @@ public class OTGChunkGenerator
 			{
 				noise += perlinNoiseSampler.sample(scaledX, scaledY, scaledZ, scaledVerticalScale, (double) y * scaledVerticalScale) / amplitude;
 			}
+
+			amplitude /= 2.0D;
 		}
 
 		return noise;
