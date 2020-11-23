@@ -14,6 +14,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 
 public class BiomeResourcesManager implements IConfigFunctionProvider
 {
@@ -60,7 +61,18 @@ public class BiomeResourcesManager implements IConfigFunctionProvider
         // Get a config function
         try
         {
-            Constructor<? extends ConfigFunction<?>> constructor = clazz.getConstructor(IBiomeConfig.class, List.class, ILogger.class, IMaterialReader.class);
+        	Constructor<? extends ConfigFunction<?>> constructor = null;
+        	if(holder instanceof IBiomeConfig)
+        	{
+        		constructor = clazz.getConstructor(IBiomeConfig.class, List.class, ILogger.class, IMaterialReader.class);
+        	}
+        	else if(holder instanceof IWorldConfig)
+        	{
+        		constructor = clazz.getConstructor(IWorldConfig.class, List.class, ILogger.class, IMaterialReader.class);        		
+        	}
+        	else {
+        		String breakpoint = "";
+        	}
             return (ConfigFunction<T>) constructor.newInstance(holder, args, logger, materialReader);
         }
         catch (NoSuchMethodException e1)

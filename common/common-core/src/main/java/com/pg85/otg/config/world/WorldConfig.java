@@ -49,9 +49,6 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Clean these fields up, move to WorldConfigBase if
 	// they need to be exposed, or remove if no longer used.
 
-    // Biome Groups and special biome lists
-    public BiomeGroupManager biomeGroupManager;
-
 	private List<String> isleBiomes = new ArrayList<String>();
 	private List<String> borderBiomes = new ArrayList<String>();
 
@@ -615,7 +612,7 @@ public class WorldConfig extends WorldConfigBase
         {
             createDefaultBiomeGroups(logger);
         }
-        for (ConfigFunction<IWorldConfig> res : new ArrayList<ConfigFunction<IWorldConfig>>(reader.getConfigFunctions(this, false, biomeResourcesManager, spawnLog, logger, materialReader)))
+        for (ConfigFunction<IWorldConfig> res : reader.getConfigFunctions((IWorldConfig)this, false, biomeResourcesManager, spawnLog, logger, materialReader))
         {
             if (res != null)
             {
@@ -720,7 +717,6 @@ public class WorldConfig extends WorldConfigBase
             "fine-grained control, or to create biomes with a chance of occurring smaller than 1/100.");
 
         // Biome groups
-        /*
         writer.smallTitle("Biome Groups",
             "Minecraft groups similar biomes together, so that they spawn next to each other.",
             "",
@@ -736,9 +732,8 @@ public class WorldConfig extends WorldConfigBase
             "ignored. The size and rarity of the NormalBiomes group is ignored as well, use LandSize and",
             "LandRarity instead.",
             "");
-        */
 
-        //writer.addConfigFunctions(this.biomeGroupManager.getGroups());
+        writer.addConfigFunctions(this.biomeGroupManager.getGroups());
 
         // Biome lists
         writer.smallTitle("Biome lists",

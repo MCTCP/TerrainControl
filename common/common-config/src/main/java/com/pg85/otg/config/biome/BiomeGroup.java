@@ -10,6 +10,7 @@ import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IBiomeRegistryProvider;
+import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import java.util.*;
 import java.util.Map.Entry;
@@ -46,7 +47,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
      * @see #BiomeGroup(WorldConfig, String, int, int, List) Constructor to
      * properly initialize this biome group manually.
      */
-    public BiomeGroup(IWorldConfig config, List<String> args) throws InvalidConfigException
+    public BiomeGroup(IWorldConfig config, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
     {
         // Must have at least a GroupName and a Biome that belongs to it
         assureSize(4, args);
