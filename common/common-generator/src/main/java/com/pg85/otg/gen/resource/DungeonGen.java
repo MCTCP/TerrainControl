@@ -14,9 +14,6 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Generates a dungeon.
- */
 public class DungeonGen extends Resource
 {
     private final int maxAltitude;

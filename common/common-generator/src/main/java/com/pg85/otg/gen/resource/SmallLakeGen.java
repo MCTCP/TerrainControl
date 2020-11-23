@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Generates a small lake. The end result will invariably look bad so it's recommended to create custom objects for your lakes.
+ * Generates a small lake. The end result will invariably look poor and cause issues so it's recommended to create custom objects for your lakes.
  */
 public class SmallLakeGen extends Resource
 {

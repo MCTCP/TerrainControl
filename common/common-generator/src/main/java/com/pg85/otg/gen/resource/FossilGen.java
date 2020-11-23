@@ -12,9 +12,6 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Generates a fossil.
- */
 public final class FossilGen extends Resource
 {
     public FossilGen(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException

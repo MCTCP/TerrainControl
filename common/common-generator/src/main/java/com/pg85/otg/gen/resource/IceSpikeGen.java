@@ -16,10 +16,6 @@ import com.pg85.otg.util.materials.MaterialSet;
 
 import java.util.List;
 import java.util.Random;
-
-/**
- * Generates an ice spike.
- */
 public class IceSpikeGen extends Resource
 {
     public enum SpikeType
