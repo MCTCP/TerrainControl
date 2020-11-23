@@ -30,7 +30,7 @@ class BiomeGroupLayer implements ParentedLayer
 			maxRarity += group.rarity;
 			this.rarityMap.put(maxRarity, group);
 		}
-
+		
 		this.maxRarity = maxRarity;
 	}
 
@@ -38,14 +38,14 @@ class BiomeGroupLayer implements ParentedLayer
 	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
 	{
 		int sample = parent.sample(x, z);
-
+		
 		// Check if it's land and then check if there is no group already here
 		if (BiomeLayers.isLand(sample) && BiomeLayers.getGroupId(sample) == 0)
 		{
 			int biomeGroup = getGroup(context);
-
+			
 			// Encode the biome group id into the sample for later use
-			return sample | biomeGroup << GROUP_SHIFT;
+			return sample | (biomeGroup << GROUP_SHIFT);
 		}
 
 		return sample;
@@ -54,7 +54,8 @@ class BiomeGroupLayer implements ParentedLayer
 	private int getGroup(LayerRandomnessSource random)
 	{
 		// Get a random rarity number from our max rarity
-		int chosenRarity = random.nextInt(maxRarity);
+		// Allow for a "no value" rarity roll, as we did for 1.12.
+		int chosenRarity = random.nextInt(this.rarityMap.size() * 100);
 
 		// Iterate through the rarity map and see if the chosen rarity is less than the rarity for each group, if it is then return.
 		for (Map.Entry<Integer, NewBiomeGroup> entry : rarityMap.entrySet())
@@ -64,7 +65,7 @@ class BiomeGroupLayer implements ParentedLayer
 			}
 		}
 
-		// Fallback
+		// Don't place a biome group at this depth
 		return 0;
 	}
 }
