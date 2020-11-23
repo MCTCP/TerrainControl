@@ -49,20 +49,6 @@ public class ForgeBiome implements IBiome
 	public IBiomeConfig getBiomeConfig()
 	{
 		return this.biomeConfig;
-	}    
-    
-	@Override
-	public boolean isCustom()
-	{
-		// TODO
-		return false;
-	}
-
-	@Override
-	public String getName()
-	{
-		// TODO
-		return null;
 	}
 
 	public static Biome createOTGBiome(IWorldConfig worldConfig, IBiomeConfig biomeConfig)

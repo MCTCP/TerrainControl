@@ -39,18 +39,18 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     protected float biomeHeight;
     protected float biomeVolatility;
     protected int smoothRadius;
-    
+
     protected float biomeTemperature;
 
     protected int biomeRarity;
     protected int biomeSize;
-    
+
     protected LocalMaterialData stoneBlock;
     protected LocalMaterialData surfaceBlock;
     protected LocalMaterialData groundBlock;
     protected LocalMaterialData sandStoneBlock;
     protected LocalMaterialData redSandStoneBlock;
-    
+
     protected ReplacedBlocksMatrix replacedBlocks;
     protected SurfaceGenerator surfaceAndGroundControl;
 

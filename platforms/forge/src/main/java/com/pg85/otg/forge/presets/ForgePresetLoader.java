@@ -13,11 +13,9 @@ import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.forge.biome.ForgeBiome;
-import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
-import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
 

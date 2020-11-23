@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import com.pg85.otg.config.ConfigFile;
+import com.pg85.otg.config.biome.BiomeGroupManager;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.biome.ReplaceBlocks;
@@ -15,6 +16,9 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 
 abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 {
+    // Biome Groups and special biome lists
+    public BiomeGroupManager biomeGroupManager;
+	
 	protected int worldHeightCap;
 	protected int worldHeightScale;
 	protected double fractureHorizontal;
