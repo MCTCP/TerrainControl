@@ -74,9 +74,6 @@ public class WorldConfig extends WorldConfigBase
     // Biome generator
     
     private boolean frozenOcean;
-    private boolean freezeAllColdGroupBiomes;
-    private double frozenOceanTemperature;
-
 	private String defaultFrozenOceanBiome;
 
     // Rivers

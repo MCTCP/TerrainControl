@@ -65,4 +65,5 @@ public interface IWorldConfig
 	public int getLandRarity();
 	public int getLandSize();
 	public BiomeMode getBiomeMode();
+	double getFrozenOceanTemperature();
 }

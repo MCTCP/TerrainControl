@@ -77,7 +77,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 			List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
 			this.biomesByPresetName.put(preset.getName(), presetBiomes);
 			WorldConfig worldConfig = preset.getWorldConfig();
-
+			BiomeConfig oceanBiomeConfig = null;
+			
 			Int2ObjectMap<BiomeConfig> presetIdMapping = new Int2ObjectLinkedOpenHashMap<>();
 			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
 			
@@ -105,6 +106,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				{
  					// TODO: Can't map the same biome to 2 int keys for the reverse map
  					// make sure this doesn't cause problems :/.
+ 					oceanBiomeConfig = biomeConfig;
  					presetIdMapping.put(0, biomeConfig);
  				}
 
@@ -121,7 +123,10 @@ public class ForgePresetLoader extends LocalPresetLoader
 			data.landSize = worldConfig.getLandSize();
 			data.landFuzzy = worldConfig.getLandFuzzy();
 			data.landRarity = worldConfig.getLandRarity();
-
+			data.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature());
+			data.frozenOceanTemperature = worldConfig.getFrozenOceanTemperature();
+			data.freezeGroups = worldConfig.getIsFreezeGroups();
+			
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
 
@@ -133,6 +138,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 				bg.id = group.getGroupId();
 				bg.rarity = group.getGroupRarity();
 
+		        float totalTemp = 0;
+		        int totalGroupRarity = 0;
+				
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
 				{
@@ -140,12 +148,16 @@ public class ForgePresetLoader extends LocalPresetLoader
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data
-					NewBiomeData newBiomeData = new NewBiomeData(presetReverseIdMapping.getInt(config), config.getBiomeRarity(), config.getBiomeSize());
+					NewBiomeData newBiomeData = new NewBiomeData(presetReverseIdMapping.getInt(config), config.getBiomeRarity(), config.getBiomeSize(), config.getBiomeTemperature());
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done
 					biomeDepths.add(config.getBiomeSize());
+					
+		            totalTemp += config.getBiomeTemperature();
+		            totalGroupRarity += config.getBiomeRarity();
 				}
+				bg.avgTemp = totalTemp / group.biomes.size();
 
 				int groupSize = group.getGenerationDepth();
 

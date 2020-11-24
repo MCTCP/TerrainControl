@@ -17,6 +17,7 @@ public class BiomeLayers
 
 	// The land bit marks whether a sample is land or not. This is used to place biomes.
 	public static final int LAND_BIT = (1 << 30);
+	public static final int ICE_BIT = (1 << 31);
 
 	public static final int GROUP_SHIFT = 23;
 
@@ -59,14 +60,18 @@ public class BiomeLayers
 				factory = new AddIslandsLayer().create(contextProvider.apply(depth), factory);
 			}
 
-
 			if (data.groups.containsKey(depth)) {
-				factory = new BiomeGroupLayer(data.groups.get(depth)).create(contextProvider.apply(depth), factory);
+				factory = new BiomeGroupLayer(data.groups.get(depth), data.freezeGroups).create(contextProvider.apply(depth), factory);
 			}
 
 			if (data.biomeDepths.contains(depth)) {
 				factory = new BiomeLayer(data, depth).create(contextProvider.apply(depth), factory);
 			}
+			
+            if (depth == 3) // TODO: Why 3?
+            {
+            	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
+            }
 		}
 
 		// Add ocean biomes. This only adds the regular ocean at the moment, soon it will add others.

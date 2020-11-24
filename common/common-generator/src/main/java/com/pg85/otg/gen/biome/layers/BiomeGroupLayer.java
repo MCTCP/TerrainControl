@@ -20,7 +20,9 @@ class BiomeGroupLayer implements ParentedLayer
 	private final TreeMap<Integer, NewBiomeGroup> rarityMap = new TreeMap<>();
 	// The rarity sum of all the groups. This is used to choose the biome group.
 	private final int maxRarity;
-	BiomeGroupLayer(List<NewBiomeGroup> groups) {
+	private final boolean freezeGroups;
+	
+	BiomeGroupLayer(List<NewBiomeGroup> groups, boolean freezeGroups) {
 		int maxRarity = 0;
 
 		// Iterate through groups and keep a tally of the rarity of each group.
@@ -32,6 +34,7 @@ class BiomeGroupLayer implements ParentedLayer
 		}
 		
 		this.maxRarity = maxRarity;
+		this.freezeGroups = freezeGroups;
 	}
 
 	@Override
@@ -42,16 +45,21 @@ class BiomeGroupLayer implements ParentedLayer
 		// Check if it's land and then check if there is no group already here
 		if (BiomeLayers.isLand(sample) && BiomeLayers.getGroupId(sample) == 0)
 		{
-			int biomeGroup = getGroup(context);
-			
-			// Encode the biome group id into the sample for later use
-			return sample | (biomeGroup << GROUP_SHIFT);
+			NewBiomeGroup biomeGroup = getGroup(context);
+			if(biomeGroup != null)
+			{
+				// Encode the biome group id into the sample for later use
+				return sample | (biomeGroup.id << GROUP_SHIFT) |
+	                //>>	If the average temp of the group is cold
+	                ((biomeGroup.isColdGroup() && freezeGroups) ? BiomeLayers.ICE_BIT : 0)
+	            ;
+			}
 		}
 
 		return sample;
 	}
 
-	private int getGroup(LayerRandomnessSource random)
+	private NewBiomeGroup getGroup(LayerRandomnessSource random)
 	{
 		// Get a random rarity number from our max rarity
 		// Allow for a "no value" rarity roll, as we did for 1.12.
@@ -61,11 +69,11 @@ class BiomeGroupLayer implements ParentedLayer
 		for (Map.Entry<Integer, NewBiomeGroup> entry : rarityMap.entrySet())
 		{
 			if (chosenRarity < entry.getKey()) {
-				return entry.getValue().id;
+				return entry.getValue();
 			}
 		}
 
 		// Don't place a biome group at this depth
-		return 0;
+		return null;
 	}
 }

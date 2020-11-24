@@ -75,30 +75,35 @@ class BiomeLayer implements ParentedLayer
 					NewBiomeGroup group = this.data.groupRegistry.get(biomeGroupId);	
 					if (this.groupToMaxRarity.containsKey(group) && this.groupBiomes.containsKey(group))
 					{
-						int biome = getBiomeFromGroup(context, this.groupToMaxRarity.get(group), this.groupBiomes.get(group));				
-						return sample | biome;
+						NewBiomeData biomeData = getBiomeFromGroup(context, this.groupToMaxRarity.get(group), this.groupBiomes.get(group));
+						return sample | biomeData.id |
+                            // Set IceBit based on Biome Temperature
+                            (biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)
+						;
 					}
 				}
 			}
 			else if(this.data.biomeMode == BiomeMode.BeforeGroups)
 			{
 				NewBiomeGroup normalGroup = this.data.groupRegistry.get(1);
-				NewBiomeData biome = null;
-				// TODO: Implement ICE_BIT
-				if (normalGroup.biomes.size() > 0) //&& (sample & BiomeLayers.ICE_BIT) == 0) // Normal biome
+				NewBiomeData biomeData = null;
+				// TODO: For 1.12, biomes.size() would be much larger than the amount of biomes in the group
+				// LayerFactory would add * biomeConfig.biomeRarity items, for each biome in the group.
+				if (normalGroup.biomes.size() > 0 && (sample & BiomeLayers.ICE_BIT) == 0) // Normal biome
 				{
-					biome = normalGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
+					biomeData = normalGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
 				}
-				/*
 				NewBiomeGroup iceGroup = this.data.groupRegistry.get(2); 
                 if (iceGroup.biomes.size() > 0 && (sample & BiomeLayers.ICE_BIT) != 0) // Ice biome
                 {
-                	biome = iceGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
+                	biomeData = iceGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
                 }
-                */
-                if (biome != null)
+                if (biomeData != null)
                 {
-                    return sample | biome.id;
+                    return sample | biomeData.id |
+                        // Set IceBit based on Biome Temperature
+                        (biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)
+                    ;
                 }
 			}
 		}
@@ -106,7 +111,7 @@ class BiomeLayer implements ParentedLayer
 		return sample;
 	}
 
-	private int getBiomeFromGroup(LayerRandomnessSource random, int maxRarity, Map<Integer, NewBiomeData> rarityMap)
+	private NewBiomeData getBiomeFromGroup(LayerRandomnessSource random, int maxRarity, Map<Integer, NewBiomeData> rarityMap)
 	{
 		// Get a random rarity number from our max rarity
 		int chosenRarity = random.nextInt(maxRarity);
@@ -116,11 +121,11 @@ class BiomeLayer implements ParentedLayer
 		{
 			if (chosenRarity < entry.getKey())
 			{
-				return entry.getValue().id;
+				return entry.getValue();
 			}
 		}
 
 		// Fallback
-		return 0;
+		return this.data.oceanBiomeData;
 	}
 }

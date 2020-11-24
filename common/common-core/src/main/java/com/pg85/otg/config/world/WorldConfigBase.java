@@ -35,6 +35,9 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int landSize;
 	protected int landFuzzy;    
 	
+    protected double frozenOceanTemperature;
+    protected boolean freezeAllColdGroupBiomes;
+	
 	protected ArrayList<String> worldBiomes = new ArrayList<String>();
 	protected int biomeRarityScale;
 	
@@ -506,5 +509,16 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public BiomeMode getBiomeMode()
 	{
 		return this.biomeMode;
+	}
+	
+	@Override
+	public double getFrozenOceanTemperature()
+	{
+		return this.frozenOceanTemperature;
+	}
+	
+	public boolean getIsFreezeGroups()
+	{
+		return this.freezeAllColdGroupBiomes;
 	}
 }
