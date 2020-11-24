@@ -33,9 +33,9 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private final Int2ObjectMap<BiomeConfig> globalIdMapping = new Int2ObjectLinkedOpenHashMap<>();
+	private final HashMap<String, Int2ObjectMap<BiomeConfig>> globalIdMapping = new HashMap<>();
 	// Using a ref is much faster than using an object
-	private final Reference2IntMap<BiomeConfig> reverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
+	private final HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();
 	private final Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
 	private final Map<String, List<RegistryKey<Biome>>> biomesByPresetName = new LinkedHashMap<>();
 	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
@@ -56,9 +56,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 		return this.biomesByPresetName.get(presetName);
 	}
 
-	public Int2ObjectMap<BiomeConfig> getGlobalIdMapping()
+	public Int2ObjectMap<BiomeConfig> getGlobalIdMapping(String presetName)
 	{
-		return globalIdMapping;
+		return globalIdMapping.get(presetName);
 	}
 
 	public Map<String, BiomeLayerData> getPresetGenerationData()
@@ -69,13 +69,18 @@ public class ForgePresetLoader extends LocalPresetLoader
 	@Override
 	public void registerBiomes()
 	{
-		int currentId = 0;
 		for(Preset preset : this.presets.values())
 		{
+			// Start at 1, 0 is the fallback for the biome generator (the world's ocean biome).
+			int currentId = 1;
+			
 			List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
 			this.biomesByPresetName.put(preset.getName(), presetBiomes);
 			WorldConfig worldConfig = preset.getWorldConfig();
 
+			Int2ObjectMap<BiomeConfig> presetIdMapping = new Int2ObjectLinkedOpenHashMap<>();
+			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
+			
 			for(BiomeConfig biomeConfig : preset.getAllBiomeConfigs())
 			{
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
@@ -91,22 +96,31 @@ public class ForgePresetLoader extends LocalPresetLoader
  				
  				presetBiomes.add(RegistryKey.func_240903_a_(Registry.field_239720_u_, resourceLocation));
 
- 				this.globalIdMapping.put(currentId, biomeConfig);
- 				this.reverseIdMapping.put(biomeConfig, currentId);
+ 				presetIdMapping.put(currentId, biomeConfig);
+ 				presetReverseIdMapping.put(biomeConfig, currentId);
+
+ 				// Biome id 0 is reserved for ocean, used when a land column has 
+ 				// no biome assigned, which can happen due to biome group rarity.
+ 				if(biomeConfig.getName().equals(preset.getWorldConfig().getDefaultOceanBiome()))
+ 				{
+ 					// TODO: Can't map the same biome to 2 int keys for the reverse map
+ 					// make sure this doesn't cause problems :/.
+ 					presetIdMapping.put(0, biomeConfig);
+ 				}
 
  				currentId++;
 			}
+			
+			this.globalIdMapping.put(preset.getName(), presetIdMapping);
+			this.reverseIdMapping.put(preset.getName(), presetReverseIdMapping);
 
 			// Set the base data
 			BiomeLayerData data = new BiomeLayerData();
+			data.biomeMode = worldConfig.getBiomeMode();
 			data.generationDepth = worldConfig.getGenerationDepth();
 			data.landSize = worldConfig.getLandSize();
 			data.landFuzzy = worldConfig.getLandFuzzy();
 			data.landRarity = worldConfig.getLandRarity();
-
-			// Get and set the ocean
-			BiomeConfig ocean = this.biomeConfigsByRegistryKey.get(new ResourceLocation(new BiomeResourceLocation(preset.getName(), worldConfig.getDefaultOceanBiome()).toResourceLocationString()));
-			data.oceanId = this.reverseIdMapping.getInt(ocean);
 
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
@@ -126,7 +140,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data
-					NewBiomeData newBiomeData = new NewBiomeData(this.reverseIdMapping.getInt(config), config.getBiomeRarity(), config.getBiomeSize());
+					NewBiomeData newBiomeData = new NewBiomeData(presetReverseIdMapping.getInt(config), config.getBiomeRarity(), config.getBiomeSize());
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done

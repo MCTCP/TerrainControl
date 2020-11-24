@@ -11,6 +11,13 @@ public class SettingsEnums
         //Default
     }
 
+    public enum BiomeMode
+    {
+    	Normal,
+    	BeforeGroups,
+    	FromImage
+    }
+    
     public enum ImageMode
     {
         Repeat,

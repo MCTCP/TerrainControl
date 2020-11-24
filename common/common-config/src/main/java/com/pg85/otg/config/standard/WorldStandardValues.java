@@ -5,6 +5,7 @@ import com.pg85.otg.config.settingType.MaterialSetting;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.settingType.Settings;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
@@ -31,12 +32,12 @@ public class WorldStandardValues extends Settings
 
     public static final Setting<ConfigMode> SETTINGS_MODE = enumSetting("SettingsMode", ConfigMode.WriteAll);
     public static final Setting<ConfigMode> SETTINGS_MODE_BO3 = enumSetting("SettingsMode", ConfigMode.WriteDisable);
+    public static final Setting<BiomeMode> BIOME_MODE = enumSetting("BiomeMode", BiomeMode.Normal);
     public static final Setting<TerrainMode> TERRAIN_MODE = enumSetting("TerrainMode", TerrainMode.Normal);
     public static final Setting<ImageMode> IMAGE_MODE = enumSetting("ImageMode", ImageMode.Mirror);
     public static final Setting<ImageOrientation> IMAGE_ORIENTATION = enumSetting("ImageOrientation", ImageOrientation.West);
 
     public static final Setting<String>
-        BIOME_MODE = stringSetting("BiomeMode", "Normal"),
         IMAGE_FILE = stringSetting("ImageFile", "map.png"),
         IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
         AUTHOR = stringSetting("Author", "Unknown"),

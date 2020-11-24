@@ -24,6 +24,7 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.constants.SettingsEnums.TerrainMode;
@@ -141,7 +142,6 @@ public class WorldConfig extends WorldConfigBase
 
     private int objectSpawnRatio;
     private TerrainMode modeTerrain;
-    //public Class<? extends BiomeGenerator> biomeMode;    
 
     private int worldHeightScaleBits;
     private int worldHeightCapBits;    
@@ -264,9 +264,9 @@ public class WorldConfig extends WorldConfigBase
         // NormalBiomes is found, and create default groups
         if (reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
         {
-            if (reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null).equals("Normal"))
+            if (reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null) == BiomeMode.Normal)
             {
-                reader.putSetting(WorldStandardValues.BIOME_MODE, "BeforeGroups");
+                reader.putSetting(WorldStandardValues.BIOME_MODE, BiomeMode.BeforeGroups);
             }
             
             int landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger, null);
@@ -360,7 +360,7 @@ public class WorldConfig extends WorldConfigBase
         // Main modes
         this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);
         this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger, null);
-        //this.biomeMode = OTG.getBiomeModeManager().getBiomeManager(reader.getSetting(WorldStandardValues.BIOME_MODE));
+        this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null);
 
         // World and water height
         this.worldHeightCapBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, logger, null);
@@ -686,8 +686,7 @@ public class WorldConfig extends WorldConfigBase
             //"   Default - use default terrain generator",
             //"   OldGenerator - Minecraft Beta 1.7.3-like land generator");
 
-        /*
-        writer.putSetting(WorldStandardValues.BIOME_MODE, OTG.getBiomeModeManager().getName(biomeMode),
+        writer.putSetting(WorldStandardValues.BIOME_MODE, this.biomeMode,
             "Possible biome modes:",
             "   Normal - use all features",
             "   FromImage - get biomes from image file",
@@ -695,7 +694,6 @@ public class WorldConfig extends WorldConfigBase
             "For old maps two more modes are available:",
             "   BeforeGroups - Minecraft 1.0 - 1.6.4 biome generator, only supports the biome groups NormalBiomes and IceBiomes");//,
             //"   OldGenerator - Minecraft Beta 1.7.3 biome generator");
-        */
 
         // Settings for BiomeMode:Normal
         writer.bigTitle("Settings for BiomeMode: Normal",

@@ -2,6 +2,7 @@ package com.pg85.otg.util.interfaces;
 
 import java.util.ArrayList;
 
+import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
@@ -63,4 +64,5 @@ public interface IWorldConfig
 	public int getLandFuzzy();
 	public int getLandRarity();
 	public int getLandSize();
+	public BiomeMode getBiomeMode();
 }

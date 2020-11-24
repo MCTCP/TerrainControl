@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.config.biome.BiomeGroupManager;
+import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.biome.ReplaceBlocks;
@@ -27,7 +28,9 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int maxSmoothRadius = 2;
 	
     // Biome generator
-    
+ 
+	protected BiomeMode biomeMode;
+	
 	protected int landRarity;
 	protected int landSize;
 	protected int landFuzzy;    
@@ -497,5 +500,11 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public int getLandSize()
 	{
 		return this.landSize;
+	}
+	
+	@Override
+	public BiomeMode getBiomeMode()
+	{
+		return this.biomeMode;
 	}
 }

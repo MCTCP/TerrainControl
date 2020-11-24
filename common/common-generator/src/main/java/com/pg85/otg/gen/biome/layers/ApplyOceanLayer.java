@@ -17,11 +17,12 @@ public class ApplyOceanLayer implements ParentedLayer
 	{
 		int sample = parent.sample(x, z);
 
-		// If there is no land bit set the ocean
-		if (!BiomeLayers.isLand(sample)) {
-			return sample | this.data.oceanId;
-		}
+		// If there is no land bit, leave the biome bit at 0.
+		// 0 is the world's ocean biome, set by PresetLoader 
+		// when registering biomes.
 
+		// TODO: Do we still need this class?
+		
 		return sample;
 	}
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.gen.biome.NewBiomeData;
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerRandomnessSource;
@@ -23,7 +24,8 @@ class BiomeLayer implements ParentedLayer
 
 	private final Map<NewBiomeGroup, Integer> groupToMaxRarity = new HashMap<>();
 	private final Map<NewBiomeGroup, Map<Integer, NewBiomeData>> groupBiomes = new HashMap<>();
-	BiomeLayer(BiomeLayerData data, int depth) {
+	BiomeLayer(BiomeLayerData data, int depth)
+	{
 		this.data = data;
 		this.depth = depth;
 
@@ -65,16 +67,39 @@ class BiomeLayer implements ParentedLayer
 			BiomeLayers.isLand(sample)
 		)
 		{
-			int biomeGroupId = BiomeLayers.getGroupId(sample);
-			if (biomeGroupId > 0)
+			if(this.data.biomeMode == BiomeMode.Normal)
 			{
-				NewBiomeGroup group = data.groupRegistry.get(biomeGroupId);
-
-				if (groupToMaxRarity.containsKey(group) && groupBiomes.containsKey(group))
+				int biomeGroupId = BiomeLayers.getGroupId(sample);
+				if (biomeGroupId > 0)
 				{
-					int biome = getBiomeFromGroup(context, groupToMaxRarity.get(group), groupBiomes.get(group));				
-					return sample | biome;
+					NewBiomeGroup group = this.data.groupRegistry.get(biomeGroupId);	
+					if (this.groupToMaxRarity.containsKey(group) && this.groupBiomes.containsKey(group))
+					{
+						int biome = getBiomeFromGroup(context, this.groupToMaxRarity.get(group), this.groupBiomes.get(group));				
+						return sample | biome;
+					}
 				}
+			}
+			else if(this.data.biomeMode == BiomeMode.BeforeGroups)
+			{
+				NewBiomeGroup normalGroup = this.data.groupRegistry.get(1);
+				NewBiomeData biome = null;
+				// TODO: Implement ICE_BIT
+				if (normalGroup.biomes.size() > 0) //&& (sample & BiomeLayers.ICE_BIT) == 0) // Normal biome
+				{
+					biome = normalGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
+				}
+				/*
+				NewBiomeGroup iceGroup = this.data.groupRegistry.get(2); 
+                if (iceGroup.biomes.size() > 0 && (sample & BiomeLayers.ICE_BIT) != 0) // Ice biome
+                {
+                	biome = iceGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
+                }
+                */
+                if (biome != null)
+                {
+                    return sample | biome.id;
+                }
 			}
 		}
 
@@ -89,7 +114,8 @@ class BiomeLayer implements ParentedLayer
 		// Iterate through the rarity map and see if the chosen rarity is less than the rarity for each group, if it is then return.
 		for (Map.Entry<Integer, NewBiomeData> entry : rarityMap.entrySet())
 		{
-			if (chosenRarity < entry.getKey()) {
+			if (chosenRarity < entry.getKey())
+			{
 				return entry.getValue().id;
 			}
 		}

@@ -27,7 +27,7 @@ public class BiomeLayers
 	public static final int BIOME_BITS = (1 << GROUP_SHIFT) - 1;
 
 	static boolean isLand(int sample) {
-		return (sample & LAND_BIT) == 0;
+		return (sample & LAND_BIT) != 0;
 	}
 
 	static int getGroupId(int sample)
