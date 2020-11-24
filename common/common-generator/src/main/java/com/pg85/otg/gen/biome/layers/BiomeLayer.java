@@ -7,9 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.gen.biome.NewBiomeData;
-import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
@@ -17,17 +15,14 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 /**
  * Places the biomes at a specific depth, given the biome groups.
  */
-class BiomeLayer implements ParentedLayer
+class BiomeLayer extends BiomeLayerBase
 {
-	private final BiomeLayerData data;
-	private final int depth;
+	protected final Map<NewBiomeGroup, Integer> groupToMaxRarity = new HashMap<>();
+	protected final Map<NewBiomeGroup, Map<Integer, NewBiomeData>> groupBiomes = new HashMap<>();
 
-	private final Map<NewBiomeGroup, Integer> groupToMaxRarity = new HashMap<>();
-	private final Map<NewBiomeGroup, Map<Integer, NewBiomeData>> groupBiomes = new HashMap<>();
 	BiomeLayer(BiomeLayerData data, int depth)
 	{
-		this.data = data;
-		this.depth = depth;
+		super(data, depth);
 
 		// Iterate through all of the groups
 		for (Map.Entry<Integer, List<NewBiomeGroup>> entry : data.groups.entrySet())
@@ -67,44 +62,18 @@ class BiomeLayer implements ParentedLayer
 			BiomeLayers.isLand(sample)
 		)
 		{
-			if(this.data.biomeMode == BiomeMode.Normal)
+			int biomeGroupId = BiomeLayers.getGroupId(sample);
+			if (biomeGroupId > 0)
 			{
-				int biomeGroupId = BiomeLayers.getGroupId(sample);
-				if (biomeGroupId > 0)
+				NewBiomeGroup group = this.data.groupRegistry.get(biomeGroupId);	
+				if (this.groupToMaxRarity.containsKey(group) && this.groupBiomes.containsKey(group))
 				{
-					NewBiomeGroup group = this.data.groupRegistry.get(biomeGroupId);	
-					if (this.groupToMaxRarity.containsKey(group) && this.groupBiomes.containsKey(group))
-					{
-						NewBiomeData biomeData = getBiomeFromGroup(context, this.groupToMaxRarity.get(group), this.groupBiomes.get(group));
-						return sample | biomeData.id |
-                            // Set IceBit based on Biome Temperature
-                            (biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)
-						;
-					}
-				}
-			}
-			else if(this.data.biomeMode == BiomeMode.BeforeGroups)
-			{
-				NewBiomeGroup normalGroup = this.data.groupRegistry.get(1);
-				NewBiomeData biomeData = null;
-				// TODO: For 1.12, biomes.size() would be much larger than the amount of biomes in the group
-				// LayerFactory would add * biomeConfig.biomeRarity items, for each biome in the group.
-				if (normalGroup.biomes.size() > 0 && (sample & BiomeLayers.ICE_BIT) == 0) // Normal biome
-				{
-					biomeData = normalGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
-				}
-				NewBiomeGroup iceGroup = this.data.groupRegistry.get(2); 
-                if (iceGroup.biomes.size() > 0 && (sample & BiomeLayers.ICE_BIT) != 0) // Ice biome
-                {
-                	biomeData = iceGroup.biomes.get(context.nextInt(normalGroup.biomes.size()));
-                }
-                if (biomeData != null)
-                {
-                    return sample | biomeData.id |
+					NewBiomeData biomeData = getBiomeFromGroup(context, this.groupToMaxRarity.get(group), this.groupBiomes.get(group));
+					return sample | biomeData.id |
                         // Set IceBit based on Biome Temperature
                         (biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)
-                    ;
-                }
+					;
+				}
 			}
 		}
 

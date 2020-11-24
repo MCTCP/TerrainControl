@@ -30,6 +30,8 @@ class IceLayer implements ParentedLayer
 		int sample = parent.sample(x, z);
 
 		// Set ice based on the rarity
+		// TODO: For 1.12, we initliased the chunkseed here with inverted coordinates,
+		// so initChunkSeed(z + zi, x + xi);, do we need to do the same here?
 		if (context.nextInt(this.rarity) == 0)
 		{
 			return sample | BiomeLayers.ICE_BIT;

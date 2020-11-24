@@ -139,7 +139,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 				bg.rarity = group.getGroupRarity();
 
 		        float totalTemp = 0;
-		        int totalGroupRarity = 0;
 				
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
@@ -155,7 +154,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					biomeDepths.add(config.getBiomeSize());
 					
 		            totalTemp += config.getBiomeTemperature();
-		            totalGroupRarity += config.getBiomeRarity();
+		            bg.totalGroupRarity += config.getBiomeRarity();
 				}
 				bg.avgTemp = totalTemp / group.biomes.size();
 

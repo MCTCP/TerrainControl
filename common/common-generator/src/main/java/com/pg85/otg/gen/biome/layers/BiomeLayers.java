@@ -2,6 +2,7 @@ package com.pg85.otg.gen.biome.layers;
 
 import java.util.function.LongFunction;
 
+import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerContext;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
 import com.pg85.otg.gen.biome.layers.util.LayerFactory;
@@ -60,12 +61,24 @@ public class BiomeLayers
 				factory = new AddIslandsLayer().create(contextProvider.apply(depth), factory);
 			}
 
-			if (data.groups.containsKey(depth)) {
-				factory = new BiomeGroupLayer(data.groups.get(depth), data.freezeGroups).create(contextProvider.apply(depth), factory);
+			if(data.biomeMode == BiomeMode.Normal)
+			{
+				if (data.groups.containsKey(depth))
+				{
+					factory = new BiomeGroupLayer(data.groups.get(depth), data.freezeGroups).create(contextProvider.apply(depth), factory);
+				}
+	
+				if (data.biomeDepths.contains(depth))
+				{
+					factory = new BiomeLayer(data, depth).create(contextProvider.apply(depth), factory);
+				}
 			}
-
-			if (data.biomeDepths.contains(depth)) {
-				factory = new BiomeLayer(data, depth).create(contextProvider.apply(depth), factory);
+			else if(data.biomeMode == BiomeMode.BeforeGroups)
+			{
+				if (data.biomeDepths.contains(depth))
+				{
+					factory = new BiomeBeforeGroupsLayer(data, depth).create(contextProvider.apply(depth), factory);
+				}
 			}
 			
             if (depth == 3) // TODO: Why 3?
