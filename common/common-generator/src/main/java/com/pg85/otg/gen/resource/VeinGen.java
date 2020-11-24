@@ -14,9 +14,6 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Generates a single ore vein.
- */
 public class VeinGen extends Resource
 {
     int maxAltitude; // Maximum altitude of the vein

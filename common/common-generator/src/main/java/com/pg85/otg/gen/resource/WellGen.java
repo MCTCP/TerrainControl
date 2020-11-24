@@ -14,9 +14,6 @@ import com.pg85.otg.util.materials.MaterialSet;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Generates a desert well.
- */
 public class WellGen extends Resource
 {
     private final int maxAltitude;
