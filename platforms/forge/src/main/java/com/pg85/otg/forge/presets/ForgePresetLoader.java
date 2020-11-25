@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.pg85.otg.config.biome.BiomeConfig;
@@ -63,7 +64,12 @@ public class ForgePresetLoader extends LocalPresetLoader
 
 	public Map<String, BiomeLayerData> getPresetGenerationData()
 	{
-		return presetGenerationData;
+		Map<String, BiomeLayerData> clonedData = new HashMap<>();
+		for(Entry<String, BiomeLayerData> entry : this.presetGenerationData.entrySet())
+		{
+			clonedData.put(entry.getKey(), entry.getValue().clone());
+		}
+		return clonedData;
 	}
 
 	@Override

@@ -14,4 +14,9 @@ public class NewBiomeData
 		this.biomeSize = biomeSize;
 		this.biomeTemperature = biomeTemperature;
 	}
+	
+	public NewBiomeData clone()
+	{
+		return new NewBiomeData(this.id, this.rarity, this.biomeSize, this.biomeTemperature);
+	}
 }

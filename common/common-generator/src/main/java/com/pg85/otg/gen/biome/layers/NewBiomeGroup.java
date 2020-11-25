@@ -23,4 +23,19 @@ public class NewBiomeGroup
 	
      // Used for BeforeGroups
     public int totalGroupRarity;
+    
+    public NewBiomeGroup clone()
+    {
+    	NewBiomeGroup clone = new NewBiomeGroup();
+    	clone.id = this.id;
+    	clone.rarity = this.rarity;
+    	clone.biomes = new ArrayList<>();
+    	for(NewBiomeData biomeData : this.biomes)
+    	{
+    		clone.biomes.add(biomeData.clone());
+    	}
+    	clone.avgTemp = this.avgTemp;
+    	clone.totalGroupRarity = this.totalGroupRarity;
+    	return clone;
+    }
 }

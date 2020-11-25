@@ -25,11 +25,9 @@ class BiomeBeforeGroupsLayer extends BiomeLayerBase
 		NewBiomeGroup configNormalGroup = this.data.groupRegistry.get(1);
 		NewBiomeGroup configIceGroup = this.data.groupRegistry.get(2);
 		this.normalGroup = new NewBiomeGroup();
-		this.normalGroup.totalGroupRarity = configNormalGroup.totalGroupRarity;
 		this.iceGroup = new NewBiomeGroup();
-		this.iceGroup.totalGroupRarity = configIceGroup.totalGroupRarity;
 		
-        List<NewBiomeData> normalBiomes= new ArrayList<NewBiomeData>();
+        List<NewBiomeData> normalBiomes = new ArrayList<NewBiomeData>();
         List<NewBiomeData> iceBiomes= new ArrayList<NewBiomeData>();
         
         for (NewBiomeData biome : configNormalGroup.biomes)
@@ -42,13 +40,13 @@ class BiomeBeforeGroupsLayer extends BiomeLayerBase
             {
             	normalBiomes.add(biome);
             }
-            this.normalGroup.totalGroupRarity -= biome.rarity;
+            configNormalGroup.totalGroupRarity -= biome.rarity;
         }
         if (!normalBiomes.isEmpty())
         {
-        	this.normalGroup.biomes = Arrays.asList(normalBiomes.toArray(new NewBiomeData[normalBiomes.size() + this.normalGroup.totalGroupRarity]));
+        	this.normalGroup.biomes = Arrays.asList(normalBiomes.toArray(new NewBiomeData[normalBiomes.size() + configNormalGroup.totalGroupRarity]));
         }
-        
+       
         for (NewBiomeData biome : configIceGroup.biomes)
         {
             if (biome.biomeSize != depth)
@@ -59,11 +57,11 @@ class BiomeBeforeGroupsLayer extends BiomeLayerBase
             {
             	iceBiomes.add(biome);
             }
-            this.iceGroup.totalGroupRarity -= biome.rarity;
+            configIceGroup.totalGroupRarity -= biome.rarity;
         }
         if (!iceBiomes.isEmpty())
         {
-        	this.iceGroup.biomes = Arrays.asList(iceBiomes.toArray(new NewBiomeData[iceBiomes.size() + this.iceGroup.totalGroupRarity]));
+        	this.iceGroup.biomes = Arrays.asList(iceBiomes.toArray(new NewBiomeData[iceBiomes.size() + configIceGroup.totalGroupRarity]));
         }
 	}
 
@@ -74,8 +72,8 @@ class BiomeBeforeGroupsLayer extends BiomeLayerBase
 
 		if (
 			// If biome bits have not yet been set (this column has not been cached), do so now.
-			(sample & BIOME_BITS) == 0 && 
-			BiomeLayers.isLand(sample)
+			(sample & BIOME_BITS) == 0 
+			//&& BiomeLayers.isLand(sample) // TODO: 1.12 beforegroups didn't check for land bit either, but that seems like a bug tbh :/
 		)
 		{
 			NewBiomeData biomeData = null;
