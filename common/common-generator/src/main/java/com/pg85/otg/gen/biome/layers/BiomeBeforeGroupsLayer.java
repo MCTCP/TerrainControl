@@ -1,7 +1,5 @@
 package com.pg85.otg.gen.biome.layers;
 
-import static com.pg85.otg.gen.biome.layers.BiomeLayers.BIOME_BITS;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,11 +67,13 @@ class BiomeBeforeGroupsLayer extends BiomeLayerBase
 	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
 	{
 		int sample = parent.sample(x, z);
-
+		
 		if (
 			// If biome bits have not yet been set (this column has not been cached), do so now.
-			(sample & BIOME_BITS) == 0 
-			//&& BiomeLayers.isLand(sample) // TODO: 1.12 beforegroups didn't check for land bit either, but that seems like a bug tbh :/
+			// TODO: We don't check for LAND_BIT here, but should? For 1.12 LayerMix fixed the 
+			// problem by just ignoring non-land columns with biome data, and placed 
+			// ocean/frozenocean based on ICE_BIT.
+			(sample & BiomeLayers.BIOME_BITS) == 0
 		)
 		{
 			NewBiomeData biomeData = null;
@@ -93,7 +93,6 @@ class BiomeBeforeGroupsLayer extends BiomeLayerBase
                 ;
             }
 		}
-
 		return sample;
 	}
 }

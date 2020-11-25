@@ -1,7 +1,5 @@
 package com.pg85.otg.gen.biome.layers;
 
-import static com.pg85.otg.gen.biome.layers.BiomeLayers.BIOME_BITS;
-
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
@@ -14,6 +12,17 @@ class FinalizeLayer implements ParentedLayer
 	@Override
 	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
 	{
-		return parent.sample(x, z) & BIOME_BITS;
+		int sample = parent.sample(x, z);
+        if ((sample & BiomeLayers.LAND_BIT) != 0)
+        {
+       		sample = sample & BiomeLayers.BIOME_BITS;	
+        } else { 
+        	// TODO: Ocean/FrozenOcean based on ICE_BIT and worldConfig.frozenOcean.
+        	// This will work for backwards compatibility, but will need to be 
+        	// re-designed for the new ocean biomes?
+        	sample = 0;
+        }
+		
+		return sample;
 	}
 }

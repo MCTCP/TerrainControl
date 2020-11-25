@@ -23,7 +23,7 @@ public class BiomeLayers
 	public static final int GROUP_SHIFT = 23;
 
 	// The marker for biome groups
-	private static final int GROUP_BIT = (127 << GROUP_SHIFT);
+	static final int GROUP_BITS = (127 << GROUP_SHIFT);
 
 	// This is the amount of bits we & the sample at the end to get the correct biome id.
 	public static final int BIOME_BITS = (1 << GROUP_SHIFT) - 1;
@@ -34,7 +34,7 @@ public class BiomeLayers
 
 	static int getGroupId(int sample)
 	{
-		return (sample & GROUP_BIT) >> GROUP_SHIFT;
+		return (sample & GROUP_BITS) >> GROUP_SHIFT;
 	}
 
 	private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider)
@@ -80,11 +80,13 @@ public class BiomeLayers
 					factory = new BiomeBeforeGroupsLayer(data, depth).create(contextProvider.apply(depth), factory);
 				}
 			}
-			
+
+			/*
             if (depth == 3) // TODO: Why 3?
             {
             	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
             }
+            */
 		}
 
 		// Add ocean biomes. This only adds the regular ocean at the moment, soon it will add others.

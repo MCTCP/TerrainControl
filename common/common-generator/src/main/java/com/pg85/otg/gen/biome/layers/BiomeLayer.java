@@ -1,7 +1,5 @@
 package com.pg85.otg.gen.biome.layers;
 
-import static com.pg85.otg.gen.biome.layers.BiomeLayers.BIOME_BITS;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,8 +56,8 @@ class BiomeLayer extends BiomeLayerBase
 
 		if (
 			// If biome bits have not yet been set (this column has not been cached), do so now.
-			(sample & BIOME_BITS) == 0 && 
-			BiomeLayers.isLand(sample)
+			(sample & BiomeLayers.GROUP_BITS) != 0 &&
+			(sample & BiomeLayers.BIOME_BITS) == 0
 		)
 		{
 			int biomeGroupId = BiomeLayers.getGroupId(sample);

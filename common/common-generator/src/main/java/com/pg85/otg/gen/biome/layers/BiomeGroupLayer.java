@@ -1,7 +1,5 @@
 package com.pg85.otg.gen.biome.layers;
 
-import static com.pg85.otg.gen.biome.layers.BiomeLayers.GROUP_SHIFT;
-
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -43,13 +41,16 @@ class BiomeGroupLayer implements ParentedLayer
 		int sample = parent.sample(x, z);
 		
 		// Check if it's land and then check if there is no group already here
-		if (BiomeLayers.isLand(sample) && BiomeLayers.getGroupId(sample) == 0)
+		if (
+			BiomeLayers.isLand(sample) && 
+			(sample & BiomeLayers.GROUP_BITS) == 0
+		)
 		{
 			NewBiomeGroup biomeGroup = getGroup(context);
 			if(biomeGroup != null)
 			{
 				// Encode the biome group id into the sample for later use
-				return sample | (biomeGroup.id << GROUP_SHIFT) |
+				return sample | (biomeGroup.id << BiomeLayers.GROUP_SHIFT) |
 	                //>>	If the average temp of the group is cold
 	                ((biomeGroup.isColdGroup() && freezeGroups) ? BiomeLayers.ICE_BIT : 0)
 	            ;
