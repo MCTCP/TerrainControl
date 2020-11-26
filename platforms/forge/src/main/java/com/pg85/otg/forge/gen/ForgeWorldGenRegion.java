@@ -276,14 +276,14 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	
 		// If the chunk doesn't exist so we're doing something outside the
     	// population sequence, return the material without loading the chunk.
-    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE)) && chunkBeingPopulated == null)
+    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES)) && chunkBeingPopulated == null)
 		{
     		// If the chunk has already been loaded, no need to use fake chunks.
     		if(
 				!(
 					chunk == null && 
 					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.SURFACE)
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.FEATURES)
 				)
 			)
     		{
@@ -293,7 +293,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	}
     	
 		// Tried to query an unloaded chunk outside the area being populated
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE))
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES))
     	{
             return null;
     	}
@@ -350,14 +350,14 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	
 		// If the chunk doesn't exist and we're doing something outside the
     	// population sequence, return the material without loading the chunk.
-    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE)) && chunkBeingPopulated == null)
+    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES)) && chunkBeingPopulated == null)
 		{
     		// If the chunk has already been loaded, no need to use fake chunks.
     		if(
 				!(
 					chunk == null && 
 					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.SURFACE)
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.FEATURES)
 				)
 			)
     		{
@@ -367,7 +367,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	}
     	
 		// Tried to query an unloaded chunk outside the area being populated
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.SURFACE))
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES))
     	{
     		return -1;
     	}

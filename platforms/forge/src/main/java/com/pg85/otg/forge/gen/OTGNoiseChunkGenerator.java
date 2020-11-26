@@ -371,13 +371,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
     		return cachedColumn;
     	}
     	   
-    	IChunk chunk = ((ForgeWorldGenRegion)worldGenRegion).getChunk(chunkCoord);
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.HEIGHTMAPS))
-    	{
-    		chunk = this.unloadedChunksCache.get(chunkCoord);
-    	} else {
-    		this.unloadedChunksCache.remove(chunkCoord);
-    	}
+    	IChunk chunk = this.unloadedChunksCache.get(chunkCoord);
     	if(chunk == null)
     	{
 			// Generate a chunk without populating it
