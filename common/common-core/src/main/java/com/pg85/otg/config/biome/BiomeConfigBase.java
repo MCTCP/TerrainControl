@@ -36,7 +36,13 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     protected IWorldConfig worldConfig;
     
     protected List<String> isleInBiome;
-	
+    protected List<String> biomeIsBorder;
+    protected List<String> notBorderNear;
+    
+    protected int biomeSizeWhenIsle;
+    protected int biomeRarityWhenIsle;
+    protected int biomeSizeWhenBorder;
+   
     // Surface config
     protected float biomeHeight;
     protected float biomeVolatility;
@@ -538,13 +544,53 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 			this.worldConfig.getIsleBiomes().contains(this.getName())
 		;
 	}
+
+    @Override
+	public boolean isBorderBiome()
+    {
+		return
+			this.biomeIsBorder != null && 
+			this.biomeIsBorder.size() > 0 &&
+			this.worldConfig.getIsleBiomes().contains(this.getName())
+		;
+	}
     
     @Override
     public List<String> getIsleInBiomes()
     {
     	return this.isleInBiome;
     }
+    
+    @Override
+	public List<String> getBorderInBiomes()
+	{
+		return this.biomeIsBorder;
+	}
 	
+    @Override
+	public List<String> getNotBorderNearBiomes()
+    {
+    	return this.notBorderNear;
+	}
+
+    @Override
+	public int getBiomeSizeWhenIsle()
+    {
+		return this.biomeSizeWhenIsle;
+	}
+    
+    @Override
+	public int getBiomeRarityWhenIsle()
+	{
+		return this.biomeRarityWhenIsle;
+	}
+    
+    @Override
+	public int getBiomeSizeWhenBorder()
+    {
+		return this.biomeSizeWhenBorder;
+	}
+    
 	//
 	
     /**

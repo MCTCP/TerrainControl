@@ -79,10 +79,16 @@ public interface IBiomeConfig
 	int getBiomeSize();
 	int getBiomeRarity();
 	boolean isIsleBiome();
+	boolean isBorderBiome();
 	int getBiomeColor();
 	String getBiomeExtends();
 	int getCHCSmoothRadius();
 	String getReplaceToBiomeName();
 	void setReplaceToBiomeName(String replaceToBiomeName);
 	List<String> getIsleInBiomes();
+	List<String> getBorderInBiomes();
+	List<String> getNotBorderNearBiomes();
+	int getBiomeSizeWhenIsle();
+	int getBiomeSizeWhenBorder();
+	int getBiomeRarityWhenIsle();
 }

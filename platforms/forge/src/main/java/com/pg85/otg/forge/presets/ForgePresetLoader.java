@@ -13,6 +13,7 @@ import java.util.Set;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
@@ -67,7 +68,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		Map<String, BiomeLayerData> clonedData = new HashMap<>();
 		for(Entry<String, BiomeLayerData> entry : this.presetGenerationData.entrySet())
 		{
-			clonedData.put(entry.getKey(), entry.getValue().clone());
+			clonedData.put(entry.getKey(), new BiomeLayerData(entry.getValue()));
 		}
 		return clonedData;
 	}
@@ -88,6 +89,11 @@ public class ForgePresetLoader extends LocalPresetLoader
 			Int2ObjectMap<BiomeConfig> presetIdMapping = new Int2ObjectLinkedOpenHashMap<>();
 			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
 			
+			Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
+			Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
+			
+			Map<String, Integer> worldBiomes = new HashMap<>();
+			
 			for(BiomeConfig biomeConfig : preset.getAllBiomeConfigs())
 			{
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
@@ -102,7 +108,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
  				
  				presetBiomes.add(RegistryKey.func_240903_a_(Registry.field_239720_u_, resourceLocation));
-
+ 				
  				presetIdMapping.put(currentId, biomeConfig);
  				presetReverseIdMapping.put(biomeConfig, currentId);
 
@@ -116,6 +122,47 @@ public class ForgePresetLoader extends LocalPresetLoader
  					presetIdMapping.put(0, biomeConfig);
  				}
 
+ 				worldBiomes.put(biomeConfig.getName(), currentId);
+ 				
+ 				// Make a list of isle and border biomes per generation depth
+ 				if(biomeConfig.isIsleBiome())
+ 				{
+					// Make or get a list for this group depth, then add
+					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(biomeConfig.getBiomeSize(), new ArrayList<>());
+					biomesAtDepth.add(
+						new NewBiomeData(
+							currentId, 
+							biomeConfig.getName(), 
+							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
+							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), 
+							biomeConfig.getBiomeTemperature(), 
+							biomeConfig.getIsleInBiomes(), 
+							biomeConfig.getBorderInBiomes(), 
+							biomeConfig.getNotBorderNearBiomes()
+						)
+					);
+					isleBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), biomesAtDepth);
+ 				}
+
+ 				if(biomeConfig.isBorderBiome())
+ 				{
+					// Make or get a list for this group depth, then add
+					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(biomeConfig.getBiomeSize(), new ArrayList<>());
+					biomesAtDepth.add(
+						new NewBiomeData(
+							currentId, 
+							biomeConfig.getName(), 
+							biomeConfig.getBiomeRarity(),
+							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), 
+							biomeConfig.getBiomeTemperature(), 
+							biomeConfig.getIsleInBiomes(), 
+							biomeConfig.getBorderInBiomes(), 
+							biomeConfig.getNotBorderNearBiomes()
+						)
+					);
+					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
+ 				}
+
  				currentId++;
 			}
 			
@@ -123,15 +170,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			this.reverseIdMapping.put(preset.getName(), presetReverseIdMapping);
 
 			// Set the base data
-			BiomeLayerData data = new BiomeLayerData();
-			data.biomeMode = worldConfig.getBiomeMode();
-			data.generationDepth = worldConfig.getGenerationDepth();
-			data.landSize = worldConfig.getLandSize();
-			data.landFuzzy = worldConfig.getLandFuzzy();
-			data.landRarity = worldConfig.getLandRarity();
-			data.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature());
-			data.frozenOceanTemperature = worldConfig.getFrozenOceanTemperature();
-			data.freezeGroups = worldConfig.getIsFreezeGroups();
+			BiomeLayerData data = new BiomeLayerData(worldConfig, oceanBiomeConfig);
 			
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
@@ -153,7 +192,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data
-					NewBiomeData newBiomeData = new NewBiomeData(presetReverseIdMapping.getInt(config), config.getBiomeRarity(), config.getBiomeSize(), config.getBiomeTemperature());
+					NewBiomeData newBiomeData = new NewBiomeData(presetReverseIdMapping.getInt(config), config.getName(), config.getBiomeRarity(), config.getBiomeSize(), config.getBiomeTemperature(), config.getIsleInBiomes(), config.getBorderInBiomes(), config.getNotBorderNearBiomes());
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done
@@ -177,10 +216,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 				data.groupRegistry.put(bg.id, bg);
 			}
 
-			// Add the data
-			data.biomeDepths.addAll(biomeDepths);
-			data.groups = groupDepths;
-
+			// Add the data and process isle/border biomes
+			data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes);
+			
 			// Set data for this preset
 			this.presetGenerationData.put(preset.getName(), data);
 		}

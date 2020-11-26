@@ -95,12 +95,11 @@ public class BiomeLayers
             if(isleBiomes != null && isleBiomes.size() > 0)
             {
                 LayerBiomeInBiome.IslesList islesAtCurrentDepth = new LayerBiomeInBiome.IslesList();
-
 	            for (NewBiomeData biome : isleBiomes)
 	            {
 	                boolean[] biomeCanSpawnIn = new boolean[1024];
 	                boolean inOcean = false;
-	                for (int islandInBiome : biome.islesInBiome)
+	                for (int islandInBiome : biome.isleInBiomes)
 	                {
 	                    if (islandInBiome == data.oceanBiomeData.id)
 	                    {
@@ -111,10 +110,23 @@ public class BiomeLayers
 	                }
 	                int chance = (data.biomeRarityScale + 1) - biome.rarity;
 	                islesAtCurrentDepth.addIsle(biome.id, chance, biomeCanSpawnIn, inOcean);
-	            }
-	
+	            }	
                 factory = new LayerBiomeInBiome(islesAtCurrentDepth).create(contextProvider.apply(depth), factory);               
-            }           
+            }
+            
+            List<NewBiomeData> borderBiomes = data.borderBiomesAtDepth.get(depth);
+            if(borderBiomes != null && borderBiomes.size() > 0)
+            {
+            	LayerBiomeBorder.BordersList bordersAtCurrentDepth = new LayerBiomeBorder.BordersList();
+	            for (NewBiomeData biome : borderBiomes)
+	            {
+	                for(int targetBiomeId : biome.borderInBiomes)
+	                {
+		                bordersAtCurrentDepth.addBorder(biome.id, targetBiomeId, biome.notBorderNearBiomes);	                	
+	                }
+	            }
+                factory = new LayerBiomeBorder(bordersAtCurrentDepth).create(contextProvider.apply(depth), factory);               
+            }            
 		}
 
 		// Add ocean biomes. This only adds the regular ocean at the moment, soon it will add others.

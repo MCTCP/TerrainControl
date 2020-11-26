@@ -106,13 +106,6 @@ public class BiomeConfig extends BiomeConfigBase
     private float riverVolatility;
     private double[] riverHeightMatrix;
 
-    private int biomeSizeWhenIsle;
-    private int biomeSizeWhenBorder;
-    private int biomeRarityWhenIsle;
-
-    private List<String> biomeIsBorder;
-    private List<String> notBorderNear;
-
     // Surface config    
 
     private int riverWaterLevel;

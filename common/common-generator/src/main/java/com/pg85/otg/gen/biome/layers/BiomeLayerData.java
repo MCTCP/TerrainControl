@@ -77,6 +77,20 @@ public class BiomeLayerData
 				this.isleBiomesAtDepth.put(entry.getKey().intValue(), null);
 			}
 		}
+		for(Entry<Integer, List<NewBiomeData>> entry : data.borderBiomesAtDepth.entrySet())
+		{
+			if(entry.getValue() != null)
+			{
+				List<NewBiomeData> clonedList = new ArrayList<>();
+				for(NewBiomeData biome : entry.getValue())
+				{
+					clonedList.add(biome.clone());
+				}
+				this.borderBiomesAtDepth.put(entry.getKey().intValue(), clonedList);
+			} else {
+				this.borderBiomesAtDepth.put(entry.getKey().intValue(), null);
+			}
+		}
 	}
 	
 	public BiomeLayerData(IWorldConfig worldConfig, IBiomeConfig oceanBiomeConfig)
@@ -86,17 +100,18 @@ public class BiomeLayerData
 		this.landSize = worldConfig.getLandSize();
 		this.landFuzzy = worldConfig.getLandFuzzy();
 		this.landRarity = worldConfig.getLandRarity();
-		this.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes());
+		this.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes(), oceanBiomeConfig.getBorderInBiomes(), oceanBiomeConfig.getNotBorderNearBiomes());
 		this.frozenOceanTemperature = worldConfig.getFrozenOceanTemperature();
 		this.biomeRarityScale = worldConfig.getBiomeRarityScale();
 		this.freezeGroups = worldConfig.getIsFreezeGroups();
 	}
 
-	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<NewBiomeData>> isleBiomesAtDepth, Map<String, Integer> worldBiomes)
+	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<NewBiomeData>> isleBiomesAtDepth, Map<Integer, List<NewBiomeData>> borderBiomesAtDepth, Map<String, Integer> worldBiomes)
 	{		
 		this.biomeDepths.addAll(biomeDepths);
 		this.groups.putAll(groupDepth);
 		this.isleBiomesAtDepth.putAll(isleBiomesAtDepth);
+		this.borderBiomesAtDepth.putAll(borderBiomesAtDepth);
 				
 		for(Entry<Integer, List<NewBiomeGroup>> entry : this.groups.entrySet())
 		{
@@ -118,6 +133,17 @@ public class BiomeLayerData
 					biome.init(worldBiomes);
 				}
 			}
-		}		
+		}
+		
+		for(Entry<Integer, List<NewBiomeData>> entry : this.borderBiomesAtDepth.entrySet())
+		{
+			if(entry.getValue() != null)
+			{
+				for(NewBiomeData biome : entry.getValue())
+				{
+					biome.init(worldBiomes);
+				}
+			}
+		}
 	}
 }
