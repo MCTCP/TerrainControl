@@ -1,6 +1,7 @@
 package com.pg85.otg.util.interfaces;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
@@ -66,4 +67,6 @@ public interface IWorldConfig
 	public int getLandSize();
 	public BiomeMode getBiomeMode();
 	double getFrozenOceanTemperature();
+	public boolean getIsFreezeGroups();
+	List<String> getIsleBiomes();
 }

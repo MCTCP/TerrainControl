@@ -34,6 +34,8 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
 	// use a parent object that holds both, like a worldgenregion.
     protected IWorldConfig worldConfig;
+    
+    protected List<String> isleInBiome;
 	
     // Surface config
     protected float biomeHeight;
@@ -111,6 +113,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		this.registryKey = registryKey;
 	}
     
+    @Override
 	public BiomeResourceLocation getRegistryKey()
 	{
 		return this.registryKey;
@@ -118,11 +121,13 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
     // Materials
         
+	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
 		return this.surfaceAndGroundControl.getSurfaceBlockAtHeight(worldGenRegion, this, x, y, z);
 	}
 	
+	@Override
 	public LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
 		return this.surfaceAndGroundControl.getGroundBlockAtHeight(worldGenRegion, this, x, y, z);
@@ -133,42 +138,13 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     // Any blocks spawned during population will have their materials parsed before spawning them
     // via world.setBlock(), so they use the default biomeconfig materials.
 	
+	@Override
 	public LocalMaterialData getDefaultGroundBlock()
 	{
 		return this.groundBlock;
 	}
-
-    public LocalMaterialData getDefaultSurfaceBlock()
-    {
-    	return this.surfaceBlock;
-    }
-    
-	// TODO: Optimise BO4, make it use replacedBlocks.replacesStoneBlock
-	// instead of replacing stone as a generic block during setBlock.
-	public LocalMaterialData getDefaultStoneBlock()
-	{
-		return this.stoneBlock;
-	}
 	
-	public LocalMaterialData getDefaultWaterBlock()
-	{		
-		return this.waterBlock;
-	}
-	
-	// TODO: Optimise FrozenSurfaceHelper, make it use replacedBlocks.replacesIce
-	// instead of replacing ice as a generic block during setBlock.
-	public LocalMaterialData getDefaultIceBlock()
-	{
-		return this.iceBlock;
-	}
-
-	// TODO: Optimise FrozenSurfaceHelper, make it use replacedBlocks.replacesCooledLavaBlock
-	// instead of replacing lava as a generic block during setBlock.	
-	public LocalMaterialData getDefaultCooledLavaBlock()
-	{
-		return this.cooledLavaBlock;
-	}    
-	
+	@Override
 	public LocalMaterialData getSurfaceBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesSurface)
@@ -178,6 +154,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.surfaceBlock;
 	}
 	
+	@Override
 	public LocalMaterialData getGroundBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesGround)
@@ -187,6 +164,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.groundBlock;
 	}
 	
+	@Override
 	public LocalMaterialData getStoneBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesStone)
@@ -196,11 +174,13 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.stoneBlock;
 	}
 
+	@Override
 	public LocalMaterialData getBedrockBlockReplaced(int y)
 	{
 		return this.worldConfig.getBedrockBlockReplaced(this.replacedBlocks, y);
 	}
 		
+	@Override
 	public LocalMaterialData getWaterBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesWater)
@@ -210,6 +190,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.waterBlock;
 	}
 	
+	@Override
 	public LocalMaterialData getSandStoneBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesSandStone)
@@ -219,6 +200,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.sandStoneBlock;
 	}
 	
+	@Override
 	public LocalMaterialData getIceBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesIce)
@@ -228,6 +210,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.iceBlock;
 	}
 	
+	@Override
 	public LocalMaterialData getCooledLavaBlockReplaced(int y)
 	{
 		if(this.replacedBlocks.replacesCooledLava)
@@ -236,31 +219,14 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		}
 		return this.cooledLavaBlock;
 	}
-			
-	public LocalMaterialData getRedSandStoneBlockReplaced(int y)
-	{
-		if(this.replacedBlocks.replacesRedSandStone)
-		{
-			return this.redSandStoneBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
-		}
-		return this.redSandStoneBlock;
-	}
 	
-	public boolean replacesDefaultWaterBlock()
-	{
-		return this.replacedBlocks.replacesWater;
-	}
-	
-	public boolean replacesDefaultStoneBlock()
-	{
-		return this.replacedBlocks.replacesStone;
-	}
-	
+	@Override
 	public ReplacedBlocksMatrix getReplaceBlocks()
 	{
 		return this.replacedBlocks;
 	}
 
+	@Override
 	public List<List<String>> getCustomStructureNames()
 	{
 		List<List<String>> customStructureNamesByGen = new ArrayList<>();
@@ -276,131 +242,157 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return customStructureNamesByGen; 
 	}
 	
+	@Override
 	public List<ICustomStructureGen> getCustomStructures()
 	{
 		return new ArrayList<ICustomStructureGen>(this.customStructures);
 	}
 	
+	@Override
 	public ICustomStructureGen getStructureGen()
 	{
 		return this.structureGen;
 	}
 	
+	@Override
 	public void setStructureGen(ICustomStructureGen customStructureGen)
 	{
 		this.structureGen = customStructureGen;
 	}
 	
+	@Override
 	public String getName()
 	{
 		return this.configName;
 	}
 			
+	@Override
 	public float getBiomeTemperature()
 	{
 		return this.biomeTemperature;
 	}
 	
+	@Override
 	public float getBiomeHeight()
 	{
 		return this.biomeHeight;
 	}
 	
+	@Override
 	public float getBiomeVolatility()
 	{
 		return this.biomeVolatility;
 	}
 	
+	@Override
 	public double getVolatility1()
 	{
 		return this.volatility1;
 	}
 	
+	@Override
 	public double getVolatility2()
 	{
 		return this.volatility2;
 	}
 	
+	@Override
 	public int getBiomeColor()
 	{
 		return this.biomeColor;
 	}
 	
+	@Override
 	public String getBiomeExtends()
 	{
 		return this.biomeExtends;
 	}
 	
+	@Override
 	public float getBiomeWetness()
 	{
 		return this.biomeWetness;
 	}
 	
+	@Override
 	public int getCHCSmoothRadius()
 	{
 		return this.CHCSmoothRadius;
 	}
 	
+	@Override
 	public int getSkyColor()
 	{
 		return this.skyColor;
 	}
 	
+	@Override
 	public int getFogColor()
 	{
 		return this.fogColor;
 	}
 
+	@Override
 	public int getFoliageColor()
 	{
 		return this.foliageColor;
 	}
 	
+	@Override
 	public int getGrassColor()
 	{
 		return this.grassColor;
 	}
 	
+	@Override
 	public int getWaterColor()
 	{
 		return this.waterColor;
 	}
 
+	@Override
 	public boolean getGrassColorIsMultiplier()
 	{
 		return this.grassColorIsMultiplier;
 	}
 	
+	@Override
 	public MineshaftType getMineShaftType()
 	{
 		return this.mineshaftType;
 	}
 	
+	@Override
 	public boolean getNetherFortressesEnabled()
 	{
 		return this.netherFortressesEnabled;
 	}
 	
+	@Override
 	public RareBuildingType getRareBuildingType()
 	{
 		return this.rareBuildingType;
 	}
 	
+	@Override
 	public VillageType getVillageType()
 	{
 		return this.villageType;
 	}
 	
+	@Override
 	public boolean getWoodlandMansionsEnabled()
 	{
 		return this.woodLandMansionsEnabled;
 	}
 	
+	@Override
 	public String getReplaceToBiomeName()
 	{
 		return this.replaceToBiomeName;
 	}
 	
+	@Override
 	public void setReplaceToBiomeName(String replaceToBiomeName)
 	{
 		this.replaceToBiomeName = replaceToBiomeName;
@@ -411,110 +403,147 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.resourceSequence;
 	}
 	
+	@Override
 	public List<WeightedMobSpawnGroup> getAmbientCreatures()
 	{
 		return this.spawnAmbientCreaturesMerged;
 	}
 	
+	@Override
 	public List<WeightedMobSpawnGroup> getCreatures()
 	{
 		return this.spawnCreaturesMerged;
 	}
 	
+	@Override
 	public List<WeightedMobSpawnGroup> getMonsters()
 	{
 		return this.spawnMonstersMerged;
 	}
 	
+	@Override
 	public List<WeightedMobSpawnGroup> getWaterCreatures()
 	{
 		return this.spawnWaterCreaturesMerged;
 	}
 	
+	@Override
 	public int getBiomeRarity()
 	{
 		return this.biomeRarity;
 	}
 	
+	@Override
 	public int getBiomeSize()
 	{
 		return this.biomeSize;
 	}
 	
+	@Override
 	public double getVolatilityWeight1()
 	{
 		return this.volatilityWeight1;
 	}
 	
+	@Override
 	public double getVolatilityWeight2()
 	{
 		return this.volatilityWeight2;
 	}
 	
+	@Override
 	public double getMaxAverageDepth()
 	{
 		return this.maxAverageDepth;
 	}
 	
+	@Override
 	public double getMaxAverageHeight()
 	{
 		return this.maxAverageHeight;
 	}
 	
+	@Override
 	public double getCHCData(int y)
 	{
 		return this.chcData[y];
 	}
 	
+	@Override
 	public int getSmoothRadius()
 	{
 		return this.smoothRadius;
 	}
 	
+	@Override
 	public int getWaterLevelMax()
 	{
 		return this.waterLevelMax;
 	}
 	
+	@Override
 	public int getWaterLevelMin()
 	{
 		return this.waterLevelMin;
 	}
 	
+	@Override
 	public boolean biomeConfigsHaveReplacement()
 	{
 		return this.worldConfig.getBiomeConfigsHaveReplacement();
 	}
 	
+	@Override
 	public double getFractureHorizontal()
 	{
 		return this.worldConfig.getFractureHorizontal();
 	}
 	
+	@Override
 	public double getFractureVertical()
 	{
 		return this.worldConfig.getFractureVertical();
 	}
 	
+	@Override
 	public boolean isFlatBedrock()
 	{
 		return this.worldConfig.getIsFlatBedrock();
 	}
 	
+	@Override
 	public boolean isCeilingBedrock()
 	{
 		return this.worldConfig.getIsCeilingBedrock();
 	}
 	
+	@Override
 	public boolean isBedrockDisabled()
 	{
 		return this.worldConfig.getBedrockDisabled();
 	}
 
+	@Override
 	public boolean isRemoveSurfaceStone()
 	{
 		return this.worldConfig.getRemoveSurfaceStone();
 	}
+	
+    @Override
+	public boolean isIsleBiome()
+	{
+		return
+			this.isleInBiome != null && 
+			this.isleInBiome.size() > 0 &&
+			this.worldConfig.getIsleBiomes().contains(this.getName())
+		;
+	}
+    
+    @Override
+    public List<String> getIsleInBiomes()
+    {
+    	return this.isleInBiome;
+    }
 	
 	//
 	
@@ -526,6 +555,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
      * @param temp The temp to get snow height for
      * @return A value from 0 to 7 to be used for snow height
      */
+    @Override
     public int getSnowHeight(float temp)
     {
     	// OTG biome temperature is between 0.0 and 2.0.
@@ -551,6 +581,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     	return  0;
     }
 	
+    @Override
 	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
 	{
 		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, x, z);

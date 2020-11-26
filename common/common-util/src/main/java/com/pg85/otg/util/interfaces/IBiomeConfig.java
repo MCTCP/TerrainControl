@@ -78,4 +78,11 @@ public interface IBiomeConfig
 	BiomeResourceLocation getRegistryKey();
 	int getBiomeSize();
 	int getBiomeRarity();
+	boolean isIsleBiome();
+	int getBiomeColor();
+	String getBiomeExtends();
+	int getCHCSmoothRadius();
+	String getReplaceToBiomeName();
+	void setReplaceToBiomeName(String replaceToBiomeName);
+	List<String> getIsleInBiomes();
 }

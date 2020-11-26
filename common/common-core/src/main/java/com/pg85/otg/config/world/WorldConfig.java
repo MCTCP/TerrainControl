@@ -50,7 +50,6 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Clean these fields up, move to WorldConfigBase if
 	// they need to be exposed, or remove if no longer used.
 
-	private List<String> isleBiomes = new ArrayList<String>();
 	private List<String> borderBiomes = new ArrayList<String>();
 
 	private boolean improvedBiomeBorders;

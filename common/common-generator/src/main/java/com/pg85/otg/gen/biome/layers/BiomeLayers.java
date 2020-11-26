@@ -1,8 +1,10 @@
 package com.pg85.otg.gen.biome.layers;
 
+import java.util.List;
 import java.util.function.LongFunction;
 
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
+import com.pg85.otg.gen.biome.NewBiomeData;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerContext;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
 import com.pg85.otg.gen.biome.layers.util.LayerFactory;
@@ -17,10 +19,11 @@ public class BiomeLayers
 	// Bit masks for biome generation
 
 	// The land bit marks whether a sample is land or not. This is used to place biomes.
-	public static final int LAND_BIT = (1 << 30);
+	public static final int LAND_BIT = (1 << 29);
+	public static final int ISLAND_BIT = (1 << 30); // TODO: Do we really need this?
 	public static final int ICE_BIT = (1 << 31);
 
-	public static final int GROUP_SHIFT = 23;
+	public static final int GROUP_SHIFT = 22;
 
 	// The marker for biome groups
 	static final int GROUP_BITS = (127 << GROUP_SHIFT);
@@ -81,12 +84,37 @@ public class BiomeLayers
 				}
 			}
 
-			/*
             if (depth == 3) // TODO: Why 3?
             {
             	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
-            }
-            */
+            }            
+
+            //
+            
+            List<NewBiomeData> isleBiomes = data.isleBiomesAtDepth.get(depth);
+            if(isleBiomes != null && isleBiomes.size() > 0)
+            {
+                LayerBiomeInBiome.IslesList islesAtCurrentDepth = new LayerBiomeInBiome.IslesList();
+
+	            for (NewBiomeData biome : isleBiomes)
+	            {
+	                boolean[] biomeCanSpawnIn = new boolean[1024];
+	                boolean inOcean = false;
+	                for (int islandInBiome : biome.islesInBiome)
+	                {
+	                    if (islandInBiome == data.oceanBiomeData.id)
+	                    {
+	                    	inOcean = true;
+	                    } else {
+	                    	biomeCanSpawnIn[islandInBiome] = true;
+	                    }
+	                }
+	                int chance = (data.biomeRarityScale + 1) - biome.rarity;
+	                islesAtCurrentDepth.addIsle(biome.id, chance, biomeCanSpawnIn, inOcean);
+	            }
+	
+                factory = new LayerBiomeInBiome(islesAtCurrentDepth).create(contextProvider.apply(depth), factory);               
+            }           
 		}
 
 		// Add ocean biomes. This only adds the regular ocean at the moment, soon it will add others.

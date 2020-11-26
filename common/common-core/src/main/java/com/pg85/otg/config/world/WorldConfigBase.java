@@ -8,10 +8,8 @@ import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.config.biome.BiomeGroupManager;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
-import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.biome.ReplaceBlocks;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
-import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -29,6 +27,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
     // Biome generator
  
+	protected List<String> isleBiomes = new ArrayList<String>();
+	
 	protected BiomeMode biomeMode;
 	
 	protected int landRarity;
@@ -198,11 +198,13 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 		super(configName);
 	}
 	
+	@Override
 	public LocalMaterialData getDefaultBedrockBlock()
 	{
 		return this.bedrockBlock;
 	}
 
+	@Override
 	public LocalMaterialData getBedrockBlockReplaced(ReplacedBlocksMatrix replaceBlocks, int y)
 	{		
 		if(replaceBlocks.replacesBedrock)
@@ -212,270 +214,295 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 		return this.bedrockBlock;
 	}
 	
+	@Override
     public double getFractureHorizontal()
     {
         return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
     }
 
+    @Override
     public double getFractureVertical()
     {
         return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
     }
-    
-    public HashMap<LocalMaterialData,LocalMaterialData> getReplaceBlocksDict(IMaterialReader materialReader)
-    {
-    	if(this.replaceBlocksDict != null)
-    	{
-    		return this.replaceBlocksDict;
-    	}
-    	if(this.replaceBlocksDict == null && this.replaceBlocksList != null)
-    	{
-    		replaceBlocksDict = new HashMap<LocalMaterialData,LocalMaterialData>();
-    		for(ReplaceBlocks blockNames : this.replaceBlocksList)
-    		{
-    			try {
-    				// TODO: If the block is unknown it will return the ReplaceUnknownBlockWithMaterial instead.
-    				// This can cause unexpected results like wrong blocks being replaced when ReplaceUnknownBlockWithMaterial is used as sourceBlock or targetBlock.
-    				this.replaceBlocksDict.put(materialReader.readMaterial(blockNames.getSourceBlock()), materialReader.readMaterial(blockNames.getTargetBlock()));
-				} catch (InvalidConfigException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-    		}
-    	}
-    	return this.replaceBlocksDict;
-    }
 
+    @Override
 	public boolean doPopulationBoundsCheck()
 	{
 		return this.populationBoundsCheck;
 	}
 	
+	@Override
 	public boolean getBedrockDisabled()
 	{
 		return this.disableBedrock;
 	}	
 	
+	@Override
 	public int getWorldHeightCap()
 	{
 		return this.worldHeightCap;
 	}
 	
+	@Override
 	public int getRavineRarity()
 	{
 		return this.ravineRarity;
 	}
 	
+	@Override
 	public int getRavineMinLength()
 	{
 		return this.ravineMinLength;
 	}
 	
+	@Override
 	public int getRavineMaxLength()
 	{
 		return this.ravineMaxLength;
 	}
 	
+	@Override
 	public double getRavineDepth()
 	{
 		return this.ravineDepth;
 	}
 	
+	@Override
 	public int getRavineMinAltitude()
 	{
 		return this.ravineMinAltitude;
 	}
 	
+	@Override
 	public int getRavineMaxAltitude()
 	{
 		return this.ravineMaxAltitude;
 	}
 	
+	@Override
 	public int getCaveFrequency()
 	{
 		return this.caveFrequency;
 	}
 	
+	@Override
 	public int getCaveRarity()
 	{
 		return this.caveRarity;
 	}
 	
+	@Override
 	public boolean isEvenCaveDistribution()
 	{
 		return this.evenCaveDistribution;
 	}
 	
+	@Override
 	public int getCaveMinAltitude()
 	{
 		return this.caveMinAltitude;
 	}
 	
+	@Override
 	public int getCaveMaxAltitude()
 	{
 		return this.caveMaxAltitude;
 	}
 	
+	@Override
 	public int getCaveSystemFrequency()
 	{
 		return this.caveSystemFrequency;
 	}
 	
+	@Override
 	public int getIndividualCaveRarity()
 	{
 		return this.individualCaveRarity;
 	}
 	
+	@Override
 	public int getCaveSystemPocketMinSize()
 	{
 		return this.caveSystemPocketMinSize;
 	}
 	
+	@Override
 	public int getCaveSystemPocketChance()
 	{
 		return this.caveSystemPocketChance;
 	}
-	
+
+	@Override
 	public int getCaveSystemPocketMaxSize()
 	{
 		return this.caveSystemPocketMaxSize;
 	}
-		
+
+	@Override
 	public boolean isBetterSnowFall()
 	{
 		return this.betterSnowFall;
 	}
 	
+	@Override
 	public boolean isFullyFreezeLakes()
 	{
 		return this.fullyFreezeLakes;
 	}
 	
+	@Override
 	public boolean isOTGPlus()
 	{
 		return this.isBO4World;
 	}
 	
+	@Override
 	public long getResourcesSeed()
 	{
 		return this.resourcesSeed;
 	}
 	
+	@Override
 	public boolean isDisableOreGen()
 	{
 		return this.disableOreGen;
 	}
 	
+	@Override
 	public int getMaximumCustomStructureRadius()
 	{
 		return this.maximumCustomStructureRadius;
 	}
 	
+	@Override
 	public boolean setBiomeConfigsHaveReplacement(boolean biomeConfigsHaveReplacement)
 	{
 		return this.biomeConfigsHaveReplacement = biomeConfigsHaveReplacement;
 	}
 	
+	@Override
 	public boolean getBiomeConfigsHaveReplacement()
 	{
 		return this.biomeConfigsHaveReplacement;
 	}
 
+	@Override
 	public int getGenerationDepth()
 	{
 		return this.generationDepth;
 	}
 	
+	@Override
 	public int getBiomeRarityScale()
 	{
 		return this.biomeRarityScale;
 	}
 	
+	@Override
 	public LocalMaterialData getCooledLavaBlock()
 	{
 		return this.cooledLavaBlock;
 	}
 		
+	@Override
 	public LocalMaterialData getIceBlock()
 	{
 		return this.iceBlock;
 	}
 	
+	@Override
 	public boolean getIsCeilingBedrock()
 	{
 		return this.ceilingBedrock;
 	}
 	
+	@Override
 	public boolean getIsFlatBedrock()
 	{
 		return this.flatBedrock;
 	}
 	
+	@Override
 	public int getMaxSmoothRadius()
 	{
 		return this.maxSmoothRadius;
 	}
 	
+	@Override
 	public boolean getMineshaftsEnabled()
 	{
 		return this.mineshaftsEnabled;
 	}
 	
+	@Override
 	public boolean getOceanMonumentsEnabled()
 	{
 		return this.oceanMonumentsEnabled;
 	}
 	
+	@Override
 	public boolean getRareBuildingsEnabled()
 	{
 		return this.rareBuildingsEnabled;
 	}
 	
+	@Override
 	public boolean getRemoveSurfaceStone()
 	{
 		return this.removeSurfaceStone;
 	}
 	
+	@Override
 	public ConfigMode getSettingsMode()
 	{
 		return this.settingsMode;
 	}
 	
+	@Override
 	public boolean getStrongholdsEnabled()
 	{
 		return this.strongholdsEnabled;
 	}
 	
+	@Override
 	public boolean getVillagesEnabled()
 	{
 		return this.villagesEnabled;
 	}
 	
+	@Override
 	public LocalMaterialData getWaterBlock()
 	{
 		return this.waterBlock;
 	}
 	
+	@Override
 	public int getWaterLevelMax()
 	{
 		return this.waterLevelMax;
 	}
 	
+	@Override
 	public int getWaterLevelMin()
 	{
 		return this.waterLevelMin;
 	}
 	
+	@Override
 	public ArrayList<String> getWorldBiomes()
 	{
 		return this.worldBiomes;
 	}
 	
+	@Override
 	public int getWorldHeightScale()
 	{
 		return this.worldHeightScale;
 	}
 	
+	@Override
 	public void setMaxSmoothRadius(int smoothRadius)
 	{
 		this.maxSmoothRadius = smoothRadius;
@@ -517,8 +544,15 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 		return this.frozenOceanTemperature;
 	}
 	
+	@Override
 	public boolean getIsFreezeGroups()
 	{
 		return this.freezeAllColdGroupBiomes;
+	}
+	
+	@Override
+	public List<String> getIsleBiomes()
+	{
+		return this.isleBiomes;
 	}
 }

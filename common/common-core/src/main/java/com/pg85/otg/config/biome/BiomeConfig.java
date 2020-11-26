@@ -111,7 +111,6 @@ public class BiomeConfig extends BiomeConfigBase
     private int biomeRarityWhenIsle;
 
     private List<String> biomeIsBorder;
-    private List<String> isleInBiome;
     private List<String> notBorderNear;
 
     // Surface config    
