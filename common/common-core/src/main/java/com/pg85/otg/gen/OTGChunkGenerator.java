@@ -218,6 +218,7 @@ public class OTGChunkGenerator
 				float heightAt = data.getBiomeHeight();
 				// TODO: vanilla reduces the weight by half when the depth here is greater than the center depth, but OTG doesn't do that?
 				float weightAt = BIOME_WEIGHT_TABLE[x1 + 32 + (z1 + 32) * 65] / (heightAt + 2.0F);
+				weightAt = Math.abs(weightAt); // This is required to prevent seams when height goes below -2
 
 				weight += weightAt;
 
