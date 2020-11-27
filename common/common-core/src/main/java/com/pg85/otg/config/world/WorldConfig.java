@@ -25,6 +25,7 @@ import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
+import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.constants.SettingsEnums.TerrainMode;
@@ -354,7 +355,9 @@ public class WorldConfig extends WorldConfigBase
     	//
 
         // Main modes
-        this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);
+    	// TODO: Re-enable writing, disabled for testing atm.
+        //this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);
+    	this.settingsMode = ConfigMode.WriteDisable;
         this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger, null);
         this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null);
 

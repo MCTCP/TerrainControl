@@ -276,14 +276,14 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	
 		// If the chunk doesn't exist so we're doing something outside the
     	// population sequence, return the material without loading the chunk.
-    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES)) && chunkBeingPopulated == null)
+    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
 		{
     		// If the chunk has already been loaded, no need to use fake chunks.
     		if(
 				!(
 					chunk == null && 
 					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.FEATURES)
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)
 				)
 			)
     		{
@@ -293,7 +293,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	}
     	
 		// Tried to query an unloaded chunk outside the area being populated
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES))
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
     	{
             return null;
     	}
@@ -350,14 +350,14 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	
 		// If the chunk doesn't exist and we're doing something outside the
     	// population sequence, return the material without loading the chunk.
-    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES)) && chunkBeingPopulated == null)
+    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
 		{
     		// If the chunk has already been loaded, no need to use fake chunks.
     		if(
 				!(
 					chunk == null && 
 					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.FEATURES)
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)
 				)
 			)
     		{
@@ -367,7 +367,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	}
     	
 		// Tried to query an unloaded chunk outside the area being populated
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.FEATURES))
+    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
     	{
     		return -1;
     	}
@@ -376,9 +376,8 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
         int internalX = x & 0xF;
         int internalZ = z & 0xF;
         
-		// Water/lava don't block motion, but MOTION_BLOCKING height map does appear to include them (?)
-		int heightMapy = chunk.getHeightmap(Type.MOTION_BLOCKING).getHeight(internalX, internalZ);
-        
+		int heightMapy = chunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(internalX, internalZ);
+		
         ForgeMaterialData material;
         boolean isSolid;
         boolean isLiquid;
@@ -449,8 +448,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getHeightMapHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		// Water/lava don't block motion, but MOTION_BLOCKING height map does appear to include them (?)
-		return this.worldGenRegion.getHeight(Type.MOTION_BLOCKING, x, z); 
+		return this.worldGenRegion.getHeight(Type.WORLD_SURFACE_WG, x, z); 
 	}
 
 	@Override
@@ -460,7 +458,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	{
     		return -1;
     	}
-				
+
     	// Check if the chunk has been lit, otherwise cancel.
     	// TODO: Check if this causes problems with BO3 LightChecks.
     	// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.

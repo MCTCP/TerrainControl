@@ -80,8 +80,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		List<RegistryKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetName);
 		if(biomesForPreset == null)
 		{
-			// TODO: Generate Default preset on install
-			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(Constants.DEFAULT_PRESET_NAME);
+			((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetName());
 		}
 		if(biomesForPreset == null)
 		{
