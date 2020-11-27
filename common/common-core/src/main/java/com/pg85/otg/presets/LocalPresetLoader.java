@@ -78,6 +78,10 @@ public abstract class LocalPresetLoader
     {
         File worldConfigFile = new File(presetDir.toString(), Constants.WORLD_CONFIG_FILE);
     	File biomesDirectory = new File(presetDir.toString(), Constants.WORLD_BIOMES_FOLDER);
+    	if(!biomesDirectory.exists())
+    	{
+    		biomesDirectory = new File(presetDir.toString(), Constants.LEGACY_WORLD_BIOMES_FOLDER);
+    	}
     	String presetName = presetDir.toFile().getName();    	
     	
         SettingsMap worldConfigSettings = FileSettingsReader.read(presetName, worldConfigFile, logger);
@@ -85,7 +89,7 @@ public abstract class LocalPresetLoader
         FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.getSettingsMode(), logger);
 
         //loadFallbacks(presetDir, worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
-        ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(presetDir, worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
+        ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(presetDir.getFileName().toString(), biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
 
         // We have to wait for the loading in order to get things like temperature
         //worldConfig.biomeGroupManager.processBiomeData(); // TODO: Re-implement this for 1.16
@@ -126,18 +130,11 @@ public abstract class LocalPresetLoader
     }
     */
 
-    private ArrayList<BiomeConfig> loadBiomeConfigs(Path presetDir, IWorldConfig worldConfig, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+    private ArrayList<BiomeConfig> loadBiomeConfigs(String presetName, Path presetBiomesDir, IWorldConfig worldConfig, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
-    	String presetName = presetDir.getFileName().toString();
-
         // Establish folders
         List<Path> biomeDirs = new ArrayList<Path>(2);
-        biomeDirs.add(Paths.get(presetDir.toString(), Constants.WORLD_BIOMES_FOLDER));
-        if(biomeDirs.isEmpty())
-        {
-        	// TODO: Rename folders
-        	biomeDirs.add(Paths.get(presetDir.toString(), Constants.LEGACY_WORLD_BIOMES_FOLDER));        	
-        }
+        biomeDirs.add(presetBiomesDir);
         
         // Build a set of all biomes to load
         Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();

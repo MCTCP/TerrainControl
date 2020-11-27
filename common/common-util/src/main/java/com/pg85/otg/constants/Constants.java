@@ -52,9 +52,9 @@ public class Constants
     public static final String WORLD_CONFIG_FILE = "WorldConfig.ini";
     public static final String FALLBACK_FILE = "Fallbacks.ini";
     public static final String WORLD_BIOMES_FOLDER = "Biomes";
-    public static final String LEGACY_WORLD_BIOMES_FOLDER = "Biomes";
+    public static final String LEGACY_WORLD_BIOMES_FOLDER = "WorldBiomes";
     public static final String WORLD_OBJECTS_FOLDER = "Objects";
-    public static final String LEGACY_WORLD_OBJECTS_FOLDER = "Objects";
+    public static final String LEGACY_WORLD_OBJECTS_FOLDER = "WorldObjects";
     
     public static String BackupFileSuffix = "-backup";
 	public static String StructureDataFileExtension = ".dat";
