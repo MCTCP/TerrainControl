@@ -50,8 +50,7 @@ public class OTGPlugin
 		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
 			// Provide our custom chunk generator, biome provider and dimension settings.
-			// TODO: Generate default preset on install
-			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(Constants.DEFAULT_PRESET_NAME, seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OTG_DIMENSION_SETTINGS_KEY));
+			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetName(), seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OTG_DIMENSION_SETTINGS_KEY));
 		}
 	};
 

@@ -133,7 +133,12 @@ public abstract class LocalPresetLoader
         // Establish folders
         List<Path> biomeDirs = new ArrayList<Path>(2);
         biomeDirs.add(Paths.get(presetDir.toString(), Constants.WORLD_BIOMES_FOLDER));
-
+        if(biomeDirs.isEmpty())
+        {
+        	// TODO: Rename folders
+        	biomeDirs.add(Paths.get(presetDir.toString(), Constants.LEGACY_WORLD_BIOMES_FOLDER));        	
+        }
+        
         // Build a set of all biomes to load
         Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();
 
@@ -357,4 +362,10 @@ public abstract class LocalPresetLoader
 	public abstract void registerBiomes();
 
 	public abstract BiomeConfig getBiomeConfig(String resourceLocationString);
+
+	public String getDefaultPresetName()
+	{
+		// TODO: Generate default preset on install
+		return this.presets.keySet().size() > 0 ? (String) this.presets.keySet().toArray()[0] : Constants.DEFAULT_PRESET_NAME;
+	}
 }

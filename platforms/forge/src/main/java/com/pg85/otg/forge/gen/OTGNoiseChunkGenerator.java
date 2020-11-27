@@ -116,8 +116,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		// TODO: Generate Default preset on install
-		this(new DimensionConfig(Constants.DEFAULT_PRESET_NAME, 0, true), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName(), 0, true), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
 	private OTGNoiseChunkGenerator(String dimensionConfigYaml, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
@@ -370,7 +369,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
     	{
     		return cachedColumn;
     	}
-    	   
+
     	IChunk chunk = this.unloadedChunksCache.get(chunkCoord);
     	if(chunk == null)
     	{

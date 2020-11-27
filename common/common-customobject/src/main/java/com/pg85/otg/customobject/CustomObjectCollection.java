@@ -230,16 +230,24 @@ public class CustomObjectCollection
     	{
 	        if (worldName != null && !customObjectFilesPerWorld.containsKey(worldName))
 	        {
-	        	logger.log(LogMarker.INFO, "Indexing WorldObjects folder for world " + worldName);
+	        	logger.log(LogMarker.INFO, "Indexing Objects folder for world " + worldName);
 	            HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
 	            customObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
-	            if (worldName != null && new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + Constants.WORLD_OBJECTS_FOLDER).exists())
+	            if (worldName != null)
 	            {
-	                indexAllCustomObjectFilesInDir(
-                		new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + Constants.WORLD_OBJECTS_FOLDER),
+	            	// TODO: Rename folders
+	            	String objectsFolderName = 
+            			new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + Constants.WORLD_OBJECTS_FOLDER).exists() ? Constants.WORLD_OBJECTS_FOLDER :
+        				new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + Constants.LEGACY_WORLD_OBJECTS_FOLDER).exists() ? Constants.LEGACY_WORLD_OBJECTS_FOLDER : null
+					;	            	
+	            	if(objectsFolderName != null)
+	            	{
+	            		indexAllCustomObjectFilesInDir(
+                		new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + objectsFolderName),
                         worldCustomObjectFiles, spawnLog, logger);
+	            	}
 	            }
-	            logger.log(LogMarker.INFO, "WorldObjects folder for world " + worldName + " indexed.");
+	            logger.log(LogMarker.INFO, "Objects folder for world " + worldName + " indexed.");
 	        }
     	}
     }
