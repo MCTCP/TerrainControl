@@ -50,6 +50,12 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	@Override
+	public BiomeConfig getBiomeConfig(String presetName, int biomeId)
+	{
+		return this.globalIdMapping.get(presetName).get(biomeId);
+	}
+	
+	@Override
 	public BiomeConfig getBiomeConfig(String resourceLocationString)
 	{
 		return this.biomeConfigsByRegistryKey.get(new ResourceLocation(resourceLocationString));

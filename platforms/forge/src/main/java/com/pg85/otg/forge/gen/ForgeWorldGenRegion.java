@@ -47,9 +47,9 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     private IBiome[][] cachedBiomeConfigs;
     private boolean cacheIsValid;
 
-	ForgeWorldGenRegion(IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
-		super(worldConfig);
+		super(presetName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
@@ -78,12 +78,9 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
 		if(biome != null)
 		{
-			// TODO: Fetch biomeConfig via Biome once layers and registries are fixed?
-			//ResourceLocation resourceLocation = ForgeRegistries.BIOMES.getKey(biome);
-			//BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(resourceLocation.toString());
+			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeProvider());
-			RegistryKey<Biome> key = ((OTGBiomeProvider)this.chunkGenerator.getBiomeProvider()).lookupKey(id);
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());
+			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
 			if(biomeConfig != null)
 			{
 				return new ForgeBiome(biome, biomeConfig);
@@ -98,12 +95,9 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 		Biome biome = this.worldGenRegion.getBiome(new BlockPos(x, 1, z));		
 		if(biome != null)
 		{
-			// TODO: Fetch biomeConfig via Biome once layers and registries are fixed?
-			//ResourceLocation resourceLocation = ForgeRegistries.BIOMES.getKey(biome);
-			//BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(resourceLocation.toString());
+			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
 			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeProvider());
-			RegistryKey<Biome> key = ((OTGBiomeProvider)this.chunkGenerator.getBiomeProvider()).lookupKey(id);
-			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());
+			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
 			return biomeConfig;
 		}
 		return null;
@@ -379,8 +373,16 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
         int internalX = x & 0xF;
         int internalZ = z & 0xF;
         
+        // TODO: For some reason, on rare occasions WORLD_SURFACE_WG heightmap returns 0 for chunks
+        // with status LIQUID_CARVERS, while the chunk does already have base terrain blocks filled.
+        // If we use a later status like FEATURES though, resource population may have problems 
+        // fetching chunks.
 		int heightMapy = chunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(internalX, internalZ);
-		
+		if(heightMapy == 0)
+		{
+			heightMapy = Constants.WORLD_HEIGHT - 1;
+		}
+
         ForgeMaterialData material;
         boolean isSolid;
         boolean isLiquid;

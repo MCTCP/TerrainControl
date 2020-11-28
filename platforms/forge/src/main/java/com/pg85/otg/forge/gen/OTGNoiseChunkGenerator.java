@@ -255,7 +255,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		init(((IServerWorldInfo)p_242427_3_.getWorldInfo()).getWorldName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ());
-		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig, this.structureCache);
 	}
 	
 	// Mob spawning on initial chunk spawn (animals).
