@@ -92,9 +92,10 @@ public abstract class LocalPresetLoader
         ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(presetDir.getFileName().toString(), biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
 
         // We have to wait for the loading in order to get things like temperature
-        //worldConfig.biomeGroupManager.processBiomeData(); // TODO: Re-implement this for 1.16
+        // TODO: Re-implement this for 1.16
+        //worldConfig.biomeGroupManager.processBiomeData();
 
-        return new Preset(presetName, worldConfig, biomeConfigs);       
+        return new Preset(presetName, worldConfig, biomeConfigs);
     }
 
     private ArrayList<String> addBiomesFromDirRecursive(File biomesDirectory)
@@ -365,4 +366,6 @@ public abstract class LocalPresetLoader
 		// TODO: Generate default preset on install
 		return this.presets.keySet().size() > 0 ? (String) this.presets.keySet().toArray()[0] : Constants.DEFAULT_PRESET_NAME;
 	}
+
+	public abstract BiomeConfig getBiomeConfig(String presetName, int biomeId);
 }
