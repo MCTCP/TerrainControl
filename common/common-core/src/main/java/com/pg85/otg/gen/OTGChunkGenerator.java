@@ -16,6 +16,7 @@ import com.pg85.otg.gen.carver.RavineCarver;
 import com.pg85.otg.gen.noise.OctavePerlinNoiseSampler;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
 import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
@@ -49,6 +50,8 @@ public class OTGChunkGenerator
 	private final OctavePerlinNoiseSampler upperInterpolatedNoise; // Volatility2 noise
 
 	private final OctavePerlinNoiseSampler depthNoise;
+
+	private final Preset preset;
 	private final long seed;
 	private final LayerSource biomeGenerator;
 
@@ -67,8 +70,9 @@ public class OTGChunkGenerator
 	private final Carver caves = new CaveCarver(256);
 	private final Carver ravines = new RavineCarver(256);
 
-	public OTGChunkGenerator(long seed, LayerSource biomeGenerator)
+	public OTGChunkGenerator(Preset preset, long seed, LayerSource biomeGenerator)
 	{
+		this.preset = preset;
 		this.seed = seed;
 		this.biomeGenerator = biomeGenerator;
 
@@ -195,6 +199,9 @@ public class OTGChunkGenerator
 	{
 		IBiomeConfig center = getBiomeAt(noiseX, noiseZ);
 
+		final int maxYSections = this.preset.getWorldConfig().getWorldHeightCap() / 8 + 1;
+		final int usedYSections = this.preset.getWorldConfig().getWorldHeightScale() / 8 + 1;
+
 		float height = 0; // depth
 		float volatility = 0; // scale
 		double volatility1 = 0;
@@ -258,17 +265,19 @@ public class OTGChunkGenerator
 			chc[y] /= weight;
 		}
 
+		// Vary the height with more noise
+		float extraHeight = (float) (getExtraHeightAt(noiseX, noiseZ, maxAverageDepth, maxAverageHeight) * 0.2);
+
 		// Do some math on volatility and height
 		volatility = volatility * 0.9f + 0.1f;
 		height = (height * 4.0F - 1.0F) / 8.0F;
-
-		// Vary the height with more noise
-		height += getExtraHeightAt(noiseX, noiseZ, maxAverageDepth, maxAverageHeight) * 0.2;
+		// Factor in y sections
+		height = usedYSections * (2.0f + height + extraHeight) / 4.0f;
 
 		for (int y = 0; y <= this.noiseSizeY; ++y)
 		{
 			// Calculate falloff
-			double falloff = ((8.5D + height * 8.5D / 8.0D * 4.0D) - y) * 12.0D * 128.0D / 256.0 / volatility;
+			double falloff = (height - y) * 12.0D * 128.0D / this.preset.getWorldConfig().getWorldHeightCap() / volatility;
 			if (falloff > 0.0)
 			{
 				falloff *= 4.0;
