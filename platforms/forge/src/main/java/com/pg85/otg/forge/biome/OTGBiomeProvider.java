@@ -104,14 +104,12 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 
 	public RegistryKey<Biome> getBiomeRegistryKey(int x, int y, int z)
 	{
-		// TODO: this is hardcoded for now until layer generation is fixed
 		return keyLookup.get(this.layer.sample(x, z));
 	}
 
 	@Override
 	public Biome getNoiseBiome(int x, int y, int z)
 	{
-		// TODO: this is hardcoded for now until layer generation is fixed
 		return registry.func_230516_a_(keyLookup.get(this.layer.sample(x, z)));
 	}
 

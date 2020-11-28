@@ -158,7 +158,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.dimensionConfig.PresetName);
         
-		this.internalGenerator = new OTGChunkGenerator(seed, (LayerSource) biomeProvider1);
+		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
 		this.chunkPopulator = new OTGChunkPopulator();
 	}
 	
