@@ -102,15 +102,19 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		return new OTGBiomeProvider(this.presetName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
 	}
 
-	public RegistryKey<Biome> getBiomeRegistryKey(int x, int y, int z)
+	public RegistryKey<Biome> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)
 	{
-		return keyLookup.get(this.layer.sample(x, z));
+		return keyLookup.get(this.layer.sample(biomeX, biomeZ));
+	}
+
+	public RegistryKey<Biome> lookupKey(int index) {
+		return keyLookup.get(index);
 	}
 
 	@Override
-	public Biome getNoiseBiome(int x, int y, int z)
+	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
 	{
-		return registry.func_230516_a_(keyLookup.get(this.layer.sample(x, z)));
+		return registry.func_230516_a_(keyLookup.get(this.layer.sample(biomeX, biomeZ)));
 	}
 
 	@Override
@@ -120,8 +124,8 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	}
 
 	@Override
-	public BiomeConfig getConfig(int x, int z)
+	public BiomeConfig getConfig(int biomeX, int biomeZ)
 	{
-		return configLookup.get(this.layer.sample(x, z));
+		return configLookup.get(this.layer.sample(biomeX, biomeZ));
 	}
 }

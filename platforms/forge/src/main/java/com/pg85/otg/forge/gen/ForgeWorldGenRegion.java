@@ -9,6 +9,7 @@ import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
+import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
@@ -80,7 +81,8 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 			// TODO: Fetch biomeConfig via Biome once layers and registries are fixed?
 			//ResourceLocation resourceLocation = ForgeRegistries.BIOMES.getKey(biome);
 			//BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(resourceLocation.toString());
-			RegistryKey<Biome> key = ((OTGBiomeProvider)this.chunkGenerator.getBiomeProvider()).getBiomeRegistryKey(x, 1, z);
+			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeProvider());
+			RegistryKey<Biome> key = ((OTGBiomeProvider)this.chunkGenerator.getBiomeProvider()).lookupKey(id);
 			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());
 			if(biomeConfig != null)
 			{
@@ -99,7 +101,8 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 			// TODO: Fetch biomeConfig via Biome once layers and registries are fixed?
 			//ResourceLocation resourceLocation = ForgeRegistries.BIOMES.getKey(biome);
 			//BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(resourceLocation.toString());
-			RegistryKey<Biome> key = ((OTGBiomeProvider)this.chunkGenerator.getBiomeProvider()).getBiomeRegistryKey(x, 1, z);
+			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeProvider());
+			RegistryKey<Biome> key = ((OTGBiomeProvider)this.chunkGenerator.getBiomeProvider()).lookupKey(id);
 			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());
 			return biomeConfig;
 		}

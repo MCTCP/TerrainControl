@@ -1,6 +1,7 @@
 package com.pg85.otg.gen.biome;
 
 import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.util.Pair;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 
@@ -14,6 +15,17 @@ public class BiomeInterpolator
 {
    public static IBiomeConfig getConfig(long seed, int x, int y, int z, LayerSource generator)
    {
+      Pair<Integer, Integer> pos = sample(seed, x, y, z);
+      return generator.getConfig(pos.getFirst(), pos.getSecond());
+   }
+
+   public static int getId(long seed, int x, int y, int z, LayerSource generator)
+   {
+      Pair<Integer, Integer> pos = sample(seed, x, y, z);
+      return generator.getSampler().sample(pos.getFirst(), pos.getSecond());
+   }
+
+   private static Pair<Integer, Integer> sample(long seed, int x, int y, int z) {
       int i = x - 2;
       int j = y - 2;
       int k = z - 2;
@@ -56,9 +68,10 @@ public class BiomeInterpolator
       }
 
       v = (t & 4) == 0 ? l : l + 1;
-      aa = (t & 2) == 0 ? m : m + 1;
+      aa = (t & 2) == 0 ? m : m + 1; // y coord is not used atm
       ab = (t & 1) == 0 ? n : n + 1;
-      return generator.getConfig(v, ab);
+
+      return Pair.of(v, ab);
    }
 
    private static double calcSquaredDistance(long seed, int x, int y, int z, double xFraction, double yFraction, double zFraction)
