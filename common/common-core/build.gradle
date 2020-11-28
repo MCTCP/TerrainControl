@@ -44,14 +44,12 @@ shadowJar {
 		include dependency(':jackson-dataformat-yaml')
 		include dependency(':jackson-databind')
 		include dependency(':snakeyaml')
-		include dependency(':fastutil')
     }
 	// TODO: ShadowJar doesn't appear to be working correctly, Forge isn't picking
 	// up shaded dependencies. Let's hope Forge know how to resolve duplicate
 	// dependencies by now...
 	//relocate 'com.fasterxml.jackson', 'com.pg85.otg.shaded.fasterxml.jackson'
 	//relocate 'org.yaml', 'com.pg85.otg.shaded.org.yaml'
-	//relocate 'it.unimi.dsi', 'com.pg85.otg.shaded.it.unimi.dsi'
 	archiveName = project.archivesBaseName + '-' + project.version + '.jar'
 	destinationDir = project.distsDir
 }
