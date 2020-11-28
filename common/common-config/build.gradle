@@ -2,7 +2,6 @@
 
 plugins {
   id 'java'
-  id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
 // Project properties
@@ -20,12 +19,3 @@ dependencies
 {
 	compile project(':common:common-util')
 }
-
-shadowJar {
-    dependencies {
-    }
-	archiveName = project.archivesBaseName + '-' + project.version + '.jar'
-	destinationDir = project.distsDir
-}
-
-build.finalizedBy(shadowJar)

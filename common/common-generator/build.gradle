@@ -2,7 +2,6 @@
 
 plugins {
   id 'java'
-  id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
 // Project properties
@@ -22,15 +21,6 @@ dependencies
 	compile project(':common:common-config')
     compile (
 		'it.unimi.dsi:fastutil:8.2.1',
-		'com.google.guava:guava:21.0'
-    )	
+		'com.google.guava:guava:23.0'
+    )
 }
-
-shadowJar {
-    dependencies {
-    }
-	archiveName = project.archivesBaseName + '-' + project.version + '.jar'
-	destinationDir = project.distsDir
-}
-
-build.finalizedBy(shadowJar)

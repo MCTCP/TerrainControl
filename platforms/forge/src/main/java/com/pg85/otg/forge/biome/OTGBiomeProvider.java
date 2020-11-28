@@ -18,7 +18,6 @@ import net.minecraft.world.biome.provider.BiomeProvider;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
 import com.pg85.otg.gen.biome.layers.LayerSource;

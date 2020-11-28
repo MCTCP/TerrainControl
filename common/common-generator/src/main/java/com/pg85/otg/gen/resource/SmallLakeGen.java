@@ -12,7 +12,6 @@ import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 

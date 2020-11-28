@@ -27,20 +27,31 @@ dependencies
 		'com.fasterxml.jackson.core:jackson-core:2.9.7',
 		'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.9.7',
 		'com.fasterxml.jackson.core:jackson-databind:2.9.7',
-		'org.yaml:snakeyaml:1.23'
+		'org.yaml:snakeyaml:1.23',
+		'it.unimi.dsi:fastutil:8.2.1',
+		'com.google.guava:guava:23.0'
     )
 }
 
 shadowJar {
     dependencies {
+		include dependency(':common-util')
+		include dependency(':common-config')
+		include dependency(':common-customobject')
+		include dependency(':common-generator')
 		include dependency(':jackson-annotations')
 		include dependency(':jackson-core')
 		include dependency(':jackson-dataformat-yaml')
 		include dependency(':jackson-databind')
 		include dependency(':snakeyaml')
+		include dependency(':fastutil')
     }
-	relocate 'com.fasterxml.jackson', 'com.pg85.otg.shaded.fasterxml.jackson'
-	relocate 'org.yaml', 'com.pg85.otg.shaded.org.yaml'
+	// TODO: ShadowJar doesn't appear to be working correctly, Forge isn't picking
+	// up shaded dependencies. Let's hope Forge know how to resolve duplicate
+	// dependencies by now...
+	//relocate 'com.fasterxml.jackson', 'com.pg85.otg.shaded.fasterxml.jackson'
+	//relocate 'org.yaml', 'com.pg85.otg.shaded.org.yaml'
+	//relocate 'it.unimi.dsi', 'com.pg85.otg.shaded.it.unimi.dsi'
 	archiveName = project.archivesBaseName + '-' + project.version + '.jar'
 	destinationDir = project.distsDir
 }
