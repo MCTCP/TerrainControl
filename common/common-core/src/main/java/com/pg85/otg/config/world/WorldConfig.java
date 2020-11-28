@@ -51,13 +51,6 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Clean these fields up, move to WorldConfigBase if
 	// they need to be exposed, or remove if no longer used.
 
-	private List<String> borderBiomes = new ArrayList<String>();
-
-	private boolean improvedBiomeBorders;
-	private boolean improvedBiomeGroups;
-	private boolean customHeightControlSmoothing;
-    private boolean improvedSmoothing;
-
     // Dimensions
 
 	// Replace blocks
@@ -403,11 +396,6 @@ public class WorldConfig extends WorldConfigBase
         // Specialized Biomes
         this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger, null);
         this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger, null);
-
-        this.improvedBiomeBorders = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS, logger, null);
-        this.improvedBiomeGroups = reader.getSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS, logger, null);
-        this.customHeightControlSmoothing = reader.getSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING, logger, null);
-        this.improvedSmoothing = reader.getSetting(WorldStandardValues.IMPROVED_SMOOTHING, logger, null);
         
         // Images
         this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE, logger, null);
@@ -738,18 +726,6 @@ public class WorldConfig extends WorldConfigBase
 
         writer.putSetting(WorldStandardValues.BORDER_BIOMES, this.borderBiomes,
             "Biomes used as borders of other biomes. You must set BiomeIsBorder in biome config for each biome here. Biome name is case sensitive.");
-
-        writer.putSetting(WorldStandardValues.IMPROVED_BIOME_BORDERS, this.improvedBiomeBorders,
-    		"Spawns more precise borders that never spill over into neighbouring biomes. Disabled by default for legacy worlds.");
-
-        writer.putSetting(WorldStandardValues.IMPROVED_BIOME_GROUPS, this.improvedBiomeGroups,
-    		"Fixes biome groups not changing with seeds. Disabled by default for legacy worlds.");
-
-        writer.putSetting(WorldStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTHING, this.customHeightControlSmoothing,
-            "Smooths biome CustomHeightControl data. Disabled by default for legacy worlds.");
-
-        writer.putSetting(WorldStandardValues.IMPROVED_SMOOTHING, this.improvedSmoothing,
-            "Smooths volatility and max average data. Disabled by default for legacy worlds.");
 
         writer.smallTitle("Landmass settings (for NormalBiomes)");
 

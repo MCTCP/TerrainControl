@@ -28,6 +28,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
     // Biome generator
  
 	protected List<String> isleBiomes = new ArrayList<String>();
+	protected List<String> borderBiomes = new ArrayList<String>();
 	
 	protected BiomeMode biomeMode;
 	
@@ -554,5 +555,11 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public List<String> getIsleBiomes()
 	{
 		return this.isleBiomes;
+	}
+
+	@Override
+	public List<String> getBorderBiomes()
+	{
+		return this.borderBiomes;
 	}
 }

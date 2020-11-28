@@ -149,10 +149,6 @@ public class WorldStandardValues extends Settings
 		WOODLAND_MANSIONS_ENABLED = booleanSetting("WoodLandMansionsEnabled", true),
         POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
         DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
-		IMPROVED_BIOME_BORDERS = booleanSetting("ImprovedBiomeBorders", false),
-		IMPROVED_BIOME_GROUPS = booleanSetting("ImprovedBiomeGroups", false),
-		CUSTOM_HEIGHT_CONTROL_SMOOTHING = booleanSetting("CustomHeightControlSmoothing", false),
-		IMPROVED_SMOOTHING = booleanSetting("ImprovedSmoothing", false),
 
 		TeleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
 		CommandBlockOutput = booleanSetting("CommandBlockOutput", true),
