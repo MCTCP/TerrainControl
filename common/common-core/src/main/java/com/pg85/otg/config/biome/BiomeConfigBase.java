@@ -551,7 +551,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return
 			this.biomeIsBorder != null && 
 			this.biomeIsBorder.size() > 0 &&
-			this.worldConfig.getIsleBiomes().contains(this.getName())
+			this.worldConfig.getBorderBiomes().contains(this.getName())
 		;
 	}
     

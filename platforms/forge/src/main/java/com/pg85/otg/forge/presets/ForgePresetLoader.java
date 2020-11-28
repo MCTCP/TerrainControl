@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
 import com.pg85.otg.config.world.WorldConfig;
@@ -20,6 +21,7 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
@@ -128,7 +130,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				if(biomeConfig.isIsleBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(biomeConfig.getBiomeSize(), new ArrayList<>());
+					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
 					biomesAtDepth.add(
 						new NewBiomeData(
 							currentId, 
@@ -147,7 +149,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				if(biomeConfig.isBorderBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(biomeConfig.getBiomeSize(), new ArrayList<>());
+					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
 					biomesAtDepth.add(
 						new NewBiomeData(
 							currentId, 
@@ -163,6 +165,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
  				}
 
+ 				OTG.log(LogMarker.INFO, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
+ 				
  				currentId++;
 			}
 			
