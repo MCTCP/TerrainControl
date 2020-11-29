@@ -26,7 +26,6 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
@@ -70,7 +69,7 @@ public class BO4 implements StructuredCustomObject
     }
     
     @Override
-    public boolean onEnable(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public boolean onEnable(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(isInvalidConfig)
     	{
@@ -83,7 +82,7 @@ public class BO4 implements StructuredCustomObject
     	
     	try
     	{
-    		this.config = new BO4Config(new FileSettingsReaderOTGPlus(name, file, logger), true, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+    		this.config = new BO4Config(new FileSettingsReaderOTGPlus(name, file, logger), true, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     		if(this.config.settingsMode != ConfigMode.WriteDisable && !this.config.isBO4Data)
     		{
     			FileSettingsWriterOTGPlus.writeToFile(this.config, this.config.settingsMode, spawnLog, logger, materialReader, manager);
@@ -153,7 +152,7 @@ public class BO4 implements StructuredCustomObject
     }
     
     // BO4's should always spawn within population bounds, so there is no SpawnForced, only TrySpawnAt
-    public boolean trySpawnAt(Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, ChunkCoordinate chunkBeingPopulated, boolean doBiomeConfigReplaceBlocks)
+    public boolean trySpawnAt(String presetName, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker, IWorldGenRegion worldGenRegion, Random random, Rotation rotation, ChunkCoordinate chunkCoord, int x, int y, int z, String replaceAbove, String replaceBelow, boolean replaceWithBiomeBlocks, String replaceWithSurfaceBlock, String replaceWithGroundBlock, String replaceWithStoneBlock, boolean spawnUnderWater, int waterLevel, boolean isStructureAtSpawn, boolean doReplaceAboveBelowOnly, ChunkCoordinate chunkBeingPopulated, boolean doBiomeConfigReplaceBlocks)
     {
    		//OTG.log(LogMarker.INFO, "Spawning " + this.getName() + " in Chunk X" + chunkCoord.getChunkX() + "Z" + chunkCoord.getChunkZ() + " at pos " + x + " " + y + " " + z);
 
@@ -257,10 +256,10 @@ public class BO4 implements StructuredCustomObject
     	
         // Spawn
     	long startTime = System.currentTimeMillis();
-    	BO4BlockFunction[] blocks = config.getBlocks(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+    	BO4BlockFunction[] blocks = config.getBlocks(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     	if(blocks != null)
     	{
-	        for (BO4BlockFunction block : config.getBlocks(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker))
+	        for (BO4BlockFunction block : config.getBlocks(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 	        {
 	        	if(block instanceof BO4RandomBlockFunction)
 	        	{

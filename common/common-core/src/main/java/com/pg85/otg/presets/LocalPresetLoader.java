@@ -52,7 +52,6 @@ public abstract class LocalPresetLoader
 
 	public void loadPresetsFromDisk(IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-	    ArrayList<String> worldNames = new ArrayList<String>();
 	    if(this.presetsDir.exists() && this.presetsDir.isDirectory())
 	    {
 	    	for(File presetDir : this.presetsDir.listFiles())
@@ -62,8 +61,7 @@ public abstract class LocalPresetLoader
 	    			for(File file : presetDir.listFiles())
 	    			{
 	    				if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
-	    				{
-			    			worldNames.add(presetDir.getName());			    			
+	    				{		    			
 			    			Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
 			    			presets.put(preset.getName(), preset);
 					        break;
@@ -95,7 +93,7 @@ public abstract class LocalPresetLoader
         // TODO: Re-implement this for 1.16
         //worldConfig.biomeGroupManager.processBiomeData();
 
-        return new Preset(presetName, worldConfig, biomeConfigs);
+        return new Preset(presetDir, presetName, worldConfig, biomeConfigs);
     }
 
     private ArrayList<String> addBiomesFromDirRecursive(File biomesDirectory)

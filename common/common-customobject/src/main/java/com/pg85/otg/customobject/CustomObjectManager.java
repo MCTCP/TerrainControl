@@ -72,8 +72,8 @@ public class CustomObjectManager implements ICustomObjectManager
 	    		    {
 	    		    	if(file.isDirectory())
 	    		    	{
-	    		    		String worldName = file.getName();
-	    		    		globalCustomObjects.indexWorldObjectsFolder(worldName, spawnLog, logger, otgRootFolder);
+	    		    		String presetName = file.getName();
+	    		    		globalCustomObjects.indexPresetObjectsFolder(presetName, spawnLog, logger, otgRootFolder);
 	    		    	}
 	    		    }
 	    		    logger.log(LogMarker.INFO, "All CustomObject files indexed.");

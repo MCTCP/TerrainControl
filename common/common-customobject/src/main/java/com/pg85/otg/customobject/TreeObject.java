@@ -8,7 +8,6 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.minecraft.TreeType;
 
@@ -35,7 +34,7 @@ class TreeObject implements CustomObject
     }
 
     @Override
-    public boolean onEnable(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public boolean onEnable(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	return true;
     }

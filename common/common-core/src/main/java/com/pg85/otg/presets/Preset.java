@@ -1,5 +1,6 @@
 package com.pg85.otg.presets;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -8,18 +9,25 @@ import com.pg85.otg.config.world.WorldConfig;
 
 public class Preset
 {
+	private final Path presetDir;
 	private final String name;
 	private final WorldConfig worldConfig;
 	private final HashMap<String, BiomeConfig> biomeConfigs = new HashMap<String, BiomeConfig>();
 
-	Preset(String name, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
+	Preset(Path presetDir, String name, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
 	{
+		this.presetDir = presetDir;
 		this.name = name;
 		this.worldConfig = worldConfig;
 		for(BiomeConfig biomeConfig : biomeConfigs)
 		{
 			this.biomeConfigs.put(biomeConfig.getName(), biomeConfig);
 		}
+	}
+	
+	public Path getPresetDir()
+	{
+		return this.presetDir;
 	}
 
 	public String getName()

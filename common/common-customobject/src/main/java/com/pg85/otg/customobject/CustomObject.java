@@ -8,7 +8,6 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.ICustomObject;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.nio.file.Path;
@@ -32,7 +31,7 @@ public interface CustomObject extends SpawnableObject, ICustomObject
      * @param otherObjectsInDirectory A map of all other objects in the
      *                                directory. Keys are lowercase.
      */
-    public boolean onEnable(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker);
+    public boolean onEnable(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker);
 
     /**
      * Returns the name of this object.

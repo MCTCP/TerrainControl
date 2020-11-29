@@ -6,7 +6,6 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.minecraft.TreeType;
 
 import java.io.File;
@@ -26,14 +25,14 @@ public class CustomObjectCollection
     private HashMap<String, CustomObject> objectsByNameGlobalObjects = new HashMap<String, CustomObject>();
     private ArrayList<String> objectsNotFoundGlobalObjects = new ArrayList<String>();
 
-    private HashMap<String, ArrayList<CustomObject>> objectsPerWorld = new HashMap<String, ArrayList<CustomObject>>();
-    private HashMap<String, HashMap<String, CustomObject>> objectsByNamePerWorld = new HashMap<String, HashMap<String, CustomObject>>();
-    private HashMap<String, ArrayList<String>> objectsNotFoundPerWorld = new HashMap<String, ArrayList<String>>();
+    private HashMap<String, ArrayList<CustomObject>> objectsPerPreset = new HashMap<String, ArrayList<CustomObject>>();
+    private HashMap<String, HashMap<String, CustomObject>> objectsByNamePerPreset = new HashMap<String, HashMap<String, CustomObject>>();
+    private HashMap<String, ArrayList<String>> objectsNotFoundPerPreset = new HashMap<String, ArrayList<String>>();
 
     private HashMap<String, File> customObjectFilesGlobalObjects = null;
-    private HashMap<String, HashMap<String, File>> customObjectFilesPerWorld = new HashMap<String, HashMap<String, File>>();
+    private HashMap<String, HashMap<String, File>> customObjectFilesPerPreset = new HashMap<String, HashMap<String, File>>();
 
-    private CustomObject loadObject(File file, String worldName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private CustomObject loadObject(File file, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	synchronized(indexingFilesLock)
     	{
@@ -58,46 +57,46 @@ public class CustomObjectCollection
 	                {
 	                    object = loader.loadFromFile(objectName, file, logger);
 	
-	                    if (worldName != null)
+	                    if (presetName != null)
 	                    {
-	                        ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
-	                        if (worldObjects == null)
+	                        ArrayList<CustomObject> presetObjects = objectsPerPreset.get(presetName);
+	                        if (presetObjects == null)
 	                        {
-	                            worldObjects = new ArrayList<CustomObject>();
-	                            objectsPerWorld.put(worldName, worldObjects);
+	                            presetObjects = new ArrayList<CustomObject>();
+	                            objectsPerPreset.put(presetName, presetObjects);
 	                        }
-	                        worldObjects.add(object);
+	                        presetObjects.add(object);
 	                    } else {
 	                        objectsGlobalObjects.add(object);
 	                    }
 	
-	                    if (!object.onEnable(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
+	                    if (!object.onEnable(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
 	                    {
 	                        // Remove the object
-	                        removeLoadedObject(worldName, object);
+	                        removeLoadedObject(presetName, object);
 							
 							// Try bo4
 							loader = customObjectManager.getObjectLoaders().get("bo4");
 							if (loader != null)
 							{
 								object = loader.loadFromFile(objectName, file, logger);
-								if (worldName != null)
+								if (presetName != null)
 								{
-									ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
-									if (worldObjects == null)
+									ArrayList<CustomObject> presetObjects = objectsPerPreset.get(presetName);
+									if (presetObjects == null)
 									{
-										worldObjects = new ArrayList<CustomObject>();
-										objectsPerWorld.put(worldName, worldObjects);
+										presetObjects = new ArrayList<CustomObject>();
+										objectsPerPreset.put(presetName, presetObjects);
 									}
-									worldObjects.add(object);
+									presetObjects.add(object);
 								} else {
 									objectsGlobalObjects.add(object);
 								}
 
-								if (!object.onEnable(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
+								if (!object.onEnable(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker) || !object.loadChecks(modLoadedChecker))
 								{
 									// Remove the object
-									removeLoadedObject(worldName, object);
+									removeLoadedObject(presetName, object);
 									return null;
 								}
 							}
@@ -112,25 +111,25 @@ public class CustomObjectCollection
     	}
     }
           
-    private void removeLoadedObject(String worldName, CustomObject object)
+    private void removeLoadedObject(String presetName, CustomObject object)
     {
-        if (worldName != null)
+        if (presetName != null)
         {
-            HashMap<String, CustomObject> worldObjectsByName = objectsByNamePerWorld.get(worldName);
-            if(worldObjectsByName != null)
+            HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetName);
+            if(presetObjectsByName != null)
             {
-	            worldObjectsByName.remove(object.getName().toLowerCase());
-	            if (worldObjectsByName.size() == 0)
+	            presetObjectsByName.remove(object.getName().toLowerCase());
+	            if (presetObjectsByName.size() == 0)
 	            {
-	            	objectsByNamePerWorld.remove(worldName, worldObjectsByName);
+	            	objectsByNamePerPreset.remove(presetName, presetObjectsByName);
 	            }
             }
             
-            ArrayList<CustomObject> worldObjects = objectsPerWorld.get(worldName);
+            ArrayList<CustomObject> worldObjects = objectsPerPreset.get(presetName);
             worldObjects.remove(object);
             if (worldObjects.size() == 0)
             {
-                objectsPerWorld.remove(worldName, worldObjects);
+                objectsPerPreset.remove(presetName, worldObjects);
             }
         } else {
             objectsGlobalObjects.remove(object);
@@ -164,9 +163,9 @@ public class CustomObjectCollection
 	        objectsByNameGlobalObjects.clear();
 	        objectsNotFoundGlobalObjects.clear();
     		
-	        objectsPerWorld.clear();
-	        objectsByNamePerWorld.clear();
-	        objectsNotFoundPerWorld.clear();	
+	        objectsPerPreset.clear();
+	        objectsByNamePerPreset.clear();
+	        objectsNotFoundPerPreset.clear();	
     	}
     }
     
@@ -178,26 +177,26 @@ public class CustomObjectCollection
 	        objectsByNameGlobalObjects.clear();
 	        objectsNotFoundGlobalObjects.clear();
 	
-	        objectsPerWorld.clear();
-	        objectsByNamePerWorld.clear();
-	        objectsNotFoundPerWorld.clear();
+	        objectsPerPreset.clear();
+	        objectsByNamePerPreset.clear();
+	        objectsNotFoundPerPreset.clear();
 	
 	        customObjectFilesGlobalObjects = null;
-	        customObjectFilesPerWorld.clear();
+	        customObjectFilesPerPreset.clear();
     	}
     }
 
-    public ArrayList<String> getAllBONamesForWorld(String worldName)
+    public ArrayList<String> getAllBONamesForPreset(String presetName)
     {
-    	HashMap<String, File> files = customObjectFilesPerWorld.get(worldName);
+    	HashMap<String, File> files = customObjectFilesPerPreset.get(presetName);
     	return files == null ? null : new ArrayList<String>(files.keySet());
     }
     
-    public CustomObject getObjectByName(String name, String worldName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public CustomObject getObjectByName(String name, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	synchronized(indexingFilesLock)
     	{
-    		return getObjectByName(name, worldName, true, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+    		return getObjectByName(name, presetName, true, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     	}
     }
     
@@ -224,30 +223,30 @@ public class CustomObjectCollection
     	}
     }
     
-    void indexWorldObjectsFolder(String worldName, boolean spawnLog, ILogger logger, Path otgRootFolder)
+    void indexPresetObjectsFolder(String presetName, boolean spawnLog, ILogger logger, Path otgRootFolder)
     {
     	synchronized(indexingFilesLock)
     	{
-	        if (worldName != null && !customObjectFilesPerWorld.containsKey(worldName))
+	        if (presetName != null && !customObjectFilesPerPreset.containsKey(presetName))
 	        {
-	        	logger.log(LogMarker.INFO, "Indexing Objects folder for world " + worldName);
-	            HashMap<String, File> worldCustomObjectFiles = new HashMap<String, File>();
-	            customObjectFilesPerWorld.put(worldName, worldCustomObjectFiles);
-	            if (worldName != null)
+	        	logger.log(LogMarker.INFO, "Indexing Objects folder for preset " + presetName);
+	            HashMap<String, File> presetCustomObjectFiles = new HashMap<String, File>();
+	            customObjectFilesPerPreset.put(presetName, presetCustomObjectFiles);
+	            if (presetName != null)
 	            {
 	            	// TODO: Rename folders
 	            	String objectsFolderName = 
-            			new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + Constants.WORLD_OBJECTS_FOLDER).exists() ? Constants.WORLD_OBJECTS_FOLDER :
-        				new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + Constants.LEGACY_WORLD_OBJECTS_FOLDER).exists() ? Constants.LEGACY_WORLD_OBJECTS_FOLDER : null
+            			new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetName + File.separator + Constants.WORLD_OBJECTS_FOLDER).exists() ? Constants.WORLD_OBJECTS_FOLDER :
+        				new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetName + File.separator + Constants.LEGACY_WORLD_OBJECTS_FOLDER).exists() ? Constants.LEGACY_WORLD_OBJECTS_FOLDER : null
 					;	            	
 	            	if(objectsFolderName != null)
 	            	{
 	            		indexAllCustomObjectFilesInDir(
-                		new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + worldName + File.separator + objectsFolderName),
-                        worldCustomObjectFiles, spawnLog, logger);
+                		new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetName + File.separator + objectsFolderName),
+                        presetCustomObjectFiles, spawnLog, logger);
 	            	}
 	            }
-	            logger.log(LogMarker.INFO, "Objects folder for world " + worldName + " indexed.");
+	            logger.log(LogMarker.INFO, "Objects folder for preset " + presetName + " indexed.");
 	        }
     	}
     }
@@ -258,45 +257,39 @@ public class CustomObjectCollection
      * @param name Name of the object.
      * @return The object, or null if not found.
      */
-    private CustomObject getObjectByName(String name, String worldName, boolean searchGlobalObjects, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private CustomObject getObjectByName(String name, String presetName, boolean searchGlobalObjects, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	synchronized(indexingFilesLock)
     	{
-	        worldName = worldName == null ? null : presetNameProvider.getPresetName(worldName);
-	        // OTG.log(LogMarker.INFO, "getObjectByName " + worldName != null ? worldName : "");
+	        // OTG.log(LogMarker.INFO, "getObjectByName " + presetName != null ? presetName : "");
 	
 	        CustomObject object = null;
 	
 	        // Check if the object has been cached
 	
-	        if (worldName != null)
+	        if (presetName != null)
 	        {
-	            if (worldName.equals("overworld"))
+	            HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetName);
+	            if (presetObjectsByName != null)
 	            {
-	                worldName = presetNameProvider.getPresetName("overworld");
-	            }
-	
-	            HashMap<String, CustomObject> worldObjectsByName = objectsByNamePerWorld.get(worldName);
-	            if (worldObjectsByName != null)
-	            {
-	                object = worldObjectsByName.get(name.toLowerCase());
+	                object = presetObjectsByName.get(name.toLowerCase());
 	            }
 	        }
 	
-	        boolean bSearchedWorldObjects = false;
+	        boolean bSearchedPresetObjects = false;
 	
-	        if (object == null && worldName != null)
+	        if (object == null && presetName != null)
 	        {
-	            ArrayList<String> worldObjectsNotFoundByName = objectsNotFoundPerWorld.get(worldName);
-	            if (worldObjectsNotFoundByName != null && worldObjectsNotFoundByName.contains(name.toLowerCase()))
+	            ArrayList<String> presetObjectsNotFoundByName = objectsNotFoundPerPreset.get(presetName);
+	            if (presetObjectsNotFoundByName != null && presetObjectsNotFoundByName.contains(name.toLowerCase()))
 	            {
 	            	// TODO: If a user adds a new object while the game is running, it won't be picked up, even when developermode:true.
-	                bSearchedWorldObjects = true;
+	                bSearchedPresetObjects = true;
 	            }
 	        }
 	
-	        // Only check the GlobalObjects if the WorldObjects directory has already been searched
-	        if (object == null && searchGlobalObjects && (worldName == null || bSearchedWorldObjects))
+	        // Only check the GlobalObjects if the preset's Objects directory has already been searched
+	        if (object == null && searchGlobalObjects && (presetName == null || bSearchedPresetObjects))
 	        {
 	            object = objectsByNameGlobalObjects.get(name.toLowerCase());
 	        }
@@ -326,36 +319,36 @@ public class CustomObjectCollection
 	            bSearchedGlobalObjects = true;
 	        }
 	
-	        if ((!searchGlobalObjects || bSearchedGlobalObjects) && (worldName == null || bSearchedWorldObjects))
+	        if ((!searchGlobalObjects || bSearchedGlobalObjects) && (presetName == null || bSearchedPresetObjects))
 	        {
 	            return null;
 	        }
 	
-	        // Index GlobalObjects and WorldObjects directories
+	        // Index GlobalObjects and preset's Objects directories
 	
 	        indexGlobalObjectsFolder(spawnLog, logger, otgRootFolder);
-	        indexWorldObjectsFolder(worldName, spawnLog, logger, otgRootFolder);
+	        indexPresetObjectsFolder(presetName, spawnLog, logger, otgRootFolder);
 	
-	        // Search WorldObjects
+	        // Search preset Objects
 	
-	        if (worldName != null && !bSearchedWorldObjects)
+	        if (presetName != null && !bSearchedPresetObjects)
 	        {
-	            HashMap<String, File> worldCustomObjectFiles = customObjectFilesPerWorld.get(worldName);
-	            if (worldCustomObjectFiles != null)
+	            HashMap<String, File> presetCustomObjectFiles = customObjectFilesPerPreset.get(presetName);
+	            if (presetCustomObjectFiles != null)
 	            {
-	                File searchForFile = worldCustomObjectFiles.get(name.toLowerCase());
+	                File searchForFile = presetCustomObjectFiles.get(name.toLowerCase());
 	                if (searchForFile != null)
 	                {
-	                    object = loadObject(searchForFile, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+	                    object = loadObject(searchForFile, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	                    if (object != null)
 	                    {
-	                        HashMap<String, CustomObject> worldObjectsByName = objectsByNamePerWorld.get(worldName);
-	                        if (worldObjectsByName == null)
+	                        HashMap<String, CustomObject> presetObjectsByName = objectsByNamePerPreset.get(presetName);
+	                        if (presetObjectsByName == null)
 	                        {
-	                            worldObjectsByName = new HashMap<String, CustomObject>();
-	                            objectsByNamePerWorld.put(worldName, worldObjectsByName);
+	                            presetObjectsByName = new HashMap<String, CustomObject>();
+	                            objectsByNamePerPreset.put(presetName, presetObjectsByName);
 	                        }
-	                        worldObjectsByName.put(name.toLowerCase(), object);
+	                        presetObjectsByName.put(name.toLowerCase(), object);
 	                        return object;
 	                    } else {
 	                        if (spawnLog)
@@ -369,13 +362,13 @@ public class CustomObjectCollection
 	            }
 	
 	            // Not found
-	            ArrayList<String> worldObjectsNotFound = objectsNotFoundPerWorld.get(worldName);
-	            if (worldObjectsNotFound == null)
+	            ArrayList<String> presetObjectsNotFound = objectsNotFoundPerPreset.get(presetName);
+	            if (presetObjectsNotFound == null)
 	            {
-	                worldObjectsNotFound = new ArrayList<String>();
-	                objectsNotFoundPerWorld.put(worldName, worldObjectsNotFound);
+	                presetObjectsNotFound = new ArrayList<String>();
+	                objectsNotFoundPerPreset.put(presetName, presetObjectsNotFound);
 	            }
-	            worldObjectsNotFound.add(name.toLowerCase());
+	            presetObjectsNotFound.add(name.toLowerCase());
 	        }
 	
 	        // Search GlobalObjects
@@ -393,7 +386,7 @@ public class CustomObjectCollection
 	
 	            if (searchForFile != null)
 	            {
-	                object = loadObject(searchForFile, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+	                object = loadObject(searchForFile, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	
 	                if (object != null)
 	                {
@@ -403,8 +396,7 @@ public class CustomObjectCollection
 	                {
 	                    if (spawnLog)
 	                    {
-	                        logger.log(LogMarker.WARN,
-	                                "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
+	                        logger.log(LogMarker.WARN, "Could not load BO2/BO3, it probably contains errors: " + searchForFile);
 	                    }
 	                    return null;
 	                }
@@ -417,7 +409,7 @@ public class CustomObjectCollection
 	        if (spawnLog)
 	        {
 	            logger.log(LogMarker.WARN,
-	                    "Could not find BO2/BO3 " + name + " in GlobalObjects " + (worldName != null ? "and WorldObjects" : "") + " directory " + (worldName != null ? "for world " + worldName : "") + ".");
+	                    "Could not find BO2/BO3 " + name + " in GlobalObjects " + (presetName != null ? "and Objects" : "") + " directory " + (presetName != null ? "for preset " + presetName : "") + ".");
 	        }
 	
 	        return null;

@@ -27,7 +27,6 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
@@ -172,12 +171,12 @@ public class CustomStructurePlotter
 	}
 
     // Only used by ObjectSpawner
-	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void spawnBO4Chunk(ChunkCoordinate chunkCoordinate, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		BO4CustomStructure structureStart = getFromStructureCache(chunkCoordinate);
 		if (structureStart != null && structureStart.start != null)
 		{
-			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, chunkBeingPopulated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+			structureStart.spawnInChunk(chunkCoordinate, structureCache, worldGenRegion, chunkBeingPopulated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 		} else {
 			// TODO: When can structure.start be null? Should only be possible for bo3 structures?
 			if(structureStart != null && structureStart.start == null)
@@ -197,15 +196,15 @@ public class CustomStructurePlotter
 	}
 
     // Only used by ObjectSpawner during population
-	public BO4CustomStructure plotStructures(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public BO4CustomStructure plotStructures(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		return plotStructures(null, null, structureCache, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+		return plotStructures(null, null, structureCache, worldGenRegion, rand, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	// Used by ObjectSpawner during population and /otg spawn. targetStructure and targetBiomes only used for /spawn (make that prettier?)
-	public BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		return plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, chunkCoord, false, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+		return plotStructures(targetStructure, targetBiomes, structureCache, worldGenRegion, rand, chunkCoord, false, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 	
 	private int getStructureCount()
@@ -224,7 +223,7 @@ public class CustomStructurePlotter
 		this.plottedChunksFastCache.put(chunkCoord, null);
 	}
 	
-	private BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private BO4CustomStructure plotStructures(BO4 targetStructure, ArrayList<String> targetBiomes, CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random rand, ChunkCoordinate chunkCoord, boolean spawningStructureAtSpawn, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
 		// Make sure the BO4 at spawn is plotted before anything else
 		// This isn't thread-safe so there's a race condition, shouldn't 
@@ -295,7 +294,7 @@ public class CustomStructurePlotter
 	        		for(ICustomStructureGen structureGen : customStructureGens)
 	        		{
 	        			int i = 0;
-	        			for(IStructuredCustomObject structure : structureGen.getObjects(worldGenRegion.getWorldName(), otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker))
+	        			for(IStructuredCustomObject structure : structureGen.getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 	        			{
 	        				if(structure != null) // Structure was in resource list but file could not be found. TODO: Make this prettier!
 	        				{
@@ -328,11 +327,11 @@ public class CustomStructurePlotter
 		            		if(!((BO4)bo4AndRarity.getKey()).isInvalidConfig && ((BO4)bo4AndRarity.getKey()).getConfig().isSpawnPoint)
 		            		{
 			            		structuresToSpawn1.add(bo4AndRarity.getKey().getName());
-			                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getWorldName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
-			                	structureStart2 = new BO4CustomStructure(worldGenRegion.getSeed(), structureCoord, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+			                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
+			                	structureStart2 = new BO4CustomStructure(worldGenRegion.getSeed(), structureCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 			                	// Get minimum size (size if spawned with branchDepth 0)
 			                	try {
-			                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(structureCache, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+			                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(structureCache, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
 			                		bo4sBySize.add(new Object[]{ bo4AndRarity.getKey(), topLeftAndLowerRightChunkCoordinates, BO3size, bo4AndRarity.getValue() });
 								}
@@ -361,11 +360,11 @@ public class CustomStructurePlotter
 		            			if(isBO4AllowedToSpawnAtByFrequency(chunkCoord, ((BO4)bo4AndRarity.getKey())))
 		            			{
 				            		structuresToSpawn1.add(bo4AndRarity.getKey().getName());
-				                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getWorldName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
-				                	structureStart2 = new BO4CustomStructure(worldGenRegion.getSeed(), structureCoord, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+				                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetName(), bo4AndRarity.getKey(), null, Rotation.NORTH, chunkCoord.getBlockX(), (short)0, chunkCoord.getBlockZ(), 0, false, false, null);
+				                	structureStart2 = new BO4CustomStructure(worldGenRegion.getSeed(), structureCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				                	// Get minimum size (size if spawned with branchDepth 0)
 				                	try {
-				                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(structureCache, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+				                		Object[] topLeftAndLowerRightChunkCoordinates = structureStart2.getMinimumSize(structureCache, worldGenRegion, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 					                	double BO3size = Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[0] - -(Integer)topLeftAndLowerRightChunkCoordinates[2]) * Math.abs((Integer)topLeftAndLowerRightChunkCoordinates[1] - -(Integer)topLeftAndLowerRightChunkCoordinates[3]);
 					            		int insertAtIndex = bo4sBySize.size();
 					            		int i = 0;
@@ -900,14 +899,14 @@ public class CustomStructurePlotter
 					                							                	
 				                		if(isBO4AllowedToSpawnAtByFrequency(spawnChunk, (BO4)currentStructureSpawning[0]))
 				                		{
-						                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getWorldName(), ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
-						                	structureStart2 = new BO4CustomStructure(structureCache, worldGenRegion, structureCoord, spawningStructureAtSpawn, targetBiomes, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+						                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetName(), ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
+						                	structureStart2 = new BO4CustomStructure(structureCache, worldGenRegion, structureCoord, spawningStructureAtSpawn, targetBiomes, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
 				            	        	if(structureStart2.IsSpawned)
 						                	{
 				            	        		structureCache.addBo4ToStructureCache(spawnChunk, structureStart2);
 
-				            	        		BO4 structureCoordConfig = ((BO4)structureCoord.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker));
+				            	        		BO4 structureCoordConfig = ((BO4)structureCoord.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker));
 				            	        		
 				            	        		structureCoordConfig.getConfig().timesSpawned += 1;
 						                		if(spawnLog)

@@ -19,7 +19,6 @@ import com.pg85.otg.util.interfaces.ICustomObjectResourcesManager;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
@@ -66,7 +65,7 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
 	}
     
     @Override
-    public List<IStructuredCustomObject> getObjects(String worldName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public List<IStructuredCustomObject> getObjects(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, ICustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	List<IStructuredCustomObject> objects = new ArrayList<>();
     	if(!objectNames.isEmpty())
@@ -75,7 +74,7 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
             {
             	// TODO: Re-wire this so we don't have to cast CustomObjectManager/CustomObjectResourcesManager :(
             	// TODO: Remove any dependency on common-customobjects, interfaces only?
-            	CustomObject object = ((CustomObjectManager)customObjectManager).getGlobalObjects().getObjectByName(objectNames.get(i), worldName, otgRootFolder, spawnLog, logger, (CustomObjectManager)customObjectManager, presetNameProvider, materialReader, (CustomObjectResourcesManager)manager, modLoadedChecker);
+            	CustomObject object = ((CustomObjectManager)customObjectManager).getGlobalObjects().getObjectByName(objectNames.get(i), presetName, otgRootFolder, spawnLog, logger, (CustomObjectManager)customObjectManager, materialReader, (CustomObjectResourcesManager)manager, modLoadedChecker);
             	objects.add((StructuredCustomObject) object);
             }
     	}
@@ -90,7 +89,7 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
 
     // Only used for BO3 CustomStructure
     @Override
-    protected void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    protected void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         // Find all structures that reach this chunk, and spawn them
         int searchRadius = worldGenRegion.getWorldConfig().getMaximumCustomStructureRadius();
@@ -101,29 +100,29 @@ public class CustomStructureGen extends CustomObjectResource implements ICustomS
         {
             for (int searchChunkZ = currentChunkZ - searchRadius; searchChunkZ < currentChunkZ + searchRadius; searchChunkZ++)
             {
-            	BO3CustomStructure structureStart = structureCache.getBo3StructureStart(worldGenRegion, random, searchChunkX, searchChunkZ, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+            	BO3CustomStructure structureStart = structureCache.getBo3StructureStart(worldGenRegion, random, searchChunkX, searchChunkZ, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
                 if (structureStart != null)
                 {
-                	structureStart.spawnInChunk(structureCache, worldGenRegion, chunkBeingPopulated, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+                	structureStart.spawnInChunk(structureCache, worldGenRegion, chunkBeingPopulated, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
                 }
             }
         }
     }
 
-    public BO3CustomStructureCoordinate getRandomObjectCoordinate(IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public BO3CustomStructureCoordinate getRandomObjectCoordinate(IWorldGenRegion worldGenRegion, Random random, int chunkX, int chunkZ, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         if (objectNames.isEmpty())
         {
             return null;
         }
-        for (int objectNumber = 0; objectNumber < getObjects(worldGenRegion.getWorldName(), otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker).size(); objectNumber++)
+        for (int objectNumber = 0; objectNumber < getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).size(); objectNumber++)
         {
             if (random.nextDouble() * 100.0 < objectChances.get(objectNumber))
             {
-            	IStructuredCustomObject object = getObjects(worldGenRegion.getWorldName(), otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker).get(objectNumber);
+            	IStructuredCustomObject object = getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker).get(objectNumber);
             	if(object != null && object instanceof BO3) // TODO: How could a BO4 end up here? seen it happen once..
             	{
-            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getWorldName(), random, chunkX, chunkZ);
+            		return (BO3CustomStructureCoordinate)((BO3)object).makeCustomStructureCoordinate(worldGenRegion.getPresetName(), random, chunkX, chunkZ);
             	} else {
             		if(spawnLog)
             		{

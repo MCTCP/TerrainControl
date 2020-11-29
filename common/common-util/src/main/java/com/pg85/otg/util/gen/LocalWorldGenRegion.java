@@ -18,4 +18,9 @@ public abstract class LocalWorldGenRegion implements IWorldGenRegion
 	{
 		return this.worldConfig;
 	}
+	
+	public String getPresetName()
+	{
+		return this.presetName;
+	}
 }

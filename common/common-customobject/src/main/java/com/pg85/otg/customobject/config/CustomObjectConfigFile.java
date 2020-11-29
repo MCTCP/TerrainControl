@@ -9,8 +9,6 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
-
 import java.io.*;
 import java.nio.file.Path;
 
@@ -92,7 +90,7 @@ public abstract class CustomObjectConfigFile
 
     protected abstract void writeConfigSettings(SettingsWriterOTGPlus writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException;
 
-    protected abstract void readConfigSettings(Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException;
+    protected abstract void readConfigSettings(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException;
     
     protected abstract void correctSettings();
 

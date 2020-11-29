@@ -13,7 +13,6 @@ import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.nio.file.Path;
@@ -43,13 +42,13 @@ public class CustomObjectGen extends CustomObjectResource
         }
     }
     
-    private List<CustomObject> getObjects(String worldName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private List<CustomObject> getObjects(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(objects.isEmpty() && !objectNames.isEmpty())
     	{
             for (int i = 0; i < objectNames.size(); i ++)
             {
-            	CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(objectNames.get(i), worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+            	CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(objectNames.get(i), presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
             	objects.add(object);	              	
             }
     	}
@@ -63,9 +62,9 @@ public class CustomObjectGen extends CustomObjectResource
     }
 
     @Override
-    protected void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    protected void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
-        for (CustomObject object : getObjects(worldGenRegion.getWorldName(), otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker))
+        for (CustomObject object : getObjects(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
         {
         	if(object != null) // if null then BO2/BO3 file could not be found
         	{

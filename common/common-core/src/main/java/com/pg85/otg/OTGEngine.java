@@ -19,11 +19,8 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.Logger;
 import com.pg85.otg.presets.LocalPresetLoader;
-import com.pg85.otg.presets.PresetNameProvider;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
-
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,7 +34,6 @@ public abstract class OTGEngine
     private final Logger logger;
     private final IMaterialReader materialReader;
     private final IModLoadedChecker modLoadedChecker;
-    private final IPresetNameProvider presetNameProvider;
 
     private PluginConfig pluginConfig;
     private DimensionsConfig dimensionsConfig;
@@ -54,7 +50,6 @@ public abstract class OTGEngine
         this.presetLoader = presetLoader;
         this.materialReader = materialReader;
         this.modLoadedChecker = modLoadedChecker;
-        this.presetNameProvider = new PresetNameProvider();
     }
     
     void onShutdown()
@@ -159,11 +154,6 @@ public abstract class OTGEngine
 		return this.materialReader;
 	}
 
-	public IPresetNameProvider getPresetNameProvider()
-	{
-		return this.presetNameProvider;
-	}	
-
 	// OTG Configs
 	
     public PluginConfig getPluginConfig()
@@ -214,6 +204,6 @@ public abstract class OTGEngine
 	public CustomStructureCache createCustomStructureCache(String worldName, Path worldSavepath, int dimId, long worldSeed, boolean otgPlus)
 	{
 		// TODO: ModLoadedChecker
-		return new CustomStructureCache(worldName, worldSavepath, dimId, worldSeed, otgPlus, getOTGRootFolder(), getPluginConfig().spawnLog, getLogger(), getCustomObjectManager(), getPresetNameProvider(), getMaterialReader(), getCustomObjectResourcesManager(), null);
+		return new CustomStructureCache(worldName, worldSavepath, dimId, worldSeed, otgPlus, getOTGRootFolder(), getPluginConfig().spawnLog, getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
 	}
 }

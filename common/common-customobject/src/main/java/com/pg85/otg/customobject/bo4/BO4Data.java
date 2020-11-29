@@ -13,7 +13,6 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 
 public class BO4Data
 {
@@ -30,7 +29,7 @@ public class BO4Data
         return file.exists();
     }
     
-    public static void generateBO4Data(BO4Config config, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public static void generateBO4Data(BO4Config config, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         //write to disk
 		String filePath = 
@@ -46,7 +45,7 @@ public class BO4Data
             try {
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				DataOutputStream dos = new DataOutputStream(bos);
-				config.writeToStream(dos, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+				config.writeToStream(dos, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 				byte[] compressedBytes = com.pg85.otg.util.CompressionUtils.compress(bos.toByteArray(), spawnLog, logger);
 				dos.close();
 				FileOutputStream fos = new FileOutputStream(file);

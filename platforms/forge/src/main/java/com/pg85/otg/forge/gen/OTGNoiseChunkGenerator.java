@@ -17,7 +17,6 @@ import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.OTGChunkPopulator;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -104,7 +103,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	public void saveStructureCache()
 	{
-    	OTG.log(LogMarker.INFO, "ForgeEngine onSave");
 		if(this.chunkPopulator.getIsSaveRequired())
 		{
 			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().spawnLog, OTG.getEngine().getLogger(), this.chunkPopulator);
@@ -179,7 +177,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if(!isInitialised)
 		{
 			isInitialised = true;
-			// TODO: ModLoadedCheckProvider
 			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus());
 			OTG.getEngine().createDimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName, this.dimensionConfig);
 		}

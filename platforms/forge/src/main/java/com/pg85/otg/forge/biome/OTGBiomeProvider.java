@@ -57,7 +57,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		this.legacyBiomeInitLayer = legacyBiomeInitLayer;
 		this.largeBiomes = largeBiomes;
 		this.registry = registry;
-		this.layer = BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetName));
+		this.layer = BiomeLayers.create(seed, ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getPresetGenerationData().get(presetName), OTG.getEngine().getLogger());
 		this.keyLookup = new Int2ObjectOpenHashMap<>();
 
 		// Default to let us know if we did anything wrong

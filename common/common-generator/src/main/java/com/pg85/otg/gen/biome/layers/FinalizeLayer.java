@@ -16,7 +16,7 @@ class FinalizeLayer implements ParentedLayer
         if ((sample & BiomeLayers.LAND_BIT) != 0)
         {
        		sample = sample & BiomeLayers.BIOME_BITS;	
-        } else { 
+        } else {
         	// TODO: Ocean/FrozenOcean based on ICE_BIT and worldConfig.frozenOcean.
         	// This will work for backwards compatibility, but will need to be 
         	// re-designed for the new ocean biomes?

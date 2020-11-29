@@ -37,7 +37,6 @@ import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
@@ -73,7 +72,7 @@ public class BO3 implements StructuredCustomObject
     }
 
     @Override
-    public boolean onEnable(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public boolean onEnable(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(this.isInvalidConfig)
     	{
@@ -85,7 +84,7 @@ public class BO3 implements StructuredCustomObject
     	}
         try
         {
-            this.settings = new BO3Config(new FileSettingsReaderOTGPlus(this.name, this.file, logger), otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+            this.settings = new BO3Config(new FileSettingsReaderOTGPlus(this.name, this.file, logger), presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
             if (this.settings.settingsMode != ConfigMode.WriteDisable)
             {
                 FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode, spawnLog, logger, materialReader, manager);
@@ -471,7 +470,7 @@ public class BO3 implements StructuredCustomObject
             	structureCache.addBo3ToStructureCache(structureCoord, structure, true);
             }
         } else {
-            CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(worldGenRegion.getWorldName(), this, this.getName(), Rotation.NORTH, x, (short) 0, z));
+            CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(worldGenRegion.getPresetName(), this, this.getName(), Rotation.NORTH, x, (short) 0, z));
             placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
             placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);
             placeHolderStructure.spawnerManager.spawnerData.addAll(newSpawnerDataInObject);
@@ -547,11 +546,11 @@ public class BO3 implements StructuredCustomObject
         return MathHelper.clamp(offset + variance, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1);
     }
     
-    public CustomStructureCoordinate makeCustomStructureCoordinate(String worldName, Random random, int chunkX, int chunkZ)
+    public CustomStructureCoordinate makeCustomStructureCoordinate(String presetName, Random random, int chunkX, int chunkZ)
     {
         Rotation rotation = this.settings.rotateRandomly ? Rotation.getRandomRotation(random) : Rotation.NORTH;
         int height = RandomHelper.numberInRange(random, this.settings.minHeight, this.settings.maxHeight);
-        return new BO3CustomStructureCoordinate(worldName, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
+        return new BO3CustomStructureCoordinate(presetName, this, this.getName(), rotation, chunkX * 16 + 8 + random.nextInt(16), (short)height, chunkZ * 16 + 7 + random.nextInt(16));
     }
 
 	@Override

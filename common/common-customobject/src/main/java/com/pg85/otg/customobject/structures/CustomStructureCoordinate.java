@@ -6,7 +6,6 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IStructuredCustomObject;
 
 import java.nio.file.Path;
@@ -21,7 +20,7 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 public abstract class CustomStructureCoordinate
 {
 	public String bo3Name;
-	public String worldName;
+	public String presetName;
 	
     protected transient IStructuredCustomObject object;
     public Rotation rotation;
@@ -66,11 +65,11 @@ public abstract class CustomStructureCoordinate
      *
      * @return The object.
      */
-    public IStructuredCustomObject getObject(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public IStructuredCustomObject getObject(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(object == null)
     	{
-    		CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+    		CustomObject object = customObjectManager.getGlobalObjects().getObjectByName(this.bo3Name, this.presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
     		if(object == null || !(object instanceof StructuredCustomObject))
     		{

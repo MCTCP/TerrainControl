@@ -23,7 +23,6 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -50,7 +49,7 @@ public class SmoothingAreaGenerator
     // *SmoothStartTop:true can be used to make smoothing area lines start at the highest block in each column that has a no neighbouring (non-air) block on one of 
     // four sides, instead of all blocks at y 0 in the bo4.
     // *Settings like SpawnUnderWater can be used to make smoothing areas place underwater and fill with water up to biome waterlevel where necessary.
-	public void calculateSmoothingAreas(Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate start, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	public void calculateSmoothingAreas(Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate start, IWorldGenRegion worldGenRegion, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         // TODO: Don't check neighbouring BO4's with SmoothRadius -1
 
@@ -70,7 +69,7 @@ public class SmoothingAreaGenerator
         int normalizedNeigbouringBlockY;
         int normalizedNeigbouringBlockZ;
         BO4 bO3InChunk;
-        boolean SmoothStartTop;
+        boolean smoothStartTop;
         int smoothRadius;
         BO4BlockFunction[][] heightMap;
         BO4BlockFunction block;
@@ -83,7 +82,7 @@ public class SmoothingAreaGenerator
         CustomStructureCoordinate blockCoords;
         Object[] smoothDirections;
         
-        BO4 startBO4 = ((BO4)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker));
+        BO4 startBO4 = ((BO4)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker));
         BO4Config startBO4Config = startBO4.getConfig();
         
         // Get all BO4's that are a part of this branching structure
@@ -101,8 +100,8 @@ public class SmoothingAreaGenerator
             		continue;
             	}
 
-            	bO3InChunk = ((BO4)objectInChunk.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker));
-            	SmoothStartTop = startBO4Config.overrideChildSettings && bO3InChunk.getConfig().overrideChildSettings ? startBO4Config.smoothStartTop : bO3InChunk.getConfig().smoothStartTop;
+            	bO3InChunk = ((BO4)objectInChunk.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker));
+            	smoothStartTop = startBO4Config.overrideChildSettings && bO3InChunk.getConfig().overrideChildSettings ? startBO4Config.smoothStartTop : bO3InChunk.getConfig().smoothStartTop;
                 smoothRadius = startBO4Config.overrideChildSettings && bO3InChunk.getConfig().overrideChildSettings && bO3InChunk.getConfig().smoothRadius == -1 ? -1 : startBO4Config.smoothRadius;
                 if(smoothRadius == -1 || bO3InChunk.getConfig().smoothRadius == -1)
                 {
@@ -110,7 +109,7 @@ public class SmoothingAreaGenerator
                 }
                 if(smoothRadius > 0)
                 {
-        			heightMap = bO3InChunk.getConfig().getSmoothingHeightMap(startBO4, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+        			heightMap = bO3InChunk.getConfig().getSmoothingHeightMap(startBO4, worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
                     // if !SmoothStartTop then for each BO3 that has a smoothradius > 0 get the lowest layer of blocks and determine smooth area starting points
                 	// if SmoothStartTop then for each BO3 that has a smoothradius > 0 get the highest blocks of the BO4 and determine smooth area starting points
@@ -159,7 +158,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    bFoundNeighbour1 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+                                    bFoundNeighbour1 = findNeighbouringBlock(smoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
                                 }
                                 if(!bFoundNeighbour2 && block.x + 1 > 15)
                                 {
@@ -170,7 +169,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    bFoundNeighbour2 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+                                    bFoundNeighbour2 = findNeighbouringBlock(smoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
                                 }
                                 if(!bFoundNeighbour3 && block.z - 1 < 0)
                                 {
@@ -181,7 +180,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    bFoundNeighbour3 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+                                    bFoundNeighbour3 = findNeighbouringBlock(smoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
                                 }
                                 if(!bFoundNeighbour4 && block.z + 1 > 15)
                                 {
@@ -192,7 +191,7 @@ public class SmoothingAreaGenerator
                                     normalizedNeigbouringBlockY = neighbouringBlockCoords.getY() + objectInChunk.getY();
                                     normalizedNeigbouringBlockZ = neighbouringBlockCoords.getZ() + (objectInChunk.getZ());
 
-                                    bFoundNeighbour4 = findNeighbouringBlock(SmoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+                                    bFoundNeighbour4 = findNeighbouringBlock(smoothStartTop, normalizedNeigbouringBlockX, normalizedNeigbouringBlockY, normalizedNeigbouringBlockZ, objectsToSpawn, objectInChunk, start, worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
                                 }
 
                                 // Only blocks that have air blocks or no blocks as neighbours should be part of the smoothing area
@@ -321,9 +320,9 @@ public class SmoothingAreaGenerator
 	
 	// Checks if the block has any neighbouring blocks, if not it's a smoothing line start point	
 
-	private boolean findNeighbouringBlock(boolean SmoothStartTop, int normalizedNeigbouringBlockX, int normalizedNeigbouringBlockY, int normalizedNeigbouringBlockZ, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate objectInChunk, BO4CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	private boolean findNeighbouringBlock(boolean SmoothStartTop, int normalizedNeigbouringBlockX, int normalizedNeigbouringBlockY, int normalizedNeigbouringBlockZ, Map<ChunkCoordinate, Stack<BO4CustomStructureCoordinate>> objectsToSpawn, BO4CustomStructureCoordinate objectInChunk, BO4CustomStructureCoordinate start, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
-		BO4 startBO4 = (BO4)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+		BO4 startBO4 = (BO4)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
         // Get the chunk that the neighbouring block is in
         ChunkCoordinate neighbouringBlockChunk = null;
         ChunkCoordinate searchTarget = ChunkCoordinate.fromBlockCoords(normalizedNeigbouringBlockX, normalizedNeigbouringBlockZ);
@@ -353,7 +352,7 @@ public class SmoothingAreaGenerator
                     if(bO3ToCheck != objectInChunk)
                     {
                         // Now find the actual block
-                    	neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker)).getConfig().getSmoothingHeightMap(startBO4, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+                    	neighbouringBO3HeightMap = ((BO4)bO3ToCheck.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig().getSmoothingHeightMap(startBO4, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
                     	for(int x = 0; x < 16; x++)
                     	{
@@ -370,7 +369,7 @@ public class SmoothingAreaGenerator
 		                            if(normalizedNeigbouringBlockX == normalizedBlockToCheckX && (normalizedNeigbouringBlockY == normalizedBlockToCheckY || SmoothStartTop) && normalizedNeigbouringBlockZ == normalizedBlockToCheckZ)
 		                            {
 		                                // Neighbouring block found
-		                            	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker))
+		                            	if(isMaterialSmoothingAnchor(blockToCheck, bO3ToCheck, start, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker))
 		                                {
 		                                    return true;
 		                                }
@@ -386,10 +385,10 @@ public class SmoothingAreaGenerator
 	}
 	
 	// Checks if a given block has a material that is viable as a smoothing area line start point.
-    private boolean isMaterialSmoothingAnchor(BO4BlockFunction blockToCheck, CustomStructureCoordinate bO3ToCheck, CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private boolean isMaterialSmoothingAnchor(BO4BlockFunction blockToCheck, CustomStructureCoordinate bO3ToCheck, CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
-    	BO4Config startBO4Config = ((BO4)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker)).getConfig();
-    	BO4Config bo4ToCheckConfig = ((BO4)bO3ToCheck.getObject(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker)).getConfig();
+    	BO4Config startBO4Config = ((BO4)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig();
+    	BO4Config bo4ToCheckConfig = ((BO4)bO3ToCheck.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker)).getConfig();
 		boolean isSmoothAreaAnchor = false;
 		if(blockToCheck instanceof BO4RandomBlockFunction)
 		{

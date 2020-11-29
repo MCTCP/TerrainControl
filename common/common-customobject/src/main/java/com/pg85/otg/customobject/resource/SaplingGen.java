@@ -12,7 +12,6 @@ import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.SaplingType;
@@ -44,11 +43,10 @@ public class SaplingGen extends ConfigFunction<IBiomeConfig>
     private List<Double> treeChances;
     private List<String> treeNames;
     private List<CustomObject> trees;
-    private String worldName;
     private String biomeName;
     private boolean treesLoaded = false;
     
-    public SaplingGen(String worldName, IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
+    public SaplingGen(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
     {
         assureSize(3, args);
 
@@ -97,9 +95,9 @@ public class SaplingGen extends ConfigFunction<IBiomeConfig>
         }
     }
 
-    private static CustomObject getTreeObject(String objectName, String worldName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+    private static CustomObject getTreeObject(String objectName, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
-        CustomObject maybeTree = customObjectManager.getGlobalObjects().getObjectByName(objectName, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+        CustomObject maybeTree = customObjectManager.getGlobalObjects().getObjectByName(objectName, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
         if (maybeTree == null)
         {
             throw new InvalidConfigException("Unknown object " + objectName);
@@ -148,9 +146,9 @@ public class SaplingGen extends ConfigFunction<IBiomeConfig>
      *                   the trunk.
      * @return Whether a tree was grown.
      */
-    public boolean growSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean isWideTree, int x, int y, int z, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public boolean growSapling(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean isWideTree, int x, int y, int z, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
-    	loadTreeObjects(otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+    	loadTreeObjects(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     	
         for (int treeNumber = 0; treeNumber < trees.size(); treeNumber++)
         {
@@ -179,7 +177,7 @@ public class SaplingGen extends ConfigFunction<IBiomeConfig>
         return false;
     }
 
-    private void loadTreeObjects(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private void loadTreeObjects(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(!this.treesLoaded)
     	{
@@ -189,7 +187,7 @@ public class SaplingGen extends ConfigFunction<IBiomeConfig>
     		{
     			CustomObject tree;
 				try {
-					tree = getTreeObject(treeName, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+					tree = getTreeObject(treeName, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	    			this.trees.add(tree);
 				} catch (InvalidConfigException e) {
 					this.trees.add(null);

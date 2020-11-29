@@ -12,8 +12,6 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
-
 import java.nio.file.Path;
 import java.util.*;
 
@@ -23,7 +21,7 @@ import java.util.*;
  */
 public class BO3BranchFunction extends BranchFunction<BO3Config>
 {	
-    public BO3BranchFunction rotate(Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public BO3BranchFunction rotate(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         BO3BranchFunction rotatedBranch = new BO3BranchFunction();
         rotatedBranch.x = z;
@@ -34,7 +32,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
         rotatedBranch.totalChanceSet = totalChanceSet;
         for (BranchNode holder : this.branches)
         {
-            rotatedBranch.branches.add(new BranchNode(holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, null, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker), holder.customObjectName));
+            rotatedBranch.branches.add(new BranchNode(holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), holder.customObjectName));
         }
         return rotatedBranch;
     }
@@ -75,7 +73,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
      * should spawn. Returns null if no branch passes the check.
      */
     @Override
-    public CustomStructureCoordinate toCustomObjectCoordinate(String worldName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public CustomStructureCoordinate toCustomObjectCoordinate(String presetName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         for (Iterator<BranchNode> it = branches.iterator(); it.hasNext();)
         {
@@ -84,7 +82,7 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
             double randomChance = random.nextDouble() * totalChance;
             if (randomChance < branch.getChance())
             {
-                return new BO3CustomStructureCoordinate(worldName, branch.getCustomObject(false, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
+                return new BO3CustomStructureCoordinate(presetName, branch.getCustomObject(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), branch.customObjectName, branch.getRotation(), x + this.x, (short)(y + this.y), z + this.z);
             }
         }
         return null;

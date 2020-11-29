@@ -14,8 +14,6 @@ import com.pg85.otg.util.helpers.StreamHelper;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
-
 import java.io.DataOutput;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -39,7 +37,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
     	this.holder = holder;
     }
     
-    public BO4BranchFunction rotate(Rotation rotation, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public BO4BranchFunction rotate(Rotation rotation, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	BO4BranchFunction rotatedBranch = new BO4BranchFunction(this.getHolder());
 
@@ -76,7 +74,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
             ArrayList<BO4BranchNode> rotatedBranchBranches = new ArrayList<BO4BranchNode>();
             for (BO4BranchNode holder : rotatedBranch.branchesOTGPlus)
             {
-            	rotatedBranchBranches.add(new BO4BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, null, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker), holder.customObjectName, holder.branchGroup));
+            	rotatedBranchBranches.add(new BO4BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), holder.customObjectName, holder.branchGroup));
             }
             rotatedBranch.branchesOTGPlus = rotatedBranchBranches;
     	}
@@ -190,7 +188,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
      * should spawn. Returns null if no branch passes the check.
      */
     @Override
-    public CustomStructureCoordinate toCustomObjectCoordinate(String worldName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public CustomStructureCoordinate toCustomObjectCoordinate(String presetName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         for (Iterator<BO4BranchNode> it = branchesOTGPlus.iterator(); it.hasNext();)
         {
@@ -201,7 +199,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
             {
                 BO4CustomStructureCoordinate rotatedCoords = BO4CustomStructureCoordinate.getRotatedCoord(this.x, this.y, this.z, rotation);
                 Rotation newRotation = Rotation.getRotation((rotation.getRotationId() + branch.getRotation().getRotationId()) % 4);
-                return new BO4CustomStructureCoordinate(worldName, branch.getCustomObject(false, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
+                return new BO4CustomStructureCoordinate(presetName, branch.getCustomObject(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), branch.customObjectName, newRotation, x + rotatedCoords.getX(), (short)(y + rotatedCoords.getY()), z + rotatedCoords.getZ(), branch.branchDepth, branch.isRequiredBranch, branch.isWeightedBranch, branch.branchGroup);
             }
         }
         return null;

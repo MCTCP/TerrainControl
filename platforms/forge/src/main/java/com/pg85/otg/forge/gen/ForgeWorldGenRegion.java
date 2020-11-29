@@ -34,7 +34,6 @@ import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.storage.IServerWorldInfo;
 import net.minecraft.world.gen.WorldGenRegion;
 
 class ForgeWorldGenRegion extends LocalWorldGenRegion
@@ -52,13 +51,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 		this.worldGenRegion = worldGenRegion;
 		this.chunkGenerator = chunkGenerator;
 	}
-
-	@Override
-	public String getWorldName()
-	{
-		return ((IServerWorldInfo)this.worldGenRegion.getWorldInfo()).getWorldName();
-	}
-	
+		
 	@Override
 	public long getSeed()
 	{

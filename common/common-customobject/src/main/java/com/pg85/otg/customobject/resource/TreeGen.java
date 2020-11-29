@@ -12,7 +12,6 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.util.interfaces.IPresetNameProvider;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 
 import java.nio.file.Path;
@@ -123,7 +122,7 @@ public class TreeGen extends CustomObjectResource
     }
     
 	// TODO: Could this cause problems for developer mode / flushcache, trees not updating during a session?
-    private void loadTrees(String worldName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    private void loadTrees(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	if(!treesLoaded)
     	{
@@ -147,7 +146,7 @@ public class TreeGen extends CustomObjectResource
 	        	{
 	        		String[] params = treeName.replace(")", "").split("\\(");
 	        		treeName = params[0];
-	        		tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+	        		tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	        		treeObjects[treeNumber] = tree;    		    
 	                if(tree == null)
 	                {
@@ -169,7 +168,7 @@ public class TreeGen extends CustomObjectResource
 	        		    treeObjectMaxChances[treeNumber] = maxHeight;        			
 	    			} catch(NumberFormatException ex) {  }
 	        	} else {
-	        		tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, worldName, otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);                
+	        		tree = customObjectManager.getGlobalObjects().getObjectByName(treeName, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);                
 	    		    treeObjects[treeNumber] = tree;
 	        		if(tree == null)
 	                {
@@ -185,11 +184,11 @@ public class TreeGen extends CustomObjectResource
     }
     
     @Override
-    protected void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    protected void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, Random random, boolean villageInChunk, ChunkCoordinate chunkCoord, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	// TODO: Make sure we stay within population bounds, anything outside won't be spawned (unless it's in an existing chunk).
 
-    	loadTrees(worldGenRegion.getWorldName(), otgRootFolder, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+    	loadTrees(worldGenRegion.getPresetName(), otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
         for (int i = 0; i < frequency; i++)
         {        	
