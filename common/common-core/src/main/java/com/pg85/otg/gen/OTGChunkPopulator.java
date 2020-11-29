@@ -13,6 +13,7 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.IChunkPopulator;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IPresetNameProvider;
@@ -22,10 +23,18 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Random;
 
-public class OTGChunkPopulator
+public class OTGChunkPopulator implements IChunkPopulator
 {
     private final Random rand;
-    private boolean processing = false;
+	// Locking objects / checks to prevent populate running on multiple threads,
+	// or when the world is waiting for an opportunity to save.
+	// TODO: Make this prettier
+    private Object lockingObject = new Object();
+	private boolean populating;
+	private boolean processing = false;
+	private boolean saving;
+	private boolean saveRequired;
+	//
    
     public OTGChunkPopulator()
     {
@@ -34,6 +43,39 @@ public class OTGChunkPopulator
 
     public void populate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
     {
+    	boolean unlockWhenDone = false;
+		// Wait for another thread running SaveToDisk, then place a lock.
+		boolean firstLog = false;
+		while(true)
+		{
+			//OTG.log(LogMarker.INFO, "Populate waiting on SaveToDisk.");
+			synchronized(this.lockingObject)
+			{
+				if(!this.saving)
+				{
+					// If populating then this method is being called recursively (indicating cascading chunk-gen).
+					// This method can be called recursively, but should never be called by two threads at once.
+					// TODO: Make sure that's the case.
+					if(!this.populating)
+					{
+						this.populating = true;
+						unlockWhenDone = true;
+					}
+					break;
+				} else {
+					if(firstLog)
+					{
+						OTG.log(LogMarker.WARN, "Populate waiting on SaveToDisk. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
+						firstLog = false;
+					}
+				}
+			}
+		}
+		synchronized(this.lockingObject)
+		{
+			this.saveRequired = true;
+		}
+		
     	Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
     	boolean developerMode = OTG.getEngine().getPluginConfig().developerMode;
     	boolean spawnLog = OTG.getEngine().getPluginConfig().spawnLog;
@@ -64,6 +106,17 @@ public class OTGChunkPopulator
 			if(developerMode)
 			{			
 				logger.log(LogMarker.INFO, Arrays.toString(Thread.currentThread().getStackTrace()));
+			}
+		}
+		
+		// Release the lock
+		synchronized(this.lockingObject)
+		{
+			// This assumes that this method can only be called alone or recursively, never by 2 threads at once.
+			// TODO: Make sure that's the case.
+			if(unlockWhenDone)
+			{
+				this.populating = false;
 			}
 		}
     }
@@ -151,5 +204,36 @@ public class OTGChunkPopulator
 	private void spawnBO4(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IPresetNameProvider presetNameProvider, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		structureCache.spawnBo4Chunk(worldGenRegion, chunkCoord, chunkBeingPopulated, otgRootFolder, developerMode, spawnLog, logger, customObjectManager, presetNameProvider, materialReader, manager, modLoadedChecker);
+	}
+
+	@Override
+	public boolean getIsSaveRequired()
+	{
+		return this.saveRequired;
+	}
+
+	@Override
+	public boolean isPopulating()
+	{
+		return this.populating;
+	}
+
+	@Override
+	public void beginSave()
+	{
+		this.saving = true;
+	}
+
+	@Override
+	public void endSave()
+	{
+		this.saveRequired = false;
+		this.saving = false;
+	}
+
+	@Override
+	public Object getLockingObject()
+	{
+		return this.lockingObject;
 	}
 }

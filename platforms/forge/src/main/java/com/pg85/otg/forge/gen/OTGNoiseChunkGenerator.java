@@ -10,7 +10,6 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.dimensions.DimensionsConfig;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -18,6 +17,7 @@ import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.OTGChunkPopulator;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.BlockPos2D;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -92,8 +92,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	);
 
-	private final BlockState defaultBlock;
-	private final BlockState defaultFluid;
 	private final Supplier<DimensionSettings> dimensionSettingsSupplier;
 	private final long worldSeed;
 	private final int noiseHeight;
@@ -103,6 +101,15 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	// TODO: Move this to WorldLoader when ready?
 	private CustomStructureCache structureCache;
+	
+	public void saveStructureCache()
+	{
+    	OTG.log(LogMarker.INFO, "ForgeEngine onSave");
+		if(this.chunkPopulator.getIsSaveRequired())
+		{
+			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().spawnLog, OTG.getEngine().getLogger(), this.chunkPopulator);
+		}
+	}
 	
 	private final DimensionConfig dimensionConfig;
 	private final Preset preset;
@@ -144,8 +151,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;
 		NoiseSettings noisesettings = dimensionsettings.func_236113_b_();
 		this.noiseHeight = noisesettings.func_236169_a_();
-		this.defaultBlock = dimensionsettings.func_236115_c_();
-		this.defaultFluid = dimensionsettings.func_236116_d_();
 		
 		// Unloaded chunk data caches for BO4's
         // TODO: Add a setting to the worldconfig for the size of these caches. 
@@ -174,13 +179,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if(!isInitialised)
 		{
 			isInitialised = true;
-			// TODO: PresetNameProvider / ModLoadedCheckProvider
-			this.structureCache = new CustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus(), OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().spawnLog, OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), null, OTG.getEngine().getMaterialReader(), OTG.getEngine().getCustomObjectResourcesManager(), null);
-			//this.structureCache = new CustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus); 
-			DimensionsConfig dimensionsConfig = new DimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName);
-			dimensionsConfig.WorldName = worldName;
-			dimensionsConfig.Overworld = this.dimensionConfig;
-			OTG.getEngine().setDimensionsConfig(dimensionsConfig);
+			// TODO: ModLoadedCheckProvider
+			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus());
+			OTG.getEngine().createDimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName, this.dimensionConfig);
 		}
 	}
 	
@@ -190,8 +191,30 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void func_230352_b_(IWorld world, StructureManager manager, IChunk chunk)
 	{
+		// If we've already generated and cached this   
+		// chunk while it was unloaded, use cached data.
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate());
+		IChunk cachedChunk = unloadedChunksCache.get(chunkCoord);
+		if(cachedChunk != null)
+		{
+			// TODO: Find some way to clone/swap chunk data efficiently :/
+			for(int x = 0; x < ChunkCoordinate.CHUNK_SIZE; x++)
+			{
+				for(int z = 0; z < ChunkCoordinate.CHUNK_SIZE; z++)
+				{
+					int endY = cachedChunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(x, z);
+					for(int y = 0; y <= endY; y++)
+					{
+						BlockPos pos = new BlockPos(x, y, z);
+						chunk.setBlockState(pos, cachedChunk.getBlockState(pos), false);
+					}
+				}
+			}
+	        this.unloadedChunksCache.remove(chunkCoord);
+		} else {
+			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate());
+		}
 	}
 
 	// Replaces surface and ground blocks in base terrain and places bedrock.
@@ -225,12 +248,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		int blockX = chunkX * 16;
 		int blockZ = chunkZ * 16;
 		BlockPos blockpos = new BlockPos(blockX, 0, blockZ);
-        ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
-		
-    	// Unloaded chunk data caches for BO4's
-        this.unloadedChunksCache.remove(chunkCoord);
-        //
-		
+				
 		// Fetch the biomeConfig by registryKey
 		RegistryKey<Biome> key = ((OTGBiomeProvider)this.biomeProvider).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());

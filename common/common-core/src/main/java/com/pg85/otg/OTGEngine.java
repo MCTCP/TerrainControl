@@ -6,6 +6,7 @@ import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
+import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.config.dimensions.DimensionsConfig;
 import com.pg85.otg.config.dimensions.ModPackConfigManager;
 import com.pg85.otg.config.io.FileSettingsReader;
@@ -14,6 +15,7 @@ import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
+import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.Logger;
 import com.pg85.otg.presets.LocalPresetLoader;
@@ -174,9 +176,12 @@ public abstract class OTGEngine
     	return this.dimensionsConfig;
     }
 	
-    public void setDimensionsConfig(DimensionsConfig dimensionsConfig)
+    public DimensionsConfig createDimensionsConfig(Path path, String worldName, DimensionConfig dimensionConfig)
     {
-    	this.dimensionsConfig = dimensionsConfig;
+    	this.dimensionsConfig = new DimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName);
+		dimensionsConfig.WorldName = worldName;
+		dimensionsConfig.Overworld = dimensionConfig;
+		return this.dimensionsConfig;
     }
     
 	// OTG dirs
@@ -203,4 +208,12 @@ public abstract class OTGEngine
 	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
 
 	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
+	
+	// Builders/Factories
+	
+	public CustomStructureCache createCustomStructureCache(String worldName, Path worldSavepath, int dimId, long worldSeed, boolean otgPlus)
+	{
+		// TODO: ModLoadedChecker
+		return new CustomStructureCache(worldName, worldSavepath, dimId, worldSeed, otgPlus, getOTGRootFolder(), getPluginConfig().spawnLog, getLogger(), getCustomObjectManager(), getPresetNameProvider(), getMaterialReader(), getCustomObjectResourcesManager(), null);
+	}
 }

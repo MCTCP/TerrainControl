@@ -19,6 +19,7 @@ import net.minecraft.world.gen.settings.SlideSettings;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.world.WorldEvent.Save;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -172,5 +173,11 @@ public class OTGPlugin
 	public void onCommandRegister(RegisterCommandsEvent event)
 	{
 		OTGCommand.register(event.getDispatcher());
+	}
+	
+	@SubscribeEvent
+	public void onSave(Save event)
+	{		
+		((ForgeEngine)OTG.getEngine()).onSave(event.getWorld());			
 	}
 }

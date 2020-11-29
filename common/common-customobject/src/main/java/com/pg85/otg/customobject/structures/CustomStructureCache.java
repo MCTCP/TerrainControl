@@ -17,6 +17,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.IChunkPopulator;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
 import com.pg85.otg.util.interfaces.ICustomObjectResourcesManager;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
@@ -271,12 +272,41 @@ public class CustomStructureCache
 
     // Persistence - WorldInfoChunks for BO3+BO4, plotter structurecache for BO4
 
-    public void saveToDisk(boolean spawnLog, ILogger logger)
+    public void saveToDisk(boolean spawnLog, ILogger logger, IChunkPopulator chunkPopulator)
     {
     	logger.log(LogMarker.INFO, "Saving structure and pregenerator data.");
+    	boolean firstLog = false;
+    	long starTime = System.currentTimeMillis();
+		while(true)
+		{
+			// TODO: Make this prettier
+			synchronized(chunkPopulator.getLockingObject())
+			{
+				if(!chunkPopulator.isPopulating())
+				{
+					chunkPopulator.beginSave();
+					break;
+				}
+			}
+			if(firstLog)
+			{
+				logger.log(LogMarker.WARN, "SaveToDisk waiting on Populate. Although other mods could be causing this and there may not be any problem, this can potentially cause an endless loop!");
+				firstLog = false;
+			}
+			int interval = 300;
+			if(System.currentTimeMillis() - starTime > (interval * 1000))
+			{
+				logger.log(LogMarker.FATAL, "SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
+				throw new RuntimeException("SaveToDisk waited on populate longer than " + interval + " seconds, something went wrong!");
+			}
+		}    	
 
 		saveStructureCache(spawnLog, logger);
 
+		synchronized(chunkPopulator.getLockingObject())
+		{
+			chunkPopulator.endSave();
+		}
 		logger.log(LogMarker.INFO, "Structure and pregenerator data saved.");
     }
 

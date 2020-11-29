@@ -13,10 +13,14 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.forge.biome.ForgeMojangSettings;
+import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeModLoadedChecker;
+
+import net.minecraft.world.IWorld;
+import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraftforge.fml.loading.FMLLoader;
 
 class ForgeEngine extends OTGEngine
@@ -51,5 +55,18 @@ class ForgeEngine extends OTGEngine
 	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{
 		// TODO: Implement this
+	}
+	
+	public void onSave(IWorld world)
+	{
+		// For server worlds, save the structure cache.
+		if(
+			!world.isRemote() && 
+			world.getChunkProvider() instanceof ServerChunkProvider && 
+			((ServerChunkProvider)world.getChunkProvider()).generator instanceof OTGNoiseChunkGenerator
+		)
+		{
+			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkProvider()).generator).saveStructureCache();
+		}
 	}
 }
