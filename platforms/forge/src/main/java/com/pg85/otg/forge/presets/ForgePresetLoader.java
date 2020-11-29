@@ -86,6 +86,9 @@ public class ForgePresetLoader extends LocalPresetLoader
 	{
 		for(Preset preset : this.presets.values())
 		{
+			// Index BiomeColors for FromImageMode and /otg map
+			HashMap<Integer, Integer> biomeColorMap = new HashMap<Integer, Integer>();
+			
 			// Start at 1, 0 is the fallback for the biome generator (the world's ocean biome).
 			int currentId = 1;
 			
@@ -170,7 +173,10 @@ public class ForgePresetLoader extends LocalPresetLoader
 					);
 					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
  				}
-
+ 				
+ 				// Index BiomeColor for FromImageMode and /otg map
+	            biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
+ 				
  				OTG.log(LogMarker.INFO, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
  				
  				currentId++;
@@ -180,7 +186,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			this.reverseIdMapping.put(preset.getName(), presetReverseIdMapping);
 
 			// Set the base data
-			BiomeLayerData data = new BiomeLayerData(worldConfig, oceanBiomeConfig);
+			BiomeLayerData data = new BiomeLayerData(preset.getPresetDir(), worldConfig, oceanBiomeConfig);
 			
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
@@ -227,7 +233,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			}
 
 			// Add the data and process isle/border biomes
-			data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes);
+			data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes, biomeColorMap);
 			
 			// Set data for this preset
 			this.presetGenerationData.put(preset.getName(), data);

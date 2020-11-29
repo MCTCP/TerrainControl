@@ -7,12 +7,12 @@ import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 
-public class LayerBiomeBorder implements ParentedLayer
+public class BiomeBorderLayer implements ParentedLayer
 { 
     boolean[][] bordersFrom = new boolean[1024][];
     private int[] bordersTo = new int[1024];
 	
-	public LayerBiomeBorder(BordersList borderBiomes)
+	public BiomeBorderLayer(BordersList borderBiomes)
     {
 		this.bordersFrom = borderBiomes.bordersFrom;
 		this.bordersTo = borderBiomes.bordersTo;

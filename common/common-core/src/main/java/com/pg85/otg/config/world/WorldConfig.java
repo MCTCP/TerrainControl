@@ -26,12 +26,9 @@ import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
-import com.pg85.otg.constants.SettingsEnums.ImageMode;
-import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.constants.SettingsEnums.TerrainMode;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 
@@ -76,18 +73,6 @@ public class WorldConfig extends WorldConfigBase
 	private boolean riversEnabled;
 	private boolean improvedRivers;
 	private boolean randomRivers;
-
-    // Biome image
-
-	private String imageFile;
-	private ImageOrientation imageOrientation;
-	private ImageMode imageMode;
-    // public int imageZoom;
-	private String imageFillBiome;
-    private int imageXOffset;
-    private int imageZOffset;
-
-    private HashMap<Integer, BiomeResourceLocation> biomeColorMap;
 
     // Look settings
     private int worldFog;
@@ -175,9 +160,9 @@ public class WorldConfig extends WorldConfigBase
        	this.correctSettings(biomes != null, OTG.getEngine().getLogger()); // If biomes is null then we're not interested in loading biomes, squelch biome warnings.        
     }
     
-    public static DefaulWorldData createDefaultOTGWorldConfig(Path settingsDir, String worldName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+    public static DefaulWorldData createDefaultOTGWorldConfig(Path settingsDir, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
-    	SimpleSettingsMap settingsMap = new SimpleSettingsMap(worldName, true);
+    	SimpleSettingsMap settingsMap = new SimpleSettingsMap(presetName, true);
     	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, getDefaultBiomeNames(), biomeResourcesManager, spawnLog, logger, materialReader);
     	defaultWorldConfig.writeConfigSettings(settingsMap);
     	return new DefaulWorldData(defaultWorldConfig, settingsMap);

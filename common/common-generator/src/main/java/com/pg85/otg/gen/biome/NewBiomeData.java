@@ -69,6 +69,10 @@ public class NewBiomeData
 		{
 			clone.borderInBiomes.add(integer.intValue());
 		}
+		for(Integer integer : this.notBorderNearBiomes)
+		{
+			clone.notBorderNearBiomes.add(integer.intValue());
+		}
 		return clone;
 	}
 }

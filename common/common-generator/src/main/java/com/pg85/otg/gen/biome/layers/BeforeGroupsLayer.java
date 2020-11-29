@@ -11,12 +11,12 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 /**
  * Places the biomes at a specific depth, given the biome groups.
  */
-class BiomeBeforeGroupsLayer extends BiomeLayerBase
+class BeforeGroupsLayer extends BiomeLayerBase
 {
 	private final NewBiomeGroup normalGroup;
 	private final NewBiomeGroup iceGroup;
 	
-	BiomeBeforeGroupsLayer(BiomeLayerData data, int depth)
+	BeforeGroupsLayer(BiomeLayerData data, int depth)
 	{
 		super(data, depth);
 

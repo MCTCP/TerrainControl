@@ -3,11 +3,12 @@ package com.pg85.otg.config.world;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
 import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.config.biome.BiomeGroupManager;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
+import com.pg85.otg.constants.SettingsEnums.ImageMode;
+import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.util.biome.ReplaceBlocks;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.interfaces.IWorldConfig;
@@ -34,13 +35,22 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	protected int landRarity;
 	protected int landSize;
-	protected int landFuzzy;    
+	protected int landFuzzy;
 	
     protected double frozenOceanTemperature;
     protected boolean freezeAllColdGroupBiomes;
 	
 	protected ArrayList<String> worldBiomes = new ArrayList<String>();
 	protected int biomeRarityScale;
+	
+    // Biome image
+
+	protected String imageFile;
+	protected ImageOrientation imageOrientation;
+	protected ImageMode imageMode;
+	protected String imageFillBiome;
+	protected int imageXOffset;
+	protected int imageZOffset;
 	
 	//
 	
@@ -561,5 +571,41 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public List<String> getBorderBiomes()
 	{
 		return this.borderBiomes;
+	}
+		
+	@Override
+	public ImageOrientation getImageOrientation()
+	{
+		return this.imageOrientation;
+	}
+
+	@Override
+	public String getImageFile()
+	{
+		return this.imageFile;
+	}
+
+	@Override
+	public String getImageFillBiome()
+	{
+		return this.imageFillBiome;
+	}
+
+	@Override
+	public ImageMode getImageMode()
+	{
+		return this.imageMode;
+	}
+
+	@Override
+	public int getImageZOffset()
+	{
+		return this.imageZOffset;
+	}
+
+	@Override
+	public int getImageXOffset()
+	{
+		return this.imageXOffset;
 	}
 }

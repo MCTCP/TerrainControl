@@ -6,7 +6,7 @@ import java.util.List;
 import com.pg85.otg.gen.biome.layers.type.DiagonalCrossSamplingLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 
-public class LayerBiomeInBiome implements DiagonalCrossSamplingLayer
+public class BiomeIsleLayer implements DiagonalCrossSamplingLayer
 {
 	public static class IslesList
 	{
@@ -44,7 +44,7 @@ public class LayerBiomeInBiome implements DiagonalCrossSamplingLayer
 
     private final IslesList isleBiomes;
    
-    public LayerBiomeInBiome(IslesList isleBiomes)
+    public BiomeIsleLayer(IslesList isleBiomes)
     {
     	this.isleBiomes = isleBiomes;
     }

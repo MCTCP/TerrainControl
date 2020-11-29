@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
+import com.pg85.otg.constants.SettingsEnums.ImageMode;
+import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -70,4 +72,10 @@ public interface IWorldConfig
 	public boolean getIsFreezeGroups();
 	public List<String> getIsleBiomes();
 	public List<String> getBorderBiomes();
+	public ImageOrientation getImageOrientation();
+	public String getImageFile();
+	public String getImageFillBiome();
+	public ImageMode getImageMode();
+	public int getImageZOffset();
+	public int getImageXOffset();
 }

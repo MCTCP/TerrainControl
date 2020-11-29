@@ -1,5 +1,6 @@
 package com.pg85.otg.gen.biome.layers;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,6 +9,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
+import com.pg85.otg.constants.SettingsEnums.ImageMode;
+import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.gen.biome.NewBiomeData;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldConfig;
@@ -32,8 +35,39 @@ public class BiomeLayerData
 	public final Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
 	public final boolean freezeGroups;
 	
+	// FromImageMode
+	public HashMap<Integer, Integer> biomeColorMap;
+	public final int imageXOffset;
+	public final int imageZOffset;
+	public final ImageMode imageMode;
+	public final String configImageFillBiome;
+	public int imageFillBiome;
+	public final Path presetDir;
+	public final String imageFile;
+	public final ImageOrientation imageOrientation;
+	
+	// TODO: The only reason we're cloning BiomeLayerData and NewBiomeData
+	// is because NewBiomeData.totalGroupRarity is used and modified across 
+	// all generation depths, and we want loaded presets to remain unmodified.
+	// totalGroupRarity is the only setting affected though, so technically 
+	// speaking we don't have to clone the others, just doing it for completeness. 
+	// Re-design this? (any solution will have some warts)
 	public BiomeLayerData(BiomeLayerData data)
 	{
+		this.biomeColorMap = new HashMap<>();
+		for(Entry<Integer, Integer> entry : data.biomeColorMap.entrySet())
+		{
+			this.biomeColorMap.put(entry.getKey().intValue(), entry.getValue().intValue());
+		}
+		this.imageXOffset = data.imageXOffset;
+		this.imageZOffset = data.imageZOffset;
+		this.imageMode = data.imageMode;
+		this.configImageFillBiome = data.configImageFillBiome;
+		this.imageFillBiome = data.imageFillBiome;
+		this.presetDir = data.presetDir;
+		this.imageFile = data.imageFile;
+		this.imageOrientation = data.imageOrientation;
+		
 		this.biomeMode = data.biomeMode;
 		this.generationDepth = data.generationDepth;
 		this.landSize = data.landSize;
@@ -93,8 +127,16 @@ public class BiomeLayerData
 		}
 	}
 	
-	public BiomeLayerData(IWorldConfig worldConfig, IBiomeConfig oceanBiomeConfig)
+	public BiomeLayerData(Path presetDir, IWorldConfig worldConfig, IBiomeConfig oceanBiomeConfig)
 	{
+		this.imageXOffset = worldConfig.getImageXOffset();
+		this.imageZOffset = worldConfig.getImageZOffset();
+		this.imageMode = worldConfig.getImageMode();
+		this.configImageFillBiome = worldConfig.getImageFillBiome();
+		this.presetDir = presetDir;
+		this.imageFile = worldConfig.getImageFile();
+		this.imageOrientation = worldConfig.getImageOrientation();
+		
 		this.biomeMode = worldConfig.getBiomeMode();
 		this.generationDepth = worldConfig.getGenerationDepth();
 		this.landSize = worldConfig.getLandSize();
@@ -106,7 +148,7 @@ public class BiomeLayerData
 		this.freezeGroups = worldConfig.getIsFreezeGroups();
 	}
 
-	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<NewBiomeData>> isleBiomesAtDepth, Map<Integer, List<NewBiomeData>> borderBiomesAtDepth, Map<String, Integer> worldBiomes)
+	public void init(Set<Integer> biomeDepths, Map<Integer, List<NewBiomeGroup>> groupDepth, Map<Integer, List<NewBiomeData>> isleBiomesAtDepth, Map<Integer, List<NewBiomeData>> borderBiomesAtDepth, Map<String, Integer> worldBiomes, HashMap<Integer, Integer> biomeColorMap)
 	{		
 		this.biomeDepths.addAll(biomeDepths);
 		this.groups.putAll(groupDepth);
@@ -145,5 +187,7 @@ public class BiomeLayerData
 				}
 			}
 		}
+		
+		this.biomeColorMap = biomeColorMap;
 	}
 }

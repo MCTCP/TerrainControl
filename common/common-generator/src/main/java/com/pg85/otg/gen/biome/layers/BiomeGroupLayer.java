@@ -20,7 +20,8 @@ class BiomeGroupLayer implements ParentedLayer
 	private final int maxRarity;
 	private final boolean freezeGroups;
 	
-	BiomeGroupLayer(List<NewBiomeGroup> groups, boolean freezeGroups) {
+	BiomeGroupLayer(List<NewBiomeGroup> groups, boolean freezeGroups)
+	{
 		int maxRarity = 0;
 
 		// Iterate through groups and keep a tally of the rarity of each group.
