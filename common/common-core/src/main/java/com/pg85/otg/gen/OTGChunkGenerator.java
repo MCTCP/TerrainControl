@@ -22,7 +22,6 @@ import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
-
 import it.unimi.dsi.fastutil.HashCommon;
 
 /**
@@ -60,15 +59,16 @@ public class OTGChunkGenerator
 	private final int noiseSizeZ = 4;
 
 	private final ThreadLocal<NoiseCache> noiseCache;
-
-	// Biome blocks noise
-	// TODO: Use new noise?
-	private double[] biomeBlocksNoise = new double[CHUNK_SIZE * CHUNK_SIZE];
 	private final NoiseGeneratorPerlinMesaBlocks biomeBlocksNoiseGen;
-
 	// Carvers
 	private final Carver caves;
 	private final Carver ravines;
+	// Biome blocks noise
+	// TODO: Use new noise?
+	private double[] biomeBlocksNoise = new double[CHUNK_SIZE * CHUNK_SIZE];
+	private int lastX = Integer.MAX_VALUE;
+	private int lastZ = Integer.MAX_VALUE;
+	private double lastNoise = 0;
 
 	public OTGChunkGenerator(Preset preset, long seed, LayerSource biomeGenerator)
 	{
@@ -85,7 +85,7 @@ public class OTGChunkGenerator
 		this.depthNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-15, 0));
 
 		this.noiseCache = ThreadLocal.withInitial(() -> new NoiseCache(128, this.noiseSizeY + 1));
-		
+
 		this.biomeBlocksNoiseGen = new NoiseGeneratorPerlinMesaBlocks(random, 4);
 
 		this.caves = new CaveCarver(256, preset.getWorldConfig());
@@ -121,7 +121,8 @@ public class OTGChunkGenerator
 		}
 	}
 
-	private double getInterpolationNoise(int x, int y, int z, double horizontalStretch, double verticalStretch) {
+	private double getInterpolationNoise(int x, int y, int z, double horizontalStretch, double verticalStretch)
+	{
 		double interpolation = 0.0D;
 		double amplitude = 1.0D;
 		for (int i = 0; i < 8; i++)
@@ -138,7 +139,8 @@ public class OTGChunkGenerator
 		return (interpolation / 10.0D + 1.0D) / 2.0D;
 	}
 
-	private double getInterpolatedNoise(OctavePerlinNoiseSampler sampler, int x, int y, int z, double horizontalScale, double verticalScale) {
+	private double getInterpolatedNoise(OctavePerlinNoiseSampler sampler, int x, int y, int z, double horizontalScale, double verticalScale)
+	{
 		double noise = 0.0D;
 		double amplitude = 1.0D;
 		for (int i = 0; i < 16; ++i)
@@ -192,7 +194,7 @@ public class OTGChunkGenerator
 		return noiseHeight;
 	}
 
-	private void getNoiseColumn(double[] buffer, int x, int z)
+	public void getNoiseColumn(double[] buffer, int x, int z)
 	{
 		// TODO: check only for edges
 		this.noiseCache.get().get(buffer, x, z);
@@ -312,21 +314,27 @@ public class OTGChunkGenerator
 		}
 	}
 
-	private IBiomeConfig getBiomeAt(int x, int z)
+	private IBiomeConfig getBiomeAt(int biomeX, int biomeZ)
 	{
-		return biomeGenerator.getConfig(x, z);
+		return biomeGenerator.getConfig(biomeX, biomeZ);
+	}
+
+	public IBiomeConfig getBiomeAtWorldCoord(int x, int z)
+	{
+		// TODO: Technically, we should be providing the hashed seed here. Perhaps this may work for the time being?
+		return BiomeInterpolator.getConfig(this.seed, x, 0, z, this.biomeGenerator);
 	}
 
 	public void populateNoise(int worldHeightCap, Random random, ChunkBuffer buffer, ChunkCoordinate pos)
-	{	
+	{
 		// Fill waterLevel array, used when placing stone/ground/surface blocks.
 		// TODO: water levels
 		byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];
-		Arrays.fill(waterLevel, (byte)63);
+		Arrays.fill(waterLevel, (byte) 63);
 
 		// TODO: this double[][][] is probably really bad for performance
 		double[][][] noiseData = new double[2][this.noiseSizeZ + 1][this.noiseSizeY + 1];
-		
+
 		// Initialize noise data on the x0 column.
 		for (int noiseZ = 0; noiseZ < this.noiseSizeZ + 1; ++noiseZ)
 		{
@@ -397,17 +405,16 @@ public class OTGChunkGenerator
 								double rawNoise = MathHelper.lerp(zLerp, z0, z1);
 								// Normalize the noise from (-256, 256) to [-1, 1]
 								double density = MathHelper.clamp(rawNoise / 200.0D, -1.0D, 1.0D);
-																
+
 								if (density > 0.0)
 								{
-									IBiomeConfig biomeConfig = this.getBiomeAt(realX, realZ);
-									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced((short)realY));
+									IBiomeConfig biomeConfig = this.getBiomeAtWorldCoord(realX, realZ);
+									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced((short) realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
-								}
-								else if (realY < 63)
+								} else if (realY < 63)
 								{
 									// TODO: water levels
-									IBiomeConfig biomeConfig = this.getBiomeAt(realX, realZ);
+									IBiomeConfig biomeConfig = this.getBiomeAtWorldCoord(realX, realZ);
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getWaterBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
 								}
@@ -422,35 +429,83 @@ public class OTGChunkGenerator
 			noiseData[0] = noiseData[1];
 			noiseData[1] = xColumn;
 		}
-		
+
 		doSurfaceAndGroundControl(random, worldHeightCap, this.seed, buffer, waterLevel);
 	}
 
-	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask) {
+	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask)
+	{
 
 		Random random = new Random();
-		for(int localChunkX = chunkX - 8; localChunkX <= chunkX + 8; ++localChunkX) {
-			for(int localChunkZ = chunkZ - 8; localChunkZ <= chunkZ + 8; ++localChunkZ) {
+		for (int localChunkX = chunkX - 8; localChunkX <= chunkX + 8; ++localChunkX)
+		{
+			for (int localChunkZ = chunkZ - 8; localChunkZ <= chunkZ + 8; ++localChunkZ)
+			{
 				setCarverSeed(random, seed, localChunkX, localChunkZ);
 
-				if (this.caves.shouldCarve(random, localChunkX, localChunkZ)) {
-					this.caves.carve(chunk,  random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask);
+				if (this.caves.shouldCarve(random, localChunkX, localChunkZ))
+				{
+					this.caves.carve(chunk, random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask);
 				}
 
-				if (this.ravines.shouldCarve(random, localChunkX, localChunkZ)) {
-					this.ravines.carve(chunk,  random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask);
+				if (this.ravines.shouldCarve(random, localChunkX, localChunkZ))
+				{
+					this.ravines.carve(chunk, random, 63, localChunkX, localChunkZ, chunkX, chunkZ, carvingMask);
 				}
 			}
 		}
 	}
 
-	private long setCarverSeed(Random random, long seed, int x, int z) {
+	// Surface / ground / stone blocks / SAGC
+
+	private long setCarverSeed(Random random, long seed, int x, int z)
+	{
 		random.setSeed(seed);
 		long i = random.nextLong();
 		long j = random.nextLong();
-		long k = (long)x * i ^ (long)z * j ^ seed;
+		long k = (long) x * i ^ (long) z * j ^ seed;
 		random.setSeed(k);
 		return k;
+	}
+
+	public int getNoiseSizeY()
+	{
+		return noiseSizeY + 1;
+	}
+
+	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
+	private void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
+	{
+		// Process surface and ground blocks for each column in the chunk
+		ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
+		double d1 = 0.03125D;
+		this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
+		GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise, heightCap);
+		for (int x = 0; x < CHUNK_SIZE; x++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				// Get the current biome config and some properties
+
+				IBiomeConfig biomeConfig = getBiomeAtWorldCoord(chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+				biomeConfig.doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
+			}
+		}
+	}
+
+	// Used by sagc for generating surface/ground block patterns
+	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+	{
+		double noise = this.lastNoise;
+		if (this.lastX != blockX || this.lastZ != blockZ)
+		{
+			double d1 = 0.03125D;
+			noise = this.biomeBlocksNoiseGen.getRegion(new double[1], blockX, blockZ, 1, 1, d1 * 2.0D, d1 * 2.0D, 1.0D)[0];
+			this.lastX = blockX;
+			this.lastZ = blockZ;
+			this.lastNoise = noise;
+		}
+		return noise;
 	}
 
 	private class NoiseCache
@@ -480,7 +535,8 @@ public class OTGChunkGenerator
 			{
 				// Copy values into buffer
 				System.arraycopy(this.values, idx * buffer.length, buffer, 0, buffer.length);
-			} else {
+			} else
+			{
 				// cache miss: sample and put the result into our cache entry
 
 				// Sample the noise column to store the new values
@@ -505,44 +561,4 @@ public class OTGChunkGenerator
 			return MathHelper.toLong(x, z);
 		}
 	}
-
-	// Surface / ground / stone blocks / SAGC
-	
-	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
-	private void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
-	{
-		// Process surface and ground blocks for each column in the chunk
-        ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();
-        double d1 = 0.03125D;
-        this.biomeBlocksNoise = this.biomeBlocksNoiseGen.getRegion(this.biomeBlocksNoise, chunkCoord.getBlockX(), chunkCoord.getBlockZ(), CHUNK_SIZE, CHUNK_SIZE, d1 * 2.0D, d1 * 2.0D, 1.0D);
-        GeneratingChunk generatingChunk = new GeneratingChunk(random, waterLevel, this.biomeBlocksNoise, heightCap);
-        for (int x = 0; x < CHUNK_SIZE; x++)
-        {
-            for (int z = 0; z < CHUNK_SIZE; z++)
-            {
-                // Get the current biome config and some properties
-				// TODO: Technically, we should be providing the hashed seed here. Perhaps this may work for the time being?
-                IBiomeConfig biomeConfig = BiomeInterpolator.getConfig(this.seed, chunkCoord.getBlockX() + x, 0, chunkCoord.getBlockZ() + z, this.biomeGenerator);
-                biomeConfig.doSurfaceAndGroundControl(worldSeed, generatingChunk, chunkBuffer, biomeConfig, chunkCoord.getBlockX() + x, chunkCoord.getBlockZ() + z);
-            }
-        }
-	}
-
-    private int lastX = Integer.MAX_VALUE;
-    private int lastZ = Integer.MAX_VALUE;
-    private double lastNoise = 0;
-    // Used by sagc for generating surface/ground block patterns
-    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
-    {
-    	double noise = this.lastNoise;
-    	if(this.lastX != blockX || this.lastZ != blockZ)
-    	{
-        	double d1 = 0.03125D;
-        	noise = this.biomeBlocksNoiseGen.getRegion(new double[1], blockX, blockZ, 1, 1, d1 * 2.0D, d1 * 2.0D, 1.0D)[0];
-        	this.lastX = blockX;
-        	this.lastZ = blockZ;
-        	this.lastNoise = noise;
-    	}
-    	return noise;
-    }
 }
