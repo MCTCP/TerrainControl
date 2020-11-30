@@ -220,9 +220,9 @@ public class OTGChunkGenerator
 			for (int z1 = -center.getSmoothRadius(); z1 <= center.getSmoothRadius(); ++z1)
 			{
 				// TODO: thread local lossy cache for biome sampling
-				IBiomeConfig data = getBiomeAt(noiseX + x1, noiseZ + z1);
+				IBiomeConfig biome = getBiomeAt(noiseX + x1, noiseZ + z1);
 
-				float heightAt = data.getBiomeHeight();
+				float heightAt = biome.getBiomeHeight();
 				// TODO: vanilla reduces the weight by half when the depth here is greater than the center depth, but OTG doesn't do that?
 				float weightAt = BIOME_WEIGHT_TABLE[x1 + 32 + (z1 + 32) * 65] / (heightAt + 2.0F);
 				weightAt = Math.abs(weightAt); // This is required to prevent seams when height goes below -2
@@ -230,19 +230,19 @@ public class OTGChunkGenerator
 				weight += weightAt;
 
 				height += heightAt * weightAt;
-				volatility += data.getBiomeVolatility() * weightAt;
-				volatility1 += data.getVolatility1() * weightAt;
-				volatility2 += data.getVolatility2() * weightAt;
-				horizontalFracture += data.getFractureHorizontal() * weightAt;
-				verticalFracture += data.getFractureVertical() * weightAt;
-				volatilityWeight1 += data.getVolatilityWeight1() * weightAt;
-				volatilityWeight2 += data.getVolatilityWeight2() * weightAt;
-				maxAverageDepth += data.getMaxAverageDepth() * weightAt;
-				maxAverageHeight += data.getMaxAverageHeight() * weightAt;
+				volatility += biome.getBiomeVolatility() * weightAt;
+				volatility1 += biome.getVolatility1() * weightAt;
+				volatility2 += biome.getVolatility2() * weightAt;
+				horizontalFracture += biome.getFractureHorizontal() * weightAt;
+				verticalFracture += biome.getFractureVertical() * weightAt;
+				volatilityWeight1 += biome.getVolatilityWeight1() * weightAt;
+				volatilityWeight2 += biome.getVolatilityWeight2() * weightAt;
+				maxAverageDepth += biome.getMaxAverageDepth() * weightAt;
+				maxAverageHeight += biome.getMaxAverageHeight() * weightAt;
 
 				for (int y = 0; y < this.noiseSizeY + 1; y++)
 				{
-					chc[y] += data.getCHCData(y) * weightAt;
+					chc[y] += biome.getCHCData(y) * weightAt;
 				}
 			}
 		}
@@ -288,13 +288,16 @@ public class OTGChunkGenerator
 
 			double noise = sampleNoise(noiseX, y, noiseZ, horizontalScale, verticalScale, horizontalScale / 80, verticalScale / 160, volatility1, volatility2, volatilityWeight1, volatilityWeight2);
 
-			// TODO: add if statement for biome height control here
-			noise += falloff;
-
-			// Reduce the last 3 layers
-			if (y > 28)
+			if (!center.disableNotchHeightControl())
 			{
-				noise = MathHelper.clampedLerp(noise, -10, ((double) y - 28) / 3.0);
+				// Add the falloff at this height
+				noise += falloff;
+
+				// Reduce the last 3 layers
+				if (y > 28)
+				{
+					noise = MathHelper.clampedLerp(noise, -10, ((double) y - 28) / 3.0);
+				}
 			}
 
 			// Add chc data

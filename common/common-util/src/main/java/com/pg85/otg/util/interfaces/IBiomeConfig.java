@@ -56,6 +56,7 @@ public interface IBiomeConfig
 	boolean isCeilingBedrock();
 	boolean isBedrockDisabled();
 	boolean isRemoveSurfaceStone();
+	boolean disableNotchHeightControl();
 	
 	int getSnowHeight(float tempAtBlockToFreeze);
 	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z);

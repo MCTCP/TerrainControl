@@ -134,7 +134,6 @@ public class BiomeConfig extends BiomeConfigBase
     private double volatilityRaw2;
     private double volatilityWeightRaw1;
     private double volatilityWeightRaw2;
-    private boolean disableNotchHeightControl;
 
     // Structures
     private boolean strongholdsEnabled;

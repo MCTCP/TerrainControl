@@ -96,6 +96,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     protected int skyColor;
     protected int waterColor;
     protected int fogColor;
+
+    // TODO: rename this setting
+	protected boolean disableNotchHeightControl;
     
     protected String replaceToBiomeName;
     
@@ -534,8 +537,14 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.worldConfig.getRemoveSurfaceStone();
 	}
-	
-    @Override
+
+	@Override
+	public boolean disableNotchHeightControl()
+	{
+		return this.disableNotchHeightControl;
+	}
+
+	@Override
 	public boolean isIsleBiome()
 	{
 		return
