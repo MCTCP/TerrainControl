@@ -5,15 +5,18 @@ import java.util.Random;
 
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.helpers.MathHelper;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterials;
 
 public abstract class Carver
 {
 	protected final int heightLimit;
+	protected final IWorldConfig worldConfig;
 
-	public Carver(int heightLimit)
+	public Carver(int heightLimit, IWorldConfig worldConfig)
 	{
 		this.heightLimit = heightLimit;
+		this.worldConfig = worldConfig;
 	}
 
 	public int getBranchFactor()

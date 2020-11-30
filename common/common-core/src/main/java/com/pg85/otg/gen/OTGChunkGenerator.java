@@ -26,7 +26,7 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import it.unimi.dsi.fastutil.HashCommon;
 
 /**
- * 1.16 version of {@link ChunkProviderOTG}. Will be renamed at some point.
+ * Generates the base terrain, surface, and caves for chunks.
  */
 public class OTGChunkGenerator
 {
@@ -67,8 +67,8 @@ public class OTGChunkGenerator
 	private final NoiseGeneratorPerlinMesaBlocks biomeBlocksNoiseGen;
 
 	// Carvers
-	private final Carver caves = new CaveCarver(256);
-	private final Carver ravines = new RavineCarver(256);
+	private final Carver caves;
+	private final Carver ravines;
 
 	public OTGChunkGenerator(Preset preset, long seed, LayerSource biomeGenerator)
 	{
@@ -87,6 +87,9 @@ public class OTGChunkGenerator
 		this.noiseCache = ThreadLocal.withInitial(() -> new NoiseCache(128, this.noiseSizeY + 1));
 		
 		this.biomeBlocksNoiseGen = new NoiseGeneratorPerlinMesaBlocks(random, 4);
+
+		this.caves = new CaveCarver(256, preset.getWorldConfig());
+		this.ravines = new RavineCarver(256, preset.getWorldConfig());
 	}
 
 	private static <T> T make(T object, Consumer<T> consumer)
@@ -271,6 +274,7 @@ public class OTGChunkGenerator
 		// Do some math on volatility and height
 		volatility = volatility * 0.9f + 0.1f;
 		height = (height * 4.0F - 1.0F) / 8.0F;
+
 		// Factor in y sections
 		height = usedYSections * (2.0f + height + extraHeight) / 4.0f;
 

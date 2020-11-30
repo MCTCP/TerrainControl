@@ -5,12 +5,14 @@ import java.util.Random;
 
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.helpers.MathHelper;
+import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 
 public class CaveCarver extends Carver
 {
-	public CaveCarver(int heightLimit)
+	public CaveCarver(int heightLimit, IWorldConfig worldConfig)
 	{
-		super(heightLimit);
+		super(heightLimit, worldConfig);
 	}
 
 	public boolean carve(ChunkBuffer chunk, Random random, int seaLevel, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet carvingMask)
@@ -18,19 +20,31 @@ public class CaveCarver extends Carver
 		int branchFactor = (this.getBranchFactor() * 2 - 1) * 16;
 		int caveCount = random.nextInt(random.nextInt(random.nextInt(this.getMaxCaveCount()) + 1) + 1);
 
+		if (this.worldConfig.isEvenCaveDistribution()) {
+			caveCount = this.worldConfig.getCaveFrequency();
+		}
+
 		for (int cave = 0; cave < caveCount; ++cave)
 		{
 			double x = chunkX * 16 + random.nextInt(16);
 			double y = this.getCaveY(random);
 			double z = chunkZ * 16 + random.nextInt(16);
-			int tunnelCount = 1;
+			// Vanilla Behavior: Default to 1.
+//			int tunnelCount = 1;
+			int tunnelCount = this.worldConfig.getCaveSystemFrequency();
+
 			float size;
-			if (random.nextInt(4) == 0)
+			if (random.nextInt(100) <= this.worldConfig.getIndividualCaveRarity())
 			{
-				double g = 0.5D;
 				size = 1.0F + random.nextFloat() * 6.0F;
 				this.carveCave(chunk, random.nextLong(), seaLevel, mainChunkX, mainChunkZ, x, y, z, size, 0.5D, carvingMask);
-				tunnelCount += random.nextInt(4);
+				// Vanilla Behavior: Add 0 to 3 more caves when generating a spherical cave.
+//				tunnelCount += random.nextInt(4);
+				tunnelCount += RandomHelper.numberInRange(random, this.worldConfig.getCaveSystemPocketMinSize(), this.worldConfig.getCaveSystemPocketMaxSize());
+			}
+			else if (random.nextInt(100) <= this.worldConfig.getCaveSystemPocketChance() - 1)
+			{
+				tunnelCount += RandomHelper.numberInRange(random, this.worldConfig.getCaveSystemPocketMinSize(), this.worldConfig.getCaveSystemPocketMaxSize());
 			}
 
 			for (int r = 0; r < tunnelCount; ++r)
@@ -48,12 +62,20 @@ public class CaveCarver extends Carver
 
 	public boolean shouldCarve(Random random, int chunkX, int chunkZ)
 	{
-		return random.nextFloat() <= (1.0 / 7.0);
+		if (this.worldConfig.getCaveFrequency() <= 0)
+		{
+			return false;
+		}
+
+		// TODO: This should be changed to 1 / rarity
+		return random.nextInt(100) < this.worldConfig.getCaveRarity();
 	}
 
 	protected int getMaxCaveCount()
 	{
-		return 15;
+		// Vanilla Behavior: Defaults to 15.
+//		return 15;
+		return this.worldConfig.getCaveFrequency();
 	}
 
 	protected float getTunnelSystemWidth(Random random)
@@ -74,7 +96,14 @@ public class CaveCarver extends Carver
 
 	protected int getCaveY(Random random)
 	{
-		return random.nextInt(random.nextInt(120) + 8);
+		// Vanilla Behavior: Random value from 8 to 120, biased downwards.
+//		return random.nextInt(random.nextInt(120) + 8);
+		if (this.worldConfig.isEvenCaveDistribution())
+		{
+			return RandomHelper.numberInRange(random, this.worldConfig.getCaveMinAltitude(), this.worldConfig.getCaveMaxAltitude());
+		} else {
+			return random.nextInt(random.nextInt(this.worldConfig.getCaveMaxAltitude() - this.worldConfig.getCaveMinAltitude() + 1) + 1) + this.worldConfig.getCaveMinAltitude();
+		}
 	}
 
 	protected void carveCave(ChunkBuffer chunk, long seed, int seaLevel, int mainChunkX, int mainChunkZ, double x, double y, double z, float yaw, double yawPitchRatio, BitSet carvingMask)

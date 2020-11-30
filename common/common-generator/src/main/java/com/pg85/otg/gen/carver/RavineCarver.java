@@ -5,19 +5,21 @@ import java.util.Random;
 
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.helpers.MathHelper;
+import com.pg85.otg.util.helpers.RandomHelper;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 
 public class RavineCarver extends Carver
 {
 	private final float[] heightToHorizontalStretchFactor = new float[1024];
 
-	public RavineCarver(int heightLimit)
+	public RavineCarver(int heightLimit, IWorldConfig worldConfig)
 	{
-		super(heightLimit);
+		super(heightLimit, worldConfig);
 	}
-
-	public boolean shouldCarve(Random random, int i, int j)
+	public boolean shouldCarve(Random random, int chunkX, int chunkZ)
 	{
-		return random.nextFloat() <= (1.0 / 50.0);
+		// TODO: This should be changed to 1 / rarity
+		return random.nextInt(100) < this.worldConfig.getRavineRarity();
 	}
 
 	public boolean carve(ChunkBuffer chunk, Random random, int seaLevel, int chunkX, int chunkZ, int mainChunkX, int mainChunkZ, BitSet bitSet)
@@ -25,15 +27,21 @@ public class RavineCarver extends Carver
 		int branchingFactor = (this.getBranchFactor() * 2 - 1) * 16;
 
 		double x = chunkX * 16 + random.nextInt(16);
-		double y = random.nextInt(random.nextInt(40) + 8) + 20;
+		// Vanilla behavior: Bias ravines downwards, with a min of 20.
+//		double y = random.nextInt(random.nextInt(40) + 8) + 20;
+		double y = RandomHelper.numberInRange(random, this.worldConfig.getRavineMinAltitude(), this.worldConfig.getRavineMaxAltitude());
 		double z = chunkZ * 16 + random.nextInt(16);
 
 		float yaw = random.nextFloat() * 6.2831855F;
 		float pitch = (random.nextFloat() - 0.5F) * 2.0F / 8.0F;
 		float width = (random.nextFloat() * 2.0F + random.nextFloat()) * 2.0F;
 
-		int branchCount = branchingFactor - random.nextInt(branchingFactor / 4);
-		this.carveRavine(chunk, random.nextLong(), seaLevel, mainChunkX, mainChunkZ, x, y, z, width, yaw, pitch, 0, branchCount, 3.0D, bitSet);
+		// Vanilla behavior: Subtract 0% - 25% of the branching factor. Default Branching factor is 112.
+//		int branchCount = branchingFactor - random.nextInt(branchingFactor / 4);
+		int branchCount = RandomHelper.numberInRange(random, this.worldConfig.getRavineMinLength(), this.worldConfig.getRavineMaxLength());
+		double yawPitchRatio = worldConfig.getRavineDepth();
+
+		this.carveRavine(chunk, random.nextLong(), seaLevel, mainChunkX, mainChunkZ, x, y, z, width, yaw, pitch, 0, branchCount, yawPitchRatio, bitSet);
 		return true;
 	}
 
