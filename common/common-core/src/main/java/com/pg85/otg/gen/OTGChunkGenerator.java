@@ -244,6 +244,22 @@ public class OTGChunkGenerator
 				volatilityWeight2 += biome.getVolatilityWeight2() * weightAt;
 				maxAverageDepth += biome.getMaxAverageDepth() * weightAt;
 				maxAverageHeight += biome.getMaxAverageHeight() * weightAt;
+			}
+		}
+
+		// CHC Smoothing
+		double chcWeight = 0;
+		for (int x1 = -center.getCHCSmoothRadius(); x1 <= center.getCHCSmoothRadius(); ++x1)
+		{
+			for (int z1 = -center.getCHCSmoothRadius(); z1 <= center.getCHCSmoothRadius(); ++z1)
+			{
+				IBiomeConfig biome = getBiomeAt(noiseX + x1, noiseZ + z1);
+
+				float heightAt = biome.getBiomeHeight();
+				float weightAt = BIOME_WEIGHT_TABLE[x1 + 32 + (z1 + 32) * 65] / (heightAt + 2.0F);
+				weightAt = Math.abs(weightAt);
+
+				chcWeight += weightAt;
 
 				for (int y = 0; y < this.noiseSizeY + 1; y++)
 				{
@@ -267,7 +283,7 @@ public class OTGChunkGenerator
 		// Normalize CHC
 		for (int y = 0; y < this.noiseSizeY + 1; y++)
 		{
-			chc[y] /= weight;
+			chc[y] /= chcWeight;
 		}
 
 		// Vary the height with more noise
