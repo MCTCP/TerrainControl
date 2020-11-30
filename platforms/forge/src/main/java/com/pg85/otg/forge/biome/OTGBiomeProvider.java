@@ -36,7 +36,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 			Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
 			Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
 			Codec.BOOL.fieldOf("large_biomes").orElse(false).stable().forGetter((provider) -> provider.largeBiomes),
-			RegistryLookupCodec.func_244331_a(Registry.field_239720_u_).forGetter((provider) -> provider.registry)
+			RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).forGetter((provider) -> provider.registry)
 		).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
  	
@@ -69,7 +69,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		{
 			BiomeConfig config = this.configLookup.get(biomeId);
 
-			RegistryKey<Biome> key = RegistryKey.func_240903_a_(Registry.field_239720_u_, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
+			RegistryKey<Biome> key = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
 			this.keyLookup.put(biomeId, key);
 		}
 	}
@@ -86,17 +86,17 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 			biomesForPreset = new ArrayList<>();
 		}		
 		return biomesForPreset.stream().map(
-			(p_242638_1_) -> () -> registry.func_243576_d(p_242638_1_)
+			(p_242638_1_) -> () -> registry.getOrThrow(p_242638_1_)
 		);
 	}
 
-	protected Codec<? extends BiomeProvider> func_230319_a_()
+	protected Codec<? extends BiomeProvider> getBiomeProviderCodec()
 	{
 		return CODEC;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public BiomeProvider func_230320_a_(long seed)
+	public BiomeProvider getBiomeProvider(long seed)
 	{
 		return new OTGBiomeProvider(this.presetName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
 	}
@@ -113,7 +113,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
 	{
-		return registry.func_230516_a_(keyLookup.get(this.layer.sample(biomeX, biomeZ)));
+		return registry.getValueForKey(keyLookup.get(this.layer.sample(biomeX, biomeZ)));
 	}
 
 	@Override

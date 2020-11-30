@@ -28,10 +28,10 @@ public final class ForgeMojangSettings implements MojangSettings
      */
     public static MojangSettings fromId(int biomeId)
     {
-    	RegistryKey<Biome> baseBiomeRegistryKey = BiomeRegistry.func_244203_a(biomeId);
+    	RegistryKey<Biome> baseBiomeRegistryKey = BiomeRegistry.getKeyFromID(biomeId);
     	if(baseBiomeRegistryKey != null)
     	{
-    		Biome biome = ForgeRegistries.BIOMES.getValue(baseBiomeRegistryKey.func_240901_a_());    		
+    		Biome biome = ForgeRegistries.BIOMES.getValue(baseBiomeRegistryKey.getLocation());
     		return fromBiomeBase(biome);
     	}
     	return null;
@@ -74,13 +74,13 @@ public final class ForgeMojangSettings implements MojangSettings
     @Override
     public LocalMaterialData getSurfaceBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.func_242440_e().func_242502_e().getTop());
+        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getTop());
     }
 
     @Override
     public LocalMaterialData getGroundBlock()
     {
-        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.func_242440_e().func_242502_e().getUnder());
+        return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getUnder());
     }
 
     @Override

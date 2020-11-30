@@ -25,6 +25,7 @@ class ForgeChunkBuffer extends ChunkBuffer
 		return ChunkCoordinate.fromChunkCoords(pos.x, pos.z);
 	}
 
+	// TODO: fastpath for setBlockState
 	@Override
 	public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
 	{

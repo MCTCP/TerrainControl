@@ -29,7 +29,7 @@ minecraft {
     // stable_#            Stables are built at the discretion of the MCP team.
     // Use non-default mappings at your own risk. they may not always work.
     // Simply re-run your setup task after changing the mappings to update your workspace.
-	mappings channel: 'snapshot', version: '20200514-1.16'
+	mappings channel: 'snapshot', version: '20201028-1.16.3'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
     // Default run configurations.
@@ -89,7 +89,7 @@ minecraft {
 
 dependencies
 {	
-    minecraft 'net.minecraftforge:forge:1.16.3-34.1.0'
+    minecraft 'net.minecraftforge:forge:1.16.4-35.1.7'
 	
 	compile project(':common:common-util')
 	compile project(':common:common-config')

@@ -68,7 +68,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 							return p_236090_0_.dimensionConfig.toYamlString();
 						}
 					),						
-					BiomeProvider.field_235202_a_.fieldOf("biome_source").forGetter(
+					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
 						(p_236096_0_) -> {
 							return p_236096_0_.biomeProvider;
 						}
@@ -136,7 +136,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// It looks like vanilla just inserts the same biomeprovider twice?
 	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfigSupplier, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().func_236108_a_(), seed);
+		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().getStructures(), seed);
 
 		if (!(biomeProvider1 instanceof LayerSource))
 		{
@@ -147,7 +147,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.worldSeed = seed;
 		DimensionSettings dimensionsettings = dimensionSettingsSupplier.get();
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;
-		NoiseSettings noisesettings = dimensionsettings.func_236113_b_();
+		NoiseSettings noisesettings = dimensionsettings.getNoise();
 		this.noiseHeight = noisesettings.func_236169_a_();
 		
 		// Unloaded chunk data caches for BO4's
@@ -167,7 +167,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public ChunkGenerator func_230349_a_(long seed)
 	{
-		return new OTGNoiseChunkGenerator(this.dimensionConfig, this.biomeProvider.func_230320_a_(seed), seed, this.dimensionSettingsSupplier);
+		return new OTGNoiseChunkGenerator(this.dimensionConfig, this.biomeProvider.getBiomeProvider(seed), seed, this.dimensionSettingsSupplier);
 	}
 	
 	// TODO: Move this to WorldLoader when ready?
@@ -229,7 +229,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			ChunkPrimer protoChunk = (ChunkPrimer)chunk;
 
 			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
-			BitSet carvingMask = protoChunk.func_230345_b_(stage); // get or create carving mask
+			BitSet carvingMask = protoChunk.getOrAddCarvingMask(stage);
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
 		}
 	}
@@ -248,7 +248,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				
 		// Fetch the biomeConfig by registryKey
 		RegistryKey<Biome> key = ((OTGBiomeProvider)this.biomeProvider).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
-		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.func_240901_a_().toString());
+		BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(key.getLocation().toString());
 
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), blockX, blockZ);
@@ -290,34 +290,34 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public List<MobSpawnInfo.Spawners> func_230353_a_(Biome biome, StructureManager structureManager, EntityClassification entityClassification, BlockPos blockPos)
 	{
-		if (structureManager.func_235010_a_(blockPos, true, Structure.field_236374_j_).isValid())
+		if (structureManager.getStructureStart(blockPos, true, Structure.SWAMP_HUT).isValid())
 		{
 			if (entityClassification == EntityClassification.MONSTER)
 			{
-				return Structure.field_236374_j_.getSpawnList();
+				return Structure.SWAMP_HUT.getSpawnList();
 			}
 
 			if (entityClassification == EntityClassification.CREATURE)
 			{
-				return Structure.field_236374_j_.getCreatureSpawnList();
+				return Structure.SWAMP_HUT.getCreatureSpawnList();
 			}
 		}
 
 		if (entityClassification == EntityClassification.MONSTER)
 		{
-			if (structureManager.func_235010_a_(blockPos, false, Structure.field_236366_b_).isValid())
+			if (structureManager.getStructureStart(blockPos, false, Structure.PILLAGER_OUTPOST).isValid())
 			{
-				return Structure.field_236366_b_.getSpawnList();
+				return Structure.PILLAGER_OUTPOST.getSpawnList();
 			}
 
-			if (structureManager.func_235010_a_(blockPos, false, Structure.field_236376_l_).isValid())
+			if (structureManager.getStructureStart(blockPos, false, Structure.MONUMENT).isValid())
 			{
-				return Structure.field_236376_l_.getSpawnList();
+				return Structure.MONUMENT.getSpawnList();
 			}
 
-			if (structureManager.func_235010_a_(blockPos, true, Structure.field_236378_n_).isValid())
+			if (structureManager.getStructureStart(blockPos, true, Structure.FORTRESS).isValid())
 			{
-				return Structure.field_236378_n_.getSpawnList();
+				return Structure.FORTRESS.getSpawnList();
 			}
 		}
 
@@ -327,7 +327,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Noise
 
 	@Override
-	public int func_222529_a(int x, int z, Type heightmapType)
+	public int getHeight(int x, int z, Type heightmapType)
 	{
 		// TODO: Used for structure spawning, implement this. See NoiseChunkGenerator func_222529_a
 		return 0;
@@ -349,13 +349,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	@Override
-	public int func_230355_e_()
+	public int getMaxBuildHeight()
 	{
 		return this.noiseHeight;
 	}
 
 	@Override
-	public int func_230356_f_()
+	public int getSeaLevel()
 	{
 		return this.dimensionSettingsSupplier.get().func_236119_g_();
 	}	

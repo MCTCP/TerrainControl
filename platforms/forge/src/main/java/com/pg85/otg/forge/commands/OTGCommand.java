@@ -73,7 +73,7 @@ public class OTGCommand
 			}
 		}
 
-		String fileName = source.getServer().func_240793_aU_().getWorldName() + " biomes.png";
+		String fileName = source.getServer().getServerConfiguration().getWorldName() + " biomes.png";
 
 		source.sendFeedback(new StringTextComponent("Finished mapping! The resulting image is located at " + fileName + "."), true);
 

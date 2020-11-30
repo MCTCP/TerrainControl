@@ -40,8 +40,8 @@ import com.pg85.otg.forge.gui.screens.CreateOTGWorldScreen;
 public class OTGPlugin
 {
 	// Generate registry key for OTG DimensionSettings
-	private static final RegistryKey<DimensionSettings> OTG_DIMENSION_SETTINGS_KEY = RegistryKey.func_240903_a_(
-		Registry.field_243549_ar, 
+	private static final RegistryKey<DimensionSettings> OTG_DIMENSION_SETTINGS_KEY = RegistryKey.getOrCreateKey(
+		Registry.NOISE_SETTINGS_KEY,
 		new ResourceLocation(Constants.MOD_ID_SHORT, "otg_dimension")
 	);
 	
@@ -51,7 +51,7 @@ public class OTGPlugin
 		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
 			// Provide our custom chunk generator, biome provider and dimension settings.
-			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetName(), seed, false, false, biomes), seed, () -> dimensionSettings.func_243576_d(OTG_DIMENSION_SETTINGS_KEY));
+			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(OTG_DIMENSION_SETTINGS_KEY));
 		}
 	};
 
@@ -62,9 +62,9 @@ public class OTGPlugin
 		
 		// Register OTG DimensionSettings for OTG worlds/dims
 		// TODO: Taken from vanilla overworld dim settings, adapt.
-		WorldGenRegistries.func_243664_a(
-			WorldGenRegistries.field_243658_j, 
-			OTGPlugin.OTG_DIMENSION_SETTINGS_KEY.func_240901_a_(), 
+		WorldGenRegistries.register(
+			WorldGenRegistries.NOISE_SETTINGS,
+			OTGPlugin.OTG_DIMENSION_SETTINGS_KEY.getLocation(),
 			new DimensionSettings(
 				new DimensionStructuresSettings(true), 
 				new NoiseSettings(
@@ -118,14 +118,14 @@ public class OTGPlugin
 
 	private static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, DimensionGeneratorSettings dimensionGeneratorSettings, DimensionConfig dimensionConfig)
 	{
-		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.func_243612_b(Registry.field_239698_ad_);
-		Registry<Biome> biomesRegistry = dynamicRegistries.func_243612_b(Registry.field_239720_u_);
-		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.func_243612_b(Registry.field_243549_ar);
+		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.getRegistry(Registry.DIMENSION_TYPE_KEY);
+		Registry<Biome> biomesRegistry = dynamicRegistries.getRegistry(Registry.BIOME_KEY);
+		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.getRegistry(Registry.NOISE_SETTINGS_KEY);
 		
 		return new DimensionGeneratorSettings(
-			dimensionGeneratorSettings.func_236221_b_(),
-			dimensionGeneratorSettings.func_236222_c_(),
-			dimensionGeneratorSettings.func_236223_d_(),
+			dimensionGeneratorSettings.getSeed(),
+			dimensionGeneratorSettings.doesGenerateFeatures(),
+			dimensionGeneratorSettings.hasBonusChest(),
 			DimensionGeneratorSettings.func_242749_a(
 				dimensionTypesRegistry,
 				dimensionGeneratorSettings.func_236224_e_(),
@@ -133,13 +133,13 @@ public class OTGPlugin
 					dimensionConfig,
 					new OTGBiomeProvider(
 						dimensionConfig.PresetName,
-						dimensionGeneratorSettings.func_236221_b_(),
+						dimensionGeneratorSettings.getSeed(),
 						false,
 						false,
 						biomesRegistry
 					),
-					dimensionGeneratorSettings.func_236221_b_(),
-					() -> { return dimensionSettingsRegistry.func_243576_d(OTG_DIMENSION_SETTINGS_KEY); }
+					dimensionGeneratorSettings.getSeed(),
+					() -> dimensionSettingsRegistry.getOrThrow(OTG_DIMENSION_SETTINGS_KEY)
 				)
 			)
 		);
@@ -155,9 +155,9 @@ public class OTGPlugin
 		// Register ourselves for server and other game events we are interested in
 		MinecraftForge.EVENT_BUS.register(this);
 		
-		// TODO: Document why we need these, they don't appear to be used for anything atm?
-		Registry.register(Registry.field_239689_aA_, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
-		Registry.register(Registry.field_239690_aB_, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
+		// These are needed to let the game know about our chunk generator and biome provider. If they are not added, then the game will error and not save games properly.
+		Registry.register(Registry.BIOME_PROVIDER_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
+		Registry.register(Registry.CHUNK_GENERATOR_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		
         // Start OpenTerrainGenerator engine, loads all presets.
         OTG.startEngine(new ForgeEngine());

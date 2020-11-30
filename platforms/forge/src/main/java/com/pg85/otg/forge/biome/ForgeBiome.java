@@ -59,7 +59,7 @@ public class ForgeBiome implements IBiome
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 		
 		// NOOP surface builder, surface/ground/stone blocks / sagc are done during base terrain gen.
-		biomeGenerationSettingsBuilder.func_242517_a(ConfiguredSurfaceBuilders.field_244184_p);
+		biomeGenerationSettingsBuilder.withSurfaceBuilder(ConfiguredSurfaceBuilders.field_244184_p);
 
 		// Default structures
 		addDefaultStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
@@ -76,17 +76,17 @@ public class ForgeBiome implements IBiome
 
 	    BiomeAmbience.Builder biomeAmbienceBuilder =
 			new BiomeAmbience.Builder()
-				.func_235239_a_(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 12638463)
-				.func_235248_c_(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 329011) // TODO: Add a setting for Water fog color.						
-				.func_235246_b_(biomeConfig.getWaterColor() != 0xffffff ? biomeConfig.getWaterColor() : 4159204)
-				.func_242539_d(biomeConfig.getSkyColor() != 0x7BA5FF ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
+				.setFogColor(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 12638463)
+				.setWaterFogColor(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 329011) // TODO: Add a setting for Water fog color.
+				.setWaterColor(biomeConfig.getWaterColor() != 0xffffff ? biomeConfig.getWaterColor() : 4159204)
+				.withSkyColor(biomeConfig.getSkyColor() != 0x7BA5FF ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
 				// TODO: Implement these
 				//particle
 				//.func_235244_a_()
 				//ambient_sound
 				//.func_235241_a_() // Sound event?
 				//mood_sound
-				.func_235243_a_(MoodSoundAmbience.field_235027_b_) // TODO: Find out what this is, a sound?
+				.setMoodSound(MoodSoundAmbience.DEFAULT_CAVE) // TODO: Find out what this is, a sound?
 				//additions_sound
 				//.func_235242_a_()
 				//music
@@ -95,14 +95,14 @@ public class ForgeBiome implements IBiome
 
 	    if(biomeConfig.getFoliageColor() != 0xffffff)
 	    {
-			biomeAmbienceBuilder.func_242540_e(biomeConfig.getFoliageColor());
+			biomeAmbienceBuilder.withFoliageColor(biomeConfig.getFoliageColor());
 	    }
 
 	    if(biomeConfig.getGrassColor() != 0xffffff)
 	    {
 	    	if(!biomeConfig.getGrassColorIsMultiplier())
 	    	{
-				biomeAmbienceBuilder.func_242541_f(biomeConfig.getGrassColor());
+				biomeAmbienceBuilder.withGrassColor(biomeConfig.getGrassColor());
 	    	} else {
 	    		// TODO: grass color multiplier
 	    		//int multipliedGrassColor = (defaultGrassColor + biomeConfig.grassColor) / 2;
@@ -123,21 +123,21 @@ public class ForgeBiome implements IBiome
 			.temperature(safeTemperature)
 			.downfall(biomeConfig.getBiomeWetness())
 			// Ambience (colours/sounds)
-			.func_235097_a_(
-				biomeAmbienceBuilder.func_235238_a_()
+			.setEffects(
+				biomeAmbienceBuilder.build()
 			// Mob spawning
-			).func_242458_a(
-				mobSpawnInfoBuilder.func_242577_b() // Validate & build
+			).withMobSpawnSettings(
+				mobSpawnInfoBuilder.copy() // Validate & build
 			// All other biome settings...
-			).func_242457_a(
-				biomeGenerationSettingsBuilder.func_242508_a() // Validate & build
+			).withGenerationSettings(
+				biomeGenerationSettingsBuilder.build() // Validate & build
 			)
 		;
 
 		return
 			biomeBuilder
 				// Finalise
-				.func_242455_a() // Validate & build
+				.build() // Validate & build
 				.setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()))
 		;
 	}
@@ -150,7 +150,7 @@ public class ForgeBiome implements IBiome
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
 			{
-				mobSpawnInfoBuilder.func_242575_a(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.withSpawner(EntityClassification.MONSTER, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
@@ -160,7 +160,7 @@ public class ForgeBiome implements IBiome
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
 			{
-				mobSpawnInfoBuilder.func_242575_a(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.withSpawner(EntityClassification.CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
@@ -170,7 +170,7 @@ public class ForgeBiome implements IBiome
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
 			{
-				mobSpawnInfoBuilder.func_242575_a(EntityClassification.WATER_CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.withSpawner(EntityClassification.WATER_CREATURE, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
@@ -180,7 +180,7 @@ public class ForgeBiome implements IBiome
 			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
 			if(entityType.isPresent())
 			{
-				mobSpawnInfoBuilder.func_242575_a(EntityClassification.AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+				mobSpawnInfoBuilder.withSpawner(EntityClassification.AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
 			} else {
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
@@ -188,7 +188,7 @@ public class ForgeBiome implements IBiome
 		
 		// TODO: EntityClassification.WATER_AMBIENT / EntityClassification.MISC ?
 		
-		mobSpawnInfoBuilder.func_242571_a(); // Default biomes do this, not sure if needed. Does the opposite of disablePlayerSpawn?
+		mobSpawnInfoBuilder.isValidSpawnBiomeForPlayer(); // Default biomes do this, not sure if needed. Does the opposite of disablePlayerSpawn?
 		return mobSpawnInfoBuilder;
 	}
 	
@@ -199,36 +199,36 @@ public class ForgeBiome implements IBiome
 		{
 			if(biomeConfig.getVillageType() == VillageType.sandstone)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244155_u);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.VILLAGE_DESERT);
 			}
 			else if(biomeConfig.getVillageType() == VillageType.savanna)
 	        {
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244156_v);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.VILLAGE_SAVANNA);
 	        }
 			else if(biomeConfig.getVillageType() == VillageType.taiga)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244158_x);			
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.VILLAGE_TAIGA);
 			}
 			else if(biomeConfig.getVillageType() == VillageType.wood)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244154_t);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.VILLAGE_PLAINS);
 			}
 			else if(biomeConfig.getVillageType() == VillageType.snowy)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244157_w);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.VILLAGE_SNOWY);
 			}
 		}
 		
 		// TODO: Stronghold count, distance, spread.
 		if(worldConfig.getStrongholdsEnabled())
 		{
-			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244145_k);
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.STRONGHOLD);
 		}
 				
 		// TODO: Ocean monument gridsize, offset.
 		if(worldConfig.getOceanMonumentsEnabled())
 		{
-			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244146_l);
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.MONUMENT);
 		}
 		
 		// TODO: Min/max distance for rare buildings.
@@ -236,30 +236,30 @@ public class ForgeBiome implements IBiome
 		{
 			if(biomeConfig.getRareBuildingType() == RareBuildingType.desertPyramid)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244140_f);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.DESERT_PYRAMID);
 			}		
 			if(biomeConfig.getRareBuildingType() == RareBuildingType.igloo)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244141_g);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.IGLOO);
 			}		
 			if(biomeConfig.getRareBuildingType() == RareBuildingType.jungleTemple)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244139_e);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.JUNGLE_PYRAMID);
 			}
 			if(biomeConfig.getRareBuildingType() == RareBuildingType.swampHut)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244144_j);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.SWAMP_HUT);
 			}
 		}
 		
 		if(biomeConfig.getWoodlandMansionsEnabled())
 		{
-			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244138_d);
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.MANSION);
 		}
 		
 		if(biomeConfig.getNetherFortressesEnabled())
 		{
-			biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244149_o);
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.FORTRESS);
 		}
 
 		// TODO: Mineshaft rarity.
@@ -267,45 +267,45 @@ public class ForgeBiome implements IBiome
 		{
 			if(biomeConfig.getMineShaftType() == MineshaftType.normal)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244136_b);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.MINESHAFT);
 			}
 			else if(biomeConfig.getMineShaftType() == MineshaftType.mesa)
 			{
-				biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244137_c);
+				biomeGenerationSettingsBuilder.withStructure(StructureFeatures.MINESHAFT_BADLANDS);
 			}
 		}
 		
 		// Buried Treasure
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244152_r); // buried_treasure		
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244152_r); // buried_treasure		
 		
 		// Ocean Ruins
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244147_m); // ocean_ruin_cold
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244148_n); // ocean_ruin_warm
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244147_m); // ocean_ruin_cold
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244148_n); // ocean_ruin_warm
 				
 		// Shipwreck
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244142_h); // shipwreck
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244143_i); // shipwreck_beached		
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244142_h); // shipwreck
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244143_i); // shipwreck_beached		
 		
 		// Pillager Outpost
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244135_a);
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244135_a);
 		
 		// Bastion Remnant
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244153_s);
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244153_s);
 		
 		// Nether Fossil
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244150_p);
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244150_p);
 		
 		// End City
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244151_q);
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244151_q);
 		
 		// Ruined Portal
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244159_y); // ruined_portal
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244160_z); // ruined_portal_desert
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244130_A); // ruined_portal_jungle
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244131_B); // ruined_portal_swamp
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244132_C); // ruined_portal_mountain
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244133_D); // ruined_portal_ocean
-		//biomeGenerationSettingsBuilder.func_242516_a(StructureFeatures.field_244134_E); // ruined_portal_nether
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244159_y); // ruined_portal
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244160_z); // ruined_portal_desert
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244130_A); // ruined_portal_jungle
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244131_B); // ruined_portal_swamp
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244132_C); // ruined_portal_mountain
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244133_D); // ruined_portal_ocean
+		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244134_E); // ruined_portal_nether
 		
 		// TODO: Fossil
 		// TODO: Amethyst Geode (1.17?)
@@ -321,7 +321,7 @@ public class ForgeBiome implements IBiome
 		if(worldConfig.getCaveFrequency() > 0 && worldConfig.getCaveRarity() > 0)
 		{
 			// Caves and ravines default config
-			DefaultBiomeFeatures.func_243738_d(biomeGenerationSettingsBuilder);
+			DefaultBiomeFeatures.withCavesAndCanyons(biomeGenerationSettingsBuilder);
 			//DefaultBiomeFeatures.func_243740_e(biomeGenerationSettingsBuilder); // Ocean caves, air and water carver?
 		}
 	}
