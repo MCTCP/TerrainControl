@@ -364,12 +364,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		double xLerp = (double) xProgress / 4.0;
 		double zLerp = (double) zProgress / 4.0;
 		// Create the noise data in a 2 * 2 * 32 grid for interpolation.
-		double[][] noiseData = new double[4][33];
+		double[][] noiseData = new double[4][this.internalGenerator.getNoiseSizeY() + 1];
 
 		// Initialize noise array.
 		for (int i = 0; i < noiseData.length; i++)
 		{
-			noiseData[i] = new double[this.internalGenerator.getNoiseSizeY()];
+			noiseData[i] = new double[this.internalGenerator.getNoiseSizeY() + 1];
 		}
 
 		// Sample all 4 nearby columns.
@@ -379,7 +379,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator.getNoiseColumn(noiseData[3], xStart + 1, zStart + 1);
 
 		// [0, 32] -> noise chunks
-		for (int noiseY = this.internalGenerator.getNoiseSizeY() - 2; noiseY >= 0; --noiseY)
+		for (int noiseY = this.internalGenerator.getNoiseSizeY() - 1; noiseY >= 0; --noiseY)
 		{
 			// Gets all the noise in a 2x2x2 cube and interpolates it together.
 			// Lower pieces

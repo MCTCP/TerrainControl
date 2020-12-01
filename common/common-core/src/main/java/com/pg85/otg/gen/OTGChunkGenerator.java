@@ -486,7 +486,7 @@ public class OTGChunkGenerator
 
 	public int getNoiseSizeY()
 	{
-		return noiseSizeY + 1;
+		return noiseSizeY;
 	}
 
 	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
