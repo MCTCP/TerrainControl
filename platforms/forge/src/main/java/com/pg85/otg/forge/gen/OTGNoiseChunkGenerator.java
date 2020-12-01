@@ -396,12 +396,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			// [0, 8] -> noise pieces
 			for (int pieceY = 7; pieceY >= 0; --pieceY)
 			{
-				double yLerp = (double) pieceY / (double) this.internalGenerator.getNoiseSizeY();
+				double yLerp = (double) pieceY / 8.0;
 				// Density at this position given the current y interpolation
 				double density = MathHelper.lerp3(yLerp, xLerp, zLerp, x0z0y0, x0z0y1, x1z0y0, x1z0y1, x0z1y0, x0z1y1, x1z1y0, x1z1y1);
 
 				// Get the real y position (translate noise chunk and noise piece)
-				int y = noiseY * this.internalGenerator.getNoiseSizeY() + pieceY;
+				int y = (noiseY * 8) + pieceY;
 
 				BlockState state = this.getBlockState(density, y, this.internalGenerator.getBiomeAtWorldCoord(x, z));
 				if (blockStates != null)
