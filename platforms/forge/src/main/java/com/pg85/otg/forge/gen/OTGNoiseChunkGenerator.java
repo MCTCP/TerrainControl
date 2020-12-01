@@ -379,7 +379,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.internalGenerator.getNoiseColumn(noiseData[3], xStart + 1, zStart + 1);
 
 		// [0, 32] -> noise chunks
-		for (int noiseY = this.internalGenerator.getNoiseSizeY() - 1; noiseY >= 0; --noiseY)
+		for (int noiseY = this.internalGenerator.getNoiseSizeY() - 2; noiseY >= 0; --noiseY)
 		{
 			// Gets all the noise in a 2x2x2 cube and interpolates it together.
 			// Lower pieces
