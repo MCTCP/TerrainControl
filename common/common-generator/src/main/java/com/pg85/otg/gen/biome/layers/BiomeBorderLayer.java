@@ -39,14 +39,14 @@ public class BiomeBorderLayer implements ParentedLayer
 	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
 	{
         int center = parent.sample(x, z);
-        int cCheck = (center & BiomeLayers.BIOME_BITS);
-               
+        int cCheck = BiomeLayers.getBiomeFromLayer(center);
+        
         if (bordersFrom[cCheck] != null)
         {
-            int northCheck = (parent.sample(x, z - 1) & BiomeLayers.BIOME_BITS);
-            int southCheck = (parent.sample(x + 1, z) & BiomeLayers.BIOME_BITS);
-            int eastCheck = (parent.sample(x, z + 1) & BiomeLayers.BIOME_BITS);
-            int westCheck = (parent.sample(x - 1, z) & BiomeLayers.BIOME_BITS);
+            int northCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z - 1));
+            int southCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z));
+            int eastCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z + 1));
+            int westCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z));
             boolean[] biomeFrom = bordersFrom[cCheck];
             
             if (biomeFrom[northCheck] && biomeFrom[eastCheck] && biomeFrom[westCheck] && biomeFrom[southCheck])
@@ -57,20 +57,20 @@ public class BiomeBorderLayer implements ParentedLayer
                 	center = 
             			(
             			center & (
-        					BiomeLayers.ISLAND_BIT | 
-        					//RiverBits | 
+        					BiomeLayers.ISLAND_BIT |
+        					BiomeLayers.RIVER_BITS |
         					BiomeLayers.ICE_BIT
 	    					)
 	        			) | 
-	        			BiomeLayers.LAND_BIT | 
+	        			BiomeLayers.LAND_BIT |
 	        			bordersTo[cCheck]
         			;
                 } else {
 	                // if it's not suitable, try again but sample in an X formation to make sure we didn't miss any potential edge
-	                int nwCheck = parent.sample(x - 1, z - 1) & BiomeLayers.BIOME_BITS;
-	                int neCheck = parent.sample(x + 1, z - 1) & BiomeLayers.BIOME_BITS;
-	                int swCheck = parent.sample(x - 1, z + 1) & BiomeLayers.BIOME_BITS;
-	                int seCheck = parent.sample(x + 1, z + 1) & BiomeLayers.BIOME_BITS;
+	                int nwCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z - 1));
+	                int neCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z - 1));
+	                int swCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x - 1, z + 1));
+	                int seCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z + 1));
 	                
 	                if (biomeFrom[nwCheck] && biomeFrom[neCheck] && biomeFrom[swCheck] && biomeFrom[seCheck])
 	                {
@@ -80,12 +80,12 @@ public class BiomeBorderLayer implements ParentedLayer
 	                    	center = 
 	                    		(
                     				center & (
-	            						BiomeLayers.ISLAND_BIT 
-	            						//| RiverBits 
+	            						BiomeLayers.ISLAND_BIT
+	            						| BiomeLayers.RIVER_BITS
 	            						| BiomeLayers.ICE_BIT
 	        						)
 	            				)
-	                    		| BiomeLayers.LAND_BIT 
+	                    		| BiomeLayers.LAND_BIT
 	                    		| bordersTo[cCheck]
 	        				;
 	                    }

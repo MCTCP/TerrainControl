@@ -58,6 +58,7 @@ public class BiomeIsleLayer implements DiagonalCrossSamplingLayer
         int swCheck;
         int seCheck;
         int sample = center;
+        int centerCheck;
         
         // Start by just copying the biome from the child layer
 
@@ -77,17 +78,17 @@ public class BiomeIsleLayer implements DiagonalCrossSamplingLayer
                 seCheck = se & BiomeLayers.LAND_BIT;
             	
                 if (
-            		((center & BiomeLayers.LAND_BIT) == 0) && 
-            		(nwCheck == 0) && 
-            		(neCheck == 0) && 
-            		(swCheck == 0) && 
+            		((center & BiomeLayers.LAND_BIT) == 0) &&
+            		(nwCheck == 0) &&
+            		(neCheck == 0) &&
+            		(swCheck == 0) &&
             		(seCheck == 0) &&
             		context.nextInt(isle.chance) == 0
         		)
                 {
                 	sample = 
             			(sample & BiomeLayers.ICE_BIT) | 
-            			//(sample & RiverBits) | 
+            			(sample & BiomeLayers.RIVER_BITS) | 
             			BiomeLayers.LAND_BIT | 
             			isle.biomeId | 
             			BiomeLayers.ISLAND_BIT
@@ -97,25 +98,25 @@ public class BiomeIsleLayer implements DiagonalCrossSamplingLayer
             }
             if (!alreadySpawned)
             {
-            	int centerCheck = (center & BiomeLayers.BIOME_BITS);
-                nwCheck = (nw & BiomeLayers.BIOME_BITS);
-                neCheck = (ne & BiomeLayers.BIOME_BITS);
-                swCheck = (sw & BiomeLayers.BIOME_BITS);
-                seCheck = (se & BiomeLayers.BIOME_BITS);
+            	centerCheck = BiomeLayers.getBiomeFromLayer(center);
+                nwCheck = BiomeLayers.getBiomeFromLayer(nw);
+                neCheck = BiomeLayers.getBiomeFromLayer(ne);
+                swCheck = BiomeLayers.getBiomeFromLayer(sw);
+                seCheck = BiomeLayers.getBiomeFromLayer(se);
             	
                 if (
-            		isle.canSpawnIn[centerCheck] && 
-            		isle.canSpawnIn[nwCheck] && 
-            		isle.canSpawnIn[neCheck] && 
-            		isle.canSpawnIn[swCheck] && 
-            		isle.canSpawnIn[seCheck] && 
+            		isle.canSpawnIn[centerCheck] &&
+            		isle.canSpawnIn[nwCheck] &&
+            		isle.canSpawnIn[neCheck] &&
+            		isle.canSpawnIn[swCheck] &&
+            		isle.canSpawnIn[seCheck] &&
             		context.nextInt(isle.chance) == 0
         		)
                 {
                 	sample = 
             			(sample & BiomeLayers.LAND_BIT) | 
             			(sample & BiomeLayers.ICE_BIT) | 
-            			//(sample & RiverBits) | 
+            			(sample & BiomeLayers.RIVER_BITS) | 
             			isle.biomeId |
             			BiomeLayers.ISLAND_BIT
         			;
@@ -123,5 +124,5 @@ public class BiomeIsleLayer implements DiagonalCrossSamplingLayer
             }
         }
         return sample;
-	}	
+	}
 }
