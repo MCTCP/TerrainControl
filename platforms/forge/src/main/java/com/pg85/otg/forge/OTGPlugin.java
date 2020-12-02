@@ -9,8 +9,10 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.DimensionType;
 import net.minecraft.world.biome.Biome;
+import net.minecraft.world.biome.provider.OverworldBiomeProvider;
 import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.DimensionSettings;
+import net.minecraft.world.gen.NoiseChunkGenerator;
 import net.minecraft.world.gen.settings.DimensionGeneratorSettings;
 import net.minecraft.world.gen.settings.DimensionStructuresSettings;
 import net.minecraft.world.gen.settings.NoiseSettings;
@@ -51,7 +53,16 @@ public class OTGPlugin
 		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
 			// Provide our custom chunk generator, biome provider and dimension settings.
-			return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(OTG_DIMENSION_SETTINGS_KEY));
+			if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
+			{
+				return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(OTG_DIMENSION_SETTINGS_KEY));
+			} else {
+				// If no presets are installed, return the default chunkgenerator / biomeprovider
+				return new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, biomes), seed, () ->
+				{
+					return dimensionSettings.getOrThrow(DimensionSettings.field_242734_c);
+				});
+			}
 		}
 	};
 
@@ -89,22 +100,28 @@ public class OTGPlugin
 				Optional.of(OTG_WORLD_TYPE),
 				(createWorldScreen, dimensionGeneratorSettings) ->
 				{
-					return new CreateOTGWorldScreen(
-						createWorldScreen,
-						createWorldScreen.field_238934_c_.func_239055_b_(),
-						// Define apply function, generates updated 
-						// settings when leaving customisation menu.
-						(dimensionConfig) ->
-						{
-							createWorldScreen.field_238934_c_.func_239043_a_(
-								OTGPlugin.createOTGDimensionGeneratorSettings(
-									createWorldScreen.field_238934_c_.func_239055_b_(),
-									dimensionGeneratorSettings,
-									dimensionConfig
-								)
-							);
-						}
-					);
+					if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
+					{
+						return new CreateOTGWorldScreen(
+							createWorldScreen,
+							createWorldScreen.field_238934_c_.func_239055_b_(),
+							// Define apply function, generates updated 
+							// settings when leaving customisation menu.
+							(dimensionConfig) ->
+							{
+								createWorldScreen.field_238934_c_.func_239043_a_(
+									OTGPlugin.createOTGDimensionGeneratorSettings(
+										createWorldScreen.field_238934_c_.func_239055_b_(),
+										dimensionGeneratorSettings,
+										dimensionConfig
+									)
+								);
+							}
+						);
+					} else {
+						// If no preset are installed, do nothing (exits to main menu)
+						return null;
+					}
 				}
 			)
 		;
