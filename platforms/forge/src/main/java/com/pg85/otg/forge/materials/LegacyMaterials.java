@@ -123,8 +123,13 @@ class LegacyMaterials
     			return Blocks.SNOW.getDefaultState();
     		case "leaves":
     			return Blocks.OAK_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
+    		case "leaves_2":
+    			return Blocks.ACACIA_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
     		case "red_rose":
     			return Blocks.ROSE_BUSH.getDefaultState();
+    		// TODO: This only spawns the bottom half?
+    		case "double_plant":
+    			return Blocks.SUNFLOWER.getDefaultState();
     			
 			case "wood_stairs":
 			case "oak_stairs":
@@ -179,6 +184,8 @@ class LegacyMaterials
     		case "log":
     		case "wood":
     			return Blocks.OAK_LOG.getDefaultState();
+    		case "log_2":
+    			return Blocks.ACACIA_LOG.getDefaultState();    			
     		case "magma":
     			return Blocks.MAGMA_BLOCK.getDefaultState();
     		case "tallgrass":
@@ -1105,6 +1112,7 @@ class LegacyMaterials
 	    					return Blocks.JUNGLE_LEAVES.getDefaultState().with(LeavesBlock.DISTANCE, 1);
 	    			}
 	    		case "leaves2":
+	    		case "leaves_2":
 	    		case "acacia_leaves":
 	    			switch(data)
 	    			{
