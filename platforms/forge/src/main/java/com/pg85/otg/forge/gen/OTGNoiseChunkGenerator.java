@@ -2,10 +2,13 @@ package com.pg85.otg.forge.gen;
 
 import java.nio.file.Paths;
 import java.util.BitSet;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -17,7 +20,6 @@ import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.OTGChunkPopulator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
@@ -43,6 +45,9 @@ import net.minecraft.util.SharedSeedRandom;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.util.math.SectionPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Blockreader;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
@@ -118,6 +123,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private CustomStructureCache structureCache;
 	// TODO: Move this to WorldLoader when ready?
 	private boolean isInitialised = false;
+
+	private final Map<Integer, List<Structure<?>>> biomeStructures;
+
 	//
 
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
@@ -145,6 +153,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			throw new RuntimeException("OTG has detected an incompatible biome provider- try using otg:otg as the biome source name");
 		}
+
+		this.biomeStructures = Registry.STRUCTURE_FEATURE.stream().collect(Collectors.groupingBy((structure) -> {
+			return structure.getDecorationStage().ordinal();
+		}));
 
 		this.dimensionConfig = dimensionConfigSupplier;
 		this.worldSeed = seed;
@@ -276,11 +288,49 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	}
 
 	// Chunk population method taken from Biome (Biome.func_242427_a())
-	private void biomePopulate(BiomeConfig biomeConfig, StructureManager p_242427_1_, ChunkGenerator p_242427_2_, WorldGenRegion p_242427_3_, long p_242427_4_, SharedSeedRandom p_242427_6_, BlockPos p_242427_7_)
+	private void biomePopulate(BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{
-		init(((IServerWorldInfo) p_242427_3_.getWorldInfo()).getWorldName());
-		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(p_242427_7_.getX(), p_242427_7_.getZ());
-		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), p_242427_3_, this), biomeConfig, this.structureCache);
+		init(((IServerWorldInfo) world.getWorldInfo()).getWorldName());
+		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+
+		// TODO: cleanup/optimize this
+		// Structure generation
+		for(int step = 0; step < GenerationStage.Decoration.values().length; ++step)
+		{
+			int index = 0;
+			// Generate features if enabled
+			if (structureManager.canGenerateFeatures())
+			{
+				// Go through all the structures set to generate at this step
+				for (Structure<?> structure : this.biomeStructures.getOrDefault(step, Collections.emptyList()))
+				{
+					// Reset the random
+					random.setFeatureSeed(seed, index, step);
+					int chunkX = pos.getX() >> 4;
+					int chunkZ = pos.getZ() >> 4;
+					int chunkStartX = chunkX << 4;
+					int chunkStartZ = chunkZ << 4;
+
+					try
+					{
+						// Generate the structure if it exists in a biome this chunk.
+						// We don't have to do any work here, we can just let StructureManager handle it all.
+						structureManager.func_235011_a_(SectionPos.from(pos), structure).forEach(start ->
+								start.func_230366_a_(world, structureManager, chunkGenerator, random, new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15), new ChunkPos(chunkX, chunkZ)));
+					} catch (Exception exception)
+					{
+						CrashReport crashreport = CrashReport.makeCrashReport(exception, "Feature placement");
+						crashreport.makeCategory("Feature").addDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure)).addDetail("Description", () ->
+								structure.toString());
+						throw new ReportedException(crashreport);
+					}
+
+					++index;
+				}
+			}
+		}
+
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
