@@ -52,6 +52,8 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 
     protected int biomeRarity;
     protected int biomeSize;
+    
+    protected String riverBiome;
 
     protected LocalMaterialData stoneBlock;
     protected LocalMaterialData surfaceBlock;
@@ -599,6 +601,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     {
 		return this.biomeSizeWhenBorder;
 	}
+
+    @Override
+	public String getRiverBiome()
+    {
+		return this.riverBiome;
+	}          
     
 	//
 	

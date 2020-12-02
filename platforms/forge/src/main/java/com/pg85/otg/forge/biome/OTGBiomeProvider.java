@@ -45,7 +45,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	private final boolean largeBiomes;
 	private final Registry<Biome> registry;
 	private final CachingLayerSampler layer;
-	public final Int2ObjectMap<BiomeConfig> configLookup;
+	public final BiomeConfig[] configLookup;
 	private final Int2ObjectMap<RegistryKey<Biome>> keyLookup;
 	private final String presetName;
 	
@@ -64,10 +64,9 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
 		this.configLookup = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetName);
-
-		for (int biomeId : this.configLookup.keySet())
+		for (int biomeId = 0; biomeId < this.configLookup.length; biomeId++)
 		{
-			BiomeConfig config = this.configLookup.get(biomeId);
+			BiomeConfig config = this.configLookup[biomeId];
 
 			RegistryKey<Biome> key = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
 			this.keyLookup.put(biomeId, key);
@@ -125,6 +124,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	@Override
 	public BiomeConfig getConfig(int biomeX, int biomeZ)
 	{
-		return configLookup.get(this.layer.sample(biomeX, biomeZ));
+		int biomeId = this.layer.sample(biomeX, biomeZ);
+		return this.configLookup.length > biomeId ? configLookup[this.layer.sample(biomeX, biomeZ)] : null;
 	}
 }

@@ -78,4 +78,8 @@ public interface IWorldConfig
 	public ImageMode getImageMode();
 	public int getImageZOffset();
 	public int getImageXOffset();
+	public boolean getIsRandomRivers();
+	public int getRiverRarity();
+	public int getRiverSize();
+	public boolean getRiversEnabled();
 }

@@ -51,6 +51,13 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected String imageFillBiome;
 	protected int imageXOffset;
 	protected int imageZOffset;
+		
+	// Rivers
+	
+	protected int riverRarity;
+	protected int riverSize;
+	protected boolean riversEnabled;
+	protected boolean randomRivers;
 	
 	//
 	
@@ -607,5 +614,29 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public int getImageXOffset()
 	{
 		return this.imageXOffset;
+	}
+	
+	@Override
+	public boolean getIsRandomRivers()
+	{
+		return this.randomRivers;
+	}
+	
+	@Override
+	public int getRiverRarity()
+	{
+		return this.riverRarity;
+	}
+	
+	@Override
+	public int getRiverSize()
+	{
+		return this.riverSize;
+	}
+
+	@Override
+	public boolean getRiversEnabled()
+	{
+		return this.riversEnabled;
 	}
 }

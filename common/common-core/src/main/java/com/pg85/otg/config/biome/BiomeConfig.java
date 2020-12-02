@@ -101,7 +101,6 @@ public class BiomeConfig extends BiomeConfigBase
     
     private boolean doResourceInheritance = true;
 
-    private String riverBiome;
     private float riverHeight;
     private float riverVolatility;
     private double[] riverHeightMatrix;

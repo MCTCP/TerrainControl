@@ -54,6 +54,9 @@ public class WorldConfig extends WorldConfigBase
     //private FallbackConfig fallbacks;
     //private Map<String, LocalMaterialData> fallbackCache = new HashMap<String, LocalMaterialData>();
    
+    // TODO: Implement or remove ImprovedRivers
+    private boolean improvedRivers;
+    
     // For old biome generator
 
     private double minMoisture;
@@ -64,15 +67,7 @@ public class WorldConfig extends WorldConfigBase
     // Biome generator
     
     private boolean frozenOcean;
-	private String defaultFrozenOceanBiome;
-
-    // Rivers
-
-	private int riverRarity;
-	private int riverSize;
-	private boolean riversEnabled;
-	private boolean improvedRivers;
-	private boolean randomRivers;
+	private String defaultFrozenOceanBiome; 
 
     // Look settings
     private int worldFog;

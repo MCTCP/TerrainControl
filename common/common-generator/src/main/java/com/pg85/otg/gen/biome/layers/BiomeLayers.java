@@ -65,10 +65,12 @@ public class BiomeLayers
 	private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider, ILogger logger)
 	{
 		// Create an empty layer to start the biome generation
-		LayerFactory<T> factory = new InitializationLayer().create(contextProvider.apply(1L));;
+		LayerFactory<T> factory = new InitializationLayer().create(contextProvider.apply(1L));
+		LayerFactory<T> factoryRiver = new InitializationLayer().create(contextProvider.apply(1L));
+		boolean riversStarted = false;
 		
 		if(!(data.biomeMode == BiomeMode.FromImage && data.imageMode != ImageMode.ContinueNormal))
-		{			
+		{
 			// Iterate through the depth, manipulating the factory at specific points
 			for (int depth = 0; depth < data.generationDepth; depth++)
 			{
@@ -76,6 +78,11 @@ public class BiomeLayers
 				factory = new ScaleLayer().create(contextProvider.apply(2000L + depth), factory);
 				// TODO: probably should add smooth layer here
 	
+	            if (data.randomRivers && riversStarted)
+	            {
+	            	factoryRiver = new ScaleLayer().create(contextProvider.apply(2000L + depth), factoryRiver);
+	            }
+				
 				// If we're at the land size, initialize the land layer with the provided rarity.
 				if (depth == data.landSize)
 				{
@@ -100,6 +107,10 @@ public class BiomeLayers
 					{
 						factory = new BiomeLayer(data, depth).create(contextProvider.apply(depth), factory);
 					}
+		            if (depth == 3) // TODO: Why 3?
+		            {
+		            	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
+		            }
 				}
 				else if(data.biomeMode == BiomeMode.BeforeGroups)
 				{
@@ -107,13 +118,33 @@ public class BiomeLayers
 					{
 						factory = new BeforeGroupsLayer(data, depth).create(contextProvider.apply(depth), factory);
 					}
+					NewBiomeGroup iceGroup = data.groupRegistry.get(2);
+		            if (iceGroup != null)
+		            {
+		            	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
+		            }
 				}
-	
-	            if (depth == 3) // TODO: Why 3?
+				
+	            if (data.riverRarity == depth)
 	            {
-	            	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
+	                if (data.randomRivers)
+	                {
+	                	factoryRiver = new RiverInitLayer().create(contextProvider.apply(depth), factoryRiver);
+	                    riversStarted = true;
+	                } else {
+	                	factory = new RiverInitLayer().create(contextProvider.apply(depth), factory);
+	                }
+	        	}
+	            if ((data.generationDepth - data.riverSize) == depth)
+	            {
+	                if (data.randomRivers)
+	                {
+	                	factoryRiver = new RiverLayer().create(contextProvider.apply(5 + depth), factoryRiver);
+	                } else {
+	                	factory = new RiverLayer().create(contextProvider.apply(5 + depth), factory);
+	                }
 	            }
-	            
+
 	            List<NewBiomeData> isleBiomes = data.isleBiomesAtDepth.get(depth);
 	            if(isleBiomes != null && isleBiomes.size() > 0)
 	            {
@@ -156,9 +187,14 @@ public class BiomeLayers
 			factory = new ApplyOceanLayer(data).create(contextProvider.apply(3L), factory);
 			
 			// Finalize the biome data
-			factory = new FinalizeLayer().create(contextProvider.apply(1L), factory);
+	        if (data.randomRivers)
+	        {
+	        	factory = new FinalizeWithRiverLayer(data.riversEnabled, data.biomes, data.riverBiomes).create(contextProvider.apply(1L), factory, factoryRiver);
+	        } else {
+				factory = new FinalizeLayer(data.riversEnabled, data.biomes, data.riverBiomes).create(contextProvider.apply(1L), factory);
+	        }
 		}
-		
+
 		if(data.biomeMode == BiomeMode.FromImage)
 		{			
         	factory = new FromImageLayer(data, logger).create(contextProvider.apply(0), factory);

@@ -92,4 +92,5 @@ public interface IBiomeConfig
 	int getBiomeSizeWhenIsle();
 	int getBiomeSizeWhenBorder();
 	int getBiomeRarityWhenIsle();
+	String getRiverBiome();
 }

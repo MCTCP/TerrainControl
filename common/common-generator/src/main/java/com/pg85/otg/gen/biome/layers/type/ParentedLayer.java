@@ -5,7 +5,7 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 
 /**
- * They type for layers that modify the output based on the previous layer.
+ * The type for layers that modify the output based on the previous layer.
  */
 public interface ParentedLayer
 {

@@ -8,7 +8,8 @@ public class ApplyOceanLayer implements ParentedLayer
 {
 	private final BiomeLayerData data;
 
-	public ApplyOceanLayer(BiomeLayerData data) {
+	public ApplyOceanLayer(BiomeLayerData data)
+	{
 		this.data = data;
 	}
 

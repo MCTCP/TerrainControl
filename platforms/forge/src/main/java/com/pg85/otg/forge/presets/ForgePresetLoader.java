@@ -29,15 +29,13 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
 import com.pg85.otg.gen.biome.NewBiomeData;
-import it.unimi.dsi.fastutil.ints.Int2ObjectLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private final HashMap<String, Int2ObjectMap<BiomeConfig>> globalIdMapping = new HashMap<>();
+	private final HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
 	// Using a ref is much faster than using an object
 	private final HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();
 	private final Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
@@ -52,7 +50,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 	@Override
 	public BiomeConfig getBiomeConfig(String presetName, int biomeId)
 	{
-		return this.globalIdMapping.get(presetName).get(biomeId);
+		BiomeConfig[] biomes = this.globalIdMapping.get(presetName);
+		return biomes.length > biomeId ? biomes[biomeId] : null;
 	}
 	
 	@Override
@@ -66,7 +65,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 		return this.biomesByPresetName.get(presetName);
 	}
 
-	public Int2ObjectMap<BiomeConfig> getGlobalIdMapping(String presetName)
+	public BiomeConfig[] getGlobalIdMapping(String presetName)
 	{
 		return globalIdMapping.get(presetName);
 	}
@@ -97,15 +96,16 @@ public class ForgePresetLoader extends LocalPresetLoader
 			WorldConfig worldConfig = preset.getWorldConfig();
 			BiomeConfig oceanBiomeConfig = null;
 			
-			Int2ObjectMap<BiomeConfig> presetIdMapping = new Int2ObjectLinkedOpenHashMap<>();
+			List<BiomeConfig> biomeConfigs = preset.getAllBiomeConfigs();
+			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size() + 1]; // +1 for default ocean biome, which is registered twice.
 			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
 			
 			Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
 			Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
 			
 			Map<String, Integer> worldBiomes = new HashMap<>();
-			
-			for(BiomeConfig biomeConfig : preset.getAllBiomeConfigs())
+					
+			for(BiomeConfig biomeConfig : biomeConfigs)
 			{
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
 				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
@@ -120,7 +120,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				
  				presetBiomes.add(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, resourceLocation));
  				
- 				presetIdMapping.put(currentId, biomeConfig);
+ 				presetIdMapping[currentId] = biomeConfig;
  				presetReverseIdMapping.put(biomeConfig, currentId);
 
  				// Biome id 0 is reserved for ocean, used when a land column has 
@@ -130,7 +130,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  					// TODO: Can't map the same biome to 2 int keys for the reverse map
  					// make sure this doesn't cause problems :/.
  					oceanBiomeConfig = biomeConfig;
- 					presetIdMapping.put(0, biomeConfig);
+ 					presetIdMapping[0] = biomeConfig;
  				}
 
  				worldBiomes.put(biomeConfig.getName(), currentId);
@@ -233,7 +233,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			}
 
 			// Add the data and process isle/border biomes
-			data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes, biomeColorMap);
+			data.init(biomeDepths, groupDepths, isleBiomesAtDepth, borderBiomesAtDepth, worldBiomes, biomeColorMap, presetIdMapping);
 			
 			// Set data for this preset
 			this.presetGenerationData.put(preset.getName(), data);
