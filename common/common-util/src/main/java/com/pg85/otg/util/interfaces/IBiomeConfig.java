@@ -93,4 +93,20 @@ public interface IBiomeConfig
 	int getBiomeSizeWhenBorder();
 	int getBiomeRarityWhenIsle();
 	String getRiverBiome();
+	boolean getBuriedTreasureEnabled();
+	boolean getOceanRuinsColdEnabled();
+	boolean getOceanRuinsWarmEnabled();
+	boolean getShipWreckEnabled();
+	boolean getShipWreckBeachedEnabled();
+	boolean getPillagerOutpostEnabled();
+	boolean getBastionRemnantEnabled();
+	boolean getNetherFossilEnabled();
+	boolean getEndCityEnabled();
+	boolean getRuinedPortalEnabled();
+	boolean getRuinedPortalDesertEnabled();
+	boolean getRuinedPortalJungleEnabled();
+	boolean getRuinedPortalSwampEnabled();
+	boolean getRuinedPortalMountainEnabled();
+	boolean getRuinedPortalOceanEnabled();
+	boolean getRuinedPortalNetherEnabled();
 }

@@ -1,6 +1,7 @@
 package com.pg85.otg.forge.biome;
 
 import java.util.Optional;
+import java.util.Random;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.constants.Constants;
@@ -61,11 +62,10 @@ public class ForgeBiome implements IBiome
 		// NOOP surface builder, surface/ground/stone blocks / sagc are done during base terrain gen.
 		biomeGenerationSettingsBuilder.withSurfaceBuilder(ConfiguredSurfaceBuilders.field_244184_p);
 
-		// Default structures
-		addDefaultStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
+		// * Carvers are handled by OTG
 		
-		// Carvers
-		addCarvers(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);
+		// Default structures
+		addDefaultStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);	
 
 	    float safeTemperature = biomeConfig.getBiomeTemperature();
 	    if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
@@ -276,36 +276,84 @@ public class ForgeBiome implements IBiome
 		}
 		
 		// Buried Treasure
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244152_r); // buried_treasure		
+		if(biomeConfig.getBuriedTreasureEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.BURIED_TREASURE); // buried_treasure
+		}
 		
 		// Ocean Ruins
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244147_m); // ocean_ruin_cold
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244148_n); // ocean_ruin_warm
+		if(biomeConfig.getOceanRuinsColdEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.OCEAN_RUIN_COLD); // ocean_ruin_cold
+		}		
+		if(biomeConfig.getOceanRuinsWarmEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.OCEAN_RUIN_WARM); // ocean_ruin_warm
+		}		
 				
 		// Shipwreck
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244142_h); // shipwreck
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244143_i); // shipwreck_beached		
+		if(biomeConfig.getShipWreckEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.SHIPWRECK); // shipwreck
+		}
+		if(biomeConfig.getShipWreckBeachedEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.SHIPWRECK_BEACHED); // shipwreck_beached
+		}
 		
 		// Pillager Outpost
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244135_a);
+		if(biomeConfig.getPillagerOutpostEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.PILLAGER_OUTPOST);
+		}
 		
 		// Bastion Remnant
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244153_s);
+		if(biomeConfig.getBastionRemnantEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.BASTION_REMNANT);
+		}
 		
 		// Nether Fossil
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244150_p);
+		if(biomeConfig.getNetherFossilEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.NETHER_FOSSIL);
+		}
 		
 		// End City
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244151_q);
+		if(biomeConfig.getEndCityEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.END_CITY);
+		}
 		
 		// Ruined Portal
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244159_y); // ruined_portal
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244160_z); // ruined_portal_desert
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244130_A); // ruined_portal_jungle
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244131_B); // ruined_portal_swamp
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244132_C); // ruined_portal_mountain
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244133_D); // ruined_portal_ocean
-		//biomeGenerationSettingsBuilder.withStructure(StructureFeatures.field_244134_E); // ruined_portal_nether
+		if(biomeConfig.getRuinedPortalEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.RUINED_PORTAL); // ruined_portal
+		}
+		if(biomeConfig.getRuinedPortalDesertEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.RUINED_PORTAL_DESERT); // ruined_portal_desert
+		}
+		if(biomeConfig.getRuinedPortalJungleEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.RUINED_PORTAL_JUNGLE); // ruined_portal_jungle
+		}
+		if(biomeConfig.getRuinedPortalSwampEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.RUINED_PORTAL_SWAMP); // ruined_portal_swamp
+		}
+		if(biomeConfig.getRuinedPortalMountainEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.RUINED_PORTAL_MOUNTAIN); // ruined_portal_mountain
+		}
+		if(biomeConfig.getRuinedPortalOceanEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.RUINED_PORTAL_OCEAN); // ruined_portal_ocean
+		}
+		if(biomeConfig.getRuinedPortalNetherEnabled())
+		{
+			biomeGenerationSettingsBuilder.withStructure(StructureFeatures.RUINED_PORTAL_NETHER); // ruined_portal_nether
+		}
 		
 		// TODO: Fossil
 		// TODO: Amethyst Geode (1.17?)
@@ -313,17 +361,6 @@ public class ForgeBiome implements IBiome
 		// Misc structures: These structures generate even when the "Generate structures" world option is disabled, and also cannot be located with the /locate command.
 		// TODO: Dungeon
 		// TODO: Desert Well
-	}
-	
-	private static void addCarvers(Builder biomeGenerationSettingsBuilder, IWorldConfig worldConfig, IBiomeConfig biomeConfig)
-	{
-		// TODO: Hook up caves/ravines properly.
-		if(worldConfig.getCaveFrequency() > 0 && worldConfig.getCaveRarity() > 0)
-		{
-			// Caves and ravines default config
-			DefaultBiomeFeatures.withCavesAndCanyons(biomeGenerationSettingsBuilder);
-			//DefaultBiomeFeatures.func_243740_e(biomeGenerationSettingsBuilder); // Ocean caves, air and water carver?
-		}
 	}
 	
 	private static int getSkyColorForTemp(float p_244206_0_)

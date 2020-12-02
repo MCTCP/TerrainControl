@@ -329,8 +329,7 @@ public class WorldConfig extends WorldConfigBase
 
         // Main modes
     	// TODO: Re-enable writing, disabled for testing atm.
-        //this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);
-    	this.settingsMode = ConfigMode.WriteDisable;
+        this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);
         this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger, null);
         this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null);
 

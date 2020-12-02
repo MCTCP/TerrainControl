@@ -111,8 +111,24 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
     protected boolean netherFortressesEnabled;
     protected VillageType villageType;
     protected RareBuildingType rareBuildingType;
-    protected MineshaftType mineshaftType = MineshaftType.normal;
-	
+    protected MineshaftType mineshaftType = MineshaftType.normal;	
+	protected boolean buriedTreasureEnabled;
+	protected boolean oceanRuinsColdEnabled;
+	protected boolean oceanRuinsWarmEnabled;
+	protected boolean shipWreckEnabled;
+	protected boolean shipWreckBeachedEnabled;
+	protected boolean pillagerOutpostEnabled;
+	protected boolean bastionRemnantEnabled;
+	protected boolean netherFossilEnabled;
+	protected boolean endCityEnabled;
+	protected boolean ruinedPortalEnabled;
+	protected boolean ruinedPortalDesertEnabled;
+	protected boolean ruinedPortalJungleEnabled;
+	protected boolean ruinedPortalSwampEnabled;
+	protected boolean ruinedPortalMountainEnabled;
+	protected boolean ruinedPortalOceanEnabled;
+	protected boolean ruinedPortalNetherEnabled;
+
     protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
 	protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
 	protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
@@ -367,6 +383,8 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.grassColorIsMultiplier;
 	}
 	
+	// Structures
+	
 	@Override
 	public MineshaftType getMineShaftType()
 	{
@@ -396,6 +414,104 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.woodLandMansionsEnabled;
 	}
+	
+	@Override
+	public boolean getBuriedTreasureEnabled()
+	{
+		return this.buriedTreasureEnabled;
+	}
+
+	@Override
+	public boolean getOceanRuinsColdEnabled()
+	{
+		return this.oceanRuinsColdEnabled;
+	}
+
+	@Override
+	public boolean getOceanRuinsWarmEnabled()
+	{
+		return this.oceanRuinsWarmEnabled;
+	}
+
+	@Override
+	public boolean getShipWreckEnabled()
+	{
+		return this.shipWreckEnabled;
+	}
+
+	@Override
+	public boolean getShipWreckBeachedEnabled()
+	{
+		return this.shipWreckBeachedEnabled;
+	}
+
+	@Override
+	public boolean getPillagerOutpostEnabled()
+	{
+		return this.pillagerOutpostEnabled;
+	}
+
+	@Override
+	public boolean getBastionRemnantEnabled()
+	{
+		return this.bastionRemnantEnabled;
+	}
+
+	@Override
+	public boolean getNetherFossilEnabled()
+	{
+		return this.netherFossilEnabled;
+	}
+
+	@Override
+	public boolean getEndCityEnabled()
+	{
+		return this.endCityEnabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalEnabled()
+	{
+		return this.ruinedPortalEnabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalDesertEnabled()
+	{
+		return this.ruinedPortalDesertEnabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalJungleEnabled()
+	{
+		return this.ruinedPortalJungleEnabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalSwampEnabled()
+	{
+		return this.ruinedPortalSwampEnabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalMountainEnabled()
+	{
+		return this.ruinedPortalMountainEnabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalOceanEnabled()
+	{
+		return this.ruinedPortalOceanEnabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalNetherEnabled()
+	{
+		return this.ruinedPortalNetherEnabled;
+	}
+	
+	//
 	
 	@Override
 	public String getReplaceToBiomeName()

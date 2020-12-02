@@ -311,6 +311,23 @@ public class BiomeConfig extends BiomeConfigBase
         this.mineshaftType = reader.getSetting(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType, logger, null);
         this.rareBuildingType = reader.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, defaultSettings.defaultRareBuildingType, logger, null);
 
+        this.buriedTreasureEnabled = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, logger, null);
+        this.oceanRuinsColdEnabled = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_COLD_ENABLED, logger, null);
+		this.oceanRuinsWarmEnabled = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_WARM_ENABLED, logger, null);
+		this.shipWreckEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, logger, null);
+		this.shipWreckBeachedEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, logger, null);
+		this.pillagerOutpostEnabled = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, logger, null);
+		this.bastionRemnantEnabled = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, logger, null);
+		this.netherFossilEnabled = reader.getSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, logger, null);
+		this.endCityEnabled = reader.getSetting(BiomeStandardValues.END_CITY_ENABLED, logger, null);
+		this.ruinedPortalEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_ENABLED, logger, null);
+		this.ruinedPortalDesertEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_DESERT_ENABLED, logger, null);
+		this.ruinedPortalJungleEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_JUNGLE_ENABLED, logger, null);
+		this.ruinedPortalSwampEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_SWAMP_ENABLED, logger, null);
+		this.ruinedPortalMountainEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_MOUNTAIN_ENABLED, logger, null);
+		this.ruinedPortalOceanEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_OCEAN_ENABLED, logger, null);
+		this.ruinedPortalNetherEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_NETHER_ENABLED, logger, null);
+        
         this.biomeDictId = reader.getSetting(BiomeStandardValues.BIOME_DICT_ID, defaultSettings.defaultBiomeDictId, logger, null);
     	this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, defaultSettings.defaultInheritMobsBiomeName, logger, null);
 
@@ -832,6 +849,39 @@ public class BiomeConfig extends BiomeConfigBase
         writer.putSetting(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType,
             "The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.");
 
+    	writer.putSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, buriedTreasureEnabled,
+                "Enables Buried Treasure spawning for this biome.");    			
+    	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_COLD_ENABLED, oceanRuinsColdEnabled,
+    			"Enables Ocean Ruins Cold spawning for this biome.");    			
+    	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_WARM_ENABLED, oceanRuinsWarmEnabled,
+    			"Enables Ocean Ruins Warm spawning for this biome.");    			
+    	writer.putSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, shipWreckEnabled,
+    			"Enables Shipwreck spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, shipWreckBeachedEnabled,
+    			"Enables Beached Shipwreck spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, pillagerOutpostEnabled,
+    			"Enables Pillager Outpost spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, bastionRemnantEnabled,
+    			"Enables Bastion Remnant spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, netherFossilEnabled,
+    			"Enables Nether Fossil spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.END_CITY_ENABLED, endCityEnabled,
+    			"Enables End City spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_ENABLED, ruinedPortalEnabled,
+    			"Enables Ruined Portal spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_DESERT_ENABLED, ruinedPortalDesertEnabled,
+    			"Enables Ruined Portal Desert spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_JUNGLE_ENABLED, ruinedPortalJungleEnabled,
+    			"Enables Ruined Portal Jungle spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_SWAMP_ENABLED, ruinedPortalSwampEnabled,
+    			"Enables Ruined Portal Swamp spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_MOUNTAIN_ENABLED, ruinedPortalMountainEnabled,
+    			"Enables Ruined Portal Mountain spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_OCEAN_ENABLED, ruinedPortalOceanEnabled,
+    			"Enables Ruined Portal Ocean spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_NETHER_ENABLED, ruinedPortalNetherEnabled,
+    			"Enables Ruined Portal Nether spawning for this biome.");
+        
         writer.bigTitle("Mob spawning",
             "This is where you configure mob spawning. Mobs spawn in groups,",
             "see http://minecraft.gamepedia.com/Spawn#Mob_spawning",
