@@ -19,27 +19,47 @@ import com.pg85.otg.logging.ILogger;
 public class BiomeLayers
 {
 	// Bit masks for biome generation
+	// TODO: Using columns atm, will need to be changed for 3D biomes.
 
-	// The land bit marks whether a sample is land or not. This is used to place biomes.
-	public static final int LAND_BIT = (1 << 29);
-	public static final int ISLAND_BIT = (1 << 30); // TODO: Do we really need this?
-	public static final int ICE_BIT = (1 << 31);
+	// The land bit marks whether a column is land or not. This is used to place biomes.
+	protected static final int LAND_BIT = (1 << 31);
+	// The ice bit marks which land columns should use the ice biome group.
+	protected static final int ICE_BIT = (1 << 30);
+	// The island bit marks isle biomes spawned inside other biomes.
+	protected static final int ISLAND_BIT = (1 << 29); // TODO: Do we really need this?
 
-	public static final int GROUP_SHIFT = 22;
+    // River bits mark whether there is a river in this column (TODO: Why 2?).
+    private static final int RIVER_SHIFT = 27;
+    protected static final int RIVER_BITS = (3 << RIVER_SHIFT);
+    protected static final int RIVER_BIT_ONE = (1 << RIVER_SHIFT);
+    protected static final int RIVER_BIT_TWO = (1 << (RIVER_SHIFT + 1));
+	
+	// Group bits store the id of the biome group used for a column.
+	protected static final int GROUP_SHIFT = 20;
+	protected static final int GROUP_BITS = (127 << GROUP_SHIFT); // Max 127 biome groups, 7 bits
 
-	// The marker for biome groups
-	static final int GROUP_BITS = (127 << GROUP_SHIFT);
-
-	// This is the amount of bits we & the sample at the end to get the correct biome id.
-	public static final int BIOME_BITS = (1 << GROUP_SHIFT) - 1;
-
-	static boolean isLand(int sample) {
+	// Biome bits store the id of the biome used for a column.
+	protected static final int BIOME_BITS = (1 << GROUP_SHIFT) - 1;
+	
+	static boolean isLand(int sample)
+	{
 		return (sample & LAND_BIT) != 0;
 	}
 
 	static int getGroupId(int sample)
 	{
 		return (sample & GROUP_BITS) >> GROUP_SHIFT;
+	}
+	
+   /**
+    * Checks for land and when present returns biome data, otherwise returns default ocean.
+    */
+	static int getBiomeFromLayer(int sample)
+	{
+		return 
+			(sample & BiomeLayers.LAND_BIT) != 0 ? 
+			(sample & BiomeLayers.BIOME_BITS) : 
+			0; // 0 Is the default ocean id
 	}
 
 	private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider, ILogger logger)
@@ -57,7 +77,8 @@ public class BiomeLayers
 				// TODO: probably should add smooth layer here
 	
 				// If we're at the land size, initialize the land layer with the provided rarity.
-				if (depth == data.landSize) {
+				if (depth == data.landSize)
+				{
 					factory = new LandLayer(data.landRarity).create(contextProvider.apply(1L), factory);
 					factory = new FuzzyScaleLayer().create(contextProvider.apply(2000L), factory);
 				}

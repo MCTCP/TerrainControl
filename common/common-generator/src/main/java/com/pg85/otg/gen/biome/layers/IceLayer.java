@@ -18,7 +18,7 @@ class IceLayer implements ParentedLayer
 		{
 			NewBiomeGroup iceGroup = data.groupRegistry.get(2);			
 			// Scale rarity from the world config
-			this.rarity = 101 - iceGroup.rarity;
+			this.rarity = 101 - (iceGroup == null ? 0 : iceGroup.rarity);
 		} else {		
 			this.rarity = 10;
 		}
