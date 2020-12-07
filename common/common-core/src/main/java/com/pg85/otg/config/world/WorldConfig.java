@@ -18,14 +18,12 @@ import com.pg85.otg.config.fallbacks.BlockFallback;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
-import com.pg85.otg.config.io.SimpleSettingsMap;
 import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
-import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.constants.SettingsEnums.TerrainMode;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
@@ -84,28 +82,6 @@ public class WorldConfig extends WorldConfigBase
 
     // Specific biome settings
 
-    // Strongholds
-    private double strongholdDistance;
-    private int strongholdCount;
-    private int strongholdSpread;
-
-    // Villages
-    private int villageSize;
-    private int villageDistance; // Has a minimum of 9
-
-    // Pyramids (also swamp huts and jungle temples)
-    private int minimumDistanceBetweenRareBuildings; // Minecraft's internal
-    // value is 1 chunk lower
-    private int maximumDistanceBetweenRareBuildings;
-
-    // Ocean monuments
-    private int oceanMonumentGridSize;
-    private int oceanMonumentRandomOffset;
-
-    // Other structures
-    private boolean netherFortressesEnabled;
-    private boolean woodLandMansionsEnabled;
-
     // Terrain
     
     private boolean populateUsingSavedBiomes;
@@ -121,18 +97,6 @@ public class WorldConfig extends WorldConfigBase
     private String bo3AtSpawn;
 
 	//
-
-    private static class DefaulWorldData
-    {
-    	private WorldConfig worldConfig;
-    	private SettingsMap settingsMap;
-    	
-    	private DefaulWorldData(WorldConfig worldConfig, SettingsMap settingsMap)
-    	{
-    		this.worldConfig = worldConfig;
-    		this.settingsMap = settingsMap;
-    	}
-    }
         
     public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
@@ -153,14 +117,6 @@ public class WorldConfig extends WorldConfigBase
         this.readConfigSettings(settingsReader, biomeResourcesManager, spawnLog, logger, materialReader);
         // Clamp Settings to acceptable values.
        	this.correctSettings(biomes != null, OTG.getEngine().getLogger()); // If biomes is null then we're not interested in loading biomes, squelch biome warnings.        
-    }
-    
-    public static DefaulWorldData createDefaultOTGWorldConfig(Path settingsDir, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
-    {
-    	SimpleSettingsMap settingsMap = new SimpleSettingsMap(presetName, true);
-    	WorldConfig defaultWorldConfig = new WorldConfig(settingsDir, settingsMap, getDefaultBiomeNames(), biomeResourcesManager, spawnLog, logger, materialReader);
-    	defaultWorldConfig.writeConfigSettings(settingsMap);
-    	return new DefaulWorldData(defaultWorldConfig, settingsMap);
     }
 
     private static ArrayList<String> getDefaultBiomeNames()
@@ -314,9 +270,6 @@ public class WorldConfig extends WorldConfigBase
         ravineMaxLength = higherThanOrEqualTo(ravineMaxLength, ravineMinLength);
 
         waterLevelMax = higherThanOrEqualTo(waterLevelMax, waterLevelMin);
-
-        maximumDistanceBetweenRareBuildings = higherThanOrEqualTo(maximumDistanceBetweenRareBuildings, minimumDistanceBetweenRareBuildings);
-        oceanMonumentRandomOffset = lowerThanOrEqualTo(oceanMonumentRandomOffset, oceanMonumentGridSize);
     }
 
     @Override
@@ -397,29 +350,24 @@ public class WorldConfig extends WorldConfigBase
         this.worldNightFogB = (worldNightFog & 0xFF) / 255F;
 
         // Structures
-        this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED, logger, null);
-        this.strongholdCount = reader.getSetting(WorldStandardValues.STRONGHOLD_COUNT, logger, null);
-        this.strongholdDistance = reader.getSetting(WorldStandardValues.STRONGHOLD_DISTANCE, logger, null);
-        this.strongholdSpread = reader.getSetting(WorldStandardValues.STRONGHOLD_SPREAD, logger, null);
-
-        this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED, logger, null);
-        this.villageDistance = reader.getSetting(WorldStandardValues.VILLAGE_DISTANCE, logger, null);
-        this.villageSize = reader.getSetting(WorldStandardValues.VILLAGE_SIZE, logger, null);
-
-        this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, logger, null);
-        this.minimumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, logger, null);
-        this.maximumDistanceBetweenRareBuildings = reader.getSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, logger, null);
-
-        this.woodLandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, logger, null);
-
-        this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, logger, null);
-        this.oceanMonumentRandomOffset = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, logger, null);
-        this.oceanMonumentGridSize = reader.getSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, logger, null);
-
+    	this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED, logger, null);
+    	this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, logger, null);
+    	this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, logger, null);
+    	this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED, logger, null);
+    	this.woodlandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, logger, null);
+    	this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, logger, null);
+    	this.buriedTreasureEnabled = reader.getSetting(WorldStandardValues.BURIED_TREASURE_ENABLED, logger, null);
+    	this.oceanRuinsEnabled = reader.getSetting(WorldStandardValues.OCEAN_RUINS_ENABLED, logger, null);
+    	this.pillagerOutpostsEnabled = reader.getSetting(WorldStandardValues.PILLAGER_OUTPOSTS_ENABLED, logger, null);
+    	this.bastionRemnantsEnabled = reader.getSetting(WorldStandardValues.BASTION_REMNANTS_ENABLED, logger, null);
+    	this.netherFossilsEnabled = reader.getSetting(WorldStandardValues.NETHER_FOSSILS_ENABLED, logger, null);
+    	this.endCitiesEndabled = reader.getSetting(WorldStandardValues.END_CITIES_ENABLED, logger, null);
+    	this.ruinedPortalsEndabled = reader.getSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, logger, null);
+    	this.shipWrecksEndabled = reader.getSetting(WorldStandardValues.SHIPWRECKS_ENABLED, logger, null);
+    	this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED, logger, null);
+        
         this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger, null);
-        this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED, logger, null);
-        this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, logger, null);
-
+        
         // Caves
         this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY, logger, null);
         this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY, logger, null);
@@ -538,8 +486,6 @@ public class WorldConfig extends WorldConfigBase
         this.fogColorGreen = reader.getSetting(WorldStandardValues.FogColorGreen, logger, null);
         this.fogColorBlue = reader.getSetting(WorldStandardValues.FogColorBlue, logger, null);
         this.isSkyColored = reader.getSetting(WorldStandardValues.IsSkyColored, logger, null);
-        //this.averageGroundlevel = reader.getSetting(WorldStandardValues.averageGroundlevel);
-        //this.horizonHeight = reader.getSetting(WorldStandardValues.horizonHeight);
         this.cloudHeight = reader.getSetting(WorldStandardValues.CloudHeight, logger, null);
         this.canDoLightning = reader.getSetting(WorldStandardValues.CanDoLightning, logger, null);
         this.canDoRainSnowIce = reader.getSetting(WorldStandardValues.CanDoRainSnowIce, logger, null);
@@ -902,69 +848,27 @@ public class WorldConfig extends WorldConfigBase
         // Structures
         writer.bigTitle("Structures",
             "Generate-structures in the server.properties file is ignored by Open Terrain Generator. Use these settings instead.",
+            "The settings are global on/off toggles for the entire world for each vanilla structure type.",
+            "When set to true, structures configured in biome configs are able to spawn.",
+            "Check the biome configs for customisation options per structure type (size/rarity etc).",
             "");
 
-        // Strongholds
-        writer.smallTitle("Strongholds");
-
-        writer.putSetting(WorldStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled,
-            "Set this to false to prevent the stronghold generator from doing anything.");
-
-        writer.putSetting(WorldStandardValues.STRONGHOLD_COUNT, this.strongholdCount,
-            "The number of strongholds in the world.");
-
-        writer.putSetting(WorldStandardValues.STRONGHOLD_DISTANCE, this.strongholdDistance,
-            "How far strongholds are from the spawn and other strongholds (minimum is 1.0, default is 32.0).");
-
-        writer.putSetting(WorldStandardValues.STRONGHOLD_SPREAD, this.strongholdSpread,
-            "How concentrated strongholds are around the spawn (minimum is 1, default is 3). Lower number, lower concentration.");
-
-        // Villages
-        writer.smallTitle("Villages");
-
-        writer.putSetting(WorldStandardValues.VILLAGES_ENABLED, this.villagesEnabled,
-            "Whether the villages are enabled or not.");
-
-        writer.putSetting(WorldStandardValues.VILLAGE_SIZE, this.villageSize,
-            "The size of the village. Larger is bigger. Normal worlds have 0 as default, superflat worlds 1.");
-
-        writer.putSetting(WorldStandardValues.VILLAGE_DISTANCE, this.villageDistance,
-            "The minimum distance between the village centers in chunks. Minimum value is 9.");
-
-        // Rare buildings
-        writer.smallTitle("Rare buildings",
-            "Rare buildings are either desert pyramids, jungle temples or swamp huts.");
-
-        writer.putSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, this.rareBuildingsEnabled,
-            "Whether rare buildings are enabled.");
-
-        writer.putSetting(WorldStandardValues.MINIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.minimumDistanceBetweenRareBuildings,
-            "The minimum distance between rare buildings in chunks.");
-
-        writer.putSetting(WorldStandardValues.MAXIMUM_DISTANCE_BETWEEN_RARE_BUILDINGS, this.maximumDistanceBetweenRareBuildings,
-            "The maximum distance between rare buildings in chunks.");
-
-        // Woodland Mansions
-        writer.smallTitle("Woodland Mansions");
-
-        writer.putSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, this.woodLandMansionsEnabled,
-            "Whether woodland mansions are enabled.");
-
-        // Ocean monuments
-        writer.smallTitle("Ocean monuments");
-
-        writer.putSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled,
-            "Whether ocean monuments are enabled.");
-
-        writer.putSetting(WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE, this.oceanMonumentGridSize,
-            "Ocean monuments are placed on the corners of a grid, with a random offset added to each corner.",
-            "The first variable is the size of the grid in chunks.",
-            "Setting this to 8 will give a grid with cells of 8x8 chunks.");
-
-        writer.putSetting(WorldStandardValues.OCEAN_MONUMENT_RANDOM_OFFSET, this.oceanMonumentRandomOffset,
-            "Random offset from each corner in chunks, on both the x and z axis.",
-            "May not be smaller than 0, and may not be larger than " + WorldStandardValues.OCEAN_MONUMENT_GRID_SIZE + ".");
-
+        writer.putSetting(WorldStandardValues.VILLAGES_ENABLED, this.villagesEnabled);
+        writer.putSetting(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
+        writer.putSetting(WorldStandardValues.STRONGHOLDS_ENABLED, this.strongholdsEnabled);
+        writer.putSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, this.rareBuildingsEnabled);        
+        writer.putSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, this.woodlandMansionsEnabled);
+        writer.putSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, this.oceanMonumentsEnabled);        
+        writer.putSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled);        		
+        writer.putSetting(WorldStandardValues.BURIED_TREASURE_ENABLED, this.buriedTreasureEnabled);
+        writer.putSetting(WorldStandardValues.OCEAN_RUINS_ENABLED, this.oceanRuinsEnabled);
+        writer.putSetting(WorldStandardValues.PILLAGER_OUTPOSTS_ENABLED, this.pillagerOutpostsEnabled);
+        writer.putSetting(WorldStandardValues.BASTION_REMNANTS_ENABLED, this.bastionRemnantsEnabled);
+        writer.putSetting(WorldStandardValues.NETHER_FOSSILS_ENABLED, this.netherFossilsEnabled);
+        writer.putSetting(WorldStandardValues.END_CITIES_ENABLED, this.endCitiesEndabled);
+        writer.putSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, this.ruinedPortalsEndabled);
+        writer.putSetting(WorldStandardValues.SHIPWRECKS_ENABLED, this.shipWrecksEndabled);
+        
         // Custom structures
         writer.smallTitle("Custom structures and objects");
 
@@ -986,11 +890,6 @@ public class WorldConfig extends WorldConfigBase
         writer.putSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, this.maximumCustomStructureRadius,
             "Maximum radius of custom structures in chunks. Custom structures are spawned by",
             "the CustomStructure resource in the biome configuration files. Not used for BO4's.");
-
-        // Other structures
-        writer.smallTitle("Other structures");
-        writer.putSetting(WorldStandardValues.MINESHAFTS_ENABLED, this.mineshaftsEnabled);
-        writer.putSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, this.netherFortressesEnabled);
 
         // Visual settings
         writer.bigTitle("Visual settings",
@@ -1187,10 +1086,6 @@ public class WorldConfig extends WorldConfigBase
         writer.putSetting(WorldStandardValues.FogColorBlue, this.fogColorBlue);
         writer.putSetting(WorldStandardValues.IsSkyColored, this.isSkyColored,
     		"Is set to false for End (black sky?)");
-        //writer.putSetting(WorldStandardValues.averageGroundlevel, this.averageGroundlevel,
-        		//"Affects spawn point location and village spawning. Should be equal to sea level + 1(?)");
-        //writer.putSetting(WorldStandardValues.horizonHeight, this.horizonHeight,
-        		//"Returns horizon height for use in rendering the sky. Should be equal to sea level(?)");
         writer.putSetting(WorldStandardValues.CloudHeight, this.cloudHeight);
         writer.putSetting(WorldStandardValues.CanDoLightning, this.canDoLightning);
         writer.putSetting(WorldStandardValues.CanDoRainSnowIce, this.canDoRainSnowIce);
@@ -1265,6 +1160,7 @@ public class WorldConfig extends WorldConfigBase
 			"When set to false players cannot place blocks in this world. Defaults to: true");
     }
     
+    // TODO: Do we still need this, what's it used for? Used to be required for legacy saved world compat only? 
     private final Comparator<Entry<String, Integer>> CBV = new Comparator<Entry<String, Integer>>()
     {
         @Override
@@ -1272,8 +1168,8 @@ public class WorldConfig extends WorldConfigBase
         {
             return o1.getValue() - o2.getValue();
         }
-    };    
-    
+    };
+
 	public static WorldConfig fromDisk(Path worldDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		File worldConfigFile = Paths.get(worldDir.toString(), Constants.WORLD_CONFIG_FILE).toFile();

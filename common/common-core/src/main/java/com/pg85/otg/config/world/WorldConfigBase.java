@@ -78,12 +78,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	protected boolean populationBoundsCheck;
 	protected int maximumCustomStructureRadius;
-	protected boolean mineshaftsEnabled;
-	protected boolean oceanMonumentsEnabled;
-	protected boolean rareBuildingsEnabled;
-	protected boolean strongholdsEnabled;
-	protected boolean villagesEnabled;
-	
+
 	protected boolean ceilingBedrock;
 	protected boolean disableBedrock;
 	protected boolean flatBedrock;
@@ -94,7 +89,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected LocalMaterialData waterBlock;
 	
 	protected String defaultOceanBiome;
-	
+
     // Caves
 	protected int individualCaveRarity;
 	protected int caveRarity;
@@ -208,7 +203,25 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
     public boolean playersCanBreakBlocks;
     public boolean explosionsCanBreakBlocks;
     public boolean playersCanPlaceBlocks;
-    	
+
+    // 
+    
+	protected boolean mineshaftsEnabled;
+	protected boolean oceanMonumentsEnabled;
+	protected boolean rareBuildingsEnabled;
+	protected boolean strongholdsEnabled;
+	protected boolean woodlandMansionsEnabled;
+	protected boolean netherFortressesEnabled;
+	protected boolean buriedTreasureEnabled;
+	protected boolean oceanRuinsEnabled;
+	protected boolean pillagerOutpostsEnabled;
+	protected boolean bastionRemnantsEnabled;
+	protected boolean netherFossilsEnabled;
+	protected boolean endCitiesEndabled;
+	protected boolean ruinedPortalsEndabled;
+	protected boolean shipWrecksEndabled;
+	protected boolean villagesEnabled;
+    
 	//
 	
 	protected WorldConfigBase(String configName)
@@ -448,23 +461,99 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 		return this.maxSmoothRadius;
 	}
 	
+	// Vanilla structures
+	
+	@Override
+	public boolean getWoodlandMansionsEnabled()
+	{
+		return this.woodlandMansionsEnabled;
+	}
+
+	@Override
+	public boolean getNetherFortressesEnabled()
+	{
+		return this.netherFortressesEnabled;
+	}
+
+	@Override
+	public boolean getBuriedTreasureEnabled()
+	{
+		return this.buriedTreasureEnabled;
+	}
+
+	@Override
+	public boolean getOceanRuinsEnabled()
+	{
+		return this.oceanRuinsEnabled;
+	}
+
+	@Override
+	public boolean getPillagerOutpostsEnabled()
+	{
+		return this.pillagerOutpostsEnabled;
+	}
+
+	@Override
+	public boolean getBastionRemnantsEnabled()
+	{
+		return this.bastionRemnantsEnabled;
+	}
+
+	@Override
+	public boolean getNetherFossilsEnabled()
+	{
+		return this.netherFossilsEnabled;
+	}
+
+	@Override
+	public boolean getEndCitiesEnabled()
+	{
+		return this.endCitiesEndabled;
+	}
+
+	@Override
+	public boolean getRuinedPortalsEnabled()
+	{
+		return this.ruinedPortalsEndabled;
+	}
+
+	@Override
+	public boolean getShipWrecksEnabled()
+	{
+		return this.shipWrecksEndabled;
+	}
+
+	@Override
+	public boolean getStrongholdsEnabled()
+	{
+		return this.strongholdsEnabled;
+	}
+
+	@Override
+	public boolean getVillagesEnabled()
+	{
+		return this.villagesEnabled;
+	}
+
 	@Override
 	public boolean getMineshaftsEnabled()
 	{
 		return this.mineshaftsEnabled;
 	}
-	
+
 	@Override
 	public boolean getOceanMonumentsEnabled()
 	{
 		return this.oceanMonumentsEnabled;
 	}
-	
+
 	@Override
 	public boolean getRareBuildingsEnabled()
 	{
 		return this.rareBuildingsEnabled;
 	}
+	
+	//
 	
 	@Override
 	public boolean getRemoveSurfaceStone()
@@ -476,18 +565,6 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	public ConfigMode getSettingsMode()
 	{
 		return this.settingsMode;
-	}
-	
-	@Override
-	public boolean getStrongholdsEnabled()
-	{
-		return this.strongholdsEnabled;
-	}
-	
-	@Override
-	public boolean getVillagesEnabled()
-	{
-		return this.villagesEnabled;
 	}
 	
 	@Override

@@ -10,7 +10,9 @@ import com.pg85.otg.config.ConfigFile;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
+import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
+import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.customobject.resource.CustomStructureGen;
 import com.pg85.otg.customobject.resource.SaplingGen;
@@ -29,111 +31,119 @@ import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 
 abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 {
-    private final BiomeResourceLocation registryKey;
+	private final BiomeResourceLocation registryKey;
 	
 	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
 	// use a parent object that holds both, like a worldgenregion.
-    protected IWorldConfig worldConfig;
-    
-    protected List<String> isleInBiome;
-    protected List<String> biomeIsBorder;
-    protected List<String> notBorderNear;
-    
-    protected int biomeSizeWhenIsle;
-    protected int biomeRarityWhenIsle;
-    protected int biomeSizeWhenBorder;
-   
-    // Surface config
-    protected float biomeHeight;
-    protected float biomeVolatility;
-    protected int smoothRadius;
-
-    protected float biomeTemperature;
-
-    protected int biomeRarity;
-    protected int biomeSize;
-    
-    protected String riverBiome;
-
-    protected LocalMaterialData stoneBlock;
-    protected LocalMaterialData surfaceBlock;
-    protected LocalMaterialData groundBlock;
-    protected LocalMaterialData sandStoneBlock;
-    protected LocalMaterialData redSandStoneBlock;
-
-    protected ReplacedBlocksMatrix replacedBlocks;
-    protected SurfaceGenerator surfaceAndGroundControl;
-
-    protected boolean useWorldWaterLevel;
-    protected int waterLevelMax;
-    protected int waterLevelMin;
-    protected LocalMaterialData waterBlock;
-    protected LocalMaterialData iceBlock;
-    protected LocalMaterialData cooledLavaBlock;
-
-    protected List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
-    private ICustomStructureGen structureGen;
-
-    protected double maxAverageHeight;
-    protected double maxAverageDepth;
-    protected double volatility1;
-    protected double volatility2;
-    protected double volatilityWeight1;
-    protected double volatilityWeight2;
-
-    protected double[] chcData;
-
-    protected Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
-    protected Map<LocalMaterialData, SaplingGen> customSaplingGrowers = new HashMap<>();
-    protected Map<LocalMaterialData, SaplingGen> customBigSaplingGrowers = new HashMap<>();
-    
-    protected String biomeExtends;
-    protected float biomeWetness;
-    protected int CHCSmoothRadius;
-
-    protected int biomeColor;
-    protected int grassColor;
-    protected boolean grassColorIsMultiplier;
-    protected int foliageColor;    
-    protected int skyColor;
-    protected int waterColor;
-    protected int fogColor;
-
-    // TODO: rename this setting
+	protected IWorldConfig worldConfig;
+	
+	protected List<String> isleInBiome;
+	protected List<String> biomeIsBorder;
+	protected List<String> notBorderNear;
+	
+	protected int biomeSizeWhenIsle;
+	protected int biomeRarityWhenIsle;
+	protected int biomeSizeWhenBorder;
+	   
+	    // Surface config
+	protected float biomeHeight;
+	protected float biomeVolatility;
+	protected int smoothRadius;
+	
+	protected float biomeTemperature;
+	
+	protected int biomeRarity;
+	protected int biomeSize;
+	
+	protected String riverBiome;
+	
+	protected LocalMaterialData stoneBlock;
+	protected LocalMaterialData surfaceBlock;
+	protected LocalMaterialData groundBlock;
+	protected LocalMaterialData sandStoneBlock;
+	protected LocalMaterialData redSandStoneBlock;
+	
+	protected ReplacedBlocksMatrix replacedBlocks;
+	protected SurfaceGenerator surfaceAndGroundControl;
+	
+	protected boolean useWorldWaterLevel;
+	protected int waterLevelMax;
+	protected int waterLevelMin;
+	protected LocalMaterialData waterBlock;
+	protected LocalMaterialData iceBlock;
+	protected LocalMaterialData cooledLavaBlock;
+	
+	protected List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
+	private ICustomStructureGen structureGen;
+	
+	protected double maxAverageHeight;
+	protected double maxAverageDepth;
+	protected double volatility1;
+	protected double volatility2;
+	protected double volatilityWeight1;
+	protected double volatilityWeight2;
+	
+	protected double[] chcData;
+	
+	protected Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
+	protected Map<LocalMaterialData, SaplingGen> customSaplingGrowers = new HashMap<>();
+	protected Map<LocalMaterialData, SaplingGen> customBigSaplingGrowers = new HashMap<>();
+	
+	protected String biomeExtends;
+	protected float biomeWetness;
+	protected int CHCSmoothRadius;
+	
+	protected int biomeColor;
+	protected int grassColor;
+	protected boolean grassColorIsMultiplier;
+	protected int foliageColor;    
+	protected int skyColor;
+	protected int waterColor;
+	protected int fogColor;
+	
+	// TODO: rename this setting
 	protected boolean disableNotchHeightControl;
-    
-    protected String replaceToBiomeName;
-    
-    protected List<ConfigFunction<IBiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<IBiomeConfig>>();
-    
-    // Structures
-    protected boolean woodLandMansionsEnabled;
-    protected boolean netherFortressesEnabled;
-    protected VillageType villageType;
-    protected RareBuildingType rareBuildingType;
-    protected MineshaftType mineshaftType = MineshaftType.normal;	
+	
+	protected String replaceToBiomeName;
+	
+	protected List<ConfigFunction<IBiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<IBiomeConfig>>();
+	
+	// Mob spawning
+	
+	protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+	
+	// Vanilla structures
+	
+	protected boolean strongholdsEnabled;
+	protected boolean oceanMonumentsEnabled;   
+	protected boolean woodLandMansionsEnabled;
+	protected boolean netherFortressesEnabled;
+	protected int villageSize;
+	protected VillageType villageType;
+	protected RareBuildingType rareBuildingType;
+	protected MineshaftType mineshaftType = MineshaftType.normal;	
 	protected boolean buriedTreasureEnabled;
-	protected boolean oceanRuinsColdEnabled;
-	protected boolean oceanRuinsWarmEnabled;
 	protected boolean shipWreckEnabled;
 	protected boolean shipWreckBeachedEnabled;
 	protected boolean pillagerOutpostEnabled;
 	protected boolean bastionRemnantEnabled;
 	protected boolean netherFossilEnabled;
 	protected boolean endCityEnabled;
-	protected boolean ruinedPortalEnabled;
-	protected boolean ruinedPortalDesertEnabled;
-	protected boolean ruinedPortalJungleEnabled;
-	protected boolean ruinedPortalSwampEnabled;
-	protected boolean ruinedPortalMountainEnabled;
-	protected boolean ruinedPortalOceanEnabled;
-	protected boolean ruinedPortalNetherEnabled;
-
-    protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-    
+	
+	protected float mineshaftProbability;
+	protected RuinedPortalType ruinedPortalType;
+	protected OceanRuinsType oceanRuinsType;
+	protected float oceanRuinsLargeProbability;
+	protected float oceanRuinsClusterProbability;
+	protected float buriedTreasureProbability;
+	protected int pillagerOutpostSize;
+	protected int bastionRemnantSize;	
+	
+	//
+	
     protected BiomeConfigBase(String configName, BiomeResourceLocation registryKey)
     {
 		super(configName);
@@ -383,7 +393,19 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.grassColorIsMultiplier;
 	}
 	
-	// Structures
+	// Vanilla structures
+	
+	@Override
+	public VillageType getVillageType()
+	{
+		return this.villageType;
+	}
+	
+	@Override
+	public int getVillageSize()
+	{
+		return this.villageSize;
+	}
 	
 	@Override
 	public MineshaftType getMineShaftType()
@@ -392,11 +414,65 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public boolean getNetherFortressesEnabled()
+	public float getMineShaftProbability()
 	{
-		return this.netherFortressesEnabled;
+		return this.mineshaftProbability;
 	}
 	
+	@Override
+	public OceanRuinsType getOceanRuinsType()
+	{
+		return this.oceanRuinsType;
+	}
+	
+	@Override
+	public float getOceanRuinsLargeProbability()
+	{
+		return this.oceanRuinsLargeProbability;
+	}
+	
+	@Override
+	public float getOceanRuinsClusterProbability()
+	{
+		return this.oceanRuinsClusterProbability;
+	}
+	
+	@Override
+	public boolean getBuriedTreasureEnabled()
+	{
+		return this.buriedTreasureEnabled;
+	}
+	
+	@Override
+	public float getBuriedTreasureProbability()
+	{
+		return this.buriedTreasureProbability;
+	}
+
+	@Override
+	public boolean getPillagerOutpostEnabled()
+	{
+		return this.pillagerOutpostEnabled;
+	}
+	
+	@Override
+	public int getPillagerOutPostSize()
+	{
+		return this.pillagerOutpostSize;
+	}
+
+	@Override
+	public boolean getBastionRemnantEnabled()
+	{
+		return this.bastionRemnantEnabled;
+	}
+	
+	@Override
+	public int getBastionRemnantSize()
+	{
+		return this.bastionRemnantSize;
+	}
+		
 	@Override
 	public RareBuildingType getRareBuildingType()
 	{
@@ -404,9 +480,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public VillageType getVillageType()
+	public RuinedPortalType getRuinedPortalType()
 	{
-		return this.villageType;
+		return this.ruinedPortalType;
 	}
 	
 	@Override
@@ -416,23 +492,11 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public boolean getBuriedTreasureEnabled()
+	public boolean getNetherFortressesEnabled()
 	{
-		return this.buriedTreasureEnabled;
+		return this.netherFortressesEnabled;
 	}
-
-	@Override
-	public boolean getOceanRuinsColdEnabled()
-	{
-		return this.oceanRuinsColdEnabled;
-	}
-
-	@Override
-	public boolean getOceanRuinsWarmEnabled()
-	{
-		return this.oceanRuinsWarmEnabled;
-	}
-
+	
 	@Override
 	public boolean getShipWreckEnabled()
 	{
@@ -444,71 +508,29 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.shipWreckBeachedEnabled;
 	}
-
-	@Override
-	public boolean getPillagerOutpostEnabled()
-	{
-		return this.pillagerOutpostEnabled;
-	}
-
-	@Override
-	public boolean getBastionRemnantEnabled()
-	{
-		return this.bastionRemnantEnabled;
-	}
-
+	
 	@Override
 	public boolean getNetherFossilEnabled()
 	{
 		return this.netherFossilEnabled;
 	}
-
+	
 	@Override
 	public boolean getEndCityEnabled()
 	{
 		return this.endCityEnabled;
 	}
-
+	
 	@Override
-	public boolean getRuinedPortalEnabled()
+	public boolean getStrongholdsEnabled()
 	{
-		return this.ruinedPortalEnabled;
+		return this.strongholdsEnabled;
 	}
-
+	
 	@Override
-	public boolean getRuinedPortalDesertEnabled()
+	public boolean getOceanMonumentsEnabled()
 	{
-		return this.ruinedPortalDesertEnabled;
-	}
-
-	@Override
-	public boolean getRuinedPortalJungleEnabled()
-	{
-		return this.ruinedPortalJungleEnabled;
-	}
-
-	@Override
-	public boolean getRuinedPortalSwampEnabled()
-	{
-		return this.ruinedPortalSwampEnabled;
-	}
-
-	@Override
-	public boolean getRuinedPortalMountainEnabled()
-	{
-		return this.ruinedPortalMountainEnabled;
-	}
-
-	@Override
-	public boolean getRuinedPortalOceanEnabled()
-	{
-		return this.ruinedPortalOceanEnabled;
-	}
-
-	@Override
-	public boolean getRuinedPortalNetherEnabled()
-	{
-		return this.ruinedPortalNetherEnabled;
+		return this.oceanMonumentsEnabled;
 	}
 	
 	//

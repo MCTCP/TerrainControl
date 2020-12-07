@@ -75,6 +75,7 @@ public class StandardBiomeTemplate
     public boolean defaultWoodlandMansions = false;
     public boolean defaultNetherFortressEnabled = false;
     public VillageType defaultVillageType = VillageType.disabled;
+    public int defaultVillageSize = 6;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
     public MineshaftType defaultMineshaftType = MineshaftType.normal;
     public int defaultEmeraldOre = 0;

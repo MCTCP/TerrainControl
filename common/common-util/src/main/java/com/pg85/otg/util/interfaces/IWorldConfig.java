@@ -12,9 +12,97 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 
 public interface IWorldConfig
 {
-	public boolean doPopulationBoundsCheck();
+	public ConfigMode getSettingsMode();
+	
+	// Biome resources
+
+	public long getResourcesSeed();
+	public boolean isDisableOreGen();
 	public boolean getBedrockDisabled();
-	public int getWorldHeightCap();
+	
+	// Blocks
+
+	public boolean getRemoveSurfaceStone();
+	public LocalMaterialData getWaterBlock();
+	public LocalMaterialData getBedrockBlockReplaced(ReplacedBlocksMatrix replacedBlocks, int y);
+	public LocalMaterialData getDefaultBedrockBlock();
+	public LocalMaterialData getCooledLavaBlock();
+	public LocalMaterialData getIceBlock();
+	
+	// Bedrock
+	
+	public boolean getIsCeilingBedrock();
+	public boolean getIsFlatBedrock();
+	
+	// Biome settings
+
+	public ArrayList<String> getWorldBiomes();
+	public int getBiomeRarityScale();
+	public int getGenerationDepth();
+	public int getLandFuzzy();
+	public int getLandRarity();
+	public int getLandSize();
+	public String getDefaultOceanBiome();
+	public BiomeMode getBiomeMode();
+	double getFrozenOceanTemperature();
+	public boolean getIsFreezeGroups();
+	public List<String> getIsleBiomes();
+	public List<String> getBorderBiomes();
+	public boolean getIsRandomRivers();
+	public int getRiverRarity();
+	public int getRiverSize();
+	public boolean getRiversEnabled();
+	public boolean getBiomeConfigsHaveReplacement();
+	public boolean setBiomeConfigsHaveReplacement(boolean biomeConfigsHaveReplacement);
+	
+	// Terrain settings
+	
+	public double getFractureHorizontal();
+	public double getFractureVertical();
+	public int getWorldHeightCap();	
+	public int getWorldHeightScale();
+	public void setMaxSmoothRadius(int smoothRadius);
+	public int getMaxSmoothRadius();
+	public boolean isBetterSnowFall();
+	public boolean isFullyFreezeLakes();
+	public int getWaterLevelMax();
+	public int getWaterLevelMin();
+	
+	// FromImageMode
+
+	public ImageOrientation getImageOrientation();
+	public String getImageFile();
+	public String getImageFillBiome();
+	public ImageMode getImageMode();
+	public int getImageZOffset();
+	public int getImageXOffset();
+	
+	// Vanilla structures
+
+	public boolean getWoodlandMansionsEnabled();
+	public boolean getNetherFortressesEnabled();
+	public boolean getBuriedTreasureEnabled();
+	public boolean getOceanRuinsEnabled();
+	public boolean getPillagerOutpostsEnabled();
+	public boolean getBastionRemnantsEnabled();
+	public boolean getNetherFossilsEnabled();
+	public boolean getEndCitiesEnabled();
+	public boolean getRuinedPortalsEnabled();
+	public boolean getShipWrecksEnabled();
+	public boolean getStrongholdsEnabled();
+	public boolean getVillagesEnabled();	
+	public boolean getMineshaftsEnabled();
+	public boolean getOceanMonumentsEnabled();
+	public boolean getRareBuildingsEnabled();
+	
+	// OTG Custom structures
+
+	public boolean isOTGPlus();
+	public boolean doPopulationBoundsCheck();
+	public int getMaximumCustomStructureRadius();
+	
+	// Caves & Ravines
+	
 	public int getRavineRarity();
 	public int getRavineMinLength();
 	public int getRavineMaxLength();
@@ -30,56 +118,5 @@ public interface IWorldConfig
 	public int getIndividualCaveRarity();
 	public int getCaveSystemPocketMinSize();
 	public int getCaveSystemPocketChance();
-	public int getCaveSystemPocketMaxSize();
-	public boolean isBetterSnowFall();
-	public boolean isFullyFreezeLakes();
-	public boolean isOTGPlus();
-	public long getResourcesSeed();
-	public boolean isDisableOreGen();
-	public int getMaximumCustomStructureRadius();
-	public boolean getBiomeConfigsHaveReplacement();
-	public boolean setBiomeConfigsHaveReplacement(boolean biomeConfigsHaveReplacement);
-	public double getFractureHorizontal();
-	public double getFractureVertical();
-	public LocalMaterialData getBedrockBlockReplaced(ReplacedBlocksMatrix replacedBlocks, int y);
-	public LocalMaterialData getDefaultBedrockBlock();
-	public int getBiomeRarityScale();
-	public LocalMaterialData getCooledLavaBlock();
-	public int getGenerationDepth();
-	public LocalMaterialData getIceBlock();
-	public boolean getIsCeilingBedrock();
-	public boolean getIsFlatBedrock();
-	public int getMaxSmoothRadius();
-	public boolean getMineshaftsEnabled();
-	public boolean getOceanMonumentsEnabled();
-	public boolean getRareBuildingsEnabled();
-	public boolean getRemoveSurfaceStone();
-	public ConfigMode getSettingsMode();
-	public boolean getStrongholdsEnabled();
-	public boolean getVillagesEnabled();
-	public LocalMaterialData getWaterBlock();
-	public int getWaterLevelMax();
-	public int getWaterLevelMin();
-	public ArrayList<String> getWorldBiomes();
-	public int getWorldHeightScale();
-	public void setMaxSmoothRadius(int smoothRadius);
-	public String getDefaultOceanBiome();
-	public int getLandFuzzy();
-	public int getLandRarity();
-	public int getLandSize();
-	public BiomeMode getBiomeMode();
-	double getFrozenOceanTemperature();
-	public boolean getIsFreezeGroups();
-	public List<String> getIsleBiomes();
-	public List<String> getBorderBiomes();
-	public ImageOrientation getImageOrientation();
-	public String getImageFile();
-	public String getImageFillBiome();
-	public ImageMode getImageMode();
-	public int getImageZOffset();
-	public int getImageXOffset();
-	public boolean getIsRandomRivers();
-	public int getRiverRarity();
-	public int getRiverSize();
-	public boolean getRiversEnabled();
+	public int getCaveSystemPocketMaxSize();	
 }

@@ -66,4 +66,23 @@ public class SettingsEnums
         swampHut,
         igloo
     }
+    
+    public enum OceanRuinsType
+    {
+    	disabled,
+    	warm,
+    	cold
+    }
+    
+    public enum RuinedPortalType
+    {
+    	disabled,
+    	normal,
+    	desert,
+    	jungle,
+    	swamp,
+    	mountain,
+    	ocean,
+    	nether
+    }
 }

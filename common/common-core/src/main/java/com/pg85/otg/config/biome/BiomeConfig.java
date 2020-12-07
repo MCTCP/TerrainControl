@@ -10,7 +10,6 @@ import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.StandardBiomeTemplate;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.customobject.resource.CustomObjectGen;
 import com.pg85.otg.customobject.resource.CustomStructureGen;
 import com.pg85.otg.customobject.resource.SaplingGen;
@@ -134,10 +133,6 @@ public class BiomeConfig extends BiomeConfigBase
     private double volatilityWeightRaw1;
     private double volatilityWeightRaw2;
 
-    // Structures
-    private boolean strongholdsEnabled;
-    private boolean oceanMonumentsEnabled;   
-
     // Forge Biome Dict Id
 
     private String biomeDictId;
@@ -151,8 +146,6 @@ public class BiomeConfig extends BiomeConfigBase
 	private List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
 	private List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
 	private List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();   
-	
-	private double mineshaftsRarity;
 	//
 
     public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, SettingsMap settings, IWorldConfig worldConfig, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
@@ -307,26 +300,24 @@ public class BiomeConfig extends BiomeConfigBase
         this.woodLandMansionsEnabled = reader.getSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, defaultSettings.defaultWoodlandMansions, logger, null);
         this.netherFortressesEnabled = reader.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, defaultSettings.defaultNetherFortressEnabled, logger, null);
         this.villageType = reader.getSetting(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType, logger, null);
-        this.mineshaftsRarity = reader.getSetting(BiomeStandardValues.MINESHAFT_RARITY, logger, null);
+        this.villageSize = reader.getSetting(BiomeStandardValues.VILLAGE_SIZE, defaultSettings.defaultVillageSize, logger, null);        
         this.mineshaftType = reader.getSetting(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType, logger, null);
         this.rareBuildingType = reader.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, defaultSettings.defaultRareBuildingType, logger, null);
-
         this.buriedTreasureEnabled = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, logger, null);
-        this.oceanRuinsColdEnabled = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_COLD_ENABLED, logger, null);
-		this.oceanRuinsWarmEnabled = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_WARM_ENABLED, logger, null);
 		this.shipWreckEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, logger, null);
 		this.shipWreckBeachedEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, logger, null);
 		this.pillagerOutpostEnabled = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, logger, null);
 		this.bastionRemnantEnabled = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, logger, null);
 		this.netherFossilEnabled = reader.getSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, logger, null);
-		this.endCityEnabled = reader.getSetting(BiomeStandardValues.END_CITY_ENABLED, logger, null);
-		this.ruinedPortalEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_ENABLED, logger, null);
-		this.ruinedPortalDesertEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_DESERT_ENABLED, logger, null);
-		this.ruinedPortalJungleEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_JUNGLE_ENABLED, logger, null);
-		this.ruinedPortalSwampEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_SWAMP_ENABLED, logger, null);
-		this.ruinedPortalMountainEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_MOUNTAIN_ENABLED, logger, null);
-		this.ruinedPortalOceanEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_OCEAN_ENABLED, logger, null);
-		this.ruinedPortalNetherEnabled = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_NETHER_ENABLED, logger, null);
+		this.endCityEnabled = reader.getSetting(BiomeStandardValues.END_CITY_ENABLED, logger, null);		
+	    this.mineshaftProbability = reader.getSetting(BiomeStandardValues.MINESHAFT_PROBABILITY, logger, null);
+	    this.ruinedPortalType = reader.getSetting(BiomeStandardValues.RUINED_PORTAL_TYPE, logger, null);
+	    this.oceanRuinsType = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_TYPE, logger, null);
+	    this.oceanRuinsLargeProbability = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_LARGE_PROBABILITY, logger, null);
+	    this.oceanRuinsClusterProbability = reader.getSetting(BiomeStandardValues.OCEAN_RUINS_CLUSTER_PROBABILITY, logger, null);
+	    this.buriedTreasureProbability = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, logger, null);
+	    this.pillagerOutpostSize = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, logger, null);
+	    this.bastionRemnantSize = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, logger, null);
         
         this.biomeDictId = reader.getSetting(BiomeStandardValues.BIOME_DICT_ID, defaultSettings.defaultBiomeDictId, logger, null);
     	this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, defaultSettings.defaultInheritMobsBiomeName, logger, null);
@@ -831,57 +822,61 @@ public class BiomeConfig extends BiomeConfigBase
 
         writer.putSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, oceanMonumentsEnabled,
             "Whether an Ocean Monument can be placed in this biome.");
-
+        
         writer.putSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, netherFortressesEnabled,
             "Whether a Nether Fortress can start in this biome. Might extend to neighbor biomes.");
-
+        
         writer.putSetting(BiomeStandardValues.VILLAGE_TYPE, villageType,
             "The village type in this biome. Can be wood, sandstone, taiga, savanna, snowy or disabled.");
-
+        writer.putSetting(BiomeStandardValues.VILLAGE_SIZE, villageSize,
+            "The village size, 6 by default.");
+        
         writer.putSetting(BiomeStandardValues.MINESHAFT_TYPE, mineshaftType,
             "The mineshaft type in this biome. Can be normal, mesa or disabled.");
-
-        writer.putSetting(BiomeStandardValues.MINESHAFT_RARITY, mineshaftsRarity,
-            "The mineshaft rarity from 0 to 100. 0 = no mineshafts, 1 = default rarity, 100 = a wooden chaos.",
-            "Note that mineshafts will never spawn, regardless of this setting, if ",
-            BiomeStandardValues.MINESHAFT_TYPE + " was set to " + MineshaftType.disabled);
-
+    	writer.putSetting(BiomeStandardValues.MINESHAFT_PROBABILITY, mineshaftProbability,
+			"Probability of mineshafts spawning, 0.004 by default. *TODO: Test different values and document usage.");
+    	
         writer.putSetting(BiomeStandardValues.RARE_BUILDING_TYPE, rareBuildingType,
             "The type of the aboveground rare building in this biome. Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.");
-
-    	writer.putSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, buriedTreasureEnabled,
-                "Enables Buried Treasure spawning for this biome.");    			
-    	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_COLD_ENABLED, oceanRuinsColdEnabled,
-    			"Enables Ocean Ruins Cold spawning for this biome.");    			
-    	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_WARM_ENABLED, oceanRuinsWarmEnabled,
-    			"Enables Ocean Ruins Warm spawning for this biome.");    			
-    	writer.putSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, shipWreckEnabled,
-    			"Enables Shipwreck spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, shipWreckBeachedEnabled,
-    			"Enables Beached Shipwreck spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, pillagerOutpostEnabled,
-    			"Enables Pillager Outpost spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, bastionRemnantEnabled,
-    			"Enables Bastion Remnant spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, netherFossilEnabled,
-    			"Enables Nether Fossil spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.END_CITY_ENABLED, endCityEnabled,
-    			"Enables End City spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_ENABLED, ruinedPortalEnabled,
-    			"Enables Ruined Portal spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_DESERT_ENABLED, ruinedPortalDesertEnabled,
-    			"Enables Ruined Portal Desert spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_JUNGLE_ENABLED, ruinedPortalJungleEnabled,
-    			"Enables Ruined Portal Jungle spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_SWAMP_ENABLED, ruinedPortalSwampEnabled,
-    			"Enables Ruined Portal Swamp spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_MOUNTAIN_ENABLED, ruinedPortalMountainEnabled,
-    			"Enables Ruined Portal Mountain spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_OCEAN_ENABLED, ruinedPortalOceanEnabled,
-    			"Enables Ruined Portal Ocean spawning for this biome.");
-    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_NETHER_ENABLED, ruinedPortalNetherEnabled,
-    			"Enables Ruined Portal Nether spawning for this biome.");
         
+    	writer.putSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, buriedTreasureEnabled,
+            "Enables Buried Treasure spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, buriedTreasureProbability,
+    			"Probability of buried treasure spawning, 0.01 by default. *TODO: Test different values and document usage.");
+    	
+    	writer.putSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, shipWreckEnabled,
+			"Enables Shipwreck spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, shipWreckBeachedEnabled,
+			"Enables Beached Shipwreck spawning for this biome.");
+    	
+    	writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_ENABLED, pillagerOutpostEnabled,
+			"Enables Pillager Outpost spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, pillagerOutpostSize,
+    			"The size of pillager outposts, 7 by default.");
+    	
+    	writer.putSetting(BiomeStandardValues.BASTION_REMNANT_ENABLED, bastionRemnantEnabled,
+			"Enables Bastion Remnant spawning for this biome.");
+    	writer.putSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, bastionRemnantSize,
+    			"The size of bastion remnants, 6 by default.");
+    	
+    	writer.putSetting(BiomeStandardValues.NETHER_FOSSIL_ENABLED, netherFossilEnabled,
+			"Enables Nether Fossil spawning for this biome.");
+    	
+    	writer.putSetting(BiomeStandardValues.END_CITY_ENABLED, endCityEnabled,
+			"Enables End City spawning for this biome.");
+    	
+    	writer.putSetting(BiomeStandardValues.RUINED_PORTAL_TYPE, ruinedPortalType,
+			"The type of Ruined Portals that should spawn in this biome.",
+			"Can be normal, desert, jungle, swamp, mountain, ocean, nether or disabled.");
+    	
+    	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_TYPE, oceanRuinsType,
+    			"The type of Ocean Ruins that should spawn in this biome.",
+    			"Can be cold, warm or disabled.");
+    	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_LARGE_PROBABILITY, oceanRuinsLargeProbability,
+    			"Probability of large ocean ruins spawning, 0.3 by default. *TODO: Test different values and document usage.");
+    	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_CLUSTER_PROBABILITY, oceanRuinsClusterProbability,
+    			"Probability of ocean ruins spawning clusters, 0.9 by default. *TODO: Test different values and document usage.");
+    	
         writer.bigTitle("Mob spawning",
             "This is where you configure mob spawning. Mobs spawn in groups,",
             "see http://minecraft.gamepedia.com/Spawn#Mob_spawning",

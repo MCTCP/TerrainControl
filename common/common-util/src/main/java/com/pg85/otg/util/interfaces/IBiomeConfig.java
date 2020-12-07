@@ -3,7 +3,9 @@ package com.pg85.otg.util.interfaces;
 import java.util.List;
 
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
+import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
+import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
@@ -14,6 +16,18 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 
 public interface IBiomeConfig
 {
+	String getName();
+	BiomeResourceLocation getRegistryKey();
+	
+	float getBiomeTemperature();
+	float getBiomeWetness();
+	
+	// WorldConfig getters (TODO: don't access worldconfig via biomeconfig)
+	
+	boolean biomeConfigsHaveReplacement();
+	
+	// Blocks
+
 	LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z);
 	LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z);
 
@@ -26,18 +40,54 @@ public interface IBiomeConfig
 	LocalMaterialData getSandStoneBlockReplaced(int y);
 	LocalMaterialData getIceBlockReplaced(int y);
 	LocalMaterialData getCooledLavaBlockReplaced(int y);
+
+	boolean isRemoveSurfaceStone();
 	
 	ReplacedBlocksMatrix getReplaceBlocks();
-
-	List<List<String>> getCustomStructureNames();
-	List<ICustomStructureGen> getCustomStructures();
-	ICustomStructureGen getStructureGen();
-	void setStructureGen(ICustomStructureGen customStructureGen);
+	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z);
 	
-	String getName();
-	boolean biomeConfigsHaveReplacement();
-		
-	float getBiomeTemperature();
+	int getSnowHeight(float tempAtBlockToFreeze);
+	
+	// Bedrock
+	
+	boolean isFlatBedrock();
+	boolean isCeilingBedrock();
+	boolean isBedrockDisabled();
+	
+	// Colors
+
+	int getFogColor();
+	int getFoliageColor();
+	int getGrassColor();
+	boolean getGrassColorIsMultiplier();
+	int getSkyColor();
+	int getWaterColor();
+	
+	// Mob spawning
+	
+	List<WeightedMobSpawnGroup> getWaterCreatures();
+	List<WeightedMobSpawnGroup> getAmbientCreatures();
+	List<WeightedMobSpawnGroup> getCreatures();
+	List<WeightedMobSpawnGroup> getMonsters();
+	
+	// Biomegen / terrain settings
+
+	String getReplaceToBiomeName();
+	void setReplaceToBiomeName(String replaceToBiomeName);
+	List<String> getIsleInBiomes();
+	List<String> getBorderInBiomes();
+	List<String> getNotBorderNearBiomes();
+	int getBiomeSizeWhenIsle();
+	int getBiomeSizeWhenBorder();
+	int getBiomeRarityWhenIsle();
+	String getRiverBiome();
+	int getBiomeSize();
+	int getBiomeRarity();
+	boolean isIsleBiome();
+	boolean isBorderBiome();
+	int getBiomeColor();
+	String getBiomeExtends();
+	int getCHCSmoothRadius();
 	float getBiomeHeight();
 	float getBiomeVolatility();
 	double getVolatility1();
@@ -50,63 +100,47 @@ public interface IBiomeConfig
 	double getMaxAverageHeight();
 	double getCHCData(int y);
 	int getSmoothRadius();
+	boolean disableNotchHeightControl();
 	int getWaterLevelMax();
 	int getWaterLevelMin();
-	boolean isFlatBedrock();
-	boolean isCeilingBedrock();
-	boolean isBedrockDisabled();
-	boolean isRemoveSurfaceStone();
-	boolean disableNotchHeightControl();
 	
-	int getSnowHeight(float tempAtBlockToFreeze);
-	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z);
-	boolean getWoodlandMansionsEnabled();
+	// Vanilla structures
+	
 	VillageType getVillageType();
+	int getVillageSize();
+	
 	MineshaftType getMineShaftType();
-	RareBuildingType getRareBuildingType();
-	boolean getNetherFortressesEnabled();
-	int getFogColor();
-	float getBiomeWetness();
-	int getFoliageColor();
-	int getGrassColor();
-	boolean getGrassColorIsMultiplier();
-	int getSkyColor();
-	int getWaterColor();
-	List<WeightedMobSpawnGroup> getWaterCreatures();
-	List<WeightedMobSpawnGroup> getAmbientCreatures();
-	List<WeightedMobSpawnGroup> getCreatures();
-	List<WeightedMobSpawnGroup> getMonsters();
-	BiomeResourceLocation getRegistryKey();
-	int getBiomeSize();
-	int getBiomeRarity();
-	boolean isIsleBiome();
-	boolean isBorderBiome();
-	int getBiomeColor();
-	String getBiomeExtends();
-	int getCHCSmoothRadius();
-	String getReplaceToBiomeName();
-	void setReplaceToBiomeName(String replaceToBiomeName);
-	List<String> getIsleInBiomes();
-	List<String> getBorderInBiomes();
-	List<String> getNotBorderNearBiomes();
-	int getBiomeSizeWhenIsle();
-	int getBiomeSizeWhenBorder();
-	int getBiomeRarityWhenIsle();
-	String getRiverBiome();
+	float getMineShaftProbability();
+	
+	OceanRuinsType getOceanRuinsType();
+	float getOceanRuinsLargeProbability();
+	float getOceanRuinsClusterProbability();
+	
 	boolean getBuriedTreasureEnabled();
-	boolean getOceanRuinsColdEnabled();
-	boolean getOceanRuinsWarmEnabled();
+	float getBuriedTreasureProbability();
+
+	boolean getPillagerOutpostEnabled();
+	int getPillagerOutPostSize();
+
+	boolean getBastionRemnantEnabled();
+	int getBastionRemnantSize();
+	
+	RareBuildingType getRareBuildingType();
+	RuinedPortalType getRuinedPortalType();
+	
+	boolean getWoodlandMansionsEnabled();
+	boolean getNetherFortressesEnabled();	
 	boolean getShipWreckEnabled();
 	boolean getShipWreckBeachedEnabled();
-	boolean getPillagerOutpostEnabled();
-	boolean getBastionRemnantEnabled();
 	boolean getNetherFossilEnabled();
 	boolean getEndCityEnabled();
-	boolean getRuinedPortalEnabled();
-	boolean getRuinedPortalDesertEnabled();
-	boolean getRuinedPortalJungleEnabled();
-	boolean getRuinedPortalSwampEnabled();
-	boolean getRuinedPortalMountainEnabled();
-	boolean getRuinedPortalOceanEnabled();
-	boolean getRuinedPortalNetherEnabled();
+	boolean getStrongholdsEnabled();
+	boolean getOceanMonumentsEnabled();
+	
+	// OTG Custom structures (BO's)
+	
+	List<List<String>> getCustomStructureNames();
+	List<ICustomStructureGen> getCustomStructures();
+	ICustomStructureGen getStructureGen();
+	void setStructureGen(ICustomStructureGen customStructureGen);
 }
