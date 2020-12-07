@@ -32,14 +32,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
     public Map<String, IBiome> biomes = new LinkedHashMap<String, IBiome>(32);
 
     /**
-     * Variable used by the the ungrouped biome generator. This generator
-     * needs to modify this variable. Directly after calling
-     * {@link #processBiomeData(LocalWorld)} it has the value of
-     * {@link #getGroupRarity()} plus the biome rarity values of each biome.
-     */
-    private int totalGroupRarity;
-
-    /**
      * Loads the biome group using the provided settings.
      * @param config The world config.
      * @param args   The settings to be parsed.
@@ -88,7 +80,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
     void processBiomeData(IBiomeRegistryProvider biomeProvider, ILogger logger)
     {
         float totalTemp = 0;
-        this.totalGroupRarity = 0;
         for (Iterator<Entry<String, IBiome>> it = this.biomes.entrySet().iterator(); it.hasNext();)
         {
             Entry<String, IBiome> entry = it.next();
@@ -105,7 +96,6 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
 
             IBiomeConfig biomeConfig = localBiome.getBiomeConfig();
             totalTemp += biomeConfig.getBiomeTemperature();
-            this.totalGroupRarity += biomeConfig.getBiomeRarity();
         }
         this.avgTemp = totalTemp / this.biomes.size();
     }

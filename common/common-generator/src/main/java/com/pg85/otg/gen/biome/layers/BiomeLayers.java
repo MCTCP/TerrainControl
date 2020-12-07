@@ -189,14 +189,14 @@ public class BiomeLayers
 			// Finalize the biome data
 	        if (data.randomRivers)
 	        {
-	        	factory = new FinalizeWithRiverLayer(data.riversEnabled, data.biomes, data.riverBiomes).create(contextProvider.apply(1L), factory, factoryRiver);
+	        	factory = new FinalizeWithRiverLayer(data.riversEnabled, data.riverBiomes).create(contextProvider.apply(1L), factory, factoryRiver);
 	        } else {
-				factory = new FinalizeLayer(data.riversEnabled, data.biomes, data.riverBiomes).create(contextProvider.apply(1L), factory);
+				factory = new FinalizeLayer(data.riversEnabled, data.riverBiomes).create(contextProvider.apply(1L), factory);
 	        }
 		}
 
 		if(data.biomeMode == BiomeMode.FromImage)
-		{			
+		{
         	factory = new FromImageLayer(data, logger).create(contextProvider.apply(0), factory);
 		}
 

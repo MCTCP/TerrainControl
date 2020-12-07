@@ -72,40 +72,40 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 {
 	// Create a codec to serialise/deserialise OTGNoiseChunkGenerator
 	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
-			(p_236091_0_) ->
-			{
-				return p_236091_0_
-						.group(
-								Codec.STRING.fieldOf("otg_dimension_config").forGetter(
-										(p_236090_0_) ->
-										{
-											return p_236090_0_.dimensionConfig.toYamlString();
-										}
-								),
-								BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
-										(p_236096_0_) ->
-										{
-											return p_236096_0_.biomeProvider;
-										}
-								),
-								Codec.LONG.fieldOf("seed").stable().forGetter(
-										(p_236093_0_) ->
-										{
-											return p_236093_0_.worldSeed;
-										}
-								),
-								DimensionSettings.field_236098_b_.fieldOf("settings").forGetter(
-										(p_236090_0_) ->
-										{
-											return p_236090_0_.dimensionSettingsSupplier;
-										}
-								)
-						).apply(
-								p_236091_0_,
-								p_236091_0_.stable(OTGNoiseChunkGenerator::new)
-						)
-						;
-			}
+		(p_236091_0_) ->
+		{
+			return p_236091_0_
+				.group(
+					Codec.STRING.fieldOf("otg_dimension_config").forGetter(
+						(p_236090_0_) ->
+						{
+							return p_236090_0_.dimensionConfig.toYamlString();
+						}
+					),
+					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
+						(p_236096_0_) ->
+						{
+							return p_236096_0_.biomeProvider;
+						}
+					),
+					Codec.LONG.fieldOf("seed").stable().forGetter(
+						(p_236093_0_) ->
+						{
+							return p_236093_0_.worldSeed;
+						}
+					),
+					DimensionSettings.field_236098_b_.fieldOf("settings").forGetter(
+						(p_236090_0_) ->
+						{
+							return p_236090_0_.dimensionSettingsSupplier;
+						}
+					)
+				).apply(
+					p_236091_0_,
+					p_236091_0_.stable(OTGNoiseChunkGenerator::new)
+				)
+			;
+		}
 	);
 
 	private final Supplier<DimensionSettings> dimensionSettingsSupplier;
@@ -125,8 +125,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	private boolean isInitialised = false;
 
 	private final Map<Integer, List<Structure<?>>> biomeStructures;
-
-	//
 
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{

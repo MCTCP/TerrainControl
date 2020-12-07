@@ -142,8 +142,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
     	return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
     }	
 	
-	// TODO: Create tree configs that don't do rarity/chance rolls (we've already done that),
-	// and make sure they look more or less the same as 1.12.2.
+	// TODO: Make sure tree spawning looks more or less the same as 1.12.2.
 	@Override
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
 	{
@@ -172,7 +171,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	            case TallBirch:
 	                //return this.longBirchTree.generate(this.world, rand, blockPos);
 	            	return true; // TODO: Implement this
-	            case HugeMushroom:	            	
+	            case HugeMushroom:
 	                if (rand.nextBoolean())
 	                {
 	                	ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;

@@ -3,7 +3,6 @@ package com.pg85.otg.gen.biome.layers;
 import com.pg85.otg.gen.biome.layers.type.ParentedLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerSampleContext;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
 
 /**
  * Gets the biome id of the sample of this position by removing the extra land and other data.
@@ -12,12 +11,10 @@ class FinalizeLayer implements ParentedLayer
 {
 	private final boolean riversEnabled;
 	private int[] riverBiomes;
-	private IBiomeConfig[] biomes;
 	
-	public FinalizeLayer(boolean riversEnabled, IBiomeConfig[] biomes, int[] riverBiomes)
+	public FinalizeLayer(boolean riversEnabled, int[] riverBiomes)
 	{
 		this.riversEnabled = riversEnabled;
-		this.biomes = biomes;
 		this.riverBiomes = riverBiomes;
 	}
 	

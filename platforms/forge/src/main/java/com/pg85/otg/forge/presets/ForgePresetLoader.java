@@ -109,8 +109,20 @@ public class ForgePresetLoader extends LocalPresetLoader
 			{
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
 				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
+
+				boolean isOceanBiome = false;
+ 				// Biome id 0 is reserved for ocean, used when a land column has 
+ 				// no biome assigned, which can happen due to biome group rarity.
+ 				if(biomeConfig.getName().equals(preset.getWorldConfig().getDefaultOceanBiome()))
+ 				{
+ 					// TODO: Can't map the same biome to 2 int keys for the reverse map
+ 					// make sure this doesn't cause problems :/.
+ 					oceanBiomeConfig = biomeConfig;
+ 					presetIdMapping[0] = biomeConfig;
+ 					isOceanBiome = true;
+ 				}
 				
-				Biome biome = ForgeBiome.createOTGBiome(preset.getWorldConfig(), biomeConfig);
+				Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
  				ForgeRegistries.BIOMES.register(biome);
  				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
@@ -122,16 +134,6 @@ public class ForgePresetLoader extends LocalPresetLoader
  				
  				presetIdMapping[currentId] = biomeConfig;
  				presetReverseIdMapping.put(biomeConfig, currentId);
-
- 				// Biome id 0 is reserved for ocean, used when a land column has 
- 				// no biome assigned, which can happen due to biome group rarity.
- 				if(biomeConfig.getName().equals(preset.getWorldConfig().getDefaultOceanBiome()))
- 				{
- 					// TODO: Can't map the same biome to 2 int keys for the reverse map
- 					// make sure this doesn't cause problems :/.
- 					oceanBiomeConfig = biomeConfig;
- 					presetIdMapping[0] = biomeConfig;
- 				}
 
  				worldBiomes.put(biomeConfig.getName(), currentId);
  				

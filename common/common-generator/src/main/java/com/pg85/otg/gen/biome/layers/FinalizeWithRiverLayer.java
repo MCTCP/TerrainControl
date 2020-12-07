@@ -3,7 +3,6 @@ package com.pg85.otg.gen.biome.layers;
 import com.pg85.otg.gen.biome.layers.type.MergingLayer;
 import com.pg85.otg.gen.biome.layers.util.LayerRandomnessSource;
 import com.pg85.otg.gen.biome.layers.util.LayerSampler;
-import com.pg85.otg.util.interfaces.IBiomeConfig;
 
 /**
  * Gets the biome id of the sample of this position by removing the extra land and other data.
@@ -12,12 +11,10 @@ class FinalizeWithRiverLayer implements MergingLayer
 {	
 	private final boolean riversEnabled;
 	private int[] riverBiomes;
-	private IBiomeConfig[] biomes;
 	
-	public FinalizeWithRiverLayer(boolean riversEnabled, IBiomeConfig[] biomes, int[] riverBiomes)
+	public FinalizeWithRiverLayer(boolean riversEnabled, int[] riverBiomes)
 	{
 		this.riversEnabled = riversEnabled;
-		this.biomes = biomes;
 		this.riverBiomes = riverBiomes;
 	}
 
