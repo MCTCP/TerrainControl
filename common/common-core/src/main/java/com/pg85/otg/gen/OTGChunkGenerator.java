@@ -44,7 +44,7 @@ public class OTGChunkGenerator
 		}
 	});
 
-	private final OctavePerlinNoiseSampler interpolationNoise;     // Volatility noise
+	private final OctavePerlinNoiseSampler interpolationNoise;	 // Volatility noise
 	private final OctavePerlinNoiseSampler lowerInterpolatedNoise; // Volatility1 noise
 	private final OctavePerlinNoiseSampler upperInterpolatedNoise; // Volatility2 noise
 
@@ -108,16 +108,16 @@ public class OTGChunkGenerator
 		if (delta < volatilityWeight1)
 		{
 			return getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1;
-		} else if (delta > volatilityWeight2)
+		}
+		else if (delta > volatilityWeight2)
 		{
 			return getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2;
-		} else
-		{
+		} else {
 			// TODO: should probably use clamping here to prevent weird artifacts
 			return MathHelper.lerp(
-					delta,
-					getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1,
-					getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2);
+				delta,
+				getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1,
+				getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2);
 		}
 	}
 
@@ -181,8 +181,7 @@ public class OTGChunkGenerator
 			noiseHeight -= maxAverageDepth;
 			noiseHeight /= 1.4D;
 			noiseHeight /= 2.0D;
-		} else
-		{
+		} else {
 			if (noiseHeight > 1.0D)
 			{
 				noiseHeight = 1.0D;
@@ -427,7 +426,8 @@ public class OTGChunkGenerator
 									IBiomeConfig biomeConfig = this.getBiomeAtWorldCoord(realX, realZ);
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced((short) realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
-								} else if (realY < 63)
+								}
+								else if (realY < 63)
 								{
 									// TODO: water levels
 									IBiomeConfig biomeConfig = this.getBiomeAtWorldCoord(realX, realZ);
@@ -551,8 +551,7 @@ public class OTGChunkGenerator
 			{
 				// Copy values into buffer
 				System.arraycopy(this.values, idx * buffer.length, buffer, 0, buffer.length);
-			} else
-			{
+			} else {
 				// cache miss: sample and put the result into our cache entry
 
 				// Sample the noise column to store the new values

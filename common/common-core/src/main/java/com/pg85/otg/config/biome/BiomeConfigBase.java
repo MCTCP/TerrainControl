@@ -44,8 +44,8 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int biomeSizeWhenIsle;
 	protected int biomeRarityWhenIsle;
 	protected int biomeSizeWhenBorder;
-	   
-	    // Surface config
+		
+		// Surface config
 	protected float biomeHeight;
 	protected float biomeVolatility;
 	protected int smoothRadius;
@@ -96,7 +96,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int biomeColor;
 	protected int grassColor;
 	protected boolean grassColorIsMultiplier;
-	protected int foliageColor;    
+	protected int foliageColor;	
 	protected int skyColor;
 	protected int waterColor;
 	protected int fogColor;
@@ -118,7 +118,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	// Vanilla structures
 	
 	protected boolean strongholdsEnabled;
-	protected boolean oceanMonumentsEnabled;   
+	protected boolean oceanMonumentsEnabled;	
 	protected boolean woodLandMansionsEnabled;
 	protected boolean netherFortressesEnabled;
 	protected int villageSize;
@@ -144,20 +144,20 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	//
 	
-    protected BiomeConfigBase(String configName, BiomeResourceLocation registryKey)
-    {
+	protected BiomeConfigBase(String configName, BiomeResourceLocation registryKey)
+	{
 		super(configName);
 		this.registryKey = registryKey;
 	}
-    
-    @Override
+	
+	@Override
 	public BiomeResourceLocation getRegistryKey()
 	{
 		return this.registryKey;
-	}   
+	}	
 	
-    // Materials
-        
+	// Materials
+		
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
@@ -170,10 +170,10 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.surfaceAndGroundControl.getGroundBlockAtHeight(worldGenRegion, this, x, y, z);
 	}
 	
-    // Any blocks spawned/checked during base terrain gen that use the biomeconfig materials
-    // call getXXXBlockReplaced to get the replaced blocks.
-    // Any blocks spawned during population will have their materials parsed before spawning them
-    // via world.setBlock(), so they use the default biomeconfig materials.
+	// Any blocks spawned/checked during base terrain gen that use the biomeconfig materials
+	// call getXXXBlockReplaced to get the replaced blocks.
+	// Any blocks spawned during population will have their materials parsed before spawning them
+	// via world.setBlock(), so they use the default biomeconfig materials.
 	
 	@Override
 	public LocalMaterialData getDefaultGroundBlock()
@@ -393,8 +393,6 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.grassColorIsMultiplier;
 	}
 	
-	// Vanilla structures
-	
 	@Override
 	public VillageType getVillageType()
 	{
@@ -532,8 +530,6 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.oceanMonumentsEnabled;
 	}
-	
-	//
 	
 	@Override
 	public String getReplaceToBiomeName()
@@ -694,119 +690,119 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		;
 	}
 
-    @Override
+	@Override
 	public boolean isBorderBiome()
-    {
+	{
 		return
 			this.biomeIsBorder != null && 
 			this.biomeIsBorder.size() > 0 &&
 			this.worldConfig.getBorderBiomes().contains(this.getName())
 		;
 	}
-    
-    @Override
-    public List<String> getIsleInBiomes()
-    {
-    	return this.isleInBiome;
-    }
-    
-    @Override
+	
+	@Override
+	public List<String> getIsleInBiomes()
+	{
+		return this.isleInBiome;
+	}
+	
+	@Override
 	public List<String> getBorderInBiomes()
 	{
 		return this.biomeIsBorder;
 	}
 	
-    @Override
+	@Override
 	public List<String> getNotBorderNearBiomes()
-    {
-    	return this.notBorderNear;
+	{
+		return this.notBorderNear;
 	}
 
-    @Override
+	@Override
 	public int getBiomeSizeWhenIsle()
-    {
+	{
 		return this.biomeSizeWhenIsle;
 	}
-    
-    @Override
+	
+	@Override
 	public int getBiomeRarityWhenIsle()
 	{
 		return this.biomeRarityWhenIsle;
 	}
-    
-    @Override
+	
+	@Override
 	public int getBiomeSizeWhenBorder()
-    {
+	{
 		return this.biomeSizeWhenBorder;
 	}
 
-    @Override
+	@Override
 	public String getRiverBiome()
-    {
+	{
 		return this.riverBiome;
-	}          
-    
+	}		  
+	
 	//
 	
-    /**
-     * This is a pretty weak map from -0.5 to ~-0.8 (min vanilla temperature)
-     *
-     * TODO: We should probably make this more configurable in the future?
-     *
-     * @param temp The temp to get snow height for
-     * @return A value from 0 to 7 to be used for snow height
-     */
-    @Override
-    public int getSnowHeight(float temp)
-    {
-    	// OTG biome temperature is between 0.0 and 2.0.
-    	// Judging by WorldStandardValues.SNOW_AND_ICE_MAX_TEMP, snow should appear below 0.15.
-    	// According to the configs, snow and ice should appear between 0.2 (at y > 90) and 0.1 (entire biome covered in ice).
-    	// Let's make sure that at 0.2, snow layers start with thickness 0 at y 90 and thickness 7 around y 255.
-    	// In a 0.2 temp biome, y90 temp is 0.156, y255 temp is -0.12
-    	   	
-    	float snowTemp = Constants.SNOW_AND_ICE_TEMP;
-    	if(temp <= snowTemp)
-    	{
-        	float maxColdTemp = Constants.SNOW_AND_ICE_MAX_TEMP;
-        	float maxThickness = 7.0f;
-        	if(temp < maxColdTemp)
-        	{
-        		return (int)maxThickness;
-        	}
-        	float range = Math.abs(maxColdTemp - snowTemp);
-        	float fraction = Math.abs(maxColdTemp - temp);
-    		return (int)Math.floor((1.0f - (fraction / range)) * maxThickness);
-    	}
+	/**
+	 * This is a pretty weak map from -0.5 to ~-0.8 (min vanilla temperature)
+	 *
+	 * TODO: We should probably make this more configurable in the future?
+	 *
+	 * @param temp The temp to get snow height for
+	 * @return A value from 0 to 7 to be used for snow height
+	 */
+	@Override
+	public int getSnowHeight(float temp)
+	{
+		// OTG biome temperature is between 0.0 and 2.0.
+		// Judging by WorldStandardValues.SNOW_AND_ICE_MAX_TEMP, snow should appear below 0.15.
+		// According to the configs, snow and ice should appear between 0.2 (at y > 90) and 0.1 (entire biome covered in ice).
+		// Let's make sure that at 0.2, snow layers start with thickness 0 at y 90 and thickness 7 around y 255.
+		// In a 0.2 temp biome, y90 temp is 0.156, y255 temp is -0.12
+				
+		float snowTemp = Constants.SNOW_AND_ICE_TEMP;
+		if(temp <= snowTemp)
+		{
+			float maxColdTemp = Constants.SNOW_AND_ICE_MAX_TEMP;
+			float maxThickness = 7.0f;
+			if(temp < maxColdTemp)
+			{
+				return (int)maxThickness;
+			}
+			float range = Math.abs(maxColdTemp - snowTemp);
+			float fraction = Math.abs(maxColdTemp - temp);
+			return (int)Math.floor((1.0f - (fraction / range)) * maxThickness);
+		}
 
-    	return  0;
-    }
+		return  0;
+	}
 	
-    @Override
+	@Override
 	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
 	{
 		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, x, z);
 	}
 	
-    public SaplingGen getSaplingGen(SaplingType type)
-    {
-        SaplingGen gen = saplingGrowers.get(type);
-        if (gen == null && type.growsTree())
-        {
-            gen = saplingGrowers.get(SaplingType.All);
-        }
-        return gen;
-    }
+	public SaplingGen getSaplingGen(SaplingType type)
+	{
+		SaplingGen gen = saplingGrowers.get(type);
+		if (gen == null && type.growsTree())
+		{
+			gen = saplingGrowers.get(SaplingType.All);
+		}
+		return gen;
+	}
 
-    public SaplingGen getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk)
-    {
-    	// TODO: Re-implement this when block data works
-        if (wideTrunk)
-        {
-        	return customBigSaplingGrowers.get(materialData);
-            //return customBigSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
-        }
-        return customSaplingGrowers.get(materialData);
-        //return customSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
-    }
+	public SaplingGen getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk)
+	{
+		// TODO: Re-implement this when block data works
+		if (wideTrunk)
+		{
+			return customBigSaplingGrowers.get(materialData);
+			//return customBigSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
+		}
+		return customSaplingGrowers.get(materialData);
+		//return customSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
+	}
 }
