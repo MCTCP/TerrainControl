@@ -42,25 +42,25 @@ public class WorldConfig extends WorldConfigBase
     	CONFIG_FUNCTIONS.put("BiomeGroup", BiomeGroup.class);
     }
    
-    // TODO: Not used atm, implement these.
-    private String author;
+	// TODO: Not used atm, implement these.
+	private String author;
 	private String description;
 	private String worldPackerModName;
-    private boolean improvedRivers;
-    private boolean frozenOcean;
+	private boolean improvedRivers;
+	private boolean frozenOcean;
 	private String defaultFrozenOceanBiome;
-    private TerrainMode modeTerrain;
-    private String bo3AtSpawn;
-
+	private TerrainMode modeTerrain;
+	private String bo3AtSpawn;
+	
 	// Fields used only in common-core or platform layers that aren't in IWorldConfig
-    
-    // TODO: Refactor BiomeGroups classes, since we have new biome groups now. Expose via IWorldConfig?
+	
+	// TODO: Refactor BiomeGroups classes, since we have new biome groups now. Expose via IWorldConfig?
 	protected BiomeGroupManager biomeGroupManager;
-
+	
 	// Private fields, only used when loading/saving
 	
-    private int worldHeightScaleBits;
-    private int worldHeightCapBits;
+	private int worldHeightScaleBits;
+	private int worldHeightCapBits;
 	
     public WorldConfig(Path settingsDir, SettingsMap settingsReader, ArrayList<String> biomes, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
@@ -741,16 +741,16 @@ public class WorldConfig extends WorldConfigBase
         writer.putSetting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
         writer.putSetting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
     }
-
+	
 	public static WorldConfig fromDisk(Path worldDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		File worldConfigFile = Paths.get(worldDir.toString(), Constants.WORLD_CONFIG_FILE).toFile();
-        if(!worldConfigFile.exists())
-        {
-        	return null;
-        }
-        SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile, logger);
-        return new WorldConfig(worldDir, settingsMap, null, biomeResourcesManager, spawnLog, logger, materialReader);
+	    if(!worldConfigFile.exists())
+	    {
+	    	return null;
+	    }
+	    SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile, logger);
+	    return new WorldConfig(worldDir, settingsMap, null, biomeResourcesManager, spawnLog, logger, materialReader);
 	}
 	
 	public BiomeGroupManager getBiomeGroupManager()
