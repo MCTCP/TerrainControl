@@ -27,7 +27,6 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	// Misc
 	
 	protected ConfigMode settingsMode;
-	protected String worldSeed;
 
 	// Visual settings
 	
@@ -139,12 +138,6 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
-	}
-
-	@Override
-	public String getWorldSeed()
-	{
-		return this.worldSeed;
 	}
 
 	@Override

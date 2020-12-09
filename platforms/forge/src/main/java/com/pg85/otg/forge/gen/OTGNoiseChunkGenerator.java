@@ -80,6 +80,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					Codec.STRING.fieldOf("otg_dimension_config").forGetter(
 						(p_236090_0_) ->
 						{
+							// TODO: Use bytestream instead?
 							return p_236090_0_.dimensionConfig.toYamlString();
 						}
 					),
@@ -129,7 +130,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName(), 0, true), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
 	private OTGNoiseChunkGenerator(String dimensionConfigYaml, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
@@ -198,7 +199,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			isInitialised = true;
 			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
-			OTG.getEngine().createDimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName, this.dimensionConfig);
 		}
 	}
 

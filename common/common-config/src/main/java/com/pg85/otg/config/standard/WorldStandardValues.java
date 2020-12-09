@@ -41,8 +41,6 @@ public class WorldStandardValues extends Settings
 		IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
 		AUTHOR = stringSetting("Author", "Unknown"),
 		DESCRIPTION = stringSetting("Description", "No description given"),
-		WORLDPACKER_MODNAME = stringSetting("WorldPackerModName", ""),
-		WORLD_SEED = stringSetting("WorldSeed", ""),
 		BO3_AT_SPAWN = stringSetting("BO3AtSpawn", ""),
 		DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
 		DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean")

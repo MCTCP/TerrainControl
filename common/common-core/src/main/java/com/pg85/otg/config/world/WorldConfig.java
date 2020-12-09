@@ -45,7 +45,6 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Not used atm, implement these.
 	private String author;
 	private String description;
-	private String worldPackerModName;
 	private boolean improvedRivers;
 	private boolean frozenOcean;
 	private String defaultFrozenOceanBiome;
@@ -146,7 +145,6 @@ public class WorldConfig extends WorldConfigBase
 		// Misc
 
 		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);		
-		this.worldSeed = reader.getSetting(WorldStandardValues.WORLD_SEED, logger, null);
 
 		// Visual settings
 
@@ -264,7 +262,6 @@ public class WorldConfig extends WorldConfigBase
 		this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS, logger, null);
 		this.author = reader.getSetting(WorldStandardValues.AUTHOR, logger, null);
 		this.description = reader.getSetting(WorldStandardValues.DESCRIPTION, logger, null);
-		this.worldPackerModName = reader.getSetting(WorldStandardValues.WORLDPACKER_MODNAME, logger, null);		
 		this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger, null);
 	}
 
@@ -360,17 +357,6 @@ public class WorldConfig extends WorldConfigBase
 			"A short description of this world"
 		);
 
-		writer.putSetting(WorldStandardValues.WORLDPACKER_MODNAME, this.worldPackerModName,
-			"The mod name of a WorldPacker jar associated with this preset.",
-			"Used to link any assets / information from the WorldPacker jar."
-		);
-		
-		writer.header2("World Seed");
-
-		writer.putSetting(WorldStandardValues.WORLD_SEED, this.worldSeed,
-			"The seed that will be used for this world unless it is overriden in the world creation menu. Leave blank for a random seed."
-		);
-		
 		writer.header2("Visual Settings",
 			"Controls the world's fog colors. Sky, grass and foliage colors are defined inside the biome configs."
 		);

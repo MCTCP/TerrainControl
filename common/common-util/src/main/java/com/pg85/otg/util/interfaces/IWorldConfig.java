@@ -26,7 +26,6 @@ public interface IWorldConfig
 	// Misc
 
 	public ConfigMode getSettingsMode();
-	public String getWorldSeed();
 
 	// Visual settings
 	

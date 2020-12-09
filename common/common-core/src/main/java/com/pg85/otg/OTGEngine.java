@@ -6,8 +6,6 @@ import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
-import com.pg85.otg.config.dimensions.DimensionConfig;
-import com.pg85.otg.config.dimensions.DimensionsConfig;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
 import com.pg85.otg.config.world.WorldConfig;
@@ -40,7 +38,6 @@ public abstract class OTGEngine
 	
 	private final Path otgRootFolder;
 	private PluginConfig pluginConfig;
-	private DimensionsConfig dimensionsConfig;
 
 	private BiomeResourcesManager biomeResourcesManager;
 	private CustomObjectResourcesManager customObjectResourcesManager;
@@ -157,20 +154,7 @@ public abstract class OTGEngine
 	{
 		return pluginConfig;
 	}
-	
-	public DimensionsConfig getDimensionsConfig()
-	{		
-		return this.dimensionsConfig;
-	}
-	
-	public DimensionsConfig createDimensionsConfig(Path path, String worldName, DimensionConfig dimensionConfig)
-	{
-		this.dimensionsConfig = new DimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName);
-		dimensionsConfig.WorldName = worldName;
-		dimensionsConfig.Overworld = dimensionConfig;
-		return this.dimensionsConfig;
-	}
-	
+
 	// OTG dirs
 
 	public Path getOTGRootFolder()
