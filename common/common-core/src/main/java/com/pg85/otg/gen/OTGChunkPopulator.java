@@ -4,6 +4,7 @@ import com.pg85.otg.OTG;
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.Resource;
+import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.resource.CustomObjectResource;
@@ -76,9 +77,9 @@ public class OTGChunkPopulator implements IChunkPopulator
 		}
 		
     	Path otgRootFolder = OTG.getEngine().getOTGRootFolder();
-    	boolean developerMode = OTG.getEngine().getPluginConfig().developerMode;
-    	boolean spawnLog = OTG.getEngine().getPluginConfig().spawnLog;
-    	boolean isBO4Enabled = worldGenRegion.getWorldConfig().isOTGPlus();
+    	boolean developerMode = OTG.getEngine().getPluginConfig().getDeveloperModeEnabled();
+    	boolean spawnLog = OTG.getEngine().getPluginConfig().getSpawnLogEnabled();
+    	boolean isBO4Enabled = worldGenRegion.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4;
     	ILogger logger = OTG.getEngine().getLogger();
     	CustomObjectManager customObjectManager = OTG.getEngine().getCustomObjectManager();
     	IMaterialReader materialReader = OTG.getEngine().getMaterialReader();
@@ -133,7 +134,7 @@ public class OTGChunkPopulator implements IChunkPopulator
         }
 
         // Get the random generator
-        long resourcesSeed = worldGenRegion.getWorldConfig().getResourcesSeed() != 0L ? worldGenRegion.getWorldConfig().getResourcesSeed() : worldGenRegion.getSeed();
+        long resourcesSeed = worldGenRegion.getSeed();
         this.rand.setSeed(resourcesSeed);
         long l1 = this.rand.nextLong() / 2L * 2L + 1L;
         long l2 = this.rand.nextLong() / 2L * 2L + 1L;
