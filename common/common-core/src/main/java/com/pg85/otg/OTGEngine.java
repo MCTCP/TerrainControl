@@ -25,6 +25,16 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * Implemented and provided by the platform-specific layer on app start and accessed via OTG.setEngine()/OTG.getEngine(),
+ * this class holds any objects and methods used during an app session.
+ * 
+ * Constructor parameters are platform-specific implementations of wrapper classes, such as a logger, material reader, 
+ * preset loader etc. Implement these to provide support for a platform (Forge, Spigot etc).
+ *  
+ * OTGEngine.onStart() should be called on mod/plugin start, and registers all presets and their biomes via the
+ * platform-specific preset loader provided as a constructor parameter. 
+ */
 public abstract class OTGEngine
 {
 	// Classes implemented/provided by the platform-specific layer.
