@@ -112,7 +112,7 @@ public class BiomeLayers
 		            	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
 		            }
 				}
-				else if(data.biomeMode == BiomeMode.BeforeGroups)
+				else if(data.biomeMode == BiomeMode.NoGroups)
 				{
 					if (data.biomeDepths.contains(depth))
 					{

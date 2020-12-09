@@ -1,20 +1,18 @@
 package com.pg85.otg.config.standard;
 
-import com.pg85.otg.config.settingType.MaterialListSetting;
 import com.pg85.otg.config.settingType.MaterialSetting;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.settingType.Settings;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
+import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.constants.SettingsEnums.TerrainMode;
-import com.pg85.otg.util.biome.ReplaceBlocks;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class WorldStandardValues extends Settings
@@ -36,7 +34,8 @@ public class WorldStandardValues extends Settings
     public static final Setting<TerrainMode> TERRAIN_MODE = enumSetting("TerrainMode", TerrainMode.Normal);
     public static final Setting<ImageMode> IMAGE_MODE = enumSetting("ImageMode", ImageMode.Mirror);
     public static final Setting<ImageOrientation> IMAGE_ORIENTATION = enumSetting("ImageOrientation", ImageOrientation.West);
-
+    public static final Setting<CustomStructureType> CUSTOM_STRUCTURE_TYPE = enumSetting("CustomStructureType", CustomStructureType.BO3);
+    
     public static final Setting<String>
 		IMAGE_FILE = stringSetting("ImageFile", "map.png"),
 		IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
@@ -45,23 +44,8 @@ public class WorldStandardValues extends Settings
 		WORLDPACKER_MODNAME = stringSetting("WorldPackerModName", ""),
 		WORLD_SEED = stringSetting("WorldSeed", ""),
 		BO3_AT_SPAWN = stringSetting("BO3AtSpawn", ""),
-		DIMENSIONBELOW = stringSetting("DimensionBelow", ""),
-		DIMENSIONABOVE = stringSetting("DimensionAbove", ""),
-		
-		WelcomeMessage = stringSetting("WelcomeMessage", ""),
-		DepartMessage = stringSetting("DepartMessage", ""),
-		ITEMS_TO_ADD_ON_JOIN_DIMENSION = stringSetting("ItemsToAddOnJoinDimension", ""),
-		ITEMS_TO_REMOVE_ON_JOIN_DIMENSION = stringSetting("ItemsToRemoveOnJoinDimension", ""),
-		ITEMS_TO_ADD_ON_LEAVE_DIMENSION = stringSetting("ItemsToAddOnLeaveDimension", ""),
-		ITEMS_TO_REMOVE_ON_LEAVE_DIMENSION = stringSetting("ItemsToRemoveOnLeaveDimension", ""),
-		ITEMS_TO_ADD_ON_RESPAWN = stringSetting("ItemsToAddOnRespawn", ""),
-		
 		DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
-		DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean"),
-		
-		PORTAL_COLOR = stringSetting("PortalColor", "default"),
-		PORTAL_PARTICLE_TYPE = stringSetting("PortalParticleType", "portal"),
-		PORTAL_MOB_TYPE = stringSetting("PortalMobType", "zombie_pigman")
+		DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean")
 	;
 
     public static final Setting<Integer>
@@ -94,29 +78,7 @@ public class WorldStandardValues extends Settings
 		RAVINE_MAX_ALTITUDE = intSetting("RavineMaxAltitude", 67, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
 		RAVINE_MIN_LENGTH = intSetting("RavineMinLength", 84, 1, 500),
 		RAVINE_MAX_LENGTH = intSetting("RavineMaxLength", 111, 1, 500),
-		OBJECT_SPAWN_RATIO = intSetting("ObjectSpawnRatio", 1, 1, 1000),
-		VILLAGE_SIZE = intSetting("VillageSize", 0, 0, 10),
-		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100),
-		PREGENERATION_RADIUS = intSetting("PreGenerationRadius", 0, 0, 999999),
-		WORLD_BORDER_RADIUS = intSetting("WorldBorderRadius", 0, 0, 999999),
-		
-		MaxCommandChainLength = intSetting("MaxCommandChainLength", 65536, 0, 999999), 
-		MaxEntityCramming = intSetting("MaxEntityCramming", 24, 0, 999999),
-		RandomTickSpeed = intSetting("RandomTickSpeed", 3, 0, 999999),
-		SpawnRadius = intSetting("SpawnRadius", 10, 0, 999999),
-		CloudHeight = intSetting("CloudHeight", 128, 0, 999999),
-		
-		DIMENSIONBELOWHEIGHT = intSetting("DimensionBelowHeight", 0, -999999, 999999),
-		DIMENSIONABOVEHEIGHT = intSetting("DimensionAboveHeight", 256, -999999, 999999),
-		
-		RESPAWN_DIMENSION = intSetting("RespawnDimension", 0, -999999, 999999),
-		MOVEMENT_FACTOR = intSetting("MovementFactor", 1, 1, 999999),
-		
-		SPAWN_POINT_X = intSetting("SpawnPointX", 0, -999999, 999999),
-		SPAWN_POINT_Y = intSetting("SpawnPointY", 0, -999999, 999999),
-		SPAWN_POINT_Z = intSetting("SpawnPointZ", 0, -999999, 999999),
-		
-		PORTAL_MOB_SPAWN_CHANCE = intSetting("PortalMobSpawnChance", 2000, 0, 999999)
+		MAXIMUM_CUSTOM_STRUCTURE_RADIUS = intSetting("MaximumCustomStructureRadius", 5, 1, 100)
     ;
     
     public static final Setting<Boolean>
@@ -133,7 +95,6 @@ public class WorldStandardValues extends Settings
 		FLAT_BEDROCK = booleanSetting("FlatBedrock", false),
 		REMOVE_SURFACE_STONE = booleanSetting("RemoveSurfaceStone", false),
 		POPULATION_BOUNDS_CHECK = booleanSetting("PopulationBoundsCheck", true),
-		POPULATE_USING_SAVED_BIOMES = booleanSetting("PopulateUsingSavedBiomes", false),
 		DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
 		
 		MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
@@ -150,62 +111,15 @@ public class WorldStandardValues extends Settings
 		END_CITIES_ENABLED = booleanSetting("EndCitiesEnabled", true),
 		RUINED_PORTALS_ENABLED = booleanSetting("RuinedPortalsEnabled", true),
 		SHIPWRECKS_ENABLED = booleanSetting("ShipwrecksEnabled", true),
-		VILLAGES_ENABLED = booleanSetting("VillagesEnabled", true),
-		
-		TeleportToSpawnOnly = booleanSetting("TeleportToSpawnOnly", false),
-		CommandBlockOutput = booleanSetting("CommandBlockOutput", true),
-		DisableElytraMovementCheck = booleanSetting("DisableElytraMovementCheck", false),
-		DoDaylightCycle = booleanSetting("DoDaylightCycle", true),
-		DoEntityDrops = booleanSetting("DoEntityDrops", true),
-		DoFireTick = booleanSetting("DoFireTick", true),
-		DoLimitedCrafting = booleanSetting("DoLimitedCrafting", false),
-		DoMobLoot = booleanSetting("DoMobLoot", true),
-		DoMobSpawning = booleanSetting("DoMobSpawning", true),
-		DoTileDrops = booleanSetting("DoTileDrops", true),
-		DoWeatherCycle = booleanSetting("DoWeatherCycle", true),
-		GameLoopFunction = booleanSetting("GameLoopFunction", true),
-		KeepInventory = booleanSetting("KeepInventory", false),
-		LogAdminCommands = booleanSetting("LogAdminCommands", true),				
-		MobGriefing = booleanSetting("MobGriefing", true),
-		NaturalRegeneration = booleanSetting("NaturalRegeneration", true),
-		ReducedDebugInfo = booleanSetting("ReducedDebugInfo", false),
-		SendCommandFeedback = booleanSetting("SendCommandFeedback", true),
-		ShowDeathMessages = booleanSetting("ShowDeathMessages", true),
-		SpectatorsGenerateChunks = booleanSetting("SpectatorsGenerateChunks", true),
-		HasSkyLight = booleanSetting("HasSkyLight", true),
-		IsSurfaceWorld = booleanSetting("IsSurfaceWorld", true),
-		CanRespawnHere = booleanSetting("CanRespawnHere", true),
-		DoesWaterVaporize = booleanSetting("DoesWaterVaporize", false),
-		DoesXZShowFog = booleanSetting("DoesXZShowFog", false),
-		IsSkyColored = booleanSetting("IsSkyColored", true),
-		CanDoLightning = booleanSetting("CanDoLightning", true),
-		CanDoRainSnowIce = booleanSetting("CanDoRainSnowIce", true),
-		IsNightWorld = booleanSetting("IsNightWorld", false),
-		ShouldMapSpin = booleanSetting("ShouldMapSpin", false),
-		CanDropChunk = booleanSetting("CanDropChunk", true),
-		UseCustomFogColor = booleanSetting("UseCustomFogColor", false),
-		IS_OTG_PLUS = booleanSetting("IsOTGPlus", false),
-		
-		SPAWN_POINT_SET = booleanSetting("SpawnPointSet", false),
-		PLAYERS_CAN_BREAK_BLOCKS = booleanSetting("PlayersCanBreakBlocks", true),
-		EXPLOSIONS_CAN_BREAK_BLOCKS = booleanSetting("ExplosionsCanBreakBlocks", true),
-		PLAYERS_CAN_PLACE_BLOCKS = booleanSetting("PlayersCanPlaceBlocks", true)
+		VILLAGES_ENABLED = booleanSetting("VillagesEnabled", true)
     ;
 
     public static final Setting<LocalMaterialData>
 		WATER_BLOCK = new MaterialSetting("WaterBlock", LocalMaterials.WATER_NAME),
 		ICE_BLOCK = new MaterialSetting("IceBlock", LocalMaterials.ICE_NAME),
 		COOLED_LAVA_BLOCK = new MaterialSetting("CooledLavaBlock", LocalMaterials.LAVA_NAME),
-		BEDROCK_BLOCK = new MaterialSetting("BedrockobBlock", LocalMaterials.BEDROCK_NAME)
+		BEDROCK_BLOCK = new MaterialSetting("BedrockBlock", LocalMaterials.BEDROCK_NAME)
     ;
-
-    public static final Setting<ArrayList<LocalMaterialData>>
-    	DIMENSION_PORTAL_MATERIALS = new MaterialListSetting("DimensionPortalMaterials", new String[] { LocalMaterials.QUARTZ_BLOCK_NAME })
-	;
-
-    public static final Setting<List<ReplaceBlocks>>
-    	REPLACE_BLOCKS_LIST = replaceBlocksListSetting("ReplaceBlocksList")
-	;
 
     public static final Setting<List<String>>
 		ISLE_BIOMES = stringListSetting("IsleBiomes", "Deep Ocean", "MushroomIsland",
@@ -214,8 +128,7 @@ public class WorldStandardValues extends Settings
 			"Mesa Plateau", "Mesa Plateau F", "Mesa Plateau M", "Mesa Plateau F M",
 			"Mesa (Bryce)", "Mega Taiga Hills", "Mega Spruce Taiga Hills"),
 		BORDER_BIOMES = stringListSetting("BorderBiomes",
-			"JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga"),
-		DIMENSIONS = stringListSetting("Dimensions")
+			"JungleEdge", "JungleEdge M", "MushroomIslandShore", "Beach", "Extreme Hills Edge", "Desert", "Taiga")
 	;
 
     public static final Setting<Double>
@@ -223,26 +136,17 @@ public class WorldStandardValues extends Settings
 		RAVINE_DEPTH = doubleSetting("RavineDepth", 3, 0.1, 15),
 		CANYON_DEPTH = doubleSetting("CanyonDepth", 3, 0.1, 15),
 		FRACTURE_HORIZONTAL = doubleSetting("FractureHorizontal", 0, -500, 500),
-		FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500),
-		
-		FogColorRed = doubleSetting("FogColorRed", 0.20000000298023224D, Double.MIN_VALUE, Double.MAX_VALUE),
-		FogColorGreen = doubleSetting("FogColorGreen", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
-		FogColorBlue = doubleSetting("FogColorBlue", 0.029999999329447746D, Double.MIN_VALUE, Double.MAX_VALUE),
-		VoidFogYFactor = doubleSetting("VoidFogYFactor", 0.03125D, Double.MIN_VALUE, Double.MAX_VALUE),
-		
-		GravityFactor = doubleSetting("GravityFactor", 0.08D, 0.0D, Double.MAX_VALUE)
+		FRACTURE_VERTICAL = doubleSetting("FractureVertical", 0, -500, 500)
     ;
 
     public static final Setting<Integer>
-		WORLD_FOG = colorSetting("WorldFog", "0xC0D8FF"),
-		WORLD_NIGHT_FOG = colorSetting("WorldNightFog", "0x0B0D17")
+		WORLD_FOG_COLOR = colorSetting("WorldFog", "0xC0D8FF")
     ;
-
-    public static final Setting<Long> RESOURCES_SEED = longSetting("ResourcesSeed", 0, Long.MIN_VALUE, Long.MAX_VALUE);
 
     // Deprecated settings
     public static final Setting<Boolean> FROZEN_RIVERS = booleanSetting("FrozenRivers", true);
-    public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting("NormalBiomes", "Desert", "Forest", "Extreme Hills",
-        "Swampland", "Plains", "Taiga", "Jungle", "River");
+    public static final Setting<List<String>> NORMAL_BIOMES = stringListSetting(
+		"NormalBiomes", "Desert", "Forest", "Extreme Hills", "Swampland", "Plains", "Taiga", "Jungle", "River"
+    );
     public static final Setting<List<String>> ICE_BIOMES = stringListSetting("IceBiomes", "Ice Plains");
 }

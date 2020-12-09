@@ -2,6 +2,7 @@ package com.pg85.otg.forge.biome;
 
 import java.util.Optional;
 import com.pg85.otg.OTG;
+import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
@@ -92,7 +93,7 @@ public class ForgeBiome implements IBiome
 
 	    BiomeAmbience.Builder biomeAmbienceBuilder =
 			new BiomeAmbience.Builder()
-				.setFogColor(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 12638463)
+				.setFogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue(null) ? biomeConfig.getFogColor() : worldConfig.getFogColor())
 				.setWaterFogColor(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 329011) // TODO: Add a setting for Water fog color.
 				.setWaterColor(biomeConfig.getWaterColor() != 0xffffff ? biomeConfig.getWaterColor() : 4159204)
 				.withSkyColor(biomeConfig.getSkyColor() != 0x7BA5FF ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
@@ -143,17 +144,17 @@ public class ForgeBiome implements IBiome
 				biomeAmbienceBuilder.build()
 			// Mob spawning
 			).withMobSpawnSettings(
-				mobSpawnInfoBuilder.copy() // Validate & build
+				mobSpawnInfoBuilder.copy()
 			// All other biome settings...
 			).withGenerationSettings(
-				biomeGenerationSettingsBuilder.build() // Validate & build
+				biomeGenerationSettingsBuilder.build()
 			)
 		;
 
 		return
 			biomeBuilder
 				// Finalise
-				.build() // Validate & build
+				.build()
 				.setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()))
 		;
 	}
@@ -204,7 +205,7 @@ public class ForgeBiome implements IBiome
 		
 		// TODO: EntityClassification.WATER_AMBIENT / EntityClassification.MISC ?
 		
-		mobSpawnInfoBuilder.isValidSpawnBiomeForPlayer(); // Default biomes do this, not sure if needed. Does the opposite of disablePlayerSpawn?
+		mobSpawnInfoBuilder.isValidSpawnBiomeForPlayer(); // Default biomes do this, not sure if needed?
 		return mobSpawnInfoBuilder;
 	}
 

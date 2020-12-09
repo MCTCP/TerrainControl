@@ -141,39 +141,39 @@ public class ForgePresetLoader extends LocalPresetLoader
  				if(biomeConfig.isIsleBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
+					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
 					biomesAtDepth.add(
 						new NewBiomeData(
 							currentId, 
 							biomeConfig.getName(), 
-							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
-							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), 
+							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
+							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), 
 							biomeConfig.getBiomeTemperature(), 
 							biomeConfig.getIsleInBiomes(), 
 							biomeConfig.getBorderInBiomes(), 
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
-					isleBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), biomesAtDepth);
+					isleBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), biomesAtDepth);
  				}
 
  				if(biomeConfig.isBorderBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
+					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
 					biomesAtDepth.add(
 						new NewBiomeData(
 							currentId, 
 							biomeConfig.getName(), 
 							biomeConfig.getBiomeRarity(),
-							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), 
+							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), 
 							biomeConfig.getBiomeTemperature(), 
 							biomeConfig.getIsleInBiomes(), 
 							biomeConfig.getBorderInBiomes(), 
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
-					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
+					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
  				}
  				
  				// Index BiomeColor for FromImageMode and /otg map
@@ -194,7 +194,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
 
 			// Iterate through the groups and add it to the layer data
-			for (BiomeGroup group : worldConfig.biomeGroupManager.getGroups())
+			for (BiomeGroup group : worldConfig.getBiomeGroupManager().getGroups())
 			{
 				// Initialize biome group data
 				NewBiomeGroup bg = new NewBiomeGroup();

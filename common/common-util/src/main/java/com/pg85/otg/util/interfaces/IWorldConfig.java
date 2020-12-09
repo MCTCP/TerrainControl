@@ -5,21 +5,38 @@ import java.util.List;
 
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
+import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+/**
+ * WorldConfig.ini classes
+ * 
+ * IWorldConfig defines anything that's used/exposed between projects.
+ * WorldConfigBase implements anything needed for IWorldConfig. 
+ * WorldConfig contains only fields/methods used for io/serialisation/instantiation.
+ * 
+ * WorldConfig should be used only in common-core and platform-specific layers, when reading/writing settings on app start.
+ * IWorldConfig should be used wherever settings are used in code. 
+ */
 public interface IWorldConfig
 {
+	// Misc
+
 	public ConfigMode getSettingsMode();
+	public String getWorldSeed();
+
+	// Visual settings
+	
+	public int getFogColor();
 	
 	// Biome resources
 
-	public long getResourcesSeed();
 	public boolean isDisableOreGen();
 	public boolean getBedrockDisabled();
-	
+
 	// Blocks
 
 	public boolean getRemoveSurfaceStone();
@@ -28,12 +45,12 @@ public interface IWorldConfig
 	public LocalMaterialData getDefaultBedrockBlock();
 	public LocalMaterialData getCooledLavaBlock();
 	public LocalMaterialData getIceBlock();
-	
+
 	// Bedrock
-	
+
 	public boolean getIsCeilingBedrock();
 	public boolean getIsFlatBedrock();
-	
+
 	// Biome settings
 
 	public ArrayList<String> getWorldBiomes();
@@ -54,9 +71,9 @@ public interface IWorldConfig
 	public boolean getRiversEnabled();
 	public boolean getBiomeConfigsHaveReplacement();
 	public boolean setBiomeConfigsHaveReplacement(boolean biomeConfigsHaveReplacement);
-	
+
 	// Terrain settings
-	
+
 	public double getFractureHorizontal();
 	public double getFractureVertical();
 	public int getWorldHeightCap();	
@@ -67,7 +84,7 @@ public interface IWorldConfig
 	public boolean isFullyFreezeLakes();
 	public int getWaterLevelMax();
 	public int getWaterLevelMin();
-	
+
 	// FromImageMode
 
 	public ImageOrientation getImageOrientation();
@@ -76,7 +93,7 @@ public interface IWorldConfig
 	public ImageMode getImageMode();
 	public int getImageZOffset();
 	public int getImageXOffset();
-	
+
 	// Vanilla structures
 
 	public boolean getWoodlandMansionsEnabled();
@@ -94,21 +111,15 @@ public interface IWorldConfig
 	public boolean getMineshaftsEnabled();
 	public boolean getOceanMonumentsEnabled();
 	public boolean getRareBuildingsEnabled();
-	
+
 	// OTG Custom structures
 
-	public boolean isOTGPlus();
+	public CustomStructureType getCustomStructureType();
 	public boolean doPopulationBoundsCheck();
 	public int getMaximumCustomStructureRadius();
-	
+
 	// Caves & Ravines
-	
-	public int getRavineRarity();
-	public int getRavineMinLength();
-	public int getRavineMaxLength();
-	public double getRavineDepth();
-	public int getRavineMinAltitude();
-	public int getRavineMaxAltitude();
+
 	public int getCaveFrequency();
 	public int getCaveRarity();
 	public boolean isEvenCaveDistribution();
@@ -118,5 +129,11 @@ public interface IWorldConfig
 	public int getIndividualCaveRarity();
 	public int getCaveSystemPocketMinSize();
 	public int getCaveSystemPocketChance();
-	public int getCaveSystemPocketMaxSize();	
+	public int getCaveSystemPocketMaxSize();
+	public int getRavineRarity();
+	public int getRavineMinLength();
+	public int getRavineMaxLength();
+	public double getRavineDepth();
+	public int getRavineMinAltitude();
+	public int getRavineMaxAltitude();
 }

@@ -58,6 +58,7 @@ import com.pg85.otg.util.minecraft.SaplingType;
 
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.*;
 
 // TODO: Clean this up further, atm BiomeConfigBase implements
@@ -148,7 +149,7 @@ public class BiomeConfig extends BiomeConfigBase
 	private List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();   
 	//
 
-    public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, SettingsMap settings, IWorldConfig worldConfig, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+    public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, Path settingsDir, SettingsMap settings, IWorldConfig worldConfig, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
     {
         super(loadInstruction.getBiomeName(), new BiomeResourceLocation(presetName, loadInstruction.getBiomeName()));       
         
@@ -175,8 +176,7 @@ public class BiomeConfig extends BiomeConfigBase
 
         this.renameOldSettings(settings, logger, materialReader);
         this.readConfigSettings(settings, biomeResourcesManager, spawnLog, logger, materialReader);
-
-        this.correctSettings(true, logger);
+        this.validateAndCorrectSettings(settingsDir, true, logger);
 
         // Add default resources when needed
         if (settings.isNewConfig())
@@ -426,7 +426,7 @@ public class BiomeConfig extends BiomeConfigBase
     @Override
     protected void writeConfigSettings(SettingsMap writer)
     {
-        writer.bigTitle("Biome Inheritance");
+        writer.header1("Biome Inheritance");
 
         writer.putSetting(BiomeStandardValues.BIOME_EXTENDS, this.biomeExtends,
             "This should be the value of the biomeConfig you wish to extend.",
@@ -440,7 +440,7 @@ public class BiomeConfig extends BiomeConfigBase
             "two ores of the same type it won't be copied.");
 
         // Biome placement
-        writer.bigTitle("Biome placement");
+        writer.header1("Biome placement");
 
         writer.putSetting(BiomeStandardValues.BIOME_SIZE, this.biomeSize,
             "Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).",
@@ -517,7 +517,7 @@ public class BiomeConfig extends BiomeConfigBase
             + " number must be larger than the " + BiomeStandardValues.BIOME_SIZE + " of the other biome.");
 
         // Terrain height and volatility
-        writer.bigTitle("Terrain height and volatility");
+        writer.header1("Terrain height and volatility");
 
         writer.putSetting(BiomeStandardValues.BIOME_HEIGHT, this.biomeHeight,
             "BiomeHeight mean how much height will be added in terrain generation",
@@ -565,7 +565,7 @@ public class BiomeConfig extends BiomeConfigBase
             "  CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0",
             "Makes empty layer above bedrock layer. ");
 
-        writer.bigTitle("Rivers",
+        writer.header1("Rivers",
             "There are two different river systems - the standard one and the improved one.",
             "See the ImprovedRivers settting in the WorldConfig. Both modes have different",
             "river settings, so carefully read the headers to know which settings you can use.",
@@ -594,7 +594,7 @@ public class BiomeConfig extends BiomeConfigBase
         writer.putSetting(BiomeStandardValues.RIVER_CUSTOM_HEIGHT_CONTROL, this.riverHeightMatrix,
             "Works the same as CustomHeightControl (scroll up), but is used where a river is generated in this biome");
 
-        writer.bigTitle("Blocks");
+        writer.header1("Blocks");
 
         writer.putSetting(BiomeStandardValues.STONE_BLOCK, this.stoneBlock,
             "Change this to generate something else than stone in the biome.");
@@ -648,7 +648,7 @@ public class BiomeConfig extends BiomeConfigBase
             "Block used as cooled or frozen lava.",
             "Set this to OBSIDIAN for \"frozen\" lava lakes in cold biomes");
 
-        writer.bigTitle("Visuals and weather",
+        writer.header1("Visuals and weather",
             "Most of the settings here only have an effect on players with the client version of Open Terrain Generator installed.");
 
         writer.putSetting(BiomeStandardValues.BIOME_TEMPERATURE, this.biomeTemperature,
@@ -714,7 +714,7 @@ public class BiomeConfig extends BiomeConfigBase
             "A value of 0.0 means the fog will stay the same color during thunderstorms.",
             "A value of 1.0 will make the fog turn completely black during thunderstorms.");
 
-        writer.bigTitle("Resource queue",
+        writer.header1("Resource queue",
             "This section control all resources spawning after terrain generation.",
             "The resources will be placed in this order.",
             "",
@@ -776,7 +776,7 @@ public class BiomeConfig extends BiomeConfigBase
             "");
         writer.addConfigFunctions(this.resourceSequence);
 
-        writer.bigTitle("Sapling resource",
+        writer.header1("Sapling resource",
             Constants.MOD_ID + " allows you to grow your custom objects from saplings, instead",
             "of the vanilla trees. Add one or more Sapling functions here to override vanilla",
             "spawning for that sapling.",
@@ -804,11 +804,11 @@ public class BiomeConfig extends BiomeConfigBase
             "replaceToBiomeName biome. If a Sapling() with the same SaplingType is defined ",
             "in this config and the parent config, the one from this config is used.");
 
-        writer.bigTitle("Custom objects");
+        writer.header1("Custom objects");
 
         this.writeCustomObjects(writer);
 
-        writer.bigTitle("Structures",
+        writer.header1("Structures",
             "Here you can change, enable or disable the stuctures.",
             "If you have disabled the structure in the WorldConfig, it won't spawn,",
             "regardless of these settings.");
@@ -877,7 +877,7 @@ public class BiomeConfig extends BiomeConfigBase
     	writer.putSetting(BiomeStandardValues.OCEAN_RUINS_CLUSTER_PROBABILITY, oceanRuinsClusterProbability,
     			"Probability of ocean ruins spawning clusters, 0.9 by default. *TODO: Test different values and document usage.");
     	
-        writer.bigTitle("Mob spawning",
+        writer.header1("Mob spawning",
             "This is where you configure mob spawning. Mobs spawn in groups,",
             "see http://minecraft.gamepedia.com/Spawn#Mob_spawning",
             "",
@@ -969,7 +969,7 @@ public class BiomeConfig extends BiomeConfigBase
     }
 
     @Override
-    protected void correctSettings(boolean logWarnings, ILogger logger)
+    protected void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger)
     {
         this.biomeExtends = (this.biomeExtends == null || this.biomeExtends.equals("null")) ? "" : this.biomeExtends;
         this.biomeSize = lowerThanOrEqualTo(biomeSize, worldConfig.getGenerationDepth());
