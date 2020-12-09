@@ -177,7 +177,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				}
  				
  				// Index BiomeColor for FromImageMode and /otg map
-	            biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
+				biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
  				
  				OTG.log(LogMarker.INFO, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
  				
@@ -201,7 +201,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				bg.id = group.getGroupId();
 				bg.rarity = group.getGroupRarity();
 
-		        float totalTemp = 0;
+				float totalTemp = 0;
 				
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
@@ -216,8 +216,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 					// Add the biome size- if it's already there, nothing is done
 					biomeDepths.add(config.getBiomeSize());
 					
-		            totalTemp += config.getBiomeTemperature();
-		            bg.totalGroupRarity += config.getBiomeRarity();
+					totalTemp += config.getBiomeTemperature();
+					bg.totalGroupRarity += config.getBiomeRarity();
 				}
 				bg.avgTemp = totalTemp / group.biomes.size();
 

@@ -50,18 +50,18 @@ public class ForgeBiome implements IBiome
 {
 	private final Biome biomeBase;
 	private final IBiomeConfig biomeConfig;
-    
-    public ForgeBiome(Biome biomeBase, IBiomeConfig biomeConfig)
-    {
-    	this.biomeBase = biomeBase;
-    	this.biomeConfig = biomeConfig;
-    }
+	
+	public ForgeBiome(Biome biomeBase, IBiomeConfig biomeConfig)
+	{
+		this.biomeBase = biomeBase;
+		this.biomeConfig = biomeConfig;
+	}
 
-    @Override
-    public float getTemperatureAt(int x, int y, int z)
-    {
-        return this.biomeBase.getTemperature(new BlockPos(x, y, z));
-    }
+	@Override
+	public float getTemperatureAt(int x, int y, int z)
+	{
+		return this.biomeBase.getTemperature(new BlockPos(x, y, z));
+	}
 
 	@Override
 	public IBiomeConfig getBiomeConfig()
@@ -84,14 +84,14 @@ public class ForgeBiome implements IBiome
 		// Default structures
 		addVanillaStructures(biomeGenerationSettingsBuilder, worldConfig, biomeConfig);	
 
-	    float safeTemperature = biomeConfig.getBiomeTemperature();
-	    if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
-	    {
-	        // Avoid temperatures between 0.1 and 0.2, Minecraft restriction
-	        safeTemperature = safeTemperature >= 1.5 ? 0.2f : 0.1f;
-	    }
+		float safeTemperature = biomeConfig.getBiomeTemperature();
+		if (safeTemperature >= 0.1 && safeTemperature <= 0.2)
+		{
+			// Avoid temperatures between 0.1 and 0.2, Minecraft restriction
+			safeTemperature = safeTemperature >= 1.5 ? 0.2f : 0.1f;
+		}
 
-	    BiomeAmbience.Builder biomeAmbienceBuilder =
+		BiomeAmbience.Builder biomeAmbienceBuilder =
 			new BiomeAmbience.Builder()
 				.setFogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue(null) ? biomeConfig.getFogColor() : worldConfig.getFogColor())
 				.setWaterFogColor(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 329011) // TODO: Add a setting for Water fog color.
@@ -110,22 +110,22 @@ public class ForgeBiome implements IBiome
 				//.func_235240_a_()				
 		;
 
-	    if(biomeConfig.getFoliageColor() != 0xffffff)
-	    {
+		if(biomeConfig.getFoliageColor() != 0xffffff)
+		{
 			biomeAmbienceBuilder.withFoliageColor(biomeConfig.getFoliageColor());
-	    }
+		}
 
-	    if(biomeConfig.getGrassColor() != 0xffffff)
-	    {
-	    	if(!biomeConfig.getGrassColorIsMultiplier())
-	    	{
+		if(biomeConfig.getGrassColor() != 0xffffff)
+		{
+			if(!biomeConfig.getGrassColorIsMultiplier())
+			{
 				biomeAmbienceBuilder.withGrassColor(biomeConfig.getGrassColor());
-	    	} else {
-	    		// TODO: grass color multiplier
-	    		//int multipliedGrassColor = (defaultGrassColor + biomeConfig.grassColor) / 2;
+			} else {
+				// TODO: grass color multiplier
+				//int multipliedGrassColor = (defaultGrassColor + biomeConfig.grassColor) / 2;
 				//biomeAmbienceBuilder.func_242537_a(biomeConfig.grassColor);
-	    	}
-	    }
+			}
+		}
 
 		Biome.Builder biomeBuilder = 
 			new Biome.Builder()

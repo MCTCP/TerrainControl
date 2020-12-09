@@ -127,10 +127,10 @@ public class OTGPlugin
 		;
 		
 		BiomeGeneratorTypeScreens.field_239069_d_ = ImmutableMap.<Optional<BiomeGeneratorTypeScreens>, BiomeGeneratorTypeScreens.IFactory>builder()
-		    .putAll(BiomeGeneratorTypeScreens.field_239069_d_)
-		    .putAll(otgWorldOptionsScreen)
-		    .build()
-	    ;
+			.putAll(BiomeGeneratorTypeScreens.field_239069_d_)
+			.putAll(otgWorldOptionsScreen)
+			.build()
+		;
 	}
 
 	private static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, DimensionGeneratorSettings dimensionGeneratorSettings, DimensionConfig dimensionConfig)
@@ -165,7 +165,7 @@ public class OTGPlugin
 	//
 
 	// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
-   	//public static final DeferredRegister<Biome> BIOMES = DeferredRegister.create(ForgeRegistries.BIOMES, PluginStandardValues.MOD_ID);
+	//public static final DeferredRegister<Biome> BIOMES = DeferredRegister.create(ForgeRegistries.BIOMES, PluginStandardValues.MOD_ID);
 
 	public OTGPlugin()
 	{	
@@ -176,15 +176,15 @@ public class OTGPlugin
 		Registry.register(Registry.BIOME_PROVIDER_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		
-        // Start OpenTerrainGenerator engine, loads all presets.
-        OTG.startEngine(new ForgeEngine());
+		// Start OpenTerrainGenerator engine, loads all presets.
+		OTG.startEngine(new ForgeEngine());
 	}
 	
-    @SubscribeEvent
-    public static void registerBiomes(RegistryEvent.Register<Biome> event)
-    {
-    	OTG.getEngine().getPresetLoader().registerBiomes();
-    }
+	@SubscribeEvent
+	public static void registerBiomes(RegistryEvent.Register<Biome> event)
+	{
+		OTG.getEngine().getPresetLoader().registerBiomes();
+	}
 
 	@SubscribeEvent
 	public void onCommandRegister(RegisterCommandsEvent event)

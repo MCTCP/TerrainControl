@@ -208,7 +208,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void func_230352_b_(IWorld world, StructureManager manager, IChunk chunk)
 	{
-		// If we've already generated and cached this   
+		// If we've already generated and cached this	
 		// chunk while it was unloaded, use cached data.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
@@ -229,8 +229,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				}
 			}
 			this.unloadedChunksCache.remove(chunkCoord);
-		} else
-		{
+		} else {
 			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate());
 		}
 	}
@@ -278,8 +277,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			// Override normal population (Biome.func_242427_a()) with OTG's.
 			biomePopulate(biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-		} catch (Exception exception)
-		{
+		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.makeCrashReport(exception, "Biome decoration");
 			crashreport.makeCategory("Generation").addDetail("CenterX", chunkX).addDetail("CenterZ", chunkZ).addDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
@@ -317,8 +315,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 						// We don't have to do any work here, we can just let StructureManager handle it all.
 						structureManager.func_235011_a_(SectionPos.from(pos), structure).forEach(start ->
 								start.func_230366_a_(world, structureManager, chunkGenerator, random, new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15), new ChunkPos(chunkX, chunkZ)));
-					} catch (Exception exception)
-					{
+					} catch (Exception exception) {
 						CrashReport crashreport = CrashReport.makeCrashReport(exception, "Feature placement");
 						crashreport.makeCategory("Feature").addDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure)).addDetail("Description", () ->
 								structure.toString());
@@ -474,11 +471,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (density > 0.0D)
 		{
 			return ((ForgeMaterialData) config.getStoneBlockReplaced(y)).internalBlock();
-		} else if (y < this.getSeaLevel())
+		}
+		else if (y < this.getSeaLevel())
 		{
 			return ((ForgeMaterialData) config.getWaterBlockReplaced(y)).internalBlock();
-		} else
-		{
+		} else {
 			return Blocks.AIR.getDefaultState();
 		}
 	}
@@ -543,8 +540,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			if (blockInChunk != null)
 			{
 				blocksInColumn[y] = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
-			} else
-			{
+			} else {
 				break;
 			}
 		}

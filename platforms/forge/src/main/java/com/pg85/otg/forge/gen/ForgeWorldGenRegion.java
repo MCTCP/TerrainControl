@@ -41,9 +41,9 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	private final WorldGenRegion worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
 	
-    // 32x32 biomes cache for fast lookups during population
-    private IBiome[][] cachedBiomeConfigs;
-    private boolean cacheIsValid;
+	// 32x32 biomes cache for fast lookups during population
+	private IBiome[][] cachedBiomeConfigs;
+	private boolean cacheIsValid;
 
 	ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
@@ -99,19 +99,19 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	// spawning during population should use getBiomeForPopulation/getBiomeConfigForPopulation 
 	// for any operation that is intended to stay within population bounds.
 
-    @Override
-    public IBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
-    {
-    	// Cache is invalidated when cascading chunkgen happens.
-    	return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
-    }
+	@Override
+	public IBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+	{
+		// Cache is invalidated when cascading chunkgen happens.
+		return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+	}
 	
-    @Override
-    public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
-    {
-    	// Cache is invalidated when cascading chunkgen happens.
-    	return !cacheIsValid ? getBiome(worldZ, worldX).getBiomeConfig() : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()].getBiomeConfig();
-    }
+	@Override
+	public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
+	{
+		// Cache is invalidated when cascading chunkgen happens.
+		return !cacheIsValid ? getBiome(worldZ, worldX).getBiomeConfig() : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()].getBiomeConfig();
+	}
 
 	@Override
 	public void cacheBiomesForPopulation(ChunkCoordinate chunkCoord)
@@ -137,105 +137,105 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-    public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
-    {
-    	return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
-    }	
+	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
+	{
+		return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
+	}	
 	
 	// TODO: Make sure tree spawning looks more or less the same as 1.12.2.
 	@Override
 	public boolean placeTree(TreeType type, Random rand, int x, int y, int z)
 	{
-    	if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
-    	{
-    		return false;
-    	}
-        BlockPos blockPos = new BlockPos(x, y, z);
-        try
-        {
-	        switch (type)
-	        {
-	            case Tree:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> oak = Features.OAK;
-	            	oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, oak.config);
-	            	return true;
-	            case BigTree:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> fancy_oak = Features.FANCY_OAK;
-	            	fancy_oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, fancy_oak.config);
-	            	return true;
-	            case Forest:
-	            case Birch:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> birch = Features.BIRCH;
-	            	birch.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, birch.config);
-	            	return true;
-	            case TallBirch:
-	                //return this.longBirchTree.generate(this.world, rand, blockPos);
-	            	return true; // TODO: Implement this
-	            case HugeMushroom:
-	                if (rand.nextBoolean())
-	                {
-	                	ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
-	                	huge_brown_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
-	                } else {
-	                	ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
-	                	huge_red_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
-	                }
-	                return true;
-	            case HugeRedMushroom:
-	            	ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
-	            	huge_red_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
-	            	return true;
-	            case HugeBrownMushroom:
-	            	ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
-	            	huge_brown_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
-	            	return true;
-	            case SwampTree:
-	            	ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
-	            	swamp_tree.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
-	            	return true;
-	            case Taiga1:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> spruce = Features.SPRUCE;
-	            	spruce.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config);
-	            	return true;
-	            case Taiga2:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> pine = Features.PINE;
-	            	pine.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, pine.config);
-	            	return true;
-	            case JungleTree:
-	            case CocoaTree:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> jungle_tree = Features.JUNGLE_TREE;
-	            	jungle_tree.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
-	            	return true;
-	            case GroundBush:
-	            	ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
-	            	jungle_bush.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config);
-	            	return true;
-	            case Acacia:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> acacia = Features.ACACIA;
-	            	acacia.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, acacia.config);
-	            	return true;
-	            case DarkOak:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> dark_oak = Features.DARK_OAK;
-	            	dark_oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, dark_oak.config);
-	            	return true;
-	            case HugeTaiga1:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_spruce = Features.MEGA_SPRUCE;
-	            	mega_spruce.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
-	            	return true;
-	            case HugeTaiga2:
-	            	ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_pine = Features.MEGA_PINE;
-	            	mega_pine.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_pine.config);
-	            	return true;
-	            default:
-	                throw new RuntimeException("Failed to handle tree of type " + type.toString());
-	        }
-        }
-        catch(NullPointerException ex)
-        {
-        	OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception: ");
-        	ex.printStackTrace();
-        	return true; // Return true to prevent further attempts.
-        }
+		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
+		{
+			return false;
+		}
+		BlockPos blockPos = new BlockPos(x, y, z);
+		try
+		{
+			switch (type)
+			{
+				case Tree:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> oak = Features.OAK;
+					oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, oak.config);
+					return true;
+				case BigTree:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> fancy_oak = Features.FANCY_OAK;
+					fancy_oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, fancy_oak.config);
+					return true;
+				case Forest:
+				case Birch:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> birch = Features.BIRCH;
+					birch.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, birch.config);
+					return true;
+				case TallBirch:
+					//return this.longBirchTree.generate(this.world, rand, blockPos);
+					return true; // TODO: Implement this
+				case HugeMushroom:
+					if (rand.nextBoolean())
+					{
+						ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
+						huge_brown_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
+					} else {
+						ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
+						huge_red_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
+					}
+					return true;
+				case HugeRedMushroom:
+					ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
+					huge_red_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
+					return true;
+				case HugeBrownMushroom:
+					ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
+					huge_brown_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
+					return true;
+				case SwampTree:
+					ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
+					swamp_tree.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
+					return true;
+				case Taiga1:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> spruce = Features.SPRUCE;
+					spruce.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config);
+					return true;
+				case Taiga2:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> pine = Features.PINE;
+					pine.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, pine.config);
+					return true;
+				case JungleTree:
+				case CocoaTree:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> jungle_tree = Features.JUNGLE_TREE;
+					jungle_tree.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
+					return true;
+				case GroundBush:
+					ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
+					jungle_bush.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config);
+					return true;
+				case Acacia:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> acacia = Features.ACACIA;
+					acacia.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, acacia.config);
+					return true;
+				case DarkOak:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> dark_oak = Features.DARK_OAK;
+					dark_oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, dark_oak.config);
+					return true;
+				case HugeTaiga1:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_spruce = Features.MEGA_SPRUCE;
+					mega_spruce.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
+					return true;
+				case HugeTaiga2:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_pine = Features.MEGA_PINE;
+					mega_pine.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_pine.config);
+					return true;
+				default:
+					throw new RuntimeException("Failed to handle tree of type " + type.toString());
+			}
+		}
+		catch(NullPointerException ex)
+		{
+			OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception: ");
+			ex.printStackTrace();
+			return true; // Return true to prevent further attempts.
+		}
 	}
 
 	// Used by ChunkGenerator for BO4's requesting data
@@ -248,73 +248,73 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-        if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
-        {
-        	return null;
-        }
-     
-        ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-        
-        // If the chunk exists or is inside the area being populated, fetch it normally.
-        IChunk chunk = null;
-    	if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
-    	{
-    		chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-    	}
-    	
-		// If the chunk doesn't exist so we're doing something outside the
-    	// population sequence, return the material without loading the chunk.
-    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		if (y >= Constants.WORLD_HEIGHT || y < Constants.WORLD_DEPTH)
 		{
-    		// If the chunk has already been loaded, no need to use fake chunks.
-    		if(
+			return null;
+		}
+	 
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+		
+		// If the chunk exists or is inside the area being populated, fetch it normally.
+		IChunk chunk = null;
+		if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+		{
+			chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		}
+		
+		// If the chunk doesn't exist so we're doing something outside the
+		// population sequence, return the material without loading the chunk.
+		if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		{
+			// If the chunk has already been loaded, no need to use fake chunks.
+			if(
 				!(
 					chunk == null && 
 					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
 					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)
 				)
 			)
-    		{
-       			// Calculate the material without loading the chunk.
-       			return this.chunkGenerator.getMaterialInUnloadedChunk(this, x , y, z);
-    		}
-    	}
-    	
+			{
+				// Calculate the material without loading the chunk.
+				return this.chunkGenerator.getMaterialInUnloadedChunk(this, x , y, z);
+			}
+		}
+		
 		// Tried to query an unloaded chunk outside the area being populated
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
-    	{
-            return null;
-    	}
-    	
+		if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
+		{
+			return null;
+		}
+		
 		// Get internal coordinates for block in chunk
-        int internalX = x & 0xF;
-        int internalZ = z & 0xF;
-        return ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(new BlockPos(internalX, y, internalZ)));
+		int internalX = x & 0xF;
+		int internalZ = z & 0xF;
+		return ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(new BlockPos(internalX, y, internalZ)));
 	}
 	
 	@Override
 	public int getBlockAboveLiquidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-        int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingPopulated);
-        if(highestY > 0)
-        {
-        	highestY += 1;
-        } else {
-        	highestY = -1;
-        }
+		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingPopulated);
+		if(highestY > 0)
+		{
+			highestY += 1;
+		} else {
+			highestY = -1;
+		}
 		return highestY;
 	}
 
 	@Override
 	public int getBlockAboveSolidHeight(int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-        int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingPopulated);
-        if(highestY > 0)
-        {
-        	highestY += 1;
-        } else {
-        	highestY = -1;
-        }
+		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingPopulated);
+		if(highestY > 0)
+		{
+			highestY += 1;
+		} else {
+			highestY = -1;
+		}
 		return highestY;
 	}
 
@@ -327,68 +327,68 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getHighestBlockYAt(int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow, boolean ignoreLeaves, ChunkCoordinate chunkBeingPopulated)
 	{
-        ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-        
-        // If the chunk exists or is inside the area being populated, fetch it normally.
-        IChunk chunk = null;
-    	if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
-    	{
-    		chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-    	}
-    	
-		// If the chunk doesn't exist and we're doing something outside the
-    	// population sequence, return the material without loading the chunk.
-    	if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+		
+		// If the chunk exists or is inside the area being populated, fetch it normally.
+		IChunk chunk = null;
+		if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
 		{
-    		// If the chunk has already been loaded, no need to use fake chunks.
-    		if(
+			chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		}
+		
+		// If the chunk doesn't exist and we're doing something outside the
+		// population sequence, return the material without loading the chunk.
+		if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		{
+			// If the chunk has already been loaded, no need to use fake chunks.
+			if(
 				!(
 					chunk == null && 
 					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
 					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)
 				)
 			)
-    		{
-       			// Calculate the material without loading the chunk.
-       			return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
-    		}
-    	}
-    	
+			{
+				// Calculate the material without loading the chunk.
+				return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+			}
+		}
+		
 		// Tried to query an unloaded chunk outside the area being populated
-    	if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
-    	{
-    		return -1;
-    	}
-    	
+		if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
+		{
+			return -1;
+		}
+		
 		// Get internal coordinates for block in chunk
-        int internalX = x & 0xF;
-        int internalZ = z & 0xF;
-        
-        // TODO: For some reason, on rare occasions WORLD_SURFACE_WG heightmap returns 0 for chunks
-        // with status LIQUID_CARVERS, while the chunk does already have base terrain blocks filled.
-        // If we use a later status like FEATURES though, resource population may have problems 
-        // fetching chunks.
+		int internalX = x & 0xF;
+		int internalZ = z & 0xF;
+		
+		// TODO: For some reason, on rare occasions WORLD_SURFACE_WG heightmap returns 0 for chunks
+		// with status LIQUID_CARVERS, while the chunk does already have base terrain blocks filled.
+		// If we use a later status like FEATURES though, resource population may have problems 
+		// fetching chunks.
 		int heightMapy = chunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(internalX, internalZ);
 		if(heightMapy == 0)
 		{
 			heightMapy = Constants.WORLD_HEIGHT - 1;
 		}
 
-        ForgeMaterialData material;
-        boolean isSolid;
-        boolean isLiquid;
-        BlockState blockState;
-        Block block;
-        
-        for(int i = heightMapy; i >= 0; i--)
-        {
-        	blockState = chunk.getBlockState(new BlockPos(internalX, i, internalZ));
-        	block = blockState.getBlock();
-    		material = ForgeMaterialData.ofMinecraftBlockState(blockState);
-        	isLiquid = material.isLiquid();
-        	isSolid =
+		ForgeMaterialData material;
+		boolean isSolid;
+		boolean isLiquid;
+		BlockState blockState;
+		Block block;
+		
+		for(int i = heightMapy; i >= 0; i--)
+		{
+			blockState = chunk.getBlockState(new BlockPos(internalX, i, internalZ));
+			block = blockState.getBlock();
+			material = ForgeMaterialData.ofMinecraftBlockState(blockState);
+			isLiquid = material.isLiquid();
+			isSolid =
 			(
-    			(
+				(
 					material.isSolid() &&
 					(
 						!ignoreLeaves || 
@@ -407,9 +407,9 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 							block != Blocks.STRIPPED_SPRUCE_LOG
 						)
 					)
-    			)
-    			||
-    			(
+				)
+				||
+				(
 					!ignoreLeaves && 
 					(
 						block == Blocks.ACACIA_LEAVES ||
@@ -424,21 +424,21 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 					block == Blocks.SNOW
 				)
 			);
-        	if(!(ignoreLiquid && isLiquid))
-        	{
-            	if((findSolid && isSolid) || (findLiquid && isLiquid))
-        		{
-            		return i;
-        		}
-            	if((findSolid && isLiquid) || (findLiquid && isSolid))
-            	{
-            		return -1;
-            	}
-        	}
-        }
-        
-    	// Can happen if this is a chunk filled with air
-        return -1;
+			if(!(ignoreLiquid && isLiquid))
+			{
+				if((findSolid && isSolid) || (findLiquid && isLiquid))
+				{
+					return i;
+				}
+				if((findSolid && isLiquid) || (findLiquid && isSolid))
+				{
+					return -1;
+				}
+			}
+		}
+		
+		// Can happen if this is a chunk filled with air
+		return -1;
 	}
 
 	@Override
@@ -450,21 +450,21 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getLightLevel(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-    	if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
-    	{
-    		return -1;
-    	}
+		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
+		{
+			return -1;
+		}
 
-    	// Check if the chunk has been lit, otherwise cancel.
-    	// TODO: Check if this causes problems with BO3 LightChecks.
-    	// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
-    	ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-    	IChunk chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-    	if(chunkBeingPopulated == null && chunk.getStatus().isAtLeast(ChunkStatus.LIGHT))
-    	{
-	        // This fetches the block and skylight as if it were day.
-    		return this.worldGenRegion.getLight(new BlockPos(x, y, z));
-    	}
+		// Check if the chunk has been lit, otherwise cancel.
+		// TODO: Check if this causes problems with BO3 LightChecks.
+		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
+		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
+		IChunk chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		if(chunkBeingPopulated == null && chunk.getStatus().isAtLeast(ChunkStatus.LIGHT))
+		{
+			// This fetches the block and skylight as if it were day.
+			return this.worldGenRegion.getLight(new BlockPos(x, y, z));
+		}
 		return -1;
 	}
 
@@ -477,37 +477,37 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
 	{
-    	if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
-    	{
-    		return;
-    	}
-    	
-    	if(material.isEmpty())
-    	{
-    		// Happens when configs contain blocks that don't exist.
-    		// TODO: Catch this earlier up the chain, avoid doing work?
-    		return;
-    	}
-    	
-    	// If no chunk was passed, we're doing something outside of the population cycle.
-    	// If a chunk was passed, only spawn in the area being populated.
-    	if(chunkBeingPopulated == null || ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
-    	{
-    		if(replaceBlocks)
-    		{
-        		if(replaceBlocksMatrix == null)
-        		{
-        			if(chunkBeingPopulated == null)
-        			{
-        				replaceBlocksMatrix = this.getBiomeConfig(x, z).getReplaceBlocks();
-        			} else {
-        				replaceBlocksMatrix = this.getBiomeConfigForPopulation(x, z, chunkBeingPopulated).getReplaceBlocks();
-        			}
-        		}
-    			material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
-    		}
-    		this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);    		
-    	}
+		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
+		{
+			return;
+		}
+		
+		if(material.isEmpty())
+		{
+			// Happens when configs contain blocks that don't exist.
+			// TODO: Catch this earlier up the chain, avoid doing work?
+			return;
+		}
+		
+		// If no chunk was passed, we're doing something outside of the population cycle.
+		// If a chunk was passed, only spawn in the area being populated.
+		if(chunkBeingPopulated == null || ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+		{
+			if(replaceBlocks)
+			{
+				if(replaceBlocksMatrix == null)
+				{
+					if(chunkBeingPopulated == null)
+					{
+						replaceBlocksMatrix = this.getBiomeConfig(x, z).getReplaceBlocks();
+					} else {
+						replaceBlocksMatrix = this.getBiomeConfigForPopulation(x, z, chunkBeingPopulated).getReplaceBlocks();
+					}
+				}
+				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
+			}
+			this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);			
+		}
 	}
 	
 	//
