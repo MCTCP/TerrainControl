@@ -16,37 +16,37 @@ import com.pg85.otg.util.interfaces.IPluginConfig;
  */
 public abstract class PluginConfigBase extends ConfigFile implements IPluginConfig
 {
-    protected LogLevels logLevel;
-    protected boolean developerMode;
-    protected boolean spawnLog;
-    protected ConfigMode settingsMode;
+	protected LogLevels logLevel;
+	protected boolean developerMode;
+	protected boolean spawnLog;
+	protected ConfigMode settingsMode;
 
-    public PluginConfigBase(String configName)
-    {
-        super(configName);
-    }
+	public PluginConfigBase(String configName)
+	{
+		super(configName);
+	}
 
-    @Override
-    public LogLevels getLogLevel()
-    {
-        return this.logLevel;
-    }
-    
-    @Override
-    public boolean getDeveloperModeEnabled()
-    {
-        return this.developerMode;
-    }
-    
-    @Override
-    public boolean getSpawnLogEnabled()
-    {
-        return this.spawnLog;
-    }
+	@Override
+	public LogLevels getLogLevel()
+	{
+		return this.logLevel;
+	}
+	
+	@Override
+	public boolean getDeveloperModeEnabled()
+	{
+		return this.developerMode;
+	}
+	
+	@Override
+	public boolean getSpawnLogEnabled()
+	{
+		return this.spawnLog;
+	}
 
-    @Override
-    public ConfigMode getSettingsMode()
-    {
-        return this.settingsMode;
-    }
+	@Override
+	public ConfigMode getSettingsMode()
+	{
+		return this.settingsMode;
+	}
 }

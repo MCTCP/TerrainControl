@@ -61,8 +61,8 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int landSize;
 	protected String defaultOceanBiome;
 	protected BiomeMode biomeMode;
-    protected double frozenOceanTemperature;
-    protected boolean freezeAllColdGroupBiomes;
+	protected double frozenOceanTemperature;
+	protected boolean freezeAllColdGroupBiomes;
 	protected List<String> isleBiomes = new ArrayList<String>();
 	protected List<String> borderBiomes = new ArrayList<String>();	
 	protected boolean randomRivers;
@@ -170,18 +170,18 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	}
 	
 	@Override
-    public double getFractureHorizontal()
-    {
-        return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
-    }
+	public double getFractureHorizontal()
+	{
+		return this.fractureHorizontal < 0.0D ? 1.0D / (Math.abs(this.fractureHorizontal) + 1.0D) : this.fractureHorizontal + 1.0D;
+	}
 
-    @Override
-    public double getFractureVertical()
-    {
-        return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
-    }
+	@Override
+	public double getFractureVertical()
+	{
+		return this.fractureVertical < 0.0D ? 1.0D / (Math.abs(this.fractureVertical) + 1.0D) : this.fractureVertical + 1.0D;
+	}
 
-    @Override
+	@Override
 	public boolean doPopulationBoundsCheck()
 	{
 		return this.populationBoundsCheck;
