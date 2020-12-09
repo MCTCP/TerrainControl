@@ -24,8 +24,8 @@ import com.pg85.otg.customobject.bo3.checks.ModCheckNot;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.customobject.config.io.SettingsReaderOTGPlus;
-import com.pg85.otg.customobject.config.io.SettingsWriterOTGPlus;
+import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
+import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.customobject.util.BO3Enums.ExtrudeMode;
 import com.pg85.otg.customobject.util.BO3Enums.OutsideSourceBlock;
@@ -104,7 +104,7 @@ public class BO3Config extends CustomObjectConfigFile
 	 * @param directory    The directory the BO3 is stored in.
 	 * @param otherObjects All other loaded objects by their name.
 	 */
-	protected BO3Config(SettingsReaderOTGPlus reader, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+	protected BO3Config(SettingsReaderBO4 reader, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		super(reader);
 		init(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
@@ -301,7 +301,7 @@ public class BO3Config extends CustomObjectConfigFile
 	}
 
 	@Override
-	protected void writeConfigSettings(SettingsWriterOTGPlus writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+	protected void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
 	{
 		// The object
 		writer.bigTitle("BO3 object");
@@ -448,7 +448,7 @@ public class BO3Config extends CustomObjectConfigFile
 		this.reader.flushCache();
 	}
 
-	private void writeResources(SettingsWriterOTGPlus writer) throws IOException
+	private void writeResources(SettingsWriterBO4 writer) throws IOException
 	{
 		writer.bigTitle("Blocks");
 		writer.comment("All the blocks used in the BO3 are listed here. Possible blocks:");

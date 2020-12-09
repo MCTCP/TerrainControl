@@ -51,7 +51,6 @@ public class BiomeStandardValues extends Settings
 	;
 
     public static final Setting<String>
-    	BIOME_CONFIG_EXTENSION = stringSetting("BiomeConfigExtension", ".bc"),
     	BIOME_EXTENDS = stringSetting("BiomeExtends", ""),
     	RIVER_BIOME = stringSetting("RiverBiome", "River"),
     	REPLACE_TO_BIOME_NAME = stringSetting("ReplaceToBiomeName", ""),

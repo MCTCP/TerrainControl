@@ -17,6 +17,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -180,7 +181,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		if (this.chunkPopulator.getIsSaveRequired())
 		{
-			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().spawnLog, OTG.getEngine().getLogger(), this.chunkPopulator);
+			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkPopulator);
 		}
 	}
 
@@ -196,7 +197,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus());
+			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
 			OTG.getEngine().createDimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName, this.dimensionConfig);
 		}
 	}
@@ -292,7 +293,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
-		// TODO: cleanup/optimize this
+		// TODO: clean up/optimise this
 		// Structure generation
 		for(int step = 0; step < GenerationStage.Decoration.values().length; ++step)
 		{
@@ -505,9 +506,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// BO4's / Smoothing Areas
 
 	// BO4's and smoothing areas may do material and height checks in unloaded chunks, OTG generates 
-	// base terrain for the chunks in memory and caches the result in a limited size-cache.
-	// TODO: Re-use the data when chunks are properly generated, or find a way to request "normal" 
-	// base terrain gen outside of the WorldGenRegion chunks.
+	// base terrain for the chunks in memory and caches the result in a limited size-cache. Cached
+	// data is used if/when the chunk is "properly" generated.
 
 	private LocalMaterialData[] getBlockColumnInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z)
 	{

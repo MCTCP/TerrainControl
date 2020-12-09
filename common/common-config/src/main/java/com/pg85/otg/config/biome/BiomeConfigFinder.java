@@ -5,6 +5,7 @@ import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.io.SimpleSettingsMap;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.StandardBiomeTemplate;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
@@ -28,18 +29,13 @@ import java.util.Map;
  */
 public final class BiomeConfigFinder
 {
-    private final String preferredBiomeFileExtension;
-
     /**
      * Constructs a new biome loader.
      * 
      * @param preferredBiomeFileExtension Biome files that do not exist yet
      *            are created with this extension.
      */
-    public BiomeConfigFinder(String preferredBiomeFileExtension)
-    {
-        this.preferredBiomeFileExtension = preferredBiomeFileExtension;
-    }
+    public BiomeConfigFinder() { }
 
     /**
      * Finds the biomes in the given directories.
@@ -231,7 +227,7 @@ public final class BiomeConfigFinder
      */
     private String toFileName(BiomeLoadInstruction biome)
     {
-        return biome.getBiomeName() + this.preferredBiomeFileExtension;
+        return biome.getBiomeName() + Constants.BiomeConfigFileExtension;
     }
 
     /**

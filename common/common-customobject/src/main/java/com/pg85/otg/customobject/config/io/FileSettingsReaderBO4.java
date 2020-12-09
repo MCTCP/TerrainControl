@@ -20,7 +20,7 @@ import java.util.Map.Entry;
  * A settings reader that reads from a file.
  *
  */
-public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
+public class FileSettingsReaderBO4 implements SettingsReaderBO4
 {  
     private static final <T, C extends CustomObjectConfigFunction<T>> List<C> mergeListsCustomObject(Collection<? extends C> childList, Collection<? extends C> parentList)
     {
@@ -90,7 +90,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
     }
     
     private final List<StringOnLine> configFunctions;
-    private SettingsReaderOTGPlus fallback;
+    private SettingsReaderBO4 fallback;
     private final File file;
     private final String name;
     
@@ -107,7 +107,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
      * @param name Name of the config file, like "WorldConfig" or "Taiga".
      * @param file File where the settings are stored.
      */
-    public FileSettingsReaderOTGPlus(String name, File file, ILogger logger)
+    public FileSettingsReaderBO4(String name, File file, ILogger logger)
     {
         this.name = name;
         
@@ -156,7 +156,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
         // Add inherited functions
         if (useFallback && fallback != null)
         {
-            return FileSettingsReaderOTGPlus.mergeListsCustomObject(result, fallback.getConfigFunctions(holder, true, spawnLog, logger, materialReader, manager));
+            return FileSettingsReaderBO4.mergeListsCustomObject(result, fallback.getConfigFunctions(holder, true, spawnLog, logger, materialReader, manager));
         }
 
         return result;
@@ -311,7 +311,7 @@ public class FileSettingsReaderOTGPlus implements SettingsReaderOTGPlus
     }
 
     @Override
-    public void setFallbackReader(SettingsReaderOTGPlus reader)
+    public void setFallbackReader(SettingsReaderBO4 reader)
     {
         this.fallback = reader;
     }

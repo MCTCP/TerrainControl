@@ -26,7 +26,7 @@ import java.util.*;
  */
 public class BO4BranchFunction extends BranchFunction<BO4Config>
 {
-    ArrayList<BO4BranchNode> branchesOTGPlus;
+    ArrayList<BO4BranchNode> branchesBO4;
     String branchGroup = "";
     boolean isRequiredBranch = false;
    
@@ -51,7 +51,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
         rotatedBranch.branchGroup = branchGroup;
         rotatedBranch.isRequiredBranch = isRequiredBranch;
 
-        rotatedBranch.branchesOTGPlus = branchesOTGPlus; // TODO: Make sure this won't cause problems
+        rotatedBranch.branchesBO4 = branchesBO4; // TODO: Make sure this won't cause problems
 
         rotatedBranch.holder = holder;
         rotatedBranch.valid = valid;
@@ -72,11 +72,11 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
             rotatedBranch.z = newZ;
 
             ArrayList<BO4BranchNode> rotatedBranchBranches = new ArrayList<BO4BranchNode>();
-            for (BO4BranchNode holder : rotatedBranch.branchesOTGPlus)
+            for (BO4BranchNode holder : rotatedBranch.branchesBO4)
             {
             	rotatedBranchBranches.add(new BO4BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), holder.customObjectName, holder.branchGroup));
             }
-            rotatedBranch.branchesOTGPlus = rotatedBranchBranches;
+            rotatedBranch.branchesBO4 = rotatedBranchBranches;
     	}
 
         return rotatedBranch;
@@ -85,7 +85,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
     @Override
     public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
     {
-        branchesOTGPlus = new ArrayList<BO4BranchNode>();
+        branchesBO4 = new ArrayList<BO4BranchNode>();
         readArgs(args, false, spawnLog, logger);
     }
 
@@ -117,10 +117,10 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
         			}
         			logger.log(LogMarker.WARN, "isRequired:true branches cannot have multiple BO3's with a rarity, only one BO3 per isRequired:true branch is allowed and the branch automatically has a 100% chance to spawn. Using only the first BO3 for branch: Branch(" + branchString.substring(0, branchString.length()  - 1) + ")");
         		}
-        		branchesOTGPlus.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), 100.0, null, args.get(i), null));
+        		branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), 100.0, null, args.get(i), null));
         		break;
         	} else {
-	            branchesOTGPlus.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
+	            branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, false, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
         	}
         }
         if(!isRequiredBranch)
@@ -148,7 +148,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
         	{
         		branchGroup = args.get(i);
 
-        		for(BO4BranchNode branch : branchesOTGPlus)
+        		for(BO4BranchNode branch : branchesBO4)
         		{
         			branch.branchGroup = branchGroup;
         		}
@@ -167,7 +167,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
             .append(z).append(',');
 
     	output.append(isRequiredBranch);
-        for (Iterator<BO4BranchNode> it = branchesOTGPlus.iterator(); it.hasNext();)
+        for (Iterator<BO4BranchNode> it = branchesBO4.iterator(); it.hasNext();)
         {
             output.append(it.next().toBranchString());
         }
@@ -190,7 +190,7 @@ public class BO4BranchFunction extends BranchFunction<BO4Config>
     @Override
     public CustomStructureCoordinate toCustomObjectCoordinate(String presetName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
-        for (Iterator<BO4BranchNode> it = branchesOTGPlus.iterator(); it.hasNext();)
+        for (Iterator<BO4BranchNode> it = branchesBO4.iterator(); it.hasNext();)
         {
             BO4BranchNode branch = it.next();
 

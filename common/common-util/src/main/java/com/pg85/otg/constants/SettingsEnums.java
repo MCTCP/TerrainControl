@@ -5,17 +5,22 @@ public class SettingsEnums
     public enum TerrainMode
     {
         Normal,
-        //OldGenerator,
         TerrainTest,
-        NotGenerate //,
-        //Default
+        NotGenerate
     }
 
     public enum BiomeMode
     {
     	Normal,
-    	BeforeGroups,
+    	BeforeGroups, // Legacy: Converted to NoGroups when loaded from config.
+    	NoGroups,
     	FromImage
+    }
+    
+    public enum CustomStructureType
+    {
+    	BO3,
+    	BO4
     }
     
     public enum ImageMode

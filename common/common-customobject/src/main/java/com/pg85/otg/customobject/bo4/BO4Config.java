@@ -20,8 +20,8 @@ import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectConfigFunction;
 import com.pg85.otg.customobject.config.CustomObjectErroredFunction;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.customobject.config.io.SettingsReaderOTGPlus;
-import com.pg85.otg.customobject.config.io.SettingsWriterOTGPlus;
+import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
+import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructureCoordinate;
 import com.pg85.otg.customobject.util.BO3Enums.SpawnHeightEnum;
 import com.pg85.otg.exception.InvalidConfigException;
@@ -169,11 +169,11 @@ public class BO4Config extends CustomObjectConfigFile
     private byte[] randomBlocksBlockCount;    
     //
     
-    private BO4BranchFunction[] branchesOTGPlus;
-    private BO4ModDataFunction[] modDataOTGPlus;
-    private BO4SpawnerFunction[] spawnerDataOTGPlus;
-    private BO4ParticleFunction[] particleDataOTGPlus;
-    private BO4EntityFunction[] entityDataOTGPlus;
+    private BO4BranchFunction[] branchesBO4;
+    private BO4ModDataFunction[] modDataBO4;
+    private BO4SpawnerFunction[] spawnerDataBO4;
+    private BO4ParticleFunction[] particleDataBO4;
+    private BO4EntityFunction[] entityDataBO4;
        
     private boolean isCollidable = false;
     boolean isBO4Data = false;
@@ -185,7 +185,7 @@ public class BO4Config extends CustomObjectConfigFile
      * @param directory    The directory the BO3 is stored in.
      * @param otherObjects All other loaded objects by their name.
      */
-    BO4Config(SettingsReaderOTGPlus reader, boolean init, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
+    BO4Config(SettingsReaderBO4 reader, boolean init, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
         super(reader);
         if(init)
@@ -469,27 +469,27 @@ public class BO4Config extends CustomObjectConfigFile
 
     protected BO4BranchFunction[] getbranches()
     {
-    	return branchesOTGPlus;
+    	return branchesBO4;
     }
 
     public BO4ModDataFunction[] getModData()
     {
-    	return modDataOTGPlus;
+    	return modDataBO4;
     }
 
     public BO4SpawnerFunction[] getSpawnerData()
     {
-    	return spawnerDataOTGPlus;
+    	return spawnerDataBO4;
     }
 
     public BO4ParticleFunction[] getParticleData()
     {
-    	return particleDataOTGPlus;
+    	return particleDataBO4;
     }
 
     public BO4EntityFunction[] getEntityData()
     {
-    	return entityDataOTGPlus;
+    	return entityDataBO4;
     }
     
     private void loadInheritedBO3(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
@@ -577,74 +577,74 @@ public class BO4Config extends CustomObjectConfigFile
 		        this.isCollidable = newBlocks.size() > 0;
 				
 				ArrayList<BO4BranchFunction> newBranches = new ArrayList<BO4BranchFunction>();
-				if(this.branchesOTGPlus != null)
+				if(this.branchesBO4 != null)
 				{
-					for(BO4BranchFunction branch : this.branchesOTGPlus)
+					for(BO4BranchFunction branch : this.branchesBO4)
 					{
 						newBranches.add(branch);
 					}
 				}
-				for(BO4BranchFunction branch : ((BO4)parentBO3).getConfig().branchesOTGPlus)
+				for(BO4BranchFunction branch : ((BO4)parentBO3).getConfig().branchesBO4)
 				{
 					newBranches.add(branch.rotate(this.inheritBO3Rotation, presetName, otgRootFolder, spawnLog, logger, customObjectManager2, materialReader, manager, modLoadedChecker));
 				}
-				this.branchesOTGPlus = newBranches.toArray(new BO4BranchFunction[newBranches.size()]);
+				this.branchesBO4 = newBranches.toArray(new BO4BranchFunction[newBranches.size()]);
 
 				ArrayList<BO4ModDataFunction> newModData = new ArrayList<BO4ModDataFunction>();
-				if(this.modDataOTGPlus != null)
+				if(this.modDataBO4 != null)
 				{
-					for(BO4ModDataFunction modData : this.modDataOTGPlus)
+					for(BO4ModDataFunction modData : this.modDataBO4)
 					{
 						newModData.add(modData);
 					}
 				}
-				for(BO4ModDataFunction modData : ((BO4)parentBO3).getConfig().modDataOTGPlus)
+				for(BO4ModDataFunction modData : ((BO4)parentBO3).getConfig().modDataBO4)
 				{
 					newModData.add(modData.rotate(this.inheritBO3Rotation));
 				}
-				this.modDataOTGPlus = newModData.toArray(new BO4ModDataFunction[newModData.size()]);
+				this.modDataBO4 = newModData.toArray(new BO4ModDataFunction[newModData.size()]);
 
 				ArrayList<BO4SpawnerFunction> newSpawnerData = new ArrayList<BO4SpawnerFunction>();
-				if(this.spawnerDataOTGPlus != null)
+				if(this.spawnerDataBO4 != null)
 				{
-					for(BO4SpawnerFunction spawnerData : this.spawnerDataOTGPlus)
+					for(BO4SpawnerFunction spawnerData : this.spawnerDataBO4)
 					{
 						newSpawnerData.add(spawnerData);
 					}
 				}
-				for(BO4SpawnerFunction spawnerData : ((BO4)parentBO3).getConfig().spawnerDataOTGPlus)
+				for(BO4SpawnerFunction spawnerData : ((BO4)parentBO3).getConfig().spawnerDataBO4)
 				{
 					newSpawnerData.add(spawnerData.rotate(this.inheritBO3Rotation));
 				}
-				this.spawnerDataOTGPlus = newSpawnerData.toArray(new BO4SpawnerFunction[newSpawnerData.size()]);
+				this.spawnerDataBO4 = newSpawnerData.toArray(new BO4SpawnerFunction[newSpawnerData.size()]);
 
 				ArrayList<BO4ParticleFunction> newParticleData = new ArrayList<BO4ParticleFunction>();
-				if(this.particleDataOTGPlus != null)
+				if(this.particleDataBO4 != null)
 				{
-					for(BO4ParticleFunction particleData : this.particleDataOTGPlus)
+					for(BO4ParticleFunction particleData : this.particleDataBO4)
 					{
 						newParticleData.add(particleData);
 					}
 				}
-				for(BO4ParticleFunction particleData : ((BO4)parentBO3).getConfig().particleDataOTGPlus)
+				for(BO4ParticleFunction particleData : ((BO4)parentBO3).getConfig().particleDataBO4)
 				{
 					newParticleData.add(particleData.rotate(this.inheritBO3Rotation));
 				}
-				this.particleDataOTGPlus = newParticleData.toArray(new BO4ParticleFunction[newParticleData.size()]);
+				this.particleDataBO4 = newParticleData.toArray(new BO4ParticleFunction[newParticleData.size()]);
 
 				ArrayList<BO4EntityFunction> newEntityData = new ArrayList<BO4EntityFunction>();
-				if(this.entityDataOTGPlus != null)
+				if(this.entityDataBO4 != null)
 				{
-					for(BO4EntityFunction entityData : this.entityDataOTGPlus)
+					for(BO4EntityFunction entityData : this.entityDataBO4)
 					{
 						newEntityData.add(entityData);
 					}
 				}
-				for(BO4EntityFunction entityData : ((BO4)parentBO3).getConfig().entityDataOTGPlus)
+				for(BO4EntityFunction entityData : ((BO4)parentBO3).getConfig().entityDataBO4)
 				{
 					newEntityData.add(entityData.rotate(this.inheritBO3Rotation));
 				}
-				this.entityDataOTGPlus = newEntityData.toArray(new BO4EntityFunction[newEntityData.size()]);
+				this.entityDataBO4 = newEntityData.toArray(new BO4EntityFunction[newEntityData.size()]);
 	
 				this.inheritedBO3s.addAll(((BO4)parentBO3).getConfig().getInheritedBO3s());
 			}
@@ -928,7 +928,7 @@ public class BO4Config extends CustomObjectConfigFile
     			illegalModData = true;
     		}
         }
-        this.modDataOTGPlus = tempModDataList.toArray(new BO4ModDataFunction[tempModDataList.size()]);
+        this.modDataBO4 = tempModDataList.toArray(new BO4ModDataFunction[tempModDataList.size()]);
 
 		boolean illegalSpawnerData = false;
         for(BO4SpawnerFunction spawnerData : tempSpawnerList)
@@ -946,7 +946,7 @@ public class BO4Config extends CustomObjectConfigFile
     			illegalSpawnerData = true;
     		}
         }
-        this.spawnerDataOTGPlus = tempSpawnerList.toArray(new BO4SpawnerFunction[tempSpawnerList.size()]);
+        this.spawnerDataBO4 = tempSpawnerList.toArray(new BO4SpawnerFunction[tempSpawnerList.size()]);
 
 		boolean illegalParticleData = false;
         for(BO4ParticleFunction particleData : tempParticlesList)
@@ -964,7 +964,7 @@ public class BO4Config extends CustomObjectConfigFile
     			illegalParticleData = true;
     		}
         }
-        this.particleDataOTGPlus = tempParticlesList.toArray(new BO4ParticleFunction[tempParticlesList.size()]);
+        this.particleDataBO4 = tempParticlesList.toArray(new BO4ParticleFunction[tempParticlesList.size()]);
 
 		boolean illegalEntityData = false;
         for(BO4EntityFunction entityData : tempEntitiesList)
@@ -982,7 +982,7 @@ public class BO4Config extends CustomObjectConfigFile
     			illegalEntityData = true;
     		}
         }
-        this.entityDataOTGPlus = tempEntitiesList.toArray(new BO4EntityFunction[tempEntitiesList.size()]);
+        this.entityDataBO4 = tempEntitiesList.toArray(new BO4EntityFunction[tempEntitiesList.size()]);
 
 		if(spawnLog)
 		{
@@ -1008,12 +1008,12 @@ public class BO4Config extends CustomObjectConfigFile
 			}
 		}
 
-		this.branchesOTGPlus = tempBranchesList.toArray(new BO4BranchFunction[tempBranchesList.size()]);
+		this.branchesBO4 = tempBranchesList.toArray(new BO4BranchFunction[tempBranchesList.size()]);
     }
     
 	public void setBranches(List<BO4BranchFunction> branches)
 	{
-		this.branchesOTGPlus = branches.toArray(new BO4BranchFunction[branches.size()]);
+		this.branchesBO4 = branches.toArray(new BO4BranchFunction[branches.size()]);
 	}
 
     /**
@@ -1027,12 +1027,12 @@ public class BO4Config extends CustomObjectConfigFile
     }
 
     @Override
-    protected void writeConfigSettings(SettingsWriterOTGPlus writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+    protected void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
     {
     	writeSettings(writer, null, null, spawnLog, logger, materialReader, manager);
     }
     
-    public void writeWithData(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+    public void writeWithData(SettingsWriterBO4 writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
     {
         writer.setConfigMode(ConfigMode.WriteAll);
         try
@@ -1044,7 +1044,7 @@ public class BO4Config extends CustomObjectConfigFile
         }
     }
     
-    private void writeSettings(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+    private void writeSettings(SettingsWriterBO4 writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
     {
         // The object
         writer.bigTitle("BO4 object");
@@ -1355,7 +1355,7 @@ public class BO4Config extends CustomObjectConfigFile
        	loadInheritedBO3(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
     }
    
-    private void writeResources(SettingsWriterOTGPlus writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+    private void writeResources(SettingsWriterBO4 writer, List<BO4BlockFunction> blocksList, List<BO4BranchFunction> branchesList, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
     {
         writer.bigTitle("Blocks");
         writer.comment("All the blocks used in the BO4 are listed here. Possible blocks:");
@@ -1619,8 +1619,8 @@ public class BO4Config extends CustomObjectConfigFile
         stream.writeBoolean(this.isCollidable);
         stream.writeBoolean(this.useCenterForHighestBlock);
 
-        stream.writeInt(this.branchesOTGPlus.length);
-        for(BO4BranchFunction func : Arrays.asList(this.branchesOTGPlus))
+        stream.writeInt(this.branchesBO4.length);
+        for(BO4BranchFunction func : Arrays.asList(this.branchesBO4))
         {
         	if(func instanceof BO4WeightedBranchFunction)
         	{
@@ -1631,26 +1631,26 @@ public class BO4Config extends CustomObjectConfigFile
         	func.writeToStream(stream);
         }
         
-        stream.writeInt(this.entityDataOTGPlus.length);
-        for(BO4EntityFunction func : Arrays.asList(this.entityDataOTGPlus))
+        stream.writeInt(this.entityDataBO4.length);
+        for(BO4EntityFunction func : Arrays.asList(this.entityDataBO4))
         {
         	func.writeToStream(stream);
         }
         
-        stream.writeInt(this.particleDataOTGPlus.length);
-        for(BO4ParticleFunction func : Arrays.asList(this.particleDataOTGPlus))
+        stream.writeInt(this.particleDataBO4.length);
+        for(BO4ParticleFunction func : Arrays.asList(this.particleDataBO4))
         {
         	func.writeToStream(stream);
         }
 
-        stream.writeInt(this.spawnerDataOTGPlus.length);
-        for(BO4SpawnerFunction func : Arrays.asList(this.spawnerDataOTGPlus))
+        stream.writeInt(this.spawnerDataBO4.length);
+        for(BO4SpawnerFunction func : Arrays.asList(this.spawnerDataBO4))
         {
         	func.writeToStream(stream);
         }
 
-        stream.writeInt(this.modDataOTGPlus.length);
-        for(BO4ModDataFunction func : Arrays.asList(this.modDataOTGPlus))
+        stream.writeInt(this.modDataBO4.length);
+        for(BO4ModDataFunction func : Arrays.asList(this.modDataBO4))
         {
         	func.writeToStream(stream);
         }        
@@ -1988,7 +1988,7 @@ public class BO4Config extends CustomObjectConfigFile
 		        int branchesOTGPlusLength = bufferDecompressed.getInt();
 		        boolean branchType;
 		        BO4BranchFunction branch;
-		        BO4BranchFunction[] branchesOTGPlus = new BO4BranchFunction[branchesOTGPlusLength];
+		        BO4BranchFunction[] branchesBO4 = new BO4BranchFunction[branchesOTGPlusLength];
 		        for(int i = 0; i < branchesOTGPlusLength; i++)
 		        {
 		        	branchType = bufferDecompressed.get() != 0;
@@ -1998,35 +1998,35 @@ public class BO4Config extends CustomObjectConfigFile
 		        	} else {
 		        		branch = BO4BranchFunction.fromStream(this, bufferDecompressed, spawnLog, logger, materialReader);
 		        	}
-		        	branchesOTGPlus[i] = branch;
+		        	branchesBO4[i] = branch;
 		        }
 		        
 		        int entityDataOTGPlusLength = bufferDecompressed.getInt();
-		        BO4EntityFunction[] entityDataOTGPlus = new BO4EntityFunction[entityDataOTGPlusLength];
+		        BO4EntityFunction[] entityDataBO4 = new BO4EntityFunction[entityDataOTGPlusLength];
 		        for(int i = 0; i < entityDataOTGPlusLength; i++)
 		        {
-		        	entityDataOTGPlus[i] = BO4EntityFunction.fromStream(this, bufferDecompressed, spawnLog, logger);
+		        	entityDataBO4[i] = BO4EntityFunction.fromStream(this, bufferDecompressed, spawnLog, logger);
 		        }
 		        
 		        int particleDataOTGPlusLength = bufferDecompressed.getInt();
-		        BO4ParticleFunction[] particleDataOTGPlus = new BO4ParticleFunction[particleDataOTGPlusLength];
+		        BO4ParticleFunction[] particleDataBO4 = new BO4ParticleFunction[particleDataOTGPlusLength];
 		        for(int i = 0; i < particleDataOTGPlusLength; i++)
 		        {
-	        		particleDataOTGPlus[i] = BO4ParticleFunction.fromStream(this, bufferDecompressed);
+	        		particleDataBO4[i] = BO4ParticleFunction.fromStream(this, bufferDecompressed);
 		        }
 				        
 		        int spawnerDataOTGPlusLength = bufferDecompressed.getInt();
-		        BO4SpawnerFunction[] spawnerDataOTGPlus = new BO4SpawnerFunction[spawnerDataOTGPlusLength];
+		        BO4SpawnerFunction[] spawnerDataBO4 = new BO4SpawnerFunction[spawnerDataOTGPlusLength];
 		        for(int i = 0; i < spawnerDataOTGPlusLength; i++)
 		        {
-		        	spawnerDataOTGPlus[i] = BO4SpawnerFunction.fromStream(this, bufferDecompressed);
+		        	spawnerDataBO4[i] = BO4SpawnerFunction.fromStream(this, bufferDecompressed);
 		        }
 		
 		        int modDataOTGPlusLength = bufferDecompressed.getInt();
-		        BO4ModDataFunction[] modDataOTGPlus = new BO4ModDataFunction[modDataOTGPlusLength];
+		        BO4ModDataFunction[] modDataBO4 = new BO4ModDataFunction[modDataOTGPlusLength];
 		        for(int i = 0; i < modDataOTGPlusLength; i++)
 		        {
-		        	modDataOTGPlus[i] = BO4ModDataFunction.fromStream(this, bufferDecompressed);
+		        	modDataBO4[i] = BO4ModDataFunction.fromStream(this, bufferDecompressed);
 		        }
 		        	
 		        ArrayList<BO4BlockFunction> newBlocks = new ArrayList<BO4BlockFunction>();
@@ -2196,12 +2196,12 @@ public class BO4Config extends CustomObjectConfigFile
 	            this.cannotBeInsideBranches = cannotBeInsideBranches;            
 	            this.replacesBO3Branches = replacesBO3Branches;
 	                        
-		        this.branchesOTGPlus = branchesOTGPlus;
-		        this.entityDataOTGPlus = entityDataOTGPlus;
-		        this.particleDataOTGPlus = particleDataOTGPlus;
-		        this.spawnerDataOTGPlus = spawnerDataOTGPlus;
-		        this.modDataOTGPlus = modDataOTGPlus;
-		        			        
+		        this.branchesBO4 = branchesBO4;
+		        this.entityDataBO4 = entityDataBO4;
+		        this.particleDataBO4 = particleDataBO4;
+		        this.spawnerDataBO4 = spawnerDataBO4;
+		        this.modDataBO4 = modDataBO4;
+
 				// Reconstruct blocks
 		        if(getBlocks)
 		        {
@@ -2343,16 +2343,10 @@ public class BO4Config extends CustomObjectConfigFile
     }
     
 	@Override
-    protected void correctSettings()
-    {
-
-    }
+    protected void correctSettings() { }
 
     @Override
-    protected void renameOldSettings()
-    {
-        // Stub method - there are no old setting to convert yet (:
-    }
+    protected void renameOldSettings() { }
 
     public boolean isCollidable()
     {

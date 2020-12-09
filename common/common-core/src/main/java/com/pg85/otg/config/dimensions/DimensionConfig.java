@@ -16,17 +16,6 @@ public class DimensionConfig extends DimensionConfigBase
 	{
 		super(presetName, dimensionId, showInWorldCreationGUI);
 	}
-
-	public DimensionConfig(DimensionConfigGui dimConfig)
-	{		
-		this.PresetName = dimConfig.PresetName;
-		this.Seed = dimConfig.Seed;
-		this.WorldBorderRadiusInChunks = dimConfig.WorldBorderRadiusInChunks;
-		this.PregeneratorRadiusInChunks = dimConfig.PregeneratorRadiusInChunks;
-		
-		this.Settings = dimConfig.Settings.clone();
-		this.GameRules = dimConfig.GameRules.clone();
-	}
 	
 	public DimensionConfig(String presetName, int dimensionId, boolean showInWorldCreationGUI, WorldConfig worldConfig)
 	{	
@@ -42,15 +31,10 @@ public class DimensionConfig extends DimensionConfigBase
 		clone.Seed = this.Seed;
 		clone.DimensionId = this.DimensionId;
 		clone.ShowInWorldCreationGUI = this.ShowInWorldCreationGUI;
-		clone.WorldBorderRadiusInChunks = this.WorldBorderRadiusInChunks;
-		clone.PregeneratorRadiusInChunks = this.PregeneratorRadiusInChunks;
 		clone.AllowCheats = this.AllowCheats;
 		clone.BonusChest = this.BonusChest;
 		clone.GameType = this.GameType;
-		
-		clone.Settings = this.Settings.clone();
-		clone.GameRules = this.GameRules.clone();
-		
+
 		return clone;
 	}
 	
@@ -58,7 +42,8 @@ public class DimensionConfig extends DimensionConfigBase
 	{
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         DimensionConfig dimConfig = null;
-       	try {
+       	
+        try {
        		dimConfig = mapper.readValue(readStringFromStream, DimensionConfig.class);
 		} catch (JsonParseException e) {
 			e.printStackTrace();

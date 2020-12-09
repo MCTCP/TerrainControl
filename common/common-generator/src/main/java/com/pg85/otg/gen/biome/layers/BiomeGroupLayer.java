@@ -31,7 +31,7 @@ class BiomeGroupLayer implements ParentedLayer
 			maxRarity += group.rarity;
 			this.rarityMap.put(maxRarity, group);
 		}
-		
+
 		this.maxRarity = maxRarity;
 		this.freezeGroups = freezeGroups;
 	}
