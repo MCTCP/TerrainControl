@@ -29,6 +29,11 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
+/**
+ * A base class for a platform-specific preset loader, which loads 
+ * all presets from disk when the OTG Engine is started at app start, 
+ * and registers all biomes with their worldconfig/biomeconfig settings.
+ */
 public abstract class LocalPresetLoader
 {
 	private static final int MAX_INHERITANCE_DEPTH = 15;

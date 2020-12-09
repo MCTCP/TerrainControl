@@ -25,7 +25,7 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import it.unimi.dsi.fastutil.HashCommon;
 
 /**
- * Generates the base terrain, surface, and caves for chunks.
+ * Generates the base terrain, sets stone/ground/surface blocks and does SurfaceAndGroundControl, generates caves and canyons.
  */
 public class OTGChunkGenerator
 {

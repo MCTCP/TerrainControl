@@ -71,6 +71,22 @@ public class WorldConfig extends WorldConfigBase
 		this.validateAndCorrectSettings(settingsDir, true, OTG.getEngine().getLogger());		 
 	}
 
+	public BiomeGroupManager getBiomeGroupManager()
+	{
+		return this.biomeGroupManager;
+	}	
+	
+	public static WorldConfig fromDisk(Path worldDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	{
+		File worldConfigFile = Paths.get(worldDir.toString(), Constants.WORLD_CONFIG_FILE).toFile();
+		if(!worldConfigFile.exists())
+		{
+			return null;
+		}
+		SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile, logger);
+		return new WorldConfig(worldDir, settingsMap, null, biomeResourcesManager, spawnLog, logger, materialReader);
+	}
+
 	@Override
 	protected void renameOldSettings(SettingsMap reader, ILogger logger, IMaterialReader materialReader)
 	{
@@ -726,21 +742,5 @@ public class WorldConfig extends WorldConfigBase
 		writer.putSetting(WorldStandardValues.RAVINE_MIN_LENGTH, this.ravineMinLength);
 		writer.putSetting(WorldStandardValues.RAVINE_MAX_LENGTH, this.ravineMaxLength);
 		writer.putSetting(WorldStandardValues.RAVINE_DEPTH, this.ravineDepth);
-	}
-	
-	public static WorldConfig fromDisk(Path worldDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
-	{
-		File worldConfigFile = Paths.get(worldDir.toString(), Constants.WORLD_CONFIG_FILE).toFile();
-		if(!worldConfigFile.exists())
-		{
-			return null;
-		}
-		SettingsMap settingsMap = FileSettingsReader.read(worldDir.toFile().getName(), worldConfigFile, logger);
-		return new WorldConfig(worldDir, settingsMap, null, biomeResourcesManager, spawnLog, logger, materialReader);
-	}
-	
-	public BiomeGroupManager getBiomeGroupManager()
-	{
-		return this.biomeGroupManager;
 	}
 }

@@ -7,6 +7,9 @@ import java.util.HashMap;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.world.WorldConfig;
 
+/**
+ * Represents an OTG preset, with all its world and biome configs, stored in /config/OpenTerrainGenerator/Presets/\<PresetName\>/.
+ */
 public class Preset
 {
 	private final Path presetDir;
