@@ -2,8 +2,8 @@ package com.pg85.otg;
 
 import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.PluginConfig;
-import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeConfig;
+import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
 import com.pg85.otg.config.io.FileSettingsReader;
@@ -26,14 +26,14 @@ import java.util.Collection;
 import java.util.HashMap;
 
 /**
- * Implemented and provided by the platform-specific layer on app start and accessed via OTG.setEngine()/OTG.getEngine(),
+ * Implemented and provided by the platform-specific layer on app start and accessed via OTG.startEngine()/OTG.getEngine(),
  * this class holds any objects and methods used during an app session.
  * 
  * Constructor parameters are platform-specific implementations of wrapper classes, such as a logger, material reader, 
  * preset loader etc. Implement these to provide support for a platform (Forge, Spigot etc).
  *  
- * OTGEngine.onStart() should be called on mod/plugin start, and registers all presets and their biomes via the
- * platform-specific preset loader provided as a constructor parameter. 
+ * OTGEngine.onStart() should be called on mod/plugin start, creates all OTG files and folders and registers all presets 
+ * and biomes via the platform-specific preset loader provided as a constructor parameter. 
  */
 public abstract class OTGEngine
 {
@@ -62,13 +62,15 @@ public abstract class OTGEngine
 		this.modLoadedChecker = modLoadedChecker;
 	}
 	
-	void onShutdown()
-	{
-		// Shutdown all loaders
-		customObjectManager.shutdown();
-	}
+	// Platform-specific methods
+	
+	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
 
-	void onStart()
+	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
+	
+	// Startup / shutdown
+	
+	public void onStart()
 	{
 		// Load plugin config
 		
@@ -124,6 +126,12 @@ public abstract class OTGEngine
 		// Load presets
 		
 		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger, materialReader);
+	}
+	
+	public void onShutdown()
+	{
+		// Shutdown all loaders
+		customObjectManager.shutdown();
 	}
 
 	// Managers
@@ -183,13 +191,7 @@ public abstract class OTGEngine
 	{
 		return logger;
 	}
-	
-	// Misc
-	
-	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
-
-	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
-	
+		
 	// Builders/Factories
 	
 	public CustomStructureCache createCustomStructureCache(String worldName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
