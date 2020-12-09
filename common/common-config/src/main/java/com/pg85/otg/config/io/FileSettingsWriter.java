@@ -96,6 +96,10 @@ public final class FileSettingsWriter
                 bigTitle(writer, value.getRawValue());
                 comments(writer, value.getComments());
                 break;
+            case BIG_TITLE_2:
+                bigTitle2(writer, value.getRawValue());
+                comments(writer, value.getComments());
+                break;
             case SMALL_TITLE:
                 smallTitle(writer, value.getRawValue());
                 comments(writer, value.getComments());
@@ -136,6 +140,30 @@ public final class FileSettingsWriter
         writer.write("# |" + builder.toString() + "| #");
         writer.newLine();
         writer.write("# +-----------------------------------------------------------------+ #");
+        writer.newLine();
+        writer.write("#######################################################################");
+        writer.newLine();
+        writer.newLine();
+    }
+    
+    private void bigTitle2(BufferedWriter writer, String title) throws IOException
+    {
+        writer.newLine();
+        writer.write("#######################################################################");
+        writer.newLine();
+        StringBuilder builder = new StringBuilder(title);
+        builder.insert(0, ' ');
+        builder.append(' ');
+        boolean flag = true;
+        while (builder.length() < 65)
+        {
+            if (flag)
+                builder.insert(0, ' ');
+            else
+                builder.append(' ');
+            flag = !flag;
+        }
+        writer.write("# |" + builder.toString() + "| #");
         writer.newLine();
         writer.write("#######################################################################");
         writer.newLine();

@@ -140,7 +140,7 @@ public interface SettingsMap
     void setFallback(SettingsMap reader);
 
     /**
-     * Adds a big title to the config file. New setting added after this title
+     * Adds a small title to the config file. New setting added after this title
      * will be placed below this title.
      * @param title    The title text.
      * @param comments Comments directly after the title.
@@ -148,10 +148,18 @@ public interface SettingsMap
     void smallTitle(String title, String... comments);
 
     /**
-     * Adds a small title to the config file. New setting added after this title
+     * Adds a big title to the config file. New setting added after this title
      * will be placed below this title.
      * @param title    The title text.
      * @param comments Comments directly after the title.
      */
-    void bigTitle(String title, String... comments);
+    void header1(String title, String... comments);
+    
+    /**
+     * Adds a big title to the config file. New setting added after this title
+     * will be placed below this title.
+     * @param title    The title text.
+     * @param comments Comments directly after the title.
+     */    
+    void header2(String title, String... comments);
 }
