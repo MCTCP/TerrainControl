@@ -17,13 +17,16 @@ public abstract class Setting<T>
         this.name = name;
     }
 
-    // TODO: After cleaning up this class, create getDefaultValue 
-    // without materialReader param for any callers passing hardcoded null.
     /**
      * Gets the default value of the setting.
      * @return The default value.
      */
     public abstract T getDefaultValue(IMaterialReader materialReader);
+    
+    public T getDefaultValue()
+    {
+    	return getDefaultValue(null);
+    }
     
     /**
      * Gets the name of this setting, like BiomeHeight.

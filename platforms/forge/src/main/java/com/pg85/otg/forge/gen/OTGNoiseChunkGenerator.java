@@ -78,29 +78,19 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			return p_236091_0_
 				.group(
 					Codec.STRING.fieldOf("otg_dimension_config").forGetter(
-						(p_236090_0_) ->
-						{
+						(p_236090_0_) -> {
 							// TODO: Use bytestream instead?
 							return p_236090_0_.dimensionConfig.toYamlString();
 						}
 					),
 					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
-						(p_236096_0_) ->
-						{
-							return p_236096_0_.biomeProvider;
-						}
+						(p_236096_0_) -> { return p_236096_0_.biomeProvider; }
 					),
 					Codec.LONG.fieldOf("seed").stable().forGetter(
-						(p_236093_0_) ->
-						{
-							return p_236093_0_.worldSeed;
-						}
+						(p_236093_0_) -> { return p_236093_0_.worldSeed; }
 					),
 					DimensionSettings.field_236098_b_.fieldOf("settings").forGetter(
-						(p_236090_0_) ->
-						{
-							return p_236090_0_.dimensionSettingsSupplier;
-						}
+						(p_236090_0_) -> { return p_236090_0_.dimensionSettingsSupplier; }
 					)
 				).apply(
 					p_236091_0_,
@@ -311,14 +301,31 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 					try
 					{
-						// Generate the structure if it exists in a biome this chunk.
+						// Generate the structure if it exists in a biome in this chunk.
 						// We don't have to do any work here, we can just let StructureManager handle it all.
-						structureManager.func_235011_a_(SectionPos.from(pos), structure).forEach(start ->
-								start.func_230366_a_(world, structureManager, chunkGenerator, random, new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15), new ChunkPos(chunkX, chunkZ)));
+						structureManager.func_235011_a_(SectionPos.from(pos), structure)
+							.forEach(start ->
+								start.func_230366_a_(
+									world, 
+									structureManager, 
+									chunkGenerator, 
+									random, 
+									new MutableBoundingBox(
+										chunkStartX, 
+										chunkStartZ, 
+										chunkStartX + 15, 
+										chunkStartZ + 15
+									), 
+									new ChunkPos(chunkX, chunkZ)
+								)
+							)
+						;
 					} catch (Exception exception) {
 						CrashReport crashreport = CrashReport.makeCrashReport(exception, "Feature placement");
-						crashreport.makeCategory("Feature").addDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure)).addDetail("Description", () ->
-								structure.toString());
+						crashreport.makeCategory("Feature")
+							.addDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure))
+							.addDetail("Description", () -> structure.toString())
+						;
 						throw new ReportedException(crashreport);
 					}
 

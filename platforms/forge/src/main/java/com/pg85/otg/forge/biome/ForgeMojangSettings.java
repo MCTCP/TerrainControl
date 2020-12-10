@@ -50,24 +50,28 @@ public final class ForgeMojangSettings implements MojangSettings
 	@Override
 	public float getTemperature()
 	{
+		// TODO: Implement this?
 		return 0.0f;//this.biomeBase.getDefaultTemperature();
 	}
 
 	@Override
 	public float getWetness()
 	{
+		// TODO: Implement this?		
 		return 0.0f;//this.biomeBase.getRainfall();
 	}
 
 	@Override
 	public float getSurfaceHeight()
 	{
+		// TODO: Implement this?	
 		return 0.0f;//this.biomeBase.getBaseHeight();
 	}
 
 	@Override
 	public float getSurfaceVolatility()
 	{
+		// TODO: Implement this?
 		return 0.0f;//this.biomeBase.getHeightVariation();
 	}
 
@@ -86,6 +90,7 @@ public final class ForgeMojangSettings implements MojangSettings
 	@Override
 	public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory entityCategory)
 	{
+		// TODO: Implement this?
 		return null;//MobSpawnGroupHelper.getListFromMinecraftBiome(this.biomeBase, entityCategory);
 	}
 }

@@ -97,10 +97,10 @@ public class ForgeBiome implements IBiome
 		
 		BiomeAmbience.Builder biomeAmbienceBuilder =
 			new BiomeAmbience.Builder()			
-				.setFogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue(null) ? biomeConfig.getFogColor() : worldConfig.getFogColor())
-				.setWaterFogColor(biomeConfig.getWaterFogColor() != 0x000000 ? biomeConfig.getWaterFogColor() : 329011) // TODO: Add a setting for Water fog color.
-				.setWaterColor(biomeConfig.getWaterColor() != 0xffffff ? biomeConfig.getWaterColor() : 4159204)
-				.withSkyColor(biomeConfig.getSkyColor() != 0x7BA5FF ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
+				.setFogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue() ? biomeConfig.getFogColor() : worldConfig.getFogColor())
+				.setWaterFogColor(biomeConfig.getWaterFogColor() != BiomeStandardValues.WATER_FOG_COLOR.getDefaultValue() ? biomeConfig.getWaterFogColor() : 329011)
+				.setWaterColor(biomeConfig.getWaterColor() != BiomeStandardValues.WATER_COLOR.getDefaultValue() ? biomeConfig.getWaterColor() : 4159204)
+				.withSkyColor(biomeConfig.getSkyColor() != BiomeStandardValues.SKY_COLOR.getDefaultValue() ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
 				// TODO: Implement sounds/music
 				.setMoodSound(MoodSoundAmbience.DEFAULT_CAVE)
 				//.setAmbientSound(SoundEvents.AMBIENT_BASALT_DELTAS_LOOP)
@@ -123,19 +123,19 @@ public class ForgeBiome implements IBiome
 		if(biomeConfig.getGrassColor() != 0xffffff)
 		{
 			biomeAmbienceBuilder.withGrassColor(biomeConfig.getGrassColor());
-
-			switch(biomeConfig.getGrassColorModifier())
-			{
-				case Swamp:
-					biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.SWAMP);
-					break;
-				case DarkForest:
-					biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.DARK_FOREST);
-					break;
-				default:
-					break;
-			}
 		}
+		
+		switch(biomeConfig.getGrassColorModifier())
+		{
+			case Swamp:
+				biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.SWAMP);
+				break;
+			case DarkForest:
+				biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.DARK_FOREST);
+				break;
+			default:
+				break;
+		}		
 
 		Biome.Builder biomeBuilder = 
 			new Biome.Builder()
@@ -154,12 +154,7 @@ public class ForgeBiome implements IBiome
 			.withGenerationSettings(biomeGenerationSettingsBuilder.build())
 		;
 
-		return
-			biomeBuilder
-				// Finalise
-				.build()
-				.setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()))
-		;
+		return biomeBuilder.build().setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()));
 	}
 
 	private static MobSpawnInfo.Builder createMobSpawnInfo(IBiomeConfig biomeConfig)
@@ -459,7 +454,7 @@ public class ForgeBiome implements IBiome
 			}
 		}
 	}
-	
+
 	// StructureFeatures.register()
 	private static <FC extends IFeatureConfig, F extends Structure<FC>> StructureFeature<FC, F> register(String name, StructureFeature<FC, F> structure)
 	{

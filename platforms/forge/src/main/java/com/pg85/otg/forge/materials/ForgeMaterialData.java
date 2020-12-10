@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.block.Block;
@@ -74,7 +75,7 @@ public class ForgeMaterialData extends LocalMaterialData
 		// Try parsing as legacy block name / id
 		if(!blockNameCorrected.contains(":"))
 		{
-			blockState = LegacyMaterials.fromLegacyBlockName(blockNameCorrected);
+			blockState = ForgeLegacyMaterials.fromLegacyBlockName(blockNameCorrected);
 			if(blockState != null)
 			{
 				return ofMinecraftBlockState(blockState, input);
@@ -87,7 +88,7 @@ public class ForgeMaterialData extends LocalMaterialData
 				{
 					blockNameCorrected = fromLegacyIdName;
 				}
-			} catch(NumberFormatException ex) { }					
+			} catch(NumberFormatException ex) { }
 		}
 		
 		// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
@@ -122,7 +123,7 @@ public class ForgeMaterialData extends LocalMaterialData
 			try
 			{
 				int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
-				blockState = LegacyMaterials.fromLegacyBlockNameOrIdWithData(blockNameOrId, data);
+				blockState = ForgeLegacyMaterials.fromLegacyBlockNameOrIdWithData(blockNameOrId, data);
 				if(blockState != null)
 				{
 					return ofMinecraftBlockState(blockState, input);
@@ -150,7 +151,7 @@ public class ForgeMaterialData extends LocalMaterialData
 		} catch(net.minecraft.util.ResourceLocationException ex) { }
 
 		// Try legacy name again, without data.
-		blockState = LegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));
+		blockState = ForgeLegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));
 		if(blockState != null)
 		{
 			return ofMinecraftBlockState(blockState, input);

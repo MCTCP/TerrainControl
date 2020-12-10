@@ -234,7 +234,8 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			OTG.log(LogMarker.WARN, "Treegen caused a non-fatal exception: ");
 			ex.printStackTrace();
-			return true; // Return true to prevent further attempts.
+			// Return true to prevent further attempts.
+			return true; 
 		}
 	}
 
@@ -508,9 +509,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
 			this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);			
 		}
-	}
-	
-	//
+	}	
 
 	@Override
 	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate)
