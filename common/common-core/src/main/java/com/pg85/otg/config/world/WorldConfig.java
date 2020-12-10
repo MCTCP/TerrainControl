@@ -45,7 +45,6 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Not used atm, implement these.
 	private String author;
 	private String description;
-	private boolean improvedRivers;
 	private boolean frozenOcean;
 	private String defaultFrozenOceanBiome;
 	private TerrainMode modeTerrain;
@@ -54,7 +53,7 @@ public class WorldConfig extends WorldConfigBase
 	// Fields used only in common-core or platform layers that aren't in IWorldConfig
 	
 	// TODO: Refactor BiomeGroups classes, since we have new biome groups now. Expose via IWorldConfig?
-	protected BiomeGroupManager biomeGroupManager;
+	private BiomeGroupManager biomeGroupManager;
 	
 	// Private fields, only used when loading/saving
 	
@@ -91,28 +90,28 @@ public class WorldConfig extends WorldConfigBase
 	protected void renameOldSettings(SettingsMap reader, ILogger logger, IMaterialReader materialReader)
 	{
 		// Rename BeforeGroups -> NoGroups
-		if (reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null) == BiomeMode.BeforeGroups)
+		if (reader.getSetting(WorldStandardValues.BIOME_MODE, logger) == BiomeMode.BeforeGroups)
 		{
 			reader.putSetting(WorldStandardValues.BIOME_MODE, BiomeMode.NoGroups);
 		}
-		
+
 		// Put BiomeMode in compatibility mode when NormalBiomes is found and create default groups
 		if (reader.hasSetting(WorldStandardValues.NORMAL_BIOMES))
 		{
-			if (reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null) == BiomeMode.Normal)
+			if (reader.getSetting(WorldStandardValues.BIOME_MODE, logger) == BiomeMode.Normal)
 			{
 				reader.putSetting(WorldStandardValues.BIOME_MODE, BiomeMode.NoGroups);
 			}
 			
-			int landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger, null);
-			int landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger, null);
-			List<String> normalBiomes = reader.getSetting(WorldStandardValues.NORMAL_BIOMES, logger, null);
+			int landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger);
+			int landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger);
+			List<String> normalBiomes = reader.getSetting(WorldStandardValues.NORMAL_BIOMES, logger);
 
 			BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, landSize, landRarity, normalBiomes);
 
-			int iceSize = reader.getSetting(WorldStandardValues.ICE_SIZE, logger, null);
-			int iceRarity = reader.getSetting(WorldStandardValues.ICE_RARITY, logger, null);
-			List<String> iceBiomes = reader.getSetting(WorldStandardValues.ICE_BIOMES, logger, null);
+			int iceSize = reader.getSetting(WorldStandardValues.ICE_SIZE, logger);
+			int iceRarity = reader.getSetting(WorldStandardValues.ICE_RARITY, logger);
+			List<String> iceBiomes = reader.getSetting(WorldStandardValues.ICE_BIOMES, logger);
 			BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, iceSize, iceRarity, iceBiomes);
 
 			reader.addConfigFunctions(Arrays.asList(normalGroup, iceGroup));
@@ -160,20 +159,20 @@ public class WorldConfig extends WorldConfigBase
 	{
 		// Misc
 
-		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);		
+		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger);		
 
 		// Visual settings
 
-		this.worldFogColor = reader.getSetting(WorldStandardValues.WORLD_FOG_COLOR, logger, null);
+		this.worldFogColor = reader.getSetting(WorldStandardValues.WORLD_FOG_COLOR, logger);
 
 		// Biome resources
 
-		this.disableOreGen = reader.getSetting(WorldStandardValues.DISABLE_OREGEN, logger, null);
-		this.disableBedrock = reader.getSetting(WorldStandardValues.DISABLE_BEDROCK, logger, null);
+		this.disableOreGen = reader.getSetting(WorldStandardValues.DISABLE_OREGEN, logger);
+		this.disableBedrock = reader.getSetting(WorldStandardValues.DISABLE_BEDROCK, logger);
 
 		// Blocks
 
-		this.removeSurfaceStone = reader.getSetting(WorldStandardValues.REMOVE_SURFACE_STONE, logger, null);
+		this.removeSurfaceStone = reader.getSetting(WorldStandardValues.REMOVE_SURFACE_STONE, logger);
 		this.waterBlock = reader.getSetting(WorldStandardValues.WATER_BLOCK, logger, materialReader);
 		this.bedrockBlock = reader.getSetting(WorldStandardValues.BEDROCK_BLOCK, logger, materialReader);		
 		this.cooledLavaBlock = reader.getSetting(WorldStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
@@ -181,104 +180,103 @@ public class WorldConfig extends WorldConfigBase
 
 		// Bedrock
 
-		this.ceilingBedrock = reader.getSetting(WorldStandardValues.CEILING_BEDROCK, logger, null);
-		this.flatBedrock = reader.getSetting(WorldStandardValues.FLAT_BEDROCK, logger, null);
+		this.ceilingBedrock = reader.getSetting(WorldStandardValues.CEILING_BEDROCK, logger);
+		this.flatBedrock = reader.getSetting(WorldStandardValues.FLAT_BEDROCK, logger);
 
 		// Biome settings
 
 		readBiomeGroups(reader, biomeResourcesManager, spawnLog, logger, materialReader);
-		this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE, logger, null);
-		this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH, logger, null);
-		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger, null);		
-		this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger, null);
-		this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger, null);
-		this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, logger, null);
-		this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger, null);
-		this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, logger, null);
-		this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, logger, null);
-		this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger, null);
-		this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger, null);
-		this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger, null);		
-		this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY, logger, null);
-		this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE, logger, null);
-		this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED, logger, null);
+		this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE, logger);
+		this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH, logger);
+		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger);		
+		this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger);
+		this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger);
+		this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, logger);
+		this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger);
+		this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, logger);
+		this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, logger);
+		this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger);
+		this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger);
+		this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger);		
+		this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY, logger);
+		this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE, logger);
+		this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED, logger);
 
 		// Terrain settings
 
-		this.fractureHorizontal = reader.getSetting(WorldStandardValues.FRACTURE_HORIZONTAL, logger, null);
-		this.fractureVertical = reader.getSetting(WorldStandardValues.FRACTURE_VERTICAL, logger, null);
-		this.worldHeightCapBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, logger, null);
+		this.fractureHorizontal = reader.getSetting(WorldStandardValues.FRACTURE_HORIZONTAL, logger);
+		this.fractureVertical = reader.getSetting(WorldStandardValues.FRACTURE_VERTICAL, logger);
+		this.worldHeightCapBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_CAP_BITS, logger);
 		this.worldHeightCap = 1 << this.worldHeightCapBits;
-		this.worldHeightScaleBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, logger, null);
+		this.worldHeightScaleBits = reader.getSetting(WorldStandardValues.WORLD_HEIGHT_SCALE_BITS, logger);
 		this.worldHeightScaleBits = lowerThanOrEqualTo(this.worldHeightScaleBits, this.worldHeightCapBits);
 		this.worldHeightScale = 1 << this.worldHeightScaleBits;
-		this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL, logger, null);
-		this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES, logger, null);
-		this.waterLevelMax = reader.getSetting(WorldStandardValues.WATER_LEVEL_MAX, logger, null);
-		this.waterLevelMin = reader.getSetting(WorldStandardValues.WATER_LEVEL_MIN, logger, null);
+		this.betterSnowFall = reader.getSetting(WorldStandardValues.BETTER_SNOW_FALL, logger);
+		this.fullyFreezeLakes = reader.getSetting(WorldStandardValues.FULLY_FREEZE_LAKES, logger);
+		this.waterLevelMax = reader.getSetting(WorldStandardValues.WATER_LEVEL_MAX, logger);
+		this.waterLevelMin = reader.getSetting(WorldStandardValues.WATER_LEVEL_MIN, logger);
 
 		// FromImageMode
 
-		this.imageOrientation = reader.getSetting(WorldStandardValues.IMAGE_ORIENTATION, logger, null);		
-		this.imageFile = reader.getSetting(WorldStandardValues.IMAGE_FILE, logger, null);
-		this.imageFillBiome = reader.getSetting(WorldStandardValues.IMAGE_FILL_BIOME, logger, null);
-		this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE, logger, null);		
-		this.imageXOffset = reader.getSetting(WorldStandardValues.IMAGE_X_OFFSET, logger, null);
-		this.imageZOffset = reader.getSetting(WorldStandardValues.IMAGE_Z_OFFSET, logger, null);
+		this.imageOrientation = reader.getSetting(WorldStandardValues.IMAGE_ORIENTATION, logger);		
+		this.imageFile = reader.getSetting(WorldStandardValues.IMAGE_FILE, logger);
+		this.imageFillBiome = reader.getSetting(WorldStandardValues.IMAGE_FILL_BIOME, logger);
+		this.imageMode = reader.getSetting(WorldStandardValues.IMAGE_MODE, logger);		
+		this.imageXOffset = reader.getSetting(WorldStandardValues.IMAGE_X_OFFSET, logger);
+		this.imageZOffset = reader.getSetting(WorldStandardValues.IMAGE_Z_OFFSET, logger);
 
 		// Vanilla structures
 
-		this.woodlandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, logger, null);
-		this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, logger, null);
-		this.buriedTreasureEnabled = reader.getSetting(WorldStandardValues.BURIED_TREASURE_ENABLED, logger, null);
-		this.oceanRuinsEnabled = reader.getSetting(WorldStandardValues.OCEAN_RUINS_ENABLED, logger, null);
-		this.pillagerOutpostsEnabled = reader.getSetting(WorldStandardValues.PILLAGER_OUTPOSTS_ENABLED, logger, null);
-		this.bastionRemnantsEnabled = reader.getSetting(WorldStandardValues.BASTION_REMNANTS_ENABLED, logger, null);
-		this.netherFossilsEnabled = reader.getSetting(WorldStandardValues.NETHER_FOSSILS_ENABLED, logger, null);
-		this.endCitiesEndabled = reader.getSetting(WorldStandardValues.END_CITIES_ENABLED, logger, null);
-		this.ruinedPortalsEndabled = reader.getSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, logger, null);
-		this.shipWrecksEndabled = reader.getSetting(WorldStandardValues.SHIPWRECKS_ENABLED, logger, null);
-		this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED, logger, null);
-		this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED, logger, null);		
-		this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED, logger, null);
-		this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, logger, null);
-		this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, logger, null);
+		this.woodlandMansionsEnabled = reader.getSetting(WorldStandardValues.WOODLAND_MANSIONS_ENABLED, logger);
+		this.netherFortressesEnabled = reader.getSetting(WorldStandardValues.NETHER_FORTRESSES_ENABLED, logger);
+		this.buriedTreasureEnabled = reader.getSetting(WorldStandardValues.BURIED_TREASURE_ENABLED, logger);
+		this.oceanRuinsEnabled = reader.getSetting(WorldStandardValues.OCEAN_RUINS_ENABLED, logger);
+		this.pillagerOutpostsEnabled = reader.getSetting(WorldStandardValues.PILLAGER_OUTPOSTS_ENABLED, logger);
+		this.bastionRemnantsEnabled = reader.getSetting(WorldStandardValues.BASTION_REMNANTS_ENABLED, logger);
+		this.netherFossilsEnabled = reader.getSetting(WorldStandardValues.NETHER_FOSSILS_ENABLED, logger);
+		this.endCitiesEndabled = reader.getSetting(WorldStandardValues.END_CITIES_ENABLED, logger);
+		this.ruinedPortalsEndabled = reader.getSetting(WorldStandardValues.RUINED_PORTALS_ENABLED, logger);
+		this.shipWrecksEndabled = reader.getSetting(WorldStandardValues.SHIPWRECKS_ENABLED, logger);
+		this.strongholdsEnabled = reader.getSetting(WorldStandardValues.STRONGHOLDS_ENABLED, logger);
+		this.villagesEnabled = reader.getSetting(WorldStandardValues.VILLAGES_ENABLED, logger);		
+		this.mineshaftsEnabled = reader.getSetting(WorldStandardValues.MINESHAFTS_ENABLED, logger);
+		this.oceanMonumentsEnabled = reader.getSetting(WorldStandardValues.OCEAN_MONUMENTS_ENABLED, logger);
+		this.rareBuildingsEnabled = reader.getSetting(WorldStandardValues.RARE_BUILDINGS_ENABLED, logger);
 
 		// OTG Custom structures
 
-		this.customStructureType = reader.getSetting(WorldStandardValues.CUSTOM_STRUCTURE_TYPE, logger, null);
-		this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, logger, null);
-		this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger, null);		
+		this.customStructureType = reader.getSetting(WorldStandardValues.CUSTOM_STRUCTURE_TYPE, logger);
+		this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, logger);
+		this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger);		
 
 		// Caves & Ravines
 
-		this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY, logger, null);
-		this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY, logger, null);
-		this.evenCaveDistribution = reader.getSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, logger, null);		
-		this.caveMinAltitude = reader.getSetting(WorldStandardValues.CAVE_MIN_ALTITUDE, logger, null);
-		this.caveMaxAltitude = reader.getSetting(WorldStandardValues.CAVE_MAX_ALTITUDE, logger, null);
-		this.caveSystemFrequency = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY, logger, null);
-		this.individualCaveRarity = reader.getSetting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY, logger, null);		
-		this.caveSystemPocketChance = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE, logger, null);
-		this.caveSystemPocketMinSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, logger, null);
-		this.caveSystemPocketMaxSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, logger, null);
+		this.caveFrequency = reader.getSetting(WorldStandardValues.CAVE_FREQUENCY, logger);
+		this.caveRarity = reader.getSetting(WorldStandardValues.CAVE_RARITY, logger);
+		this.evenCaveDistribution = reader.getSetting(WorldStandardValues.EVEN_CAVE_DISTRIBUTION, logger);		
+		this.caveMinAltitude = reader.getSetting(WorldStandardValues.CAVE_MIN_ALTITUDE, logger);
+		this.caveMaxAltitude = reader.getSetting(WorldStandardValues.CAVE_MAX_ALTITUDE, logger);
+		this.caveSystemFrequency = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_FREQUENCY, logger);
+		this.individualCaveRarity = reader.getSetting(WorldStandardValues.INDIVIDUAL_CAVE_RARITY, logger);		
+		this.caveSystemPocketChance = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_CHANCE, logger);
+		this.caveSystemPocketMinSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MIN_SIZE, logger);
+		this.caveSystemPocketMaxSize = reader.getSetting(WorldStandardValues.CAVE_SYSTEM_POCKET_MAX_SIZE, logger);
 
-		this.ravineRarity = reader.getSetting(WorldStandardValues.RAVINE_RARITY, logger, null);
-		this.ravineMinLength = reader.getSetting(WorldStandardValues.RAVINE_MIN_LENGTH, logger, null);
-		this.ravineMaxLength = reader.getSetting(WorldStandardValues.RAVINE_MAX_LENGTH, logger, null);
-		this.ravineDepth = reader.getSetting(WorldStandardValues.RAVINE_DEPTH, logger, null);
-		this.ravineMinAltitude = reader.getSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE, logger, null);
-		this.ravineMaxAltitude = reader.getSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE, logger, null);
+		this.ravineRarity = reader.getSetting(WorldStandardValues.RAVINE_RARITY, logger);
+		this.ravineMinLength = reader.getSetting(WorldStandardValues.RAVINE_MIN_LENGTH, logger);
+		this.ravineMaxLength = reader.getSetting(WorldStandardValues.RAVINE_MAX_LENGTH, logger);
+		this.ravineDepth = reader.getSetting(WorldStandardValues.RAVINE_DEPTH, logger);
+		this.ravineMinAltitude = reader.getSetting(WorldStandardValues.RAVINE_MIN_ALTITUDE, logger);
+		this.ravineMaxAltitude = reader.getSetting(WorldStandardValues.RAVINE_MAX_ALTITUDE, logger);
 
 		// TODO: Re-implement these and clean up
 
-		this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger, null);
-		this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN, logger, null);
-		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger, null);
-		this.improvedRivers = reader.getSetting(WorldStandardValues.IMPROVED_RIVERS, logger, null);
-		this.author = reader.getSetting(WorldStandardValues.AUTHOR, logger, null);
-		this.description = reader.getSetting(WorldStandardValues.DESCRIPTION, logger, null);
-		this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger, null);
+		this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger);
+		this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN, logger);
+		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
+		this.author = reader.getSetting(WorldStandardValues.AUTHOR, logger);
+		this.description = reader.getSetting(WorldStandardValues.DESCRIPTION, logger);
+		this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger);
 	}
 
 	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
@@ -495,12 +493,6 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.RIVER_SIZE, this.riverSize,
 			"Controls the size of rivers. Can range from 0 to GenerationDepth minus RiverRarity. Making this larger will make the rivers larger, without affecting how often rivers will spawn."
-		);
-
-		writer.putSetting(WorldStandardValues.IMPROVED_RIVERS, this.improvedRivers,
-			"Normally rivers use technical biomes to generate and have their own biome config (e.g. River and FrozenRiver).",
-			"If you set this setting to true, the technical biomes won't be used anymore. This causes the rivers to look exactly like the biome they are flowing through, however with fewer options than using a technical biome.",
-			"Height and other settings for improved rivers can be found in the biome the river is flowing through."
 		);
 
 		writer.header1("Settings For BiomeMode:FromImage",

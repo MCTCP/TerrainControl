@@ -4,7 +4,7 @@ import com.pg85.otg.config.settingType.DoubleArraySetting;
 import com.pg85.otg.config.settingType.MaterialSetting;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.settingType.Settings;
-import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.GrassColorModifier;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
@@ -33,10 +33,7 @@ public class BiomeStandardValues extends Settings
     public static final Setting<Boolean>
     	RESOURCE_INHERITANCE = booleanSetting("ResourceInheritance", true),
     	USE_WORLD_WATER_LEVEL = booleanSetting("UseWorldWaterLevel", true),    	 
-		GRASS_COLOR_IS_MULTIPLIER = booleanSetting("GrassColorIsMultiplier", true),
-		FOLIAGE_COLOR_IS_MULTIPLIER = booleanSetting("FoliageColorIsMultiplier", true),
 		DISABLE_BIOME_HEIGHT = booleanSetting("DisableBiomeHeight", false),
-		INHERIT_SAPLING_RESOURCE = booleanSetting("InheritSaplingResource", true),
 		STRONGHOLDS_ENABLED = booleanSetting("StrongholdsEnabled", true),
 		NETHER_FORTRESSES_ENABLED = booleanSetting("NetherFortressesEnabled", false),
 		OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", false),
@@ -53,9 +50,10 @@ public class BiomeStandardValues extends Settings
     public static final Setting<String>
     	BIOME_EXTENDS = stringSetting("BiomeExtends", ""),
     	RIVER_BIOME = stringSetting("RiverBiome", "River"),
-    	REPLACE_TO_BIOME_NAME = stringSetting("ReplaceToBiomeName", ""),
+    	VANILLA_BIOME = stringSetting("ReplaceToBiomeName", ""),
     	BIOME_DICT_ID = stringSetting("BiomeDictId", ""),
-    	INHERIT_MOBS_BIOME_NAME = stringSetting("InheritMobsBiomeName", "")
+    	INHERIT_MOBS_BIOME_NAME = stringSetting("InheritMobsBiomeName", ""),
+    	PARTICLE_TYPE = stringSetting("ParticleType", "")
 	;
 
     public static final Setting<Integer>
@@ -66,7 +64,6 @@ public class BiomeStandardValues extends Settings
 		BIOME_RARITY_WHEN_ISLE = intSetting("BiomeRarityWhenIsle", 100, 0, Integer.MAX_VALUE),
 		SMOOTH_RADIUS = intSetting("SmoothRadius", 2, 0, 32),
 		CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS = intSetting("CustomHeightControlSmoothRadius", 2, 0, 32),
-		RIVER_WATER_LEVEL = intSetting("RiverWaterLevel", 63, Constants.WORLD_DEPTH, Constants.WORLD_HEIGHT - 1),
 		WATER_LEVEL_MAX = WorldStandardValues.WATER_LEVEL_MAX,
 		WATER_LEVEL_MIN = WorldStandardValues.WATER_LEVEL_MIN,
 		VILLAGE_SIZE = intSetting("VillageSize", 6, 0, Integer.MAX_VALUE),
@@ -79,17 +76,15 @@ public class BiomeStandardValues extends Settings
     	SKY_COLOR = colorSetting("SkyColor", "#7BA5FF"),
     	WATER_COLOR = colorSetting("WaterColor", "#FFFFFF"),
     	GRASS_COLOR = colorSetting("GrassColor", "#FFFFFF"),
-    	GRASS_COLOR_2 = colorSetting("GrassColor2", "#FFFFFF"),
     	FOLIAGE_COLOR = colorSetting("FoliageColor", "#FFFFFF"),
-    	FOLIAGE_COLOR_2 = colorSetting("FoliageColor2", "#FFFFFF"),
-    	FOG_COLOR = colorSetting("FogColor", "#000000")
+    	FOG_COLOR = colorSetting("FogColor", "#000000"),
+		WATER_FOG_COLOR = colorSetting("WaterFogColor", "#000000")
     ;
 
     public static final Setting<List<String>>
     	ISLE_IN_BIOME = stringListSetting("IsleInBiome", "Ocean"),
     	BIOME_IS_BORDER = stringListSetting("BiomeIsBorder"),
-    	NOT_BORDER_NEAR = stringListSetting("NotBorderNear"),
-    	BIOME_OBJECTS = stringListSetting("BiomeObjects")
+    	NOT_BORDER_NEAR = stringListSetting("NotBorderNear")
     ;
 
     public static final Setting<Double>
@@ -111,8 +106,7 @@ public class BiomeStandardValues extends Settings
     ;
 
     public static final Setting<double[]>
-    	CUSTOM_HEIGHT_CONTROL = new DoubleArraySetting("CustomHeightControl"),
-    	RIVER_CUSTOM_HEIGHT_CONTROL = new DoubleArraySetting("RiverCustomHeightControl")
+    	CUSTOM_HEIGHT_CONTROL = new DoubleArraySetting("CustomHeightControl")
     ;
 
     public static final Setting<Float>
@@ -120,24 +114,21 @@ public class BiomeStandardValues extends Settings
     	BIOME_WETNESS = floatSetting("BiomeWetness", 0.5f, 0, 1),
     	BIOME_HEIGHT = floatSetting("BiomeHeight", 0.1f, -10, 10),
     	BIOME_VOLATILITY = floatSetting("BiomeVolatility", 0.3f, -1000, 1000),
-    	RIVER_HEIGHT = floatSetting("RiverHeight", -1, -10, 10),
-    	RIVER_VOLATILITY = floatSetting("RiverVolatility", 0.3f, -1000, 1000),
-    	FOG_DENSITY = floatSetting("FogDensity", 0.5f, 0f, 1f),
-    	FOG_TIME_WEIGHT = floatSetting("FogTimeWeight", 0.1f, 0f, 1f),
-    	FOG_RAIN_WEIGHT = floatSetting("FogRainWeight", 0.25f, 0f, 1f),
-    	FOG_THUNDER_WEIGHT = floatSetting("FogThunderWeight", 0.5f, 0f, 1f),
     	// TODO: Find the proper max values for these probabilities, likely 1 for most.
     	MINESHAFT_PROBABILITY = floatSetting("MineshaftProbability", 0.004f, 0f, 1f),
-		OCEAN_RUINS_LARGE_PROBABILITY = floatSetting("OceanRuinsLargeProbability", 0.3f, 0f, 10f),
-		OCEAN_RUINS_CLUSTER_PROBABILITY = floatSetting("OceanRuinsClusterProbability", 0.9f, 0f, 10f),
-		BURIED_TREASURE_PROBABILITY = floatSetting("BuriedTreasureProbability", 0.01f, 0f, 1f)
+		OCEAN_RUINS_LARGE_PROBABILITY = floatSetting("OceanRuinsLargeProbability", 0.3f, 0f, 1f),
+		OCEAN_RUINS_CLUSTER_PROBABILITY = floatSetting("OceanRuinsClusterProbability", 0.9f, 0f, 1f),
+		BURIED_TREASURE_PROBABILITY = floatSetting("BuriedTreasureProbability", 0.01f, 0f, 1f),
+		PARTICLE_PROBABILITY = floatSetting("ParticleProbability", 0.118093334f, 0, 1f)
     ;
 
     public static final Setting<List<WeightedMobSpawnGroup>>
     	SPAWN_MONSTERS = mobGroupListSetting("SpawnMonsters"),
     	SPAWN_CREATURES = mobGroupListSetting("SpawnCreatures"),
     	SPAWN_WATER_CREATURES = mobGroupListSetting("SpawnWaterCreatures"),
-    	SPAWN_AMBIENT_CREATURES = mobGroupListSetting("SpawnAmbientCreatures")
+    	SPAWN_AMBIENT_CREATURES = mobGroupListSetting("SpawnAmbientCreatures"),
+		SPAWN_WATER_AMBIENT_CREATURES = mobGroupListSetting("SpawnWaterAmbientCreatures"),
+		SPAWN_MISC_CREATURES = mobGroupListSetting("SpawnMiscCreatures")
     ;
 
     public static final Setting<VillageType> VILLAGE_TYPE = enumSetting("VillageType", VillageType.disabled);
@@ -145,23 +136,10 @@ public class BiomeStandardValues extends Settings
     public static final Setting<RareBuildingType> RARE_BUILDING_TYPE = enumSetting("RareBuildingType", RareBuildingType.disabled);
     public static final Setting<RuinedPortalType> RUINED_PORTAL_TYPE = enumSetting("RuinedPortalType", RuinedPortalType.disabled);
     public static final Setting<OceanRuinsType> OCEAN_RUINS_TYPE = enumSetting("OceanRuinsType", OceanRuinsType.disabled);
-
+    public static final Setting<GrassColorModifier> GRASS_COLOR_MODIFIER = enumSetting("GrassColorModifier", GrassColorModifier.None);    
+    
     public static final Setting<ReplacedBlocksMatrix> REPLACED_BLOCKS = replacedBlocksSetting("ReplacedBlocks");
 
-    // Deprecated settings
-    public static final Setting<Boolean> BIOME_RIVERS = booleanSetting("BiomeRivers", true),
-    	DISABLE_NOTCH_PONDS = booleanSetting("DisableNotchPonds", false),
-    	SPAWN_MONSTERS_ADD_DEFAULTS = booleanSetting("SpawnMonstersAddDefaults", true),
-    	SPAWN_CREATURES_ADD_DEFAULTS = booleanSetting("SpawnCreaturesAddDefaults", true),
-    	SPAWN_WATER_CREATURES_ADD_DEFAULTS = booleanSetting("SpawnWaterCreaturesAddDefaults", true),
-    	SPAWN_AMBIENT_CREATURES_ADD_DEFAULTS = booleanSetting("SpawnAmbientCreaturesAddDefaults", true)
-    ;
-
-    /**
-     * Used to read ReplacedBlocks as a string, so that conversion to the new
-     * format is possible.
-     */
-    public static final Setting<String> REPLACED_BLOCKS_OLD = stringSetting("ReplacedBlocks", "");
     // End biome settings
 
     // Resource settings

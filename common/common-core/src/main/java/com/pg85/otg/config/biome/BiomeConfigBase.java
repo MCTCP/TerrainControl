@@ -1,21 +1,17 @@
 package com.pg85.otg.config.biome;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.pg85.otg.config.ConfigFile;
-import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.GrassColorModifier;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.customobject.resource.CustomStructureGen;
-import com.pg85.otg.customobject.resource.SaplingGen;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
@@ -26,95 +22,105 @@ import com.pg85.otg.util.interfaces.ICustomStructureGen;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
-import com.pg85.otg.util.minecraft.SaplingType;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 
+/**
+ * BiomeConfig (*.bc) classes
+ * 
+ * IBiomeConfig defines anything that's used/exposed between projects.
+ * BiomeConfigBase implements anything needed for IBiomeConfig. 
+ * BiomeConfig contains only fields/methods used for io/serialisation/instantiation.
+ * 
+ * BiomeConfig should be used only in common-core and platform-specific layers, when reading/writing settings on app start.
+ * IBiomeConfig should be used wherever settings are used in code. 
+ */
 abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 {
+	// Misc
+	
 	private final BiomeResourceLocation registryKey;
 	
 	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
 	// use a parent object that holds both, like a worldgenregion.
 	protected IWorldConfig worldConfig;
 	
-	protected List<String> isleInBiome;
-	protected List<String> biomeIsBorder;
-	protected List<String> notBorderNear;
+	// Identity
 	
+	protected String vanillaBiome;
+	
+	// Inheritance
+	
+	protected String biomeExtends;
+	
+	// Placement
+	
+	protected int biomeSize;
+	protected int biomeRarity;
+	protected int biomeColor;
+	protected List<String> isleInBiome;
 	protected int biomeSizeWhenIsle;
 	protected int biomeRarityWhenIsle;
+	protected List<String> biomeIsBorder;
+	protected List<String> notBorderNear;
 	protected int biomeSizeWhenBorder;
-		
-		// Surface config
+
+	// Height / volatility
+	
 	protected float biomeHeight;
 	protected float biomeVolatility;
 	protected int smoothRadius;
+	protected int CHCSmoothRadius;
+	protected double maxAverageHeight;
+	protected double maxAverageDepth;
+	protected double volatility1;
+	protected double volatility2;
+	protected double volatilityWeight1;
+	protected double volatilityWeight2;	
+	protected boolean disableBiomeHeight;
+	protected double[] chcData;
 	
-	protected float biomeTemperature;
-	
-	protected int biomeRarity;
-	protected int biomeSize;
+	// Rivers
 	
 	protected String riverBiome;
+	
+	// Blocks
 	
 	protected LocalMaterialData stoneBlock;
 	protected LocalMaterialData surfaceBlock;
 	protected LocalMaterialData groundBlock;
 	protected LocalMaterialData sandStoneBlock;
 	protected LocalMaterialData redSandStoneBlock;
-	
-	protected ReplacedBlocksMatrix replacedBlocks;
 	protected SurfaceGenerator surfaceAndGroundControl;
+	protected ReplacedBlocksMatrix replacedBlocks;
 	
-	protected boolean useWorldWaterLevel;
+	// Water / lava / freezing
+	
+	protected boolean useWorldWaterLevel;	
 	protected int waterLevelMax;
 	protected int waterLevelMin;
 	protected LocalMaterialData waterBlock;
 	protected LocalMaterialData iceBlock;
 	protected LocalMaterialData cooledLavaBlock;
+
+	// Visuals and weather
 	
-	protected List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
-	private ICustomStructureGen structureGen;
-	
-	protected double maxAverageHeight;
-	protected double maxAverageDepth;
-	protected double volatility1;
-	protected double volatility2;
-	protected double volatilityWeight1;
-	protected double volatilityWeight2;
-	
-	protected double[] chcData;
-	
-	protected Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
-	protected Map<LocalMaterialData, SaplingGen> customSaplingGrowers = new HashMap<>();
-	protected Map<LocalMaterialData, SaplingGen> customBigSaplingGrowers = new HashMap<>();
-	
-	protected String biomeExtends;
+	protected float biomeTemperature;
 	protected float biomeWetness;
-	protected int CHCSmoothRadius;
-	
-	protected int biomeColor;
 	protected int grassColor;
-	protected boolean grassColorIsMultiplier;
+	protected GrassColorModifier grassColorModifier;
 	protected int foliageColor;	
 	protected int skyColor;
 	protected int waterColor;
 	protected int fogColor;
+	protected int waterFogColor;
+	protected String particleType;
+	protected float particleProbability;
 	
-	// TODO: rename this setting
-	protected boolean disableNotchHeightControl;
+	// Custom structures
 	
-	protected String replaceToBiomeName;
-	
-	protected List<ConfigFunction<IBiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<IBiomeConfig>>();
-	
-	// Mob spawning
-	
-	protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	protected List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-	
+	protected List<CustomStructureGen> customStructures = new ArrayList<CustomStructureGen>(); // Used as a cache for fast querying, not saved
+	private ICustomStructureGen structureGen;
+
 	// Vanilla structures
 	
 	protected boolean strongholdsEnabled;
@@ -132,7 +138,6 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected boolean bastionRemnantEnabled;
 	protected boolean netherFossilEnabled;
 	protected boolean endCityEnabled;
-	
 	protected float mineshaftProbability;
 	protected RuinedPortalType ruinedPortalType;
 	protected OceanRuinsType oceanRuinsType;
@@ -142,7 +147,14 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int pillagerOutpostSize;
 	protected int bastionRemnantSize;	
 	
-	//
+	// Mob spawning
+	
+	protected List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+	protected List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();	
 	
 	protected BiomeConfigBase(String configName, BiomeResourceLocation registryKey)
 	{
@@ -154,9 +166,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public BiomeResourceLocation getRegistryKey()
 	{
 		return this.registryKey;
-	}	
-	
-	// Materials
+	}
 		
 	@Override
 	public LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z)
@@ -169,12 +179,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.surfaceAndGroundControl.getGroundBlockAtHeight(worldGenRegion, this, x, y, z);
 	}
-	
-	// Any blocks spawned/checked during base terrain gen that use the biomeconfig materials
-	// call getXXXBlockReplaced to get the replaced blocks.
-	// Any blocks spawned during population will have their materials parsed before spawning them
-	// via world.setBlock(), so they use the default biomeconfig materials.
-	
+		
 	@Override
 	public LocalMaterialData getDefaultGroundBlock()
 	{
@@ -368,6 +373,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.fogColor;
 	}
+	
+	@Override
+	public int getWaterFogColor()
+	{
+		return this.waterFogColor;
+	}
 
 	@Override
 	public int getFoliageColor()
@@ -380,17 +391,29 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.grassColor;
 	}
+
+	@Override
+	public GrassColorModifier getGrassColorModifier()
+	{
+		return this.grassColorModifier;
+	}	
 	
 	@Override
 	public int getWaterColor()
 	{
 		return this.waterColor;
 	}
-
+	
 	@Override
-	public boolean getGrassColorIsMultiplier()
+	public String getParticleType()
 	{
-		return this.grassColorIsMultiplier;
+		return this.particleType;
+	}
+	
+	@Override
+	public float getParticleProbability()
+	{
+		return this.particleProbability;
 	}
 	
 	@Override
@@ -532,23 +555,6 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 	
 	@Override
-	public String getReplaceToBiomeName()
-	{
-		return this.replaceToBiomeName;
-	}
-	
-	@Override
-	public void setReplaceToBiomeName(String replaceToBiomeName)
-	{
-		this.replaceToBiomeName = replaceToBiomeName;
-	}
-
-	public List<ConfigFunction<IBiomeConfig>> getResourceSequence()
-	{
-		return this.resourceSequence;
-	}
-	
-	@Override
 	public List<WeightedMobSpawnGroup> getAmbientCreatures()
 	{
 		return this.spawnAmbientCreaturesMerged;
@@ -570,6 +576,18 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public List<WeightedMobSpawnGroup> getWaterCreatures()
 	{
 		return this.spawnWaterCreaturesMerged;
+	}
+	
+	@Override
+	public List<WeightedMobSpawnGroup> getWaterAmbientCreatures()
+	{
+		return this.spawnWaterAmbientCreaturesMerged;
+	}
+
+	@Override
+	public List<WeightedMobSpawnGroup> getMiscCreatures()
+	{
+		return this.spawnMiscCreaturesMerged;
 	}
 	
 	@Override
@@ -675,9 +693,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	}
 
 	@Override
-	public boolean disableNotchHeightControl()
+	public boolean disableBiomeHeight()
 	{
-		return this.disableNotchHeightControl;
+		return this.disableBiomeHeight;
 	}
 
 	@Override
@@ -741,9 +759,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	{
 		return this.riverBiome;
 	}		  
-	
-	//
-	
+
 	/**
 	 * This is a pretty weak map from -0.5 to ~-0.8 (min vanilla temperature)
 	 *
@@ -782,27 +798,5 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z)
 	{
 		this.surfaceAndGroundControl.spawn(worldSeed, generatingChunk, chunkBuffer, biomeConfig, x, z);
-	}
-	
-	public SaplingGen getSaplingGen(SaplingType type)
-	{
-		SaplingGen gen = saplingGrowers.get(type);
-		if (gen == null && type.growsTree())
-		{
-			gen = saplingGrowers.get(SaplingType.All);
-		}
-		return gen;
-	}
-
-	public SaplingGen getCustomSaplingGen(LocalMaterialData materialData, boolean wideTrunk)
-	{
-		// TODO: Re-implement this when block data works
-		if (wideTrunk)
-		{
-			return customBigSaplingGrowers.get(materialData);
-			//return customBigSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
-		}
-		return customSaplingGrowers.get(materialData);
-		//return customSaplingGrowers.get(materialData.withBlockData(materialData.getBlockData() % 8));
 	}
 }

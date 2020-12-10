@@ -122,11 +122,23 @@ public final class SimpleSettingsMap implements SettingsMap
     }
 
     @Override
+    public <S> S getSetting(Setting<S> setting, ILogger logger)
+    {
+        return getSetting(setting, logger, null);
+    }
+    
+    @Override
     public <S> S getSetting(Setting<S> setting, ILogger logger, IMaterialReader materialReader)
     {
         return getSetting(setting, setting.getDefaultValue(materialReader), logger, materialReader);
     }
 
+    @Override
+    public <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger)
+    {
+    	return getSetting(setting, defaultValue, logger, null);
+    }
+    
     @Override
     public <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger, IMaterialReader materialReader)
     {

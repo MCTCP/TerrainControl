@@ -36,10 +36,10 @@ public final class PluginConfig extends PluginConfigBase
 	@Override
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger, null);
-		this.logLevel = reader.getSetting(PluginConfigStandardValues.LOG_LEVEL, logger, null);
-		this.spawnLog = reader.getSetting(PluginConfigStandardValues.SPAWN_LOG, logger, null);
-		this.developerMode = reader.getSetting(PluginConfigStandardValues.DEVELOPER_MODE, logger, null);
+		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger);
+		this.logLevel = reader.getSetting(PluginConfigStandardValues.LOG_LEVEL, logger);
+		this.spawnLog = reader.getSetting(PluginConfigStandardValues.SPAWN_LOG, logger);
+		this.developerMode = reader.getSetting(PluginConfigStandardValues.DEVELOPER_MODE, logger);
 	}
 
 	@Override

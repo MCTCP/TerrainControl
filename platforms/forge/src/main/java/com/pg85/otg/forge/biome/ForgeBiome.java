@@ -17,9 +17,12 @@ import com.pg85.otg.util.interfaces.IWorldConfig;
 
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
+import net.minecraft.particles.IParticleData;
+import net.minecraft.particles.ParticleType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeAmbience;
@@ -27,6 +30,7 @@ import net.minecraft.world.biome.BiomeGenerationSettings;
 import net.minecraft.world.biome.BiomeGenerationSettings.Builder;
 import net.minecraft.world.biome.MobSpawnInfo;
 import net.minecraft.world.biome.MoodSoundAmbience;
+import net.minecraft.world.biome.ParticleEffectAmbience;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
@@ -90,26 +94,27 @@ public class ForgeBiome implements IBiome
 			// Avoid temperatures between 0.1 and 0.2, Minecraft restriction
 			safeTemperature = safeTemperature >= 1.5 ? 0.2f : 0.1f;
 		}
-
+		
 		BiomeAmbience.Builder biomeAmbienceBuilder =
-			new BiomeAmbience.Builder()
+			new BiomeAmbience.Builder()			
 				.setFogColor(biomeConfig.getFogColor() != BiomeStandardValues.FOG_COLOR.getDefaultValue(null) ? biomeConfig.getFogColor() : worldConfig.getFogColor())
-				.setWaterFogColor(biomeConfig.getFogColor() != 0x000000 ? biomeConfig.getFogColor() : 329011) // TODO: Add a setting for Water fog color.
+				.setWaterFogColor(biomeConfig.getWaterFogColor() != 0x000000 ? biomeConfig.getWaterFogColor() : 329011) // TODO: Add a setting for Water fog color.
 				.setWaterColor(biomeConfig.getWaterColor() != 0xffffff ? biomeConfig.getWaterColor() : 4159204)
 				.withSkyColor(biomeConfig.getSkyColor() != 0x7BA5FF ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
-				// TODO: Implement these
-				//particle
-				//.func_235244_a_()
-				//ambient_sound
-				//.func_235241_a_() // Sound event?
-				//mood_sound
-				.setMoodSound(MoodSoundAmbience.DEFAULT_CAVE) // TODO: Find out what this is, a sound?
-				//additions_sound
-				//.func_235242_a_()
-				//music
-				//.func_235240_a_()				
+				// TODO: Implement sounds/music
+				.setMoodSound(MoodSoundAmbience.DEFAULT_CAVE)
+				//.setAmbientSound(SoundEvents.AMBIENT_BASALT_DELTAS_LOOP)
+				//.setMoodSound(new MoodSoundAmbience(SoundEvents.AMBIENT_BASALT_DELTAS_MOOD, 6000, 8, 2.0D))
+				//.setAdditionsSound(new SoundAdditionsAmbience(SoundEvents.AMBIENT_BASALT_DELTAS_ADDITIONS, 0.0111D))
+				//.setMusic(BackgroundMusicTracks.getDefaultBackgroundMusicSelector(SoundEvents.MUSIC_NETHER_BASALT_DELTAS))
 		;
 
+		Optional<ParticleType<?>> particleType = Registry.PARTICLE_TYPE.getOptional(new ResourceLocation(biomeConfig.getParticleType()));
+		if(particleType.isPresent() && particleType.get() instanceof IParticleData)
+		{
+			biomeAmbienceBuilder.setParticle(new ParticleEffectAmbience((IParticleData)particleType.get(), biomeConfig.getParticleProbability()));	
+		}
+		
 		if(biomeConfig.getFoliageColor() != 0xffffff)
 		{
 			biomeAmbienceBuilder.withFoliageColor(biomeConfig.getFoliageColor());
@@ -117,13 +122,18 @@ public class ForgeBiome implements IBiome
 
 		if(biomeConfig.getGrassColor() != 0xffffff)
 		{
-			if(!biomeConfig.getGrassColorIsMultiplier())
+			biomeAmbienceBuilder.withGrassColor(biomeConfig.getGrassColor());
+
+			switch(biomeConfig.getGrassColorModifier())
 			{
-				biomeAmbienceBuilder.withGrassColor(biomeConfig.getGrassColor());
-			} else {
-				// TODO: grass color multiplier
-				//int multipliedGrassColor = (defaultGrassColor + biomeConfig.grassColor) / 2;
-				//biomeAmbienceBuilder.func_242537_a(biomeConfig.grassColor);
+				case Swamp:
+					biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.SWAMP);
+					break;
+				case DarkForest:
+					biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.DARK_FOREST);
+					break;
+				default:
+					break;
 			}
 		}
 
@@ -139,16 +149,9 @@ public class ForgeBiome implements IBiome
 			.scale(biomeConfig.getBiomeVolatility())
 			.temperature(safeTemperature)
 			.downfall(biomeConfig.getBiomeWetness())
-			// Ambience (colours/sounds)
-			.setEffects(
-				biomeAmbienceBuilder.build()
-			// Mob spawning
-			).withMobSpawnSettings(
-				mobSpawnInfoBuilder.copy()
-			// All other biome settings...
-			).withGenerationSettings(
-				biomeGenerationSettingsBuilder.build()
-			)
+			.setEffects(biomeAmbienceBuilder.build())
+			.withMobSpawnSettings(mobSpawnInfoBuilder.copy())
+			.withGenerationSettings(biomeGenerationSettingsBuilder.build())
 		;
 
 		return
@@ -202,8 +205,26 @@ public class ForgeBiome implements IBiome
 				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
 			}
 		}
-		
-		// TODO: EntityClassification.WATER_AMBIENT / EntityClassification.MISC ?
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getWaterAmbientCreatures())
+		{
+			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
+			if(entityType.isPresent())
+			{
+				mobSpawnInfoBuilder.withSpawner(EntityClassification.WATER_AMBIENT, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+			} else {
+				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+			}
+		}
+		for(WeightedMobSpawnGroup mobSpawnGroup : biomeConfig.getMiscCreatures())
+		{
+			Optional<EntityType<?>> entityType = EntityType.byKey(mobSpawnGroup.getInternalName());
+			if(entityType.isPresent())
+			{
+				mobSpawnInfoBuilder.withSpawner(EntityClassification.MISC, new MobSpawnInfo.Spawners(entityType.get(), mobSpawnGroup.getWeight(), mobSpawnGroup.getMin(), mobSpawnGroup.getMax()));
+			} else {
+				OTG.log(LogMarker.WARN, "Could not find entity for mob: " + mobSpawnGroup.getMob() + " in BiomeConfig " + biomeConfig.getName());
+			}
+		}
 		
 		mobSpawnInfoBuilder.isValidSpawnBiomeForPlayer(); // Default biomes do this, not sure if needed?
 		return mobSpawnInfoBuilder;
@@ -214,12 +235,8 @@ public class ForgeBiome implements IBiome
 		// TODO: Currently we can only enable/disable structures per biome and use any configuration options exposed by the vanilla structure 
 		// classes (size for villages fe). If we want to be able to customise more, we'll need to implement our own structure classes.
 		// TODO: Allow users to create their own jigsaw patterns (for villages, end cities, pillager outposts etc)?
-		// TODO: Fossils?
 		// TODO: Amethyst Geodes (1.17?)	
-		// TODO: Misc structures: These structures generate even when the "Generate structures" world option is disabled, and also cannot be located with the /locate command.
-		// - Dungeons
-		// - Desert Wells
-		
+
 		// Villages
 		// TODO: Allow spawning multiple types in a single biome?
 		if(worldConfig.getVillagesEnabled() && biomeConfig.getVillageType() != VillageType.disabled)
@@ -227,12 +244,12 @@ public class ForgeBiome implements IBiome
 			int villageSize = biomeConfig.getVillageSize();
 			VillageType villageType = biomeConfig.getVillageType();
 			StructureFeature<VillageConfig, ? extends Structure<VillageConfig>> customVillage = register(
-				biomeConfig.getRegistryKey().withBiomeResource("village").toResourceLocationString(), 
+				biomeConfig.getRegistryKey().withBiomeResource("village").toResourceLocationString(),
 				Structure.VILLAGE.withConfiguration(
 					new VillageConfig(
 						() -> {
 							switch(villageType)
-							{ 
+							{
 								case sandstone:
 									return DesertVillagePools.field_243774_a;
 								case savanna:
@@ -440,7 +457,7 @@ public class ForgeBiome implements IBiome
 				case disabled:
 					break;
 			}
-		}	
+		}
 	}
 	
 	// StructureFeatures.register()

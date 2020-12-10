@@ -188,29 +188,8 @@ public abstract class LocalPresetLoader
 
 	private void processSettings(IWorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs, String presetName)
 	{
-		// Update configs with resourcelocation names for default biomes
 		for(BiomeConfig biomeConfig : biomeConfigs)
 		{
-			// Update biomes for legacy worlds, default biomes should be referred to as minecraft:<biomename>
-			if(
-				biomeConfig.getReplaceToBiomeName() != null && 
-				biomeConfig.getReplaceToBiomeName().trim().length() > 0						
-			)
-			{
-				String defaultBiomeResourceLocation = BiomeRegistryNames.getRegistryNameForDefaultBiome(biomeConfig.getReplaceToBiomeName());
-				if(defaultBiomeResourceLocation != null)
-				{
-					biomeConfig.setReplaceToBiomeName(defaultBiomeResourceLocation);
-				}
-			} else {
-				// Default biomes must replacetobiomename themselves
-				String defaultBiomeResourceLocation = BiomeRegistryNames.getRegistryNameForDefaultBiome(biomeConfig.getName());
-				if(defaultBiomeResourceLocation != null)
-				{
-					biomeConfig.setReplaceToBiomeName(defaultBiomeResourceLocation);
-				}
-			}
-
 			// Index ReplacedBlocks
 			if (!worldConfig.getBiomeConfigsHaveReplacement())
 			{

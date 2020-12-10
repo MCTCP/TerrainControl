@@ -83,7 +83,6 @@ public class WorldStandardValues extends Settings
 		RIVERS_ENABLED = booleanSetting("RiversEnabled", true),
 		GROUP_FREEZE_ENABLED = booleanSetting("FreezeAllBiomesInColdGroup", false),
 		RANDOM_RIVERS = booleanSetting("RandomRivers", false),
-		IMPROVED_RIVERS = booleanSetting("ImprovedRivers", false),
 		FROZEN_OCEAN = booleanSetting("FrozenOcean", true),
 		BETTER_SNOW_FALL = booleanSetting("BetterSnowFall", false),
 		FULLY_FREEZE_LAKES = booleanSetting("FullyFreezeLakes", false),

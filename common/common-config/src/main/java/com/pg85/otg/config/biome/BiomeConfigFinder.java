@@ -121,7 +121,7 @@ public final class BiomeConfigFinder
             if (biome == null)
             {
             	// If a biome has replacetobiomename set to a vanilla biome and has the same name as the vanilla biome then it should use the vanilla biome's template. 
-            	String replaceToBiomeName = preloadedBiomeConfigStub.settings.getSetting(BiomeStandardValues.REPLACE_TO_BIOME_NAME, "", logger, materialReader);
+            	String replaceToBiomeName = preloadedBiomeConfigStub.settings.getSetting(BiomeStandardValues.VANILLA_BIOME, "", logger, materialReader);
             	if(replaceToBiomeName != null && replaceToBiomeName.length() > 0)
             	{
 	                for (BiomeLoadInstruction defaultBiome : defaultBiomes)
@@ -252,11 +252,15 @@ public final class BiomeConfigFinder
         List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
         List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
         List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
         
         List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
         List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
         List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();        
+        List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
                         
         private BiomeConfigStub(SettingsMap settings, Path file, BiomeLoadInstruction loadInstructions, ILogger logger, IMaterialReader materialReader)
         {
@@ -315,10 +319,11 @@ public final class BiomeConfigFinder
             }
         	
     		this.spawnMonstersMerged.addAll(this.spawnMonsters);
-    		this.spawnCreaturesMerged.addAll(this.spawnCreatures);
-    		
+    		this.spawnCreaturesMerged.addAll(this.spawnCreatures);    		
     		this.spawnWaterCreaturesMerged.addAll(this.spawnWaterCreatures);
     		this.spawnAmbientCreaturesMerged.addAll(this.spawnAmbientCreatures);
+    		this.spawnWaterAmbientCreaturesMerged.addAll(this.spawnWaterAmbientCreatures);
+    		this.spawnMiscCreaturesMerged.addAll(this.spawnMiscCreatures);
         }
         
         public void mergeMobs(BiomeConfigStub parent)
@@ -327,7 +332,9 @@ public final class BiomeConfigFinder
         	spawnCreaturesMerged = mergeMobs(spawnCreaturesMerged, parent.spawnCreaturesMerged);
         	spawnAmbientCreaturesMerged = mergeMobs(spawnAmbientCreaturesMerged, parent.spawnAmbientCreaturesMerged);
         	spawnWaterCreaturesMerged = mergeMobs(spawnWaterCreaturesMerged, parent.spawnWaterCreaturesMerged);
-        	    	
+        	spawnWaterAmbientCreaturesMerged = mergeMobs(spawnWaterAmbientCreaturesMerged, parent.spawnWaterAmbientCreaturesMerged);
+        	spawnMiscCreaturesMerged = mergeMobs(spawnMiscCreaturesMerged, parent.spawnMiscCreaturesMerged);
+
             inheritMobsBiomeNameProcessed = true;
         }
         

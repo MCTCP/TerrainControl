@@ -309,7 +309,7 @@ public class OTGChunkGenerator
 
 			double noise = sampleNoise(noiseX, y, noiseZ, horizontalScale, verticalScale, horizontalScale / 80, verticalScale / 160, volatility1, volatility2, volatilityWeight1, volatilityWeight2);
 
-			if (!center.disableNotchHeightControl())
+			if (!center.disableBiomeHeight())
 			{
 				// Add the falloff at this height
 				noise += falloff;

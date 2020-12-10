@@ -90,4 +90,11 @@ public class SettingsEnums
     	ocean,
     	nether
     }
+    
+    public enum GrassColorModifier
+    {
+    	None,
+    	Swamp,
+    	DarkForest
+    }
 }
