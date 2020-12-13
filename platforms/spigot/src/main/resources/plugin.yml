@@ -1,0 +1,61 @@
+name: OpenTerrainGenerator
+version: 1.16.4-0.0.1
+description: 'Team OTG: PG85 (code), MC_Pitman & LordSmellyPants (graphics, web, community). Authvin, SuperCoder79 and Josh/Coll1234567 (more code). This mod is a fork of TerrainControl by Khorn/Wickth, Olof Cayorion Larsson, RutgerKok and Timethor. - OTG: Generate anything! -'
+authors: ['PeeGee85', 'Authvin', 'SuperCoder79', 'Josh/Coll1234567', 'RutgerKok', 'TimeThor', 'Khorn/Wickth', 'Olof Cayorion Larsson']
+main: com.pg85.otg.spigot.OTGPlugin
+load: STARTUP
+commands:
+  otg:
+    description: OpenTerrainGenerator commands
+    usage: |
+      /<command> <check> [world] - Checks if OTG is enabled for this world.
+      /<command> <reload> [world] - Reload config
+      /<command> <biome> [-f] [-w] - Show current biome information
+      /<command> <tp> [name or id] - Teleport to the given biome (name or id, max range 1000 chunks)
+    aliases: [openterraingenerator]
+permissions:
+  otg.*:
+    default: false
+    children:
+      otg.cmd.*: true
+otg.cmd.*:
+  default: false
+  children:
+    otg.cmd.biome: true
+    otg.cmd.check: true
+    otg.cmd.help: true
+    otg.cmd.list: true
+    otg.cmd.map: true
+    otg.cmd.reload: true
+    otg.cmd.spawn: true
+    otg.cmd.tp: true
+  otg.cmd.biome:
+    default: op
+    description: show chunk biome and block stats
+  otg.cmd.check:
+    default: op
+    description: check/create OTG settings for world
+  otg.cmd.help:
+    default: op
+    description: show help
+  otg.cmd.list:
+    default: op
+    description: list bo2 objects
+  otg.cmd.map:
+    default: op
+    description: generate biome map image
+  otg.cmd.reload:
+    default: op
+    description: reload world settings
+  otg.cmd.spawn:
+    default: op
+    description: spawn bo2 where you look
+  otg.cmd.tp:
+    default: op
+    description: Teleport to the given biome (name or id, max range 1000 chunks)
+  otg.cmd.lookup:
+    default: op
+    description: Look up a registered biome by name or id
+  otg.cmd.export:
+    default: op
+    description: Exports the current WorldEdit selection as a new BO3.

@@ -1,0 +1,29 @@
+plugins {
+    id 'java'
+    id "fr.il_totore.manadrop" version "0.4.1-SNAPSHOT"
+}
+
+group 'com.pg85.otg'
+version '1.16.4-0.0.1'
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+    maven {
+        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    compileOnly "org.spigotmc:spigot:1.16.4-R0.1-SNAPSHOT"
+    compile project(':common:common-util')
+    compile project(':common:common-config')
+    compile project(':common:common-customobject')
+    compile project(':common:common-generator')
+    compile project(':common:common-core')
+}
+
+buildTools {
+    versions '1.16.4'
+}
