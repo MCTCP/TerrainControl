@@ -113,6 +113,16 @@ public class MathHelper
         return (long) x & 4294967295L | ((long) z & 4294967295L) << 32;
     }
 
+    public static int getXFromLong(long val)
+    {
+        return (int)(val & 4294967295L);
+    }
+
+    public static int getZFromLong(long val)
+    {
+        return (int)(val >>> 32 & 4294967295L);
+    }
+
     public static long mixSeed(long seed, long salt)
     {
         seed *= seed * 6364136223846793005L + 1442695040888963407L;

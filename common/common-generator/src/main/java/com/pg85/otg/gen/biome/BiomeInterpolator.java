@@ -1,7 +1,6 @@
 package com.pg85.otg.gen.biome;
 
 import com.pg85.otg.gen.biome.layers.LayerSource;
-import com.pg85.otg.util.Pair;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 
@@ -15,84 +14,81 @@ public class BiomeInterpolator
 {
    public static IBiomeConfig getConfig(long seed, int x, int y, int z, LayerSource generator)
    {
-      Pair<Integer, Integer> pos = sample(seed, x, y, z);
-      return generator.getConfig(pos.getFirst(), pos.getSecond());
+      long pos = sample(seed, x, y, z);
+      return generator.getConfig(MathHelper.getXFromLong(pos), MathHelper.getZFromLong(pos));
    }
 
    public static int getId(long seed, int x, int y, int z, LayerSource generator)
    {
-      Pair<Integer, Integer> pos = sample(seed, x, y, z);
-      return generator.getSampler().sample(pos.getFirst(), pos.getSecond());
+      long pos = sample(seed, x, y, z);
+      return generator.getSampler().sample(MathHelper.getXFromLong(pos), MathHelper.getZFromLong(pos));
    }
 
-   private static Pair<Integer, Integer> sample(long seed, int x, int y, int z) {
-      int i = x - 2;
-      int j = y - 2;
-      int k = z - 2;
-      int l = i >> 2;
-      int m = j >> 2;
-      int n = k >> 2;
-      double d = (double) (i & 3) / 4.0D;
-      double e = (double) (j & 3) / 4.0D;
-      double f = (double) (k & 3) / 4.0D;
-      double[] ds = new double[8];
+   private static long sample(long seed, int x, int y, int z) {
+      int startX = x - 2;
+      int startY = y - 2;
+      int startZ = z - 2;
 
-      int t;
-      int aa;
-      int ab;
-      for (t = 0; t < 8; ++t)
+      int chunkX = startX >> 2;
+      int chunkY = startY >> 2;
+      int chunkZ = startZ >> 2;
+
+      double localX = (double) (startX & 3) / 4.0D;
+      double localY = (double) (startY & 3) / 4.0D;
+      double localZ = (double) (startZ & 3) / 4.0D;
+
+      double maxDistance = Double.MAX_VALUE;
+      int idx = Integer.MIN_VALUE;
+
+      for (int i = 0; i < 8; ++i)
       {
-         boolean bl = (t & 4) == 0;
-         boolean bl2 = (t & 2) == 0;
-         boolean bl3 = (t & 1) == 0;
-         aa = bl ? l : l + 1;
-         ab = bl2 ? m : m + 1;
-         int r = bl3 ? n : n + 1;
-         double g = bl ? d : d - 1.0D;
-         double h = bl2 ? e : e - 1.0D;
-         double s = bl3 ? f : f - 1.0D;
-         ds[t] = calcSquaredDistance(seed, aa, ab, r, g, h, s);
-      }
+         boolean isX = (i & 4) == 0;
+         boolean isY = (i & 2) == 0;
+         boolean isZ = (i & 1) == 0;
 
-      t = 0;
-      double u = ds[0];
+         int lerpX = isX ? chunkX : chunkX + 1;
+         int lerpY = isY ? chunkY : chunkY + 1;
+         int lerpZ = isZ ? chunkZ : chunkZ + 1;
 
-      int v;
-      for (v = 1; v < 8; ++v)
-      {
-         if (u > ds[v])
+         double xFraction = isX ? localX : localX - 1.0D;
+         double yFraction = isY ? localY : localY - 1.0D;
+         double zFraction = isZ ? localZ : localZ - 1.0D;
+
+         double distance = calcSquaredDistance(seed, lerpX, lerpY, lerpZ, xFraction, yFraction, zFraction);
+
+         if (maxDistance > distance)
          {
-            t = v;
-            u = ds[v];
+            maxDistance = distance;
+            idx = i;
          }
       }
 
-      v = (t & 4) == 0 ? l : l + 1;
-      aa = (t & 2) == 0 ? m : m + 1; // y coord is not used atm
-      ab = (t & 1) == 0 ? n : n + 1;
+      int finalX = (idx & 4) == 0 ? chunkX : chunkX + 1;
+      // int finalY = (idx & 2) == 0 ? chunkY : chunkY + 1; // y coord is not used currently
+      int finalZ = (idx & 1) == 0 ? chunkZ : chunkZ + 1;
 
-      return Pair.of(v, ab);
+      return MathHelper.toLong(finalX, finalZ);
    }
 
    private static double calcSquaredDistance(long seed, int x, int y, int z, double xFraction, double yFraction, double zFraction)
    {
-      long l = MathHelper.mixSeed(seed, x);
-      l = MathHelper.mixSeed(l, y);
-      l = MathHelper.mixSeed(l, z);
-      l = MathHelper.mixSeed(l, x);
-      l = MathHelper.mixSeed(l, y);
-      l = MathHelper.mixSeed(l, z);
-      double d = distribute(l);
-      l = MathHelper.mixSeed(l, seed);
-      double e = distribute(l);
-      l = MathHelper.mixSeed(l, seed);
-      double f = distribute(l);
-      return square(zFraction + f) + square(yFraction + e) + square(xFraction + d);
+      long mixedSeed = MathHelper.mixSeed(seed, x);
+      mixedSeed = MathHelper.mixSeed(mixedSeed, y);
+      mixedSeed = MathHelper.mixSeed(mixedSeed, z);
+      mixedSeed = MathHelper.mixSeed(mixedSeed, x);
+      mixedSeed = MathHelper.mixSeed(mixedSeed, y);
+      mixedSeed = MathHelper.mixSeed(mixedSeed, z);
+      double xOffset = distribute(mixedSeed);
+      mixedSeed = MathHelper.mixSeed(mixedSeed, seed);
+      double yOffset = distribute(mixedSeed);
+      mixedSeed = MathHelper.mixSeed(mixedSeed, seed);
+      double zOffset = distribute(mixedSeed);
+      return square(zFraction + zOffset) + square(yFraction + yOffset) + square(xFraction + xOffset);
    }
 
    private static double distribute(long seed)
    {
-      double d = (double) ((int) Math.floorMod(seed >> 24, 1024L)) / 1024.0D;
+      double d = (double) ((int) (seed >> 24) & 1023) / 1024.0D;
       return (d - 0.5D) * 0.9D;
    }
 

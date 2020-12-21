@@ -347,6 +347,17 @@ public class OTGChunkGenerator
 		byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];
 		Arrays.fill(waterLevel, (byte) 63);
 
+		int blockX = pos.getBlockX();
+		int blockZ = pos.getBlockZ();
+
+		IBiomeConfig[] biomes = new IBiomeConfig[256];
+
+		for (int x = 0; x < 16; x++) {
+		    for (int z = 0; z < 16; z++) {
+		        biomes[x * 16 + z] = this.getBiomeAtWorldCoord(blockX + x, blockZ + z);
+		    }
+		}
+
 		// TODO: this double[][][] is probably really bad for performance
 		double[][][] noiseData = new double[2][this.noiseSizeZ + 1][this.noiseSizeY + 1];
 
@@ -403,7 +414,7 @@ public class OTGChunkGenerator
 						// [0, 4] -> x noise pieces
 						for (int pieceX = 0; pieceX < 4; ++pieceX)
 						{
-							int realX = pos.getBlockX() + noiseX * 4 + pieceX;
+							int realX = blockX + noiseX * 4 + pieceX;
 							int localX = realX & 15;
 							double xLerp = (double) pieceX / 4.0;
 							// Interpolate noise based on x progress
@@ -413,7 +424,7 @@ public class OTGChunkGenerator
 							// [0, 4) -> z noise pieces
 							for (int pieceZ = 0; pieceZ < 4; ++pieceZ)
 							{
-								int realZ = pos.getBlockZ() + noiseZ * 4 + pieceZ;
+								int realZ = blockZ + noiseZ * 4 + pieceZ;
 								int localZ = realZ & 15;
 								double zLerp = (double) pieceZ / 4.0;
 								// Get the real noise here by interpolating the last 2 noises together
@@ -421,16 +432,16 @@ public class OTGChunkGenerator
 								// Normalize the noise from (-256, 256) to [-1, 1]
 								double density = MathHelper.clamp(rawNoise / 200.0D, -1.0D, 1.0D);
 
+								IBiomeConfig biomeConfig = biomes[localX * 16 + localZ];
+
 								if (density > 0.0)
 								{
-									IBiomeConfig biomeConfig = this.getBiomeAtWorldCoord(realX, realZ);
-									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced((short) realY));
+									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
 								}
 								else if (realY < 63)
 								{
 									// TODO: water levels
-									IBiomeConfig biomeConfig = this.getBiomeAtWorldCoord(realX, realZ);
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getWaterBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
 								}
