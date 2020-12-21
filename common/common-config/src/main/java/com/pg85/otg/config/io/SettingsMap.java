@@ -67,7 +67,16 @@ public interface SettingsMap
      * @return The setting value.
      */
     <S> S getSetting(Setting<S> setting, ILogger logger, IMaterialReader materialReader);
-
+    
+    /**
+     * Reads a setting. If the setting does not exist, the default value for the
+     * setting is returned.
+     * @param <S>     Type of the value of the setting.
+     * @param setting The setting to read.
+     * @return The setting value.
+     */
+    <S> S getSetting(Setting<S> setting, ILogger logger);
+    
     /**
      * Reads a setting. This method allows you to provide another default
      * value. If the setting has an invalid value, a message is logged and
@@ -79,6 +88,17 @@ public interface SettingsMap
      */
     <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger, IMaterialReader materialReader);
 
+    /**
+     * Reads a setting. This method allows you to provide another default
+     * value. If the setting has an invalid value, a message is logged and
+     * the default value is returned.
+     * @param <S>          Type of the value of the setting.
+     * @param setting      The setting to read.
+     * @param defaultValue Default value for the setting.
+     * @return The value of the setting.
+     */
+    <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger);
+    
     /**
      * Gets whether the reader has a value of the given setting. If this
      * method returns false, trying to get the setting will return the default
@@ -140,7 +160,7 @@ public interface SettingsMap
     void setFallback(SettingsMap reader);
 
     /**
-     * Adds a big title to the config file. New setting added after this title
+     * Adds a small title to the config file. New setting added after this title
      * will be placed below this title.
      * @param title    The title text.
      * @param comments Comments directly after the title.
@@ -148,10 +168,18 @@ public interface SettingsMap
     void smallTitle(String title, String... comments);
 
     /**
-     * Adds a small title to the config file. New setting added after this title
+     * Adds a big title to the config file. New setting added after this title
      * will be placed below this title.
      * @param title    The title text.
      * @param comments Comments directly after the title.
      */
-    void bigTitle(String title, String... comments);
+    void header1(String title, String... comments);
+    
+    /**
+     * Adds a big title to the config file. New setting added after this title
+     * will be placed below this title.
+     * @param title    The title text.
+     * @param comments Comments directly after the title.
+     */    
+    void header2(String title, String... comments);
 }

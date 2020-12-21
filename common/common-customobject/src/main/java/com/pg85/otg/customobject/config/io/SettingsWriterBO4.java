@@ -16,7 +16,7 @@ import java.io.IOException;
  * just before the setting/function they explain.
  *
  */
-public interface SettingsWriterOTGPlus
+public interface SettingsWriterBO4
 {
     /**
      * Writes a big title to the configuration file.

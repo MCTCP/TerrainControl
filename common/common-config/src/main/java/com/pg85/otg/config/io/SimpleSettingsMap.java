@@ -122,11 +122,23 @@ public final class SimpleSettingsMap implements SettingsMap
     }
 
     @Override
+    public <S> S getSetting(Setting<S> setting, ILogger logger)
+    {
+        return getSetting(setting, logger, null);
+    }
+    
+    @Override
     public <S> S getSetting(Setting<S> setting, ILogger logger, IMaterialReader materialReader)
     {
         return getSetting(setting, setting.getDefaultValue(materialReader), logger, materialReader);
     }
 
+    @Override
+    public <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger)
+    {
+    	return getSetting(setting, defaultValue, logger, null);
+    }
+    
     @Override
     public <S> S getSetting(Setting<S> setting, S defaultValue, ILogger logger, IMaterialReader materialReader)
     {
@@ -222,11 +234,17 @@ public final class SimpleSettingsMap implements SettingsMap
     {
         this.settingsCache.put(nextDummyKey(), RawSettingValue.create(ValueType.SMALL_TITLE, title).withComments(comments));
     }
-
+    
     @Override
-    public void bigTitle(String title, String... comments)
+    public void header1(String title, String... comments)
     {
         this.settingsCache.put(nextDummyKey(), RawSettingValue.create(ValueType.BIG_TITLE, title).withComments(comments));
+    }
+
+    @Override
+    public void header2(String title, String... comments)
+    {
+        this.settingsCache.put(nextDummyKey(), RawSettingValue.create(ValueType.BIG_TITLE_2, title).withComments(comments));
     }
 
     @Override

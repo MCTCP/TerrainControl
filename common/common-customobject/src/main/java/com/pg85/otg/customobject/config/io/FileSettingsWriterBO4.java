@@ -15,13 +15,13 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
+public class FileSettingsWriterBO4 implements SettingsWriterBO4
 {
     private final File file;
     private boolean writeComments;
     private BufferedWriter writer;
 	
-    private FileSettingsWriterOTGPlus(File file)
+    private FileSettingsWriterBO4(File file)
     {
         this.file = file;
     }
@@ -58,7 +58,7 @@ public class FileSettingsWriterOTGPlus implements SettingsWriterOTGPlus
 
         try
         {
-            SettingsWriterOTGPlus writer = new FileSettingsWriterOTGPlus(file);
+            SettingsWriterBO4 writer = new FileSettingsWriterBO4(file);
             config.write(writer, configMode, spawnLog, logger, materialReader, manager);
         } catch (IOException e)
         {

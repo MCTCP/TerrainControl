@@ -2,8 +2,11 @@ package com.pg85.otg.util.interfaces;
 
 import java.util.List;
 
+import com.pg85.otg.constants.SettingsEnums.GrassColorModifier;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
+import com.pg85.otg.constants.SettingsEnums.OceanRuinsType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
+import com.pg85.otg.constants.SettingsEnums.RuinedPortalType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
@@ -12,101 +15,152 @@ import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
+/**
+ * BiomeConfig (*.bc) classes
+ * 
+ * IBiomeConfig defines anything that's used/exposed between projects.
+ * BiomeConfigBase implements anything needed for IBiomeConfig. 
+ * BiomeConfig contains only fields/methods used for io/serialisation/instantiation.
+ * 
+ * BiomeConfig should be used only in common-core and platform-specific layers, when reading/writing settings on app start.
+ * IBiomeConfig should be used wherever settings are used in code. 
+ */
 public interface IBiomeConfig
 {
+	// Misc
+
+	String getName();
+	BiomeResourceLocation getRegistryKey();
+
+	// WorldConfig getters
+	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
+	// use a parent object that holds both, like a worldgenregion.
+	
+	boolean biomeConfigsHaveReplacement();
+	double getFractureHorizontal();
+	double getFractureVertical();
+	boolean isFlatBedrock();
+	boolean isCeilingBedrock();
+	boolean isBedrockDisabled();
+	boolean isRemoveSurfaceStone();
+	
+	// Inheritance
+	
+	String getBiomeExtends();
+	
+	// Placement
+	
+	int getBiomeSize();
+	int getBiomeRarity();
+	int getBiomeColor();
+	boolean isIsleBiome();
+	List<String> getIsleInBiomes();
+	int getBiomeSizeWhenIsle();
+	int getBiomeRarityWhenIsle();
+	boolean isBorderBiome();
+	List<String> getBorderInBiomes();
+	List<String> getNotBorderNearBiomes();
+	int getBiomeSizeWhenBorder();
+	
+	// Height / volatility
+	
+	float getBiomeHeight();
+	float getBiomeVolatility();
+	int getSmoothRadius();	
+	int getCHCSmoothRadius();
+	double getMaxAverageDepth();
+	double getMaxAverageHeight();
+	double getVolatility1();
+	double getVolatility2();
+	double getVolatilityWeight1();
+	double getVolatilityWeight2();
+	boolean disableBiomeHeight();
+	double getCHCData(int y);
+	
+	// Rivers
+	
+	String getRiverBiome();
+	
+	// Blocks
+
+	// Any blocks spawned/checked during base terrain gen that use the biomeconfig materials
+	// call getXXXBlockReplaced to get the replaced blocks.
+	// Any blocks spawned during population will have their materials parsed before spawning
+	// them via world.setBlock(), so they use the default biomeconfig materials.	
+	
 	LocalMaterialData getSurfaceBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z);
 	LocalMaterialData getGroundBlockAtHeight(IWorldGenRegion worldGenRegion, int x, int y, int z);
-
 	LocalMaterialData getSurfaceBlockReplaced(int y);
 	LocalMaterialData getGroundBlockReplaced(int y);
 	LocalMaterialData getStoneBlockReplaced(int y);
-	LocalMaterialData getDefaultGroundBlock();
 	LocalMaterialData getBedrockBlockReplaced(int y);
-	LocalMaterialData getWaterBlockReplaced(int y);
 	LocalMaterialData getSandStoneBlockReplaced(int y);
+	LocalMaterialData getDefaultGroundBlock();
+	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z);
+	ReplacedBlocksMatrix getReplaceBlocks();
+	
+	// Water / lava / freezing
+	
+	int getWaterLevelMax();
+	int getWaterLevelMin();
+	LocalMaterialData getWaterBlockReplaced(int y);
 	LocalMaterialData getIceBlockReplaced(int y);
 	LocalMaterialData getCooledLavaBlockReplaced(int y);
 	
-	ReplacedBlocksMatrix getReplaceBlocks();
-
+	// Visuals / weather
+	
+	float getBiomeTemperature();
+	float getBiomeWetness();
+	int getFogColor();
+	int getWaterFogColor();
+	int getFoliageColor();
+	int getGrassColor();
+	GrassColorModifier getGrassColorModifier();
+	int getSkyColor();
+	int getWaterColor();
+	String getParticleType();
+	float getParticleProbability();	
+	int getSnowHeight(float tempAtBlockToFreeze);
+	
+	// OTG Custom structures (BO's)
+	
 	List<List<String>> getCustomStructureNames();
 	List<ICustomStructureGen> getCustomStructures();
 	ICustomStructureGen getStructureGen();
 	void setStructureGen(ICustomStructureGen customStructureGen);
 	
-	String getName();
-	boolean biomeConfigsHaveReplacement();
-		
-	float getBiomeTemperature();
-	float getBiomeHeight();
-	float getBiomeVolatility();
-	double getVolatility1();
-	double getVolatility2();
-	double getFractureHorizontal();
-	double getFractureVertical();
-	double getVolatilityWeight1();
-	double getVolatilityWeight2();
-	double getMaxAverageDepth();
-	double getMaxAverageHeight();
-	double getCHCData(int y);
-	int getSmoothRadius();
-	int getWaterLevelMax();
-	int getWaterLevelMin();
-	boolean isFlatBedrock();
-	boolean isCeilingBedrock();
-	boolean isBedrockDisabled();
-	boolean isRemoveSurfaceStone();
-	boolean disableNotchHeightControl();
+	// Structures
 	
-	int getSnowHeight(float tempAtBlockToFreeze);
-	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z);
-	boolean getWoodlandMansionsEnabled();
 	VillageType getVillageType();
+	int getVillageSize();
 	MineshaftType getMineShaftType();
-	RareBuildingType getRareBuildingType();
-	boolean getNetherFortressesEnabled();
-	int getFogColor();
-	float getBiomeWetness();
-	int getFoliageColor();
-	int getGrassColor();
-	boolean getGrassColorIsMultiplier();
-	int getSkyColor();
-	int getWaterColor();
-	List<WeightedMobSpawnGroup> getWaterCreatures();
-	List<WeightedMobSpawnGroup> getAmbientCreatures();
-	List<WeightedMobSpawnGroup> getCreatures();
-	List<WeightedMobSpawnGroup> getMonsters();
-	BiomeResourceLocation getRegistryKey();
-	int getBiomeSize();
-	int getBiomeRarity();
-	boolean isIsleBiome();
-	boolean isBorderBiome();
-	int getBiomeColor();
-	String getBiomeExtends();
-	int getCHCSmoothRadius();
-	String getReplaceToBiomeName();
-	void setReplaceToBiomeName(String replaceToBiomeName);
-	List<String> getIsleInBiomes();
-	List<String> getBorderInBiomes();
-	List<String> getNotBorderNearBiomes();
-	int getBiomeSizeWhenIsle();
-	int getBiomeSizeWhenBorder();
-	int getBiomeRarityWhenIsle();
-	String getRiverBiome();
+	float getMineShaftProbability();
+	OceanRuinsType getOceanRuinsType();
+	float getOceanRuinsLargeProbability();
+	float getOceanRuinsClusterProbability();
 	boolean getBuriedTreasureEnabled();
-	boolean getOceanRuinsColdEnabled();
-	boolean getOceanRuinsWarmEnabled();
+	float getBuriedTreasureProbability();
+	boolean getPillagerOutpostEnabled();
+	int getPillagerOutPostSize();
+	boolean getBastionRemnantEnabled();
+	int getBastionRemnantSize();
+	RareBuildingType getRareBuildingType();
+	RuinedPortalType getRuinedPortalType();
+	boolean getWoodlandMansionsEnabled();
+	boolean getNetherFortressesEnabled();	
 	boolean getShipWreckEnabled();
 	boolean getShipWreckBeachedEnabled();
-	boolean getPillagerOutpostEnabled();
-	boolean getBastionRemnantEnabled();
 	boolean getNetherFossilEnabled();
 	boolean getEndCityEnabled();
-	boolean getRuinedPortalEnabled();
-	boolean getRuinedPortalDesertEnabled();
-	boolean getRuinedPortalJungleEnabled();
-	boolean getRuinedPortalSwampEnabled();
-	boolean getRuinedPortalMountainEnabled();
-	boolean getRuinedPortalOceanEnabled();
-	boolean getRuinedPortalNetherEnabled();
+	boolean getStrongholdsEnabled();
+	boolean getOceanMonumentsEnabled();	
+
+	// Mob spawning
+	
+	List<WeightedMobSpawnGroup> getMonsters();
+	List<WeightedMobSpawnGroup> getCreatures();
+	List<WeightedMobSpawnGroup> getWaterCreatures();
+	List<WeightedMobSpawnGroup> getAmbientCreatures();	
+	List<WeightedMobSpawnGroup> getWaterAmbientCreatures();
+	List<WeightedMobSpawnGroup> getMiscCreatures();
 }

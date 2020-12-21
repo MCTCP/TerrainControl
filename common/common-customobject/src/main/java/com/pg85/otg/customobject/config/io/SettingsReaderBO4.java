@@ -22,7 +22,7 @@ import java.util.Map.Entry;
  * before being read.
  *
  */
-public interface SettingsReaderOTGPlus
+public interface SettingsReaderBO4
 {
 
     /**
@@ -142,7 +142,7 @@ public interface SettingsReaderOTGPlus
      *
      * @param reader The reader to fall back.
      */
-    void setFallbackReader(SettingsReaderOTGPlus reader);
+    void setFallbackReader(SettingsReaderBO4 reader);
     
     /**
      * Flushes any cached lines or settings

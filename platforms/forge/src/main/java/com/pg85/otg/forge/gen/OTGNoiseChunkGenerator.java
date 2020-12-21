@@ -17,6 +17,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.dimensions.DimensionConfig;
+import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
@@ -72,40 +73,31 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 {
 	// Create a codec to serialise/deserialise OTGNoiseChunkGenerator
 	public static final Codec<OTGNoiseChunkGenerator> CODEC = RecordCodecBuilder.create(
-			(p_236091_0_) ->
-			{
-				return p_236091_0_
-						.group(
-								Codec.STRING.fieldOf("otg_dimension_config").forGetter(
-										(p_236090_0_) ->
-										{
-											return p_236090_0_.dimensionConfig.toYamlString();
-										}
-								),
-								BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
-										(p_236096_0_) ->
-										{
-											return p_236096_0_.biomeProvider;
-										}
-								),
-								Codec.LONG.fieldOf("seed").stable().forGetter(
-										(p_236093_0_) ->
-										{
-											return p_236093_0_.worldSeed;
-										}
-								),
-								DimensionSettings.field_236098_b_.fieldOf("settings").forGetter(
-										(p_236090_0_) ->
-										{
-											return p_236090_0_.dimensionSettingsSupplier;
-										}
-								)
-						).apply(
-								p_236091_0_,
-								p_236091_0_.stable(OTGNoiseChunkGenerator::new)
-						)
-						;
-			}
+		(p_236091_0_) ->
+		{
+			return p_236091_0_
+				.group(
+					Codec.STRING.fieldOf("otg_dimension_config").forGetter(
+						(p_236090_0_) -> {
+							// TODO: Use bytestream instead?
+							return p_236090_0_.dimensionConfig.toYamlString();
+						}
+					),
+					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
+						(p_236096_0_) -> { return p_236096_0_.biomeProvider; }
+					),
+					Codec.LONG.fieldOf("seed").stable().forGetter(
+						(p_236093_0_) -> { return p_236093_0_.worldSeed; }
+					),
+					DimensionSettings.field_236098_b_.fieldOf("settings").forGetter(
+						(p_236090_0_) -> { return p_236090_0_.dimensionSettingsSupplier; }
+					)
+				).apply(
+					p_236091_0_,
+					p_236091_0_.stable(OTGNoiseChunkGenerator::new)
+				)
+			;
+		}
 	);
 
 	private final Supplier<DimensionSettings> dimensionSettingsSupplier;
@@ -126,11 +118,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	private final Map<Integer, List<Structure<?>>> biomeStructures;
 
-	//
-
 	public OTGNoiseChunkGenerator(BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName(), 0, true), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
+		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
 	}
 
 	private OTGNoiseChunkGenerator(String dimensionConfigYaml, BiomeProvider biomeProvider, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
@@ -182,7 +172,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		if (this.chunkPopulator.getIsSaveRequired())
 		{
-			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().spawnLog, OTG.getEngine().getLogger(), this.chunkPopulator);
+			this.structureCache.saveToDisk(OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), this.chunkPopulator);
 		}
 	}
 
@@ -198,8 +188,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().isOTGPlus());
-			OTG.getEngine().createDimensionsConfig(Paths.get("./saves/" + worldName + "/"), worldName, this.dimensionConfig);
+			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
 		}
 	}
 
@@ -209,7 +198,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void func_230352_b_(IWorld world, StructureManager manager, IChunk chunk)
 	{
-		// If we've already generated and cached this   
+		// If we've already generated and cached this	
 		// chunk while it was unloaded, use cached data.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
@@ -230,8 +219,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				}
 			}
 			this.unloadedChunksCache.remove(chunkCoord);
-		} else
-		{
+		} else {
 			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate());
 		}
 	}
@@ -279,8 +267,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			// Override normal population (Biome.func_242427_a()) with OTG's.
 			biomePopulate(biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
-		} catch (Exception exception)
-		{
+		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.makeCrashReport(exception, "Biome decoration");
 			crashreport.makeCategory("Generation").addDetail("CenterX", chunkX).addDetail("CenterZ", chunkZ).addDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
@@ -294,7 +281,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
-		// TODO: cleanup/optimize this
+		// TODO: clean up/optimise this
 		// Structure generation
 		for(int step = 0; step < GenerationStage.Decoration.values().length; ++step)
 		{
@@ -314,15 +301,31 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 					try
 					{
-						// Generate the structure if it exists in a biome this chunk.
+						// Generate the structure if it exists in a biome in this chunk.
 						// We don't have to do any work here, we can just let StructureManager handle it all.
-						structureManager.func_235011_a_(SectionPos.from(pos), structure).forEach(start ->
-								start.func_230366_a_(world, structureManager, chunkGenerator, random, new MutableBoundingBox(chunkStartX, chunkStartZ, chunkStartX + 15, chunkStartZ + 15), new ChunkPos(chunkX, chunkZ)));
-					} catch (Exception exception)
-					{
+						structureManager.func_235011_a_(SectionPos.from(pos), structure)
+							.forEach(start ->
+								start.func_230366_a_(
+									world, 
+									structureManager, 
+									chunkGenerator, 
+									random, 
+									new MutableBoundingBox(
+										chunkStartX, 
+										chunkStartZ, 
+										chunkStartX + 15, 
+										chunkStartZ + 15
+									), 
+									new ChunkPos(chunkX, chunkZ)
+								)
+							)
+						;
+					} catch (Exception exception) {
 						CrashReport crashreport = CrashReport.makeCrashReport(exception, "Feature placement");
-						crashreport.makeCategory("Feature").addDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure)).addDetail("Description", () ->
-								structure.toString());
+						crashreport.makeCategory("Feature")
+							.addDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure))
+							.addDetail("Description", () -> structure.toString())
+						;
 						throw new ReportedException(crashreport);
 					}
 
@@ -475,11 +478,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (density > 0.0D)
 		{
 			return ((ForgeMaterialData) config.getStoneBlockReplaced(y)).internalBlock();
-		} else if (y < this.getSeaLevel())
+		}
+		else if (y < this.getSeaLevel())
 		{
 			return ((ForgeMaterialData) config.getWaterBlockReplaced(y)).internalBlock();
-		} else
-		{
+		} else {
 			return Blocks.AIR.getDefaultState();
 		}
 	}
@@ -507,9 +510,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// BO4's / Smoothing Areas
 
 	// BO4's and smoothing areas may do material and height checks in unloaded chunks, OTG generates 
-	// base terrain for the chunks in memory and caches the result in a limited size-cache.
-	// TODO: Re-use the data when chunks are properly generated, or find a way to request "normal" 
-	// base terrain gen outside of the WorldGenRegion chunks.
+	// base terrain for the chunks in memory and caches the result in a limited size-cache. Cached
+	// data is used if/when the chunk is "properly" generated.
 
 	private LocalMaterialData[] getBlockColumnInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z)
 	{
@@ -545,8 +547,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			if (blockInChunk != null)
 			{
 				blocksInColumn[y] = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
-			} else
-			{
+			} else {
 				break;
 			}
 		}

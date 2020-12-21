@@ -41,7 +41,7 @@ public class CreateOTGWorldScreen extends Screen
 		this.parent = p_i242054_1_;
 		this.dimensionConfig = dimensionConfig;
 		this.presetList = OTG.getEngine().getPresetLoader().getAllPresets();
-		this.selectedPreset = new DimensionConfig(this.presetList.get(0).getName(), 0, true, this.presetList.get(0).getWorldConfig());
+		this.selectedPreset = new DimensionConfig(this.presetList.get(0).getName());
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class CreateOTGWorldScreen extends Screen
 			super.setSelected(p_241215_1_);
 			if (p_241215_1_ != null)
 			{
-				CreateOTGWorldScreen.this.selectedPreset = new DimensionConfig(p_241215_1_.field_238599_b_.getName(), 0, true,  p_241215_1_.field_238599_b_.getWorldConfig());
+				CreateOTGWorldScreen.this.selectedPreset = new DimensionConfig(p_241215_1_.field_238599_b_.getName());
 				NarratorChatListener.INSTANCE.say(p_241215_1_.field_238599_b_.getName());
 			}
 			CreateOTGWorldScreen.this.func_205306_h();

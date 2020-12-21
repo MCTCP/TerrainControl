@@ -2,8 +2,8 @@ package com.pg85.otg.customobject.config;
 
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
-import com.pg85.otg.customobject.config.io.SettingsReaderOTGPlus;
-import com.pg85.otg.customobject.config.io.SettingsWriterOTGPlus;
+import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
+import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
@@ -14,7 +14,7 @@ import java.nio.file.Path;
 
 public abstract class CustomObjectConfigFile
 {
-    public SettingsReaderOTGPlus reader;
+    public SettingsReaderBO4 reader;
 
     /**
      * Creates a new configuration file.
@@ -23,7 +23,7 @@ public abstract class CustomObjectConfigFile
      *               like Plains or MyBO3. May not be null.
      * @param reader Settings reader
      */
-    protected CustomObjectConfigFile(SettingsReaderOTGPlus reader) throws IllegalArgumentException
+    protected CustomObjectConfigFile(SettingsReaderBO4 reader) throws IllegalArgumentException
     {
         this.reader = reader;
     }
@@ -59,7 +59,7 @@ public abstract class CustomObjectConfigFile
      * @param configMode
      * @throws IOException
      */
-    public void write(SettingsWriterOTGPlus writer, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+    public void write(SettingsWriterBO4 writer, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
     {
         if (configMode == ConfigMode.WriteDisable)
         {
@@ -88,7 +88,7 @@ public abstract class CustomObjectConfigFile
         */
     }
 
-    protected abstract void writeConfigSettings(SettingsWriterOTGPlus writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException;
+    protected abstract void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException;
 
     protected abstract void readConfigSettings(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, ICustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException;
     

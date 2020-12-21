@@ -33,7 +33,6 @@ public class BiomeLayerData
 	public final Map<Integer, NewBiomeGroup> groupRegistry = new HashMap<>();
 	public final Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
 	public final Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
-	public IBiomeConfig[] biomes;
 	public int[] riverBiomes;
 	public final boolean freezeGroups;
 	public final boolean riversEnabled;
@@ -87,7 +86,6 @@ public class BiomeLayerData
 		this.riverSize = data.riverSize;
 		this.riversEnabled = data.riversEnabled;
 		this.oceanBiomeData = data.oceanBiomeData.clone();
-		this.biomes = data.biomes.clone(); // Not a proper clone, IBiomeConfig only has getters tho.
 		for(Integer integer : data.biomeDepths)
 		{
 			this.biomeDepths.add(integer.intValue());
@@ -205,11 +203,9 @@ public class BiomeLayerData
 			}
 		}
 		
-		this.biomeColorMap = biomeColorMap;
-		this.biomes = biomes;
-		
-		this.riverBiomes = new int[this.biomes.length];
-		for(IBiomeConfig biomeConfig : this.biomes)
+		this.biomeColorMap = biomeColorMap;		
+		this.riverBiomes = new int[biomes.length];
+		for(IBiomeConfig biomeConfig : biomes)
 		{
 			this.riverBiomes[biomeIdsByName.get(biomeConfig.getName())] = biomeIdsByName.getOrDefault(biomeConfig.getRiverBiome(), -1);
 		}

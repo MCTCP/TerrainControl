@@ -20,6 +20,7 @@ final class RawSettingValue
         PLAIN_SETTING,
         FUNCTION,
         BIG_TITLE,
+        BIG_TITLE_2,
         SMALL_TITLE
     }
 

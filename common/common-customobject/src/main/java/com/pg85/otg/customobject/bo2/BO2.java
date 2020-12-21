@@ -12,8 +12,8 @@ import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectConfigFile;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.customobject.config.io.SettingsReaderOTGPlus;
-import com.pg85.otg.customobject.config.io.SettingsWriterOTGPlus;
+import com.pg85.otg.customobject.config.io.SettingsReaderBO4;
+import com.pg85.otg.customobject.config.io.SettingsWriterBO4;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -56,7 +56,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
     private int spawnElevationMin;
     private int spawnElevationMax;
 
-    BO2(SettingsReaderOTGPlus reader)
+    BO2(SettingsReaderBO4 reader)
     {
         super(reader);
     }
@@ -354,7 +354,7 @@ class BO2 extends CustomObjectConfigFile implements CustomObject
     }
 
     @Override
-    protected void writeConfigSettings(SettingsWriterOTGPlus writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
+    protected void writeConfigSettings(SettingsWriterBO4 writer, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager) throws IOException
     {
         // It doesn't write.
     }

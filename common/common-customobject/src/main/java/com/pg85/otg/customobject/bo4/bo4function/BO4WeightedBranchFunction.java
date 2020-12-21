@@ -49,7 +49,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
         for (i = 4; i < args.size() - 3; i += 4)
         {
             double branchChance = readDouble(args.get(i + 2), 0, Double.MAX_VALUE);
-            branchesOTGPlus.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, true, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
+            branchesBO4.add(new BO4BranchNode(readInt(args.get(i + 3), -32, 32), isRequiredBranch, true, Rotation.getRotation(args.get(i + 1)), branchChance, null, args.get(i), null));
         }
 
         if (i < args.size())
@@ -75,7 +75,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
         	{
         		branchGroup = args.get(i);
 
-        		for(BO4BranchNode branch : branchesOTGPlus)
+        		for(BO4BranchNode branch : branchesBO4)
         		{
         			branch.branchGroup = branchGroup;
         		}
@@ -87,7 +87,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
     @Override
     public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
     {
-        branchesOTGPlus = new ArrayList<BO4BranchNode>();
+        branchesBO4 = new ArrayList<BO4BranchNode>();
         cumulativeChance = readArgs(args, true, spawnLog, logger);
     }
 
@@ -95,7 +95,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
     public CustomStructureCoordinate toCustomObjectCoordinate(String presetName, Random random, Rotation rotation, int x, int y, int z, String startBO3Name, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
     	int cumulativeChance = 0;
-    	for (BO4BranchNode branch : branchesOTGPlus)
+    	for (BO4BranchNode branch : branchesBO4)
     	{
     		cumulativeChance += branch.getChance();
     	}
@@ -106,7 +106,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
 
         double randomChance = random.nextDouble() * totalChance;
 
-        for(BO4BranchNode branch : branchesOTGPlus)
+        for(BO4BranchNode branch : branchesBO4)
         {
         	double branchRarity = branch.getChance();
             if (branchRarity > 0 && branchRarity >= randomChance)
@@ -145,7 +145,7 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
         rotatedBranch.inputArgs = inputArgs;
         rotatedBranch.error = error;
 
-        rotatedBranch.branchesOTGPlus = this.branchesOTGPlus; // TODO: Make sure this won't cause problems
+        rotatedBranch.branchesBO4 = this.branchesBO4; // TODO: Make sure this won't cause problems
 
         int newX = rotatedBranch.x;
         int newZ = rotatedBranch.z;
@@ -160,11 +160,11 @@ public class BO4WeightedBranchFunction extends BO4BranchFunction
             rotatedBranch.z = newZ;
 
             ArrayList<BO4BranchNode> rotatedBranchBranches = new ArrayList<BO4BranchNode>();
-            for (BO4BranchNode holder : rotatedBranch.branchesOTGPlus)
+            for (BO4BranchNode holder : rotatedBranch.branchesBO4)
             {
             	rotatedBranchBranches.add(new BO4BranchNode(holder.branchDepth, holder.isRequiredBranch, holder.isWeightedBranch, holder.getRotation().next(), holder.getChance(), holder.getCustomObject(false, presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker), holder.customObjectName, holder.branchGroup));
             }
-            rotatedBranch.branchesOTGPlus = rotatedBranchBranches;
+            rotatedBranch.branchesBO4 = rotatedBranchBranches;
     	}
 
         return rotatedBranch;

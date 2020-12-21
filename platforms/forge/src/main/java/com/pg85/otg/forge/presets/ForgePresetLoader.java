@@ -109,8 +109,20 @@ public class ForgePresetLoader extends LocalPresetLoader
 			{
 				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
 				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
+
+				boolean isOceanBiome = false;
+ 				// Biome id 0 is reserved for ocean, used when a land column has 
+ 				// no biome assigned, which can happen due to biome group rarity.
+ 				if(biomeConfig.getName().equals(preset.getWorldConfig().getDefaultOceanBiome()))
+ 				{
+ 					// TODO: Can't map the same biome to 2 int keys for the reverse map
+ 					// make sure this doesn't cause problems :/.
+ 					oceanBiomeConfig = biomeConfig;
+ 					presetIdMapping[0] = biomeConfig;
+ 					isOceanBiome = true;
+ 				}
 				
-				Biome biome = ForgeBiome.createOTGBiome(preset.getWorldConfig(), biomeConfig);
+				Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
  				ForgeRegistries.BIOMES.register(biome);
  				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
@@ -123,59 +135,49 @@ public class ForgePresetLoader extends LocalPresetLoader
  				presetIdMapping[currentId] = biomeConfig;
  				presetReverseIdMapping.put(biomeConfig, currentId);
 
- 				// Biome id 0 is reserved for ocean, used when a land column has 
- 				// no biome assigned, which can happen due to biome group rarity.
- 				if(biomeConfig.getName().equals(preset.getWorldConfig().getDefaultOceanBiome()))
- 				{
- 					// TODO: Can't map the same biome to 2 int keys for the reverse map
- 					// make sure this doesn't cause problems :/.
- 					oceanBiomeConfig = biomeConfig;
- 					presetIdMapping[0] = biomeConfig;
- 				}
-
  				worldBiomes.put(biomeConfig.getName(), currentId);
  				
  				// Make a list of isle and border biomes per generation depth
  				if(biomeConfig.isIsleBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
+					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
 					biomesAtDepth.add(
 						new NewBiomeData(
 							currentId, 
 							biomeConfig.getName(), 
-							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
-							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), 
+							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
+							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), 
 							biomeConfig.getBiomeTemperature(), 
 							biomeConfig.getIsleInBiomes(), 
 							biomeConfig.getBorderInBiomes(), 
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
-					isleBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), biomesAtDepth);
+					isleBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), biomesAtDepth);
  				}
 
  				if(biomeConfig.isBorderBiome())
  				{
 					// Make or get a list for this group depth, then add
-					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
+					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
 					biomesAtDepth.add(
 						new NewBiomeData(
 							currentId, 
 							biomeConfig.getName(), 
 							biomeConfig.getBiomeRarity(),
-							worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), 
+							worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), 
 							biomeConfig.getBiomeTemperature(), 
 							biomeConfig.getIsleInBiomes(), 
 							biomeConfig.getBorderInBiomes(), 
 							biomeConfig.getNotBorderNearBiomes()
 						)
 					);
-					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
+					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == BiomeMode.NoGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
  				}
  				
  				// Index BiomeColor for FromImageMode and /otg map
-	            biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
+				biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
  				
  				OTG.log(LogMarker.INFO, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
  				
@@ -192,14 +194,14 @@ public class ForgePresetLoader extends LocalPresetLoader
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
 
 			// Iterate through the groups and add it to the layer data
-			for (BiomeGroup group : worldConfig.biomeGroupManager.getGroups())
+			for (BiomeGroup group : worldConfig.getBiomeGroupManager().getGroups())
 			{
 				// Initialize biome group data
 				NewBiomeGroup bg = new NewBiomeGroup();
 				bg.id = group.getGroupId();
 				bg.rarity = group.getGroupRarity();
 
-		        float totalTemp = 0;
+				float totalTemp = 0;
 				
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
@@ -214,8 +216,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 					// Add the biome size- if it's already there, nothing is done
 					biomeDepths.add(config.getBiomeSize());
 					
-		            totalTemp += config.getBiomeTemperature();
-		            bg.totalGroupRarity += config.getBiomeRarity();
+					totalTemp += config.getBiomeTemperature();
+					bg.totalGroupRarity += config.getBiomeRarity();
 				}
 				bg.avgTemp = totalTemp / group.biomes.size();
 

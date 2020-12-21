@@ -2,6 +2,7 @@ package com.pg85.otg.config.standard;
 
 import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.constants.SettingsEnums.GrassColorModifier;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
 import com.pg85.otg.constants.SettingsEnums.RareBuildingType;
 import com.pg85.otg.constants.SettingsEnums.VillageType;
@@ -69,12 +70,14 @@ public class StandardBiomeTemplate
     public int defaultWaterLily = 0;
     public int defaultWaterColorMultiplier = 0x3F76E4;
     public int defaultGrassColor = 0xFFFFFF;
+    public GrassColorModifier defaultGrassColorModifier = GrassColorModifier.None;
     public int defaultFoliageColor = 0xFFFFFF;
     public boolean defaultStrongholds = true;
     public boolean defaultOceanMonuments = false;
     public boolean defaultWoodlandMansions = false;
     public boolean defaultNetherFortressEnabled = false;
     public VillageType defaultVillageType = VillageType.disabled;
+    public int defaultVillageSize = 6;
     public RareBuildingType defaultRareBuildingType = RareBuildingType.disabled;
     public MineshaftType defaultMineshaftType = MineshaftType.normal;
     public int defaultEmeraldOre = 0;
@@ -88,7 +91,6 @@ public class StandardBiomeTemplate
     public String defaultBiomeDictId = "";
     public String defaultInheritMobsBiomeName = "";
     public String defaultReplaceToBiomeName = "";
-    public boolean inheritSaplingResource = false;
     
     public List<WeightedMobSpawnGroup> defaultCreatures = Arrays.asList(
             new WeightedMobSpawnGroup(EntityNames.SHEEP, 12, 4, 4),

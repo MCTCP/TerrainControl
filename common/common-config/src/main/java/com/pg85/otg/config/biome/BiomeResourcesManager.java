@@ -70,9 +70,6 @@ public class BiomeResourcesManager implements IConfigFunctionProvider
         	{
         		constructor = clazz.getConstructor(IWorldConfig.class, List.class, ILogger.class, IMaterialReader.class);        		
         	}
-        	else {
-        		String breakpoint = "";
-        	}
             return (ConfigFunction<T>) constructor.newInstance(holder, args, logger, materialReader);
         }
         catch (NoSuchMethodException e1)

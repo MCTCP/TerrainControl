@@ -16,8 +16,8 @@ import com.pg85.otg.customobject.bo3.bo3function.BO3ParticleFunction;
 import com.pg85.otg.customobject.bo3.bo3function.BO3SpawnerFunction;
 import com.pg85.otg.customobject.bo3.checks.BO3Check;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
-import com.pg85.otg.customobject.config.io.FileSettingsReaderOTGPlus;
-import com.pg85.otg.customobject.config.io.FileSettingsWriterOTGPlus;
+import com.pg85.otg.customobject.config.io.FileSettingsReaderBO4;
+import com.pg85.otg.customobject.config.io.FileSettingsWriterBO4;
 import com.pg85.otg.customobject.structures.Branch;
 import com.pg85.otg.customobject.structures.CustomStructure;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
@@ -84,10 +84,10 @@ public class BO3 implements StructuredCustomObject
     	}
         try
         {
-            this.settings = new BO3Config(new FileSettingsReaderOTGPlus(this.name, this.file, logger), presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+            this.settings = new BO3Config(new FileSettingsReaderBO4(this.name, this.file, logger), presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
             if (this.settings.settingsMode != ConfigMode.WriteDisable)
             {
-                FileSettingsWriterOTGPlus.writeToFile(this.settings, this.settings.settingsMode, spawnLog, logger, materialReader, manager);
+                FileSettingsWriterBO4.writeToFile(this.settings, this.settings.settingsMode, spawnLog, logger, materialReader, manager);
             }
         }
         catch (InvalidConfigException ex)

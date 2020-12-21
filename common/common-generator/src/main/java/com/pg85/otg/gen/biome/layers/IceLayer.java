@@ -14,7 +14,7 @@ class IceLayer implements ParentedLayer
 	
 	IceLayer(BiomeLayerData data)
 	{
-		if(data.biomeMode == BiomeMode.BeforeGroups)
+		if(data.biomeMode == BiomeMode.NoGroups)
 		{
 			NewBiomeGroup iceGroup = data.groupRegistry.get(2);			
 			// Scale rarity from the world config

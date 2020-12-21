@@ -39,16 +39,16 @@ class ForgeEngine extends OTGEngine
 	@Override
 	public Collection<BiomeLoadInstruction> getDefaultBiomes()
 	{
-        // Loop through all default biomes and create the default settings for them
-        List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
-        for (DefaultBiome defaultBiome : DefaultBiome.values())
-        {
-            int id = defaultBiome.Id;
-            BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), 128, OTG.getEngine().getLogger()); // TODO: Why is this 128, should be 255?
-            standardBiomes.add(instruction);
-        }
+		// Loop through all default biomes and create the default settings for them
+		List<BiomeLoadInstruction> standardBiomes = new ArrayList<BiomeLoadInstruction>();
+		for (DefaultBiome defaultBiome : DefaultBiome.values())
+		{
+			int id = defaultBiome.Id;
+			BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), 128, OTG.getEngine().getLogger()); // TODO: Why is this 128, should be 255?
+			standardBiomes.add(instruction);
+		}
 
-        return standardBiomes;
+		return standardBiomes;
 	}
 
 	@Override

@@ -7,6 +7,7 @@ import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -59,7 +60,7 @@ public abstract class ConfigFile
      * Called directly after {@link #readConfigSettings(SettingsMap)} to fix
      * impossible combinations of settings.
      */
-    protected abstract void correctSettings(boolean logWarnings, ILogger logger);
+    protected abstract void validateAndCorrectSettings(Path settingsDir, boolean logWarnings, ILogger logger);
 
     /**
      * Called before {@link #readConfigSettings(SettingsMap)} to rewrite

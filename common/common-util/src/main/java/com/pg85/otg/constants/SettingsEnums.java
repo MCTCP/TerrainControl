@@ -5,17 +5,22 @@ public class SettingsEnums
     public enum TerrainMode
     {
         Normal,
-        //OldGenerator,
         TerrainTest,
-        NotGenerate //,
-        //Default
+        NotGenerate
     }
 
     public enum BiomeMode
     {
     	Normal,
-    	BeforeGroups,
+    	BeforeGroups, // Legacy: Converted to NoGroups when loaded from config.
+    	NoGroups,
     	FromImage
+    }
+    
+    public enum CustomStructureType
+    {
+    	BO3,
+    	BO4
     }
     
     public enum ImageMode
@@ -65,5 +70,31 @@ public class SettingsEnums
         jungleTemple,
         swampHut,
         igloo
+    }
+    
+    public enum OceanRuinsType
+    {
+    	disabled,
+    	warm,
+    	cold
+    }
+    
+    public enum RuinedPortalType
+    {
+    	disabled,
+    	normal,
+    	desert,
+    	jungle,
+    	swamp,
+    	mountain,
+    	ocean,
+    	nether
+    }
+    
+    public enum GrassColorModifier
+    {
+    	None,
+    	Swamp,
+    	DarkForest
     }
 }

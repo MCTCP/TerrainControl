@@ -3,63 +3,43 @@ package com.pg85.otg.config.dimensions;
 import java.io.IOException;
 
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.pg85.otg.config.world.WorldConfig;
 
-public class DimensionConfig extends DimensionConfigBase
+/**
+ * Contains data for a dimension created from a preset, with world creation / O menu settings applied.
+ * Saved and loaded with the world.
+ * * May also be used for ModPack Configs in the future, hence the yaml code.
+ * TODO: Read/Write from bytestream when saving with world data.
+ */
+public class DimensionConfig
 {
-	public DimensionConfig() { }
+	// Use capitals since we're serialising to yaml and want to make it look nice.
+	public String PresetName;
 	
-	public DimensionConfig(String presetName, int dimensionId, boolean showInWorldCreationGUI)
+	// Parameterless constructor for deserialisation
+	public DimensionConfig() {}
+	
+	public DimensionConfig(String presetName)
 	{
-		super(presetName, dimensionId, showInWorldCreationGUI);
-	}
-
-	public DimensionConfig(DimensionConfigGui dimConfig)
-	{		
-		this.PresetName = dimConfig.PresetName;
-		this.Seed = dimConfig.Seed;
-		this.WorldBorderRadiusInChunks = dimConfig.WorldBorderRadiusInChunks;
-		this.PregeneratorRadiusInChunks = dimConfig.PregeneratorRadiusInChunks;
-		
-		this.Settings = dimConfig.Settings.clone();
-		this.GameRules = dimConfig.GameRules.clone();
+		this.PresetName = presetName;
 	}
 	
-	public DimensionConfig(String presetName, int dimensionId, boolean showInWorldCreationGUI, WorldConfig worldConfig)
-	{	
-		super(presetName, dimensionId, showInWorldCreationGUI, worldConfig);
-	}
-	
-	@Override
 	public DimensionConfig clone()
 	{
-		DimensionConfig clone = new DimensionConfig();
-		
-		clone.PresetName = this.PresetName;
-		clone.Seed = this.Seed;
-		clone.DimensionId = this.DimensionId;
-		clone.ShowInWorldCreationGUI = this.ShowInWorldCreationGUI;
-		clone.WorldBorderRadiusInChunks = this.WorldBorderRadiusInChunks;
-		clone.PregeneratorRadiusInChunks = this.PregeneratorRadiusInChunks;
-		clone.AllowCheats = this.AllowCheats;
-		clone.BonusChest = this.BonusChest;
-		clone.GameType = this.GameType;
-		
-		clone.Settings = this.Settings.clone();
-		clone.GameRules = this.GameRules.clone();
-		
+		DimensionConfig clone = new DimensionConfig(this.PresetName);
 		return clone;
 	}
-	
-	public static DimensionConfig fromYamlString(String readStringFromStream)
+
+	public static DimensionConfig fromYamlString(String input)
 	{
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        DimensionConfig dimConfig = null;
-       	try {
-       		dimConfig = mapper.readValue(readStringFromStream, DimensionConfig.class);
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		DimensionConfig dimConfig = null;
+
+		try {
+			dimConfig = mapper.readValue(input, DimensionConfig.class);
 		} catch (JsonParseException e) {
 			e.printStackTrace();
 		} catch (JsonMappingException e) {
@@ -67,7 +47,18 @@ public class DimensionConfig extends DimensionConfigBase
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-       	
+
 		return dimConfig;
+	}
+
+	public String toYamlString()
+	{
+		ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+		try {
+			return mapper.writeValueAsString(this);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }
