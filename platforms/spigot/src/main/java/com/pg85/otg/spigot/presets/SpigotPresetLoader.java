@@ -216,4 +216,24 @@ public class SpigotPresetLoader extends LocalPresetLoader
 		BiomeConfig[] biomes = this.globalIdMapping.get(presetName);
 		return biomes.length > biomeId ? biomes[biomeId] : null;
 	}
+
+	public List<ResourceKey<BiomeBase>> getBiomeRegistryKeys(String presetName)
+	{
+		return this.biomesByPresetName.get(presetName);
+	}
+	public BiomeConfig[] getGlobalIdMapping(String presetName)
+	{
+		return globalIdMapping.get(presetName);
+	}
+
+	public Map<String, BiomeLayerData> getPresetGenerationData()
+	{
+		Map<String, BiomeLayerData> clonedData = new HashMap<>();
+		for(Map.Entry<String, BiomeLayerData> entry : this.presetGenerationData.entrySet())
+		{
+			clonedData.put(entry.getKey(), new BiomeLayerData(entry.getValue()));
+		}
+		return clonedData;
+	}
+
 }

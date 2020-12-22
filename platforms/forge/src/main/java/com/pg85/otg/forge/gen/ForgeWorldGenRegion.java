@@ -103,14 +103,14 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public IBiome getBiomeForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
 		// Cache is invalidated when cascading chunkgen happens.
-		return !cacheIsValid ? getBiome(worldZ, worldX) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+		return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
 	}
 	
 	@Override
 	public IBiomeConfig getBiomeConfigForPopulation(int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
 		// Cache is invalidated when cascading chunkgen happens.
-		return !cacheIsValid ? getBiome(worldZ, worldX).getBiomeConfig() : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()].getBiomeConfig();
+		return !cacheIsValid ? getBiome(worldX, worldZ).getBiomeConfig() : this.cachedBiomeConfigs[worldX - chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()].getBiomeConfig();
 	}
 
 	@Override

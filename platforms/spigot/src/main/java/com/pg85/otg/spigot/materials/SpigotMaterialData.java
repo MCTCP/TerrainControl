@@ -2,22 +2,25 @@ package com.pg85.otg.spigot.materials;
 
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.materials.LocalMaterialData;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.data.BlockData;
+import net.minecraft.server.v1_16_R3.Block;
+import net.minecraft.server.v1_16_R3.BlockFalling;
+import net.minecraft.server.v1_16_R3.IBlockData;
+import net.minecraft.server.v1_16_R3.Material;
 
 public class SpigotMaterialData extends LocalMaterialData
 {
-	private BlockData blockData;
+	private final IBlockData blockData;
 
-	private SpigotMaterialData (BlockData blockData)
+	private Block b;
+
+	private SpigotMaterialData (IBlockData blockData)
 	{
-
 		this.blockData = blockData;
 	}
 
-	private SpigotMaterialData (BlockData blockData, String raw)
+	private SpigotMaterialData (IBlockData blockData, String raw)
 	{
+		if (blockData == null) this.isBlank = true;
 		this.blockData = blockData;
 		this.rawEntry = raw;
 	}
@@ -31,6 +34,11 @@ public class SpigotMaterialData extends LocalMaterialData
 	public static LocalMaterialData ofString (String name) throws InvalidConfigException
 	{
 		return null;
+	}
+
+	public static LocalMaterialData ofBlockData (IBlockData blockData)
+	{
+		return new SpigotMaterialData(blockData, null);
 	}
 
 	@Override
@@ -94,12 +102,7 @@ public class SpigotMaterialData extends LocalMaterialData
 		{
 			return this;
 		}
-		return fromMaterial(this.blockData.getMaterial(), rawEntry);
-	}
-
-	private LocalMaterialData fromMaterial (Material material, String rawEntry)
-	{
-		return new SpigotMaterialData(material.createBlockData(), rawEntry);
+		return new SpigotMaterialData(this.blockData.getBlock().getBlockData(), rawEntry);
 	}
 
 	@Override
@@ -135,7 +138,7 @@ public class SpigotMaterialData extends LocalMaterialData
 	@Override
 	public boolean canFall ()
 	{
-		return this.blockData != null && this.blockData.getMaterial().hasGravity();
+		return this.blockData != null && this.blockData.getBlock() instanceof BlockFalling;
 	}
 
 	@Override
@@ -143,5 +146,10 @@ public class SpigotMaterialData extends LocalMaterialData
 	{
 		// TODO: Implement this for 1.16
 		return false;
+	}
+
+	public IBlockData internalBlock ()
+	{
+		return this.blockData;
 	}
 }

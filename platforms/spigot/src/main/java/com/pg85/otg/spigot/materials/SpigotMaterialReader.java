@@ -9,6 +9,6 @@ public class SpigotMaterialReader implements IMaterialReader
 	@Override
 	public LocalMaterialData readMaterial (String string) throws InvalidConfigException
 	{
-		return null;
+		return SpigotMaterials.readMaterial(string);
 	}
 }

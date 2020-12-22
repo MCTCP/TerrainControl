@@ -26,6 +26,7 @@ public class SpigotEngine extends OTGEngine
 	@Override
 	public Collection<BiomeLoadInstruction> getDefaultBiomes ()
 	{
+		// TODO: This does nothing
 		return null;
 	}
 
