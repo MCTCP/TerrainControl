@@ -44,7 +44,8 @@ class ForgeEngine extends OTGEngine
 		for (DefaultBiome defaultBiome : DefaultBiome.values())
 		{
 			int id = defaultBiome.Id;
-			BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id), 128, OTG.getEngine().getLogger()); // TODO: Why is this 128, should be 255?
+			BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(ForgeMojangSettings.fromId(id),
+					128, OTG.getEngine().getLogger()); // TODO: Why is this 128, should be 255?
 			standardBiomes.add(instruction);
 		}
 

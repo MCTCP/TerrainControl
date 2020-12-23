@@ -261,7 +261,7 @@ class ForgeLegacyMaterials
 			{
 				return null;
 			}
-		} catch(NumberFormatException ex) { }
+		} catch(NumberFormatException ignored) { }
 		
 		try
 		{
@@ -269,10 +269,9 @@ class ForgeLegacyMaterials
 			{
 				// Support "GRASS:0" here, or it will be misinterpreted as the new grass (plant)
 				case "grass":
-					switch(data)
+					if (data == 0)
 					{
-						case 0:
-							return Blocks.GRASS_BLOCK.getDefaultState();
+						return Blocks.GRASS_BLOCK.getDefaultState();
 					}
 			
 				// Legacy blocks with block data that are now their own block
@@ -793,7 +792,7 @@ class ForgeLegacyMaterials
 					}
 				case "stained_glass_pane":
 				case "white_stained_glass_pane":
-				case "thing_glass":
+				case "thin_glass":
 					switch(data)
 					{
 						case 0:
@@ -1182,10 +1181,11 @@ class ForgeLegacyMaterials
 					return getShulkerBoxWithData(6, data);
 				case "gray_shulker_box":
 					return getShulkerBoxWithData(7, data);
+				case "light_gray_shulker_box":
 				case "silver_shulker_box":
-					return getShulkerBoxWithData(8, data);				
+					return getShulkerBoxWithData(8, data);
 				case "cyan_shulker_box":
-					return getShulkerBoxWithData(9, data);				
+					return getShulkerBoxWithData(9, data);
 				case "purple_shulker_box":
 					return getShulkerBoxWithData(10, data);
 				case "blue_shulker_box":
@@ -1197,7 +1197,9 @@ class ForgeLegacyMaterials
 				case "red_shulker_box":
 					return getShulkerBoxWithData(14, data);
 				case "black_shulker_box":
-					return getShulkerBoxWithData(15, data);			
+					return getShulkerBoxWithData(15, data);
+				case "shulker_box":
+					return  getShulkerBoxWithData(16, data);		
 				case "ladder":
 					return getLadderChestOrFurnaceWithData(0, data);
 				case "chest":
@@ -1671,8 +1673,7 @@ class ForgeLegacyMaterials
 		}
 		return blockState;
 	}
-	
-	// TODO: Can't find information on 1.12 command block block data, what about facing?
+
 	private static BlockState getShulkerBoxWithData(int material, int data)
 	{
 		BlockState blockState;
@@ -1688,46 +1689,46 @@ class ForgeLegacyMaterials
 				blockState = Blocks.MAGENTA_SHULKER_BOX.getDefaultState();
 				break;
 			case 3:
-				blockState = Blocks.LIGHT_BLUE_SHULKER_BOX.getDefaultState();;
+				blockState = Blocks.LIGHT_BLUE_SHULKER_BOX.getDefaultState();
 				break;
 			case 4:
 				blockState = Blocks.YELLOW_SHULKER_BOX.getDefaultState();
 				break;
 			case 5:
-				blockState = Blocks.YELLOW_SHULKER_BOX.getDefaultState();
-				break;
-			case 6:
 				blockState = Blocks.LIME_SHULKER_BOX.getDefaultState();
 				break;
-			case 7:
+			case 6:
 				blockState = Blocks.PINK_SHULKER_BOX.getDefaultState();
 				break;
-			case 8:
+			case 7:
 				blockState = Blocks.GRAY_SHULKER_BOX.getDefaultState();
 				break;
-			case 9:
-				blockState = Blocks.SHULKER_BOX.getDefaultState();
+			case 8:
+				blockState = Blocks.LIGHT_GRAY_SHULKER_BOX.getDefaultState();
 				break;
-			case 10:
+			case 9:
 				blockState = Blocks.CYAN_SHULKER_BOX.getDefaultState();
 				break;
-			case 11:
+			case 10:
 				blockState = Blocks.PURPLE_SHULKER_BOX.getDefaultState();
 				break;
-			case 12:
+			case 11:
 				blockState = Blocks.BLUE_SHULKER_BOX.getDefaultState();
 				break;
-			case 13:
+			case 12:
 				blockState = Blocks.BROWN_SHULKER_BOX.getDefaultState();
 				break;
-			case 14:
+			case 13:
 				blockState = Blocks.GREEN_SHULKER_BOX.getDefaultState();
 				break;
-			case 15:
+			case 14:
 				blockState = Blocks.RED_SHULKER_BOX.getDefaultState();
 				break;
-			case 16:
+			case 15:
 				blockState = Blocks.BLACK_SHULKER_BOX.getDefaultState();
+				break;
+			case 16:
+				blockState = Blocks.SHULKER_BOX.getDefaultState();
 				break;
 			default:
 				return null;
