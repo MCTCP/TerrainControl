@@ -155,11 +155,11 @@ class MesaSurfaceGenerator implements SurfaceGenerator
     }
     
     // net.minecraft.world.biome.BiomeMesa.generateBands
-    private void generateBands(long p_150619_1_)
+    private void generateBands(long seed)
     {
         this.clayBands = new LocalMaterialData[64];
         Arrays.fill(this.clayBands, this.hardClay);
-        Random random = new Random(p_150619_1_);
+        Random random = new Random(seed);
 
         this.clayBandsOffsetNoise = new NoiseGeneratorPerlinMesaBlocks(random, 1);
 
@@ -268,20 +268,20 @@ class MesaSurfaceGenerator implements SurfaceGenerator
         double bryceHeight = 0.0D;
         if (this.brycePillars)
         {
-            int k = (xInWorld & -16) + (zInWorld & 15);
-            int l = (zInWorld & -16) + (xInWorld & 15);
-            double bryceNoiseValue = Math.min(Math.abs(noise), this.pillarNoise.getValue((double)k * 0.25D, (double)l * 0.25D));
+            int localX = (xInWorld & -16) + (zInWorld & 15);
+            int localZ = (zInWorld & -16) + (xInWorld & 15);
+            double bryceNoiseValue = Math.min(Math.abs(noise), this.pillarNoise.getValue((double) localX * 0.25D, (double) localZ * 0.25D));
 
             if (bryceNoiseValue > 0.0D)
             {
-                double d3 = 0.001953125D;
-                double d4 = Math.abs(this.pillarRoofNoise.getValue((double)k * d3, (double)l * d3));
+                double maxHeightScale = 0.001953125D;
+                double maxHeightNoise = Math.abs(this.pillarRoofNoise.getValue((double) localX * maxHeightScale, (double) localZ * maxHeightScale));
                 bryceHeight = bryceNoiseValue * bryceNoiseValue * 2.5D;
-                double d5 = Math.ceil(d4 * 50.0D) + 14.0D;
+                double maxHeight = Math.ceil(maxHeightNoise * 50.0D) + 14.0D;
 
-                if (bryceHeight > d5)
+                if (bryceHeight > maxHeight)
                 {
-                    bryceHeight = d5;
+                    bryceHeight = maxHeight;
                 }
 
                 bryceHeight += 64.0D;
@@ -296,11 +296,11 @@ class MesaSurfaceGenerator implements SurfaceGenerator
         
         int noisePlusRandomFactor = (int) (noise / 3.0D + 3.0D + generatingChunk.random.nextDouble() * 0.25D);
         
-        int k1 = -1;
+        int groundLayerDepth = -1;
         boolean belowSand = false;
     	boolean useGroundBlockGround = false;
     	boolean useGroundBlockStone = false;
-        int i1 = 0;
+        int generatedDepth = 0;
 
         // Bedrock on the ceiling
         if (biomeConfig.isCeilingBedrock())
@@ -310,7 +310,8 @@ class MesaSurfaceGenerator implements SurfaceGenerator
         }
         
         int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(x, z);
-        int maxHeight = highestBlockInColumn < (int)bryceHeight ? (int)bryceHeight : highestBlockInColumn;
+        int maxHeight = Math.max(highestBlockInColumn, (int) bryceHeight);
+
         if(maxHeight < bryceHeight)
         {
         	maxHeight = (int)bryceHeight;
@@ -323,7 +324,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
         {
         	if (
     			(y < (int) bryceHeight) ||
-    			(i1 < 15 || this.brycePillars)
+    			(generatedDepth < 15 || this.brycePillars)
 			)
         	{
         		worldMaterial = chunkBuffer.getBlock(x, y, z);
@@ -331,19 +332,20 @@ class MesaSurfaceGenerator implements SurfaceGenerator
 
             if (y < (int) bryceHeight && worldMaterial.isAir())
             {
-                chunkBuffer.setBlock(x, y, z, biomeConfig.getStoneBlockReplaced((short)y));
+                chunkBuffer.setBlock(x, y, z, getBand(biomeConfig, x, y, z));
             }
 
             if (generatingChunk.mustCreateBedrockAt(biomeConfig.isFlatBedrock(), biomeConfig.isBedrockDisabled(), biomeConfig.isCeilingBedrock(), y))
             {
                 chunkBuffer.setBlock(x, y, z, biomeConfig.getBedrockBlockReplaced(y));
             }
-            else if (i1 < 15 || this.brycePillars)
+            else if (generatedDepth < 15 || this.brycePillars)
             {
             	if(worldMaterial.isEmptyOrAir())
                 {
-                    k1 = -1;
+                    groundLayerDepth = -1;
                 }
+
                 // The water block is much less likely to be replaced so lookups should be quicker,
                 // do a != waterblockreplaced rather than an == stoneblockreplaced. Since we know
                 // there can be only air, water and stone in the chunk atm (unless some other mod
@@ -354,7 +356,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
                 // do replaceblock for stone/water here instead of when initially filling the chunk.            	
                 else if(!worldMaterial.equals(biomeConfig.getWaterBlockReplaced(y)))
                 {
-                    if (k1 == -1)
+                    if (groundLayerDepth == -1)
                     {
                         belowSand = false;
 
@@ -371,7 +373,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
                         	useGroundBlockStone = false;
                         }
                         
-                        k1 = noisePlusRandomFactor + Math.max(0, y - waterLevel);
+                        groundLayerDepth = noisePlusRandomFactor + Math.max(0, y - waterLevel);
                         if (y >= waterLevel - 1)
                         {
                             if (this.hasForest && y > 86 + noisePlusRandomFactor * 2)
@@ -396,7 +398,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
                             if (useGroundBlockGround)
                             {
                             	// block should already be the replaced stoneblock
-                                ++i1;
+                                ++generatedDepth;
                             	continue;
                             }
                             else if (useGroundBlockStone)
@@ -416,9 +418,9 @@ class MesaSurfaceGenerator implements SurfaceGenerator
                             }
                         }
                     }
-                    else if (k1 > 0)
+                    else if (groundLayerDepth > 0)
                     {
-                        --k1;
+                        --groundLayerDepth;
                         if (belowSand)
                         {
                             chunkBuffer.setBlock(x, y, z, !this.orangeClayIsReplaced ? this.orangeClay : this.orangeClay.parseWithBiomeAndHeight(biomeConfig.biomeConfigsHaveReplacement(), biomeConfig.getReplaceBlocks(), y));
@@ -427,7 +429,7 @@ class MesaSurfaceGenerator implements SurfaceGenerator
                             chunkBuffer.setBlock(x, y, z, worldMaterial);
                         }
                     }
-                    ++i1;
+                    ++generatedDepth;
                 }
             }
         }
