@@ -83,34 +83,15 @@ public abstract class OTGEngine
 		);
 		this.logger.setLevel(this.pluginConfig.getLogLevel().getLevel());
 		FileSettingsWriter.writeToFile(this.pluginConfig.getSettingsAsMap(), pluginConfigFile, this.pluginConfig.getSettingsMode(), this.logger);
-		
-		// Create manager objects
-		
-		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
-		boolean developerMode = getPluginConfig().getDeveloperModeEnabled();
-		ILogger logger = this.logger;
-		Path otgRootFolder = this.otgRootFolder;
-		Path presetsDirectory = this.getPresetsDirectory();
-		IMaterialReader materialReader = this.materialReader;
 
-		this.customObjectResourcesManager = new CustomObjectResourcesManager();
-		this.customObjectManager = new CustomObjectManager(spawnLog, developerMode, logger, otgRootFolder, presetsDirectory, this.customObjectResourcesManager);
-		
-		// Create BiomeResourcesManager, pass all config resources
-		
-		HashMap<String, Class<? extends ConfigFunction<?>>> configFunctions = new HashMap<>();
-		configFunctions.putAll(WorldConfig.CONFIG_FUNCTIONS);
-		configFunctions.putAll(BiomeConfig.CONFIG_FUNCTIONS);
-		this.biomeResourcesManager = new BiomeResourcesManager(configFunctions);
-		
 		// Create OTG folders
-		
+
 		File presetsDir = Paths.get(getOTGRootFolder().toString(), Constants.PRESETS_FOLDER).toFile();
 		if(!presetsDir.exists())
 		{
 			presetsDir.mkdirs();
 		}
-		
+
 		File modPacksDir = Paths.get(getOTGRootFolder().toString(), Constants.MODPACK_CONFIGS_FOLDER).toFile();
 		if(!modPacksDir.exists())
 		{
@@ -122,6 +103,27 @@ public abstract class OTGEngine
 		{
 			globalObjectsDir.mkdirs();
 		}
+
+		// Create manager objects
+		
+		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
+		boolean developerMode = getPluginConfig().getDeveloperModeEnabled();
+		ILogger logger = this.logger;
+		Path otgRootFolder = this.otgRootFolder;
+		Path presetsDirectory = this.getPresetsDirectory();
+		IMaterialReader materialReader = this.materialReader;
+
+		this.customObjectResourcesManager = new CustomObjectResourcesManager();
+		this.customObjectManager = new CustomObjectManager(spawnLog, developerMode, logger, otgRootFolder, presetsDirectory, this.customObjectResourcesManager);
+
+		// Create BiomeResourcesManager, pass all config resources
+
+		HashMap<String, Class<? extends ConfigFunction<?>>> configFunctions = new HashMap<>();
+		configFunctions.putAll(WorldConfig.CONFIG_FUNCTIONS);
+		configFunctions.putAll(BiomeConfig.CONFIG_FUNCTIONS);
+		this.biomeResourcesManager = new BiomeResourcesManager(configFunctions);
+
+
 
 		// Load presets
 		

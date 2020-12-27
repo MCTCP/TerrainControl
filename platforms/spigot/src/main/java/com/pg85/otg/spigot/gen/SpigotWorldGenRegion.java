@@ -89,7 +89,8 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiome getBiomeForPopulation (int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
-		return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX-chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
+		return getBiome(worldX, worldZ);
+		//return !cacheIsValid ? getBiome(worldX, worldZ) : this.cachedBiomeConfigs[worldX-chunkBeingPopulated.getBlockX()][worldZ - chunkBeingPopulated.getBlockZ()];
 	}
 
 	@Override

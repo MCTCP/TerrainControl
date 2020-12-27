@@ -1,5 +1,6 @@
 package com.pg85.otg.spigot.presets;
 
+import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
@@ -13,12 +14,11 @@ import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
-import it.unimi.dsi.fastutil.objects.Reference2IntLinkedOpenHashMap;
-import it.unimi.dsi.fastutil.objects.Reference2IntMap;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
+import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-
 import java.io.File;
 import java.util.*;
 
@@ -26,7 +26,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 {
 	private final HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
 	// Using a ref is much faster than using an object
-	private final HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();
+	private final HashMap<String, Object2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();
 	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 
 	private final Map<MinecraftKey, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
@@ -57,7 +57,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 
 			List<BiomeConfig> biomeConfigs = preset.getAllBiomeConfigs();
 			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size() + 1]; // +1 for default ocean biome, which is registered twice.
-			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
+			Object2IntMap<BiomeConfig> presetReverseIdMapping = new Object2IntArrayMap<>();
 
 			Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
 			Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
@@ -84,12 +84,16 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				}
 
 				BiomeBase biome = SpigotBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
-				// Get a modifiable biome registry
-				biome_registry.a(biome);
 
-				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
 				MinecraftKey resourceLocation = new MinecraftKey(biomeConfig.getRegistryKey().toResourceLocationString());
 				System.out.println(resourceLocation);
+
+				// Create a registry key
+				ResourceKey<BiomeBase> registryKey = ResourceKey.a(IRegistry.ay, resourceLocation);
+				// Store the biome in the registry
+				biome_registry.a(registryKey, biome, Lifecycle.experimental());
+
+				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
 				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
 
 				presetBiomes.add(ResourceKey.a(BIOME_KEY, resourceLocation));

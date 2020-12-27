@@ -9,7 +9,10 @@ import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
+import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 
 public class SpigotMaterialData extends LocalMaterialData
 {
@@ -132,8 +135,8 @@ public class SpigotMaterialData extends LocalMaterialData
 		// Try without data
 		Block block = null;
 
-		// This returns AIR if block is not found ><.
-		IRegistryWritable<Block> block_registry = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.j);
+		// This returns AIR if block is not found ><. ----Does it for spigot too?
+		RegistryBlocks<Block> block_registry = IRegistry.BLOCK;
 		block = block_registry.get(new MinecraftKey(blockNameCorrected));
 		//block = ForgeRegistries.BLOCKS.getValue(new MinecraftKey(blockNameCorrected));
 		if (block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
@@ -153,9 +156,9 @@ public class SpigotMaterialData extends LocalMaterialData
 			return ofBlockData(blockState, input);
 		}
 
-		OTG.log(LogMarker.INFO, "Could not parse block: " + input + ", substituting AIR.");
+		OTG.log(LogMarker.INFO, "Could not parse block: " + input + ", substituting DIRT.");
 
-		return ofBlockData(Blocks.AIR.getBlockData(), input);
+		return ofBlockData(Blocks.DIRT.getBlockData(), input);
 	}
 
 	private static LocalMaterialData getBlank ()
@@ -173,6 +176,11 @@ public class SpigotMaterialData extends LocalMaterialData
 	public static LocalMaterialData ofBlockData (IBlockData blockData, String raw)
 	{
 		return new SpigotMaterialData(blockData, raw);
+	}
+
+	public static LocalMaterialData ofSpigotMaterial (org.bukkit.Material type)
+	{
+		return new SpigotMaterialData(((CraftBlockData) type.createBlockData()).getState(), null);
 	}
 
 	@Override
@@ -285,5 +293,12 @@ public class SpigotMaterialData extends LocalMaterialData
 	public IBlockData internalBlock ()
 	{
 		return this.blockData;
+	}
+
+	public BlockData toSpigotBlockData()
+	{
+		if (this.blockData == null)
+			return null;
+		return CraftBlockData.fromData(this.blockData);
 	}
 }

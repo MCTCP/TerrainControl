@@ -9,6 +9,7 @@ public class SpigotLegacyMaterials
 {
 	static IBlockData fromLegacyBlockName (String oldBlockName)
 	{
+		if (!(oldBlockName.equalsIgnoreCase(""))) return Blocks.DIRT.getBlockData();
 		switch (oldBlockName)
 		{
 			case "stationary_water":
@@ -161,6 +162,7 @@ public class SpigotLegacyMaterials
 
 	static IBlockData fromLegacyBlockNameOrIdWithData (String blockName, int data)
 	{
+		if (!(blockName.equalsIgnoreCase(""))) return Blocks.DIRT.getBlockData();
 		if (blockName == null || blockName.trim().isEmpty())
 		{
 			return null;

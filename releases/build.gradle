@@ -52,10 +52,10 @@ task createReleaseJar <<
 	// We're including common only for the external libraries that are packaged with it (using Forge jar-in-jar).
 	File commonFile = getJarFile(project(":common:common-core"))
     File forgeFile = getJarFile(project(":platforms:forge"))
-    //File bukkitFile = getJarFile(project(":platforms:bukkit"))
+    File spigotFile = getJarFile(project(":platforms:spigot"))
     File ourFile = getJarFile(project)
 
-	if (forgeFile.exists())// && bukkitFile.exists())
+	if (forgeFile.exists() && spigotFile.exists())
     {
         ourFile.getParentFile().mkdirs()
         ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
@@ -63,12 +63,12 @@ task createReleaseJar <<
 
         addToZip(forgeFile, outputStream, alreadyAddedFiles) // Add Forge first so its jar manifest is used
 		addToZip(commonFile, outputStream, alreadyAddedFiles)
-        //addToZip(bukkitFile, outputStream, alreadyAddedFiles)
+        addToZip(spigotFile, outputStream, alreadyAddedFiles)
 
         outputStream.close()
     } else {
-        println(" Skipping the release jar, as the Bukkit or Forge file failed")
+        println(" Skipping the release jar, as the Spigot or Forge file failed")
 		println(" Forge exists: " + forgeFile.exists())
-		//println(" Bukkit exists: " + bukkitFile.exists())
+		println(" Spigot exists: " + spigotFile.exists())
     }
 }

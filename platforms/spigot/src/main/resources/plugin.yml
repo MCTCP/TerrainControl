@@ -4,6 +4,7 @@ description: 'Team OTG: PG85 (code), MC_Pitman & LordSmellyPants (graphics, web,
 authors: ['PeeGee85', 'Authvin', 'SuperCoder79', 'Josh/Coll1234567', 'RutgerKok', 'TimeThor', 'Khorn/Wickth', 'Olof Cayorion Larsson']
 main: com.pg85.otg.spigot.OTGPlugin
 load: STARTUP
+api-version: 1.16
 commands:
   otg:
     description: OpenTerrainGenerator commands

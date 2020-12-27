@@ -10,6 +10,7 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.OTGChunkPopulator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
@@ -75,6 +76,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private CustomStructureCache structureCache;
 	// TODO: Move this to WorldLoader when ready?
 	private boolean isInitialised = false;
+
+	public GeneratorAccess world = null;
 
 	public OTGNoiseChunkGenerator (WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
 	{
@@ -151,6 +154,14 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Base terrain gen
 
+	// Generates the base terrain for a chunk. Spigot compatible.
+	// IWorld -> GeneratorAccess
+	public void buildNoiseSpigot (org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord)
+	{
+		ChunkBuffer buffer = new SpigotChunkBuffer(chunk, chunkCoord);
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), this.world.getRandom(), buffer, buffer.getChunkCoordinate());
+	}
+
 	// Generates the base terrain for a chunk.
 	// IWorld -> GeneratorAccess
 	@Override
@@ -199,10 +210,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void doCarving (long seed, BiomeManager biomeManager, IChunkAccess chunk, WorldGenStage.Features stage)
 	{
+		// Call here to get around the weird restrictions in CustomChunkGenerator
 		if (stage == WorldGenStage.Features.AIR)
 		{
 			ProtoChunk protoChunk = (ProtoChunk) chunk;
-
 			ChunkBuffer chunkBuffer = new SpigotChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.b(stage);
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
