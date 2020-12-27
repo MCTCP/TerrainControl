@@ -10,7 +10,6 @@ import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.OTGChunkPopulator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
@@ -213,6 +212,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Call here to get around the weird restrictions in CustomChunkGenerator
 		if (stage == WorldGenStage.Features.AIR)
 		{
+			//buildNoise(world, null, chunk);
 			ProtoChunk protoChunk = (ProtoChunk) chunk;
 			ChunkBuffer chunkBuffer = new SpigotChunkBuffer(protoChunk);
 			BitSet carvingMask = protoChunk.b(stage);
@@ -257,6 +257,19 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 			crashreport.a("Generation").a("CenterX", chunkX).a("CenterZ", chunkZ).a("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
 		}
+	}
+
+	@Override
+	public void createBiomes (IRegistry<BiomeBase> iregistry, IChunkAccess ichunkaccess)
+	{
+		ChunkCoordIntPair chunkcoordintpair = ichunkaccess.getPos();
+		((ProtoChunk) ichunkaccess).a(new BiomeStorage(iregistry, chunkcoordintpair, this.c));
+	}
+
+	@Override
+	public void createStructures (IRegistryCustom iregistrycustom, StructureManager structuremanager, IChunkAccess ichunkaccess, DefinedStructureManager definedstructuremanager, long i)
+	{
+		super.createStructures(iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i);
 	}
 
 	// Chunk population method taken from Biome (Biome.func_242427_a())

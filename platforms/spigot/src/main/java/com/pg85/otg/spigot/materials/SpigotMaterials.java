@@ -8,8 +8,6 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import net.minecraft.server.v1_16_R3.BlockPropertyDoubleBlockHalf;
 import net.minecraft.server.v1_16_R3.BlockTallPlant;
-import net.minecraft.server.v1_16_R3.Blocks;
-import org.bukkit.block.data.Bisected;
 
 public class SpigotMaterials extends LocalMaterials
 {
@@ -82,18 +80,18 @@ public class SpigotMaterials extends LocalMaterials
 			LONG_GRASS = readMaterial(LocalMaterials.LONG_GRASS_NAME);
 			RED_MUSHROOM = readMaterial(LocalMaterials.RED_MUSHROOM_NAME);
 
-			DOUBLE_TALL_GRASS_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-			DOUBLE_TALL_GRASS_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-			LARGE_FERN_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-			LARGE_FERN_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-			LILAC_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-			LILAC_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-			PEONY_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-			PEONY_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-			ROSE_BUSH_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-			ROSE_BUSH_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
-			SUNFLOWER_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
-			SUNFLOWER_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
+			DOUBLE_TALL_GRASS_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
+			DOUBLE_TALL_GRASS_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
+			LARGE_FERN_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
+			LARGE_FERN_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
+			LILAC_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
+			LILAC_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
+			PEONY_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
+			PEONY_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
+			ROSE_BUSH_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
+			ROSE_BUSH_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
+			SUNFLOWER_LOWER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.LOWER));
+			SUNFLOWER_UPPER = SpigotMaterialData.ofBlockData(((SpigotMaterialData) readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().set(BlockTallPlant.HALF, BlockPropertyDoubleBlockHalf.UPPER));
 
 			PUMPKIN = readMaterial(LocalMaterials.PUMPKIN_NAME);
 			CACTUS = readMaterial(LocalMaterials.CACTUS_NAME);
@@ -123,7 +121,9 @@ public class SpigotMaterials extends LocalMaterials
 			COAL_BLOCK = readMaterial(LocalMaterials.COAL_BLOCK_NAME);
 			QUARTZ_BLOCK = readMaterial(LocalMaterials.QUARTZ_BLOCK_NAME);
 			EMERALD_BLOCK = readMaterial(LocalMaterials.EMERALD_BLOCK_NAME);
-		} catch(InvalidConfigException ex) {
+		}
+		catch (InvalidConfigException ex)
+		{
 			OTG.log(LogMarker.ERROR, "Could not load default blocks for this version of minecraft, exiting.");
 			throw new RuntimeException("Could not load default blocks for this version of minecraft, exiting.");
 		}
@@ -154,6 +154,8 @@ public class SpigotMaterials extends LocalMaterials
 		{
 			// Happens when a non existing block name is used.
 			String breakpoint = "";
+			OTG.log(LogMarker.WARN, "Invalid config: " + ex.getMessage());
+			OTG.log(LogMarker.WARN, "Replacing with blank");
 		}
 
 		CachedMaterials.put(name, material);

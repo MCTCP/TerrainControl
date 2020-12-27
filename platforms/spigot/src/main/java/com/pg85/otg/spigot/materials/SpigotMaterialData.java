@@ -8,17 +8,14 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.Bukkit;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
-import org.bukkit.craftbukkit.v1_16_R3.util.CraftMagicNumbers;
 
 public class SpigotMaterialData extends LocalMaterialData
 {
 	private final IBlockData blockData;
 
-	private Block b;
+	private String name;
 
 	private SpigotMaterialData (IBlockData blockData)
 	{
@@ -51,7 +48,7 @@ public class SpigotMaterialData extends LocalMaterialData
 		// block "minecraft:stone" with no block data.
 
 		// Used in BO4's as placeholder/detector block.
-		if (input.toLowerCase().equals("blank"))
+		if (input.equalsIgnoreCase("blank"))
 		{
 			return SpigotMaterialData.getBlank();
 		}
@@ -75,7 +72,7 @@ public class SpigotMaterialData extends LocalMaterialData
 					blockNameCorrected = fromLegacyIdName;
 				}
 			}
-			catch (NumberFormatException ex)
+			catch (NumberFormatException ignored)
 			{
 			}
 		}
@@ -90,7 +87,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			String newInput = blockNameCorrected.contains(":") ? blockNameCorrected : "minecraft:" + blockNameCorrected;
 			parseResult = blockStateArgument.parse(new StringReader(newInput));
 		}
-		catch (CommandSyntaxException e)
+		catch (CommandSyntaxException ignored)
 		{
 		}
 		if (parseResult != null)
@@ -113,7 +110,7 @@ public class SpigotMaterialData extends LocalMaterialData
 				int blockId = Integer.parseInt(blockNameOrId);
 				blockNameOrId = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
 			}
-			catch (NumberFormatException ex)
+			catch (NumberFormatException ignored)
 			{
 			}
 			try
@@ -127,7 +124,7 @@ public class SpigotMaterialData extends LocalMaterialData
 				// Failed to parse data, remove. fe STONE:0 or STONE:1 -> STONE
 				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));
 			}
-			catch (NumberFormatException ex)
+			catch (NumberFormatException ignored)
 			{
 			}
 		}
@@ -156,9 +153,9 @@ public class SpigotMaterialData extends LocalMaterialData
 			return ofBlockData(blockState, input);
 		}
 
-		OTG.log(LogMarker.INFO, "Could not parse block: " + input + ", substituting DIRT.");
+		OTG.log(LogMarker.INFO, "Could not parse block: " + input + " (" + blockNameCorrected + "), substituting NOTE_BLOCK.");
 
-		return ofBlockData(Blocks.DIRT.getBlockData(), input);
+		return ofBlockData(Blocks.NOTE_BLOCK.getBlockData(), input);
 	}
 
 	private static LocalMaterialData getBlank ()
@@ -186,7 +183,28 @@ public class SpigotMaterialData extends LocalMaterialData
 	@Override
 	public String getName ()
 	{
-		return null;
+		if (this.name != null)
+			return this.name;
+		if (isBlank)
+		{
+			this.name = "BLANK";
+		}
+		else if (this.blockData == null)
+		{
+			if (this.rawEntry != null)
+			{
+				this.name = this.rawEntry;
+			}
+			else
+			{
+				this.name = "Unknown";
+			}
+		}
+		else
+		{
+			this.name = IRegistry.BLOCK.getKey(this.blockData.getBlock()).toString();
+		}
+		return this.name;
 	}
 
 	@Override
@@ -295,7 +313,7 @@ public class SpigotMaterialData extends LocalMaterialData
 		return this.blockData;
 	}
 
-	public BlockData toSpigotBlockData()
+	public BlockData toSpigotBlockData ()
 	{
 		if (this.blockData == null)
 			return null;

@@ -2,7 +2,6 @@ package com.pg85.otg.spigot.gen;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
-import com.pg85.otg.config.world.WorldConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
@@ -13,7 +12,10 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
-import com.pg85.otg.util.interfaces.*;
+import com.pg85.otg.util.interfaces.IBiome;
+import com.pg85.otg.util.interfaces.IBiomeConfig;
+import com.pg85.otg.util.interfaces.IEntityFunction;
+import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.server.v1_16_R3.*;
@@ -76,7 +78,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		BiomeBase biome = this.worldGenRegion.getBiome(new BlockPosition(x, 1, z));
 		if (biome != null)
 		{
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getWorldChunkManager());
+			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider) this.chunkGenerator.getWorldChunkManager());
 			BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(presetName, id);
 			if (biomeConfig != null)
 			{
@@ -150,13 +152,15 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 					tree = BiomeDecoratorGroups.DARK_OAK;
 					break;
 				case GroundBush:
-					 other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.JUNGLE_BUSH;
+					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.JUNGLE_BUSH;
 					break;
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
 						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_BROWN_MUSHROOM;
-					} else {
+					}
+					else
+					{
 						other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.HUGE_RED_MUSHROOM;
 					}
 					break;
@@ -225,15 +229,15 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being populated, fetch it normally.
 		IChunkAccess chunk = null;
-		if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+		if (chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
 		// isAtLeast() -> b()
-		if((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
 		{
 			// If the chunk has already been loaded, no need to use fake chunks.
-			if(
+			if (
 					!(
 							chunk == null &&
 							this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
@@ -242,12 +246,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return this.chunkGenerator.getMaterialInUnloadedChunk(this, x , y, z);
+				return this.chunkGenerator.getMaterialInUnloadedChunk(this, x, y, z);
 			}
 		}
 
 		// Tried to query an unloaded chunk outside the area being populated
-		if(chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
 		{
 			return null;
 		}
@@ -262,10 +266,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	public int getBlockAboveLiquidHeight (int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
 		int highestY = getHighestBlockYAt(x, z, false, true, false, false, false, chunkBeingPopulated);
-		if(highestY > 0)
+		if (highestY > 0)
 		{
 			highestY += 1;
-		} else {
+		}
+		else
+		{
 			highestY = -1;
 		}
 		return highestY;
@@ -275,10 +281,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	public int getBlockAboveSolidHeight (int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
 		int highestY = getHighestBlockYAt(x, z, true, false, true, true, false, chunkBeingPopulated);
-		if(highestY > 0)
+		if (highestY > 0)
 		{
 			highestY += 1;
-		} else {
+		}
+		else
+		{
 			highestY = -1;
 		}
 		return highestY;
@@ -297,17 +305,17 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If the chunk exists or is inside the area being populated, fetch it normally.
 		IChunkAccess chunk = null;
-		if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+		if (chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
 		{
 			chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
 
 		// If the chunk doesn't exist and we're doing something outside the
 		// population sequence, return the material without loading the chunk.
-		if((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		if ((chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
 		{
 			// If the chunk has already been loaded, no need to use fake chunks.
-			if(
+			if (
 					!(
 							chunk == null &&
 							this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) &&
@@ -321,7 +329,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		}
 
 		// Tried to query an unloaded chunk outside the area being populated
-		if(chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
+		if (chunk == null || !chunk.getChunkStatus().b(ChunkStatus.LIQUID_CARVERS))
 		{
 			return -1;
 		}
@@ -335,7 +343,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// If we use a later status like FEATURES though, resource population may have problems
 		// fetching chunks.
 		int heightMapy = chunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(internalX, internalZ);
-		if(heightMapy == 0)
+		if (heightMapy == 0)
 		{
 			heightMapy = Constants.WORLD_HEIGHT - 1;
 		}
@@ -346,7 +354,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		IBlockData blockState;
 		Block block;
 
-		for(int i = heightMapy; i >= 0; i--)
+		for (int i = heightMapy; i >= 0; i--)
 		{
 			blockState = chunk.getType(new BlockPosition(internalX, i, internalZ));
 			block = blockState.getBlock();
@@ -390,13 +398,13 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 									block == Blocks.SNOW
 							)
 					);
-			if(!(ignoreLiquid && isLiquid))
+			if (!(ignoreLiquid && isLiquid))
 			{
-				if((findSolid && isSolid) || (findLiquid && isLiquid))
+				if ((findSolid && isSolid) || (findLiquid && isLiquid))
 				{
 					return i;
 				}
-				if((findSolid && isLiquid) || (findLiquid && isSolid))
+				if ((findSolid && isLiquid) || (findLiquid && isSolid))
 				{
 					return -1;
 				}
@@ -416,7 +424,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public int getLightLevel (int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
+		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
 			return -1;
 		}
@@ -426,7 +434,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
 		IChunkAccess chunk = this.worldGenRegion.isChunkLoaded(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-		if(chunkBeingPopulated == null && chunk.getChunkStatus().b(ChunkStatus.LIGHT))
+		if (chunkBeingPopulated == null && chunk.getChunkStatus().b(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
 			return this.worldGenRegion.getLightLevel(new BlockPosition(x, y, z));
@@ -443,12 +451,12 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
 	{
-		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
+		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
 			return;
 		}
 
-		if(material.isEmpty())
+		if (material.isEmpty())
 		{
 			// Happens when configs contain blocks that don't exist.
 			// TODO: Catch this earlier up the chain, avoid doing work?
@@ -457,22 +465,24 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 
 		// If no chunk was passed, we're doing something outside of the population cycle.
 		// If a chunk was passed, only spawn in the area being populated.
-		if(chunkBeingPopulated == null || ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
+		if (chunkBeingPopulated == null || ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
 		{
-			if(replaceBlocks)
+			if (replaceBlocks)
 			{
-				if(replaceBlocksMatrix == null)
+				if (replaceBlocksMatrix == null)
 				{
-					if(chunkBeingPopulated == null)
+					if (chunkBeingPopulated == null)
 					{
 						replaceBlocksMatrix = this.getBiomeConfig(x, z).getReplaceBlocks();
-					} else {
+					}
+					else
+					{
 						replaceBlocksMatrix = this.getBiomeConfigForPopulation(x, z, chunkBeingPopulated).getReplaceBlocks();
 					}
 				}
 				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
 			}
-			this.worldGenRegion.setTypeAndData(new BlockPosition(x, y, z), ((SpigotMaterialData)material).internalBlock(), 2 | 16);
+			this.worldGenRegion.setTypeAndData(new BlockPosition(x, y, z), ((SpigotMaterialData) material).internalBlock(), 2 | 16);
 		}
 	}
 
