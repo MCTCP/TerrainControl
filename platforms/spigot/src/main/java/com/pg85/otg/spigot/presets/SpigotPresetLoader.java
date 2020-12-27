@@ -19,6 +19,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntArrayMap;
 import org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+
 import java.io.File;
 import java.util.*;
 
@@ -68,9 +69,6 @@ public class SpigotPresetLoader extends LocalPresetLoader
 
 			for (BiomeConfig biomeConfig : biomeConfigs)
 			{
-				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
-				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
-
 				boolean isOceanBiome = false;
 				// Biome id 0 is reserved for ocean, used when a land column has
 				// no biome assigned, which can happen due to biome group rarity.
@@ -86,7 +84,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				BiomeBase biome = SpigotBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
 
 				MinecraftKey resourceLocation = new MinecraftKey(biomeConfig.getRegistryKey().toResourceLocationString());
-				System.out.println(resourceLocation);
+				//System.out.println(resourceLocation);
 
 				// Create a registry key
 				ResourceKey<BiomeBase> registryKey = ResourceKey.a(IRegistry.ay, resourceLocation);
@@ -145,7 +143,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				// Index BiomeColor for FromImageMode and /otg map
 				biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
 
-				OTG.log(LogMarker.INFO, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
+				OTG.log(LogMarker.DEBUG, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
 
 				currentId++;
 			}
@@ -221,19 +219,20 @@ public class SpigotPresetLoader extends LocalPresetLoader
 		return biomes.length > biomeId ? biomes[biomeId] : null;
 	}
 
-	public List<ResourceKey<BiomeBase>> getBiomeRegistryKeys(String presetName)
+	public List<ResourceKey<BiomeBase>> getBiomeRegistryKeys (String presetName)
 	{
 		return this.biomesByPresetName.get(presetName);
 	}
-	public BiomeConfig[] getGlobalIdMapping(String presetName)
+
+	public BiomeConfig[] getGlobalIdMapping (String presetName)
 	{
 		return globalIdMapping.get(presetName);
 	}
 
-	public Map<String, BiomeLayerData> getPresetGenerationData()
+	public Map<String, BiomeLayerData> getPresetGenerationData ()
 	{
 		Map<String, BiomeLayerData> clonedData = new HashMap<>();
-		for(Map.Entry<String, BiomeLayerData> entry : this.presetGenerationData.entrySet())
+		for (Map.Entry<String, BiomeLayerData> entry : this.presetGenerationData.entrySet())
 		{
 			clonedData.put(entry.getKey(), new BiomeLayerData(entry.getValue()));
 		}

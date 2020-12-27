@@ -9,7 +9,6 @@ public class SpigotLegacyMaterials
 {
 	static IBlockData fromLegacyBlockName (String oldBlockName)
 	{
-		if (!(oldBlockName.equalsIgnoreCase(""))) return Blocks.DIRT.getBlockData();
 		switch (oldBlockName)
 		{
 			case "stationary_water":
@@ -162,7 +161,6 @@ public class SpigotLegacyMaterials
 
 	static IBlockData fromLegacyBlockNameOrIdWithData (String blockName, int data)
 	{
-		if (!(blockName.equalsIgnoreCase(""))) return Blocks.DIRT.getBlockData();
 		if (blockName == null || blockName.trim().isEmpty())
 		{
 			return null;
@@ -552,7 +550,7 @@ public class SpigotLegacyMaterials
 				case "black_shulker_box":
 					return getShulkerBoxWithData(15, data);
 				case "shulker_box":
-					return  getShulkerBoxWithData(16, data);
+					return getShulkerBoxWithData(16, data);
 				case "ladder":
 					return getLadderChestOrFurnaceWithData(0, data);
 				case "chest":

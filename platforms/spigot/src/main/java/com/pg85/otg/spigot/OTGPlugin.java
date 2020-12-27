@@ -1,15 +1,16 @@
 package com.pg85.otg.spigot;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
-import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.commands.OTGCommandExecutor;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.spigot.gen.SpigotChunkGenerator;
-import net.minecraft.server.v1_16_R3.*;
+import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.IRegistry;
+import net.minecraft.server.v1_16_R3.IRegistryWritable;
+import net.minecraft.server.v1_16_R3.MinecraftKey;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -23,7 +24,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.Iterator;
 
 
 public class OTGPlugin extends JavaPlugin implements Listener
@@ -47,16 +47,6 @@ public class OTGPlugin extends JavaPlugin implements Listener
 		// Does this go here?
 		OTG.getEngine().getPresetLoader().registerBiomes();
 
-		/*
-		Preset preset = OTG.getEngine().getPresetLoader().getPresetByName("biome_bundle");
-
-		OTGNoiseChunkGenerator OTGChunkGen = new OTGNoiseChunkGenerator(
-				new DimensionConfig(preset.getName()),
-				new OTGBiomeProvider(preset.getName(), 0, false, false,
-						((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
-				0,
-				GeneratorSettingBase::i);
-		 */
 		IRegistryWritable<BiomeBase> biome_registry = ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay);
 		int i = 0;
 
@@ -75,15 +65,15 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	public ChunkGenerator getDefaultWorldGenerator (String worldName, String id)
 	{
 		worlds.put(worldName, id);
-		return new SpigotChunkGenerator(worldName, id);
+		return new SpigotChunkGenerator(worldName, id, 0);
 	}
 
 	@EventHandler
-	public void onWorldEnable(WorldInitEvent event)
+	public void onWorldEnable (WorldInitEvent event)
 	{
 		if (worlds.containsKey(event.getWorld().getName()))
 		{
-			OTG.log(LogMarker.INFO, "Taking over world "+event.getWorld().getName());
+			OTG.log(LogMarker.INFO, "Taking over world " + event.getWorld().getName());
 
 			net.minecraft.server.v1_16_R3.ChunkGenerator generator = ((CraftWorld) event.getWorld()).getHandle().getChunkProvider().getChunkGenerator();
 			if (!(generator instanceof CustomChunkGenerator))
@@ -92,7 +82,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				return;
 			}
 
-			OTGNoiseChunkGenerator infiltrator = ((SpigotChunkGenerator)event.getWorld().getGenerator()).generator;
+			OTGNoiseChunkGenerator infiltrator = ((SpigotChunkGenerator) event.getWorld().getGenerator()).generator;
 
 			Field field = null;
 			Field modifiers = null;
@@ -106,6 +96,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				modifiers = Field.class.getDeclaredField("modifiers");
 				modifiers.setAccessible(true);
 				modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+				field.set(generator, infiltrator);
 			}
 			catch (NoSuchFieldException | IllegalAccessException e)
 			{
@@ -113,26 +104,6 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				return;
 			}
 
-			/*
-			Preset preset = OTG.getEngine().getPresetLoader().getPresetByName(worlds.get(event.getWorld().getName()));
-			OTGNoiseChunkGenerator OTGChunkGen = new OTGNoiseChunkGenerator(
-					new DimensionConfig(preset.getName()),
-					new OTGBiomeProvider(preset.getName(), 0, false, false,
-							((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
-					0,
-					GeneratorSettingBase::i);
-
-			 */
-			try
-			{
-				field.set(generator, infiltrator);
-
-			}
-			catch (IllegalAccessException e)
-			{
-				e.printStackTrace();
-				return;
-			}
 			OTG.log(LogMarker.INFO, "Success!");
 		}
 	}

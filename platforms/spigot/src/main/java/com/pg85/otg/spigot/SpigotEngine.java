@@ -12,7 +12,6 @@ import com.pg85.otg.spigot.util.SpigotLogger;
 import com.pg85.otg.spigot.util.SpigotPluginLoadedChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

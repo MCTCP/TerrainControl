@@ -31,17 +31,16 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 					RegistryLookupCodec.a(IRegistry.ay).forGetter((provider) -> provider.registry)
 			).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
-
+	public final BiomeConfig[] configLookup;
 	private final long seed;
 	private final boolean legacyBiomeInitLayer;
 	private final boolean largeBiomes;
 	private final IRegistry<BiomeBase> registry;
 	private final CachingLayerSampler layer;
-	public final BiomeConfig[] configLookup;
 	private final Int2ObjectMap<ResourceKey<BiomeBase>> keyLookup;
 	private final String presetName;
 
-	public OTGBiomeProvider(String presetName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, IRegistry<BiomeBase> registry)
+	public OTGBiomeProvider (String presetName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, IRegistry<BiomeBase> registry)
 	{
 		super(getAllBiomesByPreset(presetName, registry));
 		this.presetName = presetName;
@@ -55,7 +54,7 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 		// Default to let us know if we did anything wrong
 		this.keyLookup.defaultReturnValue(Biomes.OCEAN);
 
-		this.configLookup = ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetName);
+		this.configLookup = ((SpigotPresetLoader) OTG.getEngine().getPresetLoader()).getGlobalIdMapping(presetName);
 		for (int biomeId = 0; biomeId < this.configLookup.length; biomeId++)
 		{
 			BiomeConfig config = this.configLookup[biomeId];
@@ -66,14 +65,14 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 		}
 	}
 
-	private static Stream<Supplier<BiomeBase>> getAllBiomesByPreset(String presetName, IRegistry<BiomeBase> registry)
+	private static Stream<Supplier<BiomeBase>> getAllBiomesByPreset (String presetName, IRegistry<BiomeBase> registry)
 	{
-		List<ResourceKey<BiomeBase>> biomesForPreset = ((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetName);
-		if(biomesForPreset == null)
+		List<ResourceKey<BiomeBase>> biomesForPreset = ((SpigotPresetLoader) OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetName);
+		if (biomesForPreset == null)
 		{
-			((SpigotPresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetName());
+			((SpigotPresetLoader) OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(OTG.getEngine().getPresetLoader().getDefaultPresetName());
 		}
-		if(biomesForPreset == null)
+		if (biomesForPreset == null)
 		{
 			biomesForPreset = new ArrayList<>();
 		}
@@ -86,23 +85,23 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 
 	// Forge name: getBiomeProviderCodec
 	// Spigot name: a
-	protected Codec<? extends WorldChunkManager> a()
+	protected Codec<? extends WorldChunkManager> a ()
 	{
 		return CODEC;
 	}
 
-	public ResourceKey<BiomeBase> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)
+	public ResourceKey<BiomeBase> getBiomeRegistryKey (int biomeX, int biomeY, int biomeZ)
 	{
 		return keyLookup.get(this.layer.sample(biomeX, biomeZ));
 	}
 
-	public ResourceKey<BiomeBase> lookupKey(int index)
+	public ResourceKey<BiomeBase> lookupKey (int index)
 	{
 		return keyLookup.get(index);
 	}
 
 	@Override
-	public BiomeBase getBiome(int biomeX, int biomeY, int biomeZ)
+	public BiomeBase getBiome (int biomeX, int biomeY, int biomeZ)
 	{
 		// Forge name: getValueForKey
 		// Spigot name: a
@@ -110,13 +109,13 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 	}
 
 	@Override
-	public CachingLayerSampler getSampler()
+	public CachingLayerSampler getSampler ()
 	{
 		return this.layer;
 	}
 
 	@Override
-	public BiomeConfig getConfig(int biomeX, int biomeZ)
+	public BiomeConfig getConfig (int biomeX, int biomeZ)
 	{
 		int biomeId = this.layer.sample(biomeX, biomeZ);
 		return this.configLookup.length > biomeId ? configLookup[this.layer.sample(biomeX, biomeZ)] : null;
