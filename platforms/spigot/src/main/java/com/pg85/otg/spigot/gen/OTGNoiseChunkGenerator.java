@@ -21,6 +21,8 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import net.minecraft.server.v1_16_R3.*;
 
 import javax.annotation.Nullable;
@@ -158,7 +160,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void buildNoiseSpigot (org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord)
 	{
 		ChunkBuffer buffer = new SpigotChunkBuffer(chunk, chunkCoord);
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), this.world.getRandom(), buffer, buffer.getChunkCoordinate());
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), this.world.getRandom(), buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
 	}
 
 	// Generates the base terrain for a chunk.
@@ -191,7 +193,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 		else
 		{
-			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate());
+			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), world.getRandom(), buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
 		}
 	}
 
@@ -575,7 +577,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ChunkBuffer buffer = new SpigotChunkBuffer(chunk);
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate());
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
 		return chunk;
 	}
 

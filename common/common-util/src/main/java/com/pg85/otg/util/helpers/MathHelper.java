@@ -123,6 +123,15 @@ public class MathHelper
         return (int)(val >>> 32 & 4294967295L);
     }
 
+    public static double fastInverseSqrt(double x) {
+        double d = 0.5D * x;
+        long l = Double.doubleToRawLongBits(x);
+        l = 6910469410427058090L - (l >> 1);
+        x = Double.longBitsToDouble(l);
+        x *= 1.5D - d * x * x;
+        return x;
+    }
+
     public static long mixSeed(long seed, long salt)
     {
         seed *= seed * 6364136223846793005L + 1442695040888963407L;

@@ -20,9 +20,12 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
+import com.pg85.otg.util.gen.JigsawStructureData;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import it.unimi.dsi.fastutil.HashCommon;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 
 /**
  * Generates the base terrain, sets stone/ground/surface blocks and does SurfaceAndGroundControl, generates caves and canyons.
@@ -44,7 +47,22 @@ public class OTGChunkGenerator
 		}
 	});
 
-	private final OctavePerlinNoiseSampler interpolationNoise;	 // Volatility noise
+	private static final float[] NOISE_WEIGHT_TABLE = make(new float[24 * 24 * 24], (array) ->
+	{
+		for (int z = 0; z < 24; ++z)
+		{
+			for (int x = 0; x < 24; ++x)
+			{
+				for (int y = 0; y < 24; ++y)
+				{
+					array[z * 24 * 24 + x * 24 + y] = (float) calculateNoiseWeight(x - 12, y - 12, z - 12);
+				}
+			}
+		}
+
+	});
+
+	private final OctavePerlinNoiseSampler interpolationNoise;     // Volatility noise
 	private final OctavePerlinNoiseSampler lowerInterpolatedNoise; // Volatility1 noise
 	private final OctavePerlinNoiseSampler upperInterpolatedNoise; // Volatility2 noise
 
@@ -98,6 +116,47 @@ public class OTGChunkGenerator
 		return object;
 	}
 
+	private static double getNoiseWeight(int x, int y, int z)
+	{
+		int arrayX = x + 12;
+		int arrayZ = y + 12;
+		int arrayY = z + 12;
+		if (arrayX >= 0 && arrayX < 24)
+		{
+			if (arrayZ >= 0 && arrayZ < 24)
+			{
+				return arrayY >= 0 && arrayY < 24 ? (double) NOISE_WEIGHT_TABLE[arrayY * 24 * 24 + arrayX * 24 + arrayZ] : 0.0D;
+			} else
+			{
+				return 0.0D;
+			}
+		} else
+		{
+			return 0.0D;
+		}
+	}
+
+	private static double calculateNoiseWeight(int x, int y, int z)
+	{
+		// Make a circle cutout
+		double sqrXZ = x * x + z * z;
+
+		// Offset the y to prevent 0
+		double offsetY = (double) y + 0.5D;
+
+		// Square the y to make a
+		double sqrY = offsetY * offsetY;
+
+		// Get the density of the current position
+		double density = Math.pow(Math.E, -(sqrY / 16.0D + sqrXZ / 16.0D));
+
+		// Controls the density (bottom is solid, top is air)
+		double yOffset = -offsetY * MathHelper.fastInverseSqrt(sqrY / 2.0D + sqrXZ / 2.0D) / 2.0D;
+
+		// Multiply the density by the y offset to get the final density
+		return yOffset * density;
+	}
+
 	private double sampleNoise(int x, int y, int z, double horizontalScale, double verticalScale, double horizontalStretch, double verticalStretch, double volatility1, double volatility2, double volatilityWeight1, double volatilityWeight2)
 	{
 		// The algorithm for noise generation varies slightly here as it calculates the interpolation first and then the interpolated noise to avoid sampling noise that will never be used.
@@ -108,16 +167,16 @@ public class OTGChunkGenerator
 		if (delta < volatilityWeight1)
 		{
 			return getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1;
-		}
-		else if (delta > volatilityWeight2)
+		} else if (delta > volatilityWeight2)
 		{
 			return getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2;
-		} else {
+		} else
+		{
 			// TODO: should probably use clamping here to prevent weird artifacts
 			return MathHelper.lerp(
-				delta,
-				getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1,
-				getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2);
+					delta,
+					getInterpolatedNoise(this.lowerInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility1,
+					getInterpolatedNoise(this.upperInterpolatedNoise, x, y, z, horizontalScale, verticalScale) / 512.0D * volatility2);
 		}
 	}
 
@@ -181,7 +240,8 @@ public class OTGChunkGenerator
 			noiseHeight -= maxAverageDepth;
 			noiseHeight /= 1.4D;
 			noiseHeight /= 2.0D;
-		} else {
+		} else
+		{
 			if (noiseHeight > 1.0D)
 			{
 				noiseHeight = 1.0D;
@@ -340,8 +400,13 @@ public class OTGChunkGenerator
 		return BiomeInterpolator.getConfig(this.seed, x, 0, z, this.biomeGenerator);
 	}
 
-	public void populateNoise(int worldHeightCap, Random random, ChunkBuffer buffer, ChunkCoordinate pos)
+	// Surface / ground / stone blocks / SAGC
+
+	public void populateNoise(int worldHeightCap, Random random, ChunkBuffer buffer, ChunkCoordinate pos, ObjectList<JigsawStructureData> structures, ObjectList<JigsawStructureData> junctions)
 	{
+		ObjectListIterator<JigsawStructureData> structureIterator = structures.iterator();
+		ObjectListIterator<JigsawStructureData> junctionsIterator = junctions.iterator();
+
 		// Fill waterLevel array, used when placing stone/ground/surface blocks.
 		// TODO: water levels
 		byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];
@@ -352,10 +417,12 @@ public class OTGChunkGenerator
 
 		IBiomeConfig[] biomes = new IBiomeConfig[256];
 
-		for (int x = 0; x < 16; x++) {
-		    for (int z = 0; z < 16; z++) {
-		        biomes[x * 16 + z] = this.getBiomeAtWorldCoord(blockX + x, blockZ + z);
-		    }
+		for (int x = 0; x < 16; x++)
+		{
+			for (int z = 0; z < 16; z++)
+			{
+				biomes[x * 16 + z] = this.getBiomeAtWorldCoord(blockX + x, blockZ + z);
+			}
 		}
 
 		// TODO: this double[][][] is probably really bad for performance
@@ -434,12 +501,33 @@ public class OTGChunkGenerator
 
 								IBiomeConfig biomeConfig = biomes[localX * 16 + localZ];
 
+								// Iterate through structures to add density
+								int structureX;
+								int structureY;
+								int structureZ;
+								for(density = density / 2.0D - density * density * density / 24.0D; structureIterator.hasNext(); density += getNoiseWeight(structureX, structureY, structureZ) * 0.8D) {
+									JigsawStructureData structure = structureIterator.next();
+									structureX = Math.max(0, Math.max(structure.minX - realX, realX - structure.maxX));
+									structureY = realY - (structure.minY + (structure.useDelta ? structure.delta : 0));
+									structureZ = Math.max(0, Math.max(structure.minZ - realZ, realZ - structure.maxZ));
+								}
+								structureIterator.back(structures.size());
+
+								// Iterate through jigsawws to add density
+								while(junctionsIterator.hasNext()) {
+									JigsawStructureData junction = junctionsIterator.next();
+									int sourceX = realX - junction.sourceX;
+									int sourceY = realY - junction.groundY;
+									int sourceZ = realZ - junction.sourceZ;
+									density += getNoiseWeight(sourceX, sourceY, sourceZ) * 0.4D;
+								}
+								junctionsIterator.back(junctions.size());
+
 								if (density > 0.0)
 								{
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
-								}
-								else if (realY < 63)
+								} else if (realY < 63)
 								{
 									// TODO: water levels
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getWaterBlockReplaced(realY));
@@ -482,8 +570,6 @@ public class OTGChunkGenerator
 			}
 		}
 	}
-
-	// Surface / ground / stone blocks / SAGC
 
 	private long setCarverSeed(Random random, long seed, int x, int z)
 	{
@@ -562,7 +648,8 @@ public class OTGChunkGenerator
 			{
 				// Copy values into buffer
 				System.arraycopy(this.values, idx * buffer.length, buffer, 0, buffer.length);
-			} else {
+			} else
+			{
 				// cache miss: sample and put the result into our cache entry
 
 				// Sample the noise column to store the new values
