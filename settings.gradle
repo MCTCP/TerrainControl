@@ -2,12 +2,3 @@ include 'common:common-util', 'common:common-config', 'common:common-customobjec
 include 'platforms:spigot'
 findProject(':platforms:spigot')?.name = 'spigot'
 
-include 'platforms:spigot'
-findProject(':platforms:spigot')?.name = 'spigot'
-
-include 'platforms:spigot'
-findProject(':platforms:spigot')?.name = 'spigot'
-
-include 'platforms:spigot'
-findProject(':platforms:spigot')?.name = 'spigot'
-

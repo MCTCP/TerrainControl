@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id 'maven'
     id "fr.il_totore.manadrop" version "0.4.1-SNAPSHOT"
 }
 
@@ -9,7 +10,11 @@ repositories {
     mavenCentral()
     mavenLocal()
     maven {
-        url "https://hub.spigotmc.org/nexus/content/repositories/snapshots"
+        url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/"
+    }
+
+    maven {
+        url = "https://repo.codemc.io/repository/nms/"
     }
 }
 
