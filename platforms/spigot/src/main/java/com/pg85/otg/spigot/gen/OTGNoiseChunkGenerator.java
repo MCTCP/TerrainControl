@@ -24,7 +24,6 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
-import org.bukkit.block.Structure;
 
 import net.minecraft.server.v1_16_R3.*;
 
@@ -395,14 +394,14 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 		// getMainChunkX -> a()
 		// getMainChunkZ -> b()
-		int i = worldGenRegion.a();
-		int j = worldGenRegion.a();
-		BiomeBase biome = worldGenRegion.getBiome((new ChunkCoordIntPair(i, j)).l());
+		int chunkX = worldGenRegion.a();
+		int chunkZ = worldGenRegion.b();
+		BiomeBase biome = worldGenRegion.getBiome((new ChunkCoordIntPair(chunkX, chunkZ)).l());
 		SeededRandom sharedseedrandom = new SeededRandom();
 		// setDecorationSeed() -> a()
-		sharedseedrandom.a(worldGenRegion.getSeed(), i << 4, j << 4);
+		sharedseedrandom.a(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
 		// performWorldGenSpawning() -> a()
-		SpawnerCreature.a(worldGenRegion, biome, i, j, sharedseedrandom);
+		SpawnerCreature.a(worldGenRegion, biome, chunkX, chunkZ, sharedseedrandom);
 
 	}
 
