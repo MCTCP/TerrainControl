@@ -58,6 +58,7 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 		for (int biomeId = 0; biomeId < this.configLookup.length; biomeId++)
 		{
 			BiomeConfig config = this.configLookup[biomeId];
+
 			// Forge method: RegistryKey.getOrCreateKey()
 			// Spigot method: ResourceKey.a()
 			ResourceKey<BiomeBase> key = ResourceKey.a(IRegistry.ay, new MinecraftKey(config.getRegistryKey().toResourceLocationString()));
