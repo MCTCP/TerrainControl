@@ -97,7 +97,7 @@ public class OTGChunkGenerator
 		// Setup noises
 		Random random = new Random(seed);
 
-		this.noiseSizeY = this.preset.getWorldConfig().getWorldHeightCap() / 8;
+		this.noiseSizeY = preset.getWorldConfig().getWorldHeightCap() / 8;
 
 		this.interpolationNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-7, 0));
 		this.lowerInterpolatedNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-15, 0));
@@ -409,9 +409,7 @@ public class OTGChunkGenerator
 		ObjectListIterator<JigsawStructureData> junctionsIterator = junctions.iterator();
 
 		// Fill waterLevel array, used when placing stone/ground/surface blocks.
-		// TODO: water levels
-		byte[] waterLevel = new byte[CHUNK_SIZE * CHUNK_SIZE];
-		Arrays.fill(waterLevel, (byte) 63);
+		int[] waterLevel = new int[256];
 
 		int blockX = pos.getBlockX();
 		int blockZ = pos.getBlockZ();
@@ -422,7 +420,10 @@ public class OTGChunkGenerator
 		{
 			for (int z = 0; z < 16; z++)
 			{
-				biomes[x * 16 + z] = this.getBiomeAtWorldCoord(blockX + x, blockZ + z);
+				IBiomeConfig config = this.getBiomeAtWorldCoord(blockX + x, blockZ + z);
+				biomes[x * 16 + z] = config;
+				// TODO: water levels used to be interpolated via bilinear interpolation. Do we still need to do that?
+				waterLevel[x * 16 + z] = config.getWaterLevelMax();
 			}
 		}
 
@@ -528,9 +529,8 @@ public class OTGChunkGenerator
 								{
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getStoneBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
-								} else if (realY < 63)
+								} else if (realY < waterLevel[localX * 16 + localZ])
 								{
-									// TODO: water levels
 									buffer.setBlock(localX, realY, localZ, biomeConfig.getWaterBlockReplaced(realY));
 									buffer.setHighestBlockForColumn(pieceX + noiseX * 4, noiseZ * 4 + pieceZ, realY);
 								}
@@ -588,7 +588,7 @@ public class OTGChunkGenerator
 	}
 
 	// Previously ChunkProviderOTG.addBiomeBlocksAndCheckWater
-	private void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, byte[] waterLevel)
+	private void doSurfaceAndGroundControl(Random random, int heightCap, long worldSeed, ChunkBuffer chunkBuffer, int[] waterLevel)
 	{
 		// Process surface and ground blocks for each column in the chunk
 		ChunkCoordinate chunkCoord = chunkBuffer.getChunkCoordinate();

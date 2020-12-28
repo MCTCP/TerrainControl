@@ -17,10 +17,10 @@ public final class GeneratingChunk
 
     public final int heightCap;
     public final Random random;
-    private final byte[] waterLevel;
+    private final int[] waterLevel;
     private final double[] surfaceNoise;
 
-    public GeneratingChunk(Random random, byte[] waterLevel, double[] surfaceNoise, int heightCap)
+    public GeneratingChunk(Random random, int[] waterLevel, double[] surfaceNoise, int heightCap)
     {
         this.random = random;
         this.waterLevel = waterLevel;
@@ -49,7 +49,7 @@ public final class GeneratingChunk
      */
     public int getWaterLevel(int x, int z)
     {
-        return this.waterLevel[z + x * CHUNK_SIZE] & 0xff;
+        return this.waterLevel[z + x * CHUNK_SIZE];
     }
 
     /**
