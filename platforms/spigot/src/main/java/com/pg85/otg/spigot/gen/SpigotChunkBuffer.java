@@ -11,6 +11,7 @@ import org.bukkit.generator.ChunkGenerator;
 
 public class SpigotChunkBuffer extends ChunkBuffer
 {
+	private final BlockPosition.MutableBlockPosition mutable = new BlockPosition.MutableBlockPosition();
 	private ChunkCoordinate chunkCoord = null;
 	private ChunkGenerator.ChunkData chunkData = null;
 	private ProtoChunk chunk = null;
@@ -46,7 +47,9 @@ public class SpigotChunkBuffer extends ChunkBuffer
 		}
 		else
 		{
-			this.chunk.setType(new BlockPosition(blockX, blockY, blockZ), ((SpigotMaterialData) material).internalBlock(), false);
+			// Forge: setPos()
+			// Spigot: d()
+			this.chunk.setType(this.mutable.d(blockX, blockY, blockZ), ((SpigotMaterialData) material).internalBlock(), false);
 		}
 	}
 
@@ -57,6 +60,6 @@ public class SpigotChunkBuffer extends ChunkBuffer
 		{
 			return SpigotMaterialData.ofSpigotMaterial(this.chunkData.getType(blockX, blockY, blockZ));
 		}
-		return SpigotMaterialData.ofBlockData(this.chunk.getType(new BlockPosition(blockX, blockY, blockZ)));
+		return SpigotMaterialData.ofBlockData(this.chunk.getType(this.mutable.d(blockX, blockY, blockZ)));
 	}
 }

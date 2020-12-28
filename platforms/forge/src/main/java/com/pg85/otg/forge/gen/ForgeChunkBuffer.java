@@ -11,6 +11,7 @@ import net.minecraft.world.chunk.ChunkPrimer;
 
 class ForgeChunkBuffer extends ChunkBuffer
 {
+	private final BlockPos.Mutable mutable = new BlockPos.Mutable();
 	private final ChunkPrimer chunk;
 
 	ForgeChunkBuffer(ChunkPrimer chunk)
@@ -25,16 +26,15 @@ class ForgeChunkBuffer extends ChunkBuffer
 		return ChunkCoordinate.fromChunkCoords(pos.x, pos.z);
 	}
 
-	// TODO: fastpath for setBlockState
 	@Override
 	public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
 	{
-		this.chunk.setBlockState(new BlockPos(blockX, blockY, blockZ), ((ForgeMaterialData) material).internalBlock(), false);
+		this.chunk.setBlockState(this.mutable.setPos(blockX, blockY, blockZ), ((ForgeMaterialData) material).internalBlock(), false);
 	}
 
 	@Override
 	public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
 	{
-		return ForgeMaterialData.ofMinecraftBlockState(this.chunk.getBlockState(new BlockPos(blockX, blockY, blockZ)));
+		return ForgeMaterialData.ofMinecraftBlockState(this.chunk.getBlockState(this.mutable.setPos(blockX, blockY, blockZ)));
 	}
 }
