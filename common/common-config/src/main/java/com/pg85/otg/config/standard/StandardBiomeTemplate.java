@@ -86,7 +86,7 @@ public class StandardBiomeTemplate
     public Object[] defaultSurfaceSurfaceAndGroundControl = new Object[0];
     public boolean defaultIceSpikes;
     public boolean defaultDisableBiomeHeight;
-    public double[] defaultCustomHeightControl = new double[Constants.PIECES_PER_CHUNK_Y + 1];;
+    public double[] defaultCustomHeightControl = new double[Constants.PIECES_PER_CHUNK_Y + 1];
     public double defaultFossilRarity = 0;
     public String defaultBiomeDictId = "";
     public String defaultInheritMobsBiomeName = "";

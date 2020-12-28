@@ -73,7 +73,7 @@ public class OTGChunkGenerator
 	private final LayerSource biomeGenerator;
 
 	private final int noiseSizeX = 4;
-	private final int noiseSizeY = 32;
+	private final int noiseSizeY;
 	private final int noiseSizeZ = 4;
 
 	private final ThreadLocal<NoiseCache> noiseCache;
@@ -96,6 +96,8 @@ public class OTGChunkGenerator
 
 		// Setup noises
 		Random random = new Random(seed);
+
+		this.noiseSizeY = this.preset.getWorldConfig().getWorldHeightCap() / 8;
 
 		this.interpolationNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-7, 0));
 		this.lowerInterpolatedNoise = new OctavePerlinNoiseSampler(random, IntStream.rangeClosed(-15, 0));
@@ -263,7 +265,6 @@ public class OTGChunkGenerator
 	{
 		IBiomeConfig center = getBiomeAt(noiseX, noiseZ);
 
-		final int maxYSections = this.preset.getWorldConfig().getWorldHeightCap() / 8 + 1;
 		final int usedYSections = this.preset.getWorldConfig().getWorldHeightScale() / 8 + 1;
 
 		float height = 0; // depth
