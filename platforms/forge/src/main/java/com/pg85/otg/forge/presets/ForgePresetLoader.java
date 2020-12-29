@@ -107,9 +107,6 @@ public class ForgePresetLoader extends LocalPresetLoader
 					
 			for(BiomeConfig biomeConfig : biomeConfigs)
 			{
-				// DeferredRegister for Biomes doesn't appear to be working atm, biomes are never registered :(
-				//RegistryObject<Biome> registryObject = OTGPlugin.BIOMES.register(biomeConfig.getRegistryKey().getResourcePath(), () -> createOTGBiome(biomeConfig));
-
 				boolean isOceanBiome = false;
  				// Biome id 0 is reserved for ocean, used when a land column has 
  				// no biome assigned, which can happen due to biome group rarity.

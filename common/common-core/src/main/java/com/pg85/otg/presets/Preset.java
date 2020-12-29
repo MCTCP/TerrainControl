@@ -27,7 +27,7 @@ public class Preset
 			this.biomeConfigs.put(biomeConfig.getName(), biomeConfig);
 		}
 	}
-	
+
 	public Path getPresetDir()
 	{
 		return this.presetDir;
@@ -51,5 +51,5 @@ public class Preset
 	public ArrayList<BiomeConfig> getAllBiomeConfigs()
 	{
 		return new ArrayList<BiomeConfig>(this.biomeConfigs.values());
-	}	
+	}
 }
