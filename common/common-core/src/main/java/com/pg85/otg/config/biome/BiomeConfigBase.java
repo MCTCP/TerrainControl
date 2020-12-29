@@ -115,6 +115,19 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected int waterFogColor;
 	protected String particleType;
 	protected float particleProbability;
+
+	// Music and sounds
+	protected String music;
+	protected int musicMinDelay;
+	protected int musicMaxDelay;
+	protected boolean replaceCurrentMusic;
+	protected String ambientSound;
+	protected String moodSound;
+	protected int moodSoundDelay;
+	protected int moodSearchRange;
+	protected double moodOffset;
+	protected String additionsSound;
+	protected double additionsTickChance;
 	
 	// Custom structures
 	
@@ -414,6 +427,72 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public float getParticleProbability()
 	{
 		return this.particleProbability;
+	}
+
+	@Override
+	public String getMusic()
+	{
+		return music;
+	}
+
+	@Override
+	public int getMusicMinDelay()
+	{
+		return musicMinDelay;
+	}
+
+	@Override
+	public int getMusicMaxDelay()
+	{
+		return musicMaxDelay;
+	}
+
+	@Override
+	public boolean isReplaceCurrentMusic()
+	{
+		return replaceCurrentMusic;
+	}
+
+	@Override
+	public String getAmbientSound()
+	{
+		return ambientSound;
+	}
+
+	@Override
+	public String getMoodSound()
+	{
+		return moodSound;
+	}
+
+	@Override
+	public int getMoodSoundDelay()
+	{
+		return moodSoundDelay;
+	}
+
+	@Override
+	public int getMoodSearchRange()
+	{
+		return moodSearchRange;
+	}
+
+	@Override
+	public double getMoodOffset()
+	{
+		return moodOffset;
+	}
+
+	@Override
+	public String getAdditionsSound()
+	{
+		return additionsSound;
+	}
+
+	@Override
+	public double getAdditionsTickChance()
+	{
+		return additionsTickChance;
 	}
 	
 	@Override

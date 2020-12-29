@@ -44,7 +44,8 @@ public class BiomeStandardValues extends Settings
 		PILLAGER_OUTPOST_ENABLED = booleanSetting("PillagerOutpostEnabled", false),
 		BASTION_REMNANT_ENABLED = booleanSetting("BastionRemnantEnabled", false),
 		NETHER_FOSSIL_ENABLED = booleanSetting("NetherFossilEnabled", false),
-		END_CITY_ENABLED = booleanSetting("EndCityEnabled", false)
+		END_CITY_ENABLED = booleanSetting("EndCityEnabled", false),
+		REPLACE_CURRENT_MUSIC = booleanSetting("ReplaceCurrentMusic", false)
 	;
 
     public static final Setting<String>
@@ -53,7 +54,11 @@ public class BiomeStandardValues extends Settings
     	VANILLA_BIOME = stringSetting("ReplaceToBiomeName", ""),
     	BIOME_DICT_ID = stringSetting("BiomeDictId", ""),
     	INHERIT_MOBS_BIOME_NAME = stringSetting("InheritMobsBiomeName", ""),
-    	PARTICLE_TYPE = stringSetting("ParticleType", "")
+    	PARTICLE_TYPE = stringSetting("ParticleType", ""),
+		MUSIC = stringSetting("Music", ""),
+		AMBIENT_SOUND = stringSetting("AmbientSound", ""),
+		MOOD_SOUND = stringSetting("MoodSound", "minecraft:ambient.cave"),
+		ADDITIONS_SOUND = stringSetting("AdditionsSound", "")
 	;
 
     public static final Setting<Integer>
@@ -68,7 +73,11 @@ public class BiomeStandardValues extends Settings
 		WATER_LEVEL_MIN = WorldStandardValues.WATER_LEVEL_MIN,
 		VILLAGE_SIZE = intSetting("VillageSize", 6, 0, Integer.MAX_VALUE),
 		PILLAGER_OUTPOST_SIZE = intSetting("PillagerOutpostSize", 7, 0, Integer.MAX_VALUE),
-		BASTION_REMNANT_SIZE = intSetting("BastionRemnantSize", 6, 0, Integer.MAX_VALUE)
+		BASTION_REMNANT_SIZE = intSetting("BastionRemnantSize", 6, 0, Integer.MAX_VALUE),
+		MUSIC_MIN_DELAY = intSetting("MusicMinDelay", 0, 0, Integer.MAX_VALUE),
+		MUSIC_MAX_DELAY = intSetting("MusicMaxDelay", 0, 0, Integer.MAX_VALUE),
+		MOOD_SOUND_DELAY = intSetting("MoodSoundDelay", 6000, 0, Integer.MAX_VALUE),
+		MOOD_SEARCH_RANGE = intSetting("MoodSearchRange", 8, 0, Integer.MAX_VALUE)
 	;
 
     public static final Setting<Integer>
@@ -93,7 +102,9 @@ public class BiomeStandardValues extends Settings
     	VOLATILITY_WEIGHT_1 = doubleSetting("VolatilityWeight1", 0.5, -1000, 1000),
     	VOLATILITY_WEIGHT_2 = doubleSetting("VolatilityWeight2", 0.45, -1000, 1000),
     	MAX_AVERAGE_HEIGHT = doubleSetting("MaxAverageHeight", 0, -1000, 1000),
-    	MAX_AVERAGE_DEPTH = doubleSetting("MaxAverageDepth", 0, -1000, 1000)
+    	MAX_AVERAGE_DEPTH = doubleSetting("MaxAverageDepth", 0, -1000, 1000),
+		MOOD_OFFSET = doubleSetting("MoodOffset", 2.0, 0, Double.MAX_VALUE),
+		ADDITIONS_TICK_CHANCE = doubleSetting("AdditionsTickChance", 0, 0, Double.MAX_VALUE)
     ;
 
     public static final Setting<LocalMaterialData>
