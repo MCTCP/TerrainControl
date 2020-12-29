@@ -57,18 +57,34 @@ public class SpigotBiome implements IBiome
 						.c(biomeConfig.getWaterFogColor() != BiomeStandardValues.WATER_FOG_COLOR.getDefaultValue() ? biomeConfig.getWaterFogColor() : 329011)
 						.d(biomeConfig.getSkyColor() != BiomeStandardValues.SKY_COLOR.getDefaultValue() ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature))
 						//.e() // TODO: Sky color is normally based on temp, make a setting for that?
-						// TODO: Implement these
-						// particle
-						// .func_235244_a_()
-						// ambient_sound
-						// .func_235241_a_() // Sound event?
-						// mood_sound
-						.a(CaveSoundSettings.b)
-				//additions_sound
-				//.func_235242_a_()
-				//music
-				//.func_235240_a_()
 				;
+
+
+		Optional<Particle<?>> particleType = IRegistry.PARTICLE_TYPE.getOptional(new MinecraftKey(biomeConfig.getParticleType()));
+		if (particleType.isPresent() && particleType.get() instanceof ParticleParam)
+		{
+			biomeAmbienceBuilder.a(new BiomeParticles((ParticleParam) particleType.get(),
+					biomeConfig.getParticleProbability()));
+		}
+
+		Optional<SoundEffect> music = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getMusic()));
+		music.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new Music(soundEffect,
+				biomeConfig.getMusicMinDelay(),
+				biomeConfig.getMusicMaxDelay(),
+				biomeConfig.isReplaceCurrentMusic())));
+
+		Optional<SoundEffect> ambientSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getAmbientSound()));
+		ambientSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(ambientSound.get()));
+
+		Optional<SoundEffect> moodSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getMoodSound()));
+		moodSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new CaveSoundSettings(moodSound.get(),
+				biomeConfig.getMoodSoundDelay(),
+				biomeConfig.getMoodSearchRange(),
+				biomeConfig.getMoodOffset())));
+
+		Optional<SoundEffect> additionsSound = IRegistry.SOUND_EVENT.getOptional(new MinecraftKey(biomeConfig.getAdditionsSound()));
+		additionsSound.ifPresent(soundEffect -> biomeAmbienceBuilder.a(new CaveSound(additionsSound.get(),
+				biomeConfig.getAdditionsTickChance())));
 
 		if (biomeConfig.getFoliageColor() != 0xffffff)
 		{
@@ -82,12 +98,11 @@ public class SpigotBiome implements IBiome
 
 		switch (biomeConfig.getGrassColorModifier())
 		{
-			//TODO: Find the right NMS methods here
 			case Swamp:
-				//biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.SWAMP);
+				biomeAmbienceBuilder.a(BiomeFog.GrassColor.SWAMP);
 				break;
 			case DarkForest:
-				//biomeAmbienceBuilder.withGrassColorModifier(BiomeAmbience.GrassColorModifier.DARK_FOREST);
+				biomeAmbienceBuilder.a(BiomeFog.GrassColor.DARK_FOREST);
 				break;
 			default:
 				break;

@@ -394,12 +394,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		if (!this.dimensionSettingsSupplier.get().func_236120_h_())
 		{
-			int i = worldGenRegion.getMainChunkX();
-			int j = worldGenRegion.getMainChunkZ();
-			Biome biome = worldGenRegion.getBiome((new ChunkPos(i, j)).asBlockPos());
+			int chunkX = worldGenRegion.getMainChunkX();
+			int chunkZ = worldGenRegion.getMainChunkZ();
+			Biome biome = worldGenRegion.getBiome((new ChunkPos(chunkX, chunkZ)).asBlockPos());
 			SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
-			sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), i << 4, j << 4);
-			WorldEntitySpawner.performWorldGenSpawning(worldGenRegion, biome, i, j, sharedseedrandom);
+			sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
+			WorldEntitySpawner.performWorldGenSpawning(worldGenRegion, biome, chunkX, chunkZ, sharedseedrandom);
 		}
 	}
 

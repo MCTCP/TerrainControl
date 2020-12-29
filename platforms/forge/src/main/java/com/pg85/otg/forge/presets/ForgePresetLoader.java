@@ -183,6 +183,11 @@ public class ForgePresetLoader extends LocalPresetLoader
  				
  				currentId++;
 			}
+
+			// If the ocean config is null, shift the array downwards to fill id 0
+			if (oceanBiomeConfig == null) {
+				System.arraycopy(presetIdMapping, 1, presetIdMapping, 0, presetIdMapping.length - 1);
+			}
 			
 			this.globalIdMapping.put(preset.getName(), presetIdMapping);
 			this.reverseIdMapping.put(preset.getName(), presetReverseIdMapping);

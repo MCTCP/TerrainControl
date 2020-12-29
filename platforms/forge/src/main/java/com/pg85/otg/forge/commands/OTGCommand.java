@@ -8,10 +8,12 @@ import java.nio.file.Paths;
 import javax.imageio.ImageIO;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.SuggestionProviders;
 import net.minecraft.util.text.StringTextComponent;
 
 public class OTGCommand
@@ -30,6 +32,12 @@ public class OTGCommand
 			).then(
 				Commands.literal("map").executes(
 					(context) -> mapBiomes(context.getSource())
+				)
+			).then(
+				Commands.literal("data").then(
+					Commands.argument("type", StringArgumentType.word()).executes(
+						(context -> DataCommand.execute(context.getSource(), context.getArgument("type", String.class)))
+					)
 				)
 			)
 		);

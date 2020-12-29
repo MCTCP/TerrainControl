@@ -1,23 +1,26 @@
 package com.pg85.otg.spigot.commands;
 
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
+import org.bukkit.util.StringUtil;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 {
+	public static List<String> COMMANDS = new ArrayList<>(Arrays.asList("data", "map", "help"));
 
 	@Override
 	public boolean onCommand (CommandSender sender, Command command, String s, String[] strings)
@@ -29,20 +32,14 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 			cmd = "help";
 		switch (cmd)
 		{
+			case "data":
+				return DataCommand.execute(sender, strings);
 			case "map":
 				return mapBiomes(sender, strings);
-			case "biomes":
-				return listBiomes(sender);
 			case "help":
 			default:
 				return helpMessage(sender);
 		}
-	}
-
-	private boolean listBiomes (CommandSender sender)
-	{
-		sender.sendMessage("This does nothing yet, sorry");
-		return true;
 	}
 
 	private boolean mapBiomes (CommandSender sender, String[] args)
@@ -122,6 +119,19 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 	@Override
 	public List<String> onTabComplete (CommandSender sender, Command command, String s, String[] strings)
 	{
-		return null;
+
+		if (strings.length == 0)
+			return COMMANDS;
+		if (strings.length == 1)
+			return StringUtil.copyPartialMatches(strings[0], COMMANDS, new ArrayList<>());
+		switch (strings[0])
+		{
+			case "data":
+				return DataCommand.tabComplete(strings);
+			case "map":
+			case "help":
+				return new ArrayList<>();
+		}
+		return new ArrayList<>();
 	}
 }

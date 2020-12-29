@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.constants.SettingsEnums.ImageMode;
 import com.pg85.otg.constants.SettingsEnums.ImageOrientation;
@@ -153,7 +154,15 @@ public class BiomeLayerData
 		this.landSize = worldConfig.getLandSize();
 		this.landFuzzy = worldConfig.getLandFuzzy();
 		this.landRarity = worldConfig.getLandRarity();
-		this.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes(), oceanBiomeConfig.getBorderInBiomes(), oceanBiomeConfig.getNotBorderNearBiomes());
+
+		if (oceanBiomeConfig == null)
+		{
+			this.oceanBiomeData = new NewBiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
+		} else
+		{
+			this.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes(), oceanBiomeConfig.getBorderInBiomes(), oceanBiomeConfig.getNotBorderNearBiomes());
+		}
+
 		this.frozenOceanTemperature = worldConfig.getFrozenOceanTemperature();
 		this.biomeRarityScale = worldConfig.getBiomeRarityScale();
 		this.freezeGroups = worldConfig.getIsFreezeGroups();
