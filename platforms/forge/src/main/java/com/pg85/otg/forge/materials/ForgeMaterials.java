@@ -7,7 +7,11 @@ import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
+import net.minecraft.block.BambooBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.state.properties.BambooLeaves;
 import net.minecraft.state.properties.DoubleBlockHalf;
 
 class ForgeMaterials extends LocalMaterials
@@ -101,7 +105,13 @@ class ForgeMaterials extends LocalMaterials
 			SAPLING = readMaterial(LocalMaterials.SAPLING_NAME);
 			WATER_LILY = readMaterial(LocalMaterials.WATER_LILY_NAME);
 			SUGAR_CANE_BLOCK = readMaterial(LocalMaterials.SUGAR_CANE_BLOCK_NAME);
-	
+			BlockState bambooState = Blocks.BAMBOO.getDefaultState().with(BambooBlock.PROPERTY_AGE, 1).with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.NONE).with(BambooBlock.PROPERTY_STAGE, 0);
+			BAMBOO = ForgeMaterialData.ofMinecraftBlockState(bambooState);
+			BAMBOO_SMALL = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.SMALL));
+			BAMBOO_LARGE = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.LARGE));
+			BAMBOO_LARGE_GROWING = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.LARGE).with(BambooBlock.PROPERTY_STAGE, 1));
+			PODZOL = readMaterial(LocalMaterials.PODZOL_NAME);
+
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);
 			DIAMOND_ORE = readMaterial(LocalMaterials.DIAMOND_ORE_NAME);

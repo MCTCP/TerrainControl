@@ -104,7 +104,7 @@ public class ReedGen extends Resource
         if (worldMaterial == null || !this.sourceBlocks.contains(worldMaterial))
         {
             return;
-        }  
+        }
 
         int height = 1 + rand.nextInt(2);
         for (int y1 = 0; y1 < height; y1++)

@@ -88,6 +88,7 @@ public class LocalMaterials
 	public static final String SAPLING_NAME = getRegistryKey("oak_sapling");
 	public static final String WATER_LILY_NAME = getRegistryKey("lily_pad");
 	public static final String SUGAR_CANE_BLOCK_NAME = getRegistryKey("sugar_cane");
+	public static final String PODZOL_NAME = getRegistryKey("podzol");
 
     // Ores
 	public static final String COAL_ORE_NAME = getRegistryKey("coal_ore");
@@ -184,7 +185,12 @@ public class LocalMaterials
     public static LocalMaterialData SAPLING;
     public static LocalMaterialData WATER_LILY;
     public static LocalMaterialData SUGAR_CANE_BLOCK;
-    
+    public static LocalMaterialData BAMBOO;
+    public static LocalMaterialData BAMBOO_SMALL;
+    public static LocalMaterialData BAMBOO_LARGE;
+    public static LocalMaterialData BAMBOO_LARGE_GROWING;
+    public static LocalMaterialData PODZOL;
+
     public static LocalMaterialData DOUBLE_TALL_GRASS_LOWER;
     public static LocalMaterialData DOUBLE_TALL_GRASS_UPPER;
     public static LocalMaterialData LARGE_FERN_LOWER;

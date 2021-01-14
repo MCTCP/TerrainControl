@@ -16,6 +16,7 @@ import com.pg85.otg.customobject.resource.SaplingGen;
 import com.pg85.otg.customobject.resource.TreeGen;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.AboveWaterGen;
+import com.pg85.otg.gen.resource.BambooGen;
 import com.pg85.otg.gen.resource.BoulderGen;
 import com.pg85.otg.gen.resource.CactusGen;
 import com.pg85.otg.gen.resource.DungeonGen;
@@ -93,6 +94,8 @@ public class BiomeConfig extends BiomeConfigBase
 		CONFIG_FUNCTIONS.put("CustomStructure", CustomStructureGen.class);		
 		CONFIG_FUNCTIONS.put("Sapling", SaplingGen.class);		
 		CONFIG_FUNCTIONS.put("Tree", TreeGen.class);
+		CONFIG_FUNCTIONS.put("Bamboo", BambooGen.class);
+
 	}
 
 	// TODO: Not used atm, implement these.

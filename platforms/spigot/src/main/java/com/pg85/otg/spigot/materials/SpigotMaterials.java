@@ -6,8 +6,14 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
+import org.bukkit.block.BlockState;
+
+import net.minecraft.server.v1_16_R3.BlockBamboo;
+import net.minecraft.server.v1_16_R3.BlockPropertyBambooSize;
 import net.minecraft.server.v1_16_R3.BlockPropertyDoubleBlockHalf;
 import net.minecraft.server.v1_16_R3.BlockTallPlant;
+import net.minecraft.server.v1_16_R3.Blocks;
+import net.minecraft.server.v1_16_R3.IBlockData;
 
 public class SpigotMaterials extends LocalMaterials
 {
@@ -100,6 +106,13 @@ public class SpigotMaterials extends LocalMaterials
 			SAPLING = readMaterial(LocalMaterials.SAPLING_NAME);
 			WATER_LILY = readMaterial(LocalMaterials.WATER_LILY_NAME);
 			SUGAR_CANE_BLOCK = readMaterial(LocalMaterials.SUGAR_CANE_BLOCK_NAME);
+			IBlockData bambooState = Blocks.BAMBOO.getBlockData().set(BlockBamboo.d, 1).set(BlockBamboo.e, BlockPropertyBambooSize.NONE).set(BlockBamboo.f, 0);
+			BAMBOO = SpigotMaterialData.ofBlockData(bambooState);
+			BAMBOO_SMALL = SpigotMaterialData.ofBlockData(bambooState.set(BlockBamboo.e, BlockPropertyBambooSize.SMALL));
+			BAMBOO_LARGE = SpigotMaterialData.ofBlockData(bambooState.set(BlockBamboo.e, BlockPropertyBambooSize.LARGE));
+			BAMBOO_LARGE_GROWING = SpigotMaterialData.ofBlockData(bambooState.set(BlockBamboo.e, BlockPropertyBambooSize.LARGE).set(BlockBamboo.f, 1));
+			PODZOL = readMaterial(LocalMaterials.PODZOL_NAME);
+
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

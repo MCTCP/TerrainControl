@@ -174,7 +174,7 @@ public abstract class Resource extends ConfigFunction<IBiomeConfig> implements C
      * @param x              The block x.
      * @param z              The block z.
      */
-    public abstract void spawn(IWorldGenRegion worldGenregion, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated);
+    public abstract void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated);
 
     /**
      * Places the resource in a chunk. The default implementation simply calls
