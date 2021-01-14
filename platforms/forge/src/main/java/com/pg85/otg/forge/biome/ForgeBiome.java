@@ -15,22 +15,19 @@ import com.pg85.otg.util.interfaces.IBiome;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 
+import net.minecraft.client.audio.BackgroundMusicSelector;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeAmbience;
-import net.minecraft.world.biome.BiomeGenerationSettings;
+import net.minecraft.world.biome.*;
 import net.minecraft.world.biome.BiomeGenerationSettings.Builder;
-import net.minecraft.world.biome.MobSpawnInfo;
-import net.minecraft.world.biome.MoodSoundAmbience;
-import net.minecraft.world.biome.ParticleEffectAmbience;
 import net.minecraft.world.gen.feature.IFeatureConfig;
 import net.minecraft.world.gen.feature.ProbabilityConfig;
 import net.minecraft.world.gen.feature.StructureFeature;
@@ -49,6 +46,7 @@ import net.minecraft.world.gen.feature.structure.StructureFeatures;
 import net.minecraft.world.gen.feature.structure.TaigaVillagePools;
 import net.minecraft.world.gen.feature.structure.VillageConfig;
 import net.minecraft.world.gen.surfacebuilders.ConfiguredSurfaceBuilders;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgeBiome implements IBiome
 {
@@ -101,18 +99,43 @@ public class ForgeBiome implements IBiome
 				.setWaterFogColor(biomeConfig.getWaterFogColor() != BiomeStandardValues.WATER_FOG_COLOR.getDefaultValue() ? biomeConfig.getWaterFogColor() : 329011)
 				.setWaterColor(biomeConfig.getWaterColor() != BiomeStandardValues.WATER_COLOR.getDefaultValue() ? biomeConfig.getWaterColor() : 4159204)
 				.withSkyColor(biomeConfig.getSkyColor() != BiomeStandardValues.SKY_COLOR.getDefaultValue() ? biomeConfig.getSkyColor() : getSkyColorForTemp(safeTemperature)) // TODO: Sky color is normally based on temp, make a setting for that?
-				// TODO: Implement sounds/music
-				.setMoodSound(MoodSoundAmbience.DEFAULT_CAVE)
-				//.setAmbientSound(SoundEvents.AMBIENT_BASALT_DELTAS_LOOP)
-				//.setMoodSound(new MoodSoundAmbience(SoundEvents.AMBIENT_BASALT_DELTAS_MOOD, 6000, 8, 2.0D))
-				//.setAdditionsSound(new SoundAdditionsAmbience(SoundEvents.AMBIENT_BASALT_DELTAS_ADDITIONS, 0.0111D))
-				//.setMusic(BackgroundMusicTracks.getDefaultBackgroundMusicSelector(SoundEvents.MUSIC_NETHER_BASALT_DELTAS))
 		;
 
 		Optional<ParticleType<?>> particleType = Registry.PARTICLE_TYPE.getOptional(new ResourceLocation(biomeConfig.getParticleType()));
 		if(particleType.isPresent() && particleType.get() instanceof IParticleData)
 		{
 			biomeAmbienceBuilder.setParticle(new ParticleEffectAmbience((IParticleData)particleType.get(), biomeConfig.getParticleProbability()));	
+		}
+
+		SoundEvent event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getMusic()));
+		if (event != null)
+		{
+			biomeAmbienceBuilder.setMusic(new BackgroundMusicSelector(event,
+					biomeConfig.getMusicMinDelay(),
+					biomeConfig.getMusicMaxDelay(),
+					biomeConfig.isReplaceCurrentMusic()));
+		}
+
+		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getAmbientSound()));
+		if (event != null)
+		{
+			biomeAmbienceBuilder.setAmbientSound(event);
+		}
+
+		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getMoodSound()));
+		if (event != null)
+		{
+			biomeAmbienceBuilder.setMoodSound(new MoodSoundAmbience(event,
+					biomeConfig.getMoodSoundDelay(),
+					biomeConfig.getMoodSearchRange(),
+					biomeConfig.getMoodOffset()));
+		}
+
+		event = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(biomeConfig.getAdditionsSound()));
+		if (event != null)
+		{
+			biomeAmbienceBuilder.setAdditionsSound(new SoundAdditionsAmbience(event,
+					biomeConfig.getAdditionsTickChance()));
 		}
 		
 		if(biomeConfig.getFoliageColor() != 0xffffff)

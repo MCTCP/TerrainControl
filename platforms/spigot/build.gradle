@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'maven'
-    id "fr.il_totore.manadrop" version "0.4.1-SNAPSHOT"
 }
 
 archivesBaseName = "openterraingenerator-spigot"
@@ -41,7 +40,6 @@ processResources
                 // Replace version
                 expand 'version': project.version
             }
-
             // Copy everything else, that's not the plugin.yml
             from(sourceSets.main.resources.srcDirs) {
                 exclude 'plugin.yml'
@@ -59,8 +57,4 @@ jar {
                 project(":common:common-generator").sourceSets.main.output.files
                 project(":common:common-core").sourceSets.main.output.files
             }
-}
-
-buildTools {
-    versions '1.16.4'
 }

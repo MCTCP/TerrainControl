@@ -1,0 +1,15 @@
+package com.pg85.otg.forge.gen;
+
+import com.pg85.otg.constants.Constants;
+
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.world.ForgeWorldType;
+
+public class OTGWorldType extends ForgeWorldType
+{
+	public OTGWorldType()
+	{
+		super(new OTGChunkGeneratorFactory());
+		this.setRegistryName(new ResourceLocation(Constants.MOD_ID_SHORT));
+	}
+}

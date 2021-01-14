@@ -121,6 +121,17 @@ public interface IBiomeConfig
 	String getParticleType();
 	float getParticleProbability();	
 	int getSnowHeight(float tempAtBlockToFreeze);
+	String getMusic();
+	int getMusicMinDelay();
+	int getMusicMaxDelay();
+	boolean isReplaceCurrentMusic();
+	String getAmbientSound();
+	String getMoodSound();
+	int getMoodSoundDelay();
+	int getMoodSearchRange();
+	double getMoodOffset();
+	String getAdditionsSound();
+	double getAdditionsTickChance();
 	
 	// OTG Custom structures (BO's)
 	

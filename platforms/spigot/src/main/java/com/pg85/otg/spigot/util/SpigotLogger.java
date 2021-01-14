@@ -1,15 +1,11 @@
 package com.pg85.otg.spigot.util;
 
-import com.pg85.otg.config.standard.PluginConfigStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.logging.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.bukkit.plugin.java.JavaPlugin;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.logging.Level;
 
 public class SpigotLogger extends Logger
 {
