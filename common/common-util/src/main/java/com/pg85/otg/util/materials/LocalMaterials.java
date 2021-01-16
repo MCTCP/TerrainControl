@@ -29,8 +29,8 @@ public class LocalMaterials
 	public static final String RED_SANDSTONE_NAME = getRegistryKey("red_sandstone");
 	public static final String GRAVEL_NAME = getRegistryKey("gravel");
 	public static final String MOSSY_COBBLESTONE_NAME = getRegistryKey("mossy_cobblestone");
-	public static final String SNOW_NAME = getRegistryKey("snow_layer");
-	public static final String SNOW_BLOCK_NAME = getRegistryKey("snow");
+	public static final String SNOW_NAME = getRegistryKey("snow");
+	public static final String SNOW_BLOCK_NAME = getRegistryKey("snow_block");
 	public static final String TORCH_NAME = getRegistryKey("torch");
 	public static final String BEDROCK_NAME = getRegistryKey("bedrock");
 	public static final String MAGMA_NAME = getRegistryKey("magma_block");

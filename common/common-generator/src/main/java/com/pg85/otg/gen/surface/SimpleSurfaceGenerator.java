@@ -58,7 +58,7 @@ public class SimpleSurfaceGenerator implements SurfaceGenerator
         final int currentWaterLevel = generatingChunk.getWaterLevel(x, z);
         LocalMaterialData blockOnCurrentPos;
         
-        int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(x, z);       
+        int highestBlockInColumn = chunkBuffer.getHighestBlockForColumn(x, z);
         for (int y = highestBlockInColumn; y >= 0; y--)
         {
             if (generatingChunk.mustCreateBedrockAt(biomeConfig.isFlatBedrock(), biomeConfig.isBedrockDisabled(), biomeConfig.isCeilingBedrock(), y))

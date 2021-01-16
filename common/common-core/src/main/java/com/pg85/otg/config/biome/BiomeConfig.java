@@ -613,7 +613,8 @@ public class BiomeConfig extends BiomeConfigBase
 			"  and " + BiomeStandardValues.GROUND_BLOCK + " will never appear in this biome.",
 			"",
 			"Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks",
-			"like the blocks found in the Mesa biomes."
+			"like the blocks found in the Mesa biomes.",
+			"You can also use Iceberg to get iceberg generation like in vanilla frozen oceans."
 		);
 
 		writer.putSetting(BiomeStandardValues.REPLACED_BLOCKS, replacedBlocks,

@@ -34,6 +34,13 @@ public class SurfaceGeneratorSetting extends Setting<SurfaceGenerator>
             {
                 return mesa;
             }
+
+            SurfaceGenerator iceberg = IcebergSurfaceGenerator.getFor(string);
+            if (iceberg != null)
+            {
+                return iceberg;
+            }
+
             String[] parts = StringHelper.readCommaSeperatedString(string);
             return new MultipleLayersSurfaceGenerator(parts, materialReader);
         }
