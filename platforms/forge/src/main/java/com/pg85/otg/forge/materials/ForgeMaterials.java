@@ -11,6 +11,7 @@ import net.minecraft.block.BambooBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DoublePlantBlock;
+import net.minecraft.block.TallSeaGrassBlock;
 import net.minecraft.state.properties.BambooLeaves;
 import net.minecraft.state.properties.DoubleBlockHalf;
 
@@ -111,6 +112,9 @@ class ForgeMaterials extends LocalMaterials
 			BAMBOO_LARGE = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.LARGE));
 			BAMBOO_LARGE_GROWING = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.LARGE).with(BambooBlock.PROPERTY_STAGE, 1));
 			PODZOL = readMaterial(LocalMaterials.PODZOL_NAME);
+			SEAGRASS = ForgeMaterialData.ofMinecraftBlockState(Blocks.SEAGRASS.getDefaultState());
+			TALL_SEAGRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.getDefaultState().with(TallSeaGrassBlock.HALF, DoubleBlockHalf.LOWER));
+			TALL_SEAGRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.getDefaultState().with(TallSeaGrassBlock.HALF, DoubleBlockHalf.UPPER));
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

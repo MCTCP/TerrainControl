@@ -12,6 +12,7 @@ import net.minecraft.server.v1_16_R3.BlockBamboo;
 import net.minecraft.server.v1_16_R3.BlockPropertyBambooSize;
 import net.minecraft.server.v1_16_R3.BlockPropertyDoubleBlockHalf;
 import net.minecraft.server.v1_16_R3.BlockTallPlant;
+import net.minecraft.server.v1_16_R3.BlockTallSeaGrass;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.IBlockData;
 
@@ -112,7 +113,9 @@ public class SpigotMaterials extends LocalMaterials
 			BAMBOO_LARGE = SpigotMaterialData.ofBlockData(bambooState.set(BlockBamboo.e, BlockPropertyBambooSize.LARGE));
 			BAMBOO_LARGE_GROWING = SpigotMaterialData.ofBlockData(bambooState.set(BlockBamboo.e, BlockPropertyBambooSize.LARGE).set(BlockBamboo.f, 1));
 			PODZOL = readMaterial(LocalMaterials.PODZOL_NAME);
-
+			SEAGRASS = SpigotMaterialData.ofBlockData(Blocks.SEAGRASS.getBlockData());
+			TALL_SEAGRASS_LOWER = SpigotMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.getBlockData().set(BlockTallSeaGrass.b, BlockPropertyDoubleBlockHalf.LOWER));
+			TALL_SEAGRASS_UPPER = SpigotMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.getBlockData().set(BlockTallSeaGrass.b, BlockPropertyDoubleBlockHalf.UPPER));
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

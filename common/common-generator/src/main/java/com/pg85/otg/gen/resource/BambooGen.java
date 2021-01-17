@@ -16,7 +16,7 @@ import com.pg85.otg.util.materials.MaterialSet;
 
 public class BambooGen extends Resource
 {
-	private final double podzolRarity;
+	private final double podzolChance;
 	private final MaterialSet sourceBlocks;
 
 	public BambooGen(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
@@ -25,14 +25,14 @@ public class BambooGen extends Resource
 
 		this.frequency = readInt(args.get(0), 1, 500);
 		this.rarity = readRarity(args.get(1));
-		this.podzolRarity = readDouble(args.get(2), 0.0, 1.0);
+		this.podzolChance = readDouble(args.get(2), 0.0, 1.0);
 		this.sourceBlocks = readMaterials(args, 3, materialReader);
 	}
 
 	@Override
 	public String toString()
 	{
-		return "Bamboo(" + this.frequency + "," + this.rarity + + this.podzolRarity + this.sourceBlocks + ")";
+		return "Bamboo(" + this.frequency + "," + this.rarity + + this.podzolChance + this.sourceBlocks + ")";
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class BambooGen extends Resource
 			}
 
 			// Place podzol around bamboo bottom with chance
-			if (random.nextDouble() <= this.podzolRarity)
+			if (random.nextDouble() <= this.podzolChance)
 			{
 				// TODO: should the radius be configurable?
 				int radius = random.nextInt(4) + 1;

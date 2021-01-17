@@ -372,7 +372,15 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 		int heightMapy = chunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(internalX, internalZ);
 		if(heightMapy == 0)
 		{
-			heightMapy = Constants.WORLD_HEIGHT - 1;
+			// Check the non wg heightmap as a secondary measure
+			int heightMapCheck = chunk.getHeightmap(Type.WORLD_SURFACE).getHeight(internalX, internalZ);
+
+			if (heightMapCheck != 0) {
+				heightMapy = heightMapCheck;
+			} else
+			{
+				heightMapy = Constants.WORLD_HEIGHT - 1;
+			}
 		}
 
 		ForgeMaterialData material;

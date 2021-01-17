@@ -119,6 +119,7 @@ public class LocalMaterials
 
     public static LocalMaterialData GRASS;
     public static LocalMaterialData DIRT;
+	public static LocalMaterialData PODZOL;
     public static LocalMaterialData CLAY;
     public static LocalMaterialData TERRACOTTA;
     public static LocalMaterialData WHITE_TERRACOTTA;
@@ -189,7 +190,9 @@ public class LocalMaterials
     public static LocalMaterialData BAMBOO_SMALL;
     public static LocalMaterialData BAMBOO_LARGE;
     public static LocalMaterialData BAMBOO_LARGE_GROWING;
-    public static LocalMaterialData PODZOL;
+    public static LocalMaterialData SEAGRASS;
+    public static LocalMaterialData TALL_SEAGRASS_LOWER;
+    public static LocalMaterialData TALL_SEAGRASS_UPPER;
 
     public static LocalMaterialData DOUBLE_TALL_GRASS_LOWER;
     public static LocalMaterialData DOUBLE_TALL_GRASS_UPPER;
