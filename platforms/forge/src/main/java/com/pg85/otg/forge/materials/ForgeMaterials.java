@@ -115,6 +115,8 @@ class ForgeMaterials extends LocalMaterials
 			SEAGRASS = ForgeMaterialData.ofMinecraftBlockState(Blocks.SEAGRASS.getDefaultState());
 			TALL_SEAGRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.getDefaultState().with(TallSeaGrassBlock.HALF, DoubleBlockHalf.LOWER));
 			TALL_SEAGRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.getDefaultState().with(TallSeaGrassBlock.HALF, DoubleBlockHalf.UPPER));
+			KELP = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP.getDefaultState());
+			KELP_PLANT = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP_PLANT.getDefaultState());
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

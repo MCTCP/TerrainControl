@@ -116,6 +116,8 @@ public class SpigotMaterials extends LocalMaterials
 			SEAGRASS = SpigotMaterialData.ofBlockData(Blocks.SEAGRASS.getBlockData());
 			TALL_SEAGRASS_LOWER = SpigotMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.getBlockData().set(BlockTallSeaGrass.b, BlockPropertyDoubleBlockHalf.LOWER));
 			TALL_SEAGRASS_UPPER = SpigotMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.getBlockData().set(BlockTallSeaGrass.b, BlockPropertyDoubleBlockHalf.UPPER));
+			KELP = SpigotMaterialData.ofBlockData(Blocks.KELP.getBlockData());
+			KELP_PLANT = SpigotMaterialData.ofBlockData(Blocks.KELP_PLANT.getBlockData());
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

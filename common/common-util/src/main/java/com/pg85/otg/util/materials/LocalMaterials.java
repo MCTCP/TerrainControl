@@ -193,6 +193,8 @@ public class LocalMaterials
     public static LocalMaterialData SEAGRASS;
     public static LocalMaterialData TALL_SEAGRASS_LOWER;
     public static LocalMaterialData TALL_SEAGRASS_UPPER;
+	public static LocalMaterialData KELP;
+	public static LocalMaterialData KELP_PLANT;
 
     public static LocalMaterialData DOUBLE_TALL_GRASS_LOWER;
     public static LocalMaterialData DOUBLE_TALL_GRASS_UPPER;

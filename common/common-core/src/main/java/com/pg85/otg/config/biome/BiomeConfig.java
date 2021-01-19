@@ -24,6 +24,7 @@ import com.pg85.otg.gen.resource.FossilGen;
 import com.pg85.otg.gen.resource.GrassGen;
 import com.pg85.otg.gen.resource.IceSpikeGen;
 import com.pg85.otg.gen.resource.IceSpikeGen.SpikeType;
+import com.pg85.otg.gen.resource.KelpGen;
 import com.pg85.otg.gen.resource.LiquidGen;
 import com.pg85.otg.gen.resource.OreGen;
 import com.pg85.otg.gen.resource.PlantGen;
@@ -97,6 +98,7 @@ public class BiomeConfig extends BiomeConfigBase
 		CONFIG_FUNCTIONS.put("Tree", TreeGen.class);
 		CONFIG_FUNCTIONS.put("Bamboo", BambooGen.class);
 		CONFIG_FUNCTIONS.put("Seagrass", SeagrassGen.class);
+		CONFIG_FUNCTIONS.put("Kelp", KelpGen.class);
 
 	}
 
