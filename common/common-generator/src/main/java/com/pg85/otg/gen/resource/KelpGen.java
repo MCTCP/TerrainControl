@@ -34,6 +34,7 @@ public class KelpGen extends Resource
 	{
 		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
 
+		// TODO: sourceblocks
 		LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
 		if (below == null || !below.isSolid())
 		{
@@ -42,14 +43,17 @@ public class KelpGen extends Resource
 
 		int height = 1 + random.nextInt(10);
 
+		// Iterate upwards
 		for (int y1 = 0; y1 <= height; y1++)
 		{
 			int dy = y + y1;
 
+			// Stop if we hit non-water
 			if (!world.getMaterial(x, dy, + z, chunkBeingPopulated).isLiquid()) {
 				break;
 			}
 
+			// If we hit the surface of the water, place the top and return
 			if (!world.getMaterial(x, dy + 1, + z, chunkBeingPopulated).isLiquid()) {
 				if (y1 > 0) {
 					world.setBlock(x, dy, z, LocalMaterials.KELP.withProperty(MaterialProperties.AGE_0_25, 20 + random.nextInt(4)), null, chunkBeingPopulated, false);
@@ -58,6 +62,7 @@ public class KelpGen extends Resource
 				break;
 			}
 
+			// Place the top if we're at the top of the column
 			if (y1 == height) {
 				world.setBlock(x, dy, z, LocalMaterials.KELP.withProperty(MaterialProperties.AGE_0_25, 20 + random.nextInt(4)), null, chunkBeingPopulated, false);
 			} else {

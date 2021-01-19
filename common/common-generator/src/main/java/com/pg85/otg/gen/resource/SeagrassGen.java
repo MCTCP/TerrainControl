@@ -34,20 +34,17 @@ public class SeagrassGen extends Resource
 	@Override
 	public void spawn(IWorldGenRegion world, Random random, boolean villageInChunk, int x, int z, ChunkCoordinate chunkBeingPopulated)
 	{
-		// Triangle distribution from provided x/z
-		int dx = random.nextInt(8) - random.nextInt(8) + x;
-		int dz = random.nextInt(8) - random.nextInt(8) + z;
-
 		// Find lowest point
-		int y = world.getBlockAboveSolidHeight(dx, dz, chunkBeingPopulated);
+		int y = world.getBlockAboveSolidHeight(x, z, chunkBeingPopulated);
 
-		LocalMaterialData below = world.getMaterial(dx, y - 1, dz, chunkBeingPopulated);
+		// TODO: sourceblocks
+		LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
 		if (below == null || !below.isSolid())
 		{
 			return;
 		}
 
-		LocalMaterialData material = world.getMaterial(dx, y, dz, chunkBeingPopulated);
+		LocalMaterialData material = world.getMaterial(x, y, z, chunkBeingPopulated);
 
 		if (material == null)
 		{
@@ -56,7 +53,8 @@ public class SeagrassGen extends Resource
 
 		if (material.isLiquid())
 		{
-			if (random.nextDouble() <= this.tallChance && world.getMaterial(dx, y + 1, dz, chunkBeingPopulated).isLiquid())
+			// If the tall chance check succeeds and the above material is also water, place tall seagrass
+			if (random.nextDouble() <= this.tallChance && world.getMaterial(x, y + 1, z, chunkBeingPopulated).isLiquid())
 			{
 				world.setBlock(x, y, z, LocalMaterials.TALL_SEAGRASS_LOWER, null, chunkBeingPopulated, false);
 				world.setBlock(x, y + 1, z, LocalMaterials.TALL_SEAGRASS_UPPER, null, chunkBeingPopulated, false);
