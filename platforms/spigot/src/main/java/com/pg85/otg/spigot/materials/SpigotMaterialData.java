@@ -8,6 +8,9 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.server.v1_16_R3.*;
+
+import com.pg85.otg.util.materials.MaterialProperties;
+import com.pg85.otg.util.materials.MaterialProperty;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
@@ -263,6 +266,21 @@ public class SpigotMaterialData extends LocalMaterialData
 			return this;
 		}
 		return new SpigotMaterialData(this.blockData.getBlock().getBlockData(), rawEntry);
+	}
+
+	@Override
+	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
+	{
+		IBlockState<T> property = null;
+
+		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
+		if (materialProperty == MaterialProperties.AGE_0_25) {
+			property = (IBlockState<T>) BlockProperties.ak;
+		} else {
+			throw new IllegalArgumentException("Bad property: " + materialProperty);
+		}
+
+		return SpigotMaterialData.ofBlockData(this.blockData.set(property, value));
 	}
 
 	@Override

@@ -16,7 +16,12 @@ import net.minecraft.block.LeavesBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.command.arguments.BlockStateArgument;
 import net.minecraft.command.arguments.BlockStateInput;
+import net.minecraft.state.Property;
+import net.minecraft.state.properties.BlockStateProperties;
 import net.minecraft.util.ResourceLocation;
+
+import com.pg85.otg.util.materials.MaterialProperty;
+import com.pg85.otg.util.materials.MaterialProperties;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /**
@@ -305,7 +310,22 @@ public class ForgeMaterialData extends LocalMaterialData
 		// TODO: Implement this for 1.16		
 		return false;
 	}
-	
+
+	@Override
+	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
+	{
+		Property<T> property = null;
+
+		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
+		if (materialProperty == MaterialProperties.AGE_0_25) {
+			property = (Property<T>) BlockStateProperties.AGE_0_25;
+		} else {
+			throw new IllegalArgumentException("Bad property: " + materialProperty);
+		}
+
+		return ForgeMaterialData.ofMinecraftBlockState(this.blockData.with(property, value));
+	}
+
 	@Override
 	public boolean equals(Object obj)
 	{

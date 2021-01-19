@@ -253,7 +253,9 @@ public abstract class LocalMaterialData
 			isMaterial(LocalMaterials.QUARTZ_ORE) ||
 			isMaterial(LocalMaterials.REDSTONE_ORE)
 		;
-	}    
+	}
+
+	public abstract <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> state, T value);
 
 	public abstract boolean hasData();
 }
