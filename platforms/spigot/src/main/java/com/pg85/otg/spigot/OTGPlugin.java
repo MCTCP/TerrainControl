@@ -1,13 +1,16 @@
 package com.pg85.otg.spigot;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.commands.OTGCommandExecutor;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.spigot.gen.SpigotChunkGenerator;
 import net.minecraft.server.v1_16_R3.BiomeBase;
+import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.IRegistryWritable;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
@@ -64,8 +67,18 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	@Override
 	public ChunkGenerator getDefaultWorldGenerator (String worldName, String id)
 	{
+		if (id == null || id.equals(""))
+		{
+			id = "Default";
+		}
+		Preset preset = OTG.getEngine().getPresetLoader().getPresetByName(id);
+		if (preset == null)
+		{
+			OTG.log(LogMarker.WARN, "Could not find preset '"+id+"', did you install it correctly?");
+			return null;
+		}
 		worlds.put(worldName, id);
-		return new SpigotChunkGenerator(worldName, id, 0);
+		return new SpigotChunkGenerator(preset);
 	}
 
 	@EventHandler
@@ -81,8 +94,33 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				OTG.log(LogMarker.INFO, "Mission failed, we'll get them next time");
 				return;
 			}
-
-			OTGNoiseChunkGenerator infiltrator = ((SpigotChunkGenerator) event.getWorld().getGenerator()).generator;
+			if (!(event.getWorld().getGenerator() instanceof SpigotChunkGenerator))
+			{
+				OTG.log(LogMarker.WARN, "World generator was not an OTG generator, cannot take over, something has gone wrong");
+				return;
+			}
+			// We have a CustomChunkGenerator and a NoiseChunkGenerator
+			SpigotChunkGenerator OTGGen = (SpigotChunkGenerator) event.getWorld().getGenerator();
+			OTGNoiseChunkGenerator OTGDelegate;
+			if (OTGGen.generator == null)
+			{
+				OTGGen.initLock.lock();
+				if (OTGGen.generator == null)
+				{
+					OTGDelegate = new OTGNoiseChunkGenerator(
+						new DimensionConfig(OTGGen.preset.getName()),
+						new OTGBiomeProvider(OTGGen.preset.getName(), event.getWorld().getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
+						event.getWorld().getSeed(),
+						GeneratorSettingBase::i
+					);
+				} else {
+					// Was made by other thread while we were waiting for the lock
+					OTGDelegate = OTGGen.generator;
+				}
+			} else {
+				OTGDelegate = OTGGen.generator;
+			}
+			OTGGen.generator = OTGDelegate;
 
 			Field field = null;
 			Field modifiers = null;
@@ -96,7 +134,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				modifiers = Field.class.getDeclaredField("modifiers");
 				modifiers.setAccessible(true);
 				modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-				field.set(generator, infiltrator);
+				field.set(generator, OTGDelegate);
 			}
 			catch (NoSuchFieldException | IllegalAccessException e)
 			{
