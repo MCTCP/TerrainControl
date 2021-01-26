@@ -1,4 +1,4 @@
-include 'common:common-util', 'common:common-config', 'common:common-customobject', 'common:common-generator', 'common:common-core', 'platforms:forge', 'releases'
+include 'common:common-util', 'common:common-config', 'common:common-customobject', 'common:common-generator', 'common:common-core', 'platforms:forge'
 include 'platforms:spigot'
 findProject(':platforms:spigot')?.name = 'spigot'
 
