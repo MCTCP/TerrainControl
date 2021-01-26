@@ -26,6 +26,10 @@ public interface IWorldConfig
 	// Misc
 
 	public ConfigMode getSettingsMode();
+	String getShortPresetName();
+	public String getVersion();
+	public String getAuthor();
+	public String getDescription();
 
 	// Visual settings
 	
@@ -75,7 +79,7 @@ public interface IWorldConfig
 
 	public double getFractureHorizontal();
 	public double getFractureVertical();
-	public int getWorldHeightCap();	
+	public int getWorldHeightCap();
 	public int getWorldHeightScale();
 	public void setMaxSmoothRadius(int smoothRadius);
 	public int getMaxSmoothRadius();
@@ -106,7 +110,7 @@ public interface IWorldConfig
 	public boolean getRuinedPortalsEnabled();
 	public boolean getShipWrecksEnabled();
 	public boolean getStrongholdsEnabled();
-	public boolean getVillagesEnabled();	
+	public boolean getVillagesEnabled();
 	public boolean getMineshaftsEnabled();
 	public boolean getOceanMonumentsEnabled();
 	public boolean getRareBuildingsEnabled();

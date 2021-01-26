@@ -37,10 +37,12 @@ public class WorldStandardValues extends Settings
     public static final Setting<CustomStructureType> CUSTOM_STRUCTURE_TYPE = enumSetting("CustomStructureType", CustomStructureType.BO3);
     
     public static final Setting<String>
+		VERSION = stringSetting("Version", "0.0"),
+		AUTHOR = stringSetting("Author", "Unknown"),
+		SHORT_PRESET_NAME = stringSetting("ShortPresetName", ""),
+		DESCRIPTION = stringSetting("Description", "No description given"),
 		IMAGE_FILE = stringSetting("ImageFile", "map.png"),
 		IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
-		AUTHOR = stringSetting("Author", "Unknown"),
-		DESCRIPTION = stringSetting("Description", "No description given"),
 		BO3_AT_SPAWN = stringSetting("BO3AtSpawn", ""),
 		DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
 		DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean")

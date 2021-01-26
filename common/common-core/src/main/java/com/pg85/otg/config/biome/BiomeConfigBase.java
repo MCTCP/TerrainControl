@@ -47,6 +47,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	// Identity
 	
 	protected String vanillaBiome;
+	protected String biomeCategory;
 	
 	// Inheritance
 	
@@ -319,6 +320,12 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	public String getName()
 	{
 		return this.configName;
+	}
+
+	@Override
+	public String getBiomeCategory()
+	{
+		return this.biomeCategory;
 	}
 			
 	@Override

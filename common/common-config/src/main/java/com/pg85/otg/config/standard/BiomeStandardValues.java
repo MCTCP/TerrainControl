@@ -58,7 +58,8 @@ public class BiomeStandardValues extends Settings
 		MUSIC = stringSetting("Music", ""),
 		AMBIENT_SOUND = stringSetting("AmbientSound", ""),
 		MOOD_SOUND = stringSetting("MoodSound", "minecraft:ambient.cave"),
-		ADDITIONS_SOUND = stringSetting("AdditionsSound", "")
+		ADDITIONS_SOUND = stringSetting("AdditionsSound", ""),
+		BIOME_CATEGORY = stringSetting("BiomeCategory", "plains")
 	;
 
     public static final Setting<Integer>

@@ -167,7 +167,6 @@ public class ForgeBiome implements IBiome
 				biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? Biome.RainType.RAIN : 
 				Biome.RainType.SNOW
 			)
-			.category(isOceanBiome ? Biome.Category.OCEAN : Biome.Category.PLAINS) // TODO: Find out what category is used for.
 			.depth(biomeConfig.getBiomeHeight())
 			.scale(biomeConfig.getBiomeVolatility())
 			.temperature(safeTemperature)
@@ -176,6 +175,12 @@ public class ForgeBiome implements IBiome
 			.withMobSpawnSettings(mobSpawnInfoBuilder.copy())
 			.withGenerationSettings(biomeGenerationSettingsBuilder.build())
 		;
+		Biome.Category category = Biome.Category.byName(biomeConfig.getBiomeCategory());
+		biomeBuilder.category(category != null ? category : isOceanBiome ? Biome.Category.OCEAN : Biome.Category.PLAINS);
+		if (category == null)
+		{
+			OTG.log(LogMarker.INFO, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+		}
 
 		return biomeBuilder.build().setRegistryName(new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString()));
 	}

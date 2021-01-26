@@ -28,6 +28,11 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	protected ConfigMode settingsMode;
 
+	protected String version;
+	protected String author;
+	protected String description;
+	protected String shortPresetName;
+
 	// Visual settings
 	
 	protected int worldFogColor;
@@ -134,7 +139,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected double ravineDepth;	
 	protected int ravineMinAltitude;
 	protected int ravineMaxAltitude;
-	
+
 	protected WorldConfigBase(String configName)
 	{
 		super(configName);
@@ -473,7 +478,31 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.settingsMode;
 	}
-	
+
+	@Override
+	public String getShortPresetName()
+	{
+		return this.shortPresetName;
+	}
+
+	@Override
+	public String getVersion()
+	{
+		return this.version;
+	}
+
+	@Override
+	public String getAuthor()
+	{
+		return this.author;
+	}
+
+	@Override
+	public String getDescription()
+	{
+		return this.description;
+	}
+
 	@Override
 	public LocalMaterialData getWaterBlock()
 	{

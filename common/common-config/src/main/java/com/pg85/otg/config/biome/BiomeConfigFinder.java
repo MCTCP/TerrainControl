@@ -153,7 +153,7 @@ public final class BiomeConfigFinder
         		biome = new BiomeLoadInstruction(biomeName, new StandardBiomeTemplate(worldHeightScale));
         	}
 
-            // Load biome and remove it from the todo list
+            // Load biome and remove it from the to-do list
             File renamedFile = renameBiomeFile(file, biome, logger);
             SettingsMap settings = FileSettingsReader.read(biomeName, renamedFile, logger);
             BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, file.toPath(), biome, logger, materialReader);
