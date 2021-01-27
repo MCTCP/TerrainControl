@@ -113,8 +113,6 @@ public class SpigotBiome implements IBiome
 				.a(biomeConfig.getBiomeWetness() <= 0.0001 ? BiomeBase.Precipitation.NONE :
 				   biomeConfig.getBiomeTemperature() > Constants.SNOW_AND_ICE_TEMP ? BiomeBase.Precipitation.RAIN :
 				   BiomeBase.Precipitation.SNOW)
-				// Biome Category TODO: Expand this beyond oceans
-				.a(isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.PLAINS)
 				// depth
 				.a(biomeConfig.getBiomeHeight())
 				.b(biomeConfig.getBiomeVolatility())
@@ -126,6 +124,13 @@ public class SpigotBiome implements IBiome
 				.a(mobSpawnInfoBuilder.b())
 				// All other biome settings...
 				.a(biomeGenerationSettingsBuilder.a());
+
+		BiomeBase.Geography category = BiomeBase.Geography.a(biomeConfig.getBiomeCategory());
+		builder.a(category != null ? category : isOceanBiome ? BiomeBase.Geography.OCEAN : BiomeBase.Geography.PLAINS);
+		if (category == null)
+		{
+			OTG.log(LogMarker.INFO, "Could not parse biome category "+biomeConfig.getBiomeCategory());
+		}
 
 		return builder.a();
 	}

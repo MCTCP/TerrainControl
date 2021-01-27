@@ -57,4 +57,9 @@ jar {
                 project(":common:common-generator").sourceSets.main.output.files
                 project(":common:common-core").sourceSets.main.output.files
             }
+    // This fetches the shared resources from root - avoids duplicating the default preset
+    from (rootDir)
+            {
+                include 'resources/**/*'
+            }
 }

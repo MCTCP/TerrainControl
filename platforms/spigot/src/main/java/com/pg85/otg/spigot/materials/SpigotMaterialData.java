@@ -68,6 +68,11 @@ public class SpigotMaterialData extends LocalMaterialData
 			}
 			try
 			{
+				// Deal with pesky accidental floats that parseInt won't recognize
+				if (blockNameCorrected.endsWith(".0"))
+				{
+					blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.length()-2);
+				}
 				int blockId = Integer.parseInt(blockNameCorrected);
 				String fromLegacyIdName = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
 				if (fromLegacyIdName != null)

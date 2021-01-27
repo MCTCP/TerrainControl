@@ -232,6 +232,7 @@ public class BiomeConfig extends BiomeConfigBase
 	protected void readConfigSettings(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		this.biomeExtends = reader.getSetting(BiomeStandardValues.BIOME_EXTENDS, logger);
+		this.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
 		this.doResourceInheritance = reader.getSetting(BiomeStandardValues.RESOURCE_INHERITANCE, logger);
 		this.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, defaultSettings.defaultSize, logger);
 		this.biomeRarity = reader.getSetting(BiomeStandardValues.BIOME_RARITY, defaultSettings.defaultRarity, logger);
@@ -429,6 +430,12 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.putSetting(BiomeStandardValues.BIOME_DICT_ID, this.biomeDictId,
 			"Forge Biome Dictionary ID used by other mods to identify a biome and",
 			"place modded blocks, items and mobs in it."
+		);
+
+		writer.putSetting(BiomeStandardValues.BIOME_CATEGORY, this.biomeCategory,
+				"Set a category for this biome, used by vanilla for... something",
+				"Accepts one of the following values:",
+				"none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether"
 		);
 
 		writer.header1("Biome Inheritance");

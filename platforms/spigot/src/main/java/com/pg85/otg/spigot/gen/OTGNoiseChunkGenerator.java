@@ -80,8 +80,6 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// TODO: Move this to WorldLoader when ready?
 	private boolean isInitialised = false;
 
-	public GeneratorAccess world = null;
-
 	public OTGNoiseChunkGenerator (WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
 	{
 		this(new DimensionConfig(OTG.getEngine().getPresetLoader().getDefaultPresetName()), biomeProvider, biomeProvider, seed, dimensionSettingsSupplier);
@@ -159,10 +157,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Generates the base terrain for a chunk. Spigot compatible.
 	// IWorld -> GeneratorAccess
-	public void buildNoiseSpigot (org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord)
+	public void buildNoiseSpigot (org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord, Random random)
 	{
 		ChunkBuffer buffer = new SpigotChunkBuffer(chunk, chunkCoord);
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), this.world.getRandom(), buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
 	}
 
 	// Generates the base terrain for a chunk.

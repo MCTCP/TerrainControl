@@ -43,15 +43,14 @@ public class WorldConfig extends WorldConfigBase
 	}
 
 	// TODO: Not used atm, implement these.
-	private String author;
-	private String description;
+
 	private boolean frozenOcean;
 	private String defaultFrozenOceanBiome;
 	private TerrainMode modeTerrain;
 	private String bo3AtSpawn;
-	
+
 	// Fields used only in common-core or platform layers that aren't in IWorldConfig
-	
+
 	// TODO: Refactor BiomeGroups classes, since we have new biome groups now. Expose via IWorldConfig?
 	private BiomeGroupManager biomeGroupManager;
 	
@@ -159,7 +158,11 @@ public class WorldConfig extends WorldConfigBase
 	{
 		// Misc
 
-		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger);		
+		this.settingsMode = reader.getSetting(WorldStandardValues.SETTINGS_MODE, logger);
+		this.author = reader.getSetting(WorldStandardValues.AUTHOR, logger);
+		this.description = reader.getSetting(WorldStandardValues.DESCRIPTION, logger);
+		this.shortPresetName = reader.getSetting(WorldStandardValues.SHORT_PRESET_NAME, logger);
+		this.version = reader.getSetting(WorldStandardValues.VERSION, logger);
 
 		// Visual settings
 
@@ -274,8 +277,6 @@ public class WorldConfig extends WorldConfigBase
 		this.modeTerrain = reader.getSetting(WorldStandardValues.TERRAIN_MODE, logger);
 		this.frozenOcean = reader.getSetting(WorldStandardValues.FROZEN_OCEAN, logger);
 		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
-		this.author = reader.getSetting(WorldStandardValues.AUTHOR, logger);
-		this.description = reader.getSetting(WorldStandardValues.DESCRIPTION, logger);
 		this.bo3AtSpawn = reader.getSetting(WorldStandardValues.BO3_AT_SPAWN, logger);
 	}
 
@@ -364,11 +365,20 @@ public class WorldConfig extends WorldConfigBase
 		writer.header2("World Identity");
 		
 		writer.putSetting(WorldStandardValues.AUTHOR, this.author,
-			"The author of this world"
+			"The author of this preset"
 		);
 
 		writer.putSetting(WorldStandardValues.DESCRIPTION, this.description,
 			"A short description of this world"
+		);
+
+		writer.putSetting(WorldStandardValues.VERSION, this.version,
+				"The preset version. Increasing the minor version makes the PresetPacker overwrite,",
+				"while increasing the major version will make the PresetPacker save a new copy"
+		);
+
+		writer.putSetting(WorldStandardValues.SHORT_PRESET_NAME, this.shortPresetName,
+				"The shortened name for the preset, used in biome resource locations and similar"
 		);
 
 		writer.header2("Visual Settings",

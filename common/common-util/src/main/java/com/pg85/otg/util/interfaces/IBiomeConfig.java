@@ -47,6 +47,7 @@ public interface IBiomeConfig
 	// Inheritance
 	
 	String getBiomeExtends();
+	String getBiomeCategory();
 	
 	// Placement
 	

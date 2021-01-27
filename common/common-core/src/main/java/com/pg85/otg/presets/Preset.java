@@ -16,12 +16,20 @@ public class Preset
 	private final String name;
 	private final WorldConfig worldConfig;
 	private final HashMap<String, BiomeConfig> biomeConfigs = new HashMap<String, BiomeConfig>();
+	private final String version;
+	private final String author;
+	private final String description;
+	private final String shortPresetName;
 
 	Preset(Path presetDir, String name, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
 	{
 		this.presetDir = presetDir;
 		this.name = name;
 		this.worldConfig = worldConfig;
+		this.author = worldConfig.getAuthor();
+		this.description = worldConfig.getDescription();
+		this.version = worldConfig.getVersion();
+
 		for(BiomeConfig biomeConfig : biomeConfigs)
 		{
 			this.biomeConfigs.put(biomeConfig.getName(), biomeConfig);
@@ -38,6 +46,11 @@ public class Preset
 		return this.name;
 	}
 
+	public String getShortPresetName()
+	{
+		return this.shortPresetName;
+	}
+
 	public WorldConfig getWorldConfig()
 	{
 		return this.worldConfig;
@@ -51,5 +64,20 @@ public class Preset
 	public ArrayList<BiomeConfig> getAllBiomeConfigs()
 	{
 		return new ArrayList<BiomeConfig>(this.biomeConfigs.values());
+	}
+
+	public String getVersion()
+	{
+		return this.version;
+	}
+
+	public String getAuthor()
+	{
+		return this.author;
+	}
+
+	public String getDescription()
+	{
+		return this.description;
 	}
 }
