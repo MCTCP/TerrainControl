@@ -1,0 +1,607 @@
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                          Biome Identity                         | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# When converting an existing OTG world to a vanilla world that can be
+# used without OTG, this is the vanilla biome that replaces this biome.
+# * Converting to vanilla biomes via console command is not yet
+#   implemented, but is planned for the future.
+# Example: minecraft:plains
+ReplaceToBiomeName: minecraft:river
+
+# Forge Biome Dictionary ID used by other mods to identify a biome and
+# place modded blocks, items and mobs in it.
+BiomeDictId: RIVER
+
+# Set a category for this biome, used by vanilla for... something
+# Accepts one of the following values:
+# none, taiga, extreme_hills, jungle, mesa, plains, savanna, icy, the_end, beach, forest, ocean, desert, river, swamp, mushroom, nether
+BiomeCategory: plains
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                        Biome Inheritance                        | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# The name of the BiomeConfig you wish to extend (if any).
+# The extended config's settings are used as default values, and will
+# overwrite any settings that are left empty in this config (excluding
+# mob spawning, saplings and resources, which have their own inheritance
+# settings).
+BiomeExtends: 
+
+# When set to true, all resources of the extended biome (if any) will be copied
+# to the resources queue of this biome, except for saplings. If a resource in
+# the parent biome looks very similar to that of a child biome (for example,
+# two ores of the same type), it won't be copied.
+ResourceInheritance: true
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                         Biome placement                         | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# Biome size from 0 to GenerationDepth. Defines in which biome layer this biome will be generated (see GenerationDepth).
+# Higher numbers result in a smaller biome, lower numbers a larger biome.
+# How this setting is used depends on the value of BiomeMode in the WorldConfig.
+# It will be used for:
+# - normal biomes, ice biomes, isle biomes and border biomes when BiomeMode is set to NoGroups
+# - biomes spawned as part of a BiomeGroup when BiomeMode is set to Normal.
+#   For biomes spawned as isles, borders or rivers other settings are available.
+#   Isle biomes:   BiomeSizeWhenIsle (see below)
+#   Border biomes: BiomeSizeWhenBorder (see below)
+#   River biomes:  RiverSize (see WorldConfig)
+BiomeSize: 8
+
+# Biome rarity from 100 to 1. If this is normal or ice biome - chance for spawn this biome then others.
+# Example for normal biome :
+#   100 rarity mean 1/6 chance than other ( with 6 default normal biomes).
+#   50 rarity mean 1/11 chance than other
+# For isle biomes see the BiomeRarityWhenIsle setting below.
+# Doesn`t work on Ocean and River (frozen versions too) biomes when not added as normal biome.
+BiomeRarity: 95
+
+# The hexadecimal color value of this biome. Used in the output of the /otg map command,
+# and used in the input of BiomeMode: FromImage.
+BiomeColor: #0000FF
+
+
+#######################################################################
+# |                           Isle biomes                           | #
+#######################################################################
+
+# To spawn a biome as an isle, first add it to the
+# IsleBiomes list in the WorldConfig.
+
+# List of biomes in which this biome will spawn as an isle.
+# For example, Mushroom Isles spawn inside the Ocean biome.
+IsleInBiome: 
+
+# Size of this biome when spawned as an isle biome in BiomeMode: Normal.
+# Valid values range from 0 to GenerationDepth.
+# Larger numbers give *smaller* islands. The biome must be smaller than the biome it's going
+# to spawn in, so the BiomeSizeWhenIsle number must be larger than the BiomeSize of the other biome.
+BiomeSizeWhenIsle: 6
+
+# Rarity of this biome when spawned as an isle biome in BiomeMode: Normal.
+BiomeRarityWhenIsle: 97
+
+#################
+# Border biomes #
+#################
+
+# To spawn a biome as a border, first add it to the
+# BorderBiomes list in the WorldConfig.
+
+# List of biomes this biome can be a border of.
+# For example, the Beach biome is a border on the Ocean biome, so
+# it can spawn anywhere on the border of an ocean.
+BiomeIsBorder: 
+
+# List of biomes that cancel spawning of this biome.
+# For example, the Beach biome will never spawn next to an Extreme Hills biome.
+NotBorderNear: 
+
+# Size of this biome when spawned as a border biome in BiomeMode: Normal.
+# Valid values range from 0 to GenerationDepth.
+# Larger numbers give *smaller* borders. The biome must be smaller than the biome it's going
+# to spawn in, so the BiomeSizeWhenBorder number must be larger than the BiomeSize of the other biome.
+BiomeSizeWhenBorder: 8
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                  Terrain height and volatility                  | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# BiomeHeight defines how much height will be added during terrain generation
+# Must be between -10.0 and 10.0
+# Value 0.0 is equivalent to half of map height with all other settings at defaults.
+BiomeHeight: -0.5
+
+# Biome volatility.
+BiomeVolatility: 0.0
+
+# Smooth radius between biomes. Must be between 0 and 32, inclusive. The resulting
+# smooth radius seems to be  (thisSmoothRadius + 1 + smoothRadiusOfBiomeOnOtherSide) * 4 .
+# So if two biomes next to each other have both a smooth radius of 2, the
+# resulting smooth area will be (2 + 1 + 2) * 4 = 20 blocks wide.
+SmoothRadius: 2
+
+# Works the same way as SmoothRadius but only acts on CustomHeightControl. Must be between 0 and 32, inclusive.
+# Does nothing if Custom Height Control smoothing is not enabled in the world config.
+CustomHeightControlSmoothRadius: 2
+
+# If this value is greater than 0, then it will affect how much, on average, the terrain will rise before leveling off when it begins to increase in elevation.
+# If the value is less than 0, then it will cause the terrain to either increase to a lower height before leveling out or decrease in height if the value is a large enough negative.
+MaxAverageHeight: 0.0
+
+# If this value is greater than 0, then it will affect how much, on average, the terrain (usually at the ottom of the ocean) will fall before leveling off when it begins to decrease in elevation. 
+# If the value is less than 0, then it will cause the terrain to either fall to a lesser depth before leveling out or increase in height if the value is a large enough negative.
+MaxAverageDepth: 0.0
+
+# Another type of noise. This noise is independent from biomes. The larger the values the more chaotic/volatile landscape generation becomes.
+# Setting the values to negative will have the opposite effect and make landscape generation calmer/gentler.
+Volatility1: 0.0
+
+Volatility2: 0.0
+
+# Adjust the weight of the corresponding volatility settings. This allows you to change how prevalent you want either of the volatility settings to be in the terrain.
+VolatilityWeight1: 0.5
+
+VolatilityWeight2: 0.45
+
+# Disable all noises except Volatility1 and Volatility2. Also disable default block chance from height.
+DisableBiomeHeight: false
+
+# List of custom height factors, 17 double entries, each controls about 7
+# blocks height, starting at the bottom of the world. Positive entry - larger chance of spawn blocks, negative - smaller
+# Values which affect your configuration may be found only experimentally. Values may be very big, like ~3000.0 depends from height
+# Example:
+#   CustomHeightControl:0.0,-2500.0,0.0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+# Makes empty layer above bedrock layer. 
+CustomHeightControl: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                              Rivers                             | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# The biome used as the river biome.
+RiverBiome: River
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                              Blocks                             | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# The stone block used for the biome, usually STONE.
+StoneBlock: minecraft:stone
+
+# The surface block used for the biome, usually GRASS.
+SurfaceBlock: minecraft:grass_block
+
+# The ground block used for the biome, usually DIRT.
+GroundBlock: minecraft:dirt
+
+# Setting for biomes with more complex surface and ground blocks.
+# Each column in the world has a noise value from what appears to be -7 to 7.
+# Values near 0 are more common than values near -7 and 7. This setting is
+# used to change the surface block based on the noise value for the column.
+# Syntax: SurfaceBlockName,GroundBlockName,MaxNoise,[AnotherSurfaceBlockName,[AnotherGroundBlockName,MaxNoise[,...]]
+# Example: SurfaceAndGroundControl: STONE,STONE,-0.8,GRAVEL,STONE,0.0,DIRT,DIRT,10.0
+#   When the noise is below -0.8, stone is the surface and ground block, between -0.8 and 0
+#   gravel with stone just below and between 0.0 and 10.0 there's only dirt.
+#   Because 10.0 is higher than the noise can ever get, the normal SurfaceBlock
+#   and GroundBlock will never appear in this biome.
+
+# Alternatively, you can use Mesa, MesaForest or MesaBryce to get blocks
+# like the blocks found in the Mesa biomes.
+# You can also use Iceberg to get iceberg generation like in vanilla frozen oceans.
+SurfaceAndGroundControl: 
+
+# Replace Variable: (blockFrom,blockTo[:blockDataTo][,minHeight,maxHeight])
+# Example :
+#   ReplacedBlocks: (GRASS,DIRT,100,127),(GRAVEL,GLASS)
+# Replace grass block to dirt from 100 to 127 height and replace gravel to glass on all height 
+# Only the following biome resources are affected: CustomObject, CustomStructure, Ore, UnderWaterOre, 
+# Vein, SurfacePatch, Boulder, IceSpike.
+# BO's used as CustomObject/CustomStructure may have DoReplaceBlocks:false to save performance.
+ReplacedBlocks: None
+
+
+#######################################################################
+# |                   Water / Lava & Frozen States                  | #
+#######################################################################
+
+# Set this to false to use the "Water / Lava & Frozen States" settings of this biome.
+UseWorldWaterLevel: true
+
+# Set water level. Every empty between this levels will be fill water or another block from WaterBlock.
+WaterLevelMax: 63
+
+WaterLevelMin: 0
+
+# The block used when placing water in the biome.
+WaterBlock: minecraft:water
+
+# The block used as ice. Ice only spawns if the BiomeTemperature is low enough.
+IceBlock: minecraft:ice
+
+# The block used as cooled or frozen lava.
+# Set this to OBSIDIAN for "frozen" lava lakes in cold biomes
+CooledLavaBlock: minecraft:lava
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                       Visuals and weather                       | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# Biome temperature. Float value from 0.0 to 2.0.
+# When this value is around 0.2, snow will fall on mountain peaks above y=90.
+# When this value is around 0.1, the whole biome will be covered in snow and ice.
+# However, on default biomes, this won't do anything except changing the grass and leaves colors slightly.
+BiomeTemperature: 0.5
+
+# Biome wetness. Float value from 0.0 to 1.0.
+# If this biome is a custom biome, and this value is set to 0, no rain will fall.
+# On default biomes, this won't do anything except changing the grass and leaves colors slightly.
+BiomeWetness: 0.5
+
+# Biome sky color.
+SkyColor: #7BA5FF
+
+# Biome water color multiplier.
+WaterColor: #FFFFFF
+
+# Biome grass color.
+GrassColor: #FFFFFF
+
+# Biome grass color modifier, can be None, Swamp or DarkForest.
+GrassColorModifier: None
+
+# Biome foliage color.
+FoliageColor: #FFFFFF
+
+# Biome fog color.
+FogColor: #000000
+
+# Biome water fog color.
+WaterFogColor: #000000
+
+# Biome particle type, fe minecraft:white_ash.
+# Use the "otg particles" console command to get a list of particles.
+ParticleType: 
+
+# Biome particle probability, 0.118093334 by default.
+# *TODO: Test different values and document usage.
+ParticleProbability: 0.118093334
+
+# Music for the biome, takes a resource location. Leave empty to disable. Examples: 
+# Music: minecraft:music_disc.cat
+# Music: minecraft:music.nether.basalt_deltas
+Music: 
+
+# Minimum delay for music to start, in ticks
+MusicMinDelay: 0
+
+# Maximum delay for music to start, in ticks
+MusicMaxDelay: 0
+
+# Whether music replaces the current playing music in the client or not
+ReplaceCurrentMusic: false
+
+# Ambient sound for the biome. Leave empty to disable. Example:
+# AmbientSound: minecraft:ambient.cave
+AmbientSound: 
+
+# Mood sound for the biome. Leave empty to disable. Example:
+# MoodSound: minecraft:ambient.crimson_forest.mood
+MoodSound: minecraft:ambient.cave
+
+# The delay in ticks between triggering mood sound
+MoodSoundDelay: 6000
+
+# How far from the player a mood sound can play
+MoodSearchRange: 8
+
+# The offset of the sound event
+MoodOffset: 2.0
+
+# Additions sound for the biome. Leave empty to disable. Example:
+# AdditionsSound: minecraft:ambient.soul_sand_valley.additions
+AdditionsSound: 
+
+# The tick chance that the additions sound plays
+AdditionsTickChance: 0.0
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                          Resource queue                         | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# This section controls all resources spawning during population.
+# The resources will be placed in this order.
+
+# Keep in mind that a high size, frequency or rarity may slow down terrain generation.
+
+# Possible resources:
+# AboveWaterRes(BlockName,Frequency,Rarity)
+# Boulder(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..]
+# Cactus(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])
+# CustomObject(Object[,AnotherObject[,...]])
+# CustomStructure([Object,Object_Chance[,AnotherObject,Object_Chance[,...]]])
+# Dungeon(Frequency,Rarity,MinAltitude,MaxAltitude)
+# Fossil(Rarity)
+# Grass(PlantType,Grouped/NotGrouped,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])
+# IceSpike(BlockName,IceSpikeType,Frequency,Rarity,MinAltitude,MaxAltitude,Blocksource[,BlockSource2,...])
+# Liquid(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])
+# Ore(BlockName,Size,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])
+# Plant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])
+# Reed(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])
+# SmallLake(BlockName,Frequency,Rarity,MinAltitude,MaxAltitude)
+# SurfacePatch(BlockName,DecorationBlockName,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....]
+# Tree(Frequency,TreeType,TreeTypeChance[,AdditionalTreeType,AdditionalTreeTypeChance.....])
+# UnderGroundLake(MinSize,MaxSize,Frequency,Rarity,MinAltitude,MaxAltitude)
+# UnderWaterOre(BlockName,Size,Frequency,Rarity,BlockSource[,BlockSource2,BlockSource3.....])
+# UnderWaterPlant(PlantType,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,BlockSource3.....])
+# Vein(BlockName,MinRadius,MaxRadius,Rarity,OreSize,OreFrequency,OreRarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])
+# Vines(Frequency,Rarity,MinAltitude,MaxAltitude)
+# Well(BaseBlockName,HalfSlabBlockName,WaterBlockName,Frequency,Rarity,MinAltitude,MaxAltitude,BlockSource[,BlockSource2,..])
+
+# BlockName:	  	The name of the block, can include data.
+# BlockSource:	List of blocks the resource can spawn on/in. You can also use "Solid" or "All".
+# Frequency:	  	Number of attempts to place this resource in each chunk.
+# Rarity:		Chance for each attempt, Rarity:100 - mean 100% to pass, Rarity:1 - mean 1% to pass.
+# MinAltitude and MaxAltitude: Height limits.
+# TreeType:	   	Tree (original oak tree) - BigTree - Birch - TallBirch - SwampTree -
+# 				HugeMushroom (randomly red or brown) - HugeRedMushroom - HugeBrownMushroom -
+# 				Taiga1 - Taiga2 - HugeTaiga1 - HugeTaiga2 -
+# 				JungleTree (the huge jungle tree) - GroundBush - CocoaTree (smaller jungle tree)
+# 				DarkOak (from the roofed forest biome) - Acacia
+# 				You can also use your own custom objects, as long as they have Tree:true in their settings.
+# TreeTypeChance: Similar to Rarity. Example:
+# 				Tree(10,Taiga1,35,Taiga2,100) - tries 10 times, for each attempt it tries to place Taiga1 (35% chance),
+# 				if that fails, it attempts to place Taiga2 (100% chance).
+# PlantType:	  	One of the plant types: Allium, AzureBluet, BlueOrchid, BrownMushroom, Dandelion, DeadBush, DoubleTallgrass, Fern, LargeFern, Lilac, OrangeTulip, OxeyeDaisy, Peony, PinkTulip, Poppy, RedMushroom, RedTulip, RoseBush, Sunflower, Tallgrass, WhiteTulip
+# 				or a block name
+# IceSpikeType:  One of the ice spike types: Basement,HugeSpike,SmallSpike
+# Object:		Any custom object (bo2 or bo3) file but without the file extension. 
+
+# Plant and Grass resource: Both a resource of one block. Plant can place blocks underground, Grass cannot.
+# UnderWaterPlant resource: Similar to plant, but places blocks underwater.
+# Liquid resource: A one-block water or lava source
+# SmallLake and UnderGroundLake resources: Small lakes of about 8x8 blocks
+# Vein resource: Starts an area where ores will spawn. Can be slow, so use a low Rarity (smaller than 1).
+# CustomStructure resource: Starts a BO3 or BO4 structure in the chunk if spawn requirements are met.
+
+Ore(minecraft:dirt,33,10,100.0,0,255,minecraft:stone)
+Ore(minecraft:gravel,33,8,100.0,0,255,minecraft:stone)
+Ore(minecraft:granite,33,10,100.0,0,79,minecraft:stone)
+Ore(minecraft:diorite,33,10,100.0,0,79,minecraft:stone)
+Ore(minecraft:andesite,33,10,100.0,0,79,minecraft:stone)
+Ore(minecraft:coal_ore,17,20,100.0,0,127,minecraft:stone)
+Ore(minecraft:iron_ore,9,20,100.0,0,63,minecraft:stone)
+Ore(minecraft:gold_ore,9,2,100.0,0,31,minecraft:stone)
+Ore(minecraft:redstone_ore,8,8,100.0,0,15,minecraft:stone)
+Ore(minecraft:diamond_ore,8,1,100.0,0,15,minecraft:stone)
+Ore(minecraft:lapis_ore,7,1,100.0,0,15,minecraft:stone)
+UnderGroundLake(25,60,2,5.0,0,49)
+Liquid(minecraft:water,20,100.0,8,128,minecraft:stone)
+Liquid(minecraft:lava,10,100.0,8,128,minecraft:stone)
+SmallLake(minecraft:water,4,7.0,8,119)
+SmallLake(minecraft:lava,2,1.0,8,119)
+SmallLake(minecraft:lava,2,8.0,6,50)
+UnderWaterOre(minecraft:sand,7,3,100.0,minecraft:dirt,minecraft:grass_block)
+UnderWaterOre(minecraft:clay,4,1,100.0,minecraft:dirt,minecraft:clay)
+UnderWaterOre(minecraft:gravel,6,1,100.0,minecraft:dirt,minecraft:grass_block)
+Dungeon(8,100.0,0,128)
+Tree(1,BigTree,1,Tree,9)
+Grass(Tallgrass,NotGrouped,10,100.0,minecraft:grass_block,minecraft:dirt)
+Plant(Dandelion,2,100.0,0,128,minecraft:grass_block,minecraft:dirt)
+Plant(minecraft:pumpkin,1,3.0,0,128,minecraft:grass_block)
+CustomObject(UseWorld)
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                         Sapling resource                        | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# OpenTerrainGenerator allows you to grow your custom objects from saplings, instead
+# of the vanilla trees. Add one or more Sapling functions here to override vanilla
+# spawning for that sapling.
+
+# The syntax is: Sapling(SaplingType,TreeType,TreeType_Chance[,Additional_TreeType,Additional_TreeType_Chance.....])
+# Works like Tree resource instead first parameter.
+# For custom saplings (Forge only); Sapling(Custom,SaplingMaterial,WideTrunk,TreeType,TreeType_Chance.....)
+# SaplingMaterial is a material name from a mod.
+# WideTrunk is 'true' or 'false', whether or not it requires 4 saplings.
+
+# Sapling types: All, Oak, Redwood, Birch, SmallJungle, BigJungle, RedMushroom, BrownMushroom, Acacia, DarkOak, HugeRedwood, Custom
+# All - will make the tree spawn from all saplings, but not from mushrooms.
+# BigJungle - for when 4 jungle saplings grow at once.
+# RedMushroom/BrownMushroom - will only grow when bonemeal is used.
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                        Vanilla structures                       | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# Vanilla structure settings, each structure type has a global on/off
+# toggle in the WorldConfig, be sure to enable it to allow biomes to
+# spawn structures.
+# * Fossils and Dungeons count as resources, not structures.
+# Toggles strongholds spawning in this biome.
+StrongholdsEnabled: false
+
+# Toggles woodland mansions spawning in this biome.
+WoodlandMansionsEnabled: false
+
+# Toggles ocean monuments spawning in this biome.
+OceanMonumentsEnabled: true
+
+# Toggles nether fortresses spawning in this biome.
+NetherFortressesEnabled: false
+
+# The type of villages in this biome. Can be wood, sandstone, taiga, savanna, snowy or disabled.
+VillageType: disabled
+
+# The size of villages in this biome, 6 by default.
+# *TODO: Test different values and document usage.
+VillageSize: 6
+
+# The type of mineshafts in this biome. Can be normal, mesa or disabled.
+MineshaftType: normal
+
+# Probability of mineshafts spawning, 0.004 by default.
+# *TODO: Test different values and document usage.
+MineshaftProbability: 0.004
+
+# The type of the aboveground rare building in this biome.
+# Can be desertPyramid, jungleTemple, swampHut, igloo or disabled.
+RareBuildingType: disabled
+
+# Toggles buried treasure spawning in this biome.
+BuriedTreasureEnabled: false
+
+# Probability of buried treasure spawning, 0.01 by default.
+# *TODO: Test different values and document usage.
+BuriedTreasureProbability: 0.01
+
+# Toggles shipwrecks spawning in this biome.
+ShipWreckEnabled: false
+
+# Toggles beached shipwrecks spawning in this biome.
+ShipWreckBeachedEnabled: false
+
+# Toggles pillager outposts spawning in this biome.
+PillagerOutpostEnabled: false
+
+# The size of pillager outposts in this biome, 7 by default.
+# *TODO: Test different values and document usage.
+PillagerOutpostSize: 7
+
+# Toggles bastion remnants spawning in this biome.
+BastionRemnantEnabled: false
+
+# The size of bastion remnants in this biome, 6 by default.
+# *TODO: Test different values and document usage.
+BastionRemnantSize: 6
+
+# Toggles nether fossils spawning in this biome.
+# Caution: Nether fossils spawn at all heights.
+NetherFossilEnabled: false
+
+# Toggles end cities spawning in this biome.
+EndCityEnabled: false
+
+# The type of ruined portals in this biome.
+# Can be normal, desert, jungle, swamp, mountain, ocean, nether or disabled.
+RuinedPortalType: disabled
+
+# The type of ocean ruins in this biome.
+# Can be cold, warm or disabled.
+OceanRuinsType: disabled
+
+# Probability of large ocean ruins spawning, 0.3 by default.
+# *TODO: Test different values and document usage.
+OceanRuinsLargeProbability: 0.3
+
+# Probability of ocean ruins spawning clusters, 0.9 by default.
+# *TODO: Test different values and document usage.
+OceanRuinsClusterProbability: 0.9
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                           Mob spawning                          | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+# Mob spawning is configured via mob groups, see http://minecraft.gamepedia.com/Spawn#Mob_spawning
+
+# A mobgroups is made of four parts; mob name, weight, min and max.
+# - Mob name is one of the Minecraft internal mob names. See http://minecraft.gamepedia.com/Chunk_format#Mobs
+# - Weight is used for a random selection. Must be a positive number.
+# - Min is the minimum amount of mobs spawning as a group. Must be a positive number.
+# - Max is the maximum amount of mobs spawning as a group. Must be a positive number.
+
+# Mob groups are written to the config files as Json.
+# Json is a tree document format: http://en.wikipedia.org/wiki/JSON
+# Syntax: {"mob": "mobname", "weight": integer, "min": integer, "max": integer}
+# Example: {"mob": "minecraft:ocelot", "weight": 10, "min": 2, "max": 6}
+# Example: {"mob": "minecraft:mooshroom", "weight": 5, "min": 2, "max": 2}
+# A json list of mobgroups looks like this: [ mobgroup, mobgroup, mobgroup... ]
+# This would be an ampty list: []
+# You can validate your json here: http://jsonlint.com/
+
+# There are six categories of mobs: monsters, creatures, water creatures, ambient creatures, water ambient creatures and miscellaneous.
+# You can add your own mobs to the mobgroups below, mobs may only work when used in specific categories, depending on their type.
+# To see the mob category a mob belongs to, use /otg entities. The mob's category (if any) is listed after its name.
+# Also supports modded mobs, if they are of the correct mob category.
+# The monsters (blazes, cave spiders, creepers, drowned, elder guardians, ender dragons, endermen, endermites, evokers, ghasts, giants,
+# guardians, hoglins, husks, illusioners, magma cubes, phantoms, piglins, pillagers, ravagers, shulkers, silverfishes, skeletons, slimes,
+# spiders, strays, vexes, vindicators, witches, zoglins, zombies, zombie villagers, zombified piglins) that spawn in this biome.
+# For instance [{"mob": "minecraft:spider", "weight": 100, "min": 4, "max": 4}, {"mob": "minecraft:zombie", "weight": 100, "min": 4, "max": 4}]
+# Use the "/otg entities" console command to get a list of possible mobs and mob categories.
+# Use the "/otg biome -m" console command to get the list of registered mobs for a biome.
+SpawnMonsters: []
+
+# The friendly creatures (bees, cats, chickens, cows, donkeys, foxes, horses, llama, mooshrooms, mules, ocelots, panda's, parrots,
+# pigs, polar bears, rabbits, sheep, skeleton horses, striders, trader llama's, turtles, wandering traders, wolves, zombie horses)
+# that spawn in this biome.
+# For instance [{"mob": "minecraft:sheep", "weight": 12, "min": 4, "max": 4}, {"mob": "minecraft:pig", "weight": 10, "min": 4, "max": 4}]
+# Use the "/otg entities" console command to get a list of possible mobs and mob categories.
+# Use the "/otg biome -m" console command to get the list of registered mobs for a biome.
+SpawnCreatures: []
+
+# The water creatures (squids and dolphins) that spawn in this biome
+# For instance [{"mob": "minecraft:squid", "weight": 10, "min": 4, "max": 4}]
+# Use the "/otg entities" console command to get a list of possible mobs and mob categories.
+# Use the "/otg biome -m" console command to get the list of registered mobs for a biome.
+SpawnWaterCreatures: []
+
+# The ambient creatures (only bats in vanila) that spawn in this biome
+# For instance [{"mob": "minecraft:bat", "weight": 10, "min": 8, "max": 8}]
+# Use the "/otg entities" console command to get a list of possible mobs and mob categories.
+# Use the "/otg biome -m" console command to get the list of registered mobs for a biome.
+SpawnAmbientCreatures: []
+
+# The ambient water creatures (cod, pufferfish, salmon, tropical fish) that spawn in this biome
+# For instance [{"mob": "minecraft:cod", "weight": 10, "min": 8, "max": 8}]
+# Use the "/otg entities" console command to get a list of possible mobs and mob categories.
+# Use the "/otg biome -m" console command to get the list of registered mobs for a biome.
+SpawnWaterAmbientCreatures: []
+
+# The miscellaneous creatures (iron golems, snow golems and villagers) that spawn in this biome
+# For instance [{"mob": "minecraft:villager", "weight": 10, "min": 8, "max": 8}]
+# Use the "/otg entities" console command to get a list of possible mobs and mob categories.
+# Use the "/otg biome -m" console command to get the list of registered mobs for a biome.
+SpawnMiscCreatures: []
+
+# Inherit the internal mobs list of another biome. Inherited mobs can be overridden using
+# the mob spawn settings in this biome config. Any mob type defined in this biome config
+# will override inherited mob settings for the same mob in the same mob category.
+# Use this setting to inherit mob spawn lists from other biomes.
+# Accepts both OTG and non-OTG (vanilla or other mods') biomes. See also: BiomeDictId.
+InheritMobsBiomeName: minecraft:river
+

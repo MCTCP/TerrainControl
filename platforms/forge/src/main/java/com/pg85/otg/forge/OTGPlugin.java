@@ -1,5 +1,12 @@
 package com.pg85.otg.forge;
 
+import com.pg85.otg.OTG;
+import com.pg85.otg.constants.Constants;
+import com.pg85.otg.forge.biome.OTGBiomeProvider;
+import com.pg85.otg.forge.commands.OTGCommand;
+import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.forge.gen.OTGWorldType;
+import com.pg85.otg.forge.gui.OTGGui;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -15,14 +22,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import com.pg85.otg.OTG;
-import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.biome.OTGBiomeProvider;
-import com.pg85.otg.forge.commands.OTGCommand;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.forge.gen.OTGWorldType;
-import com.pg85.otg.forge.gui.OTGGui;
 
 @Mod(Constants.MOD_ID_SHORT) // Should match META-INF/mods.toml
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.MOD) 
@@ -41,7 +40,8 @@ public class OTGPlugin
 		Registry.register(Registry.CHUNK_GENERATOR_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
 		
 		// Start OpenTerrainGenerator engine, loads all presets.
-		OTG.startEngine(new ForgeEngine());
+		// moved to the registerBiomes method over mod load order concerns with presetpacker
+		//OTG.startEngine(new ForgeEngine());
 	}
 	
 	// OTG World Type MP: Register the OTG world type. For MP we use server.properties level-type:otg + generatorSettings:presetname
@@ -63,6 +63,10 @@ public class OTGPlugin
 	@SubscribeEvent
 	public static void registerBiomes(RegistryEvent.Register<Biome> event)
 	{
+		// Start OpenTerrainGenerator engine, loads all presets.
+		// Done here so that file indexing happens after presetpacker has unpacked its preset
+		OTG.startEngine(new ForgeEngine());
+		// Register all biomes
 		OTG.getEngine().getPresetLoader().registerBiomes();
 	}
 

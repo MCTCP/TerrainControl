@@ -175,7 +175,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
 				{
-					MinecraftKey location = new MinecraftKey(new BiomeResourceLocation(preset.getName(), biome).toResourceLocationString());
+					MinecraftKey location = new MinecraftKey(new BiomeResourceLocation(preset.getShortPresetName(), biome).toResourceLocationString());
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data

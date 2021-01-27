@@ -12,12 +12,15 @@ import com.pg85.otg.spigot.util.SpigotLogger;
 import com.pg85.otg.spigot.util.SpigotPluginLoadedChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class SpigotEngine extends OTGEngine
 {
+	private final JavaPlugin plugin;
+
 	protected SpigotEngine (JavaPlugin plugin)
 	{
 		super(new SpigotLogger(),
@@ -25,6 +28,7 @@ public class SpigotEngine extends OTGEngine
 				new SpigotMaterialReader(),
 				new SpigotPluginLoadedChecker(),
 				new SpigotPresetLoader(plugin.getDataFolder()));
+		this.plugin = plugin;
 	}
 
 	@Override
@@ -45,5 +49,11 @@ public class SpigotEngine extends OTGEngine
 	public void mergeVanillaBiomeMobSpawnSettings (BiomeConfigFinder.BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{
 		// TODO: Implement this
+	}
+
+	@Override
+	public File getJarFile()
+	{
+		return new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
 	}
 }

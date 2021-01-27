@@ -27,7 +27,8 @@ public class SpigotLogger extends Logger
 		}
 
 		// Add prefix to log output
-		message = "[" + Constants.MOD_ID_SHORT + "] " + message;
+		// Spigot does not need prefix
+		// message = "[" + Constants.MOD_ID_SHORT + "] " + message;
 		switch (level)
 		{
 			case FATAL:

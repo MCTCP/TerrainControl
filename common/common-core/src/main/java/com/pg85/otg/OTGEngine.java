@@ -14,16 +14,20 @@ import com.pg85.otg.customobject.CustomObjectManager;
 import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.logging.ILogger;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IPluginConfig;
 
-import java.io.File;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * Implemented and provided by the platform-specific layer on app start and accessed via OTG.startEngine()/OTG.getEngine(),
@@ -67,6 +71,9 @@ public abstract class OTGEngine
 	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
 
 	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
+
+	// Get jar file that's running OTG, where we will find our default preset
+	public abstract File getJarFile();
 	
 	// Startup / shutdown
 	
@@ -104,6 +111,8 @@ public abstract class OTGEngine
 			globalObjectsDir.mkdirs();
 		}
 
+		unpackDefaultPreset(presetsDir);
+
 		// Create manager objects
 		
 		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
@@ -129,7 +138,109 @@ public abstract class OTGEngine
 		
 		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger, materialReader);
 	}
-	
+
+	private void unpackDefaultPreset(File presetsDir)
+	{
+		try
+		{
+			JarFile jarFile = new JarFile(getJarFile());
+			Enumeration<JarEntry> entries = jarFile.entries();
+			// Unpack default preset if none present
+			if (new File(presetsDir.getPath() + File.separator + "Default").exists())
+			{
+				OTG.log(LogMarker.DEBUG, "Default preset already exists");
+				File wc = new File(presetsDir.getPath() +File.separator+ "Default" +File.separator+ "WorldConfig.ini");
+				if (wc.exists())
+				{
+					BufferedReader reader = new BufferedReader(new FileReader(wc));
+					int[] oldVer = parseVersion(reader);
+					int[] newVer = new int[0];
+
+					while (entries.hasMoreElements())
+					{
+						JarEntry jarEntry = entries.nextElement();
+						if (jarEntry.getName().contains("Default/WorldConfig.ini"))
+						{
+							reader = new BufferedReader(new BufferedReader(new InputStreamReader(jarFile.getInputStream(jarEntry))));
+							newVer = parseVersion(reader);
+						}
+					}
+					int loops = Math.min(oldVer.length, newVer.length);
+					for (int i = 0; i < loops; i++)
+					{
+						if (newVer[i] < oldVer[i])
+							return; // This is an older version
+						if (newVer[i] > oldVer[i])
+							break; // This is a newer version
+						if (i == loops -1)
+							return; // The two have the same version, cancel
+					}
+				}
+			}
+			else
+			{
+				OTG.log(LogMarker.DEBUG, "Default preset does not exist");
+			}
+
+			OTG.log(LogMarker.INFO, "Unpacking default preset");
+			String rootDir = getOTGRootFolder().toString();
+			String path = "resources/Presets/Default/";
+			entries = jarFile.entries();
+
+			while (entries.hasMoreElements())
+			{
+				JarEntry entry = entries.nextElement();
+				if (entry.getName().startsWith(path))
+				{
+					File file = new File(rootDir + File.separator + (entry.getName().substring(10)));
+
+					if (entry.isDirectory())
+					{
+						file.mkdirs();
+					} else {
+						file.createNewFile();
+						FileOutputStream fos = new FileOutputStream(file);
+						byte[] byteArray = new byte[4096];
+						int i;
+						java.io.InputStream is = jarFile.getInputStream(entry);
+						while ((i = is.read(byteArray)) > 0)
+						{
+							fos.write(byteArray, 0, i);
+						}
+						is.close();
+						fos.close();
+					}
+				}
+			}
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
+	private int[] parseVersion(BufferedReader reader) throws IOException
+	{
+		int[] version = new int[] {0,0};
+		String line;
+		// Filter out the line with Version in it
+		while ((line = reader.readLine()) != null)
+			if (line.contains("Version:"))
+				break;
+
+		if (line != null)
+		{
+			String v = line.split(":")[1];
+			v = v.trim();
+			String[] arr = v.split("\\.");
+			version = new int[arr.length];
+			for (int i = 0, arrLength = arr.length; i < arrLength; i++)
+			{
+				version[i] = Integer.parseInt(arr[i]);
+			}
+		}
+		return version;
+	}
+
 	public void onShutdown()
 	{
 		// Shutdown all loaders

@@ -39,6 +39,7 @@ public abstract class LocalPresetLoader
 	private static final int MAX_INHERITANCE_DEPTH = 15;
 	private final File presetsDir;
 	protected final HashMap<String, Preset> presets = new HashMap<String, Preset>();
+	protected final HashMap<String, String> aliasMap = new HashMap<String, String>();
 
 	public LocalPresetLoader(Path otgRootFolder)
 	{
@@ -53,6 +54,11 @@ public abstract class LocalPresetLoader
 	
 	public Preset getPresetByName(String name)
 	{
+		// Example: preset is stored as "Biome Bundle v7", but also accepts "Biome Bundle"
+		if (aliasMap.containsKey(name))
+		{
+			return this.presets.get(aliasMap.get(name));
+		}
 		return this.presets.get(name);
 	}
 
@@ -81,6 +87,7 @@ public abstract class LocalPresetLoader
 						{						
 							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
 							presets.put(preset.getName(), preset);
+							aliasMap.put(preset.getShortPresetName(), preset.getName());
 							break;
 						}
 					}
@@ -97,19 +104,28 @@ public abstract class LocalPresetLoader
 		{
 			biomesDirectory = new File(presetDir.toString(), Constants.LEGACY_WORLD_BIOMES_FOLDER);
 		}
-		String presetName = presetDir.toFile().getName();		
+		String presetName = presetDir.toFile().getName();
 		
 		SettingsMap worldConfigSettings = FileSettingsReader.read(presetName, worldConfigFile, logger);
 		WorldConfig worldConfig = new WorldConfig(presetDir, worldConfigSettings, addBiomesFromDirRecursive(biomesDirectory), biomeResourcesManager, spawnLog, logger, materialReader);
 		FileSettingsWriter.writeToFile(worldConfig.getSettingsAsMap(), worldConfigFile, worldConfig.getSettingsMode(), logger);
 
-		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(presetName, presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
+		String shortPresetName = worldConfig.getShortPresetName();
+		if (shortPresetName.isEmpty())
+		{
+			shortPresetName = presetName; // Set short name to preset name as a fallback
+		} else {
+			shortPresetName += worldConfig.getVersion().equals("0.0") ? "" : worldConfig.getVersion().split("\\.")[0];
+		}
+
+		// use shortPresetName to register the biomes, instead of presetName
+		ArrayList<BiomeConfig> biomeConfigs = loadBiomeConfigs(shortPresetName, presetDir, biomesDirectory.toPath(), worldConfig, biomeResourcesManager, spawnLog, logger, materialReader);
 
 		// We have to wait for the loading in order to get things like temperature
 		// TODO: Re-implement this for 1.16
 		//worldConfig.biomeGroupManager.processBiomeData();
 
-		return new Preset(presetDir, presetName, worldConfig, biomeConfigs);
+		return new Preset(presetDir, presetName, shortPresetName, worldConfig, biomeConfigs);
 	}
 
 	private ArrayList<String> addBiomesFromDirRecursive(File biomesDirectory)

@@ -183,6 +183,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
+	public Preset getPreset() {return this.preset;}
+
 	@OnlyIn(Dist.CLIENT)
 	@Override
 	public ChunkGenerator func_230349_a_(long seed)

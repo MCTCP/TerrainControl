@@ -21,15 +21,16 @@ public class Preset
 	private final String description;
 	private final String shortPresetName;
 
-	Preset(Path presetDir, String name, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
+
+	Preset(Path presetDir, String name, String shortPresetName, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
 	{
 		this.presetDir = presetDir;
 		this.name = name;
+		this.shortPresetName = shortPresetName;
 		this.worldConfig = worldConfig;
 		this.author = worldConfig.getAuthor();
 		this.description = worldConfig.getDescription();
 		this.version = worldConfig.getVersion();
-		this.shortPresetName = worldConfig.getShortPresetName();
 
 		for(BiomeConfig biomeConfig : biomeConfigs)
 		{

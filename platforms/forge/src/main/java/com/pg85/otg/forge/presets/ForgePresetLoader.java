@@ -124,7 +124,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
  				ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString());
-				System.out.println(resourceLocation);
+				//System.out.println(resourceLocation);
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
  				
  				presetBiomes.add(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, resourceLocation));
@@ -176,7 +176,7 @@ public class ForgePresetLoader extends LocalPresetLoader
  				// Index BiomeColor for FromImageMode and /otg map
 				biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
  				
- 				OTG.log(LogMarker.INFO, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
+ 				OTG.log(LogMarker.INFO, "Registered biome " + resourceLocation.toString() + " | " + biomeConfig.getName() + " with OTG id " + currentId);
  				
  				currentId++;
 			}
@@ -208,7 +208,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				// Add each biome to the group
 				for (String biome : group.biomes.keySet())
 				{
-					ResourceLocation location = new ResourceLocation(new BiomeResourceLocation(preset.getName(), biome).toResourceLocationString());
+					ResourceLocation location = new ResourceLocation(new BiomeResourceLocation(preset.getShortPresetName(), biome).toResourceLocationString());
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data
