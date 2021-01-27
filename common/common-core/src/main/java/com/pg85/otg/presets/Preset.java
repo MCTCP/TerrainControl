@@ -29,6 +29,7 @@ public class Preset
 		this.author = worldConfig.getAuthor();
 		this.description = worldConfig.getDescription();
 		this.version = worldConfig.getVersion();
+		this.shortPresetName = worldConfig.getShortPresetName();
 
 		for(BiomeConfig biomeConfig : biomeConfigs)
 		{
