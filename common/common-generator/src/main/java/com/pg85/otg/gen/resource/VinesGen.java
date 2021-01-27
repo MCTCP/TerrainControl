@@ -16,14 +16,11 @@ import java.util.Random;
 
 public class VinesGen extends Resource
 {
-    private static final int[] D =
+    private static final LocalMaterialData[] FROM_DIRECTION =
     {
-        -1, -1, 2, 0, 1, 3
+            LocalMaterials.VINE_SOUTH, LocalMaterials.VINE_NORTH, LocalMaterials.VINE_EAST, LocalMaterials.VINE_WEST
     };
-    private static final int[] OPPOSITE_FACING =
-    {
-        1, 0, 3, 2, 5, 4
-    };
+
     private final int maxAltitude;
     private final int minAltitude;
 
@@ -41,10 +38,10 @@ public class VinesGen extends Resource
     		Constants.WORLD_HEIGHT - 1);
     }
     
-    private boolean canPlace(IWorldGenRegion worldGenRegion, int x, int y, int z, int paramInt4, ChunkCoordinate chunkBeingPopulated)
+    private boolean canPlace(IWorldGenRegion worldGenRegion, int x, int y, int z, int direction, ChunkCoordinate chunkBeingPopulated)
     {
         LocalMaterialData sourceBlock;
-        switch (paramInt4)
+        switch (direction)
         {
             default:
                 return false;
@@ -120,13 +117,12 @@ public class VinesGen extends Resource
         	worldMaterial = worldGenRegion.getMaterial(_x, y, _z, chunkBeingPopulated);
             if (worldMaterial != null && worldMaterial.isAir())
             {
+                // TODO: Refactor to enum
                 for (int direction = 2; direction <= 5; direction++)
                 {
                     if (canPlace(worldGenRegion, _x, y, _z, direction, chunkBeingPopulated))
                     {
-                    	// TODO: Reimplement this when block data works
-                    	//world.setBlock(_x, y, _z, MaterialHelper.toLocalMaterialData(DefaultMaterial.VINE, 1 << D[OPPOSITE_FACING[direction]]), null, chunkBeingPopulated, false);
-                    	worldGenRegion.setBlock(_x, y, _z, LocalMaterials.VINE, null, chunkBeingPopulated, false);                        
+                    	worldGenRegion.setBlock(_x, y, _z, FROM_DIRECTION[direction - 2], null, chunkBeingPopulated, false);
                         break;
                     }
                 }

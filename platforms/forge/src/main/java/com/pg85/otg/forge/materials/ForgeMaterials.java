@@ -12,6 +12,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DoublePlantBlock;
 import net.minecraft.block.TallSeaGrassBlock;
+import net.minecraft.block.VineBlock;
 import net.minecraft.state.properties.BambooLeaves;
 import net.minecraft.state.properties.DoubleBlockHalf;
 
@@ -117,6 +118,10 @@ class ForgeMaterials extends LocalMaterials
 			TALL_SEAGRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.getDefaultState().with(TallSeaGrassBlock.HALF, DoubleBlockHalf.UPPER));
 			KELP = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP.getDefaultState());
 			KELP_PLANT = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP_PLANT.getDefaultState());
+			VINE_SOUTH = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.SOUTH, true));
+			VINE_NORTH = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.NORTH, true));
+			VINE_WEST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.WEST, true));
+			VINE_EAST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.EAST, true));
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

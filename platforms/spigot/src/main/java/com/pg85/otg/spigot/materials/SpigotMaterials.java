@@ -13,6 +13,7 @@ import net.minecraft.server.v1_16_R3.BlockPropertyBambooSize;
 import net.minecraft.server.v1_16_R3.BlockPropertyDoubleBlockHalf;
 import net.minecraft.server.v1_16_R3.BlockTallPlant;
 import net.minecraft.server.v1_16_R3.BlockTallSeaGrass;
+import net.minecraft.server.v1_16_R3.BlockVine;
 import net.minecraft.server.v1_16_R3.Blocks;
 import net.minecraft.server.v1_16_R3.IBlockData;
 
@@ -118,6 +119,10 @@ public class SpigotMaterials extends LocalMaterials
 			TALL_SEAGRASS_UPPER = SpigotMaterialData.ofBlockData(Blocks.TALL_SEAGRASS.getBlockData().set(BlockTallSeaGrass.b, BlockPropertyDoubleBlockHalf.UPPER));
 			KELP = SpigotMaterialData.ofBlockData(Blocks.KELP.getBlockData());
 			KELP_PLANT = SpigotMaterialData.ofBlockData(Blocks.KELP_PLANT.getBlockData());
+			VINE_SOUTH = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.SOUTH, true));
+			VINE_NORTH = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.NORTH, true));
+			VINE_WEST = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.WEST, true));
+			VINE_EAST = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.EAST, true));
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);
