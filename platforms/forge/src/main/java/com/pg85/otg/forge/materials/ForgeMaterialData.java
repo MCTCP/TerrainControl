@@ -324,6 +324,8 @@ public class ForgeMaterialData extends LocalMaterialData
 		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
 		if (materialProperty == MaterialProperties.AGE_0_25) {
 			property = (Property<T>) BlockStateProperties.AGE_0_25;
+		} else if (materialProperty == MaterialProperties.PICKLES_1_4) {
+			property = (Property<T>) BlockStateProperties.PICKLES_1_4;
 		} else {
 			throw new IllegalArgumentException("Bad property: " + materialProperty);
 		}

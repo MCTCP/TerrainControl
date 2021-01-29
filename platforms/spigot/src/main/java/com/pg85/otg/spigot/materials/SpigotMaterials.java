@@ -123,6 +123,7 @@ public class SpigotMaterials extends LocalMaterials
 			VINE_NORTH = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.NORTH, true));
 			VINE_WEST = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.WEST, true));
 			VINE_EAST = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.EAST, true));
+			SEA_PICKLE = SpigotMaterialData.ofBlockData(Blocks.SEA_PICKLE.getBlockData());
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

@@ -199,6 +199,7 @@ public class LocalMaterials
 	public static LocalMaterialData VINE_SOUTH;
 	public static LocalMaterialData VINE_EAST;
 	public static LocalMaterialData VINE_WEST;
+	public static LocalMaterialData SEA_PICKLE;
 
     public static LocalMaterialData DOUBLE_TALL_GRASS_LOWER;
     public static LocalMaterialData DOUBLE_TALL_GRASS_UPPER;

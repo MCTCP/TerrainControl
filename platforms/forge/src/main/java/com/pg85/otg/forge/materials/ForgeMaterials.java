@@ -122,6 +122,7 @@ class ForgeMaterials extends LocalMaterials
 			VINE_NORTH = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.NORTH, true));
 			VINE_WEST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.WEST, true));
 			VINE_EAST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.EAST, true));
+			SEA_PICKLE = ForgeMaterialData.ofMinecraftBlockState(Blocks.SEA_PICKLE.getDefaultState());
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

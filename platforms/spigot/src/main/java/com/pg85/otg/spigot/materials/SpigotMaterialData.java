@@ -281,6 +281,8 @@ public class SpigotMaterialData extends LocalMaterialData
 		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
 		if (materialProperty == MaterialProperties.AGE_0_25) {
 			property = (IBlockState<T>) BlockProperties.ak;
+		} else if (materialProperty == MaterialProperties.PICKLES_1_4) {
+			property = (IBlockState<T>) BlockProperties.ay;
 		} else {
 			throw new IllegalArgumentException("Bad property: " + materialProperty);
 		}
