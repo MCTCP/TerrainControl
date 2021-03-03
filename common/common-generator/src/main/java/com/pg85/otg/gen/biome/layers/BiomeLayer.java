@@ -15,7 +15,6 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
  */
 class BiomeLayer extends BiomeLayerBase
 {
-	protected final Map<NewBiomeGroup, Integer> groupToMaxRarity = new HashMap<>();
 	protected final Map<NewBiomeGroup, Map<Integer, NewBiomeData>> groupBiomes = new HashMap<>();
 
 	BiomeLayer(BiomeLayerData data, int depth)
@@ -27,7 +26,7 @@ class BiomeLayer extends BiomeLayerBase
 		{
 			for (NewBiomeGroup group : entry.getValue())
 			{
-				int maxRarity = 0;
+				int cumulativeRarity = 0;
 
 				Map<Integer, NewBiomeData> biomes = new TreeMap<>();
 
@@ -35,14 +34,13 @@ class BiomeLayer extends BiomeLayerBase
 				{
 					if (depth == biome.biomeSize)
 					{
-						maxRarity += biome.rarity;
-						biomes.put(maxRarity, biome);
+						cumulativeRarity += biome.rarity;
+						biomes.put(cumulativeRarity, biome);
 					}
 				}
 
-				if (maxRarity > 0)
+				if (cumulativeRarity > 0)
 				{
-					this.groupToMaxRarity.put(group, maxRarity);
 					this.groupBiomes.put(group, biomes);
 				}
 			}
@@ -63,10 +61,10 @@ class BiomeLayer extends BiomeLayerBase
 			int biomeGroupId = BiomeLayers.getGroupId(sample);
 			if (biomeGroupId > 0)
 			{
-				NewBiomeGroup group = this.data.groupRegistry.get(biomeGroupId);	
-				if (this.groupToMaxRarity.containsKey(group) && this.groupBiomes.containsKey(group))
+				NewBiomeGroup group = this.data.groupRegistry.get(biomeGroupId);
+				if (group.maxRarityPerDepth[depth] != 0 && this.groupBiomes.containsKey(group))
 				{
-					NewBiomeData biomeData = getBiomeFromGroup(context, this.groupToMaxRarity.get(group), this.groupBiomes.get(group));
+					NewBiomeData biomeData = getBiomeFromGroup(context, group.maxRarityPerDepth[depth], this.groupBiomes.get(group));
 					return sample | biomeData.id |
                         // Set IceBit based on Biome Temperature
                         (biomeData.biomeTemperature <= this.data.frozenOceanTemperature ? BiomeLayers.ICE_BIT : 0)

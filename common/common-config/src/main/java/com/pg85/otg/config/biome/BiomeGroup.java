@@ -36,7 +36,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
      * @param config The world config.
      * @param args   The settings to be parsed.
      * @throws InvalidConfigException When the config is invalid.
-     * @see #BiomeGroup(WorldConfig, String, int, int, List) Constructor to
+     * @see #BiomeGroup(IWorldConfig, String, int, int, List) Constructor to
      * properly initialize this biome group manually.
      */
     public BiomeGroup(IWorldConfig config, List<String> args, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
@@ -75,7 +75,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
      * Does general post-initialization bookkeeping, like adding the
      * LocalBiome instances and initializing the average temperature and
      * group rarity.
-     * @param world Used to look up biomes.
+     * @param biomeProvider Used to look up biomes.
      */
     void processBiomeData(IBiomeRegistryProvider biomeProvider, ILogger logger)
     {

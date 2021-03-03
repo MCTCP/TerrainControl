@@ -195,6 +195,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
 
+			int genDepth = worldConfig.getGenerationDepth();
+
 			// Iterate through the groups and add it to the layer data
 			for (BiomeGroup group : worldConfig.getBiomeGroupManager().getGroups())
 			{
@@ -202,6 +204,10 @@ public class ForgePresetLoader extends LocalPresetLoader
 				NewBiomeGroup bg = new NewBiomeGroup();
 				bg.id = group.getGroupId();
 				bg.rarity = group.getGroupRarity();
+
+				// init to genDepth as it will have one value per depth
+				bg.totalDepthRarity = new int[genDepth];
+				bg.maxRarityPerDepth = new int[genDepth];
 
 				float totalTemp = 0;
 				
@@ -212,7 +218,15 @@ public class ForgePresetLoader extends LocalPresetLoader
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
 
 					// Make and add the generation data
-					NewBiomeData newBiomeData = new NewBiomeData(presetReverseIdMapping.getInt(config), config.getName(), config.getBiomeRarity(), config.getBiomeSize(), config.getBiomeTemperature(), config.getIsleInBiomes(), config.getBorderInBiomes(), config.getNotBorderNearBiomes());
+					NewBiomeData newBiomeData = new NewBiomeData(
+							presetReverseIdMapping.getInt(config),
+							config.getName(),
+							config.getBiomeRarity(),
+							config.getBiomeSize(),
+							config.getBiomeTemperature(),
+							config.getIsleInBiomes(),
+							config.getBorderInBiomes(),
+							config.getNotBorderNearBiomes());
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done
@@ -220,7 +234,21 @@ public class ForgePresetLoader extends LocalPresetLoader
 					
 					totalTemp += config.getBiomeTemperature();
 					bg.totalGroupRarity += config.getBiomeRarity();
+
+					// Add this biome's rarity to the total for its depth in the group
+					bg.totalDepthRarity[config.getBiomeSize()] += config.getBiomeRarity();
 				}
+
+				// We have filled out the biome group's totalDepthRarity array, use it to fill the maxRarityPerDepth array
+				for (int depth = 0; depth < bg.totalDepthRarity.length; depth++)
+				{
+					// maxRarityPerDepth is the sum of totalDepthRarity for this and subsequent depths
+					for (int j = depth; j < bg.totalDepthRarity.length; j++)
+					{
+						bg.maxRarityPerDepth[depth] += bg.totalDepthRarity[j];
+					}
+				}
+
 				bg.avgTemp = totalTemp / group.biomes.size();
 
 				int groupSize = group.getGenerationDepth();

@@ -188,10 +188,9 @@ public class WorldConfig extends WorldConfigBase
 
 		// Biome settings
 
-		readBiomeGroups(reader, biomeResourcesManager, spawnLog, logger, materialReader);
 		this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE, logger);
 		this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH, logger);
-		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger);		
+		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger);
 		this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger);
 		this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger);
 		this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, logger);
@@ -200,10 +199,13 @@ public class WorldConfig extends WorldConfigBase
 		this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, logger);
 		this.isleBiomes = reader.getSetting(WorldStandardValues.ISLE_BIOMES, logger);
 		this.borderBiomes = reader.getSetting(WorldStandardValues.BORDER_BIOMES, logger);
-		this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger);		
+		this.randomRivers = reader.getSetting(WorldStandardValues.RANDOM_RIVERS, logger);
 		this.riverRarity = reader.getSetting(WorldStandardValues.RIVER_RARITY, logger);
 		this.riverSize = reader.getSetting(WorldStandardValues.RIVER_SIZE, logger);
 		this.riversEnabled = reader.getSetting(WorldStandardValues.RIVERS_ENABLED, logger);
+
+		// BiomeGroups requires that values like genDepth are initialized
+		readBiomeGroups(reader, biomeResourcesManager, spawnLog, logger, materialReader);
 
 		// Terrain settings
 
