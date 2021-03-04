@@ -1,12 +1,15 @@
 package com.pg85.otg.forge.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.presets.Preset;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.ArgumentTypes;
 import net.minecraft.util.text.StringTextComponent;
 
 import javax.imageio.ImageIO;
@@ -30,8 +33,14 @@ public class OTGCommand
 				)
 			).then(
 				Commands.literal("map").executes(
-					(context) -> mapBiomes(context.getSource())
-				)
+					(context) -> mapBiomes(context.getSource(), 2048, 2048)
+				).then(
+					Commands.argument("width", IntegerArgumentType.integer(0)).executes(
+							(context) -> mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"))
+					).then(
+						Commands.argument("height", IntegerArgumentType.integer(0)).executes(
+							(context) -> mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"))
+				)))
 			).then(
 				Commands.literal("data").then(
 					Commands.argument("type", StringArgumentType.word()).executes(
@@ -69,7 +78,7 @@ public class OTGCommand
 		return 0;
 	}
 
-	private static int mapBiomes(CommandSource source)
+	private static int mapBiomes(CommandSource source, int width, int height)
 	{
 		if (!(source.getWorld().getChunkProvider().generator.getBiomeProvider() instanceof OTGBiomeProvider))
 		{
@@ -81,7 +90,7 @@ public class OTGCommand
 
 		//setup image
 
-		BufferedImage img = new BufferedImage(2048, 2048, BufferedImage.TYPE_INT_RGB);
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
 		int progressUpdate = img.getHeight() / 8;
 
