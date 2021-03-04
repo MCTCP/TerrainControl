@@ -30,6 +30,8 @@ public class BiomeLayerData
 	public final int biomeRarityScale;
 	public final NewBiomeData oceanBiomeData;
 	public final Map<Integer, List<NewBiomeGroup>> groups = new HashMap<>();
+	public final int[] cumulativeGroupRarities;
+	public final int[] groupMaxRarityPerDepth;
 	public final List<Integer> biomeDepths = new ArrayList<>(); // Depths with biomes
 	public final Map<Integer, NewBiomeGroup> groupRegistry = new HashMap<>();
 	public final Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
@@ -39,8 +41,8 @@ public class BiomeLayerData
 	public final boolean riversEnabled;
 	public final boolean randomRivers;
 	public final int riverRarity;
-	public final int riverSize;	
-	
+	public final int riverSize;
+
 	// FromImageMode
 	public HashMap<Integer, Integer> biomeColorMap;
 	public final int imageXOffset;
@@ -51,7 +53,7 @@ public class BiomeLayerData
 	public final Path presetDir;
 	public final String imageFile;
 	public final ImageOrientation imageOrientation;
-	
+
 	// TODO: The only reason we're cloning BiomeLayerData and NewBiomeData
 	// is because NewBiomeData.totalGroupRarity is used and modified across 
 	// all generation depths, and we want loaded presets to remain unmodified.
@@ -87,10 +89,9 @@ public class BiomeLayerData
 		this.riverSize = data.riverSize;
 		this.riversEnabled = data.riversEnabled;
 		this.oceanBiomeData = data.oceanBiomeData.clone();
-		for(Integer integer : data.biomeDepths)
-		{
-			this.biomeDepths.add(integer.intValue());
-		}
+		this.biomeDepths.addAll(data.biomeDepths);
+		this.cumulativeGroupRarities = data.cumulativeGroupRarities.clone();
+		this.groupMaxRarityPerDepth = data.groupMaxRarityPerDepth.clone();
 		for(Entry<Integer, List<NewBiomeGroup>> entry : data.groups.entrySet())
 		{
 			if(entry.getValue() != null)
@@ -106,7 +107,7 @@ public class BiomeLayerData
 			} else {
 				this.groups.put(entry.getKey().intValue(), null);
 			}
-		}		
+		}
 		for(Entry<Integer, List<NewBiomeData>> entry : data.isleBiomesAtDepth.entrySet())
 		{
 			if(entry.getValue() != null)
@@ -155,6 +156,9 @@ public class BiomeLayerData
 		this.landFuzzy = worldConfig.getLandFuzzy();
 		this.landRarity = worldConfig.getLandRarity();
 
+		this.cumulativeGroupRarities = new int[this.generationDepth];
+		this.groupMaxRarityPerDepth = new int[this.generationDepth];
+
 		if (oceanBiomeConfig == null)
 		{
 			this.oceanBiomeData = new NewBiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
@@ -183,10 +187,20 @@ public class BiomeLayerData
 		{
 			if(entry.getValue() != null)
 			{
+				int cumulativeRarity = 0;
 				for(NewBiomeGroup group : entry.getValue())
 				{
 					group.init(biomeIdsByName);
+					cumulativeRarity += group.rarity;
 				}
+				this.cumulativeGroupRarities[entry.getKey()] = cumulativeRarity;
+			}
+		}
+		for (int depth = 0; depth < this.cumulativeGroupRarities.length; depth++)
+		{
+			for (int j = depth; j < this.cumulativeGroupRarities.length; j++)
+			{
+				this.groupMaxRarityPerDepth[depth] += this.cumulativeGroupRarities[j];
 			}
 		}
 

@@ -16,23 +16,22 @@ class BiomeGroupLayer implements ParentedLayer
 {
 	// The sorted map of rarities to biome groups
 	private final TreeMap<Integer, NewBiomeGroup> rarityMap = new TreeMap<>();
-	// The rarity sum of all the groups. This is used to choose the biome group.
-	private final int maxRarity;
 	private final boolean freezeGroups;
-	
-	BiomeGroupLayer(List<NewBiomeGroup> groups, boolean freezeGroups)
+	private final int maxRarity;
+
+	BiomeGroupLayer(BiomeLayerData data, int depth, boolean freezeGroups)
 	{
-		int maxRarity = 0;
+		List<NewBiomeGroup> groups = data.groups.get(depth);
+		this.maxRarity = data.groupMaxRarityPerDepth[depth];
+		int cumulativeRarity = 0;
 
 		// Iterate through groups and keep a tally of the rarity of each group.
 		// The order doesn't matter all that much, the margin between the values dictates the rarity.
 		for (NewBiomeGroup group : groups)
 		{
-			maxRarity += group.rarity;
-			this.rarityMap.put(maxRarity, group);
+			cumulativeRarity += group.rarity;
+			this.rarityMap.put(cumulativeRarity, group);
 		}
-
-		this.maxRarity = maxRarity;
 		this.freezeGroups = freezeGroups;
 	}
 
@@ -64,8 +63,7 @@ class BiomeGroupLayer implements ParentedLayer
 	private NewBiomeGroup getGroup(LayerRandomnessSource random)
 	{
 		// Get a random rarity number from our max rarity
-		// Allow for a "no value" rarity roll, as we did for 1.12.
-		int chosenRarity = random.nextInt(this.rarityMap.size() * 100);
+		int chosenRarity = random.nextInt(maxRarity);
 
 		// Iterate through the rarity map and see if the chosen rarity is less than the rarity for each group, if it is then return.
 		for (Map.Entry<Integer, NewBiomeGroup> entry : rarityMap.entrySet())
