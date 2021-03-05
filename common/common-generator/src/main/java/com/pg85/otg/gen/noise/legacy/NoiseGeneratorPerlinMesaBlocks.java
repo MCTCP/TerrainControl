@@ -3,6 +3,7 @@ package com.pg85.otg.gen.noise.legacy;
 import java.util.Random;
 
 // Same as net.minecraft.world.gen.NoiseGeneratorPerlin
+@Deprecated
 public class NoiseGeneratorPerlinMesaBlocks
 {
     private final NoiseGeneratorSimplex[] noiseLevels;

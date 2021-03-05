@@ -2,6 +2,7 @@ package com.pg85.otg.gen.noise.legacy;
 
 import java.util.Random;
 
+@Deprecated
 class NoiseGeneratorSurfacePatch
 {
     private static final double Square3 = Math.sqrt(3.0D);

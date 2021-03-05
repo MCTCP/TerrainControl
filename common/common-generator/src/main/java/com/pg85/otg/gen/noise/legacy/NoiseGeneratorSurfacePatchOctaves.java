@@ -2,6 +2,7 @@ package com.pg85.otg.gen.noise.legacy;
 
 import java.util.Random;
 
+@Deprecated
 public class NoiseGeneratorSurfacePatchOctaves
 {
     private NoiseGeneratorSurfacePatch[] noiseArray;

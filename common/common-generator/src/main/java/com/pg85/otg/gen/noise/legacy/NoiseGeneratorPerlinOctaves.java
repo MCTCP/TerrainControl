@@ -4,6 +4,7 @@ import com.pg85.otg.util.helpers.MathHelper;
 
 import java.util.Random;
 
+@Deprecated
 public class NoiseGeneratorPerlinOctaves
 {
 

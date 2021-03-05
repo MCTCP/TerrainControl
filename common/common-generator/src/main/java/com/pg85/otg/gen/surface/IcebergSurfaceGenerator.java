@@ -6,7 +6,6 @@ import java.util.stream.IntStream;
 import com.google.common.collect.ImmutableList;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.gen.noise.OctaveSimplexNoiseSampler;
-import com.pg85.otg.gen.noise.legacy.NoiseGeneratorPerlinMesaBlocks;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.gen.GeneratingChunk;
 import com.pg85.otg.util.interfaces.IBiomeConfig;

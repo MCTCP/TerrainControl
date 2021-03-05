@@ -3,6 +3,7 @@ package com.pg85.otg.gen.noise.legacy;
 import java.util.Random;
 
 // Same as net.minecraft.world.gen.NoiseGeneratorSimplex
+@Deprecated
 class NoiseGeneratorSimplex
 {
     private static final int[][] grad3 = new int[][] {{1, 1, 0}, { -1, 1, 0}, {1, -1, 0}, { -1, -1, 0}, {1, 0, 1}, { -1, 0, 1}, {1, 0, -1}, { -1, 0, -1}, {0, 1, 1}, {0, -1, 1}, {0, 1, -1}, {0, -1, -1}};
