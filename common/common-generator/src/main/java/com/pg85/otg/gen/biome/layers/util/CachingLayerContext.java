@@ -9,7 +9,6 @@ import it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 
 public class CachingLayerContext implements LayerSampleContext<CachingLayerSampler>
 {
-   private final Long2IntLinkedOpenHashMap cache;
    private final int cacheCapacity;
    private final PerlinNoiseSampler noiseSampler;
    private final long worldSeed;
@@ -19,24 +18,22 @@ public class CachingLayerContext implements LayerSampleContext<CachingLayerSampl
    {
       this.worldSeed = addSalt(seed, salt);
       this.noiseSampler = new PerlinNoiseSampler(new Random(seed));
-      this.cache = new Long2IntLinkedOpenHashMap(16, 0.25F);
-      this.cache.defaultReturnValue(Integer.MIN_VALUE);
       this.cacheCapacity = cacheCapacity;
    }
 
    public CachingLayerSampler createSampler(LayerOperator layerOperator)
    {
-      return new CachingLayerSampler(this.cache, this.cacheCapacity, layerOperator);
+      return new CachingLayerSampler(this.cacheCapacity, layerOperator);
    }
 
    public CachingLayerSampler createSampler(LayerOperator layerOperator, CachingLayerSampler cachingLayerSampler)
    {
-      return new CachingLayerSampler(this.cache, Math.min(1024, cachingLayerSampler.getCapacity() * 4), layerOperator);
+      return new CachingLayerSampler(Math.min(1024, cachingLayerSampler.getCapacity() * 4), layerOperator);
    }
 
    public CachingLayerSampler createSampler(LayerOperator layerOperator, CachingLayerSampler cachingLayerSampler, CachingLayerSampler cachingLayerSampler2)
    {
-      return new CachingLayerSampler(this.cache, Math.min(1024, Math.max(cachingLayerSampler.getCapacity(), cachingLayerSampler2.getCapacity()) * 4), layerOperator);
+      return new CachingLayerSampler(Math.min(1024, Math.max(cachingLayerSampler.getCapacity(), cachingLayerSampler2.getCapacity()) * 4), layerOperator);
    }
 
    public void initSeed(long x, long y)
