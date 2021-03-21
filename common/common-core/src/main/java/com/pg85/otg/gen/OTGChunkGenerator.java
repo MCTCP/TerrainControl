@@ -375,10 +375,10 @@ public class OTGChunkGenerator
 				// Add the falloff at this height
 				noise += falloff;
 
-				// Reduce the last 3 layers
+				// Reduce the last 4 layers
 				if (y > 28)
 				{
-					noise = MathHelper.clampedLerp(noise, -10, ((double) y - 28) / 3.0);
+					noise = MathHelper.clampedLerp(noise, -10, ((double) y - 28) / 4.0);
 				}
 			}
 
