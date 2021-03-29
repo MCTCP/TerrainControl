@@ -79,7 +79,7 @@ public class ForgeBiome implements IBiome
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 		
 		// NOOP surface builder, surface/ground/stone blocks / sagc are done during base terrain gen.
-		biomeGenerationSettingsBuilder.withSurfaceBuilder(ConfiguredSurfaceBuilders.field_244184_p);
+		biomeGenerationSettingsBuilder.withSurfaceBuilder(ConfiguredSurfaceBuilders.field_244178_j);
 
 		// * Carvers are handled by OTG
 		

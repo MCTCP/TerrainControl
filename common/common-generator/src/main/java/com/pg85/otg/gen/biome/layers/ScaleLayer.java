@@ -20,31 +20,37 @@ class ScaleLayer implements ParentedLayer
 
    public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
    {
-      int i = parent.sample(this.transformX(x), this.transformZ(z));
-      context.initSeed((long)(x >> 1 << 1), (long)(z >> 1 << 1));
-      int j = x & 1;
-      int k = z & 1;
-      if (j == 0 && k == 0)
-      {
-         return i;
-      } else {
-         int l = parent.sample(this.transformX(x), this.transformZ(z + 1));
-         int m = context.choose(i, l);
-         if (j == 0 && k == 1)
-         {
-            return m;
-         } else {
-            int n = parent.sample(this.transformX(x + 1), this.transformZ(z));
-            int o = context.choose(i, n);
-            if (j == 1 && k == 0)
-            {
-               return o;
-            } else {
-               int p = parent.sample(this.transformX(x + 1), this.transformZ(z + 1));
-               return this.sample(context, i, n, l, p);
-            }
-         }
+      // Optimized ScaleLayer implementation from zoom-layer
+
+      // Sample top left
+      int tl = parent.sample(this.transformX(x), this.transformZ(z));
+
+      // Get last bit of the x and z
+      int ix = x & 1;
+      int iz = z & 1;
+
+      if (ix == 0 && iz == 0) return tl;
+
+      context.initSeed(x & ~1, z & ~1);
+
+      // Only sample bottom left
+      if (ix == 0) {
+         int bl = parent.sample(this.transformX(x), this.transformZ(z + 1));
+         return context.choose(tl, bl);
       }
+
+      // Only sample top right
+      if (iz == 0) {
+         int tr = parent.sample(this.transformX(x + 1), this.transformZ(z));
+         return context.choose(tl, tr);
+      }
+
+      // Perform regular sampling
+      int bl = parent.sample(this.transformX(x), this.transformZ(z + 1));
+      int tr = parent.sample(this.transformX(x + 1), this.transformZ(z));
+      int br = parent.sample(this.transformX(x + 1), this.transformZ(z + 1));
+
+      return this.sample(context, tl, tr, bl, br);
    }
 
    protected int sample(LayerSampleContext<?> context, int i, int j, int k, int l)
