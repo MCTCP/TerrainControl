@@ -18,6 +18,7 @@ import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
+import com.pg85.otg.constants.SettingsEnums.CustomStructureType;
 import com.pg85.otg.constants.SettingsEnums.TerrainMode;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
@@ -118,7 +119,6 @@ public class WorldConfig extends WorldConfigBase
 
 		// Rename old settings
 
-		reader.renameOldSetting("IsOTGPlus", WorldStandardValues.CUSTOM_STRUCTURE_TYPE);
 		reader.renameOldSetting("WorldFog", WorldStandardValues.WORLD_FOG_COLOR);
 		reader.renameOldSetting("BedrockobBlock", WorldStandardValues.BEDROCK_BLOCK);
 	}
@@ -250,7 +250,16 @@ public class WorldConfig extends WorldConfigBase
 
 		// OTG Custom structures
 
-		this.customStructureType = reader.getSetting(WorldStandardValues.CUSTOM_STRUCTURE_TYPE, logger);
+		// IsOTGPlus was renamed to CustomStructureType, but value types are different (bool -> enum)
+		// If IsOTGPlus is true, use it. IsOTGPlus isn't written to configs, so this is only required once
+		// to update configs.
+		boolean isOTGPlus = reader.getSetting(WorldStandardValues.ISOTGPLUS, logger);
+		if(isOTGPlus)
+		{
+			this.customStructureType = CustomStructureType.BO4;
+		} else {
+			this.customStructureType = reader.getSetting(WorldStandardValues.CUSTOM_STRUCTURE_TYPE, logger);	
+		}
 		this.populationBoundsCheck = reader.getSetting(WorldStandardValues.POPULATION_BOUNDS_CHECK, logger);
 		this.maximumCustomStructureRadius = reader.getSetting(WorldStandardValues.MAXIMUM_CUSTOM_STRUCTURE_RADIUS, logger);		
 
