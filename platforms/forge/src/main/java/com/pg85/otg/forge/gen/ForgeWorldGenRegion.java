@@ -368,7 +368,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// TODO: For some reason, on rare occasions WORLD_SURFACE_WG heightmap returns 0 for chunks
 		// with status LIQUID_CARVERS, while the chunk does already have base terrain blocks filled.
 		// If we use a later status like FEATURES though, resource population may have problems 
-		// fetching chunks.
+		// fetching chunks..
 		int heightMapy = chunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(internalX, internalZ);
 		if(heightMapy == 0)
 		{
@@ -377,8 +377,7 @@ class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 			if (heightMapCheck != 0) {
 				heightMapy = heightMapCheck;
-			} else
-			{
+			} else {
 				heightMapy = Constants.WORLD_HEIGHT - 1;
 			}
 		}
