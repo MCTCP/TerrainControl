@@ -109,6 +109,8 @@ public class StandardBiomeTemplate
             new WeightedMobSpawnGroup(EntityNames.BAT, 10, 8, 8));
     public List<WeightedMobSpawnGroup> defaultWaterCreatures = Collections.singletonList(
             new WeightedMobSpawnGroup(EntityNames.SQUID, 10, 4, 4));
+    public List<WeightedMobSpawnGroup> defaultWaterAmbientCreatures = new ArrayList(); // TODO: Fill in default water ambient creatures 
+    public List<WeightedMobSpawnGroup> defaultMiscCreatures = new ArrayList(); // TODO: Fill in default misc creatures
 
     public StandardBiomeTemplate(int worldHeight)
     {
