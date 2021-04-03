@@ -3,10 +3,8 @@ package com.pg85.otg.forge.commands;
 import com.pg85.otg.OTG;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistry;
 
 import java.io.File;

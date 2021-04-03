@@ -114,7 +114,10 @@ public class WorldStandardValues extends Settings
 		END_CITIES_ENABLED = booleanSetting("EndCitiesEnabled", true),
 		RUINED_PORTALS_ENABLED = booleanSetting("RuinedPortalsEnabled", true),
 		SHIPWRECKS_ENABLED = booleanSetting("ShipwrecksEnabled", true),
-		VILLAGES_ENABLED = booleanSetting("VillagesEnabled", true)
+		VILLAGES_ENABLED = booleanSetting("VillagesEnabled", true),
+		
+		// Legacy, only needed for <= 1.12.2 presets, remove when presets have been updated.
+		ISOTGPLUS = booleanSetting("IsOTGPlus", false)
     ;
 
     public static final Setting<LocalMaterialData>

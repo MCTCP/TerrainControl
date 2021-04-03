@@ -9,6 +9,7 @@ import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
 import com.pg85.otg.config.standard.StandardBiomeTemplate;
 import com.pg85.otg.config.standard.WorldStandardValues;
+import com.pg85.otg.config.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.resource.CustomObjectGen;
 import com.pg85.otg.customobject.resource.CustomStructureGen;
@@ -101,7 +102,6 @@ public class BiomeConfig extends BiomeConfigBase
 		CONFIG_FUNCTIONS.put("Seagrass", SeagrassGen.class);
 		CONFIG_FUNCTIONS.put("Kelp", KelpGen.class);
 		CONFIG_FUNCTIONS.put("SeaPickle", SeaPickleGen.class);
-
 	}
 
 	// TODO: Not used atm, implement these.
@@ -151,19 +151,19 @@ public class BiomeConfig extends BiomeConfigBase
 
 		if(biomeConfigStub != null)
 		{
-			spawnMonsters.addAll(biomeConfigStub.spawnMonsters);
-			spawnCreatures.addAll(biomeConfigStub.spawnCreatures);
-			spawnWaterCreatures.addAll(biomeConfigStub.spawnWaterCreatures);
-			spawnAmbientCreatures.addAll(biomeConfigStub.spawnAmbientCreatures);
-			spawnWaterAmbientCreatures.addAll(biomeConfigStub.spawnWaterAmbientCreatures);
-			spawnMiscCreatures.addAll(biomeConfigStub.spawnMiscCreatures);
+			spawnMonsters.addAll(biomeConfigStub.getSpawner(EntityCategory.MONSTER));
+			spawnCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.CREATURE));
+			spawnWaterCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_CREATURE));
+			spawnAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.AMBIENT_CREATURE));
+			spawnWaterAmbientCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.WATER_AMBIENT));
+			spawnMiscCreatures.addAll(biomeConfigStub.getSpawner(EntityCategory.MISC));
 			
-			spawnMonstersMerged.addAll(biomeConfigStub.spawnMonstersMerged);
-			spawnCreaturesMerged.addAll(biomeConfigStub.spawnCreaturesMerged);
-			spawnWaterCreaturesMerged.addAll(biomeConfigStub.spawnWaterCreaturesMerged);
-			spawnAmbientCreaturesMerged.addAll(biomeConfigStub.spawnAmbientCreaturesMerged);
-			spawnWaterAmbientCreaturesMerged.addAll(biomeConfigStub.spawnWaterAmbientCreaturesMerged);
-			spawnMiscCreaturesMerged.addAll(biomeConfigStub.spawnMiscCreaturesMerged);
+			spawnMonstersMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MONSTER));
+			spawnCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.CREATURE));
+			spawnWaterCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_CREATURE));
+			spawnAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.AMBIENT_CREATURE));
+			spawnWaterAmbientCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.WATER_AMBIENT));
+			spawnMiscCreaturesMerged.addAll(biomeConfigStub.getSpawnerMerged(EntityCategory.MISC));
 		}
 
 		this.worldConfig = worldConfig;

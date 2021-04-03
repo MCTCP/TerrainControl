@@ -19,7 +19,9 @@ public interface MojangSettings
         AMBIENT_CREATURE,
         WATER_CREATURE,
         CREATURE,
-        MONSTER
+        MONSTER,
+        WATER_AMBIENT,
+        MISC
     }
 
     /**

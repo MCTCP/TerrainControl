@@ -5,17 +5,26 @@ import com.pg85.otg.OTGEngine;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.minecraft.DefaultBiome;
+import com.pg85.otg.config.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.constants.Constants;
+import com.pg85.otg.forge.biome.BiomeMobSpawnGroupHelper;
 import com.pg85.otg.forge.biome.ForgeMojangSettings;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
 import com.pg85.otg.forge.util.ForgeLogger;
 import com.pg85.otg.forge.util.ForgeModLoadedChecker;
+import com.pg85.otg.logging.LogMarker;
+
+import net.minecraft.entity.EntityClassification;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.ResourceLocationException;
 import net.minecraft.world.IWorld;
+import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerChunkProvider;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.io.File;
 import java.nio.file.Paths;
@@ -54,8 +63,38 @@ class ForgeEngine extends OTGEngine
 
 	@Override
 	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
-	{
-		// TODO: Implement this
+	{		
+		String[] resourceLocationArr = biomeResourceLocation.split(":");		    
+		String resourceDomain = resourceLocationArr.length > 1 ? resourceLocationArr[0] : null;
+		String resourceLocation = resourceLocationArr.length > 1 ? resourceLocationArr[1] : resourceLocationArr[0];
+			
+		Biome biome = null;
+		try
+		{
+			ResourceLocation location = new ResourceLocation(resourceDomain, resourceLocation);
+			biome = ForgeRegistries.BIOMES.getValue(location);
+		}
+		catch(ResourceLocationException ex)
+		{
+			// Can happen when no biome is registered or input is otherwise invalid.
+		}
+		if(biome != null)
+		{
+			// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
+			// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
+			// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
+			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MONSTER), EntityCategory.MONSTER);
+			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.CREATURE), EntityCategory.CREATURE);
+			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
+			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
+			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
+		} else {
+			if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+			{
+				OTG.log(LogMarker.WARN, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
+			}
+		}
 	}
 
 	@Override

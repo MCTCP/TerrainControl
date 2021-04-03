@@ -25,7 +25,7 @@ public abstract class ChunkBuffer
      *               - 1), inclusive.
      * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
      *               - 1), inclusive.
-     * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_Z_SIZE}
+     * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
      *               - 1), inclusive.
      * @param material The material to set the block to.
      */
@@ -37,12 +37,12 @@ public abstract class ChunkBuffer
      *               - 1), inclusive.
      * @param blockY Block y, from 0 to ({@link ChunkCoordinate#CHUNK_Y_SIZE}
      *               - 1), inclusive.
-     * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_Z_SIZE}
+     * @param blockZ Block z, from 0 to ({@link ChunkCoordinate#CHUNK_SIZE}
      *               - 1), inclusive.
      * @return The block material.
      */
     public abstract LocalMaterialData getBlock(int blockX, int blockY, int blockZ);
-	
+
     private final short[] highestBlockHeight = new short[ChunkCoordinate.CHUNK_SIZE * ChunkCoordinate.CHUNK_SIZE];
 	public int getHighestBlockForColumn(int blockX, int blockZ)
 	{

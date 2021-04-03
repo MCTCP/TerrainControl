@@ -18,7 +18,7 @@ public class WeightedMobSpawnGroup
     private final int weight;
     private final int min;
 
-    private WeightedMobSpawnGroup(String mobName, int weight, int min, int max)
+    public WeightedMobSpawnGroup(String mobName, int weight, int min, int max)
     {
         this.mob = mobName;
         this.weight = weight;

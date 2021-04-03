@@ -4,6 +4,7 @@ import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.io.SimpleSettingsMap;
 import com.pg85.otg.config.standard.BiomeStandardValues;
+import com.pg85.otg.config.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.config.standard.StandardBiomeTemplate;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.ILogger;
@@ -248,19 +249,19 @@ public final class BiomeConfigFinder
         
         public boolean inheritMobsBiomeNameProcessed = false;        
        
-        List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
         
-        List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
-        List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnMonstersMerged = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnWaterCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+        private List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
                         
         private BiomeConfigStub(SettingsMap settings, Path file, BiomeLoadInstruction loadInstructions, ILogger logger, IMaterialReader materialReader)
         {
@@ -317,7 +318,29 @@ public final class BiomeConfigFinder
             } else {
             	this.spawnAmbientCreatures = defaultSettings.defaultAmbientCreatures;
             }
-        	
+
+            if(settings.hasSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES))
+            {
+    	    	this.spawnWaterAmbientCreaturesMerged = settings.getSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES, new ArrayList<WeightedMobSpawnGroup>(), logger, materialReader);
+    	        if(this.spawnWaterAmbientCreaturesMerged == null)
+    	        {
+    	        	this.spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+    	        }
+            } else {
+            	this.spawnWaterAmbientCreaturesMerged = defaultSettings.defaultWaterAmbientCreatures;
+            }
+            
+            if(settings.hasSetting(BiomeStandardValues.SPAWN_MISC_CREATURES))
+            {
+    	    	this.spawnMiscCreatures = settings.getSetting(BiomeStandardValues.SPAWN_MISC_CREATURES, new ArrayList<WeightedMobSpawnGroup>(), logger, materialReader);
+    	        if(this.spawnMiscCreatures == null)
+    	        {
+    	        	this.spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
+    	        }
+            } else {
+            	this.spawnMiscCreatures = defaultSettings.defaultMiscCreatures;
+            }            
+            
     		this.spawnMonstersMerged.addAll(this.spawnMonsters);
     		this.spawnCreaturesMerged.addAll(this.spawnCreatures);    		
     		this.spawnWaterCreaturesMerged.addAll(this.spawnWaterCreatures);
@@ -328,20 +351,42 @@ public final class BiomeConfigFinder
         
         public void mergeMobs(BiomeConfigStub parent)
         {
-        	spawnMonstersMerged = mergeMobs(spawnMonstersMerged, parent.spawnMonstersMerged);
-        	spawnCreaturesMerged = mergeMobs(spawnCreaturesMerged, parent.spawnCreaturesMerged);
-        	spawnAmbientCreaturesMerged = mergeMobs(spawnAmbientCreaturesMerged, parent.spawnAmbientCreaturesMerged);
-        	spawnWaterCreaturesMerged = mergeMobs(spawnWaterCreaturesMerged, parent.spawnWaterCreaturesMerged);
-        	spawnWaterAmbientCreaturesMerged = mergeMobs(spawnWaterAmbientCreaturesMerged, parent.spawnWaterAmbientCreaturesMerged);
-        	spawnMiscCreaturesMerged = mergeMobs(spawnMiscCreaturesMerged, parent.spawnMiscCreaturesMerged);
+        	mergeMobs(parent.spawnMonstersMerged, EntityCategory.MONSTER);
+        	mergeMobs(parent.spawnCreaturesMerged, EntityCategory.CREATURE);
+        	mergeMobs(parent.spawnAmbientCreaturesMerged, EntityCategory.AMBIENT_CREATURE);
+        	mergeMobs(parent.spawnWaterCreaturesMerged, EntityCategory.WATER_CREATURE);
+        	mergeMobs(parent.spawnWaterAmbientCreaturesMerged, EntityCategory.WATER_AMBIENT);
+        	mergeMobs(parent.spawnMiscCreaturesMerged, EntityCategory.MISC);
 
             inheritMobsBiomeNameProcessed = true;
         }
         
-        private List<WeightedMobSpawnGroup> mergeMobs(List<WeightedMobSpawnGroup> childSpawnableMonsterList, List<WeightedMobSpawnGroup> parentSpawnableMonsterList)
+        public void mergeMobs(List<WeightedMobSpawnGroup> parentSpawnableMonsterList, EntityCategory entityCategory)
         {
         	// Inherit only mobs that do not appear in this biomes' list
         	// This way a biome's mob spawn settings can override inherited settings.
+        	List<WeightedMobSpawnGroup> childSpawnableMonsterList = null;
+        	switch(entityCategory)
+        	{
+	        	case MONSTER:
+	        		childSpawnableMonsterList = this.spawnMonstersMerged;
+	            	break;
+	        	case CREATURE:
+	        		childSpawnableMonsterList = this.spawnCreaturesMerged;
+	        		break;
+	        	case AMBIENT_CREATURE:
+	        		childSpawnableMonsterList = this.spawnAmbientCreaturesMerged;        		
+	        		break;
+	        	case WATER_CREATURE:
+	        		childSpawnableMonsterList = this.spawnWaterCreaturesMerged;        		
+	        		break;
+	        	case WATER_AMBIENT:
+	        		childSpawnableMonsterList = this.spawnWaterAmbientCreaturesMerged;
+	        		break;
+	        	case MISC:
+	        		childSpawnableMonsterList = this.spawnMiscCreaturesMerged;
+	        		break;
+        	}
         	
         	List<WeightedMobSpawnGroup> newSpawnableMobsList = new ArrayList<WeightedMobSpawnGroup>();
         	newSpawnableMobsList.addAll(childSpawnableMonsterList);
@@ -352,7 +397,22 @@ public final class BiomeConfigFinder
     	    		boolean bFound = false;
     	    		for(WeightedMobSpawnGroup weightedMobSpawnGroupChild : childSpawnableMonsterList)
     	    		{
-    	    			if(weightedMobSpawnGroupChild.getMob().toLowerCase().trim().equals(weightedMobSpawnGroupParent.getMob().toLowerCase().trim()))
+        	    		// When using no resourcedomain in entity name, assume "minecraft:"
+    	    			String compareFrom = weightedMobSpawnGroupChild.getMob().toLowerCase().trim();
+    	    			String compareTo = weightedMobSpawnGroupParent.getMob().toLowerCase().trim();
+    	    			if(compareFrom.startsWith("minecraft:"))
+    	    			{
+    	    				if(!compareTo.contains(":"))
+    	    				{
+    	    					compareFrom = compareFrom.replace("minecraft:", "");
+    	    				}
+    	    			} else {
+    	    				if(compareTo.startsWith("minecraft:"))
+    	    				{
+    	    					compareTo = compareTo.replace("minecraft:", "");
+    	    				}
+    	    			}
+    	    			if(compareFrom.equals(compareTo))
     	    			{
     	    				bFound = true;
     	    				break;
@@ -364,7 +424,30 @@ public final class BiomeConfigFinder
     	    		}
     	    	}
         	}
-        	return newSpawnableMobsList;
+        	
+        	switch(entityCategory)
+        	{
+	        	case MONSTER:
+	        		this.spawnMonstersMerged = newSpawnableMobsList;
+	            	break;
+	        	case CREATURE:
+	        		this.spawnCreaturesMerged = newSpawnableMobsList;        		
+	        		break;
+	        	case AMBIENT_CREATURE:
+	        		this.spawnAmbientCreaturesMerged = newSpawnableMobsList;        		
+	        		break;
+	        	case WATER_CREATURE:
+	        		this.spawnWaterCreaturesMerged = newSpawnableMobsList;        		
+	        		break;
+	        	case WATER_AMBIENT:
+	        		this.spawnWaterAmbientCreaturesMerged = newSpawnableMobsList;
+	        		break;
+	        	case MISC:
+	        		this.spawnMiscCreaturesMerged = newSpawnableMobsList;
+	        		break;
+				default:
+					break;
+        	}
         }
 
         /**
@@ -402,5 +485,49 @@ public final class BiomeConfigFinder
         {
             return loadInstructions.getBiomeName();
         }
+
+		public Collection<? extends WeightedMobSpawnGroup> getSpawner(EntityCategory entityCategory)
+		{
+        	switch(entityCategory)
+        	{
+	        	case MONSTER:
+	        		return this.spawnMonsters;
+	        	case CREATURE:
+	        		return this.spawnCreatures;        		
+	        	case AMBIENT_CREATURE:
+	        		return this.spawnAmbientCreatures;        		
+	        	case WATER_CREATURE:
+	        		return this.spawnWaterCreatures;        		
+	        	case WATER_AMBIENT:
+	        		return this.spawnWaterAmbientCreatures;
+	        	case MISC:
+	        		return this.spawnMiscCreatures;
+				default:
+					break;
+        	}			
+			return null;
+		}
+
+		public Collection<? extends WeightedMobSpawnGroup> getSpawnerMerged(EntityCategory entityCategory)
+		{
+        	switch(entityCategory)
+        	{
+	        	case MONSTER:
+	        		return this.spawnMonstersMerged;
+	        	case CREATURE:
+	        		return this.spawnCreaturesMerged;        		
+	        	case AMBIENT_CREATURE:
+	        		return this.spawnAmbientCreaturesMerged;        		
+	        	case WATER_CREATURE:
+	        		return this.spawnWaterCreaturesMerged;        		
+	        	case WATER_AMBIENT:
+	        		return this.spawnWaterAmbientCreaturesMerged;
+	        	case MISC:
+	        		return this.spawnMiscCreaturesMerged;
+				default:
+					break;
+        	}			
+			return null;
+		}
     }
 }
