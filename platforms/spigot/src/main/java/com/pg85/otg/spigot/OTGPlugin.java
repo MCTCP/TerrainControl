@@ -14,6 +14,8 @@ import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.IRegistryWritable;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
+
+import com.pg85.otg.spigot.util.UnsafeUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
@@ -126,25 +128,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				OTGDelegate = OTGGen.generator;
 			}
 
-			Field field = null;
-			Field modifiers = null;
-			try
-			{
-				// Get the delegate chunkgen
-				field = CustomChunkGenerator.class.getDeclaredField("delegate");
-				// Set it to public
-				field.setAccessible(true);
-				// Make it not final
-				modifiers = Field.class.getDeclaredField("modifiers");
-				modifiers.setAccessible(true);
-				modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-				field.set(generator, OTGDelegate);
-			}
-			catch (NoSuchFieldException | IllegalAccessException e)
-			{
-				e.printStackTrace();
-				return;
-			}
+			UnsafeUtil.setDelegate(generator, OTGDelegate);
 
 			OTG.log(LogMarker.INFO, "Success!");
 		}
