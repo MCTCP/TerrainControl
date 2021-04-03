@@ -91,9 +91,14 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 		return CODEC;
 	}
 
-	public ResourceKey<BiomeBase> getBiomeRegistryKey (int biomeX, int biomeY, int biomeZ)
+	public ResourceKey<BiomeBase> getBiomeRegistryKey(int biomeX, int biomeY, int biomeZ)
 	{
 		return keyLookup.get(this.layer.sample(biomeX, biomeZ));
+	}
+
+	public String getBiomeRegistryName(int biomeX, int biomeY, int biomeZ)
+	{
+		return getBiomeRegistryKey(biomeX, biomeY, biomeZ).a().toString();
 	}
 
 	public ResourceKey<BiomeBase> lookupKey (int index)

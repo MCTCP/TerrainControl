@@ -102,8 +102,6 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 	 * @return String value of
 	 */
 	public String getBiomeAtLocation(int blockX, int blockY, int blockZ) {
-		// TODO: Make sure this is efficient, and correct.
-		//  Got feedback that it doesn't match up with f3. --Authvin
-		return this.generator.getBiomeResourceKey(blockX, blockY, blockZ).a().toString();
+		return this.generator.getBiomeRegistryName(blockX, blockY, blockZ);
 	}
 }

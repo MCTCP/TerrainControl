@@ -9,6 +9,7 @@ import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.OTGChunkGenerator;
 import com.pg85.otg.gen.OTGChunkPopulator;
+import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
@@ -155,8 +156,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Used by OTGSpigotChunkGen to query biome in a given location
 	// Need this because the normal Bukkit way of checking for biomes use the Bukkit Biome enum
-	public ResourceKey<BiomeBase> getBiomeResourceKey(int blockX, int blockY, int blockZ) {
-		return ((OTGBiomeProvider) this.b).getBiomeRegistryKey(blockX, blockY, blockZ);
+	public String getBiomeRegistryName(int blockX, int blockY, int blockZ) {
+		return BiomeInterpolator.getBiomeRegistryName(this.worldSeed, blockX, blockY, blockZ, (OTGBiomeProvider) this.b);
 	}
 
 	// Base terrain gen

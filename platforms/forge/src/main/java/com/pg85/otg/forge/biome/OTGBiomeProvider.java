@@ -105,6 +105,12 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		return keyLookup.get(this.layer.sample(biomeX, biomeZ));
 	}
 
+	@Override
+	public String getBiomeRegistryName(int biomeX, int biomeY, int biomeZ)
+	{
+		return getBiomeRegistryKey(biomeX, biomeY, biomeZ).getLocation().toString();
+	}
+
 	public RegistryKey<Biome> lookupKey(int index)
 	{
 		return keyLookup.get(index);

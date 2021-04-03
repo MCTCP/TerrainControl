@@ -8,4 +8,6 @@ public interface LayerSource
 	LayerSampler getSampler();
 
 	IBiomeConfig getConfig(int x, int z);
+
+	String getBiomeRegistryName(int biomeX, int biomeY, int biomeZ);
 }

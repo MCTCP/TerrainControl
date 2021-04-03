@@ -18,6 +18,12 @@ public class BiomeInterpolator
       return generator.getConfig(MathHelper.getXFromLong(pos), MathHelper.getZFromLong(pos));
    }
 
+   public static String getBiomeRegistryName(long seed, int x, int y, int z, LayerSource generator)
+   {
+      long pos = sample(seed, x, y, z);
+      return generator.getBiomeRegistryName(MathHelper.getXFromLong(pos), 0, MathHelper.getZFromLong(pos));
+   }
+
    public static int getId(long seed, int x, int y, int z, LayerSource generator)
    {
       long pos = sample(seed, x, y, z);
