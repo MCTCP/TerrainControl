@@ -15,14 +15,14 @@ import org.bukkit.generator.ChunkGenerator;
 import java.util.Random;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class SpigotChunkGenerator extends ChunkGenerator
+public class OTGSpigotChunkGen extends ChunkGenerator
 {
 	public ReentrantLock initLock = new ReentrantLock();
 	public OTGNoiseChunkGenerator generator = null;
 	public final Preset preset;
 	private final FifoMap<ChunkCoordinate, ChunkData> chunkDataCache = new FifoMap<>(128);
 
-	public SpigotChunkGenerator(Preset preset)
+	public OTGSpigotChunkGen(Preset preset)
 	{
 		this.preset = preset;
 	}
@@ -87,5 +87,23 @@ public class SpigotChunkGenerator extends ChunkGenerator
 	public boolean shouldGenerateStructures()
 	{
 		return true;
+	}
+
+	/** Method to query the OTG chunk generator for biome at a location. This is useful if you
+	 * want to do a biome check but know there are OTG biomes in the world, which you won't see
+	 * in the bukkit Biome enum.
+	 *
+	 * To query this, get Bukkit.getWorld(worldName).getGenerator(), check it is instanceof OTGSpigotChunkGen,
+	 * then call this method on it.
+	 *
+	 * @param blockX X coordinate of the block in question
+	 * @param blockY Y coordinate - as of early 1.16 builds, this is not in use yet.
+	 * @param blockZ Z coordinate of the block in question
+	 * @return String value of
+	 */
+	public String getBiomeAtLocation(int blockX, int blockY, int blockZ) {
+		// TODO: Make sure this is efficient, and correct.
+		//  Got feedback that it doesn't match up with f3. --Authvin
+		return this.generator.getBiomeResourceKey(blockX, blockY, blockZ).a().toString();
 	}
 }

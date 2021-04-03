@@ -153,6 +153,12 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
+	// Used by OTGSpigotChunkGen to query biome in a given location
+	// Need this because the normal Bukkit way of checking for biomes use the Bukkit Biome enum
+	public ResourceKey<BiomeBase> getBiomeResourceKey(int blockX, int blockY, int blockZ) {
+		return ((OTGBiomeProvider) this.b).getBiomeRegistryKey(blockX, blockY, blockZ);
+	}
+
 	// Base terrain gen
 
 	// Generates the base terrain for a chunk. Spigot compatible.

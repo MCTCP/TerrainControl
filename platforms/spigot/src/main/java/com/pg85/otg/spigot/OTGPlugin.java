@@ -8,7 +8,7 @@ import com.pg85.otg.presets.Preset;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.commands.OTGCommandExecutor;
 import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
-import com.pg85.otg.spigot.gen.SpigotChunkGenerator;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
 import net.minecraft.server.v1_16_R3.IRegistry;
@@ -27,6 +27,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
+import java.util.Objects;
 
 
 public class OTGPlugin extends JavaPlugin implements Listener
@@ -78,7 +79,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 			return null;
 		}
 		worlds.put(worldName, id);
-		return new SpigotChunkGenerator(preset);
+		return new OTGSpigotChunkGen(preset);
 	}
 
 	@EventHandler
@@ -94,33 +95,36 @@ public class OTGPlugin extends JavaPlugin implements Listener
 				OTG.log(LogMarker.INFO, "Mission failed, we'll get them next time");
 				return;
 			}
-			if (!(event.getWorld().getGenerator() instanceof SpigotChunkGenerator))
+			if (!(event.getWorld().getGenerator() instanceof OTGSpigotChunkGen))
 			{
 				OTG.log(LogMarker.WARN, "World generator was not an OTG generator, cannot take over, something has gone wrong");
 				return;
 			}
 			// We have a CustomChunkGenerator and a NoiseChunkGenerator
-			SpigotChunkGenerator OTGGen = (SpigotChunkGenerator) event.getWorld().getGenerator();
+			OTGSpigotChunkGen OTGGen = (OTGSpigotChunkGen) event.getWorld().getGenerator();
 			OTGNoiseChunkGenerator OTGDelegate;
+			// If generator is null, it has not been initialized yet. Initialize it.
+			// The lock is used to avoid the accidental creation of two separate objects, in case
+			// of a race condition.
 			if (OTGGen.generator == null)
 			{
 				OTGGen.initLock.lock();
 				if (OTGGen.generator == null)
 				{
 					OTGDelegate = new OTGNoiseChunkGenerator(
-						new DimensionConfig(OTGGen.preset.getName()),
-						new OTGBiomeProvider(OTGGen.preset.getName(), event.getWorld().getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
-						event.getWorld().getSeed(),
-						GeneratorSettingBase::i
+							new DimensionConfig(OTGGen.preset.getName()),
+							new OTGBiomeProvider(OTGGen.preset.getName(), event.getWorld().getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
+							event.getWorld().getSeed(),
+							GeneratorSettingBase::i
 					);
+					OTGGen.generator = OTGDelegate;
 				} else {
-					// Was made by other thread while we were waiting for the lock
 					OTGDelegate = OTGGen.generator;
 				}
+				OTGGen.initLock.unlock();
 			} else {
 				OTGDelegate = OTGGen.generator;
 			}
-			OTGGen.generator = OTGDelegate;
 
 			Field field = null;
 			Field modifiers = null;

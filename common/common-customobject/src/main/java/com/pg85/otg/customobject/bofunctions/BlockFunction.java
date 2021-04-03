@@ -40,7 +40,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
         {
         	throw new InvalidConfigException("Material \"" + args.get(3) + "\" could not be read.");
         }
-        
+
         if (args.size() == 5)
         {
             metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().getFile(), spawnLog, logger);
@@ -66,7 +66,7 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
      * Spawns this block at the position. The saved x, y and z in this block are
      * ignored.
      * <p/>
-     * @param world  The world to spawn in.
+     * @param worldGenRegion  The world to spawn in.
      * @param random The random number generator.
      * @param x      The absolute x to spawn. The x-position in this object is
      *               ignored.
