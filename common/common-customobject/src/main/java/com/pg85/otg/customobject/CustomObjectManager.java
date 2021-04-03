@@ -60,7 +60,10 @@ public class CustomObjectManager implements ICustomObjectManager
         registerCustomObjectLoader("bo4data", new BO4Loader(manager));
 
         this.globalCustomObjects = new CustomObjectCollection();
-               
+
+        // TODO: Move this to completeable futures. Run a preliminary search for all folders, and then create a completeable future for them.
+		// This would allow it to run concurrently and then block until all of the futures are done. This will allow us to concurrently index and
+		// also block until the indexing is done.
         if(!developerMode)
         {
 	        new Thread() { 

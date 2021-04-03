@@ -39,7 +39,8 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	@Override
 	public void onDisable ()
 	{
-		OTG.stopEngine();
+		// Experimental test to stop crash on server stop for spigot
+//		OTG.stopEngine();
 	}
 
 	@Override
