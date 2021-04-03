@@ -45,7 +45,10 @@ public class WorldStandardValues extends Settings
 		IMAGE_FILL_BIOME = stringSetting("ImageFillBiome", "Ocean"),
 		BO3_AT_SPAWN = stringSetting("BO3AtSpawn", ""),
 		DEFAULT_OCEAN_BIOME = stringSetting("DefaultOceanBiome", "Ocean"),
-		DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "FrozenOcean")
+		DEFAULT_FROZEN_OCEAN_BIOME = stringSetting("DefaultFrozenOceanBiome", "Ocean"),
+		DEFAULT_WARM_OCEAN_BIOME = stringSetting("DefaultWarmOceanBiome", "Ocean"),
+		DEFAULT_LUKEWARM_OCEAN_BIOME = stringSetting("DefaultLukewarmOceanBiome", "Ocean"),
+		DEFAULT_COLD_OCEAN_BIOME = stringSetting("DefaultColdOceanBiome", "Ocean")
 	;
 
     public static final Setting<Integer>
@@ -55,6 +58,7 @@ public class WorldStandardValues extends Settings
 		BIOME_RARITY_SCALE = intSetting("BiomeRarityScale", 100, 1, Integer.MAX_VALUE),
 		LAND_RARITY = intSetting("LandRarity", 99, 1, 100),
 		LAND_SIZE = intSetting("LandSize", 0, 0, 20),
+		OCEAN_BIOME_SIZE = intSetting("OceanBiomeSize", 6, 0, 20),
 		LAND_FUZZY = intSetting("LandFuzzy", 5, 0, 20),
 		ICE_RARITY = intSetting("IceRarity", 90, 1, 100),
 		ICE_SIZE = intSetting("IceSize", 3, 0, 20),

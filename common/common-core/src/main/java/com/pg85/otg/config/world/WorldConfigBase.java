@@ -63,7 +63,12 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	protected int landFuzzy;
 	protected int landRarity;
 	protected int landSize;
+	protected int oceanBiomeSize;
 	protected String defaultOceanBiome;
+	protected String defaultWarmOceanBiome;
+	protected String defaultLukewarmOceanBiome;
+	protected String defaultColdOceanBiome;
+	protected String defaultFrozenOceanBiome;
 	protected BiomeMode biomeMode;
 	protected double frozenOceanTemperature;
 	protected boolean freezeAllColdGroupBiomes;
@@ -546,6 +551,30 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	}
 
 	@Override
+	public String getDefaultWarmOceanBiome()
+	{
+		return this.defaultWarmOceanBiome;
+	}
+
+	@Override
+	public String getDefaultLukewarmOceanBiome()
+	{
+		return this.defaultLukewarmOceanBiome;
+	}
+
+	@Override
+	public String getDefaultColdOceanBiome()
+	{
+		return this.defaultColdOceanBiome;
+	}
+
+	@Override
+	public String getDefaultFrozenOceanBiome()
+	{
+		return this.defaultFrozenOceanBiome;
+	}
+
+	@Override
 	public int getLandFuzzy()
 	{
 		return this.landFuzzy;
@@ -562,7 +591,13 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.landSize;
 	}
-	
+
+	@Override
+	public int getOceanBiomeSize()
+	{
+		return this.oceanBiomeSize;
+	}
+
 	@Override
 	public BiomeMode getBiomeMode()
 	{

@@ -62,7 +62,12 @@ public interface IWorldConfig
 	public int getLandFuzzy();
 	public int getLandRarity();
 	public int getLandSize();
+	public int getOceanBiomeSize();
 	public String getDefaultOceanBiome();
+	public String getDefaultWarmOceanBiome();
+	public String getDefaultLukewarmOceanBiome();
+	public String getDefaultColdOceanBiome();
+	public String getDefaultFrozenOceanBiome();
 	public BiomeMode getBiomeMode();
 	double getFrozenOceanTemperature();
 	public boolean getIsFreezeGroups();

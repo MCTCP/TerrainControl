@@ -45,7 +45,6 @@ public class WorldConfig extends WorldConfigBase
 	// TODO: Not used atm, implement these.
 
 	private boolean frozenOcean;
-	private String defaultFrozenOceanBiome;
 	private TerrainMode modeTerrain;
 	private String bo3AtSpawn;
 
@@ -193,7 +192,12 @@ public class WorldConfig extends WorldConfigBase
 		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger);
 		this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger);
 		this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger);
+		this.oceanBiomeSize = reader.getSetting(WorldStandardValues.OCEAN_BIOME_SIZE, logger);
 		this.defaultOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, logger);
+		this.defaultWarmOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_WARM_OCEAN_BIOME, logger);
+		this.defaultLukewarmOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_LUKEWARM_OCEAN_BIOME, logger);
+		this.defaultColdOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_COLD_OCEAN_BIOME, logger);
+		this.defaultFrozenOceanBiome = reader.getSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, logger);
 		this.biomeMode = reader.getSetting(WorldStandardValues.BIOME_MODE, logger);
 		this.frozenOceanTemperature = reader.getSetting(WorldStandardValues.FROZEN_OCEAN_TEMPERATURE, logger);
 		this.freezeAllColdGroupBiomes = reader.getSetting(WorldStandardValues.GROUP_FREEZE_ENABLED, logger);
@@ -458,12 +462,32 @@ public class WorldConfig extends WorldConfigBase
 			"Land size from 0 to GenerationDepth. Higher LandSize numbers will make the size of the land smaller. Landsize number should always be lower than any biome groups."
 		);
 
+		writer.putSetting(WorldStandardValues.OCEAN_BIOME_SIZE, this.landSize,
+				"Ocean biome size 0 to GenerationDepth. Higher OceanBiomeSize numbers will make the size of the ocean biomes smaller."
+		);
+
 		writer.putSetting(WorldStandardValues.LAND_FUZZY, this.landFuzzy,
 			"Makes coastlines more varied in shape and can cause lakes to form. Must be from 0 to (GenerationDepth minus LandSize)."
 		);
 
 		writer.putSetting(WorldStandardValues.DEFAULT_OCEAN_BIOME, this.defaultOceanBiome,
 			"Set the default Ocean biome for this world."
+		);
+
+		writer.putSetting(WorldStandardValues.DEFAULT_WARM_OCEAN_BIOME, this.defaultWarmOceanBiome,
+				"Set the default Warm Ocean biome for this world."
+		);
+
+		writer.putSetting(WorldStandardValues.DEFAULT_LUKEWARM_OCEAN_BIOME, this.defaultLukewarmOceanBiome,
+				"Set the default Lukewarm Ocean biome for this world."
+		);
+
+		writer.putSetting(WorldStandardValues.DEFAULT_COLD_OCEAN_BIOME, this.defaultColdOceanBiome,
+				"Set the default Cold Ocean biome for this world."
+		);
+
+		writer.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, this.defaultFrozenOceanBiome,
+				"The default Frozen Ocean biome for this world."
 		);
 
 		writer.header2("Ice Area Settings");
@@ -483,10 +507,6 @@ public class WorldConfig extends WorldConfigBase
 			" - When this setting is true, all biomes in the group will have frozen oceans",
 			" - When this setting is false, only biomes with a temperature below \"OceanFreezingTemperature\" will have frozen oceans",
 			"Default: false"
-		);
-
-		writer.putSetting(WorldStandardValues.DEFAULT_FROZEN_OCEAN_BIOME, this.defaultFrozenOceanBiome,
-			"The default frozen ocean biome for this world."
 		);
 		
 		writer.header2("Rivers");

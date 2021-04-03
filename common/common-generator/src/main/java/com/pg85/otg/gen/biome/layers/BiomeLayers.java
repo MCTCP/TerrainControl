@@ -66,9 +66,11 @@ public class BiomeLayers
 	{
 		// Create an empty layer to start the biome generation
 		LayerFactory<T> factory = new InitializationLayer().create(contextProvider.apply(1L));
-		LayerFactory<T> factoryRiver = new InitializationLayer().create(contextProvider.apply(1L));
+		LayerFactory<T> riverFactory = new InitializationLayer().create(contextProvider.apply(1L));
+		LayerFactory<T> oceanTemperatureFactory = null; //
 		boolean riversStarted = false;
-		
+		boolean oceanTemperatureStarted = false;
+
 		if(!(data.biomeMode == BiomeMode.FromImage && data.imageMode != ImageMode.ContinueNormal))
 		{
 			// Iterate through the depth, manipulating the factory at specific points
@@ -77,17 +79,28 @@ public class BiomeLayers
 				// Scale the factory by 2x before adding more transformations
 				factory = new ScaleLayer().create(contextProvider.apply(2000L + depth), factory);
 				// TODO: probably should add smooth layer here
-	
+
+				// Scale our rivers if they've been started
 	            if (data.randomRivers && riversStarted)
 	            {
-	            	factoryRiver = new ScaleLayer().create(contextProvider.apply(2000L + depth), factoryRiver);
+	            	riverFactory = new ScaleLayer().create(contextProvider.apply(2000L + depth), riverFactory);
 	            }
+
+	            if (oceanTemperatureStarted) {
+					oceanTemperatureFactory = new ScaleLayer().create(contextProvider.apply(2000L + depth), oceanTemperatureFactory);
+				}
 				
 				// If we're at the land size, initialize the land layer with the provided rarity.
 				if (depth == data.landSize)
 				{
 					factory = new LandLayer(data.landRarity).create(contextProvider.apply(1L), factory);
 					factory = new FuzzyScaleLayer().create(contextProvider.apply(2000L), factory);
+				}
+
+				// TODO: worldconfig
+				if (depth == data.oceanBiomeSize && !oceanTemperatureStarted) {
+					oceanTemperatureFactory = new OceanTemperatureLayer(data).create(contextProvider.apply(3L));
+					oceanTemperatureStarted = true;
 				}
 	
 				// If the depth is between landSize and landFuzzy, add islands to fuzz the ocean/land border.
@@ -124,22 +137,25 @@ public class BiomeLayers
 		            	factory = new IceLayer(data).create(contextProvider.apply(depth), factory);
 		            }
 				}
-				
-	            if (data.riverRarity == depth)
+
+				// Start rivers if we're at the current depth
+	            if (data.riverDepth == depth)
 	            {
 	                if (data.randomRivers)
 	                {
-	                	factoryRiver = new RiverInitLayer().create(contextProvider.apply(depth), factoryRiver);
+	                	riverFactory = new RiverInitLayer().create(contextProvider.apply(depth), riverFactory);
 	                    riversStarted = true;
 	                } else {
 	                	factory = new RiverInitLayer().create(contextProvider.apply(depth), factory);
 	                }
 	        	}
+
+	            // If we're at the end of the river size
 	            if ((data.generationDepth - data.riverSize) == depth)
 	            {
 	                if (data.randomRivers)
 	                {
-	                	factoryRiver = new RiverLayer().create(contextProvider.apply(5 + depth), factoryRiver);
+	                	riverFactory = new RiverLayer().create(contextProvider.apply(5 + depth), riverFactory);
 	                } else {
 	                	factory = new RiverLayer().create(contextProvider.apply(5 + depth), factory);
 	                }
@@ -185,11 +201,13 @@ public class BiomeLayers
 
 			// Add ocean biomes. This only adds the regular ocean at the moment, soon it will add others.
 			factory = new ApplyOceanLayer(data).create(contextProvider.apply(3L), factory);
+
+			factory = new MergeOceanTemperatureLayer().create(contextProvider.apply(1L), factory, oceanTemperatureFactory);
 			
 			// Finalize the biome data
 	        if (data.randomRivers)
 	        {
-	        	factory = new FinalizeWithRiverLayer(data.riversEnabled, data.riverBiomes).create(contextProvider.apply(1L), factory, factoryRiver);
+	        	factory = new FinalizeWithRiverLayer(data.riversEnabled, data.riverBiomes).create(contextProvider.apply(1L), factory, riverFactory);
 	        } else {
 				factory = new FinalizeLayer(data.riversEnabled, data.riverBiomes).create(contextProvider.apply(1L), factory);
 	        }

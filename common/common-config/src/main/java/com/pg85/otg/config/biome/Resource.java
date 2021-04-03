@@ -21,6 +21,8 @@ public abstract class Resource extends ConfigFunction<IBiomeConfig> implements C
     protected int frequency;
     protected LocalMaterialData material;
     protected double rarity;
+
+    // TODO: registry access resource
     
     // Children must implement this constructor, or createResource will fail
     public Resource(IBiomeConfig biomeConfig, List<String> args, ILogger logger, IMaterialReader materialReader) { }

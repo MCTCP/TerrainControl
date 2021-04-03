@@ -29,7 +29,7 @@ public class SeaPickleGen extends Resource
 	@Override
 	public String toString()
 	{
-		return "SeaPickle(" + this.frequency + "," + this.rarity + this.attempts + ")";
+		return "SeaPickle(" + this.frequency + "," + this.rarity + "," + this.attempts + ")";
 	}
 
 	@Override

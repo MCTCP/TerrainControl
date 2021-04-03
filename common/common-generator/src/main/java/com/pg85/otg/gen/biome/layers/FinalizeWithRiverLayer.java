@@ -10,7 +10,7 @@ import com.pg85.otg.gen.biome.layers.util.LayerSampler;
 class FinalizeWithRiverLayer implements MergingLayer
 {	
 	private final boolean riversEnabled;
-	private int[] riverBiomes;
+	private final int[] riverBiomes;
 	
 	public FinalizeWithRiverLayer(boolean riversEnabled, int[] riverBiomes)
 	{
@@ -19,22 +19,16 @@ class FinalizeWithRiverLayer implements MergingLayer
 	}
 
 	@Override
-	public int sample(LayerRandomnessSource context, LayerSampler samplerMain, LayerSampler samplerRiver, int x, int z)
+	public int sample(LayerRandomnessSource context, LayerSampler mainSampler, LayerSampler riverSampler, int x, int z)
 	{
-		int sample = samplerMain.sample(x, z);
-        if ((sample & BiomeLayers.LAND_BIT) != 0)
-        {
-       		sample = sample & BiomeLayers.BIOME_BITS;
-        } else {
-        	// TODO: Ocean/FrozenOcean based on ICE_BIT and worldConfig.frozenOcean.
-        	// This will work for backwards compatibility, but will need to be 
-        	// re-designed for the new ocean biomes?
-        	sample = 0;
-        }
+		int sample = mainSampler.sample(x, z);
+
+		// Remove all the metadata bits from the sample
+		sample = sample & BiomeLayers.BIOME_BITS;
 
         if (this.riversEnabled)
         {
-        	int currentRiver = samplerRiver.sample(x, z);
+        	int currentRiver = riverSampler.sample(x, z);
         	if((currentRiver & BiomeLayers.RIVER_BITS) != 0)
 			{
         		int riverBiomeId = this.riverBiomes[sample];

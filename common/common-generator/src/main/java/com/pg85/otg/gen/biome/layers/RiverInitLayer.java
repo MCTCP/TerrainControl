@@ -18,6 +18,7 @@ public class RiverInitLayer implements ParentedLayer
         } else {
             currentPiece |= BiomeLayers.RIVER_BIT_TWO;
         }
+
         return currentPiece;
 	}
 }

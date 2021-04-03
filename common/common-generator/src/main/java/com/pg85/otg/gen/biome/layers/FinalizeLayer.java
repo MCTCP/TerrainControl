@@ -22,15 +22,9 @@ class FinalizeLayer implements ParentedLayer
 	public int sample(LayerSampleContext<?> context, LayerSampler parent, int x, int z)
 	{
 		int sample = parent.sample(x, z);
-        if ((sample & BiomeLayers.LAND_BIT) != 0)
-        {
-       		sample = sample & BiomeLayers.BIOME_BITS;	
-        } else {
-        	// TODO: Ocean/FrozenOcean based on ICE_BIT and worldConfig.frozenOcean.
-        	// This will work for backwards compatibility, but will need to be 
-        	// re-designed for the new ocean biomes?
-        	sample = 0;
-        }
+
+		// Remove all the metadata bits from the sample
+		sample = sample & BiomeLayers.BIOME_BITS;
 		
         if (this.riversEnabled && (sample & BiomeLayers.RIVER_BITS) != 0)
 		{

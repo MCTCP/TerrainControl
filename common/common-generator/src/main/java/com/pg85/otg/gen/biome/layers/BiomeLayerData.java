@@ -26,6 +26,8 @@ public class BiomeLayerData
 	public final int landSize;
 	public final int landFuzzy;
 	public final int landRarity;
+	public final int oceanBiomeSize;
+	public final int[] oceanTemperatures;
 	public final double frozenOceanTemperature;
 	public final int biomeRarityScale;
 	public final NewBiomeData oceanBiomeData;
@@ -40,7 +42,7 @@ public class BiomeLayerData
 	public final boolean freezeGroups;
 	public final boolean riversEnabled;
 	public final boolean randomRivers;
-	public final int riverRarity;
+	public final int riverDepth;
 	public final int riverSize;
 
 	// FromImageMode
@@ -67,6 +69,7 @@ public class BiomeLayerData
 		{
 			this.biomeColorMap.put(entry.getKey().intValue(), entry.getValue().intValue());
 		}
+
 		this.imageXOffset = data.imageXOffset;
 		this.imageZOffset = data.imageZOffset;
 		this.imageMode = data.imageMode;
@@ -81,11 +84,12 @@ public class BiomeLayerData
 		this.landSize = data.landSize;
 		this.landFuzzy = data.landFuzzy;
 		this.landRarity = data.landRarity;
+		this.oceanBiomeSize = data.oceanBiomeSize;
 		this.frozenOceanTemperature = data.frozenOceanTemperature;
 		this.biomeRarityScale = data.biomeRarityScale;
 		this.freezeGroups = data.freezeGroups;
 		this.randomRivers = data.randomRivers;
-		this.riverRarity = data.riverRarity;
+		this.riverDepth = data.riverDepth;
 		this.riverSize = data.riverSize;
 		this.riversEnabled = data.riversEnabled;
 		this.oceanBiomeData = data.oceanBiomeData.clone();
@@ -138,9 +142,12 @@ public class BiomeLayerData
 		}
 		
 		this.riverBiomes = data.riverBiomes.clone();
+
+		this.oceanTemperatures = new int[4];
+		System.arraycopy(data.oceanTemperatures, 0, this.oceanTemperatures, 0, 4);
 	}
 	
-	public BiomeLayerData(Path presetDir, IWorldConfig worldConfig, IBiomeConfig oceanBiomeConfig)
+	public BiomeLayerData(Path presetDir, IWorldConfig worldConfig, IBiomeConfig oceanBiomeConfig, int[] oceanTemperatures)
 	{
 		this.imageXOffset = worldConfig.getImageXOffset();
 		this.imageZOffset = worldConfig.getImageZOffset();
@@ -155,6 +162,8 @@ public class BiomeLayerData
 		this.landSize = worldConfig.getLandSize();
 		this.landFuzzy = worldConfig.getLandFuzzy();
 		this.landRarity = worldConfig.getLandRarity();
+		this.oceanBiomeSize = worldConfig.getOceanBiomeSize();
+		this.oceanTemperatures = oceanTemperatures;
 
 		this.cumulativeGroupRarities = new int[this.generationDepth];
 		this.groupMaxRarityPerDepth = new int[this.generationDepth];
@@ -171,7 +180,7 @@ public class BiomeLayerData
 		this.biomeRarityScale = worldConfig.getBiomeRarityScale();
 		this.freezeGroups = worldConfig.getIsFreezeGroups();
 		this.randomRivers = worldConfig.getIsRandomRivers();
-		this.riverRarity = worldConfig.getRiverRarity();
+		this.riverDepth = worldConfig.getRiverRarity();
 		this.riverSize = worldConfig.getRiverSize();
 		this.riversEnabled = worldConfig.getRiversEnabled();
 	}

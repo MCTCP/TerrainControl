@@ -55,6 +55,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			this.biomesByPresetName.put(preset.getName(), presetBiomes);
 			WorldConfig worldConfig = preset.getWorldConfig();
 			BiomeConfig oceanBiomeConfig = null;
+			int[] oceanTemperatures = new int[]{0, 0, 0, 0};
 
 			List<BiomeConfig> biomeConfigs = preset.getAllBiomeConfigs();
 			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size() + 1]; // +1 for default ocean biome, which is registered twice.
@@ -72,13 +73,27 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				boolean isOceanBiome = false;
 				// Biome id 0 is reserved for ocean, used when a land column has
 				// no biome assigned, which can happen due to biome group rarity.
-				if (biomeConfig.getName().equals(preset.getWorldConfig().getDefaultOceanBiome()))
+				if (biomeConfig.getName().equals(worldConfig.getDefaultOceanBiome()))
 				{
 					// TODO: Can't map the same biome to 2 int keys for the reverse map
 					// make sure this doesn't cause problems :/.
 					oceanBiomeConfig = biomeConfig;
 					presetIdMapping[0] = biomeConfig;
 					isOceanBiome = true;
+				}
+
+				// Ocean temperature mappings. Probably a better way to do this?
+				if (biomeConfig.getName().equals(worldConfig.getDefaultWarmOceanBiome())) {
+					oceanTemperatures[0] = currentId;
+				}
+				if (biomeConfig.getName().equals(worldConfig.getDefaultLukewarmOceanBiome())) {
+					oceanTemperatures[1] = currentId;
+				}
+				if (biomeConfig.getName().equals(worldConfig.getDefaultColdOceanBiome())) {
+					oceanTemperatures[2] = currentId;
+				}
+				if (biomeConfig.getName().equals(worldConfig.getDefaultFrozenOceanBiome())) {
+					oceanTemperatures[3] = currentId;
 				}
 
 				BiomeBase biome = SpigotBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
@@ -118,6 +133,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 									biomeConfig.getNotBorderNearBiomes()
 							)
 					);
+
 					isleBiomesAtDepth.put(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), biomesAtDepth);
 				}
 
@@ -137,6 +153,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 									biomeConfig.getNotBorderNearBiomes()
 							)
 					);
+
 					borderBiomesAtDepth.put(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), biomesAtDepth);
 				}
 
@@ -157,7 +174,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			this.reverseIdMapping.put(preset.getName(), presetReverseIdMapping);
 
 			// Set the base data
-			BiomeLayerData data = new BiomeLayerData(preset.getPresetDir(), worldConfig, oceanBiomeConfig);
+			BiomeLayerData data = new BiomeLayerData(preset.getPresetDir(), worldConfig, oceanBiomeConfig, oceanTemperatures);
 
 			Set<Integer> biomeDepths = new HashSet<>();
 			Map<Integer, List<NewBiomeGroup>> groupDepths = new HashMap<>();
