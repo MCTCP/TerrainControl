@@ -314,6 +314,9 @@ public class ReplacedBlocksMatrix
    
     public LocalMaterialData replaceBlock(int y, LocalMaterialData material)
     {
+    	// TODO: simple fix for y being out of bounds, needs a proper fix to figure out why it's happening
+		y = Math.max(Math.min(y, 255), 0);
+
     	ReplaceBlockEntry targetsAtHeight = targetsAtHeights[y];
     	if(targetsAtHeight == null)
     	{
