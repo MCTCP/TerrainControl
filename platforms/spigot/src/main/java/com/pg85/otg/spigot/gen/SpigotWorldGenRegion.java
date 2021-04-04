@@ -20,6 +20,7 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.server.v1_16_R3.*;
 
+import java.util.Optional;
 import java.util.Random;
 
 public class SpigotWorldGenRegion extends LocalWorldGenRegion
@@ -509,6 +510,21 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	public void placeFossil (Random random, ChunkCoordinate chunkCoord)
 	{
 		// TODO: Implement this.
+	}
+
+	@Override
+	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
+	{
+		IRegistryCustom registries = this.worldGenRegion.getMinecraftWorld().r();
+		IRegistry<WorldGenFeatureConfigured<?, ?>> registry = registries.b(IRegistry.au);
+
+		Optional<WorldGenFeatureConfigured<?, ?>> feature = registry.getOptional(new MinecraftKey(id));
+
+		if (feature.isPresent()) {
+			feature.get().a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+		} else {
+			OTG.log(LogMarker.ERROR, "Unable to find registry object " + id);
+		}
 	}
 
 	@Override

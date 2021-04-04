@@ -35,6 +35,7 @@ public interface IWorldGenRegion
 	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate);
 	public void placeDungeon(Random random, int x, int y, int z);
 	public void placeFossil(Random random, ChunkCoordinate chunkCoord);
+	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id);
 	public void prepareDefaultStructures(long worldSeed, int x, int z, boolean dry);
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate);
 	public ChunkCoordinate getSpawnChunk();

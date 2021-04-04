@@ -28,7 +28,7 @@ public class SeagrassGen extends Resource
 	@Override
 	public String toString()
 	{
-		return "Seagrass(" + this.frequency + "," + this.rarity + this.tallChance + ")";
+		return "Seagrass(" + this.frequency + "," + this.rarity + "," + this.tallChance + ")";
 	}
 
 	@Override

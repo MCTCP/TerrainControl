@@ -31,6 +31,7 @@ import com.pg85.otg.gen.resource.OreGen;
 import com.pg85.otg.gen.resource.PlantGen;
 import com.pg85.otg.gen.resource.PlantType;
 import com.pg85.otg.gen.resource.ReedGen;
+import com.pg85.otg.gen.resource.RegistryGen;
 import com.pg85.otg.gen.resource.SeaPickleGen;
 import com.pg85.otg.gen.resource.SeagrassGen;
 import com.pg85.otg.gen.resource.SmallLakeGen;
@@ -102,6 +103,7 @@ public class BiomeConfig extends BiomeConfigBase
 		CONFIG_FUNCTIONS.put("Seagrass", SeagrassGen.class);
 		CONFIG_FUNCTIONS.put("Kelp", KelpGen.class);
 		CONFIG_FUNCTIONS.put("SeaPickle", SeaPickleGen.class);
+		CONFIG_FUNCTIONS.put("Registry", RegistryGen.class);
 	}
 
 	// TODO: Not used atm, implement these.

@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.gen;
 
+import java.util.Optional;
 import java.util.Random;
 
 import com.pg85.otg.OTG;
@@ -25,7 +26,10 @@ import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.DynamicRegistries;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkStatus;
@@ -541,6 +545,21 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public void placeFossil(Random random, ChunkCoordinate chunkCoord)
 	{
 		// TODO: Implement this.
+	}
+
+	@Override
+	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
+	{
+		DynamicRegistries registries = this.worldGenRegion.getWorld().func_241828_r();
+		Registry<ConfiguredFeature<?, ?>> registry = registries.getRegistry(Registry.CONFIGURED_FEATURE_KEY);
+
+		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
+
+		if (feature.isPresent()) {
+			feature.get().generate(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+		} else {
+			OTG.log(LogMarker.ERROR, "Unable to find registry object " + id);
+		}
 	}
 
 	@Override
