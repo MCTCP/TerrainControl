@@ -100,7 +100,12 @@ class ForgeEngine extends OTGEngine
 	@Override
 	public File getJarFile()
 	{
-		return ModList.get().getModFileById(Constants.MOD_ID_SHORT).getFile().getFilePath().toFile();
+		File modFile = ModList.get().getModFileById(Constants.MOD_ID_SHORT).getFile().getFilePath().toFile();
+		if(!modFile.isFile())
+		{
+			return null;
+		}
+		return modFile;
 	}
 
 	public void onSave(IWorld world)

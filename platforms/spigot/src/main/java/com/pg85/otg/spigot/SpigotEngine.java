@@ -13,6 +13,9 @@ import com.pg85.otg.spigot.util.SpigotPluginLoadedChecker;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -54,6 +57,20 @@ public class SpigotEngine extends OTGEngine
 	@Override
 	public File getJarFile()
 	{
-		return new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile());
+		String fileName = plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getFile();
+		// URLEncoded string, decode.
+		try {
+			fileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8.toString());
+		} catch (UnsupportedEncodingException e) { }
+		
+		if(fileName != null)
+		{
+			File modFile = new File(fileName);
+			if(modFile.isFile())
+			{
+				return modFile;
+			}
+		}
+		return null;
 	}
 }
