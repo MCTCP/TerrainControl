@@ -5,7 +5,6 @@ import java.util.Arrays;
 import com.pg85.otg.util.helpers.MathHelper;
 
 import it.unimi.dsi.fastutil.HashCommon;
-import it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
 
 public final class CachingLayerSampler implements LayerSampler
 {

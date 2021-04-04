@@ -26,10 +26,7 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.Objects;
 
 
 public class OTGPlugin extends JavaPlugin implements Listener

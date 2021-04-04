@@ -1,9 +1,6 @@
 package com.pg85.otg.config.standard;
 
-import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.materials.LocalMaterialData;
-
-import java.util.List;
 
 /**
  * Some default settings are provided by Mojang, so that they don't have to be
@@ -47,6 +44,4 @@ public interface MojangSettings
     LocalMaterialData getSurfaceBlock();
 
     LocalMaterialData getGroundBlock();
-
-    List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory entityCategory);
 }
