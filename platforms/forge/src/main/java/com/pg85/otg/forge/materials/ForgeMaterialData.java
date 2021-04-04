@@ -282,13 +282,13 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public boolean isEmptyOrAir()
 	{
-		return this.blockData == null ? true : this.blockData.getBlock() == Blocks.AIR;
+		return this.blockData == null ? true : this.blockData.isAir();
 	}
 	
 	@Override
 	public boolean isAir()
 	{
-		return this.blockData != null && this.blockData.getBlock() == Blocks.AIR;
+		return this.blockData != null && this.blockData.isAir();
 	}
 	
 	@Override

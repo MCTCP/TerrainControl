@@ -84,9 +84,6 @@ public class SmallLakeGen extends Resource
             return;
         }
 
-        x -= 8;
-        z -= 8;
-
         int y = RandomHelper.numberInRange(rand, minAltitude, maxAltitude);
 
         // Search any free space
@@ -136,6 +133,7 @@ public class SmallLakeGen extends Resource
                         {
                             continue;
                         }
+
                         lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)] = true;
                     }
                 }
@@ -178,7 +176,7 @@ public class SmallLakeGen extends Resource
         {
             for (int lakeZ = 0; lakeZ < 16; lakeZ++)
             {
-                for (int lakeY = 0; lakeY < 8; lakeY++)
+                for (int lakeY = 0; lakeY < 4; lakeY++)
                 {
                     if (lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)])
                     {
@@ -186,6 +184,7 @@ public class SmallLakeGen extends Resource
                         lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)] = false;
                     }
                 }
+
                 for (int lakeY = 4; lakeY < 8; lakeY++)
                 {
                     if (lakeMask[((lakeX * 16 + lakeZ) * 8 + lakeY)])

@@ -132,6 +132,7 @@ public class UndergroundLakeGen extends Resource
                         {
                             continue;
                         }
+
                         LocalMaterialData materialBelow = worldGenRegion.getMaterial(xLake, yLake - 1, zLake, chunkBeingPopulated);
                         if (materialBelow != null && materialBelow.isAir())
                         {
