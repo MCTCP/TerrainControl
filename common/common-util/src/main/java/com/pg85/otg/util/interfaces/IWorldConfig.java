@@ -58,6 +58,7 @@ public interface IWorldConfig
 
 	public ArrayList<String> getWorldBiomes();
 	public int getBiomeRarityScale();
+	boolean getOldGroupRarity();
 	public int getGenerationDepth();
 	public int getLandFuzzy();
 	public int getLandRarity();
@@ -144,4 +145,5 @@ public interface IWorldConfig
 	public double getRavineDepth();
 	public int getRavineMinAltitude();
 	public int getRavineMaxAltitude();
+
 }

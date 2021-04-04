@@ -22,7 +22,14 @@ class BiomeGroupLayer implements ParentedLayer
 	BiomeGroupLayer(BiomeLayerData data, int depth, boolean freezeGroups)
 	{
 		List<NewBiomeGroup> groups = data.groups.get(depth);
-		this.maxRarity = data.groupMaxRarityPerDepth[depth];
+		if (data.oldGroupRarity)
+		{
+			this.maxRarity = Math.max(data.cumulativeGroupRarities[depth], 100);
+		}
+		else
+		{
+			this.maxRarity = data.groupMaxRarityPerDepth[depth];
+		}
 		int cumulativeRarity = 0;
 
 		// Iterate through groups and keep a tally of the rarity of each group.

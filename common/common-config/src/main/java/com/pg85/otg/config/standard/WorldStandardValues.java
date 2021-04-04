@@ -17,7 +17,7 @@ import java.util.List;
 
 public class WorldStandardValues extends Settings
 {
-    public static class BiomeGroupNames
+	public static class BiomeGroupNames
     {
 		public static final String NORMAL = "NormalBiomes";
 		public static final String ICE = "IceBiomes";
@@ -99,6 +99,8 @@ public class WorldStandardValues extends Settings
 		REMOVE_SURFACE_STONE = booleanSetting("RemoveSurfaceStone", false),
 		POPULATION_BOUNDS_CHECK = booleanSetting("PopulationBoundsCheck", true),
 		DISABLE_OREGEN = booleanSetting("DisableOreGen", false),
+
+		OLD_GROUP_RARITY = booleanSetting("OldGroupRarity", true), //TODO: for 1.16 1.0, switch this to false --Authvin
 		
 		MINESHAFTS_ENABLED = booleanSetting("MineshaftsEnabled", true),
 		OCEAN_MONUMENTS_ENABLED = booleanSetting("OceanMonumentsEnabled", true),

@@ -59,6 +59,7 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	
 	protected ArrayList<String> worldBiomes = new ArrayList<String>();
 	protected int biomeRarityScale;
+	protected boolean oldGroupRarity;
 	protected int generationDepth;
 	protected int landFuzzy;
 	protected int landRarity;
@@ -351,7 +352,13 @@ abstract class WorldConfigBase extends ConfigFile implements IWorldConfig
 	{
 		return this.biomeRarityScale;
 	}
-	
+
+	@Override
+	public boolean getOldGroupRarity()
+	{
+		return this.oldGroupRarity;
+	}
+
 	@Override
 	public LocalMaterialData getCooledLavaBlock()
 	{

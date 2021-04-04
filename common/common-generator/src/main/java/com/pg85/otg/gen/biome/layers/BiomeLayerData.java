@@ -34,6 +34,7 @@ public class BiomeLayerData
 	public final Map<Integer, List<NewBiomeGroup>> groups = new HashMap<>();
 	public final int[] cumulativeGroupRarities;
 	public final int[] groupMaxRarityPerDepth;
+	public final boolean oldGroupRarity;
 	public final List<Integer> biomeDepths = new ArrayList<>(); // Depths with biomes
 	public final Map<Integer, NewBiomeGroup> groupRegistry = new HashMap<>();
 	public final Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
@@ -96,6 +97,8 @@ public class BiomeLayerData
 		this.biomeDepths.addAll(data.biomeDepths);
 		this.cumulativeGroupRarities = data.cumulativeGroupRarities.clone();
 		this.groupMaxRarityPerDepth = data.groupMaxRarityPerDepth.clone();
+		this.oldGroupRarity = data.oldGroupRarity;
+
 		for(Entry<Integer, List<NewBiomeGroup>> entry : data.groups.entrySet())
 		{
 			if(entry.getValue() != null)
@@ -167,6 +170,7 @@ public class BiomeLayerData
 
 		this.cumulativeGroupRarities = new int[this.generationDepth+1];
 		this.groupMaxRarityPerDepth = new int[this.generationDepth+1];
+		this.oldGroupRarity = worldConfig.getOldGroupRarity();
 
 		if (oceanBiomeConfig == null)
 		{

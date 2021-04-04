@@ -189,6 +189,7 @@ public class WorldConfig extends WorldConfigBase
 
 		this.biomeRarityScale = reader.getSetting(WorldStandardValues.BIOME_RARITY_SCALE, logger);
 		this.generationDepth = reader.getSetting(WorldStandardValues.GENERATION_DEPTH, logger);
+		this.oldGroupRarity = reader.getSetting(WorldStandardValues.OLD_GROUP_RARITY, logger);
 		this.landFuzzy = reader.getSetting(WorldStandardValues.LAND_FUZZY, logger);
 		this.landRarity = reader.getSetting(WorldStandardValues.LAND_RARITY, logger);
 		this.landSize = reader.getSetting(WorldStandardValues.LAND_SIZE, logger);
@@ -432,7 +433,11 @@ public class WorldConfig extends WorldConfigBase
 
 		writer.putSetting(WorldStandardValues.BIOME_RARITY_SCALE, this.biomeRarityScale,
 			"Max biome rarity from 1 to infinity. By default this is 100, but you can raise it for fine-grained control, or to create biomes with a chance of occurring smaller than 1/100."
-		);		
+		);
+
+		writer.putSetting(WorldStandardValues.OLD_GROUP_RARITY, this.oldGroupRarity,
+			"Whether or not OTG should use the old group rarity"
+		);
 		
 		writer.header2("Biome Groups",
 			"Biome groups group similar biomes together so that they spawn next to each other.", 
