@@ -5,8 +5,6 @@ import java.util.Random;
 import com.pg85.otg.gen.noise.PerlinNoiseSampler;
 import com.pg85.otg.util.helpers.MathHelper;
 
-import it.unimi.dsi.fastutil.longs.Long2IntLinkedOpenHashMap;
-
 public class CachingLayerContext implements LayerSampleContext<CachingLayerSampler>
 {
    private final int cacheCapacity;
