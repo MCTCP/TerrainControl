@@ -304,7 +304,10 @@ public abstract class LocalPresetLoader
 					}
 					else if(inheritMobsBiomeConfig == biomeConfigStub)
 					{
-						OTG.log(LogMarker.WARN, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
+						if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+						{
+							OTG.log(LogMarker.WARN, "The biome {} tried to inherit mobs from itself.", new Object[] { biomeConfigStub.getBiomeName()});
+						}
 						continue;
 					}
 				}
@@ -312,7 +315,10 @@ public abstract class LocalPresetLoader
 				// Check for too much recursion
 				if (currentDepth > MAX_INHERITANCE_DEPTH)
 				{
-					OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getPath().toFile().getName(), inheritMobsBiomeConfig.getPath().toFile().getName()});
+					if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+					{
+						OTG.log(LogMarker.FATAL, "The biome {} cannot inherit mobs from biome {} - too much configs processed already! Cyclical inheritance?", new Object[] { biomeConfigStub.getPath().toFile().getName(), inheritMobsBiomeConfig.getPath().toFile().getName()});
+					}
 				}
 
 				if(inheritMobsBiomeConfig != null)
