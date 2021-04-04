@@ -24,14 +24,14 @@ import java.util.Random;
 
 public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
-	private final RegionLimitedWorldAccess worldGenRegion;
+	private final GeneratorAccessSeed worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
 
 	// 32x32 biomes cache for fast lookups during population
 	private IBiome[][] cachedBiomeConfigs;
 	private boolean cacheIsValid;
 
-	public SpigotWorldGenRegion (String name, IWorldConfig worldConfig, RegionLimitedWorldAccess world, OTGNoiseChunkGenerator otgNoiseChunkGenerator)
+	public SpigotWorldGenRegion (String name, IWorldConfig worldConfig, GeneratorAccessSeed world, OTGNoiseChunkGenerator otgNoiseChunkGenerator)
 	{
 		super(name, worldConfig);
 		worldGenRegion = world;

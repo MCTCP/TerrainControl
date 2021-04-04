@@ -1,15 +1,23 @@
 package com.pg85.otg.forge.commands;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.pg85.otg.OTG;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.presets.Preset;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
-import net.minecraft.command.arguments.ArgumentTypes;
+import net.minecraft.command.ISuggestionProvider;
+import net.minecraft.command.arguments.BlockPosArgument;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
 import javax.imageio.ImageIO;
@@ -17,6 +25,11 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class OTGCommand
 {
@@ -51,8 +64,41 @@ public class OTGCommand
 				Commands.literal("preset").executes(
 					(context -> showPreset(context.getSource()))
 				)
+			).then(
+				Commands.literal("biome").executes(
+						(context -> showBiome(context.getSource()))
+				)
+			).then(
+				Commands.literal("spawn").then(
+					Commands.argument("preset", new PresetArgument()).then(
+						Commands.argument("object", new BiomeObjectArgument()).then(
+							Commands.argument("location", new BlockPosArgument())
+							.executes(
+							(context -> SpawnCommand.execute(
+								context.getSource(),
+								context.getArgument("preset", String.class),
+								context.getArgument("object", String.class),
+								BlockPosArgument.getLoadedBlockPos(context, "location")))
+						)
+
+					)
+				)
 			)
-		);
+		));
+	}
+
+	private static int showBiome(CommandSource source)
+	{
+		if (!(source.getWorld().getChunkProvider().generator instanceof OTGNoiseChunkGenerator))
+		{
+			source.sendFeedback(new StringTextComponent("OTG is not enabled in this world"), false);
+			return 0;
+		}
+		source.sendFeedback(new StringTextComponent(
+				source.getWorld().getBiome(
+						new BlockPos(source.getPos().x, source.getPos().y, source.getPos().z)).toString())
+				, false);
+		return 0;
 	}
 
 	private static int showPreset(CommandSource source)
@@ -73,8 +119,10 @@ public class OTGCommand
 
 	private static int showHelp(CommandSource source)
 	{
-		source.sendFeedback(new StringTextComponent("OTG Help"), true);
-		source.sendFeedback(new StringTextComponent("/otg map -> Creates a 2048x2048 biome map of the world."), true);
+		source.sendFeedback(new StringTextComponent("OTG Help"), false);
+		source.sendFeedback(new StringTextComponent("/otg map -> Creates a 2048x2048 biome map of the world."), false);
+		source.sendFeedback(new StringTextComponent("/otg data <dataType>"), false);
+		source.sendFeedback(new StringTextComponent("/otg spawn <preset name> <object name> <location>"), false);
 		return 0;
 	}
 
@@ -124,5 +172,46 @@ public class OTGCommand
 		}
 
 		return 0;
+	}
+
+	// if a name includes a space, we wrap it in quotes
+	private static final Function<String, String> filterNamesWithSpaces = (name -> name.contains(" ") ? "\"" + name + "\"" : name);
+
+	private static class PresetArgument implements ArgumentType<String>
+	{
+		@Override
+		public String parse(StringReader reader) throws CommandSyntaxException
+		{
+			return reader.readString();
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			Set<String> set = OTG.getEngine().getPresetLoader().getAllPresetNames().stream()
+				.map(filterNamesWithSpaces).collect(Collectors.toSet());
+			return ISuggestionProvider.suggest(set, builder);
+		}
+	}
+
+	private static class BiomeObjectArgument implements ArgumentType<String>
+	{
+
+		@Override
+		public String parse(StringReader reader) throws CommandSyntaxException
+		{
+			return reader.readString();
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			List<String> list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(
+				context.getArgument("preset", String.class)).stream()
+				.map(filterNamesWithSpaces).collect(Collectors.toList());
+			return ISuggestionProvider.suggest(
+				list,
+				builder);
+		}
 	}
 }

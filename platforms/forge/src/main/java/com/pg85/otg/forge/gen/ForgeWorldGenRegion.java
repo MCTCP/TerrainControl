@@ -26,6 +26,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
@@ -34,18 +35,17 @@ import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
 import net.minecraft.world.gen.feature.Features;
 import net.minecraft.world.gen.feature.IFeatureConfig;
-import net.minecraft.world.gen.WorldGenRegion;
 
-class ForgeWorldGenRegion extends LocalWorldGenRegion
+public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
-	private final WorldGenRegion worldGenRegion;
+	private final ISeedReader worldGenRegion;
 	private final OTGNoiseChunkGenerator chunkGenerator;
 	
 	// 32x32 biomes cache for fast lookups during population
 	private IBiome[][] cachedBiomeConfigs;
 	private boolean cacheIsValid;
 
-	ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, WorldGenRegion worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	public ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, ISeedReader worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
 	{
 		super(presetName, worldConfig);
 		this.worldGenRegion = worldGenRegion;

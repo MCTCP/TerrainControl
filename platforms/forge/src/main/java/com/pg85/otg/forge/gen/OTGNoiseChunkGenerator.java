@@ -561,6 +561,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.dimensionSettingsSupplier.get().func_236119_g_();
 	}
 
+	public CustomStructureCache getStructureCache() {
+		return this.structureCache;
+	}
+
 	// BO4's / Smoothing Areas
 
 	// BO4's and smoothing areas may do material and height checks in unloaded chunks, OTG generates 
@@ -659,4 +663,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		return this.internalGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
 	}
+
+
 }

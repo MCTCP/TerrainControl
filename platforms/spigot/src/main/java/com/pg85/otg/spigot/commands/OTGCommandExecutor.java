@@ -36,6 +36,8 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 				return DataCommand.execute(sender, strings);
 			case "map":
 				return mapBiomes(sender, strings);
+			case "spawn":
+				return SpawnCommand.execute(sender, Arrays.copyOfRange(strings, 1, strings.length));
 			case "help":
 			default:
 				return helpMessage(sender);
@@ -113,6 +115,8 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 	{
 		sender.sendMessage("OTG Help");
 		sender.sendMessage("/otg map -> Creates a 2048 x 2048 biome map of the world.");
+		sender.sendMessage("/otg spawn <preset name> : <object name>");
+		sender.sendMessage("/otg data <dataType>");
 		return true;
 	}
 

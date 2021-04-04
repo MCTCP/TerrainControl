@@ -3,12 +3,7 @@ package com.pg85.otg.presets;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.pg85.otg.OTG;
@@ -65,6 +60,10 @@ public abstract class LocalPresetLoader
 	public ArrayList<Preset> getAllPresets()
 	{
 		return new ArrayList<Preset>(presets.values());
+	}
+
+	public Set<String> getAllPresetNames() {
+		return presets.keySet();
 	}
 	
 	public String getDefaultPresetName()

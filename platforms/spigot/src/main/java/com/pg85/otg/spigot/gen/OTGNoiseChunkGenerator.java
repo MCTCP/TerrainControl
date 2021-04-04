@@ -574,6 +574,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.dimensionSettingsSupplier.get().g();
 	}
 
+	public CustomStructureCache getStructureCache() {
+		return this.structureCache;
+	}
+
 	// BO4's / Smoothing Areas
 
 	// BO4's and smoothing areas may do material and height checks in unloaded chunks, OTG generates

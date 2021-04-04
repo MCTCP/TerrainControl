@@ -177,14 +177,9 @@ public class BO3 implements StructuredCustomObject
 
         for (BO3BlockFunction block : blocks)
         {
-            // Places if BO3 is in placeAnyway mode, or if target block is a source block
-            if (this.settings.outsideSourceBlock == OutsideSourceBlock.placeAnyway
-                    || this.settings.sourceBlocks.contains(block.material))
-            {
-                block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z, null, this.doReplaceBlocks());
-                oeh.addBlock(block);
-                chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
-            }
+            block.spawn(worldGenRegion, random, x + block.x, y + block.y, z + block.z, null, this.doReplaceBlocks());
+            oeh.addBlock(block);
+            chunks.add(ChunkCoordinate.fromBlockCoords(x + block.x, z + block.z));
         }
 
         oeh.extrude(worldGenRegion, random, x, y, z, null, this.doReplaceBlocks());
