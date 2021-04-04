@@ -7,7 +7,7 @@ import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.config.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.constants.Constants;
-import com.pg85.otg.forge.biome.BiomeMobSpawnGroupHelper;
+import com.pg85.otg.forge.biome.MobSpawnGroupHelper;
 import com.pg85.otg.forge.biome.ForgeMojangSettings;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialReader;
@@ -83,12 +83,12 @@ class ForgeEngine extends OTGEngine
 			// Merge the vanilla biome's mob spawning lists with the mob spawning lists from the BiomeConfig.
 			// Mob spawning settings for the same creature will not be inherited (so BiomeConfigs can override vanilla mob spawning settings).
 			// We also inherit any mobs that have been added to vanilla biomes' mob spawning lists by other mods.
-			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MONSTER), EntityCategory.MONSTER);
-			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.AMBIENT), EntityCategory.AMBIENT_CREATURE);
-			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.CREATURE), EntityCategory.CREATURE);
-			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
-			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
-			biomeConfigStub.mergeMobs(BiomeMobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MONSTER), EntityCategory.MONSTER);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.AMBIENT), EntityCategory.AMBIENT_CREATURE);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.CREATURE), EntityCategory.CREATURE);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_AMBIENT), EntityCategory.WATER_AMBIENT);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.WATER_CREATURE), EntityCategory.WATER_CREATURE);
+			biomeConfigStub.mergeMobs(MobSpawnGroupHelper.getListFromMinecraftBiome(biome, EntityClassification.MISC), EntityCategory.MISC);
 		} else {
 			if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 			{
