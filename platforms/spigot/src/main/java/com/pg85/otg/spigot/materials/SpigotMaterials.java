@@ -6,8 +6,6 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
-import org.bukkit.block.BlockState;
-
 import net.minecraft.server.v1_16_R3.BlockBamboo;
 import net.minecraft.server.v1_16_R3.BlockPropertyBambooSize;
 import net.minecraft.server.v1_16_R3.BlockPropertyDoubleBlockHalf;

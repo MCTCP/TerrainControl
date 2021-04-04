@@ -87,8 +87,8 @@ minecraft {
 
 dependencies
 {	
-    minecraft 'net.minecraftforge:forge:1.16.4-35.1.7'
-	
+    minecraft 'net.minecraftforge:forge:1.16.5-36.1.0'
+
 	compile project(':common:common-util')
 	compile project(':common:common-config')
 	compile project(':common:common-customobject')

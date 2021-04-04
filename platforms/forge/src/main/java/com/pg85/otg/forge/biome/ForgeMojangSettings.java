@@ -2,15 +2,12 @@ package com.pg85.otg.forge.biome;
 
 import com.pg85.otg.config.standard.MojangSettings;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
-import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeRegistry;
 import net.minecraftforge.registries.ForgeRegistries;
-
-import java.util.List;
 
 /**
  * Gets some default settings from the BiomeBase instance. The settings in the
@@ -85,12 +82,5 @@ public final class ForgeMojangSettings implements MojangSettings
 	public LocalMaterialData getGroundBlock()
 	{
 		return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getUnder());
-	}
-
-	@Override
-	public List<WeightedMobSpawnGroup> getMobSpawnGroup(EntityCategory entityCategory)
-	{
-		// TODO: Implement this?
-		return null;//MobSpawnGroupHelper.getListFromMinecraftBiome(this.biomeBase, entityCategory);
 	}
 }

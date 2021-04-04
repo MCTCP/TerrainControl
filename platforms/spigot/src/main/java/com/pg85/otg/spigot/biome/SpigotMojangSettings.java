@@ -2,13 +2,10 @@ package com.pg85.otg.spigot.biome;
 
 import com.pg85.otg.config.standard.MojangSettings;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
-import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-
-import java.util.List;
 
 public class SpigotMojangSettings implements MojangSettings
 {
@@ -83,12 +80,5 @@ public class SpigotMojangSettings implements MojangSettings
 	{
 		// Forge: this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getUnder()
 		return SpigotMaterialData.ofBlockData(this.biomeBase.e().e().b());
-	}
-
-	@Override
-	public List<WeightedMobSpawnGroup> getMobSpawnGroup (EntityCategory entityCategory)
-	{
-		// TODO: Implement this?
-		return null;
 	}
 }
