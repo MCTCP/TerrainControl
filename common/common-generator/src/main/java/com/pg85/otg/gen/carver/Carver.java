@@ -85,7 +85,11 @@ public abstract class Carver
 		} else
 		{
 			carvingMask.set(i);
-
+			// If there is already air here, we don't carve - don't want an ocean of lava under Skylands
+			if (chunk.getBlock(x, y, z).isMaterial(LocalMaterials.AIR))
+			{
+				return false;
+			}
 			// TODO: top layer searching
 			if (y < 11)
 			{
@@ -95,7 +99,6 @@ public abstract class Carver
 				// TODO: should be cave_air
 				chunk.setBlock(x, y, z, LocalMaterials.AIR);
 			}
-
 			return true;
 		}
 	}

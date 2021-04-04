@@ -8,7 +8,7 @@ defaultTasks 'clean', 'build', 'createReleaseJar', 'install'
 
 allprojects
 {
-    version = "1.16.5-0.0.5"
+    version = "1.16.5-0.0.6"
     group = "com.pg85.otg"
 
     // Version of the shadow plugin
@@ -79,28 +79,34 @@ static def addToZip(File source, ZipOutputStream destination, Set<String> alread
     inputStream.close()
 }
 
-task createReleaseJar <<
-{
-    // We're including common only for the external libraries that are packaged with it (using Forge jar-in-jar).
-    File commonFile = getJarFile(project(":common:common-core"))
-    File forgeFile = getJarFile(project(":platforms:forge"))
-    File spigotFile = getJarFile(project(":platforms:spigot"))
-    File ourFile = new File(project.buildDir, 'releases/OpenTerrainGenerator-'+project.version+'.jar')
+task buildSubProjects {
+    dependsOn ':common:common-core:build', ':platforms:forge:build', ':platforms:spigot:build'
+}
 
-    if (forgeFile.exists() && spigotFile.exists())
-    {
-        ourFile.getParentFile().mkdirs()
-        ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
-        Set<String> alreadyAddedFiles = new HashSet<String>()
+task createReleaseJar {
+    dependsOn project.buildSubProjects
+    doLast {
+        // We're including common only for the external libraries that are packaged with it (using Forge jar-in-jar).
+        File commonFile = getJarFile(project(":common:common-core"))
+        File forgeFile = getJarFile(project(":platforms:forge"))
+        File spigotFile = getJarFile(project(":platforms:spigot"))
+        File ourFile = new File(project.buildDir, 'releases/OpenTerrainGenerator-'+project.version+'.jar')
 
-        addToZip(forgeFile, outputStream, alreadyAddedFiles) // Add Forge first so its jar manifest is used
-        addToZip(commonFile, outputStream, alreadyAddedFiles)
-        addToZip(spigotFile, outputStream, alreadyAddedFiles)
+        if (forgeFile.exists() && spigotFile.exists())
+        {
+            ourFile.getParentFile().mkdirs()
+            ZipOutputStream outputStream = new ZipOutputStream(new FileOutputStream(ourFile))
+            Set<String> alreadyAddedFiles = new HashSet<String>()
 
-        outputStream.close()
-    } else {
-        println(" Skipping the release jar, as the Spigot or Forge file failed")
-        println(" Forge exists: " + forgeFile.exists())
-        println(" Spigot exists: " + spigotFile.exists())
+            addToZip(forgeFile, outputStream, alreadyAddedFiles) // Add Forge first so its jar manifest is used
+            addToZip(commonFile, outputStream, alreadyAddedFiles)
+            addToZip(spigotFile, outputStream, alreadyAddedFiles)
+
+            outputStream.close()
+        } else {
+            println(" Skipping the release jar, as the Spigot or Forge file failed")
+            println(" Forge exists: " + forgeFile.exists())
+            println(" Spigot exists: " + spigotFile.exists())
+        }
     }
 }
