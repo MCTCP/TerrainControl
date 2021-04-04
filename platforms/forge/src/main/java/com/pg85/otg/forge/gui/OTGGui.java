@@ -35,12 +35,12 @@ public class OTGGui
 			// Provide our custom chunk generator, biome provider and dimension settings.
 			if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
 			{
-				return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(DimensionSettings.field_242734_c));
+				return new OTGNoiseChunkGenerator(new OTGBiomeProvider(OTG.getEngine().getPresetLoader().getDefaultPresetName(), seed, false, false, biomes), seed, () -> dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD));
 			} else {
 				// If no presets are installed, return the default chunkgenerator / biomeprovider
 				return new NoiseChunkGenerator(new OverworldBiomeProvider(seed, false, false, biomes), seed, () ->
 				{
-					return dimensionSettings.getOrThrow(DimensionSettings.field_242734_c);
+					return dimensionSettings.getOrThrow(DimensionSettings.OVERWORLD);
 				});
 			}
 		}
@@ -113,7 +113,7 @@ public class OTGGui
 						biomesRegistry
 					),
 					dimensionGeneratorSettings.getSeed(),
-					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.field_242734_c)
+					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD)
 				)
 			)
 		);

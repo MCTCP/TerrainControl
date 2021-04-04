@@ -45,7 +45,7 @@ public class OTGChunkGeneratorFactory implements IChunkGeneratorFactory
 						biomesRegistry
 					),
 					seed,
-					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.field_242734_c)
+					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD)
 				)
 			)
 		);

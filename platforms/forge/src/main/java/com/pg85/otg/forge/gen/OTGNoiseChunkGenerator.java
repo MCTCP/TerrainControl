@@ -96,7 +96,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					Codec.LONG.fieldOf("seed").stable().forGetter(
 						(p_236093_0_) -> { return p_236093_0_.worldSeed; }
 					),
-					DimensionSettings.field_236098_b_.fieldOf("settings").forGetter(
+					DimensionSettings.DIMENSION_SETTINGS_CODEC.fieldOf("settings").forGetter(
 						(p_236090_0_) -> { return p_236090_0_.dimensionSettingsSupplier; }
 					)
 				).apply(
@@ -394,7 +394,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void func_230354_a_(WorldGenRegion worldGenRegion)
 	{
-		if (!this.dimensionSettingsSupplier.get().func_236120_h_())
+		if (!this.dimensionSettingsSupplier.get().isMobGenerationDisabled())
 		{
 			int chunkX = worldGenRegion.getMainChunkX();
 			int chunkZ = worldGenRegion.getMainChunkZ();
@@ -558,7 +558,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public int getSeaLevel()
 	{
-		return this.dimensionSettingsSupplier.get().func_236119_g_();
+		return this.dimensionSettingsSupplier.get().getSeaLevel();
 	}
 
 	public CustomStructureCache getStructureCache() {
