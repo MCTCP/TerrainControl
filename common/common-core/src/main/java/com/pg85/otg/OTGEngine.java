@@ -132,8 +132,6 @@ public abstract class OTGEngine
 		configFunctions.putAll(BiomeConfig.CONFIG_FUNCTIONS);
 		this.biomeResourcesManager = new BiomeResourcesManager(configFunctions);
 
-
-
 		// Load presets
 		
 		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger, materialReader);
@@ -141,74 +139,79 @@ public abstract class OTGEngine
 
 	private void unpackDefaultPreset(File presetsDir)
 	{
+		JarFile jarFile = null;
 		try
 		{
-			JarFile jarFile = new JarFile(getJarFile());
-			Enumeration<JarEntry> entries = jarFile.entries();
-			// Unpack default preset if none present
-			if (new File(presetsDir.getPath() + File.separator + "Default").exists())
+			File jarFileLocation = getJarFile();
+			if(jarFileLocation == null || !jarFileLocation.exists())
 			{
-				OTG.log(LogMarker.DEBUG, "Default preset already exists");
-				File wc = new File(presetsDir.getPath() +File.separator+ "Default" +File.separator+ "WorldConfig.ini");
-				if (wc.exists())
+				OTG.log(LogMarker.INFO, "Could not find root jar file, skipping default preset unpack (copy it manually for development).");
+			} else {
+				jarFile = new JarFile(jarFileLocation);
+				Enumeration<JarEntry> entries = jarFile.entries();
+				// Unpack default preset if none present
+				if (new File(presetsDir.getPath() + File.separator + "Default").exists())
 				{
-					BufferedReader reader = new BufferedReader(new FileReader(wc));
-					int[] oldVer = parseVersion(reader);
-					int[] newVer = new int[0];
-
-					while (entries.hasMoreElements())
+					OTG.log(LogMarker.DEBUG, "Default preset already exists");
+					File wc = new File(presetsDir.getPath() + File.separator+ "Default" + File.separator + Constants.WORLD_CONFIG_FILE);
+					if (wc.exists())
 					{
-						JarEntry jarEntry = entries.nextElement();
-						if (jarEntry.getName().contains("Default/WorldConfig.ini"))
+						BufferedReader reader = new BufferedReader(new FileReader(wc));
+						int[] oldVer = parseVersion(reader);
+						int[] newVer = new int[0];
+	
+						while (entries.hasMoreElements())
 						{
-							reader = new BufferedReader(new BufferedReader(new InputStreamReader(jarFile.getInputStream(jarEntry))));
-							newVer = parseVersion(reader);
+							JarEntry jarEntry = entries.nextElement();
+							if (jarEntry.getName().contains("Default/" + Constants.WORLD_CONFIG_FILE))
+							{
+								reader = new BufferedReader(new BufferedReader(new InputStreamReader(jarFile.getInputStream(jarEntry))));
+								newVer = parseVersion(reader);
+							}
+						}
+						int loops = Math.min(oldVer.length, newVer.length);
+						for (int i = 0; i < loops; i++)
+						{
+							if (newVer[i] < oldVer[i])
+								return; // This is an older version
+							if (newVer[i] > oldVer[i])
+								break; // This is a newer version
+							if (i == loops -1)
+								return; // The two have the same version, cancel
 						}
 					}
-					int loops = Math.min(oldVer.length, newVer.length);
-					for (int i = 0; i < loops; i++)
-					{
-						if (newVer[i] < oldVer[i])
-							return; // This is an older version
-						if (newVer[i] > oldVer[i])
-							break; // This is a newer version
-						if (i == loops -1)
-							return; // The two have the same version, cancel
-					}
+				} else {
+					OTG.log(LogMarker.DEBUG, "Default preset does not exist");
 				}
-			}
-			else
-			{
-				OTG.log(LogMarker.DEBUG, "Default preset does not exist");
-			}
-
-			OTG.log(LogMarker.INFO, "Unpacking default preset");
-			String rootDir = getOTGRootFolder().toString();
-			String path = "resources/Presets/Default/";
-			entries = jarFile.entries();
-
-			while (entries.hasMoreElements())
-			{
-				JarEntry entry = entries.nextElement();
-				if (entry.getName().startsWith(path))
+	
+				OTG.log(LogMarker.INFO, "Unpacking default preset");
+				String rootDir = getOTGRootFolder().toString();
+				String path = "resources/Presets/Default/";
+				entries = jarFile.entries();
+	
+				while (entries.hasMoreElements())
 				{
-					File file = new File(rootDir + File.separator + (entry.getName().substring(10)));
-
-					if (entry.isDirectory())
+					JarEntry entry = entries.nextElement();
+					if (entry.getName().startsWith(path))
 					{
-						file.mkdirs();
-					} else {
-						file.createNewFile();
-						FileOutputStream fos = new FileOutputStream(file);
-						byte[] byteArray = new byte[4096];
-						int i;
-						java.io.InputStream is = jarFile.getInputStream(entry);
-						while ((i = is.read(byteArray)) > 0)
+						File file = new File(rootDir + File.separator + (entry.getName().substring(10)));
+	
+						if (entry.isDirectory())
 						{
-							fos.write(byteArray, 0, i);
+							file.mkdirs();
+						} else {
+							file.createNewFile();
+							FileOutputStream fos = new FileOutputStream(file);
+							byte[] byteArray = new byte[4096];
+							int i;
+							java.io.InputStream is = jarFile.getInputStream(entry);
+							while ((i = is.read(byteArray)) > 0)
+							{
+								fos.write(byteArray, 0, i);
+							}
+							is.close();
+							fos.close();
 						}
-						is.close();
-						fos.close();
 					}
 				}
 			}
@@ -216,6 +219,15 @@ public abstract class OTGEngine
 		catch (IOException e)
 		{
 			e.printStackTrace();
+		} finally {
+			if(jarFile != null)
+			{
+				try {
+					jarFile.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 	}
 	private int[] parseVersion(BufferedReader reader) throws IOException
