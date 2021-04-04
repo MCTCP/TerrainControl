@@ -74,7 +74,7 @@ public class BiomeLayers
 		if(!(data.biomeMode == BiomeMode.FromImage && data.imageMode != ImageMode.ContinueNormal))
 		{
 			// Iterate through the depth, manipulating the factory at specific points
-			for (int depth = 0; depth < data.generationDepth; depth++)
+			for (int depth = 0; depth <= data.generationDepth; depth++)
 			{
 				// Scale the factory by 2x before adding more transformations
 				factory = new ScaleLayer().create(contextProvider.apply(2000L + depth), factory);

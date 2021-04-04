@@ -190,8 +190,8 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				bg.rarity = group.getGroupRarity();
 
 				// init to genDepth as it will have one value per depth
-				bg.totalDepthRarity = new int[genDepth];
-				bg.maxRarityPerDepth = new int[genDepth];
+				bg.totalDepthRarity = new int[genDepth+1];
+				bg.maxRarityPerDepth = new int[genDepth+1];
 
 				float totalTemp = 0;
 

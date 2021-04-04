@@ -165,8 +165,8 @@ public class BiomeLayerData
 		this.oceanBiomeSize = worldConfig.getOceanBiomeSize();
 		this.oceanTemperatures = oceanTemperatures;
 
-		this.cumulativeGroupRarities = new int[this.generationDepth];
-		this.groupMaxRarityPerDepth = new int[this.generationDepth];
+		this.cumulativeGroupRarities = new int[this.generationDepth+1];
+		this.groupMaxRarityPerDepth = new int[this.generationDepth+1];
 
 		if (oceanBiomeConfig == null)
 		{
