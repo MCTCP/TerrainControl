@@ -538,13 +538,14 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void placeDungeon(Random random, int x, int y, int z)
 	{
-		// TODO: Implement this.
+		// TODO: dungeons don't spawn due to us not using cave air in caves
+		Features.MONSTER_ROOM.generate(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
 	public void placeFossil(Random random, ChunkCoordinate chunkCoord)
 	{
-		// TODO: Implement this.
+		Features.FOSSIL.generate(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 	}
 
 	@Override

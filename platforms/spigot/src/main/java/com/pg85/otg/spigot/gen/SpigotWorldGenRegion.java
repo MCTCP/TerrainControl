@@ -503,13 +503,13 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public void placeDungeon (Random random, int x, int y, int z)
 	{
-		// TODO: Implement this.
+		BiomeDecoratorGroups.MONSTER_ROOM.a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(x, y, z));
 	}
 
 	@Override
 	public void placeFossil (Random random, ChunkCoordinate chunkCoord)
 	{
-		// TODO: Implement this.
+		BiomeDecoratorGroups.FOSSIL.a(this.worldGenRegion, this.chunkGenerator, random, new BlockPosition(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 	}
 
 	@Override
