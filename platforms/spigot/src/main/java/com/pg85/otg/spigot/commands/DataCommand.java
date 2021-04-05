@@ -3,6 +3,8 @@ package com.pg85.otg.spigot.commands;
 import com.pg85.otg.OTG;
 import net.minecraft.server.v1_16_R3.IRegistry;
 import net.minecraft.server.v1_16_R3.MinecraftKey;
+import net.minecraft.server.v1_16_R3.RegistryGeneration;
+
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
@@ -19,13 +21,14 @@ import java.util.Set;
 
 public class DataCommand
 {
-	public static final String usage = "Usage: /otg data <type>";
-	public static final List<String> dataTypes = new ArrayList<>(Arrays.asList(
+	private static final String USAGE = "Usage: /otg data <type>";
+	private static final List<String> DATA_TYPES = new ArrayList<>(Arrays.asList(
 			"biome",
 			"block",
 			"entity",
 			"sound",
-			"particle"
+			"particle",
+			"configured_feature"
 	));
 
 	public static boolean execute(CommandSender sender, String[] args)
@@ -34,8 +37,8 @@ public class DataCommand
 		// /otg data sound
 		if (args.length != 2)
 		{
-			sender.sendMessage(usage);
-			sender.sendMessage("Data types: "+String.join(", ", dataTypes));
+			sender.sendMessage(USAGE);
+			sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));
 			return true;
 		}
 
@@ -58,8 +61,11 @@ public class DataCommand
 			case "particle":
 				registry = IRegistry.PARTICLE_TYPE;
 				break;
+			case "configured_feature":
+				registry = RegistryGeneration.e;
+				break;
 			default:
-				sender.sendMessage("Data types: "+String.join(", ", dataTypes));
+				sender.sendMessage("Data types: "+String.join(", ", DATA_TYPES));
 				return true;
 		}
 		Set<MinecraftKey> set = registry.keySet();
@@ -87,6 +93,6 @@ public class DataCommand
 
 	public static List<String> tabComplete(String[] args)
 	{
-		return StringUtil.copyPartialMatches(args[1], dataTypes, new ArrayList<>());
+		return StringUtil.copyPartialMatches(args[1], DATA_TYPES, new ArrayList<>());
 	}
 }

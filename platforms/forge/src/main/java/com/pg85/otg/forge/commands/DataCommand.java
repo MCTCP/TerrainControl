@@ -3,6 +3,8 @@ package com.pg85.otg.forge.commands;
 import com.pg85.otg.OTG;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.WorldGenRegistries;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -18,13 +20,14 @@ import java.util.Set;
 
 public class DataCommand
 {
-	public static final String usage = "Usage: /otg data <type>";
-	public static final List<String> dataTypes = new ArrayList<>(Arrays.asList(
+	private static final String USAGE = "Usage: /otg data <type>";
+	private static final List<String> DATA_TYPES = new ArrayList<>(Arrays.asList(
 			"biome",
 			"block",
 			"entity",
 			"sound",
-			"particle"
+			"particle",
+			"configured_feature"
 	));
 
 	public static int execute(CommandSource source, String type)
@@ -32,7 +35,9 @@ public class DataCommand
 		// /otg data music
 		// /otg data sound
 
-		IForgeRegistry<?> registry;
+		// worldgen registries aren't wrapped by forge so we need to use another object here
+		IForgeRegistry<?> registry = null;
+		Registry<?> worldGenRegistry = null;
 
 		switch (type.toLowerCase())
 		{
@@ -51,12 +56,22 @@ public class DataCommand
 			case "particle":
 				registry = ForgeRegistries.PARTICLE_TYPES;
 				break;
+			case "configured_feature":
+				worldGenRegistry = source.getServer().getDynamicRegistries().getRegistry(Registry.CONFIGURED_FEATURE_KEY);
+				break;
 			default:
-				source.sendFeedback(new StringTextComponent(usage), false);
-				source.sendFeedback(new StringTextComponent("Data types: "+String.join(", ", dataTypes)), false);
+				source.sendFeedback(new StringTextComponent(USAGE), false);
+				source.sendFeedback(new StringTextComponent("Data types: " + String.join(", ", DATA_TYPES)), false);
 				return 0;
 		}
-		Set<ResourceLocation> set = registry.getKeys();
+
+		Set<ResourceLocation> set;
+		if (registry != null) {
+			set = registry.getKeys();
+		} else {
+			set = worldGenRegistry.keySet();
+		}
+
 		new Thread(() -> {
 			try
 			{
