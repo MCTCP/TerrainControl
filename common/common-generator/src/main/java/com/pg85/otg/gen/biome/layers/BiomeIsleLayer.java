@@ -72,11 +72,13 @@ public class BiomeIsleLayer implements DiagonalCrossSamplingLayer
                         
             if (isle.inOcean)
             {
+
                 nwCheck = nw & BiomeLayers.LAND_BIT;
                 neCheck = ne & BiomeLayers.LAND_BIT;
                 swCheck = sw & BiomeLayers.LAND_BIT;
                 seCheck = se & BiomeLayers.LAND_BIT;
-            	
+
+                // If the center isn't land and the surroundings aren't land either, generate
                 if (
             		((center & BiomeLayers.LAND_BIT) == 0) &&
             		(nwCheck == 0) &&
@@ -96,6 +98,7 @@ public class BiomeIsleLayer implements DiagonalCrossSamplingLayer
                     alreadySpawned = true;
                 }
             }
+
             if (!alreadySpawned)
             {
             	centerCheck = BiomeLayers.getBiomeFromLayer(center);

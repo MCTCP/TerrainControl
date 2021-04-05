@@ -43,6 +43,7 @@ public class BiomeBorderLayer implements ParentedLayer
         
         if (bordersFrom[cCheck] != null)
         {
+        	// Check in a + formation for edges
             int northCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z - 1));
             int southCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x + 1, z));
             int eastCheck = BiomeLayers.getBiomeFromLayer(parent.sample(x, z + 1));

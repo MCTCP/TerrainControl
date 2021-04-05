@@ -20,9 +20,7 @@ public class RegistryGen extends Resource
 		super(biomeConfig, args, logger, materialReader);
 		assureSize(1, args);
 
-		System.out.println("reading");
 		this.id = args.get(0);
-		System.out.println(id);
 	}
 
 	@Override
