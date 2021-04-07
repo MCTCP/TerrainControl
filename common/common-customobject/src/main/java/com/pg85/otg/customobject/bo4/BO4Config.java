@@ -5,8 +5,6 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.ConfigMode;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.CustomObjectManager;
-import com.pg85.otg.customobject.bo4.BO4Config;
-import com.pg85.otg.customobject.bo4.BO4Settings;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BlockFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4BranchFunction;
 import com.pg85.otg.customobject.bo4.bo4function.BO4EntityFunction;
@@ -182,8 +180,6 @@ public class BO4Config extends CustomObjectConfigFile
      * Creates a BO3Config from a file.
      *
      * @param reader       The settings of the BO3.
-     * @param directory    The directory the BO3 is stored in.
-     * @param otherObjects All other loaded objects by their name.
      */
     BO4Config(SettingsReaderBO4 reader, boolean init, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
     {
@@ -380,8 +376,8 @@ public class BO4Config extends CustomObjectConfigFile
     	            				blockFunction.x = x;
     	            				blockFunction.y = (short) y;
     	            				blockFunction.z = z;	    	            				
-    	            				blockFunction.metaDataName = this.blocksMetaDataName[blockIndex];
-    	            				blockFunction.metaDataTag = this.blocksMetaDataTag[blockIndex];
+    	            				blockFunction.nbtName = this.blocksMetaDataName[blockIndex];
+    	            				blockFunction.nbt = this.blocksMetaDataTag[blockIndex];
     	            				
     	            				this.heightMap[x][z] = blockFunction;
     	            			}
@@ -454,8 +450,8 @@ public class BO4Config extends CustomObjectConfigFile
 			    		block.y = this.blocks[x][z][i];
 			    		block.z = z;
 			    		block.material = this.blocksMaterial[blockIndex];
-			    		block.metaDataName = this.blocksMetaDataName[blockIndex];
-			    		block.metaDataTag = this.blocksMetaDataTag[blockIndex];
+			    		block.nbtName = this.blocksMetaDataName[blockIndex];
+			    		block.nbt = this.blocksMetaDataTag[blockIndex];
 			    					    		
 			    		blocksOTGPlus[blockIndex] = block;
 						blockIndex++;
@@ -898,8 +894,8 @@ public class BO4Config extends CustomObjectConfigFile
        		this.blocks[block.x][block.z][columnBlockIndex[block.x][block.z]] = (short) block.y;
         	
         	this.blocksMaterial[blockIndex] = block.material;
-        	this.blocksMetaDataName[blockIndex] = block.metaDataName;
-        	this.blocksMetaDataTag[blockIndex] = block.metaDataTag;
+        	this.blocksMetaDataName[blockIndex] = block.nbtName;
+        	this.blocksMetaDataTag[blockIndex] = block.nbt;
         	
         	if(block instanceof BO4RandomBlockFunction)
         	{
@@ -1680,9 +1676,9 @@ public class BO4Config extends CustomObjectConfigFile
         	{
         		materials.add(block.material);
         	}        	
-        	if(block.metaDataName != null && !metaDataNames.contains(block.metaDataName))
+        	if(block.nbtName != null && !metaDataNames.contains(block.nbtName))
         	{
-        		metaDataNames.add(block.metaDataName);
+        		metaDataNames.add(block.nbtName);
         	}
         }
         
@@ -2310,8 +2306,8 @@ public class BO4Config extends CustomObjectConfigFile
 			int blockIndex = columnBlockIndex[block.x][block.z] + getColumnBlockIndex(columnSizes, block.x, block.z);
 
 			this.blocksMaterial[blockIndex] = block.material;
-			this.blocksMetaDataName[blockIndex] = block.metaDataName;
-			this.blocksMetaDataTag[blockIndex] = block.metaDataTag;
+			this.blocksMetaDataName[blockIndex] = block.nbtName;
+			this.blocksMetaDataTag[blockIndex] = block.nbt;
 			
 			if(block instanceof BO4RandomBlockFunction)
 			{

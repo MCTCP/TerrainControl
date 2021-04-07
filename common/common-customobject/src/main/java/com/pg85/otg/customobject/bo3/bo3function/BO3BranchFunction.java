@@ -43,9 +43,9 @@ public class BO3BranchFunction extends BranchFunction<BO3Config>
     {
         double cumulativeChance = 0;
         assureSize(6, args);
-        x = readInt(args.get(0), -32, 32);
-        y = readInt(args.get(1), -64, 64);
-        z = readInt(args.get(2), -32, 32);
+        x = readInt(args.get(0), -10000, 10000);
+        y = readInt(args.get(1), -255, 255);
+        z = readInt(args.get(2), -10000, 10000);
         int i;
         for (i = 3; i < args.size() - 2; i += 3)
         {

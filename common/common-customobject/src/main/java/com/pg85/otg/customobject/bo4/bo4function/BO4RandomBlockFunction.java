@@ -155,9 +155,9 @@ public class BO4RandomBlockFunction extends BO4BlockFunction
 
     	rotatedBlock.blockCount = blockCount;
     	rotatedBlock.blockChances = blockChances;
-        rotatedBlock.metaDataTag = metaDataTag;
+        rotatedBlock.nbt = nbt;
         rotatedBlock.metaDataTags = metaDataTags;
-        rotatedBlock.metaDataName = metaDataName;
+        rotatedBlock.nbtName = nbtName;
         rotatedBlock.metaDataNames = metaDataNames;
 
         return rotatedBlock;

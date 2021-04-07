@@ -1450,9 +1450,9 @@ class ForgeLegacyMaterials
 					case 2:
 						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.WEST);
 					case 3:
-						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.SOUTH);
-					case 4:
 						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.NORTH);
+					case 4:
+						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.SOUTH);
 				}
 			case 1:
 				switch(data)
@@ -1460,15 +1460,15 @@ class ForgeLegacyMaterials
 					case 0:
 					case 5:
 					default:
-						return Blocks.TORCH.getDefaultState();
+						return Blocks.REDSTONE_TORCH.getDefaultState();
 					case 1:
 						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.EAST);						
 					case 2:
 						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.WEST);						
 					case 3:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);
 					case 4:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
 				}
 			case 2:
 				switch(data)
@@ -1482,9 +1482,9 @@ class ForgeLegacyMaterials
 					case 2:
 						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.WEST);						
 					case 3:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);
 					case 4:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
 				}				
 			default:
 				return null;

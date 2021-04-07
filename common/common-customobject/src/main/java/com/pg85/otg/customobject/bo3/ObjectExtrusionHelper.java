@@ -80,7 +80,7 @@ class ObjectExtrusionHelper
      * This method takes the blocks that have been added to this and extrudes them individually until a block outside
      * of the extrudeThroughBlocks has been hit
      *
-     * @param world  The LocalWorld to extrude block in
+     * @param worldGenRegion  The LocalWorld to extrude block in
      * @param random The random generator to use to spawning
      * @param x      The BO3 base X spawn location
      * @param y      The BO3 base Y spawn location
@@ -96,7 +96,7 @@ class ObjectExtrusionHelper
                      yi > extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
                      --yi)
                 {
-                	worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, chunkBeingPopulated, replaceBlock);
+                	worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingPopulated, replaceBlock);
                 }
             } else if (extrudeMode == ExtrudeMode.TopUp)
             {
@@ -104,7 +104,7 @@ class ObjectExtrusionHelper
                      yi < extrudeMode.getEndingHeight() && extrudeThroughBlocks.contains(worldGenRegion.getMaterial(x + block.x, yi, z + block.z, chunkBeingPopulated));
                      ++yi)
                 {
-                	worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.metaDataTag, chunkBeingPopulated, replaceBlock);
+                	worldGenRegion.setBlock(x + block.x, yi, z + block.z, block.material, block.nbt, chunkBeingPopulated, replaceBlock);
                 }
             }
         }

@@ -21,7 +21,7 @@ public class NamedBinaryTag
     /**
      * Enum for the tag types.
      */
-    private enum Type
+    public enum Type
     {
         TAG_End,
         TAG_Byte,
@@ -69,7 +69,7 @@ public class NamedBinaryTag
      * @param value an object that fits the tag type or a {@link Type} to
      *              create an empty TAG_List with this list type.
      */
-    private NamedBinaryTag(Type type, String name, Object value)
+    public NamedBinaryTag(Type type, String name, Object value)
     {
         switch (type)
         {

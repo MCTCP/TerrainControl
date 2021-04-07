@@ -60,6 +60,12 @@ public class BO3 implements StructuredCustomObject
         this.file = file;
     }
 
+    BO3(String name, File file, BO3Config settings) {
+        this.name = name;
+        this.file = file;
+        this.settings = settings;
+    }
+
     @Override
     public String getName()
     {

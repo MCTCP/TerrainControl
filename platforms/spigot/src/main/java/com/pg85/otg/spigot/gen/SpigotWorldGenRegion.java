@@ -546,4 +546,9 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Implement this.
 		return null;
 	}
+
+	public TileEntity getTileEntity(BlockPosition blockPos)
+	{
+		return worldGenRegion.getTileEntity(blockPos);
+	}
 }

@@ -21,8 +21,8 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 {
     public LocalMaterialData material;
     public short y;
-    public NamedBinaryTag metaDataTag;
-    public String metaDataName;
+    public NamedBinaryTag nbt;
+    public String nbtName;
 
     @Override
     public void load(List<String> args, boolean spawnLog, ILogger logger, IMaterialReader materialReader) throws InvalidConfigException
@@ -43,10 +43,10 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
 
         if (args.size() == 5)
         {
-            metaDataTag = BO3Loader.loadMetadata(args.get(4), getHolder().getFile(), spawnLog, logger);
-            if (metaDataTag != null)
+            nbt = BO3Loader.loadMetadata(args.get(4), getHolder().getFile(), spawnLog, logger);
+            if (nbt != null)
             {
-                metaDataName = args.get(4);
+                nbtName = args.get(4);
             }
         }
     }
@@ -54,10 +54,10 @@ public abstract class BlockFunction<T extends CustomObjectConfigFile> extends Cu
     @Override
     public String makeString()
     {
-        String start = "Block(" + x + ',' + y + ',' + z + ',' + material;
-        if (metaDataTag != null)
+        String start = "B(" + x + ',' + y + ',' + z + ',' + material;
+        if (nbt != null)
         {
-            start += ',' + metaDataName;
+            start += ',' + nbtName;
         }
         return start + ')';
     }

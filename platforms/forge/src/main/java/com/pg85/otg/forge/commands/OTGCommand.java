@@ -49,11 +49,11 @@ public class OTGCommand
 					(context) -> mapBiomes(context.getSource(), 2048, 2048)
 				).then(
 					Commands.argument("width", IntegerArgumentType.integer(0)).executes(
-							(context) -> mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"))
+						(context) -> mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "width"))
 					).then(
 						Commands.argument("height", IntegerArgumentType.integer(0)).executes(
 							(context) -> mapBiomes(context.getSource(), IntegerArgumentType.getInteger(context, "width"), IntegerArgumentType.getInteger(context, "height"))
-				)))
+						)))
 			).then(
 				Commands.literal("data").then(
 					Commands.argument("type", StringArgumentType.word()).executes(
@@ -66,25 +66,79 @@ public class OTGCommand
 				)
 			).then(
 				Commands.literal("biome").executes(
-						(context -> showBiome(context.getSource()))
+					(context -> showBiome(context.getSource()))
 				)
 			).then(
 				Commands.literal("spawn").then(
 					Commands.argument("preset", new PresetArgument()).then(
 						Commands.argument("object", new BiomeObjectArgument()).then(
 							Commands.argument("location", new BlockPosArgument())
-							.executes(
-							(context -> SpawnCommand.execute(
+								.executes(
+									(context -> SpawnCommand.execute(
+										context.getSource(),
+										context.getArgument("preset", String.class),
+										context.getArgument("object", String.class),
+										BlockPosArgument.getLoadedBlockPos(context, "location")))
+								)
+						)
+					)
+				)
+			).then(
+				Commands.literal("fixbo3").then(
+					Commands.argument("preset", new PresetArgument()).then(
+						Commands.argument("object", new BiomeObjectArgument()).executes(
+							(context -> FixBO3Command.execute(
 								context.getSource(),
 								context.getArgument("preset", String.class),
 								context.getArgument("object", String.class),
-								BlockPosArgument.getLoadedBlockPos(context, "location")))
+								false,
+								true)
+							)
 						)
-
+					)
+				)
+			).then(
+				Commands.literal("region").then(
+					Commands.literal("mark").executes(
+						context -> ExportCommand.mark(context.getSource())
+					)
+				).then(
+					Commands.literal("clear").executes(
+						context -> ExportCommand.clear(context.getSource())
+					)
+				).then(
+					Commands.literal("expand").then(
+						Commands.argument("direction", new DirectionArgument(true)).then(
+							Commands.argument("value", IntegerArgumentType.integer()).executes(
+								context -> ExportCommand.expand(context.getSource(),
+									context.getArgument("direction", String.class),
+									context.getArgument("value", Integer.class))
+							)
+						)
+					)
+				).then(
+					Commands.literal("shrink").then(
+						Commands.argument("direction", new DirectionArgument(true)).then(
+							Commands.argument("value", IntegerArgumentType.integer()).executes(
+								context -> ExportCommand.shrink(context.getSource(),
+									context.getArgument("direction", String.class),
+									context.getArgument("value", Integer.class))
+							)
+						)
+					)
+				)
+			).then(
+				Commands.literal("export").then(
+					Commands.argument("preset", new PresetArgument()).then(
+						Commands.argument("name", StringArgumentType.string()).executes(ExportCommand::execute).then(
+							Commands.argument("template", new TemplateArgument()).executes(ExportCommand::execute).then(
+								Commands.argument("flags", FlagsArgument.with("-o", "-a", "-b")).executes(ExportCommand::execute)
+							)
+						)
 					)
 				)
 			)
-		));
+		);
 	}
 
 	private static int showBiome(CommandSource source)
@@ -96,8 +150,8 @@ public class OTGCommand
 		}
 		source.sendFeedback(new StringTextComponent(
 				source.getWorld().getBiome(
-						new BlockPos(source.getPos().x, source.getPos().y, source.getPos().z)).toString())
-				, false);
+					new BlockPos(source.getPos().x, source.getPos().y, source.getPos().z)).toString())
+			, false);
 		return 0;
 	}
 
@@ -110,10 +164,10 @@ public class OTGCommand
 		}
 		Preset preset = ((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().generator).getPreset();
 		source.sendFeedback(new StringTextComponent
-				("Preset: "+preset.getName()
-				 + "\nDescription: " + preset.getDescription()
-				 + "\nVersion: " + preset.getVersion()
-		), false);
+			("Preset: " + preset.getName()
+			 + "\nDescription: " + preset.getDescription()
+			 + "\nVersion: " + preset.getVersion()
+			), false);
 		return 0;
 	}
 
@@ -166,7 +220,8 @@ public class OTGCommand
 		try
 		{
 			ImageIO.write(img, "png", p.toAbsolutePath().toFile());
-		} catch (IOException e)
+		}
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
@@ -206,12 +261,82 @@ public class OTGCommand
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 		{
-			List<String> list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(
-				context.getArgument("preset", String.class)).stream()
-				.map(filterNamesWithSpaces).collect(Collectors.toList());
-			return ISuggestionProvider.suggest(
-				list,
-				builder);
+			List<String> list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+				.getAllBONamesForPreset(context.getArgument("preset", String.class))
+				.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
+			return ISuggestionProvider.suggest(list, builder);
+		}
+	}
+
+	private static class TemplateArgument implements ArgumentType<String>
+	{
+		@Override
+		public String parse(StringReader reader) throws CommandSyntaxException
+		{
+			return reader.readString();
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			List<String> list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
+				.getTemplatesForPreset(context.getArgument("preset", String.class))
+				.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
+			list.add("default");
+			return ISuggestionProvider.suggest(list.stream(), builder);
+		}
+	}
+
+	private static class FlagsArgument implements ArgumentType<String>
+	{
+		private final String[] options;
+
+		private FlagsArgument(String[] options)
+		{
+			this.options = options;
+		}
+
+		public static FlagsArgument with(String... options)
+		{
+			return new FlagsArgument(options);
+		}
+
+		@Override
+		public String parse(StringReader reader)
+		{
+			final String text = reader.getRemaining();
+			reader.setCursor(reader.getTotalLength());
+			return text;
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			return ISuggestionProvider.suggest(options, builder);
+		}
+	}
+
+	private static class DirectionArgument implements ArgumentType<String>
+	{
+		private final String[] options;
+
+		public DirectionArgument(boolean vertical)
+		{
+			if (vertical) options = new String[]{"north", "south", "east", "west", "up", "down"};
+			else options = new String[]{"north", "south", "east", "west"};
+		}
+
+
+		@Override
+		public String parse(StringReader reader) throws CommandSyntaxException
+		{
+			return reader.readString();
+		}
+
+		@Override
+		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
+		{
+			return ISuggestionProvider.suggest(options, builder);
 		}
 	}
 }
