@@ -38,6 +38,7 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -47,13 +48,22 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
 public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
 	private final ISeedReader worldGenRegion;
-	private final OTGNoiseChunkGenerator chunkGenerator;
+	private final ChunkGenerator chunkGenerator;
 	
 	// 32x32 biomes cache for fast lookups during population
 	private IBiome[][] cachedBiomeConfigs;
 	private boolean cacheIsValid;
 
-	public ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, ISeedReader worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	/** Creates a LocalWorldGenRegion
+	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
+	 * 	It may crash if you try to do replaceblocks or
+	 *
+	 * @param presetName
+	 * @param worldConfig
+	 * @param worldGenRegion The world access
+	 * @param chunkGenerator The chunkgenerator
+	 */
+	public ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
 	{
 		super(presetName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
@@ -147,7 +157,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
-		return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
+		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(blockX, blockZ);
 	}	
 	
 	// TODO: Make sure tree spawning looks more or less the same as 1.12.2.
@@ -285,7 +295,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return this.chunkGenerator.getMaterialInUnloadedChunk(this, x , y, z);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this, x , y, z);
 			}
 		}
 		
@@ -359,7 +369,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 			}
 		}
 		

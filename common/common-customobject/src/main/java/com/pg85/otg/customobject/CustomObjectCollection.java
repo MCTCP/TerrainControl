@@ -157,6 +157,17 @@ public class CustomObjectCollection
     	}
     }
 
+    void addGlobalObjectFile(String name, File file)
+	{
+		synchronized(indexingFilesLock)
+		{
+			if (!customObjectFilesGlobalObjects.containsKey(name.toLowerCase(Locale.ROOT)))
+			{
+				customObjectFilesGlobalObjects.put(name.toLowerCase(Locale.ROOT), file);
+			}
+		}
+	}
+
     public void unloadCustomObjectFiles()
     {
     	synchronized(indexingFilesLock)
@@ -193,13 +204,27 @@ public class CustomObjectCollection
     public ArrayList<String> getAllBONamesForPreset(String presetName)
     {
     	HashMap<String, File> files = customObjectFilesPerPreset.get(presetName);
-    	return files == null ? null : new ArrayList<String>(files.keySet());
+    	return files == null ? null : new ArrayList<>(files.keySet());
     }
 
     public ArrayList<String> getTemplatesForPreset(String presetName)
 	{
     	HashMap<String, File> files = boTemplateFilesPerPreset.get(presetName);
     	return files == null ? null : new ArrayList<>(files.keySet());
+	}
+
+	public ArrayList<String> getGlobalObjectNames()
+	{
+		return customObjectFilesGlobalObjects == null
+			   ? null
+			   : new ArrayList<>(customObjectFilesGlobalObjects.keySet());
+	}
+
+	public ArrayList<String> getGlobalTemplates()
+	{
+		return globalTemplates == null
+			   ? null
+			   : new ArrayList<>(globalTemplates.keySet());
 	}
 
 	public void addObjectToPreset(String presetName, String objectName, File boFile)

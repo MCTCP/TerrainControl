@@ -8,12 +8,16 @@ import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
+import com.pg85.otg.util.materials.LocalMaterialData;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.CommandSource;
+import net.minecraft.command.arguments.BlockStateInput;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -31,110 +35,156 @@ public class ExportCommand
 
 	public static int execute(CommandContext<CommandSource> context)
 	{
-		CommandSource source = context.getSource();
-
-		if (!(source.getEntity() instanceof ServerPlayerEntity))
-		{
-			source.sendFeedback(new StringTextComponent("Only players can execute this command"), false);
-			return 0;
-		}
-
-		// Extract here; this is kinda complex, would be messy in OTGCommand
-		String presetName = context.getArgument("preset", String.class);
-		String objectName = context.getArgument("name", String.class);
-		String templateName = "default";
-		boolean overwrite = false, branching = false, includeAir = false;
-
 		try
 		{
-			templateName = context.getArgument("template", String.class);
-			// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
-			String flags = context.getArgument("flags", String.class);
-			overwrite = flags.contains("-o");
-			branching = flags.contains("-b");
-			includeAir = flags.contains("-a");
-		}
-		catch (IllegalArgumentException ignored)
-		{
-		} // We can deal with any of these not being there
+			CommandSource source = context.getSource();
 
-		Region region = playerSelectionMap.get(source.getEntity());
-		if (region == null || region.getLowCorner() == null)
-		{
-			source.sendFeedback(new StringTextComponent("Please mark two corners with /otg region mark"), false);
-			return 0;
-		}
-
-		Preset preset = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
-
-		Path objectPath = preset.getPresetDir().resolve(Constants.WORLD_OBJECTS_FOLDER);
-
-		if (!overwrite)
-		{
-			if (new File(objectPath.toFile(), objectName + ".bo3").exists())
+			if (!(source.getEntity() instanceof ServerPlayerEntity))
 			{
-				source.sendFeedback(new StringTextComponent("File already exists, run command with flag '-o' to overwrite"), false);
+				source.sendFeedback(new StringTextComponent("Only players can execute this command"), false);
 				return 0;
 			}
-		}
 
-		LocalWorldGenRegion otgRegion = new ForgeWorldGenRegion(
-			preset.getName(), preset.getWorldConfig(), source.getWorld(),
-			(OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()
-		);
-		LocalNBTHelper nbtHelper = new ForgeNBTHelper();
-		BOCreator.Corner lowCorner = region.getLowCorner();
-		BOCreator.Corner highCorner = region.getHighCorner();
-		BOCreator.Corner center = new BOCreator.Corner((highCorner.x - lowCorner.x) / 2 + lowCorner.x, lowCorner.y, (highCorner.z - lowCorner.z) / 2 + lowCorner.z);
+			// Extract here; this is kinda complex, would be messy in OTGCommand
+			String objectName = "";
+			BlockState centerBlockState = null;
+			String presetName = "global";
+			String templateName = "default";
+			boolean overwrite = false, branching = false, includeAir = false;
 
-		// Fetch template or default settings
-		BO3 template = (BO3) OTG.getEngine().getCustomObjectManager().getObjectLoaders().get("bo3")
-			.loadFromFile(templateName, new File(objectPath.toFile(), templateName + ".BO3Template"), OTG.getEngine().getLogger());
-
-		// Initialize the settings
-		template.onEnable(presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-			OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
-			OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-		BO3 bo3;
-
-		if (branching)
-		{
 			try
 			{
-				bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, otgRegion,
-					nbtHelper, null, template.getSettings(), presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
+				objectName = context.getArgument("name", String.class);
+				centerBlockState = context.getArgument("center", BlockStateInput.class).getState();
+				presetName = context.getArgument("preset", String.class);
+				templateName = context.getArgument("template", String.class);
+				// Flags as a string - easiest and clearest way I've found of adding multiple boolean flags
+				String flags = context.getArgument("flags", String.class);
+				overwrite = flags.contains("-o");
+				branching = flags.contains("-b");
+				includeAir = flags.contains("-a");
+			}
+			catch (IllegalArgumentException ignored)
+			{
+			} // We can deal with any of these not being there
+
+			if (objectName.equalsIgnoreCase(""))
+			{
+				source.sendFeedback(new StringTextComponent("Please specify a name for the object"), false);
+				return 0;
+			}
+
+			Region region = playerSelectionMap.get(source.getEntity());
+			if (region == null || region.getLowCorner() == null)
+			{
+				source.sendFeedback(new StringTextComponent("Please mark two corners with /otg region mark"), false);
+				return 0;
+			}
+			Preset preset;
+			Path objectPath;
+			if (presetName.equalsIgnoreCase("global"))
+			{
+				preset = OTG.getEngine().getPresetLoader().getPresetByName(OTG.getEngine().getPresetLoader().getDefaultPresetName());
+				objectPath = OTG.getEngine().getGlobalObjectsFolder();
+			}
+			else {
+				preset = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
+				objectPath = preset.getPresetDir().resolve(Constants.WORLD_OBJECTS_FOLDER);
+				if (preset == null)
+				{
+					source.sendFeedback(new StringTextComponent("Could not find preset "+presetName), false);
+					return 0;
+				}
+			}
+
+			if (!objectPath.toFile().exists())
+			{
+				if (objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
+				{
+					objectPath = objectPath.resolve("..").resolve("WorldObjects");
+				}
+			}
+
+			if (!overwrite)
+			{
+				if (new File(objectPath.toFile(), objectName + ".bo3").exists())
+				{
+					source.sendFeedback(new StringTextComponent("File already exists, run command with flag '-o' to overwrite"), false);
+					return 0;
+				}
+			}
+
+			LocalWorldGenRegion otgRegion = new ForgeWorldGenRegion(
+				preset.getName(), preset.getWorldConfig(), source.getWorld(),
+				source.getWorld().getChunkProvider().getChunkGenerator()
+			);
+			LocalNBTHelper nbtHelper = new ForgeNBTHelper();
+			BOCreator.Corner lowCorner = region.getLowCorner();
+			BOCreator.Corner highCorner = region.getHighCorner();
+			BOCreator.Corner center = new BOCreator.Corner((highCorner.x - lowCorner.x) / 2 + lowCorner.x, lowCorner.y, (highCorner.z - lowCorner.z) / 2 + lowCorner.z);
+
+			// Fetch template or default settings
+			BO3 template = (BO3) OTG.getEngine().getCustomObjectManager().getObjectLoaders().get("bo3")
+				.loadFromFile(templateName, new File(objectPath.toFile(), templateName + ".BO3Template"), OTG.getEngine().getLogger());
+
+			// Initialize the settings
+			template.onEnable(presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
+				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
+				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+			BO3 bo3;
+
+			if (branching)
+			{
+				try
+				{
+					bo3 = BO3Creator.createStructure(lowCorner, highCorner, center, objectName, includeAir, objectPath, otgRegion,
+						nbtHelper, null, template.getSettings(), presetName, OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
+						OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
+						OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
+				}
+				catch (Exception e)
+				{
+					OTG.log(LogMarker.INFO, e.toString());
+					for (StackTraceElement s : e.getStackTrace())
+					{
+						OTG.log(LogMarker.INFO, s.toString());
+					}
+					return 0;
+				}
+			}
+			else
+			{
+				// Create a new BO3 from our settings
+				LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofMinecraftBlockState(centerBlockState);
+				bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
+					objectPath, otgRegion, nbtHelper, null, template.getSettings(), presetName,
+					OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 					OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
 					OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
 			}
-			catch (Exception e)
-			{
-				OTG.log(LogMarker.INFO, e.toString());
-				for (StackTraceElement s : e.getStackTrace())
-				{
-					OTG.log(LogMarker.INFO, s.toString());
-				}
-				return 0;
-			}
-		}
-		else
-		{
-			// Create a new BO3 from our settings
-			bo3 = BO3Creator.create(lowCorner, highCorner, center, objectName, includeAir,
-				objectPath, otgRegion, nbtHelper, null, template.getSettings(), presetName,
-				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
-				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
-				OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-		}
 
-		// Send feedback, and register the BO3 for immediate use
-		if (bo3 != null)
+			// Send feedback, and register the BO3 for immediate use
+			if (bo3 != null)
+			{
+				source.sendFeedback(new StringTextComponent("Successfully created BO3 " + objectName), false);
+				if (presetName.equalsIgnoreCase("global"))
+				{
+					OTG.getEngine().getCustomObjectManager().registerGlobalObject(bo3, bo3.getSettings().getFile());
+				} else {
+					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile());
+				}
+			}
+			else
+			{
+				source.sendFeedback(new StringTextComponent("Failed to create BO3 " + objectName), false);
+			}
+		} catch (Exception e)
 		{
-			source.sendFeedback(new StringTextComponent("Successfully created BO3 " + objectName), false);
-			OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile());
-		}
-		else
-		{
-			source.sendFeedback(new StringTextComponent("Failed to create BO3 " + objectName), false);
+			OTG.log(LogMarker.INFO, e.toString());
+			for (StackTraceElement s : e.getStackTrace())
+			{
+				OTG.log(LogMarker.INFO, s.toString());
+			}
 		}
 
 		return 0;

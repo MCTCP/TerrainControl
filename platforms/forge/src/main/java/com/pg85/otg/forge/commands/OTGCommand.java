@@ -17,6 +17,8 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.ISuggestionProvider;
 import net.minecraft.command.arguments.BlockPosArgument;
+import net.minecraft.command.arguments.BlockStateArgument;
+import net.minecraft.command.arguments.ItemArgument;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
@@ -25,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -72,7 +75,7 @@ public class OTGCommand
 				Commands.literal("spawn").then(
 					Commands.argument("preset", new PresetArgument()).then(
 						Commands.argument("object", new BiomeObjectArgument()).then(
-							Commands.argument("location", new BlockPosArgument())
+							Commands.argument("location", BlockPosArgument.blockPos())
 								.executes(
 									(context -> SpawnCommand.execute(
 										context.getSource(),
@@ -128,11 +131,13 @@ public class OTGCommand
 					)
 				)
 			).then(
-				Commands.literal("export").then(
-					Commands.argument("preset", new PresetArgument()).then(
-						Commands.argument("name", StringArgumentType.string()).executes(ExportCommand::execute).then(
-							Commands.argument("template", new TemplateArgument()).executes(ExportCommand::execute).then(
-								Commands.argument("flags", FlagsArgument.with("-o", "-a", "-b")).executes(ExportCommand::execute)
+				Commands.literal("export").executes(ExportCommand::execute).then(
+					Commands.argument("name", StringArgumentType.string()).executes(ExportCommand::execute).then(
+						Commands.argument("center", BlockStateArgument.blockState()).executes(ExportCommand::execute).then(
+							Commands.argument("preset", new PresetArgument()).executes(ExportCommand::execute).then(
+								Commands.argument("template", new TemplateArgument()).executes(ExportCommand::execute).then(
+									Commands.argument("flags", FlagsArgument.with("-o", "-a", "-b")).executes(ExportCommand::execute)
+								)
 							)
 						)
 					)
@@ -245,6 +250,7 @@ public class OTGCommand
 		{
 			Set<String> set = OTG.getEngine().getPresetLoader().getAllPresetNames().stream()
 				.map(filterNamesWithSpaces).collect(Collectors.toSet());
+			set.add("global");
 			return ISuggestionProvider.suggest(set, builder);
 		}
 	}
@@ -261,9 +267,19 @@ public class OTGCommand
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 		{
-			List<String> list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
-				.getAllBONamesForPreset(context.getArgument("preset", String.class))
-				.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
+			String preset = context.getArgument("preset", String.class);
+			List<String> list;
+			// Get global objects if global, else fetch based on preset
+			if (preset.equalsIgnoreCase("global"))
+			{
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getGlobalObjectNames();
+			}
+			else
+			{
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getAllBONamesForPreset(preset);
+			}
+			if (list == null) list = new ArrayList<>();
+			list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
 			return ISuggestionProvider.suggest(list, builder);
 		}
 	}
@@ -279,9 +295,19 @@ public class OTGCommand
 		@Override
 		public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder)
 		{
-			List<String> list = OTG.getEngine().getCustomObjectManager().getGlobalObjects()
-				.getTemplatesForPreset(context.getArgument("preset", String.class))
-				.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
+			String preset = context.getArgument("preset", String.class);
+			List<String> list;
+			// Get global objects if global, else fetch based on preset
+			if (preset.equalsIgnoreCase("global"))
+			{
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getGlobalTemplates();
+			}
+			else
+			{
+				list = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getTemplatesForPreset(preset);
+			}
+			if (list == null) list = new ArrayList<>();
+			list = list.stream().map(filterNamesWithSpaces).collect(Collectors.toList());
 			list.add("default");
 			return ISuggestionProvider.suggest(list.stream(), builder);
 		}

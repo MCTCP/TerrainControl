@@ -32,13 +32,28 @@ public class BO3Creator extends BOCreator
 
 
 	public static BO3 create(
-		Corner min, Corner max, Corner center, String objectName, boolean includeAir, Path objectPath,
+		Corner min, Corner max, Corner center, LocalMaterialData centerBlock, String objectName, boolean includeAir, Path objectPath,
 		LocalWorldGenRegion localWorld, LocalNBTHelper nbtHelper, List<BO3BlockFunction> extraBlocks, BO3Config template,
 		String presetName, Path rootPath, boolean spawnLog, ILogger logger, CustomObjectManager boManager,
 		IMaterialReader mr, CustomObjectResourcesManager manager, IModLoadedChecker mlc)
 	{
 
 		File objectFolder = objectPath.toFile();
+		searchForCenter:
+		{
+			if (centerBlock != null)
+				for (int x = min.x; x <= max.x; x++)
+					for (int z = min.z; z <= max.z; z++)
+						for (int y = min.y; y <= max.y; y++)
+						{
+							LocalMaterialData data = localWorld.getMaterial(x, y, z, ChunkCoordinate.fromBlockCoords(x, z));
+							if (data != null && data.isMaterial(centerBlock))
+							{
+								center = new Corner(x, y, z);
+								break searchForCenter;
+							}
+						}
+		}
 
 		// Loop through region, getting the block from the localWorld
 		List<BO3BlockFunction> blocks = getBlockFunctions(min, max, center, localWorld, nbtHelper, includeAir, objectName, objectFolder);

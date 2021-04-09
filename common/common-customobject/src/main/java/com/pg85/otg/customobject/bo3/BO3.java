@@ -460,7 +460,7 @@ public class BO3 implements StructuredCustomObject
             chunksCustomObject.add(ChunkCoordinate.fromBlockCoords(newParticleData.x, newParticleData.z));
         }
 
-        if (structure != null)
+        if (structure != null && structureCache != null)
         {
             structure.modDataManager.modData.addAll(newModDataInObject);
             structure.particlesManager.particleData.addAll(newParticleDataInObject);
@@ -470,7 +470,7 @@ public class BO3 implements StructuredCustomObject
             {
             	structureCache.addBo3ToStructureCache(structureCoord, structure, true);
             }
-        } else {
+        } else if (structureCache != null)  {
             CustomStructure placeHolderStructure = new BO3CustomStructure(new BO3CustomStructureCoordinate(worldGenRegion.getPresetName(), this, this.getName(), Rotation.NORTH, x, (short) 0, z));
             placeHolderStructure.modDataManager.modData.addAll(newModDataInObject);
             placeHolderStructure.particlesManager.particleData.addAll(newParticleDataInObject);

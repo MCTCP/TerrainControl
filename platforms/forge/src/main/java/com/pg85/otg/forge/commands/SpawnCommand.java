@@ -1,7 +1,9 @@
 package com.pg85.otg.forge.commands;
 
 import com.pg85.otg.OTG;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
+import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.logging.LogMarker;
@@ -12,17 +14,13 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
+import java.nio.file.Path;
 import java.util.Random;
 
 public class SpawnCommand
 {
 	public static int execute(CommandSource source, String presetName, String objectName, BlockPos blockPos)
 	{
-		if (!(source.getWorld().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
-		{
-			source.sendFeedback(new StringTextComponent("Can only run this command in an OTG world"), false);
-			return 0;
-		}
 		try
 		{
 			CustomObject objectToSpawn = getObject(objectName, presetName);
@@ -32,9 +30,23 @@ public class SpawnCommand
 				source.sendFeedback(new StringTextComponent("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects"), false);
 				return 0;
 			}
-			Preset preset = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
+
+			Preset preset;
+			if (presetName.equalsIgnoreCase("global"))
+			{
+				preset = OTG.getEngine().getPresetLoader().getPresetByName(OTG.getEngine().getPresetLoader().getDefaultPresetName());
+			}
+			else {
+				preset = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
+				if (preset == null)
+				{
+					source.sendFeedback(new StringTextComponent("Could not find preset "+presetName), false);
+					return 0;
+				}
+			}
+
 			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(), source.getWorld(),
-				(OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator());
+				source.getWorld().getChunkProvider().getChunkGenerator());
 
 			/*
 			if (objectToSpawn instanceof BO3 && ((BO3)objectToSpawn).getBranches(Rotation.NORTH).length != 0)
@@ -55,8 +67,19 @@ public class SpawnCommand
 				return 0;
 			}*/
 
+			CustomStructureCache cache =  source.getWorld().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator ?
+										  ((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()).getStructureCache() :
+										  null;
+
+			// Cache is only null in non-OTG worlds
+			if (cache == null && objectToSpawn.doReplaceBlocks())
+			{
+				source.sendFeedback(new StringTextComponent("Cannot spawn objects with DoReplaceBlocks in on-OTG worlds"), false);
+				return 0;
+			}
+
 			if (objectToSpawn.spawnForced(
-				((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()).getStructureCache(),
+				cache,
 				region,
 				new Random(),
 				Rotation.NORTH,

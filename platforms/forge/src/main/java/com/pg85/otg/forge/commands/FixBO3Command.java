@@ -212,7 +212,7 @@ public class FixBO3Command
 			}
 
 
-			BO3 fixedBO3 = BO3Creator.create(min, max, new BOCreator.Corner(x, y, z), "fixed_" + bo3.getName(), false, objectPath,
+			BO3 fixedBO3 = BO3Creator.create(min, max, new BOCreator.Corner(x, y, z), null, "fixed_" + bo3.getName(), false, objectPath,
 				genRegion, nbtHelper, extraBlocks, bo3.getSettings(), presetName,
 				OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
 				OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(), OTG.getEngine().getMaterialReader(),
