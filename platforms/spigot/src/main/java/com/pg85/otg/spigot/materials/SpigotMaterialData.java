@@ -14,6 +14,8 @@ import com.pg85.otg.util.materials.MaterialProperty;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
+import java.util.Collection;
+
 public class SpigotMaterialData extends LocalMaterialData
 {
 	private final IBlockData blockData;
@@ -288,6 +290,67 @@ public class SpigotMaterialData extends LocalMaterialData
 		}
 
 		return SpigotMaterialData.ofBlockData(this.blockData.set(property, value));
+	}
+
+	@Override
+	public LocalMaterialData rotate(int rotateTimes)
+	{
+		if (rotateTimes > 3) rotateTimes = rotateTimes % 4;
+
+		if (rotations[rotateTimes] != null)
+		{
+			// Some caching, to save us making three new LocalMaterialData for each block in a bo3
+			return rotations[rotateTimes];
+		}
+		if (rotateTimes <= 0) {
+			return this;
+		}
+		IBlockData state;
+		if (rotateTimes > 1) {
+			state = ((SpigotMaterialData) this.rotate(rotateTimes-1)).blockData;
+		} else {
+			state = this.blockData;
+		}
+
+		if (state == null) return this;
+
+		Collection<IBlockState<?>> properties = state.r();
+		for (IBlockState<?> property : properties)
+		{
+			if (property instanceof BlockStateDirection) // Anything with a direction
+			{
+				EnumDirection direction = (EnumDirection) state.get(property);
+				switch (direction)
+				{
+					case DOWN:
+					case UP:
+						break;
+					case NORTH:
+						state = state.set((BlockStateDirection) property, EnumDirection.WEST);
+						break;
+					case SOUTH:
+						state = state.set((BlockStateDirection) property, EnumDirection.EAST);
+						break;
+					case WEST:
+						state = state.set((BlockStateDirection) property, EnumDirection.SOUTH);
+						break;
+					case EAST:
+						state = state.set((BlockStateDirection) property, EnumDirection.NORTH);
+						break;
+				}
+			}
+		}
+
+		if (state.b(BlockTall.EAST)) // fence or glass pane
+		{
+			boolean hasEast = state.get(BlockTall.EAST);
+			state = state.set(BlockTall.EAST, state.get(BlockTall.SOUTH));
+			state = state.set(BlockTall.SOUTH, state.get(BlockTall.WEST));
+			state = state.set(BlockTall.WEST, state.get(BlockTall.NORTH));
+			state = state.set(BlockTall.NORTH, hasEast);
+		}
+		rotations[rotateTimes] = ofBlockData(state);
+		return rotations[rotateTimes];
 	}
 
 	@Override

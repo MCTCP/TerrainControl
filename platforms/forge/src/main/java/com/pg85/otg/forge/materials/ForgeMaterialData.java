@@ -8,21 +8,20 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
 import net.minecraft.command.arguments.BlockStateParser;
+import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 
 import com.pg85.otg.util.materials.MaterialProperty;
 import com.pg85.otg.util.materials.MaterialProperties;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -71,7 +70,7 @@ public class ForgeMaterialData extends LocalMaterialData
 		// block "minecraft:stone" with no block data.
 		
 		// Used in BO4's as placeholder/detector block.
-		if(input.toLowerCase().equals("blank"))
+		if(input.equalsIgnoreCase("blank"))
 		{
 			return ForgeMaterialData.getBlank();
 		}
@@ -99,7 +98,7 @@ public class ForgeMaterialData extends LocalMaterialData
 				{
 					blockNameCorrected = fromLegacyIdName;
 				}
-			} catch(NumberFormatException ex) { }
+			} catch(NumberFormatException ignored) { }
 		}
 		
 		// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
@@ -129,7 +128,7 @@ public class ForgeMaterialData extends LocalMaterialData
 			{
 				int blockId = Integer.parseInt(blockNameOrId);
 				blockNameOrId = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
-			} catch(NumberFormatException ex) { }			
+			} catch(NumberFormatException ignored) { }
 			try
 			{
 				int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
@@ -140,7 +139,7 @@ public class ForgeMaterialData extends LocalMaterialData
 				}
 				// Failed to parse data, remove. fe STONE:0 or STONE:1 -> STONE
 				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));				
-			} catch(NumberFormatException ex) { }			
+			} catch(NumberFormatException ignored) { }
 		}
 
 		// Try without data
@@ -158,7 +157,7 @@ public class ForgeMaterialData extends LocalMaterialData
 				}
 				return ofMinecraftBlock(block, input);
 			}
-		} catch(net.minecraft.util.ResourceLocationException ex) { }
+		} catch(net.minecraft.util.ResourceLocationException ignored) { }
 
 		// Try legacy name again, without data.
 		blockState = ForgeLegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));
@@ -315,6 +314,65 @@ public class ForgeMaterialData extends LocalMaterialData
 	{
 		// TODO: Implement this for 1.16		
 		return false;
+	}
+
+	@Override
+	public LocalMaterialData rotate(int rotateTimes)
+	{
+		if (rotateTimes > 3) rotateTimes = rotateTimes % 4;
+
+		if (rotations[rotateTimes] != null)
+		{
+			// Some caching, to save us making three new LocalMaterialData for each block in a bo3
+			return rotations[rotateTimes];
+		}
+		if (rotateTimes <= 0) {
+			return this;
+		}
+		BlockState state;
+		if (rotateTimes > 1) {
+			state = ((ForgeMaterialData) this.rotate(rotateTimes-1)).blockData;
+		} else {
+			state = this.blockData;
+		}
+
+		Collection<Property<?>> properties = state.getProperties();
+		for (Property<?> property : properties)
+		{
+			if (property instanceof DirectionProperty)
+			{
+				//Collection<Direction> directions = property.getAllowedValues(); // List of Direction properties - if it has east, west, south, north, we check those
+				Direction direction = (Direction) state.get(property);
+				switch (direction)
+				{
+					case DOWN:
+					case UP:
+						break;
+					case NORTH:
+						state = state.with((DirectionProperty) property, Direction.WEST);
+						break;
+					case SOUTH:
+						state = state.with((DirectionProperty) property, Direction.EAST);
+						break;
+					case WEST:
+						state = state.with((DirectionProperty) property, Direction.SOUTH);
+						break;
+					case EAST:
+						state = state.with((DirectionProperty) property, Direction.NORTH);
+						break;
+				}
+			}
+		}
+		if (state.hasProperty(FourWayBlock.EAST)) // fence or glass pane
+		{
+			boolean hasEast = state.get(FourWayBlock.EAST);
+			state = state.with(FourWayBlock.EAST, state.get(FourWayBlock.SOUTH));
+			state = state.with(FourWayBlock.SOUTH, state.get(FourWayBlock.WEST));
+			state = state.with(FourWayBlock.WEST, state.get(FourWayBlock.NORTH));
+			state = state.with(FourWayBlock.NORTH, hasEast);
+		}
+		rotations[rotateTimes] = ofMinecraftBlockState(state);
+		return rotations[rotateTimes];
 	}
 
 	@Override

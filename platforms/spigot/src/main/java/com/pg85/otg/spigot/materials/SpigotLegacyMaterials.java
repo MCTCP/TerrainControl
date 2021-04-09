@@ -60,12 +60,11 @@ public class SpigotLegacyMaterials
 			case "jungle_stairs":
 				return Blocks.JUNGLE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
 			case "cobblestone_stairs":
-			case "stone_brick_stairs":
-				return Blocks.COBBLESTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
 			case "stone_stairs":
-				// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
+				return Blocks.COBBLESTONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+			case "stone_brick_stairs":
 			case "smooth_stairs":
-				return Blocks.STONE_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
+				return Blocks.STONE_BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
 			case "brick_stairs":
 				return Blocks.BRICK_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
 			case "nether_brick_stairs":
@@ -87,6 +86,8 @@ public class SpigotLegacyMaterials
 				return Blocks.DANDELION.getBlockData();
 			case "web":
 				return Blocks.COBWEB.getBlockData();
+			case "standing_banner":
+				return Blocks.WHITE_BANNER.getBlockData();
 			case "wall_banner":
 				return Blocks.WHITE_WALL_BANNER.getBlockData();
 			case "redstone_lamp_on":
@@ -381,6 +382,7 @@ public class SpigotLegacyMaterials
 					return Blocks.STONE_PRESSURE_PLATE.getBlockData().set(BlockPressurePlateBinary.POWERED, getBit(data, 0) == 1);
 				case "wooden_pressure_plate":
 				case "wood_plate":
+				case "oak_pressure_plate":
 					return Blocks.OAK_PRESSURE_PLATE.getBlockData().set(BlockPressurePlateBinary.POWERED, getBit(data, 0) == 1);
 				case "light_weighted_pressure_plate":
 					return Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE.getBlockData().set(BlockPressurePlateWeighted.POWER, data);
@@ -398,10 +400,13 @@ public class SpigotLegacyMaterials
 				case "crops":
 					return Blocks.WHEAT.getBlockData().set(BlockCrops.AGE, data);
 				case "carrot":
+				case "carrots":
 					return Blocks.CARROTS.getBlockData().set(BlockCarrots.AGE, data);
 				case "potato":
+				case "potatoes":
 					return Blocks.POTATOES.getBlockData().set(BlockPotatoes.AGE, data);
 				case "beetroot":
+				case "beetroots":
 					return Blocks.BEETROOTS.getBlockData().set(BlockBeetroot.AGE, data);
 				case "farmland":
 				case "soil":
@@ -496,11 +501,12 @@ public class SpigotLegacyMaterials
 					return getDoorWithData(5, data);
 				case "dark_oak_door":
 					return getDoorWithData(6, data);
+				case "oak_sign":
 				case "sign_post":
 				case "sign": // TODO: This will also pick up wall signs
 					return getSignPostWithData(data);
 				case "standing_banner":
-					return Blocks.BLACK_BANNER.getBlockData().set(BlockBanner.ROTATION, data);
+					return Blocks.WHITE_BANNER.getBlockData().set(BlockBanner.ROTATION, data);
 				case "wall_banner":
 					return Blocks.WHITE_WALL_BANNER.getBlockData().set(BlockBannerWall.a, getFacingNorthSouthWestEast(data));
 				case "end_rod":
@@ -564,6 +570,7 @@ public class SpigotLegacyMaterials
 				case "burning_furnace":
 					return getLadderChestOrFurnaceWithData(5, data);
 				case "wall_sign":
+				case "oak_wall_sign":
 					return getWallSignWithData(data);
 				case "observer":
 					return getObserverWithData(data);
@@ -580,14 +587,17 @@ public class SpigotLegacyMaterials
 					// TODO: Hopefully this auto-updates to ATTACHED_MELON_STEM when placed next to a melon block..
 					return Blocks.MELON_STEM.getBlockData().set(BlockStem.AGE, data);
 				case "carved_pumpkin":
+				case "pumpkin":
 					return getJackOLanternOrPumpkinWithData(0, data);
 				case "jack_o_lantern":
 				case "lit_pumpkin":
 					return getJackOLanternOrPumpkinWithData(1, data);
 				case "diode_block_off":
 				case "repeater":
+				case "unpowered_repeater":
 					return getRepeaterWithData(0, data);
 				case "diode_block_on":
+				case "powered_repeater":
 					return getRepeaterWithData(1, data);
 				case "redstone":
 				case "redstone_wire":
@@ -624,6 +634,7 @@ public class SpigotLegacyMaterials
 				case "vine":
 					return getVineWithData(data);
 				case "fence_gate":
+				case "oak_fence_gate":
 					return getFenceGateWithData(0, data);
 				case "spruce_fence_gate":
 					return getFenceGateWithData(1, data);
@@ -751,15 +762,20 @@ public class SpigotLegacyMaterials
 		int material = getBits(data, 0, 2);
 		int orientation = getBits(data, 2, 2);
 		EnumDirection.EnumAxis axisDirection = orientation == 0 ? EnumDirection.EnumAxis.Y : orientation == 1 ? EnumDirection.EnumAxis.X : orientation == 2 ? EnumDirection.EnumAxis.Z : EnumDirection.EnumAxis.Y;
+		boolean bark = orientation == 3;
 		switch (material)
 		{
 			case 0:
+				if (bark) return Blocks.OAK_WOOD.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 				return Blocks.OAK_LOG.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 			case 1:
+				if (bark) return Blocks.SPRUCE_WOOD.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 				return Blocks.SPRUCE_LOG.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 			case 2:
+				if (bark) return Blocks.BIRCH_WOOD.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 				return Blocks.BIRCH_LOG.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 			case 3:
+				if (bark) return Blocks.JUNGLE_WOOD.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 				return Blocks.JUNGLE_LOG.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 			default:
 				return Blocks.OAK_LOG.getBlockData();
@@ -771,11 +787,14 @@ public class SpigotLegacyMaterials
 		int material = getBits(data, 0, 2);
 		int orientation = getBits(data, 2, 2);
 		EnumDirection.EnumAxis axisDirection = orientation == 0 ? EnumDirection.EnumAxis.Y : orientation == 1 ? EnumDirection.EnumAxis.X : orientation == 2 ? EnumDirection.EnumAxis.Z : EnumDirection.EnumAxis.Y;
+		boolean bark = orientation == 3;
 		switch (material)
 		{
 			case 0:
+				if (bark) return Blocks.ACACIA_WOOD.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 				return Blocks.ACACIA_LOG.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 			case 1:
+				if (bark) return Blocks.DARK_OAK_WOOD.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 				return Blocks.DARK_OAK_LOG.getBlockData().set(BlockRotatable.AXIS, axisDirection);
 			default:
 				return Blocks.ACACIA_LOG.getBlockData();
