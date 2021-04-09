@@ -6,13 +6,14 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.BOCreator;
 import com.pg85.otg.customobject.bo3.BO3;
 import com.pg85.otg.customobject.bo3.BO3Creator;
+import com.pg85.otg.customobject.util.BoundingBox;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
-import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.LocalNBTHelper;
+import com.pg85.otg.util.bo3.Rotation;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import net.minecraft.block.BlockState;
@@ -35,10 +36,9 @@ public class ExportCommand
 
 	public static int execute(CommandContext<CommandSource> context)
 	{
+		CommandSource source = context.getSource();
 		try
 		{
-			CommandSource source = context.getSource();
-
 			if (!(source.getEntity() instanceof ServerPlayerEntity))
 			{
 				source.sendFeedback(new StringTextComponent("Only players can execute this command"), false);
@@ -75,35 +75,19 @@ public class ExportCommand
 			}
 
 			Region region = playerSelectionMap.get(source.getEntity());
-			if (region == null || region.getLowCorner() == null)
+			if (region == null || region.getLow() == null)
 			{
 				source.sendFeedback(new StringTextComponent("Please mark two corners with /otg region mark"), false);
 				return 0;
 			}
-			Preset preset;
-			Path objectPath;
-			if (presetName.equalsIgnoreCase("global"))
+			Preset preset = getPreset(presetName);
+			if (preset == null)
 			{
-				preset = OTG.getEngine().getPresetLoader().getPresetByName(OTG.getEngine().getPresetLoader().getDefaultPresetName());
-				objectPath = OTG.getEngine().getGlobalObjectsFolder();
-			}
-			else {
-				preset = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
-				objectPath = preset.getPresetDir().resolve(Constants.WORLD_OBJECTS_FOLDER);
-				if (preset == null)
-				{
-					source.sendFeedback(new StringTextComponent("Could not find preset "+presetName), false);
-					return 0;
-				}
+				source.sendFeedback(new StringTextComponent("Could not find preset "+presetName), false);
+				return 0;
 			}
 
-			if (!objectPath.toFile().exists())
-			{
-				if (objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
-				{
-					objectPath = objectPath.resolve("..").resolve("WorldObjects");
-				}
-			}
+			Path objectPath = getObjectPath(preset, presetName);
 
 			if (!overwrite)
 			{
@@ -119,8 +103,8 @@ public class ExportCommand
 				source.getWorld().getChunkProvider().getChunkGenerator()
 			);
 			LocalNBTHelper nbtHelper = new ForgeNBTHelper();
-			BOCreator.Corner lowCorner = region.getLowCorner();
-			BOCreator.Corner highCorner = region.getHighCorner();
+			BOCreator.Corner lowCorner = region.getLow();
+			BOCreator.Corner highCorner = region.getHigh();
 			BOCreator.Corner center = new BOCreator.Corner((highCorner.x - lowCorner.x) / 2 + lowCorner.x, lowCorner.y, (highCorner.z - lowCorner.z) / 2 + lowCorner.z);
 
 			// Fetch template or default settings
@@ -171,7 +155,7 @@ public class ExportCommand
 				{
 					OTG.getEngine().getCustomObjectManager().registerGlobalObject(bo3, bo3.getSettings().getFile());
 				} else {
-					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile());
+					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
 				}
 			}
 			else
@@ -180,6 +164,7 @@ public class ExportCommand
 			}
 		} catch (Exception e)
 		{
+			source.sendFeedback(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.log(LogMarker.INFO, e.toString());
 			for (StackTraceElement s : e.getStackTrace())
 			{
@@ -188,6 +173,36 @@ public class ExportCommand
 		}
 
 		return 0;
+	}
+
+	protected static Path getObjectPath(Preset preset, String presetName)
+	{
+		Path objectPath;
+		if (presetName.equalsIgnoreCase("global"))
+		{
+			objectPath = OTG.getEngine().getGlobalObjectsFolder();
+		}
+		else {
+			objectPath = preset.getPresetDir().resolve(Constants.WORLD_OBJECTS_FOLDER);
+
+		}
+
+		if (!objectPath.toFile().exists())
+		{
+			if (objectPath.resolve("..").resolve("WorldObjects").toFile().exists())
+			{
+				objectPath = objectPath.resolve("..").resolve("WorldObjects");
+			}
+		}
+		return objectPath;
+	}
+
+	protected static Preset getPreset(String presetName)
+	{
+		if (presetName.equalsIgnoreCase("global"))
+			return OTG.getEngine().getPresetLoader().getPresetByName(OTG.getEngine().getPresetLoader().getDefaultPresetName());
+		else
+			return OTG.getEngine().getPresetLoader().getPresetByName(presetName);
 	}
 
 	public static int mark(CommandSource source)
@@ -210,7 +225,7 @@ public class ExportCommand
 	{
 		if (!init(source)) return 0;
 		Region region = playerSelectionMap.get(source.getEntity());
-		if (region.getLowCorner() == null)
+		if (region.getLow() == null)
 		{
 			source.sendFeedback(new StringTextComponent("Please mark two positions before modifying or exporting the region"), false);
 			return 0;
@@ -267,6 +282,18 @@ public class ExportCommand
 		return true;
 	}
 
+	protected static Region getRegionFromObject(int x, int y, int z, BO3 bo3)
+	{
+		ExportCommand.Region region = new ExportCommand.Region();
+		BoundingBox box = bo3.getBoundingBox(Rotation.NORTH);
+		region.setPos(new BlockPos(x + box.getMinX(), y + box.getMinY(), z + box.getMinZ()));
+		region.setPos(new BlockPos(
+			x + box.getMinX() + box.getWidth(),
+			y + box.getMinY() + box.getHeight(),
+			z + box.getMinZ() + box.getDepth()));
+		return region;
+	}
+
 	public static class Region
 	{
 		private BOCreator.Corner low = null;
@@ -303,12 +330,12 @@ public class ExportCommand
 			high = null;
 		}
 
-		public BOCreator.Corner getLowCorner()
+		public BOCreator.Corner getLow()
 		{
 			return low;
 		}
 
-		public BOCreator.Corner getHighCorner()
+		public BOCreator.Corner getHigh()
 		{
 			return high;
 		}

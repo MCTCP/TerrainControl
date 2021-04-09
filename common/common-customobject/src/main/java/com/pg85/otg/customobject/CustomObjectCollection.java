@@ -227,9 +227,10 @@ public class CustomObjectCollection
 			   : new ArrayList<>(globalTemplates.keySet());
 	}
 
-	public void addObjectToPreset(String presetName, String objectName, File boFile)
+	public void addObjectToPreset(String presetName, String objectName, File boFile, CustomObject object)
 	{
-		customObjectFilesPerPreset.get((presetName)).put(objectName, boFile);
+		objectsByNamePerPreset.get(presetName).put(objectName, object);
+		customObjectFilesPerPreset.get(presetName).put(objectName, boFile);
 	}
     
     public CustomObject getObjectByName(String name, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)

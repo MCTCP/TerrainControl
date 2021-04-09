@@ -1,7 +1,6 @@
 package com.pg85.otg.forge.commands;
 
 import com.pg85.otg.OTG;
-import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
@@ -14,7 +13,6 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
 
-import java.nio.file.Path;
 import java.util.Random;
 
 public class SpawnCommand
@@ -48,25 +46,6 @@ public class SpawnCommand
 			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(), source.getWorld(),
 				source.getWorld().getChunkProvider().getChunkGenerator());
 
-			/*
-			if (objectToSpawn instanceof BO3 && ((BO3)objectToSpawn).getBranches(Rotation.NORTH).length != 0)
-			{
-				// This is a structure, spawn it as such
-				BO3CustomStructureCoordinate coord = (BO3CustomStructureCoordinate) ((BO3) objectToSpawn).makeCustomStructureCoordinate(presetName, new Random(), blockPos.getX(), blockPos.getZ());
-				BO3CustomStructure structureToSpawn = new BO3CustomStructure(region, coord, OTG.getEngine().getOTGRootFolder(),
-					OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
-					OTG.getEngine().getMaterialReader(),OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-
-				structureToSpawn.spawnInChunk(((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()).getStructureCache(),
-					region, ChunkCoordinate.fromBlockCoords(blockPos.getX(), blockPos.getZ()),
-					OTG.getEngine().getOTGRootFolder(),
-					OTG.getEngine().getPluginConfig().getSpawnLogEnabled(), OTG.getEngine().getLogger(), OTG.getEngine().getCustomObjectManager(),
-					OTG.getEngine().getMaterialReader(),OTG.getEngine().getCustomObjectResourcesManager(), OTG.getEngine().getModLoadedChecker());
-				source.sendFeedback(new StringTextComponent("Spawned structure " + objectName + " at " + blockPos.toString()), false);
-				source.sendFeedback(new StringTextComponent("If pieces are missing, that likely means you're using blockchecks. Try to avoid those."), false);
-				return 0;
-			}*/
-
 			CustomStructureCache cache =  source.getWorld().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator ?
 										  ((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()).getStructureCache() :
 										  null;
@@ -97,6 +76,7 @@ public class SpawnCommand
 		}
 		catch (Exception e)
 		{
+			source.sendFeedback(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.log(LogMarker.INFO, e.toString());
 			for (StackTraceElement s :
 				e.getStackTrace())
@@ -104,12 +84,15 @@ public class SpawnCommand
 				OTG.log(LogMarker.INFO, s.toString());
 			}
 		}
-
 		return 0;
 	}
 
 	public static CustomObject getObject(String objectName, String presetName)
 	{
+		if (presetName.equalsIgnoreCase("global"))
+		{
+			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetName();
+		}
 		return OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
 			objectName,
 			presetName,
