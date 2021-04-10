@@ -175,8 +175,7 @@ public class BiomeLayerData
 		if (oceanBiomeConfig == null)
 		{
 			this.oceanBiomeData = new NewBiomeData(0, "none", 0, 0, 0, ImmutableList.of(), ImmutableList.of(), ImmutableList.of());
-		} else
-		{
+		} else {
 			this.oceanBiomeData = new NewBiomeData(0, oceanBiomeConfig.getName(), oceanBiomeConfig.getBiomeRarity(), oceanBiomeConfig.getBiomeSize(), oceanBiomeConfig.getBiomeTemperature(), oceanBiomeConfig.getIsleInBiomes(), oceanBiomeConfig.getBorderInBiomes(), oceanBiomeConfig.getNotBorderNearBiomes());
 		}
 

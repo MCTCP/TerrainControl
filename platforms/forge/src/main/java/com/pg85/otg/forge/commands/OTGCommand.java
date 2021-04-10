@@ -166,8 +166,7 @@ public class OTGCommand
 		try
 		{
 			ImageIO.write(img, "png", p.toAbsolutePath().toFile());
-		} catch (IOException e)
-		{
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 

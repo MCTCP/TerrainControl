@@ -58,13 +58,13 @@ public class BiomeBorderLayer implements ParentedLayer
                 	center = 
             			(
             			center & (
-        					BiomeLayers.ISLAND_BIT |
-        					BiomeLayers.RIVER_BITS |
-        					BiomeLayers.ICE_BIT
+        					BiomeLayers.ISLAND_BIT
+        					| BiomeLayers.RIVER_BITS
+        					| BiomeLayers.ICE_BIT
 	    					)
-	        			) | 
-	        			BiomeLayers.LAND_BIT |
-	        			bordersTo[cCheck]
+	        			)
+            			| BiomeLayers.LAND_BIT
+            			| bordersTo[cCheck]
         			;
                 } else {
 	                // if it's not suitable, try again but sample in an X formation to make sure we didn't miss any potential edge
