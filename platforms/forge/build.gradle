@@ -1,15 +1,18 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
+apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
@@ -42,6 +45,8 @@ minecraft {
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
 
+            arg "-mixin.config=otg.mixins.json"
+
             mods {
                 openterraingenerator {
                     source sourceSets.main
@@ -57,6 +62,8 @@ minecraft {
 
             // Recommended logging level for the console
             property 'forge.logging.console.level', 'debug'
+
+            arg "-mixin.config=otg.mixins.json"
 
             mods {
                 openterraingenerator {
@@ -76,6 +83,8 @@ minecraft {
 
             args '--mod', 'openterraingenerator', '--all', '--output', file('src/generated/resources/')
 
+            arg "-mixin.config=otg.mixins.json"
+
             mods {
                 openterraingenerator {
                     source sourceSets.main
@@ -88,6 +97,8 @@ minecraft {
 dependencies
 {	
     minecraft 'net.minecraftforge:forge:1.16.5-36.1.0'
+
+    annotationProcessor 'org.spongepowered:mixin:0.8:processor'
 
 	compile project(':common:common-util')
 	compile project(':common:common-config')
@@ -159,6 +170,18 @@ publishing {
     repositories {
         maven {
             url "file:///${project.projectDir}/mcmodsrepo"
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "otg.refmap.json"
+}
+
+if (System.getProperty("idea.sync.active") == "true") {
+    afterEvaluate {
+        tasks.withType(JavaCompile).all {
+            it.options.annotationProcessorPath = files()
         }
     }
 }

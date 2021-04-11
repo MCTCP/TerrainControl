@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.pg85.otg.forge.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "otg.refmap.json",
+  "mixins": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8"
+}
