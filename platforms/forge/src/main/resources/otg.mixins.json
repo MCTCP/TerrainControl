@@ -3,7 +3,9 @@
   "package": "com.pg85.otg.forge.mixin",
   "compatibilityLevel": "JAVA_8",
   "refmap": "otg.refmap.json",
-  "mixins": [],
+  "mixins": [
+    "MixinLocateCommand"
+  ],
   "injectors": {
     "defaultRequire": 1
   },
