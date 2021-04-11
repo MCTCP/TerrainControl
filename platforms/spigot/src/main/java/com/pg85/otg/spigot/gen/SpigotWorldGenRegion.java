@@ -546,4 +546,8 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Implement this.
 		return null;
 	}
+
+	public GeneratorAccessSeed getWorldGenRegion() {
+		return worldGenRegion;
+	}
 }

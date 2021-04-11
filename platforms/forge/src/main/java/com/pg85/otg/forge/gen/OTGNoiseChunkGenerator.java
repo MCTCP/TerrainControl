@@ -36,6 +36,7 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -591,7 +592,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion).getWorldGenRegion().getWorld(), worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
@@ -614,13 +615,57 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return blocksInColumn;
 	}
 
-	private IChunk getUnloadedChunk(Random random, ChunkCoordinate chunkCoordinate)
+	private IChunk getUnloadedChunk(ServerWorld serverWorld, Random random, ChunkCoordinate chunkCoordinate)
 	{
 		IChunk chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
 
-		//TODO: don't use empty arrays
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
+		// Setup jigsaw data
+		ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
+		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
+		ChunkPos pos = chunk.getPos();
+		int chunkX = pos.x;
+		int chunkZ = pos.z;
+		int startX = chunkX << 4;
+		int startZ = chunkZ << 4;
+
+		// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
+		for(Structure<?> structure : Structure.field_236384_t_) {
+			// Get all structure starts in this chunk
+			serverWorld.getStructureManager().func_235011_a_(SectionPos.from(pos, 0), structure).forEach((start) -> {
+				// Iterate through the pieces in the structure
+				for(StructurePiece piece : start.getComponents()) {
+					// Check if it intersects with this chunk
+					if (piece.func_214810_a(pos, 12)) {
+						MutableBoundingBox box = piece.getBoundingBox();
+
+						if (piece instanceof AbstractVillagePiece) {
+							AbstractVillagePiece villagePiece = (AbstractVillagePiece) piece;
+							// Add to the list if it's a rigid piece
+							if (villagePiece.getJigsawPiece().getPlacementBehaviour() == JigsawPattern.PlacementBehaviour.RIGID) {
+								structures.add(new JigsawStructureData(box.minX, box.minY, box.minZ,box.maxX, villagePiece.getGroundLevelDelta(), box.maxZ, true, 0, 0, 0));
+							}
+
+							// Get all the junctions in this piece
+							for(JigsawJunction junction : villagePiece.getJunctions()) {
+								int sourceX = junction.getSourceX();
+								int sourceZ = junction.getSourceZ();
+
+								// If the junction is in this chunk, then add to list
+								if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
+									junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.getSourceX(), junction.getSourceGroundY(), junction.getSourceZ()));
+								}
+							}
+						} else {
+							structures.add(new JigsawStructureData(box.minX, box.minY, box.minZ,box.maxX, 0, box.maxZ, false, 0, 0, 0));
+						}
+					}
+				}
+
+			});
+		}
+
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 		return chunk;
 	}
 

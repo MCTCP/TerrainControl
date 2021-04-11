@@ -582,4 +582,8 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Implement this.
 		return null;
 	}
+
+	public ISeedReader getWorldGenRegion() {
+		return worldGenRegion;
+	}
 }

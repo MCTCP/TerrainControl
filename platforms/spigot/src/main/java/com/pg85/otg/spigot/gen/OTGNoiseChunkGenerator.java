@@ -682,7 +682,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(((SpigotWorldGenRegion)worldGenRegion).getWorldGenRegion().getMinecraftWorld(),worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
@@ -707,11 +707,57 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return blocksInColumn;
 	}
 
-	private IChunkAccess getUnloadedChunk (Random random, ChunkCoordinate chunkCoordinate)
+	private IChunkAccess getUnloadedChunk (WorldServer world, Random random, ChunkCoordinate chunkCoordinate)
 	{
 		ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ChunkBuffer buffer = new SpigotChunkBuffer(chunk);
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
+
+		// Setup jigsaw data
+		ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
+		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
+		ChunkCoordIntPair pos = chunk.getPos();
+		int chunkX = pos.x;
+		int chunkZ = pos.z;
+		int startX = chunkX << 4;
+		int startZ = chunkZ << 4;
+
+		// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
+		for(StructureGenerator<?> structure : StructureGenerator.t) {
+			// Get all structure starts in this chunk
+			world.getStructureManager().a(SectionPosition.a(pos, 0), structure).forEach((start) -> {
+				// Iterate through the pieces in the structure
+				for(StructurePiece piece : start.d()) {
+					// Check if it intersects with this chunk
+					if (piece.a(pos, 12)) {
+						StructureBoundingBox box = piece.g();
+
+						if (piece instanceof WorldGenFeaturePillagerOutpostPoolPiece) {
+							WorldGenFeaturePillagerOutpostPoolPiece villagePiece = (WorldGenFeaturePillagerOutpostPoolPiece) piece;
+							// Add to the list if it's a rigid piece
+							if (villagePiece.b().e() == WorldGenFeatureDefinedStructurePoolTemplate.Matching.RIGID) {
+								structures.add(new JigsawStructureData(box.a, box.b, box.c,box.d, villagePiece.d(), box.f, true, 0, 0, 0));
+							}
+
+							// Get all the junctions in this piece
+							for(WorldGenFeatureDefinedStructureJigsawJunction junction : villagePiece.e()) {
+								int sourceX = junction.a();
+								int sourceZ = junction.c();
+
+								// If the junction is in this chunk, then add to list
+								if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
+									junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.a(), junction.b(), junction.c()));
+								}
+							}
+						} else {
+							structures.add(new JigsawStructureData(box.a, box.b, box.c,box.d, 0, box.f,  false, 0, 0, 0));
+						}
+					}
+				}
+
+			});
+		}
+
+		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 		return chunk;
 	}
 
