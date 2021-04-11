@@ -190,7 +190,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 					tree = BiomeDecoratorGroups.MEGA_PINE;
 					break;
 				case TallBirch:
-					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.BIRCH_TALL;
+					tree = BiomeDecoratorGroups.SUPER_BIRCH_BEES_0002;
 					break;
 				case Tree:
 					tree = BiomeDecoratorGroups.OAK;

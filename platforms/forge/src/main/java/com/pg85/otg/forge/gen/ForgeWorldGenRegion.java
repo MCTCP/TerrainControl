@@ -187,8 +187,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					birch.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, birch.config);
 					return true;
 				case TallBirch:
-					//return this.longBirchTree.generate(this.world, rand, blockPos);
-					return true; // TODO: Implement this
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> tall_birch = Features.SUPER_BIRCH_BEES_0002;
+					tall_birch.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tall_birch.config);
+					return true;
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
