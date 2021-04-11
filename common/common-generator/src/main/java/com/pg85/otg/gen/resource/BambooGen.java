@@ -42,13 +42,23 @@ public class BambooGen extends Resource
 
 		int height = random.nextInt(12) + 5;
 
-		if (world.getMaterial(x, y, z, chunkBeingPopulated).isAir()) {
+		if (world.getMaterial(x, y, z, chunkBeingPopulated).isAir())
+		{
 
 			// Don't continue if the material below us isn't in the source blocks or is null
 			LocalMaterialData below = world.getMaterial(x, y - 1, z, chunkBeingPopulated);
 			if (below == null || !this.sourceBlocks.contains(below))
 			{
 				return;
+			}
+
+			// Search upwards for the max height that it can place bamboo
+			for (int y1 = 0; y1 < height; y1++)
+			{
+				if (!world.getMaterial(x, y + y1, z, chunkBeingPopulated).isAir()) {
+					height = y1;
+					break;
+				}
 			}
 
 			// Place podzol around bamboo bottom with chance
@@ -66,7 +76,10 @@ public class BambooGen extends Resource
 						{
 							int topY = world.getHighestBlockAboveYAt(x + x1, z + z1, chunkBeingPopulated);
 
-							world.setBlock(x + x1, topY - 1, z + z1, LocalMaterials.PODZOL, null, chunkBeingPopulated, false);
+							if (this.sourceBlocks.contains(world.getMaterial(x + x1, topY - 1, z + z1, chunkBeingPopulated)))
+							{
+								world.setBlock(x + x1, topY - 1, z + z1, LocalMaterials.PODZOL, null, chunkBeingPopulated, false);
+							}
 						}
 					}
 				}
