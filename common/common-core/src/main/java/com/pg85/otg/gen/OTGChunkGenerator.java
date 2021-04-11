@@ -503,6 +503,7 @@ public class OTGChunkGenerator
 
 								IBiomeConfig biomeConfig = biomes[localX * 16 + localZ];
 
+								// TODO: make this bigger and look better
 								// Iterate through structures to add density
 								int structureX;
 								int structureY;
@@ -551,6 +552,7 @@ public class OTGChunkGenerator
 
 	public void carve(ChunkBuffer chunk, long seed, int chunkX, int chunkZ, BitSet carvingMask)
 	{
+		// TODO: it should be possible to cache these carver graphs to make larger carvers more efficient and easier to use
 
 		Random random = new Random();
 		for (int localChunkX = chunkX - 8; localChunkX <= chunkX + 8; ++localChunkX)

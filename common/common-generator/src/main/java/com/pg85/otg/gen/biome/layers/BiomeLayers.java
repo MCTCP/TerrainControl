@@ -59,7 +59,7 @@ public class BiomeLayers
 		return 
 			(sample & BiomeLayers.LAND_BIT) != 0 ? 
 			(sample & BiomeLayers.BIOME_BITS) : 
-			0; // 0 Is the default ocean id
+			0; // 0 should be the default ocean biome otg id, set by the presetloader.
 	}
 
 	private static <T extends LayerSampler, C extends LayerSampleContext<T>> LayerFactory<T> build(BiomeLayerData data, LongFunction<C> contextProvider, ILogger logger)
@@ -196,7 +196,7 @@ public class BiomeLayers
 		                }
 		            }
 	                factory = new BiomeBorderLayer(bordersAtCurrentDepth).create(contextProvider.apply(depth), factory);               
-	            }            
+	            }
 			}
 
 			// Add ocean biomes. This only adds the regular ocean at the moment, soon it will add others.

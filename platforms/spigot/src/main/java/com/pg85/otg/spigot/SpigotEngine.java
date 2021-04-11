@@ -76,7 +76,6 @@ public class SpigotEngine extends OTGEngine
 		catch(IllegalArgumentException ex)
 		{
 			// Can happen when input is invalid.
-			return;
 		}
 		
 		if(location != null)

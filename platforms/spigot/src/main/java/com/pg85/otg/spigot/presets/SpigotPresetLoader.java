@@ -58,7 +58,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 			int[] oceanTemperatures = new int[]{0, 0, 0, 0};
 
 			List<BiomeConfig> biomeConfigs = preset.getAllBiomeConfigs();
-			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size() + 1]; // +1 for default ocean biome, which is registered twice.
+			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size()];
 			Object2IntMap<BiomeConfig> presetReverseIdMapping = new Object2IntArrayMap<>();
 
 			Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
@@ -75,25 +75,24 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				// no biome assigned, which can happen due to biome group rarity.
 				if (biomeConfig.getName().equals(worldConfig.getDefaultOceanBiome()))
 				{
-					// TODO: Can't map the same biome to 2 int keys for the reverse map
-					// make sure this doesn't cause problems :/.
 					oceanBiomeConfig = biomeConfig;
-					presetIdMapping[0] = biomeConfig;
 					isOceanBiome = true;
 				}
+				
+				int otgBiomeId = isOceanBiome ? 0 : currentId;
 
 				// Ocean temperature mappings. Probably a better way to do this?
 				if (biomeConfig.getName().equals(worldConfig.getDefaultWarmOceanBiome())) {
-					oceanTemperatures[0] = currentId;
+					oceanTemperatures[0] = otgBiomeId;
 				}
 				if (biomeConfig.getName().equals(worldConfig.getDefaultLukewarmOceanBiome())) {
-					oceanTemperatures[1] = currentId;
+					oceanTemperatures[1] = otgBiomeId;
 				}
 				if (biomeConfig.getName().equals(worldConfig.getDefaultColdOceanBiome())) {
-					oceanTemperatures[2] = currentId;
+					oceanTemperatures[2] = otgBiomeId;
 				}
 				if (biomeConfig.getName().equals(worldConfig.getDefaultFrozenOceanBiome())) {
-					oceanTemperatures[3] = currentId;
+					oceanTemperatures[3] = otgBiomeId;
 				}
 
 				BiomeBase biome = SpigotBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
@@ -111,10 +110,10 @@ public class SpigotPresetLoader extends LocalPresetLoader
 
 				presetBiomes.add(ResourceKey.a(BIOME_KEY, resourceLocation));
 
-				presetIdMapping[currentId] = biomeConfig;
-				presetReverseIdMapping.put(biomeConfig, currentId);
+				presetIdMapping[otgBiomeId] = biomeConfig;
+				presetReverseIdMapping.put(biomeConfig, otgBiomeId);
 
-				worldBiomes.put(biomeConfig.getName(), currentId);
+				worldBiomes.put(biomeConfig.getName(), otgBiomeId);
 
 				// Make a list of isle and border biomes per generation depth
 				if (biomeConfig.isIsleBiome())
@@ -123,7 +122,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					List<NewBiomeData> biomesAtDepth = isleBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(), new ArrayList<>());
 					biomesAtDepth.add(
 							new NewBiomeData(
-									currentId,
+									otgBiomeId,
 									biomeConfig.getName(),
 									worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeRarity() : biomeConfig.getBiomeRarityWhenIsle(),
 									worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenIsle(),
@@ -143,7 +142,7 @@ public class SpigotPresetLoader extends LocalPresetLoader
 					List<NewBiomeData> biomesAtDepth = borderBiomesAtDepth.getOrDefault(worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(), new ArrayList<>());
 					biomesAtDepth.add(
 							new NewBiomeData(
-									currentId,
+									otgBiomeId,
 									biomeConfig.getName(),
 									biomeConfig.getBiomeRarity(),
 									worldConfig.getBiomeMode() == SettingsEnums.BiomeMode.BeforeGroups ? biomeConfig.getBiomeSize() : biomeConfig.getBiomeSizeWhenBorder(),
@@ -158,11 +157,11 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				}
 
 				// Index BiomeColor for FromImageMode and /otg map
-				biomeColorMap.put(biomeConfig.getBiomeColor(), currentId);
+				biomeColorMap.put(biomeConfig.getBiomeColor(), otgBiomeId);
 
-				OTG.log(LogMarker.DEBUG, "Registered biome " + biomeConfig.getName() + " with OTG id " + currentId);
+				OTG.log(LogMarker.DEBUG, "Registered biome " + biomeConfig.getName() + " with OTG id " + otgBiomeId);
 
-				currentId++;
+				currentId += isOceanBiome ? 0 : 1;
 			}
 
 			// If the ocean config is null, shift the array downwards to fill id 0
