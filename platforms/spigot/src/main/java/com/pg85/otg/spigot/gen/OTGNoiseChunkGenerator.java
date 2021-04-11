@@ -174,24 +174,17 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		IChunkAccess cachedChunk = unloadedChunksCache.get(chunkCoord);
 		if (cachedChunk != null)
 		{
-			try {
-				// TODO: reflection will be slow, look into alternatives
-				CraftChunkData data = (CraftChunkData) chunk;
-				Method setBlock = data.getClass().getDeclaredMethod("setBlock", int.class, int.class, int.class, IBlockData.class);
-				setBlock.setAccessible(true);
+			CraftChunkData data = (CraftChunkData) chunk;
 
-				// TODO: Find some way to clone/swap chunk data efficiently :/
-				for (int x = 0; x < ChunkCoordinate.CHUNK_SIZE; x++) {
-					for (int z = 0; z < ChunkCoordinate.CHUNK_SIZE; z++) {
-						int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
-						for (int y = 0; y <= endY; y++) {
-							BlockPosition pos = new BlockPosition(x, y, z);
-							setBlock.invoke(data, x, y, z, cachedChunk.getType(pos));
-						}
+			// TODO: Find some way to clone/swap chunk data efficiently :/
+			for (int x = 0; x < ChunkCoordinate.CHUNK_SIZE; x++) {
+				for (int z = 0; z < ChunkCoordinate.CHUNK_SIZE; z++) {
+					int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
+					for (int y = 0; y <= endY; y++) {
+						BlockPosition pos = new BlockPosition(x, y, z);
+						data.setRegion(x, y, z, x + 1, y + 1, z + 1, cachedChunk.getType(pos));
 					}
 				}
-			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
 			}
 
 			this.unloadedChunksCache.remove(chunkCoord);
