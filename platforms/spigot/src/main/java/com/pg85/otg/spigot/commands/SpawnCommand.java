@@ -1,5 +1,7 @@
 package com.pg85.otg.spigot.commands;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObject;
 import com.pg85.otg.presets.Preset;
@@ -13,59 +15,46 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.entity.Player;
 import org.bukkit.util.BlockIterator;
+import org.bukkit.util.StringUtil;
 
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class SpawnCommand
 {
-	public static boolean execute(CommandSender sender, String[] strings)
+	public static boolean execute(CommandSender sender, HashMap<String, String> strings)
 	{
-		// /otg spawn BOTest : fence
-		//TODO: need Tab Completion, and I don't like requiring a : separator. Still, it's way cleaner code
-		// than if we were to deal with the spaces some other way. It's either this, or require "" for names with spaces.
-
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("Only players can execute this command");
 			return true;
 		}
 		Player player = (Player) sender;
-		if (!(player.getWorld().getGenerator() instanceof OTGSpigotChunkGen)) {
-			sender.sendMessage("Can only run this command in an OTG world");
-			return true;
-		}
-		String input = StringUtils.join(strings, ' ');
-		String[] split = input.split(":");
-		if (split.length != 2) {
-			sender.sendMessage("Spawn requires two parameters, separated by ':'. Ex: 'preset name:object name'");
-			return true;
-		}
-		String presetName = split[0].trim();
-		String objectName = split[1].trim();
 
-		CustomObject objectToSpawn = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
-			objectName,
-			presetName,
-			OTG.getEngine().getOTGRootFolder(),
-			false,
-			OTG.getEngine().getLogger(),
-			OTG.getEngine().getCustomObjectManager(),
-			OTG.getEngine().getMaterialReader(),
-			OTG.getEngine().getCustomObjectResourcesManager(),
-			OTG.getEngine().getModLoadedChecker());
+		String presetName = strings.get("1");
+		String objectName = strings.get("2");
+
+		if (presetName == null || objectName == null)
+		{
+			sender.sendMessage("Please specify a preset and an object");
+			return true;
+		}
+
+		CustomObject objectToSpawn = getObject(objectName, presetName);
 
 		if (objectToSpawn == null)
 		{
 			sender.sendMessage("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects");
 			return true;
 		}
+
 		Block block = getWatchedBlock(player, false);
 		Preset p = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
 
 		if (objectToSpawn.spawnForced(
-			((OTGSpigotChunkGen) player.getWorld().getGenerator()).generator.getStructureCache(),
+			null,
 			new SpigotWorldGenRegion(p.getName(), p.getWorldConfig(), ((CraftWorld) player.getWorld()).getHandle(),
-				((OTGSpigotChunkGen) player.getWorld().getGenerator()).generator),
+				((CraftWorld) player.getWorld()).getHandle().getChunkProvider().getChunkGenerator()),
 			new Random(),
 			Rotation.NORTH,
 			block.getX(),
@@ -107,5 +96,22 @@ public class SpawnCommand
 		}
 
 		return null;
+	}
+	public static CustomObject getObject(String objectName, String presetName)
+	{
+		if (presetName.equalsIgnoreCase("global"))
+		{
+			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetName();
+		}
+		return OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
+			objectName,
+			presetName,
+			OTG.getEngine().getOTGRootFolder(),
+			false,
+			OTG.getEngine().getLogger(),
+			OTG.getEngine().getCustomObjectManager(),
+			OTG.getEngine().getMaterialReader(),
+			OTG.getEngine().getCustomObjectResourcesManager(),
+			OTG.getEngine().getModLoadedChecker());
 	}
 }

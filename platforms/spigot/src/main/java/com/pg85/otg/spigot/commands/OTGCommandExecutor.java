@@ -1,5 +1,9 @@
 package com.pg85.otg.spigot.commands;
 
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.pg85.otg.OTG;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,16 +20,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 {
-	public static List<String> COMMANDS = new ArrayList<>(Arrays.asList("data", "map", "help"));
+	public static List<String> COMMANDS = new ArrayList<>(Arrays.asList("data", "map", "help", "spawn", "export", "edit", "finishedit", "region"));
 
 	@Override
 	public boolean onCommand (CommandSender sender, Command command, String s, String[] strings)
 	{
 		String cmd;
+		String[] args = strings.length >= 2 ? Arrays.copyOfRange(strings, 1, strings.length) : new String[0];
+
 		if (strings.length >= 1)
 			cmd = strings[0].toLowerCase();
 		else
@@ -37,7 +44,15 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 			case "map":
 				return mapBiomes(sender, strings);
 			case "spawn":
-				return SpawnCommand.execute(sender, Arrays.copyOfRange(strings, 1, strings.length));
+				return SpawnCommand.execute(sender, parseArgs(strings));
+			case "export":
+				return ExportCommand.execute(sender, args);
+			case "edit":
+				return EditCommand.execute(sender, args);
+			case "finishedit":
+				return EditCommand.finish(sender);
+			case "region":
+				return ExportCommand.region(sender, args);
 			case "help":
 			default:
 				return helpMessage(sender);
@@ -132,10 +147,78 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 		{
 			case "data":
 				return DataCommand.tabComplete(strings);
+			case "export":
+				return ExportCommand.tabCompleteExport(parseArgs(strings));
+			case "edit":
+				return EditCommand.tabComplete(parseArgs(strings), true);
+			case "region":
+				return ExportCommand.tabCompleteRegion(strings);
+			case "spawn":
+				return EditCommand.tabComplete(parseArgs(strings), false);
+			case "finishedit":
 			case "map":
 			case "help":
 				return new ArrayList<>();
 		}
 		return new ArrayList<>();
+	}
+
+	/** This method takes a list of strings from spigot and turns it into a map of arguments
+	 *  - Normal arguments are mapped to their index as a string, i.e. "1": "biome bundle"
+	 *  - Flags with one - are mapped as key to an empty string, to signify they're set, i.e. "-o": ""
+	 *  - Flags with two -- are mapped as key to the subsequent argument, i.e. "--file": "test.bo3"
+	 *
+	 * 	This method also reads quoted strings as one string, without the quotes
+	 *
+	 * @param strings The command args
+	 * @return The args, mapped by index or flag
+	 */
+	private HashMap<String, String> parseArgs(String[] strings)
+	{
+		HashMap<String, String> argsMap = new HashMap<>();
+		String input = String.join(" ", strings);
+		long count = input.chars().filter(c -> c == '"').count();
+		StringReader reader = new StringReader(input);
+		String str;
+		int index = 1;
+		try
+		{
+			reader.readString(); // Remove sub-command
+			while (reader.getCursor() < input.length())
+			{
+				if (reader.peek() == ' ') reader.skip();
+				if (count % 2 == 1 && reader.peek() == '"')
+				{ // Non-ended quote, gotta just get the remainder
+					str = reader.getRemaining();
+					reader.setCursor(reader.getTotalLength());
+				} else {
+					str = reader.readString();
+				}
+
+				if (str.matches("-[a-z0-9]+")) // if str is a single line flag
+				{
+					argsMap.put(str, "");
+					continue;
+				}
+
+				if (str.matches("--[a-z0-9]+")) // if str is a double line flag, means it has a payload
+				{
+					if (reader.canRead())
+					{
+						argsMap.put(str, reader.readString());
+					}
+					continue;
+				}
+
+				argsMap.put((index++) + "", str);
+			}
+		}
+		catch (CommandSyntaxException e)
+		{
+			OTG.log(LogMarker.ERROR, "Command syntax error");
+			e.printStackTrace();
+		}
+
+		return argsMap;
 	}
 }

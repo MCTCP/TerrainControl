@@ -29,19 +29,7 @@ public class SpawnCommand
 				return 0;
 			}
 
-			Preset preset;
-			if (presetName.equalsIgnoreCase("global"))
-			{
-				preset = OTG.getEngine().getPresetLoader().getPresetByName(OTG.getEngine().getPresetLoader().getDefaultPresetName());
-			}
-			else {
-				preset = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
-				if (preset == null)
-				{
-					source.sendFeedback(new StringTextComponent("Could not find preset "+presetName), false);
-					return 0;
-				}
-			}
+			Preset preset = ExportCommand.getPreset(presetName);
 
 			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(), source.getWorld(),
 				source.getWorld().getChunkProvider().getChunkGenerator());

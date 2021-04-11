@@ -343,14 +343,14 @@ public class ForgeMaterialData extends LocalMaterialData
 					}
 				}
 			}
-			if (state.hasProperty(FourWayBlock.EAST)) // fence or glass pane
+			if (state.hasProperty(SixWayBlock.EAST)) // fence or glass pane
 			{
 				// Cache the east value, before it's overwritten by the rotated south value
-				boolean hasEast = state.get(FourWayBlock.EAST);
-				state = state.with(FourWayBlock.EAST, state.get(FourWayBlock.SOUTH));
-				state = state.with(FourWayBlock.SOUTH, state.get(FourWayBlock.WEST));
-				state = state.with(FourWayBlock.WEST, state.get(FourWayBlock.NORTH));
-				state = state.with(FourWayBlock.NORTH, hasEast);
+				boolean hasEast = state.get(SixWayBlock.EAST);
+				state = state.with(SixWayBlock.EAST, state.get(SixWayBlock.SOUTH));
+				state = state.with(SixWayBlock.SOUTH, state.get(SixWayBlock.WEST));
+				state = state.with(SixWayBlock.WEST, state.get(SixWayBlock.NORTH));
+				state = state.with(SixWayBlock.NORTH, hasEast);
 			}
 			// Block is rotated, store a pointer to it
 			this.rotated = ForgeMaterialData.ofMinecraftBlockState(state);

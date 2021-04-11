@@ -41,14 +41,14 @@ public class EditCommand
 		try {
 			String presetName = context.getArgument("preset", String.class);
 			String objectName = "";
-			boolean immediate = false, doFixing = false;
+			boolean immediate = false, doFixing = true;
 
 			try
 			{
 				objectName = context.getArgument("object", String.class);
 				String flags = context.getArgument("flags", String.class);
 				immediate = flags.contains("-update");
-				doFixing = flags.contains("-nofix");
+				doFixing = !flags.contains("-nofix");
 			}
 			catch (IllegalArgumentException ignored) {}
 
