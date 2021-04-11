@@ -503,6 +503,7 @@ public class OTGChunkGenerator
 
 								IBiomeConfig biomeConfig = biomes[localX * 16 + localZ];
 
+								// TODO: make this bigger and look better
 								// Iterate through structures to add density
 								int structureX;
 								int structureY;

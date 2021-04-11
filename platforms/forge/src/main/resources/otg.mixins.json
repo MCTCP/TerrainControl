@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "otg.refmap.json",
   "mixins": [
-    "MixinLocateCommand"
+    "MixinLocateCommand",
+    "MixinSpawnLocationHelper"
   ],
   "injectors": {
     "defaultRequire": 1
