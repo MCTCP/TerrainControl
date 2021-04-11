@@ -533,8 +533,17 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
 			}
 
-			this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);
-			if (nbt != null) this.attachNBT(x, y, z, nbt, worldGenRegion.getBlockState(new BlockPos(x, y, z)));
+			BlockPos pos = new BlockPos(x, y, z);
+			this.worldGenRegion.setBlockState(pos, ((ForgeMaterialData)material).internalBlock(), 2 | 16);
+
+			if (material.isLiquid()) {
+				this.worldGenRegion.getPendingFluidTicks().scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getFluid(), 0);
+			}
+
+			if (nbt != null)
+			{
+				this.attachNBT(x, y, z, nbt, worldGenRegion.getBlockState(pos));
+			}
 		}
 	}
 
@@ -544,23 +553,6 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		nms.put("x", IntNBT.valueOf(x));
 		nms.put("y", IntNBT.valueOf(y));
 		nms.put("z", IntNBT.valueOf(z));
-
-		//DataFixerBuilder builder = new DataFixerBuilder(SharedConstants.getVersion().getWorldVersion());
-		//Schema schema = builder.addSchema(0, );
-		//TileEntityType
-		//DataFixerUpper dfix = (DataFixerUpper) DataFixesManager.getDataFixer();
-//
-		//Dynamic<INBT> d = dfix.update(TypeReferences.BLOCK_ENTITY,
-		//	new Dynamic<INBT>(NBTDynamicOps.INSTANCE),
-		//	512,
-		//	1343 // 1.12.2
-		//	);
-//
-//
-		//d = dfix.update(TypeReferences.BLOCK_ENTITY,
-		//	new Dynamic<INBT>(NBTDynamicOps.INSTANCE),
-		//	1343, // 1.12.2
-		//	SharedConstants.getVersion().getWorldVersion());
 
 		TileEntity tileEntity = this.worldGenRegion.getTileEntity(new BlockPos(x, y, z));
 		if (tileEntity != null)

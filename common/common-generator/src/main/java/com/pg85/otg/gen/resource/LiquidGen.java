@@ -139,7 +139,6 @@ public class LiquidGen extends Resource
         if ((sourceCount == 3) && (airCount == 1))
         {
         	worldGenregion.setBlock(x, y, z, material, null, chunkBeingPopulated, false);
-        	// TODO: we should to schedule a fluid tick here
         }
     }
 }

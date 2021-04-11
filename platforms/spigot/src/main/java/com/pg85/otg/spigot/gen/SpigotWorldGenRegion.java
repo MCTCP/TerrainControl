@@ -1,5 +1,6 @@
 package com.pg85.otg.spigot.gen;
 
+import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
@@ -8,6 +9,7 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.spigot.biome.OTGBiomeProvider;
 import com.pg85.otg.spigot.biome.SpigotBiome;
 import com.pg85.otg.spigot.materials.SpigotMaterialData;
+import com.pg85.otg.spigot.util.SpigotNBTHelper;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
@@ -19,6 +21,7 @@ import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.block.BlockState;
 
 import java.util.Optional;
 import java.util.Random;
@@ -450,7 +453,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
+	public void setBlock (int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
 	{
 		if (y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
@@ -483,7 +486,43 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 				}
 				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
 			}
-			this.worldGenRegion.setTypeAndData(new BlockPosition(x, y, z), ((SpigotMaterialData) material).internalBlock(), 2 | 16);
+
+			BlockPosition pos = new BlockPosition(x, y, z);
+			this.worldGenRegion.setTypeAndData(pos, ((SpigotMaterialData) material).internalBlock(), 2 | 16);
+
+			if (material.isLiquid())
+			{
+				this.worldGenRegion.getFluidTickList().a(pos, ((SpigotMaterialData)material).internalBlock().getFluid().getType(), 0);
+			}
+
+			if (nbt != null)
+			{
+				this.attachNBT(x, y, z, nbt, worldGenRegion.getType(pos));
+			}
+		}
+	}
+
+	private void attachNBT(int x, int y, int z, NamedBinaryTag nbt, IBlockData state)
+	{
+		NBTTagCompound nms = SpigotNBTHelper.getNMSFromNBTTagCompound(nbt);
+		nms.set("x", NBTTagInt.a(x));
+		nms.set("y", NBTTagInt.a(y));
+		nms.set("z", NBTTagInt.a(z));
+
+		TileEntity tileEntity = this.worldGenRegion.getTileEntity(new BlockPosition(x, y, z));
+		if (tileEntity != null)
+		{
+			try {
+				tileEntity.load(state, nms);
+			} catch (JsonSyntaxException e)
+			{
+				OTG.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
+			}
+		} else {
+			if(OTG.getEngine().getPluginConfig().getSpawnLogEnabled())
+			{
+				OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
+			}
 		}
 	}
 
