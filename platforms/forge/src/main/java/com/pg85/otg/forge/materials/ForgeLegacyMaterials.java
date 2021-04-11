@@ -145,9 +145,8 @@ class ForgeLegacyMaterials
 			case "jungle_stairs":
 				return Blocks.JUNGLE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
 			case "cobblestone_stairs":
-				return Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
 			case "stone_stairs":
-				return Blocks.STONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+				return Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
 			case "brick_stairs":
 				return Blocks.BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
 			case "nether_brick_stairs":
@@ -165,10 +164,8 @@ class ForgeLegacyMaterials
 			case "purpur_stairs":
 				return Blocks.PURPUR_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
 			case "stone_brick_stairs":
-				return Blocks.COBBLESTONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
-			// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
 			case "smooth_stairs":
-				return Blocks.STONE_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
+				return Blocks.STONE_BRICK_STAIRS.getDefaultState().with(StairsBlock.FACING, Direction.EAST);
 				
 			case "yellow_flower":
 				return Blocks.DANDELION.getDefaultState();
@@ -1030,6 +1027,7 @@ class ForgeLegacyMaterials
 					return Blocks.STONE_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
 				case "wooden_pressure_plate":
 				case "wood_plate":
+				case "oak_pressure_plate":
 					return Blocks.OAK_PRESSURE_PLATE.getDefaultState().with(PressurePlateBlock.POWERED, getBit(data, 0) == 1);
 				case "light_weighted_pressure_plate":
 					return Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE.getDefaultState().with(WeightedPressurePlateBlock.POWER, data);
@@ -1047,10 +1045,13 @@ class ForgeLegacyMaterials
 				case "crops":
 					return Blocks.WHEAT.getDefaultState().with(CropsBlock.AGE, data);
 				case "carrot":
+				case "carrots":
 					return Blocks.CARROTS.getDefaultState().with(CarrotBlock.AGE, data);
 				case "potato":
+				case "potatoes":
 					return Blocks.POTATOES.getDefaultState().with(PotatoBlock.AGE, data);
 				case "beetroot":
+				case "beetroots":
 					return Blocks.BEETROOTS.getDefaultState().with(BeetrootBlock.BEETROOT_AGE, data);
 				case "farmland":
 				case "soil":
@@ -1128,6 +1129,7 @@ class ForgeLegacyMaterials
 					return getLeverOrButtonWithData(1, data);
 				case "wood_button":
 				case "wooden_button":
+				case "oak_button":
 					return getLeverOrButtonWithData(2, data);
 				case "wooden_door":
 				case "oak_door":
@@ -1144,12 +1146,13 @@ class ForgeLegacyMaterials
 				case "acacia_door":
 					return getDoorWithData(5, data);
 				case "dark_oak_door":
-					return getDoorWithData(6, data);			
+					return getDoorWithData(6, data);
+				case "oak_sign":
 				case "sign_post":
 				case "sign": // TODO: This will also pick up wall signs
 					return getSignPostWithData(data);
 				case "standing_banner":
-					return Blocks.BLACK_BANNER.getDefaultState().with(BannerBlock.ROTATION, data);
+					return Blocks.WHITE_BANNER.getDefaultState().with(BannerBlock.ROTATION, data);
 				case "wall_banner":
 					return Blocks.WHITE_WALL_BANNER.getDefaultState().with(WallBannerBlock.HORIZONTAL_FACING, getFacingNorthSouthWestEast(data));
 				case "end_rod":
@@ -1213,6 +1216,7 @@ class ForgeLegacyMaterials
 				case "burning_furnace":
 					return getLadderChestOrFurnaceWithData(5, data);				
 				case "wall_sign":
+				case "oak_wall_sign":
 					return getWallSignWithData(data);			
 				case "observer":
 					return getObserverWithData(data);
@@ -1229,14 +1233,17 @@ class ForgeLegacyMaterials
 					// TODO: Hopefully this auto-updates to ATTACHED_MELON_STEM when placed next to a melon block..
 					return Blocks.MELON_STEM.getDefaultState().with(StemBlock.AGE, data);
 				case "carved_pumpkin":
+				case "pumpkin":
 					return getJackOLanternOrPumpkinWithData(0, data);
 				case "jack_o_lantern":
 				case "lit_pumpkin":
 					return getJackOLanternOrPumpkinWithData(1, data);
 				case "diode_block_off":
 				case "repeater":
+				case "unpowered_repeater":
 					return getRepeaterWithData(0, data);
 				case "diode_block_on":
+				case "powered_repeater":
 					return getRepeaterWithData(1, data);
 				case "redstone":
 				case "redstone_wire":
@@ -1273,6 +1280,7 @@ class ForgeLegacyMaterials
 				case "vine":
 					return getVineWithData(data);				
 				case "fence_gate":
+				case "oak_fence_gate":
 					return getFenceGateWithData(0, data);
 				case "spruce_fence_gate":
 					return getFenceGateWithData(1, data);
@@ -1297,9 +1305,9 @@ class ForgeLegacyMaterials
 					return Blocks.NETHER_WART.getDefaultState().with(NetherWartBlock.AGE, data);
 				case "brewing_stand":
 					return Blocks.BREWING_STAND.getDefaultState()
-						.with(BrewingStandBlock.HAS_BOTTLE[0], Boolean.valueOf(getBit(data, 0) == 1))
-						.with(BrewingStandBlock.HAS_BOTTLE[1], Boolean.valueOf(getBit(data, 1) == 1))
-						.with(BrewingStandBlock.HAS_BOTTLE[2], Boolean.valueOf(getBit(data, 2) == 1))
+						.with(BrewingStandBlock.HAS_BOTTLE[0], getBit(data, 0) == 1)
+						.with(BrewingStandBlock.HAS_BOTTLE[1], getBit(data, 1) == 1)
+						.with(BrewingStandBlock.HAS_BOTTLE[2], getBit(data, 2) == 1)
 					;
 				case "cauldron":
 					return Blocks.CAULDRON.getDefaultState().with(CauldronBlock.LEVEL, data);
@@ -1385,15 +1393,20 @@ class ForgeLegacyMaterials
 		int material = getBits(data, 0, 2);
 		int orientation = getBits(data, 2, 2);
 		Direction.Axis axisDirection = orientation == 0 ? Direction.Axis.Y : orientation == 1 ? Direction.Axis.X : orientation == 2 ? Direction.Axis.Z : Direction.Axis.Y;
+		boolean bark = orientation == 3;
 		switch(material)
 		{
 			case 0:
+				if (bark) return Blocks.OAK_WOOD.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 				return Blocks.OAK_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 			case 1:
+				if (bark) return Blocks.SPRUCE_WOOD.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 				return Blocks.SPRUCE_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 			case 2:
+				if (bark) return Blocks.BIRCH_WOOD.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 				return Blocks.BIRCH_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 			case 3:
+				if (bark) return Blocks.JUNGLE_WOOD.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 				return Blocks.JUNGLE_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 			default:
 				return Blocks.OAK_LOG.getDefaultState();
@@ -1404,12 +1417,15 @@ class ForgeLegacyMaterials
 	{
 		int material = getBits(data, 0, 2);
 		int orientation = getBits(data, 2, 2);
-		Direction.Axis axisDirection = orientation == 0 ? Direction.Axis.Y : orientation == 1 ? Direction.Axis.X : orientation == 2 ? Direction.Axis.Z : Direction.Axis.Y;		
+		Direction.Axis axisDirection = orientation == 0 ? Direction.Axis.Y : orientation == 1 ? Direction.Axis.X : orientation == 2 ? Direction.Axis.Z : Direction.Axis.Y;
+		boolean bark = orientation == 3;
 		switch(material)
 		{
 			case 0:
+				if (bark) return Blocks.ACACIA_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 				return Blocks.ACACIA_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 			case 1:
+				if (bark) return Blocks.DARK_OAK_WOOD.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 				return Blocks.DARK_OAK_LOG.getDefaultState().with(RotatedPillarBlock.AXIS, axisDirection);
 			default:
 				return Blocks.ACACIA_LOG.getDefaultState();
@@ -1450,9 +1466,9 @@ class ForgeLegacyMaterials
 					case 2:
 						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.WEST);
 					case 3:
-						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.SOUTH);
-					case 4:
 						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.NORTH);
+					case 4:
+						return Blocks.WALL_TORCH.getDefaultState().with(WallTorchBlock.HORIZONTAL_FACING, Direction.SOUTH);
 				}
 			case 1:
 				switch(data)
@@ -1460,15 +1476,15 @@ class ForgeLegacyMaterials
 					case 0:
 					case 5:
 					default:
-						return Blocks.TORCH.getDefaultState();
+						return Blocks.REDSTONE_TORCH.getDefaultState();
 					case 1:
 						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.EAST);						
 					case 2:
 						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.WEST);						
 					case 3:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);
 					case 4:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, false).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
 				}
 			case 2:
 				switch(data)
@@ -1482,9 +1498,9 @@ class ForgeLegacyMaterials
 					case 2:
 						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.WEST);						
 					case 3:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);
 					case 4:
-						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.NORTH);						
+						return Blocks.REDSTONE_WALL_TORCH.getDefaultState().with(RedstoneWallTorchBlock.REDSTONE_TORCH_LIT, true).with(RedstoneWallTorchBlock.FACING, Direction.SOUTH);
 				}				
 			default:
 				return null;

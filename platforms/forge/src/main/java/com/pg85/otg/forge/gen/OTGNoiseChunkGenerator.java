@@ -592,7 +592,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion).getWorldGenRegion().getWorld(), worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion).getInternal().getWorld(), worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 

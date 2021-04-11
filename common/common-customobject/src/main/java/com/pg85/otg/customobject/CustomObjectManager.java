@@ -112,8 +112,17 @@ public class CustomObjectManager implements ICustomObjectManager
     {
     	globalCustomObjects.addLoadedGlobalObject(object);
     }
-        
-    /**
+
+	/**
+	 *  Register a global object that has a file
+	 */
+	public void registerGlobalObject(CustomObject object, File file)
+	{
+		this.globalCustomObjects.addGlobalObjectFile(object.getName(), file);
+		registerGlobalObject(object);
+	}
+
+	/**
      * Gets all global objects.
      * @return The global objects.
      */

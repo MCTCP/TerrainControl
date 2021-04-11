@@ -2,10 +2,13 @@ package com.pg85.otg.forge.commands;
 
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.CustomObject;
+import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.forge.gen.ForgeWorldGenRegion;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.bo3.Rotation;
+import com.pg85.otg.util.gen.LocalWorldGenRegion;
 import net.minecraft.command.CommandSource;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
@@ -16,15 +19,69 @@ public class SpawnCommand
 {
 	public static int execute(CommandSource source, String presetName, String objectName, BlockPos blockPos)
 	{
-		// /otg spawn BOTest fence
-		// String presetName = "BOTest";
-		// String objectName = "fence";
-		if (!(source.getWorld().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator))
+		try
 		{
-			source.sendFeedback(new StringTextComponent("Can only run this command in an OTG world"), false);
-			return 0;
+			CustomObject objectToSpawn = getObject(objectName, presetName);
+
+			if (objectToSpawn == null)
+			{
+				source.sendFeedback(new StringTextComponent("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects"), false);
+				return 0;
+			}
+
+			Preset preset = ExportCommand.getPreset(presetName);
+
+			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(), source.getWorld(),
+				source.getWorld().getChunkProvider().getChunkGenerator());
+
+			CustomStructureCache cache =  source.getWorld().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator ?
+										  ((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()).getStructureCache() :
+										  null;
+
+			// Cache is only null in non-OTG worlds
+			if (cache == null && objectToSpawn.doReplaceBlocks())
+			{
+				source.sendFeedback(new StringTextComponent("Cannot spawn objects with DoReplaceBlocks in on-OTG worlds"), false);
+				return 0;
+			}
+
+			if (objectToSpawn.spawnForced(
+				cache,
+				region,
+				new Random(),
+				Rotation.NORTH,
+				blockPos.getX(),
+				blockPos.getY(),
+				blockPos.getZ()
+			))
+			{
+				source.sendFeedback(new StringTextComponent("Spawned object " + objectName + " at " + blockPos.toString()), false);
+			}
+			else
+			{
+				source.sendFeedback(new StringTextComponent("Failed to spawn object " + objectName + ". Is it a BO4?"), false);
+			}
 		}
-		CustomObject objectToSpawn = OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
+		catch (Exception e)
+		{
+			source.sendFeedback(new StringTextComponent("Something went wrong, please check logs"), false);
+			OTG.log(LogMarker.INFO, e.toString());
+			for (StackTraceElement s :
+				e.getStackTrace())
+			{
+				OTG.log(LogMarker.INFO, s.toString());
+			}
+		}
+		return 0;
+	}
+
+	public static CustomObject getObject(String objectName, String presetName)
+	{
+		if (presetName.equalsIgnoreCase("global"))
+		{
+			presetName = OTG.getEngine().getPresetLoader().getDefaultPresetName();
+		}
+		return OTG.getEngine().getCustomObjectManager().getGlobalObjects().getObjectByName(
 			objectName,
 			presetName,
 			OTG.getEngine().getOTGRootFolder(),
@@ -34,31 +91,5 @@ public class SpawnCommand
 			OTG.getEngine().getMaterialReader(),
 			OTG.getEngine().getCustomObjectResourcesManager(),
 			OTG.getEngine().getModLoadedChecker());
-
-		if (objectToSpawn == null)
-		{
-			source.sendFeedback(new StringTextComponent("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects"), false);
-			return 0;
-		}
-		Preset p = OTG.getEngine().getPresetLoader().getPresetByName(presetName);
-		if (objectToSpawn.spawnForced(
-			((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()).getStructureCache(),
-			new ForgeWorldGenRegion(p.getName(), p.getWorldConfig(), source.getWorld(),
-				(OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()),
-			new Random(),
-			Rotation.NORTH,
-			blockPos.getX(),
-			blockPos.getY(),
-			blockPos.getZ()
-		))
-		{
-			source.sendFeedback(new StringTextComponent("Spawned object " + objectName + " at " + blockPos.toString()), false);
-		}
-		else
-		{
-			source.sendFeedback(new StringTextComponent("Failed to spawn object " + objectName+". Is it a BO4?"), false);
-		}
-
-		return 0;
 	}
 }

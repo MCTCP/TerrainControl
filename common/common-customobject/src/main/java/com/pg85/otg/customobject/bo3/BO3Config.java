@@ -97,12 +97,8 @@ public class BO3Config extends CustomObjectConfigFile
 	BO3ModDataFunction[][] modDataFunctions = new BO3ModDataFunction[4][];
 	BO3EntityFunction[][] entityFunctions = new BO3EntityFunction[4][];
 
-	/**
+	/*
 	 * Creates a BO3Config from a file.
-	 *
-	 * @param reader       The settings of the BO3.
-	 * @param directory    The directory the BO3 is stored in.
-	 * @param otherObjects All other loaded objects by their name.
 	 */
 	protected BO3Config(SettingsReaderBO4 reader, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
@@ -110,10 +106,62 @@ public class BO3Config extends CustomObjectConfigFile
 		init(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
+	private BO3Config(SettingsReaderBO4 reader)
+	{
+		super(reader);
+	}
+
+	/**
+	 *
+	 * @return A clone BO3Config, used for templates in BO3Creator
+	 */
+	protected BO3Config cloneConfigValues(SettingsReaderBO4 newReader)
+	{
+		BO3Config clone = new BO3Config(newReader);
+		clone.author = author;
+		clone.doReplaceBlocks = doReplaceBlocks;
+		clone.description = description;
+		clone.settingsMode = settingsMode;
+		clone.tree = tree;
+		clone.frequency = frequency;
+		clone.rarity = rarity;
+		clone.rotateRandomly = rotateRandomly;
+		clone.spawnHeight = spawnHeight;
+
+		clone.spawnHeightOffset = spawnHeightOffset;
+		clone.spawnHeightVariance = spawnHeightVariance;
+
+		clone.extrudeMode = extrudeMode;
+		clone.extrudeThroughBlocks = extrudeThroughBlocks;
+
+		clone.minHeight = minHeight;
+		clone.maxHeight = maxHeight;
+		clone.excludedBiomes = excludedBiomes;
+		clone.sourceBlocks = sourceBlocks;
+		clone.maxPercentageOutsideSourceBlock = maxPercentageOutsideSourceBlock;
+		clone.outsideSourceBlock = outsideSourceBlock;
+		clone.maxBranchDepth = maxBranchDepth;
+
+		clone.bo3Checks[0] = this.bo3Checks[0].clone(); //new BO3Check[0];
+		clone.branches[0] = this.branches[0].clone(); //new BO3BranchFunction[0];
+		clone.boundingBoxes[0] = this.boundingBoxes[0].clone(); // BoundingBox.newEmptyBox();
+		clone.entityFunctions[0] = this.entityFunctions[0].clone(); // new BO3EntityFunction[0];
+		clone.particleFunctions[0] = this.particleFunctions[0].clone(); // new BO3ParticleFunction[0];
+		clone.modDataFunctions[0] = this.modDataFunctions[0].clone(); // new BO3ModDataFunction[0];
+		clone.spawnerFunctions[0] = this.spawnerFunctions[0].clone(); //new BO3SpawnerFunction[0];
+
+		return clone;
+	}
+
 	private void init(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker) throws InvalidConfigException
 	{
 		this.isOTGPlus = false;
+		// Init settings
 		readConfigSettings(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
+		// Read the resources
+		readResources(spawnLog, logger, materialReader, manager);
+
+		this.reader.flushCache();
 		rotateBlocksAndChecks(presetName, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 	}
 
@@ -187,7 +235,7 @@ public class BO3Config extends CustomObjectConfigFile
 		this.branches[0] = branches.toArray(new BO3BranchFunction[branches.size()]);
 	}
 
-	private void extractBlocks(List<BO3BlockFunction> tempBlocksList)
+	protected void extractBlocks(List<BO3BlockFunction> tempBlocksList)
 	{
 		this.blocksX = new byte[4][tempBlocksList.size()];
 		this.blocksY = new short[4][tempBlocksList.size()];
@@ -212,8 +260,8 @@ public class BO3Config extends CustomObjectConfigFile
 				this.blocksY[0][i] = (short) block.y;
 				this.blocksZ[0][i] = (byte) block.z;
 				this.blocksMaterial[0][i] = block.material;
-				this.blocksMetaDataName[i] = block.metaDataName;
-				this.blocksMetaDataTag[i] = block.metaDataTag;
+				this.blocksMetaDataName[i] = block.nbtName;
+				this.blocksMetaDataTag[i] = block.nbt;
 
 				if (block instanceof BO3RandomBlockFunction)
 				{
@@ -238,7 +286,7 @@ public class BO3Config extends CustomObjectConfigFile
 		return this.reader.getFile();
 	}
 
-	BO3BlockFunction[] getBlocks(int rotation)
+	public BO3BlockFunction[] getBlocks(int rotation)
 	{
 		BO3BlockFunction[] blocksOTGPlus = new BO3BlockFunction[this.blocksX[rotation].length];
 
@@ -261,8 +309,8 @@ public class BO3Config extends CustomObjectConfigFile
 			block.y = this.blocksY[rotation][i];
 			block.z = this.blocksZ[rotation][i];
 			block.material = this.blocksMaterial[rotation][i];
-			block.metaDataName = this.blocksMetaDataName[i];
-			block.metaDataTag = this.blocksMetaDataTag[i];
+			block.nbtName = this.blocksMetaDataName[i];
+			block.nbt = this.blocksMetaDataTag[i];
 
 			blocksOTGPlus[i] = block;
 		}
@@ -441,11 +489,6 @@ public class BO3Config extends CustomObjectConfigFile
 		this.maxPercentageOutsideSourceBlock = readSettings(BO3Settings.MAX_PERCENTAGE_OUTSIDE_SOURCE_BLOCK, spawnLog, logger, null, null);
 		this.outsideSourceBlock = readSettings(BO3Settings.OUTSIDE_SOURCE_BLOCK, spawnLog, logger, null, null);
 		this.doReplaceBlocks = readSettings(BO3Settings.DO_REPLACE_BLOCKS, spawnLog, logger, null, null);
-		
-		// Read the resources
-		readResources(spawnLog, logger, materialReader, manager);
-
-		this.reader.flushCache();
 	}
 
 	private void writeResources(SettingsWriterBO4 writer) throws IOException
@@ -484,8 +527,8 @@ public class BO3Config extends CustomObjectConfigFile
 			blockFunction.y = this.blocksY[0][i];
 			blockFunction.z = this.blocksZ[0][i];
 			blockFunction.material = this.blocksMaterial[0][i];
-			blockFunction.metaDataTag = this.blocksMetaDataTag[i];
-			blockFunction.metaDataName = this.blocksMetaDataName[i];
+			blockFunction.nbt = this.blocksMetaDataTag[i];
+			blockFunction.nbtName = this.blocksMetaDataName[i];
 
 			writer.function(blockFunction);
 		}
@@ -704,7 +747,7 @@ public class BO3Config extends CustomObjectConfigFile
 	/**
 	 * Rotates all the blocks and all the checks
 	 */
-	private void rotateBlocksAndChecks(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+	protected void rotateBlocksAndChecks(String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
 	{
 		for (int i = 1; i < 4; i++)
 		{

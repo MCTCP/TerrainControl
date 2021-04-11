@@ -31,7 +31,7 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
     @Override
     public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
-    	worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, true);
+    	worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingPopulated, true);
     }
     
     public BO4BlockFunction rotate(Rotation rotation)
@@ -62,8 +62,8 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
     		rotatedBlock.material = rotatedBlock.material.rotate(3);
     	}
 
-        rotatedBlock.metaDataTag = metaDataTag;
-        rotatedBlock.metaDataName = metaDataName;
+        rotatedBlock.nbt = nbt;
+        rotatedBlock.nbtName = nbtName;
 
         return rotatedBlock;
     }   
@@ -95,11 +95,11 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
         	stream.writeShort(-1);
         }
         bFound = false;
-        if(this.metaDataName != null)
+        if(this.nbtName != null)
         {
 	        for(int i = 0; i < metaDataNames.length; i++)
 	        {        	
-	        	if(metaDataNames[i].equals(this.metaDataName))
+	        	if(metaDataNames[i].equals(this.nbtName))
 	        	{
 	        		stream.writeShort(i);
 	        		bFound = true;
@@ -132,16 +132,16 @@ public class BO4BlockFunction extends BlockFunction<BO4Config>
     	short metaDataNameId = buffer.getShort();
     	if(metaDataNameId != -1)
     	{
-    		rbf.metaDataName = metaDataNames[metaDataNameId];
+    		rbf.nbtName = metaDataNames[metaDataNameId];
     	}
     	
-    	if(rbf.metaDataName != null)
+    	if(rbf.nbtName != null)
     	{
 	        // Get the file
-        	rbf.metaDataTag = BO3Loader.loadMetadata(rbf.metaDataName, file, spawnLog, logger);
-        	if(rbf.metaDataTag == null)
+        	rbf.nbt = BO3Loader.loadMetadata(rbf.nbtName, file, spawnLog, logger);
+        	if(rbf.nbt == null)
         	{
-        		rbf.metaDataName = null;
+        		rbf.nbtName = null;
         	}
         }
     	

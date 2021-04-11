@@ -7,6 +7,7 @@ import com.pg85.otg.forge.commands.OTGCommand;
 import com.pg85.otg.forge.gen.OTGNoiseChunkGenerator;
 import com.pg85.otg.forge.gen.OTGWorldType;
 import com.pg85.otg.forge.gui.OTGGui;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
@@ -38,7 +39,7 @@ public class OTGPlugin
 		// These are needed to let the game know about our chunk generator and biome provider. If they are not added, then the game will error and not save games properly.
 		Registry.register(Registry.BIOME_PROVIDER_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
 		Registry.register(Registry.CHUNK_GENERATOR_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
-		
+		RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
 		// Start OpenTerrainGenerator engine, loads all presets.
 		// moved to the registerBiomes method over mod load order concerns with presetpacker
 		//OTG.startEngine(new ForgeEngine());

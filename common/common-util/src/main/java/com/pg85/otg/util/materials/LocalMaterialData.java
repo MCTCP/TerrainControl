@@ -10,9 +10,7 @@ import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 /**
  * Represents one of Minecraft's materials. Also includes its data value.
  * Immutable.
- * 
- * @see OTGEngine#readMaterial(String)
- * @see OTGEngine#toLocalMaterialData(DefaultMaterial, int)
+ *
  */
 public abstract class LocalMaterialData
 {
@@ -20,9 +18,11 @@ public abstract class LocalMaterialData
 	protected boolean isBlank = false;
 	protected boolean checkedFallbacks = false;
 	protected boolean parsedDefaultMaterial = false;
+	protected LocalMaterialData[] rotations = new LocalMaterialData[] {this, null, null, null};
+	protected LocalMaterialData rotated = null;
 	   
     /**
-     * Gets the name of this material. If a {@link #toDefaultMaterial()
+     * Gets the name of this material. If a {#toDefaultMaterial()
      * DefaultMaterial is available,} that name is used, otherwise it's up to
      * the mod that provided this block to name it. Block data is appended to
      * the name, separated with a colon, like "WOOL:2".
@@ -40,8 +40,8 @@ public abstract class LocalMaterialData
 
     /**
      * Gets whether this material is solid. If there is a
-     * {@link #toDefaultMaterial() DefaultMaterial available}, this property is
-     * defined by {@link DefaultMaterial#isSolid()}. Otherwise, it's up to the
+     * { #toDefaultMaterial() DefaultMaterial available}, this property is
+     * defined by { DefaultMaterial#isSolid()}. Otherwise, it's up to the
      * mod that provided this block to say whether it's solid or not.
      * 
      * @return True if this material is solid, false otherwise.
@@ -184,7 +184,7 @@ public abstract class LocalMaterialData
     /**
      * Parses this material through the fallback system of the world if required.
      * 
-     * @param world The world this material will be parsed through, each world may have different fallbacks.
+     * @param replaceBlocks The replaceblocks matrix to use.
      * @return The parsed material
      */
     //public abstract LocalMaterialData parseForWorld(WorldConfig worldConfig);

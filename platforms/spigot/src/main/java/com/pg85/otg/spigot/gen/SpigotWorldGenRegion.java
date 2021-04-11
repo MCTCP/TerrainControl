@@ -26,13 +26,13 @@ import java.util.Random;
 public class SpigotWorldGenRegion extends LocalWorldGenRegion
 {
 	private final GeneratorAccessSeed worldGenRegion;
-	private final OTGNoiseChunkGenerator chunkGenerator;
+	private final ChunkGenerator chunkGenerator;
 
 	// 32x32 biomes cache for fast lookups during population
 	private IBiome[][] cachedBiomeConfigs;
 	private boolean cacheIsValid;
 
-	public SpigotWorldGenRegion (String name, IWorldConfig worldConfig, GeneratorAccessSeed world, OTGNoiseChunkGenerator otgNoiseChunkGenerator)
+	public SpigotWorldGenRegion (String name, IWorldConfig worldConfig, GeneratorAccessSeed world, ChunkGenerator otgNoiseChunkGenerator)
 	{
 		super(name, worldConfig);
 		worldGenRegion = world;
@@ -117,7 +117,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public double getBiomeBlocksNoiseValue (int xInWorld, int zInWorld)
 	{
-		return this.chunkGenerator.getBiomeBlocksNoiseValue(xInWorld, zInWorld);
+		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(xInWorld, zInWorld);
 	}
 
 	@Override
@@ -247,7 +247,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return this.chunkGenerator.getMaterialInUnloadedChunk(this, x, y, z);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this, x, y, z);
 			}
 		}
 
@@ -325,7 +325,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 			}
 		}
 
@@ -547,7 +547,23 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		return null;
 	}
 
-	public GeneratorAccessSeed getWorldGenRegion() {
-		return worldGenRegion;
+	public TileEntity getTileEntity(BlockPosition blockPos)
+	{
+		return worldGenRegion.getTileEntity(blockPos);
+	}
+
+	public IBlockData getBlockData(BlockPosition blockpos)
+	{
+		return worldGenRegion.getType(blockpos);
+	}
+
+	public GeneratorAccessSeed getInternal()
+	{
+		return this.worldGenRegion;
+	}
+
+	public void setBlockState(BlockPosition blockpos, IBlockData blockstate1, int i)
+	{
+		worldGenRegion.setTypeAndData(blockpos, blockstate1, i);
 	}
 }

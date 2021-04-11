@@ -7,38 +7,46 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
-import net.minecraft.server.v1_16_R3.*;
-
 import com.pg85.otg.util.materials.MaterialProperties;
 import com.pg85.otg.util.materials.MaterialProperty;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
+import java.util.Collection;
+import java.util.HashMap;
+
 public class SpigotMaterialData extends LocalMaterialData
 {
-	private final IBlockData blockData;
+	private static final LocalMaterialData blank;
 
-	private String name;
-
-	private SpigotMaterialData (IBlockData blockData)
+	static
 	{
-		this.blockData = blockData;
+		SpigotMaterialData data = new SpigotMaterialData(null, null);
+		data.isBlank = true;
+		blank = data;
 	}
 
-	private SpigotMaterialData (IBlockData blockData, String raw)
+	private static final HashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new HashMap<>();
+
+	private final IBlockData blockData;
+
+	private String name = null;
+
+	private SpigotMaterialData(IBlockData blockData, String raw)
 	{
 		if (blockData == null) this.isBlank = true;
 		this.blockData = blockData;
 		this.rawEntry = raw;
 	}
 
-	private SpigotMaterialData (String raw)
+
+	private static LocalMaterialData getBlank()
 	{
-		this.blockData = null;
-		this.rawEntry = raw;
+		return blank;
 	}
 
-	public static LocalMaterialData ofString (String input) throws InvalidConfigException
+	public static LocalMaterialData ofString(String input) throws InvalidConfigException
 	{
 		if (input == null || input.trim().isEmpty())
 		{
@@ -56,7 +64,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			return SpigotMaterialData.getBlank();
 		}
 
-		IBlockData blockState = null;
+		IBlockData blockState;
 		String blockNameCorrected = input.trim().toLowerCase();
 		// Try parsing as legacy block name / id
 		if (!blockNameCorrected.contains(":"))
@@ -71,7 +79,7 @@ public class SpigotMaterialData extends LocalMaterialData
 				// Deal with pesky accidental floats that parseInt won't recognize
 				if (blockNameCorrected.endsWith(".0"))
 				{
-					blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.length()-2);
+					blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.length() - 2);
 				}
 				int blockId = Integer.parseInt(blockNameCorrected);
 				String fromLegacyIdName = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
@@ -80,32 +88,29 @@ public class SpigotMaterialData extends LocalMaterialData
 					blockNameCorrected = fromLegacyIdName;
 				}
 			}
-			catch (NumberFormatException ignored)
-			{
-			}
+			catch (NumberFormatException ignored) { }
 		}
 
 		// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
 
 		// Use mc /setblock command logic to parse block string for us <3
-		ArgumentTile blockStateArgument = new ArgumentTile();
-		ArgumentTileLocation parseResult = null;
+		IBlockData blockdata = null;
 		try
 		{
 			String newInput = blockNameCorrected.contains(":") ? blockNameCorrected : "minecraft:" + blockNameCorrected;
-			parseResult = blockStateArgument.parse(new StringReader(newInput));
+			blockdata = new ArgumentBlock(new StringReader(newInput), true).a(true).getBlockData();
 		}
 		catch (CommandSyntaxException ignored)
 		{
 		}
-		if (parseResult != null)
+		if (blockdata != null)
 		{
 			// For leaves, add DISTANCE 1 to make them not decay.
-			if (parseResult.a().getMaterial().equals(Material.LEAVES))
+			if (blockdata.getMaterial().equals(Material.LEAVES))
 			{
-				return new SpigotMaterialData(parseResult.a().set(BlockLeaves.DISTANCE, 1), input);
+				return ofBlockData(blockdata.set(BlockLeaves.DISTANCE, 1), input);
 			}
-			return new SpigotMaterialData(parseResult.a(), input);
+			return ofBlockData(blockdata, input);
 		}
 
 		// Try legacy block with data (fe SAND:1 or 12:1)
@@ -117,10 +122,8 @@ public class SpigotMaterialData extends LocalMaterialData
 			{
 				int blockId = Integer.parseInt(blockNameOrId);
 				blockNameOrId = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
-			}
-			catch (NumberFormatException ignored)
-			{
-			}
+			} catch (NumberFormatException ignored) { }
+
 			try
 			{
 				int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
@@ -131,25 +134,20 @@ public class SpigotMaterialData extends LocalMaterialData
 				}
 				// Failed to parse data, remove. fe STONE:0 or STONE:1 -> STONE
 				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));
-			}
-			catch (NumberFormatException ignored)
-			{
-			}
+			} catch (NumberFormatException ignored) { }
 		}
 
 		// Try without data
-		Block block = null;
+		Block block;
 
 		// This returns AIR if block is not found ><. ----Does it for spigot too?
-		RegistryBlocks<Block> block_registry = IRegistry.BLOCK;
-		block = block_registry.get(new MinecraftKey(blockNameCorrected));
-		//block = ForgeRegistries.BLOCKS.getValue(new MinecraftKey(blockNameCorrected));
-		if (block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
+		block = IRegistry.BLOCK.get(new MinecraftKey(blockNameCorrected));
+		if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
 		{
 			// For leaves, add DISTANCE 1 to make them not decay.
 			if (block.getBlockData().getMaterial().equals(Material.LEAVES))
 			{
-				return new SpigotMaterialData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
+				return ofBlockData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
 			}
 			return ofBlockData(block.getBlockData(), input);
 		}
@@ -166,30 +164,27 @@ public class SpigotMaterialData extends LocalMaterialData
 		return ofBlockData(Blocks.NOTE_BLOCK.getBlockData(), input);
 	}
 
-	private static LocalMaterialData getBlank ()
+	public static LocalMaterialData ofBlockData(IBlockData blockData)
 	{
-		SpigotMaterialData material = new SpigotMaterialData(null, null);
-		material.isBlank = true;
-		return material;
+		return ofBlockData(blockData, null);
 	}
 
-	public static LocalMaterialData ofBlockData (IBlockData blockData)
+	public static LocalMaterialData ofBlockData(IBlockData blockData, String raw)
 	{
-		return new SpigotMaterialData(blockData, null);
+		if (stateToMaterialDataMap.containsKey(blockData))
+			return stateToMaterialDataMap.get(blockData);
+		LocalMaterialData data = new SpigotMaterialData(blockData, raw);
+		stateToMaterialDataMap.put(blockData, data);
+		return data;
 	}
 
-	public static LocalMaterialData ofBlockData (IBlockData blockData, String raw)
+	public static LocalMaterialData ofSpigotMaterial(org.bukkit.Material type)
 	{
-		return new SpigotMaterialData(blockData, raw);
-	}
-
-	public static LocalMaterialData ofSpigotMaterial (org.bukkit.Material type)
-	{
-		return new SpigotMaterialData(((CraftBlockData) type.createBlockData()).getState(), null);
+		return ofBlockData(((CraftBlockData) type.createBlockData()).getState(), null);
 	}
 
 	@Override
-	public String getName ()
+	public String getName()
 	{
 		if (this.name != null)
 			return this.name;
@@ -210,13 +205,15 @@ public class SpigotMaterialData extends LocalMaterialData
 		}
 		else
 		{
-			this.name = IRegistry.BLOCK.getKey(this.blockData.getBlock()).toString();
+			this.name = this.blockData.toString()
+				.replace("Block{", "")
+				.replace("}", "");
 		}
 		return this.name;
 	}
 
 	@Override
-	public boolean isLiquid ()
+	public boolean isLiquid()
 	{
 		return this.blockData != null
 			   && (this.blockData.getMaterial() == Material.WATER
@@ -224,53 +221,53 @@ public class SpigotMaterialData extends LocalMaterialData
 	}
 
 	@Override
-	public boolean isSolid ()
+	public boolean isSolid()
 	{
 		return this.blockData != null && this.blockData.getMaterial().isSolid();
 	}
 
 	@Override
-	public boolean isEmptyOrAir ()
+	public boolean isEmptyOrAir()
 	{
 		return this.blockData == null || this.blockData.getMaterial() == Material.AIR;
 	}
 
 	@Override
-	public boolean isAir ()
+	public boolean isAir()
 	{
 		return this.blockData != null && this.blockData.getMaterial() == Material.AIR;
 	}
 
 	@Override
-	public boolean isEmpty ()
+	public boolean isEmpty()
 	{
 		return this.blockData == null;
 	}
 
 	@Override
-	public boolean canSnowFallOn ()
+	public boolean canSnowFallOn()
 	{
 		return this.blockData != null && this.blockData.getMaterial().isSolid();
 	}
 
 	@Override
-	public boolean isMaterial (LocalMaterialData material)
+	public boolean isMaterial(LocalMaterialData material)
 	{
 		return (this.isBlank && ((SpigotMaterialData) material).isBlank) ||
 			   (
-					   !this.isBlank &&
-					   !((SpigotMaterialData) material).isBlank &&
-					   this.blockData.getMaterial() == ((SpigotMaterialData) material).blockData.getMaterial());
+				   !this.isBlank &&
+				   !((SpigotMaterialData) material).isBlank &&
+				   this.blockData.getBlock().r().equals(((SpigotMaterialData) material).blockData.getBlock().r()));
 	}
 
 	@Override
-	public LocalMaterialData withDefaultBlockData ()
+	public LocalMaterialData withDefaultBlockData()
 	{
 		if (this.blockData == null)
 		{
 			return this;
 		}
-		return new SpigotMaterialData(this.blockData.getBlock().getBlockData(), rawEntry);
+		return ofBlockData(this.blockData.getBlock().getBlockData(), rawEntry);
 	}
 
 	@Override
@@ -279,11 +276,16 @@ public class SpigotMaterialData extends LocalMaterialData
 		IBlockState<T> property = null;
 
 		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
-		if (materialProperty == MaterialProperties.AGE_0_25) {
+		if (materialProperty == MaterialProperties.AGE_0_25)
+		{
 			property = (IBlockState<T>) BlockProperties.ak;
-		} else if (materialProperty == MaterialProperties.PICKLES_1_4) {
+		}
+		else if (materialProperty == MaterialProperties.PICKLES_1_4)
+		{
 			property = (IBlockState<T>) BlockProperties.ay;
-		} else {
+		}
+		else
+		{
 			throw new IllegalArgumentException("Bad property: " + materialProperty);
 		}
 
@@ -291,7 +293,60 @@ public class SpigotMaterialData extends LocalMaterialData
 	}
 
 	@Override
-	public boolean equals (Object obj)
+	public LocalMaterialData rotate(int rotateTimes)
+	{
+		if (rotated == null)
+		{
+
+			IBlockData state = this.blockData;
+
+			Collection<IBlockState<?>> properties = state.r();
+			for (IBlockState<?> property : properties)
+			{
+				if (property instanceof BlockStateDirection) // Anything with a direction
+				{
+					EnumDirection direction = (EnumDirection) state.get(property);
+					switch (direction)
+					{
+						case DOWN:
+						case UP:
+							break;
+						case NORTH:
+							state = state.set((BlockStateDirection) property, EnumDirection.WEST);
+							break;
+						case SOUTH:
+							state = state.set((BlockStateDirection) property, EnumDirection.EAST);
+							break;
+						case WEST:
+							state = state.set((BlockStateDirection) property, EnumDirection.SOUTH);
+							break;
+						case EAST:
+							state = state.set((BlockStateDirection) property, EnumDirection.NORTH);
+							break;
+					}
+				}
+			}
+
+			if (state.b(BlockTall.EAST)) // fence or glass pane
+			{
+				boolean hasEast = state.get(BlockTall.EAST);
+				state = state.set(BlockTall.EAST, state.get(BlockTall.SOUTH));
+				state = state.set(BlockTall.SOUTH, state.get(BlockTall.WEST));
+				state = state.set(BlockTall.WEST, state.get(BlockTall.NORTH));
+				state = state.set(BlockTall.NORTH, hasEast);
+			}
+			this.rotated = SpigotMaterialData.ofBlockData(state);
+		}
+
+		if (rotateTimes > 1) {
+			return rotated.rotate(rotateTimes-1);
+		}
+
+		return this.rotated;
+	}
+
+	@Override
+	public boolean equals(Object obj)
 	{
 		if (this == obj)
 		{
@@ -302,43 +357,41 @@ public class SpigotMaterialData extends LocalMaterialData
 			return false;
 		}
 		SpigotMaterialData other = (SpigotMaterialData) obj;
-
-		// TODO: Compare registry names?
 		return
-				(this.isBlank && other.isBlank) ||
-				(
-						!this.isBlank &&
-						!other.isBlank &&
-						this.blockData.equals(other.blockData)
-				);
+			(this.isBlank && other.isBlank) ||
+			(
+				!this.isBlank &&
+				!other.isBlank &&
+				this.blockData.equals(other.blockData)
+			);
 	}
 
 	@Override
-	public int hashCode ()
+	public int hashCode()
 	{
 		// TODO: Implement this for 1.16
 		return this.blockData == null ? -1 : this.blockData.hashCode();
 	}
 
 	@Override
-	public boolean canFall ()
+	public boolean canFall()
 	{
 		return this.blockData != null && this.blockData.getBlock() instanceof BlockFalling;
 	}
 
 	@Override
-	public boolean hasData ()
+	public boolean hasData()
 	{
 		// TODO: Implement this for 1.16
 		return false;
 	}
 
-	public IBlockData internalBlock ()
+	public IBlockData internalBlock()
 	{
 		return this.blockData;
 	}
 
-	public BlockData toSpigotBlockData ()
+	public BlockData toSpigotBlockData()
 	{
 		if (this.blockData == null)
 			return null;

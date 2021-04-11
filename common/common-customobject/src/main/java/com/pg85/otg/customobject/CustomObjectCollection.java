@@ -30,7 +30,9 @@ public class CustomObjectCollection
     private HashMap<String, ArrayList<String>> objectsNotFoundPerPreset = new HashMap<String, ArrayList<String>>();
 
     private HashMap<String, File> customObjectFilesGlobalObjects = null;
+    private HashMap<String, File> globalTemplates = null;
     private HashMap<String, HashMap<String, File>> customObjectFilesPerPreset = new HashMap<String, HashMap<String, File>>();
+    private HashMap<String, HashMap<String, File>> boTemplateFilesPerPreset = new HashMap<>();
 
     private CustomObject loadObject(File file, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
@@ -155,6 +157,17 @@ public class CustomObjectCollection
     	}
     }
 
+    void addGlobalObjectFile(String name, File file)
+	{
+		synchronized(indexingFilesLock)
+		{
+			if (!customObjectFilesGlobalObjects.containsKey(name.toLowerCase(Locale.ROOT)))
+			{
+				customObjectFilesGlobalObjects.put(name.toLowerCase(Locale.ROOT), file);
+			}
+		}
+	}
+
     public void unloadCustomObjectFiles()
     {
     	synchronized(indexingFilesLock)
@@ -182,15 +195,43 @@ public class CustomObjectCollection
 	        objectsNotFoundPerPreset.clear();
 	
 	        customObjectFilesGlobalObjects = null;
+	        globalTemplates = null;
 	        customObjectFilesPerPreset.clear();
+	        boTemplateFilesPerPreset.clear();
     	}
     }
 
     public ArrayList<String> getAllBONamesForPreset(String presetName)
     {
     	HashMap<String, File> files = customObjectFilesPerPreset.get(presetName);
-    	return files == null ? null : new ArrayList<String>(files.keySet());
+    	return files == null ? null : new ArrayList<>(files.keySet());
     }
+
+    public ArrayList<String> getTemplatesForPreset(String presetName)
+	{
+    	HashMap<String, File> files = boTemplateFilesPerPreset.get(presetName);
+    	return files == null ? null : new ArrayList<>(files.keySet());
+	}
+
+	public ArrayList<String> getGlobalObjectNames()
+	{
+		return customObjectFilesGlobalObjects == null
+			   ? null
+			   : new ArrayList<>(customObjectFilesGlobalObjects.keySet());
+	}
+
+	public ArrayList<String> getGlobalTemplates()
+	{
+		return globalTemplates == null
+			   ? null
+			   : new ArrayList<>(globalTemplates.keySet());
+	}
+
+	public void addObjectToPreset(String presetName, String objectName, File boFile, CustomObject object)
+	{
+		objectsByNamePerPreset.get(presetName).put(objectName, object);
+		customObjectFilesPerPreset.get(presetName).put(objectName, boFile);
+	}
     
     public CustomObject getObjectByName(String name, String presetName, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
@@ -208,9 +249,10 @@ public class CustomObjectCollection
 	        {
 	        	logger.log(LogMarker.INFO, "Indexing GlobalObjects folder.");
 	            customObjectFilesGlobalObjects = new HashMap<String, File>();
+	            globalTemplates = new HashMap<>();
 	            if (new File(otgRootFolder + File.separator + Constants.GLOBAL_OBJECTS_FOLDER).exists())
 	            {
-	            	indexAllCustomObjectFilesInDir(new File(otgRootFolder + File.separator + Constants.GLOBAL_OBJECTS_FOLDER), customObjectFilesGlobalObjects, spawnLog, logger);
+	            	indexAllCustomObjectFilesInDir(new File(otgRootFolder + File.separator + Constants.GLOBAL_OBJECTS_FOLDER), customObjectFilesGlobalObjects, globalTemplates, spawnLog, logger);
 	            }
 	
 	            // Add vanilla custom objects
@@ -232,6 +274,8 @@ public class CustomObjectCollection
 	        	logger.log(LogMarker.INFO, "Indexing Objects folder for preset " + presetName);
 	            HashMap<String, File> presetCustomObjectFiles = new HashMap<String, File>();
 	            customObjectFilesPerPreset.put(presetName, presetCustomObjectFiles);
+	            HashMap<String, File> templateFiles = new HashMap<String, File>();
+	            boTemplateFilesPerPreset.put(presetName, templateFiles);
 	            if (presetName != null)
 	            {
 	            	// TODO: Rename folders
@@ -243,7 +287,7 @@ public class CustomObjectCollection
 	            	{
 	            		indexAllCustomObjectFilesInDir(
                 		new File(otgRootFolder + File.separator + Constants.PRESETS_FOLDER + File.separator + presetName + File.separator + objectsFolderName),
-                        presetCustomObjectFiles, spawnLog, logger);
+                        presetCustomObjectFiles, templateFiles, spawnLog, logger);
 	            	}
 	            }
 	            logger.log(LogMarker.INFO, "Objects folder for preset " + presetName + " indexed.");
@@ -416,7 +460,7 @@ public class CustomObjectCollection
     	}
     }
 
-    private void indexAllCustomObjectFilesInDir(File searchDir, HashMap<String, File> customObjectFiles, boolean spawnLog, ILogger logger)
+    private void indexAllCustomObjectFilesInDir(File searchDir, HashMap<String, File> customObjectFiles, HashMap<String, File> templateFiles, boolean spawnLog, ILogger logger)
     {
         if (searchDir.exists())
         {
@@ -426,7 +470,7 @@ public class CustomObjectCollection
                 {
                     if (fileInDir.isDirectory())
                     {
-                        indexAllCustomObjectFilesInDir(fileInDir, customObjectFiles, spawnLog, logger);
+                        indexAllCustomObjectFilesInDir(fileInDir, customObjectFiles, templateFiles, spawnLog, logger);
                     } else
                     {
                         if (fileInDir.getName().toLowerCase().endsWith(
@@ -450,6 +494,10 @@ public class CustomObjectCollection
                                 }
                             }
                         }
+                        else if (fileInDir.getName().toLowerCase().endsWith("bo3template"))
+						{
+							templateFiles.put(fileInDir.getName().toLowerCase(Locale.ROOT).replace(".bo3template", ""), fileInDir);
+						}
                     }
                 }
             } else {
@@ -473,6 +521,10 @@ public class CustomObjectCollection
                         }
                     }
                 }
+                else if (searchDir.getName().toLowerCase().endsWith("bo3template"))
+				{
+					templateFiles.put(searchDir.getName().toLowerCase(Locale.ROOT).replace(".bo3template", ""), searchDir);
+				}
             }
         }
     }

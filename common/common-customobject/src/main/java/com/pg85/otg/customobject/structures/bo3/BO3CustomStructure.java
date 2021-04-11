@@ -28,7 +28,7 @@ import java.util.*;
  * Represents a collection of all {@link CustomObject}s in a structure. It is
  * calculated by finding the branches of one object, then finding the branches
  * of those branches, etc., until
- * {@link CustomObject#getMaxBranchDepth()} is reached.
+ * {@link BO3#getMaxBranchDepth()} is reached.
  *
  */
 public class BO3CustomStructure extends CustomStructure
@@ -41,7 +41,10 @@ public class BO3CustomStructure extends CustomStructure
     	this.start = start;
     }
     
-    public BO3CustomStructure(IWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public BO3CustomStructure(IWorldGenRegion worldGenRegion, BO3CustomStructureCoordinate start, Path otgRootFolder,
+							  boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager,
+							  IMaterialReader materialReader, CustomObjectResourcesManager manager,
+							  IModLoadedChecker modLoadedChecker)
     {
         StructuredCustomObject object = (StructuredCustomObject)start.getObject(otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
@@ -129,7 +132,10 @@ public class BO3CustomStructure extends CustomStructure
         }
     }
 
-    public void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoordinate, Path otgRootFolder, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
+    public void spawnInChunk(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion,
+							 ChunkCoordinate chunkCoordinate, Path otgRootFolder, boolean spawnLog, ILogger logger,
+							 CustomObjectManager customObjectManager, IMaterialReader materialReader,
+							 CustomObjectResourcesManager manager, IModLoadedChecker modLoadedChecker)
     {
         Set<CustomStructureCoordinate> objectsInChunk = objectsToSpawn.get(chunkCoordinate);
         if(!worldGenRegion.getWorldConfig().doPopulationBoundsCheck())

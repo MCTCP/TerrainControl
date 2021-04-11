@@ -26,8 +26,8 @@ public class BO3BlockFunction extends BlockFunction<BO3Config>
         rotatedBlock.y = y;
         rotatedBlock.z = -x;
         rotatedBlock.material = material.rotate();
-        rotatedBlock.metaDataTag = metaDataTag;
-        rotatedBlock.metaDataName = metaDataName;
+        rotatedBlock.nbt = nbt;
+        rotatedBlock.nbtName = nbtName;
 
         return rotatedBlock;
     }
@@ -35,7 +35,7 @@ public class BO3BlockFunction extends BlockFunction<BO3Config>
     @Override
     public void spawn(IWorldGenRegion worldGenRegion, Random random, int x, int y, int z, ChunkCoordinate chunkBeingPopulated, boolean replaceBlock)
     {
-    	worldGenRegion.setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, replaceBlock);
+    	worldGenRegion.setBlock(x, y, z, material, nbt, chunkBeingPopulated, replaceBlock);
     }
     
     @Override

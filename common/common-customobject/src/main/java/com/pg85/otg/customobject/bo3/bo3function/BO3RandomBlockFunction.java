@@ -135,7 +135,7 @@ public class BO3RandomBlockFunction extends BO3BlockFunction
     @Override
     public String makeString()
     {
-        String text = "RandomBlock(" + x + "," + y + "," + z;
+        String text = "RB(" + x + "," + y + "," + z;
         for (int i = 0; i < blockCount; i++)
         {
             if (metaDataTags[i] == null)

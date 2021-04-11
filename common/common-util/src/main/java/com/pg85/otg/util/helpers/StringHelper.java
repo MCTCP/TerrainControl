@@ -159,10 +159,9 @@ public abstract class StringHelper
                 buffer.add(line.substring(lastFound, index).trim());
                 lastFound = index + 1;
             }
-
-            if (c == '(')
+            if (c == '(' || c == '[')
                 inBracer++;
-            if (c == ')')
+            if (c == ')' || c == ']')
                 inBracer--;
 
             index++;

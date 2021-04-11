@@ -3,6 +3,7 @@ package com.pg85.otg.forge.gen;
 import java.util.Optional;
 import java.util.Random;
 
+import com.google.gson.JsonSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.constants.Constants;
@@ -10,6 +11,7 @@ import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.forge.biome.OTGBiomeProvider;
 import com.pg85.otg.forge.materials.ForgeMaterialData;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
+import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
@@ -26,6 +28,8 @@ import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.nbt.*;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.DynamicRegistries;
@@ -34,6 +38,7 @@ import net.minecraft.world.ISeedReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.ChunkStatus;
 import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.gen.ChunkGenerator;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.feature.BaseTreeFeatureConfig;
 import net.minecraft.world.gen.feature.ConfiguredFeature;
@@ -43,13 +48,22 @@ import net.minecraft.world.gen.feature.IFeatureConfig;
 public class ForgeWorldGenRegion extends LocalWorldGenRegion
 {
 	private final ISeedReader worldGenRegion;
-	private final OTGNoiseChunkGenerator chunkGenerator;
+	private final ChunkGenerator chunkGenerator;
 	
 	// 32x32 biomes cache for fast lookups during population
 	private IBiome[][] cachedBiomeConfigs;
 	private boolean cacheIsValid;
 
-	public ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, ISeedReader worldGenRegion, OTGNoiseChunkGenerator chunkGenerator)
+	/** Creates a LocalWorldGenRegion
+	 * 	Note that it allows you to input ChunkGenerator instead of OTGNoiseChunkGenerator - do so with caution.
+	 * 	It may crash if you try to do replaceblocks or
+	 *
+	 * @param presetName
+	 * @param worldConfig
+	 * @param worldGenRegion The world access
+	 * @param chunkGenerator The chunkgenerator
+	 */
+	public ForgeWorldGenRegion(String presetName, IWorldConfig worldConfig, ISeedReader worldGenRegion, ChunkGenerator chunkGenerator)
 	{
 		super(presetName, worldConfig);
 		this.worldGenRegion = worldGenRegion;
@@ -143,7 +157,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
-		return this.chunkGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
+		return ((OTGNoiseChunkGenerator) this.chunkGenerator).getBiomeBlocksNoiseValue(blockX, blockZ);
 	}	
 	
 	// TODO: Make sure tree spawning looks more or less the same as 1.12.2.
@@ -281,7 +295,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return this.chunkGenerator.getMaterialInUnloadedChunk(this, x , y, z);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getMaterialInUnloadedChunk(this, x , y, z);
 			}
 		}
 		
@@ -355,7 +369,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			)
 			{
 				// Calculate the material without loading the chunk.
-				return this.chunkGenerator.getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
+				return ((OTGNoiseChunkGenerator) this.chunkGenerator).getHighestBlockYInUnloadedChunk(this, x, z, findSolid, findLiquid, ignoreLiquid, ignoreSnow);
 			}
 		}
 		
@@ -386,7 +400,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
 		}
 
-		ForgeMaterialData material;
+		LocalMaterialData material;
 		boolean isSolid;
 		boolean isLiquid;
 		BlockState blockState;
@@ -481,13 +495,13 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, boolean replaceBlocks)
 	{
-		setBlock(x, y, z, material, metaDataTag, chunkBeingPopulated, null, replaceBlocks);
+		setBlock(x, y, z, material, nbt, chunkBeingPopulated, null, replaceBlocks);
 	}
 
 	@Override
-	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag metaDataTag, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
+	public void setBlock(int x, int y, int z, LocalMaterialData material, NamedBinaryTag nbt, ChunkCoordinate chunkBeingPopulated, ReplacedBlocksMatrix replaceBlocksMatrix, boolean replaceBlocks)
 	{
 		if(y < Constants.WORLD_DEPTH || y >= Constants.WORLD_HEIGHT)
 		{
@@ -518,9 +532,52 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 				}
 				material = material.parseWithBiomeAndHeight(this.getWorldConfig().getBiomeConfigsHaveReplacement(), replaceBlocksMatrix, y);
 			}
-			this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);			
+
+			this.worldGenRegion.setBlockState(new BlockPos(x, y, z), ((ForgeMaterialData)material).internalBlock(), 2 | 16);
+			if (nbt != null) this.attachNBT(x, y, z, nbt, worldGenRegion.getBlockState(new BlockPos(x, y, z)));
 		}
-	}	
+	}
+
+	private void attachNBT(int x, int y, int z, NamedBinaryTag nbt, BlockState state)
+	{
+		CompoundNBT nms = ForgeNBTHelper.getNMSFromNBTTagCompound(nbt);
+		nms.put("x", IntNBT.valueOf(x));
+		nms.put("y", IntNBT.valueOf(y));
+		nms.put("z", IntNBT.valueOf(z));
+
+		//DataFixerBuilder builder = new DataFixerBuilder(SharedConstants.getVersion().getWorldVersion());
+		//Schema schema = builder.addSchema(0, );
+		//TileEntityType
+		//DataFixerUpper dfix = (DataFixerUpper) DataFixesManager.getDataFixer();
+//
+		//Dynamic<INBT> d = dfix.update(TypeReferences.BLOCK_ENTITY,
+		//	new Dynamic<INBT>(NBTDynamicOps.INSTANCE),
+		//	512,
+		//	1343 // 1.12.2
+		//	);
+//
+//
+		//d = dfix.update(TypeReferences.BLOCK_ENTITY,
+		//	new Dynamic<INBT>(NBTDynamicOps.INSTANCE),
+		//	1343, // 1.12.2
+		//	SharedConstants.getVersion().getWorldVersion());
+
+		TileEntity tileEntity = this.worldGenRegion.getTileEntity(new BlockPos(x, y, z));
+		if (tileEntity != null)
+		{
+			try {
+				tileEntity.read(state, nms);
+			} catch (JsonSyntaxException e)
+			{
+				OTG.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
+			}
+		} else {
+			if(OTG.getEngine().getPluginConfig().getSpawnLogEnabled())
+			{
+				OTG.log(LogMarker.WARN, "Skipping tile entity with id {}, cannot be placed at {},{},{}", nms.getString("id"), x, y, z);
+			}
+		}
+	}
 
 	@Override
 	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate)
@@ -583,7 +640,23 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		return null;
 	}
 
-	public ISeedReader getWorldGenRegion() {
+	public TileEntity getTileEntity(BlockPos blockPos)
+	{
+		return worldGenRegion.getTileEntity(blockPos);
+	}
+
+	public void setBlockState(BlockPos blockpos, BlockState blockstate1, int i)
+	{
+		worldGenRegion.setBlockState(blockpos, blockstate1, i);
+	}
+
+	public BlockState getBlockState(BlockPos blockPos)
+	{
+		return worldGenRegion.getBlockState(blockPos);
+	}
+
+	public ISeedReader getInternal()
+	{
 		return worldGenRegion;
 	}
 }

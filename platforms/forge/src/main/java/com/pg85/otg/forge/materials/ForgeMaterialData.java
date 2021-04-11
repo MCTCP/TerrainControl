@@ -8,21 +8,22 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.block.LeavesBlock;
+import net.minecraft.block.*;
 import net.minecraft.block.material.Material;
-import net.minecraft.command.arguments.BlockStateArgument;
-import net.minecraft.command.arguments.BlockStateInput;
+import net.minecraft.command.arguments.BlockStateParser;
+import net.minecraft.state.DirectionProperty;
 import net.minecraft.state.Property;
 import net.minecraft.state.properties.BlockStateProperties;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 
 import com.pg85.otg.util.materials.MaterialProperty;
 import com.pg85.otg.util.materials.MaterialProperties;
 import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -30,34 +31,29 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 public class ForgeMaterialData extends LocalMaterialData
 {
-	private BlockState blockData;
-
-	private ForgeMaterialData(BlockState blockData)
-	{
-		this.blockData = blockData;
+	private static final LocalMaterialData blank;
+	static {
+		ForgeMaterialData data = new ForgeMaterialData(null, null);
+		data.isBlank = true;
+		blank = data;
 	}
-	
+	private static final HashMap<BlockState, LocalMaterialData> stateToMaterialDataMap = new HashMap<>();
+
+	private final BlockState blockData;
+	private String name = null;
+
 	private ForgeMaterialData(BlockState blockData, String raw)
 	{
 		this.blockData = blockData;
 		this.rawEntry = raw;
 	}
 	
-	private ForgeMaterialData(String raw)
+	private static LocalMaterialData getBlank()
 	{
-		this.blockData = null;
-		this.rawEntry = raw;
-	}
-	
-	private static ForgeMaterialData getBlank()
-	{
-		// TODO: this null should probably be replaced with air
-		ForgeMaterialData material = new ForgeMaterialData((BlockState)null, null);
-		material.isBlank = true;
-		return material;
+		return blank;
 	}
 
-	static ForgeMaterialData ofString(String input) throws InvalidConfigException
+	public static LocalMaterialData ofString(String input) throws InvalidConfigException
 	{
 		if(input == null || input.trim().isEmpty())
 		{
@@ -70,12 +66,12 @@ public class ForgeMaterialData extends LocalMaterialData
 		// block "minecraft:stone" with no block data.
 		
 		// Used in BO4's as placeholder/detector block.
-		if(input.toLowerCase().equals("blank"))
+		if(input.equalsIgnoreCase("blank"))
 		{
 			return ForgeMaterialData.getBlank();
 		}
 
-		BlockState blockState = null;
+		BlockState blockState;
 		String blockNameCorrected = input.trim().toLowerCase();
 		// Try parsing as legacy block name / id
 		if(!blockNameCorrected.contains(":"))
@@ -98,26 +94,25 @@ public class ForgeMaterialData extends LocalMaterialData
 				{
 					blockNameCorrected = fromLegacyIdName;
 				}
-			} catch(NumberFormatException ex) { }
+			} catch(NumberFormatException ignored) { }
 		}
 		
 		// Try blockname[blockdata] / minecraft:blockname[blockdata] syntax
 		
 		// Use mc /setblock command logic to parse block string for us <3
-		BlockStateArgument blockStateArgument = new BlockStateArgument();
-		BlockStateInput parseResult = null;
+		BlockState state = null;
 		try {
 			String newInput = blockNameCorrected.contains(":") ? blockNameCorrected : "minecraft:" + blockNameCorrected;
-			parseResult = blockStateArgument.parse(new StringReader(newInput));
-		} catch (CommandSyntaxException e) { }		
-		if(parseResult != null)
+			state = new BlockStateParser(new StringReader(newInput), true).parse(true).getState();
+		} catch (CommandSyntaxException ignored) { }
+		if(state != null)
 		{
 			// For leaves, add DISTANCE 1 to make them not decay.
-			if(parseResult.getState().getMaterial().equals(Material.LEAVES))
+			if(state.getMaterial().equals(Material.LEAVES))
 			{
-				return new ForgeMaterialData(parseResult.getState().with(LeavesBlock.DISTANCE, 1), input);	
+				return ofMinecraftBlockState(state.with(LeavesBlock.DISTANCE, 1), input);
 			}
-			return new ForgeMaterialData(parseResult.getState(), input);
+			return ofMinecraftBlockState(state, input);
 		}
 		
 		// Try legacy block with data (fe SAND:1 or 12:1)
@@ -129,7 +124,8 @@ public class ForgeMaterialData extends LocalMaterialData
 			{
 				int blockId = Integer.parseInt(blockNameOrId);
 				blockNameOrId = LegacyMaterials.blockNameFromLegacyBlockId(blockId);
-			} catch(NumberFormatException ex) { }			
+			} catch(NumberFormatException ignored) { }
+
 			try
 			{
 				int data = Integer.parseInt(blockNameCorrected.substring(blockNameCorrected.indexOf(":") + 1));
@@ -140,11 +136,11 @@ public class ForgeMaterialData extends LocalMaterialData
 				}
 				// Failed to parse data, remove. fe STONE:0 or STONE:1 -> STONE
 				blockNameCorrected = blockNameCorrected.substring(0, blockNameCorrected.indexOf(":"));				
-			} catch(NumberFormatException ex) { }			
+			} catch(NumberFormatException ignored) { }
 		}
 
 		// Try without data
-		Block block = null;
+		Block block;
 		try
 		{
 			// This returns AIR if block is not found ><.
@@ -154,11 +150,11 @@ public class ForgeMaterialData extends LocalMaterialData
 				// For leaves, add DISTANCE 1 to make them not decay.
 				if(block.getDefaultState().getMaterial().equals(Material.LEAVES))
 				{
-					return new ForgeMaterialData(block.getDefaultState().with(LeavesBlock.DISTANCE, 1), input);	
+					return ofMinecraftBlockState(block.getDefaultState().with(LeavesBlock.DISTANCE, 1), input);
 				}
 				return ofMinecraftBlock(block, input);
 			}
-		} catch(net.minecraft.util.ResourceLocationException ex) { }
+		} catch(net.minecraft.util.ResourceLocationException ignored) { }
 
 		// Try legacy name again, without data.
 		blockState = ForgeLegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));
@@ -178,7 +174,7 @@ public class ForgeMaterialData extends LocalMaterialData
 	 * @param block The material.
 	 * @return The {@code BukkitMateialData} instance.
 	 */
-	private static ForgeMaterialData ofMinecraftBlock(Block block, String raw)
+	private static LocalMaterialData ofMinecraftBlock(Block block, String raw)
 	{
 		return ofMinecraftBlockState(block.getDefaultState(), raw);
 	}
@@ -188,19 +184,24 @@ public class ForgeMaterialData extends LocalMaterialData
 	 * @param blockData The material an data.
 	 * @return The {@code BukkitMateialData} instance.
 	 */
-	public static ForgeMaterialData ofMinecraftBlockState(BlockState blockData)
+	public static LocalMaterialData ofMinecraftBlockState(BlockState blockData)
 	{
-		return new ForgeMaterialData(blockData, null);
+		return ofMinecraftBlockState(blockData, null);
 	}
 	
 	/**
 	 * Gets a {@code ForgeMaterialData} of the given Minecraft blockData.
-	 * @param blockData The material an data.
+	 * @param blockState The material an data.
 	 * @return The {@code BukkitMateialData} instance.
 	 */
-	private static ForgeMaterialData ofMinecraftBlockState(BlockState blockData, String raw)
+	private static LocalMaterialData ofMinecraftBlockState(BlockState blockState, String raw)
 	{
-		return new ForgeMaterialData(blockData, raw);
+		// Try to create only one LocalMaterialData object for each BlockState
+		if (stateToMaterialDataMap.containsKey(blockState))
+			return stateToMaterialDataMap.get(blockState);
+		LocalMaterialData data = new ForgeMaterialData(blockState, raw);
+		stateToMaterialDataMap.put(blockState, data);
+		return data;
 	}	
 
 	@Override
@@ -217,6 +218,9 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public String getName()
 	{
+		if (this.name != null) {
+			return this.name;
+		}
 		if(isBlank)
 		{
 			return "BLANK";
@@ -225,27 +229,16 @@ public class ForgeMaterialData extends LocalMaterialData
 		{
 			if(this.rawEntry != null)
 			{
-				return this.rawEntry;
+				this.name = this.rawEntry;
 			} else {
-				return "Unknown";
+				this.name = "Unknown";
 			}
 		} else {
-			Block block = this.blockData.getBlock();	
-			//byte data = getBlockData();
-			//boolean noData = this.blockData.getPropertyKeys().isEmpty();
-			// Note that the above line is not equivalent to data != 0, as for
-			// example pumpkins have a default data value of 2
-	
-			//boolean nonDefaultData = !block.getDefaultState().equals(this.blockData);
-			
-			// Use Minecraft's name
-			//if (nonDefaultData)
-			//{
-				//return Block.REGISTRY.getNameForObject(block) + (noData ? "" : ":" + data);
-			//} else {
-				return block.getRegistryName().toString();
-			//}
+			this.name = this.blockData.toString()
+				.replace("Block{", "")
+				.replace("}", "");
 		}
+		return this.name;
 	}
 	
 	public BlockState internalBlock()
@@ -256,13 +249,12 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public boolean isMaterial(LocalMaterialData material)
 	{
-		// TODO: Compare registry names?
 		return 
-			(this.isBlank && ((ForgeMaterialData)material).isBlank) || 
+			(this.isBlank && ((ForgeMaterialData)material).isBlank) ||
 			(
 				!this.isBlank && 
 				!((ForgeMaterialData)material).isBlank &&
-				this.blockData.getBlock().equals(((ForgeMaterialData)material).internalBlock().getBlock())
+				Objects.equals(this.blockData.getBlock().getRegistryName(), ((ForgeMaterialData) material).internalBlock().getBlock().getRegistryName())
 			)
 		;
 	}
@@ -270,25 +262,25 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public boolean isLiquid()
 	{
-		return this.blockData == null ? false : this.blockData.getMaterial().isLiquid();
+		return this.blockData != null && this.blockData.getMaterial().isLiquid();
 	}
 
 	@Override
 	public boolean isSolid()
 	{		
-		return this.blockData == null ? false : this.blockData.getMaterial().isSolid();
+		return this.blockData != null && this.blockData.getMaterial().isSolid();
 	}
 	
 	@Override
 	public boolean isEmptyOrAir()
 	{
-		return this.blockData == null ? true : this.blockData.isAir();
+		return this.blockData == null || this.blockData.getMaterial() == Material.AIR;
 	}
 	
 	@Override
 	public boolean isAir()
 	{
-		return this.blockData != null && this.blockData.isAir();
+		return this.blockData != null && this.blockData.getMaterial() == Material.AIR;
 	}
 	
 	@Override
@@ -300,13 +292,13 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public boolean canFall()
 	{
-		return this.blockData == null ? false : this.blockData.getBlock() instanceof FallingBlock;
+		return this.blockData != null && this.blockData.getBlock() instanceof FallingBlock;
 	}
 
 	@Override
 	public boolean canSnowFallOn()
 	{
-		return this.blockData == null ? false : this.blockData.getMaterial().isSolid();		
+		return this.blockData != null && this.blockData.getMaterial().isSolid();
 	}
 	
 	@Override
@@ -314,6 +306,61 @@ public class ForgeMaterialData extends LocalMaterialData
 	{
 		// TODO: Implement this for 1.16		
 		return false;
+	}
+
+	@Override
+	public LocalMaterialData rotate(int rotateTimes)
+	{
+		// Get the rotation if we haven't stored the rotation yet
+		if (rotated == null)
+		{
+			BlockState state = this.blockData;
+			Collection<Property<?>> properties = state.getProperties();
+			// Loop through the blocks properties
+			for (Property<?> property : properties)
+			{
+				// We're interested in the DirectionProperty
+				if (property instanceof DirectionProperty)
+				{
+					Direction direction = (Direction) state.get(property);
+					switch (direction)
+					{
+						case DOWN:
+						case UP:
+							break;
+						case NORTH:
+							state = state.with((DirectionProperty) property, Direction.WEST);
+							break;
+						case SOUTH:
+							state = state.with((DirectionProperty) property, Direction.EAST);
+							break;
+						case WEST:
+							state = state.with((DirectionProperty) property, Direction.SOUTH);
+							break;
+						case EAST:
+							state = state.with((DirectionProperty) property, Direction.NORTH);
+							break;
+					}
+				}
+			}
+			if (state.hasProperty(SixWayBlock.EAST)) // fence or glass pane
+			{
+				// Cache the east value, before it's overwritten by the rotated south value
+				boolean hasEast = state.get(SixWayBlock.EAST);
+				state = state.with(SixWayBlock.EAST, state.get(SixWayBlock.SOUTH));
+				state = state.with(SixWayBlock.SOUTH, state.get(SixWayBlock.WEST));
+				state = state.with(SixWayBlock.WEST, state.get(SixWayBlock.NORTH));
+				state = state.with(SixWayBlock.NORTH, hasEast);
+			}
+			// Block is rotated, store a pointer to it
+			this.rotated = ForgeMaterialData.ofMinecraftBlockState(state);
+		}
+
+		if (rotateTimes > 1) {
+			return rotated.rotate(rotateTimes-1);
+		}
+
+		return this.rotated;
 	}
 
 	@Override
@@ -345,8 +392,6 @@ public class ForgeMaterialData extends LocalMaterialData
 			return false;
 		}
 		ForgeMaterialData other = (ForgeMaterialData) obj;
-		
-		// TODO: Compare registry names?
 		return 
 			(this.isBlank && other.isBlank) || 
 			(

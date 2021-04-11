@@ -51,6 +51,7 @@ public abstract class OTGEngine
 	// Common classes
 	
 	private final Path otgRootFolder;
+	private final Path globalObjectsFolder;
 	private PluginConfig pluginConfig;
 
 	private BiomeResourcesManager biomeResourcesManager;
@@ -61,6 +62,7 @@ public abstract class OTGEngine
 	{
 		this.logger = logger;
 		this.otgRootFolder = otgRootFolder;
+		this.globalObjectsFolder = otgRootFolder.resolve(Constants.GLOBAL_OBJECTS_FOLDER);
 		this.presetLoader = presetLoader;
 		this.materialReader = materialReader;
 		this.modLoadedChecker = modLoadedChecker;
@@ -105,7 +107,7 @@ public abstract class OTGEngine
 			modPacksDir.mkdirs();
 		}
 
-		File globalObjectsDir = Paths.get(getOTGRootFolder().toString(), Constants.GLOBAL_OBJECTS_FOLDER).toFile();
+		File globalObjectsDir = globalObjectsFolder.toFile();
 		if(!globalObjectsDir.exists())
 		{
 			globalObjectsDir.mkdirs();
@@ -303,6 +305,11 @@ public abstract class OTGEngine
 	public Path getOTGRootFolder()
 	{
 		return this.otgRootFolder;
+	}
+
+	public Path getGlobalObjectsFolder()
+	{
+		return this.globalObjectsFolder;
 	}
 
 	public Path getPresetsDirectory()

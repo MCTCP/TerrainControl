@@ -28,7 +28,7 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
     
     /**
      * Writes this configuration settings to a file. It will use the file
-     * returned by {@link ConfigFile#getPath()}. If writing fails, the error
+     * returned by {@link CustomObjectConfigFile#getFile()}. If writing fails, the error
      * is logged.
      *
      * @param config     The configuration to write to disk.
@@ -49,7 +49,7 @@ public class FileSettingsWriterBO4 implements SettingsWriterBO4
      * @param configMode The configuration mode. If this is set to
      * WriteDisable, this method does nothing.
      */
-    private static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
+    public static final void writeToFile(CustomObjectConfigFile config, File file, ConfigMode configMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, CustomObjectResourcesManager manager)
     {
         if (configMode == ConfigMode.WriteDisable)
         {
