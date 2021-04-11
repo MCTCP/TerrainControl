@@ -400,7 +400,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
 		}
 
-		ForgeMaterialData material;
+		LocalMaterialData material;
 		boolean isSolid;
 		boolean isLiquid;
 		BlockState blockState;

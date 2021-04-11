@@ -19,6 +19,7 @@ public abstract class LocalMaterialData
 	protected boolean checkedFallbacks = false;
 	protected boolean parsedDefaultMaterial = false;
 	protected LocalMaterialData[] rotations = new LocalMaterialData[] {this, null, null, null};
+	protected LocalMaterialData rotated = null;
 	   
     /**
      * Gets the name of this material. If a {#toDefaultMaterial()
