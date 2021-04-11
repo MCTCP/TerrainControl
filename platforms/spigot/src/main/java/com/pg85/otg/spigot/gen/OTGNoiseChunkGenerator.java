@@ -27,8 +27,11 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.craftbukkit.v1_16_R3.generator.CraftChunkData;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.function.Predicate;
@@ -164,10 +167,85 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Generates the base terrain for a chunk. Spigot compatible.
 	// IWorld -> GeneratorAccess
-	public void buildNoiseSpigot (org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord, Random random)
+	public void buildNoiseSpigot (WorldServer world, org.bukkit.generator.ChunkGenerator.ChunkData chunk, ChunkCoordinate chunkCoord, Random random)
 	{
 		ChunkBuffer buffer = new SpigotChunkBuffer(chunk, chunkCoord);
-		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), new ObjectArrayList<>(), new ObjectArrayList<>());
+
+		IChunkAccess cachedChunk = unloadedChunksCache.get(chunkCoord);
+		if (cachedChunk != null)
+		{
+			try {
+				// TODO: reflection will be slow, look into alternatives
+				CraftChunkData data = (CraftChunkData) chunk;
+				Method setBlock = data.getClass().getDeclaredMethod("setBlock", int.class, int.class, int.class, IBlockData.class);
+				setBlock.setAccessible(true);
+
+				// TODO: Find some way to clone/swap chunk data efficiently :/
+				for (int x = 0; x < ChunkCoordinate.CHUNK_SIZE; x++) {
+					for (int z = 0; z < ChunkCoordinate.CHUNK_SIZE; z++) {
+						int endY = cachedChunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(x, z);
+						for (int y = 0; y <= endY; y++) {
+							BlockPosition pos = new BlockPosition(x, y, z);
+							setBlock.invoke(data, x, y, z, cachedChunk.getType(pos));
+						}
+					}
+				}
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+
+			this.unloadedChunksCache.remove(chunkCoord);
+		} else {
+
+			// Setup jigsaw data
+			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
+			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
+			ChunkCoordIntPair pos = new ChunkCoordIntPair(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
+			int chunkX = pos.x;
+			int chunkZ = pos.z;
+			int startX = chunkX << 4;
+			int startZ = chunkZ << 4;
+
+			StructureManager manager = world.getStructureManager();
+
+		// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
+			for (StructureGenerator<?> structure : StructureGenerator.t) {
+				// Get all structure starts in this chunk
+				manager.a(SectionPosition.a(pos, 0), structure).forEach((start) -> {
+					// Iterate through the pieces in the structure
+					for (StructurePiece piece : start.d()) {
+						// Check if it intersects with this chunk
+						if (piece.a(pos, 12)) {
+							StructureBoundingBox box = piece.g();
+
+							if (piece instanceof WorldGenFeaturePillagerOutpostPoolPiece) {
+								WorldGenFeaturePillagerOutpostPoolPiece villagePiece = (WorldGenFeaturePillagerOutpostPoolPiece) piece;
+								// Add to the list if it's a rigid piece
+								if (villagePiece.b().e() == WorldGenFeatureDefinedStructurePoolTemplate.Matching.RIGID) {
+									structures.add(new JigsawStructureData(box.a, box.b, box.c, box.d, villagePiece.d(), box.f, true, 0, 0, 0));
+								}
+
+								// Get all the junctions in this piece
+								for (WorldGenFeatureDefinedStructureJigsawJunction junction : villagePiece.e()) {
+									int sourceX = junction.a();
+									int sourceZ = junction.c();
+
+									// If the junction is in this chunk, then add to list
+									if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
+										junctions.add(new JigsawStructureData(0, 0, 0, 0, 0, 0, false, junction.a(), junction.b(), junction.c()));
+									}
+								}
+							} else {
+								structures.add(new JigsawStructureData(box.a, box.b, box.c, box.d, 0, box.f, false, 0, 0, 0));
+							}
+						}
+					}
+
+				});
+			}
+
+			this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
+		}
 	}
 
 	// Generates the base terrain for a chunk.

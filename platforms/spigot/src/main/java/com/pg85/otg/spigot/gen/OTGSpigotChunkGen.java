@@ -10,6 +10,7 @@ import net.minecraft.server.v1_16_R3.IRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
+import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Random;
@@ -26,6 +27,8 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 	{
 		this.preset = preset;
 	}
+
+
 
 	@Override
 	public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome)
@@ -45,12 +48,13 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 			}
 			initLock.unlock();
 		}
+
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
 		ChunkData chunkData = chunkDataCache.get(chunkCoord);
 		if (chunkData == null)
 		{
 			chunkData = createChunkData(world);
-			generator.buildNoiseSpigot(chunkData, chunkCoord, random);
+			generator.buildNoiseSpigot(((CraftWorld)world).getHandle(), chunkData, chunkCoord, random);
 			chunkDataCache.put(chunkCoord, chunkData);
 		}
 		return chunkData;
