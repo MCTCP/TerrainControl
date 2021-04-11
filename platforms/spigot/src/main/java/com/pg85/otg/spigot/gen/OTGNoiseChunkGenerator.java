@@ -682,7 +682,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(((SpigotWorldGenRegion)worldGenRegion).getWorldGenRegion().getMinecraftWorld(),worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(((SpigotWorldGenRegion)worldGenRegion).getInternal().getMinecraftWorld(),worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
