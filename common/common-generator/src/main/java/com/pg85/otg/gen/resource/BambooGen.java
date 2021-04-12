@@ -32,7 +32,7 @@ public class BambooGen extends Resource
 	@Override
 	public String toString()
 	{
-		return "Bamboo(" + this.frequency + "," + this.rarity + + this.podzolChance + this.sourceBlocks + ")";
+		return "Bamboo(" + this.frequency + "," + this.rarity + "," + this.podzolChance + "," + this.sourceBlocks + ")";
 	}
 
 	@Override
