@@ -24,9 +24,6 @@ subprojects
 
     task.plugins.withType(JavaBasePlugin)
     {
-        sourceCompatibility = '1.8'
-        targetCompatibility = '1.8'
-
         // Generate Eclipse config files when using "gradle eclipse"
         task.apply plugin: 'eclipse'
 
