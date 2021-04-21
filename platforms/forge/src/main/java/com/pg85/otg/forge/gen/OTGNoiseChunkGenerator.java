@@ -73,6 +73,7 @@ import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
 import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
+import net.minecraft.world.gen.feature.structure.StructureStart;
 import net.minecraft.world.gen.settings.NoiseSettings;
 import net.minecraft.world.spawner.WorldEntitySpawner;
 import net.minecraft.world.storage.IServerWorldInfo;
@@ -92,12 +93,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 						}
 					),
 					BiomeProvider.CODEC.fieldOf("biome_source").forGetter(
-						(p_236096_0_) -> { return p_236096_0_.biomeProvider; }
+						(p_236096_0_) -> { return p_236096_0_.biomeSource; }
 					),
 					Codec.LONG.fieldOf("seed").stable().forGetter(
 						(p_236093_0_) -> { return p_236093_0_.worldSeed; }
 					),
-					DimensionSettings.DIMENSION_SETTINGS_CODEC.fieldOf("settings").forGetter(
+					DimensionSettings.CODEC.fieldOf("settings").forGetter(
 						(p_236090_0_) -> { return p_236090_0_.dimensionSettingsSupplier; }
 					)
 				).apply(
@@ -145,7 +146,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// It looks like vanilla just inserts the same biomeprovider twice?
 	private OTGNoiseChunkGenerator(DimensionConfig dimensionConfigSupplier, BiomeProvider biomeProvider1, BiomeProvider biomeProvider2, long seed, Supplier<DimensionSettings> dimensionSettingsSupplier)
 	{
-		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().getStructures(), seed);
+		super(biomeProvider1, biomeProvider2, dimensionSettingsSupplier.get().structureSettings(), seed);
 
 		if (!(biomeProvider1 instanceof LayerSource))
 		{
@@ -153,15 +154,15 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 
 		this.biomeStructures = Registry.STRUCTURE_FEATURE.stream().collect(Collectors.groupingBy((structure) -> {
-			return structure.getDecorationStage().ordinal();
+			return structure.step().ordinal();
 		}));
 
 		this.dimensionConfig = dimensionConfigSupplier;
 		this.worldSeed = seed;
 		DimensionSettings dimensionsettings = dimensionSettingsSupplier.get();
 		this.dimensionSettingsSupplier = dimensionSettingsSupplier;
-		NoiseSettings noisesettings = dimensionsettings.getNoise();
-		this.noiseHeight = noisesettings.func_236169_a_();
+		NoiseSettings noisesettings = dimensionsettings.noiseSettings();
+		this.noiseHeight = noisesettings.height();
 
 		// Unloaded chunk data caches for BO4's
 		// TODO: Add a setting to the worldconfig for the size of these caches.
@@ -188,9 +189,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
-	public ChunkGenerator func_230349_a_(long seed)
+	public ChunkGenerator withSeed(long seed)
 	{
-		return new OTGNoiseChunkGenerator(this.dimensionConfig, this.biomeProvider.getBiomeProvider(seed), seed, this.dimensionSettingsSupplier);
+		return new OTGNoiseChunkGenerator(this.dimensionConfig, this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
 	}
 
 	private void init(String worldName)
@@ -206,7 +207,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Generates the base terrain for a chunk.
 	@Override
-	public void func_230352_b_(IWorld world, StructureManager manager, IChunk chunk)
+	public void fillFromNoise(IWorld world, StructureManager manager, IChunk chunk)
 	{
 		// If we've already generated and cached this	
 		// chunk while it was unloaded, use cached data.
@@ -220,7 +221,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			{
 				for (int z = 0; z < ChunkCoordinate.CHUNK_SIZE; z++)
 				{
-					int endY = cachedChunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(x, z);
+					int endY = cachedChunk.getOrCreateHeightmapUnprimed(Type.WORLD_SURFACE_WG).getFirstAvailable(x, z);
 					for (int y = 0; y <= endY; y++)
 					{
 						BlockPos pos = new BlockPos(x, y, z);
@@ -240,20 +241,20 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			int startZ = chunkZ << 4;
 
 			// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-			for(Structure<?> structure : Structure.field_236384_t_) {
+			for(Structure<?> structure : Structure.NOISE_AFFECTING_FEATURES) {
 				// Get all structure starts in this chunk
-				manager.func_235011_a_(SectionPos.from(pos, 0), structure).forEach((start) -> {
+				manager.startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) -> {
 					// Iterate through the pieces in the structure
-					for(StructurePiece piece : start.getComponents()) {
+					for(StructurePiece piece : start.getPieces()) {
 						// Check if it intersects with this chunk
-						if (piece.func_214810_a(pos, 12)) {
+						if (piece.isCloseToChunk(pos, 12)) {
 							MutableBoundingBox box = piece.getBoundingBox();
 
 							if (piece instanceof AbstractVillagePiece) {
 								AbstractVillagePiece villagePiece = (AbstractVillagePiece) piece;
 								// Add to the list if it's a rigid piece
-								if (villagePiece.getJigsawPiece().getPlacementBehaviour() == JigsawPattern.PlacementBehaviour.RIGID) {
-									structures.add(new JigsawStructureData(box.minX, box.minY, box.minZ,box.maxX, villagePiece.getGroundLevelDelta(), box.maxZ, true, 0, 0, 0));
+								if (villagePiece.getElement().getProjection() == JigsawPattern.PlacementBehaviour.RIGID) {
+									structures.add(new JigsawStructureData(box.x0, box.y0, box.z0, box.x1, villagePiece.getGroundLevelDelta(), box.z1, true, 0, 0, 0));
 								}
 
 								// Get all the junctions in this piece
@@ -267,7 +268,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 									}
 								}
 							} else {
-								structures.add(new JigsawStructureData(box.minX, box.minY, box.minZ,box.maxX, 0, box.maxZ, false, 0, 0, 0));
+								structures.add(new JigsawStructureData(box.x0, box.y0, box.z0,box.x1, 0, box.z1, false, 0, 0, 0));
 							}
 						}
 					}
@@ -281,21 +282,21 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Replaces surface and ground blocks in base terrain and places bedrock.
 	@Override
-	public void generateSurface(WorldGenRegion worldGenRegion, IChunk chunk)
+	public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, IChunk chunk)
 	{
 		// Done during this.internalGenerator.populateNoise
 	}
 
 	// Carves caves and ravines
 	@Override
-	public void func_230350_a_(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
+	public void applyCarvers(long seed, BiomeManager biomeManager, IChunk chunk, GenerationStage.Carving stage)
 	{
 		if (stage == GenerationStage.Carving.AIR)
 		{
 			ChunkPrimer protoChunk = (ChunkPrimer) chunk;
 
 			ChunkBuffer chunkBuffer = new ForgeChunkBuffer(protoChunk);
-			BitSet carvingMask = protoChunk.getOrAddCarvingMask(stage);
+			BitSet carvingMask = protoChunk.getOrCreateCarvingMask(stage);
 			this.internalGenerator.carve(chunkBuffer, seed, protoChunk.getPos().x, protoChunk.getPos().z, carvingMask);
 		}
 	}
@@ -304,17 +305,17 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Does population for a given pos/chunk
 	@Override
-	public void func_230351_a_(WorldGenRegion worldGenRegion, StructureManager structureManager)
+	public void applyBiomeDecoration(WorldGenRegion worldGenRegion, StructureManager structureManager)
 	{
-		int chunkX = worldGenRegion.getMainChunkX();
-		int chunkZ = worldGenRegion.getMainChunkZ();
+		int chunkX = worldGenRegion.getCenterX();
+		int chunkZ = worldGenRegion.getCenterZ();
 		int blockX = chunkX * 16;
 		int blockZ = chunkZ * 16;
 		BlockPos blockpos = new BlockPos(blockX, 0, blockZ);
 
 		// Fetch the biomeConfig by registryKey
-		RegistryKey<Biome> key = ((OTGBiomeProvider) this.biomeProvider).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
-		BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(key.getLocation().toString());
+		RegistryKey<Biome> key = ((OTGBiomeProvider) this.biomeSource).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
+		BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(key.location().toString());
 
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), blockX, blockZ);
@@ -323,8 +324,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			// Override normal population (Biome.func_242427_a()) with OTG's.
 			biomePopulate(biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 		} catch (Exception exception) {
-			CrashReport crashreport = CrashReport.makeCrashReport(exception, "Biome decoration");
-			crashreport.makeCategory("Generation").addDetail("CenterX", chunkX).addDetail("CenterZ", chunkZ).addDetail("Seed", decorationSeed);
+			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
+			crashreport.addCategory("Generation").setDetail("CenterX", chunkX).setDetail("CenterZ", chunkZ).setDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
 		}
 	}
@@ -332,7 +333,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Chunk population method taken from Biome (Biome.func_242427_a())
 	private void biomePopulate(BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{
-		init(((IServerWorldInfo) world.getWorldInfo()).getWorldName());
+		init(((IServerWorldInfo) world.getLevelData()).getLevelName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
@@ -342,7 +343,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			int index = 0;
 			// Generate features if enabled
-			if (structureManager.canGenerateFeatures())
+			if (structureManager.shouldGenerateFeatures())
 			{
 				// Go through all the structures set to generate at this step
 				for (Structure<?> structure : this.biomeStructures.getOrDefault(step, Collections.emptyList()))
@@ -358,9 +359,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 					{
 						// Generate the structure if it exists in a biome in this chunk.
 						// We don't have to do any work here, we can just let StructureManager handle it all.
-						structureManager.func_235011_a_(SectionPos.from(pos), structure)
+						structureManager.startsForFeature(SectionPos.of(pos), structure)
 							.forEach(start ->
-								start.func_230366_a_(
+								start.placeInChunk(
 									world, 
 									structureManager, 
 									chunkGenerator, 
@@ -376,10 +377,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 							)
 						;
 					} catch (Exception exception) {
-						CrashReport crashreport = CrashReport.makeCrashReport(exception, "Feature placement");
-						crashreport.makeCategory("Feature")
-							.addDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure))
-							.addDetail("Description", () -> structure.toString())
+						CrashReport crashreport = CrashReport.forThrowable(exception, "Feature placement");
+						crashreport.addCategory("Feature")
+							.setDetail("Id", Registry.STRUCTURE_FEATURE.getKey(structure))
+							.setDetail("Description", () -> structure.toString())
 						;
 						throw new ReportedException(crashreport);
 					}
@@ -393,68 +394,70 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 
 	// Mob spawning on initial chunk spawn (animals).
 	@Override
-	public void func_230354_a_(WorldGenRegion worldGenRegion)
+	public void spawnOriginalMobs(WorldGenRegion worldGenRegion)
 	{
-		if (!this.dimensionSettingsSupplier.get().isMobGenerationDisabled())
+		if (!this.dimensionSettingsSupplier.get().disableMobGeneration())
 		{
-			int chunkX = worldGenRegion.getMainChunkX();
-			int chunkZ = worldGenRegion.getMainChunkZ();
-			Biome biome = worldGenRegion.getBiome((new ChunkPos(chunkX, chunkZ)).asBlockPos());
+			int chunkX = worldGenRegion.getCenterX();
+			int chunkZ = worldGenRegion.getCenterZ();
+			Biome biome = worldGenRegion.getBiome((new ChunkPos(chunkX, chunkZ)).getWorldPosition());
 			SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 			sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), chunkX << 4, chunkZ << 4);
-			WorldEntitySpawner.performWorldGenSpawning(worldGenRegion, biome, chunkX, chunkZ, sharedseedrandom);
+			WorldEntitySpawner.spawnMobsForChunkGeneration(worldGenRegion, biome, chunkX, chunkZ, sharedseedrandom);
 		}
 	}
 
 	// Mob spawning on chunk tick
 	@Override
-	public List<MobSpawnInfo.Spawners> func_230353_a_(Biome biome, StructureManager structureManager, EntityClassification entityClassification, BlockPos blockPos)
+	public List<MobSpawnInfo.Spawners> getMobsAt(Biome biome, StructureManager structureManager, EntityClassification entityClassification, BlockPos blockPos)
 	{
-		if (structureManager.getStructureStart(blockPos, true, Structure.SWAMP_HUT).isValid())
+		// TODO: Allow users to configure spawn lists for vanilla structures?
+		
+		if (structureManager.getStructureAt(blockPos, true, Structure.SWAMP_HUT).isValid())
 		{
 			if (entityClassification == EntityClassification.MONSTER)
 			{
-				return Structure.SWAMP_HUT.getSpawnList();
+				return Structure.SWAMP_HUT.getDefaultSpawnList();
 			}
 
 			if (entityClassification == EntityClassification.CREATURE)
 			{
-				return Structure.SWAMP_HUT.getCreatureSpawnList();
+				return Structure.SWAMP_HUT.getDefaultCreatureSpawnList();
 			}
 		}
 
 		if (entityClassification == EntityClassification.MONSTER)
 		{
-			if (structureManager.getStructureStart(blockPos, false, Structure.PILLAGER_OUTPOST).isValid())
+			if (structureManager.getStructureAt(blockPos, false, Structure.PILLAGER_OUTPOST).isValid())
 			{
-				return Structure.PILLAGER_OUTPOST.getSpawnList();
+				return Structure.PILLAGER_OUTPOST.getDefaultSpawnList();
 			}
 
-			if (structureManager.getStructureStart(blockPos, false, Structure.MONUMENT).isValid())
+			if (structureManager.getStructureAt(blockPos, false, Structure.OCEAN_MONUMENT).isValid())
 			{
-				return Structure.MONUMENT.getSpawnList();
+				return Structure.OCEAN_MONUMENT.getDefaultSpawnList();
 			}
 
-			if (structureManager.getStructureStart(blockPos, true, Structure.FORTRESS).isValid())
+			if (structureManager.getStructureAt(blockPos, true, Structure.NETHER_BRIDGE).isValid())
 			{
-				return Structure.FORTRESS.getSpawnList();
+				return Structure.NETHER_BRIDGE.getDefaultSpawnList();
 			}
 		}
 
-		return super.func_230353_a_(biome, structureManager, entityClassification, blockPos);
+		return super.getMobsAt(biome, structureManager, entityClassification, blockPos);
 	}
 
 	// Noise
 
 	@Override
-	public int getHeight(int x, int z, Type heightmapType)
+	public int getBaseHeight(int x, int z, Type heightmapType)
 	{
-		return this.sampleHeightmap(x, z, null, heightmapType.getHeightLimitPredicate());
+		return this.sampleHeightmap(x, z, null, heightmapType.isOpaque());
 	}
 
 	// Provides a sample of the full column for structure generation.
 	@Override
-	public IBlockReader func_230348_a_(int x, int z)
+	public IBlockReader getBaseColumn(int x, int z)
 	{
 		BlockState[] ablockstate = new BlockState[256];
 		this.sampleHeightmap(x, x, ablockstate, null);
@@ -538,20 +541,20 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		{
 			return ((ForgeMaterialData) config.getWaterBlockReplaced(y)).internalBlock();
 		} else {
-			return Blocks.AIR.getDefaultState();
+			return Blocks.AIR.defaultBlockState();
 		}
 	}
 
 	// Getters / misc
 
 	@Override
-	protected Codec<? extends ChunkGenerator> func_230347_a_()
+	protected Codec<? extends ChunkGenerator> codec()
 	{
 		return CODEC;
 	}
 
 	@Override
-	public int getMaxBuildHeight()
+	public int getGenDepth()
 	{
 		return this.noiseHeight;
 	}
@@ -559,7 +562,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public int getSeaLevel()
 	{
-		return this.dimensionSettingsSupplier.get().getSeaLevel();
+		return this.dimensionSettingsSupplier.get().seaLevel();
 	}
 
 	public CustomStructureCache getStructureCache() {
@@ -592,7 +595,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion).getInternal().getWorld(), worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion).getInternal().getLevel(), worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
@@ -619,10 +622,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		IChunk chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
-
+	
 		// Setup jigsaw data
 		ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
+
+		// TODO: Structure starts, causes hang on load since getChunk is used by StructureManager
+		/*
 		ChunkPos pos = chunk.getPos();
 		int chunkX = pos.x;
 		int chunkZ = pos.z;
@@ -630,20 +636,20 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		int startZ = chunkZ << 4;
 
 		// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-		for(Structure<?> structure : Structure.field_236384_t_) {
+		for(Structure<?> structure : Structure.NOISE_AFFECTING_FEATURES) {
 			// Get all structure starts in this chunk
-			serverWorld.getStructureManager().func_235011_a_(SectionPos.from(pos, 0), structure).forEach((start) -> {
+			serverWorld.structureFeatureManager().startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) -> {
 				// Iterate through the pieces in the structure
-				for(StructurePiece piece : start.getComponents()) {
+				for(StructurePiece piece : start.getPieces()) {
 					// Check if it intersects with this chunk
-					if (piece.func_214810_a(pos, 12)) {
+					if (piece.isCloseToChunk(pos, 12)) {
 						MutableBoundingBox box = piece.getBoundingBox();
 
 						if (piece instanceof AbstractVillagePiece) {
 							AbstractVillagePiece villagePiece = (AbstractVillagePiece) piece;
 							// Add to the list if it's a rigid piece
-							if (villagePiece.getJigsawPiece().getPlacementBehaviour() == JigsawPattern.PlacementBehaviour.RIGID) {
-								structures.add(new JigsawStructureData(box.minX, box.minY, box.minZ,box.maxX, villagePiece.getGroundLevelDelta(), box.maxZ, true, 0, 0, 0));
+							if (villagePiece.getElement().getProjection() == JigsawPattern.PlacementBehaviour.RIGID) {
+								structures.add(new JigsawStructureData(box.x0, box.y0, box.z0, box.x1, villagePiece.getGroundLevelDelta(), box.z1, true, 0, 0, 0));
 							}
 
 							// Get all the junctions in this piece
@@ -657,13 +663,13 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 								}
 							}
 						} else {
-							structures.add(new JigsawStructureData(box.minX, box.minY, box.minZ,box.maxX, 0, box.maxZ, false, 0, 0, 0));
+							structures.add(new JigsawStructureData(box.x0, box.y0, box.z0,box.x1, 0, box.z1, false, 0, 0, 0));
 						}
 					}
 				}
-
 			});
 		}
+		*/
 
 		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 		return chunk;
@@ -708,6 +714,4 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		return this.internalGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
 	}
-
-
 }

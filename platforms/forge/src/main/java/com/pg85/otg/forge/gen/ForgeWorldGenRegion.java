@@ -89,7 +89,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		if(biome != null)
 		{
 			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeProvider());
+			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
 			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
 			if(biomeConfig != null)
 			{
@@ -106,7 +106,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		if(biome != null)
 		{
 			// TODO: Pass preset or biome list with worldgenregion, so no lookups by preset name needed?
-			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeProvider());
+			int id = BiomeInterpolator.getId(getSeed(), x, 0, z, (OTGBiomeProvider)this.chunkGenerator.getBiomeSource());
 			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
 			return biomeConfig;
 		}
@@ -175,75 +175,75 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			{
 				case Tree:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> oak = Features.OAK;
-					oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, oak.config);
+					oak.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, oak.config);
 					return true;
 				case BigTree:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> fancy_oak = Features.FANCY_OAK;
-					fancy_oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, fancy_oak.config);
+					fancy_oak.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, fancy_oak.config);
 					return true;
 				case Forest:
 				case Birch:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> birch = Features.BIRCH;
-					birch.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, birch.config);
+					birch.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, birch.config);
 					return true;
 				case TallBirch:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> tall_birch = Features.SUPER_BIRCH_BEES_0002;
-					tall_birch.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tall_birch.config);
+					tall_birch.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, tall_birch.config);
 					return true;
 				case HugeMushroom:
 					if (rand.nextBoolean())
 					{
 						ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
-						huge_brown_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
+						huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					} else {
 						ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
-						huge_red_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
+						huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					}
 					return true;
 				case HugeRedMushroom:
 					ConfiguredFeature<IFeatureConfig, ?> huge_red_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_RED_MUSHROOM;
-					huge_red_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
+					huge_red_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_red_mushroom.config);
 					return true;
 				case HugeBrownMushroom:
 					ConfiguredFeature<IFeatureConfig, ?> huge_brown_mushroom = (ConfiguredFeature<IFeatureConfig, ?>) Features.HUGE_BROWN_MUSHROOM;
-					huge_brown_mushroom.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
+					huge_brown_mushroom.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, huge_brown_mushroom.config);
 					return true;
 				case SwampTree:
 					ConfiguredFeature<IFeatureConfig, ?> swamp_tree = (ConfiguredFeature<IFeatureConfig, ?>) Features.SWAMP_TREE;
-					swamp_tree.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
+					swamp_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
 					return true;
 				case Taiga1:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> spruce = Features.SPRUCE;
-					spruce.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config);
+					spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config);
 					return true;
 				case Taiga2:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> pine = Features.PINE;
-					pine.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, pine.config);
+					pine.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, pine.config);
 					return true;
 				case JungleTree:
 				case CocoaTree:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> jungle_tree = Features.JUNGLE_TREE;
-					jungle_tree.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
+					jungle_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
 					return true;
 				case GroundBush:
 					ConfiguredFeature<IFeatureConfig, ?> jungle_bush = (ConfiguredFeature<IFeatureConfig, ?>) Features.JUNGLE_BUSH;
-					jungle_bush.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config);
+					jungle_bush.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_bush.config);
 					return true;
 				case Acacia:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> acacia = Features.ACACIA;
-					acacia.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, acacia.config);
+					acacia.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, acacia.config);
 					return true;
 				case DarkOak:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> dark_oak = Features.DARK_OAK;
-					dark_oak.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, dark_oak.config);
+					dark_oak.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, dark_oak.config);
 					return true;
 				case HugeTaiga1:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_spruce = Features.MEGA_SPRUCE;
-					mega_spruce.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
+					mega_spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
 					return true;
 				case HugeTaiga2:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_pine = Features.MEGA_PINE;
-					mega_pine.feature.generate(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_pine.config);
+					mega_pine.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_pine.config);
 					return true;
 				default:
 					throw new RuntimeException("Failed to handle tree of type " + type.toString());
@@ -279,19 +279,19 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		IChunk chunk = null;
 		if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
 		{
-			chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
 		
 		// If the chunk doesn't exist so we're doing something outside the
 		// population sequence, return the material without loading the chunk.
-		if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
 		{
 			// If the chunk has already been loaded, no need to use fake chunks.
 			if(
 				!(
 					chunk == null && 
-					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)
+					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
 				)
 			)
 			{
@@ -301,7 +301,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		
 		// Tried to query an unloaded chunk outside the area being populated
-		if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
+		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return null;
 		}
@@ -353,19 +353,19 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		IChunk chunk = null;
 		if(chunkBeingPopulated != null && ChunkCoordinate.IsInAreaBeingPopulated(x, z, chunkBeingPopulated))
 		{
-			chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+			chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
 		}
 		
 		// If the chunk doesn't exist and we're doing something outside the
 		// population sequence, return the material without loading the chunk.
-		if((chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
+		if((chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)) && chunkBeingPopulated == null)
 		{
 			// If the chunk has already been loaded, no need to use fake chunks.
 			if(
 				!(
 					chunk == null && 
-					this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
-					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS)
+					this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) && 
+					(chunk = this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ())).getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS)
 				)
 			)
 			{
@@ -375,7 +375,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		}
 		
 		// Tried to query an unloaded chunk outside the area being populated
-		if(chunk == null || !chunk.getStatus().isAtLeast(ChunkStatus.LIQUID_CARVERS))
+		if(chunk == null || !chunk.getStatus().isOrAfter(ChunkStatus.LIQUID_CARVERS))
 		{
 			return -1;
 		}
@@ -388,11 +388,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// with status LIQUID_CARVERS, while the chunk does already have base terrain blocks filled.
 		// If we use a later status like FEATURES though, resource population may have problems 
 		// fetching chunks..
-		int heightMapy = chunk.getHeightmap(Type.WORLD_SURFACE_WG).getHeight(internalX, internalZ);
+		int heightMapy = chunk.getOrCreateHeightmapUnprimed(Type.WORLD_SURFACE_WG).getFirstAvailable(internalX, internalZ);
 		if(heightMapy == 0)
 		{
 			// Check the non wg heightmap as a secondary measure
-			int heightMapCheck = chunk.getHeightmap(Type.WORLD_SURFACE).getHeight(internalX, internalZ);
+			int heightMapCheck = chunk.getOrCreateHeightmapUnprimed(Type.WORLD_SURFACE).getFirstAvailable(internalX, internalZ);
 
 			if (heightMapCheck != 0) {
 				heightMapy = heightMapCheck;
@@ -486,11 +486,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// TODO: Check if this causes problems with BO3 LightChecks.
 		// TODO: Make a getLight method based on world.getLight that uses unloaded chunks.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromBlockCoords(x, z);
-		IChunk chunk = this.worldGenRegion.chunkExists(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
-		if(chunkBeingPopulated == null && chunk.getStatus().isAtLeast(ChunkStatus.LIGHT))
+		IChunk chunk = this.worldGenRegion.hasChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) ? this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ()) : null;
+		if(chunkBeingPopulated == null && chunk.getStatus().isOrAfter(ChunkStatus.LIGHT))
 		{
 			// This fetches the block and skylight as if it were day.
-			return this.worldGenRegion.getLight(new BlockPos(x, y, z));
+			return this.worldGenRegion.getMaxLocalRawBrightness(new BlockPos(x, y, z));
 		}
 		return -1;
 	}
@@ -535,10 +535,10 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			}
 
 			BlockPos pos = new BlockPos(x, y, z);
-			this.worldGenRegion.setBlockState(pos, ((ForgeMaterialData)material).internalBlock(), 2 | 16);
+			this.worldGenRegion.setBlock(pos, ((ForgeMaterialData)material).internalBlock(), 2 | 16);
 
 			if (material.isLiquid()) {
-				this.worldGenRegion.getPendingFluidTicks().scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getFluid(), 0);
+				this.worldGenRegion.getLiquidTicks().scheduleTick(pos, ((ForgeMaterialData)material).internalBlock().getFluidState().getType(), 0);
 			}
 
 			if (nbt != null)
@@ -555,11 +555,11 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		nms.put("y", IntNBT.valueOf(y));
 		nms.put("z", IntNBT.valueOf(z));
 
-		TileEntity tileEntity = this.worldGenRegion.getTileEntity(new BlockPos(x, y, z));
+		TileEntity tileEntity = this.worldGenRegion.getBlockEntity(new BlockPos(x, y, z));
 		if (tileEntity != null)
 		{
 			try {
-				tileEntity.read(state, nms);
+				tileEntity.deserializeNBT(state, nms);
 			} catch (JsonSyntaxException e)
 			{
 				OTG.log(LogMarker.WARN, "Badly formatted json for tile entity with id '{}' at {},{},{}", nms.getString("id"), x, y, z);
@@ -589,25 +589,25 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	public void placeDungeon(Random random, int x, int y, int z)
 	{
 		// TODO: dungeons don't spawn due to us not using cave air in caves
-		Features.MONSTER_ROOM.generate(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
+		Features.MONSTER_ROOM.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(x, y, z));
 	}
 
 	@Override
 	public void placeFossil(Random random, ChunkCoordinate chunkCoord)
 	{
-		Features.FOSSIL.generate(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+		Features.FOSSIL.place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 	}
 
 	@Override
 	public void placeFromRegistry(Random random, ChunkCoordinate chunkCoord, String id)
 	{
-		DynamicRegistries registries = this.worldGenRegion.getWorld().func_241828_r();
-		Registry<ConfiguredFeature<?, ?>> registry = registries.getRegistry(Registry.CONFIGURED_FEATURE_KEY);
+		DynamicRegistries registries = this.worldGenRegion.getLevel().registryAccess();
+		Registry<ConfiguredFeature<?, ?>> registry = registries.registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
 
 		Optional<ConfiguredFeature<?, ?>> feature = registry.getOptional(new ResourceLocation(id));
 
 		if (feature.isPresent()) {
-			feature.get().generate(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
+			feature.get().place(this.worldGenRegion, this.chunkGenerator, random, new BlockPos(chunkCoord.getBlockX(), 0, chunkCoord.getBlockZ()));
 		} else {
 			OTG.log(LogMarker.ERROR, "Unable to find registry object " + id);
 		}
@@ -635,12 +635,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 
 	public TileEntity getTileEntity(BlockPos blockPos)
 	{
-		return worldGenRegion.getTileEntity(blockPos);
+		return worldGenRegion.getBlockEntity(blockPos);
 	}
 
 	public void setBlockState(BlockPos blockpos, BlockState blockstate1, int i)
 	{
-		worldGenRegion.setBlockState(blockpos, blockstate1, i);
+		worldGenRegion.setBlock(blockpos, blockstate1, i);
 	}
 
 	public BlockState getBlockState(BlockPos blockPos)

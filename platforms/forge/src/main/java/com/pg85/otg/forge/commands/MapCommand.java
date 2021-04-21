@@ -14,13 +14,13 @@ public class MapCommand
 {
 	protected static int mapBiomes(CommandSource source, int width, int height)
 	{
-		if (!(source.getWorld().getChunkProvider().generator.getBiomeProvider() instanceof OTGBiomeProvider))
+		if (!(source.getLevel().getChunkSource().generator.getBiomeSource() instanceof OTGBiomeProvider))
 		{
-			source.sendFeedback(new StringTextComponent("Please run this command in an OTG world."), false);
+			source.sendSuccess(new StringTextComponent("Please run this command in an OTG world."), false);
 			return 1;
 		}
 
-		OTGBiomeProvider provider = (OTGBiomeProvider) source.getWorld().getChunkProvider().generator.getBiomeProvider();
+		OTGBiomeProvider provider = (OTGBiomeProvider) source.getLevel().getChunkSource().generator.getBiomeSource();
 
 		//setup image
 
@@ -39,13 +39,13 @@ public class MapCommand
 			//send a progress update to let people know the server isn't dying
 			if (x % progressUpdate == 0)
 			{
-				source.sendFeedback(new StringTextComponent((((double) x / img.getHeight()) * 100) + "% Done mapping"), true);
+				source.sendSuccess(new StringTextComponent((((double) x / img.getHeight()) * 100) + "% Done mapping"), true);
 			}
 		}
 
-		String fileName = source.getServer().getServerConfiguration().getWorldName() + " biomes.png";
+		String fileName = source.getServer().getWorldData().getLevelName() + " biomes.png";
 
-		source.sendFeedback(new StringTextComponent("Finished mapping! The resulting image is located at " + fileName + "."), true);
+		source.sendSuccess(new StringTextComponent("Finished mapping! The resulting image is located at " + fileName + "."), true);
 
 		//save the biome map
 		Path p = Paths.get(fileName);

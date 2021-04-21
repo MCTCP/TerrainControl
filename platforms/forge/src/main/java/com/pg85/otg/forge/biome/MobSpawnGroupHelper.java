@@ -13,11 +13,11 @@ public class MobSpawnGroupHelper
 {
 	public static List<WeightedMobSpawnGroup> getListFromMinecraftBiome(Biome biome, EntityClassification type)
 	{
-		List<Spawners> mobList = biome.getMobSpawnInfo().getSpawners(type);       
+		List<Spawners> mobList = biome.getMobSettings().getMobs(type);       
 		List<WeightedMobSpawnGroup> result = new ArrayList<WeightedMobSpawnGroup>();
 		for (Spawners spawner : mobList)
 		{
-			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.type.getRegistryName().toString(), spawner.itemWeight, spawner.minCount, spawner.maxCount);
+			WeightedMobSpawnGroup wMSG = new WeightedMobSpawnGroup(spawner.type.getRegistryName().toString(), spawner.weight, spawner.minCount, spawner.maxCount);
 			if(wMSG != null)
 			{
 				result.add(wMSG);

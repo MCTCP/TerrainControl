@@ -112,12 +112,12 @@ class ForgeEngine extends OTGEngine
 	{
 		// For server worlds, save the structure cache.
 		if(
-			!world.isRemote() && 
-			world.getChunkProvider() instanceof ServerChunkProvider && 
-			((ServerChunkProvider)world.getChunkProvider()).generator instanceof OTGNoiseChunkGenerator
+			!world.isClientSide() && 
+			world.getChunkSource() instanceof ServerChunkProvider && 
+			((ServerChunkProvider)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
 		)
 		{
-			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkProvider()).generator).saveStructureCache();
+			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkSource()).generator).saveStructureCache();
 		}
 	}
 }

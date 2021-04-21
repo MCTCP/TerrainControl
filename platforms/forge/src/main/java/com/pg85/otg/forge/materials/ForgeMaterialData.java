@@ -110,7 +110,7 @@ public class ForgeMaterialData extends LocalMaterialData
 			// For leaves, add DISTANCE 1 to make them not decay.
 			if(state.getMaterial().equals(Material.LEAVES))
 			{
-				return ofMinecraftBlockState(state.with(LeavesBlock.DISTANCE, 1), input);
+				return ofMinecraftBlockState(state.setValue(LeavesBlock.DISTANCE, 1), input);
 			}
 			return ofMinecraftBlockState(state, input);
 		}
@@ -148,9 +148,9 @@ public class ForgeMaterialData extends LocalMaterialData
 			if(block != null && (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air")))
 			{
 				// For leaves, add DISTANCE 1 to make them not decay.
-				if(block.getDefaultState().getMaterial().equals(Material.LEAVES))
+				if(block.defaultBlockState().getMaterial().equals(Material.LEAVES))
 				{
-					return ofMinecraftBlockState(block.getDefaultState().with(LeavesBlock.DISTANCE, 1), input);
+					return ofMinecraftBlockState(block.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1), input);
 				}
 				return ofMinecraftBlock(block, input);
 			}
@@ -176,7 +176,7 @@ public class ForgeMaterialData extends LocalMaterialData
 	 */
 	private static LocalMaterialData ofMinecraftBlock(Block block, String raw)
 	{
-		return ofMinecraftBlockState(block.getDefaultState(), raw);
+		return ofMinecraftBlockState(block.defaultBlockState(), raw);
 	}
 
 	/**
@@ -322,23 +322,23 @@ public class ForgeMaterialData extends LocalMaterialData
 				// We're interested in the DirectionProperty
 				if (property instanceof DirectionProperty)
 				{
-					Direction direction = (Direction) state.get(property);
+					Direction direction = (Direction) state.getValue(property);
 					switch (direction)
 					{
 						case DOWN:
 						case UP:
 							break;
 						case NORTH:
-							state = state.with((DirectionProperty) property, Direction.WEST);
+							state = state.setValue((DirectionProperty) property, Direction.WEST);
 							break;
 						case SOUTH:
-							state = state.with((DirectionProperty) property, Direction.EAST);
+							state = state.setValue((DirectionProperty) property, Direction.EAST);
 							break;
 						case WEST:
-							state = state.with((DirectionProperty) property, Direction.SOUTH);
+							state = state.setValue((DirectionProperty) property, Direction.SOUTH);
 							break;
 						case EAST:
-							state = state.with((DirectionProperty) property, Direction.NORTH);
+							state = state.setValue((DirectionProperty) property, Direction.NORTH);
 							break;
 					}
 				}
@@ -346,11 +346,11 @@ public class ForgeMaterialData extends LocalMaterialData
 			if (state.hasProperty(SixWayBlock.EAST)) // fence or glass pane
 			{
 				// Cache the east value, before it's overwritten by the rotated south value
-				boolean hasEast = state.get(SixWayBlock.EAST);
-				state = state.with(SixWayBlock.EAST, state.get(SixWayBlock.SOUTH));
-				state = state.with(SixWayBlock.SOUTH, state.get(SixWayBlock.WEST));
-				state = state.with(SixWayBlock.WEST, state.get(SixWayBlock.NORTH));
-				state = state.with(SixWayBlock.NORTH, hasEast);
+				boolean hasEast = state.getValue(SixWayBlock.EAST);
+				state = state.setValue(SixWayBlock.EAST, state.getValue(SixWayBlock.SOUTH));
+				state = state.setValue(SixWayBlock.SOUTH, state.getValue(SixWayBlock.WEST));
+				state = state.setValue(SixWayBlock.WEST, state.getValue(SixWayBlock.NORTH));
+				state = state.setValue(SixWayBlock.NORTH, hasEast);
 			}
 			// Block is rotated, store a pointer to it
 			this.rotated = ForgeMaterialData.ofMinecraftBlockState(state);
@@ -370,14 +370,14 @@ public class ForgeMaterialData extends LocalMaterialData
 
 		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
 		if (materialProperty == MaterialProperties.AGE_0_25) {
-			property = (Property<T>) BlockStateProperties.AGE_0_25;
+			property = (Property<T>) BlockStateProperties.AGE_25;
 		} else if (materialProperty == MaterialProperties.PICKLES_1_4) {
-			property = (Property<T>) BlockStateProperties.PICKLES_1_4;
+			property = (Property<T>) BlockStateProperties.PICKLES;
 		} else {
 			throw new IllegalArgumentException("Bad property: " + materialProperty);
 		}
 
-		return ForgeMaterialData.ofMinecraftBlockState(this.blockData.with(property, value));
+		return ForgeMaterialData.ofMinecraftBlockState(this.blockData.setValue(property, value));
 	}
 
 	@Override

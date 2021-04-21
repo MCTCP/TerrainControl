@@ -21,8 +21,7 @@ public class MobSpawnGroupHelper
         {
             WEIGHT_FIELD = WeightedRandomChoice.class.getDeclaredField("a");
             WEIGHT_FIELD.setAccessible(true);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             throw new RuntimeException("Reflection error", e);
         }
     }

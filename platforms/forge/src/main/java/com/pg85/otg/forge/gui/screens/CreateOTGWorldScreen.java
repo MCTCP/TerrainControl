@@ -45,15 +45,15 @@ public class CreateOTGWorldScreen extends Screen
 	}
 
 	@Override
-	public void closeScreen()
+	public void onClose()
 	{
-		this.minecraft.displayGuiScreen(this.parent);
+		this.minecraft.setScreen(this.parent);
 	}
 
 	@Override
 	protected void init()
 	{
-		this.minecraft.keyboardListener.enableRepeatEvents(true);
+		this.minecraft.keyboardHandler.setSendRepeatsToGui(true);
 		this.guiPresetList = new CreateOTGWorldScreen.PresetList();
 		this.children.add(this.guiPresetList);
 		this.btnClose = this.addButton(
@@ -65,7 +65,7 @@ public class CreateOTGWorldScreen extends Screen
 				DialogTexts.GUI_DONE,
 				(p_241579_1_) -> {
 					this.dimensionConfig.accept(this.selectedPreset);
-					this.minecraft.displayGuiScreen(this.parent);
+					this.minecraft.setScreen(this.parent);
 				}
 			)
 		);
@@ -77,11 +77,11 @@ public class CreateOTGWorldScreen extends Screen
 				150, 
 				20, 
 				DialogTexts.GUI_CANCEL,
-				(p_213015_1_) -> this.minecraft.displayGuiScreen(this.parent)
+				(p_213015_1_) -> this.minecraft.setScreen(this.parent)
 			)
 		);
 		
-		this.guiPresetList.setSelected(this.guiPresetList.getEventListeners().stream().filter(entry -> Objects.equals(entry.field_238599_b_.getName(), this.selectedPreset.PresetName))
+		this.guiPresetList.setSelected(this.guiPresetList.children().stream().filter(entry -> Objects.equals(entry.field_238599_b_.getName(), this.selectedPreset.PresetName))
 				.findFirst().orElse(null));
 	}
 
@@ -119,7 +119,7 @@ public class CreateOTGWorldScreen extends Screen
 		@Override
 		protected boolean isFocused()
 		{
-			return CreateOTGWorldScreen.this.getListener() == this;
+			return CreateOTGWorldScreen.this.getFocused() == this;
 		}
 
 		@Override
@@ -129,7 +129,7 @@ public class CreateOTGWorldScreen extends Screen
 			if (p_241215_1_ != null)
 			{
 				CreateOTGWorldScreen.this.selectedPreset = new DimensionConfig(p_241215_1_.field_238599_b_.getName());
-				NarratorChatListener.INSTANCE.say(p_241215_1_.field_238599_b_.getName());
+				NarratorChatListener.INSTANCE.sayNow(p_241215_1_.field_238599_b_.getName());
 			}
 			CreateOTGWorldScreen.this.func_205306_h();
 		}
