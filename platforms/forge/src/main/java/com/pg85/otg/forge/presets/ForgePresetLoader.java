@@ -141,7 +141,7 @@ public class ForgePresetLoader extends LocalPresetLoader
 				//System.out.println(resourceLocation);
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
  				
- 				presetBiomes.add(RegistryKey.getOrCreateKey(Registry.BIOME_KEY, resourceLocation));
+ 				presetBiomes.add(RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation));
  				 				
 				presetIdMapping[otgBiomeId] = biomeConfig;
 				presetReverseIdMapping.put(biomeConfig, otgBiomeId);

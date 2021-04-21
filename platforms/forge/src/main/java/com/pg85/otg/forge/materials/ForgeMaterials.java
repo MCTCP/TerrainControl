@@ -87,18 +87,18 @@ class ForgeMaterials extends LocalMaterials
 			LONG_GRASS = readMaterial(LocalMaterials.LONG_GRASS_NAME);
 			RED_MUSHROOM = readMaterial(LocalMaterials.RED_MUSHROOM_NAME);
 
-			DOUBLE_TALL_GRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
-			DOUBLE_TALL_GRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
-			LARGE_FERN_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
-			LARGE_FERN_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
-			LILAC_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
-			LILAC_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
-			PEONY_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
-			PEONY_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
-			ROSE_BUSH_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
-			ROSE_BUSH_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
-			SUNFLOWER_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
-			SUNFLOWER_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().with(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+			DOUBLE_TALL_GRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+			DOUBLE_TALL_GRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.DOUBLE_TALL_GRASS_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+			LARGE_FERN_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+			LARGE_FERN_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LARGE_FERN_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+			LILAC_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+			LILAC_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.LILAC_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+			PEONY_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+			PEONY_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.PEONY_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+			ROSE_BUSH_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+			ROSE_BUSH_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.ROSE_BUSH_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
+			SUNFLOWER_LOWER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.LOWER));
+			SUNFLOWER_UPPER = ForgeMaterialData.ofMinecraftBlockState(((ForgeMaterialData)readMaterial(LocalMaterials.SUNFLOWER_NAME)).internalBlock().setValue(DoublePlantBlock.HALF, DoubleBlockHalf.UPPER));
 			
 			PUMPKIN = readMaterial(LocalMaterials.PUMPKIN_NAME);
 			CACTUS = readMaterial(LocalMaterials.CACTUS_NAME);
@@ -107,22 +107,22 @@ class ForgeMaterials extends LocalMaterials
 			SAPLING = readMaterial(LocalMaterials.SAPLING_NAME);
 			WATER_LILY = readMaterial(LocalMaterials.WATER_LILY_NAME);
 			SUGAR_CANE_BLOCK = readMaterial(LocalMaterials.SUGAR_CANE_BLOCK_NAME);
-			BlockState bambooState = Blocks.BAMBOO.getDefaultState().with(BambooBlock.PROPERTY_AGE, 1).with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.NONE).with(BambooBlock.PROPERTY_STAGE, 0);
+			BlockState bambooState = Blocks.BAMBOO.defaultBlockState().setValue(BambooBlock.AGE, 1).setValue(BambooBlock.LEAVES, BambooLeaves.NONE).setValue(BambooBlock.STAGE, 0);
 			BAMBOO = ForgeMaterialData.ofMinecraftBlockState(bambooState);
-			BAMBOO_SMALL = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.SMALL));
-			BAMBOO_LARGE = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.LARGE));
-			BAMBOO_LARGE_GROWING = ForgeMaterialData.ofMinecraftBlockState(bambooState.with(BambooBlock.PROPERTY_BAMBOO_LEAVES, BambooLeaves.LARGE).with(BambooBlock.PROPERTY_STAGE, 1));
+			BAMBOO_SMALL = ForgeMaterialData.ofMinecraftBlockState(bambooState.setValue(BambooBlock.LEAVES, BambooLeaves.SMALL));
+			BAMBOO_LARGE = ForgeMaterialData.ofMinecraftBlockState(bambooState.setValue(BambooBlock.LEAVES, BambooLeaves.LARGE));
+			BAMBOO_LARGE_GROWING = ForgeMaterialData.ofMinecraftBlockState(bambooState.setValue(BambooBlock.LEAVES, BambooLeaves.LARGE).setValue(BambooBlock.STAGE, 1));
 			PODZOL = readMaterial(LocalMaterials.PODZOL_NAME);
-			SEAGRASS = ForgeMaterialData.ofMinecraftBlockState(Blocks.SEAGRASS.getDefaultState());
-			TALL_SEAGRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.getDefaultState().with(TallSeaGrassBlock.HALF, DoubleBlockHalf.LOWER));
-			TALL_SEAGRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.getDefaultState().with(TallSeaGrassBlock.HALF, DoubleBlockHalf.UPPER));
-			KELP = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP.getDefaultState());
-			KELP_PLANT = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP_PLANT.getDefaultState());
-			VINE_SOUTH = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.SOUTH, true));
-			VINE_NORTH = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.NORTH, true));
-			VINE_WEST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.WEST, true));
-			VINE_EAST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.getDefaultState().with(VineBlock.EAST, true));
-			SEA_PICKLE = ForgeMaterialData.ofMinecraftBlockState(Blocks.SEA_PICKLE.getDefaultState());
+			SEAGRASS = ForgeMaterialData.ofMinecraftBlockState(Blocks.SEAGRASS.defaultBlockState());
+			TALL_SEAGRASS_LOWER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeaGrassBlock.HALF, DoubleBlockHalf.LOWER));
+			TALL_SEAGRASS_UPPER = ForgeMaterialData.ofMinecraftBlockState(Blocks.TALL_SEAGRASS.defaultBlockState().setValue(TallSeaGrassBlock.HALF, DoubleBlockHalf.UPPER));
+			KELP = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP.defaultBlockState());
+			KELP_PLANT = ForgeMaterialData.ofMinecraftBlockState(Blocks.KELP_PLANT.defaultBlockState());
+			VINE_SOUTH = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.defaultBlockState().setValue(VineBlock.SOUTH, true));
+			VINE_NORTH = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.defaultBlockState().setValue(VineBlock.NORTH, true));
+			VINE_WEST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.defaultBlockState().setValue(VineBlock.WEST, true));
+			VINE_EAST = ForgeMaterialData.ofMinecraftBlockState(Blocks.VINE.defaultBlockState().setValue(VineBlock.EAST, true));
+			SEA_PICKLE = ForgeMaterialData.ofMinecraftBlockState(Blocks.SEA_PICKLE.defaultBlockState());
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

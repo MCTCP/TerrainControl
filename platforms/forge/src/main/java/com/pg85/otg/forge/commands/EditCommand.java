@@ -52,16 +52,16 @@ public class EditCommand
 			}
 			catch (IllegalArgumentException ignored) {}
 
-			if (objectName.equals("")) { source.sendFeedback(new StringTextComponent("Please supply an object name"), false); return 0; }
+			if (objectName.equals("")) { source.sendSuccess(new StringTextComponent("Please supply an object name"), false); return 0; }
 
-			if (source.getEntity() == null) { source.sendFeedback(new StringTextComponent("Only players can run this command"), false); return 0; }
+			if (source.getEntity() == null) { source.sendSuccess(new StringTextComponent("Only players can run this command"), false); return 0; }
 
 			CustomObject objectToSpawn = SpawnCommand.getObject(objectName, presetName);
 
-			if (!(objectToSpawn instanceof BO3)) { source.sendFeedback(new StringTextComponent("Could not find BO3 "+objectName), false); return 0; }
+			if (!(objectToSpawn instanceof BO3)) { source.sendSuccess(new StringTextComponent("Could not find BO3 "+objectName), false); return 0; }
 
 			Preset preset = ExportCommand.getPreset(presetName);
-			if (preset == null) { source.sendFeedback(new StringTextComponent("Could not find preset "+presetName), false); return 0; }
+			if (preset == null) { source.sendSuccess(new StringTextComponent("Could not find preset "+presetName), false); return 0; }
 
 			Path objectPath = ExportCommand.getObjectPath(preset, presetName);
 
@@ -69,9 +69,9 @@ public class EditCommand
 
 			// Use ForgeWorldGenRegion as a wrapper for the world that BO3Creator can interact with
 			ForgeWorldGenRegion genRegion = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(),
-				source.getWorld(), source.getWorld().getChunkProvider().getChunkGenerator());
+				source.getLevel(), source.getLevel().getChunkSource().getGenerator());
 
-			BlockPos pos = source.getEntity().getPosition();
+			BlockPos pos = source.getEntity().blockPosition();
 
 			BoundingBox box = bo3.getBoundingBox(Rotation.NORTH);
 			BOCreator.Corner center = new BOCreator.Corner(pos.getX() + 2 + (box.getWidth() / 2), pos.getY(), pos.getZ() + 2 + (box.getDepth() / 2));
@@ -100,26 +100,26 @@ public class EditCommand
 
 				if (fixedBO3 != null)
 				{
-					source.sendFeedback(new StringTextComponent("Successfully updated BO3 " + bo3.getName()), false);
+					source.sendSuccess(new StringTextComponent("Successfully updated BO3 " + bo3.getName()), false);
 					OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(presetName, fixedBO3.getName().toLowerCase(Locale.ROOT), fixedBO3.getSettings().getFile(), bo3);
 				}
 				else
 				{
-					source.sendFeedback(new StringTextComponent("Failed to update BO3 " + bo3.getName()), false);
+					source.sendSuccess(new StringTextComponent("Failed to update BO3 " + bo3.getName()), false);
 				}
 				cleanArea(genRegion, region.getLow(), region.getHigh());
 			} else {
 				// Store the info, wait for /otg finishedit
 				sessionsMap.put(source.getEntity(), new EditSession(genRegion, bo3, extraBlocks, objectPath, presetName, center));
-				source.sendFeedback(new StringTextComponent("You can now edit the bo3"), false);
-				source.sendFeedback(new StringTextComponent("To change the area of the bo3, use /otg region"), false);
-				source.sendFeedback(new StringTextComponent("When you are done editing, do /otg finishedit"), false);
+				source.sendSuccess(new StringTextComponent("You can now edit the bo3"), false);
+				source.sendSuccess(new StringTextComponent("To change the area of the bo3, use /otg region"), false);
+				source.sendSuccess(new StringTextComponent("When you are done editing, do /otg finishedit"), false);
 				ExportCommand.playerSelectionMap.put(source.getEntity(), region);
 			}
 		}
 		catch (Exception e)
 		{
-			source.sendFeedback(new StringTextComponent("Something went wrong, please check logs"), false);
+			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.log(LogMarker.INFO, e.toString());
 			for (StackTraceElement s : e.getStackTrace())
 			{
@@ -136,8 +136,8 @@ public class EditCommand
 		try
 		{
 			EditSession session = sessionsMap.get(source.getEntity());
-			if (session != null) source.sendFeedback(new StringTextComponent("Cleaning up..."), false);
-			else {source.sendFeedback(new StringTextComponent("No active session, do '/otg edit' to start one"), false); return 0;}
+			if (session != null) source.sendSuccess(new StringTextComponent("Cleaning up..."), false);
+			else {source.sendSuccess(new StringTextComponent("No active session, do '/otg edit' to start one"), false); return 0;}
 
 			ExportCommand.Region region = ExportCommand.playerSelectionMap.get(source.getEntity());
 
@@ -149,19 +149,19 @@ public class EditCommand
 
 			if (bo3 != null)
 			{
-				source.sendFeedback(new StringTextComponent("Successfully edited BO3 " + bo3.getName()), false);
+				source.sendSuccess(new StringTextComponent("Successfully edited BO3 " + bo3.getName()), false);
 				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetName,  bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
 			}
 			else
 			{
-				source.sendFeedback(new StringTextComponent("Failed to edit BO3 " + bo3.getName()), false);
+				source.sendSuccess(new StringTextComponent("Failed to edit BO3 " + bo3.getName()), false);
 			}
 			cleanArea(session.genRegion, region.getLow(), region.getHigh());
 			sessionsMap.put(source.getEntity(), null);
 		}
 		catch (Exception e)
 		{
-			source.sendFeedback(new StringTextComponent("Something went wrong, please check logs"), false);
+			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.log(LogMarker.INFO, e.toString());
 			for (StackTraceElement s : e.getStackTrace())
 			{
@@ -222,7 +222,7 @@ public class EditCommand
 			for (BlockPos blockpos : updates)
 			{
 				BlockState blockstate = genRegion.getBlockState(blockpos);
-				BlockState blockstate1 = Block.getValidBlockForPosition(blockstate, genRegion.getInternal(), blockpos);
+				BlockState blockstate1 = Block.updateFromNeighbourShapes(blockstate, genRegion.getInternal(), blockpos);
 				genRegion.setBlockState(blockpos, blockstate1, 20);
 			}
 		}
@@ -244,12 +244,12 @@ public class EditCommand
 
 	public static int help(CommandContext<CommandSource> context)
 	{
-		context.getSource().sendFeedback(new StringTextComponent("To use the edit command:"), false);
-		context.getSource().sendFeedback(new StringTextComponent("/otg edit <preset> <object> [-fix, -clean]"), false);
-		context.getSource().sendFeedback(new StringTextComponent(" * Preset is which preset to fetch the object from, and save it back to"), false);
-		context.getSource().sendFeedback(new StringTextComponent(" * Object is the object you want to edit"), false);
-		context.getSource().sendFeedback(new StringTextComponent(" * The -nofix flag disables block state fixing"), false);
-		context.getSource().sendFeedback(new StringTextComponent(" * The -update flag immediately exports and cleans after fixing"), false);
+		context.getSource().sendSuccess(new StringTextComponent("To use the edit command:"), false);
+		context.getSource().sendSuccess(new StringTextComponent("/otg edit <preset> <object> [-fix, -clean]"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" * Preset is which preset to fetch the object from, and save it back to"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" * Object is the object you want to edit"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" * The -nofix flag disables block state fixing"), false);
+		context.getSource().sendSuccess(new StringTextComponent(" * The -update flag immediately exports and cleans after fixing"), false);
 		return 0;
 	}
 

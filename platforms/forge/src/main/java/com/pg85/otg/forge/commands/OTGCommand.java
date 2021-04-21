@@ -30,7 +30,7 @@ public class OTGCommand
 	{
 		dispatcher.register(
 			Commands.literal("otg").requires(
-				(context) -> context.hasPermissionLevel(2)
+				(context) -> context.hasPermission(2)
 			).executes(
 				(context) -> HelpCommand.showHelp(context.getSource())
 			).then(
@@ -69,7 +69,7 @@ public class OTGCommand
 								context.getSource(),
 								context.getArgument("preset", String.class),
 								context.getArgument("object", String.class),
-								Objects.requireNonNull(context.getSource().getEntity()).getPosition())
+								Objects.requireNonNull(context.getSource().getEntity()).blockPosition())
 						).then(
 							Commands.argument("location", BlockPosArgument.blockPos())
 								.executes(
@@ -125,7 +125,7 @@ public class OTGCommand
 			).then(
 				Commands.literal("export").executes(ExportCommand::execute).then(
 					Commands.argument("name", StringArgumentType.string()).executes(ExportCommand::execute).then(
-						Commands.argument("center", BlockStateArgument.blockState()).executes(ExportCommand::execute).then(
+						Commands.argument("center", BlockStateArgument.block()).executes(ExportCommand::execute).then(
 							Commands.argument("preset", new PresetArgument()).executes(ExportCommand::execute).then(
 								Commands.argument("template", new TemplateArgument()).executes(ExportCommand::execute).then(
 									Commands.argument("flags", FlagsArgument.with("-o", "-a", "-b")).executes(ExportCommand::execute)

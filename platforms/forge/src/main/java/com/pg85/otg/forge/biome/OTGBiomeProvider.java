@@ -36,7 +36,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 			Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
 			Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
 			Codec.BOOL.fieldOf("large_biomes").orElse(false).stable().forGetter((provider) -> provider.largeBiomes),
-			RegistryLookupCodec.getLookUpCodec(Registry.BIOME_KEY).forGetter((provider) -> provider.registry)
+			RegistryLookupCodec.create(Registry.BIOME_REGISTRY).forGetter((provider) -> provider.registry)
 		).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
  	
@@ -68,7 +68,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		{
 			BiomeConfig config = this.configLookup[biomeId];
 
-			RegistryKey<Biome> key = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
+			RegistryKey<Biome> key = RegistryKey.create(Registry.BIOME_REGISTRY, new ResourceLocation(config.getRegistryKey().toResourceLocationString()));
 			this.keyLookup.put(biomeId, key);
 		}
 	}
@@ -89,13 +89,13 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		);
 	}
 
-	protected Codec<? extends BiomeProvider> getBiomeProviderCodec()
+	protected Codec<? extends BiomeProvider> codec()
 	{
 		return CODEC;
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public BiomeProvider getBiomeProvider(long seed)
+	public BiomeProvider withSeed(long seed)
 	{
 		return new OTGBiomeProvider(this.presetName, seed, this.legacyBiomeInitLayer, this.largeBiomes, this.registry);
 	}
@@ -108,7 +108,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	@Override
 	public String getBiomeRegistryName(int biomeX, int biomeY, int biomeZ)
 	{
-		return getBiomeRegistryKey(biomeX, biomeY, biomeZ).getLocation().toString();
+		return getBiomeRegistryKey(biomeX, biomeY, biomeZ).location().toString();
 	}
 
 	public RegistryKey<Biome> lookupKey(int index)
@@ -119,7 +119,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	@Override
 	public Biome getNoiseBiome(int biomeX, int biomeY, int biomeZ)
 	{
-		return registry.getValueForKey(keyLookup.get(this.layer.sample(biomeX, biomeZ)));
+		return registry.get(keyLookup.get(this.layer.sample(biomeX, biomeZ)));
 	}
 
 	@Override

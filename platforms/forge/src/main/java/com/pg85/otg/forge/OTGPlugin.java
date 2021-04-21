@@ -37,9 +37,9 @@ public class OTGPlugin
 		MinecraftForge.EVENT_BUS.register(this);
 		
 		// These are needed to let the game know about our chunk generator and biome provider. If they are not added, then the game will error and not save games properly.
-		Registry.register(Registry.BIOME_PROVIDER_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
-		Registry.register(Registry.CHUNK_GENERATOR_CODEC, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
-		RegistryKey.getOrCreateKey(Registry.WORLD_KEY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
+		Registry.register(Registry.BIOME_SOURCE, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGBiomeProvider.CODEC);
+		Registry.register(Registry.CHUNK_GENERATOR, new ResourceLocation(Constants.MOD_ID_SHORT, "default"), OTGNoiseChunkGenerator.CODEC);
+		RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(Constants.MOD_ID_SHORT, "default"));
 		// Start OpenTerrainGenerator engine, loads all presets.
 		// moved to the registerBiomes method over mod load order concerns with presetpacker
 		//OTG.startEngine(new ForgeEngine());
