@@ -321,13 +321,13 @@ public final class BiomeConfigFinder
 
             if(settings.hasSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES))
             {
-    	    	this.spawnWaterAmbientCreaturesMerged = settings.getSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES, new ArrayList<WeightedMobSpawnGroup>(), logger, materialReader);
-    	        if(this.spawnWaterAmbientCreaturesMerged == null)
+    	    	this.spawnWaterAmbientCreatures = settings.getSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES, new ArrayList<WeightedMobSpawnGroup>(), logger, materialReader);
+    	        if(this.spawnWaterAmbientCreatures == null)
     	        {
-    	        	this.spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
+    	        	this.spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
     	        }
             } else {
-            	this.spawnWaterAmbientCreaturesMerged = defaultSettings.defaultWaterAmbientCreatures;
+            	this.spawnWaterAmbientCreatures = defaultSettings.defaultWaterAmbientCreatures;
             }
             
             if(settings.hasSetting(BiomeStandardValues.SPAWN_MISC_CREATURES))
