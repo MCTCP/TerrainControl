@@ -14,6 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(SpawnLocationHelper.class)
 public class MixinSpawnLocationHelper
 {	
+	/* TODO: Find proper obfuscated method name
     @Inject(method = "func_241092_a_", at = @At("HEAD"), cancellable = true)
     private static void fixSpawningInGround(ServerWorld world, int x, int z, boolean needsValidSpawn, CallbackInfoReturnable<BlockPos> cir)
     {
@@ -33,4 +34,5 @@ public class MixinSpawnLocationHelper
             }
         }
     }
+    */
 }

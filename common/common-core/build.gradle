@@ -2,7 +2,7 @@
 
 plugins {
   id 'java'
-  id 'com.github.johnrengelman.shadow' version '1.2.4'
+  //id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
 // Project properties
@@ -33,25 +33,25 @@ dependencies
     )
 }
 
-shadowJar {
-    dependencies {
-		include dependency(':common-util')
-		include dependency(':common-config')
-		include dependency(':common-customobject')
-		include dependency(':common-generator')
-		include dependency(':jackson-annotations')
-		include dependency(':jackson-core')
-		include dependency(':jackson-dataformat-yaml')
-		include dependency(':jackson-databind')
-		include dependency(':snakeyaml')
-    }
+//shadowJar {
+    //dependencies {
+		//include dependency(':common-util')
+		//include dependency(':common-config')
+		//include dependency(':common-customobject')
+		//include dependency(':common-generator')
+		//include dependency(':jackson-annotations')
+		//include dependency(':jackson-core')
+		//include dependency(':jackson-dataformat-yaml')
+		//include dependency(':jackson-databind')
+		//include dependency(':snakeyaml')
+    //}
 	// TODO: ShadowJar doesn't appear to be working correctly, Forge isn't picking
 	// up shaded dependencies. Let's hope Forge know how to resolve duplicate
 	// dependencies by now...
 	//relocate 'com.fasterxml.jackson', 'com.pg85.otg.shaded.fasterxml.jackson'
 	//relocate 'org.yaml', 'com.pg85.otg.shaded.org.yaml'
-	archiveName = project.archivesBaseName + '-' + project.version + '.jar'
-	destinationDir = project.distsDir
-}
+	//archiveName = project.archivesBaseName + '-' + project.version + '.jar'
+	//destinationDir = project.distsDir
+//}
 
-build.finalizedBy(shadowJar)
+//build.finalizedBy(shadowJar)
