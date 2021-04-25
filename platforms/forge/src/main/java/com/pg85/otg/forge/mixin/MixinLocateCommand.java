@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(LocateCommand.class)
 public abstract class MixinLocateCommand
 {
-    @Shadow @Final private static SimpleCommandExceptionType ERROR_FAILED;
 
     @Shadow
     public static int showLocateResult(CommandSource p_241054_0_, String p_241054_1_, BlockPos p_241054_2_, BlockPos p_241054_3_, String p_241054_4_)
@@ -25,8 +24,9 @@ public abstract class MixinLocateCommand
         return 0;
     }
 
-    /* TODO: Find proper obfuscated method name
-    @Inject(method = "func_241053_a_", at = @At("HEAD"), cancellable = true)
+    @Shadow @Final private static SimpleCommandExceptionType ERROR_FAILED;
+
+    @Inject(method = "locate", at = @At("HEAD"), cancellable = true)
     private static void searchInSmallerRadius(CommandSource source, Structure<?> structure, CallbackInfoReturnable<Integer> cir) throws CommandSyntaxException
     {
         if (source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator)
@@ -42,5 +42,4 @@ public abstract class MixinLocateCommand
             }
         }
     }
-    */
 }
