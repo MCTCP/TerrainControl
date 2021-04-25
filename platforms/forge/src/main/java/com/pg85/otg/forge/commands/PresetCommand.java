@@ -9,13 +9,13 @@ public class PresetCommand
 {
 	protected static int showPreset(CommandSource source)
 	{
-		if (!(source.getWorld().getChunkProvider().generator instanceof OTGNoiseChunkGenerator))
+		if (!(source.getLevel().getChunkSource().generator instanceof OTGNoiseChunkGenerator))
 		{
-			source.sendFeedback(new StringTextComponent("OTG is not enabled in this world"), false);
+			source.sendSuccess(new StringTextComponent("OTG is not enabled in this world"), false);
 			return 0;
 		}
-		Preset preset = ((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().generator).getPreset();
-		source.sendFeedback(new StringTextComponent
+		Preset preset = ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().generator).getPreset();
+		source.sendSuccess(new StringTextComponent
 			("Preset: " + preset.getName()
 			 + "\nDescription: " + preset.getDescription()
 			 + "\nVersion: " + preset.getVersion()

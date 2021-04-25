@@ -41,7 +41,7 @@ public class ExportCommand
 		{
 			if (!(source.getEntity() instanceof ServerPlayerEntity))
 			{
-				source.sendFeedback(new StringTextComponent("Only players can execute this command"), false);
+				source.sendSuccess(new StringTextComponent("Only players can execute this command"), false);
 				return 0;
 			}
 
@@ -70,20 +70,20 @@ public class ExportCommand
 
 			if (objectName.equalsIgnoreCase(""))
 			{
-				source.sendFeedback(new StringTextComponent("Please specify a name for the object"), false);
+				source.sendSuccess(new StringTextComponent("Please specify a name for the object"), false);
 				return 0;
 			}
 
 			Region region = playerSelectionMap.get(source.getEntity());
 			if (region == null || region.getLow() == null)
 			{
-				source.sendFeedback(new StringTextComponent("Please mark two corners with /otg region mark"), false);
+				source.sendSuccess(new StringTextComponent("Please mark two corners with /otg region mark"), false);
 				return 0;
 			}
 			Preset preset = getPreset(presetName);
 			if (preset == null)
 			{
-				source.sendFeedback(new StringTextComponent("Could not find preset "+presetName), false);
+				source.sendSuccess(new StringTextComponent("Could not find preset "+presetName), false);
 				return 0;
 			}
 
@@ -93,14 +93,14 @@ public class ExportCommand
 			{
 				if (new File(objectPath.toFile(), objectName + ".bo3").exists())
 				{
-					source.sendFeedback(new StringTextComponent("File already exists, run command with flag '-o' to overwrite"), false);
+					source.sendSuccess(new StringTextComponent("File already exists, run command with flag '-o' to overwrite"), false);
 					return 0;
 				}
 			}
 
 			LocalWorldGenRegion otgRegion = new ForgeWorldGenRegion(
-				preset.getName(), preset.getWorldConfig(), source.getWorld(),
-				source.getWorld().getChunkProvider().getChunkGenerator()
+				preset.getName(), preset.getWorldConfig(), source.getLevel(),
+				source.getLevel().getChunkSource().getGenerator()
 			);
 			LocalNBTHelper nbtHelper = new ForgeNBTHelper();
 			BOCreator.Corner lowCorner = region.getLow();
@@ -150,7 +150,7 @@ public class ExportCommand
 			// Send feedback, and register the BO3 for immediate use
 			if (bo3 != null)
 			{
-				source.sendFeedback(new StringTextComponent("Successfully created BO3 " + objectName), false);
+				source.sendSuccess(new StringTextComponent("Successfully created BO3 " + objectName), false);
 				if (presetName.equalsIgnoreCase("global"))
 				{
 					OTG.getEngine().getCustomObjectManager().registerGlobalObject(bo3, bo3.getSettings().getFile());
@@ -160,11 +160,11 @@ public class ExportCommand
 			}
 			else
 			{
-				source.sendFeedback(new StringTextComponent("Failed to create BO3 " + objectName), false);
+				source.sendSuccess(new StringTextComponent("Failed to create BO3 " + objectName), false);
 			}
 		} catch (Exception e)
 		{
-			source.sendFeedback(new StringTextComponent("Something went wrong, please check logs"), false);
+			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.log(LogMarker.INFO, e.toString());
 			for (StackTraceElement s : e.getStackTrace())
 			{
@@ -208,8 +208,8 @@ public class ExportCommand
 	public static int mark(CommandSource source)
 	{
 		if (!init(source)) return 0;
-		playerSelectionMap.get(source.getEntity()).setPos(source.getEntity().getPosition());
-		source.sendFeedback(new StringTextComponent("Position marked"), false);
+		playerSelectionMap.get(source.getEntity()).setPos(source.getEntity().blockPosition());
+		source.sendSuccess(new StringTextComponent("Position marked"), false);
 		return 0;
 	}
 
@@ -217,7 +217,7 @@ public class ExportCommand
 	{
 		if (!init(source)) return 0;
 		playerSelectionMap.get(source.getEntity()).clear();
-		source.sendFeedback(new StringTextComponent("Position cleared"), false);
+		source.sendSuccess(new StringTextComponent("Position cleared"), false);
 		return 0;
 	}
 
@@ -227,7 +227,7 @@ public class ExportCommand
 		Region region = playerSelectionMap.get(source.getEntity());
 		if (region.getLow() == null)
 		{
-			source.sendFeedback(new StringTextComponent("Please mark two positions before modifying or exporting the region"), false);
+			source.sendSuccess(new StringTextComponent("Please mark two positions before modifying or exporting the region"), false);
 			return 0;
 		}
 		switch (direction)
@@ -251,11 +251,11 @@ public class ExportCommand
 				region.setLowCorner(new BOCreator.Corner(region.low.x, region.low.y - value, region.low.z));
 				break;
 			default:
-				source.sendFeedback(new StringTextComponent("Unrecognized direction " + direction), false);
+				source.sendSuccess(new StringTextComponent("Unrecognized direction " + direction), false);
 				return 0;
 		}
 
-		source.sendFeedback(new StringTextComponent("Region modified"), false);
+		source.sendSuccess(new StringTextComponent("Region modified"), false);
 		return 0;
 	}
 
@@ -272,7 +272,7 @@ public class ExportCommand
 	{
 		if (!(source.getEntity() instanceof ServerPlayerEntity))
 		{
-			source.sendFeedback(new StringTextComponent("Only players can execute this command"), false);
+			source.sendSuccess(new StringTextComponent("Only players can execute this command"), false);
 			return false;
 		}
 		if (!playerSelectionMap.containsKey(source.getEntity()))

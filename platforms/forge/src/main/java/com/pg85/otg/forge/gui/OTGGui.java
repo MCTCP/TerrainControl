@@ -30,7 +30,7 @@ public class OTGGui
 	// Define a new world type for the world creation screen
 	private static final BiomeGeneratorTypeScreens OTG_WORLD_TYPE = new BiomeGeneratorTypeScreens(Constants.MOD_ID_SHORT)
 	{
-		protected ChunkGenerator func_241869_a(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
+		protected ChunkGenerator generator(Registry<Biome> biomes, Registry<DimensionSettings> dimensionSettings, long seed)
 		{
 			// Provide our custom chunk generator, biome provider and dimension settings.
 			if(!OTG.getEngine().getPresetLoader().getAllPresets().isEmpty())
@@ -49,7 +49,7 @@ public class OTGGui
 	public static void init()
 	{
 		// Register the otg worldtype for the world creation screen
-		BiomeGeneratorTypeScreens.field_239068_c_.add(OTG_WORLD_TYPE);
+		BiomeGeneratorTypeScreens.PRESETS.add(OTG_WORLD_TYPE);
 		
 		// Register world type customisation button / screens
 		Map<Optional<BiomeGeneratorTypeScreens>, BiomeGeneratorTypeScreens.IFactory> otgWorldOptionsScreen =
@@ -61,14 +61,14 @@ public class OTGGui
 					{
 						return new CreateOTGWorldScreen(
 							createWorldScreen,
-							createWorldScreen.field_238934_c_.func_239055_b_(),
+							createWorldScreen.worldGenSettingsComponent.registryHolder(),
 							// Define apply function, generates updated 
 							// settings when leaving customisation menu.
 							(dimensionConfig) ->
 							{
-								createWorldScreen.field_238934_c_.func_239043_a_(
+								createWorldScreen.worldGenSettingsComponent.updateSettings(
 									OTGGui.createOTGDimensionGeneratorSettings(
-										createWorldScreen.field_238934_c_.func_239055_b_(),
+										createWorldScreen.worldGenSettingsComponent.registryHolder(),
 										dimensionGeneratorSettings,
 										dimensionConfig
 									)
@@ -83,8 +83,8 @@ public class OTGGui
 			)
 		;
 		
-		BiomeGeneratorTypeScreens.field_239069_d_ = ImmutableMap.<Optional<BiomeGeneratorTypeScreens>, BiomeGeneratorTypeScreens.IFactory>builder()
-			.putAll(BiomeGeneratorTypeScreens.field_239069_d_)
+		BiomeGeneratorTypeScreens.EDITORS = ImmutableMap.<Optional<BiomeGeneratorTypeScreens>, BiomeGeneratorTypeScreens.IFactory>builder()
+			.putAll(BiomeGeneratorTypeScreens.EDITORS)
 			.putAll(otgWorldOptionsScreen)
 			.build()
 		;		
@@ -92,27 +92,27 @@ public class OTGGui
 	
 	private static DimensionGeneratorSettings createOTGDimensionGeneratorSettings(DynamicRegistries dynamicRegistries, DimensionGeneratorSettings dimensionGeneratorSettings, DimensionConfig dimensionConfig)
 	{
-		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.getRegistry(Registry.DIMENSION_TYPE_KEY);
-		Registry<Biome> biomesRegistry = dynamicRegistries.getRegistry(Registry.BIOME_KEY);
-		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.getRegistry(Registry.NOISE_SETTINGS_KEY);
+		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
+		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 		
 		return new DimensionGeneratorSettings(
-			dimensionGeneratorSettings.getSeed(),
-			dimensionGeneratorSettings.doesGenerateFeatures(),
-			dimensionGeneratorSettings.hasBonusChest(),
-			DimensionGeneratorSettings.func_242749_a(
+			dimensionGeneratorSettings.seed(),
+			dimensionGeneratorSettings.generateFeatures(),
+			dimensionGeneratorSettings.generateBonusChest(),
+			DimensionGeneratorSettings.withOverworld(
 				dimensionTypesRegistry,
-				dimensionGeneratorSettings.func_236224_e_(),
+				dimensionGeneratorSettings.dimensions(),
 				new OTGNoiseChunkGenerator(
 					dimensionConfig,
 					new OTGBiomeProvider(
 						dimensionConfig.PresetName,
-						dimensionGeneratorSettings.getSeed(),
+						dimensionGeneratorSettings.seed(),
 						false,
 						false,
 						biomesRegistry
 					),
-					dimensionGeneratorSettings.getSeed(),
+					dimensionGeneratorSettings.seed(),
 					() -> dimensionSettingsRegistry.getOrThrow(DimensionSettings.OVERWORLD)
 				)
 			)

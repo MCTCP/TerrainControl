@@ -57,11 +57,11 @@ public class DataCommand
 				registry = ForgeRegistries.PARTICLE_TYPES;
 				break;
 			case "configured_feature":
-				worldGenRegistry = source.getServer().getDynamicRegistries().getRegistry(Registry.CONFIGURED_FEATURE_KEY);
+				worldGenRegistry = source.getServer().registryAccess().registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
 				break;
 			default:
-				source.sendFeedback(new StringTextComponent(USAGE), false);
-				source.sendFeedback(new StringTextComponent("Data types: " + String.join(", ", DATA_TYPES)), false);
+				source.sendSuccess(new StringTextComponent(USAGE), false);
+				source.sendSuccess(new StringTextComponent("Data types: " + String.join(", ", DATA_TYPES)), false);
 				return 0;
 		}
 
@@ -84,7 +84,7 @@ public class DataCommand
 					writer.write(key.toString()+"\n");
 				}
 				writer.close();
-				source.sendFeedback(new StringTextComponent("File exported as "+fileName), true);
+				source.sendSuccess(new StringTextComponent("File exported as "+fileName), true);
 			}
 			catch (IOException e)
 			{

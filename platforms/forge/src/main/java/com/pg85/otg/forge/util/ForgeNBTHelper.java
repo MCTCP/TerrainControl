@@ -23,7 +23,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 			return null;
 		}
 		CompoundNBT nbt = new CompoundNBT();
-		tileEntity.write(nbt);
+		tileEntity.save(nbt);
 		// Double up, just to be safe. It should be x, y, z.
 		//nmsTag.remove("pos");
 		nbt.remove("x");
@@ -53,7 +53,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 		//	return compoundTag;
 		//}
 
-		Set<String> keys = compoundNBT.keySet();
+		Set<String> keys = compoundNBT.getAllKeys();
 
 		// Add all child tags to the compound tag
 		for (String key : keys)
@@ -116,7 +116,7 @@ public class ForgeNBTHelper extends LocalNBTHelper
 			return null;
 		}
 
-		NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[listNBT.getTagType()];
+		NamedBinaryTag.Type listType = NamedBinaryTag.Type.values()[listNBT.getElementType()];
 		NamedBinaryTag listTag = new NamedBinaryTag(name, listType);
 
 		// Add all child tags
@@ -171,23 +171,23 @@ public class ForgeNBTHelper extends LocalNBTHelper
 		switch (type)
 		{
 			case TAG_Byte:
-				return ((ByteNBT) inbt).getByte();
+				return ((ByteNBT) inbt).getAsByte();
 			case TAG_Short:
-				return ((ShortNBT) inbt).getShort();
+				return ((ShortNBT) inbt).getAsShort();
 			case TAG_Int:
-				return ((IntNBT) inbt).getInt();
+				return ((IntNBT) inbt).getAsInt();
 			case TAG_Long:
-				return ((LongNBT) inbt).getLong();
+				return ((LongNBT) inbt).getAsLong();
 			case TAG_Float:
-				return ((FloatNBT) inbt).getFloat();
+				return ((FloatNBT) inbt).getAsFloat();
 			case TAG_Double:
-				return ((DoubleNBT) inbt).getDouble();
+				return ((DoubleNBT) inbt).getAsDouble();
 			case TAG_Byte_Array:
-				return ((ByteArrayNBT) inbt).getByteArray();
+				return ((ByteArrayNBT) inbt).getAsByteArray();
 			case TAG_String:
-				return inbt.getString();
+				return inbt.getAsString();
 			case TAG_Int_Array:
-				return ((IntArrayNBT) inbt).getIntArray();
+				return ((IntArrayNBT) inbt).getAsIntArray();
 			default:
 				// Cannot read this from a tag
 				throw new IllegalArgumentException(type + "doesn't have a simple value!");

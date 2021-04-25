@@ -29,12 +29,12 @@ class ForgeChunkBuffer extends ChunkBuffer
 	@Override
 	public void setBlock(int blockX, int blockY, int blockZ, LocalMaterialData material)
 	{
-		this.chunk.setBlockState(this.mutable.setPos(blockX, blockY, blockZ), ((ForgeMaterialData) material).internalBlock(), false);
+		this.chunk.setBlockState(this.mutable.set(blockX, blockY, blockZ), ((ForgeMaterialData) material).internalBlock(), false);
 	}
 
 	@Override
 	public LocalMaterialData getBlock(int blockX, int blockY, int blockZ)
 	{
-		return ForgeMaterialData.ofMinecraftBlockState(this.chunk.getBlockState(this.mutable.setPos(blockX, blockY, blockZ)));
+		return ForgeMaterialData.ofMinecraftBlockState(this.chunk.getBlockState(this.mutable.set(blockX, blockY, blockZ)));
 	}
 }

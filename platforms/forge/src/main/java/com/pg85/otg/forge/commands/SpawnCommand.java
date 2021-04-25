@@ -25,23 +25,23 @@ public class SpawnCommand
 
 			if (objectToSpawn == null)
 			{
-				source.sendFeedback(new StringTextComponent("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects"), false);
+				source.sendSuccess(new StringTextComponent("Could not find an object by the name " + objectName + " in either " + presetName + " or Global objects"), false);
 				return 0;
 			}
 
 			Preset preset = ExportCommand.getPreset(presetName);
 
-			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(), source.getWorld(),
-				source.getWorld().getChunkProvider().getChunkGenerator());
+			LocalWorldGenRegion region = new ForgeWorldGenRegion(preset.getName(), preset.getWorldConfig(), source.getLevel(),
+				source.getLevel().getChunkSource().getGenerator());
 
-			CustomStructureCache cache =  source.getWorld().getChunkProvider().getChunkGenerator() instanceof OTGNoiseChunkGenerator ?
-										  ((OTGNoiseChunkGenerator) source.getWorld().getChunkProvider().getChunkGenerator()).getStructureCache() :
+			CustomStructureCache cache =  source.getLevel().getChunkSource().getGenerator() instanceof OTGNoiseChunkGenerator ?
+										  ((OTGNoiseChunkGenerator) source.getLevel().getChunkSource().getGenerator()).getStructureCache() :
 										  null;
 
 			// Cache is only null in non-OTG worlds
 			if (cache == null && objectToSpawn.doReplaceBlocks())
 			{
-				source.sendFeedback(new StringTextComponent("Cannot spawn objects with DoReplaceBlocks in on-OTG worlds"), false);
+				source.sendSuccess(new StringTextComponent("Cannot spawn objects with DoReplaceBlocks in on-OTG worlds"), false);
 				return 0;
 			}
 
@@ -55,16 +55,16 @@ public class SpawnCommand
 				blockPos.getZ()
 			))
 			{
-				source.sendFeedback(new StringTextComponent("Spawned object " + objectName + " at " + blockPos.toString()), false);
+				source.sendSuccess(new StringTextComponent("Spawned object " + objectName + " at " + blockPos.toString()), false);
 			}
 			else
 			{
-				source.sendFeedback(new StringTextComponent("Failed to spawn object " + objectName + ". Is it a BO4?"), false);
+				source.sendSuccess(new StringTextComponent("Failed to spawn object " + objectName + ". Is it a BO4?"), false);
 			}
 		}
 		catch (Exception e)
 		{
-			source.sendFeedback(new StringTextComponent("Something went wrong, please check logs"), false);
+			source.sendSuccess(new StringTextComponent("Something went wrong, please check logs"), false);
 			OTG.log(LogMarker.INFO, e.toString());
 			for (StackTraceElement s :
 				e.getStackTrace())

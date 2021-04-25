@@ -24,17 +24,17 @@ public class OTGChunkGeneratorFactory implements IChunkGeneratorFactory
 	// Used for MP when starting the server, with settings from server.properties.
 	public DimensionGeneratorSettings createSettings(DynamicRegistries dynamicRegistries, long seed, boolean generateStructures, boolean bonusChest, String generatorSettings)
 	{
-		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.getRegistry(Registry.DIMENSION_TYPE_KEY);
-		Registry<Biome> biomesRegistry = dynamicRegistries.getRegistry(Registry.BIOME_KEY);
-		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.getRegistry(Registry.NOISE_SETTINGS_KEY);
+		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
+		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
+		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
 		
 		return new DimensionGeneratorSettings(
 			seed,
 			generateStructures,
 			bonusChest,
-			DimensionGeneratorSettings.func_242749_a(
+			DimensionGeneratorSettings.withOverworld(
 				dimensionTypesRegistry,
-				DimensionType.getDefaultSimpleRegistry(dimensionTypesRegistry, biomesRegistry, dimensionSettingsRegistry, seed),
+				DimensionType.defaultDimensions(dimensionTypesRegistry, biomesRegistry, dimensionSettingsRegistry, seed),
 				new OTGNoiseChunkGenerator(
 					new DimensionConfig(generatorSettings),
 					new OTGBiomeProvider(
