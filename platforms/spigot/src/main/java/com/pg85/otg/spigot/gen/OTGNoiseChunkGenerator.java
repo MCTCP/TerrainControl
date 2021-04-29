@@ -708,6 +708,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Setup jigsaw data
 		ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
+		/*
 		ChunkCoordIntPair pos = chunk.getPos();
 		int chunkX = pos.x;
 		int chunkZ = pos.z;
@@ -749,6 +750,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 
 			});
 		}
+		*/
 
 		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 		return chunk;
