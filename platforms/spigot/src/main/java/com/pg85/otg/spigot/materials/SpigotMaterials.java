@@ -79,7 +79,15 @@ public class SpigotMaterials extends LocalMaterials
 			SPRUCE_LEAVES = readMaterial(LocalMaterials.SPRUCE_LEAVES_NAME);
 
 			// Plants
-			RED_ROSE = readMaterial(LocalMaterials.RED_ROSE_NAME);
+			POPPY = readMaterial(LocalMaterials.POPPY_NAME);
+			BLUE_ORCHID = readMaterial(LocalMaterials.BLUE_ORCHID_NAME);
+			ALLIUM = readMaterial(LocalMaterials.ALLIUM_NAME);
+			AZURE_BLUET = readMaterial(LocalMaterials.AZURE_BLUET_NAME);
+			RED_TULIP = readMaterial(LocalMaterials.RED_TULIP_NAME);
+			ORANGE_TULIP = readMaterial(LocalMaterials.ORANGE_TULIP_NAME);
+			WHITE_TULIP = readMaterial(LocalMaterials.WHITE_TULIP_NAME);
+			PINK_TULIP = readMaterial(LocalMaterials.PINK_TULIP_NAME);
+			OXEYE_DAISY = readMaterial(LocalMaterials.OXEYE_DAISY_NAME);
 			BROWN_MUSHROOM = readMaterial(LocalMaterials.BROWN_MUSHROOM_NAME);
 			YELLOW_FLOWER = readMaterial(LocalMaterials.YELLOW_FLOWER_NAME);
 			DEAD_BUSH = readMaterial(LocalMaterials.DEAD_BUSH_NAME);
