@@ -287,6 +287,12 @@ public class IcebergSurfaceGenerator implements SurfaceGenerator
 		return null;
 	}
 
+	@Override
+	public String toString()
+	{
+		return "Iceberg";
+	}
+
 	public static IcebergSurfaceGenerator getFor(String settingValue)
 	{
 		if (settingValue.equalsIgnoreCase("Iceberg")) {
