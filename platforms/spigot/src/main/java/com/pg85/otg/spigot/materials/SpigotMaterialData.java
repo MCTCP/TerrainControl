@@ -7,6 +7,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.materials.MaterialProperties;
 import com.pg85.otg.util.materials.MaterialProperty;
 import net.minecraft.server.v1_16_R3.*;
@@ -16,34 +17,27 @@ import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 import java.util.Collection;
 import java.util.HashMap;
 
+/**
+ * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
+ */
 public class SpigotMaterialData extends LocalMaterialData
 {
-	private static final LocalMaterialData blank;
-
-	static
-	{
-		SpigotMaterialData data = new SpigotMaterialData(null, null);
-		data.isBlank = true;
-		blank = data;
-	}
-
+	private static final LocalMaterialData blank = new SpigotMaterialData(null, null, true);
 	private static final HashMap<IBlockData, LocalMaterialData> stateToMaterialDataMap = new HashMap<>();
 
 	private final IBlockData blockData;
-
 	private String name = null;
 
 	private SpigotMaterialData(IBlockData blockData, String raw)
 	{
-		if (blockData == null) this.isBlank = true;
+		this(blockData, raw, false);
+	}
+	
+	private SpigotMaterialData(IBlockData blockData, String raw, boolean isBlank)
+	{
 		this.blockData = blockData;
 		this.rawEntry = raw;
-	}
-
-
-	private static LocalMaterialData getBlank()
-	{
-		return blank;
+		this.isBlank = isBlank;
 	}
 
 	public static LocalMaterialData ofString(String input) throws InvalidConfigException
@@ -61,7 +55,7 @@ public class SpigotMaterialData extends LocalMaterialData
 		// Used in BO4's as placeholder/detector block.
 		if (input.equalsIgnoreCase("blank"))
 		{
-			return SpigotMaterialData.getBlank();
+			return SpigotMaterialData.blank;
 		}
 
 		IBlockData blockState;
@@ -100,9 +94,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			String newInput = blockNameCorrected.contains(":") ? blockNameCorrected : "minecraft:" + blockNameCorrected;
 			blockdata = new ArgumentBlock(new StringReader(newInput), true).a(true).getBlockData();
 		}
-		catch (CommandSyntaxException ignored)
-		{
-		}
+		catch (CommandSyntaxException ignored) { }
 		if (blockdata != null)
 		{
 			// For leaves, add DISTANCE 1 to make them not decay.
@@ -171,8 +163,11 @@ public class SpigotMaterialData extends LocalMaterialData
 
 	public static LocalMaterialData ofBlockData(IBlockData blockData, String raw)
 	{
+		// Create only one LocalMaterialData object for each BlockState		
 		if (stateToMaterialDataMap.containsKey(blockData))
+		{
 			return stateToMaterialDataMap.get(blockData);
+		}
 		LocalMaterialData data = new SpigotMaterialData(blockData, raw);
 		stateToMaterialDataMap.put(blockData, data);
 		return data;
@@ -183,11 +178,27 @@ public class SpigotMaterialData extends LocalMaterialData
 		return ofBlockData(((CraftBlockData) type.createBlockData()).getState(), null);
 	}
 
+	public IBlockData internalBlock()
+	{
+		return this.blockData;
+	}
+	
+	public BlockData toSpigotBlockData()
+	{
+		if (this.blockData == null)
+		{
+			return null;
+		}
+		return CraftBlockData.fromData(this.blockData);
+	}	
+	
 	@Override
 	public String getName()
 	{
 		if (this.name != null)
+		{
 			return this.name;
+		}
 		if (isBlank)
 		{
 			this.name = "BLANK";
@@ -197,14 +208,10 @@ public class SpigotMaterialData extends LocalMaterialData
 			if (this.rawEntry != null)
 			{
 				this.name = this.rawEntry;
-			}
-			else
-			{
+			} else {
 				this.name = "Unknown";
 			}
-		}
-		else
-		{
+		} else {
 			this.name = this.blockData.toString()
 				.replace("Block{", "")
 				.replace("}", "");
@@ -245,65 +252,43 @@ public class SpigotMaterialData extends LocalMaterialData
 	}
 
 	@Override
+	public boolean canFall()
+	{
+		return this.blockData != null && this.blockData.getBlock() instanceof BlockFalling;
+	}
+	
+	@Override
 	public boolean canSnowFallOn()
 	{
 		return this.blockData != null && this.blockData.getMaterial().isSolid();
 	}
-
+	
 	@Override
 	public boolean isMaterial(LocalMaterialData material)
 	{
-		return (this.isBlank && ((SpigotMaterialData) material).isBlank) ||
-			   (
-				   !this.isBlank &&
-				   !((SpigotMaterialData) material).isBlank &&
-				   this.blockData.getBlock().r().equals(((SpigotMaterialData) material).blockData.getBlock().r()));
-	}
-
-	@Override
-	public LocalMaterialData withDefaultBlockData()
-	{
-		if (this.blockData == null)
-		{
-			return this;
-		}
-		return ofBlockData(this.blockData.getBlock().getBlockData(), rawEntry);
-	}
-
-	@Override
-	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
-	{
-		IBlockState<T> property = null;
-
-		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
-		if (materialProperty == MaterialProperties.AGE_0_25)
-		{
-			property = (IBlockState<T>) BlockProperties.ak;
-		}
-		else if (materialProperty == MaterialProperties.PICKLES_1_4)
-		{
-			property = (IBlockState<T>) BlockProperties.ay;
-		}
-		else
-		{
-			throw new IllegalArgumentException("Bad property: " + materialProperty);
-		}
-
-		return SpigotMaterialData.ofBlockData(this.blockData.set(property, value));
+		return 
+			(this.isBlank && ((SpigotMaterialData) material).isBlank) ||
+			(
+				!this.isBlank &&
+				!((SpigotMaterialData) material).isBlank &&
+				this.blockData.getBlock().r().equals(((SpigotMaterialData) material).blockData.getBlock().r())
+			)
+		;
 	}
 
 	@Override
 	public LocalMaterialData rotate(int rotateTimes)
 	{
+		// Get the rotation if we haven't stored the rotation yet
 		if (rotated == null)
 		{
-
 			IBlockData state = this.blockData;
-
 			Collection<IBlockState<?>> properties = state.r();
+			// Loop through the blocks properties
 			for (IBlockState<?> property : properties)
 			{
-				if (property instanceof BlockStateDirection) // Anything with a direction
+				// Anything with a direction
+				if (property instanceof BlockStateDirection)
 				{
 					EnumDirection direction = (EnumDirection) state.get(property);
 					switch (direction)
@@ -329,12 +314,14 @@ public class SpigotMaterialData extends LocalMaterialData
 
 			if (state.b(BlockTall.EAST)) // fence or glass pane
 			{
+				// Cache the east value, before it's overwritten by the rotated south value
 				boolean hasEast = state.get(BlockTall.EAST);
 				state = state.set(BlockTall.EAST, state.get(BlockTall.SOUTH));
 				state = state.set(BlockTall.SOUTH, state.get(BlockTall.WEST));
 				state = state.set(BlockTall.WEST, state.get(BlockTall.NORTH));
 				state = state.set(BlockTall.NORTH, hasEast);
 			}
+			// Block is rotated, store a pointer to it			
 			this.rotated = SpigotMaterialData.ofBlockData(state);
 		}
 
@@ -344,7 +331,39 @@ public class SpigotMaterialData extends LocalMaterialData
 
 		return this.rotated;
 	}
+	
+	@Override
+	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
+	{
+		IBlockState<T> property = null;
 
+		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
+		if (materialProperty == MaterialProperties.AGE_0_25)
+		{
+			property = (IBlockState<T>) BlockProperties.ak;
+		}
+		else if (materialProperty == MaterialProperties.PICKLES_1_4)
+		{
+			property = (IBlockState<T>) BlockProperties.ay;
+		} else {
+			throw new IllegalArgumentException("Bad property: " + materialProperty);
+		}
+
+		return SpigotMaterialData.ofBlockData(this.blockData.set(property, value));
+	}
+
+	@Override
+	public boolean isTag()
+	{		
+		return false;
+	}	
+	
+	@Override
+	public boolean isBlockTag(LocalMaterialTag tag)
+	{
+		return this.blockData == null ? false : this.blockData.a(((SpigotMaterialTag)tag).getTag());
+	}	
+	
 	@Override
 	public boolean equals(Object obj)
 	{
@@ -371,30 +390,5 @@ public class SpigotMaterialData extends LocalMaterialData
 	{
 		// TODO: Implement this for 1.16
 		return this.blockData == null ? -1 : this.blockData.hashCode();
-	}
-
-	@Override
-	public boolean canFall()
-	{
-		return this.blockData != null && this.blockData.getBlock() instanceof BlockFalling;
-	}
-
-	@Override
-	public boolean hasData()
-	{
-		// TODO: Implement this for 1.16
-		return false;
-	}
-
-	public IBlockData internalBlock()
-	{
-		return this.blockData;
-	}
-
-	public BlockData toSpigotBlockData()
-	{
-		if (this.blockData == null)
-			return null;
-		return CraftBlockData.fromData(this.blockData);
 	}
 }

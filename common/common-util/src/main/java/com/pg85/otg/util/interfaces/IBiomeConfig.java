@@ -98,6 +98,7 @@ public interface IBiomeConfig
 	LocalMaterialData getSandStoneBlockReplaced(int y);
 	LocalMaterialData getDefaultGroundBlock();
 	void doSurfaceAndGroundControl(long worldSeed, GeneratingChunk generatingChunk, ChunkBuffer chunkBuffer, IBiomeConfig biomeConfig, int x, int z);
+	boolean hasReplaceBlocksSettings();
 	ReplacedBlocksMatrix getReplaceBlocks();
 	
 	// Water / lava / freezing
@@ -174,5 +175,5 @@ public interface IBiomeConfig
 	List<WeightedMobSpawnGroup> getWaterCreatures();
 	List<WeightedMobSpawnGroup> getAmbientCreatures();	
 	List<WeightedMobSpawnGroup> getWaterAmbientCreatures();
-	List<WeightedMobSpawnGroup> getMiscCreatures();
+	List<WeightedMobSpawnGroup> getMiscCreatures();	
 }

@@ -389,7 +389,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				}
 			}
 		}
-
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
@@ -608,7 +607,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			blockInChunk = chunk.getBlockState(new BlockPos(blockX, y, blockZ));
 			if (blockInChunk != null)
 			{
-				blocksInColumn[y] = ForgeMaterialData.ofMinecraftBlockState(blockInChunk);
+				blocksInColumn[y] = ForgeMaterialData.ofBlockState(blockInChunk);
 			} else {
 				break;
 			}

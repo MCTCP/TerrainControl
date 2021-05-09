@@ -139,7 +139,7 @@ public class ExportCommand
 			else
 			{
 				// Create a new BO3 from our settings
-				LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofMinecraftBlockState(centerBlockState);
+				LocalMaterialData centerBlock = centerBlockState == null ? null : ForgeMaterialData.ofBlockState(centerBlockState);
 				bo3 = BO3Creator.create(lowCorner, highCorner, center, centerBlock, objectName, includeAir,
 					objectPath, otgRegion, nbtHelper, null, template.getSettings(), presetName,
 					OTG.getEngine().getOTGRootFolder(), OTG.getEngine().getPluginConfig().getSpawnLogEnabled(),
