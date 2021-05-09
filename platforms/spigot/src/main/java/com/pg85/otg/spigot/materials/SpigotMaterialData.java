@@ -132,17 +132,20 @@ public class SpigotMaterialData extends LocalMaterialData
 		// Try without data
 		Block block;
 
-		// This returns AIR if block is not found ><. ----Does it for spigot too?
-		block = IRegistry.BLOCK.get(new MinecraftKey(blockNameCorrected));
-		if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
+		try
 		{
-			// For leaves, add DISTANCE 1 to make them not decay.
-			if (block.getBlockData().getMaterial().equals(Material.LEAVES))
+			// This returns AIR if block is not found ><. ----Does it for spigot too?
+			block = IRegistry.BLOCK.get(new MinecraftKey(blockNameCorrected));
+			if (block != Blocks.AIR || blockNameCorrected.toLowerCase().endsWith("air"))
 			{
-				return ofBlockData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
+				// For leaves, add DISTANCE 1 to make them not decay.
+				if (block.getBlockData().getMaterial().equals(Material.LEAVES))
+				{
+					return ofBlockData(block.getBlockData().set(BlockLeaves.DISTANCE, 1), input);
+				}
+				return ofBlockData(block.getBlockData(), input);
 			}
-			return ofBlockData(block.getBlockData(), input);
-		}
+		} catch(ResourceKeyInvalidException ignored) { }
 
 		// Try legacy name again, without data.
 		blockState = SpigotLegacyMaterials.fromLegacyBlockName(blockNameCorrected.replace("minecraft:", ""));
