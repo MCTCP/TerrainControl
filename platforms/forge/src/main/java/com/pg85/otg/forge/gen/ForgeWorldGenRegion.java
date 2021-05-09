@@ -309,7 +309,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		// Get internal coordinates for block in chunk
 		int internalX = x & 0xF;
 		int internalZ = z & 0xF;
-		return ForgeMaterialData.ofMinecraftBlockState(chunk.getBlockState(new BlockPos(internalX, y, internalZ)));
+		return ForgeMaterialData.ofBlockState(chunk.getBlockState(new BlockPos(internalX, y, internalZ)));
 	}
 	
 	@Override
@@ -411,7 +411,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 		{
 			blockState = chunk.getBlockState(new BlockPos(internalX, i, internalZ));
 			block = blockState.getBlock();
-			material = ForgeMaterialData.ofMinecraftBlockState(blockState);
+			material = ForgeMaterialData.ofBlockState(blockState);
 			isLiquid = material.isLiquid();
 			isSolid =
 			(

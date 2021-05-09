@@ -264,17 +264,6 @@ public class BiomeConfig extends BiomeConfigBase
 		this.replacedBlocks = reader.getSetting(BiomeStandardValues.REPLACED_BLOCKS, logger, materialReader);
 		this.sandStoneBlock = LocalMaterials.SANDSTONE;
 		this.redSandStoneBlock = LocalMaterials.RED_SANDSTONE;
-		this.replacedBlocks.init(
-			this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.configCooledLavaBlock,
-			this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.configIceBlock,
-			this.useWorldWaterLevel ? worldConfig.getWaterBlock() : this.configWaterBlock,
-			this.stoneBlock,
-			this.groundBlock,
-			this.surfaceBlock,
-			this.worldConfig.getDefaultBedrockBlock(),
-			this.sandStoneBlock,
-			this.redSandStoneBlock
-		);
 		this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings(reader, logger, materialReader);
 		this.useWorldWaterLevel = reader.getSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL, logger);
 		this.configWaterLevelMax = reader.getSetting(BiomeStandardValues.WATER_LEVEL_MAX, logger);
