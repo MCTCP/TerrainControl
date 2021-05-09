@@ -354,12 +354,6 @@ public class SpigotMaterialData extends LocalMaterialData
 
 		return SpigotMaterialData.ofBlockData(this.blockData.set(property, value));
 	}
-
-	@Override
-	public boolean isTag()
-	{		
-		return false;
-	}	
 	
 	@Override
 	public boolean isBlockTag(LocalMaterialTag tag)

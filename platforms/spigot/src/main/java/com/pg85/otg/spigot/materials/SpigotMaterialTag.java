@@ -20,18 +20,27 @@ public class SpigotMaterialTag extends LocalMaterialTag
 			return null;
 		}
 		Tag<Block> blockTag = TagsBlock.b().stream().filter(n -> n.a().equals(resourceLocation)).findFirst().orElse(null);
-		return blockTag == null ? null : new SpigotMaterialTag(blockTag);
+		return blockTag == null ? null : new SpigotMaterialTag(blockTag, name.trim().toLowerCase());
 	}
 	
-	private Tag<Block> blockTag;
+	private final String name;
+	private final Tag<Block> blockTag;
 	
-	private SpigotMaterialTag(Tag<Block> blockTag)
+	private SpigotMaterialTag(Tag<Block> blockTag, String name)
 	{
 		this.blockTag = blockTag;
+		this.name = name;
 	}
 
 	public Tag<Block> getTag()
 	{
 		return this.blockTag;
+	}
+	
+	@Override
+	public String toString()
+	{
+		// TODO: Fetch the registry name from the tag object.
+		return this.name;
 	}
 }

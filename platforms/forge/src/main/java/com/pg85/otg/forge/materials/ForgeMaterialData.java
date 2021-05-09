@@ -347,12 +347,6 @@ public class ForgeMaterialData extends LocalMaterialData
 
 		return ForgeMaterialData.ofBlockState(this.blockData.setValue(property, value));
 	}
-	
-	@Override
-	public boolean isTag()
-	{
-		return false;
-	}
 
 	@Override
 	public boolean isBlockTag(LocalMaterialTag tag)

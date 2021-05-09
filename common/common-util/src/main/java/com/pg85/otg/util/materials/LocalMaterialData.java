@@ -148,12 +148,19 @@ public abstract class LocalMaterialData extends LocalMaterialBase
         return replaceBlocks.replaceBlock(y, this);
 	}
 
-    public abstract boolean equals(Object other);
-    
-    public abstract int hashCode();
-    
+	@Override
+	public boolean isTag()
+	{		
+		return false;
+	}
+	
+    @Override
     public String toString()
     {
     	return getName();
     }
+	
+    public abstract boolean equals(Object other);
+    
+    public abstract int hashCode();    
 }
