@@ -350,6 +350,9 @@ public class SpigotMaterialData extends LocalMaterialData
 		else if (materialProperty == MaterialProperties.PICKLES_1_4)
 		{
 			property = BlockProperties.ay;
+		} else if (materialProperty == MaterialProperties.SNOWY)
+		{
+			property = BlockProperties.z;
 		} else if (materialProperty == MaterialProperties.HORIZONTAL_DIRECTION)
 		{
 			// Extremely ugly hack for directions

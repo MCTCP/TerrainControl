@@ -7,6 +7,7 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
+import com.pg85.otg.util.materials.MaterialProperties;
 
 public class FrozenSurfaceHelper
 {
@@ -194,6 +195,7 @@ public class FrozenSurfaceHelper
         	snowMass = LocalMaterials.SNOW;
         	//snowMass = LocalMaterialManager.toLocalMaterialData(LocalMaterialManager.SNOW, baseSnowHeight <= MAX_LAYERS_ON_LEAVES - 1 ? baseSnowHeight : MAX_LAYERS_ON_LEAVES - 1);
         	worldGenRegion.setBlock(x, y, z, snowMass, null, chunkBeingPopulated, true);
+
             return baseSnowHeight <= MAX_LAYERS_ON_LEAVES - 1;
         }
         
@@ -202,6 +204,13 @@ public class FrozenSurfaceHelper
         //snowMass = LocalMaterialManager.toLocalMaterialData(DefaultMaterial.SNOW, baseSnowHeight);
         snowMass = LocalMaterials.SNOW;
         worldGenRegion.setBlock(x, y, z, snowMass, null, chunkBeingPopulated, true);
+
+        // If we placed snow on grass or podzol, we need to update the snowy property of the grass.
+        if (materialToSnowOn.isMaterial(LocalMaterials.GRASS) || materialToSnowOn.isMaterial(LocalMaterials.PODZOL))
+        {
+            worldGenRegion.setBlock(x, y - 1, z, materialToSnowOn.withProperty(MaterialProperties.SNOWY, true), null, chunkBeingPopulated, true);
+        }
+
         return true;
     }
 

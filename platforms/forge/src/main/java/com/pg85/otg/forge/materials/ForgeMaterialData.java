@@ -342,6 +342,9 @@ public class ForgeMaterialData extends LocalMaterialData
 		} else if (materialProperty == MaterialProperties.PICKLES_1_4)
 		{
 			property = BlockStateProperties.PICKLES;
+		} else if (materialProperty == MaterialProperties.SNOWY)
+		{
+			property = BlockStateProperties.SNOWY;
 		} else if (materialProperty == MaterialProperties.HORIZONTAL_DIRECTION)
 		{
 			// Extremely ugly hack for directions

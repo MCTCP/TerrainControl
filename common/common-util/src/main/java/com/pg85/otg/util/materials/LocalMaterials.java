@@ -129,6 +129,7 @@ public class LocalMaterials
 
     public static LocalMaterialData AIR;
 
+    // Block of grass
     public static LocalMaterialData GRASS;
     public static LocalMaterialData DIRT;
 	public static LocalMaterialData PODZOL;
