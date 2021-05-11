@@ -27,7 +27,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 @Mod(Constants.MOD_ID_SHORT) // Should match META-INF/mods.toml
 @Mod.EventBusSubscriber(modid = Constants.MOD_ID_SHORT, bus = Mod.EventBusSubscriber.Bus.MOD) 
 public class OTGPlugin
-{	
+{
 	public OTGPlugin()
 	{
 		// Register the clientSetup method for client-side initialisation logic (GUI etc).

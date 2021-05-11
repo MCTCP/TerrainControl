@@ -35,8 +35,6 @@ public class AboveWaterGen extends Resource
             return;
 		}
 
-        //parseMaterials(worldGenregion.getWorldConfig(), material, null);
-
         LocalMaterialData worldMaterial;
         LocalMaterialData worldMaterialBeneath;
         

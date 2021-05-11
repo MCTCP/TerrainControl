@@ -11,8 +11,6 @@ import com.pg85.otg.util.materials.LocalMaterials;
 import net.minecraft.block.*;
 import net.minecraft.state.properties.BambooLeaves;
 import net.minecraft.state.properties.DoubleBlockHalf;
-import net.minecraft.tags.BlockTags;
-
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
