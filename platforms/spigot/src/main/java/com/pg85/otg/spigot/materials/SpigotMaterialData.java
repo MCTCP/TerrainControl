@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.OTGDirection;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.MaterialProperties;
@@ -273,23 +274,29 @@ public class SpigotMaterialData extends LocalMaterialData
 	@Override
 	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
 	{
-		IBlockState<T> property = null;
+		IBlockState property = null;
+		T finalVal = value;
 
 		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
 		if (materialProperty == MaterialProperties.AGE_0_25)
 		{
-			property = (IBlockState<T>) BlockProperties.ak;
+			property = BlockProperties.ak;
 		}
 		else if (materialProperty == MaterialProperties.PICKLES_1_4)
 		{
-			property = (IBlockState<T>) BlockProperties.ay;
-		}
-		else
+			property = BlockProperties.ay;
+		} else if (materialProperty == MaterialProperties.HORIZONTAL_DIRECTION)
 		{
-			throw new IllegalArgumentException("Bad property: " + materialProperty);
+			// Extremely ugly hack for directions
+			property = BlockProperties.O;
+			EnumDirection direction = EnumDirection.values()[((OTGDirection)value).ordinal()];
+			return SpigotMaterialData.ofBlockData(this.blockData.set(property, direction));
+		} else
+		{
+			throw new IllegalArgumentException("Unknown property: " + materialProperty);
 		}
 
-		return SpigotMaterialData.ofBlockData(this.blockData.set(property, value));
+		return SpigotMaterialData.ofBlockData(this.blockData.set(property, finalVal));
 	}
 
 	@Override

@@ -6,17 +6,19 @@ import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
-import net.minecraft.server.v1_16_R3.BlockBamboo;
-import net.minecraft.server.v1_16_R3.BlockPropertyBambooSize;
-import net.minecraft.server.v1_16_R3.BlockPropertyDoubleBlockHalf;
-import net.minecraft.server.v1_16_R3.BlockTallPlant;
-import net.minecraft.server.v1_16_R3.BlockTallSeaGrass;
-import net.minecraft.server.v1_16_R3.BlockVine;
-import net.minecraft.server.v1_16_R3.Blocks;
-import net.minecraft.server.v1_16_R3.IBlockData;
+import net.minecraft.server.v1_16_R3.*;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class SpigotMaterials extends LocalMaterials
 {
+	// Default blocks in given tags
+	// Tags aren't loaded until datapacks are loaded, on world creation. We mirror the vanilla copy of the tag to solve this.
+	private static final Block[] CORAL_BLOCKS_TAG = {Blocks.TUBE_CORAL_BLOCK, Blocks.BRAIN_CORAL_BLOCK, Blocks.BUBBLE_CORAL_BLOCK, Blocks.FIRE_CORAL_BLOCK, Blocks.HORN_CORAL_BLOCK};
+	private static final Block[] WALL_CORALS_TAG = {Blocks.TUBE_CORAL_WALL_FAN, Blocks.BRAIN_CORAL_WALL_FAN, Blocks.BUBBLE_CORAL_WALL_FAN, Blocks.FIRE_CORAL_WALL_FAN, Blocks.HORN_CORAL_WALL_FAN};
+	private static final Block[] CORALS_TAG = {Blocks.TUBE_CORAL, Blocks.BRAIN_CORAL, Blocks.BUBBLE_CORAL, Blocks.FIRE_CORAL, Blocks.HORN_CORAL, Blocks.TUBE_CORAL_FAN, Blocks.BRAIN_CORAL_FAN, Blocks.BUBBLE_CORAL_FAN, Blocks.FIRE_CORAL_FAN, Blocks.HORN_CORAL_FAN};
+
 	private static final FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<>(4096); // TODO: Smaller cache should be ok, only most frequently used should be cached?
 
 	static
@@ -122,6 +124,11 @@ public class SpigotMaterials extends LocalMaterials
 			VINE_WEST = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.WEST, true));
 			VINE_EAST = SpigotMaterialData.ofBlockData(Blocks.VINE.getBlockData().set(BlockVine.EAST, true));
 			SEA_PICKLE = SpigotMaterialData.ofBlockData(Blocks.SEA_PICKLE.getBlockData());
+
+			// Coral
+			CORAL_BLOCKS = Arrays.stream(CORAL_BLOCKS_TAG).map(block -> SpigotMaterialData.ofBlockData(block.getBlockData())).collect(Collectors.toList());
+			WALL_CORALS = Arrays.stream(WALL_CORALS_TAG).map(block -> SpigotMaterialData.ofBlockData(block.getBlockData())).collect(Collectors.toList());
+			CORALS = Arrays.stream(CORALS_TAG).map(block -> SpigotMaterialData.ofBlockData(block.getBlockData())).collect(Collectors.toList());
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);

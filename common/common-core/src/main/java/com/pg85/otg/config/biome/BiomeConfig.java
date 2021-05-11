@@ -16,32 +16,8 @@ import com.pg85.otg.customobject.resource.CustomStructureGen;
 import com.pg85.otg.customobject.resource.SaplingGen;
 import com.pg85.otg.customobject.resource.TreeGen;
 import com.pg85.otg.exception.InvalidConfigException;
-import com.pg85.otg.gen.resource.AboveWaterGen;
-import com.pg85.otg.gen.resource.BambooGen;
-import com.pg85.otg.gen.resource.BoulderGen;
-import com.pg85.otg.gen.resource.CactusGen;
-import com.pg85.otg.gen.resource.DungeonGen;
-import com.pg85.otg.gen.resource.FossilGen;
-import com.pg85.otg.gen.resource.GrassGen;
-import com.pg85.otg.gen.resource.IceSpikeGen;
+import com.pg85.otg.gen.resource.*;
 import com.pg85.otg.gen.resource.IceSpikeGen.SpikeType;
-import com.pg85.otg.gen.resource.KelpGen;
-import com.pg85.otg.gen.resource.LiquidGen;
-import com.pg85.otg.gen.resource.OreGen;
-import com.pg85.otg.gen.resource.PlantGen;
-import com.pg85.otg.gen.resource.PlantType;
-import com.pg85.otg.gen.resource.ReedGen;
-import com.pg85.otg.gen.resource.RegistryGen;
-import com.pg85.otg.gen.resource.SeaPickleGen;
-import com.pg85.otg.gen.resource.SeagrassGen;
-import com.pg85.otg.gen.resource.SmallLakeGen;
-import com.pg85.otg.gen.resource.SurfacePatchGen;
-import com.pg85.otg.gen.resource.UnderWaterOreGen;
-import com.pg85.otg.gen.resource.UnderWaterPlantGen;
-import com.pg85.otg.gen.resource.UndergroundLakeGen;
-import com.pg85.otg.gen.resource.VeinGen;
-import com.pg85.otg.gen.resource.VinesGen;
-import com.pg85.otg.gen.resource.WellGen;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
@@ -104,6 +80,9 @@ public class BiomeConfig extends BiomeConfigBase
 		CONFIG_FUNCTIONS.put("Kelp", KelpGen.class);
 		CONFIG_FUNCTIONS.put("SeaPickle", SeaPickleGen.class);
 		CONFIG_FUNCTIONS.put("Registry", RegistryGen.class);
+		CONFIG_FUNCTIONS.put("CoralMushroom", CoralMushroomGen.class);
+		CONFIG_FUNCTIONS.put("CoralTree", CoralTreeGen.class);
+		CONFIG_FUNCTIONS.put("CoralClaw", CoralClawGen.class);
 	}
 
 	// TODO: Not used atm, implement these.

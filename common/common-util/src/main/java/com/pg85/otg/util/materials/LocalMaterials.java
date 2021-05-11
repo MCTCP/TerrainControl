@@ -1,5 +1,7 @@
 package com.pg85.otg.util.materials;
 
+import java.util.List;
+
 public class LocalMaterials
 {
     // Block names used in OTG code as default values
@@ -200,6 +202,11 @@ public class LocalMaterials
 	public static LocalMaterialData VINE_EAST;
 	public static LocalMaterialData VINE_WEST;
 	public static LocalMaterialData SEA_PICKLE;
+
+	// Coral
+	public static List<LocalMaterialData> CORAL_BLOCKS;
+	public static List<LocalMaterialData> WALL_CORALS;
+	public static List<LocalMaterialData> CORALS;
 
     public static LocalMaterialData DOUBLE_TALL_GRASS_LOWER;
     public static LocalMaterialData DOUBLE_TALL_GRASS_UPPER;

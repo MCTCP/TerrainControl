@@ -5,6 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
+import com.pg85.otg.util.OTGDirection;
 import com.pg85.otg.util.materials.LegacyMaterials;
 import com.pg85.otg.util.materials.LocalMaterialData;
 
@@ -366,18 +367,28 @@ public class ForgeMaterialData extends LocalMaterialData
 	@Override
 	public <T extends Comparable<T>> LocalMaterialData withProperty(MaterialProperty<T> materialProperty, T value)
 	{
-		Property<T> property = null;
+		Property property = null;
+		T finalVal = value;
 
 		// TODO: This is really bad. We need a way to append properties onto the MaterialProperty
-		if (materialProperty == MaterialProperties.AGE_0_25) {
-			property = (Property<T>) BlockStateProperties.AGE_25;
-		} else if (materialProperty == MaterialProperties.PICKLES_1_4) {
-			property = (Property<T>) BlockStateProperties.PICKLES;
-		} else {
-			throw new IllegalArgumentException("Bad property: " + materialProperty);
+		if (materialProperty == MaterialProperties.AGE_0_25)
+		{
+			property = BlockStateProperties.AGE_25;
+		} else if (materialProperty == MaterialProperties.PICKLES_1_4)
+		{
+			property = BlockStateProperties.PICKLES;
+		} else if (materialProperty == MaterialProperties.HORIZONTAL_DIRECTION)
+		{
+			// Extremely ugly hack for directions
+			property = BlockStateProperties.HORIZONTAL_FACING;
+			Direction direction = Direction.values()[((OTGDirection)value).ordinal()];
+			return ForgeMaterialData.ofMinecraftBlockState(this.blockData.setValue(property, direction));
+		} else
+		{
+			throw new IllegalArgumentException("Unknown property: " + materialProperty);
 		}
 
-		return ForgeMaterialData.ofMinecraftBlockState(this.blockData.setValue(property, value));
+		return ForgeMaterialData.ofMinecraftBlockState(this.blockData.setValue(property, finalVal));
 	}
 
 	@Override
