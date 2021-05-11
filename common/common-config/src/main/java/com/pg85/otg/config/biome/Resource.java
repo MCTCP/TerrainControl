@@ -97,18 +97,6 @@ public abstract class Resource extends ConfigFunction<IBiomeConfig> implements C
         return material;
     }
     
-    /*
-    protected void parseMaterials(WorldConfig worldConfig, LocalMaterialData material, MaterialSet sourceBlocks)
-    {
-		material.parseForWorld(worldConfig);
-
-        if (sourceBlocks != null)
-        {
-            sourceBlocks.parseForWorld(worldConfig);
-        }
-    }
-    */
-
     public int getPriority()
     {
         return 0;

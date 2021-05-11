@@ -1,7 +1,5 @@
 package com.pg85.otg.spigot.commands;
 
-import com.mojang.brigadier.StringReader;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.pg85.otg.OTG;
 import com.pg85.otg.customobject.BOCreator;
 import com.pg85.otg.customobject.CustomObject;
