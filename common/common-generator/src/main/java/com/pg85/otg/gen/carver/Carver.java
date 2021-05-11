@@ -6,6 +6,7 @@ import java.util.Random;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IWorldConfig;
+import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
 
 public abstract class Carver
@@ -86,7 +87,9 @@ public abstract class Carver
 		{
 			carvingMask.set(i);
 			// If there is already air here, we don't carve - don't want an ocean of lava under Skylands
-			if (chunk.getBlock(x, y, z).isMaterial(LocalMaterials.AIR))
+			// Skip bedrock carving as well
+			LocalMaterialData data = chunk.getBlock(x, y, z);
+			if (data.isMaterial(LocalMaterials.AIR) || data.isMaterial(LocalMaterials.BEDROCK))
 			{
 				return false;
 			}
