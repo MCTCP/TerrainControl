@@ -206,7 +206,7 @@ public class OTGChunkPopulator implements IChunkPopulator
 		// TODO: Snow is appearing below structures, indicating it spawned before 
 		// it should. Check and align population bounds for resources and make sure
 		// freezing is done during the correct population step.
-		new FrozenSurfaceHelper().freezeChunk(worldGenRegion, chunkCoord);
+		FrozenSurfaceHelper.freezeChunk(worldGenRegion, chunkCoord);
 	}
 
 	private void plotAndSpawnBO4s(CustomStructureCache structureCache, IWorldGenRegion worldGenRegion, ChunkCoordinate chunkCoord, ChunkCoordinate chunkBeingPopulated, Path otgRootFolder, boolean developerMode, boolean spawnLog, ILogger logger, CustomObjectManager customObjectManager, IMaterialReader materialReader, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
