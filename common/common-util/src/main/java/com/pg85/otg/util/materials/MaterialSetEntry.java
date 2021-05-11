@@ -2,13 +2,11 @@ package com.pg85.otg.util.materials;
 
 class MaterialSetEntry
 {
-    private LocalMaterialData material;
-    private final boolean includesBlockData;
+    private LocalMaterialBase material;
 
-    MaterialSetEntry(LocalMaterialData material, boolean includesBlockData)
+    MaterialSetEntry(LocalMaterialBase material)
     {
         this.material = material;
-        this.includesBlockData = includesBlockData;
     }
 
     @Override
@@ -33,28 +31,20 @@ class MaterialSetEntry
     @Override
     public int hashCode()
     {
-        //if (includesBlockData)
-        //{
-            return material.hashCode();
-        //} else
-        //{
-            //return material.hashCodeWithoutBlockData();
-        //}
+        return this.material.hashCode();
     }
-
-    /*
-    public void parseForWorld(WorldConfig worldConfig)
-    {
-    	material.parseForWorld(worldConfig);
-    }
-    */
 
     @Override
     public String toString()
     {
-        return material.toString();
+        return this.material.toString();
     }
 
+    public LocalMaterialBase getMaterial()
+    {
+    	return this.material;
+    }
+    
     /**
      * Rotates this check 90 degrees. If block data was ignored in this check,
      * it will still be ignored, otherwise the block data will be rotated too.
@@ -63,14 +53,12 @@ class MaterialSetEntry
      */
     MaterialSetEntry rotate()
     {
-        if (!includesBlockData)
+        if (this.material.isTag())
         {
-            // Don't rotate block data
-            return new MaterialSetEntry(material, false);
-        } else
-        {
-            // Actually rotate block data, to maintain check correctness
-            return new MaterialSetEntry(material.rotate(), true);
+            return new MaterialSetEntry(this.material);
+        } else {
+            // Rotate block data, to maintain check correctness
+            return new MaterialSetEntry(((LocalMaterialData)this.material).rotate());
         }
     }
 }

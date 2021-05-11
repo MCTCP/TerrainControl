@@ -208,7 +208,7 @@ public abstract class LocalPresetLoader
 			// Index ReplacedBlocks
 			if (!worldConfig.getBiomeConfigsHaveReplacement())
 			{
-				worldConfig.setBiomeConfigsHaveReplacement(biomeConfig.getReplaceBlocks().hasReplaceSettings());
+				worldConfig.setBiomeConfigsHaveReplacement(biomeConfig.hasReplaceBlocksSettings());
 			}
 
 			// Index maxSmoothRadius

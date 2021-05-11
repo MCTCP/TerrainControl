@@ -5,6 +5,7 @@ import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.materials.LocalMaterialTag;
 import com.pg85.otg.util.materials.LocalMaterials;
 import net.minecraft.server.v1_16_R3.BlockBamboo;
 import net.minecraft.server.v1_16_R3.BlockPropertyBambooSize;
@@ -17,7 +18,9 @@ import net.minecraft.server.v1_16_R3.IBlockData;
 
 public class SpigotMaterials extends LocalMaterials
 {
-	private static final FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<>(4096); // TODO: Smaller cache should be ok, only most frequently used should be cached?
+	// TODO: Smaller cache should be ok, only most frequently used should be cached?
+	private static final FifoMap<String, LocalMaterialData> CachedMaterials = new FifoMap<>(4096);
+	private static final FifoMap<String, LocalMaterialTag> CachedTags = new FifoMap<>(4096);
 
 	static
 	{
@@ -191,5 +194,23 @@ public class SpigotMaterials extends LocalMaterials
 		CachedMaterials.put(name, material);
 
 		return material;
+	}
+	
+	static LocalMaterialTag readTag(String name) throws InvalidConfigException
+	{
+		if(name == null)
+		{
+			return null;
+		}
+		
+		LocalMaterialTag tag = CachedTags.get(name);
+		if(tag != null)
+		{
+			return tag;
+		}
+
+		tag = SpigotMaterialTag.ofString(name);
+		CachedTags.put(name, tag);	
+		return tag;
 	}
 }

@@ -39,6 +39,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	// Misc
 	
 	private final BiomeResourceLocation registryKey;
+	private boolean replacedBlocksInited = false;
 	
 	// TODO: Ideally, don't contain worldConfig within biomeconfig,  
 	// use a parent object that holds both, like a worldgenregion.
@@ -96,7 +97,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	
 	// Water / lava / freezing
 	
-	protected boolean useWorldWaterLevel;	
+	protected boolean useWorldWaterLevel;
 	protected int waterLevelMax;
 	protected int waterLevelMin;
 	protected LocalMaterialData waterBlock;
@@ -200,12 +201,31 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 		return this.groundBlock;
 	}
 	
+	private void initReplaceBlocks()
+	{
+		if(!this.replacedBlocksInited)
+		{
+			this.replacedBlocks.init(
+				this.useWorldWaterLevel ? worldConfig.getCooledLavaBlock() : this.cooledLavaBlock,
+				this.useWorldWaterLevel ? worldConfig.getIceBlock() : this.iceBlock,
+				this.useWorldWaterLevel ? worldConfig.getWaterBlock() : this.waterBlock,
+				this.stoneBlock,
+				this.groundBlock,
+				this.surfaceBlock,
+				this.worldConfig.getDefaultBedrockBlock(),
+				this.sandStoneBlock,
+				this.redSandStoneBlock
+			);
+		}
+		this.replacedBlocksInited = true;
+	}
+	
 	@Override
 	public LocalMaterialData getSurfaceBlockReplaced(int y)
 	{
-		if(this.replacedBlocks.replacesSurface)
+		if(getReplaceBlocks().replacesSurface)
 		{
-			return this.surfaceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
+			return this.surfaceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.surfaceBlock;
 	}
@@ -213,9 +233,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public LocalMaterialData getGroundBlockReplaced(int y)
 	{
-		if(this.replacedBlocks.replacesGround)
+		if(getReplaceBlocks().replacesGround)
 		{
-			return this.groundBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
+			return this.groundBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.groundBlock;
 	}
@@ -223,9 +243,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public LocalMaterialData getStoneBlockReplaced(int y)
 	{
-		if(this.replacedBlocks.replacesStone)
+		if(getReplaceBlocks().replacesStone)
 		{
-			return this.stoneBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
+			return this.stoneBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.stoneBlock;
 	}
@@ -233,15 +253,15 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public LocalMaterialData getBedrockBlockReplaced(int y)
 	{
-		return this.worldConfig.getBedrockBlockReplaced(this.replacedBlocks, y);
+		return this.worldConfig.getBedrockBlockReplaced(getReplaceBlocks(), y);
 	}
 		
 	@Override
 	public LocalMaterialData getWaterBlockReplaced(int y)
 	{
-		if(this.replacedBlocks.replacesWater)
+		if(getReplaceBlocks().replacesWater)
 		{
-			return this.waterBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
+			return this.waterBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.waterBlock;
 	}
@@ -249,9 +269,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public LocalMaterialData getSandStoneBlockReplaced(int y)
 	{
-		if(this.replacedBlocks.replacesSandStone)
+		if(getReplaceBlocks().replacesSandStone)
 		{
-			return this.sandStoneBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
+			return this.sandStoneBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.sandStoneBlock;
 	}
@@ -259,9 +279,9 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public LocalMaterialData getIceBlockReplaced(int y)
 	{
-		if(this.replacedBlocks.replacesIce)
+		if(getReplaceBlocks().replacesIce)
 		{
-			return this.iceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
+			return this.iceBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.iceBlock;
 	}
@@ -269,16 +289,23 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	@Override
 	public LocalMaterialData getCooledLavaBlockReplaced(int y)
 	{
-		if(this.replacedBlocks.replacesCooledLava)
+		if(getReplaceBlocks().replacesCooledLava)
 		{
-			return this.cooledLavaBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), this.replacedBlocks, y);
+			return this.cooledLavaBlock.parseWithBiomeAndHeight(this.worldConfig.getBiomeConfigsHaveReplacement(), getReplaceBlocks(), y);
 		}
 		return this.cooledLavaBlock;
 	}
 	
 	@Override
+	public boolean hasReplaceBlocksSettings()
+	{
+		return this.replacedBlocks.hasReplaceSettings();
+	}
+	
+	@Override
 	public ReplacedBlocksMatrix getReplaceBlocks()
 	{
+		initReplaceBlocks();
 		return this.replacedBlocks;
 	}
 
