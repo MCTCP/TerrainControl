@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
 import javax.annotation.Nullable;
 
 import com.mojang.serialization.Codec;
@@ -52,6 +51,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.MutableBoundingBox;
 import net.minecraft.util.math.SectionPos;
+import net.minecraft.util.registry.DynamicRegistries;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.Blockreader;
 import net.minecraft.world.IBlockReader;
@@ -67,6 +67,8 @@ import net.minecraft.world.gen.DimensionSettings;
 import net.minecraft.world.gen.GenerationStage;
 import net.minecraft.world.gen.Heightmap.Type;
 import net.minecraft.world.gen.WorldGenRegion;
+import net.minecraft.world.gen.feature.ConfiguredFeature;
+import net.minecraft.world.gen.feature.StructureFeature;
 import net.minecraft.world.gen.feature.jigsaw.JigsawJunction;
 import net.minecraft.world.gen.feature.jigsaw.JigsawPattern;
 import net.minecraft.world.gen.feature.structure.AbstractVillagePiece;
@@ -74,7 +76,10 @@ import net.minecraft.world.gen.feature.structure.Structure;
 import net.minecraft.world.gen.feature.structure.StructureManager;
 import net.minecraft.world.gen.feature.structure.StructurePiece;
 import net.minecraft.world.gen.feature.structure.StructureStart;
+import net.minecraft.world.gen.feature.structure.VillageStructure;
+import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.gen.settings.NoiseSettings;
+import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.spawner.WorldEntitySpawner;
 import net.minecraft.world.storage.IServerWorldInfo;
 
@@ -312,31 +317,35 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		int blockX = chunkX * 16;
 		int blockZ = chunkZ * 16;
 		BlockPos blockpos = new BlockPos(blockX, 0, blockZ);
-
+		
 		// Fetch the biomeConfig by registryKey
 		RegistryKey<Biome> key = ((OTGBiomeProvider) this.biomeSource).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 		BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(key.location().toString());
-
+		Biome biome = this.biomeSource.getNoiseBiome((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 		SharedSeedRandom sharedseedrandom = new SharedSeedRandom();
 		long decorationSeed = sharedseedrandom.setDecorationSeed(worldGenRegion.getSeed(), blockX, blockZ);
 		try
 		{
 			// Override normal population (Biome.func_242427_a()) with OTG's.
-			biomePopulate(biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			biomePopulate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 		} catch (Exception exception) {
 			CrashReport crashreport = CrashReport.forThrowable(exception, "Biome decoration");
 			crashreport.addCategory("Generation").setDetail("CenterX", chunkX).setDetail("CenterZ", chunkZ).setDetail("Seed", decorationSeed);
 			throw new ReportedException(crashreport);
-		}
+		}	
 	}
 
 	// Chunk population method taken from Biome (Biome.func_242427_a())
-	private void biomePopulate(BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
+	private void biomePopulate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{
 		init(((IServerWorldInfo) world.getLevelData()).getLevelName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		
+		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
 		this.chunkPopulator.populate(chunkBeingPopulated, new ForgeWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
-
+		
+		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
+		
 		// TODO: clean up/optimise this
 		// Structure generation
 		for(int step = 0; step < GenerationStage.Decoration.values().length; ++step)
@@ -385,6 +394,26 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 						throw new ReportedException(crashreport);
 					}
 
+					++index;
+				}
+			}
+
+			// Spawn any non-OTG resources registered to this biome.
+			if (list.size() > step)
+			{
+				for(Supplier<ConfiguredFeature<?, ?>> supplier : list.get(step))
+				{
+					ConfiguredFeature<?, ?> configuredfeature = supplier.get();
+					random.setFeatureSeed(seed, index, step);
+					try {
+						configuredfeature.place(world, chunkGenerator, random, pos);
+					} catch (Exception exception1) {
+						CrashReport crashreport1 = CrashReport.forThrowable(exception1, "Feature placement");
+						crashreport1.addCategory("Feature").setDetail("Id", Registry.FEATURE.getKey(configuredfeature.feature)).setDetail("Config", configuredfeature.config).setDetail("Description", () -> {
+							return configuredfeature.feature.toString();
+						});
+						throw new ReportedException(crashreport1);
+					}
 					++index;
 				}
 			}
@@ -564,7 +593,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.dimensionSettingsSupplier.get().seaLevel();
 	}
 
-	public CustomStructureCache getStructureCache() {
+	public CustomStructureCache getStructureCache()
+	{
 		return this.structureCache;
 	}
 
@@ -594,7 +624,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion).getInternal().getLevel(), worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion), ((ForgeWorldGenRegion)worldGenRegion).getInternal().getLevel(), worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
@@ -617,63 +647,84 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return blocksInColumn;
 	}
 
-	private IChunk getUnloadedChunk(ServerWorld serverWorld, Random random, ChunkCoordinate chunkCoordinate)
+	private IChunk getUnloadedChunk(ForgeWorldGenRegion worldGenRegion, ServerWorld serverWorld, Random random, ChunkCoordinate chunkCoordinate)
 	{
-		IChunk chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
-		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
-	
-		// Setup jigsaw data
+		ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
+		ChunkBuffer buffer = new ForgeChunkBuffer(chunk);
+		
+		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
+		// Doing this for unloaded chunks causes a hang on load since getChunk is called by StructureManager.
+		// BO4's avoid villages, so this method should never be called to fetch unloaded chunks that contain villages, 
+		// so we can skip noisegen affecting structures here.
+		// *TODO: Do we need to avoid any noisegen affecting structures other than villages?
+
 		ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
-
-		// TODO: Structure starts, causes hang on load since getChunk is used by StructureManager
-		/*
-		ChunkPos pos = chunk.getPos();
-		int chunkX = pos.x;
-		int chunkZ = pos.z;
-		int startX = chunkX << 4;
-		int startZ = chunkZ << 4;
-
-		// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-		for(Structure<?> structure : Structure.NOISE_AFFECTING_FEATURES) {
-			// Get all structure starts in this chunk
-			serverWorld.structureFeatureManager().startsForFeature(SectionPos.of(pos, 0), structure).forEach((start) -> {
-				// Iterate through the pieces in the structure
-				for(StructurePiece piece : start.getPieces()) {
-					// Check if it intersects with this chunk
-					if (piece.isCloseToChunk(pos, 12)) {
-						MutableBoundingBox box = piece.getBoundingBox();
-
-						if (piece instanceof AbstractVillagePiece) {
-							AbstractVillagePiece villagePiece = (AbstractVillagePiece) piece;
-							// Add to the list if it's a rigid piece
-							if (villagePiece.getElement().getProjection() == JigsawPattern.PlacementBehaviour.RIGID) {
-								structures.add(new JigsawStructureData(box.x0, box.y0, box.z0, box.x1, villagePiece.getGroundLevelDelta(), box.z1, true, 0, 0, 0));
-							}
-
-							// Get all the junctions in this piece
-							for(JigsawJunction junction : villagePiece.getJunctions()) {
-								int sourceX = junction.getSourceX();
-								int sourceZ = junction.getSourceZ();
-
-								// If the junction is in this chunk, then add to list
-								if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
-									junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.getSourceX(), junction.getSourceGroundY(), junction.getSourceZ()));
-								}
-							}
-						} else {
-							structures.add(new JigsawStructureData(box.x0, box.y0, box.z0,box.x1, 0, box.z1, false, 0, 0, 0));
-						}
-					}
-				}
-			});
-		}
-		*/
 
 		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 		return chunk;
 	}
 
+	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkCoordinate chunkCoordinate)
+	{
+		// Since we can't check for structure components/references, only structure starts,  
+		// we'll keep a safe distance away from any vanilla structure start points.
+		int radiusInChunks = 4;
+        int chunkX = chunkCoordinate.getChunkX();
+        int chunkZ = chunkCoordinate.getChunkZ();
+        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+        {
+            for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+            {
+                for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
+                {
+                    int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX-chunkX + xOffset, 2) + Math.pow (chunkZ-chunkZ + zOffset, 2)));                    
+                    if (distance == cycle)
+                    {				
+						ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);					
+						ChunkPos chunkpos = chunk.getPos();
+						
+						// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
+						// based on biome and resource settings (distance etc). Does not plot any structure components.
+						if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
+						{
+							Biome biome = this.biomeSource.getNoiseBiome((chunkpos.x << 2) + 2, 0, (chunkpos.z << 2) + 2);
+							for(Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().structures())
+							{
+								// *TODO: Do we need to avoid any structures other than villages?
+								if(supplier.get().feature instanceof VillageStructure)
+								{
+									if(this.hasStructureStart(supplier.get(), serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), serverWorld.getSeed(), chunkpos, biome))
+									{
+										return true;
+									}
+								}
+							}
+						}
+                    }
+                }
+            }
+        }
+        return false;
+	}
+	
+	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, long seed, ChunkPos chunkPos, Biome biome)
+	{
+		StructureStart<?> structurestart = structureManager.getStartForFeature(SectionPos.of(chunk.getPos(), 0), structureFeature.feature, chunk);
+		int i = structurestart != null ? structurestart.getReferences() : 0;
+		StructureSeparationSettings structureseparationsettings = this.getSettings().getConfig(structureFeature.feature);
+		if (structureseparationsettings != null)
+		{
+			StructureStart<?> structureStart1 = structureFeature.generate(dynamicRegistries, this, this.biomeSource, templateManager, seed, chunkPos, biome, i, structureseparationsettings);
+			structureManager.setStartForFeature(SectionPos.of(chunk.getPos(), 0), structureFeature.feature, structureStart1, chunk);
+			if(structureStart1 != StructureStart.INVALID_START)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	LocalMaterialData getMaterialInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
 		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
