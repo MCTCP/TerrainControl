@@ -69,14 +69,14 @@ public class LocalMaterials
 
     // Plants
 	public static final String POPPY_NAME = getRegistryKey("poppy");
-	public static final String BLUE_ORCHID_NAME = getRegistryKey("poppy");
-	public static final String ALLIUM_NAME = getRegistryKey("poppy");
-	public static final String AZURE_BLUET_NAME = getRegistryKey("poppy");
-	public static final String RED_TULIP_NAME = getRegistryKey("poppy");
-	public static final String ORANGE_TULIP_NAME = getRegistryKey("poppy");
-	public static final String WHITE_TULIP_NAME = getRegistryKey("poppy");
-	public static final String PINK_TULIP_NAME = getRegistryKey("poppy");
-	public static final String OXEYE_DAISY_NAME = getRegistryKey("poppy");
+	public static final String BLUE_ORCHID_NAME = getRegistryKey("blue_orchid");
+	public static final String ALLIUM_NAME = getRegistryKey("allium");
+	public static final String AZURE_BLUET_NAME = getRegistryKey("azure_bluet");
+	public static final String RED_TULIP_NAME = getRegistryKey("red_tulip");
+	public static final String ORANGE_TULIP_NAME = getRegistryKey("orange_tulip");
+	public static final String WHITE_TULIP_NAME = getRegistryKey("white_tulip");
+	public static final String PINK_TULIP_NAME = getRegistryKey("pink_tulip");
+	public static final String OXEYE_DAISY_NAME = getRegistryKey("oxeye_daisy");
 
 
 	public static final String BROWN_MUSHROOM_NAME = getRegistryKey("brown_mushroom");
