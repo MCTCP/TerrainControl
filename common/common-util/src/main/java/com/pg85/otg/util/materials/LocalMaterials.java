@@ -82,7 +82,7 @@ public class LocalMaterials
 	public static final String BROWN_MUSHROOM_NAME = getRegistryKey("brown_mushroom");
 	public static final String YELLOW_FLOWER_NAME = getRegistryKey("dandelion");
 	public static final String DEAD_BUSH_NAME = getRegistryKey("dead_bush");
-	public static final String LONG_GRASS_NAME = getRegistryKey("tall_grass");
+	public static final String LONG_GRASS_NAME = getRegistryKey("grass");
 	public static final String RED_MUSHROOM_NAME = getRegistryKey("red_mushroom");
 	
 	public static final String DOUBLE_TALL_GRASS_NAME = getRegistryKey("tall_grass");
