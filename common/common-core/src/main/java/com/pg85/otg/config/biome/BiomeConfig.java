@@ -675,12 +675,12 @@ public class BiomeConfig extends BiomeConfigBase
 		writer.putSetting(BiomeStandardValues.WATER_FOG_COLOR, this.waterFogColor, "Biome water fog color.");
 
 		writer.putSetting(BiomeStandardValues.PARTICLE_TYPE, this.particleType,
-			"Biome particle type, fe minecraft:white_ash.",
+			"Biome particle type, for example minecraft:white_ash.",
 			"Use the \"otg particles\" console command to get a list of particles."
 		);
 		
 		writer.putSetting(BiomeStandardValues.PARTICLE_PROBABILITY, this.particleProbability,
-			"Biome particle probability, 0.118093334 by default.",
+			"Biome particle probability, 0 by default.",
 			"*TODO: Test different values and document usage."
 		);
 
