@@ -63,9 +63,9 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 	{
 		CraftWorld world;
 		Player player;
-		int size = 200;
+		int size = 2048;
 		int offsetX = 0;
-		int offsetY = 0;
+		int offsetZ = 0;
 		String name = "";
 		for (int i = 1; i < args.length-1; i++)
 		{
@@ -73,8 +73,8 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 				size = Integer.parseInt(args[i+1]);
 			if (args[i].equalsIgnoreCase("-ox"))
 				offsetX = Integer.parseInt(args[i+1]);
-			if (args[i].equalsIgnoreCase("-oy"))
-				offsetY = Integer.parseInt(args[i+1]);
+			if (args[i].equalsIgnoreCase("-oz"))
+				offsetZ = Integer.parseInt(args[i+1]);
 			if (args[i].equalsIgnoreCase("-n"))
 				name = args[i+1];
 		}
@@ -82,8 +82,11 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 		{
 			player = (Player) sender;
 			world = (CraftWorld) player.getWorld();
-			if (offsetX == 0) offsetX += player.getLocation().getBlockX();
-			if (offsetY == 0) offsetY += player.getLocation().getBlockY();
+			if (offsetX == 0 && offsetZ == 0)
+			{
+				offsetX += player.getLocation().getBlockX();
+				offsetZ += player.getLocation().getBlockZ();
+			}
 		}
 		else {
 			sender.sendMessage("Only in-game for now");
@@ -101,9 +104,9 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 
 		int progressUpdate = img.getHeight() / 8;
 
-		for (int x = 0; x < img.getHeight(); x++)
+		for (int x = offsetX; x < img.getHeight() + offsetX; x++)
 		{
-			for (int z = 0; z < img.getWidth(); z++)
+			for (int z = offsetZ; z < img.getWidth() + offsetZ; z++)
 			{
 				img.setRGB(x, z, provider.configLookup[provider.getSampler().sample(x, z)].getBiomeColor());
 			}

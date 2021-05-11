@@ -4,7 +4,9 @@ import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.util.helpers.StringHelper;
 import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.materials.LocalMaterialBase;
 import com.pg85.otg.util.materials.LocalMaterialData;
+import com.pg85.otg.util.materials.LocalMaterialTag;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -15,22 +17,20 @@ import java.util.Map.Entry;
 
 public class ReplacedBlocksMatrix
 {
-	// Redesigned this to use ReplaceBlockEntry instead, since we're now replacing
-	// blocks when they're placed, not 4x per chunk at the end of population.
-	// TODO: After removing replaceblocks from localworld, clean this up.
-	
     private static final String NO_REPLACE = "None";
     
     private class ReplaceBlockEntry
     {
-    	public final HashMap<Integer, LocalMaterialData> targetsWithoutBlockData = new HashMap<Integer, LocalMaterialData>();
+    	public final List<ReplacedBlocksInstruction> targetsWithBlockTags = new ArrayList<ReplacedBlocksInstruction>();
     	public final HashMap<Integer, LocalMaterialData> targetsWithBlockData = new HashMap<Integer, LocalMaterialData>();
     }
     
     public static class ReplacedBlocksInstruction
     {
-        private final LocalMaterialData from;
-        private final LocalMaterialData to;
+    	// TODO: Don't use LocalMaterialBase as generic type and then do type checks  
+    	// to test for material/tag. Make separate classes?
+        private final LocalMaterialBase from;
+        private LocalMaterialData to;
         private final int minHeight;
         private final int maxHeight;
         
@@ -56,16 +56,21 @@ public class ReplacedBlocksMatrix
             {
                 throw new InvalidConfigException("Replace parts must be in the format (from,to) or (from,to,minHeight,maxHeight)");
             }
-
-           	from = materialReader.readMaterial(values[0]);
+            
+            LocalMaterialTag tag = materialReader.readTag(values[0]);
+            if(tag != null)
+            {
+            	from = tag;
+            } else {
+            	from = materialReader.readMaterial(values[0]);	
+            }
             to = materialReader.readMaterial(values[1]);
 
             if (values.length == 4)
             {
                 minHeight = StringHelper.readInt(values[2], 0, maxAllowedY);
                 maxHeight = StringHelper.readInt(values[3], minHeight, maxAllowedY);
-            } else
-            {
+            } else {
                 minHeight = 0;
                 maxHeight = maxAllowedY;
             }
@@ -91,7 +96,7 @@ public class ReplacedBlocksMatrix
             this.maxHeight = maxHeight;
         }
 
-        public LocalMaterialData getFrom()
+        public LocalMaterialBase getFrom()
         {
             return from;
         }
@@ -154,8 +159,7 @@ public class ReplacedBlocksMatrix
             {
                 String keyWithoutBraces = key.substring(start + 1, end);
                 instructions.add(new ReplacedBlocksInstruction(keyWithoutBraces, maxHeight, reader));
-            } else
-            {
+            } else {
                 throw new InvalidConfigException("One of the parts is missing braces around it.");
             }
         }
@@ -182,39 +186,45 @@ public class ReplacedBlocksMatrix
         			targetsAtHeight = new ReplaceBlockEntry();
         			this.targetsAtHeights[y] = targetsAtHeight;
         		}
+        		
         		// Users can chain replacedblocks to replace replacedblocks, instead of actually
         		// replacing the same block to different materials multiple times, we'll calculate
         		// the end result in advance.
-        		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithoutBlockData.entrySet())
+        		// TODO: Can't use this atm, tags can't be used when loading configs at app start.
+        		// Will have to move some config loading / registry logic to world creation,
+        		// as things like tags can also be added via datapacks. When that's done, reenable this code.
+        		/*
+        		for(ReplacedBlocksInstruction entry : targetsAtHeight.targetsWithBlockTags)
         		{
         			if(
             			// BLOCK:X replaces BLOCK:X
-    					(instruction.from.hasData() && instruction.from.hashCode() == entry.getValue().hashCode()) //||
-            			// BLOCK replaces all BLOCK:X
-    					//(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
+    					(!instruction.from.isTag() && instruction.from.hashCode() == entry.to.hashCode()) ||
+            			// BLOCK tag replaces all BLOCK:X
+    					(instruction.from.isTag() && entry.to.isBlockTag((LocalMaterialTag)instruction.from))
 					)
         			{
-        				entry.setValue(instruction.to);
+        				entry.to = instruction.to;
         			}
         		}
         		for(Entry<Integer, LocalMaterialData> entry : targetsAtHeight.targetsWithBlockData.entrySet())
         		{
         			if(
             			// BLOCK:X replaces BLOCK:X
-    					(instruction.from.hasData() &&  instruction.from.hashCode() == entry.getValue().hashCode()) //||
-    					// BLOCK replaces all BLOCK:X
-        				//(!instruction.from.hasData() && instruction.from.hashCodeWithoutBlockData() == entry.getValue().hashCodeWithoutBlockData())
+    					(!instruction.from.isTag() && instruction.from.hashCode() == entry.getValue().hashCode()) ||
+    					// BLOCK tag replaces all BLOCK:X
+        				(instruction.from.isTag() && entry.getValue().isBlockTag((LocalMaterialTag)instruction.from))
     				)
         			{
         				entry.setValue(instruction.to);
         			}
         		}
-        		//if(instruction.from.hasData())
-        		//{
+        		*/
+        		if(instruction.from.isTag())
+        		{
+        			targetsAtHeight.targetsWithBlockTags.add(instruction);        			
+        		} else {
         			targetsAtHeight.targetsWithBlockData.put(instruction.from.hashCode(), instruction.to);
-        		//} else {
-        			//targetsAtHeight.targetsWithoutBlockData.put(instruction.from.hashCodeWithoutBlockData(), instruction.to);
-        		//}
+        		}
         	}
         }
     }
@@ -223,65 +233,66 @@ public class ReplacedBlocksMatrix
 	{
         // Fill maps for faster access
         for(ReplacedBlocksInstruction instruction : this.instructions)
-        {     
+        {
+        	boolean isBlockTag = instruction.from.isTag();
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeCooledLavaBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeCooledLavaBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeCooledLavaBlock.hashCode() 
 			)
         	{
         		this.replacesCooledLava = true;
-        	}        	
+        	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeIceBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeIceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeIceBlock.hashCode() 
 			)
         	{
         		this.replacesIce = true;
         	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeWaterBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeWaterBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeWaterBlock.hashCode() 
 			)        		
         	{
         		this.replacesWater = true;
         	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeStoneBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeStoneBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeStoneBlock.hashCode()
 			)
         	{
         		this.replacesStone = true;
         	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeGroundBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeGroundBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeGroundBlock.hashCode()
 			)
         	{
         		this.replacesGround = true;
         	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeSurfaceBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeSurfaceBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeSurfaceBlock.hashCode()
 			)        	
         	{
         		this.replacesSurface = true;
         	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeBedrockBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeBedrockBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeBedrockBlock.hashCode()
 			)        	
         	{
         		this.replacesBedrock = true;
         	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeSandStoneBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeSandStoneBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeSandStoneBlock.hashCode()
 			)        	
         	{
         		this.replacesSandStone = true;
         	}
         	if(
-    			//!instruction.from.hasData() ? instruction.from.hashCodeWithoutBlockData() == biomeRedSandStoneBlock.hashCodeWithoutBlockData() : 
+    			isBlockTag ? biomeRedSandStoneBlock.isBlockTag((LocalMaterialTag)instruction.from) : 
 				instruction.from.hashCode() == biomeRedSandStoneBlock.hashCode()
 			)        	
         	{
@@ -289,29 +300,7 @@ public class ReplacedBlocksMatrix
         	}
         }
 	}
-
-	/*
-	private boolean parsedFallBacks = false;
-	public void parseForWorld(WorldConfig worldConfig)
-	{
-		if(!parsedFallBacks)
-		{
-			parsedFallBacks = true;
-			for(ReplacedBlocksInstruction instruction : this.instructions)
-			{
-				if(instruction.from != null)
-				{
-					instruction.from.parseForWorld(worldConfig);
-				}
-				if(instruction.to != null)
-				{
-					instruction.to.parseForWorld(worldConfig);
-				}
-			}
-		}
-	}
-	*/
-   
+  
     public LocalMaterialData replaceBlock(int y, LocalMaterialData material)
     {
     	// TODO: simple fix for y being out of bounds, needs a proper fix to figure out why it's happening
@@ -322,12 +311,21 @@ public class ReplacedBlocksMatrix
     	{
     		return material;
     	}
-    	//LocalMaterialData replaceToMaterial = targetsAtHeight.targetsWithoutBlockData.get(material.hashCodeWithoutBlockData());
-    	//if(replaceToMaterial != null)
-    	//{
-    		//return replaceToMaterial;
-    	//}
-    	LocalMaterialData replaceToMaterial = targetsAtHeight.targetsWithBlockData.get(material.hashCode());
+    	
+    	LocalMaterialData replaceToMaterial = null;
+    	for(ReplacedBlocksInstruction instruction : targetsAtHeight.targetsWithBlockTags)
+    	{
+    		if(material.isBlockTag((LocalMaterialTag)instruction.from))
+    		{
+    			replaceToMaterial = instruction.to;
+    		}
+    	}
+    	if(replaceToMaterial != null)
+    	{
+    		return replaceToMaterial;
+    	}
+    	
+    	replaceToMaterial = targetsAtHeight.targetsWithBlockData.get(material.hashCode());
     	if(replaceToMaterial != null)
     	{
     		return replaceToMaterial;
@@ -366,11 +364,6 @@ public class ReplacedBlocksMatrix
     public void setInstructions(Collection<ReplacedBlocksInstruction> instructions)
     {
         this.instructions = Collections.unmodifiableList(new ArrayList<ReplacedBlocksInstruction>(instructions));
-
-        if (this.instructions.size() == 0)
-        {
-            return;
-        }
     }
 
     public String toString()
@@ -408,24 +401,21 @@ public class ReplacedBlocksMatrix
      */
     public static ReplacedBlocksMatrix createEmptyMatrix(int maxHeight, IMaterialReader materialReader)
     {
-        try
-        {
+        try {
             return new ReplacedBlocksMatrix(NO_REPLACE, maxHeight, materialReader);
-        } catch (InvalidConfigException e)
-        {
-            // Should never happen
-            throw new AssertionError(e);
+        } catch (InvalidConfigException e) {
+            throw new AssertionError(e); // Should never happen
         }
     }
 
-	public boolean replacesBlock(LocalMaterialData surfaceBlock)
+	public boolean replacesBlock(LocalMaterialData targetBlock)
 	{				
         for(ReplacedBlocksInstruction instruction : this.instructions)
         {
         	if(
-    			//instruction.getFrom().hasData() ? 
-    			surfaceBlock.hashCode() == instruction.from.hashCode() //: 
-        		//surfaceBlock.hashCodeWithoutBlockData() == instruction.from.hashCodeWithoutBlockData()
+    			instruction.getFrom().isTag() ? 
+				targetBlock.isBlockTag((LocalMaterialTag)instruction.getFrom()) : 
+				targetBlock.hashCode() == instruction.getFrom().hashCode()
     		)
         	{
         		return true;

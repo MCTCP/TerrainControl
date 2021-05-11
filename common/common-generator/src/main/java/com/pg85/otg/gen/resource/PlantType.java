@@ -20,9 +20,9 @@ public class PlantType
     // Builds lookup map
     private static final Map<String, PlantType> LOOKUP_MAP = new TreeMap<String, PlantType>(String.CASE_INSENSITIVE_ORDER);
 
-    public static final PlantType Allium = register(new PlantType("Allium", LocalMaterials.RED_ROSE));
-    public static final PlantType AzureBluet = register(new PlantType("AzureBluet", LocalMaterials.RED_ROSE));
-    public static final PlantType BlueOrchid = register(new PlantType("BlueOrchid", LocalMaterials.RED_ROSE));
+    public static final PlantType Allium = register(new PlantType("Allium", LocalMaterials.ALLIUM));
+    public static final PlantType AzureBluet = register(new PlantType("AzureBluet", LocalMaterials.AZURE_BLUET));
+    public static final PlantType BlueOrchid = register(new PlantType("BlueOrchid", LocalMaterials.BLUE_ORCHID));
     public static final PlantType BrownMushroom = register(new PlantType("BrownMushroom", LocalMaterials.BROWN_MUSHROOM));
     public static final PlantType Dandelion = register(new PlantType("Dandelion", LocalMaterials.YELLOW_FLOWER));
     public static final PlantType DeadBush = register(new PlantType("DeadBush", LocalMaterials.DEAD_BUSH));
@@ -30,17 +30,17 @@ public class PlantType
     public static final PlantType Fern = register(new PlantType("Fern", LocalMaterials.LONG_GRASS));
     public static final PlantType LargeFern = register(new PlantType("LargeFern", LocalMaterials.LARGE_FERN_LOWER, LocalMaterials.LARGE_FERN_UPPER));
     public static final PlantType Lilac = register(new PlantType("Lilac", LocalMaterials.LILAC_LOWER, LocalMaterials.LILAC_UPPER));
-    public static final PlantType OrangeTulip = register(new PlantType("OrangeTulip", LocalMaterials.RED_ROSE));
-    public static final PlantType OxeyeDaisy = register(new PlantType("OxeyeDaisy", LocalMaterials.RED_ROSE));
+    public static final PlantType OrangeTulip = register(new PlantType("OrangeTulip", LocalMaterials.ORANGE_TULIP));
+    public static final PlantType OxeyeDaisy = register(new PlantType("OxeyeDaisy", LocalMaterials.OXEYE_DAISY));
     public static final PlantType Peony = register(new PlantType("Peony", LocalMaterials.PEONY_LOWER, LocalMaterials.PEONY_UPPER));
-    public static final PlantType PinkTulip = register(new PlantType("PinkTulip", LocalMaterials.RED_ROSE));
-    public static final PlantType Poppy = register(new PlantType("Poppy", LocalMaterials.RED_ROSE));
+    public static final PlantType PinkTulip = register(new PlantType("PinkTulip", LocalMaterials.PINK_TULIP));
+    public static final PlantType Poppy = register(new PlantType("Poppy", LocalMaterials.POPPY));
     public static final PlantType RedMushroom = register(new PlantType("RedMushroom", LocalMaterials.RED_MUSHROOM));
-    public static final PlantType RedTulip = register(new PlantType("RedTulip", LocalMaterials.RED_ROSE));
+    public static final PlantType RedTulip = register(new PlantType("RedTulip", LocalMaterials.RED_TULIP));
     public static final PlantType RoseBush = register(new PlantType("RoseBush", LocalMaterials.ROSE_BUSH_LOWER, LocalMaterials.ROSE_BUSH_UPPER));
     public static final PlantType Sunflower = register(new PlantType("Sunflower", LocalMaterials.SUNFLOWER_LOWER, LocalMaterials.SUNFLOWER_UPPER));
     public static final PlantType Tallgrass = register(new PlantType("Tallgrass", LocalMaterials.LONG_GRASS));
-    public static final PlantType WhiteTulip = register(new PlantType("WhiteTulip", LocalMaterials.RED_ROSE));
+    public static final PlantType WhiteTulip = register(new PlantType("WhiteTulip", LocalMaterials.WHITE_TULIP));
     
     /**
      * Gets the plant with the given name. The name can be one of the premade
@@ -74,7 +74,7 @@ public class PlantType
 
     /**
      * Registers the plant type so that it can be retrieved using
-     * {@link #getPlant(String)}.
+     * {@link #getPlant(String, IMaterialReader)}.
      * 
      * @param plantType The plant type.
      * @return The plant type provided.
@@ -94,7 +94,6 @@ public class PlantType
      * 
      * @param name Custom name for this plant.
      * @param material The material of the block.
-     * @param data The data value of the block.
      */
     private PlantType(String name, LocalMaterialData material)
     {
@@ -119,9 +118,8 @@ public class PlantType
      * Creates a two-block-high plant with the given name.
      * 
      * @param name Name of the plant.
-     * @param material The material of the plant.
-     * @param bottomData Data value for the bottom.
-     * @param topData Data value for the top.
+     * @param bottomMaterial The bottom material of the plant.
+     * @param topMaterial The top material of the plant, if it has one
      */
     private PlantType(String name, LocalMaterialData bottomMaterial, LocalMaterialData topMaterial)
     {
@@ -132,7 +130,7 @@ public class PlantType
 
     /**
      * Gets the name of this plant type. You can get an equivalent plant back
-     * type using {@link #getPlant(String)}.
+     * type using {@link #getPlant(String, IMaterialReader)}.
      * 
      * @return The name of this plant type.
      */
@@ -144,7 +142,7 @@ public class PlantType
     /**
      * Spawns this plant in the world.
      * 
-     * @param world The world to spawn in.
+     * @param worldGenregion The world to spawn in.
      * @param x X position of the plant.
      * @param y Y position of the lowest block of the plant.
      * @param z Z position of the plant.

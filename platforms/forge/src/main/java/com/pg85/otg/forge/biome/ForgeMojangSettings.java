@@ -75,12 +75,12 @@ public final class ForgeMojangSettings implements MojangSettings
 	@Override
 	public LocalMaterialData getSurfaceBlock()
 	{
-		return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial());
+		return ForgeMaterialData.ofBlockState(this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getTopMaterial());
 	}
 
 	@Override
 	public LocalMaterialData getGroundBlock()
 	{
-		return ForgeMaterialData.ofMinecraftBlockState(this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial());
+		return ForgeMaterialData.ofBlockState(this.biomeBase.getGenerationSettings().getSurfaceBuilderConfig().getUnderMaterial());
 	}
 }

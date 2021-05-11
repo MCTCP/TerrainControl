@@ -17,6 +17,7 @@ import net.minecraft.server.v1_16_R3.MinecraftKey;
 
 import com.pg85.otg.spigot.util.UnsafeUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator;
@@ -27,11 +28,15 @@ import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class OTGPlugin extends JavaPlugin implements Listener
 {
-	private static HashMap<String, String> worlds = new HashMap<>();
+	private static final ReentrantLock initLock = new ReentrantLock();
+	private static final HashMap<String, String> worlds = new HashMap<>();
+	private static final HashSet<String> processedWorlds = new HashSet<>();
 
 	@Override
 	public void onDisable ()
@@ -87,48 +92,60 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	{
 		if (worlds.containsKey(event.getWorld().getName()))
 		{
-			OTG.log(LogMarker.INFO, "Taking over world " + event.getWorld().getName());
-
-			net.minecraft.server.v1_16_R3.ChunkGenerator generator = ((CraftWorld) event.getWorld()).getHandle().getChunkProvider().getChunkGenerator();
-			if (!(generator instanceof CustomChunkGenerator))
-			{
-				OTG.log(LogMarker.INFO, "Mission failed, we'll get them next time");
-				return;
-			}
-			if (!(event.getWorld().getGenerator() instanceof OTGSpigotChunkGen))
-			{
-				OTG.log(LogMarker.WARN, "World generator was not an OTG generator, cannot take over, something has gone wrong");
-				return;
-			}
-			// We have a CustomChunkGenerator and a NoiseChunkGenerator
-			OTGSpigotChunkGen OTGGen = (OTGSpigotChunkGen) event.getWorld().getGenerator();
-			OTGNoiseChunkGenerator OTGDelegate;
-			// If generator is null, it has not been initialized yet. Initialize it.
-			// The lock is used to avoid the accidental creation of two separate objects, in case
-			// of a race condition.
-			if (OTGGen.generator == null)
-			{
-				OTGGen.initLock.lock();
-				if (OTGGen.generator == null)
-				{
-					OTGDelegate = new OTGNoiseChunkGenerator(
-							new DimensionConfig(OTGGen.preset.getName()),
-							new OTGBiomeProvider(OTGGen.preset.getName(), event.getWorld().getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
-							event.getWorld().getSeed(),
-							GeneratorSettingBase::i
-					);
-					OTGGen.generator = OTGDelegate;
-				} else {
-					OTGDelegate = OTGGen.generator;
-				}
-				OTGGen.initLock.unlock();
-			} else {
-				OTGDelegate = OTGGen.generator;
-			}
-
-			UnsafeUtil.setDelegate(generator, OTGDelegate);
-
-			OTG.log(LogMarker.INFO, "Success!");
+			injectInternalGenerator(event.getWorld());
 		}
+	}
+
+	public static void injectInternalGenerator(World world) {
+		initLock.lock();
+		if (processedWorlds.contains(world.getName())) {
+			// We have already processed this world, return
+			return;
+		}
+
+		OTG.log(LogMarker.INFO, "Taking over world " + world.getName());
+
+		net.minecraft.server.v1_16_R3.ChunkGenerator generator = ((CraftWorld) world).getHandle().getChunkProvider().getChunkGenerator();
+		if (!(generator instanceof CustomChunkGenerator))
+		{
+			OTG.log(LogMarker.INFO, "Mission failed, we'll get them next time");
+			return;
+		}
+		if (!(world.getGenerator() instanceof OTGSpigotChunkGen))
+		{
+			OTG.log(LogMarker.WARN, "World generator was not an OTG generator, cannot take over, something has gone wrong");
+			return;
+		}
+		// We have a CustomChunkGenerator and a NoiseChunkGenerator
+		OTGSpigotChunkGen OTGGen = (OTGSpigotChunkGen) world.getGenerator();
+		OTGNoiseChunkGenerator OTGDelegate;
+		// If generator is null, it has not been initialized yet. Initialize it.
+		// The lock is used to avoid the accidental creation of two separate objects, in case
+		// of a race condition.
+		if (OTGGen.generator == null)
+		{
+			OTGDelegate = new OTGNoiseChunkGenerator(
+				new DimensionConfig(OTGGen.preset.getName()),
+				new OTGBiomeProvider(OTGGen.preset.getName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
+				world.getSeed(),
+				GeneratorSettingBase::i
+			);
+		} else {
+			OTGDelegate = OTGGen.generator;
+		}
+
+		UnsafeUtil.setDelegate(generator, OTGDelegate);
+
+		if (OTGGen.generator == null) {
+			OTGGen.generator = OTGDelegate;
+		}
+
+		// Spigot may have started generating - we gotta regen if so
+
+		OTG.log(LogMarker.INFO, "Success!");
+
+		processedWorlds.add(world.getName());
+
+		initLock.unlock();
 	}
 }

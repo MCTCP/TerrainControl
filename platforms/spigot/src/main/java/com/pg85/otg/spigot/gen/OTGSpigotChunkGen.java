@@ -1,24 +1,17 @@
 package com.pg85.otg.spigot.gen;
 
-import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.presets.Preset;
-import com.pg85.otg.spigot.biome.OTGBiomeProvider;
+import com.pg85.otg.spigot.OTGPlugin;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
-import net.minecraft.server.v1_16_R3.GeneratorSettingBase;
-import net.minecraft.server.v1_16_R3.IRegistry;
-import org.bukkit.Bukkit;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
 import org.bukkit.generator.ChunkGenerator;
 
 import java.util.Random;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class OTGSpigotChunkGen extends ChunkGenerator
 {
-	public ReentrantLock initLock = new ReentrantLock();
 	public OTGNoiseChunkGenerator generator = null;
 	public final Preset preset;
 	private final FifoMap<ChunkCoordinate, ChunkData> chunkDataCache = new FifoMap<>(128);
@@ -28,25 +21,12 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 		this.preset = preset;
 	}
 
-
-
 	@Override
 	public ChunkData generateChunkData(World world, Random random, int chunkX, int chunkZ, BiomeGrid biome)
 	{
 		if (generator == null)
 		{
-			initLock.lock();
-			// Check if someone else made this object since last time
-			if (generator == null)
-			{
-				generator = new OTGNoiseChunkGenerator(
-						new DimensionConfig(preset.getName()),
-						new OTGBiomeProvider(preset.getName(), world.getSeed(), false, false, ((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay)),
-						world.getSeed(),
-						GeneratorSettingBase::i
-				);
-			}
-			initLock.unlock();
+			OTGPlugin.injectInternalGenerator(world);
 		}
 
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
@@ -58,7 +38,6 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 			chunkDataCache.put(chunkCoord, chunkData);
 		}
 		return chunkData;
-
 	}
 
 	@Override

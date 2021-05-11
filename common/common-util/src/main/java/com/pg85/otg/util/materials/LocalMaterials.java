@@ -68,7 +68,17 @@ public class LocalMaterials
 	public static final String SPRUCE_LEAVES_NAME = getRegistryKey("spruce_leaves");
 
     // Plants
-	public static final String RED_ROSE_NAME = getRegistryKey("rose_bush");
+	public static final String POPPY_NAME = getRegistryKey("poppy");
+	public static final String BLUE_ORCHID_NAME = getRegistryKey("poppy");
+	public static final String ALLIUM_NAME = getRegistryKey("poppy");
+	public static final String AZURE_BLUET_NAME = getRegistryKey("poppy");
+	public static final String RED_TULIP_NAME = getRegistryKey("poppy");
+	public static final String ORANGE_TULIP_NAME = getRegistryKey("poppy");
+	public static final String WHITE_TULIP_NAME = getRegistryKey("poppy");
+	public static final String PINK_TULIP_NAME = getRegistryKey("poppy");
+	public static final String OXEYE_DAISY_NAME = getRegistryKey("poppy");
+
+
 	public static final String BROWN_MUSHROOM_NAME = getRegistryKey("brown_mushroom");
 	public static final String YELLOW_FLOWER_NAME = getRegistryKey("dandelion");
 	public static final String DEAD_BUSH_NAME = getRegistryKey("dead_bush");
@@ -174,7 +184,17 @@ public class LocalMaterials
     public static LocalMaterialData SPRUCE_LEAVES;
 
     // Plants
-    public static LocalMaterialData RED_ROSE;
+    public static LocalMaterialData POPPY;
+    public static LocalMaterialData BLUE_ORCHID;
+    public static LocalMaterialData ALLIUM;
+    public static LocalMaterialData AZURE_BLUET;
+    public static LocalMaterialData RED_TULIP;
+    public static LocalMaterialData ORANGE_TULIP;
+    public static LocalMaterialData WHITE_TULIP;
+    public static LocalMaterialData PINK_TULIP;
+    public static LocalMaterialData OXEYE_DAISY;
+
+
 	public static LocalMaterialData BROWN_MUSHROOM;
 	public static LocalMaterialData YELLOW_FLOWER;
 	public static LocalMaterialData DEAD_BUSH;
