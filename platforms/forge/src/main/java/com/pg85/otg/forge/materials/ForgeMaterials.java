@@ -141,9 +141,9 @@ class ForgeMaterials extends LocalMaterials
 			SEA_PICKLE = ForgeMaterialData.ofBlockState(Blocks.SEA_PICKLE.defaultBlockState());
 
 			// Coral
-			CORAL_BLOCKS = Arrays.stream(CORAL_BLOCKS_TAG).map(block -> ForgeMaterialData.ofMinecraftBlockState(block.defaultBlockState())).collect(Collectors.toList());
-			WALL_CORALS = Arrays.stream(WALL_CORALS_TAG).map(block -> ForgeMaterialData.ofMinecraftBlockState(block.defaultBlockState())).collect(Collectors.toList());
-			CORALS = Arrays.stream(CORALS_TAG).map(block -> ForgeMaterialData.ofMinecraftBlockState(block.defaultBlockState())).collect(Collectors.toList());
+			CORAL_BLOCKS = Arrays.stream(CORAL_BLOCKS_TAG).map(block -> ForgeMaterialData.ofBlockState(block.defaultBlockState())).collect(Collectors.toList());
+			WALL_CORALS = Arrays.stream(WALL_CORALS_TAG).map(block -> ForgeMaterialData.ofBlockState(block.defaultBlockState())).collect(Collectors.toList());
+			CORALS = Arrays.stream(CORALS_TAG).map(block -> ForgeMaterialData.ofBlockState(block.defaultBlockState())).collect(Collectors.toList());
 
 			// Ores
 			COAL_ORE = readMaterial(LocalMaterials.COAL_ORE_NAME);
