@@ -149,6 +149,8 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 					tree = BiomeDecoratorGroups.BIRCH;
 					break;
 				case JungleTree:
+					tree = BiomeDecoratorGroups.MEGA_JUNGLE_TREE;
+					break;
 				case CocoaTree:
 					tree = BiomeDecoratorGroups.JUNGLE_TREE;
 					break;
@@ -178,16 +180,16 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 					other = (WorldGenFeatureConfigured<WorldGenFeatureConfiguration, ?>) BiomeDecoratorGroups.SWAMP_TREE;
 					break;
 				case Taiga1:
-					tree = BiomeDecoratorGroups.SPRUCE;
-					break;
-				case Taiga2:
 					tree = BiomeDecoratorGroups.PINE;
 					break;
+				case Taiga2:
+					tree = BiomeDecoratorGroups.SPRUCE;
+					break;
 				case HugeTaiga1:
-					tree = BiomeDecoratorGroups.MEGA_SPRUCE;
+					tree = BiomeDecoratorGroups.MEGA_PINE;
 					break;
 				case HugeTaiga2:
-					tree = BiomeDecoratorGroups.MEGA_PINE;
+					tree = BiomeDecoratorGroups.MEGA_SPRUCE;
 					break;
 				case TallBirch:
 					tree = BiomeDecoratorGroups.SUPER_BIRCH_BEES_0002;

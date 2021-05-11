@@ -213,14 +213,17 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					swamp_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, swamp_tree.config);
 					return true;
 				case Taiga1:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> spruce = Features.SPRUCE;
-					spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config);
-					return true;
-				case Taiga2:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> pine = Features.PINE;
 					pine.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, pine.config);
 					return true;
+				case Taiga2:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> spruce = Features.SPRUCE;
+					spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, spruce.config);
+					return true;
 				case JungleTree:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_jungle_tree = Features.MEGA_JUNGLE_TREE;
+					mega_jungle_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_jungle_tree.config);
+					return true;
 				case CocoaTree:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> jungle_tree = Features.JUNGLE_TREE;
 					jungle_tree.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, jungle_tree.config);
@@ -238,12 +241,12 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 					dark_oak.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, dark_oak.config);
 					return true;
 				case HugeTaiga1:
-					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_spruce = Features.MEGA_SPRUCE;
-					mega_spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
-					return true;
-				case HugeTaiga2:
 					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_pine = Features.MEGA_PINE;
 					mega_pine.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_pine.config);
+					return true;
+				case HugeTaiga2:
+					ConfiguredFeature<BaseTreeFeatureConfig, ?> mega_spruce = Features.MEGA_SPRUCE;
+					mega_spruce.feature.place(this.worldGenRegion, this.chunkGenerator, rand, blockPos, mega_spruce.config);
 					return true;
 				default:
 					throw new RuntimeException("Failed to handle tree of type " + type.toString());
