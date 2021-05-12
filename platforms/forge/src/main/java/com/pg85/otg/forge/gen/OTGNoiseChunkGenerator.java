@@ -665,6 +665,66 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return chunk;
 	}
 
+	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkCoordinate chunkCoordinate)
+	{
+		// Since we can't check for structure components/references, only structure starts,  
+		// we'll keep a safe distance away from any vanilla structure start points.
+		int radiusInChunks = 4;
+        int chunkX = chunkCoordinate.getChunkX();
+        int chunkZ = chunkCoordinate.getChunkZ();
+        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+        {
+            for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+            {
+                for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
+                {
+                    int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX-chunkX + xOffset, 2) + Math.pow (chunkZ-chunkZ + zOffset, 2)));                    
+                    if (distance == cycle)
+                    {				
+						ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);					
+						ChunkPos chunkpos = chunk.getPos();
+						
+						// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
+						// based on biome and resource settings (distance etc). Does not plot any structure components.
+						if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
+						{
+							Biome biome = this.biomeSource.getNoiseBiome((chunkpos.x << 2) + 2, 0, (chunkpos.z << 2) + 2);
+							for(Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().structures())
+							{
+								// *TODO: Do we need to avoid any structures other than villages?
+								if(supplier.get().feature instanceof VillageStructure)
+								{
+									if(this.hasStructureStart(supplier.get(), serverWorld.registryAccess(), serverWorld.structureFeatureManager(), chunk, serverWorld.getStructureManager(), serverWorld.getSeed(), chunkpos, biome))
+									{
+										return true;
+									}
+								}
+							}
+						}
+                    }
+                }
+            }
+        }
+        return false;
+	}
+	
+	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, long seed, ChunkPos chunkPos, Biome biome)
+	{
+		StructureStart<?> structurestart = structureManager.getStartForFeature(SectionPos.of(chunk.getPos(), 0), structureFeature.feature, chunk);
+		int i = structurestart != null ? structurestart.getReferences() : 0;
+		StructureSeparationSettings structureseparationsettings = this.getSettings().getConfig(structureFeature.feature);
+		if (structureseparationsettings != null)
+		{
+			StructureStart<?> structureStart1 = structureFeature.generate(dynamicRegistries, this, this.biomeSource, templateManager, seed, chunkPos, biome, i, structureseparationsettings);
+			structureManager.setStartForFeature(SectionPos.of(chunk.getPos(), 0), structureFeature.feature, structureStart1, chunk);
+			if(structureStart1 != StructureStart.INVALID_START)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	LocalMaterialData getMaterialInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int y, int z)
 	{
 		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
