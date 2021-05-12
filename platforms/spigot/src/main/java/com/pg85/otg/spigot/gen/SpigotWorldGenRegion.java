@@ -21,8 +21,6 @@ import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.minecraft.TreeType;
 import net.minecraft.server.v1_16_R3.*;
-import org.bukkit.block.BlockState;
-
 import java.util.Optional;
 import java.util.Random;
 
@@ -214,13 +212,6 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 			// Return true to prevent further attempts.
 			return true;
 		}
-	}
-
-	// Used by ChunkGenerator for BO4's requesting data
-	// in chunks outside the area being populated.
-	IChunkAccess getChunk (ChunkCoordinate chunkCoord)
-	{
-		return this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
 	}
 
 	@Override
@@ -545,8 +536,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public boolean chunkHasDefaultStructure (Random worldRandom, ChunkCoordinate chunkCoordinate)
 	{
-		// TODO: Implement this.
-		return false;
+		return ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
 	}
 
 	@Override
@@ -577,23 +567,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void prepareDefaultStructures (long worldSeed, int x, int z, boolean dry)
-	{
-		// TODO: Implement this.
-	}
-
-	@Override
 	public boolean isInsideWorldBorder (ChunkCoordinate chunkCoordinate)
 	{
 		// TODO: Implement this.
 		return true;
-	}
-
-	@Override
-	public ChunkCoordinate getSpawnChunk ()
-	{
-		// TODO: Implement this.
-		return null;
 	}
 
 	public TileEntity getTileEntity(BlockPosition blockPos)

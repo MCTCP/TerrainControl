@@ -261,13 +261,6 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			return true; 
 		}
 	}
-
-	// Used by ChunkGenerator for BO4's requesting data
-	// in chunks outside the area being populated.
-	IChunk getChunk(ChunkCoordinate chunkCoord)
-	{
-		return this.worldGenRegion.getChunk(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
-	}
 	
 	@Override
 	public LocalMaterialData getMaterial(int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
@@ -580,10 +573,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate)
 	{
-		// TODO: Implement this.
-		return false;
-	}	
-	
+		return ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
+	}
+
 	@Override
 	public void spawnEntity(IEntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate)
 	{
@@ -619,23 +611,10 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	}
 
 	@Override
-	public void prepareDefaultStructures(long worldSeed, int x, int z, boolean dry)
-	{
-		// TODO: Implement this.
-	}
-
-	@Override
 	public boolean isInsideWorldBorder(ChunkCoordinate chunkCoordinate)
 	{
 		// TODO: Implement this.
 		return true;
-	}
-
-	@Override
-	public ChunkCoordinate getSpawnChunk()
-	{
-		// TODO: Implement this.
-		return null;
 	}
 
 	public TileEntity getTileEntity(BlockPos blockPos)
