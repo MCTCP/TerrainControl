@@ -348,10 +348,18 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		// with status LIQUID_CARVERS, while the chunk does already have base terrain blocks filled.
 		// If we use a later status like FEATURES though, resource population may have problems
 		// fetching chunks.
-		int heightMapy = chunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(internalX, internalZ);
+		int heightMapy = chunk.a(HeightMap.Type.WORLD_SURFACE).a(internalX, internalZ);
 		if (heightMapy == 0)
 		{
-			heightMapy = Constants.WORLD_HEIGHT - 1;
+			// Check the wg heightmap as a secondary measure
+			// The heightmap doesn't track any changes to terrain after initial generation, and is out of date, so it's a last resort in case things don't work.
+			int heightMapCheck = chunk.a(HeightMap.Type.WORLD_SURFACE_WG).a(internalX, internalZ);
+			if (heightMapCheck != 0)
+			{
+				heightMapy = heightMapCheck;
+			} else {
+				heightMapy = Constants.WORLD_HEIGHT - 1;
+			}
 		}
 
 		LocalMaterialData material;
