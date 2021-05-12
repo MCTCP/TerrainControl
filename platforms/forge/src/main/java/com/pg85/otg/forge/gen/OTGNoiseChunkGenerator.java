@@ -624,7 +624,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (chunk == null)
 		{
 			// Generate a chunk without populating it
-			chunk = getUnloadedChunk(((ForgeWorldGenRegion)worldGenRegion), ((ForgeWorldGenRegion)worldGenRegion).getInternal().getLevel(), worldGenRegion.getWorldRandom(), chunkCoord);
+			chunk = getUnloadedChunk(worldGenRegion.getWorldRandom(), chunkCoord);
 			unloadedChunksCache.put(chunkCoord, chunk);
 		}
 
@@ -647,7 +647,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return blocksInColumn;
 	}
 
-	private IChunk getUnloadedChunk(ForgeWorldGenRegion worldGenRegion, ServerWorld serverWorld, Random random, ChunkCoordinate chunkCoordinate)
+	private IChunk getUnloadedChunk(Random random, ChunkCoordinate chunkCoordinate)
 	{
 		ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ChunkBuffer buffer = new ForgeChunkBuffer(chunk);
@@ -688,6 +688,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 						// based on biome and resource settings (distance etc). Does not plot any structure components.
 						if (serverWorld.getServer().getWorldData().worldGenSettings().generateFeatures())
 						{
+							// TODO: Optimise this, make the BO4 plotter reuse biome/default structure information.
 							Biome biome = this.biomeSource.getNoiseBiome((chunkpos.x << 2) + 2, 0, (chunkpos.z << 2) + 2);
 							for(Supplier<StructureFeature<?, ?>> supplier : biome.getGenerationSettings().structures())
 							{
@@ -716,7 +717,6 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (structureseparationsettings != null)
 		{
 			StructureStart<?> structureStart1 = structureFeature.generate(dynamicRegistries, this, this.biomeSource, templateManager, seed, chunkPos, biome, i, structureseparationsettings);
-			structureManager.setStartForFeature(SectionPos.of(chunk.getPos(), 0), structureFeature.feature, structureStart1, chunk);
 			if(structureStart1 != StructureStart.INVALID_START)
 			{
 				return true;
