@@ -27,6 +27,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import net.minecraft.server.v1_16_R3.*;
+
 import org.bukkit.craftbukkit.v1_16_R3.generator.CraftChunkData;
 
 import javax.annotation.Nullable;
@@ -361,6 +362,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// this.biomeProvider -> this.b
 		ResourceKey<BiomeBase> key = ((OTGBiomeProvider) this.b).getBiomeRegistryKey((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 		BiomeConfig biomeConfig = OTG.getEngine().getPresetLoader().getBiomeConfig(key.a().toString());
+		BiomeBase biome = this.c.getBiome((chunkX << 2) + 2, 2, (chunkZ << 2) + 2);
 
 		// SharedSeedRandom -> SeededRandom
 		SeededRandom sharedseedrandom = new SeededRandom();
@@ -369,7 +371,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		try
 		{
 			// Override normal population (Biome.func_242427_a()) with OTG's.
-			biomePopulate(biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			biomePopulate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 		}
 		catch (Exception exception)
 		{
@@ -388,22 +390,19 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		ChunkCoordIntPair chunkcoordintpair = ichunkaccess.getPos();
 		((ProtoChunk) ichunkaccess).a(new BiomeStorage(iregistry, chunkcoordintpair, this.c));
 	}
-
-	@Override
-	public void createStructures (IRegistryCustom iregistrycustom, StructureManager structuremanager, IChunkAccess ichunkaccess, DefinedStructureManager definedstructuremanager, long i)
-	{
-		super.createStructures(iregistrycustom, structuremanager, ichunkaccess, definedstructuremanager, i);
-	}
-
+	
 	// Chunk population method taken from Biome (Biome.func_242427_a())
-	private void biomePopulate (BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, RegionLimitedWorldAccess world, long seed, SeededRandom random, BlockPosition pos)
+	private void biomePopulate (BiomeBase biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, RegionLimitedWorldAccess world, long seed, SeededRandom random, BlockPosition pos)
 	{
 		init(((IWorldDataServer) world.getWorldData()).getName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
+		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
 		this.chunkPopulator.populate(chunkBeingPopulated, new SpigotWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
-		// TODO: clean up/optimise this
-		// Structure generation
+		List<List<Supplier<WorldGenFeatureConfigured<?, ?>>>> list = biome.e().c();
+		
+		// TODO: Spawn snow only after this!		
+		// Vanilla structure generation
 		for (int step = 0; step < WorldGenStage.Decoration.values().length; ++step)
 		{
 			int index = 0;
@@ -426,29 +425,29 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 						// Generate the structure if it exists in a biome in this chunk.
 						// We don't have to do any work here, we can just let StructureManager handle it all.
 						structureManager.a(SectionPosition.a(pos), structure)
-								.forEach(start ->
-										start.a(
-												world,
-												structureManager,
-												chunkGenerator,
-												random,
-												new StructureBoundingBox(
-														chunkStartX,
-														chunkStartZ,
-														chunkStartX + 15,
-														chunkStartZ + 15
-												),
-												new ChunkCoordIntPair(chunkX, chunkZ)
-										)
+							.forEach(start ->
+								start.a(
+									world,
+									structureManager,
+									chunkGenerator,
+									random,
+									new StructureBoundingBox(
+										chunkStartX,
+										chunkStartZ,
+										chunkStartX + 15,
+										chunkStartZ + 15
+									),
+									new ChunkCoordIntPair(chunkX, chunkZ)
 								)
+							)
 						;
 					}
 					catch (Exception exception)
 					{
 						CrashReport crashreport = CrashReport.a(exception, "Feature placement");
 						crashreport.a("Feature")
-								.a("Id", IRegistry.STRUCTURE_FEATURE.getKey(structure))
-								.a("Description", structure::toString)
+							.a("Id", IRegistry.STRUCTURE_FEATURE.getKey(structure))
+							.a("Description", structure::toString)
 						;
 						throw new ReportedException(crashreport);
 					}
@@ -456,8 +455,27 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 					++index;
 				}
 			}
+			
+			// Spawn any non-OTG resources registered to this biome.
+			if (list.size() > step)
+			{
+				for(Supplier<WorldGenFeatureConfigured<?, ?>> supplier : list.get(step))
+				{
+					WorldGenFeatureConfigured<?, ?> configuredfeature = supplier.get();
+					random.b(seed, index, step);
+					try {
+						configuredfeature.a(world, chunkGenerator, random, pos);
+					} catch (Exception exception1) {
+						CrashReport crashreport1 = CrashReport.a(exception1, "Feature placement");
+						crashreport1.a("Feature").a("Id", IRegistry.FEATURE.getKey(configuredfeature.e)).a("Config", configuredfeature.f).a("Description", () -> {
+							return configuredfeature.e.toString();
+						});
+						throw new ReportedException(crashreport1);
+					}
+					++index;
+				}
+			}
 		}
-
 	}
 
 	// Mob spawning on initial chunk spawn (animals).
@@ -616,9 +634,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		else if (y < this.getSeaLevel())
 		{
 			return ((SpigotMaterialData) config.getWaterBlockReplaced(y)).internalBlock();
-		}
-		else
-		{
+		} else {
 			return Blocks.AIR.getBlockData();
 		}
 	}
@@ -643,7 +659,8 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return this.dimensionSettingsSupplier.get().g();
 	}
 
-	public CustomStructureCache getStructureCache() {
+	public CustomStructureCache getStructureCache()
+	{
 		return this.structureCache;
 	}
 
@@ -703,52 +720,14 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX(), chunkCoordinate.getChunkZ()), null);
 		ChunkBuffer buffer = new SpigotChunkBuffer(chunk);
 
-		// Setup jigsaw data
+		// This is where vanilla processes any noise affecting structures like villages, in order to spawn smoothing areas.
+		// Doing this for unloaded chunks causes a hang on load since getChunk is called by StructureManager.
+		// BO4's avoid villages, so this method should never be called to fetch unloaded chunks that contain villages, 
+		// so we can skip noisegen affecting structures here.
+		// *TODO: Do we need to avoid any noisegen affecting structures other than villages?
+		
 		ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 		ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
-		/*
-		ChunkCoordIntPair pos = chunk.getPos();
-		int chunkX = pos.x;
-		int chunkZ = pos.z;
-		int startX = chunkX << 4;
-		int startZ = chunkZ << 4;
-
-		// Iterate through all of the jigsaw structures (villages, pillager outposts, nether fossils)
-		for(StructureGenerator<?> structure : StructureGenerator.t) {
-			// Get all structure starts in this chunk
-			world.getStructureManager().a(SectionPosition.a(pos, 0), structure).forEach((start) -> {
-				// Iterate through the pieces in the structure
-				for(StructurePiece piece : start.d()) {
-					// Check if it intersects with this chunk
-					if (piece.a(pos, 12)) {
-						StructureBoundingBox box = piece.g();
-
-						if (piece instanceof WorldGenFeaturePillagerOutpostPoolPiece) {
-							WorldGenFeaturePillagerOutpostPoolPiece villagePiece = (WorldGenFeaturePillagerOutpostPoolPiece) piece;
-							// Add to the list if it's a rigid piece
-							if (villagePiece.b().e() == WorldGenFeatureDefinedStructurePoolTemplate.Matching.RIGID) {
-								structures.add(new JigsawStructureData(box.a, box.b, box.c,box.d, villagePiece.d(), box.f, true, 0, 0, 0));
-							}
-
-							// Get all the junctions in this piece
-							for(WorldGenFeatureDefinedStructureJigsawJunction junction : villagePiece.e()) {
-								int sourceX = junction.a();
-								int sourceZ = junction.c();
-
-								// If the junction is in this chunk, then add to list
-								if (sourceX > startX - 12 && sourceZ > startZ - 12 && sourceX < startX + 15 + 12 && sourceZ < startZ + 15 + 12) {
-									junctions.add(new JigsawStructureData(0, 0, 0,0, 0, 0, false, junction.a(), junction.b(), junction.c()));
-								}
-							}
-						} else {
-							structures.add(new JigsawStructureData(box.a, box.b, box.c,box.d, 0, box.f,  false, 0, 0, 0));
-						}
-					}
-				}
-
-			});
-		}
-		*/
 
 		this.internalGenerator.populateNoise(this.preset.getWorldConfig().getWorldHeightCap(), random, buffer, buffer.getChunkCoordinate(), structures, junctions);
 		return chunk;
@@ -789,6 +768,64 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		return height;
 	}
 
+	public boolean checkHasVanillaStructureWithoutLoading(WorldServer serverWorld, ChunkCoordinate chunkCoordinate)
+	{
+		// Since we can't check for structure components/references, only structure starts,  
+		// we'll keep a safe distance away from any vanilla structure start points.
+		int radiusInChunks = 4;
+        int chunkX = chunkCoordinate.getChunkX();
+        int chunkZ = chunkCoordinate.getChunkZ();
+        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+        {
+            for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+            {
+                for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
+                {
+                    int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX-chunkX + xOffset, 2) + Math.pow (chunkZ-chunkZ + zOffset, 2)));                    
+                    if (distance == cycle)
+                    {
+                    	ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);			
+                    	ChunkCoordIntPair chunkpos = chunk.getPos();
+						
+						// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
+						// based on biome and resource settings (distance etc). Does not plot any structure components.
+						if (serverWorld.worldDataServer.getGeneratorSettings().shouldGenerateMapFeatures())
+						{
+							// TODO: Optimise this, make the BO4 plotter reuse biome/default structure information.
+							BiomeBase biome = this.b.getBiome((chunkpos.x << 2) + 2, 0, (chunkpos.z << 2) + 2);
+							for(Supplier<StructureFeature<?, ?>> supplier : biome.e().a())
+							{
+								// *TODO: Do we need to avoid any structures other than villages?
+								if(supplier.get().d instanceof net.minecraft.server.v1_16_R3.WorldGenVillage)
+								{
+									if(this.hasStructureStart(supplier.get(), serverWorld.r(), serverWorld.getStructureManager(), chunk, serverWorld.n(), serverWorld.getSeed(), chunkpos, biome))
+									{
+										return true;
+									}
+								}
+							}
+						}
+                    }
+                }
+            }
+        }
+        return false;
+	}
+	
+	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, IRegistryCustom dynamicRegistries, StructureManager structureManager, IChunkAccess chunk, DefinedStructureManager templateManager, long seed, ChunkCoordIntPair chunkPos, BiomeBase biome)
+	{
+		StructureSettingsFeature structureseparationsettings = this.getSettings().a(structureFeature.d);
+		if (structureseparationsettings != null)
+		{
+			StructureStart<?> structureStart1 = structureFeature.a(dynamicRegistries, this, this.b, templateManager, seed, chunkPos, biome, 0, structureseparationsettings);
+			if(structureStart1 != StructureStart.a)
+			{
+				return true;
+			}
+		}
+		return false;
+	}	
+	
 	double getBiomeBlocksNoiseValue (int blockX, int blockZ)
 	{
 		return this.internalGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);

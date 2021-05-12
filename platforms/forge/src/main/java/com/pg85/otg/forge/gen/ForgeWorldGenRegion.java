@@ -575,7 +575,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	{
 		return ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
 	}
-	
+
 	@Override
 	public void spawnEntity(IEntityFunction<?> newEntityData, ChunkCoordinate chunkCoordinate)
 	{

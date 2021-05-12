@@ -214,13 +214,6 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		}
 	}
 
-	// Used by ChunkGenerator for BO4's requesting data
-	// in chunks outside the area being populated.
-	IChunkAccess getChunk (ChunkCoordinate chunkCoord)
-	{
-		return this.worldGenRegion.getChunkAt(chunkCoord.getChunkX(), chunkCoord.getChunkZ());
-	}
-
 	@Override
 	public LocalMaterialData getMaterial (int x, int y, int z, ChunkCoordinate chunkBeingPopulated)
 	{
@@ -543,8 +536,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public boolean chunkHasDefaultStructure (Random worldRandom, ChunkCoordinate chunkCoordinate)
 	{
-		// TODO: Implement this.
-		return false;
+		return ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
 	}
 
 	@Override

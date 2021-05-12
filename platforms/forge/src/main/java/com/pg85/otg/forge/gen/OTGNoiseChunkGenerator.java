@@ -346,8 +346,8 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
 		
-		// TODO: clean up/optimise this
-		// Structure generation
+		// TODO: Spawn snow only after this!		
+		// Vanilla structure generation
 		for(int step = 0; step < GenerationStage.Decoration.values().length; ++step)
 		{
 			int index = 0;
@@ -665,6 +665,41 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return chunk;
 	}
 
+	LocalMaterialData getMaterialInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int y, int z)
+	{
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
+		return blockColumn[y];
+	}
+
+	int getHighestBlockYInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
+	{
+		int height = -1;
+
+		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
+		ForgeMaterialData material;
+		boolean isLiquid;
+		boolean isSolid;
+
+		for (int y = 255; y > -1; y--)
+		{
+			material = (ForgeMaterialData) blockColumn[y];
+			isLiquid = material.isLiquid();
+			isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(LocalMaterials.SNOW));
+			if (!(isLiquid && ignoreLiquid))
+			{
+				if ((findSolid && isSolid) || (findLiquid && isLiquid))
+				{
+					return y;
+				}
+				if ((findSolid && isLiquid) || (findLiquid && isSolid))
+				{
+					return -1;
+				}
+			}
+		}
+		return height;
+	}
+	
 	public boolean checkHasVanillaStructureWithoutLoading(ServerWorld serverWorld, ChunkCoordinate chunkCoordinate)
 	{
 		// Since we can't check for structure components/references, only structure starts,  
@@ -711,54 +746,17 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	
 	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, long seed, ChunkPos chunkPos, Biome biome)
 	{
-		StructureStart<?> structurestart = structureManager.getStartForFeature(SectionPos.of(chunk.getPos(), 0), structureFeature.feature, chunk);
-		int i = structurestart != null ? structurestart.getReferences() : 0;
 		StructureSeparationSettings structureseparationsettings = this.getSettings().getConfig(structureFeature.feature);
 		if (structureseparationsettings != null)
 		{
-			StructureStart<?> structureStart1 = structureFeature.generate(dynamicRegistries, this, this.biomeSource, templateManager, seed, chunkPos, biome, i, structureseparationsettings);
+			StructureStart<?> structureStart1 = structureFeature.generate(dynamicRegistries, this, this.biomeSource, templateManager, seed, chunkPos, biome, 0, structureseparationsettings);
 			if(structureStart1 != StructureStart.INVALID_START)
 			{
 				return true;
 			}
 		}
 		return false;
-	}
-	
-	LocalMaterialData getMaterialInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int y, int z)
-	{
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
-		return blockColumn[y];
-	}
-
-	int getHighestBlockYInUnloadedChunk(IWorldGenRegion worldGenRegion, int x, int z, boolean findSolid, boolean findLiquid, boolean ignoreLiquid, boolean ignoreSnow)
-	{
-		int height = -1;
-
-		LocalMaterialData[] blockColumn = getBlockColumnInUnloadedChunk(worldGenRegion, x, z);
-		ForgeMaterialData material;
-		boolean isLiquid;
-		boolean isSolid;
-
-		for (int y = 255; y > -1; y--)
-		{
-			material = (ForgeMaterialData) blockColumn[y];
-			isLiquid = material.isLiquid();
-			isSolid = material.isSolid() || (!ignoreSnow && material.isMaterial(LocalMaterials.SNOW));
-			if (!(isLiquid && ignoreLiquid))
-			{
-				if ((findSolid && isSolid) || (findLiquid && isLiquid))
-				{
-					return y;
-				}
-				if ((findSolid && isLiquid) || (findLiquid && isSolid))
-				{
-					return -1;
-				}
-			}
-		}
-		return height;
-	}
+	}	
 
 	double getBiomeBlocksNoiseValue(int blockX, int blockZ)
 	{
