@@ -3,6 +3,7 @@ package com.pg85.otg.gen.carver;
 import java.util.BitSet;
 import java.util.Random;
 
+import com.pg85.otg.util.MutableBoolean;
 import com.pg85.otg.util.gen.ChunkBuffer;
 import com.pg85.otg.util.helpers.MathHelper;
 import com.pg85.otg.util.interfaces.IWorldConfig;
@@ -56,13 +57,14 @@ public abstract class Carver
 						double g = ((double) r + 0.5D - z) / yaw;
 						if (f * f + g * g < 1.0D)
 						{
+							MutableBoolean foundSurface = new MutableBoolean(false);
 
 							for (int s = l; s > k; --s)
 							{
 								double h = ((double) s - 0.5D - y) / pitch;
 								if (!this.isPositionExcluded(f, h, g, s))
 								{
-									bl |= this.carveAtPoint(chunk, carvingMask, random, seaLevel, chunkX, chunkZ, p, r, o, s, q);
+									bl |= this.carveAtPoint(chunk, carvingMask, random, seaLevel, chunkX, chunkZ, p, r, o, s, q, foundSurface);
 								}
 							}
 						}
@@ -77,7 +79,7 @@ public abstract class Carver
 		}
 	}
 
-	protected boolean carveAtPoint(ChunkBuffer chunk, BitSet carvingMask, Random random, int seaLevel, int mainChunkX, int mainChunkZ, int x, int z, int relativeX, int y, int relativeZ)
+	protected boolean carveAtPoint(ChunkBuffer chunk, BitSet carvingMask, Random random, int seaLevel, int mainChunkX, int mainChunkZ, int x, int z, int relativeX, int y, int relativeZ, MutableBoolean foundSurface)
 	{
 		int i = relativeX | relativeZ << 4 | y << 8;
 		if (carvingMask.get(i))
@@ -86,14 +88,22 @@ public abstract class Carver
 		} else
 		{
 			carvingMask.set(i);
+
+			// Check to see if we've found the surface.
+			// TODO: check the biome's top block instead of just grass, and search a larger height up instead of just the current carving sphere
+			if (chunk.getBlock(x, y, z).isMaterial(LocalMaterials.GRASS))
+			{
+				foundSurface.setValue(true);
+			}
+
 			// If there is already air here, we don't carve - don't want an ocean of lava under Skylands
 			// Skip bedrock carving as well
 			LocalMaterialData data = chunk.getBlock(x, y, z);
+
 			if (data.isMaterial(LocalMaterials.AIR) || data.isMaterial(LocalMaterials.BEDROCK))
 			{
 				return false;
 			}
-			// TODO: top layer searching
 			if (y < 11)
 			{
 				chunk.setBlock(x, y, z, LocalMaterials.LAVA);
@@ -102,6 +112,13 @@ public abstract class Carver
 				// TODO: should be cave_air
 				chunk.setBlock(x, y, z, LocalMaterials.AIR);
 			}
+
+			// If we found the surface and the below block is dirt, set the below block to grass
+			if (foundSurface.isValue() && chunk.getBlock(x, y - 1, z).isMaterial(LocalMaterials.DIRT))
+			{
+				chunk.setBlock(x, y - 1, z, LocalMaterials.GRASS);
+			}
+
 			return true;
 		}
 	}

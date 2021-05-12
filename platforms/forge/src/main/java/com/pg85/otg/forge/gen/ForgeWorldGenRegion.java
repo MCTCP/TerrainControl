@@ -93,6 +93,7 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 			BiomeConfig biomeConfig = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeConfig(this.presetName, id);
 			if(biomeConfig != null)
 			{
+				// TODO: cache this
 				return new ForgeBiome(biome, biomeConfig);
 			}
 		}
