@@ -93,7 +93,7 @@ public class UnderWaterOreGen extends Resource
         	}
         }
         
-        int currentSize = rand.nextInt(this.size);
+        int currentSize = rand.nextInt(this.size) + 2;
         int deltaX;
         int deltaZ;
         LocalMaterialData sourceBlock;
