@@ -9,19 +9,6 @@ import com.pg85.otg.util.materials.LocalMaterialData;
 public interface MojangSettings
 {
     /**
-     * Represents the four mob type groups used by vanilla Minecraft.
-     */
-    public static enum EntityCategory
-    {
-        AMBIENT_CREATURE,
-        WATER_CREATURE,
-        CREATURE,
-        MONSTER,
-        WATER_AMBIENT,
-        MISC
-    }
-
-    /**
      * Gets the temperature of this biome, between 0 and 2 (inclusive).
      * Higher is warmer.
      *  

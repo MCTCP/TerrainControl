@@ -147,18 +147,19 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
-	private void init (String worldName)
+	private void init (String worldSaveFolderName)
 	{
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getName(), Paths.get("./saves/" + worldSaveFolderName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
 		}
 	}
 
 	// Used by OTGSpigotChunkGen to query biome in a given location
 	// Need this because the normal Bukkit way of checking for biomes use the Bukkit Biome enum
-	public String getBiomeRegistryName(int blockX, int blockY, int blockZ) {
+	public String getBiomeRegistryName(int blockX, int blockY, int blockZ)
+	{
 		return BiomeInterpolator.getBiomeRegistryName(this.worldSeed, blockX, blockY, blockZ, (OTGBiomeProvider) this.b);
 	}
 
@@ -326,6 +327,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void buildBase (RegionLimitedWorldAccess worldGenRegion, IChunkAccess chunk)
 	{
 		// Done during this.internalGenerator.populateNoise
+		// TODO: Not doing this ignores any SurfaceBuilderss registered to this biome. We may have to enable this for non-otg biomes / non-otg surfacebuilders?
 	}
 
 	// Carves caves and ravines
@@ -394,6 +396,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Chunk population method taken from Biome (Biome.func_242427_a())
 	private void biomePopulate (BiomeBase biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, RegionLimitedWorldAccess world, long seed, SeededRandom random, BlockPosition pos)
 	{
+		// TODO: Parameter should be world save folder name, not world name. This only works when world name == world save folder name.
 		init(((IWorldDataServer) world.getWorldData()).getName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())

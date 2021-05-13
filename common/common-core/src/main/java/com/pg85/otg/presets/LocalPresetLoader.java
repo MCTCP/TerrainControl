@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfigFinder;
-import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
@@ -153,12 +152,9 @@ public abstract class LocalPresetLoader
 		List<Path> biomeDirs = new ArrayList<Path>(2);
 		biomeDirs.add(presetBiomesDir);
 		
-		// Build a set of all biomes to load
-		Collection<BiomeLoadInstruction> biomesToLoad = new HashSet<BiomeLoadInstruction>();
-
 		// Load all files
 		BiomeConfigFinder biomeConfigFinder = new BiomeConfigFinder();
-		Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(worldConfig.getWorldBiomes(), worldConfig.getWorldHeightScale(), biomeDirs, biomesToLoad, logger, materialReader, OTG.getEngine().getDefaultBiomes());
+		Map<String, BiomeConfigStub> biomeConfigStubs = biomeConfigFinder.findBiomes(worldConfig.getWorldBiomes(), worldConfig.getWorldHeightScale(), biomeDirs, logger, materialReader);
 
 		// Read all settings
 		ArrayList<BiomeConfig> biomeConfigs = readAndWriteSettings(worldConfig, biomeConfigStubs, presetDir, presetName, true, biomeResourcesManager, spawnLog, logger, materialReader);
@@ -183,7 +179,7 @@ public abstract class LocalPresetLoader
 			processMobInheritance(biomeConfigStubs, biomeConfigStub, 0, logger);
 
 			// Settings reading
-			BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getLoadInstructions(), biomeConfigStub, settingsDir, biomeConfigStub.getSettings(), worldConfig, presetName, biomeResourcesManager, spawnLog, logger, materialReader);
+			BiomeConfig biomeConfig = new BiomeConfig(biomeConfigStub.getBiomeName(), biomeConfigStub, settingsDir, biomeConfigStub.getSettings(), worldConfig, presetName, biomeResourcesManager, spawnLog, logger, materialReader);
 			biomeConfigs.add(biomeConfig);
 
 			// Settings writing
@@ -278,7 +274,7 @@ public abstract class LocalPresetLoader
 			return;
 		}
 
-		String stubInheritMobsBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, biomeConfigStub.getLoadInstructions().getBiomeTemplate().defaultInheritMobsBiomeName, logger, null);
+		String stubInheritMobsBiomeName = biomeConfigStub.getSettings().getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, BiomeStandardValues.INHERIT_MOBS_BIOME_NAME.getDefaultValue(), logger, null);
 
 		if(stubInheritMobsBiomeName != null && stubInheritMobsBiomeName.length() > 0)
 		{

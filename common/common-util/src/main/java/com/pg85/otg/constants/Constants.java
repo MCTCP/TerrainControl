@@ -56,33 +56,33 @@ public class Constants
 	public static final String WORLD_OBJECTS_FOLDER = "Objects";
 	public static final String LEGACY_WORLD_OBJECTS_FOLDER = "WorldObjects";
 	
-	public static String BackupFileSuffix = "-backup";
-	public static String StructureDataFileExtension = ".dat";
-	public static String BiomeConfigFileExtension = ".bc";
+	public static final String BackupFileSuffix = "-backup";
+	public static final String StructureDataFileExtension = ".dat";
+	public static final String BiomeConfigFileExtension = ".bc";
 	
 	// Contains the O menu settings for a world/dims.
-	public static String DimensionsConfigFileName = "Config.yaml";
-	public static String DimensionsConfigBackupFileName = "Config" + BackupFileSuffix + ".yaml";
+	public static final String DimensionsConfigFileName = "Config.yaml";
+	public static final String DimensionsConfigBackupFileName = "Config" + BackupFileSuffix + ".yaml";
 	// Contains the biome id's for a world/dim, generated on world/dim creation
-	public static String BiomeIdDataFileName = "BiomeIds.txt";
-	public static String BiomeIdDataBackupFileName = "BiomeIds" + BackupFileSuffix + ".txt";
+	public static final String BiomeIdDataFileName = "BiomeIds.txt";
+	public static final String BiomeIdDataBackupFileName = "BiomeIds" + BackupFileSuffix + ".txt";
 	// Data about dimensions, used to load dims on server start.
-	public static String DimensionsDataFileName = "Dimensions.txt";
-	public static String DimensionsDataBackupFileName = "Dimensions" + BackupFileSuffix + ".txt";
+	public static final String DimensionsDataFileName = "Dimensions.txt";
+	public static final String DimensionsDataBackupFileName = "Dimensions" + BackupFileSuffix + ".txt";
 	// Data on all chunks containing structures or spawners/particles/moddata
-	public static String StructureDataFolderName = "StructureData";	
-	public static String StructureDataBackupFileExtension = BackupFileSuffix + StructureDataFileExtension;
-	public static String PlottedChunksDataFolderName = StructureDataFolderName + File.separator + "PlottedChunks";
+	public static final String StructureDataFolderName = "StructureData";	
+	public static final String StructureDataBackupFileExtension = BackupFileSuffix + StructureDataFileExtension;
+	public static final String PlottedChunksDataFolderName = StructureDataFolderName + File.separator + "PlottedChunks";
 	// Data about structure start points and bo4 groups, used for distance.
-	public static String SpawnedStructuresFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataFileExtension;
-	public static String SpawnedStructuresBackupFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataBackupFileExtension;
+	public static final String SpawnedStructuresFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataFileExtension;
+	public static final String SpawnedStructuresBackupFileName = StructureDataFolderName + File.separator + "SpawnedStructures" + StructureDataBackupFileExtension;
 	// Data about pregenerator progress
-	public static String PregeneratedChunksFileName = "PregeneratedChunks.txt";
-	public static String PregeneratedChunksBackupFileName = "PregeneratedChunks" + BackupFileSuffix + ".txt";
+	public static final String PregeneratedChunksFileName = "PregeneratedChunks.txt";
+	public static final String PregeneratedChunksBackupFileName = "PregeneratedChunks" + BackupFileSuffix + ".txt";
 	// Misc data that should be saved with the world. Currently only contains version, 
 	// can be used for backwards compatibility when updating configs.
-	public static String WorldSaveDataFileName = "WorldSave.txt";
-	public static String WorldSaveDataBackupFileName = "WorldSave" + BackupFileSuffix + ".txt";
+	public static final String WorldSaveDataFileName = "WorldSave.txt";
+	public static final String WorldSaveDataBackupFileName = "WorldSave" + BackupFileSuffix + ".txt";
 	
 	/**
 	 * Temperatures below this temperature will cause the biome to be covered

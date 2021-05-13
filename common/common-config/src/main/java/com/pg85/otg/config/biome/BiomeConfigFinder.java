@@ -2,20 +2,16 @@ package com.pg85.otg.config.biome;
 
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.SettingsMap;
-import com.pg85.otg.config.io.SimpleSettingsMap;
 import com.pg85.otg.config.standard.BiomeStandardValues;
-import com.pg85.otg.config.standard.MojangSettings.EntityCategory;
-import com.pg85.otg.config.standard.StandardBiomeTemplate;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.biome.WeightedMobSpawnGroup;
 import com.pg85.otg.util.interfaces.IMaterialReader;
-import com.pg85.otg.util.minecraft.BiomeRegistryNames;
+import com.pg85.otg.util.minecraft.EntityCategory;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -46,16 +42,9 @@ public final class BiomeConfigFinder
      *
      * @return A map of biome name --> location on disk.
      */
-    public Map<String, BiomeConfigStub> findBiomes(List<String> worldBiomes, int worldHeightScale, Collection<Path> directories, Collection<BiomeLoadInstruction> biomesToLoad, ILogger logger, IMaterialReader materialReader, Collection<? extends BiomeLoadInstruction> defaultBiomes)
+    public Map<String, BiomeConfigStub> findBiomes(List<String> worldBiomes, int worldHeightScale, Collection<Path> directories, ILogger logger, IMaterialReader materialReader)
     {
         Map<String, BiomeConfigStub> biomeConfigsStore = new HashMap<String, BiomeConfigStub>();
-
-        // Switch to a Map<String, LocalBiome>
-        Map<String, BiomeLoadInstruction> remainingBiomes = new HashMap<String, BiomeLoadInstruction>();
-        for (BiomeLoadInstruction biome : biomesToLoad)
-        {
-            remainingBiomes.put(biome.getBiomeName(), biome);
-        }
 
         // Search all directories
         for (Path directoryPath  : directories)
@@ -64,20 +53,10 @@ public final class BiomeConfigFinder
             // Account for the possibility that folder creation failed
             if (directory.exists())
             {
-                loadBiomesFromDirectory(worldBiomes, worldHeightScale, biomeConfigsStore, directory, remainingBiomes, logger, materialReader, defaultBiomes);
+                loadBiomesFromDirectory(worldBiomes, worldHeightScale, biomeConfigsStore, directory, logger, materialReader);
             }
         }
         
-        // Create all biomes that weren't loaded
-        Path preferredDirectory = directories.iterator().next();
-        for (BiomeLoadInstruction localBiome : remainingBiomes.values())
-        {
-        	Path newConfigFile = Paths.get(preferredDirectory.toString(), toFileName(localBiome));
-            SettingsMap settings = new SimpleSettingsMap(localBiome.getBiomeName(), true);
-            BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, newConfigFile, localBiome, logger, materialReader);
-            biomeConfigsStore.put(localBiome.getBiomeName(), biomeConfigStub);
-        }
-
         return biomeConfigsStore;
     }
 
@@ -89,14 +68,14 @@ public final class BiomeConfigFinder
      * @param remainingBiomes   The biomes that should still be loaded. When a
      *                          biome is found, it is removed from this map.
      */
-    private void loadBiomesFromDirectory(List<String> worldBiomes, int worldHeightScale, Map<String, BiomeConfigStub> biomeConfigsStore, File directory, Map<String, BiomeLoadInstruction> remainingBiomes, ILogger logger, IMaterialReader materialReader, Collection<? extends BiomeLoadInstruction> defaultBiomes)
+    private void loadBiomesFromDirectory(List<String> worldBiomes, int worldHeightScale, Map<String, BiomeConfigStub> biomeConfigsStore, File directory, ILogger logger, IMaterialReader materialReader)
     {
         for (File file : directory.listFiles())
         {
             // Search recursively
             if (file.isDirectory())
             {
-                loadBiomesFromDirectory(worldBiomes, worldHeightScale, biomeConfigsStore, file, remainingBiomes, logger, materialReader, defaultBiomes);
+                loadBiomesFromDirectory(worldBiomes, worldHeightScale, biomeConfigsStore, file, logger, materialReader);
                 continue;
             }
 
@@ -107,63 +86,12 @@ public final class BiomeConfigFinder
                 // Not a valid biome file
                 continue;
             }
-                        
-            // Load file with standard template to get replacetobiomename setting
-            BiomeLoadInstruction preloadedBiome = new BiomeLoadInstruction(biomeName, new StandardBiomeTemplate(worldHeightScale));
-            File preloadedRenamedFile = renameBiomeFile(file, preloadedBiome, logger);
-            SettingsMap preloadedSettings = FileSettingsReader.read(biomeName, preloadedRenamedFile, logger);
-            BiomeConfigStub preloadedBiomeConfigStub = new BiomeConfigStub(preloadedSettings, file.toPath(), preloadedBiome, logger, materialReader);
-            
-            // Get the correct LocalBiome, 
-            
-            // For legacy worlds that use the custombiomes list but don't have the vanilla biomes listed make sure the default biome templates are used. 
-            // For newly created configs the default biomes have been added to remainingBiomes so those already use the correct templates. 
-            BiomeLoadInstruction biome = remainingBiomes.get(biomeName);
-            if (biome == null)
-            {
-            	// If a biome has replacetobiomename set to a vanilla biome and has the same name as the vanilla biome then it should use the vanilla biome's template. 
-            	String replaceToBiomeName = preloadedBiomeConfigStub.settings.getSetting(BiomeStandardValues.VANILLA_BIOME, "", logger, materialReader);
-            	if(replaceToBiomeName != null && replaceToBiomeName.length() > 0)
-            	{
-	                for (BiomeLoadInstruction defaultBiome : defaultBiomes)
-	                {
-	                	if(biomeName.equals(defaultBiome.getBiomeName()) && replaceToBiomeName.equals(BiomeRegistryNames.getRegistryNameForDefaultBiome(defaultBiome.getBiomeName())))
-	                	{
-	                		biome = new BiomeLoadInstruction(defaultBiome.getBiomeName(), defaultBiome.getBiomeTemplate());
-	                		break;
-	                	}
-	                }
-            	}
-            	// If this is a new world using legacy configs then update the config by adding replaceToBiomeName              	
-            	// If this biome is not listed in custombiomes, does not have replacetobiomename set and has the same name as a vanilla biome then
-            	// assume it is a legacy config
-        		else if(!worldBiomes.contains(biomeName)) 
-    			{
-	                for (BiomeLoadInstruction defaultBiome : defaultBiomes)
-	                {
-	                	if(biomeName.equals(defaultBiome.getBiomeName()))
-	                	{
-	                		biome = new BiomeLoadInstruction(defaultBiome.getBiomeName(), defaultBiome.getBiomeTemplate());
-	                		break;
-	                	}
-	                }
-            	}
-            }
-        	if(biome == null)
-        	{
-        		biome = new BiomeLoadInstruction(biomeName, new StandardBiomeTemplate(worldHeightScale));
-        	}
-
-            // Load biome and remove it from the to-do list
-            File renamedFile = renameBiomeFile(file, biome, logger);
+        	
+            // Load biomeconfig
+            File renamedFile = renameBiomeFile(file, biomeName, logger);
             SettingsMap settings = FileSettingsReader.read(biomeName, renamedFile, logger);
-            BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, file.toPath(), biome, logger, materialReader);
+            BiomeConfigStub biomeConfigStub = new BiomeConfigStub(settings, file.toPath(), biomeName, logger, materialReader);
             biomeConfigsStore.put(biomeName, biomeConfigStub);
-            
-            if(remainingBiomes.containsKey(biome.getBiomeName()))
-            {
-            	remainingBiomes.remove(biome.getBiomeName());
-            }
         }
     }
 
@@ -176,9 +104,9 @@ public final class BiomeConfigFinder
      * @param biome The biome that the file has settings for.
      * @return The renamed file.
      */
-    private File renameBiomeFile(File toRename, BiomeLoadInstruction biome, ILogger logger)
+    private File renameBiomeFile(File toRename, String biomeName, ILogger logger)
     {
-        String preferredFileName = toFileName(biome);
+        String preferredFileName = toFileName(biomeName);
         if (toRename.getName().equalsIgnoreCase(preferredFileName))
         {
             // No need to rename
@@ -226,9 +154,9 @@ public final class BiomeConfigFinder
      * @param biome The biome.
      * @return The name of the file the biome should be saved in.
      */
-    private String toFileName(BiomeLoadInstruction biome)
+    private String toFileName(String biomeName)
     {
-        return biome.getBiomeName() + Constants.BiomeConfigFileExtension;
+        return biomeName + Constants.BiomeConfigFileExtension;
     }
 
     /**
@@ -240,7 +168,7 @@ public final class BiomeConfigFinder
     {
         private final SettingsMap settings;
         private final Path file;
-        private final BiomeLoadInstruction loadInstructions;
+        private final String biomeName;
         public boolean biomeExtendsProcessed = false;
         
         // Mob inheritance has to be done before the configs are actually loaded
@@ -263,16 +191,14 @@ public final class BiomeConfigFinder
         private List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
         private List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
                         
-        private BiomeConfigStub(SettingsMap settings, Path file, BiomeLoadInstruction loadInstructions, ILogger logger, IMaterialReader materialReader)
+        private BiomeConfigStub(SettingsMap settings, Path file, String biomeName, ILogger logger, IMaterialReader materialReader)
         {
             super();
             this.settings = settings;
             this.file = file;
-            this.loadInstructions = loadInstructions;
+            this.biomeName = biomeName;
             
             // Load mob settings here so we can process mob inheritance before loading the BiomeConfigs.
-            
-            StandardBiomeTemplate defaultSettings = loadInstructions.getBiomeTemplate();
             
             // Apply default values only when no mob spawning settings are present in the config
             if(settings.hasSetting(BiomeStandardValues.SPAWN_MONSTERS))
@@ -283,7 +209,7 @@ public final class BiomeConfigFinder
     	        	this.spawnMonsters = new ArrayList<WeightedMobSpawnGroup>();
     	        }
             } else {
-        		this.spawnMonsters = defaultSettings.defaultMonsters;
+        		this.spawnMonsters = BiomeStandardValues.SPAWN_MONSTERS.getDefaultValue();
             }
 
             if(settings.hasSetting(BiomeStandardValues.SPAWN_CREATURES))
@@ -294,7 +220,7 @@ public final class BiomeConfigFinder
     	        	this.spawnCreatures = new ArrayList<WeightedMobSpawnGroup>();
     	        }
             } else {
-            	this.spawnCreatures = defaultSettings.defaultCreatures;
+            	this.spawnCreatures = BiomeStandardValues.SPAWN_CREATURES.getDefaultValue();
             }
 
             if(settings.hasSetting(BiomeStandardValues.SPAWN_WATER_CREATURES))
@@ -305,7 +231,7 @@ public final class BiomeConfigFinder
     	        	this.spawnWaterCreatures = new ArrayList<WeightedMobSpawnGroup>();
     	        }
             } else {
-            	this.spawnWaterCreatures = defaultSettings.defaultWaterCreatures;
+            	this.spawnWaterCreatures = BiomeStandardValues.SPAWN_WATER_CREATURES.getDefaultValue();
             }
             
             if(settings.hasSetting(BiomeStandardValues.SPAWN_AMBIENT_CREATURES))
@@ -316,7 +242,7 @@ public final class BiomeConfigFinder
     	        	this.spawnAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
     	        }
             } else {
-            	this.spawnAmbientCreatures = defaultSettings.defaultAmbientCreatures;
+            	this.spawnAmbientCreatures = BiomeStandardValues.SPAWN_AMBIENT_CREATURES.getDefaultValue();
             }
 
             if(settings.hasSetting(BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES))
@@ -327,7 +253,7 @@ public final class BiomeConfigFinder
     	        	this.spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
     	        }
             } else {
-            	this.spawnWaterAmbientCreatures = defaultSettings.defaultWaterAmbientCreatures;
+            	this.spawnWaterAmbientCreatures = BiomeStandardValues.SPAWN_WATER_AMBIENT_CREATURES.getDefaultValue();
             }
             
             if(settings.hasSetting(BiomeStandardValues.SPAWN_MISC_CREATURES))
@@ -338,7 +264,7 @@ public final class BiomeConfigFinder
     	        	this.spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
     	        }
             } else {
-            	this.spawnMiscCreatures = defaultSettings.defaultMiscCreatures;
+            	this.spawnMiscCreatures = BiomeStandardValues.SPAWN_MISC_CREATURES.getDefaultValue();
             }            
             
     		this.spawnMonstersMerged.addAll(this.spawnMonsters);
@@ -460,15 +386,6 @@ public final class BiomeConfigFinder
         }
 
         /**
-         * Gets the instructions used for loading the biome.
-         * @return The instructions.
-         */
-        public BiomeLoadInstruction getLoadInstructions()
-        {
-            return loadInstructions;
-        }
-
-        /**
          * Gets the settings for the biome.
          * @return The settings.
          */
@@ -483,7 +400,7 @@ public final class BiomeConfigFinder
          */
         public String getBiomeName()
         {
-            return loadInstructions.getBiomeName();
+            return this.biomeName;
         }
 
 		public Collection<? extends WeightedMobSpawnGroup> getSpawner(EntityCategory entityCategory)

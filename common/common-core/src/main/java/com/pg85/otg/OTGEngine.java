@@ -4,7 +4,6 @@ import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.PluginConfig;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
-import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
@@ -23,7 +22,6 @@ import com.pg85.otg.util.interfaces.IPluginConfig;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.jar.JarEntry;
@@ -69,8 +67,6 @@ public abstract class OTGEngine
 	}
 	
 	// Platform-specific methods
-	
-	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
 
 	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 
@@ -326,9 +322,9 @@ public abstract class OTGEngine
 		
 	// Builders/Factories
 	
-	public CustomStructureCache createCustomStructureCache(String worldName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
+	public CustomStructureCache createCustomStructureCache(String presetName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
 	{
 		// TODO: ModLoadedChecker
-		return new CustomStructureCache(worldName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
+		return new CustomStructureCache(presetName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
 	}
 }
