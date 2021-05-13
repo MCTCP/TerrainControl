@@ -112,7 +112,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public IBiomeConfig getBiomeConfigForPopulation (int worldX, int worldZ, ChunkCoordinate chunkBeingPopulated)
 	{
-		return getBiomeForPopulation(worldX, worldX, chunkBeingPopulated).getBiomeConfig();
+		return getBiomeForPopulation(worldX, worldZ, chunkBeingPopulated).getBiomeConfig();
 	}
 
 	@Override
@@ -479,9 +479,7 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 					if (chunkBeingPopulated == null)
 					{
 						replaceBlocksMatrix = this.getBiomeConfig(x, z).getReplaceBlocks();
-					}
-					else
-					{
+					} else {
 						replaceBlocksMatrix = this.getBiomeConfigForPopulation(x, z, chunkBeingPopulated).getReplaceBlocks();
 					}
 				}

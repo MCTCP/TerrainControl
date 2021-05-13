@@ -1,7 +1,6 @@
 package com.pg85.otg.forge.gen;
 
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.List;
@@ -83,7 +82,6 @@ import net.minecraft.world.gen.settings.NoiseSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.spawner.WorldEntitySpawner;
 import net.minecraft.world.storage.FolderName;
-import net.minecraft.world.storage.IServerWorldInfo;
 
 public final class OTGNoiseChunkGenerator extends ChunkGenerator
 {
