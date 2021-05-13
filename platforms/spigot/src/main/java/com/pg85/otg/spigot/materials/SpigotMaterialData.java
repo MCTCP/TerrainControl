@@ -17,6 +17,7 @@ import org.bukkit.craftbukkit.v1_16_R3.block.data.CraftBlockData;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * Implementation of LocalMaterial that wraps one of Minecraft's Blocks.
@@ -275,7 +276,7 @@ public class SpigotMaterialData extends LocalMaterialData
 			(
 				!this.isBlank &&
 				!((SpigotMaterialData) material).isBlank &&
-				this.blockData.getBlock().r().equals(((SpigotMaterialData) material).blockData.getBlock().r())
+				Objects.equals(IRegistry.BLOCK.getKey(this.blockData.getBlock()), IRegistry.BLOCK.getKey(((SpigotMaterialData) material).blockData.getBlock()))
 			)
 		;
 	}
