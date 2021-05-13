@@ -3,17 +3,14 @@ package com.pg85.otg.spigot;
 import com.pg85.otg.OTG;
 import com.pg85.otg.OTGEngine;
 import com.pg85.otg.config.biome.BiomeConfigFinder;
-import com.pg85.otg.config.biome.BiomeLoadInstruction;
-import com.pg85.otg.config.minecraft.DefaultBiome;
-import com.pg85.otg.config.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.spigot.biome.MobSpawnGroupHelper;
-import com.pg85.otg.spigot.biome.SpigotMojangSettings;
 import com.pg85.otg.spigot.materials.SpigotMaterialReader;
 import com.pg85.otg.spigot.presets.SpigotPresetLoader;
 import com.pg85.otg.spigot.util.SpigotLogger;
 import com.pg85.otg.spigot.util.SpigotPluginLoadedChecker;
+import com.pg85.otg.util.minecraft.EntityCategory;
 
 import net.minecraft.server.v1_16_R3.BiomeBase;
 import net.minecraft.server.v1_16_R3.EnumCreatureType;
@@ -29,9 +26,6 @@ import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 public class SpigotEngine extends OTGEngine
 {
@@ -45,20 +39,6 @@ public class SpigotEngine extends OTGEngine
 				new SpigotPluginLoadedChecker(),
 				new SpigotPresetLoader(plugin.getDataFolder()));
 		this.plugin = plugin;
-	}
-
-	@Override
-	public Collection<BiomeLoadInstruction> getDefaultBiomes ()
-	{
-		List<BiomeLoadInstruction> standardBiomes = new ArrayList<>();
-		for (DefaultBiome defaultBiome : DefaultBiome.values())
-		{
-			int id = defaultBiome.Id;
-			BiomeLoadInstruction instruction = defaultBiome.getLoadInstructions(SpigotMojangSettings.fromId(id),
-					128, OTG.getEngine().getLogger());
-			standardBiomes.add(instruction);
-		}
-		return standardBiomes;
 	}
 
 	@Override

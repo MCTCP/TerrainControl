@@ -1,7 +1,6 @@
 package com.pg85.otg.config.biome;
 
 import com.pg85.otg.config.ConfigFunction;
-import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.logging.ILogger;
@@ -12,6 +11,8 @@ import com.pg85.otg.util.interfaces.IBiomeConfig;
 import com.pg85.otg.util.interfaces.IBiomeRegistryProvider;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
+import com.pg85.otg.util.minecraft.BiomeRegistryNames;
+
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -142,7 +143,7 @@ public final class BiomeGroup extends ConfigFunction<IWorldConfig>
             String biomeName = it.next();
             if(biomeName != null && biomeName.trim().length() > 0)
             {
-	            if (DefaultBiome.Contain(biomeName) || customBiomeNames.contains(biomeName))
+	            if (BiomeRegistryNames.Contain(biomeName) || customBiomeNames.contains(biomeName))
 	            {
 	                continue;
 	            }

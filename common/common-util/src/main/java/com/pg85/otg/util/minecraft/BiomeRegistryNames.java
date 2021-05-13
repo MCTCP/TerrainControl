@@ -3,6 +3,13 @@ package com.pg85.otg.util.minecraft;
 // Recurring TODO: Update this when MC is updated. Last updated for 1.16.5. 
 public class BiomeRegistryNames
 {
+	// TODO: Turn this class into an Enum
+	
+	public static boolean Contain(String biomeName)
+	{
+		return getRegistryNameForDefaultBiome(biomeName.replace("minecraft:", "")) != null;
+	}
+	
 	public static String getRegistryNameForDefaultBiome(String biomeName)
 	{
 		String registryName = null;

@@ -14,7 +14,6 @@ import com.pg85.otg.config.biome.BiomeGroupManager;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
-import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.config.standard.WorldStandardValues;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
@@ -24,6 +23,7 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
+import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
 /**
  * WorldConfig.ini classes
@@ -143,7 +143,7 @@ public class WorldConfig extends WorldConfigBase
 				this.biomeMode = BiomeMode.Normal;
 			}
 		}
-		this.imageFillBiome = (DefaultBiome.Contain(this.imageFillBiome) || this.worldBiomes.contains(this.imageFillBiome)) ? this.imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue(null);
+		this.imageFillBiome = (BiomeRegistryNames.Contain(this.imageFillBiome) || this.worldBiomes.contains(this.imageFillBiome)) ? this.imageFillBiome : WorldStandardValues.IMAGE_FILL_BIOME.getDefaultValue(null);
 
 		this.caveMaxAltitude = higherThanOrEqualTo(this.caveMaxAltitude, this.caveMinAltitude);
 		this.caveSystemPocketMaxSize = higherThanOrEqualTo(this.caveSystemPocketMaxSize, this.caveSystemPocketMinSize);
@@ -299,10 +299,6 @@ public class WorldConfig extends WorldConfigBase
 	private void readBiomeGroups(SettingsMap reader, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		this.biomeGroupManager = new BiomeGroupManager();
-		if (reader.isNewConfig())
-		{
-			createDefaultBiomeGroups(logger);
-		}
 		for (ConfigFunction<IWorldConfig> res : reader.getConfigFunctions((IWorldConfig)this, false, biomeResourcesManager, spawnLog, logger, materialReader))
 		{
 			if (res != null)
@@ -313,51 +309,6 @@ public class WorldConfig extends WorldConfigBase
 				}
 			}
 		}
-	}
-
-	private void createDefaultBiomeGroups(ILogger logger)
-	{
-		BiomeGroup normalGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.NORMAL, 0, 98,
-			Arrays.asList(
-				"Forest", "Roofed Forest", "Extreme Hills", "Plains", "Birch Forest", "Swampland", 
-				"Flower Forest", "Roofed Forest M", "Extreme Hills+", "Sunflower Plains", 
-				"Birch Forest M", "Swampland M"
-			)
-		);
-		this.biomeGroupManager.registerGroup(normalGroup, logger);
-
-		BiomeGroup iceGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.ICE, 2, 40,
-			Arrays.asList("Ice Plains", "Cold Taiga", "Ice Plains Spikes", "Cold Taiga M")
-		);
-		this.biomeGroupManager.registerGroup(iceGroup, logger);
-
-		BiomeGroup hotGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.HOT, 1, 98,
-			Arrays.asList("Desert", "Savanna", "Plains", "Desert M", "Savanna M", "Sunflower Plains")
-		);
-		this.biomeGroupManager.registerGroup(hotGroup, logger);
-
-		BiomeGroup coldGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.COLD, 0, 98,
-			Arrays.asList(
-				"Forest", "Extreme Hills", "Taiga", "Plains", "Flower Forest", "Extreme Hills+", 
-				"Taiga M", "Sunflower Plains"
-			)
-		);
-		this.biomeGroupManager.registerGroup(coldGroup, logger);
-
-		BiomeGroup mesaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MESA, 2, 40,
-			Arrays.asList("Mesa")
-		);
-		this.biomeGroupManager.registerGroup(mesaGroup, logger);
-
-		BiomeGroup jungleGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.JUNGLE, 1, 40,
-			Arrays.asList("Jungle", "Jungle M")
-		);
-		this.biomeGroupManager.registerGroup(jungleGroup, logger);
-
-		BiomeGroup megaTaigaGroup = new BiomeGroup(this, WorldStandardValues.BiomeGroupNames.MEGA_TAIGA, 1, 40,
-			Arrays.asList("Mega Taiga", "Mega Spruce Taiga")
-		);
-		this.biomeGroupManager.registerGroup(megaTaigaGroup, logger);
 	}
 
 	@Override

@@ -7,9 +7,7 @@ import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.settingType.Setting;
 import com.pg85.otg.config.standard.BiomeStandardValues;
-import com.pg85.otg.config.standard.StandardBiomeTemplate;
 import com.pg85.otg.config.standard.WorldStandardValues;
-import com.pg85.otg.config.standard.MojangSettings.EntityCategory;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.customobject.resource.CustomObjectGen;
 import com.pg85.otg.customobject.resource.CustomStructureGen;
@@ -17,7 +15,6 @@ import com.pg85.otg.customobject.resource.SaplingGen;
 import com.pg85.otg.customobject.resource.TreeGen;
 import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.*;
-import com.pg85.otg.gen.resource.IceSpikeGen.SpikeType;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
@@ -31,7 +28,7 @@ import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IWorldConfig;
 import com.pg85.otg.util.materials.LocalMaterialData;
 import com.pg85.otg.util.materials.LocalMaterials;
-import com.pg85.otg.util.materials.MaterialSet;
+import com.pg85.otg.util.minecraft.EntityCategory;
 import com.pg85.otg.util.minecraft.SaplingType;
 
 import java.nio.file.Path;
@@ -99,7 +96,6 @@ public class BiomeConfig extends BiomeConfigBase
 
 	// Private fields, only used when loading/saving
 
-	private StandardBiomeTemplate defaultSettings;
 	private boolean doResourceInheritance = true;
 	
 	private int configWaterLevelMax;
@@ -121,9 +117,9 @@ public class BiomeConfig extends BiomeConfigBase
 	private List<WeightedMobSpawnGroup> spawnWaterAmbientCreatures = new ArrayList<WeightedMobSpawnGroup>();
 	private List<WeightedMobSpawnGroup> spawnMiscCreatures = new ArrayList<WeightedMobSpawnGroup>();
 
-	public BiomeConfig(BiomeLoadInstruction loadInstruction, BiomeConfigStub biomeConfigStub, Path settingsDir, SettingsMap settings, IWorldConfig worldConfig, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	public BiomeConfig(String biomeName, BiomeConfigStub biomeConfigStub, Path settingsDir, SettingsMap settings, IWorldConfig worldConfig, String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
-		super(loadInstruction.getBiomeName(), new BiomeResourceLocation(presetName, loadInstruction.getBiomeName()));
+		super(biomeName, new BiomeResourceLocation(presetName, biomeName));
 
 		// Mob inheritance
 		// Mob spawning data was already loaded seperately before the rest of the biomeconfig to make inheritance work properly
@@ -148,24 +144,10 @@ public class BiomeConfig extends BiomeConfigBase
 		}
 
 		this.worldConfig = worldConfig;
-		this.defaultSettings = loadInstruction.getBiomeTemplate();
 
 		this.renameOldSettings(settings, logger, materialReader);
 		this.readConfigSettings(settings, biomeResourcesManager, spawnLog, logger, materialReader);
 		this.validateAndCorrectSettings(settingsDir, true, logger);
-
-		// Add default resources when needed
-		if (settings.isNewConfig())
-		{
-			this.resourceSequence.addAll(createDefaultResources(defaultSettings, logger, materialReader));
-			for (ConfigFunction<IBiomeConfig> res : this.resourceSequence)
-			{
-				if(res instanceof CustomStructureGen)
-				{
-					this.customStructures.add((CustomStructureGen)res);
-				}
-			}
-		}
 
 		// Set water level
 		if (this.useWorldWaterLevel)
@@ -217,41 +199,41 @@ public class BiomeConfig extends BiomeConfigBase
 		this.biomeExtends = reader.getSetting(BiomeStandardValues.BIOME_EXTENDS, logger);
 		this.biomeCategory = reader.getSetting(BiomeStandardValues.BIOME_CATEGORY, logger);
 		this.doResourceInheritance = reader.getSetting(BiomeStandardValues.RESOURCE_INHERITANCE, logger);
-		this.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, defaultSettings.defaultSize, logger);
-		this.biomeRarity = reader.getSetting(BiomeStandardValues.BIOME_RARITY, defaultSettings.defaultRarity, logger);
-		this.biomeRarityWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, defaultSettings.defaultRarityWhenIsle, logger);
-		this.biomeColor = reader.getSetting(BiomeStandardValues.BIOME_COLOR, defaultSettings.defaultColor, logger);
-		this.riverBiome = reader.getSetting(BiomeStandardValues.RIVER_BIOME, defaultSettings.defaultRiverBiome, logger);
-		this.isleInBiome = reader.getSetting(BiomeStandardValues.ISLE_IN_BIOME, defaultSettings.defaultIsle, logger);
-		this.biomeSizeWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, defaultSettings.defaultSizeWhenIsle, logger);
-		this.biomeIsBorder = reader.getSetting(BiomeStandardValues.BIOME_IS_BORDER, defaultSettings.defaultBorder, logger);
-		this.notBorderNear = reader.getSetting(BiomeStandardValues.NOT_BORDER_NEAR, defaultSettings.defaultNotBorderNear, logger);
-		this.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, defaultSettings.defaultSizeWhenBorder, logger);
-		this.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, defaultSettings.defaultBiomeTemperature, logger);
-		this.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, defaultSettings.defaultBiomeWetness, logger);
-		this.vanillaBiome = reader.getSetting(BiomeStandardValues.VANILLA_BIOME, defaultSettings.defaultReplaceToBiomeName, logger);
-		this.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, defaultSettings.defaultBiomeSurface, logger);
-		this.biomeVolatility = reader.getSetting(BiomeStandardValues.BIOME_VOLATILITY, defaultSettings.defaultBiomeVolatility, logger);
+		this.biomeSize = reader.getSetting(BiomeStandardValues.BIOME_SIZE, logger);
+		this.biomeRarity = reader.getSetting(BiomeStandardValues.BIOME_RARITY, logger);
+		this.biomeRarityWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_RARITY_WHEN_ISLE, logger);
+		this.biomeColor = reader.getSetting(BiomeStandardValues.BIOME_COLOR, logger);
+		this.riverBiome = reader.getSetting(BiomeStandardValues.RIVER_BIOME, logger);
+		this.isleInBiome = reader.getSetting(BiomeStandardValues.ISLE_IN_BIOME, logger);
+		this.biomeSizeWhenIsle = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_ISLE, logger);
+		this.biomeIsBorder = reader.getSetting(BiomeStandardValues.BIOME_IS_BORDER, logger);
+		this.notBorderNear = reader.getSetting(BiomeStandardValues.NOT_BORDER_NEAR, logger);
+		this.biomeSizeWhenBorder = reader.getSetting(BiomeStandardValues.BIOME_SIZE_WHEN_BORDER, logger);
+		this.biomeTemperature = reader.getSetting(BiomeStandardValues.BIOME_TEMPERATURE, logger);
+		this.biomeWetness = reader.getSetting(BiomeStandardValues.BIOME_WETNESS, logger);
+		this.vanillaBiome = reader.getSetting(BiomeStandardValues.VANILLA_BIOME, logger);
+		this.biomeHeight = reader.getSetting(BiomeStandardValues.BIOME_HEIGHT, logger);
+		this.biomeVolatility = reader.getSetting(BiomeStandardValues.BIOME_VOLATILITY, logger);
 		this.smoothRadius = reader.getSetting(BiomeStandardValues.SMOOTH_RADIUS, logger);
 		this.CHCSmoothRadius = reader.getSetting(BiomeStandardValues.CUSTOM_HEIGHT_CONTROL_SMOOTH_RADIUS, logger);		
 		this.stoneBlock = reader.getSetting(BiomeStandardValues.STONE_BLOCK, logger, materialReader);
-		this.surfaceBlock = reader.getSetting(BiomeStandardValues.SURFACE_BLOCK, defaultSettings.defaultSurfaceBlock, logger, materialReader);
-		this.groundBlock = reader.getSetting(BiomeStandardValues.GROUND_BLOCK, defaultSettings.defaultGroundBlock, logger, materialReader);
+		this.surfaceBlock = reader.getSetting(BiomeStandardValues.SURFACE_BLOCK, logger, materialReader);
+		this.groundBlock = reader.getSetting(BiomeStandardValues.GROUND_BLOCK, logger, materialReader);
 		this.configWaterBlock = reader.getSetting(BiomeStandardValues.WATER_BLOCK, logger, materialReader);
 		this.configIceBlock = reader.getSetting(BiomeStandardValues.ICE_BLOCK, logger, materialReader);
 		this.configCooledLavaBlock = reader.getSetting(BiomeStandardValues.COOLED_LAVA_BLOCK, logger, materialReader);
 		this.replacedBlocks = reader.getSetting(BiomeStandardValues.REPLACED_BLOCKS, logger, materialReader);
 		this.sandStoneBlock = LocalMaterials.SANDSTONE;
 		this.redSandStoneBlock = LocalMaterials.RED_SANDSTONE;
-		this.surfaceAndGroundControl = readSurfaceAndGroundControlSettings(reader, logger, materialReader);
+		this.surfaceAndGroundControl = reader.getSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, new SimpleSurfaceGenerator(), logger, materialReader);
 		this.useWorldWaterLevel = reader.getSetting(BiomeStandardValues.USE_WORLD_WATER_LEVEL, logger);
 		this.configWaterLevelMax = reader.getSetting(BiomeStandardValues.WATER_LEVEL_MAX, logger);
 		this.configWaterLevelMin = reader.getSetting(BiomeStandardValues.WATER_LEVEL_MIN, logger);
 		this.skyColor = reader.getSetting(BiomeStandardValues.SKY_COLOR, logger);
-		this.waterColor = reader.getSetting(BiomeStandardValues.WATER_COLOR, defaultSettings.defaultWaterColorMultiplier, logger);
-		this.grassColor = reader.getSetting(BiomeStandardValues.GRASS_COLOR, defaultSettings.defaultGrassColor, logger);
-		this.grassColorModifier = reader.getSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, defaultSettings.defaultGrassColorModifier, logger);
-		this.foliageColor = reader.getSetting(BiomeStandardValues.FOLIAGE_COLOR, defaultSettings.defaultFoliageColor, logger);
+		this.waterColor = reader.getSetting(BiomeStandardValues.WATER_COLOR, logger);
+		this.grassColor = reader.getSetting(BiomeStandardValues.GRASS_COLOR, logger);
+		this.grassColorModifier = reader.getSetting(BiomeStandardValues.GRASS_COLOR_MODIFIER, logger);
+		this.foliageColor = reader.getSetting(BiomeStandardValues.FOLIAGE_COLOR, logger);
 		this.fogColor = reader.getSetting(BiomeStandardValues.FOG_COLOR, logger);
 		this.waterFogColor = reader.getSetting(BiomeStandardValues.WATER_FOG_COLOR, logger);
 		this.particleType = reader.getSetting(BiomeStandardValues.PARTICLE_TYPE, logger);
@@ -271,17 +253,17 @@ public class BiomeConfig extends BiomeConfigBase
 		this.volatilityRaw2 = reader.getSetting(BiomeStandardValues.VOLATILITY_2, logger);
 		this.volatilityWeightRaw1 = reader.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_1, logger);
 		this.volatilityWeightRaw2 = reader.getSetting(BiomeStandardValues.VOLATILITY_WEIGHT_2, logger);
-		this.disableBiomeHeight = reader.getSetting(BiomeStandardValues.DISABLE_BIOME_HEIGHT, defaultSettings.defaultDisableBiomeHeight, logger);
+		this.disableBiomeHeight = reader.getSetting(BiomeStandardValues.DISABLE_BIOME_HEIGHT, logger);
 		this.maxAverageHeight = reader.getSetting(BiomeStandardValues.MAX_AVERAGE_HEIGHT, logger);
 		this.maxAverageDepth = reader.getSetting(BiomeStandardValues.MAX_AVERAGE_DEPTH, logger);
-		this.strongholdsEnabled = reader.getSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, defaultSettings.defaultStrongholds, logger);
-		this.oceanMonumentsEnabled = reader.getSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, defaultSettings.defaultOceanMonuments, logger);
-		this.woodLandMansionsEnabled = reader.getSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, defaultSettings.defaultWoodlandMansions, logger);
-		this.netherFortressesEnabled = reader.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, defaultSettings.defaultNetherFortressEnabled, logger);
-		this.villageType = reader.getSetting(BiomeStandardValues.VILLAGE_TYPE, defaultSettings.defaultVillageType, logger);
-		this.villageSize = reader.getSetting(BiomeStandardValues.VILLAGE_SIZE, defaultSettings.defaultVillageSize, logger);		
-		this.mineshaftType = reader.getSetting(BiomeStandardValues.MINESHAFT_TYPE, defaultSettings.defaultMineshaftType, logger);
-		this.rareBuildingType = reader.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, defaultSettings.defaultRareBuildingType, logger);
+		this.strongholdsEnabled = reader.getSetting(BiomeStandardValues.STRONGHOLDS_ENABLED, logger);
+		this.oceanMonumentsEnabled = reader.getSetting(BiomeStandardValues.OCEAN_MONUMENTS_ENABLED, logger);
+		this.woodLandMansionsEnabled = reader.getSetting(BiomeStandardValues.WOODLAND_MANSIONS_ENABLED, logger);
+		this.netherFortressesEnabled = reader.getSetting(BiomeStandardValues.NETHER_FORTRESSES_ENABLED, logger);
+		this.villageType = reader.getSetting(BiomeStandardValues.VILLAGE_TYPE, logger);
+		this.villageSize = reader.getSetting(BiomeStandardValues.VILLAGE_SIZE, logger);		
+		this.mineshaftType = reader.getSetting(BiomeStandardValues.MINESHAFT_TYPE, logger);
+		this.rareBuildingType = reader.getSetting(BiomeStandardValues.RARE_BUILDING_TYPE, logger);
 		this.buriedTreasureEnabled = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_ENABLED, logger);
 		this.shipWreckEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_ENABLED, logger);
 		this.shipWreckBeachedEnabled = reader.getSetting(BiomeStandardValues.SHIP_WRECK_BEACHED_ENABLED, logger);
@@ -297,13 +279,13 @@ public class BiomeConfig extends BiomeConfigBase
 		this.buriedTreasureProbability = reader.getSetting(BiomeStandardValues.BURIED_TREASURE_PROBABILITY, logger);
 		this.pillagerOutpostSize = reader.getSetting(BiomeStandardValues.PILLAGER_OUTPOST_SIZE, logger);
 		this.bastionRemnantSize = reader.getSetting(BiomeStandardValues.BASTION_REMNANT_SIZE, logger);		
-		this.biomeDictId = reader.getSetting(BiomeStandardValues.BIOME_DICT_ID, defaultSettings.defaultBiomeDictId, logger);
-		this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, defaultSettings.defaultInheritMobsBiomeName, logger);
+		this.biomeDictId = reader.getSetting(BiomeStandardValues.BIOME_DICT_ID, logger);
+		this.inheritMobsBiomeName = reader.getSetting(BiomeStandardValues.INHERIT_MOBS_BIOME_NAME, logger);
 
 		this.readResourceSettings(reader, biomeResourcesManager, spawnLog, logger, materialReader);
 		
 		this.chcData = new double[this.worldConfig.getWorldHeightCap() / Constants.PIECE_Y_SIZE + 1];
-		this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, defaultSettings.defaultCustomHeightControl, logger);
+		this.readHeightSettings(reader, this.chcData, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL, BiomeStandardValues.CUSTOM_HEIGHT_CONTROL.getDefaultValue(), logger);
 	}
 
 	private void readHeightSettings(SettingsMap settings, double[] heightMatrix, Setting<double[]> setting, double[] defaultValue, ILogger logger)
@@ -313,26 +295,6 @@ public class BiomeConfig extends BiomeConfigBase
 		{
 			heightMatrix[i] = keys[i];
 		}
-	}
-
-	private SurfaceGenerator readSurfaceAndGroundControlSettings(SettingsMap settings, ILogger logger, IMaterialReader materialReader)
-	{
-		// Get default value
-		SurfaceGenerator defaultSetting;
-		if (settings.isNewConfig())
-		{
-			String defaultString = StringHelper.join(defaultSettings.defaultSurfaceSurfaceAndGroundControl, ",");
-			try
-			{
-				defaultSetting = SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL.read(defaultString, materialReader);
-			} catch (InvalidConfigException e) {
-				throw new AssertionError(e);
-			}
-		} else {
-			defaultSetting = new SimpleSurfaceGenerator();
-		}
-
-		return settings.getSetting(SurfaceGeneratorSetting.SURFACE_AND_GROUND_CONTROL, defaultSetting, logger, materialReader);
 	}
 
 	private void readResourceSettings(SettingsMap settings, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
@@ -1027,354 +989,5 @@ public class BiomeConfig extends BiomeConfigBase
 	{
 		settings.renameOldSetting("ReplaceToBiomeName", BiomeStandardValues.VANILLA_BIOME);
 		settings.renameOldSetting("DisableNotchHeightControl", BiomeStandardValues.DISABLE_BIOME_HEIGHT);
-	}
-	
-	private List<Resource> createDefaultResources(StandardBiomeTemplate biomeTemplate, ILogger logger, IMaterialReader materialReader)
-	{
-		List<Resource> resources = new ArrayList<Resource>(32);
-
-		// Small water lakes
-		if (biomeTemplate.defaultWaterLakes)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, SmallLakeGen.class, LocalMaterials.WATER, BiomeStandardValues.SmallLakeWaterFrequency,
-				BiomeStandardValues.SmallLakeWaterRarity, BiomeStandardValues.SmallLakeMinAltitude, BiomeStandardValues.SmallLakeMaxAltitude));
-		}
-
-		// Small lava lakes
-		resources.add(Resource.createResource(this, logger, materialReader, SmallLakeGen.class, LocalMaterials.LAVA, BiomeStandardValues.SmallLakeLavaFrequency,
-			BiomeStandardValues.SmallLakeLavaRarity, BiomeStandardValues.SmallLakeMinAltitude, BiomeStandardValues.SmallLakeMaxAltitude));
-
-		// Small underground lava lakes
-		resources.add(Resource.createResource(this, logger, materialReader, SmallLakeGen.class, LocalMaterials.LAVA, BiomeStandardValues.SmallLakeLavaFrequency2,
-			BiomeStandardValues.SmallLakeLavaRarity2, BiomeStandardValues.SmallLakeMinAltitude2, BiomeStandardValues.SmallLakeMaxAltitude2));
-		
-		// Underground lakes
-		resources.add(Resource
-			.createResource(this, logger, materialReader, UndergroundLakeGen.class, BiomeStandardValues.UndergroundLakeMinSize, BiomeStandardValues.UndergroundLakeMaxSize, BiomeStandardValues.UndergroundLakeFrequency,
-				BiomeStandardValues.UndergroundLakeRarity, BiomeStandardValues.UndergroundLakeMinAltitude, BiomeStandardValues.UndergroundLakeMaxAltitude));
-
-		// Dungeon
-		resources.add(Resource.createResource(this, logger, materialReader, DungeonGen.class, BiomeStandardValues.DungeonFrequency, BiomeStandardValues.DungeonRarity, BiomeStandardValues.DungeonMinAltitude,
-			biomeTemplate.worldHeight));
-		
-		// Fossil
-		if (biomeTemplate.defaultFossilRarity > 0)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, FossilGen.class, biomeTemplate.defaultFossilRarity));
-		}
-
-		// Dirt
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.DIRT, BiomeStandardValues.DirtDepositSize, BiomeStandardValues.DirtDepositFrequency,
-			BiomeStandardValues.DirtDepositRarity, BiomeStandardValues.DirtDepositMinAltitude, BiomeStandardValues.DirtDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Gravel
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.GRAVEL, BiomeStandardValues.GravelDepositSize, BiomeStandardValues.GravelDepositFrequency,
-			BiomeStandardValues.GravelDepositRarity, BiomeStandardValues.GravelDepositMinAltitude, BiomeStandardValues.GravelDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Granite
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.STONE + ":1", BiomeStandardValues.GraniteDepositSize,
-			BiomeStandardValues.GraniteDepositFrequency, BiomeStandardValues.GraniteDepositRarity, BiomeStandardValues.GraniteDepositMinAltitude,
-			BiomeStandardValues.GraniteDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Diorite
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.STONE + ":3", BiomeStandardValues.DioriteDepositSize,
-			BiomeStandardValues.DioriteDepositFrequency, BiomeStandardValues.DioriteDepositRarity, BiomeStandardValues.DioriteDepositMinAltitude,
-			BiomeStandardValues.DioriteDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Andesite
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.STONE + ":5", BiomeStandardValues.AndesiteDepositSize,
-			BiomeStandardValues.AndesiteDepositFrequency, BiomeStandardValues.AndesiteDepositRarity, BiomeStandardValues.AndesiteDepositMinAltitude,
-			BiomeStandardValues.AndesiteDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Coal
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.COAL_ORE, BiomeStandardValues.CoalDepositSize, BiomeStandardValues.CoalDepositFrequency,
-			BiomeStandardValues.CoalDepositRarity, BiomeStandardValues.CoalDepositMinAltitude, BiomeStandardValues.CoalDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Iron
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.IRON_ORE, BiomeStandardValues.IronDepositSize, BiomeStandardValues.IronDepositFrequency,
-			BiomeStandardValues.IronDepositRarity, BiomeStandardValues.IronDepositMinAltitude, BiomeStandardValues.IronDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Gold
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.GOLD_ORE, BiomeStandardValues.GoldDepositSize, BiomeStandardValues.GoldDepositFrequency,
-			BiomeStandardValues.GoldDepositRarity, BiomeStandardValues.GoldDepositMinAltitude, BiomeStandardValues.GoldDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Redstone
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.REDSTONE_ORE, BiomeStandardValues.RedstoneDepositSize,
-			BiomeStandardValues.RedstoneDepositFrequency, BiomeStandardValues.RedstoneDepositRarity, BiomeStandardValues.RedstoneDepositMinAltitude,
-			BiomeStandardValues.RedstoneDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Diamond
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.DIAMOND_ORE, BiomeStandardValues.DiamondDepositSize,
-			BiomeStandardValues.DiamondDepositFrequency, BiomeStandardValues.DiamondDepositRarity, BiomeStandardValues.DiamondDepositMinAltitude,
-			BiomeStandardValues.DiamondDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Lapislazuli
-		resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.LAPIS_ORE, BiomeStandardValues.LapislazuliDepositSize,
-			BiomeStandardValues.LapislazuliDepositFrequency, BiomeStandardValues.LapislazuliDepositRarity, BiomeStandardValues.LapislazuliDepositMinAltitude,
-			BiomeStandardValues.LapislazuliDepositMaxAltitude, LocalMaterials.STONE));
-
-		// Emerald ore
-		if (biomeTemplate.defaultEmeraldOre > 0)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, OreGen.class, LocalMaterials.EMERALD_ORE, BiomeStandardValues.EmeraldDepositSize,
-				biomeTemplate.defaultEmeraldOre,
-				BiomeStandardValues.EmeraldDepositRarity, BiomeStandardValues.EmeraldDepositMinAltitude, BiomeStandardValues.EmeraldDepositMaxAltitude, LocalMaterials.STONE));
-		}
-
-		// Under water sand
-		if (biomeTemplate.defaultWaterSand > 0)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, UnderWaterOreGen.class, LocalMaterials.SAND, BiomeStandardValues.WaterSandDepositSize,
-				biomeTemplate.defaultWaterSand,
-				BiomeStandardValues.WaterSandDepositRarity, LocalMaterials.DIRT, LocalMaterials.GRASS));
-		}
-
-		// Under water clay
-		resources.add(Resource.createResource(this, logger, materialReader, UnderWaterOreGen.class, LocalMaterials.CLAY, BiomeStandardValues.WaterClayDepositSize,
-			BiomeStandardValues.WaterClayDepositFrequency,
-			BiomeStandardValues.WaterClayDepositRarity, LocalMaterials.DIRT, LocalMaterials.CLAY));
-
-		// Under water gravel
-		if (biomeTemplate.defaultWaterGravel > 0)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, BoulderGen.class, LocalMaterials.MOSSY_COBBLESTONE, biomeTemplate.defaultBoulder,
-				biomeTemplate.defaultWaterGravel,
-				BiomeStandardValues.BoulderDepositMinAltitude, BiomeStandardValues.BoulderDepositMaxAltitude, LocalMaterials.GRASS, LocalMaterials.DIRT,
-				LocalMaterials.STONE));
-		}
-
-		// Custom objects
-		resources.add(Resource.createResource(this, logger, materialReader, CustomObjectGen.class, "UseWorld"));
-
-		// Boulder
-		if (biomeTemplate.defaultBoulder != 0)
-		{
-			 resources.add(Resource.createResource(this, logger, materialReader, BoulderGen.class, LocalMaterials.MOSSY_COBBLESTONE, biomeTemplate.defaultBoulder,
-				 BiomeStandardValues.BoulderDepositRarity,
-				 BiomeStandardValues.BoulderDepositMinAltitude, BiomeStandardValues.BoulderDepositMaxAltitude, LocalMaterials.GRASS, LocalMaterials.DIRT,
-				 LocalMaterials.STONE
-			 ));
-		}
-
-		// Ice spikes
-		if (biomeTemplate.defaultIceSpikes)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, IceSpikeGen.class, LocalMaterials.PACKED_ICE, SpikeType.HugeSpike, 3, 1.66,
-				BiomeStandardValues.IceSpikeDepositMinHeight,
-				BiomeStandardValues.IceSpikeDepositMaxHeight, LocalMaterials.ICE, LocalMaterials.DIRT, LocalMaterials.SNOW_BLOCK));
-			resources.add(Resource.createResource(this, logger, materialReader, IceSpikeGen.class, LocalMaterials.PACKED_ICE, SpikeType.SmallSpike, 3, 98.33,
-				BiomeStandardValues.IceSpikeDepositMinHeight,
-				BiomeStandardValues.IceSpikeDepositMaxHeight, LocalMaterials.ICE, LocalMaterials.DIRT, LocalMaterials.SNOW_BLOCK));
-			resources.add(Resource.createResource(this, logger, materialReader, IceSpikeGen.class, LocalMaterials.PACKED_ICE, SpikeType.Basement, 2, 100,
-				BiomeStandardValues.IceSpikeDepositMinHeight,
-				BiomeStandardValues.IceSpikeDepositMaxHeight, LocalMaterials.ICE, LocalMaterials.DIRT, LocalMaterials.SNOW_BLOCK));
-		}
-
-		// Melons (need to be spawned before trees)
-		if (biomeTemplate.defaultMelons > 0)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, LocalMaterials.MELON_BLOCK, biomeTemplate.defaultMelons,
-				BiomeStandardValues.FlowerDepositRarity, BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		// Melons (need to be spawned before trees)
-		if (biomeTemplate.defaultSwampPatches > 0)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, SurfacePatchGen.class, LocalMaterials.WATER, LocalMaterials.WATER_LILY,
-				62, 62, MaterialSet.SOLID_MATERIALS));
-		}
-
-		// Trees
-		if (biomeTemplate.defaultTree != null)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, TreeGen.class, biomeTemplate.defaultTree));
-		}
-
-		if (biomeTemplate.defaultWaterLily > 0)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, AboveWaterGen.class, LocalMaterials.WATER_LILY, biomeTemplate.defaultWaterLily, 100));
-		}
-
-		if (biomeTemplate.defaultPoppies > 0)
-		{
-			// Poppy
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.Poppy, biomeTemplate.defaultPoppies, BiomeStandardValues.RoseDepositRarity,
-				BiomeStandardValues.RoseDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultBlueOrchids > 0)
-		{
-			// Blue orchid
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.BlueOrchid, biomeTemplate.defaultBlueOrchids,
-				BiomeStandardValues.BlueOrchidDepositRarity, BiomeStandardValues.BlueOrchidDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultDandelions > 0)
-		{
-			// Dandelion
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.Dandelion, biomeTemplate.defaultDandelions, BiomeStandardValues.FlowerDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultTallFlowers > 0)
-		{
-			// Lilac
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.Lilac, biomeTemplate.defaultTallFlowers, BiomeStandardValues.FlowerDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-
-			// Rose bush
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.RoseBush, biomeTemplate.defaultTallFlowers, BiomeStandardValues.FlowerDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-
-			// Peony
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.Peony, biomeTemplate.defaultTallFlowers, BiomeStandardValues.FlowerDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultSunflowers > 0)
-		{
-			// Sunflower
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.Sunflower, biomeTemplate.defaultSunflowers, BiomeStandardValues.FlowerDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultTulips > 0)
-		{
-			// Tulip
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.OrangeTulip, biomeTemplate.defaultTulips, BiomeStandardValues.TulipDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.RedTulip, biomeTemplate.defaultTulips, BiomeStandardValues.TulipDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude,
-				biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.WhiteTulip, biomeTemplate.defaultTulips, BiomeStandardValues.TulipDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.PinkTulip, biomeTemplate.defaultTulips, BiomeStandardValues.TulipDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultAzureBluets > 0)
-		{
-			// Azure bluet
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.AzureBluet, biomeTemplate.defaultDandelions,
-				BiomeStandardValues.FlowerDepositRarity, BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultAlliums > 0)
-		{
-			// Allium
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.Allium, biomeTemplate.defaultDandelions, BiomeStandardValues.FlowerDepositRarity,
-				BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-
-		}
-
-		if (biomeTemplate.defaultOxeyeDaisies > 0)
-		{
-			// Oxeye Daisy
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.OxeyeDaisy, biomeTemplate.defaultDandelions,
-				BiomeStandardValues.FlowerDepositRarity, BiomeStandardValues.FlowerDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultMushroom > 0)
-		{
-			// Red mushroom
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.RedMushroom, biomeTemplate.defaultMushroom,
-				BiomeStandardValues.RedMushroomDepositRarity, BiomeStandardValues.RedMushroomDepositMinAltitude, biomeTemplate.worldHeight, biomeTemplate.defaultSurfaceBlock, LocalMaterials.DIRT));
-
-			// Brown mushroom
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.BrownMushroom, biomeTemplate.defaultMushroom,
-				BiomeStandardValues.BrownMushroomDepositRarity, BiomeStandardValues.BrownMushroomDepositMinAltitude,
-				biomeTemplate.worldHeight, biomeTemplate.defaultSurfaceBlock, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultFerns > 0)
-		{
-			// Ferns
-			resources.add(Resource.createResource(this, logger, materialReader, GrassGen.class, PlantType.Fern, GrassGen.GroupOption.NotGrouped,
-				biomeTemplate.defaultFerns, BiomeStandardValues.LongGrassDepositRarity, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultDoubleGrass > 0)
-		{
-			// Double tall grass
-			if (biomeTemplate.defaultDoubleGrassIsGrouped)
-			{
-				resources.add(Resource.createResource(this, logger, materialReader, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.Grouped, biomeTemplate.defaultDoubleGrass,
-					BiomeStandardValues.DoubleGrassGroupedDepositRarity, LocalMaterials.GRASS, LocalMaterials.DIRT));
-			} else {
-				resources.add(Resource.createResource(this, logger, materialReader, GrassGen.class, PlantType.DoubleTallgrass, GrassGen.GroupOption.NotGrouped, biomeTemplate.defaultDoubleGrass,
-					BiomeStandardValues.DoubleGrassDepositRarity, LocalMaterials.GRASS, LocalMaterials.DIRT));
-			}
-		}
-
-		if (biomeTemplate.defaultGrass > 0)
-		{
-			// Tall grass
-			if (biomeTemplate.defaultGrassIsGrouped)
-			{
-				resources.add(Resource.createResource(this, logger, materialReader, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.Grouped,
-					biomeTemplate.defaultGrass, BiomeStandardValues.LongGrassGroupedDepositRarity, LocalMaterials.GRASS, LocalMaterials.DIRT));
-			} else {
-				resources.add(Resource.createResource(this, logger, materialReader, GrassGen.class, PlantType.Tallgrass, GrassGen.GroupOption.NotGrouped,
-					biomeTemplate.defaultGrass, BiomeStandardValues.LongGrassDepositRarity, LocalMaterials.GRASS, LocalMaterials.DIRT));
-			}
-		}
-
-		if (biomeTemplate.defaultLargeFerns > 0)
-		{
-			// Large ferns
-			resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, PlantType.LargeFern, biomeTemplate.defaultLargeFerns, 90, 30, biomeTemplate.worldHeight, LocalMaterials.GRASS, LocalMaterials.DIRT));
-		}
-
-		if (biomeTemplate.defaultDeadBush > 0)
-		{
-			// Dead Bush
-			resources.add(Resource.createResource(this, logger, materialReader, GrassGen.class, PlantType.DeadBush, 0, biomeTemplate.defaultDeadBush,
-				BiomeStandardValues.DeadBushDepositRarity, LocalMaterials.SAND, LocalMaterials.TERRACOTTA,
-				LocalMaterials.TERRACOTTA, LocalMaterials.DIRT));
-		}
-
-		// Pumpkin
-		resources.add(Resource.createResource(this, logger, materialReader, PlantGen.class, LocalMaterials.PUMPKIN, BiomeStandardValues.PumpkinDepositFrequency,
-			BiomeStandardValues.PumpkinDepositRarity, BiomeStandardValues.PumpkinDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.GRASS));
-
-		if (biomeTemplate.defaultReed > 0)
-		{
-			// Reed
-			resources.add(Resource.createResource(this, logger, materialReader, ReedGen.class, LocalMaterials.SUGAR_CANE_BLOCK, biomeTemplate.defaultReed,
-				BiomeStandardValues.ReedDepositRarity, BiomeStandardValues.ReedDepositMinAltitude, biomeTemplate.worldHeight,
-				LocalMaterials.GRASS, LocalMaterials.DIRT, LocalMaterials.SAND));
-		}
-
-		if (biomeTemplate.defaultCactus > 0)
-		{
-			// Cactus
-			resources.add(Resource.createResource(this, logger, materialReader, CactusGen.class, LocalMaterials.CACTUS, biomeTemplate.defaultCactus, BiomeStandardValues.CactusDepositRarity,
-				BiomeStandardValues.CactusDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.SAND));
-		}
-		if (biomeTemplate.defaultHasVines)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, VinesGen.class, BiomeStandardValues.VinesFrequency, BiomeStandardValues.VinesRarity, BiomeStandardValues.VinesMinAltitude, biomeTemplate.worldHeight,
-				LocalMaterials.VINE));
-		}
-
-		// Water source
-		resources.add(Resource.createResource(this, logger, materialReader, LiquidGen.class, LocalMaterials.WATER, BiomeStandardValues.WaterSourceDepositFrequency,
-			BiomeStandardValues.WaterSourceDepositRarity, BiomeStandardValues.WaterSourceDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.STONE));
-
-		// Lava source
-		resources.add(Resource.createResource(this, logger, materialReader, LiquidGen.class, LocalMaterials.LAVA, BiomeStandardValues.LavaSourceDepositFrequency,
-			BiomeStandardValues.LavaSourceDepositRarity, BiomeStandardValues.LavaSourceDepositMinAltitude, biomeTemplate.worldHeight, LocalMaterials.STONE));
-
-		// Desert wells
-		if (biomeTemplate.defaultWell != null)
-		{
-			resources.add(Resource.createResource(this, logger, materialReader, WellGen.class, biomeTemplate.defaultWell));
-		}
-
-		// Sort resources according to their natural other.
-		// * Sorting the resources here is easier and less error prone than keeping 
-		// the order of biomeTemplate method in sync with the natural resource order.
-		Collections.sort(resources);
-		return resources;
 	}
 }
