@@ -35,6 +35,7 @@ public class SpigotBiome implements IBiome
 		// NOOP surface builder, surface/ground/stone blocks / sagc are done during base terrain gen.
 		// a() == withSurfaceBuilder() in forge
 		// WorldGenSurfaceComposites.j == ConfiguredSurfaceBuilders.field_244184_p in forge
+		// TODO: This should be the "NOPE" surfacebuilder.		
 		biomeGenerationSettingsBuilder.a(WorldGenSurfaceComposites.j);
 
 		// * Carvers are handled by OTG

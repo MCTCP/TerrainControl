@@ -151,10 +151,8 @@ public class EditCommand
 			{
 				source.sendSuccess(new StringTextComponent("Successfully edited BO3 " + bo3.getName()), false);
 				OTG.getEngine().getCustomObjectManager().getGlobalObjects().addObjectToPreset(session.presetName,  bo3.getName().toLowerCase(Locale.ROOT), bo3.getSettings().getFile(), bo3);
-			}
-			else
-			{
-				source.sendSuccess(new StringTextComponent("Failed to edit BO3 " + bo3.getName()), false);
+			} else {
+				source.sendSuccess(new StringTextComponent("Failed to edit BO3 " + session.bo3.getName()), false);
 			}
 			cleanArea(session.genRegion, region.getLow(), region.getHigh());
 			sessionsMap.put(source.getEntity(), null);

@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.gen;
 
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.BitSet;
 import java.util.Collections;
@@ -81,6 +82,7 @@ import net.minecraft.world.gen.feature.template.TemplateManager;
 import net.minecraft.world.gen.settings.NoiseSettings;
 import net.minecraft.world.gen.settings.StructureSeparationSettings;
 import net.minecraft.world.spawner.WorldEntitySpawner;
+import net.minecraft.world.storage.FolderName;
 import net.minecraft.world.storage.IServerWorldInfo;
 
 public final class OTGNoiseChunkGenerator extends ChunkGenerator
@@ -202,12 +204,12 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		return new OTGNoiseChunkGenerator(this.dimensionConfig, this.biomeSource.withSeed(seed), seed, this.dimensionSettingsSupplier);
 	}
 
-	private void init(String worldName)
+	private void init(Path worldSaveFolder)
 	{
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getName(), Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getName(), worldSaveFolder, 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
 		}
 	}
 
@@ -294,6 +296,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	public void buildSurfaceAndBedrock(WorldGenRegion worldGenRegion, IChunk chunk)
 	{
 		// Done during this.internalGenerator.populateNoise
+		// TODO: Not doing this ignores any SurfaceBuilders registered to this biome. We may have to enable this for non-otg biomes / non-otg surfacebuilders?
 	}
 
 	// Carves caves and ravines
@@ -342,7 +345,9 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	// Chunk population method taken from Biome (Biome.func_242427_a())
 	private void biomePopulate(Biome biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, WorldGenRegion world, long seed, SharedSeedRandom random, BlockPos pos)
 	{
-		init(((IServerWorldInfo) world.getLevelData()).getLevelName());
+		// World save folder name may not be identical to level name, fetch it.
+		Path worldSaveFolder = world.getLevel().getServer().getWorldPath(FolderName.PLAYER_DATA_DIR).getParent();
+		init(worldSaveFolder);
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
