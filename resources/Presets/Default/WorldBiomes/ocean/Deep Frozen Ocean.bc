@@ -1,0 +1,299 @@
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                          Biome Identity                         | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+ReplaceToBiomeName: minecraft:deep_frozen_ocean
+
+BiomeDictId: COLD, OCEAN, SNOWY
+
+BiomeCategory: ocean
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                        Biome Inheritance                        | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+BiomeExtends: 
+
+ResourceInheritance: true
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                         Biome placement                         | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+BiomeSize: 4
+
+BiomeRarity: 100
+
+BiomeColor: #404090
+
+
+#######################################################################
+# |                           Isle biomes                           | #
+#######################################################################
+
+IsleInBiome: Frozen Ocean
+
+BiomeSizeWhenIsle: 4
+
+BiomeRarityWhenIsle: 100
+
+#################
+# Border biomes #
+#################
+
+BiomeIsBorder: 
+
+NotBorderNear: 
+
+BiomeSizeWhenBorder: 8
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                  Terrain height and volatility                  | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+BiomeHeight: -1.0
+
+BiomeVolatility: 0.1
+
+SmoothRadius: 2
+
+CustomHeightControlSmoothRadius: 2
+
+MaxAverageHeight: 0.0
+
+MaxAverageDepth: 0.0
+
+Volatility1: 0.0
+
+Volatility2: 0.0
+
+VolatilityWeight1: 0.5
+
+VolatilityWeight2: 0.45
+
+DisableBiomeHeight: false
+
+CustomHeightControl: 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                              Rivers                             | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+RiverBiome: 
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                              Blocks                             | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+StoneBlock: minecraft:stone
+
+SurfaceBlock: minecraft:gravel
+
+GroundBlock: minecraft:stone
+
+SurfaceAndGroundControl: com.pg85.otg.gen.surface.IcebergSurfaceGenerator@5634a861
+
+ReplacedBlocks: None
+
+
+#######################################################################
+# |                   Water / Lava & Frozen States                  | #
+#######################################################################
+
+UseWorldWaterLevel: true
+
+WaterLevelMax: 63
+
+WaterLevelMin: 0
+
+WaterBlock: minecraft:water[level=0]
+
+IceBlock: minecraft:ice
+
+CooledLavaBlock: minecraft:lava[level=0]
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                       Visuals and weather                       | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+BiomeTemperature: 0.0
+
+BiomeWetness: 0.5
+
+SkyColor: #7BA5FF
+
+WaterColor: #FFFFFF
+
+GrassColor: #FFFFFF
+
+GrassColorModifier: None
+
+FoliageColor: #FFFFFF
+
+FogColor: #000000
+
+WaterFogColor: #000000
+
+ParticleType: 
+
+ParticleProbability: 0.118093334
+
+Music: 
+
+MusicMinDelay: 0
+
+MusicMaxDelay: 0
+
+ReplaceCurrentMusic: false
+
+AmbientSound: 
+
+MoodSound: minecraft:ambient.cave
+
+MoodSoundDelay: 6000
+
+MoodSearchRange: 8
+
+MoodOffset: 2.0
+
+AdditionsSound: 
+
+AdditionsTickChance: 0.0
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                          Resource queue                         | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+Ore(minecraft:dirt,33,10,100.0,0,255,minecraft:stone)
+Ore(minecraft:gravel,33,8,100.0,0,255,minecraft:stone)
+Ore(minecraft:granite,33,10,100.0,0,79,minecraft:stone)
+Ore(minecraft:diorite,33,10,100.0,0,79,minecraft:stone)
+Ore(minecraft:andesite,33,10,100.0,0,79,minecraft:stone)
+Ore(minecraft:coal_ore,17,20,100.0,0,127,minecraft:stone)
+Ore(minecraft:iron_ore,9,20,100.0,0,63,minecraft:stone)
+Ore(minecraft:gold_ore,9,2,100.0,0,31,minecraft:stone)
+Ore(minecraft:redstone_ore[lit=false],8,8,100.0,0,15,minecraft:stone)
+Ore(minecraft:diamond_ore,8,1,100.0,0,15,minecraft:stone)
+Ore(minecraft:lapis_ore,7,1,100.0,0,15,minecraft:stone)
+Registry(minecraft:iceberg_packed)
+Registry(minecraft:iceberg_blue)
+UnderGroundLake(25,60,2,5.0,0,49)
+Liquid(minecraft:water[level=0],20,100.0,8,128,minecraft:stone)
+Liquid(minecraft:lava[level=0],10,100.0,8,128,minecraft:stone)
+SmallLake(minecraft:water[level=0],4,7.0,8,119)
+SmallLake(minecraft:lava[level=0],2,1.0,8,119)
+SmallLake(minecraft:lava[level=0],2,8.0,6,50)
+UnderWaterOre(minecraft:sand,7,3,100.0,minecraft:gravel)
+UnderWaterOre(minecraft:clay,4,1,100.0,minecraft:gravel)
+UnderWaterOre(minecraft:dirt,6,1,100.0,minecraft:gravel)
+Dungeon(8,100.0,0,128)
+Tree(1,BigTree,1,Tree,9)
+Grass(Tallgrass,NotGrouped,10,100.0,minecraft:grass_block[snowy=false],minecraft:dirt)
+Plant(Dandelion,2,100.0,0,128,minecraft:grass_block[snowy=false],minecraft:dirt)
+Plant(minecraft:pumpkin,1,3.0,0,128,minecraft:grass_block[snowy=false])
+CustomObject(UseWorld)
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                         Sapling resource                        | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                        Vanilla structures                       | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+StrongholdsEnabled: true
+
+WoodlandMansionsEnabled: false
+
+OceanMonumentsEnabled: true
+
+NetherFortressesEnabled: false
+
+VillageType: disabled
+
+VillageSize: 6
+
+MineshaftType: normal
+
+MineshaftProbability: 0.004
+
+RareBuildingType: disabled
+
+BuriedTreasureEnabled: false
+
+BuriedTreasureProbability: 0.01
+
+ShipWreckEnabled: true
+
+ShipWreckBeachedEnabled: true
+
+PillagerOutpostEnabled: false
+
+PillagerOutpostSize: 7
+
+BastionRemnantEnabled: false
+
+BastionRemnantSize: 6
+
+NetherFossilEnabled: false
+
+EndCityEnabled: false
+
+RuinedPortalType: disabled
+
+OceanRuinsType: cold
+
+OceanRuinsLargeProbability: 0.3
+
+OceanRuinsClusterProbability: 0.9
+
+
+#######################################################################
+# +-----------------------------------------------------------------+ #
+# |                           Mob spawning                          | #
+# +-----------------------------------------------------------------+ #
+#######################################################################
+
+SpawnMonsters: []
+
+SpawnCreatures: []
+
+SpawnWaterCreatures: []
+
+SpawnAmbientCreatures: []
+
+SpawnWaterAmbientCreatures: []
+
+SpawnMiscCreatures: []
+
+InheritMobsBiomeName: minecraft:deep_frozen_ocean
+
