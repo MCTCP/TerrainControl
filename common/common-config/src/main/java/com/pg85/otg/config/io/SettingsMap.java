@@ -109,21 +109,6 @@ public interface SettingsMap
     boolean hasSetting(Setting<?> setting);
 
     /**
-     * Gets whether the config file is newly created.
-     *
-     * <p>This is used for backwards compatibility of settings files. When a
-     * new setting is introduced, and its default value doesn't match the old
-     * behavior, the default value must be changed to match the old
-     * behavior for old configs.
-     *
-     * <p>An example of this is SurfaceAndGroundControl, that should not
-     * create stone on the surface of existing Extreme Hills biomes, but
-     * should create stone on new Extreme Hills biomes.
-     * @return True if this
-     */
-    boolean isNewConfig();
-
-    /**
      * Adds a setting to this map, overwriting existing settings with the same name.
      * @param <S>      Type of the value of the setting.
      * @param setting  The setting to set.

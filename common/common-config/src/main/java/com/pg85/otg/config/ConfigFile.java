@@ -3,9 +3,9 @@ package com.pg85.otg.config;
 import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.io.SettingsMap;
 import com.pg85.otg.config.io.SimpleSettingsMap;
-import com.pg85.otg.config.minecraft.DefaultBiome;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.interfaces.IMaterialReader;
+import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public abstract class ConfigFile
      */
     public SettingsMap getSettingsAsMap()
     {
-        SettingsMap settingsMap = new SimpleSettingsMap(configName, false);
+        SettingsMap settingsMap = new SimpleSettingsMap(configName);
         writeConfigSettings(settingsMap);
         return settingsMap;
     }
@@ -130,7 +130,7 @@ public abstract class ConfigFile
                 continue;
             }
 
-            if (DefaultBiome.Contain(key))
+            if (BiomeRegistryNames.Contain(key))
             {
                 output.add(key);
             }

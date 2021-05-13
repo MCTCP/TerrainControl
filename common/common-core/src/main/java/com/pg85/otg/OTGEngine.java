@@ -4,7 +4,6 @@ import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.config.PluginConfig;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeConfigFinder.BiomeConfigStub;
-import com.pg85.otg.config.biome.BiomeLoadInstruction;
 import com.pg85.otg.config.biome.BiomeResourcesManager;
 import com.pg85.otg.config.io.FileSettingsReader;
 import com.pg85.otg.config.io.FileSettingsWriter;
@@ -23,7 +22,6 @@ import com.pg85.otg.util.interfaces.IPluginConfig;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.jar.JarEntry;
@@ -69,8 +67,6 @@ public abstract class OTGEngine
 	}
 	
 	// Platform-specific methods
-	
-	public abstract Collection<BiomeLoadInstruction> getDefaultBiomes();
 
 	public abstract void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation);
 

@@ -24,7 +24,7 @@ public class FileSettingsReader
      */
     public static SettingsMap read(String configName, File file, ILogger logger)
     {
-        SettingsMap settingsMap = new SimpleSettingsMap(configName, !file.exists());
+        SettingsMap settingsMap = new SimpleSettingsMap(configName);
         new FileSettingsReader().readIntoMap(settingsMap, file, logger);
         return settingsMap;
     }
