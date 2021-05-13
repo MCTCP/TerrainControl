@@ -30,7 +30,6 @@ public final class SimpleSettingsMap implements SettingsMap
      * over this map.
      */
     private final Map<String, RawSettingValue> settingsCache;
-    private final boolean isNewConfig;
     private int dummyKeyIndex = 0;
 
     /**
@@ -38,12 +37,11 @@ public final class SimpleSettingsMap implements SettingsMap
      * @param name        Name of the config file, like "WorldConfig" or "Taiga".
      * @param isNewConfig True if this config is newly created.
      */
-    public SimpleSettingsMap(String name, boolean isNewConfig)
+    public SimpleSettingsMap(String name)
     {
         this.name = name;
         this.settingsCache = new LinkedHashMap<String, RawSettingValue>();
         this.configFunctions = new ArrayList<RawSettingValue>();
-        this.isNewConfig = isNewConfig;
     }
 
     /**
@@ -179,12 +177,6 @@ public final class SimpleSettingsMap implements SettingsMap
             return fallback.hasSetting(setting);
         }
         return false;
-    }
-
-    @Override
-    public boolean isNewConfig()
-    {
-        return isNewConfig;
     }
 
     @Override
