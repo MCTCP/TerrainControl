@@ -152,13 +152,14 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getName(), Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == SettingsEnums.CustomStructureType.BO4);
 		}
 	}
 
 	// Used by OTGSpigotChunkGen to query biome in a given location
 	// Need this because the normal Bukkit way of checking for biomes use the Bukkit Biome enum
-	public String getBiomeRegistryName(int blockX, int blockY, int blockZ) {
+	public String getBiomeRegistryName(int blockX, int blockY, int blockZ)
+	{
 		return BiomeInterpolator.getBiomeRegistryName(this.worldSeed, blockX, blockY, blockZ, (OTGBiomeProvider) this.b);
 	}
 

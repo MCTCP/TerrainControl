@@ -326,9 +326,9 @@ public abstract class OTGEngine
 		
 	// Builders/Factories
 	
-	public CustomStructureCache createCustomStructureCache(String worldName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
+	public CustomStructureCache createCustomStructureCache(String presetName, Path worldSavepath, int dimId, long worldSeed, boolean isBo4Enabled)
 	{
 		// TODO: ModLoadedChecker
-		return new CustomStructureCache(worldName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
+		return new CustomStructureCache(presetName, worldSavepath, dimId, worldSeed, isBo4Enabled, getOTGRootFolder(), getPluginConfig().getSpawnLogEnabled(), getLogger(), getCustomObjectManager(), getMaterialReader(), getCustomObjectResourcesManager(), null);
 	}
 }

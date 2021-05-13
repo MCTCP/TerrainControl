@@ -190,7 +190,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		}
 	}
 
-	public Preset getPreset() {return this.preset;}
+	public Preset getPreset()
+	{
+		return this.preset;
+	}
 
 	@OnlyIn(Dist.CLIENT)
 	@Override
@@ -204,7 +207,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		if (!isInitialised)
 		{
 			isInitialised = true;
-			this.structureCache = OTG.getEngine().createCustomStructureCache(worldName, Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
+			this.structureCache = OTG.getEngine().createCustomStructureCache(this.preset.getName(), Paths.get("./saves/" + worldName + "/"), 0, this.worldSeed, this.preset.getWorldConfig().getCustomStructureType() == CustomStructureType.BO4);
 		}
 	}
 
@@ -214,9 +217,10 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	@Override
 	public void fillFromNoise(IWorld world, StructureManager manager, IChunk chunk)
 	{
-		// If we've already generated and cached this	
-		// chunk while it was unloaded, use cached data.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
+	
+		// If we've already generated and cached this	
+		// chunk while it was unloaded, use cached data.		
 		ChunkBuffer buffer = new ForgeChunkBuffer((ChunkPrimer) chunk);
 		IChunk cachedChunk = unloadedChunksCache.get(chunkCoord);
 		if (cachedChunk != null)
@@ -235,7 +239,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 				}
 			}
 			this.unloadedChunksCache.remove(chunkCoord);
-		} else {
+		} else {			
 			// Setup jigsaw data
 			ObjectList<JigsawStructureData> structures = new ObjectArrayList<>(10);
 			ObjectList<JigsawStructureData> junctions = new ObjectArrayList<>(32);
@@ -346,7 +350,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		
 		List<List<Supplier<ConfiguredFeature<?, ?>>>> list = biome.getGenerationSettings().features();		
 		
-		// TODO: Spawn snow only after this!		
+		// TODO: Spawn snow only after this!
 		// Vanilla structure generation
 		for(int step = 0; step < GenerationStage.Decoration.values().length; ++step)
 		{
