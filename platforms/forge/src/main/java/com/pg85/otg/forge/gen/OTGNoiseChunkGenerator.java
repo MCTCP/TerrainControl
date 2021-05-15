@@ -711,7 +711,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 	{
 		// Since we can't check for structure components/references, only structure starts,  
 		// we'll keep a safe distance away from any vanilla structure start points.
-		int radiusInChunks = 4;
+		int radiusInChunks = 5;
 		int chunkX = chunkCoordinate.getChunkX();
 		int chunkZ = chunkCoordinate.getChunkZ();
 		for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
@@ -720,7 +720,7 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 			{
 				for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
 				{
-					int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX + xOffset, 2) + Math.pow (chunkZ + zOffset, 2)));                    
+					int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX - chunkX + xOffset, 2) + Math.pow (chunkZ - chunkZ + zOffset, 2)));                    
 					if (distance == cycle)
 					{
 						ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);					
