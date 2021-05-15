@@ -55,9 +55,7 @@ public class SpawnCommand
 		))
 		{
 			sender.sendMessage("Spawned object " + objectName + " at " + block.getLocation().toString());
-		}
-		else
-		{
+		} else {
 			sender.sendMessage("Failed to spawn object " + objectName+". Is it a BO4?");
 		}
 

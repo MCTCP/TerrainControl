@@ -75,6 +75,11 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	
 	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetName, Registry<Biome> registry)
 	{
+		if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
+		{
+			OTG.getEngine().reloadPreset(presetName);
+		}
+		
 		List<RegistryKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetName);
 		if(biomesForPreset == null)
 		{

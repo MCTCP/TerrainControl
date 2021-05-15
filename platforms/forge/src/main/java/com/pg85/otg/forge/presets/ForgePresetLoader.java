@@ -35,12 +35,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private final HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
-	// Using a ref is much faster than using an object
-	private final HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();
-	private final Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
 	private final Map<String, List<RegistryKey<Biome>>> biomesByPresetName = new LinkedHashMap<>();
-	private final Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
+	
+	private HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
+	private HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();	// Using a ref is much faster than using an object
+	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
+	private Map<String, BiomeLayerData> presetGenerationData = new HashMap<>();
 	
 	public ForgePresetLoader(Path otgRootFolder)
 	{
@@ -81,7 +81,22 @@ public class ForgePresetLoader extends LocalPresetLoader
 	}
 
 	@Override
+	protected void refreshConfigs()
+	{
+		this.globalIdMapping = new HashMap<>();
+		this.reverseIdMapping = new HashMap<>();
+		this.biomeConfigsByRegistryKey = new HashMap<>();
+		this.presetGenerationData = new HashMap<>();
+		registerBiomes(true);
+	}
+
+	@Override
 	public void registerBiomes()
+	{
+		registerBiomes(false);
+	}
+	
+	public void registerBiomes(boolean refresh)
 	{
 		for(Preset preset : this.presets.values())
 		{
@@ -92,7 +107,10 @@ public class ForgePresetLoader extends LocalPresetLoader
 			int currentId = 1;
 			
 			List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
-			this.biomesByPresetName.put(preset.getName(), presetBiomes);
+			if(!refresh)
+			{			
+				this.biomesByPresetName.put(preset.getName(), presetBiomes);
+			}
 			WorldConfig worldConfig = preset.getWorldConfig();
 			BiomeConfig oceanBiomeConfig = null;
 			int[] oceanTemperatures = new int[]{0, 0, 0, 0};
@@ -132,16 +150,22 @@ public class ForgePresetLoader extends LocalPresetLoader
  				if (biomeConfig.getName().equals(worldConfig.getDefaultFrozenOceanBiome())) {
 					oceanTemperatures[3] = otgBiomeId;
 				}
-				
-				Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
- 				ForgeRegistries.BIOMES.register(biome);
+
+				if(!refresh)
+				{
+					Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
+					ForgeRegistries.BIOMES.register(biome);
+				}
  				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
  				ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString());
 				//System.out.println(resourceLocation);
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
  				
- 				presetBiomes.add(RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation));
+ 				if(!refresh)
+ 				{
+ 					presetBiomes.add(RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation));
+ 				}
  				 				
 				presetIdMapping[otgBiomeId] = biomeConfig;
 				presetReverseIdMapping.put(biomeConfig, otgBiomeId);

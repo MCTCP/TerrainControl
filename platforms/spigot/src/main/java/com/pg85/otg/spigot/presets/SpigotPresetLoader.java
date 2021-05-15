@@ -288,4 +288,9 @@ public class SpigotPresetLoader extends LocalPresetLoader
 		return clonedData;
 	}
 
+	@Override
+	protected void refreshConfigs()
+	{
+		// Not used for Spigot, since any exit/rejoin is a server restart.
+	}
 }

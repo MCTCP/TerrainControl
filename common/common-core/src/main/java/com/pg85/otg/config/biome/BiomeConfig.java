@@ -13,10 +13,8 @@ import com.pg85.otg.customobject.resource.CustomObjectGen;
 import com.pg85.otg.customobject.resource.CustomStructureGen;
 import com.pg85.otg.customobject.resource.SaplingGen;
 import com.pg85.otg.customobject.resource.TreeGen;
-import com.pg85.otg.exception.InvalidConfigException;
 import com.pg85.otg.gen.resource.*;
 import com.pg85.otg.gen.surface.SimpleSurfaceGenerator;
-import com.pg85.otg.gen.surface.SurfaceGenerator;
 import com.pg85.otg.gen.surface.SurfaceGeneratorSetting;
 import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
@@ -82,14 +80,16 @@ public class BiomeConfig extends BiomeConfigBase
 		CONFIG_FUNCTIONS.put("CoralClaw", CoralClawGen.class);
 	}
 
+	// This field is only used for reading/writing,
+	// We read InheritMobsBiomeName from the raw settings when 
+	// processing mob inheritance, rather than using this field.
+	private String inheritMobsBiomeName;
+
 	// TODO: Not used atm, implement these.
-	private String inheritMobsBiomeName;	
 	private String biomeDictId;
 	
 	// Fields used only in common-core or platform layers that aren't in IBiomeConfig	
-	// TODO: Refactor, expose via IBiomeConfig?
-
-	private List<ConfigFunction<IBiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<IBiomeConfig>>();
+	// TODO: Refactor, expose via IBiomeConfig?	
 	private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
 	private Map<LocalMaterialData, SaplingGen> customSaplingGrowers = new HashMap<>();
 	private Map<LocalMaterialData, SaplingGen> customBigSaplingGrowers = new HashMap<>();	
@@ -164,11 +164,6 @@ public class BiomeConfig extends BiomeConfigBase
 			this.iceBlock = this.configIceBlock;
 			this.cooledLavaBlock = this.configCooledLavaBlock;
 		}
-	}
-
-	public List<ConfigFunction<IBiomeConfig>> getResourceSequence()
-	{
-		return this.resourceSequence;
 	}
 	
 	public SaplingGen getSaplingGen(SaplingType type)

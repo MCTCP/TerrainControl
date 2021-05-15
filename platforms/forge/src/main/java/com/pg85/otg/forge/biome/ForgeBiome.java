@@ -78,8 +78,10 @@ public class ForgeBiome implements IBiome
 		// Mob spawning
 		MobSpawnInfo.Builder mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
 		
-		// NOOP surface builder, surface/ground/stone blocks / sagc are done during base terrain gen.
-		biomeGenerationSettingsBuilder.surfaceBuilder(ConfiguredSurfaceBuilders.NOPE);
+		// Surface/ground/stone blocks / sagc are done during base terrain gen.
+		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
+		// TODO: What if there's no grass around spawn?
+		biomeGenerationSettingsBuilder.surfaceBuilder(ConfiguredSurfaceBuilders.GRASS);
 
 		// * Carvers are handled by OTG
 		

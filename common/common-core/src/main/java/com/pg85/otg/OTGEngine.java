@@ -134,6 +134,12 @@ public abstract class OTGEngine
 		
 		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger, materialReader);
 	}
+	
+	public void reloadPreset(String presetName)
+	{
+		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
+		this.presetLoader.reloadPresetFromDisk(presetName, this.biomeResourcesManager, spawnLog, logger, materialReader);
+	}
 
 	private void unpackDefaultPreset(File presetsDir)
 	{
