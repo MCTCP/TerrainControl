@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pg85.otg.config.ConfigFile;
+import com.pg85.otg.config.ConfigFunction;
 import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.GrassColorModifier;
 import com.pg85.otg.constants.SettingsEnums.MineshaftType;
@@ -119,6 +120,7 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected float particleProbability;
 
 	// Music and sounds
+	
 	protected String music;
 	protected int musicMinDelay;
 	protected int musicMaxDelay;
@@ -171,10 +173,19 @@ abstract class BiomeConfigBase extends ConfigFile implements IBiomeConfig
 	protected List<WeightedMobSpawnGroup> spawnWaterAmbientCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();
 	protected List<WeightedMobSpawnGroup> spawnMiscCreaturesMerged = new ArrayList<WeightedMobSpawnGroup>();	
 	
+	// Resources
+	
+	protected List<ConfigFunction<IBiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<IBiomeConfig>>();
+	
 	protected BiomeConfigBase(String configName, BiomeResourceLocation registryKey)
 	{
 		super(configName);
 		this.registryKey = registryKey;
+	}
+	
+	public List<ConfigFunction<IBiomeConfig>> getResourceSequence()
+	{
+		return this.resourceSequence;
 	}
 	
 	@Override

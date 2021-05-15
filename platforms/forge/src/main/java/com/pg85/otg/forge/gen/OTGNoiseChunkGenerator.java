@@ -712,17 +712,17 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Since we can't check for structure components/references, only structure starts,  
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 4;
-        int chunkX = chunkCoordinate.getChunkX();
-        int chunkZ = chunkCoordinate.getChunkZ();
-        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
-        {
-            for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
-            {
-                for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
-                {
-                    int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX-chunkX + xOffset, 2) + Math.pow (chunkZ-chunkZ + zOffset, 2)));                    
-                    if (distance == cycle)
-                    {				
+		int chunkX = chunkCoordinate.getChunkX();
+		int chunkZ = chunkCoordinate.getChunkZ();
+		for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+		{
+			for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+			{
+				for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
+				{
+					int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX + xOffset, 2) + Math.pow (chunkZ + zOffset, 2)));                    
+					if (distance == cycle)
+					{
 						ChunkPrimer chunk = new ChunkPrimer(new ChunkPos(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);					
 						ChunkPos chunkpos = chunk.getPos();
 						
@@ -744,11 +744,11 @@ public final class OTGNoiseChunkGenerator extends ChunkGenerator
 								}
 							}
 						}
-                    }
-                }
-            }
-        }
-        return false;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, DynamicRegistries dynamicRegistries, StructureManager structureManager, IChunk chunk, TemplateManager templateManager, long seed, ChunkPos chunkPos, Biome biome)

@@ -31,11 +31,12 @@ public class SpigotBiome implements IBiome
 		BiomeSettingsGeneration.a biomeGenerationSettingsBuilder = new BiomeSettingsGeneration.a();
 
 		BiomeSettingsMobs.a mobSpawnInfoBuilder = createMobSpawnInfo(biomeConfig);
-
-		// NOOP surface builder, surface/ground/stone blocks / sagc are done during base terrain gen.
+	
+		// Surface/ground/stone blocks / sagc are done during base terrain gen.
 		// a() == withSurfaceBuilder() in forge
-		// WorldGenSurfaceComposites.j == ConfiguredSurfaceBuilders.field_244184_p in forge
-		// TODO: This should be the "NOPE" surfacebuilder.		
+		// WorldGenSurfaceComposites.j == ConfiguredSurfaceBuilders.field_244184_p in forge		
+		// Spawn point detection checks for surfacebuilder blocks, so using ConfiguredSurfaceBuilders.GRASS.
+		// TODO: What if there's no grass around spawn?		
 		biomeGenerationSettingsBuilder.a(WorldGenSurfaceComposites.j);
 
 		// * Carvers are handled by OTG

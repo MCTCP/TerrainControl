@@ -776,19 +776,19 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// Since we can't check for structure components/references, only structure starts,  
 		// we'll keep a safe distance away from any vanilla structure start points.
 		int radiusInChunks = 4;
-        int chunkX = chunkCoordinate.getChunkX();
-        int chunkZ = chunkCoordinate.getChunkZ();
-        for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
-        {
-            for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
-            {
-                for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
-                {
-                    int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX-chunkX + xOffset, 2) + Math.pow (chunkZ-chunkZ + zOffset, 2)));                    
-                    if (distance == cycle)
-                    {
-                    	ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);			
-                    	ChunkCoordIntPair chunkpos = chunk.getPos();
+		int chunkX = chunkCoordinate.getChunkX();
+		int chunkZ = chunkCoordinate.getChunkZ();
+		for (int cycle = 0; cycle <= radiusInChunks; ++cycle)
+		{
+			for (int xOffset = -cycle; xOffset <= cycle; ++xOffset)
+			{
+				for (int zOffset = -cycle; zOffset <= cycle; ++zOffset)
+				{
+					int distance = (int)Math.floor(Math.sqrt(Math.pow (chunkX + xOffset, 2) + Math.pow (chunkZ + zOffset, 2)));                    
+					if (distance == cycle)
+					{
+						ProtoChunk chunk = new ProtoChunk(new ChunkCoordIntPair(chunkCoordinate.getChunkX() + xOffset, chunkCoordinate.getChunkZ() + zOffset), null);			
+						ChunkCoordIntPair chunkpos = chunk.getPos();
 						
 						// Borrowed from STRUCTURE_STARTS phase of chunkgen, only determines structure start point
 						// based on biome and resource settings (distance etc). Does not plot any structure components.
@@ -808,11 +808,11 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 								}
 							}
 						}
-                    }
-                }
-            }
-        }
-        return false;
+					}
+				}
+			}
+		}
+		return false;
 	}
 	
 	private boolean hasStructureStart(StructureFeature<?, ?> structureFeature, IRegistryCustom dynamicRegistries, StructureManager structureManager, IChunkAccess chunk, DefinedStructureManager templateManager, long seed, ChunkCoordIntPair chunkPos, BiomeBase biome)

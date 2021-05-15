@@ -82,14 +82,16 @@ public class BiomeConfig extends BiomeConfigBase
 		CONFIG_FUNCTIONS.put("CoralClaw", CoralClawGen.class);
 	}
 
+	// This field is only used for reading/writing,
+	// We read InheritMobsBiomeName from the raw settings when 
+	// processing mob inheritance, rather than using this field.
+	private String inheritMobsBiomeName;
+
 	// TODO: Not used atm, implement these.
-	private String inheritMobsBiomeName;	
 	private String biomeDictId;
 	
 	// Fields used only in common-core or platform layers that aren't in IBiomeConfig	
-	// TODO: Refactor, expose via IBiomeConfig?
-
-	private List<ConfigFunction<IBiomeConfig>> resourceSequence = new ArrayList<ConfigFunction<IBiomeConfig>>();
+	// TODO: Refactor, expose via IBiomeConfig?	
 	private Map<SaplingType, SaplingGen> saplingGrowers = new EnumMap<SaplingType, SaplingGen>(SaplingType.class);
 	private Map<LocalMaterialData, SaplingGen> customSaplingGrowers = new HashMap<>();
 	private Map<LocalMaterialData, SaplingGen> customBigSaplingGrowers = new HashMap<>();	
@@ -164,11 +166,6 @@ public class BiomeConfig extends BiomeConfigBase
 			this.iceBlock = this.configIceBlock;
 			this.cooledLavaBlock = this.configCooledLavaBlock;
 		}
-	}
-
-	public List<ConfigFunction<IBiomeConfig>> getResourceSequence()
-	{
-		return this.resourceSequence;
 	}
 	
 	public SaplingGen getSaplingGen(SaplingType type)
