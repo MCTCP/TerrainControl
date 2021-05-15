@@ -14,13 +14,16 @@ public class Preset
 {
 	private final Path presetDir;
 	private final String name;
-	private final WorldConfig worldConfig;
-	private final HashMap<String, BiomeConfig> biomeConfigs = new HashMap<String, BiomeConfig>();
-	private final String version;
-	private final String author;
-	private final String description;
 	private final String shortPresetName;
-
+	
+	// Note: Since we're not using Supplier<>, we need to be careful about any classes fetching 
+	// and caching our worldconfig/biomeconfigs etc, or they won't update when reloaded from disk.
+	// BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
+	private WorldConfig worldConfig;
+	private HashMap<String, BiomeConfig> biomeConfigs = new HashMap<String, BiomeConfig>();
+	private String version;
+	private String author;
+	private String description;
 
 	Preset(Path presetDir, String name, String shortPresetName, WorldConfig worldConfig, ArrayList<BiomeConfig> biomeConfigs)
 	{
@@ -36,6 +39,15 @@ public class Preset
 		{
 			this.biomeConfigs.put(biomeConfig.getName(), biomeConfig);
 		}
+	}
+	
+	public void update(Preset preset)
+	{
+		this.worldConfig = preset.worldConfig;
+		this.biomeConfigs = preset.biomeConfigs;
+		this.author = preset.author;
+		this.description = preset.description; 
+		this.version = preset.version;
 	}
 
 	public Path getPresetDir()
@@ -57,7 +69,7 @@ public class Preset
 	{
 		return this.worldConfig;
 	}
-
+	
 	public BiomeConfig getBiomeConfig(String biomeName)
 	{
 		return this.biomeConfigs.get(biomeName);
@@ -67,7 +79,7 @@ public class Preset
 	{
 		return new ArrayList<BiomeConfig>(this.biomeConfigs.values());
 	}
-
+	
 	public String getVersion()
 	{
 		return this.version;

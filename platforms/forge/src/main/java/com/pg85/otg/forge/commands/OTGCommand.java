@@ -58,6 +58,10 @@ public class OTGCommand
 					(context -> PresetCommand.showPreset(context.getSource()))
 				)
 			).then(
+				Commands.literal("flush").executes(
+					(context -> FlushCommand.flushCache(context.getSource()))
+				)
+			).then(					
 				Commands.literal("biome").executes(
 					(context -> BiomeCommand.showBiome(context.getSource()))
 				)

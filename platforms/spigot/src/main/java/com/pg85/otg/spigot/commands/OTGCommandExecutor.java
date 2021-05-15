@@ -53,6 +53,8 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 				return EditCommand.finish(sender);
 			case "region":
 				return ExportCommand.region(sender, args);
+			case "flush":
+				return FlushCommand.execute(sender, args);				
 			case "help":
 			default:
 				return helpMessage(sender);
