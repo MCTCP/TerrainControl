@@ -15,6 +15,7 @@ import com.pg85.otg.forge.util.ForgeNBTHelper;
 import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
+import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.biome.ReplacedBlocksMatrix;
 import com.pg85.otg.util.bo3.NamedBinaryTag;
 import com.pg85.otg.util.gen.LocalWorldGenRegion;
@@ -52,6 +53,9 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	
 	// 32x32 biomes cache for fast lookups during population
 	private IBiome[][] cachedBiomeConfigs;
+	// BO4 plotting may call hasDefaultStructures on chunks outside the area being populated, in order to plot large structures.
+	// It may query the same chunk multiple times, so use a fixed size cache.	
+	private FifoMap<ChunkCoordinate, Boolean> cachedHasDefaultStructureChunks = new FifoMap<ChunkCoordinate, Boolean>(2048);
 	private boolean cacheIsValid;
 
 	/** Creates a LocalWorldGenRegion
@@ -573,7 +577,14 @@ public class ForgeWorldGenRegion extends LocalWorldGenRegion
 	@Override
 	public boolean chunkHasDefaultStructure(Random worldRandom, ChunkCoordinate chunkCoordinate)
 	{
-		return ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
+		Boolean hasDefaultStructure = cachedHasDefaultStructureChunks.get(chunkCoordinate);
+		if(hasDefaultStructure != null)
+		{
+			return hasDefaultStructure.booleanValue();
+		}
+		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getLevel(), chunkCoordinate);
+		cachedHasDefaultStructureChunks.put(chunkCoordinate, new Boolean(hasDefaultStructure));
+		return hasDefaultStructure;
 	}
 
 	@Override
