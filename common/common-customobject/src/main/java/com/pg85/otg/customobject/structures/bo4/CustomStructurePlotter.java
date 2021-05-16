@@ -902,7 +902,7 @@ public class CustomStructurePlotter
 						                	structureCoord = new BO4CustomStructureCoordinate(worldGenRegion.getPresetName(), ((BO4)currentStructureSpawning[0]), null, rotation, spawnCoordX * 16, (short)0, spawnCoordZ * 16, 0, false, false, null);
 						                	structureStart2 = new BO4CustomStructure(structureCache, worldGenRegion, structureCoord, spawningStructureAtSpawn, targetBiomes, chunkCoord, otgRootFolder, spawnLog, logger, customObjectManager, materialReader, manager, modLoadedChecker);
 
-				            	        	if(structureStart2.IsSpawned)
+				            	        	if(structureStart2.isSpawned())
 						                	{
 				            	        		structureCache.addBo4ToStructureCache(spawnChunk, structureStart2);
 
@@ -1107,11 +1107,11 @@ public class CustomStructurePlotter
 					// smoothing areas. Any chunks that have had their bo4's spawned while populating a neighbouring 
 					// chunk, but have not yet been fully populated themselves are kept in populatedChunks, along with all
 					// fully populated chunks (they are considered fully populated for the purposes of bo4 plotting).
-					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).objectsToSpawn.keySet())
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).getObjectsToSpawn().keySet())
 					{
 						this.addToStructureCache(chunkCoord, (BO4CustomStructure)loadedStructure.getKey()); // This structure has blocks that need to be spawned
 					}
-					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).smoothingAreaManager.getSmoothingAreaChunkCoords())
+					for(ChunkCoordinate chunkCoord : ((BO4CustomStructure)loadedStructure.getKey()).getSmoothingAreaManager().getSmoothingAreaChunkCoords())
 					{
 						this.addToStructureCache(chunkCoord, (BO4CustomStructure)loadedStructure.getKey()); // This structure has smoothing area blocks that need to be spawned
 					}

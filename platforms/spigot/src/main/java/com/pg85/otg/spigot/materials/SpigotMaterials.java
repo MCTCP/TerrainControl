@@ -70,6 +70,11 @@ public class SpigotMaterials extends LocalMaterials
 			DARK_OAK_LOG = readMaterial(LocalMaterials.DARK_OAK_LOG_NAME);
 			OAK_LOG = readMaterial(LocalMaterials.OAK_LOG_NAME);
 			SPRUCE_LOG = readMaterial(LocalMaterials.SPRUCE_LOG_NAME);
+			ACACIA_WOOD = readMaterial(LocalMaterials.ACACIA_WOOD_NAME);
+			BIRCH_WOOD = readMaterial(LocalMaterials.BIRCH_WOOD_NAME);
+			DARK_OAK_WOOD = readMaterial(LocalMaterials.DARK_OAK_WOOD_NAME);
+			OAK_WOOD = readMaterial(LocalMaterials.OAK_WOOD_NAME);
+			SPRUCE_WOOD = readMaterial(LocalMaterials.SPRUCE_WOOD_NAME);			
 			STRIPPED_ACACIA_LOG = readMaterial(LocalMaterials.STRIPPED_ACACIA_LOG_NAME);
 			STRIPPED_BIRCH_LOG = readMaterial(LocalMaterials.STRIPPED_BIRCH_LOG_NAME);
 			STRIPPED_DARK_OAK_LOG = readMaterial(LocalMaterials.STRIPPED_DARK_OAK_LOG_NAME);
