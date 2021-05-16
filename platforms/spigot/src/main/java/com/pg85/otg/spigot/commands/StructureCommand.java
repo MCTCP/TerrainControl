@@ -8,7 +8,6 @@ import com.pg85.otg.customobject.config.CustomObjectResourcesManager;
 import com.pg85.otg.customobject.structures.CustomStructure;
 import com.pg85.otg.customobject.structures.bo4.BO4CustomStructure;
 import com.pg85.otg.logging.ILogger;
-import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
@@ -33,6 +32,8 @@ public class StructureCommand
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)((Player)sender).getLocation().getBlockX(), (int)((Player)sender).getLocation().getBlockZ());
 		// if the player is in range
 
+		// TODO: This throws an exception, as apparently this is a org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator, not our OTGNoiseChunkGenerator
+		// How do we fetch our OTGNoiseChunkGenerator?
 		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)((CraftWorld)((Player)sender).getWorld()).getHandle().getChunkProvider().getChunkGenerator()).getStructureCache().getChunkData(playerChunk);
 		if(worldInfoChunk != null)
 		{
