@@ -47,12 +47,17 @@ public class LocalMaterials
 	public static final String WATER_NAME = getRegistryKey("water");
 	public static final String LAVA_NAME = getRegistryKey("lava");
 
-    // Trees    
+    // Trees
 	public static final String ACACIA_LOG_NAME = getRegistryKey("acacia_log");
 	public static final String BIRCH_LOG_NAME = getRegistryKey("birch_log");
 	public static final String DARK_OAK_LOG_NAME = getRegistryKey("dark_oak_log");
 	public static final String OAK_LOG_NAME = getRegistryKey("oak_log");
 	public static final String SPRUCE_LOG_NAME = getRegistryKey("spruce_log");
+	public static final String ACACIA_WOOD_NAME = getRegistryKey("acacia_wood");
+	public static final String BIRCH_WOOD_NAME = getRegistryKey("birch_wood");
+	public static final String DARK_OAK_WOOD_NAME = getRegistryKey("dark_oak_wood");
+	public static final String OAK_WOOD_NAME = getRegistryKey("oak_wood");
+	public static final String SPRUCE_WOOD_NAME = getRegistryKey("spruce_wood");	
 	public static final String STRIPPED_ACACIA_LOG_NAME = getRegistryKey("stripped_acacia_log");
 	public static final String STRIPPED_BIRCH_LOG_NAME = getRegistryKey("stripped_birch_log");
 	public static final String STRIPPED_DARK_OAK_LOG_NAME = getRegistryKey("stripped_dark_oak_log");
@@ -176,6 +181,11 @@ public class LocalMaterials
     public static LocalMaterialData STRIPPED_JUNGLE_LOG;
     public static LocalMaterialData STRIPPED_OAK_LOG;
     public static LocalMaterialData STRIPPED_SPRUCE_LOG;
+    public static LocalMaterialData ACACIA_WOOD;
+    public static LocalMaterialData BIRCH_WOOD;
+    public static LocalMaterialData DARK_OAK_WOOD;
+    public static LocalMaterialData OAK_WOOD;
+    public static LocalMaterialData SPRUCE_WOOD;    
 	
     public static LocalMaterialData ACACIA_LEAVES;
     public static LocalMaterialData BIRCH_LEAVES;

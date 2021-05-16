@@ -50,8 +50,11 @@ import java.util.zip.DataFormatException;
 
 public class BO4Config extends CustomObjectConfigFile
 {
-	private String author;
-    private String description;
+	// TODO: Split this up into multiple config classes like common-core
+	// does for world/biome configs, add getters etc.
+	
+	public String author;
+	public String description;
     ConfigMode settingsMode;
     public boolean doReplaceBlocks;
     public int frequency;
