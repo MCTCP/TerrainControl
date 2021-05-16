@@ -41,9 +41,9 @@ public abstract class OTGEngine
 {
 	// Classes implemented/provided by the platform-specific layer.
 	
-	private final LocalPresetLoader presetLoader;
-	private final ILogger logger;
-	private final IMaterialReader materialReader;
+	protected final LocalPresetLoader presetLoader;
+	protected final ILogger logger;
+	protected final IMaterialReader materialReader;
 	private final IModLoadedChecker modLoadedChecker;
 
 	// Common classes
@@ -52,7 +52,7 @@ public abstract class OTGEngine
 	private final Path globalObjectsFolder;
 	private PluginConfig pluginConfig;
 
-	private BiomeResourcesManager biomeResourcesManager;
+	protected BiomeResourcesManager biomeResourcesManager;
 	private CustomObjectResourcesManager customObjectResourcesManager;
 	private CustomObjectManager customObjectManager;
 	
@@ -133,12 +133,6 @@ public abstract class OTGEngine
 		// Load presets
 		
 		this.presetLoader.loadPresetsFromDisk(this.biomeResourcesManager, spawnLog, logger, materialReader);
-	}
-	
-	public void reloadPreset(String presetName)
-	{
-		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
-		this.presetLoader.reloadPresetFromDisk(presetName, this.biomeResourcesManager, spawnLog, logger, materialReader);
 	}
 
 	private void unpackDefaultPreset(File presetsDir)

@@ -16,6 +16,7 @@ import com.pg85.otg.util.minecraft.EntityCategory;
 import net.minecraft.entity.EntityClassification;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.ResourceLocationException;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.server.ServerChunkProvider;
@@ -26,7 +27,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.io.File;
 import java.nio.file.Paths;
 
-class ForgeEngine extends OTGEngine
+public class ForgeEngine extends OTGEngine
 {
 	public ForgeEngine()
 	{
@@ -39,6 +40,36 @@ class ForgeEngine extends OTGEngine
 		);
 	}
 
+	public void reloadPreset(String presetName, MutableRegistry<Biome> biomeRegistry)
+	{
+		boolean spawnLog = getPluginConfig().getSpawnLogEnabled();
+		((ForgePresetLoader)this.presetLoader).reloadPresetFromDisk(presetName, this.biomeResourcesManager, spawnLog, this.logger, this.materialReader, biomeRegistry);
+	}
+	
+	public void onSave(IWorld world)
+	{
+		// For server worlds, save the structure cache.
+		if(
+			!world.isClientSide() && 
+			world.getChunkSource() instanceof ServerChunkProvider && 
+			((ServerChunkProvider)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
+		)
+		{
+			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkSource()).generator).saveStructureCache();
+		}
+	}
+	
+	@Override
+	public File getJarFile()
+	{
+		File modFile = ModList.get().getModFileById(Constants.MOD_ID_SHORT).getFile().getFilePath().toFile();
+		if(!modFile.isFile())
+		{
+			return null;
+		}
+		return modFile;
+	}
+	
 	@Override
 	public void mergeVanillaBiomeMobSpawnSettings(BiomeConfigStub biomeConfigStub, String biomeResourceLocation)
 	{		
@@ -73,29 +104,5 @@ class ForgeEngine extends OTGEngine
 				OTG.log(LogMarker.WARN, "Could not inherit mobs for unrecognised biome \"" +  biomeResourceLocation + "\" in " + biomeConfigStub.getBiomeName() + Constants.BiomeConfigFileExtension);
 			}
 		}
-	}
-
-	@Override
-	public File getJarFile()
-	{
-		File modFile = ModList.get().getModFileById(Constants.MOD_ID_SHORT).getFile().getFilePath().toFile();
-		if(!modFile.isFile())
-		{
-			return null;
-		}
-		return modFile;
-	}
-
-	public void onSave(IWorld world)
-	{
-		// For server worlds, save the structure cache.
-		if(
-			!world.isClientSide() && 
-			world.getChunkSource() instanceof ServerChunkProvider && 
-			((ServerChunkProvider)world.getChunkSource()).generator instanceof OTGNoiseChunkGenerator
-		)
-		{
-			((OTGNoiseChunkGenerator)((ServerChunkProvider)world.getChunkSource()).generator).saveStructureCache();
-		}
-	}
+	}	
 }

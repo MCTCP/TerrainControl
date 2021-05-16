@@ -95,7 +95,7 @@ public class OTGGui
 		Registry<DimensionType> dimensionTypesRegistry = dynamicRegistries.registryOrThrow(Registry.DIMENSION_TYPE_REGISTRY);
 		Registry<Biome> biomesRegistry = dynamicRegistries.registryOrThrow(Registry.BIOME_REGISTRY);
 		Registry<DimensionSettings> dimensionSettingsRegistry = dynamicRegistries.registryOrThrow(Registry.NOISE_GENERATOR_SETTINGS_REGISTRY);
-		
+
 		return new DimensionGeneratorSettings(
 			dimensionGeneratorSettings.seed(),
 			dimensionGeneratorSettings.generateFeatures(),

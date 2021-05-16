@@ -23,13 +23,13 @@ import java.util.stream.Stream;
 public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 {
 	public static final Codec<OTGBiomeProvider> CODEC = RecordCodecBuilder.create(
-			(instance) -> instance.group(
-					Codec.STRING.fieldOf("preset_name").stable().forGetter((provider) -> provider.presetName),
-					Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
-					Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
-					Codec.BOOL.fieldOf("large_biomes").orElse(false).stable().forGetter((provider) -> provider.largeBiomes),
-					RegistryLookupCodec.a(IRegistry.ay).forGetter((provider) -> provider.registry)
-			).apply(instance, instance.stable(OTGBiomeProvider::new))
+		(instance) -> instance.group(
+			Codec.STRING.fieldOf("preset_name").stable().forGetter((provider) -> provider.presetName),
+			Codec.LONG.fieldOf("seed").stable().forGetter((provider) -> provider.seed),
+			Codec.BOOL.optionalFieldOf("legacy_biome_init_layer", Boolean.FALSE, Lifecycle.stable()).forGetter((provider) -> provider.legacyBiomeInitLayer),
+			Codec.BOOL.fieldOf("large_biomes").orElse(false).stable().forGetter((provider) -> provider.largeBiomes),
+			RegistryLookupCodec.a(IRegistry.ay).forGetter((provider) -> provider.registry)
+		).apply(instance, instance.stable(OTGBiomeProvider::new))
 	);
 	public final BiomeConfig[] configLookup;
 	private final long seed;
@@ -78,9 +78,9 @@ public class OTGBiomeProvider extends WorldChunkManager implements LayerSource
 			biomesForPreset = new ArrayList<>();
 		}
 		return biomesForPreset.stream().map(
-				// Forge method: getOrThrow
-				// Spigot method: d
-				(p_242638_1_) -> () -> registry.d(p_242638_1_)
+			// Forge method: getOrThrow
+			// Spigot method: d
+			(p_242638_1_) -> () -> registry.d(p_242638_1_)
 		);
 	}
 

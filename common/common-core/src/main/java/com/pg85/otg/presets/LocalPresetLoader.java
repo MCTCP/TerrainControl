@@ -31,7 +31,7 @@ import com.pg85.otg.util.minecraft.BiomeRegistryNames;
 public abstract class LocalPresetLoader
 {
 	private static final int MAX_INHERITANCE_DEPTH = 15;
-	private final File presetsDir;
+	protected final File presetsDir;
 	protected final HashMap<String, Preset> presets = new HashMap<String, Preset>();
 	protected final HashMap<String, String> aliasMap = new HashMap<String, String>();
 
@@ -45,9 +45,7 @@ public abstract class LocalPresetLoader
 	public abstract BiomeConfig getBiomeConfig(String resourceLocationString);
 
 	public abstract BiomeConfig getBiomeConfig(String presetName, int biomeId);	
-	
-	protected abstract void refreshConfigs();
-	
+		
 	public Preset getPresetByName(String name)
 	{
 		// Example: preset is stored as "Biome Bundle v7", but also accepts "Biome Bundle"
@@ -72,32 +70,7 @@ public abstract class LocalPresetLoader
 		// TODO: Generate default preset on install
 		return this.presets.keySet().size() > 0 ? (String) this.presets.keySet().toArray()[0] : Constants.DEFAULT_PRESET_NAME;
 	}
-	
-	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
-	public void reloadPresetFromDisk(String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
-	{
-		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
-		{
-			for(File presetDir : this.presetsDir.listFiles())
-			{
-				if(presetDir.isDirectory() && presetDir.getName().equals(presetName))
-				{
-					for(File file : presetDir.listFiles())
-					{
-						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
-						{						
-							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
-							Preset existingPreset = presets.get(preset.getName());
-							existingPreset.update(preset);
-							break;
-						}
-					}
-				}
-			}
-		}
-		refreshConfigs();
-	}
-	
+		
 	public void loadPresetsFromDisk(IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
@@ -121,7 +94,7 @@ public abstract class LocalPresetLoader
 		}
 	}
 
-	private Preset loadPreset(Path presetDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
+	protected Preset loadPreset(Path presetDir, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader)
 	{
 		File worldConfigFile = new File(presetDir.toString(), Constants.WORLD_CONFIG_FILE);
 		File biomesDirectory = new File(presetDir.toString(), Constants.WORLD_BIOMES_FOLDER);
