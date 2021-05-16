@@ -11,7 +11,7 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
-import com.pg85.otg.spigot.gen.OTGNoiseChunkGenerator;
+import com.pg85.otg.spigot.gen.OTGSpigotChunkGen;
 
 import java.nio.file.Path;
 
@@ -32,9 +32,7 @@ public class StructureCommand
 		ChunkCoordinate playerChunk = ChunkCoordinate.fromBlockCoords((int)((Player)sender).getLocation().getBlockX(), (int)((Player)sender).getLocation().getBlockZ());
 		// if the player is in range
 
-		// TODO: This throws an exception, as apparently this is a org.bukkit.craftbukkit.v1_16_R3.generator.CustomChunkGenerator, not our OTGNoiseChunkGenerator
-		// How do we fetch our OTGNoiseChunkGenerator?
-		CustomStructure worldInfoChunk = ((OTGNoiseChunkGenerator)((CraftWorld)((Player)sender).getWorld()).getHandle().getChunkProvider().getChunkGenerator()).getStructureCache().getChunkData(playerChunk);
+		CustomStructure worldInfoChunk = ((OTGSpigotChunkGen)((CraftWorld)((Player)sender).getWorld()).getGenerator()).generator.getStructureCache().getChunkData(playerChunk);
 		if(worldInfoChunk != null)
 		{
 			Path otgRootFolder = OTG.getEngine().getOTGRootFolder();

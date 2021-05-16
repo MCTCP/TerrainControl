@@ -139,7 +139,7 @@ public class ForgeBiome implements IBiome
 			biomeAmbienceBuilder.ambientAdditionsSound(new SoundAdditionsAmbience(event,
 					biomeConfig.getAdditionsTickChance()));
 		}
-		
+
 		if(biomeConfig.getFoliageColor() != 0xffffff)
 		{
 			biomeAmbienceBuilder.foliageColorOverride(biomeConfig.getFoliageColor());
@@ -160,7 +160,7 @@ public class ForgeBiome implements IBiome
 				break;
 			default:
 				break;
-		}		
+		}
 
 		Biome.Builder biomeBuilder = 
 			new Biome.Builder()
