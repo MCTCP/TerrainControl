@@ -1,5 +1,6 @@
 package com.pg85.otg.forge.presets;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,23 +9,30 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.OptionalInt;
 import java.util.Set;
 
+import com.mojang.serialization.Lifecycle;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.config.biome.BiomeGroup;
+import com.pg85.otg.config.io.IConfigFunctionProvider;
 import com.pg85.otg.config.world.WorldConfig;
+import com.pg85.otg.constants.Constants;
 import com.pg85.otg.constants.SettingsEnums.BiomeMode;
 import com.pg85.otg.forge.biome.ForgeBiome;
 import com.pg85.otg.presets.LocalPresetLoader;
 import com.pg85.otg.presets.Preset;
 import com.pg85.otg.util.biome.BiomeResourceLocation;
+import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.gen.biome.layers.BiomeLayerData;
 import com.pg85.otg.gen.biome.layers.NewBiomeGroup;
+import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.biome.Biome;
 
@@ -35,8 +43,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 public class ForgePresetLoader extends LocalPresetLoader
 {
-	private final Map<String, List<RegistryKey<Biome>>> biomesByPresetName = new LinkedHashMap<>();
-	
+	private Map<String, List<RegistryKey<Biome>>> biomesByPresetName = new LinkedHashMap<>();	
 	private HashMap<String, BiomeConfig[]> globalIdMapping = new HashMap<>();
 	private HashMap<String, Reference2IntMap<BiomeConfig>> reverseIdMapping = new HashMap<>();	// Using a ref is much faster than using an object
 	private Map<ResourceLocation, BiomeConfig> biomeConfigsByRegistryKey = new HashMap<>();
@@ -80,23 +87,48 @@ public class ForgePresetLoader extends LocalPresetLoader
 		return clonedData;
 	}
 
-	@Override
-	protected void refreshConfigs()
+	// Note: BiomeGen and ChunkGen cache some settings during a session, so they'll only update on world exit/rejoin.
+	public void reloadPresetFromDisk(String presetName, IConfigFunctionProvider biomeResourcesManager, boolean spawnLog, ILogger logger, IMaterialReader materialReader, MutableRegistry<Biome> biomeRegistry)
+	{
+		if(this.presetsDir.exists() && this.presetsDir.isDirectory())
+		{
+			for(File presetDir : this.presetsDir.listFiles())
+			{
+				if(presetDir.isDirectory() && presetDir.getName().equals(presetName))
+				{
+					for(File file : presetDir.listFiles())
+					{
+						if(file.getName().equals(Constants.WORLD_CONFIG_FILE))
+						{						
+							Preset preset = loadPreset(presetDir.toPath(), biomeResourcesManager, spawnLog, logger, materialReader);
+							Preset existingPreset = this.presets.get(preset.getName());
+							existingPreset.update(preset);
+							break;
+						}
+					}
+				}
+			}
+		}
+		refreshConfigs(biomeRegistry);
+	}
+	
+	protected void refreshConfigs(MutableRegistry<Biome> biomeRegistry)
 	{
 		this.globalIdMapping = new HashMap<>();
 		this.reverseIdMapping = new HashMap<>();
 		this.biomeConfigsByRegistryKey = new HashMap<>();
 		this.presetGenerationData = new HashMap<>();
-		registerBiomes(true);
+		this.biomesByPresetName = new LinkedHashMap<>();
+		registerBiomes(true, biomeRegistry);
 	}
 
 	@Override
 	public void registerBiomes()
 	{
-		registerBiomes(false);
+		registerBiomes(false, null);
 	}
-	
-	public void registerBiomes(boolean refresh)
+
+	public void registerBiomes(boolean refresh, MutableRegistry<Biome> biomeRegistry)
 	{
 		for(Preset preset : this.presets.values())
 		{
@@ -107,10 +139,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 			int currentId = 1;
 			
 			List<RegistryKey<Biome>> presetBiomes = new ArrayList<>();
-			if(!refresh)
-			{			
-				this.biomesByPresetName.put(preset.getName(), presetBiomes);
-			}
+			this.biomesByPresetName.put(preset.getName(), presetBiomes);
+
 			WorldConfig worldConfig = preset.getWorldConfig();
 			BiomeConfig oceanBiomeConfig = null;
 			int[] oceanTemperatures = new int[]{0, 0, 0, 0};
@@ -118,12 +148,12 @@ public class ForgePresetLoader extends LocalPresetLoader
 			List<BiomeConfig> biomeConfigs = preset.getAllBiomeConfigs();
 			BiomeConfig[] presetIdMapping = new BiomeConfig[biomeConfigs.size()];
 			Reference2IntMap<BiomeConfig> presetReverseIdMapping = new Reference2IntLinkedOpenHashMap<>();
-			
+
 			Map<Integer, List<NewBiomeData>> isleBiomesAtDepth = new HashMap<>();
 			Map<Integer, List<NewBiomeData>> borderBiomesAtDepth = new HashMap<>();
 			
 			Map<String, Integer> worldBiomes = new HashMap<>();
-					
+
 			for(BiomeConfig biomeConfig : biomeConfigs)
 			{
 				boolean isOceanBiome = false;
@@ -138,35 +168,38 @@ public class ForgePresetLoader extends LocalPresetLoader
  				int otgBiomeId = isOceanBiome ? 0 : currentId;
  				
  				// Ocean temperature mappings. Probably a better way to do this?
- 				if (biomeConfig.getName().equals(worldConfig.getDefaultWarmOceanBiome())) {
+ 				if (biomeConfig.getName().equals(worldConfig.getDefaultWarmOceanBiome()))
+ 				{
  					oceanTemperatures[0] = otgBiomeId;
 				}
- 				if (biomeConfig.getName().equals(worldConfig.getDefaultLukewarmOceanBiome())) {
+ 				if (biomeConfig.getName().equals(worldConfig.getDefaultLukewarmOceanBiome()))
+ 				{
 					oceanTemperatures[1] = otgBiomeId;
 				}
- 				if (biomeConfig.getName().equals(worldConfig.getDefaultColdOceanBiome())) {
+ 				if (biomeConfig.getName().equals(worldConfig.getDefaultColdOceanBiome()))
+ 				{
 					oceanTemperatures[2] = otgBiomeId;
 				}
- 				if (biomeConfig.getName().equals(worldConfig.getDefaultFrozenOceanBiome())) {
+ 				if (biomeConfig.getName().equals(worldConfig.getDefaultFrozenOceanBiome()))
+ 				{
 					oceanTemperatures[3] = otgBiomeId;
 				}
 
-				if(!refresh)
-				{
-					Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
-					ForgeRegistries.BIOMES.register(biome);
-				}
- 				
  				// Store registry key (resourcelocation) so we can look up biomeconfigs via RegistryKey<Biome> later.
  				ResourceLocation resourceLocation = new ResourceLocation(biomeConfig.getRegistryKey().toResourceLocationString());
-				//System.out.println(resourceLocation);
  				this.biomeConfigsByRegistryKey.put(resourceLocation, biomeConfig);
  				
- 				if(!refresh)
- 				{
- 					presetBiomes.add(RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation));
- 				}
- 				 				
+ 				RegistryKey<Biome> registryKey = RegistryKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+				presetBiomes.add(registryKey);
+ 				
+ 				Biome biome = ForgeBiome.createOTGBiome(isOceanBiome, preset.getWorldConfig(), biomeConfig);
+				if(!refresh)
+				{					
+					ForgeRegistries.BIOMES.register(biome);
+				} else {
+					biomeRegistry.registerOrOverride(OptionalInt.empty(), registryKey, biome, Lifecycle.stable());
+				}
+ 				 				 				
 				presetIdMapping[otgBiomeId] = biomeConfig;
 				presetReverseIdMapping.put(biomeConfig, otgBiomeId);
 
@@ -221,7 +254,8 @@ public class ForgePresetLoader extends LocalPresetLoader
 			}
 
 			// If the ocean config is null, shift the array downwards to fill id 0
-			if (oceanBiomeConfig == null) {
+			if (oceanBiomeConfig == null)
+			{
 				System.arraycopy(presetIdMapping, 1, presetIdMapping, 0, presetIdMapping.length - 1);
 			}
 			
@@ -258,14 +292,14 @@ public class ForgePresetLoader extends LocalPresetLoader
 
 					// Make and add the generation data
 					NewBiomeData newBiomeData = new NewBiomeData(
-							presetReverseIdMapping.getInt(config),
-							config.getName(),
-							config.getBiomeRarity(),
-							config.getBiomeSize(),
-							config.getBiomeTemperature(),
-							config.getIsleInBiomes(),
-							config.getBorderInBiomes(),
-							config.getNotBorderNearBiomes());
+						presetReverseIdMapping.getInt(config),
+						config.getName(),
+						config.getBiomeRarity(),
+						config.getBiomeSize(),
+						config.getBiomeTemperature(),
+						config.getIsleInBiomes(),
+						config.getBorderInBiomes(),
+						config.getNotBorderNearBiomes());
 					bg.biomes.add(newBiomeData);
 
 					// Add the biome size- if it's already there, nothing is done

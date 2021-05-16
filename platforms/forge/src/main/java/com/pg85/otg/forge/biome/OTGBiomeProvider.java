@@ -10,6 +10,7 @@ import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.MutableRegistry;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.util.registry.RegistryLookupCodec;
 import net.minecraft.world.biome.Biome;
@@ -19,6 +20,7 @@ import net.minecraft.world.biome.provider.BiomeProvider;
 import com.pg85.otg.OTG;
 import com.pg85.otg.config.biome.BiomeConfig;
 import com.pg85.otg.forge.presets.ForgePresetLoader;
+import com.pg85.otg.forge.ForgeEngine;
 import com.pg85.otg.gen.biome.layers.BiomeLayers;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.gen.biome.layers.util.CachingLayerSampler;
@@ -51,7 +53,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 	
 	public OTGBiomeProvider(String presetName, long seed, boolean legacyBiomeInitLayer, boolean largeBiomes, Registry<Biome> registry)
 	{
-		super(getAllBiomesByPreset(presetName, registry));
+		super(getAllBiomesByPreset(presetName, (MutableRegistry<Biome>)registry));
 		this.presetName = presetName;
 		this.seed = seed;
 		this.legacyBiomeInitLayer = legacyBiomeInitLayer;
@@ -73,11 +75,11 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		}
 	}
 	
-	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetName, Registry<Biome> registry)
+	private static Stream<Supplier<Biome>> getAllBiomesByPreset(String presetName, MutableRegistry<Biome> registry)
 	{
 		if(OTG.getEngine().getPluginConfig().getDeveloperModeEnabled())
 		{
-			OTG.getEngine().reloadPreset(presetName);
+			((ForgeEngine)OTG.getEngine()).reloadPreset(presetName, registry);
 		}
 		
 		List<RegistryKey<Biome>> biomesForPreset = ((ForgePresetLoader)OTG.getEngine().getPresetLoader()).getBiomeRegistryKeys(presetName);
@@ -88,7 +90,7 @@ public class OTGBiomeProvider extends BiomeProvider implements LayerSource
 		if(biomesForPreset == null)
 		{
 			biomesForPreset = new ArrayList<>();
-		}		
+		}
 		return biomesForPreset.stream().map(
 			(p_242638_1_) -> () -> registry.getOrThrow(p_242638_1_)
 		);
