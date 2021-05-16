@@ -106,11 +106,11 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 
 		int progressUpdate = img.getHeight() / 8;
 
-		for (int x = offsetX; x < img.getHeight() + offsetX; x++)
+		for (int x = 0; x < img.getHeight(); x++)
 		{
-			for (int z = offsetZ; z < img.getWidth() + offsetZ; z++)
+			for (int z = 0; z < img.getWidth(); z++)
 			{
-				img.setRGB(x, z, provider.configLookup[provider.getSampler().sample(x, z)].getBiomeColor());
+				img.setRGB(x, z, provider.configLookup[provider.getSampler().sample(x+offsetX, z+offsetZ)].getBiomeColor());
 			}
 			if (x % progressUpdate == 0)
 			{
@@ -162,6 +162,7 @@ public class OTGCommandExecutor implements TabCompleter, CommandExecutor
 				return EditCommand.tabComplete(parseArgs(strings), false);
 			case "finishedit":
 			case "map":
+			case "flush":
 			case "help":
 				return new ArrayList<>();
 		}
