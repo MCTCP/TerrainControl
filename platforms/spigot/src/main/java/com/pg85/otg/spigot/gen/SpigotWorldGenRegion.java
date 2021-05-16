@@ -541,10 +541,10 @@ public class SpigotWorldGenRegion extends LocalWorldGenRegion
 		Boolean hasDefaultStructure = cachedHasDefaultStructureChunks.get(chunkCoordinate);
 		if(hasDefaultStructure != null)
 		{
-			return hasDefaultStructure.booleanValue();
+			return hasDefaultStructure;
 		}
 		hasDefaultStructure = ((OTGNoiseChunkGenerator) this.chunkGenerator).checkHasVanillaStructureWithoutLoading(this.worldGenRegion.getMinecraftWorld(), chunkCoordinate);
-		cachedHasDefaultStructureChunks.put(chunkCoordinate, new Boolean(hasDefaultStructure));
+		cachedHasDefaultStructureChunks.put(chunkCoordinate, hasDefaultStructure);
 		return hasDefaultStructure;
 	}
 
