@@ -3,6 +3,7 @@ package com.pg85.otg.spigot.materials;
 import com.pg85.otg.OTG;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.materials.LegacyMaterials;
+
 import net.minecraft.server.v1_16_R3.*;
 
 public class SpigotLegacyMaterials
@@ -11,6 +12,15 @@ public class SpigotLegacyMaterials
 	{
 		switch (oldBlockName)
 		{
+			// TODO: These minecraft:xxx blocks no longer exist, so cannot be parsed by mc.
+			// We should parse them here, but atm we're not falling back to legacy parsing
+			// for those blocks. Should make that work, and also handle minecraft:xxx:data.
+			/*
+			case "minecraft:silver_shulker_box":
+				return Blocks.LIGHT_GRAY_SHULKER_BOX.defaultBlockState();
+			case "minecraft:silver_glazed_terracotta":
+				return Blocks.LIGHT_GRAY_GLAZED_TERRACOTTA.defaultBlockState();
+			*/	
 			case "stationary_water":
 				return Blocks.WATER.getBlockData();
 			case "stationary_lava":
@@ -42,7 +52,7 @@ public class SpigotLegacyMaterials
 			case "leaves_2":
 				return Blocks.ACACIA_LEAVES.getBlockData().set(BlockLeaves.DISTANCE, 1);
 			case "red_rose":
-				return Blocks.ROSE_BUSH.getBlockData();
+				return Blocks.POPPY.getBlockData();
 			// TODO: This only spawns the bottom half?
 			case "double_plant":
 				return Blocks.SUNFLOWER.getBlockData();
@@ -82,6 +92,8 @@ public class SpigotLegacyMaterials
 			case "purpur_stairs":
 				return Blocks.PURPUR_STAIRS.getBlockData().set(BlockStairs.FACING, EnumDirection.EAST);
 
+			case "quartz_ore":
+				return Blocks.NETHER_QUARTZ_ORE.getBlockData();				
 			case "yellow_flower":
 				return Blocks.DANDELION.getBlockData();
 			case "web":
@@ -111,16 +123,22 @@ public class SpigotLegacyMaterials
 				return Blocks.IRON_BARS.getBlockData();
 			case "workbench":
 				return Blocks.CRAFTING_TABLE.getBlockData();
+			case "enchantment_table":
+				return Blocks.ENCHANTING_TABLE.getBlockData();
 			case "mob_spawner":
 				return Blocks.INFESTED_STONE.getBlockData();
 			case "double_step":
-				return Blocks.SMOOTH_STONE.getBlockData();
+				return IRegistry.BLOCK.get(new MinecraftKey("minecraft:smooth_stone_slab"))
+						.getBlockData().set(BlockStepAbstract.a,
+								BlockPropertySlabType.DOUBLE);
 			case "smooth_brick":
 				return Blocks.STONE_BRICKS.getBlockData();
 			case "rails":
 				return Blocks.RAIL.getBlockData();
 			case "fence":
 				return Blocks.OAK_FENCE.getBlockData();
+			case "nether_fence":
+				return Blocks.NETHER_BRICK_FENCE.getBlockData();				
 			case "wood_step":
 				return Blocks.OAK_SLAB.getBlockData();
 			case "thin_glass":
@@ -141,6 +159,20 @@ public class SpigotLegacyMaterials
 				return Blocks.CARROTS.getBlockData();
 			case "skull":
 				return Blocks.SKELETON_SKULL.getBlockData();
+			case "nether_wart":
+				return Blocks.NETHER_WART.getBlockData();				
+			case "nether_wart_block":
+				return Blocks.NETHER_WART_BLOCK.getBlockData();				
+			case "nether_brick":
+				return Blocks.NETHER_BRICKS.getBlockData();
+			case "red_nether_brick":
+				return Blocks.RED_NETHER_BRICKS.getBlockData();				
+			case "end_bricks":
+			case "ender_bricks":
+				return Blocks.END_STONE_BRICKS.getBlockData();
+			case "end_stone":
+			case "ender_stone":
+				return Blocks.END_STONE.getBlockData();				
 			case "mcpitman":
 				return Blocks.CREEPER_HEAD.getBlockData();
 			case "pg85":
@@ -261,6 +293,7 @@ public class SpigotLegacyMaterials
 					return IRegistry.BLOCK.get(getFlatKey("minecraft:monster_egg", data)).getBlockData();
 
 				case "planks":
+				case "wood":
 				case "oak_planks":
 					return IRegistry.BLOCK.get(getFlatKey("minecraft:planks", data)).getBlockData();
 
@@ -274,6 +307,7 @@ public class SpigotLegacyMaterials
 									data == 10 ? BlockPropertySlabType.TOP : BlockPropertySlabType.BOTTOM);
 
 				case "red_flower":
+				case "red_rose":
 					return IRegistry.BLOCK.get(getFlatKey("minecraft:red_flower", data)).getBlockData();
 
 				case "red_sandstone":
@@ -331,7 +365,6 @@ public class SpigotLegacyMaterials
 
 				case "stained_hardened_clay":
 				case "stained_clay":
-				case "hard_clay":
 				case "white_terracotta":
 					return IRegistry.BLOCK.get(getFlatKey("minecraft:stained_hardened_clay", data)).getBlockData();
 
@@ -341,9 +374,13 @@ public class SpigotLegacyMaterials
 				case "stone_slab":
 				case "step":
 					return IRegistry.BLOCK.get(getFlatKey("minecraft:stone_slab", data % 8))
-							.getBlockData().set(BlockStepAbstract.a,
-									data >= 8 ? BlockPropertySlabType.TOP : BlockPropertySlabType.BOTTOM);
+						.getBlockData().set(BlockStepAbstract.a,
+							data >= 8 ? BlockPropertySlabType.TOP : BlockPropertySlabType.BOTTOM);
 
+				case "double_step":
+					return IRegistry.BLOCK.get(getFlatKey("minecraft:stone_slab", data % 8))
+						.getBlockData().set(BlockStepAbstract.a, BlockPropertySlabType.DOUBLE);					
+					
 				case "stonebrick":
 				case "stone_bricks":
 				case "smooth_brick":
@@ -385,8 +422,10 @@ public class SpigotLegacyMaterials
 				case "oak_pressure_plate":
 					return Blocks.OAK_PRESSURE_PLATE.getBlockData().set(BlockPressurePlateBinary.POWERED, getBit(data, 0) == 1);
 				case "light_weighted_pressure_plate":
+				case "gold_plate":					
 					return Blocks.LIGHT_WEIGHTED_PRESSURE_PLATE.getBlockData().set(BlockPressurePlateWeighted.POWER, data);
 				case "heavy_weighted_pressure_plate":
+				case "iron_plate":					
 					return Blocks.HEAVY_WEIGHTED_PRESSURE_PLATE.getBlockData().set(BlockPressurePlateWeighted.POWER, data);
 				case "snow_layer":
 					return Blocks.SNOW.getBlockData().set(BlockSnow.LAYERS, data);
@@ -414,7 +453,6 @@ public class SpigotLegacyMaterials
 				case "anvil":
 					return getAnvilWithData(0, data);
 				case "log":
-				case "wood":
 				case "oak_log":
 					return getLogWithData(data);
 				case "log_2":
@@ -439,7 +477,7 @@ public class SpigotLegacyMaterials
 				case "activator_rail":
 					return getRailsWithData(2, data);
 				case "hay_block":
-					return Blocks.HAY_BLOCK.getBlockData().set(BlockHay.AXIS, getAxisXYZ(data));
+					return Blocks.HAY_BLOCK.getBlockData().set(BlockHay.AXIS, getPillarAxisXYZ(data));
 				case "bone_block":
 					return Blocks.BONE_BLOCK.getBlockData().set(BlockRotatable.AXIS, getAxisXYZ(data));
 				case "wood_stairs":
@@ -506,7 +544,7 @@ public class SpigotLegacyMaterials
 				case "sign": // TODO: This will also pick up wall signs
 					return getSignPostWithData(data);
 				case "standing_banner":
-					return Blocks.WHITE_BANNER.getBlockData().set(BlockBanner.ROTATION, data);
+					return Blocks.RED_BANNER.getBlockData().set(BlockBanner.ROTATION, data);
 				case "wall_banner":
 					return Blocks.WHITE_WALL_BANNER.getBlockData().set(BlockBannerWall.a, getFacingNorthSouthWestEast(data));
 				case "end_rod":
@@ -654,7 +692,7 @@ public class SpigotLegacyMaterials
 				case "tripwire":
 					return getTripWireWithData(data);
 				case "purpur_pillar":
-					return Blocks.PURPUR_PILLAR.getBlockData().set(BlockRotatable.AXIS, getAxisXYZ(data));
+					return Blocks.PURPUR_PILLAR.getBlockData().set(BlockRotatable.AXIS, getPillarAxisXYZ(data));
 				case "nether_wart":
 					return Blocks.NETHER_WART.getBlockData().set(BlockNetherWart.AGE, data);
 				case "brewing_stand":
@@ -668,6 +706,7 @@ public class SpigotLegacyMaterials
 				case "portal":
 					return Blocks.NETHER_PORTAL.getBlockData().set(BlockPortal.AXIS, getAxisXZ(data));
 				case "end_portal_frame":
+				case "ender_portal_frame":
 					return getEndPortalFrameWithData(data);
 				case "structure_block":
 					return getStructureBlockWithData(data);
@@ -845,7 +884,7 @@ public class SpigotLegacyMaterials
 					case 0:
 					case 5:
 					default:
-						return Blocks.TORCH.getBlockData();
+						return Blocks.REDSTONE_TORCH.getBlockData();
 					case 1:
 						return Blocks.REDSTONE_WALL_TORCH.getBlockData().set(BlockRedstoneTorchWall.LIT, false).set(BlockRedstoneTorchWall.b, EnumDirection.EAST);
 					case 2:
@@ -861,7 +900,7 @@ public class SpigotLegacyMaterials
 					case 0:
 					case 5:
 					default:
-						return Blocks.TORCH.getBlockData();
+						return Blocks.REDSTONE_TORCH.getBlockData().set(BlockRedstoneTorchWall.LIT, true);
 					case 1:
 						return Blocks.REDSTONE_WALL_TORCH.getBlockData().set(BlockRedstoneTorchWall.LIT, true).set(BlockRedstoneTorchWall.b, EnumDirection.EAST);
 					case 2:
@@ -1199,7 +1238,7 @@ public class SpigotLegacyMaterials
 		}
 		return blockState
 				.set(BlockRepeater.DELAY, delay)
-				.set(BlockRepeater.FACING, getFacingNorthEastSouthWest(facing))
+				.set(BlockRepeater.FACING, getFacingSouthWestNorthEast(facing))
 				;
 	}
 
@@ -1209,7 +1248,7 @@ public class SpigotLegacyMaterials
 		int mode = getBit(data, 2);
 		int powered = material == 1 ? 1 : getBit(data, 3);
 		return Blocks.COMPARATOR.getBlockData()
-				.set(BlockRedstoneComparator.FACING, getFacingNorthEastSouthWest(facing))
+				.set(BlockRedstoneComparator.FACING, getFacingSouthWestNorthEast(facing))
 				.set(BlockRedstoneComparator.MODE, mode == 0 ? BlockPropertyComparatorMode.COMPARE : BlockPropertyComparatorMode.SUBTRACT)
 				.set(BlockRedstoneComparator.c, powered == 1)
 				;
@@ -1220,7 +1259,7 @@ public class SpigotLegacyMaterials
 		int facing = getBits(data, 0, 2);
 		int occupied = getBit(data, 2);
 		int part = getBit(data, 3);
-		return Blocks.WHITE_BED.getBlockData()
+		return Blocks.RED_BED.getBlockData()
 				.set(BlockBed.FACING, getFacingSouthWestNorthEast(facing))
 				.set(BlockBed.OCCUPIED, occupied == 1)
 				.set(BlockBed.PART, part == 0 ? BlockPropertyBedPart.FOOT : BlockPropertyBedPart.HEAD)
@@ -1630,6 +1669,21 @@ public class SpigotLegacyMaterials
 			case 4:
 			default:
 				return EnumDirection.UP;
+		}
+	}
+	
+	private static EnumDirection.EnumAxis getPillarAxisXYZ(int data)
+	{
+		switch(data)
+		{
+			case 0:
+				return EnumDirection.EnumAxis.Y;
+			case 4:
+				return EnumDirection.EnumAxis.X;
+			case 8:
+				return EnumDirection.EnumAxis.Z;
+			default:
+				return EnumDirection.EnumAxis.Y;
 		}
 	}
 
