@@ -17,7 +17,7 @@ import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.FifoMap;
 import com.pg85.otg.util.helpers.RandomHelper;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IChunkPopulator;
+import com.pg85.otg.util.interfaces.IChunkDecorator;
 import com.pg85.otg.util.interfaces.ICustomObjectManager;
 import com.pg85.otg.util.interfaces.ICustomObjectResourcesManager;
 import com.pg85.otg.util.interfaces.ICustomStructureGen;
@@ -271,7 +271,7 @@ public class CustomStructureCache
 
     // Persistence - WorldInfoChunks for BO3+BO4, plotter structurecache for BO4
 
-    public void saveToDisk(boolean spawnLog, ILogger logger, IChunkPopulator chunkPopulator)
+    public void saveToDisk(boolean spawnLog, ILogger logger, IChunkDecorator chunkPopulator)
     {
     	logger.log(LogMarker.INFO, "Saving structure and pregenerator data.");
     	boolean firstLog = false;

@@ -8,7 +8,7 @@ import com.pg85.otg.config.dimensions.DimensionConfig;
 import com.pg85.otg.constants.SettingsEnums;
 import com.pg85.otg.customobject.structures.CustomStructureCache;
 import com.pg85.otg.gen.OTGChunkGenerator;
-import com.pg85.otg.gen.OTGChunkPopulator;
+import com.pg85.otg.gen.OTGChunkDecorator;
 import com.pg85.otg.gen.biome.BiomeInterpolator;
 import com.pg85.otg.gen.biome.layers.LayerSource;
 import com.pg85.otg.presets.Preset;
@@ -69,7 +69,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private final int noiseHeight;
 
 	private final OTGChunkGenerator internalGenerator;
-	private final OTGChunkPopulator chunkPopulator;
+	private final OTGChunkDecorator chunkPopulator;
 	private final DimensionConfig dimensionConfig;
 	private final Preset preset;
 	// Unloaded chunk data caches for BO4's
@@ -136,7 +136,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		this.preset = OTG.getEngine().getPresetLoader().getPresetByName(this.dimensionConfig.PresetName);
 
 		this.internalGenerator = new OTGChunkGenerator(preset, seed, (LayerSource) biomeProvider1);
-		this.chunkPopulator = new OTGChunkPopulator();
+		this.chunkPopulator = new OTGChunkDecorator();
 	}
 
 	public void saveStructureCache ()
@@ -373,7 +373,7 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		try
 		{
 			// Override normal population (Biome.func_242427_a()) with OTG's.
-			biomePopulate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
+			biomeDecorate(biome, biomeConfig, structureManager, this, worldGenRegion, decorationSeed, sharedseedrandom, blockpos);
 		}
 		catch (Exception exception)
 		{
@@ -393,14 +393,14 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		((ProtoChunk) ichunkaccess).a(new BiomeStorage(iregistry, chunkcoordintpair, this.c));
 	}
 	
-	// Chunk population method taken from Biome (Biome.func_242427_a())
-	private void biomePopulate (BiomeBase biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, RegionLimitedWorldAccess world, long seed, SeededRandom random, BlockPosition pos)
+	// Chunk decoration method taken from Biome class
+	private void biomeDecorate (BiomeBase biome, BiomeConfig biomeConfig, StructureManager structureManager, ChunkGenerator chunkGenerator, RegionLimitedWorldAccess world, long seed, SeededRandom random, BlockPosition pos)
 	{
 		// TODO: Parameter should be world save folder name, not world name. This only works when world name == world save folder name.
 		init(((IWorldDataServer) world.getWorldData()).getName());
 		ChunkCoordinate chunkBeingPopulated = ChunkCoordinate.fromBlockCoords(pos.getX(), pos.getZ());
 		// TODO: Implement resources avoiding villages in common: if (world.startsForFeature(SectionPos.of(blockPos), Structure.VILLAGE).findAny().isPresent())
-		this.chunkPopulator.populate(chunkBeingPopulated, new SpigotWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
+		this.chunkPopulator.decorate(chunkBeingPopulated, new SpigotWorldGenRegion(this.preset.getName(), this.preset.getWorldConfig(), world, this), biomeConfig, this.structureCache);
 
 		List<List<Supplier<WorldGenFeatureConfigured<?, ?>>>> list = biome.e().c();
 		

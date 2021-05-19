@@ -14,7 +14,7 @@ import com.pg85.otg.logging.ILogger;
 import com.pg85.otg.logging.LogMarker;
 import com.pg85.otg.util.ChunkCoordinate;
 import com.pg85.otg.util.interfaces.IBiomeConfig;
-import com.pg85.otg.util.interfaces.IChunkPopulator;
+import com.pg85.otg.util.interfaces.IChunkDecorator;
 import com.pg85.otg.util.interfaces.IMaterialReader;
 import com.pg85.otg.util.interfaces.IModLoadedChecker;
 import com.pg85.otg.util.interfaces.IWorldGenRegion;
@@ -28,7 +28,7 @@ import java.util.Random;
  * and mob spawning) use mc logic and are spawned by mc itself. For those population steps, OTG only fills in the 
  * required configurations when registering the biomes in the platform-specific layer (see OTGBiome/ForgeBiome).
  */
-public class OTGChunkPopulator implements IChunkPopulator
+public class OTGChunkDecorator implements IChunkDecorator
 {
 	private final Random rand;
 
@@ -41,7 +41,7 @@ public class OTGChunkPopulator implements IChunkPopulator
 	private boolean saving;
 	private boolean saveRequired;
 
-	public OTGChunkPopulator()
+	public OTGChunkDecorator()
 	{
 		this.rand = new Random();
 	}
@@ -77,7 +77,7 @@ public class OTGChunkPopulator implements IChunkPopulator
 		return this.lockingObject;
 	}	
 
-	public void populate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
+	public void decorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, CustomStructureCache structureCache)
 	{
 		boolean unlockWhenDone = false;
 		// Wait for another thread running SaveToDisk, then place a lock.
@@ -128,7 +128,7 @@ public class OTGChunkPopulator implements IChunkPopulator
 			// Cache all biomes in the are being populated (2x2 chunks)
 			worldGenRegion.cacheBiomesForPopulation(chunkCoord);
 			
-			doPopulate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
+			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
 			
 			this.processing = false;
 		} else {
@@ -136,7 +136,7 @@ public class OTGChunkPopulator implements IChunkPopulator
 			// Don't use the population chunk biome cache during cascading chunk generation
 			worldGenRegion.invalidatePopulationBiomeCache();
 
-			doPopulate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
+			doDecorate(chunkCoord, worldGenRegion, biomeConfig, isBO4Enabled, developerMode, spawnLog, logger, materialReader, otgRootFolder, structureCache, customObjectManager, customObjectResourcesManager, modLoadedChecker);
 
 			logger.log(LogMarker.INFO, "Cascading chunk generation detected.");
 
@@ -161,7 +161,7 @@ public class OTGChunkPopulator implements IChunkPopulator
 	}
 
 	// TODO: Fire population events.
-	private void doPopulate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled, boolean developerMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
+	private void doDecorate(ChunkCoordinate chunkCoord, IWorldGenRegion worldGenRegion, BiomeConfig biomeConfig, boolean isBO4Enabled, boolean developerMode, boolean spawnLog, ILogger logger, IMaterialReader materialReader, Path otgRootFolder, CustomStructureCache structureCache, CustomObjectManager customObjectManager, CustomObjectResourcesManager customObjectResourcesManager, IModLoadedChecker modLoadedChecker)
 	{		
 		// Get the corner block coords
 		int x = chunkCoord.getBlockX();
