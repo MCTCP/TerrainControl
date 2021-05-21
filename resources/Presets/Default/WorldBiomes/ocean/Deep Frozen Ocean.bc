@@ -109,7 +109,7 @@ SurfaceBlock: minecraft:gravel
 
 GroundBlock: minecraft:stone
 
-SurfaceAndGroundControl: com.pg85.otg.gen.surface.IcebergSurfaceGenerator@5634a861
+SurfaceAndGroundControl: Iceberg
 
 ReplacedBlocks: None
 

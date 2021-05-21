@@ -26,11 +26,10 @@ public class SpigotLegacyMaterials
 			case "stationary_lava":
 				return Blocks.LAVA.getBlockData();
 			case "stained_clay":
-				return Blocks.WHITE_TERRACOTTA.getBlockData();
 			case "hard_clay":
 				return Blocks.TERRACOTTA.getBlockData();
 			case "step":
-				return Blocks.STONE_SLAB.getBlockData();
+				return Blocks.SMOOTH_STONE_SLAB.getBlockData();
 			case "sugar_cane_block":
 				return Blocks.SUGAR_CANE.getBlockData();
 			case "melon_block":
@@ -302,9 +301,12 @@ public class SpigotLegacyMaterials
 
 				case "purpur_slab":
 					return Blocks.PURPUR_SLAB.getBlockData()
-							.set(BlockStepAbstract.a,
-									data == 2 ? BlockPropertySlabType.BOTTOM :
-									data == 10 ? BlockPropertySlabType.TOP : BlockPropertySlabType.BOTTOM);
+						.set(BlockStepAbstract.a,
+							data == 0 ? BlockPropertySlabType.BOTTOM :
+							data == 8 ? BlockPropertySlabType.TOP : BlockPropertySlabType.BOTTOM);
+				case "purpur_double_slab":
+					return Blocks.PURPUR_SLAB.getBlockData()
+						.set(BlockStepAbstract.a, BlockPropertySlabType.DOUBLE);		
 
 				case "red_flower":
 				case "red_rose":
@@ -323,6 +325,9 @@ public class SpigotLegacyMaterials
 						case 8:
 							return Blocks.RED_SANDSTONE_SLAB.getBlockData().set(BlockStepAbstract.a, BlockPropertySlabType.TOP);
 					}
+				case "double_red_sandstone_slab":
+				case "double_stone_slab2":
+					return Blocks.RED_SANDSTONE_SLAB.getBlockData().set(BlockStepAbstract.a, BlockPropertySlabType.DOUBLE);
 
 				case "sand":
 					switch (data)
@@ -496,10 +501,8 @@ public class SpigotLegacyMaterials
 				case "stone_stairs":
 					return getStairsWithData(4, data);
 				case "brick_stairs":
+				case "smooth_stairs":					
 					return getStairsWithData(5, data);
-				// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
-				case "smooth_stairs":
-					return getStairsWithData(6, data);
 				case "nether_brick_stairs":
 					return getStairsWithData(7, data);
 				case "sandstone_stairs":
