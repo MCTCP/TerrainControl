@@ -143,13 +143,13 @@ BiomeWetness: 0.9
 
 SkyColor: #7BA5FF
 
-WaterColor: #E0FFAE
+WaterColor: #555742
 
-GrassColor: #7E6E7E
+GrassColor: #4A5129
 
-GrassColorModifier: None
+GrassColorModifier: Swamp
 
-FoliageColor: #7E6E7E
+FoliageColor: #5A6232
 
 FogColor: #000000
 
