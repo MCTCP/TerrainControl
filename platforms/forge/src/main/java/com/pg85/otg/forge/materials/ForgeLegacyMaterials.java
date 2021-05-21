@@ -110,11 +110,10 @@ class ForgeLegacyMaterials
 			case "stationary_lava":
 				return Blocks.LAVA.defaultBlockState();
 			case "stained_clay":
-				return Blocks.WHITE_TERRACOTTA.defaultBlockState();
 			case "hard_clay":
 				return Blocks.TERRACOTTA.defaultBlockState();
 			case "step":
-				return Blocks.STONE_SLAB.defaultBlockState();
+				return Blocks.SMOOTH_STONE_SLAB.defaultBlockState();
 			case "sugar_cane_block":
 				return Blocks.SUGAR_CANE.defaultBlockState();
 			case "melon_block":
@@ -669,7 +668,9 @@ class ForgeLegacyMaterials
 					}
 				case "purpur_slab":
 					return Blocks.PURPUR_SLAB.defaultBlockState()
-						.setValue(SlabBlock.TYPE, data == 2 ? SlabType.BOTTOM : data == 10 ? SlabType.TOP : SlabType.BOTTOM);
+						.setValue(SlabBlock.TYPE, data == 0 ? SlabType.BOTTOM : data == 8 ? SlabType.TOP : SlabType.BOTTOM);
+				case "purpur_double_slab":
+					return Blocks.PURPUR_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);					
 				case "red_flower":
 				case "red_rose":
 					switch(data)
@@ -713,8 +714,11 @@ class ForgeLegacyMaterials
 						default:
 							return Blocks.RED_SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
 						case 8:
-							return Blocks.CHISELED_RED_SANDSTONE.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
+							return Blocks.RED_SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
 					}
+				case "double_red_sandstone_slab":
+				case "double_stone_slab2": 
+					return Blocks.RED_SANDSTONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE);
 				case "sand":
 					switch(data)
 					{
@@ -1154,10 +1158,8 @@ class ForgeLegacyMaterials
 				case "stone_stairs":
 					return getStairsWithData(4, data);
 				case "brick_stairs":
+				case "smooth_stairs":					
 					return getStairsWithData(5, data);
-				// TODO: Stone stairs didn't exist in 1.12? OTG had a smooth_stairs DefaultMaterial tho :/
-				case "smooth_stairs":
-					return getStairsWithData(6, data);
 				case "nether_brick_stairs":
 					return getStairsWithData(7, data);
 				case "sandstone_stairs":
