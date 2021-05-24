@@ -142,38 +142,38 @@ class ForgeLegacyMaterials
 				
 			case "wood_stairs":
 			case "oak_stairs":
-				return Blocks.OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "birch_wood_stairs":
 			case "birch_stairs":
-				return Blocks.BIRCH_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.BIRCH_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "spruce_wood_stairs":
 			case "spruce_stairs":
-				return Blocks.SPRUCE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.SPRUCE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "jungle_wood_stairs":				
 			case "jungle_stairs":
-				return Blocks.JUNGLE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.JUNGLE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "cobblestone_stairs":
 			case "stone_stairs":
-				return Blocks.COBBLESTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
-			case "brick_stairs":
-				return Blocks.BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.COBBLESTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "nether_brick_stairs":
-				return Blocks.NETHER_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.NETHER_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "sandstone_stairs":
-				return Blocks.SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "quartz_stairs":
-				return Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.QUARTZ_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "acacia_stairs":
-				return Blocks.ACACIA_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.ACACIA_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "dark_oak_stairs":
-				return Blocks.DARK_OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.DARK_OAK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "red_sandstone_stairs":
-				return Blocks.RED_SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.RED_SANDSTONE_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			case "purpur_stairs":
-				return Blocks.PURPUR_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.PURPUR_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
+			case "brick_stairs":
+				return Blocks.BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);				
 			case "stone_brick_stairs":
 			case "smooth_stairs":
-				return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.EAST);
+				return Blocks.STONE_BRICK_STAIRS.defaultBlockState().setValue(StairsBlock.FACING, Direction.NORTH);
 			
 			case "quartz_ore":
 				return Blocks.NETHER_QUARTZ_ORE.defaultBlockState();
@@ -1158,7 +1158,6 @@ class ForgeLegacyMaterials
 				case "stone_stairs":
 					return getStairsWithData(4, data);
 				case "brick_stairs":
-				case "smooth_stairs":					
 					return getStairsWithData(5, data);
 				case "nether_brick_stairs":
 					return getStairsWithData(7, data);
@@ -1175,6 +1174,7 @@ class ForgeLegacyMaterials
 				case "purpur_stairs":
 					return getStairsWithData(13, data);
 				case "stone_brick_stairs":
+				case "smooth_stairs":
 					return getStairsWithData(14, data);					
 				case "lever":
 					return getLeverOrButtonWithData(0, data);
