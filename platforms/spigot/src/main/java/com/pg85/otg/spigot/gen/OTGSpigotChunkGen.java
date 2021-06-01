@@ -27,6 +27,7 @@ public class OTGSpigotChunkGen extends ChunkGenerator
 		if (generator == null)
 		{
 			OTGPlugin.injectInternalGenerator(world);
+			generator.fixBiomes(chunkX, chunkZ);
 		}
 
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);

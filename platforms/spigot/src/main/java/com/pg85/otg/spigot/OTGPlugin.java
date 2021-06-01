@@ -92,6 +92,7 @@ public class OTGPlugin extends JavaPlugin implements Listener
 	{
 		if (worlds.containsKey(event.getWorld().getName()))
 		{
+			// Most likely no longer needed, but keeping it just in case. The lock keeps it from doing it double anyway.
 			injectInternalGenerator(event.getWorld());
 		}
 	}

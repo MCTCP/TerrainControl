@@ -28,6 +28,8 @@ import it.unimi.dsi.fastutil.objects.ObjectList;
 
 import net.minecraft.server.v1_16_R3.*;
 
+import org.bukkit.Bukkit;
+import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
 import org.bukkit.craftbukkit.v1_16_R3.generator.CraftChunkData;
 
 import javax.annotation.Nullable;
@@ -82,6 +84,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	private CustomStructureCache structureCache;
 	// TODO: Move this to WorldLoader when ready?
 	private boolean isInitialised = false;
+
+	// Used to specify which chunk to regen biomes and structures for
+	// Necessary because Spigot calls those methods before we have the chance to inject
+	private ChunkCoordinate fixBiomesForChunk = null;
 
 	public OTGNoiseChunkGenerator (WorldChunkManager biomeProvider, long seed, Supplier<GeneratorSettingBase> dimensionSettingsSupplier)
 	{
@@ -249,6 +255,17 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 		// If we've already generated and cached this
 		// chunk while it was unloaded, use cached data.
 		ChunkCoordinate chunkCoord = ChunkCoordinate.fromChunkCoords(chunk.getPos().x, chunk.getPos().z);
+
+		// When generating the spawn area, Spigot will get the structure and biome info for the first chunk before we can inject
+		// Therefore, we need to re-do these calls now, for that one chunk
+		if (fixBiomesForChunk != null && fixBiomesForChunk.equals(chunkCoord))
+		{
+			// Should only run when first creating the world, on a single chunk
+			this.createStructures(world.getMinecraftWorld().r(), world.getMinecraftWorld().getStructureManager(), chunk,
+				world.getMinecraftWorld().n(), world.getMinecraftWorld().getSeed());
+			this.createBiomes(((CraftServer) Bukkit.getServer()).getServer().customRegistry.b(IRegistry.ay), chunk);
+			fixBiomesForChunk = null;
+		}
 		// ChunkPrimer -> ProtoChunk
 		ChunkBuffer buffer = new SpigotChunkBuffer((ProtoChunk) chunk);
 		IChunkAccess cachedChunk = unloadedChunksCache.get(chunkCoord);
@@ -831,5 +848,10 @@ public class OTGNoiseChunkGenerator extends ChunkGenerator
 	double getBiomeBlocksNoiseValue (int blockX, int blockZ)
 	{
 		return this.internalGenerator.getBiomeBlocksNoiseValue(blockX, blockZ);
+	}
+
+	public void fixBiomes(int chunkX, int chunkZ)
+	{
+		this.fixBiomesForChunk = ChunkCoordinate.fromChunkCoords(chunkX, chunkZ);
 	}
 }

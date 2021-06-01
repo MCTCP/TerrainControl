@@ -199,6 +199,10 @@ public class SpigotPresetLoader extends LocalPresetLoader
 				{
 					MinecraftKey location = new MinecraftKey(new BiomeResourceLocation(preset.getShortPresetName(), biome).toResourceLocationString());
 					BiomeConfig config = this.biomeConfigsByRegistryKey.get(location);
+					if (config == null)
+					{
+						throw new NullPointerException("Failed to fetch biome config using ResourceLocation '"+location+"'");
+					}
 
 					// Make and add the generation data
 					NewBiomeData newBiomeData = new NewBiomeData(
